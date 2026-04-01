@@ -34,11 +34,12 @@ jobs:
         with:
           xcode-version: "16.2"
 
-      - name: Build App (Unsigned, Controlled Output)
+      - name: Build App (Unsigned)
         run: |
           set -e
 
-          mkdir -p build/output
+          OUTPUT_DIR=$(pwd)/build/output
+          mkdir -p "$OUTPUT_DIR"
 
           xcodebuild \
             -project "$PROJECT" \
@@ -46,24 +47,25 @@ jobs:
             -configuration Release \
             -destination "generic/platform=iOS" \
             -sdk iphoneos \
-            clean build \
+            build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CONFIGURATION_BUILD_DIR=$(pwd)/build/output \
+            CONFIGURATION_BUILD_DIR="$OUTPUT_DIR" \
             PRODUCT_NAME="$APP_NAME" \
             MARKETING_VERSION="$MARKETING_VERSION" \
             CURRENT_PROJECT_VERSION="$BUILD_VERSION" \
             TARGETED_DEVICE_FAMILY="1,2"
 
-      - name: Locate .app (Deterministic)
+      - name: Locate .app
         run: |
           set -e
 
-          APP_PATH=$(find build/output -maxdepth 1 -name "*.app" | head -n 1)
+          OUTPUT_DIR=$(pwd)/build/output
+          APP_PATH=$(find "$OUTPUT_DIR" -maxdepth 1 -name "*.app" | head -n 1)
 
           if [ -z "$APP_PATH" ]; then
-            echo "No .app bundle found in build/output"
-            ls -R build/output
+            echo "No .app bundle found in $OUTPUT_DIR"
+            ls -R "$OUTPUT_DIR"
             exit 1
           fi
 
@@ -82,6 +84,7 @@ jobs:
 
       - name: Verify IPA
         run: |
+          set -e
           unzip -l build/Tools-Kit.ipa
 
       - name: Generate Release Tag
