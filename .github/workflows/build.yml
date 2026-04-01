@@ -16,7 +16,6 @@ env:
 jobs:
   build:
     runs-on: macos-14
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,6 +36,7 @@ jobs:
         run: |
           rm -rf ~/Library/Developer/Xcode/DerivedData
 
+
       - name: Verify CI secret wiring
         run: |
           if [ -n "$CLIENT_SECRET" ]; then
@@ -52,124 +52,44 @@ jobs:
           fi
 
       - name: Resolve Package Dependencies
-        run: |
-          xcodebuild -project Tools-Kit.xcodeproj \
-            -scheme Tools-Kit \
-            -resolvePackageDependencies
+        run: xcodebuild -project Tools-Kit.xcodeproj -scheme Tools-Kit -resolvePackageDependencies
+
 
       - name: Swift build (env check)
         run: |
-          echo "Skipping swift build - this is an iOS-only package that cannot be built with SwiftPM on macOS/Linux."
-          echo "The package will be built using xcodebuild with the iOS SDK instead."
+          if [ -f Package.swift ]; then
+            swift build
+          else
+            echo "No Package.swift found; skipping swift build for Xcode project workflow."
+          fi
 
-      # ✅ FIXED BUILD STEP
       - name: Compile and Build .ipa
         run: |
-          set -e
-
           mkdir -p upload
-
-          xcodebuild \
-            -project Tools-Kit.xcodeproj \
-            -scheme Tools-Kit \
+          xcodebuild -project Tools-Kit.xcodeproj \
+            -scheme SwiftCode \
             -configuration Release \
             -destination "generic/platform=iOS" \
             -sdk iphoneos \
             -archivePath upload/Tools-Kit.xcarchive \
             archive \
-            SKIP_INSTALL=NO \
-            BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
 
-          echo "==== ARCHIVE CONTENTS ===="
-          ls -R upload/Tools-Kit.xcarchive
-
-          APP_PATH=$(find upload/Tools-Kit.xcarchive -name "*.app" | head -n 1)
-
-          if [ -z "$APP_PATH" ]; then
-            echo "❌ No .app found in archive"
-            exit 1
-          fi
-
-          echo "Using app: $APP_PATH"
-
-          # 🔑 CRITICAL: remove broken signing artifacts
-          rm -rf "$APP_PATH/_CodeSignature" || true
-          rm -rf "$APP_PATH/CodeResources" || true
-
-          if [ -d "$APP_PATH/Frameworks" ]; then
-            find "$APP_PATH/Frameworks" -name "_CodeSignature" -type d -exec rm -rf {} + || true
-          fi
-
-          # ✅ CREATE ENTITLEMENTS FILE FOR AD-HOC SIGNING
-          cat > /tmp/entitlements.plist <<EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>get-task-allow</key>
-            <true/>
-          </dict>
-          </plist>
-          EOF
-
-          echo "==== SIGNING APP BUNDLE ===="
-          # Sign all embedded frameworks first (if any)
-          if [ -d "$APP_PATH/Frameworks" ]; then
-            echo "Signing frameworks..."
-            for framework in "$APP_PATH/Frameworks"/*.framework; do
-              if [ -d "$framework" ]; then
-                echo "  Signing $(basename "$framework")"
-                codesign --force --sign - --timestamp=none "$framework"
-              fi
-            done
-
-            for dylib in "$APP_PATH/Frameworks"/*.dylib; do
-              if [ -f "$dylib" ]; then
-                echo "  Signing $(basename "$dylib")"
-                codesign --force --sign - --timestamp=none "$dylib"
-              fi
-            done
-          fi
-
-          # Sign the main app bundle with entitlements
-          echo "Signing main app bundle..."
-          codesign --force --sign - \
-            --entitlements /tmp/entitlements.plist \
-            --timestamp=none \
-            --generate-entitlement-der \
-            "$APP_PATH"
-
-          # Verify the signature
-          echo "==== VERIFYING SIGNATURE ===="
-          codesign -dv --verbose=4 "$APP_PATH" || true
-          codesign --verify --verbose=4 "$APP_PATH" || true
-
-          # Extract and display entitlements
-          echo "==== EMBEDDED ENTITLEMENTS ===="
-          codesign -d --entitlements :- "$APP_PATH" || true
-
-          # Check binary
-          echo "==== BINARY INFO ===="
-          file "$APP_PATH/Tools-Kit" || true
-          otool -l "$APP_PATH/Tools-Kit" | grep -A 5 LC_CODE_SIGNATURE || true
-
           mkdir -p upload/Payload
-          cp -R "$APP_PATH" upload/Payload/
-
+          cp -R upload/SwiftCode.xcarchive/Products/Applications/*.app upload/Payload/
           cd upload
-          zip -r Tools-Kit.ipa Payload
+          zip -r SwiftCode.ipa Payload
 
       - name: Verify IPA
         run: |
           ls -la upload/
-          unzip -l upload/Tools-Kit.ipa
+          test -f upload/Tools-Kit.ipa && echo "IPA created successfully"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
-          name: Tools-Kit Build ${{ github.run_number }}
+          name: SwiftCode Build ${{ github.run_number }}
           files: upload/Tools-Kit.ipa
           generate_release_notes: true
