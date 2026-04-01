@@ -4,7 +4,8 @@ import PackageDescription
 let package = Package(
     name: "ToolsKit",
     platforms: [
-        .iOS(.v16)
+        .iOS(.v16),
+        .macOS(.v12)
     ],
     targets: [
         .executableTarget(name: "ToolsKit", path: "Sources")
