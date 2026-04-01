@@ -1,0 +1,27 @@
+The job failed because the build could not find Info.plist at /Users/runner/work/Tools-Kit/Tools-Kit/Info.plist. This file is required by your Xcode target Test.
+
+To fix this:
+
+1. Ensure Info.plist exists at Tools-Kit/Info.plist in your repository.
+2. If it's missing, create one. Here’s a minimal sample:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>com.dylans2010.ToolsKit</string>
+    <key>CFBundleName</key>
+    <string>Tools Kit</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+</dict>
+</plist>
+```
+
+3. Commit and push this file so that the workflow can find it during the build.
+
+This will resolve the “Build input file cannot be found: Info.plist” error and allow the workflow to proceed.
