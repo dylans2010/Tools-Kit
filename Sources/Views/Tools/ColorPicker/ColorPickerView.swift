@@ -31,7 +31,11 @@ struct ColorPickerView: View {
                 }
             }
             .padding()
-            .background(Color(.secondarySystemBackground))
+            #if canImport(UIKit)
+            .background(Color(uiColor: .secondarySystemBackground))
+            #else
+            .background(.quaternary)
+            #endif
             .cornerRadius(12)
 
             Spacer()
