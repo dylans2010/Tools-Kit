@@ -72,10 +72,25 @@ jobs:
           cd upload
           zip -r Tools-Kit.ipa Payload
 
-      - name: Verify IPA
+      - name: Verify IPA and Info.plist
         run: |
           ls -la upload/
           test -f upload/Tools-Kit.ipa && echo "IPA created successfully"
+
+          # Extract and validate Info.plist from the built app
+          echo "Validating Info.plist in the .app bundle..."
+          APP_PATH="upload/Payload/Tools-Kit.app"
+          if [ -f "$APP_PATH/Info.plist" ]; then
+            echo "Info.plist found in .app bundle"
+            /usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$APP_PATH/Info.plist" || echo "Warning: CFBundleIdentifier missing"
+            /usr/libexec/PlistBuddy -c "Print CFBundleExecutable" "$APP_PATH/Info.plist" || echo "Warning: CFBundleExecutable missing"
+            /usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$APP_PATH/Info.plist" || echo "Warning: CFBundleVersion missing"
+            /usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_PATH/Info.plist" || echo "Warning: CFBundleShortVersionString missing"
+            echo "Info.plist validation complete"
+          else
+            echo "ERROR: Info.plist not found in .app bundle!"
+            exit 1
+          fi
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
