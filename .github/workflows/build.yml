@@ -59,11 +59,8 @@ jobs:
 
       - name: Swift build (env check)
         run: |
-          if [ -f Package.swift ]; then
-            swift build
-          else
-            echo "No Package.swift found; skipping swift build."
-          fi
+          echo "Skipping swift build - this is an iOS-only package that cannot be built with SwiftPM on macOS/Linux."
+          echo "The package will be built using xcodebuild with the iOS SDK instead."
 
       # ✅ FIXED BUILD STEP
       - name: Compile and Build .ipa

@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#endif
 
 struct NotesView: View {
     @StateObject private var backend = NotesBackend()
@@ -131,7 +133,11 @@ struct NoteEditorView: View {
                 TextField("Folder", text: $note.folder)
                     .font(.subheadline)
                     .padding(8)
+                    #if canImport(UIKit)
                     .background(Color(uiColor: .secondarySystemBackground))
+                    #else
+                    .background(.quaternary)
+                    #endif
                     .cornerRadius(8)
                     .onChange(of: note.folder) { _ in backend.updateNote(note) }
 
