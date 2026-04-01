@@ -10,11 +10,13 @@
 		6EB694012ED3223035B3C257 /* AppEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1060294FE4D1B96EE4302F9E /* AppEntry.swift */; };
 		BBC0543E9EE67EE5AC4CD422 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E00A1458A464DAB575C4FE /* AppModel.swift */; };
 		BD781D5600F4E98B9B514667 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54244EAC19ED294008A5A839 /* ContentView.swift */; };
+		BD781D5700F4E98B9B514667 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54244EAD19ED294008A5A839 /* DashboardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1060294FE4D1B96EE4302F9E /* AppEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEntry.swift; sourceTree = "<group>"; };
 		54244EAC19ED294008A5A839 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		54244EAD19ED294008A5A839 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		732E3165BFBB323BD8081B3F /* Tools-Kit.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Tools-Kit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0E00A1458A464DAB575C4FE /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -24,6 +26,7 @@
 			isa = PBXGroup;
 			children = (
 				54244EAC19ED294008A5A839 /* ContentView.swift */,
+				54244EAD19ED294008A5A839 /* DashboardView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -120,6 +123,7 @@
 				6EB694012ED3223035B3C257 /* AppEntry.swift in Sources */,
 				BBC0543E9EE67EE5AC4CD422 /* AppModel.swift in Sources */,
 				BD781D5600F4E98B9B514667 /* ContentView.swift in Sources */,
+				BD781D5700F4E98B9B514667 /* DashboardView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
