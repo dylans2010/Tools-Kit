@@ -47,6 +47,7 @@ struct ExtendedTranslationTool: Tool {
     let category = ToolCategory.ai
     let complexity = ToolComplexity.advanced
     let description = "AI translation with voice input/output"
+    let requiresAPI = true
 
     var view: AnyView {
         AnyView(ExtendedTranslationView())

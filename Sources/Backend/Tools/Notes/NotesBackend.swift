@@ -51,7 +51,7 @@ class NotesBackend: ObservableObject {
         do {
             if FileManager.default.fileExists(atPath: savePath.path) {
                 let data = try Data(contentsOf: savePath)
-                notes = try JSONDecoder().decode([Note].self, data)
+                notes = try JSONDecoder().decode([Note].self, from: data)
             }
         } catch {
             print("Error loading notes: \(error)")

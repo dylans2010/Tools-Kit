@@ -35,6 +35,7 @@ struct PasswordGeneratorTool: Tool {
     let category = ToolCategory.utility
     let complexity = ToolComplexity.basic
     let description = "Secure, random password generator"
+    let requiresAPI = false
 
     var view: AnyView {
         AnyView(PasswordGeneratorView())

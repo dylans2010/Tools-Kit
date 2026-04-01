@@ -38,6 +38,7 @@ struct JSONFormatterTool: Tool {
     let category = ToolCategory.development
     let complexity = ToolComplexity.advanced
     let description = "Format and validate JSON data"
+    let requiresAPI = false
 
     var view: AnyView {
         AnyView(JSONFormatterView())

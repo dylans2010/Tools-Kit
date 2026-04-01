@@ -36,6 +36,7 @@ struct TextSummarizerTool: Tool {
     let category = ToolCategory.ai
     let complexity = ToolComplexity.advanced
     let description = "AI-powered text summarization"
+    let requiresAPI = true
 
     var view: AnyView {
         AnyView(TextSummarizerView())

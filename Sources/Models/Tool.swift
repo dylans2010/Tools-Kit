@@ -20,6 +20,7 @@ protocol Tool: Identifiable {
     var category: ToolCategory { get }
     var complexity: ToolComplexity { get }
     var description: String { get }
+    var requiresAPI: Bool { get }
 
     @ViewBuilder var view: AnyView { get }
 }

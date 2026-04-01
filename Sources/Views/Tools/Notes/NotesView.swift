@@ -86,6 +86,19 @@ struct NotesView: View {
     }
 }
 
+struct NotesTool: Tool {
+    let name = "Notes"
+    let icon = "note.text"
+    let category = ToolCategory.utility
+    let complexity = ToolComplexity.advanced
+    let description = "Organize and manage your personal notes"
+    let requiresAPI = false
+
+    var view: AnyView {
+        AnyView(NotesView())
+    }
+}
+
 struct NoteEditorView: View {
     @State var note: Note
     @ObservedObject var backend: NotesBackend

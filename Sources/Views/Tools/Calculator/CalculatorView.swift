@@ -73,6 +73,7 @@ struct CalculatorTool: Tool {
     let category = ToolCategory.general
     let complexity = ToolComplexity.basic
     let description = "Basic arithmetic operations"
+    let requiresAPI = false
 
     var view: AnyView {
         AnyView(CalculatorView())

@@ -49,6 +49,7 @@ struct RealTimeTranslationTool: Tool {
     let category = ToolCategory.general
     let complexity = ToolComplexity.basic
     let description = "Real-time text translation"
+    let requiresAPI = true
 
     var view: AnyView {
         AnyView(RealTimeTranslationView())
