@@ -67,7 +67,7 @@ jobs:
         run: |
           mkdir -p upload
           xcodebuild -project Tools-Kit.xcodeproj \
-            -scheme SwiftCode \
+            -scheme Tools-Kit \
             -configuration Release \
             -destination "generic/platform=iOS" \
             -sdk iphoneos \
@@ -77,9 +77,9 @@ jobs:
             CODE_SIGNING_REQUIRED=NO
 
           mkdir -p upload/Payload
-          cp -R upload/SwiftCode.xcarchive/Products/Applications/*.app upload/Payload/
+          cp -R upload/Tools-Kit.xcarchive/Products/Applications/*.app upload/Payload/
           cd upload
-          zip -r SwiftCode.ipa Payload
+          zip -r Tools-Kit.ipa Payload
 
       - name: Verify IPA
         run: |
