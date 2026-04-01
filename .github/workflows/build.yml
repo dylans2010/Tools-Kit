@@ -47,7 +47,7 @@ jobs:
           mkdir -p upload
 
           xcodebuild \
-            -project "Tools Kit.xcodeproj" \
+            -project "Tools-Kit.xcodeproj" \
             -scheme "Test" \
             -configuration Release \
             -destination "generic/platform=iOS" \
