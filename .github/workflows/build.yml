@@ -6,35 +6,38 @@ on:
     branches:
       - main
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 permissions:
   contents: write
-
-env:
-  APP_NAME: "Tools Kit"
-  PROJECT: "Tools-Kit.xcodeproj"
-  SCHEME: "Test"
-  MARKETING_VERSION: "1.0"
-  BUILD_VERSION: "1"
 
 jobs:
   build:
     runs-on: macos-14
-    timeout-minutes: 30
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: 'true'
 
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "16.2"
+          xcode-version: '16.2'
 
-      - name: Build App (Unsigned)
+      - name: Verify Xcode Version
+        run: |
+          xcodebuild -version
+          xcodebuild -showsdks
+
+      - name: Clean DerivedData
+        run: |
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+
+      - name: Resolve Dependencies
+        run: |
+          xcodebuild -project Tools-Kit.xcodeproj -scheme Test -resolvePackageDependencies
+
+      - name: Build App (Unsigned, Deterministic Output)
         run: |
           set -e
 
@@ -42,37 +45,32 @@ jobs:
           mkdir -p "$OUTPUT_DIR"
 
           xcodebuild \
-            -project "$PROJECT" \
-            -scheme "$SCHEME" \
+            -project Tools-Kit.xcodeproj \
+            -scheme Test \
             -configuration Release \
             -destination "generic/platform=iOS" \
             -sdk iphoneos \
             build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CONFIGURATION_BUILD_DIR="$OUTPUT_DIR" \
-            PRODUCT_NAME="$APP_NAME" \
-            MARKETING_VERSION="$MARKETING_VERSION" \
-            CURRENT_PROJECT_VERSION="$BUILD_VERSION" \
-            TARGETED_DEVICE_FAMILY="1,2"
+            CONFIGURATION_BUILD_DIR="$OUTPUT_DIR"
 
       - name: Locate .app
         run: |
           set -e
 
-          OUTPUT_DIR=$(pwd)/build/output
-          APP_PATH=$(find "$OUTPUT_DIR" -maxdepth 1 -name "*.app" | head -n 1)
+          APP_PATH=$(find build/output -maxdepth 1 -name "*.app" | head -n 1)
 
           if [ -z "$APP_PATH" ]; then
-            echo "No .app bundle found in $OUTPUT_DIR"
-            ls -R "$OUTPUT_DIR"
+            echo "No .app found"
+            ls -R build/output
             exit 1
           fi
 
           echo "Found app at: $APP_PATH"
           echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
 
-      - name: Create IPA
+      - name: Create IPA (Proper Payload Structure)
         run: |
           set -e
 
@@ -80,22 +78,16 @@ jobs:
           cp -R "$APP_PATH" build/Payload/
 
           cd build
-          zip -r "Tools-Kit.ipa" Payload
+          zip -r Tools-Kit.ipa Payload
 
       - name: Verify IPA
         run: |
-          set -e
           unzip -l build/Tools-Kit.ipa
-
-      - name: Generate Release Tag
-        id: tag
-        run: |
-          TAG="v$(date +'%Y.%m.%d.%H%M%S')"
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.tag.outputs.tag }}
-          name: "Tools Kit Build ${{ steps.tag.outputs.tag }}"
+          tag_name: build-${{ github.run_number }}
+          name: Tools Kit Build ${{ github.run_number }}
           files: build/Tools-Kit.ipa
+          generate_release_notes: true
