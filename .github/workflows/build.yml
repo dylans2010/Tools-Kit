@@ -37,13 +37,12 @@ jobs:
             -scheme Tools-Kit \
             -resolvePackageDependencies
 
-      # ✅ CRITICAL FIX: build instead of archive
-      - name: Build App (Clean Unsigned)
+      # ✅ Keep archive, but controlled
+      - name: Archive App (Unsigned)
         run: |
           set -e
 
-          OUTPUT_DIR=$(pwd)/upload/output
-          mkdir -p "$OUTPUT_DIR"
+          mkdir -p upload
 
           xcodebuild \
             -project Tools-Kit.xcodeproj \
@@ -51,21 +50,32 @@ jobs:
             -configuration Release \
             -destination "generic/platform=iOS" \
             -sdk iphoneos \
-            build \
+            -archivePath upload/Tools-Kit.xcarchive \
+            archive \
             CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CONFIGURATION_BUILD_DIR="$OUTPUT_DIR"
+            CODE_SIGNING_REQUIRED=NO
 
-      - name: Locate .app
+      # ✅ CRITICAL FIX: clean signing artifacts
+      - name: Strip Code Signing
         run: |
           set -e
 
-          APP_PATH=$(find upload/output -maxdepth 1 -name "*.app" | head -n 1)
+          APP_PATH=$(find upload/Tools-Kit.xcarchive -name "*.app" | head -n 1)
 
           if [ -z "$APP_PATH" ]; then
-            echo "No .app found"
-            ls -R upload/output
+            echo "No app found in archive"
             exit 1
+          fi
+
+          echo "Cleaning signing data from: $APP_PATH"
+
+          # Remove existing signatures
+          rm -rf "$APP_PATH/_CodeSignature"
+          rm -rf "$APP_PATH/CodeResources"
+
+          # Clean frameworks if they exist
+          if [ -d "$APP_PATH/Frameworks" ]; then
+            find "$APP_PATH/Frameworks" -name "_CodeSignature" -type d -exec rm -rf {} +
           fi
 
           echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
@@ -81,8 +91,7 @@ jobs:
           zip -r Tools-Kit.ipa Payload
 
       - name: Verify IPA
-        run: |
-          unzip -l upload/Tools-Kit.ipa
+        run: unzip -l upload/Tools-Kit.ipa
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
