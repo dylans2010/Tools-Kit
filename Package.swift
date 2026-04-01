@@ -3,7 +3,10 @@ import PackageDescription
 
 let package = Package(
     name: "ToolsKit",
-    platforms: [.iOS(.v16)],
+    platforms: [
+        .iOS(.v16),
+        .macOS(.v11)
+    ],
     targets: [
         .executableTarget(name: "ToolsKit", path: "Sources")
     ]
