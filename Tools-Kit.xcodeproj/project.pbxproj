@@ -10,6 +10,50 @@
 		6EB694012ED3223035B3C257 /* AppEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1060294FE4D1B96EE4302F9E /* AppEntry.swift */; };
 		BBC0543E9EE67EE5AC4CD422 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E00A1458A464DAB575C4FE /* AppModel.swift */; };
 		BD781D5600F4E98B9B514667 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54244EAC19ED294008A5A839 /* ContentView.swift */; };
+		0F2ADB8479EDC0825C9438A7 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C64705A35F47170E32671A8 /* SearchBar.swift */; };
+		25E1CEA5A953C9E4853589A0 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E38B5C98809D6F3C945B403 /* SectionHeader.swift */; };
+		566A233B3EA96CE80EBBDF76 /* ToolCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C72C46590F0D2DF3905704D /* ToolCard.swift */; };
+		6F0289D2117E2AE96BCD5C42 /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28CBFF507E2A09CC7BF3347A /* Tool.swift */; };
+		C938352C18EB1E5DB569A985 /* ToolRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = B675CF28C260A51B817F972B /* ToolRegistry.swift */; };
+		DDD30F5D82F4CB722A44E15A /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C458ADF9030029CBB6F530D8 /* DashboardView.swift */; };
+		301D7599E12AF5EE631B0145 /* APITesterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E2F305BE49769F3412F4739 /* APITesterView.swift */; };
+		573F57F0D6A999E61C29D9E0 /* Base64View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62D97610853F6F6D717C67CD /* Base64View.swift */; };
+		671693B7EAB36073E1BACD77 /* CalculatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C38F51049B44D3F0CCA93B0 /* CalculatorView.swift */; };
+		5E55A636CB25AEADDB9123B2 /* ClipboardManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97835D0E0448323B36A93FA /* ClipboardManagerView.swift */; };
+		FEA8C8895C93939B35B06FC7 /* CodeFormatterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0A0DC68363AC330E626162 /* CodeFormatterView.swift */; };
+		1778F885D07FF6B50D2AC682 /* ColorPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF4E00F5C18370EEA5E5F4DA /* ColorPickerView.swift */; };
+		E9680C2953F7BB1D9C70F4A5 /* CurrencyConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611A3B7EEBB1E5DFBE50B865 /* CurrencyConverterView.swift */; };
+		75D13F247D21C21CCEBAB568 /* ExtendedTranslationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2CD19383FB258EC53EE9BDD /* ExtendedTranslationView.swift */; };
+		5D36D38F89ECDA62D86E2B23 /* FileSizeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E3272AFE64325ABC14B3E7 /* FileSizeView.swift */; };
+		F58EECF511B108D2D4E2083E /* JSONFormatterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57DB1B8BE415BC670AD7174 /* JSONFormatterView.swift */; };
+		F8E20550C7B10CAEB91AF44C /* LogViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604D64518D6EE38F8BC681AD /* LogViewerView.swift */; };
+		5ED4361057BA4C74E2D5F11E /* NotesFormatterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3C6AA33B82919F8257937E /* NotesFormatterView.swift */; };
+		CF38E90285A180F50206DA4C /* PasswordGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FFBA843F4F590B4FD483643 /* PasswordGeneratorView.swift */; };
+		7D4E6856E4B8D490F3BE3DFC /* QRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EEE74E0B0951259AF0A355 /* QRCodeView.swift */; };
+		1A674FAAA1318DBF854ABE30 /* RealTimeTranslationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18EEC9C79390E75EC52F1069 /* RealTimeTranslationView.swift */; };
+		BC233928BADA9805AE0DC991 /* RegexTesterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19819715E4C59A5B3187B68 /* RegexTesterView.swift */; };
+		D49B2EA06E004A0209316300 /* TextSummarizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2710AA08B7CCAB83F29CFE34 /* TextSummarizerView.swift */; };
+		938921ECA564B2CC3E698E8E /* TimezoneConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7345007A29FF2FF2F62D8532 /* TimezoneConverterView.swift */; };
+		967ECC5B51481C3B8CBE1AFE /* UnitConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F913948626289D4410F1588 /* UnitConverterView.swift */; };
+		57C1C5F703AF328DCC7BDBE1 /* APITesterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440F21DB7CA502D2BB4C9D43 /* APITesterBackend.swift */; };
+		FEC998EBC1ADFFC1CE866D9E /* Base64Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA8493BF922E1D5E4071B3F /* Base64Backend.swift */; };
+		1E09FC515250B3AADF4652CD /* CalculatorBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03FDF792C66162F569B04B3 /* CalculatorBackend.swift */; };
+		4068C60DEB09661C3C936B4F /* ClipboardManagerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66423032F670B61F4DA6F446 /* ClipboardManagerBackend.swift */; };
+		AB353B796EAB6C5765555A9C /* CodeFormatterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDF053BCAA1E13751EF6BF5 /* CodeFormatterBackend.swift */; };
+		5CA861C9E5AE46727516D097 /* ColorPickerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC06083B83EFCA910B929255 /* ColorPickerBackend.swift */; };
+		AA296E9F35CA1E53E0B79B4E /* CurrencyConverterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795F38375A3BCB5EC511578C /* CurrencyConverterBackend.swift */; };
+		71415B5427F7F39C75AF8BDD /* ExtendedTranslationBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A82680FBE55CB9BE4026F9B /* ExtendedTranslationBackend.swift */; };
+		9DF6A929E7272675290907EE /* FileSizeBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22605F394A2D53E4C01EF80B /* FileSizeBackend.swift */; };
+		095A0D51F2CE9A1844BE3F7D /* JSONFormatterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72CA5D3DAA0AD7129C2577BE /* JSONFormatterBackend.swift */; };
+		0B3F6EAB9FF16DB116DB7765 /* LogViewerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65FC803E1C3F989CB8B7F4 /* LogViewerBackend.swift */; };
+		1A40BB39C7B5085567C00F6D /* NotesFormatterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761392EEA983ADAF972B7697 /* NotesFormatterBackend.swift */; };
+		07FE0F91FB9126E8171F6572 /* PasswordGeneratorBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = B371AEC6C6D8DCE318232683 /* PasswordGeneratorBackend.swift */; };
+		EBD9DA73874B31F52DEE2EDC /* QRCodeBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 341B42544AEE8EBA5D399550 /* QRCodeBackend.swift */; };
+		D5580FCF24ED2AF97E3290AA /* RealTimeTranslationBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27821DCA654784C7E65630EE /* RealTimeTranslationBackend.swift */; };
+		597FF3DFDE7D26F1B13E8685 /* RegexTesterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D9416094646FD5596E58049 /* RegexTesterBackend.swift */; };
+		932B5350C5FCE4FBDD426AFC /* TextSummarizerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0C86D07E36287E6C4406592 /* TextSummarizerBackend.swift */; };
+		7B365DBAA7A645B268338E14 /* TimezoneConverterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C5D0AE6AE02F5CC20A6C06 /* TimezoneConverterBackend.swift */; };
+		50636A475B06BF68DF2B62D2 /* UnitConverterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8ADAADA1C9A9EB9AD784D41 /* UnitConverterBackend.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -17,29 +61,461 @@
 		54244EAC19ED294008A5A839 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		732E3165BFBB323BD8081B3F /* Tools-Kit.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Tools-Kit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0E00A1458A464DAB575C4FE /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		4C64705A35F47170E32671A8 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
+		3E38B5C98809D6F3C945B403 /* SectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
+		2C72C46590F0D2DF3905704D /* ToolCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolCard.swift; sourceTree = "<group>"; };
+		28CBFF507E2A09CC7BF3347A /* Tool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
+		B675CF28C260A51B817F972B /* ToolRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolRegistry.swift; sourceTree = "<group>"; };
+		C458ADF9030029CBB6F530D8 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		0E2F305BE49769F3412F4739 /* APITesterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APITesterView.swift; sourceTree = "<group>"; };
+		62D97610853F6F6D717C67CD /* Base64View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base64View.swift; sourceTree = "<group>"; };
+		4C38F51049B44D3F0CCA93B0 /* CalculatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorView.swift; sourceTree = "<group>"; };
+		B97835D0E0448323B36A93FA /* ClipboardManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardManagerView.swift; sourceTree = "<group>"; };
+		9C0A0DC68363AC330E626162 /* CodeFormatterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeFormatterView.swift; sourceTree = "<group>"; };
+		CF4E00F5C18370EEA5E5F4DA /* ColorPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPickerView.swift; sourceTree = "<group>"; };
+		611A3B7EEBB1E5DFBE50B865 /* CurrencyConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterView.swift; sourceTree = "<group>"; };
+		E2CD19383FB258EC53EE9BDD /* ExtendedTranslationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtendedTranslationView.swift; sourceTree = "<group>"; };
+		64E3272AFE64325ABC14B3E7 /* FileSizeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSizeView.swift; sourceTree = "<group>"; };
+		B57DB1B8BE415BC670AD7174 /* JSONFormatterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONFormatterView.swift; sourceTree = "<group>"; };
+		604D64518D6EE38F8BC681AD /* LogViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewerView.swift; sourceTree = "<group>"; };
+		2E3C6AA33B82919F8257937E /* NotesFormatterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesFormatterView.swift; sourceTree = "<group>"; };
+		8FFBA843F4F590B4FD483643 /* PasswordGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordGeneratorView.swift; sourceTree = "<group>"; };
+		F9EEE74E0B0951259AF0A355 /* QRCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeView.swift; sourceTree = "<group>"; };
+		18EEC9C79390E75EC52F1069 /* RealTimeTranslationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTimeTranslationView.swift; sourceTree = "<group>"; };
+		E19819715E4C59A5B3187B68 /* RegexTesterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexTesterView.swift; sourceTree = "<group>"; };
+		2710AA08B7CCAB83F29CFE34 /* TextSummarizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSummarizerView.swift; sourceTree = "<group>"; };
+		7345007A29FF2FF2F62D8532 /* TimezoneConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimezoneConverterView.swift; sourceTree = "<group>"; };
+		4F913948626289D4410F1588 /* UnitConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConverterView.swift; sourceTree = "<group>"; };
+		440F21DB7CA502D2BB4C9D43 /* APITesterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APITesterBackend.swift; sourceTree = "<group>"; };
+		FDA8493BF922E1D5E4071B3F /* Base64Backend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base64Backend.swift; sourceTree = "<group>"; };
+		A03FDF792C66162F569B04B3 /* CalculatorBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorBackend.swift; sourceTree = "<group>"; };
+		66423032F670B61F4DA6F446 /* ClipboardManagerBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardManagerBackend.swift; sourceTree = "<group>"; };
+		1EDF053BCAA1E13751EF6BF5 /* CodeFormatterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeFormatterBackend.swift; sourceTree = "<group>"; };
+		AC06083B83EFCA910B929255 /* ColorPickerBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPickerBackend.swift; sourceTree = "<group>"; };
+		795F38375A3BCB5EC511578C /* CurrencyConverterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterBackend.swift; sourceTree = "<group>"; };
+		1A82680FBE55CB9BE4026F9B /* ExtendedTranslationBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtendedTranslationBackend.swift; sourceTree = "<group>"; };
+		22605F394A2D53E4C01EF80B /* FileSizeBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSizeBackend.swift; sourceTree = "<group>"; };
+		72CA5D3DAA0AD7129C2577BE /* JSONFormatterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONFormatterBackend.swift; sourceTree = "<group>"; };
+		4B65FC803E1C3F989CB8B7F4 /* LogViewerBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewerBackend.swift; sourceTree = "<group>"; };
+		761392EEA983ADAF972B7697 /* NotesFormatterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesFormatterBackend.swift; sourceTree = "<group>"; };
+		B371AEC6C6D8DCE318232683 /* PasswordGeneratorBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordGeneratorBackend.swift; sourceTree = "<group>"; };
+		341B42544AEE8EBA5D399550 /* QRCodeBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeBackend.swift; sourceTree = "<group>"; };
+		27821DCA654784C7E65630EE /* RealTimeTranslationBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTimeTranslationBackend.swift; sourceTree = "<group>"; };
+		2D9416094646FD5596E58049 /* RegexTesterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegexTesterBackend.swift; sourceTree = "<group>"; };
+		F0C86D07E36287E6C4406592 /* TextSummarizerBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSummarizerBackend.swift; sourceTree = "<group>"; };
+		A9C5D0AE6AE02F5CC20A6C06 /* TimezoneConverterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimezoneConverterBackend.swift; sourceTree = "<group>"; };
+		B8ADAADA1C9A9EB9AD784D41 /* UnitConverterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConverterBackend.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		C80C5BE2949281365508C536 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				C458ADF9030029CBB6F530D8 /* DashboardView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		E433382BAA034A2B8188396E /* APITester */ = {
+			isa = PBXGroup;
+			children = (
+				0E2F305BE49769F3412F4739 /* APITesterView.swift */,
+			);
+			path = APITester;
+			sourceTree = "<group>";
+		};
+		8C2BCBC3787C627AA4433667 /* Base64 */ = {
+			isa = PBXGroup;
+			children = (
+				62D97610853F6F6D717C67CD /* Base64View.swift */,
+			);
+			path = Base64;
+			sourceTree = "<group>";
+		};
+		535DFB9118EC7EED62462417 /* Calculator */ = {
+			isa = PBXGroup;
+			children = (
+				4C38F51049B44D3F0CCA93B0 /* CalculatorView.swift */,
+			);
+			path = Calculator;
+			sourceTree = "<group>";
+		};
+		F1A1753D485A012109C49397 /* ClipboardManager */ = {
+			isa = PBXGroup;
+			children = (
+				B97835D0E0448323B36A93FA /* ClipboardManagerView.swift */,
+			);
+			path = ClipboardManager;
+			sourceTree = "<group>";
+		};
+		5BBBFDF4CE0BBA70F17AFC3D /* CodeFormatter */ = {
+			isa = PBXGroup;
+			children = (
+				9C0A0DC68363AC330E626162 /* CodeFormatterView.swift */,
+			);
+			path = CodeFormatter;
+			sourceTree = "<group>";
+		};
+		26EEE6A2E97B08437187D387 /* ColorPicker */ = {
+			isa = PBXGroup;
+			children = (
+				CF4E00F5C18370EEA5E5F4DA /* ColorPickerView.swift */,
+			);
+			path = ColorPicker;
+			sourceTree = "<group>";
+		};
+		8CDBB6F188AF93EBE31E9778 /* CurrencyConverter */ = {
+			isa = PBXGroup;
+			children = (
+				611A3B7EEBB1E5DFBE50B865 /* CurrencyConverterView.swift */,
+			);
+			path = CurrencyConverter;
+			sourceTree = "<group>";
+		};
+		69663516A9E279821DE11098 /* ExtendedTranslation */ = {
+			isa = PBXGroup;
+			children = (
+				E2CD19383FB258EC53EE9BDD /* ExtendedTranslationView.swift */,
+			);
+			path = ExtendedTranslation;
+			sourceTree = "<group>";
+		};
+		8E007A4EAFAC7CFD919FE84E /* FileSize */ = {
+			isa = PBXGroup;
+			children = (
+				64E3272AFE64325ABC14B3E7 /* FileSizeView.swift */,
+			);
+			path = FileSize;
+			sourceTree = "<group>";
+		};
+		1BEE0B3650979C57E248B74E /* JSONFormatter */ = {
+			isa = PBXGroup;
+			children = (
+				B57DB1B8BE415BC670AD7174 /* JSONFormatterView.swift */,
+			);
+			path = JSONFormatter;
+			sourceTree = "<group>";
+		};
+		9AFBF9BA076B1ADC015F1623 /* LogViewer */ = {
+			isa = PBXGroup;
+			children = (
+				604D64518D6EE38F8BC681AD /* LogViewerView.swift */,
+			);
+			path = LogViewer;
+			sourceTree = "<group>";
+		};
+		DA13987CF9E85F01A6C1CD2B /* NotesFormatter */ = {
+			isa = PBXGroup;
+			children = (
+				2E3C6AA33B82919F8257937E /* NotesFormatterView.swift */,
+			);
+			path = NotesFormatter;
+			sourceTree = "<group>";
+		};
+		67D2FE5F7F7F914C25B0AF55 /* PasswordGenerator */ = {
+			isa = PBXGroup;
+			children = (
+				8FFBA843F4F590B4FD483643 /* PasswordGeneratorView.swift */,
+			);
+			path = PasswordGenerator;
+			sourceTree = "<group>";
+		};
+		2A7A043944EE8430C70A4D54 /* QRCode */ = {
+			isa = PBXGroup;
+			children = (
+				F9EEE74E0B0951259AF0A355 /* QRCodeView.swift */,
+			);
+			path = QRCode;
+			sourceTree = "<group>";
+		};
+		C6C4555AC2A6BC33552646AF /* RealTimeTranslation */ = {
+			isa = PBXGroup;
+			children = (
+				18EEC9C79390E75EC52F1069 /* RealTimeTranslationView.swift */,
+			);
+			path = RealTimeTranslation;
+			sourceTree = "<group>";
+		};
+		60B3EF777E3F17300F116463 /* RegexTester */ = {
+			isa = PBXGroup;
+			children = (
+				E19819715E4C59A5B3187B68 /* RegexTesterView.swift */,
+			);
+			path = RegexTester;
+			sourceTree = "<group>";
+		};
+		7ED03E7DBBD8A6B3350209FA /* TextSummarizer */ = {
+			isa = PBXGroup;
+			children = (
+				2710AA08B7CCAB83F29CFE34 /* TextSummarizerView.swift */,
+			);
+			path = TextSummarizer;
+			sourceTree = "<group>";
+		};
+		AACDAC623811659D60AC9DA7 /* TimezoneConverter */ = {
+			isa = PBXGroup;
+			children = (
+				7345007A29FF2FF2F62D8532 /* TimezoneConverterView.swift */,
+			);
+			path = TimezoneConverter;
+			sourceTree = "<group>";
+		};
+		6815FB7C12C6F59E8B3B69F0 /* UnitConverter */ = {
+			isa = PBXGroup;
+			children = (
+				4F913948626289D4410F1588 /* UnitConverterView.swift */,
+			);
+			path = UnitConverter;
+			sourceTree = "<group>";
+		};
+		01AB57C71A0D9EBE651BE59C /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				E433382BAA034A2B8188396E /* APITester */,
+				8C2BCBC3787C627AA4433667 /* Base64 */,
+				535DFB9118EC7EED62462417 /* Calculator */,
+				F1A1753D485A012109C49397 /* ClipboardManager */,
+				5BBBFDF4CE0BBA70F17AFC3D /* CodeFormatter */,
+				26EEE6A2E97B08437187D387 /* ColorPicker */,
+				8CDBB6F188AF93EBE31E9778 /* CurrencyConverter */,
+				69663516A9E279821DE11098 /* ExtendedTranslation */,
+				8E007A4EAFAC7CFD919FE84E /* FileSize */,
+				1BEE0B3650979C57E248B74E /* JSONFormatter */,
+				9AFBF9BA076B1ADC015F1623 /* LogViewer */,
+				DA13987CF9E85F01A6C1CD2B /* NotesFormatter */,
+				67D2FE5F7F7F914C25B0AF55 /* PasswordGenerator */,
+				2A7A043944EE8430C70A4D54 /* QRCode */,
+				C6C4555AC2A6BC33552646AF /* RealTimeTranslation */,
+				60B3EF777E3F17300F116463 /* RegexTester */,
+				7ED03E7DBBD8A6B3350209FA /* TextSummarizer */,
+				AACDAC623811659D60AC9DA7 /* TimezoneConverter */,
+				6815FB7C12C6F59E8B3B69F0 /* UnitConverter */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
 		4A2CB0E156D82F6EAA22B391 /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				54244EAC19ED294008A5A839 /* ContentView.swift */,
+				C80C5BE2949281365508C536 /* Dashboard */,
+				01AB57C71A0D9EBE651BE59C /* Tools */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		86B30826509D60ACFBFFFEC0 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				4C64705A35F47170E32671A8 /* SearchBar.swift */,
+				3E38B5C98809D6F3C945B403 /* SectionHeader.swift */,
+				2C72C46590F0D2DF3905704D /* ToolCard.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 		55F4704416753FAA2B8FF663 /* Models */ = {
 			isa = PBXGroup;
 			children = (
 				E0E00A1458A464DAB575C4FE /* AppModel.swift */,
+				28CBFF507E2A09CC7BF3347A /* Tool.swift */,
+				B675CF28C260A51B817F972B /* ToolRegistry.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		A2282A1B0F6C513A38755F4A /* APITester */ = {
+			isa = PBXGroup;
+			children = (
+				440F21DB7CA502D2BB4C9D43 /* APITesterBackend.swift */,
+			);
+			path = APITester;
+			sourceTree = "<group>";
+		};
+		810D29ECE4CED3F2BECD3BA8 /* Base64 */ = {
+			isa = PBXGroup;
+			children = (
+				FDA8493BF922E1D5E4071B3F /* Base64Backend.swift */,
+			);
+			path = Base64;
+			sourceTree = "<group>";
+		};
+		6D9CE5E37A49051B995F4AA0 /* Calculator */ = {
+			isa = PBXGroup;
+			children = (
+				A03FDF792C66162F569B04B3 /* CalculatorBackend.swift */,
+			);
+			path = Calculator;
+			sourceTree = "<group>";
+		};
+		4F2FE3AFA62CEE6DE6FB8279 /* ClipboardManager */ = {
+			isa = PBXGroup;
+			children = (
+				66423032F670B61F4DA6F446 /* ClipboardManagerBackend.swift */,
+			);
+			path = ClipboardManager;
+			sourceTree = "<group>";
+		};
+		819997FFED24DABC64EC55FF /* CodeFormatter */ = {
+			isa = PBXGroup;
+			children = (
+				1EDF053BCAA1E13751EF6BF5 /* CodeFormatterBackend.swift */,
+			);
+			path = CodeFormatter;
+			sourceTree = "<group>";
+		};
+		527E1009B4B275D42021BB0F /* ColorPicker */ = {
+			isa = PBXGroup;
+			children = (
+				AC06083B83EFCA910B929255 /* ColorPickerBackend.swift */,
+			);
+			path = ColorPicker;
+			sourceTree = "<group>";
+		};
+		3DA2DA695AA5E6D025B985C9 /* CurrencyConverter */ = {
+			isa = PBXGroup;
+			children = (
+				795F38375A3BCB5EC511578C /* CurrencyConverterBackend.swift */,
+			);
+			path = CurrencyConverter;
+			sourceTree = "<group>";
+		};
+		967E819544991B2610AF208E /* ExtendedTranslation */ = {
+			isa = PBXGroup;
+			children = (
+				1A82680FBE55CB9BE4026F9B /* ExtendedTranslationBackend.swift */,
+			);
+			path = ExtendedTranslation;
+			sourceTree = "<group>";
+		};
+		7A7E14FD66AF21386FA9A4B1 /* FileSize */ = {
+			isa = PBXGroup;
+			children = (
+				22605F394A2D53E4C01EF80B /* FileSizeBackend.swift */,
+			);
+			path = FileSize;
+			sourceTree = "<group>";
+		};
+		0E06DA726609C1D88A18F9CD /* JSONFormatter */ = {
+			isa = PBXGroup;
+			children = (
+				72CA5D3DAA0AD7129C2577BE /* JSONFormatterBackend.swift */,
+			);
+			path = JSONFormatter;
+			sourceTree = "<group>";
+		};
+		A511504DF6A5EFA256E0852B /* LogViewer */ = {
+			isa = PBXGroup;
+			children = (
+				4B65FC803E1C3F989CB8B7F4 /* LogViewerBackend.swift */,
+			);
+			path = LogViewer;
+			sourceTree = "<group>";
+		};
+		578E021860DEB48625A98293 /* NotesFormatter */ = {
+			isa = PBXGroup;
+			children = (
+				761392EEA983ADAF972B7697 /* NotesFormatterBackend.swift */,
+			);
+			path = NotesFormatter;
+			sourceTree = "<group>";
+		};
+		ADE060AFA968EB88A8806568 /* PasswordGenerator */ = {
+			isa = PBXGroup;
+			children = (
+				B371AEC6C6D8DCE318232683 /* PasswordGeneratorBackend.swift */,
+			);
+			path = PasswordGenerator;
+			sourceTree = "<group>";
+		};
+		E18B8A9DDD35A8F9079F6661 /* QRCode */ = {
+			isa = PBXGroup;
+			children = (
+				341B42544AEE8EBA5D399550 /* QRCodeBackend.swift */,
+			);
+			path = QRCode;
+			sourceTree = "<group>";
+		};
+		0E0F4E514C166D882A78701B /* RealTimeTranslation */ = {
+			isa = PBXGroup;
+			children = (
+				27821DCA654784C7E65630EE /* RealTimeTranslationBackend.swift */,
+			);
+			path = RealTimeTranslation;
+			sourceTree = "<group>";
+		};
+		A881B2ED112CF768B949A9A0 /* RegexTester */ = {
+			isa = PBXGroup;
+			children = (
+				2D9416094646FD5596E58049 /* RegexTesterBackend.swift */,
+			);
+			path = RegexTester;
+			sourceTree = "<group>";
+		};
+		5E6CB7CED67869978CE76B1E /* TextSummarizer */ = {
+			isa = PBXGroup;
+			children = (
+				F0C86D07E36287E6C4406592 /* TextSummarizerBackend.swift */,
+			);
+			path = TextSummarizer;
+			sourceTree = "<group>";
+		};
+		1B115A1C01FB3B964B7AD5D9 /* TimezoneConverter */ = {
+			isa = PBXGroup;
+			children = (
+				A9C5D0AE6AE02F5CC20A6C06 /* TimezoneConverterBackend.swift */,
+			);
+			path = TimezoneConverter;
+			sourceTree = "<group>";
+		};
+		34909F28BEABFFE48B844702 /* UnitConverter */ = {
+			isa = PBXGroup;
+			children = (
+				B8ADAADA1C9A9EB9AD784D41 /* UnitConverterBackend.swift */,
+			);
+			path = UnitConverter;
+			sourceTree = "<group>";
+		};
+		5871C24ACC049E9676E5B8A7 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				A2282A1B0F6C513A38755F4A /* APITester */,
+				810D29ECE4CED3F2BECD3BA8 /* Base64 */,
+				6D9CE5E37A49051B995F4AA0 /* Calculator */,
+				4F2FE3AFA62CEE6DE6FB8279 /* ClipboardManager */,
+				819997FFED24DABC64EC55FF /* CodeFormatter */,
+				527E1009B4B275D42021BB0F /* ColorPicker */,
+				3DA2DA695AA5E6D025B985C9 /* CurrencyConverter */,
+				967E819544991B2610AF208E /* ExtendedTranslation */,
+				7A7E14FD66AF21386FA9A4B1 /* FileSize */,
+				0E06DA726609C1D88A18F9CD /* JSONFormatter */,
+				A511504DF6A5EFA256E0852B /* LogViewer */,
+				578E021860DEB48625A98293 /* NotesFormatter */,
+				ADE060AFA968EB88A8806568 /* PasswordGenerator */,
+				E18B8A9DDD35A8F9079F6661 /* QRCode */,
+				0E0F4E514C166D882A78701B /* RealTimeTranslation */,
+				A881B2ED112CF768B949A9A0 /* RegexTester */,
+				5E6CB7CED67869978CE76B1E /* TextSummarizer */,
+				1B115A1C01FB3B964B7AD5D9 /* TimezoneConverter */,
+				34909F28BEABFFE48B844702 /* UnitConverter */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
+		EC62C2EB14438B0923256EED /* Backend */ = {
+			isa = PBXGroup;
+			children = (
+				5871C24ACC049E9676E5B8A7 /* Tools */,
+			);
+			path = Backend;
 			sourceTree = "<group>";
 		};
 		8DF4BF69CF55A81CB6EBF3DE /* Sources */ = {
 			isa = PBXGroup;
 			children = (
 				1060294FE4D1B96EE4302F9E /* AppEntry.swift */,
+				EC62C2EB14438B0923256EED /* Backend */,
+				86B30826509D60ACFBFFFEC0 /* Components */,
 				55F4704416753FAA2B8FF663 /* Models */,
 				4A2CB0E156D82F6EAA22B391 /* Views */,
 			);
@@ -120,6 +596,50 @@
 				6EB694012ED3223035B3C257 /* AppEntry.swift in Sources */,
 				BBC0543E9EE67EE5AC4CD422 /* AppModel.swift in Sources */,
 				BD781D5600F4E98B9B514667 /* ContentView.swift in Sources */,
+				0F2ADB8479EDC0825C9438A7 /* SearchBar.swift in Sources */,
+				25E1CEA5A953C9E4853589A0 /* SectionHeader.swift in Sources */,
+				566A233B3EA96CE80EBBDF76 /* ToolCard.swift in Sources */,
+				6F0289D2117E2AE96BCD5C42 /* Tool.swift in Sources */,
+				C938352C18EB1E5DB569A985 /* ToolRegistry.swift in Sources */,
+				DDD30F5D82F4CB722A44E15A /* DashboardView.swift in Sources */,
+				301D7599E12AF5EE631B0145 /* APITesterView.swift in Sources */,
+				573F57F0D6A999E61C29D9E0 /* Base64View.swift in Sources */,
+				671693B7EAB36073E1BACD77 /* CalculatorView.swift in Sources */,
+				5E55A636CB25AEADDB9123B2 /* ClipboardManagerView.swift in Sources */,
+				FEA8C8895C93939B35B06FC7 /* CodeFormatterView.swift in Sources */,
+				1778F885D07FF6B50D2AC682 /* ColorPickerView.swift in Sources */,
+				E9680C2953F7BB1D9C70F4A5 /* CurrencyConverterView.swift in Sources */,
+				75D13F247D21C21CCEBAB568 /* ExtendedTranslationView.swift in Sources */,
+				5D36D38F89ECDA62D86E2B23 /* FileSizeView.swift in Sources */,
+				F58EECF511B108D2D4E2083E /* JSONFormatterView.swift in Sources */,
+				F8E20550C7B10CAEB91AF44C /* LogViewerView.swift in Sources */,
+				5ED4361057BA4C74E2D5F11E /* NotesFormatterView.swift in Sources */,
+				CF38E90285A180F50206DA4C /* PasswordGeneratorView.swift in Sources */,
+				7D4E6856E4B8D490F3BE3DFC /* QRCodeView.swift in Sources */,
+				1A674FAAA1318DBF854ABE30 /* RealTimeTranslationView.swift in Sources */,
+				BC233928BADA9805AE0DC991 /* RegexTesterView.swift in Sources */,
+				D49B2EA06E004A0209316300 /* TextSummarizerView.swift in Sources */,
+				938921ECA564B2CC3E698E8E /* TimezoneConverterView.swift in Sources */,
+				967ECC5B51481C3B8CBE1AFE /* UnitConverterView.swift in Sources */,
+				57C1C5F703AF328DCC7BDBE1 /* APITesterBackend.swift in Sources */,
+				FEC998EBC1ADFFC1CE866D9E /* Base64Backend.swift in Sources */,
+				1E09FC515250B3AADF4652CD /* CalculatorBackend.swift in Sources */,
+				4068C60DEB09661C3C936B4F /* ClipboardManagerBackend.swift in Sources */,
+				AB353B796EAB6C5765555A9C /* CodeFormatterBackend.swift in Sources */,
+				5CA861C9E5AE46727516D097 /* ColorPickerBackend.swift in Sources */,
+				AA296E9F35CA1E53E0B79B4E /* CurrencyConverterBackend.swift in Sources */,
+				71415B5427F7F39C75AF8BDD /* ExtendedTranslationBackend.swift in Sources */,
+				9DF6A929E7272675290907EE /* FileSizeBackend.swift in Sources */,
+				095A0D51F2CE9A1844BE3F7D /* JSONFormatterBackend.swift in Sources */,
+				0B3F6EAB9FF16DB116DB7765 /* LogViewerBackend.swift in Sources */,
+				1A40BB39C7B5085567C00F6D /* NotesFormatterBackend.swift in Sources */,
+				07FE0F91FB9126E8171F6572 /* PasswordGeneratorBackend.swift in Sources */,
+				EBD9DA73874B31F52DEE2EDC /* QRCodeBackend.swift in Sources */,
+				D5580FCF24ED2AF97E3290AA /* RealTimeTranslationBackend.swift in Sources */,
+				597FF3DFDE7D26F1B13E8685 /* RegexTesterBackend.swift in Sources */,
+				932B5350C5FCE4FBDD426AFC /* TextSummarizerBackend.swift in Sources */,
+				7B365DBAA7A645B268338E14 /* TimezoneConverterBackend.swift in Sources */,
+				50636A475B06BF68DF2B62D2 /* UnitConverterBackend.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
