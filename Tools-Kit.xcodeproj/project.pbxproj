@@ -615,6 +615,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.swiftcode.userproject.tools-kit";
 				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -632,6 +634,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.swiftcode.userproject.tools-kit";
 				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;

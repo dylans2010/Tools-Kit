@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct NotesView: View {
     @StateObject private var backend = NotesBackend()
@@ -6,10 +7,21 @@ struct NotesView: View {
     @State private var searchText = ""
     @State private var selectedFolder: String? = nil
 
+    private var folders: [String] {
+        Array(Set(backend.notes.map { $0.folder })).sorted()
+    }
+
+    private var filteredNotes: [Note] {
+        backend.notes.filter { note in
+            (searchText.isEmpty || note.title.localizedCaseInsensitiveContains(searchText)) &&
+            (selectedFolder == nil || note.folder == selectedFolder)
+        }
+    }
+
     var body: some View {
         List {
             Section(header: Text("Folders")) {
-                ForEach(Array(Set(backend.notes.map { $0.folder })).sorted(), id: \.self) { folder in
+                ForEach(folders, id: \.self) { folder in
                     Button(action: {
                         selectedFolder = (selectedFolder == folder) ? nil : folder
                     }) {
@@ -26,29 +38,9 @@ struct NotesView: View {
             }
 
             Section(header: Text("Notes")) {
-                ForEach(backend.notes.filter { note in
-                    (searchText.isEmpty || note.title.localizedCaseInsensitiveContains(searchText)) &&
-                    (selectedFolder == nil || note.folder == selectedFolder)
-                }) { note in
+                ForEach(filteredNotes) { note in
                     NavigationLink(destination: NoteEditorView(note: note, backend: backend)) {
-                        VStack(alignment: .leading) {
-                            Text(note.title)
-                                .font(.headline)
-                            Text(note.content.prefix(50))
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            if !note.tags.isEmpty {
-                                HStack {
-                                    ForEach(note.tags, id: \.self) { tag in
-                                        Text("#\(tag)")
-                                            .font(.system(size: 10))
-                                            .padding(4)
-                                            .background(Color.blue.opacity(0.1))
-                                            .cornerRadius(4)
-                                    }
-                                }
-                            }
-                        }
+                        noteRow(for: note)
                     }
                 }
                 .onDelete(perform: deleteNotes)
@@ -74,11 +66,29 @@ struct NotesView: View {
         }
     }
 
-    private func deleteNotes(at offsets: IndexSet) {
-        let filteredNotes = backend.notes.filter { note in
-            (searchText.isEmpty || note.title.localizedCaseInsensitiveContains(searchText)) &&
-            (selectedFolder == nil || note.folder == selectedFolder)
+    @ViewBuilder
+    private func noteRow(for note: Note) -> some View {
+        VStack(alignment: .leading) {
+            Text(note.title)
+                .font(.headline)
+            Text(note.content.prefix(50))
+                .font(.caption)
+                .foregroundColor(.secondary)
+            if !note.tags.isEmpty {
+                HStack {
+                    ForEach(note.tags, id: \.self) { tag in
+                        Text("#\(tag)")
+                            .font(.system(size: 10))
+                            .padding(4)
+                            .background(Color.blue.opacity(0.1))
+                            .cornerRadius(4)
+                    }
+                }
+            }
         }
+    }
+
+    private func deleteNotes(at offsets: IndexSet) {
         offsets.forEach { index in
             let note = filteredNotes[index]
             backend.deleteNote(note)
@@ -121,7 +131,7 @@ struct NoteEditorView: View {
                 TextField("Folder", text: $note.folder)
                     .font(.subheadline)
                     .padding(8)
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .cornerRadius(8)
                     .onChange(of: note.folder) { _ in backend.updateNote(note) }
 
@@ -232,7 +242,7 @@ struct VersionHistoryView: View {
 
     var body: some View {
         NavigationStack {
-            List(note.versionHistory.reversed()) { version in
+            List(Array(note.versionHistory.reversed())) { version in
                 VStack(alignment: .leading) {
                     Text(version.timestamp.formatted())
                         .font(.headline)
