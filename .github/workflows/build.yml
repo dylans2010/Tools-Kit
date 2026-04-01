@@ -1,7 +1,7 @@
 name: Create New Release
 
-# This workflow builds an iOS-only application
-# macOS is not supported and all builds target iOS platform only
+# This workflow is strictly for building the iOS-only application.
+# The codebase contains no macOS-specific code, and all builds target the iOS platform exclusively.
 
 on:
   workflow_dispatch:
