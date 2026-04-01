@@ -1,7 +1,17 @@
 import SwiftUI
 struct PDFToolsView: View {
     @StateObject private var backend = PDFToolsBackend()
-    var body: some View { Button("Merge PDFs") { backend.merge(pdfURLs: []) }.navigationTitle("PDF Tools") }
+    var body: some View {
+        VStack(spacing: 16) {
+            Button("Merge PDFs") { backend.merge(pdfURLs: []) }
+                .buttonStyle(.borderedProminent)
+                .frame(maxWidth: .infinity)
+            Spacer()
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .navigationTitle("PDF Tools")
+    }
 }
 struct PDFTools: Tool {
     let name = "PDF Tools"

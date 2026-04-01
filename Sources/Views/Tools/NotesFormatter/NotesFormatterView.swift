@@ -4,24 +4,25 @@ struct NotesFormatterView: View {
     @StateObject private var backend = NotesFormatterBackend()
 
     var body: some View {
-        VStack {
-            TextEditor(text: $backend.inputText)
-                .frame(maxHeight: 200)
-                .border(Color.gray, width: 1)
-                .padding()
+        ScrollView {
+            VStack(spacing: 16) {
+                TextEditor(text: $backend.inputText)
+                    .frame(maxWidth: .infinity, minHeight: 180)
+                    .border(Color.gray, width: 1)
 
-            HStack {
-                Button("ABC") { backend.format(to: .uppercase) }
-                Button("abc") { backend.format(to: .lowercase) }
-                Button("Abc") { backend.format(to: .capitalized) }
-                Button("• Bullets") { backend.format(to: .bulletPoints) }
+                HStack {
+                    Button("ABC") { backend.format(to: .uppercase) }
+                    Button("abc") { backend.format(to: .lowercase) }
+                    Button("Abc") { backend.format(to: .capitalized) }
+                    Button("• Bullets") { backend.format(to: .bulletPoints) }
+                }
+                .buttonStyle(.bordered)
+
+                TextEditor(text: .constant(backend.formattedText))
+                    .frame(maxWidth: .infinity, minHeight: 180)
+                    .border(Color.blue, width: 1)
             }
-            .buttonStyle(.bordered)
-
-            TextEditor(text: .constant(backend.formattedText))
-                .frame(maxHeight: 200)
-                .border(Color.blue, width: 1)
-                .padding()
+            .padding()
         }
         .navigationTitle("Notes Formatter")
     }

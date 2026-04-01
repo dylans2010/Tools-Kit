@@ -5,7 +5,7 @@ struct LogViewerView: View {
     @State private var newLog = ""
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             HStack {
                 TextField("Add custom log...", text: $newLog)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -21,12 +21,14 @@ struct LogViewerView: View {
                     .font(.system(.caption, design: .monospaced))
             }
             .listStyle(.plain)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             Button("Clear Logs", role: .destructive) {
                 backend.clearLogs()
             }
             .padding()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .navigationTitle("Log Viewer")
         .onAppear {
             backend.addLog("Log session started.")

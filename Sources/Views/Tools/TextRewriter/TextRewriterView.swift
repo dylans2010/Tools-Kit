@@ -1,7 +1,17 @@
 import SwiftUI
 struct TextRewriterView: View {
     @StateObject private var backend = TextRewriterBackend()
-    var body: some View { Button("Rewrite") { backend.rewrite() }.navigationTitle("Rewriter") }
+    var body: some View {
+        VStack(spacing: 16) {
+            Button("Rewrite Text") { backend.rewrite() }
+                .buttonStyle(.borderedProminent)
+                .frame(maxWidth: .infinity)
+            Spacer()
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .navigationTitle("Text Rewriter")
+    }
 }
 struct TextRewriterTool: Tool {
     let name = "Text Rewriter"

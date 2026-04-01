@@ -1,7 +1,24 @@
 import SwiftUI
 struct WordCounterView: View {
     @StateObject private var backend = WordCounterBackend()
-    var body: some View { VStack { TextEditor(text: $backend.text); Text("Words: \(backend.wordCount)") }.navigationTitle("Word Counter") }
+    var body: some View {
+        VStack(spacing: 16) {
+            TextEditor(text: $backend.text)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .border(Color.gray, width: 1)
+            HStack(spacing: 24) {
+                Label("\(backend.wordCount) words", systemImage: "textformat.abc")
+                    .font(.headline)
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color(.secondarySystemBackground))
+            .cornerRadius(10)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .navigationTitle("Word Counter")
+    }
 }
 struct WordCounterTool: Tool {
     let name = "Word Counter"

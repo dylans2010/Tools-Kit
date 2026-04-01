@@ -1,7 +1,17 @@
 import SwiftUI
 struct WebhookTesterView: View {
     @StateObject private var backend = WebhookTesterBackend()
-    var body: some View { Button("Send Webhook") { backend.send() }.navigationTitle("Webhook Tester") }
+    var body: some View {
+        VStack(spacing: 16) {
+            Button("Send Webhook") { backend.send() }
+                .buttonStyle(.borderedProminent)
+                .frame(maxWidth: .infinity)
+            Spacer()
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .navigationTitle("Webhook Tester")
+    }
 }
 struct WebhookTesterTool: Tool {
     let name = "Webhook Tester"

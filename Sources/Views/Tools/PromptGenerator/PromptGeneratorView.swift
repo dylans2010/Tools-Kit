@@ -1,7 +1,17 @@
 import SwiftUI
 struct PromptGeneratorView: View {
     @StateObject private var backend = PromptGeneratorBackend()
-    var body: some View { Button("Generate") { backend.generate() }.navigationTitle("Prompt Gen") }
+    var body: some View {
+        VStack(spacing: 16) {
+            Button("Generate Prompt") { backend.generate() }
+                .buttonStyle(.borderedProminent)
+                .frame(maxWidth: .infinity)
+            Spacer()
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .navigationTitle("Prompt Generator")
+    }
 }
 struct PromptGeneratorTool: Tool {
     let name = "Prompt Generator"

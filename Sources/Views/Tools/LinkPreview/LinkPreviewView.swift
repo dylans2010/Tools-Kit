@@ -1,7 +1,17 @@
 import SwiftUI
 struct LinkPreviewView: View {
     @StateObject private var backend = LinkPreviewBackend()
-    var body: some View { Button("Preview") { backend.fetch() }.navigationTitle("Link Preview") }
+    var body: some View {
+        VStack(spacing: 16) {
+            Button("Preview Link") { backend.fetch() }
+                .buttonStyle(.borderedProminent)
+                .frame(maxWidth: .infinity)
+            Spacer()
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .navigationTitle("Link Preview")
+    }
 }
 struct LinkPreviewTool: Tool {
     let name = "Link Preview"

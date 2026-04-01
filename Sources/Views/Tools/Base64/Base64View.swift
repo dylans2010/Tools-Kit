@@ -4,26 +4,24 @@ struct Base64View: View {
     @StateObject private var backend = Base64Backend()
 
     var body: some View {
-        VStack {
-            TextEditor(text: $backend.inputText)
-                .frame(maxHeight: 200)
-                .border(Color.gray, width: 1)
-                .padding()
+        ScrollView {
+            VStack(spacing: 16) {
+                TextEditor(text: $backend.inputText)
+                    .frame(maxWidth: .infinity, minHeight: 180)
+                    .border(Color.gray, width: 1)
 
-            HStack {
-                Button("Encode") { backend.encode() }
-                Button("Decode") { backend.decode() }
+                HStack {
+                    Button("Encode") { backend.encode() }
+                    Button("Decode") { backend.decode() }
+                }
+                .buttonStyle(.borderedProminent)
+
+                TextEditor(text: .constant(backend.outputText))
+                    .frame(maxWidth: .infinity, minHeight: 180)
+                    .border(Color.blue, width: 1)
             }
-            .buttonStyle(.borderedProminent)
-
-            TextEditor(text: .constant(backend.outputText))
-                .frame(maxHeight: 200)
-                .border(Color.blue, width: 1)
-                .padding()
-
-            Spacer()
+            .padding()
         }
-        .padding()
         .navigationTitle("Base64 Encoder/Decoder")
     }
 }

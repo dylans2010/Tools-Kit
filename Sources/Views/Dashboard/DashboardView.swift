@@ -19,6 +19,8 @@ struct DashboardView: View {
                         searchResultsSection
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 20)
             }
             .navigationTitle("Tools Kit")
             .background(Color(.systemGroupedBackground))

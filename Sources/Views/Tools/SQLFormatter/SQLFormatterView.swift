@@ -1,7 +1,20 @@
 import SwiftUI
 struct SQLFormatterView: View {
     @StateObject private var backend = SQLFormatterBackend()
-    var body: some View { VStack { TextEditor(text: $backend.sql); Button("Format") { backend.format() } }.navigationTitle("SQL Formatter") }
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                TextEditor(text: $backend.sql)
+                    .frame(maxWidth: .infinity, minHeight: 200)
+                    .border(Color.gray, width: 1)
+                Button("Format SQL") { backend.format() }
+                    .buttonStyle(.borderedProminent)
+                    .frame(maxWidth: .infinity)
+            }
+            .padding()
+        }
+        .navigationTitle("SQL Formatter")
+    }
 }
 struct SQLFormatterTool: Tool {
     let name = "SQL Formatter"

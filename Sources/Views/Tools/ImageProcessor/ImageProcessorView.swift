@@ -6,11 +6,18 @@ import UIKit
 struct ImageProcessorView: View {
     @StateObject private var backend = ImageProcessorBackend()
     var body: some View {
-        Button("Compress") {
-            #if canImport(UIKit)
-            backend.compressImage(UIImage())
-            #endif
+        VStack(spacing: 16) {
+            Button("Compress Image") {
+                #if canImport(UIKit)
+                backend.compressImage(UIImage())
+                #endif
+            }
+            .buttonStyle(.borderedProminent)
+            .frame(maxWidth: .infinity)
+            Spacer()
         }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .navigationTitle("Image Processor")
     }
 }

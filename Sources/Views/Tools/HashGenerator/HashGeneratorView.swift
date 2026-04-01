@@ -1,7 +1,26 @@
 import SwiftUI
 struct HashGeneratorView: View {
     @StateObject private var backend = HashGeneratorBackend()
-    var body: some View { VStack { TextField("Input", text: $backend.input); Button("Hash") { backend.generate() }; Text(backend.hash) }.navigationTitle("Hash Generator") }
+    var body: some View {
+        Form {
+            Section(header: Text("Input")) {
+                TextField("Enter text to hash", text: $backend.input)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+            }
+            Section {
+                Button("Generate Hash") { backend.generate() }
+                    .buttonStyle(.borderedProminent)
+            }
+            Section(header: Text("Hash Result")) {
+                Text(backend.hash.isEmpty ? "No hash generated yet" : backend.hash)
+                    .font(.system(.body, design: .monospaced))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundColor(backend.hash.isEmpty ? .secondary : .primary)
+            }
+        }
+        .navigationTitle("Hash Generator")
+    }
 }
 struct HashGeneratorTool: Tool {
     let name = "Hash Generator"

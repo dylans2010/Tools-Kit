@@ -1,7 +1,17 @@
 import SwiftUI
 struct MetadataRemoverView: View {
     @StateObject private var backend = MetadataRemoverBackend()
-    var body: some View { Button("Clean") { backend.clean() }.navigationTitle("Metadata") }
+    var body: some View {
+        VStack(spacing: 16) {
+            Button("Remove Metadata") { backend.clean() }
+                .buttonStyle(.borderedProminent)
+                .frame(maxWidth: .infinity)
+            Spacer()
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .navigationTitle("Metadata Remover")
+    }
 }
 struct MetadataRemoverTool: Tool {
     let name = "Metadata Remover"

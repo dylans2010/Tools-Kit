@@ -1,7 +1,17 @@
 import SwiftUI
 struct EncryptionView: View {
     @StateObject private var backend = EncryptionBackend()
-    var body: some View { Button("Encrypt") { backend.encrypt() }.navigationTitle("Encryption") }
+    var body: some View {
+        VStack(spacing: 16) {
+            Button("Encrypt") { backend.encrypt() }
+                .buttonStyle(.borderedProminent)
+                .frame(maxWidth: .infinity)
+            Spacer()
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .navigationTitle("Text Encryption")
+    }
 }
 struct EncryptionTool: Tool {
     let name = "Text Encryption"

@@ -11,9 +11,10 @@ struct ColorPickerView: View {
 
             Rectangle()
                 .fill(backend.selectedColor)
-                .frame(width: 200, height: 100)
+                .frame(maxWidth: .infinity, minHeight: 100)
                 .cornerRadius(12)
                 .shadow(radius: 5)
+                .padding(.horizontal)
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
@@ -41,6 +42,7 @@ struct ColorPickerView: View {
             Spacer()
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .navigationTitle("Color Picker")
     }
 }

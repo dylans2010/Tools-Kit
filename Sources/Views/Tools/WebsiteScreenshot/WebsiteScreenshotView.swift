@@ -1,7 +1,17 @@
 import SwiftUI
 struct WebsiteScreenshotView: View {
     @StateObject private var backend = WebsiteScreenshotBackend()
-    var body: some View { Button("Capture") { backend.capture() }.navigationTitle("Screenshot") }
+    var body: some View {
+        VStack(spacing: 16) {
+            Button("Capture Screenshot") { backend.capture() }
+                .buttonStyle(.borderedProminent)
+                .frame(maxWidth: .infinity)
+            Spacer()
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .navigationTitle("Website Screenshot")
+    }
 }
 struct WebsiteScreenshotTool: Tool {
     let name = "Website Screenshot"

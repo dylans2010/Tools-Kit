@@ -2,10 +2,20 @@ import SwiftUI
 struct FileConverterView: View {
     @StateObject private var backend = FileConverterBackend()
     var body: some View {
-        VStack {
-            if backend.isConverting { ProgressView("Converting...", value: backend.conversionProgress, total: 1.0) }
-            Button("Convert Mock File") { backend.convert(fileURL: URL(fileURLWithPath: "test.docx"), to: "PDF") }
+        VStack(spacing: 20) {
+            if backend.isConverting {
+                ProgressView("Converting...", value: backend.conversionProgress, total: 1.0)
+                    .padding()
+            }
+            Button("Convert Mock File") {
+                backend.convert(fileURL: URL(fileURLWithPath: "test.docx"), to: "PDF")
+            }
+            .buttonStyle(.borderedProminent)
+            .frame(maxWidth: .infinity)
+            Spacer()
         }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .navigationTitle("File Converter")
     }
 }

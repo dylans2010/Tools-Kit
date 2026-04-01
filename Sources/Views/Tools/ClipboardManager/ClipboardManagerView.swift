@@ -4,14 +4,14 @@ struct ClipboardManagerView: View {
     @StateObject private var backend = ClipboardManagerBackend()
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             Text("Clipboard Content:")
                 .font(.headline)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             TextEditor(text: $backend.clipboardContent)
-                .frame(maxHeight: 200)
+                .frame(maxWidth: .infinity, minHeight: 200)
                 .border(Color.gray, width: 1)
-                .padding()
 
             HStack {
                 Button("Copy") {
@@ -26,6 +26,7 @@ struct ClipboardManagerView: View {
             Spacer()
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .navigationTitle("Clipboard Manager")
     }
 }
