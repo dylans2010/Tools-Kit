@@ -7,9 +7,7 @@ struct UnitConverterView: View {
         Form {
             Section(header: Text("Input")) {
                 TextField("Amount", text: $backend.input)
-#if os(iOS)
                     .keyboardType(.decimalPad)
-#endif
                 Picker("From", selection: $backend.inputUnit) {
                     ForEach(backend.units, id: \.self) { unit in
                         Text(unit.symbol).tag(unit)
