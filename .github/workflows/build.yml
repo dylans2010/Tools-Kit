@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   APP_NAME: "Tools Kit"
@@ -41,7 +41,7 @@ jobs:
         with:
           xcode-version: "16.2"
 
-      - name: Build Archive
+      - name: Build Archive (Unsigned)
         run: |
           set -e
           mkdir -p upload
@@ -54,30 +54,35 @@ jobs:
             -sdk iphoneos \
             -archivePath upload/Tools-Kit.xcarchive \
             clean archive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
             PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_IDENTIFIER" \
             MARKETING_VERSION="$MARKETING_VERSION" \
             CURRENT_PROJECT_VERSION="$BUILD_VERSION" \
             PRODUCT_NAME="$APP_NAME" \
-            TARGETED_DEVICE_FAMILY="1,2" \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO
+            TARGETED_DEVICE_FAMILY="1,2"
 
       - name: Create IPA
         run: |
+          set -e
           mkdir -p upload/Payload
-          cp -R upload/Tools-Kit.xcarchive/Products/Applications/*.app upload/Payload/
+
+          APP_PATH=$(find upload/Tools-Kit.xcarchive/Products/Applications -name "*.app" | head -n 1)
+
+          cp -R "$APP_PATH" upload/Payload/
+
           cd upload
           zip -r "Tools-Kit.ipa" Payload
 
-      - name: Upload IPA Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Tools-Kit-ipa
-          path: upload/Tools-Kit.ipa
+      - name: Generate Release Tag
+        id: tag
+        run: |
+          TAG="v$(date +'%Y.%m.%d.%H%M%S')"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      - name: Upload Build Logs
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: Tools-Kit-build-logs
-          path: ~/Library/Logs
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: "Tools Kit Build ${{ steps.tag.outputs.tag }}"
+          files: upload/Tools-Kit.ipa
