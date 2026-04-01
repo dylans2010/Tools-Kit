@@ -56,14 +56,6 @@ jobs:
       - name: Resolve Package Dependencies
         run: xcodebuild -project Tools-Kit.xcodeproj -scheme Tools-Kit -resolvePackageDependencies
 
-      - name: Swift build (env check)
-        run: |
-          if [ -f Package.swift ]; then
-            swift build
-          else
-            echo "No Package.swift found; skipping swift build for Xcode project workflow."
-          fi
-
       - name: Compile and Build .ipa
         run: |
           mkdir -p upload
