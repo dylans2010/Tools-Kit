@@ -7,7 +7,9 @@ struct CurrencyConverterView: View {
         Form {
             Section(header: Text("Amount")) {
                 TextField("Amount", text: $backend.amount)
+                #if canImport(UIKit)
                     .keyboardType(.decimalPad)
+                #endif
                 Picker("From", selection: $backend.fromCurrency) {
                     ForEach(Array(backend.rates.keys), id: \.self) { currency in
                         Text(currency).tag(currency)

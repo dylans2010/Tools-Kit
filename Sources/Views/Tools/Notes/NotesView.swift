@@ -61,8 +61,14 @@ struct NotesView: View {
         }
         .sheet(isPresented: $showingAddNote) {
             if let note = backend.selectedNote {
-                NavigationStack {
-                    NoteEditorView(note: note, backend: backend)
+                if #available(iOS 16.0, macOS 13.0, *) {
+                    NavigationStack {
+                        NoteEditorView(note: note, backend: backend)
+                    }
+                } else {
+                    NavigationView {
+                        NoteEditorView(note: note, backend: backend)
+                    }
                 }
             }
         }
@@ -247,20 +253,30 @@ struct VersionHistoryView: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        NavigationStack {
-            List(note.versionHistory.sorted { $0.timestamp > $1.timestamp }) { version in
-                VStack(alignment: .leading) {
-                    Text(version.timestamp.formatted())
-                        .font(.headline)
-                    Text(version.content.prefix(100))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+        if #available(iOS 16.0, macOS 13.0, *) {
+            NavigationStack {
+                content
             }
-            .navigationTitle("Version History")
-            .toolbar {
-                Button("Close") { dismiss() }
+        } else {
+            NavigationView {
+                content
             }
+        }
+    }
+
+    private var content: some View {
+        List(note.versionHistory.sorted { $0.timestamp > $1.timestamp }) { version in
+            VStack(alignment: .leading) {
+                Text(version.timestamp.formatted())
+                    .font(.headline)
+                Text(version.content.prefix(100))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .navigationTitle("Version History")
+        .toolbar {
+            Button("Close") { dismiss() }
         }
     }
 }
