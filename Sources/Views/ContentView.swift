@@ -6,7 +6,6 @@ struct ContentView: View {
     }
 }
 
-@available(iOS 16.0, *)
 #Preview {
     ContentView()
 }
