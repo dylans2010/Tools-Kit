@@ -1,7 +1,7 @@
 import Foundation
+import SwiftUI
 
-@Observable
-final class AppModel {
-    var isLoading = false
-    var errorMessage: String?
+final class AppModel: ObservableObject {
+    @Published var isLoading = false
+    @Published var errorMessage: String?
 }
