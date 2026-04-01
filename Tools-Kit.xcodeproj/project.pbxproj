@@ -238,6 +238,9 @@
 			isa = PBXGroup;
 			children = (
 				E0E00A1458A464DAB575C4FE /* AppModel.swift */,
+				D735D463856D4BA588299529 /* Tool.swift */,
+				45DBE4B4F95D46F58A5304BC /* ToolRegistry.swift */,
+				126F5D3967E54F42B0F95A85 /* Note.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -249,8 +252,6 @@
 				55F4704416753FAA2B8FF663 /* Models */,
 				4A2CB0E156D82F6EAA22B391 /* Views */,
 
-				D735D463856D4BA588299529 /* Tool.swift */,
-				45DBE4B4F95D46F58A5304BC /* ToolRegistry.swift */,
 				B64E5154717C4F53A3A10C60 /* APITesterBackend.swift */,
 				1C52B3FE7AF54B5D81689AC7 /* RealTimeTranslationBackend.swift */,
 				0FC0283DB1C04DC994AE0753 /* TextSummarizerBackend.swift */,
@@ -308,7 +309,6 @@
 				D3614DB596A94EBEA3646F6A /* ToolCard.swift */,
 				8089CEDC467040D2B38719FF /* SectionHeader.swift */,
 				8F5090DCA1AD4E1DA6D7A453 /* SearchBar.swift */,
-				126F5D3967E54F42B0F95A85 /* Note.swift */,
 				48A66E8681454E9BA63967D7 /* HashGeneratorBackend.swift */,
 				789744A07C4847959848A33D /* WebhookTesterBackend.swift */,
 				96F39AF3124148D4AFFBC420 /* NotesBackend.swift */,
