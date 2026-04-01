@@ -102,6 +102,59 @@ jobs:
             find "$APP_PATH/Frameworks" -name "_CodeSignature" -type d -exec rm -rf {} + || true
           fi
 
+          # ✅ CREATE ENTITLEMENTS FILE FOR AD-HOC SIGNING
+          cat > /tmp/entitlements.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>get-task-allow</key>
+            <true/>
+          </dict>
+          </plist>
+          EOF
+
+          echo "==== SIGNING APP BUNDLE ===="
+          # Sign all embedded frameworks first (if any)
+          if [ -d "$APP_PATH/Frameworks" ]; then
+            echo "Signing frameworks..."
+            for framework in "$APP_PATH/Frameworks"/*.framework; do
+              if [ -d "$framework" ]; then
+                echo "  Signing $(basename "$framework")"
+                codesign --force --sign - --timestamp=none "$framework"
+              fi
+            done
+
+            for dylib in "$APP_PATH/Frameworks"/*.dylib; do
+              if [ -f "$dylib" ]; then
+                echo "  Signing $(basename "$dylib")"
+                codesign --force --sign - --timestamp=none "$dylib"
+              fi
+            done
+          fi
+
+          # Sign the main app bundle with entitlements
+          echo "Signing main app bundle..."
+          codesign --force --sign - \
+            --entitlements /tmp/entitlements.plist \
+            --timestamp=none \
+            --generate-entitlement-der \
+            "$APP_PATH"
+
+          # Verify the signature
+          echo "==== VERIFYING SIGNATURE ===="
+          codesign -dv --verbose=4 "$APP_PATH" || true
+          codesign --verify --verbose=4 "$APP_PATH" || true
+
+          # Extract and display entitlements
+          echo "==== EMBEDDED ENTITLEMENTS ===="
+          codesign -d --entitlements :- "$APP_PATH" || true
+
+          # Check binary
+          echo "==== BINARY INFO ===="
+          file "$APP_PATH/Tools-Kit" || true
+          otool -l "$APP_PATH/Tools-Kit" | grep -A 5 LC_CODE_SIGNATURE || true
+
           mkdir -p upload/Payload
           cp -R "$APP_PATH" upload/Payload/
 
