@@ -248,7 +248,7 @@ struct VersionHistoryView: View {
 
     var body: some View {
         NavigationStack {
-            List(Array(note.versionHistory.reversed())) { version in
+            List(note.versionHistory.sorted { $0.timestamp > $1.timestamp }) { version in
                 VStack(alignment: .leading) {
                     Text(version.timestamp.formatted())
                         .font(.headline)
