@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct NotesView: View {
     @StateObject private var backend = NotesBackend()
@@ -121,7 +122,7 @@ struct NoteEditorView: View {
                 TextField("Folder", text: $note.folder)
                     .font(.subheadline)
                     .padding(8)
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(uiColor: .secondarySystemBackground))
                     .cornerRadius(8)
                     .onChange(of: note.folder) { _ in backend.updateNote(note) }
 
@@ -232,7 +233,7 @@ struct VersionHistoryView: View {
 
     var body: some View {
         NavigationStack {
-            List(note.versionHistory.reversed()) { version in
+            List(Array(note.versionHistory.reversed())) { version in
                 VStack(alignment: .leading) {
                     Text(version.timestamp.formatted())
                         .font(.headline)
