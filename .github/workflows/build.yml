@@ -42,7 +42,7 @@ jobs:
         with:
           xcode-version: "16.2"
 
-      - name: Build Archive (Unsigned)
+      - name: Build App (Unsigned)
         run: |
           set -e
           mkdir -p build
@@ -52,42 +52,39 @@ jobs:
             -scheme "$SCHEME" \
             -configuration Release \
             -destination "generic/platform=iOS" \
-            -archivePath build/App.xcarchive \
-            clean archive \
+            -sdk iphoneos \
+            -derivedDataPath build/DerivedData \
+            build \
             CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO
+            CODE_SIGNING_REQUIRED=NO \
+            PRODUCT_BUNDLE_IDENTIFIER="com.example.myapp" \
+            MARKETING_VERSION="$MARKETING_VERSION" \
+            CURRENT_PROJECT_VERSION="$BUILD_VERSION" \
+            PRODUCT_NAME="$APP_NAME" \
+            TARGETED_DEVICE_FAMILY="1,2"
 
-      - name: Create Export Options Plist
+      - name: Locate .app
         run: |
-          cat <<EOF > build/exportOptions.plist
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>development</string>
-            <key>signingStyle</key>
-            <string>manual</string>
-            <key>compileBitcode</key>
-            <false/>
-            <key>stripSwiftSymbols</key>
-            <true/>
-          </dict>
-          </plist>
-          EOF
+          set -e
+          APP_PATH=$(find build/DerivedData -name "*.app" | grep -i "Products/Applications" | head -n 1)
 
-      - name: Export IPA (Xcode)
+          echo "Found app at: $APP_PATH"
+          echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
+
+      - name: Create IPA
         run: |
           set -e
 
-          xcodebuild -exportArchive \
-            -archivePath build/App.xcarchive \
-            -exportPath build/export \
-            -exportOptionsPlist build/exportOptions.plist
+          mkdir -p build/Payload
+          cp -R "$APP_PATH" build/Payload/
 
-      - name: Verify IPA Structure
+          cd build
+          zip -r "Tools-Kit.ipa" Payload
+
+      - name: Verify IPA
         run: |
-          ls -R build/export
+          ls -R build
+          unzip -l build/Tools-Kit.ipa
 
       - name: Generate Release Tag
         id: tag
@@ -100,4 +97,4 @@ jobs:
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: "Tools Kit Build ${{ steps.tag.outputs.tag }}"
-          files: build/export/*.ipa
+          files: build/Tools-Kit.ipa
