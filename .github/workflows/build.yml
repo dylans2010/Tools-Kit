@@ -1,4 +1,4 @@
-name: Create New Release
+name: Build Tools Kit
 
 on:
   workflow_dispatch:
@@ -9,10 +9,6 @@ on:
 permissions:
   contents: write
 
-env:
-  CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-  SECRET_ID: ${{ secrets.SECRET_ID }}
-
 jobs:
   build:
     runs-on: macos-14
@@ -21,28 +17,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: 'true'
-      
+          submodules: true
+
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.2'
+          xcode-version: "16.2"
 
       - name: Clean DerivedData
         run: rm -rf ~/Library/Developer/Xcode/DerivedData
 
       - name: Resolve Dependencies
         run: |
-          xcodebuild -project Tools-Kit.xcodeproj \
+          xcodebuild \
+            -project Tools-Kit.xcodeproj \
             -scheme Tools-Kit \
             -resolvePackageDependencies
 
-      # ✅ Keep archive, but controlled
-      - name: Archive App (Unsigned)
+      # ✅ BUILD (NOT ARCHIVE)
+      - name: Build App (Unsigned Clean Output)
         run: |
           set -e
 
-          mkdir -p upload
+          OUTPUT_DIR=$(pwd)/build/output
+          mkdir -p "$OUTPUT_DIR"
 
           xcodebuild \
             -project Tools-Kit.xcodeproj \
@@ -50,53 +48,55 @@ jobs:
             -configuration Release \
             -destination "generic/platform=iOS" \
             -sdk iphoneos \
-            -archivePath upload/Tools-Kit.xcarchive \
-            archive \
+            build \
             CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO
+            CODE_SIGNING_REQUIRED=NO \
+            CONFIGURATION_BUILD_DIR="$OUTPUT_DIR"
 
-      # ✅ CRITICAL FIX: clean signing artifacts
-      - name: Strip Code Signing
+      # ✅ ENSURE CLEAN BINARY (IMPORTANT)
+      - name: Normalize App Bundle
         run: |
           set -e
 
-          APP_PATH=$(find upload/Tools-Kit.xcarchive -name "*.app" | head -n 1)
+          APP_PATH=$(find build/output -maxdepth 1 -name "*.app" | head -n 1)
 
           if [ -z "$APP_PATH" ]; then
-            echo "No app found in archive"
+            echo "No .app found"
+            ls -R build/output
             exit 1
           fi
 
-          echo "Cleaning signing data from: $APP_PATH"
+          echo "Using app: $APP_PATH"
 
-          # Remove existing signatures
-          rm -rf "$APP_PATH/_CodeSignature"
-          rm -rf "$APP_PATH/CodeResources"
+          # Remove any residual signing artifacts
+          rm -rf "$APP_PATH/_CodeSignature" || true
+          rm -rf "$APP_PATH/CodeResources" || true
 
-          # Clean frameworks if they exist
           if [ -d "$APP_PATH/Frameworks" ]; then
-            find "$APP_PATH/Frameworks" -name "_CodeSignature" -type d -exec rm -rf {} +
+            find "$APP_PATH/Frameworks" -name "_CodeSignature" -type d -exec rm -rf {} + || true
           fi
 
           echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
 
+      # ✅ PROPER IPA STRUCTURE
       - name: Create IPA
         run: |
           set -e
 
-          mkdir -p upload/Payload
-          cp -R "$APP_PATH" upload/Payload/
+          mkdir -p build/Payload
+          cp -R "$APP_PATH" build/Payload/
 
-          cd upload
-          zip -r Tools-Kit.ipa Payload
+          cd build
+          /usr/bin/zip -r Tools-Kit.ipa Payload
 
       - name: Verify IPA
-        run: unzip -l upload/Tools-Kit.ipa
+        run: |
+          unzip -l build/Tools-Kit.ipa
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
           name: Tools-Kit Build ${{ github.run_number }}
-          files: upload/Tools-Kit.ipa
+          files: build/Tools-Kit.ipa
           generate_release_notes: true
