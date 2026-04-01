@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(macOS 11.0, *)
 struct ColorPickerView: View {
     @StateObject private var backend = ColorPickerBackend()
 
@@ -41,6 +42,7 @@ struct ColorPickerView: View {
     }
 }
 
+@available(macOS 11.0, *)
 struct ColorPickerTool: Tool {
     let name = "Color Picker"
     let icon = "eyedropper"

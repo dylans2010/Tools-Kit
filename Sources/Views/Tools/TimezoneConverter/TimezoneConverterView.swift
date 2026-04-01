@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(macOS 11.0, *)
 struct TimezoneConverterView: View {
     @StateObject private var backend = TimezoneConverterBackend()
 
@@ -32,6 +33,7 @@ struct TimezoneConverterView: View {
     }
 }
 
+@available(macOS 11.0, *)
 struct TimezoneConverterTool: Tool {
     let name = "Timezone Converter"
     let icon = "clock"

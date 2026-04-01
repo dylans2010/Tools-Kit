@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(macOS 11.0, *)
 struct ClipboardManagerView: View {
     @StateObject private var backend = ClipboardManagerBackend()
 
@@ -30,6 +31,7 @@ struct ClipboardManagerView: View {
     }
 }
 
+@available(macOS 11.0, *)
 struct ClipboardManagerTool: Tool {
     let name = "Clipboard Manager"
     let icon = "paperclip"

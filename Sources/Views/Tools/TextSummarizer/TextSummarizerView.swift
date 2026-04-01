@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(macOS 11.0, *)
 struct TextSummarizerView: View {
     @StateObject private var backend = TextSummarizerBackend()
 
@@ -30,6 +31,7 @@ struct TextSummarizerView: View {
     }
 }
 
+@available(macOS 11.0, *)
 struct TextSummarizerTool: Tool {
     let name = "Text Summarizer"
     let icon = "text.quote"

@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(macOS 10.15, *)
 struct SearchBar: View {
     @Binding var text: String
 

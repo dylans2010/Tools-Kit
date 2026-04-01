@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(macOS 11.0, *)
 struct JSONFormatterView: View {
     @StateObject private var backend = JSONFormatterBackend()
 
@@ -32,6 +33,7 @@ struct JSONFormatterView: View {
     }
 }
 
+@available(macOS 11.0, *)
 struct JSONFormatterTool: Tool {
     let name = "JSON Formatter"
     let icon = "chevron.left.forwardslash.chevron.right"
