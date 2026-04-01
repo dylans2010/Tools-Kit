@@ -2,6 +2,7 @@ import Foundation
 import CoreImage.CIFilterBuiltins
 import SwiftUI
 import AVFoundation
+import UIKit
 
 class QRCodeBackend: NSObject, ObservableObject, AVCaptureMetadataOutputObjectsDelegate {
     @Published var inputText = ""

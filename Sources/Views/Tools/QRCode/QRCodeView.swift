@@ -19,16 +19,20 @@ struct QRCodeView: View {
             .padding()
 
             if mode == .generate {
-                generationView
+                QRGenerationView(backend: backend)
             } else {
-                scanningView
+                QRScanningView(backend: backend)
             }
         }
         .padding()
         .navigationTitle("QR Code")
     }
+}
 
-    private var generationView: some View {
+private struct QRGenerationView: View {
+    @ObservedObject var backend: QRCodeBackend
+
+    var body: some View {
         VStack {
             TextField("Enter text or URL", text: $backend.inputText)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -51,8 +55,12 @@ struct QRCodeView: View {
             }
         }
     }
+}
 
-    private var scanningView: some View {
+private struct QRScanningView: View {
+    @ObservedObject var backend: QRCodeBackend
+
+    var body: some View {
         VStack {
             if backend.isScanning {
                 ZStack {
