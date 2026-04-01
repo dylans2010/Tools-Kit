@@ -1,6 +1,5 @@
 import SwiftUI
 
-@available(macOS 10.15, *)
 struct SectionHeader: View {
     let title: String
     let subtitle: String?

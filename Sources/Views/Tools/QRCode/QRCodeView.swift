@@ -1,7 +1,6 @@
 import SwiftUI
 import AVFoundation
 
-@available(macOS 11.0, *)
 struct QRCodeView: View {
     @StateObject private var backend = QRCodeBackend()
     @State private var mode: QRMode = .generate
@@ -94,7 +93,6 @@ struct QRCodeView: View {
     }
 }
 
-@available(macOS 11.0, *)
 struct QRCodeTool: Tool {
     let name = "QR Code Tool"
     let icon = "qrcode"

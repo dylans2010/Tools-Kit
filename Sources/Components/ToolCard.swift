@@ -1,6 +1,5 @@
 import SwiftUI
 
-@available(macOS 10.15, *)
 struct ToolCard: View {
     let tool: any Tool
     let isFavorite: Bool

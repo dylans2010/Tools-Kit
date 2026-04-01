@@ -1,6 +1,5 @@
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct CodeFormatterView: View {
     @StateObject private var backend = CodeFormatterBackend()
 
@@ -36,7 +35,6 @@ struct CodeFormatterView: View {
     }
 }
 
-@available(macOS 11.0, *)
 struct CodeFormatterTool: Tool {
     let name = "Code Formatter"
     let icon = "chevron.left.slash.chevron.right"
