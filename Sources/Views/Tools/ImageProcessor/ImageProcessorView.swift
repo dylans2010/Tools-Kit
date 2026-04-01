@@ -1,7 +1,18 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
+
 struct ImageProcessorView: View {
     @StateObject private var backend = ImageProcessorBackend()
-    var body: some View { Button("Compress") { backend.compressImage(UIImage()) }.navigationTitle("Image Processor") }
+    var body: some View {
+        Button("Compress") {
+            #if canImport(UIKit)
+            backend.compressImage(UIImage())
+            #endif
+        }
+        .navigationTitle("Image Processor")
+    }
 }
 struct ImageProcessorTool: Tool {
     let name = "Image Processor"
