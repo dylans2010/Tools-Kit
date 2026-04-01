@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(macOS 11.0, *)
 struct NotesFormatterView: View {
     @StateObject private var backend = NotesFormatterBackend()
 
@@ -27,6 +28,7 @@ struct NotesFormatterView: View {
     }
 }
 
+@available(macOS 11.0, *)
 struct NotesFormatterTool: Tool {
     let name = "Notes Formatter"
     let icon = "text.badge.plus"

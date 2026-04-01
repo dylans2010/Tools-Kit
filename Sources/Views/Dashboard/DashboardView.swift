@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(macOS 11.0, *)
 struct DashboardView: View {
     @StateObject private var registry = ToolRegistry()
     @State private var searchText = ""

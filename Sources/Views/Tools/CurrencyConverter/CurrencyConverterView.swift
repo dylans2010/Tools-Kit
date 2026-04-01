@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(macOS 11.0, *)
 struct CurrencyConverterView: View {
     @StateObject private var backend = CurrencyConverterBackend()
 
@@ -7,7 +8,9 @@ struct CurrencyConverterView: View {
         Form {
             Section(header: Text("Amount")) {
                 TextField("Amount", text: $backend.amount)
+                    #if os(iOS)
                     .keyboardType(.decimalPad)
+                    #endif
                 Picker("From", selection: $backend.fromCurrency) {
                     ForEach(Array(backend.rates.keys), id: \.self) { currency in
                         Text(currency).tag(currency)
@@ -33,6 +36,7 @@ struct CurrencyConverterView: View {
     }
 }
 
+@available(macOS 11.0, *)
 struct CurrencyConverterTool: Tool {
     let name = "Currency Converter"
     let icon = "dollarsign.circle"

@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(macOS 11.0, *)
 struct PasswordGeneratorView: View {
     @StateObject private var backend = PasswordGeneratorBackend()
 
@@ -29,6 +30,7 @@ struct PasswordGeneratorView: View {
     }
 }
 
+@available(macOS 11.0, *)
 struct PasswordGeneratorTool: Tool {
     let name = "Password Generator"
     let icon = "key"

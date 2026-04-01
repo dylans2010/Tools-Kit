@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(macOS 11.0, *)
 struct FileSizeView: View {
     @StateObject private var backend = FileSizeBackend()
 
@@ -7,7 +8,9 @@ struct FileSizeView: View {
         Form {
             Section(header: Text("Input")) {
                 TextField("Amount", text: $backend.inputAmount)
+                    #if os(iOS)
                     .keyboardType(.decimalPad)
+                    #endif
                 Picker("Unit", selection: $backend.inputUnit) {
                     ForEach(FileSizeBackend.SizeUnit.allCases, id: \.self) { unit in
                         Text(unit.rawValue).tag(unit)
@@ -29,6 +32,7 @@ struct FileSizeView: View {
     }
 }
 
+@available(macOS 11.0, *)
 struct FileSizeTool: Tool {
     let name = "File Size Converter"
     let icon = "externaldrive"

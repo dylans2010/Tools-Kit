@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(macOS 11.0, *)
 struct RegexTesterView: View {
     @StateObject private var backend = RegexTesterBackend()
 
@@ -30,6 +31,7 @@ struct RegexTesterView: View {
     }
 }
 
+@available(macOS 11.0, *)
 struct RegexTesterTool: Tool {
     let name = "Regex Tester"
     let icon = "text.magnifyingglass"

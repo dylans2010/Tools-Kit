@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(macOS 11.0, *)
 struct RealTimeTranslationView: View {
     @StateObject private var backend = RealTimeTranslationBackend()
 
@@ -43,6 +44,7 @@ struct RealTimeTranslationView: View {
     }
 }
 
+@available(macOS 11.0, *)
 struct RealTimeTranslationTool: Tool {
     let name = "Real-time Translation"
     let icon = "character.book.closed"
