@@ -1,6 +1,5 @@
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct CalculatorView: View {
     @StateObject private var backend = CalculatorBackend()
 
@@ -68,7 +67,6 @@ struct CalculatorView: View {
     }
 }
 
-@available(macOS 11.0, *)
 struct CalculatorTool: Tool {
     let name = "Calculator"
     let icon = "plus.forwardslash.minus"

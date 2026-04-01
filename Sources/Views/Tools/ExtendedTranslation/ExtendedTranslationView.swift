@@ -1,6 +1,5 @@
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct ExtendedTranslationView: View {
     @StateObject private var backend = ExtendedTranslationBackend()
 
@@ -42,7 +41,6 @@ struct ExtendedTranslationView: View {
     }
 }
 
-@available(macOS 11.0, *)
 struct ExtendedTranslationTool: Tool {
     let name = "Extended Translation"
     let icon = "text.bubble"

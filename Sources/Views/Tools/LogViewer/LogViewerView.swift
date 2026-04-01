@@ -1,6 +1,5 @@
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct LogViewerView: View {
     @StateObject private var backend = LogViewerBackend()
     @State private var newLog = ""
@@ -35,7 +34,6 @@ struct LogViewerView: View {
     }
 }
 
-@available(macOS 11.0, *)
 struct LogViewerTool: Tool {
     let name = "Log Viewer"
     let icon = "list.bullet.rectangle"

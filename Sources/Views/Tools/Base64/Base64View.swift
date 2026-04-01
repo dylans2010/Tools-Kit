@@ -1,6 +1,5 @@
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct Base64View: View {
     @StateObject private var backend = Base64Backend()
 
@@ -29,7 +28,6 @@ struct Base64View: View {
     }
 }
 
-@available(macOS 11.0, *)
 struct Base64Tool: Tool {
     let name = "Base64 Tool"
     let icon = "lock.open"

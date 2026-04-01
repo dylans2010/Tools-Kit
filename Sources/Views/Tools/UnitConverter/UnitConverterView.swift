@@ -1,6 +1,5 @@
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct UnitConverterView: View {
     @StateObject private var backend = UnitConverterBackend()
 
@@ -8,9 +7,7 @@ struct UnitConverterView: View {
         Form {
             Section(header: Text("Input")) {
                 TextField("Amount", text: $backend.input)
-                    #if os(iOS)
                     .keyboardType(.decimalPad)
-                    #endif
                 Picker("From", selection: $backend.inputUnit) {
                     ForEach(backend.units, id: \.self) { unit in
                         Text(unit.symbol).tag(unit)
@@ -36,7 +33,6 @@ struct UnitConverterView: View {
     }
 }
 
-@available(macOS 11.0, *)
 struct UnitConverterTool: Tool {
     let name = "Unit Converter"
     let icon = "ruler"

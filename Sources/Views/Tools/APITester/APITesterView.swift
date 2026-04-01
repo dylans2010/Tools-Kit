@@ -1,6 +1,5 @@
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct APITesterView: View {
     @StateObject private var backend = APITesterBackend()
 
@@ -65,7 +64,6 @@ struct APITesterView: View {
     }
 }
 
-@available(macOS 11.0, *)
 struct APITesterTool: Tool {
     let name = "API Tester"
     let icon = "network"

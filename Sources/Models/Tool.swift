@@ -13,7 +13,6 @@ enum ToolComplexity: String, CaseIterable, Codable {
     case advanced = "Advanced"
 }
 
-@available(macOS 10.15, *)
 protocol Tool: Identifiable {
     var id: String { get }
     var name: String { get }
