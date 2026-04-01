@@ -6,10 +6,18 @@ class ToolRegistry: ObservableObject {
     @Published var tools: [any Tool] = []
     @Published var favoriteToolIDs: Set<String> = []
     @Published var recentlyUsedIDs: [String] = []
+    @Published var installedToolIDs: Set<String> = []
 
     init() {
         registerTools()
         loadPersistedData()
+
+        // Mark all non-API tools as installed by default
+        for tool in tools {
+            if !tool.requiresAPI {
+                installedToolIDs.insert(tool.id)
+            }
+        }
     }
 
     private func registerTools() {
@@ -27,6 +35,10 @@ class ToolRegistry: ObservableObject {
             Base64Tool(),
             FileSizeTool(),
             RealTimeTranslationTool(),
+            WordCounterTool(),
+            TextFormatterTool(),
+            PasswordStrengthTool(),
+            MetadataRemoverTool(),
 
             // Advanced Tools
             JSONFormatterTool(),
@@ -35,7 +47,32 @@ class ToolRegistry: ObservableObject {
             CodeFormatterTool(),
             LogViewerTool(),
             TextSummarizerTool(),
-            ExtendedTranslationTool()
+            ExtendedTranslationTool(),
+            NotesTool(),
+            FileConverterTool(),
+            PDFTools(),
+            OCRTool(),
+            ImageProcessorTool(),
+            MeetingNotesTool(),
+            JWTDecoderTool(),
+            HashGeneratorTool(),
+            DiffCheckerTool(),
+            XMLFormatterTool(),
+            SQLFormatterTool(),
+            WebhookTesterTool(),
+            SecureNotesTool(),
+            EncryptionTool(),
+            IPInfoTool(),
+            DNSLookupTool(),
+            PortCheckerTool(),
+            WebsiteScreenshotTool(),
+            LinkPreviewTool(),
+            HTTPInspectorTool(),
+            TextRewriterTool(),
+            CodeExplainerTool(),
+            PromptGeneratorTool(),
+            EmailGeneratorTool(),
+            IdeaGeneratorTool()
         ]
     }
 
@@ -65,12 +102,27 @@ class ToolRegistry: ObservableObject {
         UserDefaults.standard.set(recentlyUsedIDs, forKey: "recentlyUsedIDs")
     }
 
+    private func saveInstalledTools() {
+        UserDefaults.standard.set(Array(installedToolIDs), forKey: "installedToolIDs")
+    }
+
     private func loadPersistedData() {
         if let favs = UserDefaults.standard.stringArray(forKey: "favoriteToolIDs") {
             favoriteToolIDs = Set(favs)
         }
         if let recent = UserDefaults.standard.stringArray(forKey: "recentlyUsedIDs") {
             recentlyUsedIDs = recent
+        }
+        if let installed = UserDefaults.standard.stringArray(forKey: "installedToolIDs") {
+            installedToolIDs = Set(installed)
+        }
+    }
+
+    func installTool(toolID: String) {
+        // Simulate a download delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            self.installedToolIDs.insert(toolID)
+            self.saveInstalledTools()
         }
     }
 
