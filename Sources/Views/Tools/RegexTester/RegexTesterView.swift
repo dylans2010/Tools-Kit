@@ -7,8 +7,8 @@ struct RegexTesterView: View {
         Form {
             Section(header: Text("Regex Pattern")) {
                 TextField("Pattern", text: $backend.pattern)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled(true)
                     .onChange(of: backend.pattern) { _ in backend.findMatches() }
             }
 

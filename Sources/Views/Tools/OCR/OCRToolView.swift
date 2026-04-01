@@ -1,4 +1,6 @@
 import SwiftUI
+import UIKit
+
 struct OCRToolView: View {
     @StateObject private var backend = OCRToolBackend()
     var body: some View { VStack { Text(backend.extractedText); Button("Extract") { backend.extractText(from: UIImage()) } }.navigationTitle("OCR") }
