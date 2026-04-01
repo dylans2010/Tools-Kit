@@ -38,6 +38,7 @@ struct TimezoneConverterTool: Tool {
     let category = ToolCategory.conversion
     let complexity = ToolComplexity.basic
     let description = "Convert between different timezones"
+    let requiresAPI = false
 
     var view: AnyView {
         AnyView(TimezoneConverterView())

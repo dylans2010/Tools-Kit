@@ -36,6 +36,7 @@ struct RegexTesterTool: Tool {
     let category = ToolCategory.development
     let complexity = ToolComplexity.advanced
     let description = "Live regex matching and testing"
+    let requiresAPI = false
 
     var view: AnyView {
         AnyView(RegexTesterView())

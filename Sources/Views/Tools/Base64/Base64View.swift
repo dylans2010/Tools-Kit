@@ -34,6 +34,7 @@ struct Base64Tool: Tool {
     let category = ToolCategory.development
     let complexity = ToolComplexity.basic
     let description = "Encode and decode Base64 strings"
+    let requiresAPI = false
 
     var view: AnyView {
         AnyView(Base64View())

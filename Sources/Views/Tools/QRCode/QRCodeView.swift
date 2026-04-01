@@ -99,6 +99,7 @@ struct QRCodeTool: Tool {
     let category = ToolCategory.utility
     let complexity = ToolComplexity.basic
     let description = "Generate and scan QR codes"
+    let requiresAPI = false
 
     var view: AnyView {
         AnyView(QRCodeView())

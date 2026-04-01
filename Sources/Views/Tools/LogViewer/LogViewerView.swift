@@ -40,6 +40,7 @@ struct LogViewerTool: Tool {
     let category = ToolCategory.development
     let complexity = ToolComplexity.advanced
     let description = "View and debug application logs"
+    let requiresAPI = false
 
     var view: AnyView {
         AnyView(LogViewerView())

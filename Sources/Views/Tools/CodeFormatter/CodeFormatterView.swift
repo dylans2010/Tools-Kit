@@ -41,6 +41,7 @@ struct CodeFormatterTool: Tool {
     let category = ToolCategory.development
     let complexity = ToolComplexity.advanced
     let description = "Format code for multiple languages"
+    let requiresAPI = false
 
     var view: AnyView {
         AnyView(CodeFormatterView())

@@ -70,6 +70,7 @@ struct APITesterTool: Tool {
     let category = ToolCategory.development
     let complexity = ToolComplexity.advanced
     let description = "Test API endpoints with custom payloads"
+    let requiresAPI = true
 
     var view: AnyView {
         AnyView(APITesterView())

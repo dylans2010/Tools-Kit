@@ -47,6 +47,7 @@ struct ColorPickerTool: Tool {
     let category = ToolCategory.utility
     let complexity = ToolComplexity.basic
     let description = "HEX and RGB color conversion"
+    let requiresAPI = false
 
     var view: AnyView {
         AnyView(ColorPickerView())

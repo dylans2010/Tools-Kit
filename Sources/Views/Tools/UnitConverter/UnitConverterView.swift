@@ -39,6 +39,7 @@ struct UnitConverterTool: Tool {
     let category = ToolCategory.conversion
     let complexity = ToolComplexity.basic
     let description = "Convert between various measurement units"
+    let requiresAPI = false
 
     var view: AnyView {
         AnyView(UnitConverterView())

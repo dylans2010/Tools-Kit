@@ -39,6 +39,7 @@ struct CurrencyConverterTool: Tool {
     let category = ToolCategory.conversion
     let complexity = ToolComplexity.basic
     let description = "Real-time currency exchange rates"
+    let requiresAPI = true
 
     var view: AnyView {
         AnyView(CurrencyConverterView())

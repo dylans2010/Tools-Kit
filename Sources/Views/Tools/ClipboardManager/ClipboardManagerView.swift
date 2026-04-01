@@ -36,6 +36,7 @@ struct ClipboardManagerTool: Tool {
     let category = ToolCategory.utility
     let complexity = ToolComplexity.basic
     let description = "Manage your clipboard history"
+    let requiresAPI = false
 
     var view: AnyView {
         AnyView(ClipboardManagerView())

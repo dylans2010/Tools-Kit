@@ -33,6 +33,7 @@ struct NotesFormatterTool: Tool {
     let category = ToolCategory.utility
     let complexity = ToolComplexity.basic
     let description = "Format and clean up text notes"
+    let requiresAPI = false
 
     var view: AnyView {
         AnyView(NotesFormatterView())

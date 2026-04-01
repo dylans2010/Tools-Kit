@@ -35,6 +35,7 @@ struct FileSizeTool: Tool {
     let category = ToolCategory.conversion
     let complexity = ToolComplexity.basic
     let description = "Convert between various file size units"
+    let requiresAPI = false
 
     var view: AnyView {
         AnyView(FileSizeView())
