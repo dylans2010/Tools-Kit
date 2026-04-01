@@ -15,7 +15,7 @@
 /* Begin PBXFileReference section */
 		1060294FE4D1B96EE4302F9E /* AppEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEntry.swift; sourceTree = "<group>"; };
 		54244EAC19ED294008A5A839 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		732E3165BFBB323BD8081B3F /* Test.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Test.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		732E3165BFBB323BD8081B3F /* Tools-Kit.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Tools-Kit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0E00A1458A464DAB575C4FE /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -49,7 +49,7 @@
 		B81AA4FC2BB81266E881DF5B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				732E3165BFBB323BD8081B3F /* Test.app */,
+				732E3165BFBB323BD8081B3F /* Tools-Kit.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -65,9 +65,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		F3353FBEDEEBF7704E1E6451 /* Test */ = {
+		F3353FBEDEEBF7704E1E6451 /* Tools-Kit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7A6D9F4389A5C85EEE4A6E47 /* Build configuration list for PBXNativeTarget "Test" */;
+			buildConfigurationList = 7A6D9F4389A5C85EEE4A6E47 /* Build configuration list for PBXNativeTarget "Tools-Kit" */;
 			buildPhases = (
 				C9111E28A299A9C316B4C75C /* Sources */,
 			);
@@ -75,11 +75,11 @@
 			);
 			dependencies = (
 			);
-			name = Test;
+			name = Tools-Kit;
 			packageProductDependencies = (
 			);
-			productName = Test;
-			productReference = 732E3165BFBB323BD8081B3F /* Test.app */;
+			productName = Tools-Kit;
+			productReference = 732E3165BFBB323BD8081B3F /* Tools-Kit.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -107,7 +107,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				F3353FBEDEEBF7704E1E6451 /* Test */,
+				F3353FBEDEEBF7704E1E6451 /* Tools-Kit */,
 			);
 		};
 /* End PBXProject section */
@@ -284,7 +284,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7A6D9F4389A5C85EEE4A6E47 /* Build configuration list for PBXNativeTarget "Test" */ = {
+		7A6D9F4389A5C85EEE4A6E47 /* Build configuration list for PBXNativeTarget "Tools-Kit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8EF2AC13861B30D4D246AC91 /* Debug */,
