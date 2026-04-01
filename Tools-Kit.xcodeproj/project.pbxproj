@@ -117,11 +117,11 @@
 
 /* Begin PBXFileReference section */
 		1060294FE4D1B96EE4302F9E /* AppEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppEntry.swift"; sourceTree = "<group>"; };
-		54244EAC19ED294008A5A839 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/ContentView.swift"; sourceTree = "<group>"; };
+		54244EAC19ED294008A5A839 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		732E3165BFBB323BD8081B3F /* Tools-Kit.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Tools-Kit.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E0E00A1458A464DAB575C4FE /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/AppModel.swift"; sourceTree = "<group>"; };
-		D735D463856D4BA588299529 /* Tool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Tool.swift"; sourceTree = "<group>"; };
-		45DBE4B4F95D46F58A5304BC /* ToolRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/ToolRegistry.swift"; sourceTree = "<group>"; };
+		E0E00A1458A464DAB575C4FE /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		D735D463856D4BA588299529 /* Tool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
+		45DBE4B4F95D46F58A5304BC /* ToolRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolRegistry.swift; sourceTree = "<group>"; };
 		B64E5154717C4F53A3A10C60 /* APITesterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/APITester/APITesterBackend.swift"; sourceTree = "<group>"; };
 		1C52B3FE7AF54B5D81689AC7 /* RealTimeTranslationBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/RealTimeTranslation/RealTimeTranslationBackend.swift"; sourceTree = "<group>"; };
 		0FC0283DB1C04DC994AE0753 /* TextSummarizerBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/TextSummarizer/TextSummarizerBackend.swift"; sourceTree = "<group>"; };
@@ -179,7 +179,7 @@
 		D3614DB596A94EBEA3646F6A /* ToolCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/ToolCard.swift"; sourceTree = "<group>"; };
 		8089CEDC467040D2B38719FF /* SectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/SectionHeader.swift"; sourceTree = "<group>"; };
 		8F5090DCA1AD4E1DA6D7A453 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/SearchBar.swift"; sourceTree = "<group>"; };
-		126F5D3967E54F42B0F95A85 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Note.swift"; sourceTree = "<group>"; };
+		126F5D3967E54F42B0F95A85 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		48A66E8681454E9BA63967D7 /* HashGeneratorBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/HashGenerator/HashGeneratorBackend.swift"; sourceTree = "<group>"; };
 		789744A07C4847959848A33D /* WebhookTesterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/WebhookTester/WebhookTesterBackend.swift"; sourceTree = "<group>"; };
 		96F39AF3124148D4AFFBC420 /* NotesBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Notes/NotesBackend.swift"; sourceTree = "<group>"; };
