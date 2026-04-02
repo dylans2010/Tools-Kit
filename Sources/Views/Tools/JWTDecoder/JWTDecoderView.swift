@@ -1,7 +1,28 @@
 import SwiftUI
 struct JWTDecoderView: View {
     @StateObject private var backend = JWTDecoderBackend()
-    var body: some View { VStack { TextField("JWT", text: $backend.token); Button("Decode") { backend.decode() }; Text(backend.decoded) }.navigationTitle("JWT Decoder") }
+    var body: some View {
+        VStack(spacing: 20) {
+            TextField("JWT Token", text: $backend.token)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+
+            Button("Decode") {
+                backend.decode()
+            }
+            .buttonStyle(.borderedProminent)
+
+            Text(backend.decoded)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(8)
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding()
+        .navigationTitle("JWT Decoder")
+    }
 }
 struct JWTDecoderTool: Tool {
     let name = "JWT Decoder"
