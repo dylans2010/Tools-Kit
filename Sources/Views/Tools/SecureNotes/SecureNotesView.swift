@@ -50,7 +50,7 @@ struct SecureNotesView: View {
 
     private var notesList: some View {
         List {
-            ForEach(backend.notes) { note in
+            ForEach(backend.notes, id: \.id) { note in
                 VStack(alignment: .leading) {
                     Text(note.title).font(.headline)
                     Text(note.content).font(.subheadline).lineLimit(2).foregroundColor(.secondary)
