@@ -1,7 +1,19 @@
 import SwiftUI
 struct PortCheckerView: View {
     @StateObject private var backend = PortCheckerBackend()
-    var body: some View { Button("Check") { backend.check() }.navigationTitle("Port Checker") }
+    var body: some View {
+        VStack(spacing: 20) {
+            Button("Check") {
+                backend.check()
+            }
+            .buttonStyle(.borderedProminent)
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding()
+        .navigationTitle("Port Checker")
+    }
 }
 struct PortCheckerTool: Tool {
     let name = "Port Checker"

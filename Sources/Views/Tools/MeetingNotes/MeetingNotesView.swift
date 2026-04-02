@@ -1,7 +1,25 @@
 import SwiftUI
 struct MeetingNotesView: View {
     @StateObject private var backend = MeetingNotesBackend()
-    var body: some View { VStack { Text(backend.notes); Button("Generate") { backend.generate() } }.navigationTitle("Meeting Notes") }
+    var body: some View {
+        VStack(spacing: 20) {
+            Text(backend.notes)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(8)
+
+            Button("Generate Meeting Notes") {
+                backend.generate()
+            }
+            .buttonStyle(.borderedProminent)
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding()
+        .navigationTitle("Meeting Notes")
+    }
 }
 struct MeetingNotesTool: Tool {
     let name = "Meeting Notes"

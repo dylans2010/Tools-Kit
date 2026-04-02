@@ -1,7 +1,19 @@
 import SwiftUI
 struct IdeaGeneratorView: View {
     @StateObject private var backend = IdeaGeneratorBackend()
-    var body: some View { Button("Generate") { backend.generate() }.navigationTitle("Idea Gen") }
+    var body: some View {
+        VStack(spacing: 20) {
+            Button("Generate") {
+                backend.generate()
+            }
+            .buttonStyle(.borderedProminent)
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding()
+        .navigationTitle("Idea Generator")
+    }
 }
 struct IdeaGeneratorTool: Tool {
     let name = "Idea Generator"

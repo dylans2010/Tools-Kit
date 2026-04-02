@@ -1,7 +1,19 @@
 import SwiftUI
 struct DNSLookupView: View {
     @StateObject private var backend = DNSLookupBackend()
-    var body: some View { Button("Lookup") { backend.lookup() }.navigationTitle("DNS Lookup") }
+    var body: some View {
+        VStack(spacing: 20) {
+            Button("Lookup") {
+                backend.lookup()
+            }
+            .buttonStyle(.borderedProminent)
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding()
+        .navigationTitle("DNS Lookup")
+    }
 }
 struct DNSLookupTool: Tool {
     let name = "DNS Lookup"

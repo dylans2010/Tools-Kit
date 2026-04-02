@@ -10,13 +10,12 @@ struct QRCodeView: View {
     }
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             Picker("Mode", selection: $mode) {
                 Text("Generate").tag(QRMode.generate)
                 Text("Scan").tag(QRMode.scan)
             }
             .pickerStyle(.segmented)
-            .padding()
 
             if mode == .generate {
                 QRGenerationView(backend: backend)
@@ -24,6 +23,7 @@ struct QRCodeView: View {
                 QRScanningView(backend: backend)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding()
         .navigationTitle("QR Code")
     }
@@ -33,10 +33,9 @@ private struct QRGenerationView: View {
     @ObservedObject var backend: QRCodeBackend
 
     var body: some View {
-        VStack {
+        VStack(spacing: 20) {
             TextField("Enter text or URL", text: $backend.inputText)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
 
             Button("Generate QR Code") {
                 backend.generateQRCode()
@@ -48,12 +47,13 @@ private struct QRGenerationView: View {
                     .interpolation(.none)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 200, height: 200)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding()
             } else {
                 Spacer()
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
 
@@ -61,20 +61,20 @@ private struct QRScanningView: View {
     @ObservedObject var backend: QRCodeBackend
 
     var body: some View {
-        VStack {
+        VStack(spacing: 20) {
             if backend.isScanning {
                 ZStack {
                     Color.black
                     Text("Scanning Camera Preview...")
                         .foregroundColor(.white)
                 }
-                .frame(height: 300)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .cornerRadius(12)
-                .padding()
 
                 Button("Stop Scanning") {
                     backend.stopScanning()
                 }
+                .buttonStyle(.borderedProminent)
             } else {
                 VStack(spacing: 20) {
                     if let code = backend.scannedCode {
@@ -94,10 +94,11 @@ private struct QRScanningView: View {
                     }
                     .buttonStyle(.borderedProminent)
                 }
-                .padding()
+
+                Spacer()
             }
-            Spacer()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
 

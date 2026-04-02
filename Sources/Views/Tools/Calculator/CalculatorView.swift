@@ -37,6 +37,7 @@ struct CalculatorView: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding()
         .navigationTitle("Calculator")
     }

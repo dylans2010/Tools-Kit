@@ -1,7 +1,19 @@
 import SwiftUI
 struct IPInfoView: View {
     @StateObject private var backend = IPInfoBackend()
-    var body: some View { Button("Fetch") { backend.fetch() }.navigationTitle("IP Info") }
+    var body: some View {
+        VStack(spacing: 20) {
+            Button("Fetch") {
+                backend.fetch()
+            }
+            .buttonStyle(.borderedProminent)
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding()
+        .navigationTitle("IP Info")
+    }
 }
 struct IPInfoTool: Tool {
     let name = "IP Info"

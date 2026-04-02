@@ -4,11 +4,10 @@ struct Base64View: View {
     @StateObject private var backend = Base64Backend()
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             TextEditor(text: $backend.inputText)
-                .frame(maxHeight: 200)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .border(Color.gray, width: 1)
-                .padding()
 
             HStack {
                 Button("Encode") { backend.encode() }
@@ -17,12 +16,10 @@ struct Base64View: View {
             .buttonStyle(.borderedProminent)
 
             TextEditor(text: .constant(backend.outputText))
-                .frame(maxHeight: 200)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .border(Color.blue, width: 1)
-                .padding()
-
-            Spacer()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
         .navigationTitle("Base64 Encoder/Decoder")
     }

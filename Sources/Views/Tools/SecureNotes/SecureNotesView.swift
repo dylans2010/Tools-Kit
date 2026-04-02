@@ -1,7 +1,19 @@
 import SwiftUI
 struct SecureNotesView: View {
     @StateObject private var backend = SecureNotesBackend()
-    var body: some View { Button("Unlock") { backend.auth() }.navigationTitle("Secure Notes") }
+    var body: some View {
+        VStack(spacing: 20) {
+            Button("Unlock") {
+                backend.auth()
+            }
+            .buttonStyle(.borderedProminent)
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding()
+        .navigationTitle("Secure Notes")
+    }
 }
 struct SecureNotesTool: Tool {
     let name = "Secure Notes"

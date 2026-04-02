@@ -1,7 +1,21 @@
 import SwiftUI
 struct XMLFormatterView: View {
     @StateObject private var backend = XMLFormatterBackend()
-    var body: some View { VStack { TextEditor(text: $backend.xml); Button("Format") { backend.format() } }.navigationTitle("XML Formatter") }
+    var body: some View {
+        VStack(spacing: 20) {
+            TextEditor(text: $backend.xml)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .border(Color.gray, width: 1)
+
+            Button("Format XML") {
+                backend.format()
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding()
+        .navigationTitle("XML Formatter")
+    }
 }
 struct XMLFormatterTool: Tool {
     let name = "XML Formatter"

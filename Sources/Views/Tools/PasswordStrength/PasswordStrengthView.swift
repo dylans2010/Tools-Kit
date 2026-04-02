@@ -1,7 +1,24 @@
 import SwiftUI
 struct PasswordStrengthView: View {
     @StateObject private var backend = PasswordStrengthBackend()
-    var body: some View { VStack { SecureField("Pass", text: $backend.password); Text("Strength: \(backend.strength)") }.navigationTitle("Pass Strength") }
+    var body: some View {
+        VStack(spacing: 20) {
+            SecureField("Enter Password", text: $backend.password)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+
+            Text("Strength: \(backend.strength)")
+                .font(.headline)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(8)
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding()
+        .navigationTitle("Password Strength")
+    }
 }
 struct PasswordStrengthTool: Tool {
     let name = "Password Strength"

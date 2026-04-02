@@ -1,7 +1,21 @@
 import SwiftUI
 struct TextFormatterView: View {
     @StateObject private var backend = TextFormatterBackend()
-    var body: some View { VStack { TextEditor(text: $backend.text); Button("Uppercase") { backend.uppercase() } }.navigationTitle("Text Formatter") }
+    var body: some View {
+        VStack(spacing: 20) {
+            TextEditor(text: $backend.text)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .border(Color.gray, width: 1)
+
+            Button("Uppercase") {
+                backend.uppercase()
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding()
+        .navigationTitle("Text Formatter")
+    }
 }
 struct TextFormatterTool: Tool {
     let name = "Text Formatter"

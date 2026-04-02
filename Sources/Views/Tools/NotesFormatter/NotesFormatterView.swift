@@ -4,11 +4,10 @@ struct NotesFormatterView: View {
     @StateObject private var backend = NotesFormatterBackend()
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             TextEditor(text: $backend.inputText)
-                .frame(maxHeight: 200)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .border(Color.gray, width: 1)
-                .padding()
 
             HStack {
                 Button("ABC") { backend.format(to: .uppercase) }
@@ -19,10 +18,11 @@ struct NotesFormatterView: View {
             .buttonStyle(.bordered)
 
             TextEditor(text: .constant(backend.formattedText))
-                .frame(maxHeight: 200)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .border(Color.blue, width: 1)
-                .padding()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding()
         .navigationTitle("Notes Formatter")
     }
 }

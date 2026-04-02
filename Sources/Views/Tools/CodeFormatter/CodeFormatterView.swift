@@ -4,19 +4,17 @@ struct CodeFormatterView: View {
     @StateObject private var backend = CodeFormatterBackend()
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             Picker("Language", selection: $backend.selectedLanguage) {
                 ForEach(backend.languages, id: \.self) { lang in
                     Text(lang).tag(lang)
                 }
             }
             .pickerStyle(.segmented)
-            .padding()
 
             TextEditor(text: $backend.inputText)
-                .frame(maxHeight: 200)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .border(Color.gray, width: 1)
-                .padding()
 
             Button("Format Code") {
                 backend.format()
@@ -24,12 +22,10 @@ struct CodeFormatterView: View {
             .buttonStyle(.borderedProminent)
 
             TextEditor(text: .constant(backend.formattedText))
-                .frame(maxHeight: 200)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .border(Color.blue, width: 1)
-                .padding()
-
-            Spacer()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
         .navigationTitle("Code Formatter")
     }

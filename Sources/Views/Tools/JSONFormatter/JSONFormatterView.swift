@@ -4,11 +4,10 @@ struct JSONFormatterView: View {
     @StateObject private var backend = JSONFormatterBackend()
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             TextEditor(text: $backend.inputText)
-                .frame(maxHeight: 200)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .border(backend.isValid ? Color.gray : Color.red, width: 1)
-                .padding()
 
             Button("Format and Validate") {
                 backend.format()
@@ -16,17 +15,15 @@ struct JSONFormatterView: View {
             .buttonStyle(.borderedProminent)
 
             TextEditor(text: .constant(backend.outputText))
-                .frame(maxHeight: 200)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .border(Color.blue, width: 1)
-                .padding()
 
             if !backend.isValid {
                 Text("Invalid JSON format")
                     .foregroundColor(.red)
             }
-
-            Spacer()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
         .navigationTitle("JSON Formatter/Validator")
     }

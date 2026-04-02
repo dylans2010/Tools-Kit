@@ -1,7 +1,19 @@
 import SwiftUI
 struct HTTPInspectorView: View {
     @StateObject private var backend = HTTPInspectorBackend()
-    var body: some View { Button("Inspect") { backend.inspect() }.navigationTitle("HTTP Inspector") }
+    var body: some View {
+        VStack(spacing: 20) {
+            Button("Inspect") {
+                backend.inspect()
+            }
+            .buttonStyle(.borderedProminent)
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding()
+        .navigationTitle("HTTP Inspector")
+    }
 }
 struct HTTPInspectorTool: Tool {
     let name = "HTTP Inspector"
