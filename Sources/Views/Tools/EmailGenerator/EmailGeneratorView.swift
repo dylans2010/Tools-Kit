@@ -1,7 +1,19 @@
 import SwiftUI
 struct EmailGeneratorView: View {
     @StateObject private var backend = EmailGeneratorBackend()
-    var body: some View { Button("Generate") { backend.generate() }.navigationTitle("Email Assistant") }
+    var body: some View {
+        VStack(spacing: 20) {
+            Button("Generate") {
+                backend.generate()
+            }
+            .buttonStyle(.borderedProminent)
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding()
+        .navigationTitle("Email Assistant")
+    }
 }
 struct EmailGeneratorTool: Tool {
     let name = "Email Assistant"

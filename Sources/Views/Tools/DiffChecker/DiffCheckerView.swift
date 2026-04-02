@@ -1,7 +1,19 @@
 import SwiftUI
 struct DiffCheckerView: View {
     @StateObject private var backend = DiffCheckerBackend()
-    var body: some View { Button("Check Diff") { backend.check() }.navigationTitle("Diff Checker") }
+    var body: some View {
+        VStack(spacing: 20) {
+            Button("Check Diff") {
+                backend.check()
+            }
+            .buttonStyle(.borderedProminent)
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding()
+        .navigationTitle("Diff Checker")
+    }
 }
 struct DiffCheckerTool: Tool {
     let name = "Diff Checker"

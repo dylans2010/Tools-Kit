@@ -1,7 +1,19 @@
 import SwiftUI
 struct CodeExplainerView: View {
     @StateObject private var backend = CodeExplainerBackend()
-    var body: some View { Button("Explain") { backend.explain() }.navigationTitle("Explainer") }
+    var body: some View {
+        VStack(spacing: 20) {
+            Button("Explain") {
+                backend.explain()
+            }
+            .buttonStyle(.borderedProminent)
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding()
+        .navigationTitle("Code Explainer")
+    }
 }
 struct CodeExplainerTool: Tool {
     let name = "Code Explainer"
