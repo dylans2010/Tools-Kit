@@ -50,11 +50,17 @@ struct SecureNotesView: View {
 
     private var notesList: some View {
         List {
-            ForEach(backend.notes, id: \.id) { note in
+            ForEach(backend.notes) { note in
                 VStack(alignment: .leading) {
-                    Text(note.title).font(.headline)
-                    Text(note.content).font(.subheadline).lineLimit(2).foregroundColor(.secondary)
-                    Text(note.date, style: .date).font(.caption2).foregroundColor(.tertiaryLabel)
+                    Text(note.title)
+                        .font(.headline)
+                    Text(note.content)
+                        .font(.subheadline)
+                        .lineLimit(2)
+                        .foregroundColor(.secondary)
+                    Text(note.date, style: .date)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
                 }
             }
             .onDelete(perform: backend.deleteNote)
