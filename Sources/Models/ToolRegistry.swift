@@ -72,7 +72,8 @@ class ToolRegistry: ObservableObject {
             CodeExplainerTool(),
             PromptGeneratorTool(),
             EmailGeneratorTool(),
-            IdeaGeneratorTool()
+            IdeaGeneratorTool(),
+            WeatherTool()
         ]
     }
 

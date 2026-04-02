@@ -11,6 +11,7 @@ struct DashboardView: View {
                     SearchBar(text: $searchText)
 
                     if searchText.isEmpty {
+                        weatherSection
                         recentlyUsedSection
                         favoritesSection
                         basicToolsSection
@@ -24,6 +25,14 @@ struct DashboardView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
+    }
+
+    private var weatherSection: some View {
+        NavigationLink(destination: WeatherView()) {
+            WeatherMiniCard()
+        }
+        .padding(.horizontal)
+        .padding(.bottom, 8)
     }
 
     private var recentlyUsedSection: some View {
