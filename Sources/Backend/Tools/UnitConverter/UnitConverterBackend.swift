@@ -1,7 +1,6 @@
 import Foundation
 
 enum UnitCategory: String, CaseIterable {
-    let id = UUID()
     case length = "Length"
     case mass = "Mass"
     case temperature = "Temperature"
