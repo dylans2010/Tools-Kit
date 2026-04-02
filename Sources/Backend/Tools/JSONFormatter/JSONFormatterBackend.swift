@@ -6,8 +6,15 @@ class JSONFormatterBackend: ObservableObject {
     @Published var isValid = true
 
     func format() {
+        guard !inputText.isEmpty else {
+            outputText = ""
+            isValid = true
+            return
+        }
+
         guard let data = inputText.data(using: .utf8) else {
             isValid = false
+            outputText = "Error: Invalid character encoding"
             return
         }
 

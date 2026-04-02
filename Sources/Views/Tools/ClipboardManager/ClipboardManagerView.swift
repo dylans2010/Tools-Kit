@@ -2,29 +2,73 @@ import SwiftUI
 
 struct ClipboardManagerView: View {
     @StateObject private var backend = ClipboardManagerBackend()
+    @State private var textToCopy = ""
 
     var body: some View {
-        VStack(spacing: 16) {
-            Text("Clipboard Content:")
-                .font(.headline)
-                .frame(maxWidth: .infinity, alignment: .leading)
+        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("New Entry").font(.caption).foregroundColor(.secondary)
+                HStack {
+                    TextField("Type or paste text here...", text: $textToCopy)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
 
-            TextEditor(text: $backend.clipboardContent)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .border(Color.gray, width: 1)
-
-            HStack {
-                Button("Copy") {
-                    backend.copyToClipboard(backend.clipboardContent)
+                    Button("Copy") {
+                        backend.copyToClipboard(textToCopy)
+                        textToCopy = ""
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(textToCopy.isEmpty)
                 }
-                Button("Paste") {
-                    backend.pasteFromClipboard()
+
+                Button(action: {
+                    let pasted = backend.pasteFromClipboard()
+                    if textToCopy.isEmpty { textToCopy = pasted }
+                }) {
+                    Label("Paste from System Clipboard", systemImage: "doc.on.clipboard")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+            }
+            .padding()
+            .background(Color(.secondarySystemBackground))
+
+            List {
+                Section(header: Text("History")) {
+                    if backend.history.isEmpty {
+                        Text("No history yet.").foregroundColor(.secondary)
+                    } else {
+                        ForEach(backend.history) { entry in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(entry.content)
+                                    .lineLimit(3)
+                                    .font(.system(.subheadline, design: .monospaced))
+
+                                HStack {
+                                    Text(entry.timestamp, style: .time)
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                    Spacer()
+                                    Button(action: { UIPasteboard.general.string = entry.content }) {
+                                        Image(systemName: "doc.on.doc")
+                                            .font(.caption)
+                                    }
+                                }
+                            }
+                            .padding(.vertical, 4)
+                        }
+                        .onDelete(perform: backend.deleteEntry)
+                    }
                 }
             }
-            .buttonStyle(.borderedProminent)
+            .listStyle(PlainListStyle())
+
+            if !backend.history.isEmpty {
+                Button("Clear History", role: .destructive) {
+                    backend.clearHistory()
+                }
+                .padding()
+            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
         .navigationTitle("Clipboard Manager")
     }
 }
@@ -34,10 +78,7 @@ struct ClipboardManagerTool: Tool {
     let icon = "paperclip"
     let category = ToolCategory.utility
     let complexity = ToolComplexity.basic
-    let description = "Manage your clipboard history"
+    let description = "Keep track of your recently copied text and manage history"
     let requiresAPI = false
-
-    var view: AnyView {
-        AnyView(ClipboardManagerView())
-    }
+    var view: AnyView { AnyView(ClipboardManagerView()) }
 }

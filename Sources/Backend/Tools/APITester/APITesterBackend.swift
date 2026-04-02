@@ -1,26 +1,50 @@
 import Foundation
 
+struct HTTPHeader: Identifiable, Equatable {
+    let id = UUID()
+    var key: String
+    var value: String
+}
+
 class APITesterBackend: ObservableObject {
     @Published var url = "https://jsonplaceholder.typicode.com/posts"
     @Published var method = "POST"
+    @Published var headers: [HTTPHeader] = [
+        HTTPHeader(key: "Content-Type", value: "application/json")
+    ]
     @Published var requestBody = "{\n  \"title\": \"foo\",\n  \"body\": \"bar\",\n  \"userId\": 1\n}"
     @Published var responseBody = ""
     @Published var responseStatus = 0
     @Published var isLoading = false
+    @Published var responseHeaders: [String: String] = [:]
 
-    let methods = ["GET", "POST", "PUT", "DELETE"]
+    let methods = ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"]
 
     func sendRequest() {
-        guard let url = URL(string: url) else { return }
+        guard let url = URL(string: url) else {
+            self.responseBody = "Invalid URL"
+            return
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = method
 
-        if method != "GET" && !requestBody.isEmpty {
+        // Add custom headers
+        for header in headers {
+            if !header.key.isEmpty {
+                request.addValue(header.value, forHTTPHeaderField: header.key)
+            }
+        }
+
+        if method != "GET" && method != "HEAD" && !requestBody.isEmpty {
             request.httpBody = requestBody.data(using: .utf8)
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         }
 
         isLoading = true
+        responseBody = ""
+        responseStatus = 0
+        responseHeaders = [:]
+
         URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 self.isLoading = false
@@ -31,6 +55,7 @@ class APITesterBackend: ObservableObject {
 
                 if let httpResponse = response as? HTTPURLResponse {
                     self.responseStatus = httpResponse.statusCode
+                    self.responseHeaders = httpResponse.allHeaderFields as? [String: String] ?? [:]
                 }
 
                 if let data = data {
@@ -43,5 +68,13 @@ class APITesterBackend: ObservableObject {
                 }
             }
         }.resume()
+    }
+
+    func addHeader() {
+        headers.append(HTTPHeader(key: "", value: ""))
+    }
+
+    func removeHeader(at offsets: IndexSet) {
+        headers.remove(atOffsets: offsets)
     }
 }

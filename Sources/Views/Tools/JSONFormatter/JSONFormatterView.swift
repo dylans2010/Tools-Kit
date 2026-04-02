@@ -5,27 +5,38 @@ struct JSONFormatterView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            TextEditor(text: $backend.inputText)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .border(backend.isValid ? Color.gray : Color.red, width: 1)
+            VStack(alignment: .leading) {
+                Text("Input JSON").font(.caption).foregroundColor(.secondary)
+                TextEditor(text: $backend.inputText)
+                    .frame(maxHeight: .infinity)
+                    .padding(4)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(backend.isValid ? Color.gray.opacity(0.2) : Color.red.opacity(0.5)))
+            }
 
-            Button("Format and Validate") {
-                backend.format()
+            Button(action: { backend.format() }) {
+                Text("Format and Validate")
+                    .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
 
-            TextEditor(text: .constant(backend.outputText))
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .border(Color.blue, width: 1)
-
-            if !backend.isValid {
-                Text("Invalid JSON format")
-                    .foregroundColor(.red)
+            VStack(alignment: .leading) {
+                HStack {
+                    Text("Output").font(.caption).foregroundColor(.secondary)
+                    Spacer()
+                    Button(action: { UIPasteboard.general.string = backend.outputText }) {
+                        Image(systemName: "doc.on.doc")
+                            .font(.caption)
+                    }
+                    .disabled(backend.outputText.isEmpty || !backend.isValid)
+                }
+                TextEditor(text: .constant(backend.outputText))
+                    .frame(maxHeight: .infinity)
+                    .padding(4)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.blue.opacity(0.2)))
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
-        .navigationTitle("JSON Formatter/Validator")
+        .navigationTitle("JSON Formatter")
     }
 }
 
@@ -36,8 +47,5 @@ struct JSONFormatterTool: Tool {
     let complexity = ToolComplexity.advanced
     let description = "Format and validate JSON data"
     let requiresAPI = false
-
-    var view: AnyView {
-        AnyView(JSONFormatterView())
-    }
+    var view: AnyView { AnyView(JSONFormatterView()) }
 }

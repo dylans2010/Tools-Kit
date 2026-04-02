@@ -40,4 +40,11 @@ class EncryptionBackend: ObservableObject {
             self.error = "Decryption failed: check your key"
         }
     }
+
+    func clear() {
+        inputText = ""
+        keyText = ""
+        outputText = ""
+        error = nil
+    }
 }

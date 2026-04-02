@@ -1,29 +1,79 @@
 import SwiftUI
+
 struct DiffCheckerView: View {
     @StateObject private var backend = DiffCheckerBackend()
+
     var body: some View {
-        VStack(spacing: 20) {
-            Button("Check Diff") {
-                backend.check()
+        VStack(spacing: 16) {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading) {
+                    Text("Original").font(.caption).foregroundColor(.secondary)
+                    TextEditor(text: $backend.text1)
+                        .frame(maxHeight: 200)
+                        .border(Color.gray.opacity(0.2))
+                }
+                VStack(alignment: .leading) {
+                    Text("Modified").font(.caption).foregroundColor(.secondary)
+                    TextEditor(text: $backend.text2)
+                        .frame(maxHeight: 200)
+                        .border(Color.gray.opacity(0.2))
+                }
+            }
+
+            Button(action: { backend.check() }) {
+                Text("Compare Text")
+                    .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
 
-            Spacer()
+            if !backend.diffResults.isEmpty {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 2) {
+                        ForEach(0..<backend.diffResults.count, id: \.self) { index in
+                            diffRow(for: backend.diffResults[index])
+                        }
+                    }
+                    .padding()
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(8)
+                }
+            } else {
+                Spacer()
+            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding()
         .navigationTitle("Diff Checker")
     }
+
+    @ViewBuilder
+    private func diffRow(for element: DiffElement) -> some View {
+        switch element {
+        case .common(let text):
+            Text(text)
+                .font(.system(.body, design: .monospaced))
+                .padding(.horizontal, 4)
+        case .added(let text):
+            Text("+ " + text)
+                .font(.system(.body, design: .monospaced))
+                .foregroundColor(.green)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.green.opacity(0.1))
+        case .removed(let text):
+            Text("- " + text)
+                .font(.system(.body, design: .monospaced))
+                .foregroundColor(.red)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.red.opacity(0.1))
+        }
+    }
 }
+
 struct DiffCheckerTool: Tool {
     let name = "Diff Checker"
     let icon = "arrow.left.arrow.right"
     let category = ToolCategory.development
     let complexity = ToolComplexity.advanced
     let description = "Compare text"
-    let isOfflineCapable = true
     let requiresAPI = false
-    let isAIEnabled = false
-    let complexityLevel = 3
     var view: AnyView { AnyView(DiffCheckerView()) }
 }

@@ -3,14 +3,16 @@ import Foundation
 class FileSizeBackend: ObservableObject {
     @Published var inputAmount = "1.0"
     @Published var inputUnit: SizeUnit = .megabytes
-    @Published var result = ""
+    @Published var results: [String: String] = [:]
 
-    enum SizeUnit: String, CaseIterable {
+    enum SizeUnit: String, CaseIterable, Identifiable {
         case bytes = "Bytes"
         case kilobytes = "KB"
         case megabytes = "MB"
         case gigabytes = "GB"
         case terabytes = "TB"
+
+        var id: String { self.rawValue }
 
         var multiplier: Double {
             switch self {
@@ -27,9 +29,19 @@ class FileSizeBackend: ObservableObject {
         guard let amount = Double(inputAmount) else { return }
         let bytes = amount * inputUnit.multiplier
 
-        result = SizeUnit.allCases.map { unit in
+        var newResults: [String: String] = [:]
+        for unit in SizeUnit.allCases {
             let value = bytes / unit.multiplier
-            return String(format: "%.4f %@", value, unit.rawValue)
-        }.joined(separator: "\n")
+            newResults[unit.rawValue] = format(value)
+        }
+        self.results = newResults
+    }
+
+    private func format(_ value: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.maximumFractionDigits = 4
+        formatter.minimumFractionDigits = 0
+        formatter.numberStyle = .decimal
+        return formatter.string(from: NSNumber(value: value)) ?? "0"
     }
 }

@@ -1,36 +1,96 @@
 import SwiftUI
-import UIKit
 
 struct UnitConverterView: View {
     @StateObject private var backend = UnitConverterBackend()
 
     var body: some View {
         Form {
-            Section(header: Text("Input")) {
-                TextField("Amount", text: $backend.input)
-                    .keyboardType(.decimalPad)
-                Picker("From", selection: $backend.inputUnit) {
-                    ForEach(backend.units, id: \.self) { unit in
-                        Text(unit.symbol).tag(unit)
+            Section(header: Text("Category")) {
+                Picker("Category", selection: $backend.selectedCategory) {
+                    ForEach(UnitCategory.allCases, id: \.self) { cat in
+                        Text(cat.rawValue).tag(cat)
                     }
+                }
+                .pickerStyle(.segmented)
+                .onChange(of: backend.selectedCategory) { _ in backend.convert() }
+            }
+
+            Section(header: Text("Conversion")) {
+                HStack {
+                    TextField("Value", text: $backend.input)
+                        .keyboardType(.decimalPad)
+                        .font(.title3.bold())
+                        .onChange(of: backend.input) { _ in backend.convert() }
+
+                    Spacer()
+
+                    unitPicker(for: .from)
+                }
+
+                HStack {
+                    Spacer()
+                    Button(action: backend.swap) {
+                        Image(systemName: "arrow.up.arrow.down.circle.fill")
+                            .font(.title2)
+                    }
+                    Spacer()
+                }
+
+                HStack {
+                    Text(backend.output)
+                        .font(.title3.bold())
+                        .foregroundColor(.blue)
+
+                    Spacer()
+
+                    unitPicker(for: .to)
                 }
             }
 
-            Section(header: Text("Output")) {
-                Picker("To", selection: $backend.outputUnit) {
-                    ForEach(backend.units, id: \.self) { unit in
-                        Text(unit.symbol).tag(unit)
-                    }
+            Section {
+                Button(action: { UIPasteboard.general.string = backend.output }) {
+                    Label("Copy Result", systemImage: "doc.on.doc")
                 }
-                Text(backend.output)
-                    .font(.headline)
-            }
-
-            Button("Convert") {
-                backend.convert()
+                .disabled(backend.output == "0")
             }
         }
         .navigationTitle("Unit Converter")
+    }
+
+    enum PickerType { case from, to }
+
+    @ViewBuilder
+    private func unitPicker(for type: PickerType) -> some View {
+        switch backend.selectedCategory {
+        case .length:
+            Picker("", selection: type == .from ? $backend.lengthUnitFrom : $backend.lengthUnitTo) {
+                ForEach(backend.lengthUnits, id: \.self) { unit in
+                    Text(unit.symbol).tag(unit)
+                }
+            }
+            .onChange(of: type == .from ? backend.lengthUnitFrom : backend.lengthUnitTo) { _ in backend.convert() }
+        case .mass:
+            Picker("", selection: type == .from ? $backend.massUnitFrom : $backend.massUnitTo) {
+                ForEach(backend.massUnits, id: \.self) { unit in
+                    Text(unit.symbol).tag(unit)
+                }
+            }
+            .onChange(of: type == .from ? backend.massUnitFrom : backend.massUnitTo) { _ in backend.convert() }
+        case .temperature:
+            Picker("", selection: type == .from ? $backend.tempUnitFrom : $backend.tempUnitTo) {
+                ForEach(backend.tempUnits, id: \.self) { unit in
+                    Text(unit.symbol).tag(unit)
+                }
+            }
+            .onChange(of: type == .from ? backend.tempUnitFrom : backend.tempUnitTo) { _ in backend.convert() }
+        case .volume:
+            Picker("", selection: type == .from ? $backend.volumeUnitFrom : $backend.volumeUnitTo) {
+                ForEach(backend.volumeUnits, id: \.self) { unit in
+                    Text(unit.symbol).tag(unit)
+                }
+            }
+            .onChange(of: type == .from ? backend.volumeUnitFrom : backend.volumeUnitTo) { _ in backend.convert() }
+        }
     }
 }
 
@@ -41,8 +101,5 @@ struct UnitConverterTool: Tool {
     let complexity = ToolComplexity.basic
     let description = "Convert between various measurement units"
     let requiresAPI = false
-
-    var view: AnyView {
-        AnyView(UnitConverterView())
-    }
+    var view: AnyView { AnyView(UnitConverterView()) }
 }

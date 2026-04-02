@@ -5,23 +5,43 @@ struct Base64View: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            TextEditor(text: $backend.inputText)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .border(Color.gray, width: 1)
+            VStack(alignment: .leading) {
+                Text("Input").font(.caption).foregroundColor(.secondary)
+                TextEditor(text: $backend.inputText)
+                    .frame(maxHeight: .infinity)
+                    .padding(4)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
+            }
 
             HStack {
                 Button("Encode") { backend.encode() }
                 Button("Decode") { backend.decode() }
+                Spacer()
+                Button(action: { backend.clear() }) {
+                    Image(systemName: "trash")
+                        .foregroundColor(.red)
+                }
             }
             .buttonStyle(.borderedProminent)
 
-            TextEditor(text: .constant(backend.outputText))
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .border(Color.blue, width: 1)
+            VStack(alignment: .leading) {
+                HStack {
+                    Text("Output").font(.caption).foregroundColor(.secondary)
+                    Spacer()
+                    Button(action: { UIPasteboard.general.string = backend.outputText }) {
+                        Image(systemName: "doc.on.doc")
+                            .font(.caption)
+                    }
+                    .disabled(backend.outputText.isEmpty)
+                }
+                TextEditor(text: .constant(backend.outputText))
+                    .frame(maxHeight: .infinity)
+                    .padding(4)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.blue.opacity(0.2)))
+            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
-        .navigationTitle("Base64 Encoder/Decoder")
+        .navigationTitle("Base64 Tool")
     }
 }
 
@@ -32,8 +52,5 @@ struct Base64Tool: Tool {
     let complexity = ToolComplexity.basic
     let description = "Encode and decode Base64 strings"
     let requiresAPI = false
-
-    var view: AnyView {
-        AnyView(Base64View())
-    }
+    var view: AnyView { AnyView(Base64View()) }
 }

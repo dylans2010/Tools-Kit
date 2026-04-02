@@ -2,56 +2,111 @@ import SwiftUI
 
 struct APITesterView: View {
     @StateObject private var backend = APITesterBackend()
+    @State private var selectedTab = 0
 
     var body: some View {
-        Form {
-            Section(header: Text("Request Details")) {
-                TextField("URL", text: $backend.url)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
+        VStack(spacing: 0) {
+            Form {
+                Section(header: Text("Request")) {
+                    TextField("URL", text: $backend.url)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                        .font(.caption)
 
-                Picker("Method", selection: $backend.method) {
-                    ForEach(backend.methods, id: \.self) { method in
-                        Text(method).tag(method)
+                    Picker("Method", selection: $backend.method) {
+                        ForEach(backend.methods, id: \.self) { method in
+                            Text(method).tag(method)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                }
+
+                Section(header: headerSectionHeader) {
+                    ForEach($backend.headers) { $header in
+                        HStack {
+                            TextField("Key", text: $header.key)
+                                .font(.caption.monospaced())
+                            Divider()
+                            TextField("Value", text: $header.value)
+                                .font(.caption.monospaced())
+                        }
+                    }
+                    .onDelete(perform: backend.removeHeader)
+
+                    Button(action: backend.addHeader) {
+                        Label("Add Header", systemImage: "plus.circle")
                     }
                 }
-                .pickerStyle(.segmented)
-            }
 
-            if backend.method != "GET" {
-                Section(header: Text("Request Body (JSON)")) {
-                    TextEditor(text: $backend.requestBody)
-                        .frame(height: 150)
-                        .font(.system(.caption, design: .monospaced))
+                if backend.method != "GET" && backend.method != "HEAD" {
+                    Section(header: Text("Body")) {
+                        TextEditor(text: $backend.requestBody)
+                            .frame(height: 100)
+                            .font(.system(.caption, design: .monospaced))
+                            .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.gray.opacity(0.2)))
+                    }
                 }
-            }
 
-            Section {
-                Button("Send Request") {
-                    backend.sendRequest()
+                Section {
+                    Button(action: backend.sendRequest) {
+                        if backend.isLoading {
+                            ProgressView().tint(.white)
+                        } else {
+                            Text("Send Request").frame(maxWidth: .infinity)
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(backend.isLoading)
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(backend.isLoading)
-            }
 
-            Section(header: Text("Response Viewer")) {
-                if backend.isLoading {
-                    ProgressView("Loading...")
-                } else {
+                Section(header: Text("Response Status")) {
                     HStack {
-                        Text("Status:")
-                        Text("\(backend.responseStatus)")
-                            .foregroundColor(statusColor)
+                        Circle()
+                            .fill(statusColor)
+                            .frame(width: 10, height: 10)
+                        Text("Status Code: \(backend.responseStatus)")
                             .bold()
                     }
+                }
 
-                    TextEditor(text: .constant(backend.responseBody))
-                        .frame(height: 300)
-                        .font(.system(.caption, design: .monospaced))
+                Section(header: responseTabPicker) {
+                    if selectedTab == 0 {
+                        TextEditor(text: .constant(backend.responseBody))
+                            .frame(height: 250)
+                            .font(.system(.caption, design: .monospaced))
+                    } else {
+                        VStack(alignment: .leading, spacing: 8) {
+                            ForEach(backend.responseHeaders.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
+                                VStack(alignment: .leading) {
+                                    Text(key).font(.caption).bold()
+                                    Text(value).font(.caption2).foregroundColor(.secondary)
+                                }
+                                Divider()
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
                 }
             }
         }
         .navigationTitle("API Tester")
+    }
+
+    private var headerSectionHeader: some View {
+        HStack {
+            Text("Headers")
+            Spacer()
+            EditButton().font(.caption)
+        }
+    }
+
+    private var responseTabPicker: some View {
+        Picker("Response Part", selection: $selectedTab) {
+            Text("Body").tag(0)
+            Text("Headers").tag(1)
+        }
+        .pickerStyle(.segmented)
+        .padding(.vertical, 4)
     }
 
     private var statusColor: Color {
@@ -69,10 +124,7 @@ struct APITesterTool: Tool {
     let icon = "network"
     let category = ToolCategory.development
     let complexity = ToolComplexity.advanced
-    let description = "Test API endpoints with custom payloads"
+    let description = "Test API endpoints with custom headers and payloads"
     let requiresAPI = true
-
-    var view: AnyView {
-        AnyView(APITesterView())
-    }
+    var view: AnyView { AnyView(APITesterView()) }
 }

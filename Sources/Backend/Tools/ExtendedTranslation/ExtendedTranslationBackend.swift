@@ -5,9 +5,10 @@ import Speech
 class ExtendedTranslationBackend: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
     @Published var inputText = ""
     @Published var translatedText = ""
-    @Published var sourceLanguage = "en"
-    @Published var targetLanguage = "es"
+    @Published var sourceLanguage = "en-US"
+    @Published var targetLanguage = "es-ES"
     @Published var isListening = false
+    @Published var isProcessing = false
 
     let speechSynthesizer = AVSpeechSynthesizer()
     private var speechRecognizer: SFSpeechRecognizer?
@@ -17,17 +18,26 @@ class ExtendedTranslationBackend: NSObject, ObservableObject, SFSpeechRecognizer
 
     override init() {
         super.init()
-        speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
+        setupRecognizer()
+    }
+
+    private func setupRecognizer() {
+        speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: sourceLanguage))
         speechRecognizer?.delegate = self
     }
 
     func translate() {
-        if inputText.isEmpty {
-            translatedText = ""
-            return
+        let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+
+        isProcessing = true
+
+        // Simulating translation with a rule-based prefix for functional feedback
+        // In a real production app, this would call a translation API
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.translatedText = "[Translated to \(self.targetLanguage)]: " + text
+            self.isProcessing = false
         }
-        // AI translation mock
-        translatedText = "[AI Enhanced Translation]: " + inputText
     }
 
     func startSpeechToText() {
@@ -37,11 +47,10 @@ class ExtendedTranslationBackend: NSObject, ObservableObject, SFSpeechRecognizer
         }
 
         isListening = true
-        // Logic to setup recognitionRequest and recognitionTask would be here
-        // Simulating the voice recognition
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        // Functional simulation of voice recognition for demonstration
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             if self.isListening {
-                self.inputText = "This is a recorded message."
+                self.inputText = "This is a recorded message for translation."
                 self.isListening = false
                 self.translate()
             }
@@ -50,13 +59,16 @@ class ExtendedTranslationBackend: NSObject, ObservableObject, SFSpeechRecognizer
 
     func stopSpeechToText() {
         isListening = false
-        audioEngine.stop()
-        recognitionRequest?.endAudio()
     }
 
     func playSpeech() {
         let utterance = AVSpeechUtterance(string: translatedText)
         utterance.voice = AVSpeechSynthesisVoice(language: targetLanguage)
         speechSynthesizer.speak(utterance)
+    }
+
+    func updateSourceLanguage(_ code: String) {
+        sourceLanguage = code
+        setupRecognizer()
     }
 }
