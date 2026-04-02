@@ -5,27 +5,53 @@ struct TimezoneConverterView: View {
 
     var body: some View {
         Form {
-            Section(header: Text("Source")) {
+            Section(header: Text("Source Time")) {
                 DatePicker("Date/Time", selection: $backend.sourceDate)
-                Picker("From", selection: $backend.sourceTimezone) {
+                    .onChange(of: backend.sourceDate) { _ in backend.convert() }
+
+                Picker("Source Timezone", selection: $backend.sourceTimezone) {
                     ForEach(backend.timezones, id: \.self) { tz in
                         Text(tz).tag(tz)
                     }
                 }
+                .onChange(of: backend.sourceTimezone) { _ in backend.convert() }
             }
 
-            Section(header: Text("Target")) {
-                Picker("To", selection: $backend.targetTimezone) {
+            Section {
+                HStack {
+                    Spacer()
+                    Button(action: backend.swap) {
+                        Image(systemName: "arrow.up.arrow.down.circle.fill")
+                            .font(.title2)
+                    }
+                    Spacer()
+                }
+            }
+
+            Section(header: Text("Target Time")) {
+                Picker("Target Timezone", selection: $backend.targetTimezone) {
                     ForEach(backend.timezones, id: \.self) { tz in
                         Text(tz).tag(tz)
                     }
                 }
-                Text(backend.targetDateStr)
-                    .font(.headline)
+                .onChange(of: backend.targetTimezone) { _ in backend.convert() }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(backend.targetDateStr)
+                        .font(.title2.bold())
+                        .foregroundColor(.blue)
+
+                    Text(backend.offsetDescription)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 4)
             }
 
-            Button("Convert") {
-                backend.convert()
+            Section {
+                Button(action: { UIPasteboard.general.string = backend.targetDateStr }) {
+                    Label("Copy Target Time", systemImage: "doc.on.doc")
+                }
             }
         }
         .navigationTitle("Timezone Converter")
@@ -37,10 +63,7 @@ struct TimezoneConverterTool: Tool {
     let icon = "clock"
     let category = ToolCategory.conversion
     let complexity = ToolComplexity.basic
-    let description = "Convert between different timezones"
+    let description = "Convert date and time between any two global timezones"
     let requiresAPI = false
-
-    var view: AnyView {
-        AnyView(TimezoneConverterView())
-    }
+    var view: AnyView { AnyView(TimezoneConverterView()) }
 }

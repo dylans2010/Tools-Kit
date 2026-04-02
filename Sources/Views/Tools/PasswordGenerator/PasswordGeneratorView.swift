@@ -6,23 +6,42 @@ struct PasswordGeneratorView: View {
     var body: some View {
         Form {
             Section(header: Text("Options")) {
-                Slider(value: $backend.length, in: 8...32, step: 1)
-                Text("Length: \(Int(backend.length))")
+                VStack {
+                    HStack {
+                        Text("Length")
+                        Spacer()
+                        Text("\(Int(backend.length))").bold()
+                    }
+                    Slider(value: $backend.length, in: 4...64, step: 1)
+                }
                 Toggle("Include Uppercase", isOn: $backend.includeUppercase)
                 Toggle("Include Numbers", isOn: $backend.includeNumbers)
-                Toggle("Include Special", isOn: $backend.includeSpecial)
+                Toggle("Include Special Characters", isOn: $backend.includeSpecial)
             }
 
             Section(header: Text("Generated Password")) {
-                Text(backend.password)
-                    .font(.system(.title3, design: .monospaced))
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding()
-
-                Button("Generate") {
-                    backend.generate()
+                if !backend.password.isEmpty {
+                    Text(backend.password)
+                        .font(.system(.title3, design: .monospaced))
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding()
+                        .textSelection(.enabled)
                 }
-                .buttonStyle(.borderedProminent)
+
+                HStack {
+                    Button(action: backend.generate) {
+                        Text("Generate")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+
+                    if !backend.password.isEmpty {
+                        Button(action: { UIPasteboard.general.string = backend.password }) {
+                            Image(systemName: "doc.on.doc")
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                }
             }
         }
         .navigationTitle("Password Generator")
@@ -34,10 +53,7 @@ struct PasswordGeneratorTool: Tool {
     let icon = "key"
     let category = ToolCategory.utility
     let complexity = ToolComplexity.basic
-    let description = "Secure, random password generator"
+    let description = "Generate secure, random passwords with custom requirements"
     let requiresAPI = false
-
-    var view: AnyView {
-        AnyView(PasswordGeneratorView())
-    }
+    var view: AnyView { AnyView(PasswordGeneratorView()) }
 }

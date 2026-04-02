@@ -1,29 +1,58 @@
 import SwiftUI
+
 struct EmailGeneratorView: View {
     @StateObject private var backend = EmailGeneratorBackend()
-    var body: some View {
-        VStack(spacing: 20) {
-            Button("Generate") {
-                backend.generate()
-            }
-            .buttonStyle(.borderedProminent)
 
-            Spacer()
+    var body: some View {
+        Form {
+            Section(header: Text("Configuration")) {
+                Picker("Email Type", selection: $backend.selectedType) {
+                    ForEach(EmailType.allCases, id: \.self) { type in
+                        Text(type.rawValue).tag(type)
+                    }
+                }
+
+                Picker("Tone", selection: $backend.selectedTone) {
+                    ForEach(EmailTone.allCases, id: \.self) { tone in
+                        Text(tone.rawValue).tag(tone)
+                    }
+                }
+
+                TextField("Recipient Name", text: $backend.recipientName)
+                TextField("Your Name", text: $backend.senderName)
+                TextField("Context / Topic", text: $backend.contextInfo)
+            }
+
+            Section {
+                Button(action: backend.generate) {
+                    Text("Generate Email")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+
+            if !backend.generatedEmail.isEmpty {
+                Section(header: Text("Generated Email")) {
+                    TextEditor(text: .constant(backend.generatedEmail))
+                        .frame(height: 200)
+                        .font(.body)
+
+                    Button(action: { UIPasteboard.general.string = backend.generatedEmail }) {
+                        Label("Copy to Clipboard", systemImage: "doc.on.doc")
+                    }
+                }
+            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .padding()
         .navigationTitle("Email Assistant")
     }
 }
+
 struct EmailGeneratorTool: Tool {
     let name = "Email Assistant"
     let icon = "envelope.open.fill"
     let category = ToolCategory.ai
     let complexity = ToolComplexity.basic
-    let description = "Email assistant"
-    let isOfflineCapable = false
-    let requiresAPI = true
-    let isAIEnabled = true
-    let complexityLevel = 2
+    let description = "Generate professional emails from templates"
+    let requiresAPI = false
     var view: AnyView { AnyView(EmailGeneratorView()) }
 }

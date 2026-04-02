@@ -1,35 +1,51 @@
 import SwiftUI
+
 struct MeetingNotesView: View {
     @StateObject private var backend = MeetingNotesBackend()
+
     var body: some View {
-        VStack(spacing: 20) {
-            Text(backend.notes)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .background(Color(.secondarySystemBackground))
-                .cornerRadius(8)
+        Form {
+            Section(header: Text("Meeting Info")) {
+                TextField("Topic", text: $backend.topic)
+                TextField("Participants (comma separated)", text: $backend.participants)
 
-            Button("Generate Meeting Notes") {
-                backend.generate()
+                Picker("Meeting Type", selection: $backend.selectedType) {
+                    ForEach(MeetingType.allCases, id: \.self) { type in
+                        Text(type.rawValue).tag(type)
+                    }
+                }
             }
-            .buttonStyle(.borderedProminent)
 
-            Spacer()
+            Section {
+                Button(action: backend.generate) {
+                    Text("Generate Structured Notes")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+
+            if !backend.generatedNotes.isEmpty {
+                Section(header: Text("Generated Notes")) {
+                    TextEditor(text: .constant(backend.generatedNotes))
+                        .frame(height: 300)
+                        .font(.system(.body, design: .monospaced))
+
+                    Button(action: { UIPasteboard.general.string = backend.generatedNotes }) {
+                        Label("Copy to Clipboard", systemImage: "doc.on.doc")
+                    }
+                }
+            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .padding()
         .navigationTitle("Meeting Notes")
     }
 }
+
 struct MeetingNotesTool: Tool {
     let name = "Meeting Notes"
     let icon = "calendar.badge.clock"
     let category = ToolCategory.ai
     let complexity = ToolComplexity.advanced
-    let description = "Generate meeting notes"
-    let isOfflineCapable = false
-    let requiresAPI = true
-    let isAIEnabled = true
-    let complexityLevel = 4
+    let description = "Generate structured meeting minutes and action items"
+    let requiresAPI = false
     var view: AnyView { AnyView(MeetingNotesView()) }
 }

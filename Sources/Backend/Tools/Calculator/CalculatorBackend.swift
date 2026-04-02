@@ -19,6 +19,13 @@ class CalculatorBackend: ObservableObject {
         }
     }
 
+    func inputDecimal() {
+        if !display.contains(".") {
+            display += "."
+            isEnteringNumber = true
+        }
+    }
+
     func setOperation(_ operation: Operation) {
         if let current = Double(display) {
             if let acc = accumulator, let op = pendingOperation {
@@ -42,6 +49,26 @@ class CalculatorBackend: ObservableObject {
         }
     }
 
+    func percentage() {
+        if let current = Double(display) {
+            display = format(current / 100.0)
+            isEnteringNumber = false
+        }
+    }
+
+    func negate() {
+        if let current = Double(display) {
+            display = format(current * -1.0)
+        }
+    }
+
+    func squareRoot() {
+        if let current = Double(display), current >= 0 {
+            display = format(sqrt(current))
+            isEnteringNumber = false
+        }
+    }
+
     func clear() {
         display = "0"
         accumulator = nil
@@ -61,6 +88,9 @@ class CalculatorBackend: ObservableObject {
     private func format(_ value: Double) -> String {
         let formatter = NumberFormatter()
         formatter.maximumFractionDigits = 8
+        formatter.minimumFractionDigits = 0
+        formatter.numberStyle = .decimal
+        formatter.usesGroupingSeparator = false
         return formatter.string(from: NSNumber(value: value)) ?? "0"
     }
 }

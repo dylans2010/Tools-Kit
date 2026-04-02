@@ -4,40 +4,47 @@ struct CalculatorView: View {
     @StateObject private var backend = CalculatorBackend()
 
     let buttons = [
-        ["7", "8", "9", "/"],
-        ["4", "5", "6", "*"],
-        ["1", "2", "3", "-"],
-        ["C", "0", "=", "+"]
+        ["C", "√", "%", "/"],
+        ["7", "8", "9", "*"],
+        ["4", "5", "6", "-"],
+        ["1", "2", "3", "+"],
+        ["±", "0", ".", "="]
     ]
 
     var body: some View {
         VStack(spacing: 12) {
+            Spacer()
+
             Text(backend.display)
-                .font(.system(size: 64))
+                .font(.system(size: 64, weight: .light, design: .monospaced))
                 .frame(maxWidth: .infinity, alignment: .trailing)
                 .padding()
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
                 .background(Color(.secondarySystemBackground))
-                .cornerRadius(12)
+                .cornerRadius(16)
 
-            ForEach(buttons, id: \.self) { row in
-                HStack(spacing: 12) {
-                    ForEach(row, id: \.self) { button in
-                        Button(action: {
-                            self.buttonPressed(button)
-                        }) {
-                            Text(button)
-                                .font(.title)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .aspectRatio(1, contentMode: .fit)
-                                .background(self.buttonColor(button))
-                                .foregroundColor(.white)
-                                .cornerRadius(12)
+            VStack(spacing: 12) {
+                ForEach(buttons, id: \.self) { row in
+                    HStack(spacing: 12) {
+                        ForEach(row, id: \.self) { button in
+                            Button(action: {
+                                self.buttonPressed(button)
+                            }) {
+                                Text(button)
+                                    .font(.title)
+                                    .bold()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .aspectRatio(1, contentMode: .fit)
+                                    .background(self.buttonColor(button))
+                                    .foregroundColor(self.textColor(button))
+                                    .cornerRadius(16)
+                            }
                         }
                     }
                 }
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding()
         .navigationTitle("Calculator")
     }
@@ -53,6 +60,10 @@ struct CalculatorView: View {
             case "/": backend.setOperation(.divide)
             case "=": backend.calculate()
             case "C": backend.clear()
+            case "√": backend.squareRoot()
+            case "%": backend.percentage()
+            case "±": backend.negate()
+            case ".": backend.inputDecimal()
             default: break
             }
         }
@@ -61,10 +72,17 @@ struct CalculatorView: View {
     private func buttonColor(_ button: String) -> Color {
         if ["+", "-", "*", "/", "="].contains(button) {
             return .orange
-        } else if button == "C" {
-            return .red
+        } else if ["C", "√", "%", "±"].contains(button) {
+            return Color(.systemGray4)
         }
-        return .gray
+        return Color(.systemGray5)
+    }
+
+    private func textColor(_ button: String) -> Color {
+        if ["+", "-", "*", "/", "="].contains(button) {
+            return .white
+        }
+        return .primary
     }
 }
 
@@ -73,10 +91,7 @@ struct CalculatorTool: Tool {
     let icon = "plus.forwardslash.minus"
     let category = ToolCategory.general
     let complexity = ToolComplexity.basic
-    let description = "Basic arithmetic operations"
+    let description = "Advanced arithmetic with roots and percentages"
     let requiresAPI = false
-
-    var view: AnyView {
-        AnyView(CalculatorView())
-    }
+    var view: AnyView { AnyView(CalculatorView()) }
 }

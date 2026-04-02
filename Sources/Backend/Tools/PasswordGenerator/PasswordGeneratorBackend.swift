@@ -1,7 +1,7 @@
 import Foundation
 
 class PasswordGeneratorBackend: ObservableObject {
-    @Published var length = 12.0
+    @Published var length = 16.0
     @Published var includeUppercase = true
     @Published var includeNumbers = true
     @Published var includeSpecial = true
@@ -17,6 +17,11 @@ class PasswordGeneratorBackend: ObservableObject {
         if includeUppercase { charset += uppercase }
         if includeNumbers { charset += numbers }
         if includeSpecial { charset += special }
+
+        guard !charset.isEmpty else {
+            password = ""
+            return
+        }
 
         password = String((0..<Int(length)).compactMap { _ in charset.randomElement() })
     }
