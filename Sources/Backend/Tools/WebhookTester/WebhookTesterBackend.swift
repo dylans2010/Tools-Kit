@@ -32,7 +32,7 @@ class WebhookTesterBackend: ObservableObject {
 
                 if let httpResponse = response as? HTTPURLResponse {
                     let status = httpResponse.statusCode
-                    let body = data.flatMap { String(data: $0, encoding: .utf8) } ?? "No body"
+                    let body = data.flatMap { String(data: $0, encoding: .utf8) } ?? "No Body"
                     self.responseText = "Status: \(status)\n\nResponse Body:\n\(body)"
                 }
             }

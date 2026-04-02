@@ -5,7 +5,7 @@ struct ColorPickerView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            ColorPicker("Select a Color", selection: $backend.selectedColor)
+            ColorPicker("Select Color", selection: $backend.selectedColor)
                 .font(.headline)
 
             Rectangle()
@@ -50,7 +50,7 @@ struct ColorPickerTool: Tool {
     let icon = "eyedropper"
     let category = ToolCategory.utility
     let complexity = ToolComplexity.basic
-    let description = "HEX and RGB color conversion"
+    let description = "HEX and RGB Color Conversion"
     let requiresAPI = false
 
     var view: AnyView {

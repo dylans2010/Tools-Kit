@@ -26,7 +26,7 @@ class Base64Backend: ObservableObject {
         if let data = Data(base64Encoded: base64) {
             outputText = String(data: data, encoding: .utf8) ?? "Decoded binary data (\(data.count) bytes)"
         } else {
-            outputText = "Invalid Base64 string"
+            outputText = "Invalid Base64 String"
         }
     }
 

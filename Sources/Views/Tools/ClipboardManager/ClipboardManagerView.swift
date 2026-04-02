@@ -9,7 +9,7 @@ struct ClipboardManagerView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("New Entry").font(.caption).foregroundColor(.secondary)
                 HStack {
-                    TextField("Type or paste text here...", text: $textToCopy)
+                    TextField("Type or Paste Text", text: $textToCopy)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
 
                     Button("Copy") {
@@ -24,7 +24,7 @@ struct ClipboardManagerView: View {
                     let pasted = backend.pasteFromClipboard()
                     if textToCopy.isEmpty { textToCopy = pasted }
                 }) {
-                    Label("Paste from System Clipboard", systemImage: "doc.on.clipboard")
+                    Label("Paste From Clipboard", systemImage: "doc.on.clipboard")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
@@ -35,7 +35,7 @@ struct ClipboardManagerView: View {
             List {
                 Section(header: Text("History")) {
                     if backend.history.isEmpty {
-                        Text("No history yet.").foregroundColor(.secondary)
+                        Text("No History Yet").foregroundColor(.secondary)
                     } else {
                         ForEach(backend.history) { entry in
                             VStack(alignment: .leading, spacing: 4) {
