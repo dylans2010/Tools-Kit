@@ -21,8 +21,9 @@ struct DashboardView: View {
                 }
             }
             .navigationTitle("Tools Kit")
-            .background(Color(.systemGroupedBackground))
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
     }
 
     private var recentlyUsedSection: some View {
