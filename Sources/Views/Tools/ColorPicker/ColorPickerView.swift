@@ -7,11 +7,10 @@ struct ColorPickerView: View {
         VStack(spacing: 20) {
             ColorPicker("Select a Color", selection: $backend.selectedColor)
                 .font(.headline)
-                .padding()
 
             Rectangle()
                 .fill(backend.selectedColor)
-                .frame(width: 200, height: 100)
+                .frame(maxWidth: .infinity, maxHeight: 200)
                 .cornerRadius(12)
                 .shadow(radius: 5)
 
@@ -40,6 +39,7 @@ struct ColorPickerView: View {
 
             Spacer()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding()
         .navigationTitle("Color Picker")
     }
