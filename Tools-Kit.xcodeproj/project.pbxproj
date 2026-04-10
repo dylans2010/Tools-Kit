@@ -146,6 +146,20 @@
 		4F078F067D0C42C2B41E19F6 /* CodeDebuggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0407FB7EBE4E41C5A8D6F56D /* CodeDebuggerView.swift */; };
 		E8B0DFEF41AC419395701189 /* ReminderGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D3383FBCCC9495FB66A5E70 /* ReminderGeneratorView.swift */; };
 		9A41C025821D4FA6BFC14214 /* SchemaGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E54D0DDB142F45E8887AB2FF /* SchemaGeneratorView.swift */; };
+		5A82A13D42198C48CDCB9A51 /* CameraColorPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA91E8AADF9C3476A979CC9D /* CameraColorPickerView.swift */; };
+		48C2DE828318343BCF13C883 /* LiveTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418612C0CE11895A092A1E89 /* LiveTextView.swift */; };
+		35192B4E290E9B11B8B6B0CE /* StorageAnalyzerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9A809BE89CA2CF2BE442F1 /* StorageAnalyzerView.swift */; };
+		0F94C02BB88C853D0A2EF6DB /* BatteryAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC19D120C5EA0581ADFE87AC /* BatteryAnalyticsView.swift */; };
+		0A78374478B40A38DB97D3CF /* AIChatSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B0B52F727678316A6551CB /* AIChatSettings.swift */; };
+		0F335D642BABA28429D6D80C /* AIChatSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2613768EBF12072C6C0D2706 /* AIChatSettingsView.swift */; };
+		58A984D73306005E5E8269AD /* ProjectModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F2E2F7FD50452EFABEF77A7 /* ProjectModels.swift */; };
+		5EFCD23AAC9ACB9076A4482B /* ProjectsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFE683C7198829E6706B4FCB /* ProjectsManager.swift */; };
+		F38365BBDC822A6EF5171A90 /* ProjectsTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77E556C825E47800C896DF9E /* ProjectsTool.swift */; };
+		CA4D1377D35C28969899495E /* ProjectsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2254C780F1C5F02E91F07C1A /* ProjectsMainView.swift */; };
+		DCBF0369DAC3FAD0A75031F2 /* ProjectCreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7679023FD093812DECFB0110 /* ProjectCreateView.swift */; };
+		D9F50B598DD9C577FC648E67 /* ProjectDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CA3298669648F7EC784FD9 /* ProjectDetailsView.swift */; };
+		A16FD4012C798954554BD244 /* ProjectSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E730C86FE6E37EB081481454 /* ProjectSettingsView.swift */; };
+		20B4161A16479DEAB11738D8 /* ProjectTaskDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E39EB987ED765AEA0EBF43AF /* ProjectTaskDetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -289,6 +303,20 @@
 		0407FB7EBE4E41C5A8D6F56D /* CodeDebuggerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/CodeDebugger/CodeDebuggerView.swift"; sourceTree = "<group>"; };
 		0D3383FBCCC9495FB66A5E70 /* ReminderGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/ReminderGenerator/ReminderGeneratorView.swift"; sourceTree = "<group>"; };
 		E54D0DDB142F45E8887AB2FF /* SchemaGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/SchemaGenerator/SchemaGeneratorView.swift"; sourceTree = "<group>"; };
+		CA91E8AADF9C3476A979CC9D /* CameraColorPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/CameraColorPicker/CameraColorPickerView.swift"; sourceTree = "<group>"; };
+		418612C0CE11895A092A1E89 /* LiveTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/LiveText/LiveTextView.swift"; sourceTree = "<group>"; };
+		7B9A809BE89CA2CF2BE442F1 /* StorageAnalyzerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/StorageAnalyzer/StorageAnalyzerView.swift"; sourceTree = "<group>"; };
+		FC19D120C5EA0581ADFE87AC /* BatteryAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/BatteryAnalytics/BatteryAnalyticsView.swift"; sourceTree = "<group>"; };
+		B4B0B52F727678316A6551CB /* AIChatSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/AIChatSettings.swift"; sourceTree = "<group>"; };
+		2613768EBF12072C6C0D2706 /* AIChatSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/AIChat/AIChatSettingsView.swift"; sourceTree = "<group>"; };
+		7F2E2F7FD50452EFABEF77A7 /* ProjectModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Projects/ProjectModels.swift"; sourceTree = "<group>"; };
+		DFE683C7198829E6706B4FCB /* ProjectsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Projects/ProjectsManager.swift"; sourceTree = "<group>"; };
+		77E556C825E47800C896DF9E /* ProjectsTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Projects/ProjectsTool.swift"; sourceTree = "<group>"; };
+		2254C780F1C5F02E91F07C1A /* ProjectsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Projects/ProjectsMainView.swift"; sourceTree = "<group>"; };
+		7679023FD093812DECFB0110 /* ProjectCreateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Projects/ProjectCreateView.swift"; sourceTree = "<group>"; };
+		88CA3298669648F7EC784FD9 /* ProjectDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Projects/ProjectDetailsView.swift"; sourceTree = "<group>"; };
+		E730C86FE6E37EB081481454 /* ProjectSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Projects/ProjectSettingsView.swift"; sourceTree = "<group>"; };
+		E39EB987ED765AEA0EBF43AF /* ProjectTaskDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Projects/ProjectTaskDetailView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -452,6 +480,20 @@
 				0407FB7EBE4E41C5A8D6F56D /* CodeDebuggerView.swift */,
 				0D3383FBCCC9495FB66A5E70 /* ReminderGeneratorView.swift */,
 				E54D0DDB142F45E8887AB2FF /* SchemaGeneratorView.swift */,
+				CA91E8AADF9C3476A979CC9D /* CameraColorPickerView.swift */,
+				418612C0CE11895A092A1E89 /* LiveTextView.swift */,
+				7B9A809BE89CA2CF2BE442F1 /* StorageAnalyzerView.swift */,
+				FC19D120C5EA0581ADFE87AC /* BatteryAnalyticsView.swift */,
+				B4B0B52F727678316A6551CB /* AIChatSettings.swift */,
+				2613768EBF12072C6C0D2706 /* AIChatSettingsView.swift */,
+				7F2E2F7FD50452EFABEF77A7 /* ProjectModels.swift */,
+				DFE683C7198829E6706B4FCB /* ProjectsManager.swift */,
+				77E556C825E47800C896DF9E /* ProjectsTool.swift */,
+				2254C780F1C5F02E91F07C1A /* ProjectsMainView.swift */,
+				7679023FD093812DECFB0110 /* ProjectCreateView.swift */,
+				88CA3298669648F7EC784FD9 /* ProjectDetailsView.swift */,
+				E730C86FE6E37EB081481454 /* ProjectSettingsView.swift */,
+				E39EB987ED765AEA0EBF43AF /* ProjectTaskDetailView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -668,6 +710,20 @@
 				4F078F067D0C42C2B41E19F6 /* CodeDebuggerView.swift in Sources */,
 				E8B0DFEF41AC419395701189 /* ReminderGeneratorView.swift in Sources */,
 				9A41C025821D4FA6BFC14214 /* SchemaGeneratorView.swift in Sources */,
+				5A82A13D42198C48CDCB9A51 /* CameraColorPickerView.swift in Sources */,
+				48C2DE828318343BCF13C883 /* LiveTextView.swift in Sources */,
+				35192B4E290E9B11B8B6B0CE /* StorageAnalyzerView.swift in Sources */,
+				0F94C02BB88C853D0A2EF6DB /* BatteryAnalyticsView.swift in Sources */,
+				0A78374478B40A38DB97D3CF /* AIChatSettings.swift in Sources */,
+				0F335D642BABA28429D6D80C /* AIChatSettingsView.swift in Sources */,
+				58A984D73306005E5E8269AD /* ProjectModels.swift in Sources */,
+				5EFCD23AAC9ACB9076A4482B /* ProjectsManager.swift in Sources */,
+				F38365BBDC822A6EF5171A90 /* ProjectsTool.swift in Sources */,
+				CA4D1377D35C28969899495E /* ProjectsMainView.swift in Sources */,
+				DCBF0369DAC3FAD0A75031F2 /* ProjectCreateView.swift in Sources */,
+				D9F50B598DD9C577FC648E67 /* ProjectDetailsView.swift in Sources */,
+				A16FD4012C798954554BD244 /* ProjectSettingsView.swift in Sources */,
+				20B4161A16479DEAB11738D8 /* ProjectTaskDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

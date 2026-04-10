@@ -40,10 +40,10 @@ class ToolRegistry: ObservableObject {
             PasswordStrengthTool(),
             MetadataRemoverTool(),
             DocumentScannerTool(),
-            // CameraColorPickerTool(),
-            // LiveTextTool(),
-            // StorageAnalyzerTool(),
-            // BatteryAnalyticsTool(),
+            CameraColorPickerTool(),
+            LiveTextTool(),
+            StorageAnalyzerTool(),
+            BatteryAnalyticsTool(),
             DeviceInfoTool(),
             FileTypeInspectorTool(),
             MetadataViewerTool(),
@@ -97,7 +97,8 @@ class ToolRegistry: ObservableObject {
             ReasoningTool(),
             CodeDebuggerTool(),
             ReminderGeneratorTool(),
-            SchemaGeneratorTool()
+            SchemaGeneratorTool(),
+            ProjectsTool()
         ]
     }
 
