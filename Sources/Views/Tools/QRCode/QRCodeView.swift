@@ -1,8 +1,10 @@
+import CoreImage.CIFilterBuiltins
 import SwiftUI
-import AVFoundation
+import Vision
 
 struct QRCodeView: View {
-    @StateObject private var backend = QRCodeBackend()
+    @StateObject private var scanner = QRScanner()
+    @StateObject private var cameraService = CameraService()
     @State private var mode: QRMode = .generate
 
     enum QRMode {
@@ -18,9 +20,33 @@ struct QRCodeView: View {
             .pickerStyle(.segmented)
 
             if mode == .generate {
-                QRGenerationView(backend: backend)
+                QRGenerationView()
             } else {
-                QRScanningView(backend: backend)
+                VStack {
+                    ZStack {
+                        CameraPreview(cameraService: cameraService)
+                            .onAppear {
+                                cameraService.delegate = scanner
+                                cameraService.startSession()
+                            }
+                            .onDisappear {
+                                cameraService.stopSession()
+                            }
+
+                        if let code = scanner.scannedCode {
+                            VStack {
+                                Spacer()
+                                Text(code)
+                                    .padding()
+                                    .background(.ultraThinMaterial)
+                                    .cornerRadius(10)
+                                    .padding(.bottom, 20)
+                            }
+                        }
+                    }
+                    .cornerRadius(12)
+                    .padding()
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -30,19 +56,23 @@ struct QRCodeView: View {
 }
 
 private struct QRGenerationView: View {
-    @ObservedObject var backend: QRCodeBackend
+    @State private var inputText = ""
+    @State private var qrCodeImage: UIImage? = nil
+
+    private let context = CIContext()
+    private let filter = CIFilter.qrCodeGenerator()
 
     var body: some View {
         VStack(spacing: 20) {
-            TextField("Enter text or URL", text: $backend.inputText)
+            TextField("Enter text or URL", text: $inputText)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
 
             Button("Generate QR Code") {
-                backend.generateQRCode()
+                generateQRCode()
             }
             .buttonStyle(.borderedProminent)
 
-            if let image = backend.qrCodeImage {
+            if let image = qrCodeImage {
                 Image(uiImage: image)
                     .interpolation(.none)
                     .resizable()
@@ -55,60 +85,45 @@ private struct QRGenerationView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
-}
 
-private struct QRScanningView: View {
-    @ObservedObject var backend: QRCodeBackend
+    func generateQRCode() {
+        let data = Data(inputText.utf8)
+        filter.setValue(data, forKey: "inputMessage")
 
-    var body: some View {
-        VStack(spacing: 20) {
-            if backend.isScanning {
-                ZStack {
-                    Color.black
-                    Text("Scanning Camera Preview...")
-                        .foregroundColor(.white)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .cornerRadius(12)
-
-                Button("Stop Scanning") {
-                    backend.stopScanning()
-                }
-                .buttonStyle(.borderedProminent)
-            } else {
-                VStack(spacing: 20) {
-                    if let code = backend.scannedCode {
-                        Text("Scanned Code:")
-                            .font(.headline)
-                        Text(code)
-                            .padding()
-                            .background(Color.blue.opacity(0.1))
-                            .cornerRadius(8)
-                    } else {
-                        Text("Ready to scan")
-                            .foregroundColor(.secondary)
-                    }
-
-                    Button("Start Camera Scan") {
-                        backend.startScanning()
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-
-                Spacer()
+        if let outputImage = filter.outputImage {
+            if let cgimg = context.createCGImage(outputImage, from: outputImage.extent) {
+                qrCodeImage = UIImage(cgImage: cgimg)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+}
+
+class QRScanner: NSObject, ObservableObject, CameraServiceDelegate {
+    @Published var scannedCode: String?
+
+    func didOutput(pixelBuffer: CVPixelBuffer) {
+        let request = VNDetectBarcodesRequest { [weak self] request, error in
+            guard let results = request.results as? [VNBarcodeObservation],
+                  let first = results.first?.payloadStringValue else { return }
+
+            DispatchQueue.main.async {
+                self?.scannedCode = first
+            }
+        }
+
+        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:])
+        try? handler.perform([request])
     }
 }
 
 struct QRCodeTool: Tool {
+    let id = UUID()
+    let requiresAPI = false
     let name = "QR Code Tool"
     let icon = "qrcode"
     let category = ToolCategory.utility
     let complexity = ToolComplexity.basic
     let description = "Generate and scan QR codes"
-    let requiresAPI = false
 
     var view: AnyView {
         AnyView(QRCodeView())
