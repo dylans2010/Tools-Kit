@@ -4,6 +4,12 @@ import VisionKit
 struct DocumentScannerView: View {
     @State private var showingScanner = false
     @State private var scannedImages: [UIImage] = []
+    @State private var extractedTexts: [String] = []
+    @State private var summary: String = ""
+    @State private var isProcessing = false
+
+    private let visionService = VisionService()
+    private let aiService = AIService()
 
     var body: some View {
         VStack {
@@ -21,26 +27,62 @@ struct DocumentScannerView: View {
                 }
             } else {
                 List {
-                    ForEach(scannedImages, id: \.self) { image in
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 200)
-                            .cornerRadius(8)
+                    Section("Scanned Pages") {
+                        ForEach(0..<scannedImages.count, id: \.self) { index in
+                            VStack(alignment: .leading) {
+                                Image(uiImage: scannedImages[index])
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 200)
+                                    .cornerRadius(8)
+
+                                if index < extractedTexts.count {
+                                    Text(extractedTexts[index])
+                                        .font(.caption)
+                                        .lineLimit(3)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        }
+                    }
+
+                    if !summary.isEmpty {
+                        Section("AI Summary") {
+                            Text(summary)
+                                .font(.body)
+                        }
                     }
                 }
 
-                Button("Scan More") {
-                    showingScanner = true
+                if isProcessing {
+                    ProgressView("Processing with AI...")
+                        .padding()
+                } else {
+                    HStack(spacing: 20) {
+                        Button("Scan More") {
+                            showingScanner = true
+                        }
+                        .buttonStyle(.bordered)
+
+                        Button("Summarize") {
+                            Task { await processDocuments() }
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                    .padding()
                 }
-                .padding()
+
                 HStack {
                     Text("\(scannedImages.count) pages scanned")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Spacer()
-                    Button("Clear") { scannedImages = [] }
-                        .foregroundColor(.red)
+                    Button("Clear") {
+                        scannedImages = []
+                        extractedTexts = []
+                        summary = ""
+                    }
+                    .foregroundColor(.red)
                 }
                 .padding(.horizontal)
             }
@@ -50,6 +92,29 @@ struct DocumentScannerView: View {
             ScannerRepresentable { images in
                 self.scannedImages.append(contentsOf: images)
                 showingScanner = false
+            }
+        }
+    }
+
+    private func processDocuments() async {
+        isProcessing = true
+        defer { isProcessing = false }
+
+        var allText = ""
+        var newTexts: [String] = []
+
+        for image in scannedImages {
+            if let text = try? await visionService.performOCR(on: image) {
+                newTexts.append(text)
+                allText += text + "\n"
+            }
+        }
+
+        self.extractedTexts = newTexts
+
+        if !allText.isEmpty {
+            if let aiSummary = try? await aiService.summarize(text: allText) {
+                self.summary = aiSummary
             }
         }
     }
@@ -88,11 +153,12 @@ struct ScannerRepresentable: UIViewControllerRepresentable {
 }
 
 struct DocumentScannerTool: Tool {
+    let id = UUID()
     let name = "Doc Scanner"
     let icon = "doc.text.viewfinder"
     let category = ToolCategory.utility
     let complexity = ToolComplexity.basic
     let description = "Scan documents using high-quality camera recognition"
-    let requiresAPI = false
+    let requiresAPI = true
     var view: AnyView { AnyView(DocumentScannerView()) }
 }

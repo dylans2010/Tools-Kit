@@ -2,8 +2,11 @@ import SwiftUI
 
 struct ReasoningToolView: View {
     @State private var question = ""
-    @State private var steps: [String] = []
+    @State private var reasoningResult = ""
     @State private var isThinking = false
+    @State private var errorMessage: String?
+
+    private let aiService = AIService()
 
     var body: some View {
         ScrollView {
@@ -12,50 +15,54 @@ struct ReasoningToolView: View {
                     .textFieldStyle(.roundedBorder)
                     .padding()
 
-                Button("Start Reasoning") {
-                    think()
+                Button(action: { Task { await think() } }) {
+                    if isThinking {
+                        ProgressView("AI is thinking...")
+                            .padding()
+                    } else {
+                        Text("Start Reasoning")
+                            .frame(maxWidth: .infinity)
+                    }
                 }
                 .buttonStyle(.borderedProminent)
+                .padding(.horizontal)
+                .disabled(question.isEmpty || isThinking)
 
-                if isThinking {
-                    ProgressView("AI is thinking...")
-                        .padding()
+                if let error = errorMessage {
+                    Text(error).foregroundColor(.red).font(.caption).padding()
                 }
 
-                ForEach(steps, id: \.self) { step in
-                    HStack(alignment: .top) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                        Text(step)
+                if !reasoningResult.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Label("Step-by-Step Reasoning", systemImage: "brain.head.profile")
+                            .font(.headline)
+
+                        Text(reasoningResult)
+                            .padding()
+                            .background(Color(.secondarySystemBackground))
+                            .cornerRadius(12)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
-                    .background(Color(.secondarySystemBackground))
-                    .cornerRadius(8)
-                    .padding(.horizontal)
                 }
             }
         }
         .navigationTitle("Reasoning Assistant")
     }
 
-    private func think() {
-        steps = []
+    private func think() async {
         isThinking = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            steps.append("Deconstructing the problem into core components...")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                steps.append("Analyzing historical patterns and data...")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    steps.append("Synthesizing a multi-step solution...")
-                    isThinking = false
-                }
-            }
+        errorMessage = nil
+        do {
+            reasoningResult = try await aiService.reason(problem: question)
+        } catch {
+            errorMessage = error.localizedDescription
         }
+        isThinking = false
     }
 }
 
 struct ReasoningTool: Tool {
+    let id = UUID()
     let name = "Reasoning Tool"
     let icon = "brain.head.profile"
     let category = ToolCategory.ai

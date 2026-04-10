@@ -4,6 +4,9 @@ struct ContextSummarizerView: View {
     @State private var inputText = ""
     @State private var summary = ""
     @State private var isLoading = false
+    @State private var errorMessage: String?
+
+    private let aiService = AIService()
 
     var body: some View {
         ScrollView {
@@ -13,7 +16,7 @@ struct ContextSummarizerView: View {
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
                     .padding()
 
-                Button(action: summarize) {
+                Button(action: { Task { await summarize() } }) {
                     if isLoading {
                         ProgressView().tint(.white)
                     } else {
@@ -23,6 +26,11 @@ struct ContextSummarizerView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .padding(.horizontal)
+                .disabled(inputText.isEmpty || isLoading)
+
+                if let error = errorMessage {
+                    Text(error).foregroundColor(.red).font(.caption).padding()
+                }
 
                 if !summary.isEmpty {
                     VStack(alignment: .leading) {
@@ -39,16 +47,20 @@ struct ContextSummarizerView: View {
         .navigationTitle("Context Summarizer")
     }
 
-    private func summarize() {
+    private func summarize() async {
         isLoading = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            summary = "Summary: This tool analyzes the context and provides a structured overview of the input text."
-            isLoading = false
+        errorMessage = nil
+        do {
+            summary = try await aiService.summarize(text: inputText)
+        } catch {
+            errorMessage = error.localizedDescription
         }
+        isLoading = false
     }
 }
 
 struct ContextSummarizerTool: Tool {
+    let id = UUID()
     let name = "Smart Summarizer"
     let icon = "text.justify.left"
     let category = ToolCategory.ai
