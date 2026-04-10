@@ -39,6 +39,18 @@ class ToolRegistry: ObservableObject {
             TextFormatterTool(),
             PasswordStrengthTool(),
             MetadataRemoverTool(),
+            DocumentScannerTool(),
+            CameraColorPickerTool(),
+            LiveTextTool(),
+            StorageAnalyzerTool(),
+            BatteryAnalyticsTool(),
+            DeviceInfoTool(),
+            FileTypeInspectorTool(),
+            MetadataViewerTool(),
+            AudioConverterTool(),
+            SmartAutofillTool(),
+            HabitTrackerTool(),
+            FocusTrackerTool(),
 
             // Advanced Tools
             JSONFormatterTool(),
@@ -73,7 +85,19 @@ class ToolRegistry: ObservableObject {
             PromptGeneratorTool(),
             EmailGeneratorTool(),
             IdeaGeneratorTool(),
-            WeatherTool()
+            WeatherTool(),
+            AIChatTool(),
+            MapsTool(),
+            ObjectDetectionTool(),
+            PerspectiveCorrectorTool(),
+            IDClassifierTool(),
+            NetworkSpeedTool(),
+            VideoCompressorTool(),
+            ContextSummarizerTool(),
+            ReasoningTool(),
+            CodeDebuggerTool(),
+            ReminderGeneratorTool(),
+            SchemaGeneratorTool()
         ]
     }
 
@@ -135,10 +159,14 @@ class ToolRegistry: ObservableObject {
         tools.filter { $0.complexity == .advanced }
     }
 
-    func filteredTools(query: String) -> [any Tool] {
-        if query.isEmpty {
-            return tools
+    func filteredTools(query: String, category: ToolCategory? = nil) -> [any Tool] {
+        var results = tools
+        if let category = category {
+            results = results.filter { $0.category == category }
         }
-        return tools.filter { $0.name.localizedCaseInsensitiveContains(query) || $0.description.localizedCaseInsensitiveContains(query) }
+        if !query.isEmpty {
+            results = results.filter { $0.name.localizedCaseInsensitiveContains(query) || $0.description.localizedCaseInsensitiveContains(query) }
+        }
+        return results
     }
 }

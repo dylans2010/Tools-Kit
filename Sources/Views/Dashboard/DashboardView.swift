@@ -3,6 +3,7 @@ import SwiftUI
 struct DashboardView: View {
     @StateObject private var registry = ToolRegistry()
     @State private var searchText = ""
+    @State private var selectedCategory: ToolCategory? = nil
 
     var body: some View {
         NavigationStack {
@@ -10,14 +11,16 @@ struct DashboardView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     SearchBar(text: $searchText)
 
-                    if searchText.isEmpty {
+                    categoryPicker
+
+                    if searchText.isEmpty && selectedCategory == nil {
                         weatherSection
                         recentlyUsedSection
                         favoritesSection
                         basicToolsSection
                         advancedToolsSection
                     } else {
-                        searchResultsSection
+                        filteredResultsSection
                     }
                 }
             }
@@ -25,6 +28,23 @@ struct DashboardView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
+    }
+
+    private var categoryPicker: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                CategoryTag(title: "All", isSelected: selectedCategory == nil) {
+                    selectedCategory = nil
+                }
+
+                ForEach(ToolCategory.allCases, id: \.self) { category in
+                    CategoryTag(title: category.rawValue, isSelected: selectedCategory == category) {
+                        selectedCategory = category
+                    }
+                }
+            }
+            .padding(.horizontal)
+        }
     }
 
     private var weatherSection: some View {
@@ -42,7 +62,7 @@ struct DashboardView: View {
                 VStack(alignment: .leading) {
                     SectionHeader(title: "Recently Used", subtitle: "Quick access to your last tools", icon: "clock.arrow.circlepath")
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 16) {
+                        LazyHStack(spacing: 16) {
                             ForEach(recent, id: \.id) { tool in
                                 NavigationLink(destination: tool.view.onAppear { registry.markAsUsed(toolID: tool.id) }) {
                                     ToolCard(tool: tool, isFavorite: registry.favoriteToolIDs.contains(tool.id)) {
@@ -66,7 +86,7 @@ struct DashboardView: View {
                 VStack(alignment: .leading) {
                     SectionHeader(title: "Favorites", subtitle: "Your pinned tools", icon: "star.fill")
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 16) {
+                        LazyHStack(spacing: 16) {
                             ForEach(favorites, id: \.id) { tool in
                                 NavigationLink(destination: tool.view.onAppear { registry.markAsUsed(toolID: tool.id) }) {
                                     ToolCard(tool: tool, isFavorite: true) {
@@ -87,7 +107,7 @@ struct DashboardView: View {
         VStack(alignment: .leading) {
             SectionHeader(title: "Basic Tools", subtitle: "Everyday fast-access utilities", icon: "briefcase")
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
+                LazyHStack(spacing: 16) {
                     ForEach(registry.basicTools, id: \.id) { tool in
                         NavigationLink(destination: tool.view.onAppear { registry.markAsUsed(toolID: tool.id) }) {
                             ToolCard(tool: tool, isFavorite: registry.favoriteToolIDs.contains(tool.id)) {
@@ -106,7 +126,7 @@ struct DashboardView: View {
         VStack(alignment: .leading) {
             SectionHeader(title: "Advanced Tools", subtitle: "Power user and developer utilities", icon: "cpu")
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
+                LazyHStack(spacing: 16) {
                     ForEach(registry.advancedTools, id: \.id) { tool in
                         NavigationLink(destination: tool.view.onAppear { registry.markAsUsed(toolID: tool.id) }) {
                             ToolCard(tool: tool, isFavorite: registry.favoriteToolIDs.contains(tool.id)) {
@@ -121,10 +141,10 @@ struct DashboardView: View {
         }
     }
 
-    private var searchResultsSection: some View {
-        let results = registry.filteredTools(query: searchText)
+    private var filteredResultsSection: some View {
+        let results = registry.filteredTools(query: searchText, category: selectedCategory)
         return VStack(alignment: .leading) {
-            SectionHeader(title: "Search Results", subtitle: "Found \(results.count) tools", icon: "magnifyingglass")
+            SectionHeader(title: "Filtered Tools", subtitle: "Found \(results.count) tools", icon: "line.3.horizontal.decrease.circle")
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                 ForEach(results, id: \.id) { tool in
                     NavigationLink(destination: tool.view.onAppear { registry.markAsUsed(toolID: tool.id) }) {
@@ -135,6 +155,25 @@ struct DashboardView: View {
                 }
             }
             .padding(.horizontal)
+        }
+    }
+}
+
+struct CategoryTag: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline)
+                .fontWeight(isSelected ? .bold : .regular)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(isSelected ? Color.blue : Color(.secondarySystemBackground))
+                .foregroundColor(isSelected ? .white : .primary)
+                .cornerRadius(20)
         }
     }
 }
