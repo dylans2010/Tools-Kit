@@ -8,6 +8,7 @@ struct AIChatToolView: View {
     @State private var showFileImporter = false
     @State private var showPhotoPicker = false
     @State private var showVisionAlert = false
+    @State private var showHistorySheet = false
     @State private var selectedPhotoItem: PhotosPickerItem? = nil
 
     var body: some View {
@@ -25,6 +26,7 @@ struct AIChatToolView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         Button("Settings") { showSettings = true }
+                        Button("History") { showHistorySheet = true }
                         Button("Clear Chat", role: .destructive, action: viewModel.clearChat)
                         Button("Change API Key") {
                             viewModel.deleteKey()
@@ -38,8 +40,24 @@ struct AIChatToolView: View {
         .sheet(isPresented: $showSettings) {
             AIChatSettingsView(settings: $viewModel.settingsManager.settings)
         }
-        .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.data, .image, .pdf, .text], allowsMultipleSelection: false) { result in
-            handleFileImport(result: result)
+        .sheet(isPresented: $showHistorySheet) {
+            NavigationStack {
+                List(viewModel.messages) { message in
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(message.role.capitalized).font(.caption).foregroundColor(.secondary)
+                        Text(message.content).lineLimit(4)
+                        Text(message.timestamp.formatted(date: .abbreviated, time: .shortened))
+                            .font(.caption2).foregroundColor(.secondary)
+                    }
+                }
+                .navigationTitle("Chat History")
+            }
+        }
+        .sheet(isPresented: $showFileImporter) {
+            FileImporterRepresentableView(allowedContentTypes: [.data, .image, .pdf, .text], allowsMultipleSelection: false) { urls in
+                handleImportedURLs(urls)
+                showFileImporter = false
+            }
         }
         .onChange(of: selectedPhotoItem) { item in
             guard let item = item else { return }
@@ -188,23 +206,18 @@ struct AIChatToolView: View {
         }
     }
 
-    private func handleFileImport(result: Result<[URL], Error>) {
-        switch result {
-        case .success(let urls):
-            guard let url = urls.first else { return }
-            let accessing = url.startAccessingSecurityScopedResource()
-            defer { if accessing { url.stopAccessingSecurityScopedResource() } }
-            guard let data = try? Data(contentsOf: url) else { return }
-            let mimeType = mimeType(for: url.pathExtension)
-            let attachment = ChatAttachment(data: data, mimeType: mimeType, fileName: url.lastPathComponent)
-            let model = viewModel.settingsManager.settings.modelID
-            if !OpenRouterService.supportsVision(model: model) {
-                showVisionAlert = true
-            } else {
-                viewModel.addAttachment(attachment)
-            }
-        case .failure:
-            break
+    private func handleImportedURLs(_ urls: [URL]) {
+        guard let url = urls.first else { return }
+        let accessing = url.startAccessingSecurityScopedResource()
+        defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+        guard let data = try? Data(contentsOf: url) else { return }
+        let mimeType = mimeType(for: url.pathExtension)
+        let attachment = ChatAttachment(data: data, mimeType: mimeType, fileName: url.lastPathComponent)
+        let model = viewModel.settingsManager.settings.modelID
+        if !OpenRouterService.supportsVision(model: model) {
+            showVisionAlert = true
+        } else {
+            viewModel.addAttachment(attachment)
         }
     }
 
@@ -259,7 +272,7 @@ struct ChatBubble: View {
             if isUser { Spacer() }
 
             VStack(alignment: isUser ? .trailing : .leading, spacing: 2) {
-                Text(message.content)
+                MarkdownBubbleText(markdown: message.content, fontSize: fontSize, foregroundColor: isUser ? .white : .primary)
                     .font(.system(size: fontSize))
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
@@ -276,6 +289,24 @@ struct ChatBubble: View {
             }
 
             if !isUser { Spacer() }
+        }
+    }
+}
+
+struct MarkdownBubbleText: View {
+    let markdown: String
+    let fontSize: Double
+    let foregroundColor: Color
+
+    var body: some View {
+        if let parsed = try? AttributedString(markdown: markdown) {
+            Text(parsed)
+                .font(.system(size: fontSize))
+                .foregroundColor(foregroundColor)
+        } else {
+            Text(markdown)
+                .font(.system(size: fontSize))
+                .foregroundColor(foregroundColor)
         }
     }
 }

@@ -20,6 +20,18 @@ struct CodeFormatterView: View {
                 backend.format()
             }
             .buttonStyle(.borderedProminent)
+            HStack {
+                Button("Clear") {
+                    backend.inputText = ""
+                    backend.formattedText = ""
+                }
+                Spacer()
+                Button("Copy Output") {
+                    UIPasteboard.general.string = backend.formattedText
+                }
+                .disabled(backend.formattedText.isEmpty)
+            }
+            .font(.caption)
 
             TextEditor(text: .constant(backend.formattedText))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

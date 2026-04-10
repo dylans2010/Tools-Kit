@@ -27,6 +27,11 @@ struct TextFormatterView: View {
                     backend.format(to: selectedStyle)
                 }
                 .buttonStyle(.borderedProminent)
+                Button("Clear") {
+                    backend.inputText = ""
+                    backend.outputText = ""
+                }
+                .buttonStyle(.bordered)
             }
 
             VStack(alignment: .leading) {
@@ -43,6 +48,13 @@ struct TextFormatterView: View {
                     .padding(4)
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.blue.opacity(0.2)))
             }
+            HStack {
+                Text("Input chars: \(backend.inputText.count)")
+                Spacer()
+                Text("Output chars: \(backend.outputText.count)")
+            }
+            .font(.caption)
+            .foregroundColor(.secondary)
         }
         .padding()
         .navigationTitle("Text Formatter")

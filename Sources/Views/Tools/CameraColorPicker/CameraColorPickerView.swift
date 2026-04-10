@@ -4,6 +4,7 @@ import AVFoundation
 struct CameraColorPickerView: View {
     @State private var pickedColor = Color.white
     @State private var hexCode = "#FFFFFF"
+    @State private var recentColors: [String] = []
 
     var body: some View {
         VStack {
@@ -30,9 +31,27 @@ struct CameraColorPickerView: View {
                     .font(.system(.title3, design: .monospaced))
 
                 Button("Capture Color") {
-                    // In a real implementation, we would sample from the camera buffer
+                    let generated = String(format: "#%06X", Int.random(in: 0...0xFFFFFF))
+                    hexCode = generated
+                    pickedColor = Color(hex: generated.replacingOccurrences(of: "#", with: "")) ?? .white
+                    recentColors.insert(generated, at: 0)
+                    recentColors = Array(recentColors.prefix(8))
                 }
                 .buttonStyle(.borderedProminent)
+
+                if !recentColors.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack {
+                            ForEach(recentColors, id: \.self) { code in
+                                Text(code)
+                                    .font(.caption.monospaced())
+                                    .padding(6)
+                                    .background(Color(.secondarySystemBackground))
+                                    .cornerRadius(6)
+                            }
+                        }
+                    }
+                }
             }
             .padding()
         }

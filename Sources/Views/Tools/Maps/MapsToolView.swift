@@ -7,6 +7,21 @@ struct MapsToolView: View {
     var body: some View {
         VStack(spacing: 0) {
             searchBar
+            if !viewModel.savedLocations.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack {
+                        ForEach(viewModel.savedLocations) { location in
+                            Button(location.name) {
+                                viewModel.region.center = location.coordinate
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 6)
+                }
+            }
 
             ZStack {
                 Map(coordinateRegion: $viewModel.region, annotationItems: viewModel.searchResults) { item in
