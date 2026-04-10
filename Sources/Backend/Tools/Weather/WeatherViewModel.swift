@@ -2,7 +2,8 @@ import SwiftUI
 import WeatherKit
 import CoreLocation
 
-class WeatherViewModel: ObservableObject {
+@MainActor
+final class WeatherViewModel: ObservableObject {
     @Published var weatherData: FullWeatherData?
     @Published var isLoading = false
     @Published var errorMessage: String?
@@ -15,12 +16,14 @@ class WeatherViewModel: ObservableObject {
 
     init() {
         weatherManager.onLocationUpdate = { [weak self] location in
-            self?.fetchWeather(for: location)
-            self?.fetchLocationName(for: location)
+            Task { @MainActor in
+                self?.fetchWeather(for: location)
+                self?.fetchLocationName(for: location)
+            }
         }
 
         weatherManager.onAuthorizationChange = { [weak self] status in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self?.authorizationStatus = status
                 if status == .authorizedWhenInUse || status == .authorizedAlways {
                     self?.refresh()
@@ -37,20 +40,16 @@ class WeatherViewModel: ObservableObject {
     }
 
     private func fetchWeather(for location: CLLocation) {
-        Task {
+        Task { @MainActor in
             do {
                 let weather = try await weatherManager.fetchWeather(for: location)
                 let transformed = repository.transform(weather: weather)
-                DispatchQueue.main.async {
-                    self.weatherData = transformed
-                    self.repository.saveToCache(transformed)
-                    self.isLoading = false
-                }
+                self.weatherData = transformed
+                self.repository.saveToCache(transformed)
+                self.isLoading = false
             } catch {
-                DispatchQueue.main.async {
-                    self.errorMessage = error.localizedDescription
-                    self.isLoading = false
-                }
+                self.errorMessage = error.localizedDescription
+                self.isLoading = false
             }
         }
     }
@@ -58,7 +57,7 @@ class WeatherViewModel: ObservableObject {
     private func fetchLocationName(for location: CLLocation) {
         geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, _ in
             if let city = placemarks?.first?.locality {
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self?.locationName = city
                 }
             }
