@@ -32,7 +32,7 @@ struct DailyForecastModel: Codable, Identifiable {
 }
 
 struct WeatherInsight: Codable, Identifiable {
-    let id = UUID()
+    var id = UUID()
     let title: String
     let description: String
     let type: InsightType
