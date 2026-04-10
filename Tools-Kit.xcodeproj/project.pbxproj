@@ -78,6 +78,7 @@
 		AA11BB22CC33DD44EE55FF03 /* MapsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA03 /* MapsService.swift */; };
 		AA11BB22CC33DD44EE55FF04 /* FileImporterRepresentableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */; };
 		AA11BB22CC33DD44EE55FF05 /* AIChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA05 /* AIChatViewModel.swift */; };
+		AA11BB22CC33DD44EE55FF06 /* AIChatMemoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA06 /* AIChatMemoryStore.swift */; };
 		1D850FF7369F4F688D80DA62 /* ToolCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3614DB596A94EBEA3646F6A /* ToolCard.swift */; };
 		9899E0E87F5E483AAFE3DC1E /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8089CEDC467040D2B38719FF /* SectionHeader.swift */; };
 		EBE22210307D4412B2B687E0 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F5090DCA1AD4E1DA6D7A453 /* SearchBar.swift */; };
@@ -132,7 +133,9 @@
 		27E7A717B4F74AD18150C366 /* AudioConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3E970024494C71B6ED1599 /* AudioConverterView.swift */; };
 		A2448FEA477A4F4CAAC29DD5 /* SmartAutofillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645DFCFABAC545B7AFD0C88B /* SmartAutofillView.swift */; };
 		F2E5E31805DE4F0783E49178 /* HabitTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDC177FCF5D46119D1C8CC1 /* HabitTrackerView.swift */; };
+		F2E5E31805DE4F0783E49179 /* HabitTrackerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDC177FCF5D46119D1C8CC2 /* HabitTrackerBackend.swift */; };
 		B1A65EEDE8D6432C82D99E87 /* FocusTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7F486EF5ED54F9B9D7B0875 /* FocusTrackerView.swift */; };
+		B1A65EEDE8D6432C82D99E88 /* FocusSessionBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7F486EF5ED54F9B9D7B0876 /* FocusSessionBackend.swift */; };
 		BBC8C27D49F84AC394DC0D4F /* AIChatToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6662160AA2024E9FBEA29A4C /* AIChatToolView.swift */; };
 		F684E2F4E8324F3291DBC3B3 /* MapsToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 064CB13BC205411B91EAA752 /* MapsToolView.swift */; };
 		1E0DA9F8E1B94A5DAF20BC4A /* MapsToolViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09E6435EECFF4FD6B31B4C0B /* MapsToolViewModel.swift */; };
@@ -284,13 +287,16 @@
 		6B3E970024494C71B6ED1599 /* AudioConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/AudioConverter/AudioConverterView.swift"; sourceTree = "<group>"; };
 		645DFCFABAC545B7AFD0C88B /* SmartAutofillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/SmartAutofill/SmartAutofillView.swift"; sourceTree = "<group>"; };
 		DDDC177FCF5D46119D1C8CC1 /* HabitTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/HabitTracker/HabitTrackerView.swift"; sourceTree = "<group>"; };
+		DDDC177FCF5D46119D1C8CC2 /* HabitTrackerBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/HabitTracker/HabitTrackerBackend.swift"; sourceTree = "<group>"; };
 		E7F486EF5ED54F9B9D7B0875 /* FocusTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/FocusTracker/FocusTrackerView.swift"; sourceTree = "<group>"; };
+		E7F486EF5ED54F9B9D7B0876 /* FocusSessionBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/FocusTracker/FocusSessionBackend.swift"; sourceTree = "<group>"; };
 		6662160AA2024E9FBEA29A4C /* AIChatToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/AIChat/AIChatToolView.swift"; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA01 /* APIKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/APIKeyManager.swift"; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/OpenRouterService.swift"; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA03 /* MapsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Maps/MapsService.swift"; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Shared/FileImporterRepresentableView.swift"; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA05 /* AIChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/AIChat/AIChatViewModel.swift"; sourceTree = "<group>"; };
+		AB11BC22CD33DE44EF55FA06 /* AIChatMemoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/AIChatMemoryStore.swift"; sourceTree = "<group>"; };
 		064CB13BC205411B91EAA752 /* MapsToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Maps/MapsToolView.swift"; sourceTree = "<group>"; };
 		09E6435EECFF4FD6B31B4C0B /* MapsToolViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Maps/MapsToolViewModel.swift"; sourceTree = "<group>"; };
 		CCFF0BDC48A74ACABA6CE6DD /* ObjectDetectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/ObjectDetection/ObjectDetectionView.swift"; sourceTree = "<group>"; };
@@ -461,9 +467,12 @@
 				6B3E970024494C71B6ED1599 /* AudioConverterView.swift */,
 				645DFCFABAC545B7AFD0C88B /* SmartAutofillView.swift */,
 				DDDC177FCF5D46119D1C8CC1 /* HabitTrackerView.swift */,
+				DDDC177FCF5D46119D1C8CC2 /* HabitTrackerBackend.swift */,
 				E7F486EF5ED54F9B9D7B0875 /* FocusTrackerView.swift */,
+				E7F486EF5ED54F9B9D7B0876 /* FocusSessionBackend.swift */,
 				6662160AA2024E9FBEA29A4C /* AIChatToolView.swift */,
 				AB11BC22CD33DE44EF55FA05 /* AIChatViewModel.swift */,
+				AB11BC22CD33DE44EF55FA06 /* AIChatMemoryStore.swift */,
 				AB11BC22CD33DE44EF55FA01 /* APIKeyManager.swift */,
 				AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */,
 				AB11BC22CD33DE44EF55FA03 /* MapsService.swift */,
@@ -691,9 +700,12 @@
 				27E7A717B4F74AD18150C366 /* AudioConverterView.swift in Sources */,
 				A2448FEA477A4F4CAAC29DD5 /* SmartAutofillView.swift in Sources */,
 				F2E5E31805DE4F0783E49178 /* HabitTrackerView.swift in Sources */,
+				F2E5E31805DE4F0783E49179 /* HabitTrackerBackend.swift in Sources */,
 				B1A65EEDE8D6432C82D99E87 /* FocusTrackerView.swift in Sources */,
+				B1A65EEDE8D6432C82D99E88 /* FocusSessionBackend.swift in Sources */,
 				BBC8C27D49F84AC394DC0D4F /* AIChatToolView.swift in Sources */,
 				AA11BB22CC33DD44EE55FF05 /* AIChatViewModel.swift in Sources */,
+				AA11BB22CC33DD44EE55FF06 /* AIChatMemoryStore.swift in Sources */,
 				AA11BB22CC33DD44EE55FF01 /* APIKeyManager.swift in Sources */,
 				AA11BB22CC33DD44EE55FF02 /* OpenRouterService.swift in Sources */,
 				AA11BB22CC33DD44EE55FF03 /* MapsService.swift in Sources */,
