@@ -49,7 +49,7 @@ struct ProjectDetailsView: View {
         .sheet(isPresented: $showAddTask) {
             ProjectTaskDetailView(projectID: currentProject.id, task: nil)
         }
-        .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.data, .image, .pdf, .text]) { result in
+        .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.data, .image, .pdf, .text], allowsMultipleSelection: false) { result in
             handleFileImport(result: result)
         }
         .onChange(of: selectedPhotoItem) { item in
