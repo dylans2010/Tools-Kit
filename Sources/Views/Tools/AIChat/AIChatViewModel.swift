@@ -93,7 +93,7 @@ class AIChatViewModel: ObservableObject {
             do {
                 let response: String
                 if !attachmentsToSend.isEmpty {
-                    if !OpenRouterService.supportsVision(model: model) {
+                    guard OpenRouterService.supportsVision(model: model) else {
                         DispatchQueue.main.async {
                             self.error = "The selected model does not support vision/file attachments. Please choose a vision-capable model in settings."
                             self.isLoading = false
