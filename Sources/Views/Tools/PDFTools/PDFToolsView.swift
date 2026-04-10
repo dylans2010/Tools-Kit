@@ -67,12 +67,9 @@ struct PDFToolsView: View {
             }
         }
         .navigationTitle("PDF Tools")
-        .fileImporter(isPresented: $showingFilePicker, allowedContentTypes: [.pdf], allowsMultipleSelection: true) { result in
-            switch result {
-            case .success(let urls):
+        .sheet(isPresented: $showingFilePicker) {
+            FileImporterRepresentableView(allowedContentTypes: [.pdf], allowsMultipleSelection: true) { urls in
                 selectedURLs.append(contentsOf: urls)
-            case .failure(let error):
-                backend.error = error.localizedDescription
             }
         }
     }
