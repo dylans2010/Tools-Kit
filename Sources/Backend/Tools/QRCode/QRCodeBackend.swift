@@ -27,18 +27,45 @@ class QRCodeBackend: NSObject, ObservableObject, AVCaptureMetadataOutputObjectsD
     }
 
     func startScanning() {
+        if captureSession == nil {
+            setupCaptureSession()
+        }
+
         isScanning = true
         scannedCode = nil
 
-        // This logic would normally initialize AVCaptureSession on a real device
-        // We'll simulate the state here for the modular toolkit
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.captureSession?.startRunning()
+        }
     }
 
     func stopScanning() {
         isScanning = false
+        captureSession?.stopRunning()
     }
 
-    // AVCaptureMetadataOutputObjectsDelegate method (simulated)
+    private func setupCaptureSession() {
+        let session = AVCaptureSession()
+
+        guard let videoDevice = AVCaptureDevice.default(for: .video),
+              let videoInput = try? AVCaptureDeviceInput(device: videoDevice) else {
+            return
+        }
+
+        if session.canAddInput(videoInput) {
+            session.addInput(videoInput)
+        }
+
+        let metadataOutput = AVCaptureMetadataOutput()
+        if session.canAddOutput(metadataOutput) {
+            session.addOutput(metadataOutput)
+            metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
+            metadataOutput.metadataObjectTypes = [.qr]
+        }
+
+        self.captureSession = session
+    }
+
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         if let metadataObject = metadataObjects.first {
             guard let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject else { return }
@@ -47,6 +74,7 @@ class QRCodeBackend: NSObject, ObservableObject, AVCaptureMetadataOutputObjectsD
             DispatchQueue.main.async {
                 self.scannedCode = stringValue
                 self.isScanning = false
+                self.captureSession?.stopRunning()
             }
         }
     }

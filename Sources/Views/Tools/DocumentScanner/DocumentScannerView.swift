@@ -4,6 +4,12 @@ import VisionKit
 struct DocumentScannerView: View {
     @State private var showingScanner = false
     @State private var scannedImages: [UIImage] = []
+    @State private var recognizedText = ""
+    @State private var isProcessing = false
+    @State private var summary = ""
+
+    private let ocrService = OCRService.shared
+    private let aiService = AIService()
 
     var body: some View {
         VStack {
@@ -20,29 +26,70 @@ struct DocumentScannerView: View {
                     .buttonStyle(.borderedProminent)
                 }
             } else {
-                List {
-                    ForEach(scannedImages, id: \.self) { image in
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 200)
-                            .cornerRadius(8)
+                ScrollView {
+                    VStack(spacing: 20) {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack {
+                                ForEach(scannedImages, id: \.self) { image in
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(height: 150)
+                                        .cornerRadius(8)
+                                }
+                            }
+                            .padding()
+                        }
+
+                        HStack {
+                            Button("Scan More") { showingScanner = true }
+                                .buttonStyle(.bordered)
+                            Spacer()
+                            Button("Clear All") {
+                                scannedImages = []
+                                recognizedText = ""
+                                summary = ""
+                            }
+                                .foregroundColor(.red)
+                        }
+                        .padding(.horizontal)
+
+                        Divider()
+
+                        Button(action: processDocuments) {
+                            if isProcessing {
+                                ProgressView().tint(.white)
+                            } else {
+                                Label("OCR & AI Summarize", systemImage: "sparkles")
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(isProcessing)
+
+                        if !summary.isEmpty {
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("AI Summary").font(.headline)
+                                Text(summary)
+                                    .padding()
+                                    .background(Color(uiColor: .secondarySystemBackground))
+                                    .cornerRadius(8)
+                            }
+                            .padding()
+                        }
+
+                        if !recognizedText.isEmpty {
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Recognized Text").font(.headline)
+                                Text(recognizedText)
+                                    .font(.caption)
+                                    .padding()
+                                    .background(Color(uiColor: .secondarySystemBackground))
+                                    .cornerRadius(8)
+                            }
+                            .padding()
+                        }
                     }
                 }
-
-                Button("Scan More") {
-                    showingScanner = true
-                }
-                .padding()
-                HStack {
-                    Text("\(scannedImages.count) pages scanned")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Button("Clear") { scannedImages = [] }
-                        .foregroundColor(.red)
-                }
-                .padding(.horizontal)
             }
         }
         .navigationTitle("Document Scanner")
@@ -50,6 +97,41 @@ struct DocumentScannerView: View {
             ScannerRepresentable { images in
                 self.scannedImages.append(contentsOf: images)
                 showingScanner = false
+            }
+        }
+    }
+
+    private func processDocuments() {
+        guard !scannedImages.isEmpty else { return }
+        isProcessing = true
+
+        Task {
+            var fullText = ""
+            for image in scannedImages {
+                if let text = try? await ocrService.recognizeText(in: image) {
+                    fullText += text + "\n\n"
+                }
+            }
+
+            await MainActor.run {
+                self.recognizedText = fullText
+            }
+
+            let prompt = "Summarize the following scanned document text and extract key information:\n\n\(fullText)"
+            let request = AIRequest(
+                prompt: prompt,
+                systemPrompt: "You are a document analysis assistant. Provide clear summaries and extract structured data from OCR text.",
+                model: "google/gemini-2.0-flash-exp:free",
+                attachments: nil
+            )
+
+            if let result = try? await aiService.process(request: request) {
+                await MainActor.run {
+                    self.summary = result
+                    self.isProcessing = false
+                }
+            } else {
+                await MainActor.run { self.isProcessing = false }
             }
         }
     }

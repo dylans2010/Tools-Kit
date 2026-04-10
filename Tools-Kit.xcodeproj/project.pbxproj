@@ -75,6 +75,10 @@
 		B1C2D3E4F5A60708090A0B07 /* WeatherComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60708090A0B07 /* WeatherComponents.swift */; };
 		AA11BB22CC33DD44EE55FF01 /* APIKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA01 /* APIKeyManager.swift */; };
 		AA11BB22CC33DD44EE55FF02 /* OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */; };
+		EE000001CC33DD44EE55FF01 /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE000001CD33DE44EF55FA01 /* CameraService.swift */; };
+		EE000001CC33DD44EE55FF02 /* AIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE000001CD33DE44EF55FA02 /* AIService.swift */; };
+		EE000001CC33DD44EE55FF03 /* VisionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE000001CD33DE44EF55FA03 /* VisionService.swift */; };
+		EE000001CC33DD44EE55FF04 /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE000001CD33DE44EF55FA04 /* OCRService.swift */; };
 		AA11BB22CC33DD44EE55FF03 /* MapsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA03 /* MapsService.swift */; };
 		AA11BB22CC33DD44EE55FF04 /* FileImporterRepresentableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */; };
 		AA11BB22CC33DD44EE55FF05 /* AIChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA05 /* AIChatViewModel.swift */; };
@@ -293,6 +297,10 @@
 		6662160AA2024E9FBEA29A4C /* AIChatToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/AIChat/AIChatToolView.swift"; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA01 /* APIKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/APIKeyManager.swift"; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/OpenRouterService.swift"; sourceTree = "<group>"; };
+		FE000001CD33DE44EF55FA01 /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraService.swift; sourceTree = "<group>"; };
+		FE000001CD33DE44EF55FA02 /* AIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIService.swift; sourceTree = "<group>"; };
+		FE000001CD33DE44EF55FA03 /* VisionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionService.swift; sourceTree = "<group>"; };
+		FE000001CD33DE44EF55FA04 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA03 /* MapsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Maps/MapsService.swift"; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Shared/FileImporterRepresentableView.swift"; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA05 /* AIChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/AIChat/AIChatViewModel.swift"; sourceTree = "<group>"; };
@@ -346,12 +354,32 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		EE000002CD33DE44EF55FA01 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				FE000001CD33DE44EF55FA01 /* CameraService.swift */,
+				FE000001CD33DE44EF55FA02 /* AIService.swift */,
+				FE000001CD33DE44EF55FA03 /* VisionService.swift */,
+				FE000001CD33DE44EF55FA04 /* OCRService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		EE000002CD33DE44EF55FA02 /* Backend */ = {
+			isa = PBXGroup;
+			children = (
+				EE000002CD33DE44EF55FA01 /* Services */,
+			);
+			path = Backend;
+			sourceTree = "<group>";
+		};
 		8DF4BF69CF55A81CB6EBF3DE /* Sources */ = {
 			isa = PBXGroup;
 			children = (
 				1060294FE4D1B96EE4302F9E /* AppEntry.swift */,
 				55F4704416753FAA2B8FF663 /* Models */,
 				4A2CB0E156D82F6EAA22B391 /* Views */,
+				EE000002CD33DE44EF55FA02 /* Backend */,
 
 				A1B2C3D4E5F60708090A0B02 /* WeatherService.swift */,
 				A1B2C3D4E5F60708090A0B03 /* WeatherRepository.swift */,
@@ -585,6 +613,10 @@
 				B1C2D3E4F5A60708090A0B01 /* WeatherModels.swift in Sources */,
 				B1C2D3E4F5A60708090A0B02 /* WeatherService.swift in Sources */,
 				B1C2D3E4F5A60708090A0B03 /* WeatherRepository.swift in Sources */,
+				EE000001CC33DD44EE55FF01 /* CameraService.swift in Sources */,
+				EE000001CC33DD44EE55FF02 /* AIService.swift in Sources */,
+				EE000001CC33DD44EE55FF03 /* VisionService.swift in Sources */,
+				EE000001CC33DD44EE55FF04 /* OCRService.swift in Sources */,
 				B1C2D3E4F5A60708090A0B04 /* WeatherViewModel.swift in Sources */,
 				B1C2D3E4F5A60708090A0B05 /* WeatherView.swift in Sources */,
 				B1C2D3E4F5A60708090A0B06 /* WeatherMiniCard.swift in Sources */,

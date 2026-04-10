@@ -4,6 +4,9 @@ struct CodeDebuggerView: View {
     @State private var code = ""
     @State private var analysis = ""
     @State private var isAnalyzing = false
+    @State private var error: String?
+
+    private let aiService = AIService()
 
     var body: some View {
         ScrollView {
@@ -14,7 +17,11 @@ struct CodeDebuggerView: View {
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
                     .padding()
 
-                Button(action: debug) {
+                Button(action: {
+                    Task {
+                        await debug()
+                    }
+                }) {
                     if isAnalyzing {
                         ProgressView().tint(.white)
                     } else {
@@ -24,10 +31,18 @@ struct CodeDebuggerView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .padding(.horizontal)
+                .disabled(code.isEmpty || isAnalyzing)
+
+                if let error = error {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .font(.caption)
+                        .padding()
+                }
 
                 if !analysis.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
-                        Label("Potential Issues", systemImage: "ladybug.fill")
+                        Label("AI Analysis & Fix Suggestions", systemImage: "ladybug.fill")
                             .font(.headline)
                             .foregroundColor(.orange)
 
@@ -43,11 +58,41 @@ struct CodeDebuggerView: View {
         .navigationTitle("Code Debugger")
     }
 
-    private func debug() {
+    private func debug() async {
+        guard !code.isEmpty else { return }
+
         isAnalyzing = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            analysis = "1. Found potential memory leak in closure.\n2. Optional value should be unwrapped safely.\n3. Variable 'temp' is never used."
-            isAnalyzing = false
+        error = nil
+
+        let prompt = """
+        Analyze the following code for bugs, logic errors, or potential optimizations.
+        Provide a structured response with:
+        1. Identified Issues
+        2. Suggested Fixes
+        3. Optimized Code Snippet (if applicable)
+
+        Code:
+        \(code)
+        """
+
+        let request = AIRequest(
+            prompt: prompt,
+            systemPrompt: "You are an expert software engineer and debugger. Provide concise and accurate technical analysis.",
+            model: "google/gemini-2.0-flash-exp:free",
+            attachments: nil
+        )
+
+        do {
+            let result = try await aiService.process(request: request)
+            await MainActor.run {
+                self.analysis = result
+                isAnalyzing = false
+            }
+        } catch {
+            await MainActor.run {
+                self.error = error.localizedDescription
+                isAnalyzing = false
+            }
         }
     }
 }

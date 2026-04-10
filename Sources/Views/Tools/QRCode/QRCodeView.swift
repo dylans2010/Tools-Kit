@@ -64,9 +64,19 @@ private struct QRScanningView: View {
         VStack(spacing: 20) {
             if backend.isScanning {
                 ZStack {
-                    Color.black
-                    Text("Scanning Camera Preview...")
-                        .foregroundColor(.white)
+                    if let session = backend.captureSession {
+                        CameraPreview(session: session)
+                    } else {
+                        Color.black
+                    }
+
+                    VStack {
+                        Spacer()
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.white, lineWidth: 2)
+                            .frame(width: 250, height: 250)
+                        Spacer()
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .cornerRadius(12)

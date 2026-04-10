@@ -4,6 +4,9 @@ struct ContextSummarizerView: View {
     @State private var inputText = ""
     @State private var summary = ""
     @State private var isLoading = false
+    @State private var error: String?
+
+    private let aiService = AIService()
 
     var body: some View {
         ScrollView {
@@ -13,7 +16,11 @@ struct ContextSummarizerView: View {
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
                     .padding()
 
-                Button(action: summarize) {
+                Button(action: {
+                    Task {
+                        await summarize()
+                    }
+                }) {
                     if isLoading {
                         ProgressView().tint(.white)
                     } else {
@@ -23,10 +30,18 @@ struct ContextSummarizerView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .padding(.horizontal)
+                .disabled(inputText.isEmpty || isLoading)
+
+                if let error = error {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .font(.caption)
+                        .padding()
+                }
 
                 if !summary.isEmpty {
                     VStack(alignment: .leading) {
-                        Text("Key Insights").font(.headline)
+                        Text("AI Summary & Key Insights").font(.headline)
                         Text(summary)
                             .padding()
                             .background(Color.blue.opacity(0.1))
@@ -39,11 +54,40 @@ struct ContextSummarizerView: View {
         .navigationTitle("Context Summarizer")
     }
 
-    private func summarize() {
+    private func summarize() async {
+        guard !inputText.isEmpty else { return }
+
         isLoading = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            summary = "Summary: This tool analyzes the context and provides a structured overview of the input text."
-            isLoading = false
+        error = nil
+
+        let prompt = """
+        Provide a detailed summary of the following text, including:
+        - A concise overview
+        - Key points as a bulleted list
+        - Recommended action items (if any)
+
+        Text:
+        \(inputText)
+        """
+
+        let request = AIRequest(
+            prompt: prompt,
+            systemPrompt: "You are an expert at synthesizing information and providing structured summaries.",
+            model: "google/gemini-2.0-flash-exp:free",
+            attachments: nil
+        )
+
+        do {
+            let result = try await aiService.process(request: request)
+            await MainActor.run {
+                self.summary = result
+                isLoading = false
+            }
+        } catch {
+            await MainActor.run {
+                self.error = error.localizedDescription
+                isLoading = false
+            }
         }
     }
 }
