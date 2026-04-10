@@ -37,9 +37,9 @@ struct IDClassifierView: View {
                 Divider()
 
                 Group {
-                    InfoRow(label: "Name", value: classifier.extractedName)
-                    InfoRow(label: "DOB", value: classifier.extractedDOB)
-                    InfoRow(label: "ID Number", value: classifier.extractedIDNumber)
+                    IDInfoRow(label: "Name", value: classifier.extractedName)
+                    IDInfoRow(label: "DOB", value: classifier.extractedDOB)
+                    IDInfoRow(label: "ID Number", value: classifier.extractedIDNumber)
                 }
             }
             .padding()
@@ -53,7 +53,7 @@ struct IDClassifierView: View {
     }
 }
 
-struct InfoRow: View {
+struct IDInfoRow: View {
     let label: String
     let value: String
 
