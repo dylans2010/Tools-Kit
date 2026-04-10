@@ -121,11 +121,13 @@ struct FileConverterView: View {
             }
         }
         .navigationTitle("File Converter")
-        .sheet(isPresented: $showingFilePicker) {
-            FileImporterRepresentableView(allowedContentTypes: [.data]) { urls in
-                if let url = urls.first {
-                    backend.selectedFileURL = url
-                }
+        .fileImporter(
+            isPresented: $showingFilePicker,
+            allowedContentTypes: [.data],
+            allowsMultipleSelection: false
+        ) { result in
+            if case let .success(urls) = result, let url = urls.first {
+                backend.selectedFileURL = url
             }
         }
     }
