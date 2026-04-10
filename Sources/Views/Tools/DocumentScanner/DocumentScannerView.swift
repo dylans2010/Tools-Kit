@@ -34,6 +34,15 @@ struct DocumentScannerView: View {
                     showingScanner = true
                 }
                 .padding()
+                HStack {
+                    Text("\(scannedImages.count) pages scanned")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Button("Clear") { scannedImages = [] }
+                        .foregroundColor(.red)
+                }
+                .padding(.horizontal)
             }
         }
         .navigationTitle("Document Scanner")

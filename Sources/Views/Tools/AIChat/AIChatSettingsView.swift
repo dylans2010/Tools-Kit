@@ -5,6 +5,7 @@ struct AIChatSettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var newTrait: String = ""
     @State private var newExpertise: String = ""
+    @StateObject private var memoryStore = AIChatMemoryStore.shared
 
     var body: some View {
         NavigationStack {
@@ -82,6 +83,23 @@ struct AIChatSettingsView: View {
                     }
                     Toggle("Show Timestamps", isOn: $settings.showTimestamps)
                 }
+
+                Section("Storage & Reliability") {
+                    Toggle("Save Chat History", isOn: $settings.saveChatHistory)
+                    Toggle("Detailed Error Logging", isOn: $settings.logErrorsToConsole)
+                    Toggle("Enable Streaming (experimental)", isOn: $settings.streamResponseText)
+                }
+
+                Section("Memory (CoreML-assisted)") {
+                    Toggle("Enable Memory", isOn: $settings.memoryEnabled)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Sensitivity: \(settings.memorySensitivity, specifier: "%.2f")")
+                        Slider(value: $settings.memorySensitivity, in: 0.2...1.0, step: 0.05)
+                    }
+                    NavigationLink("Manage Saved Memory") {
+                        MemoryManagerView(memoryStore: memoryStore)
+                    }
+                }
             }
             .navigationTitle("AI Chat Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -89,6 +107,40 @@ struct AIChatSettingsView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") { dismiss() }
                 }
+            }
+        }
+    }
+}
+
+struct MemoryManagerView: View {
+    @ObservedObject var memoryStore: AIChatMemoryStore
+
+    var body: some View {
+        List {
+            if memoryStore.memories.isEmpty {
+                Text("No memory items have been captured yet.")
+                    .foregroundColor(.secondary)
+            } else {
+                ForEach(memoryStore.memories) { item in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(item.value)
+                        Text(item.createdAt.formatted(date: .abbreviated, time: .shortened))
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .onDelete { indexSet in
+                    for index in indexSet {
+                        memoryStore.delete(memoryStore.memories[index])
+                    }
+                }
+            }
+        }
+        .navigationTitle("AI Memory")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Clear") { memoryStore.clear() }
+                    .foregroundColor(.red)
             }
         }
     }

@@ -4,6 +4,7 @@ import Vision
 struct LiveTextView: View {
     @State private var extractedText = ""
     @State private var isScanning = false
+    @State private var scanCount = 0
 
     var body: some View {
         VStack {
@@ -15,7 +16,10 @@ struct LiveTextView: View {
                 if !extractedText.isEmpty {
                     VStack {
                         Spacer()
-                        Text(extractedText)
+                        ScrollView {
+                            Text(extractedText)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
                             .padding()
                             .background(.ultraThinMaterial)
                             .cornerRadius(12)
@@ -27,11 +31,23 @@ struct LiveTextView: View {
             .cornerRadius(12)
             .padding()
 
-            Button(isScanning ? "Stop Scanning" : "Start Live Text") {
-                isScanning.toggle()
-                if isScanning { extractedText = "Sample extracted text from camera..." }
+            HStack {
+                Button(isScanning ? "Stop Scanning" : "Start Live Text") {
+                    isScanning.toggle()
+                    if isScanning {
+                        scanCount += 1
+                        extractedText = "Capture #\(scanCount): Sample extracted text from camera..."
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+
+                Button("Copy") { UIPasteboard.general.string = extractedText }
+                    .buttonStyle(.bordered)
+                    .disabled(extractedText.isEmpty)
+
+                Button("Clear") { extractedText = "" }
+                    .buttonStyle(.bordered)
             }
-            .buttonStyle(.borderedProminent)
             .padding()
         }
         .navigationTitle("Live Text")

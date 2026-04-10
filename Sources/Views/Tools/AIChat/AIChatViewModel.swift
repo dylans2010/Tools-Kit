@@ -10,15 +10,18 @@ class AIChatViewModel: ObservableObject {
     @Published var isApiKeySaved: Bool = false
     @Published var pendingAttachments: [ChatAttachment] = []
     @Published var settingsManager = AIChatSettingsManager.shared
+    @Published var memoryStore = AIChatMemoryStore.shared
 
     private let aiService = OpenRouterService()
     private let keyManager = APIKeyManager.shared
+    private let historyKey = "ai_chat_history"
 
     init() {
         if let savedKey = keyManager.getKey() {
             self.apiKey = savedKey
             self.isApiKeySaved = true
         }
+        loadHistory()
     }
 
     func saveKey() {
@@ -65,6 +68,10 @@ class AIChatViewModel: ObservableObject {
         if !s.knowledgeContext.isEmpty {
             parts.append(s.knowledgeContext)
         }
+        if s.memoryEnabled {
+            let memory = memoryStore.contextSnippet()
+            if !memory.isEmpty { parts.append(memory) }
+        }
 
         return parts.isEmpty ? nil : parts.joined(separator: " ")
     }
@@ -74,6 +81,9 @@ class AIChatViewModel: ObservableObject {
 
         let userMessage = ChatMessage(role: "user", content: inputText)
         messages.append(userMessage)
+        if settingsManager.settings.memoryEnabled {
+            memoryStore.ingestUserMessage(inputText, sensitivity: settingsManager.settings.memorySensitivity)
+        }
         let currentInput = inputText
         let attachmentsToSend = pendingAttachments
         inputText = ""
@@ -115,10 +125,14 @@ class AIChatViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     self.messages.append(ChatMessage(role: "assistant", content: response))
                     self.isLoading = false
+                    self.persistHistoryIfEnabled()
                 }
             } catch {
                 DispatchQueue.main.async {
-                    self.error = error.localizedDescription
+                    self.error = "Request failed: \(error.localizedDescription)"
+                    if self.settingsManager.settings.logErrorsToConsole {
+                        print("AIChat error: \(String(describing: error))")
+                    }
                     self.isLoading = false
                     self.inputText = currentInput
                     self.pendingAttachments = attachmentsToSend
@@ -129,5 +143,21 @@ class AIChatViewModel: ObservableObject {
 
     func clearChat() {
         messages = []
+        persistHistoryIfEnabled()
+    }
+
+    private func persistHistoryIfEnabled() {
+        guard settingsManager.settings.saveChatHistory else {
+            UserDefaults.standard.removeObject(forKey: historyKey)
+            return
+        }
+        guard let data = try? JSONEncoder().encode(messages) else { return }
+        UserDefaults.standard.set(data, forKey: historyKey)
+    }
+
+    private func loadHistory() {
+        guard let data = UserDefaults.standard.data(forKey: historyKey),
+              let decoded = try? JSONDecoder().decode([ChatMessage].self, from: data) else { return }
+        messages = decoded
     }
 }

@@ -15,6 +15,11 @@ struct AIChatSettings: Codable {
     var fontSize: Double = 16
     var showTimestamps: Bool = false
     var selectedPresetID: String? = nil
+    var saveChatHistory: Bool = true
+    var streamResponseText: Bool = false
+    var logErrorsToConsole: Bool = true
+    var memoryEnabled: Bool = true
+    var memorySensitivity: Double = 0.7
 }
 
 struct SystemPromptPreset: Identifiable, Codable {

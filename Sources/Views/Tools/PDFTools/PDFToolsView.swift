@@ -5,6 +5,8 @@ struct PDFToolsView: View {
     @StateObject private var backend = PDFToolsBackend()
     @State private var showingFilePicker = false
     @State private var selectedURLs: [URL] = []
+    @State private var reverseMergeOrder = false
+    @State private var extractRange = "1-1"
 
     var body: some View {
         VStack(spacing: 20) {
@@ -31,7 +33,7 @@ struct PDFToolsView: View {
                 }
                 .buttonStyle(.bordered)
 
-                Button(action: { backend.merge(pdfURLs: selectedURLs) }) {
+                Button(action: { backend.merge(pdfURLs: selectedURLs, reverseOrder: reverseMergeOrder) }) {
                     if backend.isProcessing {
                         ProgressView().tint(.white)
                     } else {
@@ -41,6 +43,20 @@ struct PDFToolsView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(selectedURLs.count < 2 || backend.isProcessing)
+
+                Toggle("Reverse merge order", isOn: $reverseMergeOrder)
+
+                HStack {
+                    TextField("Extract pages, e.g. 2-5", text: $extractRange)
+                        .textFieldStyle(.roundedBorder)
+                    Button("Extract") {
+                        guard let first = selectedURLs.first,
+                              let range = parseRange(extractRange) else { return }
+                        backend.extract(pageRange: range, from: first)
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(selectedURLs.isEmpty)
+                }
             }
             .padding()
 
@@ -67,15 +83,20 @@ struct PDFToolsView: View {
             }
         }
         .navigationTitle("PDF Tools")
-        .fileImporter(
-            isPresented: $showingFilePicker,
-            allowedContentTypes: [.pdf],
-            allowsMultipleSelection: true
-        ) { result in
-            if case let .success(urls) = result {
+        .sheet(isPresented: $showingFilePicker) {
+            FileImporterRepresentableView(allowedContentTypes: [.pdf], allowsMultipleSelection: true) { urls in
                 selectedURLs.append(contentsOf: urls)
+                showingFilePicker = false
             }
         }
+    }
+}
+
+extension PDFToolsView {
+    private func parseRange(_ value: String) -> ClosedRange<Int>? {
+        let parts = value.split(separator: "-").compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
+        guard parts.count == 2 else { return nil }
+        return min(parts[0], parts[1])...max(parts[0], parts[1])
     }
 }
 

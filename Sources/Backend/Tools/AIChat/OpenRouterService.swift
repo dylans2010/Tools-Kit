@@ -49,8 +49,9 @@ class OpenRouterService {
         let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            let responseText = String(data: data, encoding: .utf8) ?? "No response body"
             throw NSError(domain: "OpenRouter", code: (response as? HTTPURLResponse)?.statusCode ?? -1,
-                          userInfo: [NSLocalizedDescriptionKey: "Failed to get response from AI"])
+                          userInfo: [NSLocalizedDescriptionKey: "Failed to get response from AI. Body: \(responseText)"])
         }
 
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
@@ -87,8 +88,9 @@ class OpenRouterService {
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            let responseText = String(data: data, encoding: .utf8) ?? "No response body"
             throw NSError(domain: "OpenRouter", code: (response as? HTTPURLResponse)?.statusCode ?? -1,
-                          userInfo: [NSLocalizedDescriptionKey: "Failed to get response from AI"])
+                          userInfo: [NSLocalizedDescriptionKey: "Failed to get response from AI. Body: \(responseText)"])
         }
 
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]

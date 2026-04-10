@@ -6,6 +6,10 @@ struct TimezoneConverterView: View {
     var body: some View {
         Form {
             Section(header: Text("Source Time")) {
+                HStack {
+                    Button("Now") { backend.sourceDate = Date(); backend.convert() }
+                    Button("+1 Day") { backend.sourceDate = Calendar.current.date(byAdding: .day, value: 1, to: backend.sourceDate) ?? backend.sourceDate; backend.convert() }
+                }
                 DatePicker("Date/Time", selection: $backend.sourceDate)
                     .onChange(of: backend.sourceDate) { _ in backend.convert() }
 

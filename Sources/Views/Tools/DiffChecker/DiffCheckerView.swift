@@ -27,6 +27,13 @@ struct DiffCheckerView: View {
             .buttonStyle(.borderedProminent)
 
             if !backend.diffResults.isEmpty {
+                HStack {
+                    Label("\(backend.diffResults.filter { if case .added = $0 { return true } else { return false } }.count)", systemImage: "plus.circle.fill")
+                        .foregroundColor(.green)
+                    Label("\(backend.diffResults.filter { if case .removed = $0 { return true } else { return false } }.count)", systemImage: "minus.circle.fill")
+                        .foregroundColor(.red)
+                    Spacer()
+                }
                 ScrollView {
                     VStack(alignment: .leading, spacing: 2) {
                         ForEach(0..<backend.diffResults.count, id: \.self) { index in

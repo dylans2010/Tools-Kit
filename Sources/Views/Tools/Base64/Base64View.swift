@@ -23,6 +23,9 @@ struct Base64View: View {
                 }
             }
             .buttonStyle(.borderedProminent)
+            Text("Input: \(backend.inputText.count) chars • Output: \(backend.outputText.count) chars")
+                .font(.caption2)
+                .foregroundColor(.secondary)
 
             VStack(alignment: .leading) {
                 HStack {

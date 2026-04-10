@@ -5,6 +5,7 @@ struct ProjectsMainView: View {
     @State private var searchText = ""
     @State private var statusFilter: ProjectStatus? = nil
     @State private var showCreateSheet = false
+    @State private var sortByUpdated = true
 
     var filteredProjects: [Project] {
         var result = manager.projects
@@ -18,6 +19,7 @@ struct ProjectsMainView: View {
             result = result.filter { $0.status == filter }
         }
         return result
+            .sorted { sortByUpdated ? $0.updatedAt > $1.updatedAt : $0.name < $1.name }
     }
 
     var body: some View {
@@ -32,6 +34,12 @@ struct ProjectsMainView: View {
             .navigationTitle("Projects")
             .searchable(text: $searchText, prompt: "Search projects")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Menu {
+                        Button("Sort: Recently Updated") { sortByUpdated = true }
+                        Button("Sort: Name") { sortByUpdated = false }
+                    } label: { Image(systemName: "arrow.up.arrow.down.circle") }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button { showCreateSheet = true } label: {
                         Image(systemName: "plus")
@@ -66,6 +74,13 @@ struct ProjectsMainView: View {
 
     private var projectList: some View {
         VStack(spacing: 0) {
+            HStack {
+                StatPill(title: "Active", count: manager.activeProjects.count, color: .green)
+                StatPill(title: "Completed", count: manager.completedProjects.count, color: .blue)
+                StatPill(title: "Total", count: manager.projects.count, color: .secondary)
+            }
+            .padding(.horizontal)
+            .padding(.top, 8)
             statusFilterPicker
             List {
                 ForEach(filteredProjects) { project in
@@ -97,6 +112,23 @@ struct ProjectsMainView: View {
             .padding(.vertical, 8)
         }
         .background(Color(.systemGroupedBackground))
+    }
+}
+
+struct StatPill: View {
+    let title: String
+    let count: Int
+    let color: Color
+
+    var body: some View {
+        VStack(spacing: 2) {
+            Text("\(count)").font(.headline)
+            Text(title).font(.caption2).foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(8)
+        .background(color.opacity(0.12))
+        .cornerRadius(10)
     }
 }
 

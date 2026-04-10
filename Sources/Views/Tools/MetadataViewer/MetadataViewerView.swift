@@ -1,9 +1,15 @@
 import SwiftUI
 import PhotosUI
+import ImageIO
 
 struct MetadataViewerView: View {
     @State private var selectedItem: PhotosPickerItem?
     @State private var metadata: [String: String] = [:]
+    @State private var filter = ""
+
+    var filteredMetadata: [(key: String, value: String)] {
+        metadata.sorted(by: { $0.key < $1.key }).filter { filter.isEmpty || $0.key.localizedCaseInsensitiveContains(filter) || $0.value.localizedCaseInsensitiveContains(filter) }
+    }
 
     var body: some View {
         VStack {
@@ -15,17 +21,23 @@ struct MetadataViewerView: View {
                     .foregroundColor(.white)
                     .cornerRadius(12)
             }
-            .padding()
+            .padding([.horizontal, .top])
 
             if !metadata.isEmpty {
+                TextField("Filter metadata", text: $filter)
+                    .textFieldStyle(.roundedBorder)
+                    .padding(.horizontal)
+            }
+
+            if !filteredMetadata.isEmpty {
                 List {
-                    ForEach(metadata.sorted(by: <), id: \.key) { key, value in
-                        LabeledContent(key, value: value)
+                    ForEach(filteredMetadata, id: \.key) { pair in
+                        LabeledContent(pair.key, value: pair.value)
                     }
                 }
             } else {
                 Spacer()
-                Text("Select an image to view EXIF and GPS metadata")
+                Text(metadata.isEmpty ? "Select an image to view EXIF and GPS metadata" : "No matching metadata")
                     .foregroundColor(.secondary)
                 Spacer()
             }
@@ -33,18 +45,31 @@ struct MetadataViewerView: View {
         .navigationTitle("Metadata Viewer")
         .onChange(of: selectedItem) { newItem in
             Task {
-                if let data = try? await newItem?.loadTransferable(type: Data.self) {
-                    // Logic to extract EXIF using CGImageSource
-                    metadata = [
-                        "Camera": "iPhone 15 Pro",
-                        "Focal Length": "24mm",
-                        "Aperture": "f/1.78",
-                        "ISO": "80",
-                        "Exposure": "1/120s"
-                    ]
-                }
+                guard let data = try? await newItem?.loadTransferable(type: Data.self) else { return }
+                metadata = extractMetadata(from: data)
             }
         }
+    }
+
+    private func extractMetadata(from data: Data) -> [String: String] {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let props = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any] else { return [:] }
+
+        var flattened: [String: String] = [:]
+        func walk(_ prefix: String, _ value: Any) {
+            if let dict = value as? [CFString: Any] {
+                for (k, v) in dict {
+                    walk(prefix.isEmpty ? (k as String) : "\(prefix).\(k)", v)
+                }
+            } else {
+                flattened[prefix] = "\(value)"
+            }
+        }
+
+        for (k, v) in props {
+            walk(k as String, v)
+        }
+        return flattened
     }
 }
 

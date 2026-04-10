@@ -49,8 +49,11 @@ struct ProjectDetailsView: View {
         .sheet(isPresented: $showAddTask) {
             ProjectTaskDetailView(projectID: currentProject.id, task: nil)
         }
-        .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.data, .image, .pdf, .text], allowsMultipleSelection: false) { result in
-            handleFileImport(result: result)
+        .sheet(isPresented: $showFileImporter) {
+            FileImporterRepresentableView(allowedContentTypes: [.data, .image, .pdf, .text], allowsMultipleSelection: false) { urls in
+                handleImportedURLs(urls)
+                showFileImporter = false
+            }
         }
         .onChange(of: selectedPhotoItem) { item in
             guard let item = item else { return }
@@ -344,19 +347,14 @@ struct ProjectDetailsView: View {
     }
 
     // MARK: - File Handling
-    private func handleFileImport(result: Result<[URL], Error>) {
-        switch result {
-        case .success(let urls):
-            guard let url = urls.first else { return }
-            let accessing = url.startAccessingSecurityScopedResource()
-            defer { if accessing { url.stopAccessingSecurityScopedResource() } }
-            guard let data = try? Data(contentsOf: url) else { return }
-            let mimeType = mimeTypeFor(ext: url.pathExtension)
-            let file = ProjectFile(fileName: url.lastPathComponent, mimeType: mimeType, data: data)
-            manager.addFile(to: currentProject.id, file: file)
-        case .failure:
-            break
-        }
+    private func handleImportedURLs(_ urls: [URL]) {
+        guard let url = urls.first else { return }
+        let accessing = url.startAccessingSecurityScopedResource()
+        defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+        guard let data = try? Data(contentsOf: url) else { return }
+        let mimeType = mimeTypeFor(ext: url.pathExtension)
+        let file = ProjectFile(fileName: url.lastPathComponent, mimeType: mimeType, data: data)
+        manager.addFile(to: currentProject.id, file: file)
     }
 
     private func loadPhoto(from item: PhotosPickerItem) {
