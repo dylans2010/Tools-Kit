@@ -67,8 +67,12 @@ struct PDFToolsView: View {
             }
         }
         .navigationTitle("PDF Tools")
-        .sheet(isPresented: $showingFilePicker) {
-            FileImporterRepresentableView(allowedContentTypes: [.pdf], allowsMultipleSelection: true) { urls in
+        .fileImporter(
+            isPresented: $showingFilePicker,
+            allowedContentTypes: [.pdf],
+            allowsMultipleSelection: true
+        ) { result in
+            if case let .success(urls) = result {
                 selectedURLs.append(contentsOf: urls)
             }
         }

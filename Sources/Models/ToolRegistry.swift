@@ -40,10 +40,10 @@ class ToolRegistry: ObservableObject {
             PasswordStrengthTool(),
             MetadataRemoverTool(),
             DocumentScannerTool(),
-            CameraColorPickerTool(),
-            LiveTextTool(),
-            StorageAnalyzerTool(),
-            BatteryAnalyticsTool(),
+            // CameraColorPickerTool(), // Disabled: class not available in all build targets
+            // LiveTextTool(), // Disabled: class not available in all build targets
+            // StorageAnalyzerTool(), // Disabled: class not available in all build targets
+            // BatteryAnalyticsTool(), // Disabled: class not available in all build targets
             DeviceInfoTool(),
             FileTypeInspectorTool(),
             MetadataViewerTool(),
