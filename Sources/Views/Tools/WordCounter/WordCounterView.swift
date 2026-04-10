@@ -11,34 +11,14 @@ struct WordCounterView: View {
                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                StatCard(title: "Characters", value: "\(backend.characterCount)")
-                StatCard(title: "Words", value: "\(backend.wordCount)")
-                StatCard(title: "Sentences", value: "\(backend.sentenceCount)")
-                StatCard(title: "Lines", value: "\(backend.lineCount)")
+                StatCard(title: "Characters", value: "\(backend.characterCount)", icon: "character.cursor.ibeam", color: .blue)
+                StatCard(title: "Words", value: "\(backend.wordCount)", icon: "textformat", color: .orange)
+                StatCard(title: "Sentences", value: "\(backend.sentenceCount)", icon: "text.quote", color: .green)
+                StatCard(title: "Lines", value: "\(backend.lineCount)", icon: "list.number", color: .purple)
             }
         }
         .padding()
         .navigationTitle("Word Counter")
-    }
-}
-
-struct StatCard: View {
-    let title: String
-    let value: String
-
-    var body: some View {
-        VStack {
-            Text(value)
-                .font(.title2)
-                .bold()
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(10)
     }
 }
 
