@@ -212,7 +212,7 @@ struct ProjectRowView: View {
                 Label("\(taskCount) tasks", systemImage: "checkmark.circle")
                 Label("\(project.files.count) files", systemImage: "doc")
                 if let nextTask = project.tasks.first(where: { $0.status != .done }), let dueDate = nextTask.dueDate {
-                    Label(dueDate, style: .date)
+                    Text(dueDate, style: .date)
                         .foregroundColor(.red)
                 }
             }

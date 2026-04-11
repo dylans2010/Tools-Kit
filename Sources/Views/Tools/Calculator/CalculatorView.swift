@@ -192,7 +192,7 @@ private struct GeometryCalcView: View {
 
     var body: some View {
         Form {
-            Section("Circle Area") {
+            Section {
                 TextField("Radius", text: $radius)
                     .keyboardType(.decimalPad)
                 Button("Calculate") {
@@ -203,6 +203,8 @@ private struct GeometryCalcView: View {
                 if !result.isEmpty {
                     Text("Area: \(result)")
                 }
+            } header: {
+                Text("Circle Area")
             } footer: {
                 Text("Enter radius to calculate area.")
             }
@@ -268,8 +270,6 @@ private struct CalcButton: View {
                 .cornerRadius(12)
         }
     }
-}
-
 }
 
 struct CalculatorTool: Tool {
