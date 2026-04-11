@@ -53,6 +53,8 @@ class ToolRegistry: ObservableObject {
             FocusTrackerTool(),
 
             // Advanced Tools
+            CSVAnalyzerTool(),
+            LatencyTesterTool(),
             JSONFormatterTool(),
             APITesterTool(),
             RegexTesterTool(),

@@ -167,6 +167,12 @@
 		D9F50B598DD9C577FC648E67 /* ProjectDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CA3298669648F7EC784FD9 /* ProjectDetailsView.swift */; };
 		A16FD4012C798954554BD244 /* ProjectSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E730C86FE6E37EB081481454 /* ProjectSettingsView.swift */; };
 		20B4161A16479DEAB11738D8 /* ProjectTaskDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E39EB987ED765AEA0EBF43AF /* ProjectTaskDetailView.swift */; };
+		AABB000101010101AABB0001 /* ToolEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB000201010101AABB0002 /* ToolEngine.swift */; };
+		AABB000301010101AABB0003 /* CSVAnalyzerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB000401010101AABB0004 /* CSVAnalyzerBackend.swift */; };
+		AABB000501010101AABB0005 /* CSVAnalyzerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB000601010101AABB0006 /* CSVAnalyzerView.swift */; };
+		AABB000701010101AABB0007 /* LatencyTesterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB000801010101AABB0008 /* LatencyTesterBackend.swift */; };
+		AABB000901010101AABB0009 /* LatencyTesterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB000A01010101AABB000A /* LatencyTesterView.swift */; };
+		AABB000B01010101AABB000B /* ToolComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB000C01010101AABB000C /* ToolComponents.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -328,6 +334,12 @@
 		88CA3298669648F7EC784FD9 /* ProjectDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Projects/ProjectDetailsView.swift"; sourceTree = "<group>"; };
 		E730C86FE6E37EB081481454 /* ProjectSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Projects/ProjectSettingsView.swift"; sourceTree = "<group>"; };
 		E39EB987ED765AEA0EBF43AF /* ProjectTaskDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Projects/ProjectTaskDetailView.swift"; sourceTree = "<group>"; };
+		AABB000201010101AABB0002 /* ToolEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/ToolEngine/ToolEngine.swift"; sourceTree = "<group>"; };
+		AABB000401010101AABB0004 /* CSVAnalyzerBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/CSVAnalyzer/CSVAnalyzerBackend.swift"; sourceTree = "<group>"; };
+		AABB000601010101AABB0006 /* CSVAnalyzerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/CSVAnalyzer/CSVAnalyzerView.swift"; sourceTree = "<group>"; };
+		AABB000801010101AABB0008 /* LatencyTesterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/LatencyTester/LatencyTesterBackend.swift"; sourceTree = "<group>"; };
+		AABB000A01010101AABB000A /* LatencyTesterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/LatencyTester/LatencyTesterView.swift"; sourceTree = "<group>"; };
+		AABB000C01010101AABB000C /* ToolComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Shared/ToolComponents.swift"; sourceTree = "<group>"; };
 		B1C2D3E4F5A60708090A0C01 /* AIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Services/AIService.swift; sourceTree = "<group>"; };
 		B1C2D3E4F5A60708090A0C02 /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Services/CameraService.swift; sourceTree = "<group>"; };
 		B1C2D3E4F5A60708090A0C03 /* VisionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Services/VisionService.swift; sourceTree = "<group>"; };
@@ -516,6 +528,12 @@
 				88CA3298669648F7EC784FD9 /* ProjectDetailsView.swift */,
 				E730C86FE6E37EB081481454 /* ProjectSettingsView.swift */,
 				E39EB987ED765AEA0EBF43AF /* ProjectTaskDetailView.swift */,
+				AABB000201010101AABB0002 /* ToolEngine.swift */,
+				AABB000401010101AABB0004 /* CSVAnalyzerBackend.swift */,
+				AABB000601010101AABB0006 /* CSVAnalyzerView.swift */,
+				AABB000801010101AABB0008 /* LatencyTesterBackend.swift */,
+				AABB000A01010101AABB000A /* LatencyTesterView.swift */,
+				AABB000C01010101AABB000C /* ToolComponents.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -754,6 +772,12 @@
 				D9F50B598DD9C577FC648E67 /* ProjectDetailsView.swift in Sources */,
 				A16FD4012C798954554BD244 /* ProjectSettingsView.swift in Sources */,
 				20B4161A16479DEAB11738D8 /* ProjectTaskDetailView.swift in Sources */,
+				AABB000101010101AABB0001 /* ToolEngine.swift in Sources */,
+				AABB000301010101AABB0003 /* CSVAnalyzerBackend.swift in Sources */,
+				AABB000501010101AABB0005 /* CSVAnalyzerView.swift in Sources */,
+				AABB000701010101AABB0007 /* LatencyTesterBackend.swift in Sources */,
+				AABB000901010101AABB0009 /* LatencyTesterView.swift in Sources */,
+				AABB000B01010101AABB000B /* ToolComponents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

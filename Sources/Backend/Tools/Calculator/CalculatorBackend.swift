@@ -114,6 +114,33 @@ class CalculatorBackend: ObservableObject {
         isEnteringNumber = false
     }
 
+    @Published var expressionInput: String = ""
+
+    func evaluateExpression() {
+        guard !expressionInput.isEmpty else { return }
+        var expr = expressionInput
+            .replacingOccurrences(of: "×", with: "*")
+            .replacingOccurrences(of: "÷", with: "/")
+            .replacingOccurrences(of: "π", with: "3.14159265358979")
+
+        do {
+            let nsExpr = NSExpression(format: expr)
+            if let result = nsExpr.expressionValue(with: nil, context: nil) as? NSNumber {
+                let resultStr = format(result.doubleValue)
+                let entry = CalculationEntry(expression: expressionInput, result: resultStr)
+                history.insert(entry, at: 0)
+                if history.count > 50 { history.removeLast() }
+                saveHistory()
+                display = resultStr
+                isEnteringNumber = false
+            } else {
+                display = "Error"
+            }
+        } catch {
+            display = "Error"
+        }
+    }
+
     private func perform(_ op: Operation, _ a: Double, _ b: Double) -> Double {
         switch op {
         case .add: return a + b
