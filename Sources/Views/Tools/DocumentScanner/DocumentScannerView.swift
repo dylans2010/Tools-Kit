@@ -221,8 +221,6 @@ struct DrawingView: UIViewRepresentable {
     }
 }
 
-}
-
 struct ScannerRepresentable: UIViewControllerRepresentable {
     let completion: ([UIImage]) -> Void
 

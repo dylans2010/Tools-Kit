@@ -77,10 +77,10 @@ struct FileSizeView: View {
     private func descriptionForUnit(_ unit: FileSizeBackend.SizeUnit) -> String {
         switch unit {
         case .bytes: return "Base unit of data"
-        case .kb: return "Kilobytes"
-        case .mb: return "Megabytes"
-        case .gb: return "Gigabytes"
-        case .tb: return "Terabytes"
+        case .kilobytes: return "Kilobytes"
+        case .megabytes: return "Megabytes"
+        case .gigabytes: return "Gigabytes"
+        case .terabytes: return "Terabytes"
         }
     }
 }

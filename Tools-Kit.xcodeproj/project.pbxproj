@@ -84,6 +84,7 @@
 		B1C2D3E4F5A60708090A0D03 /* VisionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C03 /* VisionService.swift */; };
 		1D850FF7369F4F688D80DA62 /* ToolCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3614DB596A94EBEA3646F6A /* ToolCard.swift */; };
 		9899E0E87F5E483AAFE3DC1E /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8089CEDC467040D2B38719FF /* SectionHeader.swift */; };
+		CA9876543210FEDCBA987654 /* CameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1234567890ABCDEF123456 /* CameraPreview.swift */; };
 		EBE22210307D4412B2B687E0 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F5090DCA1AD4E1DA6D7A453 /* SearchBar.swift */; };
 		E73FCC0E5082438986D07BA4 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 126F5D3967E54F42B0F95A85 /* Note.swift */; };
 		D337498F1A804510A06449E3 /* HashGeneratorBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A66E8681454E9BA63967D7 /* HashGeneratorBackend.swift */; };
@@ -238,6 +239,7 @@
 		A1B2C3D4E5F60708090A0B07 /* WeatherComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Tools/Weather/WeatherComponents.swift; sourceTree = "<group>"; };
 		D3614DB596A94EBEA3646F6A /* ToolCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/ToolCard.swift"; sourceTree = "<group>"; };
 		8089CEDC467040D2B38719FF /* SectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/SectionHeader.swift"; sourceTree = "<group>"; };
+		CA1234567890ABCDEF123456 /* CameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/CameraPreview.swift"; sourceTree = "<group>"; };
 		8F5090DCA1AD4E1DA6D7A453 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/SearchBar.swift"; sourceTree = "<group>"; };
 		126F5D3967E54F42B0F95A85 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		48A66E8681454E9BA63967D7 /* HashGeneratorBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/HashGenerator/HashGeneratorBackend.swift"; sourceTree = "<group>"; };
@@ -426,6 +428,7 @@
 				0CC491BC963045ECA25BD9ED /* DashboardView.swift */,
 				D3614DB596A94EBEA3646F6A /* ToolCard.swift */,
 				8089CEDC467040D2B38719FF /* SectionHeader.swift */,
+				CA1234567890ABCDEF123456 /* CameraPreview.swift */,
 				8F5090DCA1AD4E1DA6D7A453 /* SearchBar.swift */,
 				48A66E8681454E9BA63967D7 /* HashGeneratorBackend.swift */,
 				789744A07C4847959848A33D /* WebhookTesterBackend.swift */,
@@ -662,6 +665,7 @@
 				1A7693C243A940E5B12B384B /* DashboardView.swift in Sources */,
 				1D850FF7369F4F688D80DA62 /* ToolCard.swift in Sources */,
 				9899E0E87F5E483AAFE3DC1E /* SectionHeader.swift in Sources */,
+				CA9876543210FEDCBA987654 /* CameraPreview.swift in Sources */,
 				EBE22210307D4412B2B687E0 /* SearchBar.swift in Sources */,
 				E73FCC0E5082438986D07BA4 /* Note.swift in Sources */,
 				D337498F1A804510A06449E3 /* HashGeneratorBackend.swift in Sources */,
