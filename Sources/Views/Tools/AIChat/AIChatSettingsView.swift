@@ -58,6 +58,20 @@ struct AIChatSettingsView: View {
                     TagEditorView(tags: $settings.expertiseAreas, placeholder: "Add expertise...")
                 }
 
+                Section("Personality & Style") {
+                    Picker("Response Tone", selection: $settings.responseTone) {
+                        ForEach(ResponseTone.allCases, id: \.self) { tone in
+                            Text(tone.rawValue).tag(tone)
+                        }
+                    }
+
+                    Picker("Response Length", selection: $settings.preferredResponseLength) {
+                        ForEach(ResponseLength.allCases, id: \.self) { length in
+                            Text(length.rawValue).tag(length)
+                        }
+                    }
+                }
+
                 Section("Knowledge & Context") {
                     TextEditor(text: $settings.knowledgeContext)
                         .frame(minHeight: 80)

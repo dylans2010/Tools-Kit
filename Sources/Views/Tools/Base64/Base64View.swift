@@ -4,46 +4,71 @@ struct Base64View: View {
     @StateObject private var backend = Base64Backend()
 
     var body: some View {
-        VStack(spacing: 16) {
-            VStack(alignment: .leading) {
-                Text("Input").font(.caption).foregroundColor(.secondary)
-                TextEditor(text: $backend.inputText)
-                    .frame(maxHeight: .infinity)
-                    .padding(4)
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
-            }
+        Form {
+            Section {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Enter plain text to encode into Base64, or a Base64 string to decode back to plain text.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
 
-            HStack {
-                Button("Encode") { backend.encode() }
-                Button("Decode") { backend.decode() }
-                Spacer()
-                Button(action: { backend.clear() }) {
-                    Image(systemName: "trash")
-                        .foregroundColor(.red)
+                    TextEditor(text: $backend.inputText)
+                        .frame(minHeight: 120)
+                        .font(.body.monospaced())
                 }
+            } header: {
+                Text("Input Data")
             }
-            .buttonStyle(.borderedProminent)
-            Text("Input: \(backend.inputText.count) chars • Output: \(backend.outputText.count) chars")
-                .font(.caption2)
-                .foregroundColor(.secondary)
 
-            VStack(alignment: .leading) {
-                HStack {
-                    Text("Output").font(.caption).foregroundColor(.secondary)
-                    Spacer()
-                    Button(action: { UIPasteboard.general.string = backend.outputText }) {
-                        Image(systemName: "doc.on.doc")
-                            .font(.caption)
+            Section {
+                HStack(spacing: 16) {
+                    Button(action: backend.encode) {
+                        Label("Encode", systemImage: "arrow.right.circle.fill")
+                            .frame(maxWidth: .infinity)
                     }
-                    .disabled(backend.outputText.isEmpty)
+                    .buttonStyle(.borderedProminent)
+
+                    Button(action: backend.decode) {
+                        Label("Decode", systemImage: "arrow.left.circle.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
                 }
-                TextEditor(text: .constant(backend.outputText))
-                    .frame(maxHeight: .infinity)
-                    .padding(4)
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.blue.opacity(0.2)))
+                .padding(.vertical, 4)
+            }
+
+            if !backend.outputText.isEmpty {
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(backend.outputText)
+                            .font(.system(.body, design: .monospaced))
+                            .padding(8)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color(.secondarySystemBackground))
+                            .cornerRadius(8)
+                            .textSelection(.enabled)
+
+                        HStack {
+                            Button(action: { UIPasteboard.general.string = backend.outputText }) {
+                                Label("Copy", systemImage: "doc.on.doc")
+                            }
+                            .buttonStyle(.bordered)
+
+                            Spacer()
+
+                            Button(action: backend.clear) {
+                                Label("Clear", systemImage: "trash")
+                                    .foregroundColor(.red)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 4)
+                } header: {
+                    Text("Result")
+                } footer: {
+                    Text("Conversion complete. Input: \(backend.inputText.count) chars • Output: \(backend.outputText.count) chars")
+                }
             }
         }
-        .padding()
         .navigationTitle("Base64 Tool")
     }
 }

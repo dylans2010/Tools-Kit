@@ -11,10 +11,13 @@ class CameraService: NSObject, ObservableObject {
     private let sessionQueue = DispatchQueue(label: "com.tools-kit.camera-queue")
 
     weak var delegate: CameraServiceDelegate?
+    private var _previewLayer: AVCaptureVideoPreviewLayer?
 
     var previewLayer: AVCaptureVideoPreviewLayer {
+        if let existing = _previewLayer { return existing }
         let layer = AVCaptureVideoPreviewLayer(session: captureSession)
         layer.videoGravity = .resizeAspectFill
+        _previewLayer = layer
         return layer
     }
 
@@ -39,6 +42,12 @@ class CameraService: NSObject, ObservableObject {
             if !self.captureSession.isRunning {
                 self.captureSession.startRunning()
             }
+        }
+    }
+
+    func updatePreviewLayerFrame(_ frame: CGRect) {
+        DispatchQueue.main.async {
+            self._previewLayer?.frame = frame
         }
     }
 

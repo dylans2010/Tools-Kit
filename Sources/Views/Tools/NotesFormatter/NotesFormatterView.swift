@@ -5,46 +5,76 @@ struct NotesFormatterView: View {
     @State private var selectedStyle: NoteFormatStyle = .bulletPoints
 
     var body: some View {
-        VStack(spacing: 16) {
-            VStack(alignment: .leading) {
-                Text("Input Notes").font(.caption).foregroundColor(.secondary)
-                TextEditor(text: $backend.inputText)
-                    .frame(maxHeight: .infinity)
-                    .padding(4)
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
+        Form {
+            Section {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Enter your raw, unorganized notes here to be cleaned and formatted.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    TextEditor(text: $backend.inputText)
+                        .frame(minHeight: 120)
+                        .cornerRadius(8)
+                }
+            } header: {
+                Text("Source Notes")
             }
 
-            HStack {
-                Picker("Format Style", selection: $selectedStyle) {
-                    ForEach(NoteFormatStyle.allCases, id: \.self) { style in
-                        Text(style.rawValue).tag(style)
+            Section {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Select a formatting style and apply it to your notes.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    HStack {
+                        Picker("Style", selection: $selectedStyle) {
+                            ForEach(NoteFormatStyle.allCases, id: \.self) { style in
+                                Text(style.rawValue).tag(style)
+                            }
+                        }
+                        .pickerStyle(.menu)
+
+                        Spacer()
+
+                        Button(action: { backend.format(to: selectedStyle) }) {
+                            Label("Apply Format", systemImage: "wand.and.stars")
+                        }
+                        .buttonStyle(.borderedProminent)
                     }
                 }
-                .pickerStyle(.menu)
-                .buttonStyle(.bordered)
-
-                Button("Apply") {
-                    backend.format(to: selectedStyle)
-                }
-                .buttonStyle(.borderedProminent)
+            } header: {
+                Text("Formatting Options")
             }
 
-            VStack(alignment: .leading) {
-                HStack {
-                    Text("Formatted Output").font(.caption).foregroundColor(.secondary)
-                    Spacer()
-                    Button(action: { UIPasteboard.general.string = backend.outputText }) {
-                        Image(systemName: "doc.on.doc")
+            if !backend.outputText.isEmpty {
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        TextEditor(text: .constant(backend.outputText))
+                            .frame(minHeight: 200)
+                            .font(.body)
+
+                        HStack {
+                            Button(action: { UIPasteboard.general.string = backend.outputText }) {
+                                Label("Copy Formatted", systemImage: "doc.on.doc")
+                            }
+                            .buttonStyle(.bordered)
+
+                            Spacer()
+
+                            Button(action: { backend.outputText = "" }) {
+                                Label("Clear", systemImage: "trash")
+                                    .foregroundColor(.red)
+                            }
+                        }
                     }
-                    .disabled(backend.outputText.isEmpty)
+                    .padding(.vertical, 4)
+                } header: {
+                    Text("Formatted Output")
+                } footer: {
+                    Text("Your notes have been formatted into a clean structure.")
                 }
-                TextEditor(text: .constant(backend.outputText))
-                    .frame(maxHeight: .infinity)
-                    .padding(4)
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.blue.opacity(0.2)))
             }
         }
-        .padding()
         .navigationTitle("Notes Formatter")
     }
 }

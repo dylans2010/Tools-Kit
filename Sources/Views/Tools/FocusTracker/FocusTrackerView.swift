@@ -6,52 +6,113 @@ struct FocusTrackerView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
-                Picker("Session", selection: $backend.selectedPreset) {
+            VStack(spacing: 28) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Maximize your productivity using the Pomodoro technique. Focus on your work during high-intensity intervals and rest during short breaks.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.horizontal)
+
+                Picker("Protocol", selection: $backend.selectedPreset) {
                     ForEach(FocusPreset.presets) { preset in
                         Text(preset.name).tag(preset)
                     }
                 }
                 .pickerStyle(.segmented)
+                .padding(.horizontal)
 
                 ZStack {
-                    Circle().stroke(Color.gray.opacity(0.2), lineWidth: 18)
+                    Circle()
+                        .stroke(Color(.systemGray6), lineWidth: 16)
+
                     Circle()
                         .trim(from: 0, to: backend.progress)
-                        .stroke(backend.phase == .work ? Color.red : Color.green, style: .init(lineWidth: 18, lineCap: .round))
+                        .stroke(
+                            backend.phase == .work ? Color.orange.gradient : Color.green.gradient,
+                            style: StrokeStyle(lineWidth: 16, lineCap: .round)
+                        )
                         .rotationEffect(.degrees(-90))
+                        .animation(.linear(duration: 1.0), value: backend.progress)
 
-                    VStack(spacing: 8) {
-                        Text(backend.phase.rawValue).font(.headline)
+                    VStack(spacing: 12) {
+                        Text(backend.phase.rawValue.uppercased())
+                            .font(.system(.subheadline, design: .rounded))
+                            .fontWeight(.bold)
+                            .foregroundColor(backend.phase == .work ? .orange : .green)
+                            .tracking(2)
+
                         Text(timeString)
-                            .font(.system(size: 48, weight: .bold, design: .monospaced))
+                            .font(.system(size: 64, weight: .medium, design: .rounded))
                     }
                 }
-                .frame(width: 260, height: 260)
-                .padding(.top, 12)
+                .frame(width: 280, height: 280)
 
-                HStack(spacing: 16) {
-                    Button(backend.isActive ? "Pause" : "Start", action: backend.toggle)
-                        .buttonStyle(.borderedProminent)
-                    Button("Reset", action: backend.reset)
-                        .buttonStyle(.bordered)
+                HStack(spacing: 24) {
+                    Button(action: backend.reset) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(.title2)
+                            .foregroundColor(.secondary)
+                            .padding()
+                            .background(Color(.secondarySystemBackground))
+                            .clipShape(Circle())
+                    }
+
+                    Button(action: backend.toggle) {
+                        Image(systemName: backend.isActive ? "pause.fill" : "play.fill")
+                            .font(.system(size: 32))
+                            .foregroundColor(.white)
+                            .padding(24)
+                            .background(backend.phase == .work ? Color.orange : Color.green)
+                            .clipShape(Circle())
+                            .shadow(color: (backend.phase == .work ? Color.orange : Color.green).opacity(0.3), radius: 10, x: 0, y: 5)
+                    }
+
+                    // Placeholder for a future skip or more options button
+                    Button(action: {}) {
+                        Image(systemName: "ellipsis")
+                            .font(.title2)
+                            .foregroundColor(.secondary)
+                            .padding()
+                            .background(Color(.secondarySystemBackground))
+                            .clipShape(Circle())
+                    }
+                    .opacity(0) // Hide for now but keep spacing
                 }
 
-                Stepper("Daily Goal: \(backend.dailyGoal)", value: $backend.dailyGoal, in: 1...16)
+                VStack(spacing: 20) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Label("Daily Goal", systemImage: "target")
+                                .font(.headline)
+                            Spacer()
+                            Text("\(backend.dailyGoal) sessions")
+                                .bold()
+                        }
 
-                VStack(alignment: .leading, spacing: 6) {
-                    Label(backend.streakStatus, systemImage: "flame.fill")
-                        .foregroundColor(.orange)
-                    Text("Auto switches between work and breaks based on the selected focus protocol.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        Stepper(value: $backend.dailyGoal, in: 1...16) {
+                            ProgressView(value: 2.0, total: Double(backend.dailyGoal)) // Mocked progress
+                                .tint(.blue)
+                        }
+                    }
+                    .padding()
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(20)
+
+                    HStack {
+                        Image(systemName: "flame.fill")
+                            .foregroundColor(.orange)
+                        Text(backend.streakStatus)
+                            .font(.subheadline.bold())
+                        Spacer()
+                    }
+                    .padding()
+                    .background(Color.orange.opacity(0.1))
+                    .cornerRadius(16)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .background(Color(.secondarySystemBackground))
-                .cornerRadius(12)
+                .padding(.horizontal)
             }
-            .padding()
+            .padding(.vertical)
         }
         .navigationTitle("Focus Session")
         .onReceive(timer) { _ in backend.tick() }

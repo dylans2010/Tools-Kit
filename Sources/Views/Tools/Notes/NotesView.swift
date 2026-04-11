@@ -20,32 +20,77 @@ struct NotesView: View {
         }
     }
 
+    private var pinnedNotes: [Note] {
+        filteredNotes.filter { $0.isPinned }
+    }
+
+    private var unpinnedNotes: [Note] {
+        filteredNotes.filter { !$0.isPinned }
+    }
+
     var body: some View {
         List {
-            Section(header: Text("Folders")) {
-                ForEach(folders, id: \.self) { folder in
-                    Button(action: {
-                        selectedFolder = (selectedFolder == folder) ? nil : folder
-                    }) {
-                        HStack {
-                            Image(systemName: "folder")
-                            Text(folder)
-                            Spacer()
-                            if selectedFolder == folder {
-                                Image(systemName: "checkmark")
+            Section {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Organize your thoughts into folders and search through your notes easily. Pin important notes to the top for quick access.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            FolderChip(title: "All", isSelected: selectedFolder == nil) {
+                                selectedFolder = nil
                             }
+                            ForEach(folders, id: \.self) { folder in
+                                FolderChip(title: folder, isSelected: selectedFolder == folder) {
+                                    selectedFolder = folder
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding(.vertical, 8)
+            } header: {
+                Text("Information & Folders")
+            }
+
+            if !pinnedNotes.isEmpty {
+                Section(header: Text("Pinned")) {
+                    ForEach(pinnedNotes) { note in
+                        NavigationLink(destination: NoteEditorView(note: note, backend: backend)) {
+                            noteRow(for: note)
+                        }
+                        .swipeActions(edge: .leading) {
+                            Button {
+                                togglePin(note)
+                            } label: {
+                                Label("Unpin", systemImage: "pin.slash.fill")
+                            }
+                            .tint(.orange)
                         }
                     }
                 }
             }
 
             Section(header: Text("Notes")) {
-                ForEach(filteredNotes) { note in
-                    NavigationLink(destination: NoteEditorView(note: note, backend: backend)) {
-                        noteRow(for: note)
+                if unpinnedNotes.isEmpty && pinnedNotes.isEmpty {
+                    ContentUnavailableView("No Notes", systemImage: "note.text", description: Text("Create your first note by tapping the plus button above."))
+                } else {
+                    ForEach(unpinnedNotes) { note in
+                        NavigationLink(destination: NoteEditorView(note: note, backend: backend)) {
+                            noteRow(for: note)
+                        }
+                        .swipeActions(edge: .leading) {
+                            Button {
+                                togglePin(note)
+                            } label: {
+                                Label("Pin", systemImage: "pin.fill")
+                            }
+                            .tint(.orange)
+                        }
                     }
+                    .onDelete(perform: deleteNotes)
                 }
-                .onDelete(perform: deleteNotes)
             }
         }
         .navigationTitle("Notes")
@@ -76,30 +121,72 @@ struct NotesView: View {
 
     @ViewBuilder
     private func noteRow(for note: Note) -> some View {
-        VStack(alignment: .leading) {
-            Text(note.title)
-                .font(.headline)
-            Text(note.content.prefix(50))
-                .font(.caption)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                if note.isPinned {
+                    Image(systemName: "pin.fill")
+                        .font(.caption2)
+                        .foregroundColor(.orange)
+                }
+                Text(note.title)
+                    .font(.headline)
+            }
+
+            Text(note.content.isEmpty ? "No content" : note.content)
+                .lineLimit(2)
+                .font(.subheadline)
                 .foregroundColor(.secondary)
-            if !note.tags.isEmpty {
-                HStack {
-                    ForEach(note.tags, id: \.self) { tag in
-                        Text("#\(tag)")
-                            .font(.system(size: 10))
-                            .padding(4)
-                            .background(Color.blue.opacity(0.1))
-                            .cornerRadius(4)
+
+            HStack {
+                Text(note.updatedAt, style: .date)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+
+                if !note.tags.isEmpty {
+                    Spacer()
+                    HStack(spacing: 4) {
+                        ForEach(note.tags.prefix(3), id: \.self) { tag in
+                            Text("#\(tag)")
+                                .font(.system(size: 8))
+                                .padding(3)
+                                .background(Color.blue.opacity(0.1))
+                                .cornerRadius(3)
+                        }
                     }
                 }
             }
         }
+        .padding(.vertical, 4)
+    }
+
+    private func togglePin(_ note: Note) {
+        var updated = note
+        updated.isPinned.toggle()
+        backend.updateNote(updated)
     }
 
     private func deleteNotes(at offsets: IndexSet) {
         offsets.forEach { index in
-            let note = filteredNotes[index]
+            let note = unpinnedNotes[index]
             backend.deleteNote(note)
+        }
+    }
+}
+
+struct FolderChip: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(isSelected ? Color.blue : Color(.secondarySystemBackground))
+                .foregroundColor(isSelected ? .white : .primary)
+                .cornerRadius(16)
         }
     }
 }

@@ -2,12 +2,24 @@ import Foundation
 
 class CalculatorBackend: ObservableObject {
     @Published var display = "0"
+    @Published var history: [CalculationEntry] = []
     private var accumulator: Double? = nil
     private var pendingOperation: Operation? = nil
     private var isEnteringNumber = false
 
-    enum Operation {
-        case add, subtract, multiply, divide
+    struct CalculationEntry: Identifiable, Codable {
+        let id = UUID()
+        let expression: String
+        let result: String
+        let timestamp = Date()
+    }
+
+    enum Operation: String {
+        case add = "+", subtract = "-", multiply = "×", divide = "÷"
+    }
+
+    init() {
+        loadHistory()
     }
 
     func inputDigit(_ digit: String) {
@@ -42,11 +54,37 @@ class CalculatorBackend: ObservableObject {
     func calculate() {
         if let current = Double(display), let acc = accumulator, let op = pendingOperation {
             let result = perform(op, acc, current)
-            display = format(result)
+            let expression = "\(format(acc)) \(op.rawValue) \(format(current))"
+            let resultStr = format(result)
+
+            let entry = CalculationEntry(expression: expression, result: resultStr)
+            history.insert(entry, at: 0)
+            if history.count > 50 { history.removeLast() }
+            saveHistory()
+
+            display = resultStr
             accumulator = nil
             pendingOperation = nil
             isEnteringNumber = false
         }
+    }
+
+    private func saveHistory() {
+        if let data = try? JSONEncoder().encode(history) {
+            UserDefaults.standard.set(data, forKey: "calculator_history")
+        }
+    }
+
+    private func loadHistory() {
+        if let data = UserDefaults.standard.data(forKey: "calculator_history"),
+           let decoded = try? JSONDecoder().decode([CalculationEntry].self, from: data) {
+            history = decoded
+        }
+    }
+
+    func clearHistory() {
+        history = []
+        saveHistory()
     }
 
     func percentage() {

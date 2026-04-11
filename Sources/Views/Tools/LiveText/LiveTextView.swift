@@ -2,22 +2,27 @@ import SwiftUI
 import Vision
 
 struct LiveTextView: View {
-    @State private var extractedText = ""
+    @StateObject private var scanner = LiveTextScanner()
+    @StateObject private var cameraService = CameraService()
     @State private var isScanning = false
-    @State private var scanCount = 0
 
     var body: some View {
         VStack {
             ZStack {
-                Color.black
-                Text("Live Camera Feed")
-                    .foregroundColor(.white)
+                CameraPreview(cameraService: cameraService)
+                    .onAppear {
+                        cameraService.delegate = scanner
+                        cameraService.startSession()
+                    }
+                    .onDisappear {
+                        cameraService.stopSession()
+                    }
 
-                if !extractedText.isEmpty {
+                if !scanner.extractedText.isEmpty {
                     VStack {
                         Spacer()
                         ScrollView {
-                            Text(extractedText)
+                            Text(scanner.extractedText)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                             .padding()
@@ -34,23 +39,42 @@ struct LiveTextView: View {
             HStack {
                 Button(isScanning ? "Stop Scanning" : "Start Live Text") {
                     isScanning.toggle()
-                    if isScanning {
-                        scanCount += 1
-                        extractedText = "Capture #\(scanCount): Sample extracted text from camera..."
-                    }
+                    scanner.isScanning = isScanning
                 }
                 .buttonStyle(.borderedProminent)
 
-                Button("Copy") { UIPasteboard.general.string = extractedText }
+                Button("Copy") { UIPasteboard.general.string = scanner.extractedText }
                     .buttonStyle(.bordered)
-                    .disabled(extractedText.isEmpty)
+                    .disabled(scanner.extractedText.isEmpty)
 
-                Button("Clear") { extractedText = "" }
+                Button("Clear") { scanner.extractedText = "" }
                     .buttonStyle(.bordered)
             }
             .padding()
         }
         .navigationTitle("Live Text")
+    }
+}
+
+class LiveTextScanner: NSObject, ObservableObject, CameraServiceDelegate {
+    @Published var extractedText = ""
+    var isScanning = false
+
+    func didOutput(pixelBuffer: CVPixelBuffer) {
+        guard isScanning else { return }
+
+        let request = VNRecognizeTextRequest { [weak self] request, error in
+            guard let observations = request.results as? [VNRecognizedTextObservation] else { return }
+            let recognizedStrings = observations.compactMap { $0.topCandidates(1).first?.string }
+
+            DispatchQueue.main.async {
+                self?.extractedText = recognizedStrings.joined(separator: "\n")
+            }
+        }
+
+        request.recognitionLevel = .accurate
+        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:])
+        try? handler.perform([request])
     }
 }
 

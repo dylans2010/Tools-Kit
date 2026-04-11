@@ -4,15 +4,20 @@ struct RealTimeTranslationView: View {
     @StateObject private var backend = RealTimeTranslationBackend()
 
     var body: some View {
-        VStack(spacing: 0) {
-            Form {
-                Section(header: Text("Language Selection")) {
+        Form {
+            Section {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Select your source and target languages, then type or paste text to translate it instantly.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
                     HStack {
                         Picker("From", selection: $backend.sourceLanguage) {
                             ForEach(backend.languages.keys.sorted(), id: \.self) { key in
                                 Text(backend.languages[key] ?? "").tag(key)
                             }
                         }
+                        .pickerStyle(.menu)
 
                         Spacer()
 
@@ -22,9 +27,10 @@ struct RealTimeTranslationView: View {
                             backend.targetLanguage = temp
                             backend.translate()
                         }) {
-                            Image(systemName: "arrow.left.arrow.right")
+                            Image(systemName: "arrow.left.arrow.right.circle.fill")
+                                .font(.title2)
                         }
-                        .buttonStyle(.bordered)
+                        .foregroundColor(.blue)
 
                         Spacer()
 
@@ -33,38 +39,75 @@ struct RealTimeTranslationView: View {
                                 Text(backend.languages[key] ?? "").tag(key)
                             }
                         }
+                        .pickerStyle(.menu)
                     }
                 }
+                .padding(.vertical, 4)
+            } header: {
+                Text("Languages")
+            }
 
-                Section(header: Text("Input Text")) {
+            Section {
+                VStack(alignment: .leading, spacing: 8) {
                     TextEditor(text: $backend.inputText)
-                        .frame(height: 120)
+                        .frame(minHeight: 120)
+                        .cornerRadius(8)
                         .onChange(of: backend.inputText) { _ in
                             backend.translate()
                         }
+
+                    if backend.inputText.isEmpty {
+                        Text("Type here...")
+                            .foregroundColor(Color(.placeholderText))
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 8)
+                            .allowsHitTesting(false)
+                    }
                 }
+            } header: {
+                Text("Input Text")
+            }
 
-                Section(header: Text("Translation")) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        if backend.isTranslating {
+            Section {
+                VStack(alignment: .leading, spacing: 12) {
+                    if backend.isTranslating {
+                        HStack {
                             ProgressView()
+                            Text("Translating...")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
+                    }
 
+                    if !backend.translatedText.isEmpty {
                         Text(backend.translatedText)
-                            .font(.title3.bold())
+                            .font(.body.bold())
                             .foregroundColor(.blue)
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
 
-                        if !backend.translatedText.isEmpty {
+                        HStack {
                             Button(action: { UIPasteboard.general.string = backend.translatedText }) {
                                 Label("Copy", systemImage: "doc.on.doc")
                             }
-                            .font(.caption)
-                            .padding(.top, 4)
+                            .buttonStyle(.bordered)
+
+                            Spacer()
+
+                            Button(action: { backend.inputText = "" }) {
+                                Label("Clear", systemImage: "trash")
+                                    .foregroundColor(.red)
+                            }
                         }
+                    } else if !backend.isTranslating {
+                        Text("Your translation will appear here.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
-                    .padding(.vertical, 8)
                 }
+                .padding(.vertical, 8)
+            } header: {
+                Text("Result")
             }
         }
         .navigationTitle("Real-time Translation")

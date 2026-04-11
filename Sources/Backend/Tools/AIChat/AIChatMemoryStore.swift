@@ -1,5 +1,5 @@
 import Foundation
-import CoreML
+import NaturalLanguage
 
 struct ChatMemoryItem: Identifiable, Codable {
     let id: UUID
@@ -18,28 +18,34 @@ final class AIChatMemoryStore: ObservableObject {
 
     @Published private(set) var memories: [ChatMemoryItem] = []
     private let key = "ai_chat_memories"
-    private let config = MLModelConfiguration()
 
     private init() {
-        _ = config
         load()
     }
 
     func ingestUserMessage(_ text: String, sensitivity: Double) {
         let important = extractImportantDetails(from: text, sensitivity: sensitivity)
         guard !important.isEmpty else { return }
-        for detail in important where !memories.contains(where: { $0.value.caseInsensitiveCompare(detail) == .orderedSame }) {
-            memories.insert(ChatMemoryItem(value: detail), at: 0)
+
+        for detail in important {
+            let exists = memories.contains {
+                $0.value.caseInsensitiveCompare(detail) == .orderedSame ||
+                detail.localizedCaseInsensitiveContains($0.value)
+            }
+            if !exists {
+                memories.insert(ChatMemoryItem(value: detail), at: 0)
+            }
         }
+
         if memories.count > 100 {
             memories = Array(memories.prefix(100))
         }
         save()
     }
 
-    func contextSnippet(limit: Int = 8) -> String {
+    func contextSnippet(limit: Int = 12) -> String {
         let top = memories.prefix(limit).map { "- \($0.value)" }.joined(separator: "\n")
-        return top.isEmpty ? "" : "User memory:\n\(top)"
+        return top.isEmpty ? "" : "Relevant User Facts & History:\n\(top)"
     }
 
     func delete(_ item: ChatMemoryItem) {
@@ -53,17 +59,36 @@ final class AIChatMemoryStore: ObservableObject {
     }
 
     private func extractImportantDetails(from text: String, sensitivity: Double) -> [String] {
-        let lines = text
-            .split(separator: ".")
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
+        var findings: [String] = []
+        let tagger = NLTagger(tagSchemes: [.nameType, .lexicalClass])
+        tagger.string = text
 
-        let triggerWords = ["i am", "i'm", "my", "prefer", "allergic", "timezone", "name is", "work as", "goal"]
-        let minLength = sensitivity > 0.8 ? 20 : 12
-
-        return lines.filter { line in
-            line.count >= minLength && triggerWords.contains(where: { line.lowercased().contains($0) })
+        // 1. Named Entity Recognition (People, Places, Orgs)
+        let options: NLTagger.Options = [.omitPunctuation, .omitWhitespace, .joinNames]
+        tagger.enumerateTags(in: text.startIndex..<text.endIndex, unit: .word, scheme: .nameType, options: options) { tag, range in
+            if let tag = tag, [.personalName, .placeName, .organizationName].contains(tag) {
+                let entity = String(text[range])
+                if entity.count > 2 {
+                    findings.append("Mentioned \(tag.rawValue.replacingOccurrences(of: "Name", with: "")): \(entity)")
+                }
+            }
+            return true
         }
+
+        // 2. Intent & Preference Extraction (Heuristic-based)
+        let lines = text.split(separator: ".").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+        let triggers = ["i am", "i'm", "my", "prefer", "love", "hate", "allergic", "live in", "work as", "studied", "goal is"]
+
+        for line in lines {
+            let lowerLine = line.lowercased()
+            if triggers.contains(where: { lowerLine.contains($0) }) {
+                if line.count > 10 && line.count < 150 {
+                    findings.append(line)
+                }
+            }
+        }
+
+        return Array(Set(findings))
     }
 
     private func load() {

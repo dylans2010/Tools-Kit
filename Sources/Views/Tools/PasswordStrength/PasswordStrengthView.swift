@@ -4,46 +4,76 @@ struct PasswordStrengthView: View {
     @StateObject private var backend = PasswordStrengthBackend()
 
     var body: some View {
-        VStack(spacing: 24) {
-            VStack(alignment: .leading) {
-                Text("Password").font(.caption).foregroundColor(.secondary)
-                SecureField("Enter password to test", text: $backend.password)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .font(.body.monospaced())
-            }
+        ScrollView {
+            VStack(spacing: 24) {
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Analyze your password's resistance to brute-force attacks.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
 
-            VStack(spacing: 12) {
-                HStack {
-                    Text("Security Level:")
-                    Spacer()
-                    Text(backend.strengthLabel)
-                        .bold()
-                        .foregroundColor(colorFromString(backend.strengthColor))
+                        HStack {
+                            Image(systemName: "key.fill")
+                                .foregroundColor(.blue)
+                            SecureField("Enter password to test", text: $backend.password)
+                                .font(.body.monospaced())
+                        }
+                        .padding()
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(12)
+                    }
                 }
 
-                ProgressView(value: min(backend.entropy, 128), total: 128)
-                    .accentColor(colorFromString(backend.strengthColor))
-                    .scaleEffect(x: 1, y: 2, anchor: .center)
+                Section {
+                    VStack(spacing: 16) {
+                        HStack {
+                            Text("Security Level")
+                                .font(.headline)
+                            Spacer()
+                            Text(backend.strengthLabel)
+                                .font(.headline)
+                                .foregroundColor(colorFromString(backend.strengthColor))
+                        }
+
+                        ProgressView(value: min(backend.entropy, 128), total: 128)
+                            .accentColor(colorFromString(backend.strengthColor))
+                            .scaleEffect(x: 1, y: 2, anchor: .center)
+                            .animation(.spring(), value: backend.entropy)
+
+                        Text("\(Int(backend.entropy)) bits of entropy")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding()
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(12)
+                }
+
+                Section {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Detailed Analysis")
+                            .font(.headline)
+
+                        Text("Meeting these criteria significantly increases your password's complexity.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+
+                        VStack(spacing: 12) {
+                            StrengthCriteriaRow(label: "Minimum 12 characters (\(backend.password.count))", met: backend.password.count >= 12)
+                            StrengthCriteriaRow(label: "Include uppercase & lowercase", met: backend.password.rangeOfCharacter(from: .lowercaseLetters) != nil && backend.password.rangeOfCharacter(from: .uppercaseLetters) != nil)
+                            StrengthCriteriaRow(label: "Include numeric digits", met: backend.password.rangeOfCharacter(from: .decimalDigits) != nil)
+                            StrengthCriteriaRow(label: "Include special symbols", met: backend.password.rangeOfCharacter(from: CharacterSet(charactersIn: "!@#$%^&*()-_=+[]{}|;:,.<>?")) != nil)
+                        }
+                    }
+                    .padding()
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(12)
+                }
+
+                Spacer()
             }
             .padding()
-            .background(Color(.secondarySystemBackground))
-            .cornerRadius(12)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Why this score?").font(.headline)
-                Text("Strength is calculated based on entropy (bit-length). A higher entropy means it's harder for a computer to guess your password.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-
-                StrengthCriteriaRow(label: "Length (\(backend.password.count))", met: backend.password.count >= 12)
-                StrengthCriteriaRow(label: "Mixed Case", met: backend.password.rangeOfCharacter(from: .lowercaseLetters) != nil && backend.password.rangeOfCharacter(from: .uppercaseLetters) != nil)
-                StrengthCriteriaRow(label: "Numbers", met: backend.password.rangeOfCharacter(from: .decimalDigits) != nil)
-                StrengthCriteriaRow(label: "Special Characters", met: backend.password.rangeOfCharacter(from: CharacterSet(charactersIn: "!@#$%^&*()-_=+[]{}|;:,.<>?")) != nil)
-            }
-
-            Spacer()
         }
-        .padding()
         .navigationTitle("Password Strength")
     }
 

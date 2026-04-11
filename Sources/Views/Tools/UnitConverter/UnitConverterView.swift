@@ -5,52 +5,76 @@ struct UnitConverterView: View {
 
     var body: some View {
         Form {
-            Section(header: Text("Category")) {
-                Picker("Category", selection: $backend.selectedCategory) {
-                    ForEach(UnitCategory.allCases, id: \.self) { cat in
-                        Text(cat.rawValue).tag(cat)
+            Section {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Select a category and enter a value to convert between different units of measurement.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        Picker("Category", selection: $backend.selectedCategory) {
+                            ForEach(UnitCategory.allCases, id: \.self) { cat in
+                                Text(cat.rawValue).tag(cat)
+                            }
+                        }
+                        .pickerStyle(.segmented)
                     }
                 }
-                .pickerStyle(.segmented)
-                .onChange(of: backend.selectedCategory) { _ in backend.convert() }
+                .padding(.vertical, 4)
+            } header: {
+                Text("Category")
             }
 
-            Section(header: Text("Conversion")) {
-                HStack {
-                    TextField("Value", text: $backend.input)
-                        .keyboardType(.decimalPad)
-                        .font(.title3.bold())
-                        .onChange(of: backend.input) { _ in backend.convert() }
+            Section {
+                VStack(spacing: 16) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("From")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            TextField("Value", text: $backend.input)
+                                .keyboardType(.decimalPad)
+                                .font(.title3.bold())
+                                .onChange(of: backend.input) { _ in backend.convert() }
+                        }
 
-                    Spacer()
+                        Spacer()
 
-                    unitPicker(for: .from)
-                }
+                        unitPicker(for: .from)
+                    }
 
-                HStack {
-                    Spacer()
                     Button(action: backend.swap) {
                         Image(systemName: "arrow.up.arrow.down.circle.fill")
                             .font(.title2)
+                            .foregroundColor(.blue)
                     }
-                    Spacer()
+
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("To")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text(backend.output)
+                                .font(.title3.bold())
+                                .foregroundColor(.blue)
+                        }
+
+                        Spacer()
+
+                        unitPicker(for: .to)
+                    }
                 }
-
-                HStack {
-                    Text(backend.output)
-                        .font(.title3.bold())
-                        .foregroundColor(.blue)
-
-                    Spacer()
-
-                    unitPicker(for: .to)
-                }
+                .padding(.vertical, 8)
+            } header: {
+                Text("Conversion")
             }
 
             Section {
                 Button(action: { UIPasteboard.general.string = backend.output }) {
                     Label("Copy Result", systemImage: "doc.on.doc")
+                        .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(.bordered)
                 .disabled(backend.output == "0")
             }
         }
@@ -90,6 +114,27 @@ struct UnitConverterView: View {
                 }
             }
             .onChange(of: type == .from ? backend.volumeUnitFrom : backend.volumeUnitTo) { _ in backend.convert() }
+        case .speed:
+            Picker("", selection: type == .from ? $backend.speedUnitFrom : $backend.speedUnitTo) {
+                ForEach(backend.speedUnits, id: \.self) { unit in
+                    Text(unit.symbol).tag(unit)
+                }
+            }
+            .onChange(of: type == .from ? backend.speedUnitFrom : backend.speedUnitTo) { _ in backend.convert() }
+        case .pressure:
+            Picker("", selection: type == .from ? $backend.pressureUnitFrom : $backend.pressureUnitTo) {
+                ForEach(backend.pressureUnits, id: \.self) { unit in
+                    Text(unit.symbol).tag(unit)
+                }
+            }
+            .onChange(of: type == .from ? backend.pressureUnitFrom : backend.pressureUnitTo) { _ in backend.convert() }
+        case .energy:
+            Picker("", selection: type == .from ? $backend.energyUnitFrom : $backend.energyUnitTo) {
+                ForEach(backend.energyUnits, id: \.self) { unit in
+                    Text(unit.symbol).tag(unit)
+                }
+            }
+            .onChange(of: type == .from ? backend.energyUnitFrom : backend.energyUnitTo) { _ in backend.convert() }
         }
     }
 }

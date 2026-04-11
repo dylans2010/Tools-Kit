@@ -12,17 +12,18 @@ struct QRCodeView: View {
     }
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 0) {
             Picker("Mode", selection: $mode) {
-                Text("Generate").tag(QRMode.generate)
-                Text("Scan").tag(QRMode.scan)
+                Label("Generate", systemImage: "plus.square.dashed").tag(QRMode.generate)
+                Label("Scan", systemImage: "qrcode.viewfinder").tag(QRMode.scan)
             }
             .pickerStyle(.segmented)
+            .padding()
 
             if mode == .generate {
                 QRGenerationView()
             } else {
-                VStack {
+                VStack(spacing: 16) {
                     ZStack {
                         CameraPreview(cameraService: cameraService)
                             .onAppear {
@@ -33,24 +34,59 @@ struct QRCodeView: View {
                                 cameraService.stopSession()
                             }
 
-                        if let code = scanner.scannedCode {
-                            VStack {
-                                Spacer()
-                                Text(code)
-                                    .padding()
-                                    .background(.ultraThinMaterial)
-                                    .cornerRadius(10)
-                                    .padding(.bottom, 20)
+                        // Scanning Overlay
+                        Color.black.opacity(0.3)
+
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.white, lineWidth: 2)
+                            .frame(width: 250, height: 250)
+                            .overlay(
+                                Image(systemName: "viewfinder")
+                                    .font(.system(size: 280, weight: .ultraLight))
+                                    .foregroundColor(.white)
+                            )
+                    }
+                    .cornerRadius(24)
+                    .padding()
+
+                    if let code = scanner.scannedCode {
+                        VStack(spacing: 12) {
+                            Text("Detected Code")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+
+                            Text(code)
+                                .font(.headline)
+                                .multilineTextAlignment(.center)
+                                .padding()
+                                .background(Color(.secondarySystemBackground))
+                                .cornerRadius(12)
+
+                            HStack {
+                                Button(action: { UIPasteboard.general.string = code }) {
+                                    Label("Copy", systemImage: "doc.on.doc")
+                                }
+                                .buttonStyle(.bordered)
+
+                                if let url = URL(string: code), UIApplication.shared.canOpenURL(url) {
+                                    Button(action: { UIApplication.shared.open(url) }) {
+                                        Label("Open", systemImage: "safari")
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                }
                             }
                         }
+                        .padding()
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    } else {
+                        Text("Point the camera at a QR code to scan it automatically.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .padding()
                     }
-                    .cornerRadius(12)
-                    .padding()
                 }
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .padding()
         .navigationTitle("QR Code")
     }
 }
@@ -63,27 +99,73 @@ private struct QRGenerationView: View {
     private let filter = CIFilter.qrCodeGenerator()
 
     var body: some View {
-        VStack(spacing: 20) {
-            TextField("Enter text or URL", text: $inputText)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
+        ScrollView {
+            VStack(spacing: 24) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Enter the content you want to encode into a QR code.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
 
-            Button("Generate QR Code") {
-                generateQRCode()
-            }
-            .buttonStyle(.borderedProminent)
+                    TextField("Text or URL", text: $inputText)
+                        .textFieldStyle(.roundedBorder)
+                        .padding(.vertical, 4)
 
-            if let image = qrCodeImage {
-                Image(uiImage: image)
-                    .interpolation(.none)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding()
-            } else {
-                Spacer()
+                    Button(action: generateQRCode) {
+                        Label("Generate QR Code", systemImage: "qrcode")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(inputText.isEmpty)
+                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(16)
+
+                if let image = qrCodeImage {
+                    VStack(spacing: 16) {
+                        Image(uiImage: image)
+                            .interpolation(.none)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 250, height: 250)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(16)
+                            .shadow(radius: 5)
+
+                        HStack {
+                            Button(action: {
+                                UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                            }) {
+                                Label("Save to Photos", systemImage: "square.and.arrow.down")
+                            }
+                            .buttonStyle(.bordered)
+
+                            Button(action: {
+                                let av = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+                                if let vc = UIApplication.shared.windows.first?.rootViewController {
+                                    vc.present(av, animated: true)
+                                }
+                            }) {
+                                Label("Share", systemImage: "square.and.arrow.up")
+                            }
+                            .buttonStyle(.bordered)
+                        }
+                    }
+                } else {
+                    VStack(spacing: 12) {
+                        Image(systemName: "qrcode")
+                            .font(.system(size: 80, weight: .ultraLight))
+                            .foregroundColor(Color(.systemGray4))
+                        Text("Your QR code will appear here.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.top, 40)
+                }
             }
+            .padding()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     func generateQRCode() {

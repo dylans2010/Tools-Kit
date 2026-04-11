@@ -6,11 +6,12 @@ struct Note: Identifiable, Codable, Equatable {
     var content: String
     var folder: String
     var tags: [String]
+    var isPinned: Bool = false
     var createdAt: Date
     var updatedAt: Date
     var versionHistory: [NoteVersion]
 
-    init(id: UUID = UUID(), title: String = "Untitled", content: String = "", folder: String = "General", tags: [String] = [], createdAt: Date = Date(), updatedAt: Date = Date(), versionHistory: [NoteVersion] = []) {
+    init(id: UUID = UUID(), title: String = "Untitled", content: String = "", folder: String = "General", tags: [String] = [], isPinned: Bool = false, createdAt: Date = Date(), updatedAt: Date = Date(), versionHistory: [NoteVersion] = []) {
         self.id = id
         self.title = title
         self.content = content

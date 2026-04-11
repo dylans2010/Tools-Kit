@@ -156,40 +156,70 @@ struct ProjectRowView: View {
 
     var taskCount: Int { project.tasks.count }
     var doneCount: Int { project.tasks.filter { $0.status == .done }.count }
+    var progress: Double {
+        guard taskCount > 0 else { return 0 }
+        return Double(doneCount) / Double(taskCount)
+    }
 
     var body: some View {
-        HStack(spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(hex: project.colorHex) ?? .blue)
-                    .frame(width: 44, height: 44)
-                Image(systemName: project.iconName)
-                    .foregroundColor(.white)
-                    .font(.system(size: 20))
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color(hex: project.colorHex) ?? .blue)
+                        .frame(width: 44, height: 44)
+                    Image(systemName: project.iconName)
+                        .foregroundColor(.white)
+                        .font(.system(size: 20))
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(project.name)
+                        .font(.headline)
+                        .lineLimit(1)
+                    if !project.description.isEmpty {
+                        Text(project.description)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+                }
+
+                Spacer()
+
+                StatusBadge(status: project.status)
             }
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(project.name)
-                    .font(.headline)
-                    .lineLimit(1)
-                if !project.description.isEmpty {
-                    Text(project.description)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
-                }
-                HStack(spacing: 12) {
-                    Label("\(taskCount) tasks", systemImage: "checkmark.circle")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                    Label("\(project.files.count) files", systemImage: "doc")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                    StatusBadge(status: project.status)
+            if taskCount > 0 {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Text("Progress")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text("\(Int(progress * 100))%")
+                            .font(.caption2.bold())
+                            .foregroundColor(.primary)
+                    }
+
+                    ProgressView(value: progress)
+                        .tint(Color(hex: project.colorHex) ?? .blue)
+                        .scaleEffect(x: 1, y: 0.5)
                 }
             }
+
+            HStack(spacing: 16) {
+                Label("\(taskCount) tasks", systemImage: "checkmark.circle")
+                Label("\(project.files.count) files", systemImage: "doc")
+                if let nextTask = project.tasks.first(where: { $0.status != .done }), let dueDate = nextTask.dueDate {
+                    Label(dueDate, style: .date)
+                        .foregroundColor(.red)
+                }
+            }
+            .font(.system(size: 10))
+            .foregroundColor(.secondary)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 8)
     }
 }
 

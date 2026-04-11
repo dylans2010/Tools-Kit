@@ -4,47 +4,68 @@ struct IPInfoView: View {
     @StateObject private var backend = IPInfoBackend()
 
     var body: some View {
-        VStack(spacing: 20) {
-            Button(action: { backend.fetch() }) {
-                if backend.isLoading {
-                    ProgressView()
-                } else {
-                    Text("Fetch My IP Info")
-                        .frame(maxWidth: .infinity)
+        VStack(spacing: 0) {
+            Form {
+                Section {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Get detailed geographical and network information about your current internet connection.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+
+                        Button(action: { backend.fetch() }) {
+                            if backend.isLoading {
+                                HStack {
+                                    Spacer()
+                                    ProgressView()
+                                    Spacer()
+                                }
+                            } else {
+                                Label("Fetch My IP Details", systemImage: "arrow.down.circle")
+                                    .frame(maxWidth: .infinity)
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(backend.isLoading)
+                        .padding(.vertical, 8)
+                    }
+                } header: {
+                    Text("Lookup")
                 }
-            }
-            .buttonStyle(.borderedProminent)
-            .padding(.horizontal)
 
-            if !backend.error.isEmpty {
-                Text(backend.error)
-                    .foregroundColor(.red)
-                    .padding()
-            }
+                if !backend.error.isEmpty {
+                    Section {
+                        Text(backend.error)
+                            .foregroundColor(.red)
+                    }
+                }
 
-            if let info = backend.info {
-                List {
-                    Section(header: Text("Network")) {
-                        InfoRow(label: "IP Address", value: info.ip ?? "Unknown")
-                        InfoRow(label: "Organization", value: info.org ?? "Unknown")
+                if let info = backend.info {
+                    Section {
+                        IPInfoRow(label: "IP Address", value: info.ip ?? "Unknown")
+                        IPInfoRow(label: "Organization", value: info.org ?? "Unknown")
+                    } header: {
+                        Text("Network")
                     }
 
-                    Section(header: Text("Location")) {
-                        InfoRow(label: "City", value: info.city ?? "Unknown")
-                        InfoRow(label: "Region", value: info.region ?? "Unknown")
-                        InfoRow(label: "Country", value: info.country_name ?? "Unknown")
-                        InfoRow(label: "Coordinates", value: "\(info.latitude ?? 0), \(info.longitude ?? 0)")
+                    Section {
+                        IPInfoRow(label: "City", value: info.city ?? "Unknown")
+                        IPInfoRow(label: "Region", value: info.region ?? "Unknown")
+                        IPInfoRow(label: "Country", value: info.country_name ?? "Unknown")
+                        IPInfoRow(label: "Coordinates", value: "\(info.latitude ?? 0), \(info.longitude ?? 0)")
+                        IPInfoRow(label: "Timezone", value: info.timezone ?? "Unknown")
+                    } header: {
+                        Text("Location")
+                    } footer: {
+                        Text("IP information provided by public lookup services.")
                     }
                 }
-            } else if !backend.isLoading {
-                ContentUnavailableView("No IP Info", systemImage: "network", description: Text("Tap the button to fetch your current IP details."))
             }
         }
         .navigationTitle("IP Info")
     }
 }
 
-struct InfoRow: View {
+struct IPInfoRow: View {
     let label: String
     let value: String
 
