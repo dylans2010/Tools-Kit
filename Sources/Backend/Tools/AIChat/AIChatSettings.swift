@@ -20,6 +20,21 @@ struct AIChatSettings: Codable {
     var logErrorsToConsole: Bool = true
     var memoryEnabled: Bool = true
     var memorySensitivity: Double = 0.7
+    var responseTone: ResponseTone = .balanced
+    var preferredResponseLength: ResponseLength = .medium
+}
+
+enum ResponseTone: String, Codable, CaseIterable {
+    case professional = "Professional"
+    case casual = "Casual"
+    case creative = "Creative"
+    case balanced = "Balanced"
+}
+
+enum ResponseLength: String, Codable, CaseIterable {
+    case concise = "Concise"
+    case medium = "Medium"
+    case detailed = "Detailed"
 }
 
 struct SystemPromptPreset: Identifiable, Codable {

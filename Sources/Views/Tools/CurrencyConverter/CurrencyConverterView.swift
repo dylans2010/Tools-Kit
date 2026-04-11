@@ -5,57 +5,72 @@ struct CurrencyConverterView: View {
 
     var body: some View {
         Form {
-            Section(header: Text("Exchange Rate Conversion")) {
-                VStack(spacing: 16) {
-                    HStack {
-                        TextField("Amount", text: $backend.amount)
-                            .keyboardType(.decimalPad)
-                            .font(.title2.bold())
-                            .onChange(of: backend.amount) { _ in backend.convert() }
+            Section {
+                VStack(spacing: 20) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Source Amount")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
 
-                        Spacer()
+                        HStack {
+                            TextField("Amount", text: $backend.amount)
+                                .keyboardType(.decimalPad)
+                                .font(.system(size: 32, weight: .bold, design: .rounded))
+                                .onChange(of: backend.amount) { _ in backend.convert() }
 
-                        Picker("", selection: $backend.fromCurrency) {
-                            ForEach(backend.rates.keys.sorted(), id: \.self) { currency in
-                                Text(currency).tag(currency)
+                            Spacer()
+
+                            Picker("From", selection: $backend.fromCurrency) {
+                                ForEach(backend.rates.keys.sorted(), id: \.self) { currency in
+                                    Text("\(currency) - \(backend.names[currency] ?? "")").tag(currency)
+                                }
                             }
+                            .pickerStyle(.menu)
                         }
-                        .onChange(of: backend.fromCurrency) { _ in backend.convert() }
                     }
 
                     Button(action: backend.swap) {
                         Image(systemName: "arrow.up.arrow.down.circle.fill")
-                            .font(.title2)
+                            .font(.title)
+                            .foregroundColor(.blue)
                     }
 
-                    HStack {
-                        Text(backend.result)
-                            .font(.title2.bold())
-                            .foregroundColor(.blue)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Converted Amount")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
 
-                        Spacer()
+                        HStack {
+                            Text(backend.result)
+                                .font(.system(size: 32, weight: .bold, design: .rounded))
+                                .foregroundColor(.blue)
+                                .minimumScaleFactor(0.5)
+                                .lineLimit(1)
 
-                        Picker("", selection: $backend.toCurrency) {
-                            ForEach(backend.rates.keys.sorted(), id: \.self) { currency in
-                                Text(currency).tag(currency)
+                            Spacer()
+
+                            Picker("To", selection: $backend.toCurrency) {
+                                ForEach(backend.rates.keys.sorted(), id: \.self) { currency in
+                                    Text("\(currency) - \(backend.names[currency] ?? "")").tag(currency)
+                                }
                             }
+                            .pickerStyle(.menu)
                         }
-                        .onChange(of: backend.toCurrency) { _ in backend.convert() }
                     }
                 }
-                .padding(.vertical, 8)
-            }
-
-            Section(header: Text("Info")) {
-                Text("Note: Rates are approximate and for demonstration purposes.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                .padding(.vertical, 12)
+            } header: {
+                Text("Quick Convert")
+            } footer: {
+                Text("Exchange rates are updated periodically and intended for reference only.")
             }
 
             Section {
                 Button(action: { UIPasteboard.general.string = backend.result }) {
                     Label("Copy Result", systemImage: "doc.on.doc")
+                        .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(.bordered)
             }
         }
         .navigationTitle("Currency Converter")

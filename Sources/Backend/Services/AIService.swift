@@ -9,17 +9,20 @@ enum AIError: Error {
 class AIService {
     private let openRouter = OpenRouterService()
 
-    func processText(prompt: String, systemPrompt: String = "You are a helpful assistant.", model: String = "google/gemini-2.0-flash-exp:free") async throws -> String {
+    func processText(prompt: String, systemPrompt: String = "You are a helpful assistant.", model: String? = nil) async throws -> String {
         guard let apiKey = APIKeyManager.shared.getKey() else {
             throw AIError.missingAPIKey
         }
 
+        let modelToUse = model ?? AIChatSettingsManager.shared.settings.modelID
+        let systemPromptToUse = systemPrompt.isEmpty ? AIChatSettingsManager.shared.settings.systemPrompt : systemPrompt
+
         let messages = [
-            ChatMessage(role: "system", content: systemPrompt),
+            ChatMessage(role: "system", content: systemPromptToUse),
             ChatMessage(role: "user", content: prompt)
         ]
 
-        return try await openRouter.sendMessage(messages: messages, apiKey: apiKey, model: model)
+        return try await openRouter.sendMessage(messages: messages, apiKey: apiKey, model: modelToUse)
     }
 
     func summarize(text: String) async throws -> String {

@@ -5,42 +5,65 @@ struct PasswordGeneratorView: View {
 
     var body: some View {
         Form {
-            Section(header: Text("Options")) {
-                VStack {
+            Section {
+                VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text("Length")
                         Spacer()
                         Text("\(Int(backend.length))").bold()
+                            .foregroundColor(.blue)
                     }
                     Slider(value: $backend.length, in: 4...64, step: 1)
                 }
                 Toggle("Include Uppercase", isOn: $backend.includeUppercase)
                 Toggle("Include Numbers", isOn: $backend.includeNumbers)
                 Toggle("Include Special Characters", isOn: $backend.includeSpecial)
+            } header: {
+                Text("Configuration")
+            } footer: {
+                Text("Adjust the length and character sets to meet your security requirements.")
             }
 
-            Section(header: Text("Generated Password")) {
+            Section {
                 if !backend.password.isEmpty {
-                    Text(backend.password)
-                        .font(.system(.title3, design: .monospaced))
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding()
-                        .textSelection(.enabled)
-                }
-
-                HStack {
-                    Button(action: backend.generate) {
-                        Text("Generate")
+                    VStack(spacing: 16) {
+                        Text(backend.password)
+                            .font(.system(.title3, design: .monospaced))
+                            .multilineTextAlignment(.center)
+                            .padding()
                             .frame(maxWidth: .infinity)
+                            .background(Color(.secondarySystemBackground))
+                            .cornerRadius(12)
+                            .textSelection(.enabled)
+
+                        HStack(spacing: 12) {
+                            Button(action: backend.generate) {
+                                Label("Regenerate", systemImage: "arrow.clockwise")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+
+                            Button(action: { UIPasteboard.general.string = backend.password }) {
+                                Image(systemName: "doc.on.doc")
+                                    .padding(.horizontal)
+                            }
+                            .buttonStyle(.bordered)
+                        }
+                    }
+                    .padding(.vertical, 8)
+                } else {
+                    Button(action: backend.generate) {
+                        Text("Generate Password")
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 8)
                     }
                     .buttonStyle(.borderedProminent)
-
-                    if !backend.password.isEmpty {
-                        Button(action: { UIPasteboard.general.string = backend.password }) {
-                            Image(systemName: "doc.on.doc")
-                        }
-                        .buttonStyle(.bordered)
-                    }
+                }
+            } header: {
+                Text("Result")
+            } footer: {
+                if !backend.password.isEmpty {
+                    Text("Your new password is ready. Copy it or regenerate a new one.")
                 }
             }
         }

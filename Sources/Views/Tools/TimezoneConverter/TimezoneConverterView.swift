@@ -2,63 +2,126 @@ import SwiftUI
 
 struct TimezoneConverterView: View {
     @StateObject private var backend = TimezoneConverterBackend()
+    @State private var sourceSearch = ""
+    @State private var targetSearch = ""
 
     var body: some View {
         Form {
-            Section(header: Text("Source Time")) {
-                HStack {
-                    Button("Now") { backend.sourceDate = Date(); backend.convert() }
-                    Button("+1 Day") { backend.sourceDate = Calendar.current.date(byAdding: .day, value: 1, to: backend.sourceDate) ?? backend.sourceDate; backend.convert() }
-                }
-                DatePicker("Date/Time", selection: $backend.sourceDate)
-                    .onChange(of: backend.sourceDate) { _ in backend.convert() }
+            Section {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Select two timezones to see the time difference and convert specific moments.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
 
-                Picker("Source Timezone", selection: $backend.sourceTimezone) {
-                    ForEach(backend.timezones, id: \.self) { tz in
-                        Text(tz).tag(tz)
+                    DatePicker("Select Source Time", selection: $backend.sourceDate)
+                        .onChange(of: backend.sourceDate) { _ in backend.convert() }
+
+                    HStack {
+                        Button(action: { backend.sourceDate = Date(); backend.convert() }) {
+                            Label("Current Time", systemImage: "clock.fill")
+                                .font(.caption)
+                        }
+                        .buttonStyle(.bordered)
+
+                        Spacer()
+
+                        Button(action: {
+                            backend.sourceDate = Calendar.current.date(byAdding: .day, value: 1, to: backend.sourceDate) ?? backend.sourceDate
+                            backend.convert()
+                        }) {
+                            Label("+1 Day", systemImage: "plus.circle")
+                                .font(.caption)
+                        }
+                        .buttonStyle(.bordered)
                     }
                 }
-                .onChange(of: backend.sourceTimezone) { _ in backend.convert() }
+                .padding(.vertical, 4)
+            } header: {
+                Text("Reference Time")
             }
 
             Section {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Image(systemName: "mappin.and.ellipse")
+                            .foregroundColor(.red)
+                        Picker("From", selection: $backend.sourceTimezone) {
+                            ForEach(filteredTimezones(query: sourceSearch), id: \.self) { tz in
+                                Text(tz.replacingOccurrences(of: "_", with: " ")).tag(tz)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                    }
+
+                    TextField("Search source city...", text: $sourceSearch)
+                        .font(.caption)
+                        .textFieldStyle(.roundedBorder)
+                }
+
                 HStack {
                     Spacer()
                     Button(action: backend.swap) {
                         Image(systemName: "arrow.up.arrow.down.circle.fill")
                             .font(.title2)
+                            .foregroundColor(.blue)
                     }
                     Spacer()
                 }
-            }
-
-            Section(header: Text("Target Time")) {
-                Picker("Target Timezone", selection: $backend.targetTimezone) {
-                    ForEach(backend.timezones, id: \.self) { tz in
-                        Text(tz).tag(tz)
-                    }
-                }
-                .onChange(of: backend.targetTimezone) { _ in backend.convert() }
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(backend.targetDateStr)
-                        .font(.title2.bold())
-                        .foregroundColor(.blue)
+                    HStack {
+                        Image(systemName: "mappin.circle.fill")
+                            .foregroundColor(.green)
+                        Picker("To", selection: $backend.targetTimezone) {
+                            ForEach(filteredTimezones(query: targetSearch), id: \.self) { tz in
+                                Text(tz.replacingOccurrences(of: "_", with: " ")).tag(tz)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                    }
 
-                    Text(backend.offsetDescription)
+                    TextField("Search target city...", text: $targetSearch)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .textFieldStyle(.roundedBorder)
                 }
-                .padding(.vertical, 4)
+            } header: {
+                Text("Locations")
             }
 
             Section {
-                Button(action: { UIPasteboard.general.string = backend.targetDateStr }) {
-                    Label("Copy Target Time", systemImage: "doc.on.doc")
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(backend.targetDateStr)
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundColor(.blue)
+
+                    HStack {
+                        Image(systemName: "info.circle")
+                            .font(.caption)
+                        Text(backend.offsetDescription)
+                            .font(.caption)
+                    }
+                    .foregroundColor(.secondary)
+
+                    Button(action: { UIPasteboard.general.string = backend.targetDateStr }) {
+                        Label("Copy Converted Time", systemImage: "doc.on.doc")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
                 }
+                .padding(.vertical, 8)
+            } header: {
+                Text("Converted Result")
             }
         }
         .navigationTitle("Timezone Converter")
+    }
+
+    private func filteredTimezones(query: String) -> [String] {
+        if query.isEmpty {
+            // Provide a few common ones if empty, or just return all
+            return ["UTC", "GMT", "US/Pacific", "US/Eastern", "Europe/London", "Europe/Paris", "Asia/Tokyo", "Asia/Shanghai", "Australia/Sydney"] + backend.timezones.prefix(5)
+        }
+        return backend.timezones.filter { $0.localizedCaseInsensitiveContains(query) }
     }
 }
 

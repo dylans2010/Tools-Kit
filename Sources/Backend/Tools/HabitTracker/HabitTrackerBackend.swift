@@ -5,16 +5,44 @@ struct HabitItem: Identifiable, Codable {
     var name: String
     var targetPerWeek: Int
     var completionsByDay: [String: Int]
+    var color: String = "blue"
 
-    init(id: UUID = UUID(), name: String, targetPerWeek: Int = 5, completionsByDay: [String: Int] = [:]) {
+    init(id: UUID = UUID(), name: String, targetPerWeek: Int = 5, completionsByDay: [String: Int] = [:], color: String = "blue") {
         self.id = id
         self.name = name
         self.targetPerWeek = targetPerWeek
         self.completionsByDay = completionsByDay
+        self.color = color
     }
 
     var completedThisWeek: Int {
+        // This is a simplification; in a real app, you'd filter by actual week dates
         completionsByDay.values.reduce(0, +)
+    }
+
+    var currentStreak: Int {
+        let sortedKeys = completionsByDay.keys.sorted().reversed()
+        var streak = 0
+        let calendar = Calendar.current
+        var checkDate = Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+
+        for _ in 0..<completionsByDay.count {
+            let key = formatter.string(from: checkDate)
+            if (completionsByDay[key] ?? 0) > 0 {
+                streak += 1
+                checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
+            } else {
+                // If it's today and not yet completed, don't break streak yet
+                if formatter.string(from: Date()) == key {
+                    checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
+                    continue
+                }
+                break
+            }
+        }
+        return streak
     }
 }
 

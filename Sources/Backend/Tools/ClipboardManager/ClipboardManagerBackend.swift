@@ -5,6 +5,7 @@ struct ClipboardEntry: Identifiable, Codable, Equatable {
     let id: UUID
     let content: String
     let timestamp: Date
+    var isFavorite: Bool = false
 }
 
 class ClipboardManagerBackend: ObservableObject {
@@ -48,6 +49,13 @@ class ClipboardManagerBackend: ObservableObject {
     func deleteEntry(at offsets: IndexSet) {
         history.remove(atOffsets: offsets)
         saveHistory()
+    }
+
+    func toggleFavorite(_ entry: ClipboardEntry) {
+        if let index = history.firstIndex(where: { $0.id == entry.id }) {
+            history[index].isFavorite.toggle()
+            saveHistory()
+        }
     }
 
     func clearHistory() {

@@ -3,8 +3,11 @@ import Foundation
 enum UnitCategory: String, CaseIterable {
     case length = "Length"
     case mass = "Mass"
-    case temperature = "Temperature"
+    case temperature = "Temp"
     case volume = "Volume"
+    case speed = "Speed"
+    case pressure = "Pressure"
+    case energy = "Energy"
 }
 
 class UnitConverterBackend: ObservableObject {
@@ -24,10 +27,22 @@ class UnitConverterBackend: ObservableObject {
     @Published var volumeUnitFrom: UnitVolume = .liters
     @Published var volumeUnitTo: UnitVolume = .gallons
 
+    @Published var speedUnitFrom: UnitSpeed = .kilometersPerHour
+    @Published var speedUnitTo: UnitSpeed = .milesPerHour
+
+    @Published var pressureUnitFrom: UnitPressure = .kilopascals
+    @Published var pressureUnitTo: UnitPressure = .bars
+
+    @Published var energyUnitFrom: UnitEnergy = .kilojoules
+    @Published var energyUnitTo: UnitEnergy = .calories
+
     let lengthUnits: [UnitLength] = [.meters, .kilometers, .miles, .feet, .inches, .yards, .centimeters, .millimeters]
     let massUnits: [UnitMass] = [.kilograms, .grams, .pounds, .ounces, .stones, .metricTons]
     let tempUnits: [UnitTemperature] = [.celsius, .fahrenheit, .kelvin]
     let volumeUnits: [UnitVolume] = [.liters, .milliliters, .gallons, .cups, .pints, .quarts]
+    let speedUnits: [UnitSpeed] = [.kilometersPerHour, .milesPerHour, .knots, .metersPerSecond]
+    let pressureUnits: [UnitPressure] = [.kilopascals, .bars, .millimetersOfMercury, .poundsForcePerSquareInch, .hectopascals]
+    let energyUnits: [UnitEnergy] = [.kilojoules, .calories, .kilocalories, .kilowattHours, .joules]
 
     func convert() {
         guard let value = Double(input) else { return }
@@ -45,6 +60,15 @@ class UnitConverterBackend: ObservableObject {
         case .volume:
             let m = Measurement(value: value, unit: volumeUnitFrom)
             output = String(format: "%.4f", m.converted(to: volumeUnitTo).value)
+        case .speed:
+            let m = Measurement(value: value, unit: speedUnitFrom)
+            output = String(format: "%.4f", m.converted(to: speedUnitTo).value)
+        case .pressure:
+            let m = Measurement(value: value, unit: pressureUnitFrom)
+            output = String(format: "%.4f", m.converted(to: pressureUnitTo).value)
+        case .energy:
+            let m = Measurement(value: value, unit: energyUnitFrom)
+            output = String(format: "%.4f", m.converted(to: energyUnitTo).value)
         }
     }
 
@@ -66,6 +90,18 @@ class UnitConverterBackend: ObservableObject {
             let temp = volumeUnitFrom
             volumeUnitFrom = volumeUnitTo
             volumeUnitTo = temp
+        case .speed:
+            let temp = speedUnitFrom
+            speedUnitFrom = speedUnitTo
+            speedUnitTo = temp
+        case .pressure:
+            let temp = pressureUnitFrom
+            pressureUnitFrom = pressureUnitTo
+            pressureUnitTo = temp
+        case .energy:
+            let temp = energyUnitFrom
+            energyUnitFrom = energyUnitTo
+            energyUnitTo = temp
         }
         convert()
     }

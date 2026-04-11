@@ -6,7 +6,7 @@ struct ObjectDetectionView: View {
     @StateObject private var cameraService = CameraService()
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             ZStack {
                 CameraPreview(cameraService: cameraService)
                     .onAppear {
@@ -19,28 +19,64 @@ struct ObjectDetectionView: View {
 
                 Canvas { context, size in
                     for observation in detector.observations {
-                        let rect = VNImageRectForNormalizedRect(observation.boundingBox, Int(size.width), Int(size.height))
+                        // Flip coordinates for Vision to SwiftUI mapping
+                        let normalizedRect = observation.boundingBox
+                        let rect = CGRect(
+                            x: normalizedRect.origin.x * size.width,
+                            y: (1 - normalizedRect.origin.y - normalizedRect.height) * size.height,
+                            width: normalizedRect.width * size.width,
+                            height: normalizedRect.height * size.height
+                        )
                         context.stroke(Path(rect), with: .color(.green), lineWidth: 2)
+
+                        if let label = observation.labels.first?.identifier {
+                            context.draw(Text(label).font(.caption).bold(), at: CGPoint(x: rect.minX, y: rect.minY - 10))
+                        }
                     }
                 }
             }
-            .cornerRadius(12)
+            .cornerRadius(24)
             .padding()
 
-            VStack(alignment: .leading) {
-                Text("Detected Objects")
-                    .font(.headline)
-
-                if detector.detectedLabels.isEmpty {
-                    Text("No objects detected")
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Real-Time Object Detection")
+                        .font(.headline)
+                    Text("Point your camera at objects to identify them and see their bounding boxes in real-time.")
+                        .font(.caption)
                         .foregroundColor(.secondary)
-                } else {
-                    ForEach(detector.detectedLabels, id: \.self) { label in
-                        Text("• \(label)")
+                }
+
+                Divider()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        if detector.detectedLabels.isEmpty {
+                            HStack {
+                                ProgressView()
+                                    .padding(.trailing, 8)
+                                Text("Scanning for objects...")
+                                    .foregroundColor(.secondary)
+                            }
+                        } else {
+                            ForEach(detector.detectedLabels, id: \.self) { label in
+                                HStack {
+                                    Image(systemName: "tag.fill")
+                                        .foregroundColor(.blue)
+                                        .font(.caption)
+                                    Text(label)
+                                        .font(.body)
+                                }
+                                .padding(.vertical, 4)
+                            }
+                        }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+            .background(Color(.secondarySystemBackground))
+            .cornerRadius(24)
             .padding()
         }
         .navigationTitle("Object Detection")
@@ -67,20 +103,6 @@ class ObjectDetector: NSObject, ObservableObject, CameraServiceDelegate {
     }
 }
 
-struct CameraPreview: UIViewRepresentable {
-    let cameraService: CameraService
-
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView(frame: .zero)
-        let layer = cameraService.previewLayer
-        view.layer.addSublayer(layer)
-        return view
-    }
-
-    func updateUIView(_ uiView: UIView, context: Context) {
-        uiView.layer.sublayers?.first?.frame = uiView.bounds
-    }
-}
 
 struct ObjectDetectionTool: Tool {
     let id = UUID()
