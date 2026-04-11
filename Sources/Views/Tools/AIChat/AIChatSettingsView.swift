@@ -3,117 +3,29 @@ import SwiftUI
 struct AIChatSettingsView: View {
     @Binding var settings: AIChatSettings
     @Environment(\.dismiss) private var dismiss
-    @State private var newTrait: String = ""
-    @State private var newExpertise: String = ""
     @StateObject private var memoryStore = AIChatMemoryStore.shared
+
+    private let registry = AIProviderRegistry.shared
+
+    var selectedProvider: (any AIProvider)? {
+        registry.provider(for: settings.selectedProviderID)
+    }
 
     var body: some View {
         NavigationStack {
             Form {
-                Section("Model") {
-                    TextField("e.g. google/gemini-2.0-flash-exp:free", text: $settings.modelID)
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
-                    Link("Browse models at openrouter.ai", destination: URL(string: "https://openrouter.ai/models")!)
-                        .font(.footnote)
-                }
-
-                Section("System Prompt") {
-                    Toggle("Use Preset", isOn: Binding(
-                        get: { settings.selectedPresetID != nil },
-                        set: { usePreset in
-                            if !usePreset { settings.selectedPresetID = nil }
-                            else if settings.selectedPresetID == nil {
-                                settings.selectedPresetID = SystemPromptPreset.builtIn.first?.id
-                            }
-                        }
-                    ))
-
-                    if settings.selectedPresetID != nil {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 140))], spacing: 12) {
-                            ForEach(SystemPromptPreset.builtIn) { preset in
-                                PresetCard(preset: preset, isSelected: settings.selectedPresetID == preset.id)
-                                    .onTapGesture {
-                                        settings.selectedPresetID = preset.id
-                                        settings.systemPrompt = preset.prompt
-                                    }
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    } else {
-                        TextEditor(text: $settings.systemPrompt)
-                            .frame(minHeight: 80)
-                    }
-                }
-
-                Section("AI Personality") {
-                    Toggle("Use Custom Personality", isOn: $settings.useCustomPersonality)
-                    if settings.useCustomPersonality {
-                        TextField("Personality Name", text: $settings.personalityName)
-                        TagEditorView(tags: $settings.personalityTraits, placeholder: "Add trait...")
-                    }
-                }
-
-                Section("Expertise Areas") {
-                    TagEditorView(tags: $settings.expertiseAreas, placeholder: "Add expertise...")
-                }
-
-                Section("Personality & Style") {
-                    Picker("Response Tone", selection: $settings.responseTone) {
-                        ForEach(ResponseTone.allCases, id: \.self) { tone in
-                            Text(tone.rawValue).tag(tone)
-                        }
-                    }
-
-                    Picker("Response Length", selection: $settings.preferredResponseLength) {
-                        ForEach(ResponseLength.allCases, id: \.self) { length in
-                            Text(length.rawValue).tag(length)
-                        }
-                    }
-                }
-
-                Section("Knowledge & Context") {
-                    TextEditor(text: $settings.knowledgeContext)
-                        .frame(minHeight: 80)
-                }
-
-                Section("Advanced") {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Temperature: \(settings.temperature, specifier: "%.1f")")
-                        Slider(value: $settings.temperature, in: 0...2, step: 0.1)
-                    }
-                    Stepper("Max Tokens: \(settings.maxTokens)", value: $settings.maxTokens, in: 256...8192, step: 256)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Top P: \(settings.topP, specifier: "%.2f")")
-                        Slider(value: $settings.topP, in: 0...1, step: 0.05)
-                    }
-                }
-
-                Section("Chat Interface") {
-                    ColorPickerRow(label: "Bubble Color", hexColor: $settings.bubbleColorHex)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Font Size: \(Int(settings.fontSize))pt")
-                        Slider(value: $settings.fontSize, in: 12...22, step: 1)
-                    }
-                    Toggle("Show Timestamps", isOn: $settings.showTimestamps)
-                }
-
-                Section("Storage & Reliability") {
-                    Toggle("Save Chat History", isOn: $settings.saveChatHistory)
-                    Toggle("Detailed Error Logging", isOn: $settings.logErrorsToConsole)
-                    Toggle("Enable Streaming (experimental)", isOn: $settings.streamResponseText)
-                }
-
-                Section("Memory (CoreML-assisted)") {
-                    Toggle("Enable Memory", isOn: $settings.memoryEnabled)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Sensitivity: \(settings.memorySensitivity, specifier: "%.2f")")
-                        Slider(value: $settings.memorySensitivity, in: 0.2...1.0, step: 0.05)
-                    }
-                    NavigationLink("Manage Saved Memory") {
-                        MemoryManagerView(memoryStore: memoryStore)
-                    }
-                }
+                providerSection
+                apiKeySection
+                modelSection
+                systemPromptSection
+                personalitySection
+                expertiseSection
+                styleSection
+                contextSection
+                advancedSection
+                chatInterfaceSection
+                storageSection
+                memorySection
             }
             .navigationTitle("AI Chat Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -124,7 +36,379 @@ struct AIChatSettingsView: View {
             }
         }
     }
+
+    // MARK: - Provider Section
+
+    private var providerSection: some View {
+        Section {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(registry.providers, id: \.id) { provider in
+                        ProviderChip(
+                            provider: provider,
+                            isSelected: settings.selectedProviderID == provider.id
+                        ) {
+                            settings.selectedProviderID = provider.id
+                            // Reset model if current model is not in new provider's list
+                            if !provider.models.contains(where: { $0.id == settings.modelID }) {
+                                settings.modelID = provider.models.first?.id ?? ""
+                            }
+                        }
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        } header: {
+            Text("AI Provider")
+        } footer: {
+            if let provider = selectedProvider, let url = provider.apiKeyURL {
+                Link("Get an API key from \(provider.name)", destination: url)
+                    .font(.footnote)
+            }
+        }
+    }
+
+    // MARK: - API Key Section
+
+    private var apiKeySection: some View {
+        Section {
+            if let provider = selectedProvider {
+                APIKeyRowView(
+                    providerID: provider.id,
+                    providerName: provider.name,
+                    placeholder: provider.apiKeyPlaceholder
+                )
+            }
+        } header: {
+            Text("API Key")
+        }
+    }
+
+    // MARK: - Model Section
+
+    private var modelSection: some View {
+        Section("Model") {
+            if let provider = selectedProvider, !provider.models.isEmpty {
+                Picker("Model", selection: $settings.modelID) {
+                    ForEach(provider.models) { model in
+                        HStack {
+                            Text(model.name)
+                            if model.supportsVision {
+                                Image(systemName: "eye.fill")
+                                    .foregroundColor(.blue)
+                                    .font(.caption)
+                            }
+                        }
+                        .tag(model.id)
+                    }
+                }
+                .pickerStyle(.navigationLink)
+
+                if let model = provider.models.first(where: { $0.id == settings.modelID }) {
+                    HStack {
+                        if model.supportsVision {
+                            Label("Vision supported", systemImage: "eye.fill")
+                                .font(.caption)
+                                .foregroundColor(.blue)
+                        }
+                        if let ctx = model.contextLength {
+                            Spacer()
+                            Text("\(ctx / 1000)K context")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+            } else {
+                TextField("Model ID", text: $settings.modelID)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+            }
+        }
+    }
+
+    // MARK: - System Prompt Section
+
+    private var systemPromptSection: some View {
+        Section("System Prompt") {
+            Toggle("Use Preset", isOn: Binding(
+                get: { settings.selectedPresetID != nil },
+                set: { usePreset in
+                    if !usePreset { settings.selectedPresetID = nil }
+                    else if settings.selectedPresetID == nil {
+                        settings.selectedPresetID = SystemPromptPreset.builtIn.first?.id
+                    }
+                }
+            ))
+
+            if settings.selectedPresetID != nil {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 140))], spacing: 12) {
+                    ForEach(SystemPromptPreset.builtIn) { preset in
+                        PresetCard(preset: preset, isSelected: settings.selectedPresetID == preset.id)
+                            .onTapGesture {
+                                settings.selectedPresetID = preset.id
+                                settings.systemPrompt = preset.prompt
+                            }
+                    }
+                }
+                .padding(.vertical, 4)
+            } else {
+                TextEditor(text: $settings.systemPrompt)
+                    .frame(minHeight: 80)
+            }
+        }
+    }
+
+    // MARK: - Personality Section
+
+    private var personalitySection: some View {
+        Section("AI Personality") {
+            Toggle("Use Custom Personality", isOn: $settings.useCustomPersonality)
+            if settings.useCustomPersonality {
+                TextField("Personality Name", text: $settings.personalityName)
+                TagEditorView(tags: $settings.personalityTraits, placeholder: "Add trait...")
+            }
+        }
+    }
+
+    // MARK: - Expertise Section
+
+    private var expertiseSection: some View {
+        Section("Expertise Areas") {
+            TagEditorView(tags: $settings.expertiseAreas, placeholder: "Add expertise...")
+        }
+    }
+
+    // MARK: - Style Section
+
+    private var styleSection: some View {
+        Section("Personality & Style") {
+            Picker("Response Tone", selection: $settings.responseTone) {
+                ForEach(ResponseTone.allCases, id: \.self) { tone in
+                    Text(tone.rawValue).tag(tone)
+                }
+            }
+            Picker("Response Length", selection: $settings.preferredResponseLength) {
+                ForEach(ResponseLength.allCases, id: \.self) { length in
+                    Text(length.rawValue).tag(length)
+                }
+            }
+        }
+    }
+
+    // MARK: - Context Section
+
+    private var contextSection: some View {
+        Section("Knowledge & Context") {
+            TextEditor(text: $settings.knowledgeContext)
+                .frame(minHeight: 80)
+        }
+    }
+
+    // MARK: - Advanced Section
+
+    private var advancedSection: some View {
+        Section("Advanced") {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Temperature: \(settings.temperature, specifier: "%.1f")")
+                Slider(value: $settings.temperature, in: 0...2, step: 0.1)
+            }
+            Stepper("Max Tokens: \(settings.maxTokens)", value: $settings.maxTokens, in: 256...8192, step: 256)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Top P: \(settings.topP, specifier: "%.2f")")
+                Slider(value: $settings.topP, in: 0...1, step: 0.05)
+            }
+        }
+    }
+
+    // MARK: - Chat Interface Section
+
+    private var chatInterfaceSection: some View {
+        Section("Chat Interface") {
+            ColorPickerRow(label: "Bubble Color", hexColor: $settings.bubbleColorHex)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Font Size: \(Int(settings.fontSize))pt")
+                Slider(value: $settings.fontSize, in: 12...22, step: 1)
+            }
+            Toggle("Show Timestamps", isOn: $settings.showTimestamps)
+        }
+    }
+
+    // MARK: - Storage Section
+
+    private var storageSection: some View {
+        Section("Storage & Reliability") {
+            Toggle("Save Chat History", isOn: $settings.saveChatHistory)
+            Toggle("Detailed Error Logging", isOn: $settings.logErrorsToConsole)
+            Toggle("Enable Streaming (experimental)", isOn: $settings.streamResponseText)
+        }
+    }
+
+    // MARK: - Memory Section
+
+    private var memorySection: some View {
+        Section("Memory (CoreML-assisted)") {
+            Toggle("Enable Memory", isOn: $settings.memoryEnabled)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Sensitivity: \(settings.memorySensitivity, specifier: "%.2f")")
+                Slider(value: $settings.memorySensitivity, in: 0.2...1.0, step: 0.05)
+            }
+            NavigationLink("Manage Saved Memory") {
+                MemoryManagerView(memoryStore: memoryStore)
+            }
+        }
+    }
 }
+
+// MARK: - Provider Chip
+
+struct ProviderChip: View {
+    let provider: any AIProvider
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 6) {
+                Image(systemName: provider.icon)
+                    .font(.title3)
+                    .foregroundColor(isSelected ? .white : .blue)
+                Text(provider.name)
+                    .font(.caption2)
+                    .fontWeight(.medium)
+                    .foregroundColor(isSelected ? .white : .primary)
+                    .lineLimit(1)
+            }
+            .frame(width: 80, height: 64)
+            .background(isSelected ? Color.blue : Color(.secondarySystemGroupedBackground))
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isSelected ? Color.blue : Color.gray.opacity(0.2), lineWidth: 1.5)
+            )
+        }
+    }
+}
+
+// MARK: - API Key Row
+
+struct APIKeyRowView: View {
+    let providerID: String
+    let providerName: String
+    let placeholder: String
+
+    @State private var key: String = ""
+    @State private var isSaved: Bool = false
+    @State private var isValidating: Bool = false
+    @State private var validationResult: Bool? = nil
+    @State private var showKey: Bool = false
+
+    private let keyManager = APIKeyManager.shared
+    private let registry = AIProviderRegistry.shared
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Group {
+                    if showKey {
+                        TextField(placeholder, text: $key)
+                    } else {
+                        SecureField(placeholder, text: $key)
+                    }
+                }
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+                .textContentType(.none)
+
+                Button {
+                    showKey.toggle()
+                } label: {
+                    Image(systemName: showKey ? "eye.slash" : "eye")
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            HStack(spacing: 12) {
+                Button(isSaved ? "Update Key" : "Save Key") {
+                    saveKey()
+                }
+                .disabled(key.trimmingCharacters(in: .whitespaces).isEmpty)
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+
+                if isSaved {
+                    Button("Delete") { deleteKey() }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .tint(.red)
+
+                    Button("Validate") { validateKey() }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .disabled(isValidating)
+                }
+
+                if isValidating {
+                    ProgressView().scaleEffect(0.7)
+                } else if let result = validationResult {
+                    Image(systemName: result ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        .foregroundColor(result ? .green : .red)
+                    Text(result ? "Valid" : "Invalid")
+                        .font(.caption)
+                        .foregroundColor(result ? .green : .red)
+                }
+            }
+        }
+        .onAppear { loadSavedKey() }
+        .onChange(of: providerID) { _, _ in loadSavedKey() }
+    }
+
+    private func loadSavedKey() {
+        if let saved = keyManager.getKey(for: providerID) {
+            key = saved
+            isSaved = true
+        } else {
+            key = ""
+            isSaved = false
+            validationResult = nil
+        }
+    }
+
+    private func saveKey() {
+        guard keyManager.saveKey(key, for: providerID) else { return }
+        isSaved = true
+        validationResult = nil
+    }
+
+    private func deleteKey() {
+        keyManager.deleteKey(for: providerID)
+        key = ""
+        isSaved = false
+        validationResult = nil
+    }
+
+    private func validateKey() {
+        guard let provider = registry.provider(for: providerID) else { return }
+        isValidating = true
+        validationResult = nil
+        Task {
+            do {
+                let result = try await provider.validateAPIKey(key)
+                await MainActor.run {
+                    validationResult = result
+                    isValidating = false
+                }
+            } catch {
+                await MainActor.run {
+                    validationResult = false
+                    isValidating = false
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Supporting Views (unchanged)
 
 struct MemoryManagerView: View {
     @ObservedObject var memoryStore: AIChatMemoryStore

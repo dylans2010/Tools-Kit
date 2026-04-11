@@ -4,25 +4,47 @@ enum AIError: Error {
     case missingAPIKey
     case networkError(String)
     case invalidResponse
+    case unknownProvider(String)
 }
 
 class AIService {
-    private let openRouter = OpenRouterService()
+    private let registry = AIProviderRegistry.shared
+    private let keyManager = APIKeyManager.shared
+    private let settingsManager = AIChatSettingsManager.shared
+
+    // MARK: - Current provider helpers
+
+    private var currentProviderID: String {
+        settingsManager.settings.selectedProviderID
+    }
+
+    private var currentProvider: (any AIProvider)? {
+        registry.provider(for: currentProviderID)
+    }
+
+    private var currentAPIKey: String? {
+        keyManager.getKey(for: currentProviderID)
+    }
+
+    // MARK: - Public API
 
     func processText(prompt: String, systemPrompt: String = "You are a helpful assistant.", model: String? = nil) async throws -> String {
-        guard let apiKey = APIKeyManager.shared.getKey() else {
+        guard let provider = currentProvider else {
+            throw AIError.unknownProvider(currentProviderID)
+        }
+        guard let apiKey = currentAPIKey else {
             throw AIError.missingAPIKey
         }
 
-        let modelToUse = model ?? AIChatSettingsManager.shared.settings.modelID
-        let systemPromptToUse = systemPrompt.isEmpty ? AIChatSettingsManager.shared.settings.systemPrompt : systemPrompt
+        let modelToUse = model ?? settingsManager.settings.modelID
+        let systemPromptToUse = systemPrompt.isEmpty ? settingsManager.settings.systemPrompt : systemPrompt
 
         let messages = [
             ChatMessage(role: "system", content: systemPromptToUse),
             ChatMessage(role: "user", content: prompt)
         ]
 
-        return try await openRouter.sendMessage(messages: messages, apiKey: apiKey, model: modelToUse)
+        return try await provider.send(messages: messages, model: modelToUse, apiKey: apiKey)
     }
 
     func summarize(text: String) async throws -> String {
