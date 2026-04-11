@@ -360,7 +360,7 @@ struct APIKeyRowView: View {
             }
         }
         .onAppear { loadSavedKey() }
-        .onChange(of: providerID) { _ in loadSavedKey() }
+        .onChange(of: providerID) { _, _ in loadSavedKey() }
     }
 
     private func loadSavedKey() {
