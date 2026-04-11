@@ -11,30 +11,86 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
     @Published var pendingAttachments: [ChatAttachment] = []
     @Published var settingsManager = AIChatSettingsManager.shared
     @Published var memoryStore = AIChatMemoryStore.shared
+    @Published var keyValidationState: KeyValidationState = .unknown
 
-    private let aiService = OpenRouterService()
+    private let registry = AIProviderRegistry.shared
     private let keyManager = APIKeyManager.shared
     private let historyKey = "ai_chat_history"
 
+    enum KeyValidationState {
+        case unknown, validating, valid, invalid
+    }
+
+    var currentProvider: (any AIProvider)? {
+        registry.provider(for: settingsManager.settings.selectedProviderID)
+    }
+
     init() {
-        if let savedKey = keyManager.getKey() {
+        let providerID = settingsManager.settings.selectedProviderID
+        if let savedKey = keyManager.getKey(for: providerID) {
             self.apiKey = savedKey
             self.isApiKeySaved = true
         }
         loadHistory()
     }
 
-    func saveKey() {
-        if keyManager.saveKey(apiKey) {
+    // MARK: - Provider / Key Management
+
+    func onProviderChanged() {
+        let providerID = settingsManager.settings.selectedProviderID
+        if let savedKey = keyManager.getKey(for: providerID) {
+            apiKey = savedKey
             isApiKeySaved = true
+            keyValidationState = .unknown
+        } else {
+            apiKey = ""
+            isApiKeySaved = false
+            keyValidationState = .unknown
+        }
+        // Reset model to provider's first model if current model isn't in new provider's list
+        if let provider = currentProvider,
+           !provider.models.contains(where: { $0.id == settingsManager.settings.modelID }) {
+            settingsManager.settings.modelID = provider.models.first?.id ?? ""
         }
     }
 
+    func saveKey() {
+        let providerID = settingsManager.settings.selectedProviderID
+        guard keyManager.saveKey(apiKey, for: providerID) else { return }
+        isApiKeySaved = true
+        validateCurrentKey()
+    }
+
     func deleteKey() {
-        keyManager.deleteKey()
+        let providerID = settingsManager.settings.selectedProviderID
+        keyManager.deleteKey(for: providerID)
         apiKey = ""
         isApiKeySaved = false
+        keyValidationState = .unknown
     }
+
+    func validateCurrentKey() {
+        guard let provider = currentProvider,
+              let key = keyManager.getKey(for: provider.id) else {
+            keyValidationState = .unknown
+            return
+        }
+        keyValidationState = .validating
+        Task {
+            do {
+                let valid = try await provider.validateAPIKey(key)
+                await MainActor.run {
+                    self.keyValidationState = valid ? .valid : .invalid
+                }
+            } catch {
+                await MainActor.run {
+                    self.keyValidationState = .invalid
+                }
+            }
+        }
+    }
+
+    // MARK: - Attachments
 
     func addAttachment(_ attachment: ChatAttachment) {
         pendingAttachments.append(attachment)
@@ -44,6 +100,15 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
         guard index < pendingAttachments.count else { return }
         pendingAttachments.remove(at: index)
     }
+
+    // MARK: - Vision Check
+
+    func currentModelSupportsVision() -> Bool {
+        let model = settingsManager.settings.modelID
+        return currentProvider?.supportsVision(model: model) ?? false
+    }
+
+    // MARK: - Messaging
 
     private func buildSystemPrompt() -> String? {
         let s = settingsManager.settings
@@ -78,6 +143,15 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
 
     func sendMessage() {
         guard !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        guard let provider = currentProvider else {
+            error = "No AI provider selected."
+            return
+        }
+        let providerID = settingsManager.settings.selectedProviderID
+        guard let key = keyManager.getKey(for: providerID) else {
+            error = "No API key saved for \(provider.name)."
+            return
+        }
 
         let userMessage = ChatMessage(role: "user", content: inputText)
         messages.append(userMessage)
@@ -103,8 +177,8 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
             do {
                 let response: String
                 if !attachmentsToSend.isEmpty {
-                    guard OpenRouterService.supportsVision(model: model) else {
-                        DispatchQueue.main.async {
+                    guard provider.supportsVision(model: model) else {
+                        await MainActor.run {
                             self.error = "The selected model does not support vision/file attachments. Please choose a vision-capable model in settings."
                             self.isLoading = false
                             self.inputText = currentInput
@@ -112,23 +186,23 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
                         }
                         return
                     }
-                    response = try await aiService.sendMessageWithAttachments(
+                    response = try await provider.sendWithAttachments(
                         messages: allMessages,
                         attachments: attachmentsToSend,
                         model: model,
-                        apiKey: apiKey
+                        apiKey: key
                     )
                 } else {
-                    response = try await aiService.sendMessage(messages: allMessages, apiKey: apiKey, model: model)
+                    response = try await provider.send(messages: allMessages, model: model, apiKey: key)
                 }
 
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.messages.append(ChatMessage(role: "assistant", content: response))
                     self.isLoading = false
                     self.persistHistoryIfEnabled()
                 }
             } catch {
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.error = "Request failed: \(error.localizedDescription)"
                     if self.settingsManager.settings.logErrorsToConsole {
                         print("AIChat error: \(String(describing: error))")

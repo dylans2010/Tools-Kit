@@ -72,23 +72,26 @@ struct AIChatToolView: View {
     }
 
     private var apiKeySetupView: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "key.fill")
+        let provider = viewModel.currentProvider
+        return VStack(spacing: 20) {
+            Image(systemName: provider?.icon ?? "key.fill")
                 .font(.system(size: 60))
                 .foregroundColor(.blue)
 
-            Text("OpenRouter API Key")
+            Text("\(provider?.name ?? "AI") API Key")
                 .font(.title2)
                 .bold()
 
-            Text("Enter your API key to start chatting with AI models. Your key is stored securely in the Keychain.")
+            Text("Enter your \(provider?.name ?? "AI provider") API key to start chatting. Your key is stored securely in the Keychain.")
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .padding(.horizontal)
 
-            SecureField("sk-or-v1-...", text: $viewModel.apiKey)
+            SecureField(provider?.apiKeyPlaceholder ?? "API Key", text: $viewModel.apiKey)
                 .textFieldStyle(.roundedBorder)
                 .padding(.horizontal)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
 
             Button(action: viewModel.saveKey) {
                 Text("Save and Continue")
@@ -101,8 +104,14 @@ struct AIChatToolView: View {
             .padding(.horizontal)
             .disabled(viewModel.apiKey.isEmpty)
 
-            Link("Get an API key from OpenRouter", destination: URL(string: "https://openrouter.ai/keys")!)
+            if let url = provider?.apiKeyURL {
+                Link("Get an API key from \(provider?.name ?? "your provider")", destination: url)
+                    .font(.footnote)
+            }
+
+            Button("Change Provider") { showSettings = true }
                 .font(.footnote)
+                .foregroundColor(.secondary)
         }
         .padding()
     }
@@ -173,8 +182,7 @@ struct AIChatToolView: View {
                 }
 
                 Button {
-                    let model = viewModel.settingsManager.settings.modelID
-                    if !OpenRouterService.supportsVision(model: model) {
+                    if !viewModel.currentModelSupportsVision() {
                         showVisionAlert = true
                     } else {
                         showFileImporter = true
@@ -213,8 +221,7 @@ struct AIChatToolView: View {
         guard let data = try? Data(contentsOf: url) else { return }
         let mimeType = mimeType(for: url.pathExtension)
         let attachment = ChatAttachment(data: data, mimeType: mimeType, fileName: url.lastPathComponent)
-        let model = viewModel.settingsManager.settings.modelID
-        if !OpenRouterService.supportsVision(model: model) {
+        if !viewModel.currentModelSupportsVision() {
             showVisionAlert = true
         } else {
             viewModel.addAttachment(attachment)
@@ -228,16 +235,15 @@ struct AIChatToolView: View {
                 case .success(let data):
                     guard let data = data else { return }
                     let attachment = ChatAttachment(data: data, mimeType: "image/jpeg", fileName: "photo.jpg")
-                    let model = viewModel.settingsManager.settings.modelID
-                    if !OpenRouterService.supportsVision(model: model) {
-                        showVisionAlert = true
+                    if !self.viewModel.currentModelSupportsVision() {
+                        self.showVisionAlert = true
                     } else {
-                        viewModel.addAttachment(attachment)
+                        self.viewModel.addAttachment(attachment)
                     }
                 case .failure:
                     break
                 }
-                selectedPhotoItem = nil
+                self.selectedPhotoItem = nil
             }
         }
     }
@@ -347,7 +353,7 @@ struct AIChatTool: Tool {
     let icon = "bubble.left.and.bubble.right.fill"
     let category = ToolCategory.ai
     let complexity = ToolComplexity.advanced
-    let description = "Advanced AI chatbot powered by OpenRouter"
+    let description = "AI chatbot with multi-provider support (OpenAI, Anthropic, Gemini, Mistral, OpenRouter)"
     let requiresAPI = true
 
     var view: AnyView {
