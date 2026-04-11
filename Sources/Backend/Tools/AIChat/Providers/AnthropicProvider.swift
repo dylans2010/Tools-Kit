@@ -58,7 +58,7 @@ final class AnthropicProvider: AIProvider {
     }
 
     func validateAPIKey(_ key: String) async throws -> Bool {
-        // Use a minimal message to verify the key
+        // A minimal valid request; 200 = valid key, 401 = invalid key, other errors = network/config issue
         var request = URLRequest(url: URL(string: endpoint)!)
         request.httpMethod = "POST"
         request.addValue(key, forHTTPHeaderField: "x-api-key")
@@ -72,7 +72,8 @@ final class AnthropicProvider: AIProvider {
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         let (_, response) = try await URLSession.shared.data(for: request)
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
-        return code == 200 || code == 400
+        // 200 = success, 401 = invalid key
+        return code == 200
     }
 
     private func roleFor(_ role: String) -> String {
