@@ -8,6 +8,7 @@ struct IPInfoData: Codable {
     let org: String?
     let latitude: Double?
     let longitude: Double?
+    let timezone: String?
 }
 
 class IPInfoBackend: ObservableObject {
