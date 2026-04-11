@@ -118,26 +118,127 @@ class CalculatorBackend: ObservableObject {
 
     func evaluateExpression() {
         guard !expressionInput.isEmpty else { return }
-        var expr = expressionInput
+        let expr = expressionInput
             .replacingOccurrences(of: "×", with: "*")
             .replacingOccurrences(of: "÷", with: "/")
-            .replacingOccurrences(of: "π", with: "3.14159265358979")
+            .replacingOccurrences(of: "π", with: String(Double.pi))
+            .replacingOccurrences(of: "e", with: String(M_E))
 
-        do {
-            let nsExpr = NSExpression(format: expr)
-            if let result = nsExpr.expressionValue(with: nil, context: nil) as? NSNumber {
-                let resultStr = format(result.doubleValue)
-                let entry = CalculationEntry(expression: expressionInput, result: resultStr)
-                history.insert(entry, at: 0)
-                if history.count > 50 { history.removeLast() }
-                saveHistory()
-                display = resultStr
-                isEnteringNumber = false
-            } else {
-                display = "Error"
-            }
-        } catch {
+        let parser = MathExpressionParser(expression: expr)
+        if let result = parser.parse(), result.isFinite {
+            let resultStr = format(result)
+            let entry = CalculationEntry(expression: expressionInput, result: resultStr)
+            history.insert(entry, at: 0)
+            if history.count > 50 { history.removeLast() }
+            saveHistory()
+            display = resultStr
+            isEnteringNumber = false
+        } else {
             display = "Error"
+        }
+    }
+
+    // MARK: - Safe Math Expression Parser (recursive descent, whitelist-only)
+    private struct MathExpressionParser {
+        let tokens: [Token]
+        var pos: Int = 0
+
+        enum Token {
+            case number(Double)
+            case plus, minus, multiply, divide, power
+            case lparen, rparen
+        }
+
+        init(expression: String) {
+            var ts: [Token] = []
+            var i = expression.startIndex
+            while i < expression.endIndex {
+                let ch = expression[i]
+                if ch.isWhitespace { i = expression.index(after: i); continue }
+                if ch.isNumber || ch == "." {
+                    var numStr = ""
+                    while i < expression.endIndex && (expression[i].isNumber || expression[i] == ".") {
+                        numStr.append(expression[i])
+                        i = expression.index(after: i)
+                    }
+                    if let v = Double(numStr) { ts.append(.number(v)) }
+                    continue
+                }
+                switch ch {
+                case "+": ts.append(.plus)
+                case "-": ts.append(.minus)
+                case "*": ts.append(.multiply)
+                case "/": ts.append(.divide)
+                case "^": ts.append(.power)
+                case "(": ts.append(.lparen)
+                case ")": ts.append(.rparen)
+                default: break
+                }
+                i = expression.index(after: i)
+            }
+            self.tokens = ts
+        }
+
+        mutating func parse() -> Double? {
+            let result = parseAddSub()
+            return pos == tokens.count ? result : nil
+        }
+
+        private mutating func parseAddSub() -> Double? {
+            guard var left = parseMulDiv() else { return nil }
+            while pos < tokens.count {
+                switch tokens[pos] {
+                case .plus:  pos += 1; guard let r = parseMulDiv() else { return nil }; left += r
+                case .minus: pos += 1; guard let r = parseMulDiv() else { return nil }; left -= r
+                default: return left
+                }
+            }
+            return left
+        }
+
+        private mutating func parseMulDiv() -> Double? {
+            guard var left = parsePower() else { return nil }
+            while pos < tokens.count {
+                switch tokens[pos] {
+                case .multiply: pos += 1; guard let r = parsePower() else { return nil }; left *= r
+                case .divide:   pos += 1; guard let r = parsePower() else { return nil }; guard r != 0 else { return nil }; left /= r
+                default: return left
+                }
+            }
+            return left
+        }
+
+        private mutating func parsePower() -> Double? {
+            guard let base = parseUnary() else { return nil }
+            if pos < tokens.count, case .power = tokens[pos] {
+                pos += 1
+                guard let exp = parseUnary() else { return nil }
+                return pow(base, exp)
+            }
+            return base
+        }
+
+        private mutating func parseUnary() -> Double? {
+            if pos < tokens.count, case .minus = tokens[pos] {
+                pos += 1
+                guard let v = parsePrimary() else { return nil }
+                return -v
+            }
+            return parsePrimary()
+        }
+
+        private mutating func parsePrimary() -> Double? {
+            guard pos < tokens.count else { return nil }
+            switch tokens[pos] {
+            case .number(let v): pos += 1; return v
+            case .lparen:
+                pos += 1
+                guard let v = parseAddSub() else { return nil }
+                guard pos < tokens.count, case .rparen = tokens[pos] else { return nil }
+                pos += 1
+                return v
+            default: return nil
+            }
         }
     }
 
