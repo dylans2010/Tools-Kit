@@ -107,9 +107,6 @@ struct FileIntegrityView: View {
                         recordRow(record)
                         Divider()
                     }
-                    .onDelete { indexSet in
-                        indexSet.forEach { backend.deleteRecord(backend.records[$0]) }
-                    }
                 }
             }
         }
@@ -128,6 +125,10 @@ struct FileIntegrityView: View {
             Button("Verify") { backend.verify(record: record) }
                 .font(.caption)
                 .buttonStyle(.bordered)
+            Button(role: .destructive) { backend.deleteRecord(record) } label: {
+                Image(systemName: "trash").font(.caption)
+            }
+            .buttonStyle(.borderless)
         }
         .padding()
     }

@@ -22,7 +22,7 @@ struct TLSCertificateInfo {
 }
 
 @MainActor
-final class TLSInspectorBackend: ObservableObject, @unchecked Sendable {
+final class TLSInspectorBackend: ObservableObject {
     @Published var domain = "apple.com"
     @Published var isLoading = false
     @Published var certInfo: TLSCertificateInfo?

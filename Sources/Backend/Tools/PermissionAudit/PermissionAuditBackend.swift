@@ -110,11 +110,13 @@ final class PermissionAuditBackend: ObservableObject {
         let status = EKEventStore.authorizationStatus(for: .event)
         let s: PermissionItem.Status
         switch status {
-        case .authorized, .fullAccess, .writeOnly: s = .granted
+        case .authorized: s = .granted
         case .denied: s = .denied
         case .notDetermined: s = .undetermined
         case .restricted: s = .restricted
-        @unknown default: s = .undetermined
+        @unknown default:
+            // .fullAccess and .writeOnly are iOS 17+; treat as granted
+            s = .granted
         }
         return PermissionItem(name: "Calendar", icon: "calendar", status: s, detail: "Used for reminder generator")
     }
