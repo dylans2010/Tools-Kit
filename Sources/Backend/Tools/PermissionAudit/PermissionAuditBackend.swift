@@ -111,12 +111,11 @@ final class PermissionAuditBackend: ObservableObject {
         let s: PermissionItem.Status
         switch status {
         case .authorized: s = .granted
+        case .fullAccess, .writeOnly: s = .granted
         case .denied: s = .denied
         case .notDetermined: s = .undetermined
         case .restricted: s = .restricted
-        @unknown default:
-            // .fullAccess and .writeOnly are iOS 17+; treat as granted
-            s = .granted
+        @unknown default: s = .undetermined
         }
         return PermissionItem(name: "Calendar", icon: "calendar", status: s, detail: "Used for reminder generator")
     }
