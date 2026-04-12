@@ -12,7 +12,7 @@ struct ZIPExtractor {
     /// Extracts all entries from the ZIP archive at `url` that match the
     /// allowed audio file extensions, returning their data in memory.
     static func extract(from url: URL) -> [Entry] {
-        guard let archive = Archive(url: url, accessMode: .read) else {
+        guard let archive = try? Archive(url: url, accessMode: .read) else {
             return []
         }
 
