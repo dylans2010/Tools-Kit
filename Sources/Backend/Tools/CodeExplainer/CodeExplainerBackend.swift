@@ -12,18 +12,29 @@ class CodeExplainerBackend: ObservableObject {
     @Published var components: [CodeComponent] = []
     @Published var isProcessing = false
 
-    func explain() {
+    @MainActor
+    func explain() async {
         let input = code.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !input.isEmpty else { return }
 
         isProcessing = true
         explanation = ""
         components = []
+        let prompt = """
+        Explain the following code in plain language.
+        Then list key components (functions/classes/loops/conditionals) as bullet points.
+        Code:
+        \(input)
+        """
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-            self.analyze(input)
-            self.isProcessing = false
+        do {
+            let result = try await AIService.shared.generateResponse(prompt: prompt)
+            explanation = result
+            analyze(input)
+        } catch {
+            explanation = "Failed to explain code: \(error.localizedDescription)"
         }
+        isProcessing = false
     }
 
     private func analyze(_ input: String) {

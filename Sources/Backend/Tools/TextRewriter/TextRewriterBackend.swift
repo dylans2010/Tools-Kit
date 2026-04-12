@@ -12,68 +12,25 @@ class TextRewriterBackend: ObservableObject {
     @Published var rewrittenText = ""
     @Published var isProcessing = false
 
-    private let professionalMap: [String: String] = [
-        "get": "obtain",
-        "buy": "purchase",
-        "help": "assist",
-        "fix": "resolve",
-        "think": "believe",
-        "check": "verify",
-        "start": "commence",
-        "end": "terminate",
-        "use": "utilize",
-        "want": "desire",
-        "show": "demonstrate",
-        "tell": "inform"
-    ]
-
-    private let formalMap: [String: String] = [
-        "maybe": "perhaps",
-        "really": "extremely",
-        "bad": "unfavorable",
-        "good": "commendable",
-        "so": "consequently",
-        "but": "however",
-        "also": "furthermore",
-        "kids": "children",
-        "stuff": "materials",
-        "anyways": "nevertheless"
-    ]
-
-    func rewrite(to tone: RewriteTone) {
+    @MainActor
+    func rewrite(to tone: RewriteTone) async {
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
 
         isProcessing = true
+        defer { isProcessing = false }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-            var words = text.components(separatedBy: " ")
-            let map: [String: String]
+        let prompt = """
+        Rewrite the following text in a \(tone.rawValue.lowercased()) tone.
+        Keep the original meaning.
+        Text:
+        \(text)
+        """
 
-            switch tone {
-            case .professional: map = self.professionalMap
-            case .formal: map = self.formalMap
-            case .casual:
-                self.rewrittenText = "Hey! " + text.lowercased().replacingOccurrences(of: ".", with: "!")
-                self.isProcessing = false
-                return
-            case .concise:
-                self.rewrittenText = text.components(separatedBy: ".").first ?? text
-                self.isProcessing = false
-                return
-            }
-
-            for i in 0..<words.count {
-                let cleanWord = words[i].lowercased().trimmingCharacters(in: .punctuationCharacters)
-                if let replacement = map[cleanWord] {
-                    let hasPunctuation = words[i].rangeOfCharacter(from: .punctuationCharacters) != nil
-                    let punctuation = hasPunctuation ? String(words[i].suffix(1)) : ""
-                    words[i] = (words[i].first?.isUppercase ?? false ? replacement.capitalized : replacement) + punctuation
-                }
-            }
-
-            self.rewrittenText = words.joined(separator: " ")
-            self.isProcessing = false
+        do {
+            rewrittenText = try await AIService.shared.generateResponse(prompt: prompt)
+        } catch {
+            rewrittenText = "Failed to rewrite text: \(error.localizedDescription)"
         }
     }
 }

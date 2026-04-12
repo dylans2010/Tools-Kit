@@ -24,11 +24,18 @@ struct EmailGeneratorView: View {
             }
 
             Section {
-                Button(action: backend.generate) {
-                    Text("Generate Email")
+                Button {
+                    Task { await backend.generate() }
+                } label: {
+                    if backend.isProcessing {
+                        ProgressView().frame(maxWidth: .infinity)
+                    } else {
+                        Text("Generate Email")
                         .frame(maxWidth: .infinity)
+                    }
                 }
                 .buttonStyle(.borderedProminent)
+                .disabled(backend.isProcessing)
             }
 
             if !backend.generatedEmail.isEmpty {
@@ -53,6 +60,6 @@ struct EmailGeneratorTool: Tool {
     let category = ToolCategory.ai
     let complexity = ToolComplexity.basic
     let description = "Generate professional emails from templates"
-    let requiresAPI = false
+    let requiresAPI = true
     var view: AnyView { AnyView(EmailGeneratorView()) }
 }

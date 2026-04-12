@@ -17,11 +17,18 @@ struct MeetingNotesView: View {
             }
 
             Section {
-                Button(action: backend.generate) {
-                    Text("Generate Structured Notes")
+                Button {
+                    Task { await backend.generate() }
+                } label: {
+                    if backend.isProcessing {
+                        ProgressView().frame(maxWidth: .infinity)
+                    } else {
+                        Text("Generate Structured Notes")
                         .frame(maxWidth: .infinity)
+                    }
                 }
                 .buttonStyle(.borderedProminent)
+                .disabled(backend.isProcessing)
             }
 
             if !backend.generatedNotes.isEmpty {
@@ -46,6 +53,6 @@ struct MeetingNotesTool: Tool {
     let category = ToolCategory.ai
     let complexity = ToolComplexity.advanced
     let description = "Generate structured meeting minutes and action items"
-    let requiresAPI = false
+    let requiresAPI = true
     var view: AnyView { AnyView(MeetingNotesView()) }
 }

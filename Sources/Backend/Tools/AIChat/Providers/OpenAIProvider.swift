@@ -9,18 +9,13 @@ final class OpenAIProvider: AIProvider {
     let apiKeyURL = URL(string: "https://platform.openai.com/api-keys")
     let apiKeyPlaceholder = "sk-..."
 
-    let models: [AIModel] = [
-        AIModel(id: "gpt-4o",            name: "GPT-4o",            supportsVision: true,  contextLength: 128_000),
-        AIModel(id: "gpt-4o-mini",       name: "GPT-4o Mini",       supportsVision: true,  contextLength: 128_000),
-        AIModel(id: "gpt-4-turbo",       name: "GPT-4 Turbo",       supportsVision: true,  contextLength: 128_000),
-        AIModel(id: "gpt-3.5-turbo",     name: "GPT-3.5 Turbo",     supportsVision: false, contextLength: 16_385),
-        AIModel(id: "o1-mini",           name: "o1 Mini",           supportsVision: false, contextLength: 128_000),
-    ]
+    let models: [AIModel] = []
 
     private let endpoint = "https://api.openai.com/v1/chat/completions"
 
     func supportsVision(model: String) -> Bool {
-        models.first(where: { $0.id == model })?.supportsVision ?? false
+        let lowered = model.lowercased()
+        return lowered.contains("vision") || lowered.contains("gpt-4o") || lowered.contains("omni")
     }
 
     func send(messages: [ChatMessage], model: String, apiKey: String) async throws -> String {
@@ -51,6 +46,21 @@ final class OpenAIProvider: AIProvider {
         request.addValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
         let (_, response) = try await URLSession.shared.data(for: request)
         return (response as? HTTPURLResponse)?.statusCode == 200
+    }
+
+    func fetchModels(apiKey: String) async throws -> [AIModel] {
+        var request = URLRequest(url: URL(string: "https://api.openai.com/v1/models")!)
+        request.addValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            return []
+        }
+        let fetched = try ProviderModelFetchSupport.parseModelArray(data)
+        let preferred = fetched.filter { model in
+            let id = model.id.lowercased()
+            return id.hasPrefix("gpt") || id.hasPrefix("o1") || id.hasPrefix("o3")
+        }
+        return preferred.isEmpty ? fetched : preferred
     }
 
     private func buildRequest(messages: [[String: Any]], model: String, apiKey: String) throws -> URLRequest {

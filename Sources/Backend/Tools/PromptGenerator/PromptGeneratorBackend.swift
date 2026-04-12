@@ -22,32 +22,29 @@ class PromptGeneratorBackend: ObservableObject {
     @Published var selectedModel: PromptAIModel = .gpt4
     @Published var selectedType: PromptType = .creativeWriting
     @Published var includeConstraints = true
+    @Published var isProcessing = false
 
-    func generate() {
+    @MainActor
+    func generate() async {
+        isProcessing = true
+        defer { isProcessing = false }
+
         let topicStr = topic.isEmpty ? "[Your Topic]" : topic
-        var prompt = ""
+        let instructions = includeConstraints
+            ? "Include constraints and a structured output format."
+            : "No extra constraints."
 
-        switch selectedType {
-        case .creativeWriting:
-            prompt = "Act as a professional creative writer. Write a compelling story about \(topicStr). Ensure the tone is engaging and uses vivid imagery."
-        case .codeGeneration:
-            prompt = "Act as an expert software engineer. Write a clean, efficient, and well-documented implementation of \(topicStr) in the most suitable programming language."
-        case .imagePrompt:
-            if selectedModel == .midjourney {
-                prompt = "A hyper-realistic cinematic shot of \(topicStr), 8k resolution, Unreal Engine 5 render, depth of field, golden hour lighting --v 6.0 --ar 16:9"
-            } else {
-                prompt = "A high-quality digital art piece representing \(topicStr). Detailed textures, vibrant colors, professional lighting, centered composition."
-            }
-        case .dataAnalysis:
-            prompt = "Act as a senior data scientist. Analyze the following scenario: \(topicStr). Provide a structured breakdown of key trends, potential outliers, and actionable insights."
-        case .roleplay:
-            prompt = "I want you to act as an expert in \(topicStr). Use your deep knowledge to answer questions, provide advice, and explain complex concepts in an easy-to-understand way."
+        let prompt = """
+        Create one high quality \(selectedType.rawValue.lowercased()) prompt for \(selectedModel.rawValue).
+        Topic: \(topicStr)
+        \(instructions)
+        Return only the final prompt text.
+        """
+
+        do {
+            generatedPrompt = try await AIService.shared.generateResponse(prompt: prompt)
+        } catch {
+            generatedPrompt = "Failed to generate prompt: \(error.localizedDescription)"
         }
-
-        if includeConstraints {
-            prompt += "\n\nConstraints: Avoid clichés, maintain a professional tone, and keep the output concise yet comprehensive."
-        }
-
-        generatedPrompt = prompt
     }
 }

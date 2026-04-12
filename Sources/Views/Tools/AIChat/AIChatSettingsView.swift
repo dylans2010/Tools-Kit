@@ -4,6 +4,7 @@ struct AIChatSettingsView: View {
     @Binding var settings: AIChatSettings
     @Environment(\.dismiss) private var dismiss
     @StateObject private var memoryStore = AIChatMemoryStore.shared
+    @StateObject private var modelCatalog = AIModelCatalog.shared
 
     private let registry = AIProviderRegistry.shared
 
@@ -27,6 +28,12 @@ struct AIChatSettingsView: View {
                 storageSection
                 memorySection
             }
+            .task {
+                await loadProviderModels(force: false)
+            }
+            .onChange(of: settings.selectedProviderID) { _ in
+                Task { await loadProviderModels(force: false) }
+            }
             .navigationTitle("AI Chat Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -49,10 +56,7 @@ struct AIChatSettingsView: View {
                             isSelected: settings.selectedProviderID == provider.id
                         ) {
                             settings.selectedProviderID = provider.id
-                            // Reset model if current model is not in new provider's list
-                            if !provider.models.contains(where: { $0.id == settings.modelID }) {
-                                settings.modelID = provider.models.first?.id ?? ""
-                            }
+                            Task { await loadProviderModels(force: true) }
                         }
                     }
                 }
@@ -88,9 +92,10 @@ struct AIChatSettingsView: View {
 
     private var modelSection: some View {
         Section("Model") {
-            if let provider = selectedProvider, !provider.models.isEmpty {
+            let availableModels = modelCatalog.models(for: settings.selectedProviderID)
+            if !availableModels.isEmpty {
                 Picker("Model", selection: $settings.modelID) {
-                    ForEach(provider.models) { model in
+                    ForEach(availableModels) { model in
                         HStack {
                             Text(model.name)
                             if model.supportsVision {
@@ -104,7 +109,7 @@ struct AIChatSettingsView: View {
                 }
                 .pickerStyle(.navigationLink)
 
-                if let model = provider.models.first(where: { $0.id == settings.modelID }) {
+                if let model = availableModels.first(where: { $0.id == settings.modelID }) {
                     HStack {
                         if model.supportsVision {
                             Label("Vision supported", systemImage: "eye.fill")
@@ -119,10 +124,19 @@ struct AIChatSettingsView: View {
                         }
                     }
                 }
+            } else if modelCatalog.loadingProviders.contains(settings.selectedProviderID) {
+                HStack {
+                    ProgressView()
+                    Text("Loading models…")
+                        .foregroundColor(.secondary)
+                }
             } else {
                 TextField("Model ID", text: $settings.modelID)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
+                Button("Fetch Models") {
+                    Task { await loadProviderModels(force: true) }
+                }
             }
         }
     }
@@ -258,6 +272,17 @@ struct AIChatSettingsView: View {
             }
         }
     }
+
+    private func loadProviderModels(force: Bool) async {
+        let providerID = settings.selectedProviderID
+        await modelCatalog.loadModels(for: providerID, force: force)
+        let models = await MainActor.run { modelCatalog.models(for: providerID) }
+        await MainActor.run {
+            if !models.contains(where: { $0.id == settings.modelID }) {
+                settings.modelID = models.first?.id ?? ""
+            }
+        }
+    }
 }
 
 // MARK: - Provider Chip
@@ -305,6 +330,7 @@ struct APIKeyRowView: View {
 
     private let keyManager = APIKeyManager.shared
     private let registry = AIProviderRegistry.shared
+    @StateObject private var modelCatalog = AIModelCatalog.shared
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -378,6 +404,7 @@ struct APIKeyRowView: View {
         guard keyManager.saveKey(key, for: providerID) else { return }
         isSaved = true
         validationResult = nil
+        Task { await modelCatalog.loadModels(for: providerID, force: true) }
     }
 
     private func deleteKey() {
@@ -385,6 +412,7 @@ struct APIKeyRowView: View {
         key = ""
         isSaved = false
         validationResult = nil
+        Task { await modelCatalog.loadModels(for: providerID, force: true) }
     }
 
     private func validateKey() {

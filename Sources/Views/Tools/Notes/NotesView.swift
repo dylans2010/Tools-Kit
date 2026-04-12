@@ -1,7 +1,4 @@
 import SwiftUI
-#if canImport(UIKit)
-import UIKit
-#endif
 
 struct NotesView: View {
     @StateObject private var backend = NotesBackend()
@@ -15,105 +12,60 @@ struct NotesView: View {
 
     private var filteredNotes: [Note] {
         backend.notes.filter { note in
-            (searchText.isEmpty || note.title.localizedCaseInsensitiveContains(searchText)) &&
+            (searchText.isEmpty || note.title.localizedCaseInsensitiveContains(searchText) || note.content.localizedCaseInsensitiveContains(searchText)) &&
             (selectedFolder == nil || note.folder == selectedFolder)
         }
     }
 
-    private var pinnedNotes: [Note] {
-        filteredNotes.filter { $0.isPinned }
-    }
-
-    private var unpinnedNotes: [Note] {
-        filteredNotes.filter { !$0.isPinned }
-    }
-
     var body: some View {
-        List {
-            Section {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Organize your thoughts into folders and search through your notes easily. Pin important notes to the top for quick access.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-
+        ToolDetailView(tool: NotesTool()) {
+            VStack(spacing: 16) {
+                ToolInputSection("Folders") {
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12) {
-                            FolderChip(title: "All", isSelected: selectedFolder == nil) {
-                                selectedFolder = nil
-                            }
+                        HStack(spacing: 8) {
+                            FolderChip(title: "All", isSelected: selectedFolder == nil) { selectedFolder = nil }
                             ForEach(folders, id: \.self) { folder in
-                                FolderChip(title: folder, isSelected: selectedFolder == folder) {
-                                    selectedFolder = folder
-                                }
+                                FolderChip(title: folder, isSelected: selectedFolder == folder) { selectedFolder = folder }
                             }
                         }
+                        .padding()
                     }
                 }
-                .padding(.vertical, 8)
-            } header: {
-                Text("Information & Folders")
-            }
 
-            if !pinnedNotes.isEmpty {
-                Section(header: Text("Pinned")) {
-                    ForEach(pinnedNotes) { note in
-                        NavigationLink(destination: NoteEditorView(note: note, backend: backend)) {
-                            noteRow(for: note)
-                        }
-                        .swipeActions(edge: .leading) {
-                            Button {
-                                togglePin(note)
-                            } label: {
-                                Label("Unpin", systemImage: "pin.slash.fill")
+                ToolInputSection("Notes") {
+                    if filteredNotes.isEmpty {
+                        ContentUnavailableView("No Notes", systemImage: "note.text", description: Text("Create your first note with the + button."))
+                            .padding()
+                    } else {
+                        ForEach(filteredNotes) { note in
+                            NavigationLink(destination: NoteEditorView(note: note, backend: backend)) {
+                                noteRow(for: note)
                             }
-                            .tint(.orange)
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            if note.id != filteredNotes.last?.id { Divider() }
                         }
                     }
-                }
-            }
-
-            Section(header: Text("Notes")) {
-                if unpinnedNotes.isEmpty && pinnedNotes.isEmpty {
-                    ContentUnavailableView("No Notes", systemImage: "note.text", description: Text("Create your first note by tapping the plus button above."))
-                } else {
-                    ForEach(unpinnedNotes) { note in
-                        NavigationLink(destination: NoteEditorView(note: note, backend: backend)) {
-                            noteRow(for: note)
-                        }
-                        .swipeActions(edge: .leading) {
-                            Button {
-                                togglePin(note)
-                            } label: {
-                                Label("Pin", systemImage: "pin.fill")
-                            }
-                            .tint(.orange)
-                        }
-                    }
-                    .onDelete(perform: deleteNotes)
                 }
             }
         }
         .navigationTitle("Notes")
         .searchable(text: $searchText)
         .toolbar {
-            Button(action: {
-                let newNote = backend.createNote()
-                backend.selectedNote = newNote
-                showingAddNote = true
-            }) {
-                Image(systemName: "plus")
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    let newNote = backend.createNote()
+                    backend.selectedNote = newNote
+                    showingAddNote = true
+                } label: {
+                    Image(systemName: "plus")
+                }
             }
         }
         .sheet(isPresented: $showingAddNote) {
             if let note = backend.selectedNote {
-                if #available(iOS 16.0, macOS 13.0, *) {
-                    NavigationStack {
-                        NoteEditorView(note: note, backend: backend)
-                    }
-                } else {
-                    NavigationView {
-                        NoteEditorView(note: note, backend: backend)
-                    }
+                NavigationStack {
+                    NoteEditorView(note: note, backend: backend)
                 }
             }
         }
@@ -123,52 +75,20 @@ struct NotesView: View {
     private func noteRow(for note: Note) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
-                if note.isPinned {
-                    Image(systemName: "pin.fill")
-                        .font(.caption2)
-                        .foregroundColor(.orange)
-                }
+                Image(systemName: note.isPinned ? "pin.fill" : "note.text")
+                    .foregroundColor(note.isPinned ? .orange : .blue)
                 Text(note.title)
                     .font(.headline)
+                Spacer()
+                Text(note.updatedAt, style: .date)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
             }
 
             Text(note.content.isEmpty ? "No content" : note.content)
                 .lineLimit(2)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-
-            HStack {
-                Text(note.updatedAt, style: .date)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-
-                if !note.tags.isEmpty {
-                    Spacer()
-                    HStack(spacing: 4) {
-                        ForEach(note.tags.prefix(3), id: \.self) { tag in
-                            Text("#\(tag)")
-                                .font(.system(size: 8))
-                                .padding(3)
-                                .background(Color.blue.opacity(0.1))
-                                .cornerRadius(3)
-                        }
-                    }
-                }
-            }
-        }
-        .padding(.vertical, 4)
-    }
-
-    private func togglePin(_ note: Note) {
-        var updated = note
-        updated.isPinned.toggle()
-        backend.updateNote(updated)
-    }
-
-    private func deleteNotes(at offsets: IndexSet) {
-        offsets.forEach { index in
-            let note = unpinnedNotes[index]
-            backend.deleteNote(note)
         }
     }
 }
@@ -181,12 +101,12 @@ struct FolderChip: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.subheadline)
+                .font(.subheadline.bold())
                 .padding(.horizontal, 12)
-                .padding(.vertical, 6)
+                .padding(.vertical, 8)
                 .background(isSelected ? Color.blue : Color(.secondarySystemBackground))
                 .foregroundColor(isSelected ? .white : .primary)
-                .cornerRadius(16)
+                .cornerRadius(14)
         }
     }
 }
@@ -196,12 +116,10 @@ struct NotesTool: Tool {
     let icon = "note.text"
     let category = ToolCategory.utility
     let complexity = ToolComplexity.advanced
-    let description = "Organize and manage your personal notes"
+    let description = "Organize and manage your personal notes with markdown and AI summaries"
     let requiresAPI = false
 
-    var view: AnyView {
-        AnyView(NotesView())
-    }
+    var view: AnyView { AnyView(NotesView()) }
 }
 
 struct NoteEditorView: View {
@@ -216,122 +134,152 @@ struct NoteEditorView: View {
     @State private var newTag = ""
 
     var body: some View {
-        VStack {
-            TextField("Title", text: $note.title)
-                .font(.title)
-                .padding(.horizontal)
-                .onChange(of: note.title) { _ in backend.updateNote(note) }
-
-            HStack {
-                TextField("Folder", text: $note.folder)
-                    .font(.subheadline)
-                    .padding(8)
-                    #if canImport(UIKit)
-                    .background(Color(uiColor: .secondarySystemBackground))
-                    #else
-                    .background(.quaternary)
-                    #endif
-                    .cornerRadius(8)
-                    .onChange(of: note.folder) { _ in backend.updateNote(note) }
-
-                Spacer()
-
-                Button(action: { showingHistory = true }) {
-                    Image(systemName: "clock.arrow.circlepath")
+        ScrollView {
+            VStack(spacing: 16) {
+                ToolInputSection("Title & Folder") {
+                    VStack(spacing: 12) {
+                        TextField("Title", text: $note.title)
+                            .font(.title3.bold())
+                            .onChange(of: note.title) { _ in backend.updateNote(note) }
+                        TextField("Folder", text: $note.folder)
+                            .textFieldStyle(.roundedBorder)
+                            .onChange(of: note.folder) { _ in backend.updateNote(note) }
+                    }
+                    .padding()
                 }
-            }
-            .padding(.horizontal)
 
-            HStack {
-                ForEach(note.tags, id: \.self) { tag in
-                    Text("#\(tag)")
-                        .font(.caption)
-                        .padding(4)
-                        .background(Color.blue.opacity(0.1))
-                        .cornerRadius(4)
-                        .onTapGesture {
-                            note.tags.removeAll { $0 == tag }
-                            backend.updateNote(note)
+                ToolInputSection("Tags") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack {
+                                ForEach(note.tags, id: \.self) { tag in
+                                    Button {
+                                        note.tags.removeAll { $0 == tag }
+                                        backend.updateNote(note)
+                                    } label: {
+                                        Text("#\(tag)")
+                                            .font(.caption)
+                                            .padding(6)
+                                            .background(Color.blue.opacity(0.1))
+                                            .cornerRadius(8)
+                                    }
+                                }
+                            }
                         }
-                }
-                TextField("Add tag...", text: $newTag, onCommit: {
-                    if !newTag.isEmpty {
-                        note.tags.append(newTag)
-                        newTag = ""
-                        backend.updateNote(note)
+                        TextField("Add tag...", text: $newTag, onCommit: addTag)
+                            .textFieldStyle(.roundedBorder)
                     }
-                })
-                .font(.caption)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .frame(width: 100)
-            }
-            .padding(.horizontal)
-
-            TextEditor(text: $note.content)
-                .padding()
-                .border(Color.gray.opacity(0.2))
-                .onChange(of: note.content) { _ in
-                    // Auto-save logic
-                    backend.updateNote(note)
+                    .padding()
                 }
 
-            if !summaryText.isEmpty {
-                VStack(alignment: .leading) {
-                    HStack {
-                        Text("AI Summary").font(.headline)
-                        Spacer()
-                        Button(action: { summaryText = "" }) { Image(systemName: "xmark.circle") }
+                ToolInputSection("Editor") {
+                    TextEditor(text: $note.content)
+                        .frame(minHeight: 260)
+                        .padding(8)
+                        .onChange(of: note.content) { _ in backend.updateNote(note) }
+                }
+
+                markdownToolbar
+
+                if !summaryText.isEmpty {
+                    ToolInputSection("AI Summary") {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(summaryText)
+                                .font(.subheadline)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Button("Clear Summary", role: .destructive) { summaryText = "" }
+                        }
+                        .padding()
                     }
-                    Text(summaryText).font(.subheadline)
                 }
-                .padding()
-                .background(Color.blue.opacity(0.1))
-                .cornerRadius(10)
-                .padding(.horizontal)
-            }
 
-            HStack {
-                Button(action: {
-                    isSummarizing = true
-                    backend.summarizeNote(note) { summary in
-                        self.summaryText = summary
-                        self.isSummarizing = false
+                HStack {
+                    Button {
+                        isSummarizing = true
+                        Task {
+                            do {
+                                summaryText = try await backend.summarizeNote(note)
+                            } catch {
+                                summaryText = "Failed to summarize: \(error.localizedDescription)"
+                            }
+                            isSummarizing = false
+                        }
+                    } label: {
+                        if isSummarizing { ProgressView() } else { Label("AI Summary", systemImage: "sparkles") }
                     }
-                }) {
-                    Label("Summarize", systemImage: "sparkles")
-                }
-                .disabled(isSummarizing)
+                    .buttonStyle(.borderedProminent)
 
-                Spacer()
+                    Spacer()
 
-                Button(action: { showingExportActionSheet = true }) {
-                    Label("Export", systemImage: "square.and.arrow.up")
+                    Button(action: { showingHistory = true }) {
+                        Label("History", systemImage: "clock.arrow.circlepath")
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button(action: { showingExportActionSheet = true }) {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
+                    .buttonStyle(.bordered)
                 }
             }
-            .padding()
+            .padding(.vertical)
         }
         .navigationTitle("Edit Note")
         .toolbar {
-            Button("Done") {
-                dismiss()
-            }
+            Button("Done") { dismiss() }
         }
         .sheet(isPresented: $showingHistory) {
             VersionHistoryView(note: note)
         }
         .confirmationDialog("Export Note", isPresented: $showingExportActionSheet) {
-            Button("Plain Text (.txt)") {
-                if let url = backend.exportAsTXT(note: note) {
-                    print("Exported to \(url)")
-                }
-            }
-            Button("Markdown (.md)") {
-                if let url = backend.exportAsMarkdown(note: note) {
-                    print("Exported to \(url)")
-                }
-            }
+            Button("Plain Text (.txt)") { _ = backend.exportAsTXT(note: note) }
+            Button("Markdown (.md)") { _ = backend.exportAsMarkdown(note: note) }
             Button("Cancel", role: .cancel) {}
         }
+    }
+
+    private var markdownToolbar: some View {
+        ToolInputSection("Markdown Toolbar") {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    markdownButton("bold", icon: "bold", wrapper: "**")
+                    markdownButton("italic", icon: "italic", wrapper: "*")
+                    markdownButton("code", icon: "curlybraces", wrapper: "`")
+                    markdownInsertButton("list.bullet", text: "\n- ")
+                    markdownInsertButton("quote.bubble", text: "\n> ")
+                    markdownInsertButton("link", text: "[title](https://)")
+                }
+                .padding()
+            }
+        }
+    }
+
+    private func markdownButton(_ title: String, icon: String, wrapper: String) -> some View {
+        Button {
+            note.content += "\(wrapper)\(title)\(wrapper)"
+            backend.updateNote(note)
+        } label: {
+            Image(systemName: icon)
+        }
+        .buttonStyle(.bordered)
+    }
+
+    private func markdownInsertButton(_ icon: String, text: String) -> some View {
+        Button {
+            note.content += text
+            backend.updateNote(note)
+        } label: {
+            Image(systemName: icon)
+        }
+        .buttonStyle(.bordered)
+    }
+
+    private func addTag() {
+        let tag = newTag.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !tag.isEmpty else { return }
+        note.tags.append(tag)
+        newTag = ""
+        backend.updateNote(note)
     }
 }
 
@@ -340,30 +288,18 @@ struct VersionHistoryView: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        if #available(iOS 16.0, macOS 13.0, *) {
-            NavigationStack {
-                content
+        NavigationStack {
+            List(note.versionHistory.sorted { $0.timestamp > $1.timestamp }) { version in
+                VStack(alignment: .leading) {
+                    Text(version.timestamp.formatted())
+                        .font(.headline)
+                    Text(version.content.prefix(100))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
-        } else {
-            NavigationView {
-                content
-            }
-        }
-    }
-
-    private var content: some View {
-        List(note.versionHistory.sorted { $0.timestamp > $1.timestamp }) { version in
-            VStack(alignment: .leading) {
-                Text(version.timestamp.formatted())
-                    .font(.headline)
-                Text(version.content.prefix(100))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-        }
-        .navigationTitle("Version History")
-        .toolbar {
-            Button("Close") { dismiss() }
+            .navigationTitle("Version History")
+            .toolbar { Button("Close") { dismiss() } }
         }
     }
 }

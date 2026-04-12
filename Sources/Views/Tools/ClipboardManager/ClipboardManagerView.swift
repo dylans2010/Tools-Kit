@@ -14,69 +14,66 @@ struct ClipboardManagerView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Manage your clipboard history. You can save snippets, search through them, and mark your favorites for quick access.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-
-                HStack {
-                    TextField("New entry or search...", text: $textToCopy)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                    Button(action: {
-                        backend.copyToClipboard(textToCopy)
-                        textToCopy = ""
-                    }) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.title2)
+        ToolDetailView(tool: ClipboardManagerTool()) {
+            VStack(spacing: 16) {
+                ToolInputSection("Quick Add") {
+                    HStack {
+                        TextField("Type text to save to clipboard", text: $textToCopy)
+                            .textFieldStyle(.roundedBorder)
+                        Button {
+                            backend.copyToClipboard(textToCopy)
+                            textToCopy = ""
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.title2)
+                        }
+                        .disabled(textToCopy.isEmpty)
                     }
-                    .disabled(textToCopy.isEmpty)
+                    .padding()
                 }
 
-                HStack {
-                    TextField("Search history...", text: $searchQuery)
-                        .textFieldStyle(.roundedBorder)
-                        .font(.caption)
-
-                    Toggle(isOn: $showFavoritesOnly) {
-                        Image(systemName: showFavoritesOnly ? "star.fill" : "star")
-                            .foregroundColor(.yellow)
+                ToolInputSection("Filters") {
+                    HStack {
+                        TextField("Search history...", text: $searchQuery)
+                            .textFieldStyle(.roundedBorder)
+                        Toggle(isOn: $showFavoritesOnly) {
+                            Image(systemName: showFavoritesOnly ? "star.fill" : "star")
+                                .foregroundColor(.yellow)
+                        }
+                        .toggleStyle(.button)
+                        .labelsHidden()
                     }
-                    .toggleStyle(.button)
-                    .labelsHidden()
+                    .padding()
                 }
-            }
-            .padding()
-            .background(Color(.secondarySystemBackground))
 
-            List {
-                if filteredHistory.isEmpty {
-                    ContentUnavailableView("No Results", systemImage: "doc.on.clipboard", description: Text("No clipboard entries found matching your criteria."))
-                } else {
-                    ForEach(filteredHistory) { entry in
-                        ClipboardEntryRow(entry: entry, backend: backend)
+                ToolInputSection("History") {
+                    if filteredHistory.isEmpty {
+                        ContentUnavailableView("No Results", systemImage: "doc.on.clipboard", description: Text("No clipboard entries found matching your criteria."))
+                            .padding()
+                    } else {
+                        ForEach(filteredHistory) { entry in
+                            ClipboardEntryRow(entry: entry, backend: backend)
+                                .padding(.horizontal)
+                                .padding(.vertical, 8)
+                            if entry.id != filteredHistory.last?.id { Divider() }
+                        }
                     }
-                    .onDelete(perform: backend.deleteEntry)
                 }
-            }
-            .listStyle(InsetGroupedListStyle())
 
-            if !backend.history.isEmpty {
-                HStack {
-                    Button(action: backend.clearHistory) {
-                        Label("Clear All", systemImage: "trash")
-                            .foregroundColor(.red)
+                if !backend.history.isEmpty {
+                    HStack {
+                        Button(action: backend.clearHistory) {
+                            Label("Clear All", systemImage: "trash")
+                                .foregroundColor(.red)
+                        }
+                        Spacer()
+                        Text("\(backend.history.count) entries")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
                     }
-                    Spacer()
-                    Text("\(backend.history.count) entries")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
                 }
-                .padding()
             }
         }
-        .navigationTitle("Clipboard Manager")
     }
 }
 

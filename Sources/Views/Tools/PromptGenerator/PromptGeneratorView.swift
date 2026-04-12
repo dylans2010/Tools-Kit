@@ -24,11 +24,18 @@ struct PromptGeneratorView: View {
             }
 
             Section {
-                Button(action: backend.generate) {
-                    Text("Generate Optimized Prompt")
+                Button {
+                    Task { await backend.generate() }
+                } label: {
+                    if backend.isProcessing {
+                        ProgressView().frame(maxWidth: .infinity)
+                    } else {
+                        Text("Generate Optimized Prompt")
                         .frame(maxWidth: .infinity)
+                    }
                 }
                 .buttonStyle(.borderedProminent)
+                .disabled(backend.isProcessing)
             }
 
             if !backend.generatedPrompt.isEmpty {
@@ -53,6 +60,6 @@ struct PromptGeneratorTool: Tool {
     let category = ToolCategory.ai
     let complexity = ToolComplexity.basic
     let description = "Generate optimized prompts for various AI models"
-    let requiresAPI = false
+    let requiresAPI = true
     var view: AnyView { AnyView(PromptGeneratorView()) }
 }

@@ -15,6 +15,7 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
 
     private let registry = AIProviderRegistry.shared
     private let keyManager = APIKeyManager.shared
+    private let modelCatalog = AIModelCatalog.shared
     private let historyKey = "ai_chat_history"
 
     enum KeyValidationState {
@@ -32,6 +33,7 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
             self.isApiKeySaved = true
         }
         loadHistory()
+        Task { await refreshModels(force: false) }
     }
 
     // MARK: - Provider / Key Management
@@ -47,11 +49,7 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
             isApiKeySaved = false
             keyValidationState = .unknown
         }
-        // Reset model to provider's first model if current model isn't in new provider's list
-        if let provider = currentProvider,
-           !provider.models.contains(where: { $0.id == settingsManager.settings.modelID }) {
-            settingsManager.settings.modelID = provider.models.first?.id ?? ""
-        }
+        Task { await refreshModels(force: true) }
     }
 
     func saveKey() {
@@ -59,6 +57,7 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
         guard keyManager.saveKey(apiKey, for: providerID) else { return }
         isApiKeySaved = true
         validateCurrentKey()
+        Task { await refreshModels(force: true) }
     }
 
     func deleteKey() {
@@ -67,6 +66,7 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
         apiKey = ""
         isApiKeySaved = false
         keyValidationState = .unknown
+        settingsManager.settings.modelID = ""
     }
 
     func validateCurrentKey() {
@@ -106,6 +106,27 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
     func currentModelSupportsVision() -> Bool {
         let model = settingsManager.settings.modelID
         return currentProvider?.supportsVision(model: model) ?? false
+    }
+
+    @MainActor
+    func availableModels() -> [AIModel] {
+        modelCatalog.models(for: settingsManager.settings.selectedProviderID)
+    }
+
+    @MainActor
+    func isLoadingModels() -> Bool {
+        modelCatalog.loadingProviders.contains(settingsManager.settings.selectedProviderID)
+    }
+
+    func refreshModels(force: Bool) async {
+        let providerID = settingsManager.settings.selectedProviderID
+        await modelCatalog.loadModels(for: providerID, force: force)
+        let models = await MainActor.run { modelCatalog.models(for: providerID) }
+        await MainActor.run {
+            if !models.contains(where: { $0.id == self.settingsManager.settings.modelID }) {
+                self.settingsManager.settings.modelID = models.first?.id ?? ""
+            }
+        }
     }
 
     // MARK: - Messaging

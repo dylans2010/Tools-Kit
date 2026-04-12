@@ -29,6 +29,7 @@ protocol AIProvider: Identifiable {
     func send(messages: [ChatMessage], model: String, apiKey: String) async throws -> String
     func sendWithAttachments(messages: [ChatMessage], attachments: [ChatAttachment], model: String, apiKey: String) async throws -> String
     func supportsVision(model: String) -> Bool
+    func fetchModels(apiKey: String) async throws -> [AIModel]
     func validateAPIKey(_ key: String) async throws -> Bool
 }
 

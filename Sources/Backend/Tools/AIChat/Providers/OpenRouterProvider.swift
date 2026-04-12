@@ -9,16 +9,7 @@ final class OpenRouterProvider: AIProvider {
     let apiKeyURL = URL(string: "https://openrouter.ai/keys")
     let apiKeyPlaceholder = "sk-or-v1-..."
 
-    let models: [AIModel] = [
-        AIModel(id: "google/gemini-2.0-flash-exp:free", name: "Gemini 2.0 Flash (Free)", supportsVision: true, contextLength: 1_048_576),
-        AIModel(id: "anthropic/claude-3.5-sonnet",      name: "Claude 3.5 Sonnet",       supportsVision: true, contextLength: 200_000),
-        AIModel(id: "anthropic/claude-3-haiku",         name: "Claude 3 Haiku",           supportsVision: true, contextLength: 200_000),
-        AIModel(id: "openai/gpt-4o",                    name: "GPT-4o",                   supportsVision: true, contextLength: 128_000),
-        AIModel(id: "openai/gpt-4o-mini",               name: "GPT-4o Mini",              supportsVision: true, contextLength: 128_000),
-        AIModel(id: "mistralai/mistral-large",           name: "Mistral Large",            supportsVision: false, contextLength: 128_000),
-        AIModel(id: "meta-llama/llama-3.1-70b-instruct", name: "Llama 3.1 70B",           supportsVision: false, contextLength: 131_072),
-        AIModel(id: "qwen/qwen-2.5-72b-instruct",        name: "Qwen 2.5 72B",            supportsVision: false, contextLength: 128_000),
-    ]
+    let models: [AIModel] = []
 
     private let endpoint = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -74,6 +65,18 @@ final class OpenRouterProvider: AIProvider {
         request.addValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
         let (_, response) = try await URLSession.shared.data(for: request)
         return (response as? HTTPURLResponse)?.statusCode == 200
+    }
+
+    func fetchModels(apiKey: String) async throws -> [AIModel] {
+        var request = URLRequest(url: URL(string: "https://openrouter.ai/api/v1/models")!)
+        request.addValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.addValue("https://tools-kit.app", forHTTPHeaderField: "HTTP-Referer")
+        request.addValue("Tools Kit", forHTTPHeaderField: "X-Title")
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            return []
+        }
+        return try ProviderModelFetchSupport.parseModelArray(data)
     }
 
     private func performRequest(_ request: URLRequest) async throws -> String {
