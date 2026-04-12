@@ -13,7 +13,13 @@ final class MusicLibraryManager: ObservableObject {
     private let playlistsKey = "music.playlists"
     private let songIDsByPathKey = "music.songIDsByPath"
     private let allowedExtensions: Set<String> = ["mp3", "mp4", "m4a", "aac", "wav", "flac"]
-    private static let backupDateFormatter = ISO8601DateFormatter()
+    private static let backupDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd'T'HH-mm-ss'Z'"
+        return formatter
+    }()
 
     private struct BackupSongRecord: Codable {
         let id: UUID
@@ -279,7 +285,7 @@ final class MusicLibraryManager: ObservableObject {
     }
 
     func createBackupArchive() throws -> URL {
-        let stamp = Self.backupDateFormatter.string(from: Date()).replacingOccurrences(of: ":", with: "-")
+        let stamp = Self.backupDateFormatter.string(from: Date())
         let backupURL = FileManager.default.temporaryDirectory.appendingPathComponent("ToolsKit-Music-Backup-\(stamp).zip")
         try? FileManager.default.removeItem(at: backupURL)
         guard let archive = Archive(url: backupURL, accessMode: .create) else {
@@ -359,6 +365,8 @@ final class MusicLibraryManager: ObservableObject {
         return (songs: songs.count, playlists: playlists.count)
     }
 
+    /// Builds a deterministic UUID from a song file path so song IDs remain stable
+    /// when metadata is reconstructed from on-disk files after app relaunches.
     private func stableSongID(for url: URL) -> UUID {
         let normalizedPath = url.standardizedFileURL.path.lowercased()
         let digest = SHA256.hash(data: Data(normalizedPath.utf8))
