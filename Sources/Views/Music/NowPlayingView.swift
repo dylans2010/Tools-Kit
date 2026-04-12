@@ -75,11 +75,13 @@ struct NowPlayingView: View {
                 Image(uiImage: img)
                     .resizable()
                     .scaledToFill()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .ignoresSafeArea()
-                    .blur(radius: 80)
-                    .scaleEffect(1.6)
-                    .opacity(0.55)
+                    .transition(.opacity)
             }
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .ignoresSafeArea()
             LinearGradient(
                 colors: [Color.black.opacity(0.25), Color.black.opacity(0.6)],
                 startPoint: .top,
@@ -152,11 +154,14 @@ struct NowPlayingView: View {
     // MARK: - Artwork
 
     private func artworkSection(availableHeight: CGFloat) -> some View {
-        let artworkPad: CGFloat = availableHeight < 700 ? 20 : 36
+        let artworkPad: CGFloat = availableHeight < 700 ? 18 : 30
+        let maxCardWidth: CGFloat = min(UIScreen.main.bounds.width - (artworkPad * 2), 420)
         let vPad: CGFloat = availableHeight < 700 ? 8 : 16
         return VStack(spacing: 0) {
             Spacer(minLength: vPad)
             artworkCard
+                .frame(width: maxCardWidth)
+                .frame(maxWidth: .infinity)
                 .padding(.horizontal, artworkPad)
             Spacer(minLength: vPad)
         }
@@ -168,9 +173,10 @@ struct NowPlayingView: View {
                let img = UIImage(data: data) {
                 Image(uiImage: img)
                     .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity)
+                    .scaledToFill()
+                    .aspectRatio(1, contentMode: .fit)
                     .cornerRadius(14)
+                    .clipped()
                     .shadow(color: .black.opacity(0.55), radius: 36, x: 0, y: 14)
             } else {
                 RoundedRectangle(cornerRadius: 14)
@@ -190,6 +196,7 @@ struct NowPlayingView: View {
                     .shadow(color: .black.opacity(0.5), radius: 36, x: 0, y: 14)
             }
         }
+        .id(player.currentSong?.id)
         .scaleEffect(player.isPlaying ? 1.0 : 0.82)
         .animation(.spring(response: 0.5, dampingFraction: 0.72), value: player.isPlaying)
     }
