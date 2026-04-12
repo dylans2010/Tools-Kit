@@ -8,7 +8,7 @@ enum FeedbackFormTemplate {
             FormQuestion(title: "What should we improve?", type: .textInput, required: false)
         ]
 
-        FormDocument(
+        return FormDocument(
             name: "Customer Feedback",
             description: "Collect product feedback from users.",
             questions: questions,
