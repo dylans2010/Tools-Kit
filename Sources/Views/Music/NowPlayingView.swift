@@ -25,6 +25,7 @@ struct NowPlayingView: View {
 
                     if showLyrics {
                         LyricsView()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .transition(.asymmetric(
                                 insertion: .move(edge: .trailing).combined(with: .opacity),
                                 removal: .move(edge: .leading).combined(with: .opacity)
@@ -35,11 +36,11 @@ struct NowPlayingView: View {
                                 insertion: .move(edge: .leading).combined(with: .opacity),
                                 removal: .move(edge: .trailing).combined(with: .opacity)
                             ))
-                    }
 
-                    bottomControls(screenHeight: geo.size.height)
-                        .padding(.horizontal, 24)
-                        .padding(.bottom, max(geo.safeAreaInsets.bottom, 16))
+                        bottomControls(screenHeight: geo.size.height)
+                            .padding(.horizontal, 24)
+                            .padding(.bottom, max(geo.safeAreaInsets.bottom, 16))
+                    }
                 }
             }
         }
@@ -168,6 +169,7 @@ struct NowPlayingView: View {
                 Image(uiImage: img)
                     .resizable()
                     .scaledToFit()
+                    .frame(maxWidth: .infinity)
                     .cornerRadius(14)
                     .shadow(color: .black.opacity(0.55), radius: 36, x: 0, y: 14)
             } else {
