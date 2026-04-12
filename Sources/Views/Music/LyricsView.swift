@@ -1,5 +1,4 @@
 import SwiftUI
-import UniformTypeIdentifiers
 
 struct LyricsView: View {
     @StateObject private var engine = LyricsSyncEngine.shared
@@ -7,6 +6,7 @@ struct LyricsView: View {
     @State private var showLRCImporter = false
     @State private var showLRCExporter = false
     @State private var showOffsetEditor = false
+    @State private var showEditor = false
     @State private var offsetText = ""
 
     var body: some View {
@@ -24,8 +24,24 @@ struct LyricsView: View {
                 .padding(.trailing, 16)
                 .padding(.top, 4)
         }
-        .sheet(isPresented: $showLRCImporter) { lrcImporterSheet }
+        .sheet(isPresented: $showLRCImporter) {
+            if let song = player.currentSong {
+                LyricsImportView(song: song) { lines in
+                    engine.setLines(lines)
+                }
+            }
+        }
+        .sheet(isPresented: $showLRCExporter) {
+            if let song = player.currentSong {
+                LyricsExportView(song: song, lines: engine.lines)
+            }
+        }
         .sheet(isPresented: $showOffsetEditor) { offsetEditorSheet }
+        .sheet(isPresented: $showEditor) {
+            if let song = player.currentSong {
+                LyricsEditorView(song: song)
+            }
+        }
     }
 
     // MARK: - Lyrics Scroller
@@ -101,16 +117,29 @@ struct LyricsView: View {
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.4))
                 .multilineTextAlignment(.center)
-            Button {
-                showLRCImporter = true
-            } label: {
-                Label("Import .lrc File", systemImage: "square.and.arrow.down")
-                    .font(.subheadline.weight(.semibold))
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 10)
-                    .background(Color.white.opacity(0.15))
-                    .foregroundColor(.white)
-                    .cornerRadius(20)
+            HStack(spacing: 12) {
+                Button {
+                    showLRCImporter = true
+                } label: {
+                    Label("Import", systemImage: "square.and.arrow.down")
+                        .font(.subheadline.weight(.semibold))
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(Color.white.opacity(0.15))
+                        .foregroundColor(.white)
+                        .cornerRadius(20)
+                }
+                Button {
+                    showEditor = true
+                } label: {
+                    Label("Create", systemImage: "pencil")
+                        .font(.subheadline.weight(.semibold))
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(Color.white.opacity(0.15))
+                        .foregroundColor(.white)
+                        .cornerRadius(20)
+                }
             }
             .padding(.top, 8)
         }
@@ -128,9 +157,15 @@ struct LyricsView: View {
                 Label("Import .lrc File", systemImage: "square.and.arrow.down")
             }
 
+            Button {
+                showEditor = true
+            } label: {
+                Label("Edit Lyrics", systemImage: "pencil")
+            }
+
             if !engine.lines.isEmpty {
                 Button {
-                    exportLRC()
+                    showLRCExporter = true
                 } label: {
                     Label("Export .lrc File", systemImage: "square.and.arrow.up")
                 }
@@ -155,23 +190,6 @@ struct LyricsView: View {
                 .foregroundColor(.white.opacity(0.7))
                 .padding(8)
                 .background(Color.white.opacity(0.1), in: Circle())
-        }
-    }
-
-    // MARK: - LRC Importer Sheet
-
-    private var lrcImporterSheet: some View {
-        FileImporterRepresentableView(
-            allowedContentTypes: [UTType(filenameExtension: "lrc") ?? .plainText]
-        ) { urls in
-            showLRCImporter = false
-            guard let url = urls.first, let song = player.currentSong else { return }
-            let accessing = url.startAccessingSecurityScopedResource()
-            let service = LyricsService()
-            if let imported = service.importLRC(from: url, for: song) {
-                engine.setLines(imported)
-            }
-            if accessing { url.stopAccessingSecurityScopedResource() }
         }
     }
 
@@ -217,23 +235,5 @@ struct LyricsView: View {
             }
         }
         .presentationDetents([.medium])
-    }
-
-    // MARK: - Export
-
-    private func exportLRC() {
-        guard let song = player.currentSong else { return }
-        let service = LyricsService()
-        let lrcURL = service.lrcFileURL(for: song)
-        service.save(engine.lines, for: song)
-
-        let activityVC = UIActivityViewController(
-            activityItems: [lrcURL],
-            applicationActivities: nil
-        )
-        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let root = scene.windows.first?.rootViewController {
-            root.present(activityVC, animated: true)
-        }
     }
 }
