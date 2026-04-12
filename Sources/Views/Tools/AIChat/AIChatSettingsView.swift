@@ -5,6 +5,7 @@ struct AIChatSettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var memoryStore = AIChatMemoryStore.shared
     @StateObject private var modelCatalog = AIModelCatalog.shared
+    @StateObject private var musicMode = MusicModeManager.shared
 
     private let registry = AIProviderRegistry.shared
 
@@ -27,6 +28,7 @@ struct AIChatSettingsView: View {
                 chatInterfaceSection
                 storageSection
                 memorySection
+                musicModeSection
                 toolVisibilitySection
             }
             .task {
@@ -271,6 +273,33 @@ struct AIChatSettingsView: View {
             NavigationLink("Manage Saved Memory") {
                 MemoryManagerView(memoryStore: memoryStore)
             }
+        }
+    }
+
+    // MARK: - Music Mode Section
+
+    private var musicModeSection: some View {
+        Section {
+            Toggle(isOn: $musicMode.isMusicModeEnabled) {
+                HStack(spacing: 14) {
+                    Image(systemName: "music.note.list")
+                        .font(.title3)
+                        .foregroundColor(.pink)
+                        .frame(width: 32)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Turn ToolsKit Into Music")
+                            .font(.body)
+                        Text("Replace the Dashboard with the Music player")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+        } header: {
+            Text("Music Mode")
+        } footer: {
+            Text("When enabled, ToolsKit launches directly into the Music library instead of the Dashboard.")
+                .font(.caption)
         }
     }
 

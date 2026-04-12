@@ -5,6 +5,7 @@ struct DashboardView: View {
     @StateObject private var visibility = ToolVisibilityManager.shared
     @StateObject private var settingsManager = AIChatSettingsManager.shared
     @StateObject private var privateMode = PrivateModeManager.shared
+    @StateObject private var musicMode = MusicModeManager.shared
     @State private var searchText = ""
     @State private var selectedCategory: ToolCategory? = nil
     @State private var showSettings = false
@@ -19,6 +20,7 @@ struct DashboardView: View {
                     SearchBar(text: $searchText)
                     categoryPicker
                     privateModeCard
+                    musicModeCard
 
                     if searchText.isEmpty && selectedCategory == nil {
                         toolSection(title: "Favorites", tools: favoriteTools)
@@ -100,6 +102,44 @@ struct DashboardView: View {
         )
         .padding(.horizontal)
         .animation(.easeInOut(duration: 0.25), value: privateMode.isEnabled)
+    }
+
+    private var musicModeCard: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(musicMode.isMusicModeEnabled ? Color.pink : Color(.systemGray5))
+                    .frame(width: 44, height: 44)
+                Image(systemName: "music.note.list")
+                    .foregroundColor(musicMode.isMusicModeEnabled ? .white : .secondary)
+                    .font(.system(size: 18, weight: .semibold))
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Music Mode")
+                    .font(.subheadline.weight(.semibold))
+                Text(musicMode.isMusicModeEnabled
+                     ? "ToolsKit is in Music mode"
+                     : "Turn ToolsKit into a Music player")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            Spacer()
+            Toggle("", isOn: $musicMode.isMusicModeEnabled)
+                .labelsHidden()
+        }
+        .padding()
+        .background(
+            musicMode.isMusicModeEnabled
+                ? LinearGradient(colors: [Color.pink.opacity(0.15), Color.purple.opacity(0.1)], startPoint: .leading, endPoint: .trailing)
+                : LinearGradient(colors: [Color(.secondarySystemGroupedBackground)], startPoint: .leading, endPoint: .trailing)
+        )
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(musicMode.isMusicModeEnabled ? Color.pink.opacity(0.4) : Color.clear, lineWidth: 1)
+        )
+        .padding(.horizontal)
+        .animation(.easeInOut(duration: 0.25), value: musicMode.isMusicModeEnabled)
     }
 
     private var categoryPicker: some View {
