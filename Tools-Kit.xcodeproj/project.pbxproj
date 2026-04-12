@@ -227,6 +227,33 @@
 		D9F50B598DD9C577FC648E67 /* ProjectDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CA3298669648F7EC784FD9 /* ProjectDetailsView.swift */; };
 		A16FD4012C798954554BD244 /* ProjectSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E730C86FE6E37EB081481454 /* ProjectSettingsView.swift */; };
 		20B4161A16479DEAB11738D8 /* ProjectTaskDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E39EB987ED765AEA0EBF43AF /* ProjectTaskDetailView.swift */; };
+		8A06539AC054402AAE166EE9 /* AIModelCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7EF938890D4F8AA5D57456 /* AIModelCatalog.swift */; };
+		799B76EAACB04967A612930E /* ProviderModelFetchSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928AD5D50EF44D6B87CD4F37 /* ProviderModelFetchSupport.swift */; };
+		AED3656225D341B1A9E46FD4 /* FileManagementBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD2FAAB244D44438FA8D622 /* FileManagementBackend.swift */; };
+		B83CCE58EF014E7DA6ADE30F /* FilledOutFormManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11C6DE14DF64117B792A58D /* FilledOutFormManager.swift */; };
+		0C308764E53449BDA56EE939 /* FormFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3201D387DAFC42968E1ACBBE /* FormFileManager.swift */; };
+		5A5D5EF6F13C430B8C2BEC07 /* FormModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3804879B86244E5DBBD122A7 /* FormModels.swift */; };
+		8FC699C01C8F473B88894EC2 /* DragDropOptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B24D63D76544828D405D44 /* DragDropOptionManager.swift */; };
+		090C32DF869F46339E3C9245 /* DropdownOptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A4B3BAC55A496B9C9F0455 /* DropdownOptionManager.swift */; };
+		3CA705D2E22A4D91AFFC4228 /* FormOptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D35DBFCED84DA5A1E446C0 /* FormOptionManager.swift */; };
+		DEB62AD128AD481CA2D361FB /* ImageUploadOptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED5AE6658B5543E2A26F0654 /* ImageUploadOptionManager.swift */; };
+		AE7E39207BC44190834E1919 /* MultipleChoiceOptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08F71AB4833C4032BBBEB9A1 /* MultipleChoiceOptionManager.swift */; };
+		8E8B6E2B67B44E91A42DE07D /* RatingScaleOptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E5F6A1EE16F4A858831B04B /* RatingScaleOptionManager.swift */; };
+		FAF5DC94BD24403EB3049436 /* SliderOptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F983F4EB6B654B2D867A8129 /* SliderOptionManager.swift */; };
+		044F68FD900B4013B8BC6BDF /* TextInputOptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D27EF0F4F44FB5BEE4AD88 /* TextInputOptionManager.swift */; };
+		ACEBFFCD847A48CA87EEC182 /* FormsBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87CBA43321DB4D6C8F6360AD /* FormsBackend.swift */; };
+		D67BE94E98814B09B81D26B8 /* FileManagementFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477BDEC4EBAB4332A8BD30D1 /* FileManagementFeatures.swift */; };
+		D44610D490D24281A86B6AE3 /* FileManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF694E185DA4FBBAC1E2792 /* FileManagementView.swift */; };
+		8904AABB73084051BFE6E9AC /* CreateFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183AAC02545C470EACC7D9FD /* CreateFormView.swift */; };
+		C3C67CE338BA480ABB151230 /* EditFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D81A79C73D034CADA4F4B676 /* EditFormView.swift */; };
+		66FCAC4BF23042ABA42F0001 /* FillOutFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9011242A9D432C9640BDEF /* FillOutFormView.swift */; };
+		5162239239E240959BBD0638 /* EventRegistrationFormTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09C00226BE5401788DF33C6 /* EventRegistrationFormTemplate.swift */; };
+		69ADEE0EFCF448E1A9B839D7 /* FeedbackFormTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6825CEB1AD34CA7B7A7386E /* FeedbackFormTemplate.swift */; };
+		90C7D7CFD9D748C6A2B5315A /* JobApplicationFormTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD647C8F2DDC4FB1AFA46EF0 /* JobApplicationFormTemplate.swift */; };
+		81A7259D12B24449AD1013CF /* FormTemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B6651F22B8D4965A3224F5D /* FormTemplatesView.swift */; };
+		86E33EB1AA4F4A6880501CFE /* FormsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D36E2A06247452981FC530B /* FormsView.swift */; };
+		2B8623EC4C2746FD8064E6B0 /* ImportFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B01DFECD64440AB1621D72 /* ImportFormView.swift */; };
+		63C9778815934ACDBAE8A11B /* ManifestDataForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A733FE0F3549B681C5FE2E /* ManifestDataForm.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -451,6 +478,33 @@
 		B1C2D3E4F5A60708090A0C01 /* AIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Services/AIService.swift; sourceTree = "<group>"; };
 		B1C2D3E4F5A60708090A0C02 /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Services/CameraService.swift; sourceTree = "<group>"; };
 		B1C2D3E4F5A60708090A0C03 /* VisionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Services/VisionService.swift; sourceTree = "<group>"; };
+		4D7EF938890D4F8AA5D57456 /* AIModelCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/AIModelCatalog.swift"; sourceTree = "<group>"; };
+		928AD5D50EF44D6B87CD4F37 /* ProviderModelFetchSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/Providers/ProviderModelFetchSupport.swift"; sourceTree = "<group>"; };
+		1DD2FAAB244D44438FA8D622 /* FileManagementBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Files/FileManagementBackend.swift"; sourceTree = "<group>"; };
+		F11C6DE14DF64117B792A58D /* FilledOutFormManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Forms/FilledOutFormManager.swift"; sourceTree = "<group>"; };
+		3201D387DAFC42968E1ACBBE /* FormFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Forms/FormFileManager.swift"; sourceTree = "<group>"; };
+		3804879B86244E5DBBD122A7 /* FormModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Forms/FormModels.swift"; sourceTree = "<group>"; };
+		52B24D63D76544828D405D44 /* DragDropOptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Forms/FormOptions/DragDropOptionManager.swift"; sourceTree = "<group>"; };
+		73A4B3BAC55A496B9C9F0455 /* DropdownOptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Forms/FormOptions/DropdownOptionManager.swift"; sourceTree = "<group>"; };
+		84D35DBFCED84DA5A1E446C0 /* FormOptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Forms/FormOptions/FormOptionManager.swift"; sourceTree = "<group>"; };
+		ED5AE6658B5543E2A26F0654 /* ImageUploadOptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Forms/FormOptions/ImageUploadOptionManager.swift"; sourceTree = "<group>"; };
+		08F71AB4833C4032BBBEB9A1 /* MultipleChoiceOptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Forms/FormOptions/MultipleChoiceOptionManager.swift"; sourceTree = "<group>"; };
+		3E5F6A1EE16F4A858831B04B /* RatingScaleOptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Forms/FormOptions/RatingScaleOptionManager.swift"; sourceTree = "<group>"; };
+		F983F4EB6B654B2D867A8129 /* SliderOptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Forms/FormOptions/SliderOptionManager.swift"; sourceTree = "<group>"; };
+		C2D27EF0F4F44FB5BEE4AD88 /* TextInputOptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Forms/FormOptions/TextInputOptionManager.swift"; sourceTree = "<group>"; };
+		87CBA43321DB4D6C8F6360AD /* FormsBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Forms/FormsBackend.swift"; sourceTree = "<group>"; };
+		477BDEC4EBAB4332A8BD30D1 /* FileManagementFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Files/FileManagementFeatures.swift"; sourceTree = "<group>"; };
+		6CF694E185DA4FBBAC1E2792 /* FileManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Files/FileManagementView.swift"; sourceTree = "<group>"; };
+		183AAC02545C470EACC7D9FD /* CreateFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/CreateFormView.swift"; sourceTree = "<group>"; };
+		D81A79C73D034CADA4F4B676 /* EditFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/EditFormView.swift"; sourceTree = "<group>"; };
+		0A9011242A9D432C9640BDEF /* FillOutFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/FillOutFormView.swift"; sourceTree = "<group>"; };
+		B09C00226BE5401788DF33C6 /* EventRegistrationFormTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/FormTemplates/EventRegistrationFormTemplate.swift"; sourceTree = "<group>"; };
+		A6825CEB1AD34CA7B7A7386E /* FeedbackFormTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/FormTemplates/FeedbackFormTemplate.swift"; sourceTree = "<group>"; };
+		AD647C8F2DDC4FB1AFA46EF0 /* JobApplicationFormTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/FormTemplates/JobApplicationFormTemplate.swift"; sourceTree = "<group>"; };
+		1B6651F22B8D4965A3224F5D /* FormTemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/FormTemplatesView.swift"; sourceTree = "<group>"; };
+		1D36E2A06247452981FC530B /* FormsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/FormsView.swift"; sourceTree = "<group>"; };
+		C1B01DFECD64440AB1621D72 /* ImportFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/ImportFormView.swift"; sourceTree = "<group>"; };
+		20A733FE0F3549B681C5FE2E /* ManifestDataForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/ManifestDataForm.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -696,6 +750,33 @@
 				88CA3298669648F7EC784FD9 /* ProjectDetailsView.swift */,
 				E730C86FE6E37EB081481454 /* ProjectSettingsView.swift */,
 				E39EB987ED765AEA0EBF43AF /* ProjectTaskDetailView.swift */,
+				4D7EF938890D4F8AA5D57456 /* AIModelCatalog.swift */,
+				928AD5D50EF44D6B87CD4F37 /* ProviderModelFetchSupport.swift */,
+				1DD2FAAB244D44438FA8D622 /* FileManagementBackend.swift */,
+				F11C6DE14DF64117B792A58D /* FilledOutFormManager.swift */,
+				3201D387DAFC42968E1ACBBE /* FormFileManager.swift */,
+				3804879B86244E5DBBD122A7 /* FormModels.swift */,
+				52B24D63D76544828D405D44 /* DragDropOptionManager.swift */,
+				73A4B3BAC55A496B9C9F0455 /* DropdownOptionManager.swift */,
+				84D35DBFCED84DA5A1E446C0 /* FormOptionManager.swift */,
+				ED5AE6658B5543E2A26F0654 /* ImageUploadOptionManager.swift */,
+				08F71AB4833C4032BBBEB9A1 /* MultipleChoiceOptionManager.swift */,
+				3E5F6A1EE16F4A858831B04B /* RatingScaleOptionManager.swift */,
+				F983F4EB6B654B2D867A8129 /* SliderOptionManager.swift */,
+				C2D27EF0F4F44FB5BEE4AD88 /* TextInputOptionManager.swift */,
+				87CBA43321DB4D6C8F6360AD /* FormsBackend.swift */,
+				477BDEC4EBAB4332A8BD30D1 /* FileManagementFeatures.swift */,
+				6CF694E185DA4FBBAC1E2792 /* FileManagementView.swift */,
+				183AAC02545C470EACC7D9FD /* CreateFormView.swift */,
+				D81A79C73D034CADA4F4B676 /* EditFormView.swift */,
+				0A9011242A9D432C9640BDEF /* FillOutFormView.swift */,
+				B09C00226BE5401788DF33C6 /* EventRegistrationFormTemplate.swift */,
+				A6825CEB1AD34CA7B7A7386E /* FeedbackFormTemplate.swift */,
+				AD647C8F2DDC4FB1AFA46EF0 /* JobApplicationFormTemplate.swift */,
+				1B6651F22B8D4965A3224F5D /* FormTemplatesView.swift */,
+				1D36E2A06247452981FC530B /* FormsView.swift */,
+				C1B01DFECD64440AB1621D72 /* ImportFormView.swift */,
+				20A733FE0F3549B681C5FE2E /* ManifestDataForm.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -994,6 +1075,33 @@
 				D9F50B598DD9C577FC648E67 /* ProjectDetailsView.swift in Sources */,
 				A16FD4012C798954554BD244 /* ProjectSettingsView.swift in Sources */,
 				20B4161A16479DEAB11738D8 /* ProjectTaskDetailView.swift in Sources */,
+				8A06539AC054402AAE166EE9 /* AIModelCatalog.swift in Sources */,
+				799B76EAACB04967A612930E /* ProviderModelFetchSupport.swift in Sources */,
+				AED3656225D341B1A9E46FD4 /* FileManagementBackend.swift in Sources */,
+				B83CCE58EF014E7DA6ADE30F /* FilledOutFormManager.swift in Sources */,
+				0C308764E53449BDA56EE939 /* FormFileManager.swift in Sources */,
+				5A5D5EF6F13C430B8C2BEC07 /* FormModels.swift in Sources */,
+				8FC699C01C8F473B88894EC2 /* DragDropOptionManager.swift in Sources */,
+				090C32DF869F46339E3C9245 /* DropdownOptionManager.swift in Sources */,
+				3CA705D2E22A4D91AFFC4228 /* FormOptionManager.swift in Sources */,
+				DEB62AD128AD481CA2D361FB /* ImageUploadOptionManager.swift in Sources */,
+				AE7E39207BC44190834E1919 /* MultipleChoiceOptionManager.swift in Sources */,
+				8E8B6E2B67B44E91A42DE07D /* RatingScaleOptionManager.swift in Sources */,
+				FAF5DC94BD24403EB3049436 /* SliderOptionManager.swift in Sources */,
+				044F68FD900B4013B8BC6BDF /* TextInputOptionManager.swift in Sources */,
+				ACEBFFCD847A48CA87EEC182 /* FormsBackend.swift in Sources */,
+				D67BE94E98814B09B81D26B8 /* FileManagementFeatures.swift in Sources */,
+				D44610D490D24281A86B6AE3 /* FileManagementView.swift in Sources */,
+				8904AABB73084051BFE6E9AC /* CreateFormView.swift in Sources */,
+				C3C67CE338BA480ABB151230 /* EditFormView.swift in Sources */,
+				66FCAC4BF23042ABA42F0001 /* FillOutFormView.swift in Sources */,
+				5162239239E240959BBD0638 /* EventRegistrationFormTemplate.swift in Sources */,
+				69ADEE0EFCF448E1A9B839D7 /* FeedbackFormTemplate.swift in Sources */,
+				90C7D7CFD9D748C6A2B5315A /* JobApplicationFormTemplate.swift in Sources */,
+				81A7259D12B24449AD1013CF /* FormTemplatesView.swift in Sources */,
+				86E33EB1AA4F4A6880501CFE /* FormsView.swift in Sources */,
+				2B8623EC4C2746FD8064E6B0 /* ImportFormView.swift in Sources */,
+				63C9778815934ACDBAE8A11B /* ManifestDataForm.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
