@@ -1,9 +1,15 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var modeManager = MusicModeManager.shared
+
     var body: some View {
-        DashboardView()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        if modeManager.isMusicModeEnabled {
+            MusicLibraryView()
+        } else {
+            DashboardView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
     }
 }
 
