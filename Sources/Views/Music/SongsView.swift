@@ -205,7 +205,6 @@ struct SongsView: View {
         }
         .presentationDetents([.height(260)])
         .presentationDragIndicator(.hidden)
-        .presentationCornerRadius(20)
     }
 
     private func importOption(
