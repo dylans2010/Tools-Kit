@@ -98,6 +98,8 @@ struct CustomizePlaylistArtwork: View {
 
     // Preview size
     private let artworkSize: CGFloat = 260
+    private let maxVisibleGradientStops = 4
+    private let compactGradientSheetDetent: CGFloat = 0.45
     private let randomColorSaturation: Double = 0.8
     private let randomColorBrightness: Double = 0.9
 
@@ -255,9 +257,9 @@ struct CustomizePlaylistArtwork: View {
 
                 Divider()
 
-                colorStopsEditor(maxVisibleStops: 4)
+                colorStopsEditor(maxVisibleStops: maxVisibleGradientStops)
 
-                if stops.count > 4 {
+                if stops.count > maxVisibleGradientStops {
                     Button {
                         showGradientControls = true
                     } label: {
@@ -434,7 +436,7 @@ struct CustomizePlaylistArtwork: View {
             .navigationTitle("Gradient Controls")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .presentationDetents([.fraction(0.45), .medium])
+        .presentationDetents([.fraction(compactGradientSheetDetent), .medium])
     }
 
     // MARK: - Upload Section
