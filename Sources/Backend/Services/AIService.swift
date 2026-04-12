@@ -13,7 +13,7 @@ class AIService {
     private let registry = AIProviderRegistry.shared
     private let keyManager = APIKeyManager.shared
     private let settingsManager = AIChatSettingsManager.shared
-    private let modelCatalog = AIModelCatalog.shared
+    @MainActor private let modelCatalog = AIModelCatalog.shared
 
     // MARK: - Current provider helpers
 
@@ -31,6 +31,7 @@ class AIService {
 
     // MARK: - Public API
 
+    @MainActor
     func processText(prompt: String, systemPrompt: String = "You are a helpful assistant.", model: String? = nil) async throws -> String {
         guard let provider = currentProvider else {
             throw AIError.unknownProvider(currentProviderID)

@@ -128,12 +128,15 @@ final class MusicLibraryManager: ObservableObject {
                 try entry.data.write(to: destURL)
 
                 let song = extractMetadata(from: destURL)
-                await MainActor.run {
+                let added = await MainActor.run {
                     guard !self.songs.contains(where: {
                         $0.fileURL.path == destURL.path
-                    }) else { return }
+                    }) else { return false }
                     self.songs.append(song)
                     self.save()
+                    return true
+                }
+                if added {
                     imported.append(song)
                 }
             } catch {
@@ -372,9 +375,9 @@ final class MusicLibraryManager: ObservableObject {
     private func stableSongID(for url: URL) -> UUID {
         let normalizedPath = url.standardizedFileURL.path.lowercased()
         let digest = SHA256.hash(data: Data(normalizedPath.utf8))
-        var uuid = uuid_t()
+        var uuid: uuid_t = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
         withUnsafeMutableBytes(of: &uuid) { destination in
-            _ = destination.copyBytes(from: digest.prefix(16))
+            _ = destination.copyBytes(from: [UInt8](digest.prefix(16)))
         }
         return UUID(uuid: uuid)
     }

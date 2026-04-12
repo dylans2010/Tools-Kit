@@ -15,7 +15,7 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
 
     private let registry = AIProviderRegistry.shared
     private let keyManager = APIKeyManager.shared
-    private let modelCatalog = AIModelCatalog.shared
+    @MainActor private let modelCatalog = AIModelCatalog.shared
     private let historyKey = "ai_chat_history"
 
     enum KeyValidationState {
@@ -118,6 +118,7 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
         modelCatalog.loadingProviders.contains(settingsManager.settings.selectedProviderID)
     }
 
+    @MainActor
     func refreshModels(force: Bool) async {
         let providerID = settingsManager.settings.selectedProviderID
         await modelCatalog.loadModels(for: providerID, force: force)
