@@ -4,30 +4,60 @@ struct ManifestDataForm: View {
     let manifest: FormManifest
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("Created by: \(manifest.createdBy)")
-            Text("Created at: \(manifest.createdAt.formatted(date: .abbreviated, time: .shortened))")
-            Text("Last edited: \(manifest.lastEditedAt.formatted(date: .abbreviated, time: .shortened))")
-            Text("Form version: \(manifest.formVersion)")
-            Text("Manifest schema: \(manifest.manifestSchemaVersion)")
-            Text("App version: \(manifest.appVersion) (\(manifest.buildNumber))")
-            Text("Bundle ID: \(manifest.bundleIdentifier)")
-            Text("Platform: \(manifest.platform)")
-            Text("Locale: \(manifest.localeIdentifier)")
-            Text("Time zone: \(manifest.timeZoneIdentifier)")
-            Text("Question count: \(manifest.questionCount)")
-            Text("Required questions: \(manifest.requiredQuestionCount)")
-            Text("Supports attachments: \(manifest.supportsAttachments ? "Yes" : "No")")
+        VStack(alignment: .leading, spacing: 0) {
+            row(label: "Created by", value: manifest.createdBy)
+            Divider().padding(.leading, 120)
+            row(label: "Created", value: manifest.createdAt.formatted(date: .abbreviated, time: .shortened))
+            Divider().padding(.leading, 120)
+            row(label: "Last edited", value: manifest.lastEditedAt.formatted(date: .abbreviated, time: .shortened))
+            Divider().padding(.leading, 120)
+            row(label: "Form version", value: manifest.formVersion)
+            Divider().padding(.leading, 120)
+            row(label: "Schema", value: manifest.manifestSchemaVersion)
+            Divider().padding(.leading, 120)
+            row(label: "App version", value: "\(manifest.appVersion) (\(manifest.buildNumber))")
+            Divider().padding(.leading, 120)
+            row(label: "Bundle ID", value: manifest.bundleIdentifier)
+            Divider().padding(.leading, 120)
+            row(label: "Platform", value: manifest.platform)
+            Divider().padding(.leading, 120)
+            row(label: "Locale", value: manifest.localeIdentifier)
+            Divider().padding(.leading, 120)
+            row(label: "Time zone", value: manifest.timeZoneIdentifier)
+            Divider().padding(.leading, 120)
+            row(label: "Questions", value: "\(manifest.questionCount) (\(manifest.requiredQuestionCount) required)")
+            Divider().padding(.leading, 120)
+            row(label: "Attachments", value: manifest.supportsAttachments ? "Yes" : "No")
             if let templateName = manifest.templateName, !templateName.isEmpty {
-                Text("Template: \(templateName)")
+                Divider().padding(.leading, 120)
+                row(label: "Template", value: templateName)
             }
-            Text("Privacy: \(manifest.privacyNote)")
-            Text("Export: \(manifest.exportNote)")
+            if !manifest.privacyNote.isEmpty {
+                Divider().padding(.leading, 120)
+                row(label: "Privacy", value: manifest.privacyNote)
+            }
             if !manifest.tags.isEmpty {
-                Text("Tags: \(manifest.tags.joined(separator: ", "))")
+                Divider().padding(.leading, 120)
+                row(label: "Tags", value: manifest.tags.joined(separator: ", "))
             }
         }
-        .font(.caption)
-        .foregroundColor(.secondary)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
+    }
+
+    private func row(label: String, value: String) -> some View {
+        HStack(spacing: 12) {
+            Text(label)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .frame(width: 108, alignment: .leading)
+            Text(value)
+                .font(.caption)
+                .foregroundColor(.primary)
+                .lineLimit(2)
+            Spacer()
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
     }
 }

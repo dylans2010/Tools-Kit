@@ -8,140 +8,138 @@ struct FillOutFormView: View {
     @State private var answers: [UUID: String] = [:]
     @State private var responderName = ""
     @State private var exportURL: URL?
+    @State private var showValidationAlert = false
+
+    private var accentColor: Color {
+        Color(hex: form.accentHexColor) ?? .blue
+    }
+
+    private var unansweredRequired: [FormQuestion] {
+        form.questions.filter { q in
+            q.required && (answers[q.id] ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+    }
 
     var body: some View {
-        Form {
-            Section("Responder") {
-                TextField("Your name", text: $responderName)
-            }
+        ScrollView {
+            VStack(spacing: 20) {
+                // Responder card
+                VStack(alignment: .leading, spacing: 10) {
+                    Label("Your Name", systemImage: "person.circle")
+                        .font(.subheadline.bold())
+                        .foregroundColor(accentColor)
+                    TextField("Enter your name…", text: $responderName)
+                        .padding(10)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(10)
+                }
+                .padding(16)
+                .background(Color(.systemBackground))
+                .cornerRadius(14)
+                .shadow(color: .black.opacity(0.04), radius: 4, y: 2)
 
-            Section("Manifest") {
-                ManifestDataForm(manifest: form.manifest)
-            }
+                // Questions
+                ForEach(Array(form.questions.enumerated()), id: \.element.id) { index, question in
+                    questionCard(question: question, index: index)
+                }
 
-            Section("Questions") {
-                ForEach(form.questions) { question in
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Image(systemName: question.type.icon)
-                                .foregroundColor(.blue)
-                                .font(.caption)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(question.title)
-                                    .font(.subheadline.bold())
-                                if !question.questionName.isEmpty {
-                                    Text("Field: \(question.questionName)")
-                                        .font(.caption2)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                            if question.required {
-                                Spacer()
-                                Text("Required")
-                                    .font(.caption2)
-                                    .foregroundColor(.red)
-                            }
+                // Export row
+                VStack(spacing: 12) {
+                    Button {
+                        submitForm()
+                    } label: {
+                        Label("Submit & Export Answers", systemImage: "checkmark.circle.fill")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(accentColor)
+                            .foregroundColor(.white)
+                            .cornerRadius(14)
+                    }
+                    .buttonStyle(.plain)
+
+                    if let exportURL {
+                        ShareLink(item: exportURL) {
+                            Label("Share Filled Answers", systemImage: "square.and.arrow.up")
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color(.secondarySystemBackground))
+                                .foregroundColor(.primary)
+                                .cornerRadius(14)
                         }
-                        questionInput(for: question)
                     }
-                    .padding(.vertical, 4)
                 }
             }
-
-            Section("Export Answers") {
-                Button("Export Filled .form") {
-                    exportAnswers()
-                }
-                if let exportURL {
-                    ShareLink(item: exportURL) {
-                        Label("Share Filled Answers", systemImage: "square.and.arrow.up")
-                    }
-                }
+            .padding()
+        }
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .navigationTitle(form.name)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") { dismiss() }
             }
         }
-        .navigationTitle("Fill Out Form")
-        .toolbar { Button("Done") { dismiss() } }
+        .alert("Required Questions Missing", isPresented: $showValidationAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Please answer all required questions before submitting.")
+        }
     }
 
     @ViewBuilder
-    private func questionInput(for question: FormQuestion) -> some View {
-        switch question.type {
-        case .dragDrop:
-            DragDropQuestionFillerView(
+    private func questionCard(question: FormQuestion, index: Int) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Header
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: question.type.icon)
+                    .foregroundColor(accentColor)
+                    .frame(width: 22)
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 4) {
+                        Text(question.title.isEmpty ? "Question \(index + 1)" : question.title)
+                            .font(.subheadline.bold())
+                        if question.required {
+                            Text("*")
+                                .foregroundColor(.red)
+                                .font(.subheadline.bold())
+                        }
+                    }
+                    if !question.questionName.isEmpty {
+                        Text(question.questionName)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                Spacer()
+                Text(question.type.displayName)
+                    .font(.caption2)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(accentColor.opacity(0.1))
+                    .foregroundColor(accentColor)
+                    .cornerRadius(4)
+            }
+
+            // Interactive component
+            FormQuestionRenderer(
                 question: question,
                 answer: Binding(
                     get: { answers[question.id] ?? "" },
                     set: { answers[question.id] = $0 }
                 )
             )
-        case .multipleChoice:
-            if question.options.isEmpty {
-                TextField("Your answer", text: answerBinding(question.id))
-            } else {
-                Picker("Answer", selection: answerBinding(question.id)) {
-                    Text("Select an option").tag("")
-                    ForEach(question.options, id: \.self) { option in
-                        Text(option).tag(option)
-                    }
-                }
-                .pickerStyle(.menu)
-            }
-        case .dropdown:
-            if question.options.isEmpty {
-                TextField("Your answer", text: answerBinding(question.id))
-            } else {
-                Picker("Answer", selection: answerBinding(question.id)) {
-                    Text("Select an option").tag("")
-                    ForEach(question.options, id: \.self) { option in
-                        Text(option).tag(option)
-                    }
-                }
-                .pickerStyle(.navigationLink)
-            }
-        case .ratingScale:
-            let ratingOptions = resolvedRatingOptions(for: question)
-            Picker("Rating", selection: answerBinding(question.id)) {
-                Text("Select a rating").tag("")
-                ForEach(ratingOptions, id: \.self) { value in
-                    Text(value).tag(value)
-                }
-            }
-            .pickerStyle(.segmented)
-        case .slider:
-            let sliderConfig = resolvedSliderConfig(for: question)
-            VStack(alignment: .leading, spacing: 4) {
-                Slider(
-                    value: Binding(
-                        get: { Double(answers[question.id] ?? String(sliderConfig.defaultValue)) ?? sliderConfig.defaultValue },
-                        set: { answers[question.id] = String(Int($0)) }
-                    ),
-                    in: sliderConfig.min...sliderConfig.max,
-                    step: sliderConfig.step
-                )
-                Text("Value: \(answers[question.id] ?? String(Int(sliderConfig.defaultValue)))")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-        case .imageUpload:
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Attach image externally and describe reference here.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                TextField("Image notes", text: answerBinding(question.id))
-            }
-        case .textInput:
-            TextField("Your answer", text: answerBinding(question.id))
         }
+        .padding(16)
+        .background(Color(.systemBackground))
+        .cornerRadius(14)
+        .shadow(color: .black.opacity(0.04), radius: 4, y: 2)
     }
 
-    private func answerBinding(_ id: UUID) -> Binding<String> {
-        Binding(
-            get: { answers[id] ?? "" },
-            set: { answers[id] = $0 }
-        )
-    }
-
-    private func exportAnswers() {
+    private func submitForm() {
+        guard unansweredRequired.isEmpty else {
+            showValidationAlert = true
+            return
+        }
         let doc = FilledOutFormDocument(
             formID: form.id,
             formName: form.name,
@@ -149,28 +147,10 @@ struct FillOutFormView: View {
             answers: answers,
             responderName: responderName.isEmpty ? "Anonymous" : responderName
         )
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(form.name)-answers.form")
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("\(form.name)-answers.form")
         try? FilledOutFormManager.exportAnswers(doc, to: url)
         exportURL = url
-    }
-
-    private func resolvedRatingOptions(for question: FormQuestion) -> [String] {
-        if question.options.count >= 2,
-           let min = Int(question.options[0]),
-           let max = Int(question.options[1]),
-           min <= max {
-            return Array(min...max).map(String.init)
-        }
-        let normalized = question.options.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-        return normalized.isEmpty ? ["1", "2", "3", "4", "5"] : normalized
-    }
-
-    private func resolvedSliderConfig(for question: FormQuestion) -> (min: Double, max: Double, step: Double, defaultValue: Double) {
-        let min = Double(question.options.first ?? "") ?? 0
-        let maxCandidate = Double(question.options.count > 1 ? question.options[1] : "") ?? 100
-        let maxValue = Swift.max(min, maxCandidate)
-        let step = Swift.max(0.1, Double(question.options.count > 2 ? question.options[2] : "") ?? 1)
-        return (min, maxValue, step, (min + maxValue) / 2)
     }
 }
 

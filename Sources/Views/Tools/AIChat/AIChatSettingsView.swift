@@ -27,6 +27,7 @@ struct AIChatSettingsView: View {
                 chatInterfaceSection
                 storageSection
                 memorySection
+                toolVisibilitySection
             }
             .task {
                 await loadProviderModels(force: false)
@@ -34,7 +35,7 @@ struct AIChatSettingsView: View {
             .onChange(of: settings.selectedProviderID) { _ in
                 Task { await loadProviderModels(force: false) }
             }
-            .navigationTitle("AI Chat Settings")
+            .navigationTitle("App Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -270,6 +271,32 @@ struct AIChatSettingsView: View {
             NavigationLink("Manage Saved Memory") {
                 MemoryManagerView(memoryStore: memoryStore)
             }
+        }
+    }
+
+    // MARK: - Tool Visibility Section
+
+    private var toolVisibilitySection: some View {
+        Section {
+            NavigationLink {
+                ToolVisibilitySettingsView()
+            } label: {
+                HStack(spacing: 14) {
+                    Image(systemName: "square.grid.2x2")
+                        .font(.title3)
+                        .foregroundColor(.blue)
+                        .frame(width: 32)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Tool Visibility")
+                            .font(.body)
+                        Text("Show or hide tools on the Dashboard")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+        } header: {
+            Text("Dashboard")
         }
     }
 
