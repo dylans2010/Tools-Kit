@@ -100,7 +100,7 @@ struct CreateFormView: View {
                         .padding(.horizontal, 4)
 
                         ForEach($questions) { $question in
-                            questionCard($question: $question)
+                            questionCard(binding: $question)
                         }
                         .onDelete { questions.remove(atOffsets: $0) }
                         .onMove { questions.move(fromOffsets: $0, toOffset: $1) }
@@ -146,8 +146,8 @@ struct CreateFormView: View {
     // MARK: - Question Card
 
     @ViewBuilder
-    private func questionCard($question: Binding<FormQuestion>) -> some View {
-        let question = $question.wrappedValue
+    private func questionCard(binding: Binding<FormQuestion>) -> some View {
+        let question = binding.wrappedValue
         let isExpanded = expandedQuestionID == question.id
 
         VStack(alignment: .leading, spacing: 0) {
@@ -194,7 +194,7 @@ struct CreateFormView: View {
 
             if isExpanded {
                 Divider()
-                QuestionEditorView(question: $question)
+                QuestionEditorView(question: binding)
                     .padding(14)
             }
         }
