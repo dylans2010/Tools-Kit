@@ -2,10 +2,13 @@ import SwiftUI
 
 struct DashboardView: View {
     @StateObject private var registry = ToolRegistry()
+    @StateObject private var visibility = ToolVisibilityManager.shared
     @State private var searchText = ""
     @State private var selectedCategory: ToolCategory? = nil
+    @State private var showSettings = false
+    @State private var aiSettings = AIChatSettings()
 
-    private let columns = [GridItem(.adaptive(minimum: 170), spacing: 14)]
+    private let columns = [GridItem(.adaptive(minimum: 160), spacing: 14)]
 
     var body: some View {
         NavigationStack {
@@ -18,15 +21,30 @@ struct DashboardView: View {
                     if searchText.isEmpty && selectedCategory == nil {
                         toolSection(title: "Favorites", tools: favoriteTools)
                         toolSection(title: "Recently Used", tools: recentTools)
-                        toolSection(title: "All Tools", tools: registry.tools)
+                        toolSection(title: "All Tools", tools: visibleTools)
                     } else {
-                        toolSection(title: "Results", tools: registry.filteredTools(query: searchText, category: selectedCategory))
+                        let filtered = registry.filteredTools(query: searchText, category: selectedCategory)
+                            .filter { visibility.isVisible($0.id) }
+                        toolSection(title: "Results", tools: filtered)
                     }
                 }
                 .padding(.bottom, 24)
             }
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationTitle("Tools Kit")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                            .font(.body)
+                    }
+                }
+            }
+            .sheet(isPresented: $showSettings) {
+                AIChatSettingsView(settings: $aiSettings)
+            }
         }
     }
 
@@ -34,7 +52,7 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Choose your tool")
                 .font(.title.bold())
-            Text("\(registry.tools.count) tools across \(ToolCategory.allCases.count) categories")
+            Text("\(visibleTools.count) of \(registry.tools.count) tools across \(ToolCategory.allCases.count) categories")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         }
@@ -58,12 +76,16 @@ struct DashboardView: View {
         }
     }
 
+    private var visibleTools: [any Tool] {
+        registry.tools.filter { visibility.isVisible($0.id) }
+    }
+
     private var favoriteTools: [any Tool] {
-        registry.tools.filter { registry.favoriteToolIDs.contains($0.id) }
+        visibleTools.filter { registry.favoriteToolIDs.contains($0.id) }
     }
 
     private var recentTools: [any Tool] {
-        registry.tools.filter { registry.recentlyUsedIDs.contains($0.id) }
+        visibleTools.filter { registry.recentlyUsedIDs.contains($0.id) }
     }
 
     @ViewBuilder

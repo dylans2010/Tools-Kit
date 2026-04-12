@@ -6,34 +6,53 @@ struct FormsView: View {
     @State private var showingCreate = false
     @State private var showingTemplates = false
     @State private var showingImport = false
+    @State private var formToDelete: FormDocument?
+    @State private var showDeleteConfirm = false
+
+    private let columns = [GridItem(.adaptive(minimum: 160), spacing: 14)]
 
     var body: some View {
         ToolDetailView(tool: FormsTool()) {
-            VStack(spacing: 16) {
-                HStack {
-                    Button("Create Form") { showingCreate = true }
-                        .buttonStyle(.borderedProminent)
-                    Button("Templates") { showingTemplates = true }
-                        .buttonStyle(.bordered)
-                    Button("Import .form") { showingImport = true }
-                        .buttonStyle(.bordered)
+            VStack(spacing: 20) {
+                // Action bar
+                HStack(spacing: 10) {
+                    actionButton("Create", icon: "plus.circle.fill", color: .blue) {
+                        showingCreate = true
+                    }
+                    actionButton("Templates", icon: "doc.on.doc", color: .purple) {
+                        showingTemplates = true
+                    }
+                    actionButton("Import", icon: "tray.and.arrow.down", color: .green) {
+                        showingImport = true
+                    }
                 }
 
-                ToolInputSection("Your Forms") {
-                    if backend.forms.isEmpty {
-                        ContentUnavailableView("No Forms", systemImage: "list.bullet.rectangle", description: Text("Create or import a form to start."))
-                            .padding()
-                    } else {
-                        ForEach(backend.forms) { form in
-                            NavigationLink(destination: EditFormView(backend: backend, form: form)) {
-                                VStack(alignment: .leading) {
-                                    Text(form.name).font(.headline)
-                                    Text(form.description).font(.subheadline).foregroundColor(.secondary)
+                // Forms grid
+                if backend.forms.isEmpty {
+                    ContentUnavailableView(
+                        "No Forms Yet",
+                        systemImage: "list.bullet.rectangle.portrait",
+                        description: Text("Create a new form, pick a template, or import a .form file.")
+                    )
+                    .padding(.vertical, 24)
+                } else {
+                    VStack(alignment: .leading, spacing: 12) {
+                        SectionHeader(
+                            title: "Your Forms",
+                            subtitle: "\(backend.forms.count)",
+                            icon: "list.bullet.rectangle.portrait"
+                        )
+
+                        LazyVGrid(columns: columns, spacing: 14) {
+                            ForEach(backend.forms) { form in
+                                NavigationLink(destination: FormDetailView(form: form, backend: backend)) {
+                                    FormCard(form: form) {
+                                        formToDelete = form
+                                        showDeleteConfirm = true
+                                    }
                                 }
+                                .buttonStyle(.plain)
                             }
-                            .padding(.horizontal)
-                            .padding(.vertical, 8)
-                            if form.id != backend.forms.last?.id { Divider() }
                         }
                     }
                 }
@@ -46,8 +65,94 @@ struct FormsView: View {
             NavigationStack { FormTemplatesView(backend: backend) }
         }
         .sheet(isPresented: $showingImport) {
-            ImportFormView(backend: backend)
+            NavigationStack { ImportFormView(backend: backend) }
         }
+        .confirmationDialog(
+            "Delete "\(formToDelete?.name ?? "")"?",
+            isPresented: $showDeleteConfirm,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                if let form = formToDelete {
+                    backend.remove(form)
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        }
+    }
+
+    private func actionButton(_ title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 5) {
+                Image(systemName: icon)
+                    .font(.title3)
+                Text(title)
+                    .font(.caption.bold())
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(color.opacity(0.12))
+            .foregroundColor(color)
+            .cornerRadius(12)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Form Card
+
+private struct FormCard: View {
+    let form: FormDocument
+    let onDelete: () -> Void
+
+    private var accentColor: Color {
+        Color(hex: form.accentHexColor) ?? .blue
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Image(systemName: "list.bullet.rectangle.portrait")
+                    .font(.title2)
+                    .foregroundColor(accentColor)
+                Spacer()
+                Button {
+                    onDelete()
+                } label: {
+                    Image(systemName: "trash")
+                        .font(.caption)
+                        .foregroundColor(.red.opacity(0.7))
+                }
+                .buttonStyle(.plain)
+            }
+
+            Text(form.name.isEmpty ? "Untitled" : form.name)
+                .font(.subheadline.bold())
+                .lineLimit(2)
+
+            if !form.description.isEmpty {
+                Text(form.description)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
+            }
+
+            Spacer(minLength: 4)
+
+            HStack(spacing: 6) {
+                Label("\(form.questions.count)", systemImage: "questionmark.circle")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(form.manifest.createdAt, style: .date)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(14)
+        .frame(minHeight: 120)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(14)
     }
 }
 
