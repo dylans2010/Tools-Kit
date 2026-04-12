@@ -346,14 +346,14 @@ actor SpotifyFetchService {
         return result
     }
 
-    private var cacheURL: URL {
+    private nonisolated var cacheURL: URL {
         let musicDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("Music", isDirectory: true)
         try? FileManager.default.createDirectory(at: musicDirectory, withIntermediateDirectories: true)
         return musicDirectory.appendingPathComponent("spotify-playlist-cache.json")
     }
 
-    private func loadCache() -> [String: CachedPlaylist] {
+    private nonisolated func loadCache() -> [String: CachedPlaylist] {
         guard let data = try? Data(contentsOf: cacheURL),
               let decoded = try? JSONDecoder().decode([String: CachedPlaylist].self, from: data) else {
             return [:]
@@ -361,7 +361,7 @@ actor SpotifyFetchService {
         return decoded
     }
 
-    private func saveCache(_ value: [String: CachedPlaylist]) {
+    private nonisolated func saveCache(_ value: [String: CachedPlaylist]) {
         guard let data = try? JSONEncoder().encode(value) else { return }
         try? data.write(to: cacheURL, options: .atomic)
     }

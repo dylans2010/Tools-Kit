@@ -1,5 +1,6 @@
 import Foundation
 import Network
+import os
 
 struct PortResult: Identifiable {
     let id = UUID()
@@ -58,38 +59,32 @@ final class PortScannerBackend: ObservableObject {
                 port: NWEndpoint.Port(integerLiteral: port),
                 using: .tcp
             )
-            var resolved = false
+            let resolved = OSAllocatedUnfairLock(initialState: false)
+            let tryResolve: (PortResult.Status) -> Void = { [weak self, weak connection] status in
+                let isFirst = resolved.withLock { flag -> Bool in
+                    if flag { return false }
+                    flag = true
+                    return true
+                }
+                guard isFirst else { return }
+                connection?.cancel()
+                Task { @MainActor [weak self] in
+                    self?.results[index].status = status
+                    continuation.resume()
+                }
+            }
 
-            connection.stateUpdateHandler = { [weak self] state in
-                guard !resolved else { return }
+            connection.stateUpdateHandler = { state in
                 switch state {
-                case .ready:
-                    resolved = true
-                    connection.cancel()
-                    Task { @MainActor in
-                        self?.results[index].status = .open
-                        continuation.resume()
-                    }
-                case .failed:
-                    resolved = true
-                    connection.cancel()
-                    Task { @MainActor in
-                        self?.results[index].status = .closed
-                        continuation.resume()
-                    }
+                case .ready: tryResolve(.open)
+                case .failed: tryResolve(.closed)
                 default: break
                 }
             }
             connection.start(queue: .global())
 
-            DispatchQueue.global().asyncAfter(deadline: .now() + 4) { [weak self] in
-                guard !resolved else { return }
-                resolved = true
-                connection.cancel()
-                Task { @MainActor [weak self] in
-                    self?.results[index].status = .timeout
-                    continuation.resume()
-                }
+            DispatchQueue.global().asyncAfter(deadline: .now() + 4) {
+                tryResolve(.timeout)
             }
         }
     }
