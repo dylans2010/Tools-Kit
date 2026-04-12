@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import SwiftUI
 
 final class LyricsSyncEngine: ObservableObject {
     static let shared = LyricsSyncEngine()
@@ -40,7 +41,7 @@ final class LyricsSyncEngine: ObservableObject {
         }
         if idx != currentIndex {
             DispatchQueue.main.async {
-                withAnimation(.easeInOut(duration: 0.25)) {
+                withAnimation(.easeInOut) {
                     self.currentIndex = idx
                 }
             }
