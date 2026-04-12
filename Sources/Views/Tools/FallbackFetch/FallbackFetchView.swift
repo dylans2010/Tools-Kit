@@ -116,18 +116,15 @@ struct FallbackFetchView: View {
             }
             .padding()
         }
-        .fileImporter(
-            isPresented: $showingImporter,
-            allowedContentTypes: [.commaSeparatedText],
-            allowsMultipleSelection: false
-        ) { result in
-            switch result {
-            case .success(let urls):
+        .sheet(isPresented: $showingImporter) {
+            FileImporterRepresentableView(
+                allowedContentTypes: [.commaSeparatedText],
+                allowsMultipleSelection: false
+            ) { urls in
+                showingImporter = false
                 if let url = urls.first {
                     viewModel.importCSV(url: url)
                 }
-            case .failure(let error):
-                viewModel.errorMessage = error.localizedDescription
             }
         }
         .alert("Error", isPresented: Binding(
