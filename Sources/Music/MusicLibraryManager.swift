@@ -289,7 +289,7 @@ final class MusicLibraryManager: ObservableObject {
         let backupURL = FileManager.default.temporaryDirectory.appendingPathComponent("ToolsKit-Music-Backup-\(stamp).zip")
         try? FileManager.default.removeItem(at: backupURL)
         guard let archive = Archive(url: backupURL, accessMode: .create) else {
-            throw NSError(domain: "MusicLibraryBackup", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create backup archive."])
+            throw NSError(domain: "MusicLibraryBackup", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create backup archive. Check available storage and try again."])
         }
 
         var usedNames = Set<String>()
@@ -320,7 +320,7 @@ final class MusicLibraryManager: ObservableObject {
     @discardableResult
     func restoreFromBackup(at url: URL) throws -> (songs: Int, playlists: Int) {
         guard let archive = Archive(url: url, accessMode: .read) else {
-            throw NSError(domain: "MusicLibraryBackup", code: 2, userInfo: [NSLocalizedDescriptionKey: "Selected file is not a valid backup ZIP."])
+            throw NSError(domain: "MusicLibraryBackup", code: 2, userInfo: [NSLocalizedDescriptionKey: "The selected file could not be read as a ZIP archive. Please select a valid music backup file."])
         }
 
         guard let manifestEntry = archive["manifest.json"] else {
@@ -367,6 +367,8 @@ final class MusicLibraryManager: ObservableObject {
 
     /// Builds a deterministic UUID from a song file path so song IDs remain stable
     /// when metadata is reconstructed from on-disk files after app relaunches.
+    /// SHA-256 is used to minimize collisions for different paths, then truncated to
+    /// 16 bytes because UUID storage requires 128 bits.
     private func stableSongID(for url: URL) -> UUID {
         let normalizedPath = url.standardizedFileURL.path.lowercased()
         let digest = SHA256.hash(data: Data(normalizedPath.utf8))
