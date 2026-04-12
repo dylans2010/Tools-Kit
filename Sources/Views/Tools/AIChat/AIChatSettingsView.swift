@@ -330,6 +330,7 @@ struct APIKeyRowView: View {
 
     private let keyManager = APIKeyManager.shared
     private let registry = AIProviderRegistry.shared
+    @StateObject private var modelCatalog = AIModelCatalog.shared
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -403,6 +404,7 @@ struct APIKeyRowView: View {
         guard keyManager.saveKey(key, for: providerID) else { return }
         isSaved = true
         validationResult = nil
+        Task { await modelCatalog.loadModels(for: providerID, force: true) }
     }
 
     private func deleteKey() {
@@ -410,6 +412,7 @@ struct APIKeyRowView: View {
         key = ""
         isSaved = false
         validationResult = nil
+        Task { await modelCatalog.loadModels(for: providerID, force: true) }
     }
 
     private func validateKey() {
