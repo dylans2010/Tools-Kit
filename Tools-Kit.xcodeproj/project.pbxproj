@@ -132,6 +132,13 @@
 		AA11BB22CC33DD44EE55FF04 /* FileImporterRepresentableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */; };
 		AA11BB22CC33DD44EE55FF05 /* AIChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA05 /* AIChatViewModel.swift */; };
 		AA11BB22CC33DD44EE55FF06 /* AIChatMemoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA06 /* AIChatMemoryStore.swift */; };
+		CC11DD22EE33FF44AA55BB01 /* AIProviderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11EE22FF33AA44BB55CC01 /* AIProviderProtocol.swift */; };
+		CC11DD22EE33FF44AA55BB02 /* AIProviderRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11EE22FF33AA44BB55CC02 /* AIProviderRegistry.swift */; };
+		CC11DD22EE33FF44AA55BB03 /* AnthropicProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11EE22FF33AA44BB55CC03 /* AnthropicProvider.swift */; };
+		CC11DD22EE33FF44AA55BB04 /* GeminiProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11EE22FF33AA44BB55CC04 /* GeminiProvider.swift */; };
+		CC11DD22EE33FF44AA55BB05 /* MistralProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11EE22FF33AA44BB55CC05 /* MistralProvider.swift */; };
+		CC11DD22EE33FF44AA55BB06 /* OpenAIProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11EE22FF33AA44BB55CC06 /* OpenAIProvider.swift */; };
+		CC11DD22EE33FF44AA55BB07 /* OpenRouterProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11EE22FF33AA44BB55CC07 /* OpenRouterProvider.swift */; };
 		B1C2D3E4F5A60708090A0D01 /* AIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C01 /* AIService.swift */; };
 		B1C2D3E4F5A60708090A0D02 /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C02 /* CameraService.swift */; };
 		B1C2D3E4F5A60708090A0D03 /* VisionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C03 /* VisionService.swift */; };
@@ -408,6 +415,13 @@
 		AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Shared/FileImporterRepresentableView.swift"; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA05 /* AIChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/AIChat/AIChatViewModel.swift"; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA06 /* AIChatMemoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/AIChatMemoryStore.swift"; sourceTree = "<group>"; };
+		DD11EE22FF33AA44BB55CC01 /* AIProviderProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/AIProviderProtocol.swift"; sourceTree = "<group>"; };
+		DD11EE22FF33AA44BB55CC02 /* AIProviderRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/AIProviderRegistry.swift"; sourceTree = "<group>"; };
+		DD11EE22FF33AA44BB55CC03 /* AnthropicProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/Providers/AnthropicProvider.swift"; sourceTree = "<group>"; };
+		DD11EE22FF33AA44BB55CC04 /* GeminiProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/Providers/GeminiProvider.swift"; sourceTree = "<group>"; };
+		DD11EE22FF33AA44BB55CC05 /* MistralProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/Providers/MistralProvider.swift"; sourceTree = "<group>"; };
+		DD11EE22FF33AA44BB55CC06 /* OpenAIProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/Providers/OpenAIProvider.swift"; sourceTree = "<group>"; };
+		DD11EE22FF33AA44BB55CC07 /* OpenRouterProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/Providers/OpenRouterProvider.swift"; sourceTree = "<group>"; };
 		064CB13BC205411B91EAA752 /* MapsToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Maps/MapsToolView.swift"; sourceTree = "<group>"; };
 		09E6435EECFF4FD6B31B4C0B /* MapsToolViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Maps/MapsToolViewModel.swift"; sourceTree = "<group>"; };
 		CCFF0BDC48A74ACABA6CE6DD /* ObjectDetectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/ObjectDetection/ObjectDetectionView.swift"; sourceTree = "<group>"; };
@@ -647,6 +661,13 @@
 				AB11BC22CD33DE44EF55FA06 /* AIChatMemoryStore.swift */,
 				AB11BC22CD33DE44EF55FA01 /* APIKeyManager.swift */,
 				AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */,
+				DD11EE22FF33AA44BB55CC01 /* AIProviderProtocol.swift */,
+				DD11EE22FF33AA44BB55CC02 /* AIProviderRegistry.swift */,
+				DD11EE22FF33AA44BB55CC03 /* AnthropicProvider.swift */,
+				DD11EE22FF33AA44BB55CC04 /* GeminiProvider.swift */,
+				DD11EE22FF33AA44BB55CC05 /* MistralProvider.swift */,
+				DD11EE22FF33AA44BB55CC06 /* OpenAIProvider.swift */,
+				DD11EE22FF33AA44BB55CC07 /* OpenRouterProvider.swift */,
 				AB11BC22CD33DE44EF55FA03 /* MapsService.swift */,
 				AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */,
 				064CB13BC205411B91EAA752 /* MapsToolView.swift */,
@@ -938,6 +959,13 @@
 				AA11BB22CC33DD44EE55FF06 /* AIChatMemoryStore.swift in Sources */,
 				AA11BB22CC33DD44EE55FF01 /* APIKeyManager.swift in Sources */,
 				AA11BB22CC33DD44EE55FF02 /* OpenRouterService.swift in Sources */,
+				CC11DD22EE33FF44AA55BB01 /* AIProviderProtocol.swift in Sources */,
+				CC11DD22EE33FF44AA55BB02 /* AIProviderRegistry.swift in Sources */,
+				CC11DD22EE33FF44AA55BB03 /* AnthropicProvider.swift in Sources */,
+				CC11DD22EE33FF44AA55BB04 /* GeminiProvider.swift in Sources */,
+				CC11DD22EE33FF44AA55BB05 /* MistralProvider.swift in Sources */,
+				CC11DD22EE33FF44AA55BB06 /* OpenAIProvider.swift in Sources */,
+				CC11DD22EE33FF44AA55BB07 /* OpenRouterProvider.swift in Sources */,
 				AA11BB22CC33DD44EE55FF03 /* MapsService.swift in Sources */,
 				AA11BB22CC33DD44EE55FF04 /* FileImporterRepresentableView.swift in Sources */,
 				F684E2F4E8324F3291DBC3B3 /* MapsToolView.swift in Sources */,
