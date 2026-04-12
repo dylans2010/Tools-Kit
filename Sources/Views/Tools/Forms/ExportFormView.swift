@@ -1,5 +1,4 @@
 import SwiftUI
-import UniformTypeIdentifiers
 
 /// Exports a FormDocument as a `.form` file and presents a system share sheet.
 struct ExportFormView: View {
@@ -7,7 +6,6 @@ struct ExportFormView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var exportURL: URL?
-    @State private var showShare = false
     @State private var errorMessage: String?
 
     var body: some View {

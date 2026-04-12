@@ -55,14 +55,19 @@ struct ImageUploadQuestionView: View {
                 .background(Color(.secondarySystemBackground))
                 .cornerRadius(8)
         }
-        .onChange(of: pickerItem) { item in
+        .onChange(of: pickerItem) { newItem in
             Task {
-                if let data = try? await item?.loadTransferable(type: Data.self),
-                   let uiImage = UIImage(data: data) {
-                    selectedImage = uiImage
-                    if answer.isEmpty {
-                        answer = "Image attached"
+                guard let item = newItem else { return }
+                do {
+                    if let data = try await item.loadTransferable(type: Data.self),
+                       let uiImage = UIImage(data: data) {
+                        selectedImage = uiImage
+                        if answer.isEmpty {
+                            answer = "Image attached"
+                        }
                     }
+                } catch {
+                    // Silently ignore picker errors
                 }
             }
         }

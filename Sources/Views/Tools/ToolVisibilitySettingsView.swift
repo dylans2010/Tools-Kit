@@ -3,7 +3,7 @@ import SwiftUI
 /// Full-screen list letting users toggle each tool's visibility on the Dashboard.
 struct ToolVisibilitySettingsView: View {
     @StateObject private var registry = ToolRegistry()
-    @ObservedObject private var visibility = ToolVisibilityManager.shared
+    @StateObject private var visibility = ToolVisibilityManager.shared
 
     @State private var searchText = ""
 

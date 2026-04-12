@@ -3,10 +3,10 @@ import SwiftUI
 struct DashboardView: View {
     @StateObject private var registry = ToolRegistry()
     @StateObject private var visibility = ToolVisibilityManager.shared
+    @StateObject private var settingsManager = AIChatSettingsManager.shared
     @State private var searchText = ""
     @State private var selectedCategory: ToolCategory? = nil
     @State private var showSettings = false
-    @State private var aiSettings = AIChatSettings()
 
     private let columns = [GridItem(.adaptive(minimum: 160), spacing: 14)]
 
@@ -43,7 +43,7 @@ struct DashboardView: View {
                 }
             }
             .sheet(isPresented: $showSettings) {
-                AIChatSettingsView(settings: $aiSettings)
+                AIChatSettingsView(settings: $settingsManager.settings)
             }
         }
     }
