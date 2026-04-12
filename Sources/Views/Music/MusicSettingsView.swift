@@ -7,7 +7,6 @@ struct MusicSettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     @AppStorage("music.autoFetchLyrics") private var autoFetchLyrics = true
-    @AppStorage("music.crossfade") private var crossfadeEnabled = false
     @AppStorage("music.gapless") private var gaplessEnabled = true
 
     @State private var showSleepTimer = false
@@ -35,8 +34,13 @@ struct MusicSettingsView: View {
                 // MARK: Playback
                 Section {
                     Toggle("Gapless Playback", isOn: $gaplessEnabled)
-                    Toggle("Crossfade Tracks", isOn: $crossfadeEnabled)
-                        .disabled(true) // placeholder
+                    Toggle("Crossfade Tracks", isOn: Binding(
+                            get: { AudioEngineManager.shared.crossfadeEnabled },
+                            set: {
+                                AudioEngineManager.shared.crossfadeEnabled = $0
+                                AudioEngineManager.shared.saveSettings()
+                            }
+                        ))
                     HStack {
                         Label("Shuffle", systemImage: "shuffle")
                         Spacer()

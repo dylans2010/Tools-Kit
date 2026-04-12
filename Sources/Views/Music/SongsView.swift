@@ -1,6 +1,8 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+// MARK: - SongRow
+
 struct SongRow: View {
     let song: Song
     let onTap: () -> Void
@@ -9,7 +11,7 @@ struct SongRow: View {
 
     var body: some View {
         Button(action: onTap) {
-            HStack(spacing: 14) {
+            HStack(spacing: 12) {
                 artworkView
                 VStack(alignment: .leading, spacing: 2) {
                     Text(song.title)
@@ -30,7 +32,7 @@ struct SongRow: View {
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }
-            .padding(.vertical, 4)
+            .padding(.vertical, 3)
         }
         .buttonStyle(.plain)
     }
@@ -38,7 +40,7 @@ struct SongRow: View {
     @ViewBuilder
     private var artworkView: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 7)
                 .fill(Color(.systemGray5))
             if let data = song.artworkData, let img = UIImage(data: data) {
                 Image(uiImage: img)
@@ -49,23 +51,23 @@ struct SongRow: View {
                     .foregroundColor(.secondary)
             }
         }
-        .frame(width: 44, height: 44)
+        .frame(width: 40, height: 40)
         .clipped()
+        .cornerRadius(7)
     }
 }
+
+// MARK: - SongsView
 
 struct SongsView: View {
     @StateObject private var library = MusicLibraryManager.shared
     @StateObject private var player = MusicPlayerManager.shared
     @State private var searchText = ""
-
-    // Import sheet state
+    @State private var selectedSort: SortOption = .dateAdded
     @State private var showImportPicker = false
     @State private var showSingleImporter = false
     @State private var showZIPImporter = false
     @State private var isImportingZIP = false
-
-    // ZIP → playlist prompt state
     @State private var zipImportedSongs: [Song] = []
     @State private var showZIPPlaylistAlert = false
     @State private var showPlaylistNameAlert = false
@@ -74,11 +76,23 @@ struct SongsView: View {
     @State private var renameTargetSongID: UUID?
     @State private var pendingSongName = ""
 
+    enum SortOption: String, CaseIterable {
+        case dateAdded = "Recently Added"
+        case title     = "Title"
+        case artist    = "Artist"
+        case playCount = "Most Played"
+    }
+
     private var filteredSongs: [Song] {
-        guard !searchText.isEmpty else { return library.songs }
-        return library.songs.filter {
+        let base = searchText.isEmpty ? library.songs : library.songs.filter {
             $0.title.localizedCaseInsensitiveContains(searchText) ||
             $0.artist.localizedCaseInsensitiveContains(searchText)
+        }
+        switch selectedSort {
+        case .dateAdded: return base.sorted { $0.dateAdded > $1.dateAdded }
+        case .title:     return base.sorted { $0.title.localizedCompare($1.title) == .orderedAscending }
+        case .artist:    return base.sorted { $0.artist.localizedCompare($1.artist) == .orderedAscending }
+        case .playCount: return base.sorted { $0.playCount > $1.playCount }
         }
     }
 
@@ -88,45 +102,68 @@ struct SongsView: View {
                 emptyState
             } else {
                 List {
-                    ForEach(filteredSongs) { song in
-                        SongRow(song: song) {
-                            let idx = filteredSongs.firstIndex(where: { $0.id == song.id }) ?? 0
-                            player.play(song: song, queue: filteredSongs, startIndex: idx)
+                    // Activity header (not shown when searching)
+                    if searchText.isEmpty {
+                        Section {
+                            activityHeader
+                                .listRowInsets(EdgeInsets())
+                                .listRowBackground(Color.clear)
+                                .listRowSeparator(.hidden)
                         }
-                        .swipeActions(edge: .trailing) {
-                            Button(role: .destructive) {
-                                library.deleteSong(song)
-                            } label: {
-                                Label("Delete", systemImage: "trash")
+                    }
+
+                    // Sort bar
+                    Section {
+                        sortBar
+                            .listRowInsets(EdgeInsets())
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                    }
+
+                    // Song rows
+                    Section {
+                        ForEach(filteredSongs) { song in
+                            SongRow(song: song) {
+                                let idx = filteredSongs.firstIndex(where: { $0.id == song.id }) ?? 0
+                                player.play(song: song, queue: filteredSongs, startIndex: idx)
                             }
-                            Button {
-                                player.addToQueue(song)
-                            } label: {
-                                Label("Add to Queue", systemImage: "text.badge.plus")
+                            .swipeActions(edge: .trailing) {
+                                Button(role: .destructive) {
+                                    library.deleteSong(song)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                                Button {
+                                    player.addToQueue(song)
+                                } label: {
+                                    Label("Add to Queue", systemImage: "text.badge.plus")
+                                }
+                                .tint(.blue)
+                                Button {
+                                    renameTargetSongID = song.id
+                                    pendingSongName = song.title
+                                    showRenameAlert = true
+                                } label: {
+                                    Label("Rename", systemImage: "pencil")
+                                }
+                                .tint(.gray)
                             }
-                            .tint(.blue)
-                            Button {
-                                renameTargetSongID = song.id
-                                pendingSongName = song.title
-                                showRenameAlert = true
-                            } label: {
-                                Label("Rename", systemImage: "pencil")
-                            }
-                            .tint(.gray)
                         }
+                    } header: {
+                        Text("\(filteredSongs.count) Songs")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 }
                 .listStyle(.plain)
                 .searchable(text: $searchText, prompt: "Search songs")
             }
 
-            // ZIP import progress overlay
             if isImportingZIP {
                 Color(.systemBackground).opacity(0.85)
                     .ignoresSafeArea()
                 VStack(spacing: 16) {
-                    ProgressView()
-                        .scaleEffect(1.4)
+                    ProgressView().scaleEffect(1.4)
                     Text("Importing from ZIP…")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
@@ -140,11 +177,7 @@ struct SongsView: View {
                 }
             }
         }
-        // Import type selection sheet
-        .sheet(isPresented: $showImportPicker) {
-            importPickerSheet
-        }
-        // Single song file importer
+        .sheet(isPresented: $showImportPicker) { importPickerSheet }
         .sheet(isPresented: $showSingleImporter) {
             FileImporterRepresentableView(
                 allowedContentTypes: [.audio, .mp3,
@@ -160,7 +193,6 @@ struct SongsView: View {
                 if accessing { url.stopAccessingSecurityScopedResource() }
             }
         }
-        // ZIP file importer
         .sheet(isPresented: $showZIPImporter) {
             FileImporterRepresentableView(
                 allowedContentTypes: [UTType(filenameExtension: "zip") ?? .data]
@@ -182,57 +214,128 @@ struct SongsView: View {
                 }
             }
         }
-        // Ask whether to turn the imported songs into a playlist
         .alert("Create Playlist?", isPresented: $showZIPPlaylistAlert) {
-            Button("Yes") {
-                pendingPlaylistName = ""
-                showPlaylistNameAlert = true
-            }
-            Button("No", role: .cancel) {
-                zipImportedSongs = []
-            }
+            Button("Yes") { pendingPlaylistName = ""; showPlaylistNameAlert = true }
+            Button("No", role: .cancel) { zipImportedSongs = [] }
         } message: {
             let count = zipImportedSongs.count
-            Text("Would you like to add \(count) imported \(count == 1 ? "song" : "songs") to a new playlist?")
+            Text("Add \(count) imported \(count == 1 ? "song" : "songs") to a new playlist?")
         }
-        // Collect the playlist name then create it
         .alert("Name Your Playlist", isPresented: $showPlaylistNameAlert) {
             TextField("Playlist Name", text: $pendingPlaylistName)
             Button("Create") {
                 let name = pendingPlaylistName.trimmingCharacters(in: .whitespaces)
-                library.createPlaylist(
-                    name: name.isEmpty ? "Imported Playlist" : name,
-                    songIDs: zipImportedSongs.map(\.id)
-                )
-                zipImportedSongs = []
-                pendingPlaylistName = ""
+                library.createPlaylist(name: name.isEmpty ? "Imported Playlist" : name,
+                                       songIDs: zipImportedSongs.map(\.id))
+                zipImportedSongs = []; pendingPlaylistName = ""
             }
-            Button("Cancel", role: .cancel) {
-                zipImportedSongs = []
-                pendingPlaylistName = ""
-            }
-        } message: {
-            Text("Enter a name for your new playlist.")
-        }
+            Button("Cancel", role: .cancel) { zipImportedSongs = []; pendingPlaylistName = "" }
+        } message: { Text("Enter a name for your new playlist.") }
         .alert("Rename Song", isPresented: $showRenameAlert) {
             TextField("Song Name", text: $pendingSongName)
             Button("Save") {
                 guard let id = renameTargetSongID else { return }
                 library.renameSong(id: id, newTitle: pendingSongName)
-                renameTargetSongID = nil
-                pendingSongName = ""
+                renameTargetSongID = nil; pendingSongName = ""
             }
             .disabled(pendingSongName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-            Button("Cancel", role: .cancel) {
-                renameTargetSongID = nil
-                pendingSongName = ""
+            Button("Cancel", role: .cancel) { renameTargetSongID = nil; pendingSongName = "" }
+        } message: { Text("Enter a new song name.") }
+    }
+
+    // MARK: - Activity Header
+
+    private var activityHeader: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                activityCard(
+                    title: "Songs",
+                    value: "\(library.songs.count)",
+                    icon: "music.note",
+                    color: .blue
+                )
+                activityCard(
+                    title: "Played",
+                    value: "\(totalPlays)",
+                    icon: "play.circle.fill",
+                    color: .green
+                )
+                activityCard(
+                    title: "Favorites",
+                    value: topArtist,
+                    icon: "star.fill",
+                    color: .orange
+                )
+                if let top = topSong {
+                    activityCard(
+                        title: "Top Song",
+                        value: top.title,
+                        icon: "crown.fill",
+                        color: .purple
+                    )
+                }
             }
-        } message: {
-            Text("Enter a new song name.")
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
         }
     }
 
-    // MARK: - Import Picker Sheet
+    private func activityCard(title: String, value: String, icon: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(color)
+                Text(title)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.secondary)
+            }
+            Text(value)
+                .font(.system(size: 17, weight: .bold))
+                .foregroundColor(.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .frame(minWidth: 110, alignment: .leading)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
+    }
+
+    private var totalPlays: Int { library.songs.reduce(0) { $0 + $1.playCount } }
+    private var topArtist: String {
+        let counts = Dictionary(grouping: library.songs, by: \.artist)
+            .mapValues { $0.reduce(0) { $0 + $1.playCount } }
+        return counts.max(by: { $0.value < $1.value })?.key ?? "—"
+    }
+    private var topSong: Song? { library.songs.max(by: { $0.playCount < $1.playCount }).flatMap { $0.playCount > 0 ? $0 : nil } }
+
+    // MARK: - Sort Bar
+
+    private var sortBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(SortOption.allCases, id: \.self) { opt in
+                    let selected = selectedSort == opt
+                    Button { withAnimation { selectedSort = opt } } label: {
+                        Text(opt.rawValue)
+                            .font(.system(size: 13, weight: selected ? .semibold : .regular))
+                            .foregroundColor(selected ? .white : .primary)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(selected ? Color.accentColor : Color(.secondarySystemBackground))
+                            .cornerRadius(16)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 4)
+        }
+    }
+
+    // MARK: - Import Picker
 
     private var importPickerSheet: some View {
         VStack(spacing: 0) {
@@ -247,45 +350,27 @@ struct SongsView: View {
                 .padding(.bottom, 20)
 
             VStack(spacing: 12) {
-                importOption(
-                    title: "Single Song",
-                    subtitle: "Add one audio file from your Files",
-                    icon: "music.note",
-                    color: .blue
-                ) {
+                importOption(title: "Single Song",
+                             subtitle: "Add one audio file from your Files",
+                             icon: "music.note", color: .blue) {
                     showImportPicker = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-                        showSingleImporter = true
-                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) { showSingleImporter = true }
                 }
-
-                importOption(
-                    title: "ZIP File",
-                    subtitle: "Extract all MP3 & MP4 files from a ZIP archive",
-                    icon: "doc.zipper",
-                    color: .orange
-                ) {
+                importOption(title: "ZIP File",
+                             subtitle: "Extract all audio files from a ZIP archive",
+                             icon: "doc.zipper", color: .orange) {
                     showImportPicker = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-                        showZIPImporter = true
-                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) { showZIPImporter = true }
                 }
             }
             .padding(.horizontal, 20)
-
             Spacer()
         }
         .presentationDetents([.height(260)])
         .presentationDragIndicator(.hidden)
     }
 
-    private func importOption(
-        title: String,
-        subtitle: String,
-        icon: String,
-        color: Color,
-        action: @escaping () -> Void
-    ) -> some View {
+    private func importOption(title: String, subtitle: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: 16) {
                 ZStack {
@@ -297,18 +382,11 @@ struct SongsView: View {
                         .foregroundColor(color)
                 }
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(title)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.primary)
-                    Text(subtitle)
-                        .font(.system(size: 13))
-                        .foregroundColor(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
+                    Text(title).font(.system(size: 16, weight: .semibold)).foregroundColor(.primary)
+                    Text(subtitle).font(.system(size: 13)).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14))
-                    .foregroundColor(.secondary)
+                Image(systemName: "chevron.right").font(.system(size: 14)).foregroundColor(.secondary)
             }
             .padding(14)
             .background(Color(.secondarySystemBackground))

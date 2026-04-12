@@ -88,6 +88,10 @@
 		MU020000000000000000001F /* ZipExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU010000000000000000001F /* ZipExportService.swift */; };
 		MU0200000000000000000020 /* SpotifyFetchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000020 /* SpotifyFetchView.swift */; };
 		MU0200000000000000000021 /* SpotifyFetchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000021 /* SpotifyFetchViewModel.swift */; };
+		MU0200000000000000000022 /* AudioEngineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000022 /* AudioEngineManager.swift */; };
+		MU0200000000000000000023 /* EqualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000023 /* EqualizerView.swift */; };
+		MU0200000000000000000024 /* CustomizePlaylistArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000024 /* CustomizePlaylistArtwork.swift */; };
+		MU0200000000000000000025 /* AudioControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000025 /* AudioControlsView.swift */; };
 		FF0200000000000000000001 /* YouTubeAPIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0100000000000000000001 /* YouTubeAPIKey.swift */; };
 		FF0200000000000000000002 /* FallbackFetchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0100000000000000000002 /* FallbackFetchViewModel.swift */; };
 		FF0200000000000000000003 /* SongsCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0100000000000000000003 /* SongsCheck.swift */; };
@@ -722,6 +726,10 @@
 		MU010000000000000000001E /* DownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Services/SpotifyFetchAPI/DownloadManager.swift"; sourceTree = "<group>"; };
 		MU010000000000000000001F /* ZipExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Services/SpotifyFetchAPI/ZipExportService.swift"; sourceTree = "<group>"; };
 		MU0100000000000000000021 /* SpotifyFetchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Services/SpotifyFetchAPI/SpotifyFetchViewModel.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000022 /* AudioEngineManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/AudioEngineManager.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000023 /* EqualizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/EqualizerView.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000024 /* CustomizePlaylistArtwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/CustomizePlaylistArtwork.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000025 /* AudioControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/AudioControlsView.swift"; sourceTree = "<group>"; };
 		FF0100000000000000000001 /* YouTubeAPIKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Services/FallbackFetch/YouTubeAPIKey.swift"; sourceTree = "<group>"; };
 		FF0100000000000000000002 /* FallbackFetchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Services/FallbackFetch/FallbackFetchViewModel.swift"; sourceTree = "<group>"; };
 		FF0100000000000000000003 /* SongsCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Services/FallbackFetch/SongsCheck.swift"; sourceTree = "<group>"; };
@@ -1107,6 +1115,10 @@
 			MU010000000000000000001E /* DownloadManager.swift */,
 			MU010000000000000000001F /* ZipExportService.swift */,
 			MU0100000000000000000021 /* SpotifyFetchViewModel.swift */,
+				MU0100000000000000000022 /* AudioEngineManager.swift */,
+				MU0100000000000000000023 /* EqualizerView.swift */,
+				MU0100000000000000000024 /* CustomizePlaylistArtwork.swift */,
+				MU0100000000000000000025 /* AudioControlsView.swift */,
 			MU0100000000000000000020 /* SpotifyFetchView.swift */,
 			FF0100000000000000000001 /* YouTubeAPIKey.swift */,
 			FF0100000000000000000002 /* FallbackFetchViewModel.swift */,
@@ -1551,6 +1563,10 @@
 			MU020000000000000000001F /* ZipExportService.swift in Sources */,
 			MU0200000000000000000020 /* SpotifyFetchView.swift in Sources */,
 			MU0200000000000000000021 /* SpotifyFetchViewModel.swift in Sources */,
+				MU0200000000000000000022 /* AudioEngineManager.swift in Sources */,
+				MU0200000000000000000023 /* EqualizerView.swift in Sources */,
+				MU0200000000000000000024 /* CustomizePlaylistArtwork.swift in Sources */,
+				MU0200000000000000000025 /* AudioControlsView.swift in Sources */,
 				FF0200000000000000000001 /* YouTubeAPIKey.swift in Sources */,
 				FF0200000000000000000002 /* FallbackFetchViewModel.swift in Sources */,
 				FF0200000000000000000003 /* SongsCheck.swift in Sources */,

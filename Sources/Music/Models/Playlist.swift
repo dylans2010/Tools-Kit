@@ -6,6 +6,7 @@ struct Playlist: Identifiable, Codable, Equatable {
     var songIDs: [UUID]
     var dateCreated: Date
     var artworkSongID: UUID?
+    var customArtworkData: Data?
 
     init(id: UUID = UUID(), name: String, songIDs: [UUID] = []) {
         self.id = id

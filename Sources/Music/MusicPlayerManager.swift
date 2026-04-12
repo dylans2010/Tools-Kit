@@ -23,10 +23,7 @@ final class MusicPlayerManager: ObservableObject {
     @Published var sleepTimerEndDate: Date?
 
     // MARK: - Private
-    private var player: AVPlayer?
-    private var timeObserver: Any?
-    private var playerItemObserver: AnyCancellable?
-    private var cancellables = Set<AnyCancellable>()
+    private let audioEngine = AudioEngineManager.shared
     private var originalQueue: [Song] = []
     private var sleepTimerTimer: Timer?
     private var wasPlayingBeforeInterruption = false
@@ -38,6 +35,7 @@ final class MusicPlayerManager: ObservableObject {
 
     private init() {
         setupAudioSession()
+        setupEngineCallbacks()
         setupRemoteCommands()
         setupNotifications()
         restorePlaybackState()
@@ -52,6 +50,19 @@ final class MusicPlayerManager: ObservableObject {
             try session.setActive(true)
         } catch {
             print("MusicPlayerManager: AVAudioSession error \(error)")
+        }
+    }
+
+    // MARK: - Engine Callbacks
+
+    private func setupEngineCallbacks() {
+        audioEngine.onTrackFinished = { [weak self] in
+            self?.handleSongEnd()
+        }
+        audioEngine.onTimeUpdate = { [weak self] time in
+            guard let self else { return }
+            self.currentTime = time
+            if self.duration > 0 { self.updateNowPlayingInfo() }
         }
     }
 
@@ -72,13 +83,13 @@ final class MusicPlayerManager: ObservableObject {
     }
 
     func play() {
-        player?.play()
+        audioEngine.resume()
         isPlaying = true
         updateNowPlayingInfo()
     }
 
     func pause() {
-        player?.pause()
+        audioEngine.pause()
         isPlaying = false
         updateNowPlayingInfo()
     }
@@ -92,7 +103,7 @@ final class MusicPlayerManager: ObservableObject {
         switch repeatMode {
         case .one:
             seek(to: 0)
-            play()
+            if !isPlaying { play() }
         case .all:
             currentIndex = (currentIndex + 1) % queue.count
             load(song: queue[currentIndex])
@@ -119,8 +130,7 @@ final class MusicPlayerManager: ObservableObject {
     }
 
     func seek(to time: TimeInterval) {
-        let cmTime = CMTime(seconds: time, preferredTimescale: 600)
-        player?.seek(to: cmTime)
+        audioEngine.seek(to: time)
         currentTime = time
         updateNowPlayingInfo()
     }
@@ -191,10 +201,7 @@ final class MusicPlayerManager: ObservableObject {
     func resetPlaybackState() {
         sleepTimerTimer?.invalidate()
         sleepTimerTimer = nil
-        removeTimeObserver()
-        player?.pause()
-        player?.replaceCurrentItem(with: nil)
-        player = nil
+        audioEngine.stop()
         currentSong = nil
         isPlaying = false
         currentTime = 0
@@ -214,39 +221,40 @@ final class MusicPlayerManager: ObservableObject {
             pause()
             return
         }
-        removeTimeObserver()
         currentSong = song
         duration = song.duration
+        currentTime = 0
+        isPlaying = true
 
-        let item = AVPlayerItem(url: song.fileURL)
-        if player == nil {
-            player = AVPlayer(playerItem: item)
-        } else {
-            player?.replaceCurrentItem(with: item)
+        audioEngine.play(url: song.fileURL)
+
+        // Schedule crossfade to next track if enabled
+        if audioEngine.crossfadeEnabled {
+            let nextIdx: Int?
+            switch repeatMode {
+            case .one:
+                nextIdx = currentIndex
+            case .all:
+                nextIdx = (currentIndex + 1) % queue.count
+            case .off:
+                let n = currentIndex + 1
+                nextIdx = n < queue.count ? n : nil
+            }
+            if let idx = nextIdx, let nextSong = queue[safe: idx],
+               nextSong.fileURL.isFileURL, FileManager.default.fileExists(atPath: nextSong.fileURL.path) {
+                audioEngine.scheduleCrossfadeIfNeeded(nextURL: nextSong.fileURL, trackDuration: song.duration)
+            }
         }
 
-        observePlayerItem(item)
-        addTimeObserver()
-        player?.play()
-        isPlaying = true
-        currentTime = 0
         updateNowPlayingInfo()
         MusicLibraryManager.shared.incrementPlayCount(for: song)
         savePlaybackState()
     }
 
-    private func observePlayerItem(_ item: AVPlayerItem) {
-        playerItemObserver = NotificationCenter.default
-            .publisher(for: .AVPlayerItemDidPlayToEndTime, object: item)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in self?.handleSongEnd() }
-    }
-
     private func handleSongEnd() {
         switch repeatMode {
         case .one:
-            seek(to: 0)
-            play()
+            load(song: queue[safe: currentIndex] ?? currentSong!)
         case .all:
             currentIndex = (currentIndex + 1) % queue.count
             load(song: queue[currentIndex])
@@ -261,28 +269,6 @@ final class MusicPlayerManager: ObservableObject {
             }
         }
         savePlaybackState()
-    }
-
-    private func addTimeObserver() {
-        let interval = CMTime(seconds: 0.5, preferredTimescale: 600)
-        timeObserver = player?.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
-            guard let self = self else { return }
-            let secs = CMTimeGetSeconds(time)
-            if secs.isFinite { self.currentTime = secs }
-            if let dur = self.player?.currentItem?.duration,
-               dur.isValid, dur.timescale > 0 {
-                let d = CMTimeGetSeconds(dur)
-                if d.isFinite && d > 0 { self.duration = d }
-            }
-            self.updateNowPlayingInfo()
-        }
-    }
-
-    private func removeTimeObserver() {
-        if let obs = timeObserver {
-            player?.removeTimeObserver(obs)
-            timeObserver = nil
-        }
     }
 
     private func shuffled(from songs: [Song], keeping song: Song?) -> [Song] {
