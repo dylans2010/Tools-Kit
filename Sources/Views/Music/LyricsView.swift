@@ -19,6 +19,7 @@ struct LyricsView: View {
                 lyricsScroller
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .topTrailing) {
             lyricsMenu
                 .padding(.trailing, 16)
