@@ -13,6 +13,7 @@ struct MusicSettingsView: View {
     @State private var sleepMinutes: Double = 30
     @State private var showClearLibraryAlert = false
     @State private var showSpotifySheet = false
+    @State private var showSpotifyFetchSheet = false
 
     var body: some View {
         NavigationStack {
@@ -98,6 +99,11 @@ struct MusicSettingsView: View {
                 // MARK: Spotify
                 Section {
                     Button {
+                        showSpotifyFetchSheet = true
+                    } label: {
+                        Label("Fetch Spotify Playlist", systemImage: "square.and.arrow.down")
+                    }
+                    Button {
                         showSpotifySheet = true
                     } label: {
                         Label("Open Spotify Link", systemImage: "music.note.list")
@@ -136,6 +142,7 @@ struct MusicSettingsView: View {
                 Text("This will remove all songs from your library. Audio files stored in the app will be deleted. This cannot be undone.")
             }
             .sheet(isPresented: $showSleepTimer) { sleepTimerSheet }
+            .sheet(isPresented: $showSpotifyFetchSheet) { SpotifyFetchView() }
             .sheet(isPresented: $showSpotifySheet) { SpotifyLinkSheet() }
         }
     }

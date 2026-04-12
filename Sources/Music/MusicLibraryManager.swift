@@ -9,6 +9,7 @@ final class MusicLibraryManager: ObservableObject {
 
     private let songsKey = "music.songs"
     private let playlistsKey = "music.playlists"
+    private let allowedExtensions: Set<String> = ["mp3", "mp4", "m4a", "aac", "wav", "flac"]
 
     private var musicDirectory: URL {
         let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -28,23 +29,18 @@ final class MusicLibraryManager: ObservableObject {
     }
 
     private func importFile(from sourceURL: URL, data: Data?) {
-        let destURL = musicDirectory.appendingPathComponent(sourceURL.lastPathComponent)
+        let preferredName = sourceURL.lastPathComponent
+        let destURL = uniqueDestinationURL(for: preferredName)
         do {
             if let data = data {
-                if FileManager.default.fileExists(atPath: destURL.path) {
-                    try FileManager.default.removeItem(at: destURL)
-                }
                 try data.write(to: destURL)
             } else {
-                if FileManager.default.fileExists(atPath: destURL.path) {
-                    try FileManager.default.removeItem(at: destURL)
-                }
                 try FileManager.default.copyItem(at: sourceURL, to: destURL)
             }
 
             let song = extractMetadata(from: destURL)
             DispatchQueue.main.async {
-                guard !self.songs.contains(where: { $0.fileURL.lastPathComponent == destURL.lastPathComponent }) else { return }
+                guard !self.songs.contains(where: { $0.fileURL.path == destURL.path }) else { return }
                 self.songs.append(song)
                 self.save()
             }
@@ -96,17 +92,14 @@ final class MusicLibraryManager: ObservableObject {
             let filename = URL(fileURLWithPath: entry.filename).lastPathComponent
             guard !filename.isEmpty else { continue }
 
-            let destURL = musicDirectory.appendingPathComponent(filename)
+            let destURL = uniqueDestinationURL(for: filename)
             do {
-                if FileManager.default.fileExists(atPath: destURL.path) {
-                    try FileManager.default.removeItem(at: destURL)
-                }
                 try entry.data.write(to: destURL)
 
                 let song = extractMetadata(from: destURL)
                 await MainActor.run {
                     guard !self.songs.contains(where: {
-                        $0.fileURL.lastPathComponent == destURL.lastPathComponent
+                        $0.fileURL.path == destURL.path
                     }) else { return }
                     self.songs.append(song)
                     self.save()
@@ -186,13 +179,55 @@ final class MusicLibraryManager: ObservableObject {
     }
 
     private func load() {
+        _ = musicDirectory // ensure directory exists
+
+        var persistedSongs: [Song] = []
         if let data = UserDefaults.standard.data(forKey: songsKey),
            let decoded = try? JSONDecoder().decode([Song].self, from: data) {
-            songs = decoded.filter { FileManager.default.fileExists(atPath: $0.fileURL.path) }
+            persistedSongs = decoded.filter { FileManager.default.fileExists(atPath: $0.fileURL.path) }
         }
+
+        let songsByPath = Dictionary(uniqueKeysWithValues: persistedSongs.map { ($0.fileURL.path, $0) })
+        let onDiskURLs = ((try? FileManager.default.contentsOfDirectory(
+            at: musicDirectory,
+            includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles]
+        )) ?? []).filter { allowedExtensions.contains($0.pathExtension.lowercased()) }
+
+        songs = onDiskURLs.map { fileURL in
+            if let existing = songsByPath[fileURL.path] {
+                return existing
+            }
+            return extractMetadata(from: fileURL)
+        }
+
         if let data = UserDefaults.standard.data(forKey: playlistsKey),
            let decoded = try? JSONDecoder().decode([Playlist].self, from: data) {
             playlists = decoded
+        }
+        save()
+    }
+
+    private func uniqueDestinationURL(for filename: String) -> URL {
+        let sanitized = filename.trimmingCharacters(in: .whitespacesAndNewlines)
+        let baseName = URL(fileURLWithPath: sanitized).deletingPathExtension().lastPathComponent
+        let ext = URL(fileURLWithPath: sanitized).pathExtension
+        let fallbackBase = baseName.isEmpty ? "Imported Song" : baseName
+
+        var candidate = musicDirectory.appendingPathComponent(sanitized.isEmpty ? "\(fallbackBase).mp3" : sanitized)
+        if !FileManager.default.fileExists(atPath: candidate.path) {
+            return candidate
+        }
+
+        var index = 1
+        while true {
+            let suffix = " (\(index))"
+            let name = ext.isEmpty ? "\(fallbackBase)\(suffix)" : "\(fallbackBase)\(suffix).\(ext)"
+            candidate = musicDirectory.appendingPathComponent(name)
+            if !FileManager.default.fileExists(atPath: candidate.path) {
+                return candidate
+            }
+            index += 1
         }
     }
 }

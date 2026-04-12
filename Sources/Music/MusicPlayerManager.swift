@@ -30,11 +30,17 @@ final class MusicPlayerManager: ObservableObject {
     private var originalQueue: [Song] = []
     private var sleepTimerTimer: Timer?
     private var wasPlayingBeforeInterruption = false
+    private let queueIDsKey = "music.player.queueIDs"
+    private let currentIndexKey = "music.player.currentIndex"
+    private let currentSongIDKey = "music.player.currentSongID"
+    private let shuffleKey = "music.player.shuffleEnabled"
+    private let repeatModeKey = "music.player.repeatMode"
 
     private init() {
         setupAudioSession()
         setupRemoteCommands()
         setupNotifications()
+        restorePlaybackState()
     }
 
     // MARK: - Audio Session
@@ -52,11 +58,17 @@ final class MusicPlayerManager: ObservableObject {
     // MARK: - Playback Control
 
     func play(song: Song, queue: [Song] = [], startIndex: Int = 0) {
-        let sourceQueue = queue.isEmpty ? [song] : queue
+        let localQueue = (queue.isEmpty ? [song] : queue).filter {
+            $0.fileURL.isFileURL && FileManager.default.fileExists(atPath: $0.fileURL.path)
+        }
+        let sourceQueue = localQueue.isEmpty ? [song] : localQueue
         originalQueue = sourceQueue
         self.queue = shuffleEnabled ? shuffled(from: sourceQueue, keeping: song) : sourceQueue
-        currentIndex = self.queue.firstIndex(where: { $0.id == song.id }) ?? 0
-        load(song: song)
+        currentIndex = self.queue.firstIndex(where: { $0.id == song.id })
+            ?? min(max(startIndex, 0), max(0, self.queue.count - 1))
+        let resolvedSong = self.queue[safe: currentIndex] ?? song
+        load(song: resolvedSong)
+        savePlaybackState()
     }
 
     func play() {
@@ -116,8 +128,10 @@ final class MusicPlayerManager: ObservableObject {
     // MARK: - Queue Management
 
     func addToQueue(_ song: Song) {
+        guard song.fileURL.isFileURL, FileManager.default.fileExists(atPath: song.fileURL.path) else { return }
         queue.append(song)
         originalQueue.append(song)
+        savePlaybackState()
     }
 
     func removeFromQueue(at offsets: IndexSet) {
@@ -128,6 +142,7 @@ final class MusicPlayerManager: ObservableObject {
         queue.remove(atOffsets: offsets)
         originalQueue = queue
         currentIndex = adjusted
+        savePlaybackState()
     }
 
     func moveInQueue(from source: IndexSet, to destination: Int) {
@@ -136,6 +151,7 @@ final class MusicPlayerManager: ObservableObject {
         if let song = currentSong, let newIdx = queue.firstIndex(where: { $0.id == song.id }) {
             currentIndex = newIdx
         }
+        savePlaybackState()
     }
 
     func toggleShuffle() {
@@ -148,10 +164,12 @@ final class MusicPlayerManager: ObservableObject {
         if let song = currentSong, let idx = queue.firstIndex(where: { $0.id == song.id }) {
             currentIndex = idx
         }
+        savePlaybackState()
     }
 
     func setRepeatMode(_ mode: RepeatMode) {
         repeatMode = mode
+        savePlaybackState()
     }
 
     // MARK: - Sleep Timer
@@ -173,6 +191,10 @@ final class MusicPlayerManager: ObservableObject {
     // MARK: - Private helpers
 
     private func load(song: Song) {
+        guard song.fileURL.isFileURL, FileManager.default.fileExists(atPath: song.fileURL.path) else {
+            pause()
+            return
+        }
         removeTimeObserver()
         currentSong = song
         duration = song.duration
@@ -191,6 +213,7 @@ final class MusicPlayerManager: ObservableObject {
         currentTime = 0
         updateNowPlayingInfo()
         MusicLibraryManager.shared.incrementPlayCount(for: song)
+        savePlaybackState()
     }
 
     private func observePlayerItem(_ item: AVPlayerItem) {
@@ -218,6 +241,7 @@ final class MusicPlayerManager: ObservableObject {
                 currentTime = 0
             }
         }
+        savePlaybackState()
     }
 
     private func addTimeObserver() {
@@ -324,6 +348,47 @@ final class MusicPlayerManager: ObservableObject {
               let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue),
               reason == .oldDeviceUnavailable else { return }
         DispatchQueue.main.async { self.pause() }
+    }
+
+    private func savePlaybackState() {
+        let defaults = UserDefaults.standard
+        defaults.set(queue.map { $0.id.uuidString }, forKey: queueIDsKey)
+        defaults.set(currentIndex, forKey: currentIndexKey)
+        defaults.set(currentSong?.id.uuidString, forKey: currentSongIDKey)
+        defaults.set(shuffleEnabled, forKey: shuffleKey)
+        defaults.set(repeatMode.rawValue, forKey: repeatModeKey)
+    }
+
+    private func restorePlaybackState() {
+        let defaults = UserDefaults.standard
+        shuffleEnabled = defaults.bool(forKey: shuffleKey)
+
+        if let rawRepeat = defaults.string(forKey: repeatModeKey),
+           let mode = RepeatMode(rawValue: rawRepeat) {
+            repeatMode = mode
+        }
+
+        guard let idStrings = defaults.array(forKey: queueIDsKey) as? [String], !idStrings.isEmpty else { return }
+        let ids = idStrings.compactMap(UUID.init(uuidString:))
+        let allSongs = MusicLibraryManager.shared.songs
+        let restoredQueue = ids.compactMap { id in
+            allSongs.first { $0.id == id && $0.fileURL.isFileURL && FileManager.default.fileExists(atPath: $0.fileURL.path) }
+        }
+        guard !restoredQueue.isEmpty else { return }
+
+        queue = restoredQueue
+        originalQueue = restoredQueue
+        currentIndex = min(max(defaults.integer(forKey: currentIndexKey), 0), max(0, restoredQueue.count - 1))
+
+        if let currentIDString = defaults.string(forKey: currentSongIDKey),
+           let currentID = UUID(uuidString: currentIDString),
+           let song = restoredQueue.first(where: { $0.id == currentID }) {
+            currentSong = song
+            duration = song.duration
+        } else if let song = restoredQueue[safe: currentIndex] {
+            currentSong = song
+            duration = song.duration
+        }
     }
 }
 
