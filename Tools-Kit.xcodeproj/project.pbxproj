@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04450CC11B3A4A3CA84BC3CA /* FileModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5AEBD1200A44657A5C545F3 /* FileModels.swift */; };
+		5E0CD5A16EF14B369FEA355E /* FileFolderBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9A900AAA944545B9AA0217 /* FileFolderBackend.swift */; };
+		7F46638E50884AFF969EBA75 /* FileFolderContentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D892907BAC409D9E8D7684 /* FileFolderContentsView.swift */; };
+		3D0B0D2B774E4F298B2E7424 /* QuestionEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C7570717DA449692472DC7 /* QuestionEditorView.swift */; };
+		3E03416052DD4C3CA1A54E8A /* DragDropQuestionFillerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28651E16D0534324A81C2E92 /* DragDropQuestionFillerView.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711D3FB735414113B06478F1 /* MorseCodeView.swift */; };
 		F36CC1CEC21A4752B8FFDB90 /* PrimeFactorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8156480BE054D17A41ABFCF /* PrimeFactorView.swift */; };
@@ -270,6 +275,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E5AEBD1200A44657A5C545F3 /* FileModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileModels.swift; sourceTree = "<group>"; };
+		CF9A900AAA944545B9AA0217 /* FileFolderBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileFolderBackend.swift; sourceTree = "<group>"; };
+		10D892907BAC409D9E8D7684 /* FileFolderContentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileFolderContentsView.swift; sourceTree = "<group>"; };
+		C4C7570717DA449692472DC7 /* QuestionEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionEditorView.swift; sourceTree = "<group>"; };
+		28651E16D0534324A81C2E92 /* DragDropQuestionFillerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragDropQuestionFillerView.swift; sourceTree = "<group>"; };
 		B1ABEF1CC5614B57A749E486 /* NATOView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/NATO/NATOView.swift"; sourceTree = "<group>"; };
 		711D3FB735414113B06478F1 /* MorseCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/MorseCode/MorseCodeView.swift"; sourceTree = "<group>"; };
 		D8156480BE054D17A41ABFCF /* PrimeFactorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/PrimeFactor/PrimeFactorView.swift"; sourceTree = "<group>"; };
@@ -891,6 +901,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04450CC11B3A4A3CA84BC3CA /* FileModels.swift in Sources */,
+				5E0CD5A16EF14B369FEA355E /* FileFolderBackend.swift in Sources */,
+				7F46638E50884AFF969EBA75 /* FileFolderContentsView.swift in Sources */,
+				3D0B0D2B774E4F298B2E7424 /* QuestionEditorView.swift in Sources */,
+				3E03416052DD4C3CA1A54E8A /* DragDropQuestionFillerView.swift in Sources */,
 				005CC343AB814B9885292A08 /* NATOView.swift in Sources */,
 				6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */,
 				F36CC1CEC21A4752B8FFDB90 /* PrimeFactorView.swift in Sources */,

@@ -21,12 +21,26 @@ enum FormQuestionType: String, Codable, CaseIterable, Identifiable {
         case .dragDrop: return "Drag & Drop"
         }
     }
+    var icon: String {
+        switch self {
+        case .textInput:      return "text.cursor"
+        case .multipleChoice: return "checklist"
+        case .ratingScale:    return "star.leadinghalf.filled"
+        case .slider:         return "slider.horizontal.3"
+        case .dropdown:       return "chevron.down.circle"
+        case .imageUpload:    return "photo.badge.plus"
+        case .dragDrop:       return "arrow.up.arrow.down"
+        }
+    }
 }
 
 struct FormQuestion: Identifiable, Codable, Hashable {
     var id: UUID = UUID()
+    /// A short creator-assigned name/label for this question (e.g. "satisfaction_rating").
+    var questionName: String = ""
     var title: String
     var type: FormQuestionType
+    /// Named elements for this question (choice labels, drag-drop items, dropdown entries, etc.)
     var options: [String] = []
     var required: Bool = false
 }

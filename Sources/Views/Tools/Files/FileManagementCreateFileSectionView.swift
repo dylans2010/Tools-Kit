@@ -2,26 +2,38 @@ import SwiftUI
 
 struct FileManagementCreateFileSectionView: View {
     @ObservedObject var backend: FileManagementBackend
+    let onDismiss: () -> Void
     @State private var newFileName = ""
     @State private var selectedType: ManagedFileType = .text
 
     var body: some View {
-        ToolInputSection("Create File") {
-            VStack(spacing: 10) {
-                TextField("File name", text: $newFileName)
-                    .textFieldStyle(.roundedBorder)
-                Picker("Type", selection: $selectedType) {
-                    ForEach(FileManagementFeatures.supportedCreationTypes) { type in
-                        Text(".\(type.rawValue)").tag(type)
+        NavigationStack {
+            Form {
+                Section("File Details") {
+                    TextField("Name", text: $newFileName)
+                        .autocorrectionDisabled()
+                    Picker("Type", selection: $selectedType) {
+                        ForEach(ManagedFileType.allCases) { type in
+                            Text(".\(type.rawValue)").tag(type)
+                        }
                     }
                 }
-                Button("Create File") {
-                    backend.createFile(name: newFileName, type: selectedType)
-                    newFileName = ""
-                }
-                .buttonStyle(.borderedProminent)
             }
-            .padding()
+            .navigationTitle("New File")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { onDismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Create") {
+                        backend.createFile(name: newFileName, type: selectedType)
+                        newFileName = ""
+                        onDismiss()
+                    }
+                    .disabled(newFileName.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+            }
         }
     }
 }
