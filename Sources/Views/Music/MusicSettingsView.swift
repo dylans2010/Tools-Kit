@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct MusicSettingsView: View {
     @StateObject private var modeManager = MusicModeManager.shared
@@ -14,6 +15,10 @@ struct MusicSettingsView: View {
     @State private var showClearLibraryAlert = false
     @State private var showSpotifySheet = false
     @State private var showSpotifyFetchSheet = false
+    @State private var showBackupExporter = false
+    @State private var backupURL: URL?
+    @State private var showBackupImporter = false
+    @State private var backupStatusMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -116,6 +121,21 @@ struct MusicSettingsView: View {
 
                 // MARK: Library
                 Section {
+                    Button {
+                        do {
+                            backupURL = try MusicLibraryManager.shared.createBackupArchive()
+                            showBackupExporter = true
+                        } catch {
+                            backupStatusMessage = error.localizedDescription
+                        }
+                    } label: {
+                        Label("Backup Songs & Playlists", systemImage: "externaldrive.badge.plus")
+                    }
+                    Button {
+                        showBackupImporter = true
+                    } label: {
+                        Label("Restore Backup", systemImage: "arrow.clockwise.icloud")
+                    }
                     Button(role: .destructive) {
                         showClearLibraryAlert = true
                     } label: {
@@ -123,6 +143,8 @@ struct MusicSettingsView: View {
                     }
                 } header: {
                     Text("Library")
+                } footer: {
+                    Text("Backup creates a ZIP with your songs and playlists. Restore replaces your current music library with the selected backup.")
                 }
             }
             .navigationTitle("Music Settings")
@@ -135,7 +157,7 @@ struct MusicSettingsView: View {
             .alert("Clear Library?", isPresented: $showClearLibraryAlert) {
                 Button("Clear All", role: .destructive) {
                     MusicLibraryManager.shared.clearLibrary()
-                    player.pause()
+                    player.resetPlaybackState()
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
@@ -144,6 +166,38 @@ struct MusicSettingsView: View {
             .sheet(isPresented: $showSleepTimer) { sleepTimerSheet }
             .sheet(isPresented: $showSpotifyFetchSheet) { SpotifyFetchView() }
             .sheet(isPresented: $showSpotifySheet) { SpotifyLinkSheet() }
+            .sheet(isPresented: $showBackupExporter, onDismiss: { backupURL = nil }) {
+                if let backupURL {
+                    ActivityView(activityItems: [backupURL])
+                }
+            }
+            .sheet(isPresented: $showBackupImporter) {
+                FileImporterRepresentableView(
+                    allowedContentTypes: [UTType(filenameExtension: "zip") ?? .data]
+                ) { urls in
+                    showBackupImporter = false
+                    guard let url = urls.first else { return }
+                    let accessing = url.startAccessingSecurityScopedResource()
+                    defer {
+                        if accessing { url.stopAccessingSecurityScopedResource() }
+                    }
+                    do {
+                        let counts = try MusicLibraryManager.shared.restoreFromBackup(at: url)
+                        player.resetPlaybackState()
+                        backupStatusMessage = "Restore complete: \(counts.songs) songs and \(counts.playlists) playlists imported."
+                    } catch {
+                        backupStatusMessage = "Restore failed: \(error.localizedDescription)"
+                    }
+                }
+            }
+            .alert("Music Backup", isPresented: Binding(
+                get: { backupStatusMessage != nil },
+                set: { if !$0 { backupStatusMessage = nil } }
+            )) {
+                Button("OK", role: .cancel) { backupStatusMessage = nil }
+            } message: {
+                Text(backupStatusMessage ?? "")
+            }
         }
     }
 
@@ -175,6 +229,16 @@ struct MusicSettingsView: View {
         }
         .presentationDetents([.medium])
     }
+}
+
+private struct ActivityView: UIViewControllerRepresentable {
+    let activityItems: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 // MARK: - Lyrics Settings Detail

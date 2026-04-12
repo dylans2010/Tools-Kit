@@ -1,5 +1,7 @@
 import Foundation
 import AVFoundation
+import ZIPFoundation
+import CryptoKit
 
 final class MusicLibraryManager: ObservableObject {
     static let shared = MusicLibraryManager()
@@ -9,7 +11,25 @@ final class MusicLibraryManager: ObservableObject {
 
     private let songsKey = "music.songs"
     private let playlistsKey = "music.playlists"
+    private let songIDsByPathKey = "music.songIDsByPath"
     private let allowedExtensions: Set<String> = ["mp3", "mp4", "m4a", "aac", "wav", "flac"]
+
+    private struct BackupSongRecord: Codable {
+        let id: UUID
+        let title: String
+        let artist: String
+        let duration: TimeInterval
+        let artworkData: Data?
+        let dateAdded: Date
+        let playCount: Int
+        let fileName: String
+    }
+
+    private struct BackupManifest: Codable {
+        let version: Int
+        let songs: [BackupSongRecord]
+        let playlists: [Playlist]
+    }
 
     private var musicDirectory: URL {
         let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -49,7 +69,7 @@ final class MusicLibraryManager: ObservableObject {
         }
     }
 
-    private func extractMetadata(from url: URL) -> Song {
+    private func extractMetadata(from url: URL, preferredID: UUID? = nil) -> Song {
         let asset = AVURLAsset(url: url)
         var title = url.deletingPathExtension().lastPathComponent
         var artist = "Unknown Artist"
@@ -72,7 +92,7 @@ final class MusicLibraryManager: ObservableObject {
         let d = CMTimeGetSeconds(asset.duration)
         if d.isFinite && d > 0 { duration = d }
 
-        return Song(title: title, artist: artist, duration: duration,
+        return Song(id: preferredID ?? stableSongID(for: url), title: title, artist: artist, duration: duration,
                     fileURL: url, artworkData: artworkData)
     }
 
@@ -147,6 +167,13 @@ final class MusicLibraryManager: ObservableObject {
         save()
     }
 
+    func renameSong(id: UUID, newTitle: String) {
+        let trimmed = newTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, let idx = songs.firstIndex(where: { $0.id == id }) else { return }
+        songs[idx].title = trimmed
+        save()
+    }
+
     func updatePlaylist(_ playlist: Playlist) {
         if let idx = playlists.firstIndex(where: { $0.id == playlist.id }) {
             playlists[idx] = playlist
@@ -180,6 +207,8 @@ final class MusicLibraryManager: ObservableObject {
         if let data = try? JSONEncoder().encode(songs) {
             UserDefaults.standard.set(data, forKey: songsKey)
         }
+        let songIDsByPath = Dictionary(uniqueKeysWithValues: songs.map { ($0.fileURL.path, $0.id.uuidString) })
+        UserDefaults.standard.set(songIDsByPath, forKey: songIDsByPathKey)
         if let data = try? JSONEncoder().encode(playlists) {
             UserDefaults.standard.set(data, forKey: playlistsKey)
         }
@@ -194,6 +223,7 @@ final class MusicLibraryManager: ObservableObject {
             persistedSongs = decoded.filter { FileManager.default.fileExists(atPath: $0.fileURL.path) }
         }
 
+        let persistedIDsByPath = (UserDefaults.standard.dictionary(forKey: songIDsByPathKey) as? [String: String]) ?? [:]
         let songsByPath = Dictionary(uniqueKeysWithValues: persistedSongs.map { ($0.fileURL.path, $0) })
         let onDiskURLs = ((try? FileManager.default.contentsOfDirectory(
             at: musicDirectory,
@@ -205,12 +235,21 @@ final class MusicLibraryManager: ObservableObject {
             if let existing = songsByPath[fileURL.path] {
                 return existing
             }
-            return extractMetadata(from: fileURL)
+            let restoredID = persistedIDsByPath[fileURL.path].flatMap(UUID.init(uuidString:))
+            return extractMetadata(from: fileURL, preferredID: restoredID ?? stableSongID(for: fileURL))
         }
 
         if let data = UserDefaults.standard.data(forKey: playlistsKey),
            let decoded = try? JSONDecoder().decode([Playlist].self, from: data) {
-            playlists = decoded
+            let validSongIDs = Set(songs.map(\.id))
+            playlists = decoded.map { playlist in
+                var updated = playlist
+                updated.songIDs = playlist.songIDs.filter { validSongIDs.contains($0) }
+                if let artworkID = updated.artworkSongID, !validSongIDs.contains(artworkID) {
+                    updated.artworkSongID = updated.songIDs.first
+                }
+                return updated
+            }
         }
         save()
     }
@@ -236,5 +275,129 @@ final class MusicLibraryManager: ObservableObject {
             }
             index += 1
         }
+    }
+
+    func createBackupArchive() throws -> URL {
+        let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
+        let backupURL = FileManager.default.temporaryDirectory.appendingPathComponent("ToolsKit-Music-Backup-\(stamp).zip")
+        try? FileManager.default.removeItem(at: backupURL)
+        guard let archive = Archive(url: backupURL, accessMode: .create) else {
+            throw NSError(domain: "MusicLibraryBackup", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create backup archive."])
+        }
+
+        var usedNames = Set<String>()
+        var records: [BackupSongRecord] = []
+        for song in songs where FileManager.default.fileExists(atPath: song.fileURL.path) {
+            let backupFileName = uniqueBackupFileName(for: song.fileURL.lastPathComponent, usedNames: &usedNames)
+            let data = try Data(contentsOf: song.fileURL)
+            try addToArchive(data: data, atPath: "songs/\(backupFileName)", archive: archive)
+
+            records.append(BackupSongRecord(
+                id: song.id,
+                title: song.title,
+                artist: song.artist,
+                duration: song.duration,
+                artworkData: song.artworkData,
+                dateAdded: song.dateAdded,
+                playCount: song.playCount,
+                fileName: backupFileName
+            ))
+        }
+
+        let manifest = BackupManifest(version: 1, songs: records, playlists: playlists)
+        let manifestData = try JSONEncoder().encode(manifest)
+        try addToArchive(data: manifestData, atPath: "manifest.json", archive: archive)
+        return backupURL
+    }
+
+    @discardableResult
+    func restoreFromBackup(at url: URL) throws -> (songs: Int, playlists: Int) {
+        guard let archive = Archive(url: url, accessMode: .read) else {
+            throw NSError(domain: "MusicLibraryBackup", code: 2, userInfo: [NSLocalizedDescriptionKey: "Selected file is not a valid backup ZIP."])
+        }
+
+        guard let manifestEntry = archive["manifest.json"] else {
+            throw NSError(domain: "MusicLibraryBackup", code: 3, userInfo: [NSLocalizedDescriptionKey: "Backup manifest is missing."])
+        }
+        let manifestData = try extractData(from: manifestEntry, archive: archive)
+        let manifest = try JSONDecoder().decode(BackupManifest.self, from: manifestData)
+
+        let existingFiles = (try? FileManager.default.contentsOfDirectory(at: musicDirectory, includingPropertiesForKeys: nil)) ?? []
+        for fileURL in existingFiles {
+            try? FileManager.default.removeItem(at: fileURL)
+        }
+
+        var restoredSongs: [Song] = []
+        for record in manifest.songs {
+            guard let songEntry = archive["songs/\(record.fileName)"] else { continue }
+            let songData = try extractData(from: songEntry, archive: archive)
+            let destination = uniqueDestinationURL(for: record.fileName)
+            try songData.write(to: destination)
+
+            var restored = extractMetadata(from: destination, preferredID: record.id)
+            restored.title = record.title
+            restored.artist = record.artist
+            restored.duration = record.duration
+            restored.artworkData = record.artworkData ?? restored.artworkData
+            restored.dateAdded = record.dateAdded
+            restored.playCount = record.playCount
+            restoredSongs.append(restored)
+        }
+
+        songs = restoredSongs
+        let validSongIDs = Set(restoredSongs.map(\.id))
+        playlists = manifest.playlists.map { playlist in
+            var updated = playlist
+            updated.songIDs = playlist.songIDs.filter { validSongIDs.contains($0) }
+            if let artworkID = updated.artworkSongID, !validSongIDs.contains(artworkID) {
+                updated.artworkSongID = updated.songIDs.first
+            }
+            return updated
+        }
+        save()
+        return (songs: songs.count, playlists: playlists.count)
+    }
+
+    private func stableSongID(for url: URL) -> UUID {
+        let normalizedPath = url.standardizedFileURL.path.lowercased()
+        let digest = SHA256.hash(data: Data(normalizedPath.utf8))
+        let bytes = Array(digest.prefix(16))
+        let uuid = uuid_t(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7], bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15])
+        return UUID(uuid: uuid)
+    }
+
+    private func uniqueBackupFileName(for original: String, usedNames: inout Set<String>) -> String {
+        let trimmed = original.trimmingCharacters(in: .whitespacesAndNewlines)
+        let originalURL = URL(fileURLWithPath: trimmed.isEmpty ? "song.mp3" : trimmed)
+        let ext = originalURL.pathExtension
+        let base = originalURL.deletingPathExtension().lastPathComponent.isEmpty
+            ? "song"
+            : originalURL.deletingPathExtension().lastPathComponent
+
+        var candidate = ext.isEmpty ? base : "\(base).\(ext)"
+        var index = 1
+        while usedNames.contains(candidate) {
+            let suffix = " (\(index))"
+            candidate = ext.isEmpty ? "\(base)\(suffix)" : "\(base)\(suffix).\(ext)"
+            index += 1
+        }
+        usedNames.insert(candidate)
+        return candidate
+    }
+
+    private func addToArchive(data: Data, atPath path: String, archive: Archive) throws {
+        try archive.addEntry(with: path, type: .file, uncompressedSize: Int64(data.count), compressionMethod: .deflate) { position, size in
+            let lowerBound = Int(position)
+            let upperBound = min(lowerBound + size, data.count)
+            return data.subdata(in: lowerBound..<upperBound)
+        }
+    }
+
+    private func extractData(from entry: Archive.Entry, archive: Archive) throws -> Data {
+        var result = Data()
+        _ = try archive.extract(entry) { chunk in
+            result.append(chunk)
+        }
+        return result
     }
 }
