@@ -58,18 +58,19 @@ final class FallbackFetchViewModel: ObservableObject {
             return
         }
 
-        let header = lines[0].lowercased()
-        let columns = header.components(separatedBy: ",")
+        let headerFields = parseCSVLine(lines[0])
+        let normalizedHeaders = headerFields.map { $0.trimmingCharacters(in: .init(charactersIn: "\" ")).lowercased() }
 
-        guard let titleIndex = columns.firstIndex(where: { $0.contains("track") || $0.contains("title") || $0.contains("name") }),
-              let artistIndex = columns.firstIndex(where: { $0.contains("artist") }) else {
-            errorMessage = "Could not find 'Track Name' and 'Artist' columns in CSV"
+        guard let titleIndex = normalizedHeaders.firstIndex(where: { $0 == "track name" }),
+              let artistIndex = normalizedHeaders.firstIndex(where: { $0 == "artist name(s)" }) else {
+            errorMessage = "Could not find 'Track Name' and 'Artist Name(s)' columns in CSV"
             return
         }
 
         var importedSongs: [SongFetchItem] = []
         for i in 1..<lines.count {
             let line = lines[i]
+            guard !line.trimmingCharacters(in: .whitespaces).isEmpty else { continue }
             let fields = parseCSVLine(line)
             if fields.count > max(titleIndex, artistIndex) {
                 let title = fields[titleIndex].trimmingCharacters(in: .init(charactersIn: "\" "))
