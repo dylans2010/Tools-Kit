@@ -4,6 +4,7 @@ struct DashboardView: View {
     @StateObject private var registry = ToolRegistry()
     @StateObject private var visibility = ToolVisibilityManager.shared
     @StateObject private var settingsManager = AIChatSettingsManager.shared
+    @StateObject private var privateMode = PrivateModeManager.shared
     @State private var searchText = ""
     @State private var selectedCategory: ToolCategory? = nil
     @State private var showSettings = false
@@ -17,11 +18,14 @@ struct DashboardView: View {
                     dashboardHeader
                     SearchBar(text: $searchText)
                     categoryPicker
+                    privateModeCard
 
                     if searchText.isEmpty && selectedCategory == nil {
                         toolSection(title: "Favorites", tools: favoriteTools)
                         toolSection(title: "Recently Used", tools: recentTools)
-                        toolSection(title: "All Tools", tools: visibleTools)
+                        toolSection(title: "Network", tools: networkTools)
+                        toolSection(title: "Privacy", tools: privacyTools)
+                        toolSection(title: "All Tools", tools: otherTools)
                     } else {
                         let filtered = registry.filteredTools(query: searchText, category: selectedCategory)
                             .filter { visibility.isVisible($0.id) }
@@ -60,6 +64,44 @@ struct DashboardView: View {
         .padding(.top, 8)
     }
 
+    private var privateModeCard: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(privateMode.isEnabled ? Color.blue : Color(.systemGray5))
+                    .frame(width: 44, height: 44)
+                Image(systemName: "lock.shield.fill")
+                    .foregroundColor(privateMode.isEnabled ? .white : .secondary)
+                    .font(.system(size: 18, weight: .semibold))
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Private Mode")
+                    .font(.subheadline.weight(.semibold))
+                Text(privateMode.isEnabled
+                     ? "Secure Router · DoH · Tracker Blocker active"
+                     : "Enable to activate all privacy protections")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            Spacer()
+            Toggle("", isOn: $privateMode.isEnabled)
+                .labelsHidden()
+        }
+        .padding()
+        .background(
+            privateMode.isEnabled
+                ? LinearGradient(colors: [Color.blue.opacity(0.15), Color.indigo.opacity(0.1)], startPoint: .leading, endPoint: .trailing)
+                : LinearGradient(colors: [Color(.secondarySystemGroupedBackground)], startPoint: .leading, endPoint: .trailing)
+        )
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(privateMode.isEnabled ? Color.blue.opacity(0.4) : Color.clear, lineWidth: 1)
+        )
+        .padding(.horizontal)
+        .animation(.easeInOut(duration: 0.25), value: privateMode.isEnabled)
+    }
+
     private var categoryPicker: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
@@ -86,6 +128,18 @@ struct DashboardView: View {
 
     private var recentTools: [any Tool] {
         visibleTools.filter { registry.recentlyUsedIDs.contains($0.id) }
+    }
+
+    private var networkTools: [any Tool] {
+        visibleTools.filter { $0.category == .network }
+    }
+
+    private var privacyTools: [any Tool] {
+        visibleTools.filter { $0.category == .privacy }
+    }
+
+    private var otherTools: [any Tool] {
+        visibleTools.filter { $0.category != .network && $0.category != .privacy }
     }
 
     @ViewBuilder

@@ -115,7 +115,20 @@ class ToolRegistry: ObservableObject {
             CodeDebuggerTool(),
             ReminderGeneratorTool(),
             SchemaGeneratorTool(),
-            ProjectsTool()
+            ProjectsTool(),
+
+            // Network Tools
+            DoHTool(),
+            IPIntelligenceTool(),
+            ConnectionInspectorTool(),
+            EndpointTesterTool(),
+            SecureRouterTool(),
+
+            // Privacy Tools
+            EncryptedVaultTool(),
+            TrackerBlockerTool(),
+            TemporaryIdentityTool(),
+            SecureFileSenderTool()
         ]
     }
 
