@@ -74,6 +74,10 @@
 		MU0200000000000000000011 /* ZIPExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000011 /* ZIPExtractor.swift */; };
 		MU0200000000000000000012 /* LyricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000012 /* LyricsView.swift */; };
 		MU0200000000000000000013 /* SpotifyLinkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000013 /* SpotifyLinkService.swift */; };
+		MU0200000000000000000014 /* LyricsDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000014 /* LyricsDocument.swift */; };
+		MU0200000000000000000015 /* LyricsEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000015 /* LyricsEditorView.swift */; };
+		MU0200000000000000000016 /* LyricsImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000016 /* LyricsImportView.swift */; };
+		MU0200000000000000000017 /* LyricsExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000017 /* LyricsExportView.swift */; };
 		88656A686AF741EB83B8FD5F /* SliderQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711D3FB735414113B06478F1 /* MorseCodeView.swift */; };
@@ -686,6 +690,10 @@
 		MU0100000000000000000011 /* ZIPExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/ZIPExtractor.swift"; sourceTree = "<group>"; };
 		MU0100000000000000000012 /* LyricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/LyricsView.swift"; sourceTree = "<group>"; };
 		MU0100000000000000000013 /* SpotifyLinkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Services/SpotifyLinkService.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000014 /* LyricsDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Models/LyricsDocument.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000015 /* LyricsEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/LyricsEditorView.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000016 /* LyricsImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/LyricsImportView.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000017 /* LyricsExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/LyricsExportView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1048,6 +1056,10 @@
 			MU0100000000000000000011 /* ZIPExtractor.swift */,
 			MU0100000000000000000012 /* LyricsView.swift */,
 			MU0100000000000000000013 /* SpotifyLinkService.swift */,
+			MU0100000000000000000014 /* LyricsDocument.swift */,
+			MU0100000000000000000015 /* LyricsEditorView.swift */,
+			MU0100000000000000000016 /* LyricsImportView.swift */,
+			MU0100000000000000000017 /* LyricsExportView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -1468,6 +1480,10 @@
 			MU0200000000000000000011 /* ZIPExtractor.swift in Sources */,
 			MU0200000000000000000012 /* LyricsView.swift in Sources */,
 			MU0200000000000000000013 /* SpotifyLinkService.swift in Sources */,
+			MU0200000000000000000014 /* LyricsDocument.swift in Sources */,
+			MU0200000000000000000015 /* LyricsEditorView.swift in Sources */,
+			MU0200000000000000000016 /* LyricsImportView.swift in Sources */,
+			MU0200000000000000000017 /* LyricsExportView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
