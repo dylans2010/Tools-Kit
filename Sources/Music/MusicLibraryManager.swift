@@ -13,6 +13,7 @@ final class MusicLibraryManager: ObservableObject {
     private let playlistsKey = "music.playlists"
     private let songIDsByPathKey = "music.songIDsByPath"
     private let allowedExtensions: Set<String> = ["mp3", "mp4", "m4a", "aac", "wav", "flac"]
+    private static let backupDateFormatter = ISO8601DateFormatter()
 
     private struct BackupSongRecord: Codable {
         let id: UUID
@@ -278,7 +279,7 @@ final class MusicLibraryManager: ObservableObject {
     }
 
     func createBackupArchive() throws -> URL {
-        let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
+        let stamp = Self.backupDateFormatter.string(from: Date()).replacingOccurrences(of: ":", with: "-")
         let backupURL = FileManager.default.temporaryDirectory.appendingPathComponent("ToolsKit-Music-Backup-\(stamp).zip")
         try? FileManager.default.removeItem(at: backupURL)
         guard let archive = Archive(url: backupURL, accessMode: .create) else {
@@ -361,8 +362,10 @@ final class MusicLibraryManager: ObservableObject {
     private func stableSongID(for url: URL) -> UUID {
         let normalizedPath = url.standardizedFileURL.path.lowercased()
         let digest = SHA256.hash(data: Data(normalizedPath.utf8))
-        let bytes = Array(digest.prefix(16))
-        let uuid = uuid_t(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7], bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15])
+        var uuid = uuid_t()
+        withUnsafeMutableBytes(of: &uuid) { destination in
+            _ = destination.copyBytes(from: digest.prefix(16))
+        }
         return UUID(uuid: uuid)
     }
 

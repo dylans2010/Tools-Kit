@@ -222,6 +222,7 @@ struct SongsView: View {
                 renameTargetSongID = nil
                 pendingSongName = ""
             }
+            .disabled(pendingSongName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             Button("Cancel", role: .cancel) {
                 renameTargetSongID = nil
                 pendingSongName = ""

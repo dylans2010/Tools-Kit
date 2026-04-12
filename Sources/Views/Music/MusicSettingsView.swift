@@ -173,7 +173,7 @@ struct MusicSettingsView: View {
             }
             .sheet(isPresented: $showBackupImporter) {
                 FileImporterRepresentableView(
-                    allowedContentTypes: [UTType(filenameExtension: "zip") ?? .data]
+                    allowedContentTypes: [.zip]
                 ) { urls in
                     showBackupImporter = false
                     guard let url = urls.first else { return }
