@@ -82,12 +82,12 @@ final class PortScannerBackend: ObservableObject {
             }
             connection.start(queue: .global())
 
-            DispatchQueue.global().asyncAfter(deadline: .now() + 4) {
+            DispatchQueue.global().asyncAfter(deadline: .now() + 4) { [weak self] in
                 guard !resolved else { return }
                 resolved = true
                 connection.cancel()
-                Task { @MainActor in
-                    self.results[index].status = .timeout
+                Task { @MainActor [weak self] in
+                    self?.results[index].status = .timeout
                     continuation.resume()
                 }
             }

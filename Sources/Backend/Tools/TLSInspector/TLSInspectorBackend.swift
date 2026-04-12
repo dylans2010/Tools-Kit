@@ -115,9 +115,8 @@ private final class TLSCaptureDelegate: NSObject, URLSessionDelegate, @unchecked
                 }
             }
 
-            var result = SecTrustResultType.invalid
-            SecTrustEvaluate(trust, &result)
-            info.isValid = (result == .unspecified || result == .proceed)
+            var trustError: CFError?
+            info.isValid = SecTrustEvaluateWithError(trust, &trustError)
         }
 
         capturedInfo = info

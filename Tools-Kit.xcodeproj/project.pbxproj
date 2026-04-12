@@ -33,6 +33,28 @@
 		NP0200000000000000000012 /* TrackerBlockerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000012 /* TrackerBlockerView.swift */; };
 		NP0200000000000000000013 /* TemporaryIdentityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000013 /* TemporaryIdentityView.swift */; };
 		NP0200000000000000000014 /* SecureFileSenderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000014 /* SecureFileSenderView.swift */; };
+		NT0200000000000000000001 /* NetworkProfilerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000001 /* NetworkProfilerBackend.swift */; };
+		NT0200000000000000000002 /* WebSocketInspectorBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000002 /* WebSocketInspectorBackend.swift */; };
+		NT0200000000000000000003 /* TLSInspectorBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000003 /* TLSInspectorBackend.swift */; };
+		NT0200000000000000000004 /* PortScannerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000004 /* PortScannerBackend.swift */; };
+		NT0200000000000000000005 /* LinkSanitizerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000005 /* LinkSanitizerBackend.swift */; };
+		NT0200000000000000000006 /* PermissionAuditBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000006 /* PermissionAuditBackend.swift */; };
+		NT0200000000000000000007 /* ClipboardMonitorBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000007 /* ClipboardMonitorBackend.swift */; };
+		NT0200000000000000000008 /* TokenInspectorBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000008 /* TokenInspectorBackend.swift */; };
+		NT0200000000000000000009 /* FileIntegrityBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000009 /* FileIntegrityBackend.swift */; };
+		NT020000000000000000000A /* SafeBrowsingBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT010000000000000000000A /* SafeBrowsingBackend.swift */; };
+		NT020000000000000000000B /* BackgroundTaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT010000000000000000000B /* BackgroundTaskManager.swift */; };
+		NT020000000000000000000C /* CertificatePinningManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT010000000000000000000C /* CertificatePinningManager.swift */; };
+		NT020000000000000000000D /* NetworkProfilerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT010000000000000000000D /* NetworkProfilerView.swift */; };
+		NT020000000000000000000E /* WebSocketInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT010000000000000000000E /* WebSocketInspectorView.swift */; };
+		NT020000000000000000000F /* TLSInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT010000000000000000000F /* TLSInspectorView.swift */; };
+		NT0200000000000000000010 /* PortScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000010 /* PortScannerView.swift */; };
+		NT0200000000000000000011 /* LinkSanitizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000011 /* LinkSanitizerView.swift */; };
+		NT0200000000000000000012 /* PermissionAuditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000012 /* PermissionAuditView.swift */; };
+		NT0200000000000000000013 /* ClipboardMonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000013 /* ClipboardMonitorView.swift */; };
+		NT0200000000000000000014 /* TokenInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000014 /* TokenInspectorView.swift */; };
+		NT0200000000000000000015 /* FileIntegrityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000015 /* FileIntegrityView.swift */; };
+		NT0200000000000000000016 /* SafeBrowsingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000016 /* SafeBrowsingView.swift */; };
 		88656A686AF741EB83B8FD5F /* SliderQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711D3FB735414113B06478F1 /* MorseCodeView.swift */; };
@@ -603,6 +625,28 @@
 		NP0100000000000000000012 /* TrackerBlockerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/TrackerBlocker/TrackerBlockerView.swift"; sourceTree = "<group>"; };
 		NP0100000000000000000013 /* TemporaryIdentityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/TemporaryIdentity/TemporaryIdentityView.swift"; sourceTree = "<group>"; };
 		NP0100000000000000000014 /* SecureFileSenderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/SecureFileSender/SecureFileSenderView.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000001 /* NetworkProfilerBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/NetworkProfiler/NetworkProfilerBackend.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000002 /* WebSocketInspectorBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/WebSocketInspector/WebSocketInspectorBackend.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000003 /* TLSInspectorBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/TLSInspector/TLSInspectorBackend.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000004 /* PortScannerBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/PortScanner/PortScannerBackend.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000005 /* LinkSanitizerBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/LinkSanitizer/LinkSanitizerBackend.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000006 /* PermissionAuditBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/PermissionAudit/PermissionAuditBackend.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000007 /* ClipboardMonitorBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/ClipboardMonitor/ClipboardMonitorBackend.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000008 /* TokenInspectorBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/TokenInspector/TokenInspectorBackend.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000009 /* FileIntegrityBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/FileIntegrity/FileIntegrityBackend.swift"; sourceTree = "<group>"; };
+		NT010000000000000000000A /* SafeBrowsingBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/SafeBrowsing/SafeBrowsingBackend.swift"; sourceTree = "<group>"; };
+		NT010000000000000000000B /* BackgroundTaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Services/BackgroundTaskManager.swift"; sourceTree = "<group>"; };
+		NT010000000000000000000C /* CertificatePinningManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Network/CertificatePinningManager.swift"; sourceTree = "<group>"; };
+		NT010000000000000000000D /* NetworkProfilerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/NetworkProfiler/NetworkProfilerView.swift"; sourceTree = "<group>"; };
+		NT010000000000000000000E /* WebSocketInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/WebSocketInspector/WebSocketInspectorView.swift"; sourceTree = "<group>"; };
+		NT010000000000000000000F /* TLSInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/TLSInspector/TLSInspectorView.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000010 /* PortScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/PortScanner/PortScannerView.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000011 /* LinkSanitizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/LinkSanitizer/LinkSanitizerView.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000012 /* PermissionAuditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/PermissionAudit/PermissionAuditView.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000013 /* ClipboardMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/ClipboardMonitor/ClipboardMonitorView.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000014 /* TokenInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/TokenInspector/TokenInspectorView.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000015 /* FileIntegrityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/FileIntegrity/FileIntegrityView.swift"; sourceTree = "<group>"; };
+		NT0100000000000000000016 /* SafeBrowsingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/SafeBrowsing/SafeBrowsingView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -924,6 +968,28 @@
 				NP0100000000000000000012 /* TrackerBlockerView.swift */,
 				NP0100000000000000000013 /* TemporaryIdentityView.swift */,
 				NP0100000000000000000014 /* SecureFileSenderView.swift */,
+				NT0100000000000000000001 /* NetworkProfilerBackend.swift */,
+				NT0100000000000000000002 /* WebSocketInspectorBackend.swift */,
+				NT0100000000000000000003 /* TLSInspectorBackend.swift */,
+				NT0100000000000000000004 /* PortScannerBackend.swift */,
+				NT0100000000000000000005 /* LinkSanitizerBackend.swift */,
+				NT0100000000000000000006 /* PermissionAuditBackend.swift */,
+				NT0100000000000000000007 /* ClipboardMonitorBackend.swift */,
+				NT0100000000000000000008 /* TokenInspectorBackend.swift */,
+				NT0100000000000000000009 /* FileIntegrityBackend.swift */,
+				NT010000000000000000000A /* SafeBrowsingBackend.swift */,
+				NT010000000000000000000B /* BackgroundTaskManager.swift */,
+				NT010000000000000000000C /* CertificatePinningManager.swift */,
+				NT010000000000000000000D /* NetworkProfilerView.swift */,
+				NT010000000000000000000E /* WebSocketInspectorView.swift */,
+				NT010000000000000000000F /* TLSInspectorView.swift */,
+				NT0100000000000000000010 /* PortScannerView.swift */,
+				NT0100000000000000000011 /* LinkSanitizerView.swift */,
+				NT0100000000000000000012 /* PermissionAuditView.swift */,
+				NT0100000000000000000013 /* ClipboardMonitorView.swift */,
+				NT0100000000000000000014 /* TokenInspectorView.swift */,
+				NT0100000000000000000015 /* FileIntegrityView.swift */,
+				NT0100000000000000000016 /* SafeBrowsingView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -1298,6 +1364,28 @@
 				NP0200000000000000000012 /* TrackerBlockerView.swift in Sources */,
 				NP0200000000000000000013 /* TemporaryIdentityView.swift in Sources */,
 				NP0200000000000000000014 /* SecureFileSenderView.swift in Sources */,
+				NT0200000000000000000001 /* NetworkProfilerBackend.swift in Sources */,
+				NT0200000000000000000002 /* WebSocketInspectorBackend.swift in Sources */,
+				NT0200000000000000000003 /* TLSInspectorBackend.swift in Sources */,
+				NT0200000000000000000004 /* PortScannerBackend.swift in Sources */,
+				NT0200000000000000000005 /* LinkSanitizerBackend.swift in Sources */,
+				NT0200000000000000000006 /* PermissionAuditBackend.swift in Sources */,
+				NT0200000000000000000007 /* ClipboardMonitorBackend.swift in Sources */,
+				NT0200000000000000000008 /* TokenInspectorBackend.swift in Sources */,
+				NT0200000000000000000009 /* FileIntegrityBackend.swift in Sources */,
+				NT020000000000000000000A /* SafeBrowsingBackend.swift in Sources */,
+				NT020000000000000000000B /* BackgroundTaskManager.swift in Sources */,
+				NT020000000000000000000C /* CertificatePinningManager.swift in Sources */,
+				NT020000000000000000000D /* NetworkProfilerView.swift in Sources */,
+				NT020000000000000000000E /* WebSocketInspectorView.swift in Sources */,
+				NT020000000000000000000F /* TLSInspectorView.swift in Sources */,
+				NT0200000000000000000010 /* PortScannerView.swift in Sources */,
+				NT0200000000000000000011 /* LinkSanitizerView.swift in Sources */,
+				NT0200000000000000000012 /* PermissionAuditView.swift in Sources */,
+				NT0200000000000000000013 /* ClipboardMonitorView.swift in Sources */,
+				NT0200000000000000000014 /* TokenInspectorView.swift in Sources */,
+				NT0200000000000000000015 /* FileIntegrityView.swift in Sources */,
+				NT0200000000000000000016 /* SafeBrowsingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
