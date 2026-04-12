@@ -254,6 +254,19 @@
 		86E33EB1AA4F4A6880501CFE /* FormsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D36E2A06247452981FC530B /* FormsView.swift */; };
 		2B8623EC4C2746FD8064E6B0 /* ImportFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B01DFECD64440AB1621D72 /* ImportFormView.swift */; };
 		63C9778815934ACDBAE8A11B /* ManifestDataForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A733FE0F3549B681C5FE2E /* ManifestDataForm.swift */; };
+		A1B2C3D4E5F6478899AA0001 /* BugReportFormTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA0001 /* BugReportFormTemplate.swift */; };
+		A1B2C3D4E5F6478899AA0002 /* ITServiceRequestFormTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA0002 /* ITServiceRequestFormTemplate.swift */; };
+		A1B2C3D4E5F6478899AA0003 /* CourseEvaluationFormTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA0003 /* CourseEvaluationFormTemplate.swift */; };
+		A1B2C3D4E5F6478899AA0004 /* OrderIntakeFormTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA0004 /* OrderIntakeFormTemplate.swift */; };
+		A1B2C3D4E5F6478899AA0005 /* FileWorkspaceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA0005 /* FileWorkspaceManager.swift */; };
+		A1B2C3D4E5F6478899AA0006 /* FileNameValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA0006 /* FileNameValidator.swift */; };
+		A1B2C3D4E5F6478899AA0007 /* ManagedFileMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA0007 /* ManagedFileMetadataService.swift */; };
+		A1B2C3D4E5F6478899AA0008 /* FileManagementStatsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA0008 /* FileManagementStatsSectionView.swift */; };
+		A1B2C3D4E5F6478899AA0009 /* FileManagementCreateFolderSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA0009 /* FileManagementCreateFolderSectionView.swift */; };
+		A1B2C3D4E5F6478899AA000A /* FileManagementCreateFileSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA000A /* FileManagementCreateFileSectionView.swift */; };
+		A1B2C3D4E5F6478899AA000B /* FileManagementTemplateSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA000B /* FileManagementTemplateSectionView.swift */; };
+		A1B2C3D4E5F6478899AA000C /* FileManagementWorkspaceSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA000C /* FileManagementWorkspaceSectionView.swift */; };
+		A1B2C3D4E5F6478899AA000D /* FileManagementActionsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA000D /* FileManagementActionsSectionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -505,6 +518,19 @@
 		1D36E2A06247452981FC530B /* FormsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/FormsView.swift"; sourceTree = "<group>"; };
 		C1B01DFECD64440AB1621D72 /* ImportFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/ImportFormView.swift"; sourceTree = "<group>"; };
 		20A733FE0F3549B681C5FE2E /* ManifestDataForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/ManifestDataForm.swift"; sourceTree = "<group>"; };
+		B1C2D3E4F5A6478899AA0001 /* BugReportFormTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/FormTemplates/BugReportFormTemplate.swift"; sourceTree = "<group>"; };
+		B1C2D3E4F5A6478899AA0002 /* ITServiceRequestFormTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/FormTemplates/ITServiceRequestFormTemplate.swift"; sourceTree = "<group>"; };
+		B1C2D3E4F5A6478899AA0003 /* CourseEvaluationFormTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/FormTemplates/CourseEvaluationFormTemplate.swift"; sourceTree = "<group>"; };
+		B1C2D3E4F5A6478899AA0004 /* OrderIntakeFormTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/FormTemplates/OrderIntakeFormTemplate.swift"; sourceTree = "<group>"; };
+		B1C2D3E4F5A6478899AA0005 /* FileWorkspaceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Files/FileWorkspaceManager.swift"; sourceTree = "<group>"; };
+		B1C2D3E4F5A6478899AA0006 /* FileNameValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Files/FileNameValidator.swift"; sourceTree = "<group>"; };
+		B1C2D3E4F5A6478899AA0007 /* ManagedFileMetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Files/ManagedFileMetadataService.swift"; sourceTree = "<group>"; };
+		B1C2D3E4F5A6478899AA0008 /* FileManagementStatsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Files/FileManagementStatsSectionView.swift"; sourceTree = "<group>"; };
+		B1C2D3E4F5A6478899AA0009 /* FileManagementCreateFolderSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Files/FileManagementCreateFolderSectionView.swift"; sourceTree = "<group>"; };
+		B1C2D3E4F5A6478899AA000A /* FileManagementCreateFileSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Files/FileManagementCreateFileSectionView.swift"; sourceTree = "<group>"; };
+		B1C2D3E4F5A6478899AA000B /* FileManagementTemplateSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Files/FileManagementTemplateSectionView.swift"; sourceTree = "<group>"; };
+		B1C2D3E4F5A6478899AA000C /* FileManagementWorkspaceSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Files/FileManagementWorkspaceSectionView.swift"; sourceTree = "<group>"; };
+		B1C2D3E4F5A6478899AA000D /* FileManagementActionsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Files/FileManagementActionsSectionView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -777,6 +803,19 @@
 				1D36E2A06247452981FC530B /* FormsView.swift */,
 				C1B01DFECD64440AB1621D72 /* ImportFormView.swift */,
 				20A733FE0F3549B681C5FE2E /* ManifestDataForm.swift */,
+				B1C2D3E4F5A6478899AA0001 /* BugReportFormTemplate.swift */,
+				B1C2D3E4F5A6478899AA0002 /* ITServiceRequestFormTemplate.swift */,
+				B1C2D3E4F5A6478899AA0003 /* CourseEvaluationFormTemplate.swift */,
+				B1C2D3E4F5A6478899AA0004 /* OrderIntakeFormTemplate.swift */,
+				B1C2D3E4F5A6478899AA0005 /* FileWorkspaceManager.swift */,
+				B1C2D3E4F5A6478899AA0006 /* FileNameValidator.swift */,
+				B1C2D3E4F5A6478899AA0007 /* ManagedFileMetadataService.swift */,
+				B1C2D3E4F5A6478899AA0008 /* FileManagementStatsSectionView.swift */,
+				B1C2D3E4F5A6478899AA0009 /* FileManagementCreateFolderSectionView.swift */,
+				B1C2D3E4F5A6478899AA000A /* FileManagementCreateFileSectionView.swift */,
+				B1C2D3E4F5A6478899AA000B /* FileManagementTemplateSectionView.swift */,
+				B1C2D3E4F5A6478899AA000C /* FileManagementWorkspaceSectionView.swift */,
+				B1C2D3E4F5A6478899AA000D /* FileManagementActionsSectionView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -1102,6 +1141,19 @@
 				86E33EB1AA4F4A6880501CFE /* FormsView.swift in Sources */,
 				2B8623EC4C2746FD8064E6B0 /* ImportFormView.swift in Sources */,
 				63C9778815934ACDBAE8A11B /* ManifestDataForm.swift in Sources */,
+				A1B2C3D4E5F6478899AA0001 /* BugReportFormTemplate.swift in Sources */,
+				A1B2C3D4E5F6478899AA0002 /* ITServiceRequestFormTemplate.swift in Sources */,
+				A1B2C3D4E5F6478899AA0003 /* CourseEvaluationFormTemplate.swift in Sources */,
+				A1B2C3D4E5F6478899AA0004 /* OrderIntakeFormTemplate.swift in Sources */,
+				A1B2C3D4E5F6478899AA0005 /* FileWorkspaceManager.swift in Sources */,
+				A1B2C3D4E5F6478899AA0006 /* FileNameValidator.swift in Sources */,
+				A1B2C3D4E5F6478899AA0007 /* ManagedFileMetadataService.swift in Sources */,
+				A1B2C3D4E5F6478899AA0008 /* FileManagementStatsSectionView.swift in Sources */,
+				A1B2C3D4E5F6478899AA0009 /* FileManagementCreateFolderSectionView.swift in Sources */,
+				A1B2C3D4E5F6478899AA000A /* FileManagementCreateFileSectionView.swift in Sources */,
+				A1B2C3D4E5F6478899AA000B /* FileManagementTemplateSectionView.swift in Sources */,
+				A1B2C3D4E5F6478899AA000C /* FileManagementWorkspaceSectionView.swift in Sources */,
+				A1B2C3D4E5F6478899AA000D /* FileManagementActionsSectionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

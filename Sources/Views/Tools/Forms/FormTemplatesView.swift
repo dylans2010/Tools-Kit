@@ -6,20 +6,24 @@ struct FormTemplatesView: View {
 
     var body: some View {
         List {
-            Button("Customer Feedback") {
-                backend.add(FeedbackFormTemplate.build())
-                dismiss()
-            }
-            Button("Event Registration") {
-                backend.add(EventRegistrationFormTemplate.build())
-                dismiss()
-            }
-            Button("Job Application") {
-                backend.add(JobApplicationFormTemplate.build())
-                dismiss()
+            Section("Popular") {
+                templateButton("Customer Feedback", form: FeedbackFormTemplate.build())
+                templateButton("Event Registration", form: EventRegistrationFormTemplate.build())
+                templateButton("Job Application", form: JobApplicationFormTemplate.build())
+                templateButton("Bug Report", form: BugReportFormTemplate.build())
+                templateButton("IT Service Request", form: ITServiceRequestFormTemplate.build())
+                templateButton("Course Evaluation", form: CourseEvaluationFormTemplate.build())
+                templateButton("Order Intake", form: OrderIntakeFormTemplate.build())
             }
         }
         .navigationTitle("Form Templates")
         .toolbar { Button("Close") { dismiss() } }
+    }
+
+    private func templateButton(_ title: String, form: FormDocument) -> some View {
+        Button(title) {
+            backend.add(form)
+            dismiss()
+        }
     }
 }

@@ -34,8 +34,120 @@ struct FormQuestion: Identifiable, Codable, Hashable {
 struct FormManifest: Codable, Hashable {
     var createdBy: String
     var createdAt: Date
+    var lastEditedAt: Date
+    var formVersion: String
+    var manifestSchemaVersion: String
     var appVersion: String
+    var buildNumber: String
+    var bundleIdentifier: String
+    var platform: String
+    var localeIdentifier: String
+    var timeZoneIdentifier: String
+    var questionCount: Int
+    var requiredQuestionCount: Int
+    var supportsAttachments: Bool
+    var templateName: String?
     var privacyNote: String
+    var exportNote: String
+    var tags: [String]
+
+    init(
+        createdBy: String,
+        createdAt: Date,
+        lastEditedAt: Date = Date(),
+        formVersion: String = "1.0",
+        manifestSchemaVersion: String = "2.0",
+        appVersion: String,
+        buildNumber: String = "1",
+        bundleIdentifier: String = "com.dylans2010.ToolsKit",
+        platform: String = "iOS",
+        localeIdentifier: String = Locale.current.identifier,
+        timeZoneIdentifier: String = TimeZone.current.identifier,
+        questionCount: Int = 0,
+        requiredQuestionCount: Int = 0,
+        supportsAttachments: Bool = false,
+        templateName: String? = nil,
+        privacyNote: String,
+        exportNote: String = "Review form data before sharing outside your trusted workspace.",
+        tags: [String] = []
+    ) {
+        self.createdBy = createdBy
+        self.createdAt = createdAt
+        self.lastEditedAt = lastEditedAt
+        self.formVersion = formVersion
+        self.manifestSchemaVersion = manifestSchemaVersion
+        self.appVersion = appVersion
+        self.buildNumber = buildNumber
+        self.bundleIdentifier = bundleIdentifier
+        self.platform = platform
+        self.localeIdentifier = localeIdentifier
+        self.timeZoneIdentifier = timeZoneIdentifier
+        self.questionCount = questionCount
+        self.requiredQuestionCount = requiredQuestionCount
+        self.supportsAttachments = supportsAttachments
+        self.templateName = templateName
+        self.privacyNote = privacyNote
+        self.exportNote = exportNote
+        self.tags = tags
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let now = Date()
+        createdBy = try container.decodeIfPresent(String.self, forKey: .createdBy) ?? "Unknown"
+        createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt) ?? now
+        lastEditedAt = try container.decodeIfPresent(Date.self, forKey: .lastEditedAt) ?? createdAt
+        formVersion = try container.decodeIfPresent(String.self, forKey: .formVersion) ?? "1.0"
+        manifestSchemaVersion = try container.decodeIfPresent(String.self, forKey: .manifestSchemaVersion) ?? "1.0"
+        appVersion = try container.decodeIfPresent(String.self, forKey: .appVersion) ?? "1.0"
+        buildNumber = try container.decodeIfPresent(String.self, forKey: .buildNumber) ?? "1"
+        bundleIdentifier = try container.decodeIfPresent(String.self, forKey: .bundleIdentifier) ?? "com.dylans2010.ToolsKit"
+        platform = try container.decodeIfPresent(String.self, forKey: .platform) ?? "iOS"
+        localeIdentifier = try container.decodeIfPresent(String.self, forKey: .localeIdentifier) ?? Locale.current.identifier
+        timeZoneIdentifier = try container.decodeIfPresent(String.self, forKey: .timeZoneIdentifier) ?? TimeZone.current.identifier
+        questionCount = try container.decodeIfPresent(Int.self, forKey: .questionCount) ?? 0
+        requiredQuestionCount = try container.decodeIfPresent(Int.self, forKey: .requiredQuestionCount) ?? 0
+        supportsAttachments = try container.decodeIfPresent(Bool.self, forKey: .supportsAttachments) ?? false
+        templateName = try container.decodeIfPresent(String.self, forKey: .templateName)
+        privacyNote = try container.decodeIfPresent(String.self, forKey: .privacyNote) ?? "Review manifest before sharing."
+        exportNote = try container.decodeIfPresent(String.self, forKey: .exportNote) ?? "Review form data before sharing outside your trusted workspace."
+        tags = try container.decodeIfPresent([String].self, forKey: .tags) ?? []
+    }
+
+    static func compose(
+        creatorName: String,
+        questions: [FormQuestion],
+        privacyNote: String,
+        templateName: String? = nil,
+        tags: [String] = []
+    ) -> FormManifest {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+        let bundleID = Bundle.main.bundleIdentifier ?? "com.dylans2010.ToolsKit"
+        let questionCount = questions.count
+        let requiredCount = questions.filter(\.required).count
+        let supportsAttachments = questions.contains { $0.type == .imageUpload }
+
+        return FormManifest(
+            createdBy: creatorName.isEmpty ? "Unknown" : creatorName,
+            createdAt: Date(),
+            lastEditedAt: Date(),
+            formVersion: "1.0",
+            manifestSchemaVersion: "2.0",
+            appVersion: version,
+            buildNumber: build,
+            bundleIdentifier: bundleID,
+            platform: "iOS",
+            localeIdentifier: Locale.current.identifier,
+            timeZoneIdentifier: TimeZone.current.identifier,
+            questionCount: questionCount,
+            requiredQuestionCount: requiredCount,
+            supportsAttachments: supportsAttachments,
+            templateName: templateName,
+            privacyNote: privacyNote,
+            tags: tags
+        )
+    }
 }
 
 struct FormDocument: Identifiable, Codable, Hashable {

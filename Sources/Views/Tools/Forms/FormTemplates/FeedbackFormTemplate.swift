@@ -2,16 +2,25 @@ import Foundation
 
 enum FeedbackFormTemplate {
     static func build() -> FormDocument {
+        let questions = [
+            FormQuestion(title: "How satisfied are you?", type: .ratingScale, options: ["1", "5"], required: true),
+            FormQuestion(title: "Which area should improve first?", type: .dropdown, options: ["Product quality", "Pricing", "Support", "Delivery speed"], required: true),
+            FormQuestion(title: "What should we improve?", type: .textInput, required: false)
+        ]
+
         FormDocument(
             name: "Customer Feedback",
             description: "Collect product feedback from users.",
-            questions: [
-                FormQuestion(title: "How satisfied are you?", type: .ratingScale, options: ["1", "2", "3", "4", "5"], required: true),
-                FormQuestion(title: "What should we improve?", type: .textInput, required: false)
-            ],
+            questions: questions,
             accentHexColor: "007AFF",
             backgroundHexColor: "F2F2F7",
-            manifest: FormManifest(createdBy: "Template", createdAt: Date(), appVersion: "1.0", privacyNote: "No personal data is required by default.")
+            manifest: FormManifest.compose(
+                creatorName: "Template",
+                questions: questions,
+                privacyNote: "No personal data is required by default.",
+                templateName: "Customer Feedback",
+                tags: ["feedback", "customer", "survey"]
+            )
         )
     }
 }

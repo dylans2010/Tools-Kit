@@ -47,31 +47,47 @@ struct FillOutFormView: View {
     private func questionInput(for question: FormQuestion) -> some View {
         switch question.type {
         case .multipleChoice, .dropdown, .dragDrop:
-            Picker("Answer", selection: Binding(
-                get: { answers[question.id] ?? "" },
-                set: { answers[question.id] = $0 }
-            )) {
-                ForEach(question.options, id: \.self) { option in
-                    Text(option).tag(option)
+            if question.options.isEmpty {
+                TextField(
+                    "Your answer",
+                    text: Binding(
+                        get: { answers[question.id] ?? "" },
+                        set: { answers[question.id] = $0 }
+                    )
+                )
+            } else {
+                Picker("Answer", selection: Binding(
+                    get: { answers[question.id] ?? question.options.first ?? "" },
+                    set: { answers[question.id] = $0 }
+                )) {
+                    ForEach(question.options, id: \.self) { option in
+                        Text(option).tag(option)
+                    }
                 }
             }
         case .ratingScale:
+            let ratingOptions = resolvedRatingOptions(for: question)
             Picker("Rating", selection: Binding(
-                get: { answers[question.id] ?? "3" },
+                get: { answers[question.id] ?? ratingOptions.first ?? "" },
                 set: { answers[question.id] = $0 }
             )) {
-                ForEach(question.options.isEmpty ? ["1", "2", "3", "4", "5"] : question.options, id: \.self) { value in
+                ForEach(ratingOptions, id: \.self) { value in
                     Text(value).tag(value)
                 }
             }
         case .slider:
+            let sliderConfig = resolvedSliderConfig(for: question)
             Slider(
                 value: Binding(
-                    get: { Double(answers[question.id] ?? "50") ?? 50 },
+                    get: { Double(answers[question.id] ?? String(sliderConfig.defaultValue)) ?? sliderConfig.defaultValue },
                     set: { answers[question.id] = String(Int($0)) }
                 ),
-                in: 0...100
+                in: sliderConfig.min...sliderConfig.max,
+                step: sliderConfig.step
             )
+            Text("Value: \(answers[question.id] ?? String(Int(sliderConfig.defaultValue)))")
+                .font(.caption)
+                .foregroundColor(.secondary)
         case .imageUpload:
             Text("Attach image externally and describe reference here.")
                 .font(.caption)
@@ -99,5 +115,24 @@ struct FillOutFormView: View {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(form.name)-answers.form")
         try? FilledOutFormManager.exportAnswers(doc, to: url)
         exportURL = url
+    }
+
+    private func resolvedRatingOptions(for question: FormQuestion) -> [String] {
+        if question.options.count >= 2,
+           let min = Int(question.options[0]),
+           let max = Int(question.options[1]),
+           min <= max {
+            return Array(min...max).map(String.init)
+        }
+        let normalized = question.options.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        return normalized.isEmpty ? ["1", "2", "3", "4", "5"] : normalized
+    }
+
+    private func resolvedSliderConfig(for question: FormQuestion) -> (min: Double, max: Double, step: Double, defaultValue: Double) {
+        let min = Double(question.options.first ?? "") ?? 0
+        let maxCandidate = Double(question.options.count > 1 ? question.options[1] : "") ?? 100
+        let maxValue = Swift.max(min, maxCandidate)
+        let step = Swift.max(0.1, Double(question.options.count > 2 ? question.options[2] : "") ?? 1)
+        return (min, maxValue, step, (min + maxValue) / 2)
     }
 }
