@@ -13,32 +13,36 @@ struct NowPlayingView: View {
     @State private var showLRCImportSheet = false
 
     var body: some View {
-        ZStack {
-            backgroundView
-            VStack(spacing: 0) {
-                headerRow
-                    .padding(.horizontal, 24)
-                    .padding(.top, 14)
-                    .padding(.bottom, 8)
+        GeometryReader { geo in
+            ZStack {
+                backgroundView
+                VStack(spacing: 0) {
+                    headerRow
+                        .padding(.horizontal, 24)
+                        .padding(.top, max(14, geo.safeAreaInsets.top + 4))
+                        .padding(.bottom, 8)
 
-                if showLyrics {
-                    LyricsView()
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .trailing).combined(with: .opacity),
-                            removal: .move(edge: .leading).combined(with: .opacity)
-                        ))
-                } else {
-                    artworkSection
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .leading).combined(with: .opacity),
-                            removal: .move(edge: .trailing).combined(with: .opacity)
-                        ))
+                    if showLyrics {
+                        LyricsView()
+                            .transition(.asymmetric(
+                                insertion: .move(edge: .trailing).combined(with: .opacity),
+                                removal: .move(edge: .leading).combined(with: .opacity)
+                            ))
+                    } else {
+                        artworkSection(availableHeight: geo.size.height)
+                            .transition(.asymmetric(
+                                insertion: .move(edge: .leading).combined(with: .opacity),
+                                removal: .move(edge: .trailing).combined(with: .opacity)
+                            ))
+                    }
+
+                    bottomControls(screenHeight: geo.size.height)
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, max(geo.safeAreaInsets.bottom, 16))
                 }
-
-                bottomControls
-                    .padding(.horizontal, 24)
             }
         }
+        .ignoresSafeArea()
         .gesture(
             DragGesture(minimumDistance: 20)
                 .onChanged { v in
@@ -133,12 +137,14 @@ struct NowPlayingView: View {
 
     // MARK: - Artwork
 
-    private var artworkSection: some View {
-        VStack(spacing: 0) {
-            Spacer(minLength: 12)
+    private func artworkSection(availableHeight: CGFloat) -> some View {
+        let artworkPad: CGFloat = availableHeight < 700 ? 20 : 36
+        let vPad: CGFloat = availableHeight < 700 ? 8 : 16
+        return VStack(spacing: 0) {
+            Spacer(minLength: vPad)
             artworkCard
-                .padding(.horizontal, 36)
-            Spacer(minLength: 12)
+                .padding(.horizontal, artworkPad)
+            Spacer(minLength: vPad)
         }
     }
 
@@ -175,22 +181,24 @@ struct NowPlayingView: View {
 
     // MARK: - Bottom Controls Stack
 
-    private var bottomControls: some View {
-        VStack(spacing: 0) {
+    private func bottomControls(screenHeight: CGFloat) -> some View {
+        let compact = screenHeight < 700
+        let vGap: CGFloat = compact ? 10 : 18
+        return VStack(spacing: 0) {
             songInfoRow
-                .padding(.bottom, 18)
+                .padding(.bottom, vGap)
 
             progressSection
-                .padding(.bottom, 18)
+                .padding(.bottom, vGap)
 
             mainControlsRow
-                .padding(.bottom, 20)
+                .padding(.bottom, compact ? 12 : 20)
 
             volumeRow
-                .padding(.bottom, 20)
+                .padding(.bottom, compact ? 10 : 18)
 
             secondaryControlsRow
-                .padding(.bottom, 28)
+                .padding(.bottom, compact ? 8 : 16)
         }
     }
 
@@ -210,13 +218,18 @@ struct NowPlayingView: View {
             }
             Spacer()
             Button {
-                showLyrics.toggle()
+                withAnimation { showLyrics.toggle() }
             } label: {
-                Image(systemName: showLyrics ? "photo" : "quote.bubble.fill")
-                    .font(.system(size: 22))
-                    .foregroundColor(showLyrics ? .white : .white.opacity(0.55))
-                    .frame(width: 44, height: 44)
-                    .contentShape(Rectangle())
+                ZStack {
+                    Circle()
+                        .fill(showLyrics ? Color.white.opacity(0.22) : Color.white.opacity(0.1))
+                        .frame(width: 40, height: 40)
+                    Image(systemName: showLyrics ? "photo" : "quote.bubble.fill")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(showLyrics ? .white : .white.opacity(0.75))
+                }
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
             }
         }
     }
