@@ -64,6 +64,12 @@ struct SongsView: View {
     @State private var showZIPImporter = false
     @State private var isImportingZIP = false
 
+    // ZIP → playlist prompt state
+    @State private var zipImportedSongs: [Song] = []
+    @State private var showZIPPlaylistAlert = false
+    @State private var showPlaylistNameAlert = false
+    @State private var pendingPlaylistName = ""
+
     private var filteredSongs: [Song] {
         guard !searchText.isEmpty else { return library.songs }
         return library.songs.filter {
@@ -152,11 +158,49 @@ struct SongsView: View {
                 let accessing = url.startAccessingSecurityScopedResource()
                 isImportingZIP = true
                 Task {
-                    await library.importFromZIP(at: url)
+                    let imported = await library.importFromZIP(at: url)
                     if accessing { url.stopAccessingSecurityScopedResource() }
-                    await MainActor.run { isImportingZIP = false }
+                    await MainActor.run {
+                        isImportingZIP = false
+                        if !imported.isEmpty {
+                            zipImportedSongs = imported
+                            showZIPPlaylistAlert = true
+                        }
+                    }
                 }
             }
+        }
+        // Ask whether to turn the imported songs into a playlist
+        .alert("Create Playlist?", isPresented: $showZIPPlaylistAlert) {
+            Button("Yes") {
+                pendingPlaylistName = ""
+                showPlaylistNameAlert = true
+            }
+            Button("No", role: .cancel) {
+                zipImportedSongs = []
+            }
+        } message: {
+            let count = zipImportedSongs.count
+            Text("Would you like to add \(count) imported \(count == 1 ? "song" : "songs") to a new playlist?")
+        }
+        // Collect the playlist name then create it
+        .alert("Name Your Playlist", isPresented: $showPlaylistNameAlert) {
+            TextField("Playlist Name", text: $pendingPlaylistName)
+            Button("Create") {
+                let name = pendingPlaylistName.trimmingCharacters(in: .whitespaces)
+                library.createPlaylist(
+                    name: name.isEmpty ? "Imported Playlist" : name,
+                    songIDs: zipImportedSongs.map(\.id)
+                )
+                zipImportedSongs = []
+                pendingPlaylistName = ""
+            }
+            Button("Cancel", role: .cancel) {
+                zipImportedSongs = []
+                pendingPlaylistName = ""
+            }
+        } message: {
+            Text("Enter a name for your new playlist.")
         }
     }
 
