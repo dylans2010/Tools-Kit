@@ -10,7 +10,7 @@ enum EventRegistrationFormTemplate {
             FormQuestion(title: "Session preference order", type: .dragDrop, options: ["iOS Architecture", "SwiftUI Deep Dive", "Testing Strategy", "Release Pipeline"], required: false)
         ]
 
-        FormDocument(
+        return FormDocument(
             name: "Event Registration",
             description: "Capture attendees for an event.",
             questions: questions,

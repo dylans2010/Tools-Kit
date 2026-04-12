@@ -10,7 +10,7 @@ enum JobApplicationFormTemplate {
             FormQuestion(title: "Upload Portfolio", type: .imageUpload, required: false)
         ]
 
-        FormDocument(
+        return FormDocument(
             name: "Job Application",
             description: "Collect applicant details.",
             questions: questions,
