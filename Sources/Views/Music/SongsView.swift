@@ -45,7 +45,9 @@ struct SongRow: View {
             if let data = song.artworkData, let img = UIImage(data: data) {
                 Image(uiImage: img)
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(2)
             } else {
                 Image(systemName: "music.note")
                     .foregroundColor(.secondary)

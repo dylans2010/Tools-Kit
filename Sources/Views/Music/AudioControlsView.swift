@@ -2,30 +2,16 @@ import SwiftUI
 
 struct AudioControlsView: View {
     @StateObject private var engine = AudioEngineManager.shared
-    @StateObject private var player = MusicPlayerManager.shared
-    @Environment(\.dismiss) private var dismiss
-
-    @State private var showEqualizer = false
 
     var body: some View {
-        NavigationStack {
-            Form {
-                playbackSection
-                crossfadeSection
-                outputSection
-                equalizerShortcutSection
-            }
-            .navigationTitle("Audio Controls")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }
-                }
-            }
-            .sheet(isPresented: $showEqualizer) {
-                EqualizerView()
-            }
+        Form {
+            playbackSection
+            crossfadeSection
+            outputSection
+            equalizerShortcutSection
         }
+        .navigationTitle("Audio Controls")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     // MARK: - Playback Section
@@ -150,8 +136,8 @@ struct AudioControlsView: View {
 
     private var equalizerShortcutSection: some View {
         Section {
-            Button {
-                showEqualizer = true
+            NavigationLink {
+                EqualizerView()
             } label: {
                 HStack {
                     Label("Equalizer", systemImage: "waveform.path.ecg")
