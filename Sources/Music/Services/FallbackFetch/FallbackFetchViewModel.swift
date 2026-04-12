@@ -175,7 +175,9 @@ final class FallbackFetchViewModel: ObservableObject {
     }
 
     init() {
-        LogManager.shared.debugMode = true
+        Task { @MainActor in
+            LogManager.shared.debugMode = true
+        }
     }
 
     func importCSV(url: URL) {
