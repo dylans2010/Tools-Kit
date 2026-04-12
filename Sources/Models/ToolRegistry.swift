@@ -69,6 +69,7 @@ class ToolRegistry: ObservableObject {
             NATOTool(),
 
             // Advanced Tools
+            FallbackFetchTool(),
             JSONFormatterTool(),
             APITesterTool(),
             RegexTesterTool(),
