@@ -71,6 +71,7 @@ final class AudioEngineManager: ObservableObject {
     private var totalFrames: Int64 = 0
     private var sampleRate: Double = 44_100
     private var crossfadeTimer: Timer?
+    private var fadingStepTimer: Timer?
     private var positionTimer: Timer?
     private var isEngineReady = false
 
@@ -234,7 +235,8 @@ final class AudioEngineManager: ObservableObject {
         var step       = 0
         let outgoing   = activeNode
 
-        Timer.scheduledTimer(withTimeInterval: stepDur, repeats: true) { [weak self] timer in
+        fadingStepTimer?.invalidate()
+        fadingStepTimer = Timer.scheduledTimer(withTimeInterval: stepDur, repeats: true) { [weak self] timer in
             guard let self else { timer.invalidate(); return }
             step += 1
             let progress = Float(step) / Float(steps)
@@ -242,6 +244,7 @@ final class AudioEngineManager: ObservableObject {
             incoming.volume = progress
             if step >= steps {
                 timer.invalidate()
+                self.fadingStepTimer = nil
                 outgoing.stop()
                 outgoing.volume = 1
                 self.currentFile       = file
@@ -335,6 +338,8 @@ final class AudioEngineManager: ObservableObject {
     private func stopCurrent() {
         crossfadeTimer?.invalidate()
         crossfadeTimer = nil
+        fadingStepTimer?.invalidate()
+        fadingStepTimer = nil
         for node in nodes { node.stop(); node.volume = 1 }
         stopPositionTimer()
     }

@@ -309,7 +309,10 @@ struct SongsView: View {
             .mapValues { $0.reduce(0) { $0 + $1.playCount } }
         return counts.max(by: { $0.value < $1.value })?.key ?? "—"
     }
-    private var topSong: Song? { library.songs.max(by: { $0.playCount < $1.playCount }).flatMap { $0.playCount > 0 ? $0 : nil } }
+    private var topSong: Song? {
+        let best = library.songs.max(by: { $0.playCount < $1.playCount })
+        return best.flatMap { $0.playCount > 0 ? $0 : nil }
+    }
 
     // MARK: - Sort Bar
 
