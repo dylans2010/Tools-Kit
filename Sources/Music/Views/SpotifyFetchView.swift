@@ -4,6 +4,13 @@ struct SpotifyFetchView: View {
     @StateObject private var viewModel = SpotifyFetchViewModel()
     @Environment(\.dismiss) private var dismiss
     @State private var showLogs = false
+    @State private var showFallbackFetch = false
+    @State private var showThirdPartySheet = false
+    @State private var thirdPartyVideoURL = ""
+    @State private var thirdPartyResult: MP3Result?
+    @State private var thirdPartyError: String?
+    @State private var isThirdPartyLoading = false
+    @AppStorage("zylaLabsAPIKey") private var zylaAPIKey = ""
 
     var body: some View {
         NavigationStack {
@@ -36,6 +43,12 @@ struct SpotifyFetchView: View {
             }
             .sheet(isPresented: $showLogs) {
                 logView
+            }
+            .sheet(isPresented: $showFallbackFetch) {
+                FallbackFetchView()
+            }
+            .sheet(isPresented: $showThirdPartySheet) {
+                thirdPartyDownloadSheet
             }
             .alert("Spotify Fetch", isPresented: Binding(
                 get: { viewModel.errorMessage != nil },
@@ -241,8 +254,128 @@ struct SpotifyFetchView: View {
                     .buttonStyle(.bordered)
                 }
             }
+
+            Divider()
+                .padding(.vertical, 4)
+
+            Button {
+                showFallbackFetch = true
+            } label: {
+                Label("Fallback Fetch (CSV Import)", systemImage: "arrow.down.doc.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+
+            if zylaAPIKey.isEmpty {
+                Button {
+                    thirdPartyVideoURL = ""
+                    thirdPartyResult = nil
+                    thirdPartyError = nil
+                    showThirdPartySheet = true
+                } label: {
+                    Label("Download Without API Key", systemImage: "arrow.down.circle")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(.orange)
+            }
         }
         .padding(.bottom, 10)
+    }
+
+    private var thirdPartyDownloadSheet: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Paste a YouTube video URL below and download the highest-quality MP3 without needing a Zyla Labs API key.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.leading)
+
+                    TextField("https://www.youtube.com/watch?v=...", text: $thirdPartyVideoURL)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .keyboardType(.URL)
+                        .textFieldStyle(.roundedBorder)
+                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(12)
+
+                if let result = thirdPartyResult {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(result.title)
+                            .font(.headline)
+                            .lineLimit(2)
+                        Text("\(result.bitrate) kbps · \(result.size)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        if let downloadURL = URL(string: result.url) {
+                            ShareLink(item: downloadURL) {
+                                Label("Share MP3 Link", systemImage: "square.and.arrow.up")
+                                    .font(.subheadline.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    }
+                    .padding()
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(12)
+                }
+
+                if let error = thirdPartyError {
+                    Text(error)
+                        .font(.footnote)
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
+
+                Button {
+                    Task {
+                        isThirdPartyLoading = true
+                        thirdPartyResult = nil
+                        thirdPartyError = nil
+                        do {
+                            thirdPartyResult = try await ThirdPartyAPI.getMP3Links(videoUrl: thirdPartyVideoURL)
+                        } catch {
+                            thirdPartyError = error.localizedDescription
+                        }
+                        isThirdPartyLoading = false
+                    }
+                } label: {
+                    if isThirdPartyLoading {
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                    } else {
+                        Label("Fetch MP3 Link", systemImage: "arrow.down.circle")
+                            .font(.subheadline.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+                .buttonStyle(.bordered)
+                .disabled(thirdPartyVideoURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isThirdPartyLoading)
+
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+            .navigationTitle("Download Without API Key")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Close") {
+                        showThirdPartySheet = false
+                        thirdPartyVideoURL = ""
+                        thirdPartyResult = nil
+                        thirdPartyError = nil
+                    }
+                }
+            }
+        }
     }
 
     private var logView: some View {

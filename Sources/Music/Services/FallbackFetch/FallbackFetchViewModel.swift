@@ -23,7 +23,9 @@ struct SongFetchItem: Identifiable, Equatable {
 }
 
 final class FallbackFetchViewModel: ObservableObject {
-    @Published var apiKey: String = ""
+    @Published var apiKey: String = UserDefaults.standard.string(forKey: "zylaLabsAPIKey") ?? "" {
+        didSet { UserDefaults.standard.set(apiKey, forKey: "zylaLabsAPIKey") }
+    }
     @Published var songs: [SongFetchItem] = []
     @Published var isProcessing: Bool = false
     @Published var overallProgress: Double = 0
