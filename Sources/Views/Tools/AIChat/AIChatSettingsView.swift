@@ -292,9 +292,15 @@ struct AIChatSettingsView: View {
                         Text("Replace the Dashboard with the Music player")
                             .font(.caption)
                             .foregroundColor(.secondary)
+                        if musicMode.isLocked {
+                            Text("Locked by bundle identifier containing “Music”.")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
                     }
                 }
             }
+            .disabled(musicMode.isLocked)
         } header: {
             Text("Music Mode")
         } footer: {

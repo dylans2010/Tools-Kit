@@ -25,6 +25,12 @@ struct MusicSettingsView: View {
                 // MARK: Mode
                 Section {
                     Toggle("Music Mode", isOn: $modeManager.isMusicModeEnabled)
+                        .disabled(modeManager.isLocked)
+                    if modeManager.isLocked {
+                        Text("Locked by bundle identifier containing “Music”.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
                 } header: {
                     Text("App Mode")
                 } footer: {

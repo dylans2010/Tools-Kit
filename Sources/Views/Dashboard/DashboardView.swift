@@ -122,10 +122,16 @@ struct DashboardView: View {
                      : "Turn ToolsKit into a Music player")
                     .font(.caption)
                     .foregroundColor(.secondary)
+                if musicMode.isLocked {
+                    Text("Locked by bundle identifier")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
             }
             Spacer()
             Toggle("", isOn: $musicMode.isMusicModeEnabled)
                 .labelsHidden()
+                .disabled(musicMode.isLocked)
         }
         .padding()
         .background(
