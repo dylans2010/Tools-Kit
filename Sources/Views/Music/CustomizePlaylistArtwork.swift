@@ -1,4 +1,17 @@
 import SwiftUI
+import PhotosUI
+#if canImport(ImagePlayground)
+import ImagePlayground
+#endif
+
+// MARK: - Gradient Type
+
+private enum GradientType: String, CaseIterable, Identifiable {
+    case linear = "Linear"
+    case radial  = "Radial"
+    case angular = "Angular"
+    var id: String { rawValue }
+}
 
 // MARK: - Gradient Color Stop
 
@@ -30,6 +43,11 @@ struct CustomizePlaylistArtwork: View {
         GradientStop(color: .blue)
     ]
     @State private var gradientAngle: Double = 135
+    @State private var gradientType: GradientType = .linear
+
+    // Uploaded image background
+    @State private var uploadedBackground: UIImage?
+    @State private var photoPickerItem: PhotosPickerItem?
 
     // Text overlay
     @State private var overlayText: String = ""
@@ -48,6 +66,9 @@ struct CustomizePlaylistArtwork: View {
 
     // Preview size
     private let artworkSize: CGFloat = 260
+    private let radialGradientRadiusMultiplier: CGFloat = 0.7
+    private let randomColorSaturation: Double = 0.8
+    private let randomColorBrightness: Double = 0.9
 
     var body: some View {
         NavigationStack {
@@ -55,6 +76,7 @@ struct CustomizePlaylistArtwork: View {
                 VStack(spacing: 24) {
                     artworkPreview
                     gradientSection
+                    uploadSection
                     textSection
                     stickersSection
                     if supportsImagePlayground {
@@ -83,6 +105,29 @@ struct CustomizePlaylistArtwork: View {
                     showStickerPicker = false
                 }
             }
+            .modifier(ImagePlaygroundModifier(
+                isPresented: $showImagePlayground,
+                concept: playgroundPrompt,
+                onResult: { url in
+                    if let data = try? Data(contentsOf: url),
+                       let img = UIImage(data: data) {
+                        generatedImage = img
+                        uploadedBackground = nil
+                    }
+                }
+            ))
+        }
+        .onChange(of: photoPickerItem) { newItem in
+            guard let newItem else { return }
+            Task {
+                if let data = try? await newItem.loadTransferable(type: Data.self),
+                   let img = UIImage(data: data) {
+                    await MainActor.run {
+                        uploadedBackground = img
+                        generatedImage = nil
+                    }
+                }
+            }
         }
     }
 
@@ -102,6 +147,10 @@ struct CustomizePlaylistArtwork: View {
     private var artworkCanvas: some View {
         ZStack {
             if let img = generatedImage {
+                Image(uiImage: img)
+                    .resizable()
+                    .scaledToFill()
+            } else if let img = uploadedBackground {
                 Image(uiImage: img)
                     .resizable()
                     .scaledToFill()
@@ -127,12 +176,18 @@ struct CustomizePlaylistArtwork: View {
         .clipped()
     }
 
+    @ViewBuilder
     private var gradientBackground: some View {
-        LinearGradient(
-            gradient: Gradient(colors: stops.map(\.color)),
-            startPoint: gradientStart,
-            endPoint: gradientEnd
-        )
+        let colors = stops.map(\.color)
+        let gradient = Gradient(colors: colors)
+        switch gradientType {
+        case .linear:
+            LinearGradient(gradient: gradient, startPoint: gradientStart, endPoint: gradientEnd)
+        case .radial:
+            RadialGradient(gradient: gradient, center: .center, startRadius: 0, endRadius: artworkSize * radialGradientRadiusMultiplier)
+        case .angular:
+            AngularGradient(gradient: gradient, center: .center, angle: .degrees(gradientAngle))
+        }
     }
 
     private var gradientStart: UnitPoint {
@@ -150,12 +205,23 @@ struct CustomizePlaylistArtwork: View {
     private var gradientSection: some View {
         cardSection("Gradient") {
             VStack(spacing: 14) {
-                // Color stops
-                ForEach(Array(stops.enumerated()), id: \.element.id) { idx, stop in
+                // Gradient type picker
+                Picker("Type", selection: $gradientType) {
+                    ForEach(GradientType.allCases) { type in
+                        Text(type.rawValue).tag(type)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .onChange(of: gradientType) { _ in generatedImage = nil; uploadedBackground = nil }
+
+                Divider()
+
+                // Color stops (unlimited)
+                ForEach(Array(stops.enumerated()), id: \.element.id) { idx, _ in
                     HStack {
                         ColorPicker("Color \(idx + 1)", selection: Binding(
                             get: { stops[idx].color },
-                            set: { stops[idx].color = $0; generatedImage = nil }
+                            set: { stops[idx].color = $0; generatedImage = nil; uploadedBackground = nil }
                         ))
 
                         if stops.count > 2 {
@@ -170,36 +236,45 @@ struct CustomizePlaylistArtwork: View {
                     }
                 }
 
-                if stops.count < 5 {
-                    Button {
-                        stops.append(GradientStop(color: .pink))
-                        generatedImage = nil
-                    } label: {
-                        Label("Add Color Stop", systemImage: "plus.circle")
-                    }
-                    .font(.subheadline)
+                Button {
+                    stops.append(GradientStop(color: randomBrightColor()))
+                    generatedImage = nil
+                    uploadedBackground = nil
+                } label: {
+                    Label("Add Color Stop", systemImage: "plus.circle")
                 }
+                .font(.subheadline)
 
                 Divider()
 
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        Text("Angle")
-                        Spacer()
-                        Text("\(Int(gradientAngle))°")
-                            .foregroundColor(.secondary)
-                            .monospacedDigit()
+                if gradientType != .radial {
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text("Angle")
+                            Spacer()
+                            Text("\(Int(gradientAngle))°")
+                                .foregroundColor(.secondary)
+                                .monospacedDigit()
+                        }
+                        Slider(value: $gradientAngle, in: 0...360, step: 5)
+                            .onChange(of: gradientAngle) { _ in generatedImage = nil; uploadedBackground = nil }
                     }
-                    Slider(value: $gradientAngle, in: 0...360, step: 5)
-                        .onChange(of: gradientAngle) { _ in generatedImage = nil }
+
+                    Divider()
                 }
 
-                // Quick palette
-                HStack(spacing: 10) {
+                // Quick palettes
+                Text("Quick Palettes")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 52))], spacing: 10) {
                     ForEach(quickPalettes, id: \.0) { name, colors in
                         Button {
                             stops = colors.map { GradientStop(color: $0) }
                             generatedImage = nil
+                            uploadedBackground = nil
                         } label: {
                             quickPaletteChip(colors: colors, name: name)
                         }
@@ -212,26 +287,73 @@ struct CustomizePlaylistArtwork: View {
 
     private var quickPalettes: [(String, [Color])] {
         [
-            ("Sunset", [.orange, .red, .purple]),
-            ("Ocean",  [.cyan,   .blue]),
-            ("Forest", [.green,  .teal]),
-            ("Berry",  [.pink,   .purple, .indigo]),
-            ("Gold",   [.yellow, .orange])
+            ("Sunset",   [.orange, .red, .purple]),
+            ("Ocean",    [.cyan, .blue]),
+            ("Forest",   [.green, .teal]),
+            ("Berry",    [.pink, .purple, .indigo]),
+            ("Gold",     [.yellow, .orange]),
+            ("Candy",    [.pink, .yellow, .cyan]),
+            ("Aurora",   [.green, .cyan, .blue, .purple]),
+            ("Neon",     [Color(red: 1, green: 0, blue: 0.5), Color(red: 0, green: 1, blue: 0.8)]),
+            ("Dusk",     [Color(red: 0.1, green: 0.1, blue: 0.4), .purple, .orange]),
+            ("Pastel",   [Color(red: 1, green: 0.8, blue: 0.9), Color(red: 0.8, green: 0.9, blue: 1)]),
+            ("Fire",     [.yellow, .orange, .red, Color(red: 0.5, green: 0, blue: 0)]),
+            ("Ice",      [.white, .cyan, .blue]),
+            ("Lavender", [Color(red: 0.9, green: 0.8, blue: 1), .purple]),
+            ("Mint",     [Color(red: 0.7, green: 1, blue: 0.85), .teal]),
+            ("Rose",     [Color(red: 1, green: 0.85, blue: 0.85), .pink, .red]),
+            ("Space",    [.black, Color(red: 0.1, green: 0, blue: 0.3), .indigo])
         ]
     }
 
     private func quickPaletteChip(colors: [Color], name: String) -> some View {
         LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
-            .frame(width: 44, height: 44)
+            .frame(width: 52, height: 52)
             .cornerRadius(10)
             .overlay(
                 Text(name)
                     .font(.system(size: 7, weight: .semibold))
                     .foregroundColor(.white)
-                    .shadow(color: .black.opacity(0.4), radius: 2)
+                    .shadow(color: .black.opacity(0.5), radius: 2)
                     .padding(2),
                 alignment: .bottom
             )
+    }
+
+    private func randomBrightColor() -> Color {
+        let hue = Double.random(in: 0...1)
+        return Color(hue: hue, saturation: randomColorSaturation, brightness: randomColorBrightness)
+    }
+
+    // MARK: - Upload Section
+
+    private var uploadSection: some View {
+        cardSection("Background Image") {
+            VStack(spacing: 12) {
+                if let img = uploadedBackground {
+                    Image(uiImage: img)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 80)
+                        .clipped()
+                        .cornerRadius(10)
+
+                    Button(role: .destructive) {
+                        uploadedBackground = nil
+                        photoPickerItem = nil
+                    } label: {
+                        Label("Remove Image", systemImage: "trash")
+                    }
+                    .font(.subheadline)
+                } else {
+                    PhotosPicker(selection: $photoPickerItem, matching: .images) {
+                        Label("Upload Image", systemImage: "photo.on.rectangle.angled")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                }
+            }
+        }
     }
 
     // MARK: - Text Section
@@ -335,7 +457,7 @@ struct CustomizePlaylistArtwork: View {
                     .lineLimit(2...4)
 
                 Button {
-                    openImagePlayground()
+                    showImagePlayground = true
                 } label: {
                     Label("Generate with Image Playground", systemImage: "sparkles")
                         .frame(maxWidth: .infinity)
@@ -345,12 +467,6 @@ struct CustomizePlaylistArtwork: View {
                 .disabled(playgroundPrompt.trimmingCharacters(in: .whitespaces).isEmpty)
             }
         }
-    }
-
-    private func openImagePlayground() {
-        // Image Playground is available on iOS 18.1+ with Apple Intelligence
-        // The ImagePlayground framework sheet is presented via SwiftUI
-        showImagePlayground = true
     }
 
     // MARK: - Card Section
@@ -385,6 +501,29 @@ struct CustomizePlaylistArtwork: View {
             library.updatePlaylist(updated)
         }
         dismiss()
+    }
+}
+
+// MARK: - Image Playground View Modifier
+
+/// Wraps `imagePlaygroundSheet` when available, no-op on older OS versions.
+private struct ImagePlaygroundModifier: ViewModifier {
+    @Binding var isPresented: Bool
+    let concept: String
+    let onResult: (URL) -> Void
+
+    func body(content: Content) -> some View {
+        if #available(iOS 18.1, *) {
+            content
+                .imagePlaygroundSheet(
+                    isPresented: $isPresented,
+                    concept: concept
+                ) { url in
+                    onResult(url)
+                }
+        } else {
+            content
+        }
     }
 }
 
