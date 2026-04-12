@@ -103,15 +103,14 @@ struct SongsView: View {
                 }
             }
         }
-        .fileImporter(isPresented: $showImporter,
-                      allowedContentTypes: [.audio]) { result in
-            switch result {
-            case .success(let url):
-                let accessing = url.startAccessingSecurityScopedResource()
-                library.importSong(from: url)
-                if accessing { url.stopAccessingSecurityScopedResource() }
-            case .failure:
-                break
+        .sheet(isPresented: $showImporter) {
+            FileImporterRepresentableView(allowedContentTypes: [.audio]) { urls in
+                if let url = urls.first {
+                    let accessing = url.startAccessingSecurityScopedResource()
+                    library.importSong(from: url)
+                    if accessing { url.stopAccessingSecurityScopedResource() }
+                }
+                showImporter = false
             }
         }
     }

@@ -35,6 +35,7 @@ struct MusicLibraryView: View {
                         }
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .navigationTitle("Music")
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
