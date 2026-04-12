@@ -1082,6 +1082,7 @@
 			);
 			name = Tools-Kit;
 			packageProductDependencies = (
+				ZF0000000000000000000002 /* ZIPFoundation */,
 			);
 			productName = Tools-Kit;
 			productReference = 732E3165BFBB323BD8081B3F /* Tools-Kit.app */;
@@ -1111,6 +1112,9 @@
 			productRefGroup = B81AA4FC2BB81266E881DF5B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
+			packageReferences = (
+				ZF0000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+			);
 			targets = (
 				F3353FBEDEEBF7704E1E6451 /* Tools-Kit */,
 			);
@@ -1649,6 +1653,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		ZF0000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.19;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		ZF0000000000000000000002 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = ZF0000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0F81FBDC64413435A909E984 /* Project object */;
 }
