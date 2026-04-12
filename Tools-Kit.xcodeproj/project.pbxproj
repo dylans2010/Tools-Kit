@@ -854,6 +854,8 @@
 				C4C7570717DA449692472DC7 /* QuestionEditorView.swift */,
 				28651E16D0534324A81C2E92 /* DragDropQuestionFillerView.swift */,
 				080B28C9F0E54D43BD51389A /* ToolVisibilityManager.swift */,
+				01F2FB6A2AD144A482A77028 /* FormQuestionRenderer.swift */,
+				14348B7A70A64EBC8BEA5262 /* TextInputQuestionView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
