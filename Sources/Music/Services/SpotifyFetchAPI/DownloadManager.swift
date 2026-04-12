@@ -16,6 +16,7 @@ actor DownloadManager {
                   let sourceURLString = match.sourceURL,
                   let sourceURL = URL(string: sourceURLString),
                   sourceURL.isFileURL,
+                  sourceURL.pathExtension.lowercased() == "mp3",
                   FileManager.default.fileExists(atPath: sourceURL.path) else {
                 continue
             }
