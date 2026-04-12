@@ -8,7 +8,7 @@ enum ITServiceRequestFormTemplate {
             FormQuestion(title: "Request Type", type: .dropdown, options: ["Hardware", "Software", "Access", "Network", "Account Reset"], required: true),
             FormQuestion(title: "Priority", type: .ratingScale, options: ["1", "5"], required: true),
             FormQuestion(title: "Preferred fulfillment order", type: .dragDrop, options: ["Today", "This week", "This month"], required: false),
-            FormQuestion(title: "Request details", type: .textInput, required: true)
+            FormQuestion(title: "Request Details", type: .textInput, required: true)
         ]
 
         return FormDocument(
