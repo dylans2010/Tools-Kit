@@ -6,6 +6,7 @@ actor SpotifyFetchService {
         case invalidPlaylistURL
         case requestFailed
         case parseFailed
+        case cancelled
 
         var errorDescription: String? {
             switch self {
@@ -17,6 +18,8 @@ actor SpotifyFetchService {
                 return "Could not load the Spotify playlist page."
             case .parseFailed:
                 return "Could not parse playlist tracks from the page."
+            case .cancelled:
+                return "The operation was cancelled."
             }
         }
     }
@@ -35,39 +38,72 @@ actor SpotifyFetchService {
         self.cache = loadCache()
     }
 
-    func fetchPlaylistTracks(from playlistURLString: String) async throws -> [SpotifyTrack] {
-        guard let playlistID = extractPlaylistID(from: playlistURLString) else {
-            throw Error.invalidPlaylistURL
+    /// Fetches playlist tracks and emits them in chunks via AsyncThrowingStream
+    func fetchPlaylistTracksStreaming(from playlistURLString: String) -> AsyncThrowingStream<[SpotifyTrack], Swift.Error> {
+        AsyncThrowingStream { continuation in
+            let task = Task {
+                do {
+                    guard let playlistID = extractPlaylistID(from: playlistURLString) else {
+                        continuation.finish(throwing: Error.invalidPlaylistURL)
+                        return
+                    }
+
+                    if let cached = cache[playlistID], !cached.tracks.isEmpty {
+                        // Emit cached tracks in chunks to simulate streaming if needed, or just all at once
+                        let chunks = cached.tracks.chunked(into: 25)
+                        for chunk in chunks {
+                            continuation.yield(chunk)
+                        }
+                        continuation.finish()
+                        return
+                    }
+
+                    guard let url = URL(string: "https://open.spotify.com/playlist/\(playlistID)") else {
+                        continuation.finish(throwing: Error.invalidURL)
+                        return
+                    }
+
+                    var request = URLRequest(url: url)
+                    request.timeoutInterval = 30
+                    request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8", forHTTPHeaderField: "Accept")
+                    request.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36", forHTTPHeaderField: "User-Agent")
+
+                    let (data, response) = try await session.data(for: request)
+
+                    if Task.isCancelled {
+                        continuation.finish(throwing: Error.cancelled)
+                        return
+                    }
+
+                    guard let httpResponse = response as? HTTPURLResponse,
+                          200..<300 ~= httpResponse.statusCode,
+                          let html = String(data: data, encoding: .utf8) else {
+                        continuation.finish(throwing: Error.requestFailed)
+                        return
+                    }
+
+                    let tracks = parseTracksStreaming(from: html, playlistID: playlistID) { chunk in
+                        continuation.yield(chunk)
+                    }
+
+                    guard !tracks.isEmpty else {
+                        continuation.finish(throwing: Error.parseFailed)
+                        return
+                    }
+
+                    self.cache[playlistID] = CachedPlaylist(playlistID: playlistID, tracks: tracks, savedAt: Date())
+                    self.saveCache(self.cache)
+                    continuation.finish()
+
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+
+            continuation.onTermination = { @Sendable _ in
+                task.cancel()
+            }
         }
-
-        if let cached = cache[playlistID], !cached.tracks.isEmpty {
-            return cached.tracks
-        }
-
-        guard let url = URL(string: "https://open.spotify.com/playlist/\(playlistID)") else {
-            throw Error.invalidURL
-        }
-
-        var request = URLRequest(url: url)
-        request.timeoutInterval = 20
-        request.setValue("text/html,application/xhtml+xml", forHTTPHeaderField: "Accept")
-        request.setValue("Mozilla/5.0", forHTTPHeaderField: "User-Agent")
-
-        let (data, response) = try await session.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse,
-              200..<300 ~= httpResponse.statusCode,
-              let html = String(data: data, encoding: .utf8) else {
-            throw Error.requestFailed
-        }
-
-        let tracks = parseTracks(from: html, playlistID: playlistID)
-        guard !tracks.isEmpty else {
-            throw Error.parseFailed
-        }
-
-        cache[playlistID] = CachedPlaylist(playlistID: playlistID, tracks: tracks, savedAt: Date())
-        saveCache(cache)
-        return tracks
     }
 
     func parseManualTrackList(_ manualInput: String) -> [SpotifyTrack] {
@@ -84,7 +120,9 @@ actor SpotifyFetchService {
                 id: "manual-\(index)-\(UUID().uuidString)",
                 title: title.isEmpty ? "Unknown Title" : title,
                 artist: artist.isEmpty ? "Unknown Artist" : artist,
-                duration: nil
+                album: nil,
+                duration: nil,
+                artworkURL: nil
             )
         }
     }
@@ -106,23 +144,41 @@ actor SpotifyFetchService {
         return components[1]
     }
 
-    private func parseTracks(from html: String, playlistID: String) -> [SpotifyTrack] {
-        var tracks: [SpotifyTrack] = []
+    private func parseTracksStreaming(from html: String, playlistID: String, onChunk: ([SpotifyTrack]) -> Void) -> [SpotifyTrack] {
+        var allTracks: [SpotifyTrack] = []
+        var currentChunk: [SpotifyTrack] = []
+        let chunkSize = 25
 
         let candidates = jsonCandidates(from: html)
         for candidate in candidates {
             guard let data = candidate.data(using: .utf8) else { continue }
             if let jsonObject = try? JSONSerialization.jsonObject(with: data) {
-                tracks.append(contentsOf: extractTracks(from: jsonObject, playlistID: playlistID))
+                let tracks = extractTracks(from: jsonObject, playlistID: playlistID)
+                for track in tracks {
+                    if !allTracks.contains(where: { $0.id == track.id }) {
+                        allTracks.append(track)
+                        currentChunk.append(track)
+
+                        if currentChunk.count >= chunkSize {
+                            onChunk(currentChunk)
+                            currentChunk = []
+                        }
+                    }
+                }
             }
         }
 
-        return deduplicatedTracks(tracks)
+        if !currentChunk.isEmpty {
+            onChunk(currentChunk)
+        }
+
+        return deduplicatedTracks(allTracks)
     }
 
     private func jsonCandidates(from html: String) -> [String] {
         var candidates: [String] = []
 
+        // Primary: script tags
         let scriptPattern = #"<script[^>]*>(.*?)</script>"#
         let scriptRegex = try? NSRegularExpression(pattern: scriptPattern, options: [.dotMatchesLineSeparators, .caseInsensitive])
         let nsRange = NSRange(location: 0, length: html.utf16.count)
@@ -140,6 +196,11 @@ actor SpotifyFetchService {
             if let assignmentJSON = extractAssignedJSONObject(from: scriptContent) {
                 candidates.append(assignmentJSON)
             }
+        }
+
+        // Secondary: Embed metadata if script parsing is limited
+        if let embedJSON = extractEmbedMetadata(from: html) {
+            candidates.append(embedJSON)
         }
 
         return candidates
@@ -187,6 +248,17 @@ actor SpotifyFetchService {
         return nil
     }
 
+    private func extractEmbedMetadata(from html: String) -> String? {
+        // Fallback pattern for metadata hidden in other tags or alternate structures
+        let pattern = #"id="session" type="application/json">(\{.*?\})</script>"#
+        if let regex = try? NSRegularExpression(pattern: pattern, options: .dotMatchesLineSeparators),
+           let match = regex.firstMatch(in: html, options: [], range: NSRange(location: 0, length: html.utf16.count)),
+           let range = Range(match.range(at: 1), in: html) {
+            return String(html[range])
+        }
+        return nil
+    }
+
     private func extractTracks(from jsonObject: Any, playlistID: String) -> [SpotifyTrack] {
         var found: [SpotifyTrack] = []
         var index = 0
@@ -231,6 +303,8 @@ actor SpotifyFetchService {
         let artist = artistNames.joined(separator: ", ").trimmingCharacters(in: .whitespacesAndNewlines)
         guard !artist.isEmpty else { return nil }
 
+        let albumName = (dictionary["album"] as? [String: Any])?["name"] as? String
+
         let durationMilliseconds = dictionary["duration_ms"] as? Double
             ?? (dictionary["duration_ms"] as? Int).map(Double.init)
             ?? (dictionary["duration"] as? Double)
@@ -246,7 +320,16 @@ actor SpotifyFetchService {
         let id = (dictionary["id"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
         let resolvedID = (id?.isEmpty == false ? id! : "\(playlistID)-\(index)")
 
-        return SpotifyTrack(id: resolvedID, title: title, artist: artist, duration: durationSeconds)
+        let artworkURL: String? = {
+            if let album = dictionary["album"] as? [String: Any],
+               let images = album["images"] as? [[String: Any]],
+               let first = images.first {
+                return first["url"] as? String
+            }
+            return nil
+        }()
+
+        return SpotifyTrack(id: resolvedID, title: title, artist: artist, album: albumName, duration: durationSeconds, artworkURL: artworkURL)
     }
 
     private func deduplicatedTracks(_ tracks: [SpotifyTrack]) -> [SpotifyTrack] {
@@ -281,5 +364,13 @@ actor SpotifyFetchService {
     private func saveCache(_ value: [String: CachedPlaylist]) {
         guard let data = try? JSONEncoder().encode(value) else { return }
         try? data.write(to: cacheURL, options: .atomic)
+    }
+}
+
+extension Array {
+    func chunked(into size: Int) -> [[Element]] {
+        stride(from: 0, to: count, by: size).map {
+            Array(self[$0 ..< Swift.min($0 + size, count)])
+        }
     }
 }

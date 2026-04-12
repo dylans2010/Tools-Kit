@@ -9,7 +9,7 @@ struct ZipExportService {
         var errorDescription: String? {
             switch self {
             case .noFiles:
-                return "No downloaded MP3 files are available to export."
+                return "No downloaded music files are available to export."
             case .creationFailed:
                 return "Failed to create ZIP archive."
             }
@@ -29,13 +29,14 @@ struct ZipExportService {
         return dir
     }
 
-    func exportDownloadedFilesAsPlaylistZip() throws -> URL {
+    func exportDownloadedFilesAsPlaylistZip(onProgress: (Double) -> Void) throws -> URL {
+        let allowedExtensions: Set<String> = ["mp3", "mp4", "m4a", "aac", "wav", "flac"]
         let files = ((try? FileManager.default.contentsOfDirectory(
             at: musicDirectory,
             includingPropertiesForKeys: nil,
             options: [.skipsHiddenFiles]
         )) ?? [])
-            .filter { $0.pathExtension.lowercased() == "mp3" }
+            .filter { allowedExtensions.contains($0.pathExtension.lowercased()) }
 
         guard !files.isEmpty else {
             throw Error.noFiles
@@ -50,8 +51,10 @@ struct ZipExportService {
             throw Error.creationFailed
         }
 
-        for file in files {
+        for (index, file) in files.enumerated() {
             try archive.addEntry(with: file.lastPathComponent, relativeTo: musicDirectory)
+            let progress = Double(index + 1) / Double(files.count)
+            onProgress(progress)
         }
 
         return zipURL

@@ -1,160 +1,41 @@
 import SwiftUI
-import UIKit
-
-@MainActor
-final class SpotifyFetchViewModel: ObservableObject {
-    @Published var playlistURL: String = ""
-    @Published var manualTrackInput: String = ""
-    @Published var matchedTracks: [MatchedTrack] = []
-    @Published var isImporting = false
-    @Published var isDownloading = false
-    @Published var isMatching = false
-    @Published var showManualFallback = false
-    @Published var errorMessage: String?
-    @Published var exportURL: URL?
-    @Published var hasDownloadedFiles = false
-
-    private let fetchService = SpotifyFetchService()
-    private let matchingService = TrackMatchingService()
-    private let downloadManager = DownloadManager()
-    private let zipExportService = ZipExportService()
-    private let maxConcurrentMatches = 4
-
-    func importPlaylist() {
-        Task {
-            isImporting = true
-            errorMessage = nil
-            showManualFallback = false
-            matchedTracks = []
-
-            do {
-                let tracks = try await fetchService.fetchPlaylistTracks(from: playlistURL)
-                await matchTracks(tracks)
-            } catch {
-                showManualFallback = true
-                errorMessage = error.localizedDescription
-            }
-
-            isImporting = false
-        }
-    }
-
-    func importManualTracks() {
-        Task {
-            let tracks = await fetchService.parseManualTrackList(manualTrackInput)
-            guard !tracks.isEmpty else {
-                errorMessage = "Add at least one track line in the format: Song - Artist"
-                return
-            }
-            errorMessage = nil
-            await matchTracks(tracks)
-        }
-    }
-
-    func downloadAvailableTracks() {
-        Task {
-            isDownloading = true
-            let saved = await downloadManager.downloadAvailableTracks(from: matchedTracks)
-            if saved.isEmpty {
-                errorMessage = "No direct local file URLs were available for download."
-            } else {
-                errorMessage = nil
-            }
-            hasDownloadedFiles = await downloadManager.hasDownloadedFiles()
-            isDownloading = false
-        }
-    }
-
-    func exportAsZIP() {
-        do {
-            exportURL = try zipExportService.exportDownloadedFilesAsPlaylistZip()
-            errorMessage = nil
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-
-    func openSourceIfNeeded(for track: MatchedTrack) {
-        guard track.sourceType == .external,
-              let sourceURL = track.sourceURL,
-              let url = URL(string: sourceURL) else {
-            return
-        }
-        UIApplication.shared.open(url)
-    }
-
-    func refreshDownloadState() {
-        Task {
-            hasDownloadedFiles = await downloadManager.hasDownloadedFiles()
-        }
-    }
-
-    private func matchTracks(_ tracks: [SpotifyTrack]) async {
-        isMatching = true
-
-        matchedTracks = tracks.map {
-            MatchedTrack(
-                original: $0,
-                matchedTitle: nil,
-                matchedArtist: nil,
-                sourceType: .none,
-                sourceURL: nil,
-                confidence: 0,
-                status: .searching
-            )
-        }
-
-        let librarySongs = MusicLibraryManager.shared.songs
-
-        for start in stride(from: 0, to: tracks.count, by: maxConcurrentMatches) {
-            let end = min(start + maxConcurrentMatches, tracks.count)
-            let chunk = Array(tracks[start..<end])
-
-            let chunkResults = await withTaskGroup(of: (Int, MatchedTrack).self) { group in
-                for (offset, track) in chunk.enumerated() {
-                    let trackIndex = start + offset
-                    group.addTask { [matchingService] in
-                        let matched = matchingService.match(track: track, localSongs: librarySongs)
-                        return (trackIndex, matched)
-                    }
-                }
-
-                var results: [(Int, MatchedTrack)] = []
-                for await result in group {
-                    results.append(result)
-                }
-                return results
-            }
-
-            for (index, matched) in chunkResults {
-                guard matchedTracks.indices.contains(index) else { continue }
-                matchedTracks[index] = matched
-            }
-        }
-
-        isMatching = false
-    }
-}
 
 struct SpotifyFetchView: View {
     @StateObject private var viewModel = SpotifyFetchViewModel()
     @Environment(\.dismiss) private var dismiss
+    @State private var showLogs = false
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 12) {
-                topSection
-                middleSection
-                bottomSection
+            VStack(spacing: 0) {
+                if viewModel.isImporting || viewModel.isMatching || viewModel.isDownloading || viewModel.isExporting {
+                    progressOverlay
+                }
+
+                VStack(spacing: 12) {
+                    topSection
+                    middleSection
+                    bottomSection
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 12)
             .navigationTitle("Spotify Fetch")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        showLogs.toggle()
+                    } label: {
+                        Image(systemName: "terminal")
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") { dismiss() }
                 }
+            }
+            .sheet(isPresented: $showLogs) {
+                logView
             }
             .alert("Spotify Fetch", isPresented: Binding(
                 get: { viewModel.errorMessage != nil },
@@ -168,13 +49,48 @@ struct SpotifyFetchView: View {
         }
     }
 
+    private var progressOverlay: some View {
+        VStack(spacing: 8) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(viewModel.progressMessage)
+                        .font(.caption.weight(.semibold))
+                    ProgressView(value: viewModel.overallProgress)
+                        .progressViewStyle(.linear)
+                }
+
+                Button {
+                    viewModel.cancelCurrentTask()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.secondary)
+                        .font(.title3)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(Color(.secondarySystemBackground))
+        }
+    }
+
     private var topSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            TextField("Paste Spotify Playlist URL", text: $viewModel.playlistURL)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-                .keyboardType(.URL)
-                .textFieldStyle(.roundedBorder)
+            HStack {
+                TextField("Paste Spotify Playlist URL", text: $viewModel.playlistURL)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .keyboardType(.URL)
+                    .textFieldStyle(.roundedBorder)
+
+                if !viewModel.playlistURL.isEmpty {
+                    Button {
+                        viewModel.playlistURL = ""
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
 
             Button {
                 viewModel.importPlaylist()
@@ -188,7 +104,7 @@ struct SpotifyFetchView: View {
 
             if viewModel.showManualFallback {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Couldn’t parse playlist. Paste tracks manually (one per line: Song - Artist).")
+                    Text("Couldn’t parse playlist automatically. Paste tracks manually.")
                         .font(.footnote)
                         .foregroundColor(.secondary)
 
@@ -210,40 +126,77 @@ struct SpotifyFetchView: View {
         Group {
             if viewModel.matchedTracks.isEmpty {
                 Spacer()
-                Text(viewModel.isImporting ? "Importing playlist…" : "Imported tracks will appear here.")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                VStack(spacing: 12) {
+                    Image(systemName: "music.note.list")
+                        .font(.system(size: 48))
+                        .foregroundColor(.secondary.opacity(0.5))
+                    Text(viewModel.isImporting ? "Importing playlist..." : "Imported tracks will appear here.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
                 Spacer()
             } else {
-                List(viewModel.matchedTracks) { track in
-                    Button {
-                        viewModel.openSourceIfNeeded(for: track)
-                    } label: {
-                        HStack(spacing: 10) {
-                            statusIndicator(for: track.status)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(track.original.title)
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundColor(.primary)
-                                    .lineLimit(1)
-                                Text(track.original.artist)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(1)
-                            }
+                List {
+                    Section {
+                        ForEach(viewModel.matchedTracks) { track in
+                            trackRow(for: track)
+                        }
+                    } header: {
+                        HStack {
+                            Text("\(viewModel.matchedTracks.count) Tracks")
                             Spacer()
-                            if track.sourceType == .external {
-                                Image(systemName: "arrow.up.right.square")
-                                    .foregroundColor(.secondary)
+                            if viewModel.isMatching {
+                                ProgressView()
+                                    .controlSize(.small)
                             }
                         }
                     }
-                    .buttonStyle(.plain)
-                    .disabled(track.sourceType != .external)
                 }
-                .listStyle(.plain)
+                .listStyle(.insetGrouped)
             }
         }
+    }
+
+    private func trackRow(for track: MatchedTrack) -> some View {
+        Button {
+            viewModel.openSourceIfNeeded(for: track)
+        } label: {
+            HStack(spacing: 12) {
+                statusIndicator(for: track)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(track.original.title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.primary)
+                        .lineLimit(1)
+                    Text(track.original.artist)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                }
+
+                Spacer()
+
+                if let reason = track.reasonText {
+                    Text(reason)
+                        .font(.system(size: 10, weight: .bold))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(track.reasonColor.opacity(0.15))
+                        .foregroundColor(track.reasonColor)
+                        .cornerRadius(4)
+                }
+
+                if track.sourceType == .external {
+                    Image(systemName: "arrow.up.right.square")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(track.sourceType != .external)
     }
 
     private var bottomSection: some View {
@@ -251,49 +204,118 @@ struct SpotifyFetchView: View {
             Button {
                 viewModel.downloadAvailableTracks()
             } label: {
-                if viewModel.isDownloading || viewModel.isMatching {
+                if viewModel.isDownloading {
                     ProgressView()
                         .frame(maxWidth: .infinity)
                 } else {
-                    Text("Download Available Tracks")
+                    Label("Download Available Tracks", systemImage: "square.and.arrow.down")
                         .font(.subheadline.weight(.semibold))
                         .frame(maxWidth: .infinity)
                 }
             }
             .buttonStyle(.borderedProminent)
-            .disabled(viewModel.matchedTracks.isEmpty || viewModel.isMatching || viewModel.isDownloading)
+            .disabled(viewModel.matchedTracks.isEmpty || viewModel.isMatching || viewModel.isDownloading || !viewModel.matchedTracks.contains(where: { $0.status == .matched }))
 
-            if let exportURL = viewModel.exportURL {
-                ShareLink(item: exportURL) {
-                    Text("Share playlist.zip")
-                        .font(.subheadline.weight(.semibold))
-                        .frame(maxWidth: .infinity)
+            HStack(spacing: 12) {
+                Button {
+                    viewModel.exportAsZIP()
+                } label: {
+                    if viewModel.isExporting {
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                    } else {
+                        Label("Export ZIP", systemImage: "archivebox")
+                            .font(.subheadline.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                    }
                 }
                 .buttonStyle(.bordered)
-            }
+                .disabled(!viewModel.hasDownloadedFiles || viewModel.isExporting)
 
-            Button("Export as ZIP") {
-                viewModel.exportAsZIP()
+                if let exportURL = viewModel.exportURL {
+                    ShareLink(item: exportURL) {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                            .font(.subheadline.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                }
             }
-            .buttonStyle(.bordered)
-            .frame(maxWidth: .infinity)
-            .disabled(!viewModel.hasDownloadedFiles)
         }
         .padding(.bottom, 10)
     }
 
+    private var logView: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(viewModel.logs, id: \.self) { log in
+                        Text(log)
+                            .font(.system(.caption2, design: .monospaced))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 2)
+                        Divider()
+                    }
+                }
+            }
+            .navigationTitle("Internal Logs")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Close") { showLogs = false }
+                }
+            }
+        }
+    }
+
     @ViewBuilder
-    private func statusIndicator(for status: MatchStatus) -> some View {
-        switch status {
+    private func statusIndicator(for track: MatchedTrack) -> some View {
+        switch track.status {
+        case .queued:
+            Circle()
+                .fill(Color.secondary.opacity(0.3))
+                .frame(width: 20, height: 20)
+                .overlay(
+                    Image(systemName: "hourglass")
+                        .font(.system(size: 10))
+                        .foregroundColor(.white)
+                )
         case .searching:
             ProgressView()
                 .controlSize(.small)
+                .frame(width: 20, height: 20)
         case .matched:
             Image(systemName: "checkmark.circle.fill")
+                .foregroundColor(.blue)
+                .font(.system(size: 20))
+        case .downloaded:
+            Image(systemName: "arrow.down.circle.fill")
                 .foregroundColor(.green)
+                .font(.system(size: 20))
         case .failed:
-            Image(systemName: "xmark.circle.fill")
+            Image(systemName: "questionmark.circle.fill")
                 .foregroundColor(.orange)
+                .font(.system(size: 20))
+        }
+    }
+}
+
+extension MatchedTrack {
+    var reasonText: String? {
+        switch reason {
+        case .exact: return "EXACT"
+        case .fuzzy: return "FUZZY"
+        case .fallback: return "FALLBACK"
+        case .none: return nil
+        }
+    }
+
+    var reasonColor: Color {
+        switch reason {
+        case .exact: return .green
+        case .fuzzy: return .blue
+        case .fallback: return .orange
+        case .none: return .secondary
         }
     }
 }
