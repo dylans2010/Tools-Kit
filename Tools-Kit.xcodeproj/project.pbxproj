@@ -270,8 +270,6 @@
 		AD8F34BE81F24C45B0C8313D /* TextInputQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14348B7A70A64EBC8BEA5262 /* TextInputQuestionView.swift */; };
 		8CFE46CD3022400D8780AF81 /* DropdownQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3221DDE3ED3A4F85830177FB /* DropdownQuestionView.swift */; };
 		D290405EEFB347BF8E0BB870 /* DragDropQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040A34EF8984338BD59A031 /* DragDropQuestionView.swift */; };
-		3A2EE30B743C40388085A50C /* RatingQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CA1A60A7804431CBBED8F64 /* RatingQuestionView.swift */; };
-		1214D97105C54D848B4F22AA /* SliderQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA942D78BA04378BF943CFD /* SliderQuestionView.swift */; };
 		81F51F59B4454DFC92E30A9C /* ImageUploadQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6CA609075B44B8EBB9A9380 /* ImageUploadQuestionView.swift */; };
 		050B8A6BB4A94EF68C44BD19 /* FormDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9CE0713895A4D92B8410432 /* FormDetailView.swift */; };
 		58F7509D15644968905DBDAC /* ExportFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0090C083144968A5BDFF53 /* ExportFormView.swift */; };
@@ -553,8 +551,6 @@
 		14348B7A70A64EBC8BEA5262 /* TextInputQuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/TextInputQuestionView.swift"; sourceTree = "<group>"; };
 		3221DDE3ED3A4F85830177FB /* DropdownQuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/DropdownQuestionView.swift"; sourceTree = "<group>"; };
 		C040A34EF8984338BD59A031 /* DragDropQuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/DragDropQuestionView.swift"; sourceTree = "<group>"; };
-		7CA1A60A7804431CBBED8F64 /* RatingQuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/RatingQuestionView.swift"; sourceTree = "<group>"; };
-		CAA942D78BA04378BF943CFD /* SliderQuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/SliderQuestionView.swift"; sourceTree = "<group>"; };
 		A6CA609075B44B8EBB9A9380 /* ImageUploadQuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/ImageUploadQuestionView.swift"; sourceTree = "<group>"; };
 		C9CE0713895A4D92B8410432 /* FormDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/FormDetailView.swift"; sourceTree = "<group>"; };
 		ED0090C083144968A5BDFF53 /* ExportFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/ExportFormView.swift"; sourceTree = "<group>"; };
@@ -864,6 +860,10 @@
 				C040A34EF8984338BD59A031 /* DragDropQuestionView.swift */,
 				FD02A9EA505D413A96021DD2 /* RatingQuestionView.swift */,
 				96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */,
+				A6CA609075B44B8EBB9A9380 /* ImageUploadQuestionView.swift */,
+				C9CE0713895A4D92B8410432 /* FormDetailView.swift */,
+				ED0090C083144968A5BDFF53 /* ExportFormView.swift */,
+				FAE72CB2484B4F979B8155E6 /* ToolVisibilitySettingsView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -1214,8 +1214,6 @@
 				AD8F34BE81F24C45B0C8313D /* TextInputQuestionView.swift in Sources */,
 				8CFE46CD3022400D8780AF81 /* DropdownQuestionView.swift in Sources */,
 				D290405EEFB347BF8E0BB870 /* DragDropQuestionView.swift in Sources */,
-				3A2EE30B743C40388085A50C /* RatingQuestionView.swift in Sources */,
-				1214D97105C54D848B4F22AA /* SliderQuestionView.swift in Sources */,
 				81F51F59B4454DFC92E30A9C /* ImageUploadQuestionView.swift in Sources */,
 				050B8A6BB4A94EF68C44BD19 /* FormDetailView.swift in Sources */,
 				58F7509D15644968905DBDAC /* ExportFormView.swift in Sources */,
