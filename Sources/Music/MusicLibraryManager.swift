@@ -21,43 +21,30 @@ final class MusicLibraryManager: ObservableObject {
         load()
     }
 
-    // MARK: - Import
+    // MARK: - Single File Import
 
     func importSong(from sourceURL: URL) {
+        importFile(from: sourceURL, data: nil)
+    }
+
+    private func importFile(from sourceURL: URL, data: Data?) {
         let destURL = musicDirectory.appendingPathComponent(sourceURL.lastPathComponent)
         do {
-            if FileManager.default.fileExists(atPath: destURL.path) {
-                try FileManager.default.removeItem(at: destURL)
-            }
-            try FileManager.default.copyItem(at: sourceURL, to: destURL)
-
-            let asset = AVURLAsset(url: destURL)
-            var title = sourceURL.deletingPathExtension().lastPathComponent
-            var artist = "Unknown Artist"
-            var duration: TimeInterval = 0
-            var artworkData: Data?
-
-            for item in asset.commonMetadata {
-                switch item.commonKey {
-                case .commonKeyTitle:
-                    if let val = item.value as? String { title = val }
-                case .commonKeyArtist:
-                    if let val = item.value as? String { artist = val }
-                case .commonKeyArtwork:
-                    if let val = item.value as? Data { artworkData = val }
-                default:
-                    break
+            if let data = data {
+                if FileManager.default.fileExists(atPath: destURL.path) {
+                    try FileManager.default.removeItem(at: destURL)
                 }
+                try data.write(to: destURL)
+            } else {
+                if FileManager.default.fileExists(atPath: destURL.path) {
+                    try FileManager.default.removeItem(at: destURL)
+                }
+                try FileManager.default.copyItem(at: sourceURL, to: destURL)
             }
 
-            let cmDuration = asset.duration
-            if cmDuration.timescale > 0 {
-                duration = CMTimeGetSeconds(cmDuration)
-            }
-
-            let song = Song(title: title, artist: artist, duration: duration,
-                            fileURL: destURL, artworkData: artworkData)
+            let song = extractMetadata(from: destURL)
             DispatchQueue.main.async {
+                guard !self.songs.contains(where: { $0.fileURL.lastPathComponent == destURL.lastPathComponent }) else { return }
                 self.songs.append(song)
                 self.save()
             }
@@ -65,6 +52,72 @@ final class MusicLibraryManager: ObservableObject {
             print("MusicLibraryManager: import error \(error)")
         }
     }
+
+    private func extractMetadata(from url: URL) -> Song {
+        let asset = AVURLAsset(url: url)
+        var title = url.deletingPathExtension().lastPathComponent
+        var artist = "Unknown Artist"
+        var artworkData: Data?
+
+        for item in asset.commonMetadata {
+            switch item.commonKey {
+            case .commonKeyTitle:
+                if let v = item.value as? String { title = v }
+            case .commonKeyArtist:
+                if let v = item.value as? String { artist = v }
+            case .commonKeyArtwork:
+                if let v = item.value as? Data { artworkData = v }
+            default:
+                break
+            }
+        }
+
+        var duration: TimeInterval = 0
+        let d = CMTimeGetSeconds(asset.duration)
+        if d.isFinite && d > 0 { duration = d }
+
+        return Song(title: title, artist: artist, duration: duration,
+                    fileURL: url, artworkData: artworkData)
+    }
+
+    // MARK: - ZIP Import
+
+    func importFromZIP(at url: URL) async {
+        let entries = ZIPExtractor.extract(from: url)
+        let allowed = Set(["mp3", "mp4", "m4a", "aac", "wav", "flac"])
+
+        for entry in entries {
+            let ext = URL(fileURLWithPath: entry.filename)
+                .pathExtension
+                .lowercased()
+            guard allowed.contains(ext) else { continue }
+
+            // Use only the last path component (avoid nested folder names)
+            let filename = URL(fileURLWithPath: entry.filename).lastPathComponent
+            guard !filename.isEmpty else { continue }
+
+            let destURL = musicDirectory.appendingPathComponent(filename)
+            do {
+                if FileManager.default.fileExists(atPath: destURL.path) {
+                    try FileManager.default.removeItem(at: destURL)
+                }
+                try entry.data.write(to: destURL)
+
+                let song = extractMetadata(from: destURL)
+                await MainActor.run {
+                    guard !self.songs.contains(where: {
+                        $0.fileURL.lastPathComponent == destURL.lastPathComponent
+                    }) else { return }
+                    self.songs.append(song)
+                    self.save()
+                }
+            } catch {
+                print("MusicLibraryManager: ZIP entry error \(entry.filename): \(error)")
+            }
+        }
+    }
+
+    // MARK: - Delete
 
     func deleteSong(_ song: Song) {
         songs.removeAll { $0.id == song.id }
@@ -74,6 +127,15 @@ final class MusicLibraryManager: ObservableObject {
             return p
         }
         try? FileManager.default.removeItem(at: song.fileURL)
+        save()
+    }
+
+    func clearLibrary() {
+        for song in songs {
+            try? FileManager.default.removeItem(at: song.fileURL)
+        }
+        songs = []
+        playlists = []
         save()
     }
 
