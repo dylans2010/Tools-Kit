@@ -123,12 +123,22 @@ class ToolRegistry: ObservableObject {
             ConnectionInspectorTool(),
             EndpointTesterTool(),
             SecureRouterTool(),
+            NetworkProfilerTool(),
+            WebSocketInspectorTool(),
+            TLSInspectorTool(),
+            PortScannerTool(),
+            TokenInspectorTool(),
+            FileIntegrityTool(),
+            SafeBrowsingTool(),
 
             // Privacy Tools
             EncryptedVaultTool(),
             TrackerBlockerTool(),
             TemporaryIdentityTool(),
-            SecureFileSenderTool()
+            SecureFileSenderTool(),
+            LinkSanitizerTool(),
+            PermissionAuditTool(),
+            ClipboardMonitorTool()
         ]
     }
 
