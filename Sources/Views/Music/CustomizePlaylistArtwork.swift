@@ -594,9 +594,7 @@ struct CustomizePlaylistArtwork: View {
             var updated = playlist
             updated.customArtworkData = data
             playlist = updated
-            if library.playlists.contains(where: { $0.id == updated.id }) {
-                library.updatePlaylist(updated)
-            }
+            library.updatePlaylist(updated)
         }
         dismiss()
     }

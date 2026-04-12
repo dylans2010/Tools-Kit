@@ -80,9 +80,7 @@ struct CreatePlaylistView: View {
         var playlist = draftPlaylist ?? Playlist(name: resolvedName, songIDs: Array(selectedSongs))
         playlist.name = resolvedName
         playlist.songIDs = Array(selectedSongs)
-        if let artworkSongID = playlist.artworkSongID, !selectedSongs.contains(artworkSongID) {
-            playlist.artworkSongID = playlist.songIDs.first
-        } else if playlist.artworkSongID == nil {
+        if playlist.artworkSongID == nil || !(playlist.artworkSongID.map(selectedSongs.contains) ?? false) {
             playlist.artworkSongID = playlist.songIDs.first
         }
         draftPlaylist = playlist
