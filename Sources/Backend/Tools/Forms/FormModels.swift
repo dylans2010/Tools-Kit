@@ -172,6 +172,43 @@ struct FormDocument: Identifiable, Codable, Hashable {
     var accentHexColor: String
     var backgroundHexColor: String
     var manifest: FormManifest
+    var ownerAccessKey: String
+
+    init(
+        id: UUID = UUID(),
+        name: String,
+        description: String,
+        questions: [FormQuestion],
+        accentHexColor: String,
+        backgroundHexColor: String,
+        manifest: FormManifest,
+        ownerAccessKey: String = UUID().uuidString
+    ) {
+        self.id = id
+        self.name = name
+        self.description = description
+        self.questions = questions
+        self.accentHexColor = accentHexColor
+        self.backgroundHexColor = backgroundHexColor
+        self.manifest = manifest
+        self.ownerAccessKey = ownerAccessKey
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        name = try container.decodeIfPresent(String.self, forKey: .name) ?? "Untitled Form"
+        description = try container.decodeIfPresent(String.self, forKey: .description) ?? ""
+        questions = try container.decodeIfPresent([FormQuestion].self, forKey: .questions) ?? []
+        accentHexColor = try container.decodeIfPresent(String.self, forKey: .accentHexColor) ?? "007AFF"
+        backgroundHexColor = try container.decodeIfPresent(String.self, forKey: .backgroundHexColor) ?? "F2F2F7"
+        manifest = try container.decodeIfPresent(FormManifest.self, forKey: .manifest) ?? FormManifest.compose(
+            creatorName: "Unknown",
+            questions: questions,
+            privacyNote: "Review manifest before sharing."
+        )
+        ownerAccessKey = try container.decodeIfPresent(String.self, forKey: .ownerAccessKey) ?? UUID().uuidString
+    }
 }
 
 struct FilledOutFormDocument: Codable, Hashable {
@@ -180,4 +217,31 @@ struct FilledOutFormDocument: Codable, Hashable {
     var answeredAt: Date
     var answers: [UUID: String]
     var responderName: String
+    var ownerAccessKey: String
+
+    init(
+        formID: UUID,
+        formName: String,
+        answeredAt: Date,
+        answers: [UUID: String],
+        responderName: String,
+        ownerAccessKey: String = ""
+    ) {
+        self.formID = formID
+        self.formName = formName
+        self.answeredAt = answeredAt
+        self.answers = answers
+        self.responderName = responderName
+        self.ownerAccessKey = ownerAccessKey
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        formID = try container.decode(UUID.self, forKey: .formID)
+        formName = try container.decodeIfPresent(String.self, forKey: .formName) ?? "Form"
+        answeredAt = try container.decodeIfPresent(Date.self, forKey: .answeredAt) ?? Date()
+        answers = try container.decodeIfPresent([UUID: String].self, forKey: .answers) ?? [:]
+        responderName = try container.decodeIfPresent(String.self, forKey: .responderName) ?? "Anonymous"
+        ownerAccessKey = try container.decodeIfPresent(String.self, forKey: .ownerAccessKey) ?? ""
+    }
 }

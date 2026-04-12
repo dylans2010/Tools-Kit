@@ -11,8 +11,6 @@ struct ExportFormView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
-                Spacer()
-
                 Image(systemName: "square.and.arrow.up.circle.fill")
                     .font(.system(size: 64))
                     .foregroundColor(.blue)
@@ -59,8 +57,8 @@ struct ExportFormView: View {
                     }
                 }
 
-                Spacer()
             }
+            .padding(.vertical, 20)
             .navigationTitle("Export")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -70,6 +68,8 @@ struct ExportFormView: View {
             }
             .onAppear { generateExport() }
         }
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
     }
 
     private func generateExport() {

@@ -32,7 +32,7 @@ struct ImportFormView: View {
                 guard let url = urls.first else { return }
                 if let imported = try? FormFileManager.importForm(from: url) {
                     backend.importedForm = imported
-                    backend.add(imported)
+                    backend.add(imported, isOwned: false)
                 }
                 dismiss()
             }

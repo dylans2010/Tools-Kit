@@ -60,12 +60,18 @@ struct FormsView: View {
         }
         .sheet(isPresented: $showingCreate) {
             NavigationStack { CreateFormView(backend: backend) }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showingTemplates) {
             NavigationStack { FormTemplatesView(backend: backend) }
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showingImport) {
             NavigationStack { ImportFormView(backend: backend) }
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
         }
         .confirmationDialog(
             "Delete \(formToDelete?.name ?? "")?",

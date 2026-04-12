@@ -9,6 +9,7 @@ struct FillOutFormView: View {
     @State private var responderName = ""
     @State private var exportURL: URL?
     @State private var showValidationAlert = false
+    @State private var showCompletedSheet = false
 
     private var accentColor: Color {
         Color(hex: form.accentHexColor) ?? .blue
@@ -43,31 +44,17 @@ struct FillOutFormView: View {
                     questionCard(question: question, index: index)
                 }
 
-                // Export row
-                VStack(spacing: 12) {
-                    Button {
-                        submitForm()
-                    } label: {
-                        Label("Submit & Export Answers", systemImage: "checkmark.circle.fill")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(accentColor)
-                            .foregroundColor(.white)
-                            .cornerRadius(14)
-                    }
-                    .buttonStyle(.plain)
-
-                    if let exportURL {
-                        ShareLink(item: exportURL) {
-                            Label("Share Filled Answers", systemImage: "square.and.arrow.up")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color(.secondarySystemBackground))
-                                .foregroundColor(.primary)
-                                .cornerRadius(14)
-                        }
-                    }
+                Button {
+                    submitForm()
+                } label: {
+                    Label("Submit & Export Answers", systemImage: "checkmark.circle.fill")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(accentColor)
+                        .foregroundColor(.white)
+                        .cornerRadius(14)
                 }
+                .buttonStyle(.plain)
             }
             .padding()
         }
@@ -83,6 +70,11 @@ struct FillOutFormView: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text("Please answer all required questions before submitting.")
+        }
+        .sheet(isPresented: $showCompletedSheet) {
+            completionSheet
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
         }
     }
 
@@ -145,12 +137,56 @@ struct FillOutFormView: View {
             formName: form.name,
             answeredAt: Date(),
             answers: answers,
-            responderName: responderName.isEmpty ? "Anonymous" : responderName
+            responderName: responderName.isEmpty ? "Anonymous" : responderName,
+            ownerAccessKey: form.ownerAccessKey
         )
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent("\(form.name)-answers.form")
         try? FilledOutFormManager.exportAnswers(doc, to: url)
         exportURL = url
+        showCompletedSheet = true
+    }
+
+    private var completionSheet: some View {
+        VStack(spacing: 16) {
+            Capsule()
+                .fill(Color.secondary.opacity(0.25))
+                .frame(width: 42, height: 5)
+                .padding(.top, 4)
+
+            Image(systemName: "checkmark.seal.fill")
+                .font(.system(size: 44))
+                .foregroundColor(accentColor)
+
+            Text("Form Completed!")
+                .font(.title3.bold())
+
+            Text("Your responses were saved. Export the filled form to share it with the form owner.")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 12)
+
+            if let exportURL {
+                ShareLink(item: exportURL) {
+                    Label("Export Filled Form", systemImage: "square.and.arrow.up")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(accentColor)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                }
+                .buttonStyle(.plain)
+            }
+
+            Button("Done") {
+                showCompletedSheet = false
+            }
+            .font(.subheadline.weight(.semibold))
+            .padding(.top, 2)
+
+            Spacer(minLength: 0)
+        }
+        .padding()
     }
 }
-

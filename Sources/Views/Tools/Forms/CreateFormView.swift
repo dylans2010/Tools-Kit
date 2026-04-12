@@ -10,6 +10,8 @@ struct CreateFormView: View {
     @State private var selectedType: FormQuestionType = .textInput
     @State private var accentHex = "007AFF"
     @State private var backgroundHex = "F2F2F7"
+    @State private var cardCornerRadius: Double = 14
+    @State private var cardShadowOpacity: Double = 0.05
     @State private var creatorName = ""
     @State private var privacyNote = "Review manifest before sharing."
     @State private var tags = ""
@@ -29,6 +31,10 @@ struct CreateFormView: View {
         Color(hex: accentHex) ?? .blue
     }
 
+    private var backgroundColor: Color {
+        Color(hex: backgroundHex) ?? Color(.secondarySystemGroupedBackground)
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -46,17 +52,72 @@ struct CreateFormView: View {
                 formCard {
                     VStack(alignment: .leading, spacing: 12) {
                         cardHeader("Style", icon: "paintpalette")
-                        HStack(spacing: 12) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Accent Color").font(.caption).foregroundColor(.secondary)
-                                TextField("Hex e.g. 007AFF", text: $accentHex)
+                        HStack(alignment: .top, spacing: 12) {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Accent")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                TextField("007AFF", text: $accentHex)
                                     .textFieldStyle(.roundedBorder)
                                     .autocapitalization(.allCharacters)
+                                ColorPicker("Accent Color", selection: Binding(
+                                    get: { accentColor },
+                                    set: { if let hex = $0.toHex() { accentHex = hex } }
+                                ), supportsOpacity: false)
+                                    .font(.caption)
                             }
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(accentColor)
-                                .frame(width: 40, height: 36)
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Background")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                TextField("F2F2F7", text: $backgroundHex)
+                                    .textFieldStyle(.roundedBorder)
+                                    .autocapitalization(.allCharacters)
+                                ColorPicker("Background Color", selection: Binding(
+                                    get: { backgroundColor },
+                                    set: { if let hex = $0.toHex() { backgroundHex = hex } }
+                                ), supportsOpacity: false)
+                                    .font(.caption)
+                            }
                         }
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Card Roundness")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Slider(value: $cardCornerRadius, in: 10...24, step: 1)
+                            Text("\(Int(cardCornerRadius)) px")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Shadow")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Slider(value: $cardShadowOpacity, in: 0...0.15, step: 0.01)
+                            Text("\(Int(cardShadowOpacity * 100))%")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+
+                        RoundedRectangle(cornerRadius: CGFloat(cardCornerRadius))
+                            .fill(backgroundColor)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: CGFloat(cardCornerRadius))
+                                    .stroke(accentColor.opacity(0.25), lineWidth: 1)
+                            )
+                            .frame(height: 60)
+                            .overlay(
+                                HStack {
+                                    Circle().fill(accentColor).frame(width: 16, height: 16)
+                                    Text("Live style preview")
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundColor(.primary)
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 14)
+                            )
                     }
                 }
 
@@ -99,8 +160,8 @@ struct CreateFormView: View {
                         }
                         .padding(.horizontal, 4)
 
-                        ForEach($questions) { $question in
-                            questionCard(binding: $question)
+                        ForEach(Array(questions.indices), id: \.self) { index in
+                            questionCard(binding: $questions[index], index: index + 1)
                         }
                         .onDelete { questions.remove(atOffsets: $0) }
                         .onMove { questions.move(fromOffsets: $0, toOffset: $1) }
@@ -134,7 +195,7 @@ struct CreateFormView: View {
             }
             .padding()
         }
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .background(backgroundColor.opacity(0.35).ignoresSafeArea())
         .navigationTitle("Create Form")
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -146,7 +207,7 @@ struct CreateFormView: View {
     // MARK: - Question Card
 
     @ViewBuilder
-    private func questionCard(binding: Binding<FormQuestion>) -> some View {
+    private func questionCard(binding: Binding<FormQuestion>, index: Int) -> some View {
         let question = binding.wrappedValue
         let isExpanded = expandedQuestionID == question.id
 
@@ -161,6 +222,14 @@ struct CreateFormView: View {
                     Image(systemName: question.type.icon)
                         .foregroundColor(accentColor)
                         .frame(width: 22)
+
+                    Text("\(index)")
+                        .font(.caption.bold())
+                        .foregroundColor(accentColor)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(accentColor.opacity(0.12))
+                        .clipShape(Capsule())
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text(question.title.isEmpty ? "Untitled Question" : question.title)
@@ -199,7 +268,11 @@ struct CreateFormView: View {
             }
         }
         .background(Color(.secondarySystemBackground))
-        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: CGFloat(cardCornerRadius))
+                .stroke(accentColor.opacity(0.14), lineWidth: 1)
+        )
+        .cornerRadius(CGFloat(cardCornerRadius))
     }
 
     // MARK: - Type Chip
@@ -231,8 +304,8 @@ struct CreateFormView: View {
                 .padding(16)
         }
         .background(Color(.systemBackground))
-        .cornerRadius(14)
-        .shadow(color: .black.opacity(0.04), radius: 4, y: 2)
+        .cornerRadius(CGFloat(cardCornerRadius))
+        .shadow(color: .black.opacity(cardShadowOpacity), radius: 8, y: 4)
     }
 
     private func cardHeader(_ title: String, icon: String) -> some View {
@@ -283,4 +356,3 @@ struct CreateFormView: View {
         dismiss()
     }
 }
-
