@@ -87,6 +87,7 @@
 		MU020000000000000000001E /* DownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU010000000000000000001E /* DownloadManager.swift */; };
 		MU020000000000000000001F /* ZipExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU010000000000000000001F /* ZipExportService.swift */; };
 		MU0200000000000000000020 /* SpotifyFetchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000020 /* SpotifyFetchView.swift */; };
+		MU0200000000000000000021 /* SpotifyFetchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000021 /* SpotifyFetchViewModel.swift */; };
 		88656A686AF741EB83B8FD5F /* SliderQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711D3FB735414113B06478F1 /* MorseCodeView.swift */; };
@@ -711,6 +712,7 @@
 		MU010000000000000000001D /* TrackMatchingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Services/SpotifyFetchAPI/TrackMatchingService.swift"; sourceTree = "<group>"; };
 		MU010000000000000000001E /* DownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Services/SpotifyFetchAPI/DownloadManager.swift"; sourceTree = "<group>"; };
 		MU010000000000000000001F /* ZipExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Services/SpotifyFetchAPI/ZipExportService.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000021 /* SpotifyFetchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Services/SpotifyFetchAPI/SpotifyFetchViewModel.swift"; sourceTree = "<group>"; };
 		MU0100000000000000000020 /* SpotifyFetchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Views/SpotifyFetchView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1086,6 +1088,7 @@
 			MU010000000000000000001D /* TrackMatchingService.swift */,
 			MU010000000000000000001E /* DownloadManager.swift */,
 			MU010000000000000000001F /* ZipExportService.swift */,
+			MU0100000000000000000021 /* SpotifyFetchViewModel.swift */,
 			MU0100000000000000000020 /* SpotifyFetchView.swift */,
 			);
 			path = Sources;
@@ -1520,6 +1523,7 @@
 			MU020000000000000000001E /* DownloadManager.swift in Sources */,
 			MU020000000000000000001F /* ZipExportService.swift in Sources */,
 			MU0200000000000000000020 /* SpotifyFetchView.swift in Sources */,
+			MU0200000000000000000021 /* SpotifyFetchViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

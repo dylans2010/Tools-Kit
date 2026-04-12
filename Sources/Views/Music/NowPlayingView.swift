@@ -74,9 +74,11 @@ struct NowPlayingView: View {
                let img = UIImage(data: data) {
                 Image(uiImage: img)
                     .resizable()
-                    .scaledToFill()
+                    .aspectRatio(contentMode: .fill)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipped()
                     .ignoresSafeArea()
+                    .drawingGroup()
                     .transition(.opacity)
             }
             Rectangle()
