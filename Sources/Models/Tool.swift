@@ -6,6 +6,8 @@ enum ToolCategory: String, CaseIterable, Codable {
     case development = "Development"
     case utility = "Utility"
     case ai = "AI"
+    case network = "Network"
+    case privacy = "Privacy"
 }
 
 enum ToolComplexity: String, CaseIterable, Codable {
