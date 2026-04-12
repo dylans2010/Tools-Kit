@@ -289,8 +289,8 @@
 		E5AEBD1200A44657A5C545F3 /* FileModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Files/FileModels.swift"; sourceTree = "<group>"; };
 		CF9A900AAA944545B9AA0217 /* FileFolderBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Files/FileFolderBackend.swift"; sourceTree = "<group>"; };
 		10D892907BAC409D9E8D7684 /* FileFolderContentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Files/FileFolderContentsView.swift"; sourceTree = "<group>"; };
-		C4C7570717DA449692472DC7 /* QuestionEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionEditorView.swift; sourceTree = "<group>"; };
-		28651E16D0534324A81C2E92 /* DragDropQuestionFillerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragDropQuestionFillerView.swift; sourceTree = "<group>"; };
+		C4C7570717DA449692472DC7 /* QuestionEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/QuestionEditorView.swift"; sourceTree = "<group>"; };
+		28651E16D0534324A81C2E92 /* DragDropQuestionFillerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/DragDropQuestionFillerView.swift"; sourceTree = "<group>"; };
 		B1ABEF1CC5614B57A749E486 /* NATOView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/NATO/NATOView.swift"; sourceTree = "<group>"; };
 		711D3FB735414113B06478F1 /* MorseCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/MorseCode/MorseCodeView.swift"; sourceTree = "<group>"; };
 		D8156480BE054D17A41ABFCF /* PrimeFactorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/PrimeFactor/PrimeFactorView.swift"; sourceTree = "<group>"; };
@@ -851,6 +851,9 @@
 				B1C2D3E4F5A6478899AA000B /* FileManagementTemplateSectionView.swift */,
 				B1C2D3E4F5A6478899AA000C /* FileManagementWorkspaceSectionView.swift */,
 				B1C2D3E4F5A6478899AA000D /* FileManagementActionsSectionView.swift */,
+				C4C7570717DA449692472DC7 /* QuestionEditorView.swift */,
+				28651E16D0534324A81C2E92 /* DragDropQuestionFillerView.swift */,
+				080B28C9F0E54D43BD51389A /* ToolVisibilityManager.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
