@@ -71,5 +71,11 @@
     <string>Camera access is required for scanning documents, classifying IDs, and detecting objects.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Photo Library access is required to import media for metadata viewing, perspective correction, and compression tools.</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>audio</string>
+    </array>
+    <key>NSAppleMusicUsageDescription</key>
+    <string>Access is needed to import and play music files.</string>
 </dict>
 </plist>

@@ -55,6 +55,19 @@
 		NT0200000000000000000014 /* TokenInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000014 /* TokenInspectorView.swift */; };
 		NT0200000000000000000015 /* FileIntegrityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000015 /* FileIntegrityView.swift */; };
 		NT0200000000000000000016 /* SafeBrowsingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000016 /* SafeBrowsingView.swift */; };
+		MU0200000000000000000001 /* Song.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000001 /* Song.swift */; };
+		MU0200000000000000000002 /* Playlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000002 /* Playlist.swift */; };
+		MU0200000000000000000003 /* MusicLibraryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000003 /* MusicLibraryManager.swift */; };
+		MU0200000000000000000004 /* MusicPlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000004 /* MusicPlayerManager.swift */; };
+		MU0200000000000000000005 /* MusicModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000005 /* MusicModeManager.swift */; };
+		MU0200000000000000000006 /* MusicLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000006 /* MusicLibraryView.swift */; };
+		MU0200000000000000000007 /* SongsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000007 /* SongsView.swift */; };
+		MU0200000000000000000008 /* MiniPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000008 /* MiniPlayer.swift */; };
+		MU0200000000000000000009 /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000009 /* NowPlayingView.swift */; };
+		MU020000000000000000000A /* QueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU010000000000000000000A /* QueueView.swift */; };
+		MU020000000000000000000B /* PlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU010000000000000000000B /* PlaylistView.swift */; };
+		MU020000000000000000000C /* CreatePlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU010000000000000000000C /* CreatePlaylistView.swift */; };
+		MU020000000000000000000D /* MusicSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU010000000000000000000D /* MusicSettingsView.swift */; };
 		88656A686AF741EB83B8FD5F /* SliderQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711D3FB735414113B06478F1 /* MorseCodeView.swift */; };
@@ -647,6 +660,19 @@
 		NT0100000000000000000014 /* TokenInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/TokenInspector/TokenInspectorView.swift"; sourceTree = "<group>"; };
 		NT0100000000000000000015 /* FileIntegrityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/FileIntegrity/FileIntegrityView.swift"; sourceTree = "<group>"; };
 		NT0100000000000000000016 /* SafeBrowsingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/SafeBrowsing/SafeBrowsingView.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000001 /* Song.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Models/Song.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000002 /* Playlist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Models/Playlist.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000003 /* MusicLibraryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/MusicLibraryManager.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000004 /* MusicPlayerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/MusicPlayerManager.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000005 /* MusicModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/MusicModeManager.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000006 /* MusicLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/MusicLibraryView.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000007 /* SongsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/SongsView.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000008 /* MiniPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/MiniPlayer.swift"; sourceTree = "<group>"; };
+		MU0100000000000000000009 /* NowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/NowPlayingView.swift"; sourceTree = "<group>"; };
+		MU010000000000000000000A /* QueueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/QueueView.swift"; sourceTree = "<group>"; };
+		MU010000000000000000000B /* PlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/PlaylistView.swift"; sourceTree = "<group>"; };
+		MU010000000000000000000C /* CreatePlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/CreatePlaylistView.swift"; sourceTree = "<group>"; };
+		MU010000000000000000000D /* MusicSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/MusicSettingsView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -990,6 +1016,19 @@
 				NT0100000000000000000014 /* TokenInspectorView.swift */,
 				NT0100000000000000000015 /* FileIntegrityView.swift */,
 				NT0100000000000000000016 /* SafeBrowsingView.swift */,
+				MU0100000000000000000001 /* Song.swift */,
+				MU0100000000000000000002 /* Playlist.swift */,
+				MU0100000000000000000003 /* MusicLibraryManager.swift */,
+				MU0100000000000000000004 /* MusicPlayerManager.swift */,
+				MU0100000000000000000005 /* MusicModeManager.swift */,
+				MU0100000000000000000006 /* MusicLibraryView.swift */,
+				MU0100000000000000000007 /* SongsView.swift */,
+				MU0100000000000000000008 /* MiniPlayer.swift */,
+				MU0100000000000000000009 /* NowPlayingView.swift */,
+				MU010000000000000000000A /* QueueView.swift */,
+				MU010000000000000000000B /* PlaylistView.swift */,
+				MU010000000000000000000C /* CreatePlaylistView.swift */,
+				MU010000000000000000000D /* MusicSettingsView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -1386,6 +1425,19 @@
 				NT0200000000000000000014 /* TokenInspectorView.swift in Sources */,
 				NT0200000000000000000015 /* FileIntegrityView.swift in Sources */,
 				NT0200000000000000000016 /* SafeBrowsingView.swift in Sources */,
+				MU0200000000000000000001 /* Song.swift in Sources */,
+				MU0200000000000000000002 /* Playlist.swift in Sources */,
+				MU0200000000000000000003 /* MusicLibraryManager.swift in Sources */,
+				MU0200000000000000000004 /* MusicPlayerManager.swift in Sources */,
+				MU0200000000000000000005 /* MusicModeManager.swift in Sources */,
+				MU0200000000000000000006 /* MusicLibraryView.swift in Sources */,
+				MU0200000000000000000007 /* SongsView.swift in Sources */,
+				MU0200000000000000000008 /* MiniPlayer.swift in Sources */,
+				MU0200000000000000000009 /* NowPlayingView.swift in Sources */,
+				MU020000000000000000000A /* QueueView.swift in Sources */,
+				MU020000000000000000000B /* PlaylistView.swift in Sources */,
+				MU020000000000000000000C /* CreatePlaylistView.swift in Sources */,
+				MU020000000000000000000D /* MusicSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
