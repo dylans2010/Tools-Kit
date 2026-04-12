@@ -73,9 +73,13 @@ class NotesBackend: ObservableObject {
         return tempPath
     }
 
-    func summarizeNote(_ note: Note, completion: @escaping (String) -> Void) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            completion("Summary of \(note.title): This note contains information about \(note.content.prefix(50))...")
-        }
+    func summarizeNote(_ note: Note) async throws -> String {
+        let prompt = """
+        Summarize this note in concise bullet points.
+        Title: \(note.title)
+        Content:
+        \(note.content)
+        """
+        return try await AIService.shared.generateResponse(prompt: prompt)
     }
 }

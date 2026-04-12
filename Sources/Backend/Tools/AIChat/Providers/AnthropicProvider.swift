@@ -9,20 +9,13 @@ final class AnthropicProvider: AIProvider {
     let apiKeyURL = URL(string: "https://console.anthropic.com/settings/keys")
     let apiKeyPlaceholder = "sk-ant-..."
 
-    let models: [AIModel] = [
-        AIModel(id: "claude-opus-4-5",              name: "Claude Opus 4.5",          supportsVision: true,  contextLength: 200_000),
-        AIModel(id: "claude-sonnet-4-5",            name: "Claude Sonnet 4.5",        supportsVision: true,  contextLength: 200_000),
-        AIModel(id: "claude-3-5-sonnet-20241022",   name: "Claude 3.5 Sonnet",        supportsVision: true,  contextLength: 200_000),
-        AIModel(id: "claude-3-5-haiku-20241022",    name: "Claude 3.5 Haiku",         supportsVision: true,  contextLength: 200_000),
-        AIModel(id: "claude-3-haiku-20240307",      name: "Claude 3 Haiku",           supportsVision: true,  contextLength: 200_000),
-        AIModel(id: "claude-3-opus-20240229",       name: "Claude 3 Opus",            supportsVision: true,  contextLength: 200_000),
-    ]
+    let models: [AIModel] = []
 
     private let endpoint = "https://api.anthropic.com/v1/messages"
     private let anthropicVersion = "2023-06-01"
 
     func supportsVision(model: String) -> Bool {
-        models.first(where: { $0.id == model })?.supportsVision ?? true
+        model.lowercased().contains("claude")
     }
 
     func send(messages: [ChatMessage], model: String, apiKey: String) async throws -> String {
@@ -74,6 +67,25 @@ final class AnthropicProvider: AIProvider {
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         // 200 = success, 401 = invalid key
         return code == 200
+    }
+
+    func fetchModels(apiKey: String) async throws -> [AIModel] {
+        var request = URLRequest(url: URL(string: "https://api.anthropic.com/v1/models")!)
+        request.httpMethod = "GET"
+        request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
+        request.addValue(anthropicVersion, forHTTPHeaderField: "anthropic-version")
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            return []
+        }
+        let object = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        let rows = object?["data"] as? [[String: Any]] ?? []
+        return rows.compactMap { row in
+            guard let id = row["id"] as? String else { return nil }
+            let name = (row["display_name"] as? String) ?? id
+            return AIModel(id: id, name: name, supportsVision: id.lowercased().contains("claude"), contextLength: nil)
+        }
+        .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
     private func roleFor(_ role: String) -> String {

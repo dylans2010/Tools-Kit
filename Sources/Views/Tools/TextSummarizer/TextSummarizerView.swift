@@ -26,7 +26,7 @@ struct TextSummarizerView: View {
                 .background(Color(.secondarySystemBackground))
                 .cornerRadius(12)
 
-                Button(action: backend.summarize) {
+                Button(action: { Task { await backend.summarize() } }) {
                     if backend.isLoading {
                         ProgressView().tint(.white)
                     } else {
@@ -67,6 +67,6 @@ struct TextSummarizerTool: Tool {
     let category = ToolCategory.ai
     let complexity = ToolComplexity.advanced
     let description = "Generate a concise summary of long articles or documents"
-    let requiresAPI = false
+    let requiresAPI = true
     var view: AnyView { AnyView(TextSummarizerView()) }
 }

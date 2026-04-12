@@ -24,7 +24,7 @@ struct TextRewriterView: View {
                     .pickerStyle(.menu)
                     .buttonStyle(.bordered)
 
-                    Button(action: { backend.rewrite(to: selectedTone) }) {
+                    Button(action: { Task { await backend.rewrite(to: selectedTone) } }) {
                         if backend.isProcessing {
                             ProgressView().tint(.white)
                         } else {
@@ -67,6 +67,6 @@ struct TextRewriterTool: Tool {
     let category = ToolCategory.ai
     let complexity = ToolComplexity.advanced
     let description = "Change the tone and style of your text while keeping the meaning"
-    let requiresAPI = false
+    let requiresAPI = true
     var view: AnyView { AnyView(TextRewriterView()) }
 }

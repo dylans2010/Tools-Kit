@@ -4,63 +4,55 @@ struct IdeaGeneratorView: View {
     @StateObject private var backend = IdeaGeneratorBackend()
 
     var body: some View {
-        VStack(spacing: 20) {
-            VStack(spacing: 12) {
-                Image(systemName: "lightbulb.stars.fill")
-                    .font(.system(size: 60))
-                    .foregroundColor(.yellow)
-                    .shadow(radius: 5)
+        ToolDetailView(tool: IdeaGeneratorTool()) {
+            VStack(spacing: 20) {
+                ToolInputSection("Focus Area") {
+                    TextField("What kind of idea do you want?", text: $backend.topic)
+                        .padding()
+                }
 
-                Text("Need Inspiration?")
-                    .font(.title2).bold()
+                Button {
+                    Task { await backend.generate() }
+                } label: {
+                    if backend.isProcessing {
+                        ProgressView().tint(.white).frame(maxWidth: .infinity)
+                    } else {
+                        Label("Generate Ideas", systemImage: "sparkles")
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(backend.isProcessing)
 
-                Text("Generate random startup and project ideas based on trending niches and technologies.")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-            }
-            .padding(.top)
-
-            Button(action: backend.generate) {
-                Label("Generate New Idea", systemImage: "sparkles")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-            }
-            .padding(.horizontal)
-
-            List {
-                Section(header: Text("Recent Ideas")) {
+                ToolInputSection("Ideas") {
                     if backend.ideas.isEmpty {
-                        Text("No ideas yet. Tap the button!").foregroundColor(.secondary)
+                        Text("No ideas yet. Generate a batch to get started.")
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding()
                     } else {
                         ForEach(backend.ideas, id: \.self) { idea in
-                            HStack {
+                            HStack(alignment: .top) {
                                 Text(idea)
-                                Spacer()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                                 Button(action: { UIPasteboard.general.string = idea }) {
                                     Image(systemName: "doc.on.doc")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
                                 }
                             }
+                            .padding()
+                            if idea != backend.ideas.last { Divider() }
                         }
                     }
                 }
-            }
-            .listStyle(InsetGroupedListStyle())
 
-            if !backend.ideas.isEmpty {
-                Button("Clear History", role: .destructive) {
-                    backend.clear()
+                if !backend.ideas.isEmpty {
+                    Button("Clear", role: .destructive) {
+                        backend.clear()
+                    }
+                    .frame(maxWidth: .infinity, alignment: .trailing)
                 }
-                .padding(.bottom)
             }
         }
-        .navigationTitle("Idea Generator")
     }
 }
 
@@ -70,6 +62,6 @@ struct IdeaGeneratorTool: Tool {
     let category = ToolCategory.ai
     let complexity = ToolComplexity.basic
     let description = "Generate innovative app and business ideas"
-    let requiresAPI = false
+    let requiresAPI = true
     var view: AnyView { AnyView(IdeaGeneratorView()) }
 }

@@ -12,15 +12,16 @@ struct ToolDetailView<Content: View>: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                // Header Section
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 16) {
                         Image(systemName: tool.icon)
-                            .font(.system(size: 32))
+                            .font(.system(size: 30, weight: .semibold))
                             .foregroundColor(.blue)
-                            .frame(width: 64, height: 64)
-                            .background(Color.blue.opacity(0.1))
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .frame(width: 58, height: 58)
+                            .background(
+                                LinearGradient(colors: [Color.blue.opacity(0.18), Color.cyan.opacity(0.18)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
 
                         VStack(alignment: .leading, spacing: 4) {
                             Text(tool.name)
@@ -51,12 +52,11 @@ struct ToolDetailView<Content: View>: View {
                         .foregroundColor(.secondary)
                         .padding(.top, 8)
                 }
+                .padding()
+                .background(Color(.secondarySystemGroupedBackground))
+                .cornerRadius(16)
                 .padding(.horizontal)
 
-                Divider()
-                    .padding(.horizontal)
-
-                // Tool Content
                 content
                     .padding(.horizontal)
             }

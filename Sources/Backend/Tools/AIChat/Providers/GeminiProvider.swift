@@ -9,18 +9,12 @@ final class GeminiProvider: AIProvider {
     let apiKeyURL = URL(string: "https://aistudio.google.com/app/apikey")
     let apiKeyPlaceholder = "AIza..."
 
-    let models: [AIModel] = [
-        AIModel(id: "gemini-2.0-flash",        name: "Gemini 2.0 Flash",        supportsVision: true,  contextLength: 1_048_576),
-        AIModel(id: "gemini-2.0-flash-lite",   name: "Gemini 2.0 Flash Lite",   supportsVision: true,  contextLength: 1_048_576),
-        AIModel(id: "gemini-1.5-pro",          name: "Gemini 1.5 Pro",          supportsVision: true,  contextLength: 2_097_152),
-        AIModel(id: "gemini-1.5-flash",        name: "Gemini 1.5 Flash",        supportsVision: true,  contextLength: 1_048_576),
-        AIModel(id: "gemini-1.5-flash-8b",     name: "Gemini 1.5 Flash 8B",     supportsVision: true,  contextLength: 1_048_576),
-    ]
+    let models: [AIModel] = []
 
     private let baseURL = "https://generativelanguage.googleapis.com/v1beta/models"
 
     func supportsVision(model: String) -> Bool {
-        models.first(where: { $0.id == model })?.supportsVision ?? true
+        model.lowercased().contains("gemini")
     }
 
     func send(messages: [ChatMessage], model: String, apiKey: String) async throws -> String {
@@ -73,6 +67,26 @@ final class GeminiProvider: AIProvider {
         let url = URL(string: "\(baseURL)?key=\(key)")!
         let (_, response) = try await URLSession.shared.data(from: url)
         return (response as? HTTPURLResponse)?.statusCode == 200
+    }
+
+    func fetchModels(apiKey: String) async throws -> [AIModel] {
+        let url = URL(string: "\(baseURL)?key=\(apiKey)")!
+        let (data, response) = try await URLSession.shared.data(from: url)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            return []
+        }
+
+        let object = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        let rows = object?["models"] as? [[String: Any]] ?? []
+        return rows.compactMap { row in
+            guard let name = row["name"] as? String else { return nil }
+            let id = name.replacingOccurrences(of: "models/", with: "")
+            let methods = row["supportedGenerationMethods"] as? [String] ?? []
+            guard methods.contains("generateContent") else { return nil }
+            let context = row["inputTokenLimit"] as? Int
+            return AIModel(id: id, name: id, supportsVision: id.lowercased().contains("gemini"), contextLength: context)
+        }
+        .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
     private func splitSystem(_ messages: [ChatMessage]) -> (String?, [ChatMessage]) {

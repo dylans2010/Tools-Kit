@@ -1,22 +1,30 @@
 import Foundation
 
-class IdeaGeneratorBackend: ObservableObject {
+@MainActor
+final class IdeaGeneratorBackend: ObservableObject {
     @Published var ideas: [String] = []
+    @Published var topic: String = ""
+    @Published var isProcessing = false
 
-    private let niches = ["Fitness", "Education", "Finance", "Healthcare", "Travel", "Sustainability", "Gaming", "Pet Care", "Real Estate", "Remote Work"]
-    private let technologies = ["AI/ML", "Blockchain", "AR/VR", "IoT", "Mobile App", "SaaS", "Marketplace", "Wearables", "Voice Interface"]
-    private let targets = ["for Seniors", "for Students", "for Small Businesses", "for Digital Nomads", "for Busy Parents", "for Creators"]
+    func generate() async {
+        isProcessing = true
+        defer { isProcessing = false }
 
-    func generate() {
-        let niche = niches.randomElement() ?? "General"
-        let tech = technologies.randomElement() ?? "Platform"
-        let target = targets.randomElement() ?? "for Everyone"
+        let focus = topic.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "a useful app or startup" : topic
+        let prompt = """
+        Generate 5 concise and practical product ideas about \(focus).
+        Return each idea as a single bullet with a short one-line rationale.
+        """
 
-        let newIdea = "\(tech) \(niche) solution \(target)"
-        ideas.insert(newIdea, at: 0)
-
-        if ideas.count > 10 {
-            ideas.removeLast()
+        do {
+            let response = try await AIService.shared.generateResponse(prompt: prompt)
+            let rows = response
+                .components(separatedBy: .newlines)
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .filter { !$0.isEmpty }
+            ideas = Array(rows.prefix(10))
+        } catch {
+            ideas = ["Failed to generate ideas: \(error.localizedDescription)"]
         }
     }
 

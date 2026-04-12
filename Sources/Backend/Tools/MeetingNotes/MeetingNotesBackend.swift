@@ -12,33 +12,28 @@ class MeetingNotesBackend: ObservableObject {
     @Published var participants = ""
     @Published var generatedNotes = ""
     @Published var selectedType: MeetingType = .standup
+    @Published var isProcessing = false
 
-    func generate() {
+    @MainActor
+    func generate() async {
+        isProcessing = true
+        defer { isProcessing = false }
+
         let topicStr = topic.isEmpty ? "[Topic]" : topic
         let people = participants.isEmpty ? "[Participants]" : participants
 
-        var template = ""
-        let dateStr = DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .short)
+        let prompt = """
+        Create structured meeting notes.
+        Type: \(selectedType.rawValue)
+        Topic: \(topicStr)
+        Participants: \(people)
+        Include sections for agenda, highlights, decisions, risks, and action items with owners.
+        """
 
-        template = "MEETING NOTES\n"
-        template += "Date: \(dateStr)\n"
-        template += "Topic: \(topicStr)\n"
-        template += "Attendees: \(people)\n\n"
-        template += "AGENDA:\n- Review progress on \(topicStr)\n- Address any blockers\n- Next steps\n\n"
-
-        switch selectedType {
-        case .standup:
-            template += "KEY UPDATES:\n- [Update 1]\n- [Update 2]\n\n"
-        case .brainstorming:
-            template += "IDEAS GENERATED:\n- [Idea A]\n- [Idea B]\n- [Idea C]\n\n"
-        case .clientCall:
-            template += "CLIENT FEEDBACK:\n- [Requirement 1]\n- [Requirement 2]\n\n"
-        case .technical:
-            template += "TECHNICAL DECISIONS:\n- [Decision 1]\n- [Decision 2]\n\n"
+        do {
+            generatedNotes = try await AIService.shared.generateResponse(prompt: prompt)
+        } catch {
+            generatedNotes = "Failed to generate notes: \(error.localizedDescription)"
         }
-
-        template += "ACTION ITEMS:\n[ ] Follow up on \(topicStr)\n[ ] Assign tasks to \(people.components(separatedBy: ",").first ?? "team")"
-
-        generatedNotes = template
     }
 }

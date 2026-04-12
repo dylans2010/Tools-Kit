@@ -2,7 +2,7 @@ import Foundation
 
 struct AIChatSettings: Codable {
     var selectedProviderID: String = "openrouter"
-    var modelID: String = "google/gemini-2.0-flash-exp:free"
+    var modelID: String = ""
     var systemPrompt: String = ""
     var useCustomPersonality: Bool = false
     var personalityName: String = ""

@@ -13,6 +13,7 @@ class AIService {
     private let registry = AIProviderRegistry.shared
     private let keyManager = APIKeyManager.shared
     private let settingsManager = AIChatSettingsManager.shared
+    private let modelCatalog = AIModelCatalog.shared
 
     // MARK: - Current provider helpers
 
@@ -38,7 +39,20 @@ class AIService {
             throw AIError.missingAPIKey
         }
 
-        let modelToUse = model ?? settingsManager.settings.modelID
+        var modelToUse = model ?? settingsManager.settings.modelID
+        if modelToUse.isEmpty {
+            await modelCatalog.loadModels(for: provider.id)
+            let availableModels = await MainActor.run { modelCatalog.models(for: provider.id) }
+            modelToUse = availableModels.first?.id ?? ""
+            if modelToUse.isEmpty {
+                throw AIError.invalidResponse
+            }
+            await MainActor.run {
+                if settingsManager.settings.modelID.isEmpty {
+                    settingsManager.settings.modelID = modelToUse
+                }
+            }
+        }
         let systemPromptToUse = systemPrompt.isEmpty ? settingsManager.settings.systemPrompt : systemPrompt
 
         let messages = [

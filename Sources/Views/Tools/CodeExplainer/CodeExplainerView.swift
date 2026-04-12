@@ -15,7 +15,9 @@ struct CodeExplainerView: View {
                         .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
                 }
 
-                Button(action: backend.explain) {
+                Button {
+                    Task { await backend.explain() }
+                } label: {
                     if backend.isProcessing {
                         ProgressView().tint(.white)
                     } else {
@@ -82,6 +84,6 @@ struct CodeExplainerTool: Tool {
     let category = ToolCategory.ai
     let complexity = ToolComplexity.advanced
     let description = "Analyze and explain the structure of your code snippets"
-    let requiresAPI = false
+    let requiresAPI = true
     var view: AnyView { AnyView(CodeExplainerView()) }
 }

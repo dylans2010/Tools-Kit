@@ -9,19 +9,13 @@ final class MistralProvider: AIProvider {
     let apiKeyURL = URL(string: "https://console.mistral.ai/api-keys")
     let apiKeyPlaceholder = "..."
 
-    let models: [AIModel] = [
-        AIModel(id: "mistral-large-latest",    name: "Mistral Large",         supportsVision: false, contextLength: 128_000),
-        AIModel(id: "mistral-small-latest",    name: "Mistral Small",         supportsVision: false, contextLength: 32_000),
-        AIModel(id: "codestral-latest",        name: "Codestral",             supportsVision: false, contextLength: 256_000),
-        AIModel(id: "open-mistral-nemo",       name: "Mistral Nemo (Free)",   supportsVision: false, contextLength: 128_000),
-        AIModel(id: "pixtral-large-latest",    name: "Pixtral Large",         supportsVision: true,  contextLength: 128_000),
-        AIModel(id: "pixtral-12b-2409",        name: "Pixtral 12B",           supportsVision: true,  contextLength: 128_000),
-    ]
+    let models: [AIModel] = []
 
     private let endpoint = "https://api.mistral.ai/v1/chat/completions"
 
     func supportsVision(model: String) -> Bool {
-        models.first(where: { $0.id == model })?.supportsVision ?? false
+        let lowered = model.lowercased()
+        return lowered.contains("pixtral") || lowered.contains("vision")
     }
 
     func send(messages: [ChatMessage], model: String, apiKey: String) async throws -> String {
@@ -54,6 +48,16 @@ final class MistralProvider: AIProvider {
         request.addValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
         let (_, response) = try await URLSession.shared.data(for: request)
         return (response as? HTTPURLResponse)?.statusCode == 200
+    }
+
+    func fetchModels(apiKey: String) async throws -> [AIModel] {
+        var request = URLRequest(url: URL(string: "https://api.mistral.ai/v1/models")!)
+        request.addValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            return []
+        }
+        return try ProviderModelFetchSupport.parseModelArray(data, visionKeywords: ["pixtral", "vision"])
     }
 
     private func buildRequest(messages: [[String: Any]], model: String, apiKey: String) throws -> URLRequest {
