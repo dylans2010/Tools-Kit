@@ -97,9 +97,7 @@ struct FallbackFetchView: View {
                 // Actions
                 VStack(spacing: 12) {
                     Button(action: {
-                        Task {
-                            await viewModel.startFetching()
-                        }
+                        viewModel.startFetchingFromUI()
                     }) {
                         if viewModel.isProcessing {
                             ProgressView()
@@ -187,4 +185,3 @@ struct FallbackFetchView_Previews: PreviewProvider {
         FallbackFetchView()
     }
 }
-

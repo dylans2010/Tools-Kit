@@ -20,7 +20,7 @@ class SongRank {
 
         // We want a decent match, let's say at least 0.4
         if let bestMatch = bestMatch, bestScore > 0.4 {
-            return "https://www.youtube.com/watch?v=\(bestMatch.id)"
+            return bestMatch.url
         }
 
         return nil
