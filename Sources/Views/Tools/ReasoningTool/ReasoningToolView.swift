@@ -49,3 +49,5 @@ struct ReasoningToolTool: Tool {
         return nil
     }
 }
+
+typealias ReasoningTool = ReasoningToolTool

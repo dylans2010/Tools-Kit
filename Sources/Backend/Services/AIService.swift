@@ -8,6 +8,8 @@ enum AIError: Error {
 }
 
 class AIService {
+    static let shared = AIService()
+
     private let registry = AIProviderRegistry.shared
     private let keyManager = APIKeyManager.shared
     private let settingsManager = AIChatSettingsManager.shared
@@ -67,8 +69,7 @@ class AIService {
         return try await processText(prompt: prompt)
     }
 
-    func reason(problem: String) async throws -> String {
-        let prompt = "Solve this problem step-by-step with clear reasoning:\n\n\(problem)"
+    func generateResponse(prompt: String) async throws -> String {
         return try await processText(prompt: prompt)
     }
 }
