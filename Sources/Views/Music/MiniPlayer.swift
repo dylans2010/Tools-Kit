@@ -82,20 +82,18 @@ struct MiniPlayer: View {
     // MARK: - Artwork
 
     private var artworkThumbnail: some View {
-        Group {
+        ZStack {
+            RoundedRectangle(cornerRadius: 7)
+                .fill(Color(.systemGray5))
             if let data = player.currentSong?.artworkData,
                let img = UIImage(data: data) {
                 Image(uiImage: img)
                     .resizable()
                     .scaledToFill()
             } else {
-                RoundedRectangle(cornerRadius: 7)
-                    .fill(Color(.systemGray5))
-                    .overlay(
-                        Image(systemName: "music.note")
-                            .font(.system(size: 14))
-                            .foregroundColor(.secondary)
-                    )
+                Image(systemName: "music.note")
+                    .font(.system(size: 14))
+                    .foregroundColor(.secondary)
             }
         }
         .frame(width: 40, height: 40)

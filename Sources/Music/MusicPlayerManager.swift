@@ -188,6 +188,25 @@ final class MusicPlayerManager: ObservableObject {
         }
     }
 
+    func resetPlaybackState() {
+        sleepTimerTimer?.invalidate()
+        sleepTimerTimer = nil
+        removeTimeObserver()
+        player?.pause()
+        player?.replaceCurrentItem(with: nil)
+        player = nil
+        currentSong = nil
+        isPlaying = false
+        currentTime = 0
+        duration = 0
+        queue = []
+        originalQueue = []
+        currentIndex = 0
+        sleepTimerEndDate = nil
+        updateNowPlayingInfo()
+        savePlaybackState()
+    }
+
     // MARK: - Private helpers
 
     private func load(song: Song) {

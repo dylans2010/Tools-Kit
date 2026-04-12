@@ -37,19 +37,20 @@ struct SongRow: View {
 
     @ViewBuilder
     private var artworkView: some View {
-        if let data = song.artworkData, let img = UIImage(data: data) {
-            Image(uiImage: img)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 44, height: 44)
-                .cornerRadius(8)
-                .clipped()
-        } else {
+        ZStack {
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color(.systemGray5))
-                .frame(width: 44, height: 44)
-                .overlay(Image(systemName: "music.note").foregroundColor(.secondary))
+            if let data = song.artworkData, let img = UIImage(data: data) {
+                Image(uiImage: img)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                Image(systemName: "music.note")
+                    .foregroundColor(.secondary)
+            }
         }
+        .frame(width: 44, height: 44)
+        .clipped()
     }
 }
 
@@ -69,6 +70,9 @@ struct SongsView: View {
     @State private var showZIPPlaylistAlert = false
     @State private var showPlaylistNameAlert = false
     @State private var pendingPlaylistName = ""
+    @State private var showRenameAlert = false
+    @State private var renameTargetSongID: UUID?
+    @State private var pendingSongName = ""
 
     private var filteredSongs: [Song] {
         guard !searchText.isEmpty else { return library.songs }
@@ -101,6 +105,14 @@ struct SongsView: View {
                                 Label("Add to Queue", systemImage: "text.badge.plus")
                             }
                             .tint(.blue)
+                            Button {
+                                renameTargetSongID = song.id
+                                pendingSongName = song.title
+                                showRenameAlert = true
+                            } label: {
+                                Label("Rename", systemImage: "pencil")
+                            }
+                            .tint(.gray)
                         }
                     }
                 }
@@ -201,6 +213,22 @@ struct SongsView: View {
             }
         } message: {
             Text("Enter a name for your new playlist.")
+        }
+        .alert("Rename Song", isPresented: $showRenameAlert) {
+            TextField("Song Name", text: $pendingSongName)
+            Button("Save") {
+                guard let id = renameTargetSongID else { return }
+                library.renameSong(id: id, newTitle: pendingSongName)
+                renameTargetSongID = nil
+                pendingSongName = ""
+            }
+            .disabled(pendingSongName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            Button("Cancel", role: .cancel) {
+                renameTargetSongID = nil
+                pendingSongName = ""
+            }
+        } message: {
+            Text("Enter a new song name.")
         }
     }
 

@@ -132,21 +132,22 @@ struct PlaylistsListView: View {
 
     @ViewBuilder
     private func artworkThumbnail(for playlist: Playlist) -> some View {
-        if let id = playlist.artworkSongID,
-           let song = library.song(by: id),
-           let data = song.artworkData,
-           let img = UIImage(data: data) {
-            Image(uiImage: img)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 48, height: 48)
-                .cornerRadius(8)
-                .clipped()
-        } else {
+        ZStack {
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color(.systemGray5))
-                .frame(width: 48, height: 48)
-                .overlay(Image(systemName: "music.note.list").foregroundColor(.secondary))
+            if let id = playlist.artworkSongID,
+               let song = library.song(by: id),
+               let data = song.artworkData,
+               let img = UIImage(data: data) {
+                Image(uiImage: img)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                Image(systemName: "music.note.list")
+                    .foregroundColor(.secondary)
+            }
         }
+        .frame(width: 48, height: 48)
+        .clipped()
     }
 }
