@@ -57,9 +57,10 @@ struct FillOutFormView: View {
                 )
             } else {
                 Picker("Answer", selection: Binding(
-                    get: { answers[question.id] ?? question.options.first ?? "" },
+                    get: { answers[question.id] ?? "" },
                     set: { answers[question.id] = $0 }
                 )) {
+                    Text("Select an option").tag("")
                     ForEach(question.options, id: \.self) { option in
                         Text(option).tag(option)
                     }
@@ -68,9 +69,10 @@ struct FillOutFormView: View {
         case .ratingScale:
             let ratingOptions = resolvedRatingOptions(for: question)
             Picker("Rating", selection: Binding(
-                get: { answers[question.id] ?? ratingOptions.first ?? "" },
+                get: { answers[question.id] ?? "" },
                 set: { answers[question.id] = $0 }
             )) {
+                Text("Select a rating").tag("")
                 ForEach(ratingOptions, id: \.self) { value in
                     Text(value).tag(value)
                 }

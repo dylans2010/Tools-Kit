@@ -3,7 +3,7 @@ import Foundation
 struct RatingScaleOptionManager: FormOptionManager {
     let type: FormQuestionType = .ratingScale
     func defaultQuestion() -> FormQuestion {
-        FormQuestion(title: "Rating scale question", type: .ratingScale, options: [], required: false)
+        FormQuestion(title: "Rate your experience", type: .ratingScale, options: [], required: false)
     }
 
     func normalize(_ question: FormQuestion) -> FormQuestion {

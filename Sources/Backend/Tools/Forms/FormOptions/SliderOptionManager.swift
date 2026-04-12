@@ -3,7 +3,7 @@ import Foundation
 struct SliderOptionManager: FormOptionManager {
     let type: FormQuestionType = .slider
     func defaultQuestion() -> FormQuestion {
-        FormQuestion(title: "Slider question", type: .slider, options: [], required: false)
+        FormQuestion(title: "Select a value", type: .slider, options: [], required: false)
     }
 
     func normalize(_ question: FormQuestion) -> FormQuestion {

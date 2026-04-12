@@ -98,11 +98,7 @@ final class FileManagementBackend: ObservableObject {
 
     func importFiles(urls: [URL]) {
         for url in urls {
-            var target = workspaceManager.uniqueURL(for: url.lastPathComponent)
-            if FileManager.default.fileExists(atPath: target.path) {
-                try? FileManager.default.removeItem(at: target)
-                target = workspaceManager.uniqueURL(for: url.lastPathComponent)
-            }
+            let target = workspaceManager.uniqueURL(for: url.lastPathComponent)
             try? FileManager.default.copyItem(at: url, to: target)
         }
         reload()
