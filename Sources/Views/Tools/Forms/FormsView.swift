@@ -68,7 +68,7 @@ struct FormsView: View {
             NavigationStack { ImportFormView(backend: backend) }
         }
         .confirmationDialog(
-            "Delete "\(formToDelete?.name ?? "")"?",
+            "Delete \(formToDelete?.name ?? "")?",
             isPresented: $showDeleteConfirm,
             titleVisibility: .visible
         ) {
