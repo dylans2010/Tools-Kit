@@ -371,7 +371,7 @@ final class MusicLibraryManager: ObservableObject {
     /// 16 bytes because UUID storage requires 128 bits.
     private func stableSongID(for url: URL) -> UUID {
         let normalizedPath = url.standardizedFileURL.path.lowercased()
-        let digest = SHA256.hash(data: Data(normalizedPath.utf8))
+        let digest = SHA256.hash(data: normalizedPath.utf8)
         var uuid = uuid_t()
         withUnsafeMutableBytes(of: &uuid) { destination in
             _ = destination.copyBytes(from: digest.prefix(16))

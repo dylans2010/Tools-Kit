@@ -126,7 +126,7 @@ struct MusicSettingsView: View {
                             backupURL = try MusicLibraryManager.shared.createBackupArchive()
                             showBackupExporter = true
                         } catch {
-                            backupStatusMessage = error.localizedDescription
+                            backupStatusMessage = "Backup failed. Please ensure you have enough free storage and try again."
                         }
                     } label: {
                         Label("Backup Songs & Playlists", systemImage: "externaldrive.badge.plus")
