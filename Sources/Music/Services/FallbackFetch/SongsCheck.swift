@@ -1,36 +1,55 @@
 import Foundation
 
-struct YouTubeSearchResult: Decodable {
+struct YouTubeSearchResult {
     let id: String
     let title: String
 }
 
 class SongsCheck {
-    func search(query: String, apiKey: String) async -> [YouTubeSearchResult] {
-        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let urlString = "https://zylalabs.com/api/2490/youtube+keyword+research+api/2384/get+results+by+keyword?keyword=\(encodedQuery)"
+    /// Searches YouTube Data API v3 for videos matching the given query.
+    /// - Parameters:
+    ///   - query: The search query (song name + artist).
+    ///   - youtubeAPIKey: A Google Cloud YouTube Data API v3 key.
+    func search(query: String, youtubeAPIKey: String) async -> [YouTubeSearchResult] {
+        guard var components = URLComponents(string: "https://www.googleapis.com/youtube/v3/search") else { return [] }
+        components.queryItems = [
+            URLQueryItem(name: "part", value: "snippet"),
+            URLQueryItem(name: "q", value: query),
+            URLQueryItem(name: "type", value: "video"),
+            URLQueryItem(name: "maxResults", value: "10"),
+            URLQueryItem(name: "key", value: youtubeAPIKey)
+        ]
 
-        guard let url = URL(string: urlString) else { return [] }
-
-        var request = URLRequest(url: url)
-        request.allHTTPHeaderFields = YouTubeAPIKey.headers(apiKey: apiKey)
+        guard let url = components.url else { return [] }
 
         do {
-            let (data, _) = try await URLSession.shared.data(for: request)
+            let (data, _) = try await URLSession.shared.data(from: url)
             let response = try JSONDecoder().decode(YouTubeSearchResponse.self, from: data)
-            return response.videos.map { YouTubeSearchResult(id: $0.id, title: $0.title ?? "Unknown") }
+            return response.items.map { item in
+                YouTubeSearchResult(id: item.id.videoId, title: item.snippet.title)
+            }
         } catch {
-            print("Search error: \(error)")
+            print("YouTube search error: \(error)")
             return []
         }
     }
 }
 
-struct YouTubeSearchResponse: Decodable {
-    let videos: [YouTubeVideo]
+// MARK: - YouTube Data API v3 response models
 
-    struct YouTubeVideo: Decodable {
-        let id: String
-        let title: String?
+private struct YouTubeSearchResponse: Decodable {
+    let items: [Item]
+
+    struct Item: Decodable {
+        let id: VideoID
+        let snippet: Snippet
+    }
+
+    struct VideoID: Decodable {
+        let videoId: String
+    }
+
+    struct Snippet: Decodable {
+        let title: String
     }
 }

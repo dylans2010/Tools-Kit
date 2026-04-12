@@ -8,17 +8,32 @@ struct FallbackFetchView: View {
     var body: some View {
         ToolDetailView(tool: FallbackFetchTool()) {
             VStack(spacing: 20) {
-                // API Key Section
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Zyla Labs API Key")
+                // API Keys Section
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("API Keys")
                         .font(.headline)
 
-                    SecureField("Enter your API Key", text: $viewModel.apiKey)
-                        .textFieldStyle(.roundedBorder)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("YouTube Data API Key")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        SecureField("Enter your YouTube Data API Key", text: $viewModel.youtubeAPIKey)
+                            .textFieldStyle(.roundedBorder)
+        Link("Get a YouTube Data API Key", destination: URL(string: "https://console.cloud.google.com/apis/library/youtube.googleapis.com") ?? URL(string: "https://console.cloud.google.com")!)
+                            .font(.footnote)
+                            .foregroundColor(.blue)
+                    }
 
-                    Link("Get your API Key here", destination: URL(string: "https://zylalabs.com/api-marketplace/music+%26+audio/youtube+to+audio+api/381")!)
-                        .font(.footnote)
-                        .foregroundColor(.blue)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Zyla Labs API Key")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        SecureField("Enter your Zyla Labs API Key", text: $viewModel.zylaAPIKey)
+                            .textFieldStyle(.roundedBorder)
+                        Link("Get a Zyla Labs API Key", destination: URL(string: "https://zylalabs.com/api-marketplace/music+%26+audio/youtube+to+audio+api/381") ?? URL(string: "https://zylalabs.com")!)
+                            .font(.footnote)
+                            .foregroundColor(.blue)
+                    }
                 }
                 .padding()
                 .background(Color(.secondarySystemBackground))
@@ -96,10 +111,10 @@ struct FallbackFetchView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(viewModel.songs.isEmpty || viewModel.apiKey.isEmpty || viewModel.isProcessing ? Color.gray : Color.blue)
+                    .background(viewModel.canStartFetching ? Color.blue : Color.gray)
                     .foregroundColor(.white)
                     .cornerRadius(10)
-                    .disabled(viewModel.songs.isEmpty || viewModel.apiKey.isEmpty || viewModel.isProcessing)
+                    .disabled(!viewModel.canStartFetching)
 
                     if let zipURL = viewModel.zipURL {
                         ShareLink(item: zipURL) {
@@ -172,3 +187,4 @@ struct FallbackFetchView_Previews: PreviewProvider {
         FallbackFetchView()
     }
 }
+

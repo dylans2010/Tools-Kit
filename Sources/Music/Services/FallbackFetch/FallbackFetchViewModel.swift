@@ -23,8 +23,11 @@ struct SongFetchItem: Identifiable, Equatable {
 }
 
 final class FallbackFetchViewModel: ObservableObject {
-    @Published var apiKey: String = UserDefaults.standard.string(forKey: "zylaLabsAPIKey") ?? "" {
-        didSet { UserDefaults.standard.set(apiKey, forKey: "zylaLabsAPIKey") }
+    @Published var youtubeAPIKey: String = UserDefaults.standard.string(forKey: "youtubeDataAPIKey") ?? "" {
+        didSet { UserDefaults.standard.set(youtubeAPIKey, forKey: "youtubeDataAPIKey") }
+    }
+    @Published var zylaAPIKey: String = UserDefaults.standard.string(forKey: "zylaLabsAPIKey") ?? "" {
+        didSet { UserDefaults.standard.set(zylaAPIKey, forKey: "zylaLabsAPIKey") }
     }
     @Published var songs: [SongFetchItem] = []
     @Published var isProcessing: Bool = false
@@ -38,6 +41,10 @@ final class FallbackFetchViewModel: ObservableObject {
     private let songGetAudio = SongGetAudio()
     private let songDownloadAudio = SongDownloadAudio()
     private let finishedFetch = FinishedFetch()
+
+    var canStartFetching: Bool {
+        !songs.isEmpty && !youtubeAPIKey.isEmpty && !zylaAPIKey.isEmpty && !isProcessing
+    }
 
     func importCSV(url: URL) {
         let accessed = url.startAccessingSecurityScopedResource()
@@ -104,7 +111,12 @@ final class FallbackFetchViewModel: ObservableObject {
     }
 
     func startFetching() async {
-        guard !apiKey.isEmpty else {
+        guard !youtubeAPIKey.isEmpty else {
+            errorMessage = "Please enter your YouTube Data API Key"
+            return
+        }
+
+        guard !zylaAPIKey.isEmpty else {
             errorMessage = "Please enter your Zyla Labs API Key"
             return
         }
@@ -114,15 +126,21 @@ final class FallbackFetchViewModel: ObservableObject {
             return
         }
 
-        isProcessing = true
-        overallProgress = 0
-        zipURL = nil
+        await MainActor.run {
+            isProcessing = true
+            overallProgress = 0
+            zipURL = nil
+            // Reset statuses
+            for i in songs.indices { songs[i].status = .idle }
+        }
 
         let totalSongs = Double(songs.count)
 
         for i in 0..<songs.count {
             await fetchSong(index: i)
-            overallProgress = Double(i + 1) / totalSongs
+            await MainActor.run {
+                overallProgress = Double(i + 1) / totalSongs
+            }
         }
 
         do {
@@ -150,39 +168,44 @@ final class FallbackFetchViewModel: ObservableObject {
     private func fetchSong(index: Int) async {
         let song = songs[index]
 
-        // 1. Search YouTube
+        // 1. Search YouTube using YouTube Data API v3
         await updateStatus(index: index, status: .searching)
-        let searchResults = await songsCheck.search(query: "\(song.title) \(song.artist)", apiKey: apiKey)
+        let query = "\(song.title) \(song.artist)"
+        let searchResults = await songsCheck.search(query: query, youtubeAPIKey: youtubeAPIKey)
 
         guard !searchResults.isEmpty else {
             await updateStatus(index: index, status: .failed("No YouTube results found"))
             return
         }
 
-        // 2. Rank Results
+        // 2. Rank results and pick the best match
         await updateStatus(index: index, status: .ranking)
-        if let bestMatch = songRank.findBestMatch(for: song, in: searchResults) {
-            await updateYoutubeURL(index: index, url: bestMatch)
+        guard let bestMatch = songRank.findBestMatch(for: song, in: searchResults) else {
+            await updateStatus(index: index, status: .failed("No suitable YouTube match found"))
+            return
+        }
+        await updateYoutubeURL(index: index, url: bestMatch)
 
-            // 3. Get Audio Link
-            await updateStatus(index: index, status: .fetchingAudio)
-            do {
-                if let audioLink = try await songGetAudio.getAudioLink(youtubeURL: bestMatch, apiKey: apiKey) {
-
-                    // 4. Download Audio
-                    await updateStatus(index: index, status: .downloading)
-                    let downloadedURL = try await songDownloadAudio.download(from: audioLink, fileName: "\(song.title) - \(song.artist).mp3")
-
-                    await updateDownloadURL(index: index, url: downloadedURL)
-                    await updateStatus(index: index, status: .completed)
-                } else {
-                    await updateStatus(index: index, status: .failed("Could not get audio link"))
-                }
-            } catch {
-                await updateStatus(index: index, status: .failed(error.localizedDescription))
+        // 3. Extract MP3 download URL via Zyla YouTube-to-Audio API
+        await updateStatus(index: index, status: .fetchingAudio)
+        do {
+            let audioURL = try await songGetAudio.getAudioLink(youtubeURL: bestMatch, zylaAPIKey: zylaAPIKey)
+            guard let audioURL = audioURL else {
+                await updateStatus(index: index, status: .failed("Zyla returned no audio link"))
+                return
             }
-        } else {
-            await updateStatus(index: index, status: .failed("No suitable match found"))
+
+            // 4. Download the MP3 file
+            await updateStatus(index: index, status: .downloading)
+            let destinationURL = try await songDownloadAudio.download(
+                from: audioURL,
+                fileName: "\(song.title) - \(song.artist).mp3"
+            )
+
+            await updateDownloadURL(index: index, url: destinationURL)
+            await updateStatus(index: index, status: .completed)
+        } catch {
+            await updateStatus(index: index, status: .failed(error.localizedDescription))
         }
     }
 
