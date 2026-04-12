@@ -78,9 +78,13 @@ final class MusicLibraryManager: ObservableObject {
 
     // MARK: - ZIP Import
 
-    func importFromZIP(at url: URL) async {
+    /// Imports all supported audio files from a ZIP archive.
+    /// - Returns: The `Song` objects that were successfully imported.
+    @discardableResult
+    func importFromZIP(at url: URL) async -> [Song] {
         let entries = ZIPExtractor.extract(from: url)
         let allowed = Set(["mp3", "mp4", "m4a", "aac", "wav", "flac"])
+        var imported: [Song] = []
 
         for entry in entries {
             let ext = URL(fileURLWithPath: entry.filename)
@@ -103,11 +107,14 @@ final class MusicLibraryManager: ObservableObject {
                     }) else { return }
                     self.songs.append(song)
                     self.save()
+                    imported.append(song)
                 }
             } catch {
                 print("MusicLibraryManager: ZIP entry error \(entry.filename): \(error)")
             }
         }
+
+        return imported
     }
 
     // MARK: - Delete
