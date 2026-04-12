@@ -5,6 +5,7 @@ struct CreatePlaylistView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var name: String = ""
     @State private var selectedSongs: Set<UUID> = []
+    @State private var draftPlaylist: Playlist?
 
     var body: some View {
         NavigationStack {
@@ -12,6 +13,15 @@ struct CreatePlaylistView: View {
                 Section("Playlist Name") {
                     TextField("My Playlist", text: $name)
                 }
+
+                Section("Artwork") {
+                    Button {
+                        openArtworkCustomizer()
+                    } label: {
+                        Label("Customize Playlist Artwork", systemImage: "paintbrush.pointed")
+                    }
+                }
+
                 if !library.songs.isEmpty {
                     Section("Add Songs") {
                         ForEach(library.songs) { song in
@@ -43,14 +53,38 @@ struct CreatePlaylistView: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Create") {
-                        library.createPlaylist(
+                        let created = library.createPlaylist(
                             name: name.trimmingCharacters(in: .whitespaces).isEmpty ? "Untitled" : name,
                             songIDs: Array(selectedSongs)
                         )
+                        if let customArtworkData = draftPlaylist?.customArtworkData {
+                            var updated = created
+                            updated.customArtworkData = customArtworkData
+                            library.updatePlaylist(updated)
+                        }
                         dismiss()
                     }
                 }
             }
         }
+        .sheet(item: $draftPlaylist) { playlist in
+            CustomizePlaylistArtwork(playlist: Binding(
+                get: { draftPlaylist ?? playlist },
+                set: { draftPlaylist = $0 }
+            ))
+        }
+    }
+
+    private func openArtworkCustomizer() {
+        let resolvedName = name.trimmingCharacters(in: .whitespaces).isEmpty ? "Untitled" : name
+        var playlist = draftPlaylist ?? Playlist(name: resolvedName, songIDs: Array(selectedSongs))
+        playlist.name = resolvedName
+        playlist.songIDs = Array(selectedSongs)
+        if let artworkSongID = playlist.artworkSongID, !selectedSongs.contains(artworkSongID) {
+            playlist.artworkSongID = playlist.songIDs.first
+        } else if playlist.artworkSongID == nil {
+            playlist.artworkSongID = playlist.songIDs.first
+        }
+        draftPlaylist = playlist
     }
 }

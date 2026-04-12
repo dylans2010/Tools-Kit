@@ -175,10 +175,11 @@ struct NowPlayingView: View {
                let img = UIImage(data: data) {
                 Image(uiImage: img)
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit()
                     .aspectRatio(1, contentMode: .fit)
                     .cornerRadius(14)
                     .clipped()
+                    .background(Color.black.opacity(0.2))
                     .shadow(color: .black.opacity(0.55), radius: 36, x: 0, y: 14)
             } else {
                 RoundedRectangle(cornerRadius: 14)

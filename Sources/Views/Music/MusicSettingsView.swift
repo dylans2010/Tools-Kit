@@ -66,6 +66,32 @@ struct MusicSettingsView: View {
                     Text("Playback")
                 }
 
+                // MARK: Sound
+                Section {
+                    NavigationLink {
+                        AudioControlsView()
+                    } label: {
+                        Label("Audio Controls", systemImage: "slider.horizontal.3")
+                    }
+                    NavigationLink {
+                        EqualizerView()
+                    } label: {
+                        HStack {
+                            Label("Equalizer", systemImage: "waveform.path.ecg")
+                            Spacer()
+                            if AudioEngineManager.shared.equalizerEnabled {
+                                Text("On")
+                                    .font(.caption)
+                                    .foregroundColor(.accentColor)
+                            }
+                        }
+                    }
+                } header: {
+                    Text("Sound")
+                } footer: {
+                    Text("Tune output mode, speed, crossfade, and frequency bands in one place.")
+                }
+
                 // MARK: Sleep Timer
                 Section {
                     if let end = player.sleepTimerEndDate {

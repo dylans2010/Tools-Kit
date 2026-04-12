@@ -7,8 +7,6 @@ struct MusicLibraryView: View {
     @State private var selectedTab: MusicTab = .songs
     @State private var showNowPlaying = false
     @State private var showSettings = false
-    @State private var showEqualizer = false
-    @State private var showAudioControls = false
 
     enum MusicTab: String, CaseIterable {
         case songs = "Songs"
@@ -40,17 +38,7 @@ struct MusicLibraryView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .navigationTitle("Music")
                 .toolbar {
-                    ToolbarItemGroup(placement: .navigationBarTrailing) {
-                        Button {
-                            showAudioControls = true
-                        } label: {
-                            Image(systemName: "slider.horizontal.3")
-                        }
-                        Button {
-                            showEqualizer = true
-                        } label: {
-                            Image(systemName: "waveform.path.ecg")
-                        }
+                    ToolbarItem(placement: .navigationBarTrailing) {
                         Button { showSettings = true } label: {
                             Image(systemName: "gearshape")
                         }
@@ -58,12 +46,6 @@ struct MusicLibraryView: View {
                 }
                 .sheet(isPresented: $showSettings) {
                     MusicSettingsView()
-                }
-                .sheet(isPresented: $showEqualizer) {
-                    EqualizerView()
-                }
-                .sheet(isPresented: $showAudioControls) {
-                    AudioControlsView()
                 }
             }
             // Reserve space so list content doesn't scroll under the mini player
@@ -177,14 +159,18 @@ struct PlaylistsListView: View {
             if let data = playlist.customArtworkData, let img = UIImage(data: data) {
                 Image(uiImage: img)
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(2)
             } else if let id = playlist.artworkSongID,
                let song = library.song(by: id),
                let data = song.artworkData,
                let img = UIImage(data: data) {
                 Image(uiImage: img)
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(2)
             } else {
                 Image(systemName: "music.note.list")
                     .foregroundColor(.secondary)

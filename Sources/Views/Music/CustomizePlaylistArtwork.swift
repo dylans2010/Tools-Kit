@@ -13,6 +13,35 @@ private enum GradientType: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
+private enum LabelPreset: String, CaseIterable, Identifiable {
+    case playlistName = "Playlist Name"
+    case vibes = "Vibes"
+    case favorites = "Favorites"
+    case chill = "Chill Mix"
+    case workout = "Workout"
+    case focus = "Focus"
+
+    var id: String { rawValue }
+}
+
+private enum FontDesignStyle: String, CaseIterable, Identifiable {
+    case `default` = "Default"
+    case rounded = "Rounded"
+    case serif = "Serif"
+    case monospaced = "Monospaced"
+
+    var id: String { rawValue }
+
+    var fontDesign: Font.Design {
+        switch self {
+        case .default: return .default
+        case .rounded: return .rounded
+        case .serif: return .serif
+        case .monospaced: return .monospaced
+        }
+    }
+}
+
 // MARK: - Gradient Color Stop
 
 private struct GradientStop: Identifiable {
@@ -44,16 +73,20 @@ struct CustomizePlaylistArtwork: View {
     ]
     @State private var gradientAngle: Double = 135
     @State private var gradientType: GradientType = .linear
+    @State private var radialGradientRadiusMultiplier: CGFloat = 0.7
+    @State private var showGradientControls = false
 
     // Uploaded image background
     @State private var uploadedBackground: UIImage?
     @State private var photoPickerItem: PhotosPickerItem?
 
-    // Text overlay
-    @State private var overlayText: String = ""
+    // Label overlay
+    @State private var showLabel = true
+    @State private var selectedLabelPreset: LabelPreset = .playlistName
     @State private var textColor: Color = .white
     @State private var textSize: CGFloat = 28
     @State private var textBold: Bool = true
+    @State private var textDesign: FontDesignStyle = .rounded
 
     // Stickers
     @State private var stickers: [ArtworkSticker] = []
@@ -61,12 +94,10 @@ struct CustomizePlaylistArtwork: View {
 
     // Image Playground (Apple Intelligence)
     @State private var showImagePlayground = false
-    @State private var playgroundPrompt: String = ""
     @State private var generatedImage: UIImage?
 
     // Preview size
     private let artworkSize: CGFloat = 260
-    private let radialGradientRadiusMultiplier: CGFloat = 0.7
     private let randomColorSaturation: Double = 0.8
     private let randomColorBrightness: Double = 0.9
 
@@ -77,11 +108,8 @@ struct CustomizePlaylistArtwork: View {
                     artworkPreview
                     gradientSection
                     uploadSection
-                    textSection
+                    labelSection
                     stickersSection
-                    if supportsImagePlayground {
-                        playgroundSection
-                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 12)
@@ -105,9 +133,12 @@ struct CustomizePlaylistArtwork: View {
                     showStickerPicker = false
                 }
             }
+            .sheet(isPresented: $showGradientControls) {
+                gradientControlsSheet
+            }
             .modifier(ImagePlaygroundModifier(
                 isPresented: $showImagePlayground,
-                concept: playgroundPrompt,
+                concept: imagePlaygroundConcept,
                 onResult: { url in
                     if let data = try? Data(contentsOf: url),
                        let img = UIImage(data: data) {
@@ -139,6 +170,21 @@ struct CustomizePlaylistArtwork: View {
                 .frame(width: artworkSize, height: artworkSize)
                 .cornerRadius(18)
                 .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 8)
+                .overlay(alignment: .topTrailing) {
+                    if supportsImagePlayground {
+                        Button {
+                            showImagePlayground = true
+                        } label: {
+                            Image(systemName: "sparkles")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(width: 34, height: 34)
+                                .background(.black.opacity(0.35), in: Circle())
+                        }
+                        .padding(10)
+                        .accessibilityLabel("Open Image Playground")
+                    }
+                }
         }
         .frame(maxWidth: .infinity)
     }
@@ -158,9 +204,9 @@ struct CustomizePlaylistArtwork: View {
                 gradientBackground
             }
 
-            if !overlayText.isEmpty {
-                Text(overlayText)
-                    .font(.system(size: textSize, weight: textBold ? .bold : .regular))
+            if showLabel {
+                Text(displayLabelText)
+                    .font(.system(size: textSize, weight: textBold ? .bold : .regular, design: textDesign.fontDesign))
                     .foregroundColor(textColor)
                     .multilineTextAlignment(.center)
                     .padding(8)
@@ -205,62 +251,20 @@ struct CustomizePlaylistArtwork: View {
     private var gradientSection: some View {
         cardSection("Gradient") {
             VStack(spacing: 14) {
-                // Gradient type picker
-                Picker("Type", selection: $gradientType) {
-                    ForEach(GradientType.allCases) { type in
-                        Text(type.rawValue).tag(type)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .onChange(of: gradientType) { _ in generatedImage = nil; uploadedBackground = nil }
+                gradientTypePicker
 
                 Divider()
 
-                // Color stops (unlimited)
-                ForEach(Array(stops.enumerated()), id: \.element.id) { idx, _ in
-                    HStack {
-                        ColorPicker("Color \(idx + 1)", selection: Binding(
-                            get: { stops[idx].color },
-                            set: { stops[idx].color = $0; generatedImage = nil; uploadedBackground = nil }
-                        ))
+                colorStopsEditor(maxVisibleStops: 4)
 
-                        if stops.count > 2 {
-                            Button {
-                                stops.remove(at: idx)
-                            } label: {
-                                Image(systemName: "minus.circle.fill")
-                                    .foregroundColor(.red)
-                            }
-                            .buttonStyle(.plain)
-                        }
+                if stops.count > 4 {
+                    Button {
+                        showGradientControls = true
+                    } label: {
+                        Label("More Gradient Controls", systemImage: "chevron.down.circle")
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                }
-
-                Button {
-                    stops.append(GradientStop(color: randomBrightColor()))
-                    generatedImage = nil
-                    uploadedBackground = nil
-                } label: {
-                    Label("Add Color Stop", systemImage: "plus.circle")
-                }
-                .font(.subheadline)
-
-                Divider()
-
-                if gradientType != .radial {
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack {
-                            Text("Angle")
-                            Spacer()
-                            Text("\(Int(gradientAngle))°")
-                                .foregroundColor(.secondary)
-                                .monospacedDigit()
-                        }
-                        Slider(value: $gradientAngle, in: 0...360, step: 5)
-                            .onChange(of: gradientAngle) { _ in generatedImage = nil; uploadedBackground = nil }
-                    }
-
-                    Divider()
+                    .buttonStyle(.bordered)
                 }
 
                 // Quick palettes
@@ -325,6 +329,114 @@ struct CustomizePlaylistArtwork: View {
         return Color(hue: hue, saturation: randomColorSaturation, brightness: randomColorBrightness)
     }
 
+    private var displayLabelText: String {
+        switch selectedLabelPreset {
+        case .playlistName: return playlist.name
+        case .vibes: return "VIBES"
+        case .favorites: return "FAVORITES"
+        case .chill: return "CHILL MIX"
+        case .workout: return "WORKOUT"
+        case .focus: return "FOCUS"
+        }
+    }
+
+    private var imagePlaygroundConcept: String {
+        let base = displayLabelText.trimmingCharacters(in: .whitespacesAndNewlines)
+        return base.isEmpty ? "Playlist cover art with vivid gradient" : "\(base) playlist cover art"
+    }
+
+    private var gradientTypePicker: some View {
+        Picker("Type", selection: $gradientType) {
+            ForEach(GradientType.allCases) { type in
+                Text(type.rawValue).tag(type)
+            }
+        }
+        .pickerStyle(.segmented)
+        .onChange(of: gradientType) { _ in generatedImage = nil; uploadedBackground = nil }
+    }
+
+    private func colorStopsEditor(maxVisibleStops: Int? = nil) -> some View {
+        VStack(spacing: 12) {
+            let visibleStops = maxVisibleStops.map { Array(stops.prefix($0)) } ?? stops
+            ForEach(Array(visibleStops.enumerated()), id: \.element.id) { idx, _ in
+                HStack {
+                    ColorPicker("Color \(idx + 1)", selection: Binding(
+                        get: { stops[idx].color },
+                        set: { stops[idx].color = $0; generatedImage = nil; uploadedBackground = nil }
+                    ))
+
+                    if stops.count > 2 {
+                        Button {
+                            stops.remove(at: idx)
+                        } label: {
+                            Image(systemName: "minus.circle.fill")
+                                .foregroundColor(.red)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+
+            Button {
+                stops.append(GradientStop(color: randomBrightColor()))
+                generatedImage = nil
+                uploadedBackground = nil
+            } label: {
+                Label("Add Color Stop", systemImage: "plus.circle")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .font(.subheadline)
+        }
+    }
+
+    private var gradientControlsSheet: some View {
+        NavigationStack {
+            Form {
+                Section("Type") {
+                    gradientTypePicker
+                }
+
+                Section("Advanced") {
+                    if gradientType != .radial {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Angle")
+                                Spacer()
+                                Text("\(Int(gradientAngle))°")
+                                    .foregroundColor(.secondary)
+                                    .monospacedDigit()
+                            }
+                            Slider(value: $gradientAngle, in: 0...360, step: 5)
+                                .onChange(of: gradientAngle) { _ in generatedImage = nil; uploadedBackground = nil }
+                        }
+                    } else {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Radius")
+                                Spacer()
+                                Text("\(Int(radialGradientRadiusMultiplier * 100))%")
+                                    .foregroundColor(.secondary)
+                                    .monospacedDigit()
+                            }
+                            Slider(value: $radialGradientRadiusMultiplier, in: 0.2...1.2, step: 0.05)
+                                .onChange(of: radialGradientRadiusMultiplier) { _ in
+                                    generatedImage = nil
+                                    uploadedBackground = nil
+                                }
+                        }
+                    }
+                }
+
+                Section("Colors") {
+                    colorStopsEditor()
+                }
+            }
+            .navigationTitle("Gradient Controls")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+        .presentationDetents([.fraction(0.45), .medium])
+    }
+
     // MARK: - Upload Section
 
     private var uploadSection: some View {
@@ -356,28 +468,43 @@ struct CustomizePlaylistArtwork: View {
         }
     }
 
-    // MARK: - Text Section
+    // MARK: - Labels Section
 
-    private var textSection: some View {
-        cardSection("Text Overlay") {
+    private var labelSection: some View {
+        cardSection("Labels") {
             VStack(spacing: 12) {
-                TextField("Playlist name or custom text", text: $overlayText)
-                    .textFieldStyle(.roundedBorder)
+                Toggle("Show Label", isOn: $showLabel)
 
-                HStack {
-                    ColorPicker("Color", selection: $textColor)
-                    Spacer()
-                    Toggle("Bold", isOn: $textBold)
-                }
-
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        Text("Size")
-                        Spacer()
-                        Text("\(Int(textSize))pt")
-                            .foregroundColor(.secondary)
+                if showLabel {
+                    Picker("Text", selection: $selectedLabelPreset) {
+                        ForEach(LabelPreset.allCases) { preset in
+                            Text(preset.rawValue).tag(preset)
+                        }
                     }
-                    Slider(value: $textSize, in: 12...60)
+                    .pickerStyle(.menu)
+
+                    HStack {
+                        ColorPicker("Color", selection: $textColor)
+                        Spacer()
+                        Toggle("Bold", isOn: $textBold)
+                    }
+
+                    Picker("Font Design", selection: $textDesign) {
+                        ForEach(FontDesignStyle.allCases) { style in
+                            Text(style.rawValue).tag(style)
+                        }
+                    }
+                    .pickerStyle(.menu)
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text("Size")
+                            Spacer()
+                            Text("\(Int(textSize))pt")
+                                .foregroundColor(.secondary)
+                        }
+                        Slider(value: $textSize, in: 12...60)
+                    }
                 }
             }
         }
@@ -426,47 +553,13 @@ struct CustomizePlaylistArtwork: View {
         }
     }
 
-    // MARK: - Image Playground Section
+    // MARK: - Image Playground
 
     private var supportsImagePlayground: Bool {
         if #available(iOS 18.1, *) {
             return true
         }
         return false
-    }
-
-    private var playgroundSection: some View {
-        cardSection("Image Playground") {
-            VStack(spacing: 12) {
-                HStack(spacing: 10) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 22))
-                        .foregroundStyle(.indigo.gradient)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Apple Intelligence")
-                            .font(.subheadline.weight(.semibold))
-                        Text("Generate artwork using AI")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                }
-
-                TextField("Describe your artwork…", text: $playgroundPrompt, axis: .vertical)
-                    .textFieldStyle(.roundedBorder)
-                    .lineLimit(2...4)
-
-                Button {
-                    showImagePlayground = true
-                } label: {
-                    Label("Generate with Image Playground", systemImage: "sparkles")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(.indigo)
-                .disabled(playgroundPrompt.trimmingCharacters(in: .whitespaces).isEmpty)
-            }
-        }
     }
 
     // MARK: - Card Section
@@ -498,6 +591,7 @@ struct CustomizePlaylistArtwork: View {
         if let uiImage = renderer.uiImage, let data = uiImage.jpegData(compressionQuality: 0.9) {
             var updated = playlist
             updated.customArtworkData = data
+            playlist = updated
             library.updatePlaylist(updated)
         }
         dismiss()

@@ -171,10 +171,12 @@ final class MusicLibraryManager: ObservableObject {
 
     // MARK: - Playlists
 
-    func createPlaylist(name: String, songIDs: [UUID] = []) {
+    @discardableResult
+    func createPlaylist(name: String, songIDs: [UUID] = []) -> Playlist {
         let pl = Playlist(name: name, songIDs: songIDs)
         playlists.append(pl)
         save()
+        return pl
     }
 
     func renameSong(id: UUID, newTitle: String) {

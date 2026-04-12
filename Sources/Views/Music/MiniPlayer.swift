@@ -89,7 +89,9 @@ struct MiniPlayer: View {
                let img = UIImage(data: data) {
                 Image(uiImage: img)
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(2)
             } else {
                 Image(systemName: "music.note")
                     .font(.system(size: 14))

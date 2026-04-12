@@ -2,36 +2,29 @@ import SwiftUI
 
 struct EqualizerView: View {
     @StateObject private var engine = AudioEngineManager.shared
-    @Environment(\.dismiss) private var dismiss
 
     @State private var selectedPreset: EQPreset? = EQPreset.flat
-    @State private var showPresets = false
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 24) {
-                    enableToggleCard
-                    presetScrollRow
-                    bandSlidersCard
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-                .padding(.bottom, 24)
+        ScrollView {
+            VStack(spacing: 24) {
+                enableToggleCard
+                presetScrollRow
+                bandSlidersCard
             }
-            .navigationTitle("Equalizer")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }
-                }
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Reset") { resetToFlat() }
-                        .foregroundColor(.secondary)
-                }
-            }
-            .background(Color(.systemGroupedBackground).ignoresSafeArea())
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 24)
         }
+        .navigationTitle("Equalizer")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Reset") { resetToFlat() }
+                    .foregroundColor(.secondary)
+            }
+        }
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
     }
 
     // MARK: - Enable Toggle
