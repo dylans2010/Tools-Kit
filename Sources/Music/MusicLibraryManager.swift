@@ -288,7 +288,7 @@ final class MusicLibraryManager: ObservableObject {
         let stamp = Self.backupDateFormatter.string(from: Date())
         let backupURL = FileManager.default.temporaryDirectory.appendingPathComponent("ToolsKit-Music-Backup-\(stamp).zip")
         try? FileManager.default.removeItem(at: backupURL)
-        guard let archive = Archive(url: backupURL, accessMode: .create) else {
+        guard let archive = try? Archive(url: backupURL, accessMode: .create) else {
             throw NSError(domain: "MusicLibraryBackup", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create backup archive. Check available storage and try again."])
         }
 
@@ -319,7 +319,7 @@ final class MusicLibraryManager: ObservableObject {
 
     @discardableResult
     func restoreFromBackup(at url: URL) throws -> (songs: Int, playlists: Int) {
-        guard let archive = Archive(url: url, accessMode: .read) else {
+        guard let archive = try? Archive(url: url, accessMode: .read) else {
             throw NSError(domain: "MusicLibraryBackup", code: 2, userInfo: [NSLocalizedDescriptionKey: "The selected file could not be read as a ZIP archive. Please select a valid music backup file."])
         }
 
@@ -371,7 +371,7 @@ final class MusicLibraryManager: ObservableObject {
     /// 16 bytes because UUID storage requires 128 bits.
     private func stableSongID(for url: URL) -> UUID {
         let normalizedPath = url.standardizedFileURL.path.lowercased()
-        let digest = SHA256.hash(data: normalizedPath.utf8)
+        let digest = SHA256.hash(data: Data(normalizedPath.utf8))
         var uuid = uuid_t()
         withUnsafeMutableBytes(of: &uuid) { destination in
             _ = destination.copyBytes(from: digest.prefix(16))
@@ -406,7 +406,7 @@ final class MusicLibraryManager: ObservableObject {
         }
     }
 
-    private func extractData(from entry: Archive.Entry, archive: Archive) throws -> Data {
+    private func extractData(from entry: Entry, archive: Archive) throws -> Data {
         var result = Data()
         _ = try archive.extract(entry) { chunk in
             result.append(chunk)
