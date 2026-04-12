@@ -343,7 +343,7 @@ struct CustomizePlaylistArtwork: View {
     }
 
     private var imagePlaygroundConcept: String {
-        let base = displayLabelText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let base = displayLabelText.trimmingCharacters(in: .whitespaces)
         return base.isEmpty ? "Playlist cover art with vivid gradient" : "\(base) playlist cover art"
     }
 
@@ -594,7 +594,9 @@ struct CustomizePlaylistArtwork: View {
             var updated = playlist
             updated.customArtworkData = data
             playlist = updated
-            library.updatePlaylist(updated)
+            if library.playlists.contains(where: { $0.id == updated.id }) {
+                library.updatePlaylist(updated)
+            }
         }
         dismiss()
     }
