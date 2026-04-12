@@ -1,72 +1,56 @@
 import SwiftUI
 
 struct ReminderGeneratorView: View {
-    @State private var topic = ""
-    @State private var reminders: String = ""
-    @State private var isLoading = false
-    @State private var errorMessage: String?
-
-    private let aiService = AIService()
+    @StateObject private var backend = ReminderGeneratorBackend()
+    @State private var input: String = ""
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                TextField("What are you planning? (e.g. Travel to Japan)", text: $topic)
-                    .textFieldStyle(.roundedBorder)
-                    .padding()
+        ToolDetailView(tool: ReminderGeneratorTool()) {
+            VStack(spacing: 24) {
+                ToolInputSection("Notes or Transcript") {
+                    TextEditor(text: $input)
+                        .frame(height: 150)
+                        .padding(8)
+                }
 
-                Button(action: { Task { await generate() } }) {
-                    if isLoading {
-                        ProgressView().tint(.white)
+                Button(action: {
+                    Task { await backend.generateReminders(from: input) }
+                }) {
+                    if backend.isProcessing {
+                        ProgressView()
                     } else {
-                        Text("Generate Reminders")
+                        Text("Extract Reminders")
+                            .bold()
                             .frame(maxWidth: .infinity)
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .padding(.horizontal)
-                .disabled(topic.isEmpty || isLoading)
+                .disabled(input.isEmpty || backend.isProcessing)
 
-                if let error = errorMessage {
-                    Text(error).foregroundColor(.red).font(.caption).padding()
-                }
-
-                if !reminders.isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Generated Reminders", systemImage: "bell.badge.fill")
-                            .font(.headline)
-
-                        Text(reminders)
+                if !backend.reminders.isEmpty {
+                    ToolInputSection("Generated Reminders") {
+                        ForEach(backend.reminders, id: \.self) { reminder in
+                            HStack {
+                                Image(systemName: "circle")
+                                Text(reminder)
+                                Spacer()
+                            }
                             .padding()
-                            .background(Color(.secondarySystemBackground))
-                            .cornerRadius(12)
+                            Divider()
+                        }
                     }
-                    .padding()
                 }
             }
         }
-        .navigationTitle("Smart Reminders")
-    }
-
-    private func generate() async {
-        isLoading = true
-        errorMessage = nil
-        do {
-            reminders = try await aiService.generateReminders(topic: topic)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-        isLoading = false
     }
 }
 
 struct ReminderGeneratorTool: Tool {
-    let id = UUID()
-    let name = "Smart Reminders"
-    let icon = "bell.badge.fill"
-    let category = ToolCategory.ai
-    let complexity = ToolComplexity.basic
-    let description = "Automatically generate a list of reminders for any task or event"
+    let name = "Reminder Generator"
+    let icon = "bell.badge"
+    let category = ToolCategory.utility
+    let complexity = ToolComplexity.advanced
+    let description = "Extract actionable reminders and tasks from text using AI"
     let requiresAPI = true
     var view: AnyView { AnyView(ReminderGeneratorView()) }
 }

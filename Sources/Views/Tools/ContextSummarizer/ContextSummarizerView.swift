@@ -1,71 +1,52 @@
 import SwiftUI
 
 struct ContextSummarizerView: View {
-    @State private var inputText = ""
-    @State private var summary = ""
-    @State private var isLoading = false
-    @State private var errorMessage: String?
-
-    private let aiService = AIService()
+    @StateObject private var backend = ContextSummarizerBackend()
+    @State private var text: String = ""
+    @State private var context: String = ""
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                TextEditor(text: $inputText)
-                    .frame(height: 200)
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
-                    .padding()
+        ToolDetailView(tool: ContextSummarizerTool()) {
+            VStack(spacing: 24) {
+                ToolInputSection("Context") {
+                    TextField("What is this about? (e.g. Legal, Technical, Casual)", text: $context)
+                        .padding()
+                }
 
-                Button(action: { Task { await summarize() } }) {
-                    if isLoading {
-                        ProgressView().tint(.white)
+                ToolInputSection("Content") {
+                    TextEditor(text: $text)
+                        .frame(height: 150)
+                        .padding(8)
+                }
+
+                Button(action: {
+                    Task { await backend.summarize(text: text, context: context) }
+                }) {
+                    if backend.isProcessing {
+                        ProgressView()
                     } else {
                         Text("Summarize with Context")
+                            .bold()
                             .frame(maxWidth: .infinity)
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .padding(.horizontal)
-                .disabled(inputText.isEmpty || isLoading)
+                .disabled(text.isEmpty || backend.isProcessing)
 
-                if let error = errorMessage {
-                    Text(error).foregroundColor(.red).font(.caption).padding()
-                }
-
-                if !summary.isEmpty {
-                    VStack(alignment: .leading) {
-                        Text("Key Insights").font(.headline)
-                        Text(summary)
-                            .padding()
-                            .background(Color.blue.opacity(0.1))
-                            .cornerRadius(12)
-                    }
-                    .padding()
+                if !backend.summary.isEmpty {
+                    ToolOutputView("Summary", value: backend.summary)
                 }
             }
         }
-        .navigationTitle("Context Summarizer")
-    }
-
-    private func summarize() async {
-        isLoading = true
-        errorMessage = nil
-        do {
-            summary = try await aiService.summarize(text: inputText)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-        isLoading = false
     }
 }
 
 struct ContextSummarizerTool: Tool {
-    let id = UUID()
-    let name = "Smart Summarizer"
-    let icon = "text.justify.left"
+    let name = "Context Summarizer"
+    let icon = "text.badge.star"
     let category = ToolCategory.ai
     let complexity = ToolComplexity.advanced
-    let description = "AI-powered summarization that understands document context"
+    let description = "Generate smart summaries tailored to a specific context or field"
     let requiresAPI = true
     var view: AnyView { AnyView(ContextSummarizerView()) }
 }

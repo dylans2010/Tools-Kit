@@ -1,43 +1,39 @@
 import SwiftUI
 
 struct VideoCompressorView: View {
+    @StateObject private var backend = VideoCompressorBackend()
     @State private var showingPicker = false
-    @State private var selectedVideo: URL?
-    @State private var compressionLevel = 0.5
 
     var body: some View {
-        VStack(spacing: 20) {
-            if let video = selectedVideo {
-                Label(video.lastPathComponent, systemImage: "video.fill")
-                    .font(.headline)
-            } else {
+        ToolDetailView(tool: VideoCompressorTool()) {
+            VStack(spacing: 24) {
                 Button(action: { showingPicker = true }) {
-                    VStack {
+                    VStack(spacing: 12) {
                         Image(systemName: "video.badge.plus")
-                            .font(.system(size: 60))
-                        Text("Select Video File")
+                            .font(.system(size: 48))
+                        Text("Select Video")
+                            .font(.headline)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 60)
+                    .background(Color.blue.opacity(0.1))
+                    .cornerRadius(16)
+                }
+
+                if backend.isProcessing {
+                    VStack(spacing: 12) {
+                        ProgressView()
+                        Text("Compressing video...")
+                            .foregroundColor(.secondary)
                     }
                 }
             }
-
-            if selectedVideo != nil {
-                VStack {
-                    Text("Compression Quality: \(Int(compressionLevel * 100))%")
-                    Slider(value: $compressionLevel)
-                }
-                .padding()
-
-                Button("Compress Video") {
-                    // Logic for AVAssetExportSession
-                }
-                .buttonStyle(.borderedProminent)
-                .padding()
-            }
         }
-        .navigationTitle("Video Compressor")
         .sheet(isPresented: $showingPicker) {
-            FileImporterRepresentableView(allowedContentTypes: [.movie]) { urls in
-                selectedVideo = urls.first
+            FileImporterRepresentableView(allowedContentTypes: [.movie]) { url in
+                Task {
+                    try? await backend.compressVideo(at: url)
+                }
             }
         }
     }
@@ -45,10 +41,10 @@ struct VideoCompressorView: View {
 
 struct VideoCompressorTool: Tool {
     let name = "Video Compressor"
-    let icon = "video.circle.fill"
+    let icon = "video.circle"
     let category = ToolCategory.utility
     let complexity = ToolComplexity.advanced
-    let description = "Reduce video file size without significant quality loss"
+    let description = "Reduce video file size while maintaining quality"
     let requiresAPI = false
     var view: AnyView { AnyView(VideoCompressorView()) }
 }

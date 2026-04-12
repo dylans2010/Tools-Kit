@@ -1,49 +1,57 @@
 import SwiftUI
 
 struct SchemaGeneratorView: View {
-    @State private var json = ""
-    @State private var swiftCode = ""
+    @StateObject private var backend = SchemaGeneratorBackend()
+    @State private var description: String = ""
+    @State private var format: String = "SQL"
+
+    let formats = ["SQL", "JSON Schema", "Swift Model", "GraphQL"]
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                Text("JSON Input")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+        ToolDetailView(tool: SchemaGeneratorTool()) {
+            VStack(spacing: 24) {
+                ToolInputSection("Format") {
+                    Picker("Format", selection: $format) {
+                        ForEach(formats, id: \.self) { Text($0).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+                    .padding()
+                }
 
-                TextEditor(text: $json)
-                    .frame(height: 150)
-                    .font(.system(.body, design: .monospaced))
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
+                ToolInputSection("Description") {
+                    TextEditor(text: $description)
+                        .frame(height: 120)
+                        .padding(8)
+                }
 
-                Button("Generate Swift Models") {
-                    swiftCode = "struct Root: Codable {\n  let id: Int\n  let name: String\n}"
+                Button(action: {
+                    Task { await backend.generateSchema(from: description, format: format) }
+                }) {
+                    if backend.isProcessing {
+                        ProgressView()
+                    } else {
+                        Text("Generate Schema")
+                            .bold()
+                            .frame(maxWidth: .infinity)
+                    }
                 }
                 .buttonStyle(.borderedProminent)
+                .disabled(description.isEmpty || backend.isProcessing)
 
-                if !swiftCode.isEmpty {
-                    Text("Swift Code")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                    TextEditor(text: .constant(swiftCode))
-                        .frame(height: 150)
-                        .font(.system(.body, design: .monospaced))
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
+                if !backend.schema.isEmpty {
+                    ToolOutputView("Generated Schema", value: backend.schema)
                 }
             }
-            .padding()
         }
-        .navigationTitle("Schema Generator")
     }
 }
 
 struct SchemaGeneratorTool: Tool {
-    let name = "Schema Gen"
-    let icon = "curlybraces.square"
+    let name = "Schema Generator"
+    let icon = "tablecells.badge.ellipsis"
     let category = ToolCategory.development
     let complexity = ToolComplexity.advanced
-    let description = "Convert JSON objects into Codable Swift models instantly"
-    let requiresAPI = false
+    let description = "Generate database schemas or code models from natural language"
+    let requiresAPI = true
     var view: AnyView { AnyView(SchemaGeneratorView()) }
 }

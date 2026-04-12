@@ -1,75 +1,47 @@
 import SwiftUI
 
 struct CodeDebuggerView: View {
-    @State private var code = ""
-    @State private var analysis = ""
-    @State private var isAnalyzing = false
-    @State private var errorMessage: String?
-
-    private let aiService = AIService()
+    @StateObject private var backend = CodeDebuggerBackend()
+    @State private var code: String = ""
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                TextEditor(text: $code)
-                    .frame(height: 250)
-                    .font(.system(.body, design: .monospaced))
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
-                    .padding()
+        ToolDetailView(tool: CodeDebuggerTool()) {
+            VStack(spacing: 24) {
+                ToolInputSection("Source Code") {
+                    TextEditor(text: $code)
+                        .frame(height: 200)
+                        .font(.system(.body, design: .monospaced))
+                        .padding(8)
+                }
 
-                Button(action: { Task { await debug() } }) {
-                    if isAnalyzing {
-                        ProgressView().tint(.white)
+                Button(action: {
+                    Task { await backend.debugCode(code) }
+                }) {
+                    if backend.isProcessing {
+                        ProgressView()
                     } else {
-                        Text("Analyze Code")
+                        Text("Analyze & Debug")
+                            .bold()
                             .frame(maxWidth: .infinity)
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .padding(.horizontal)
-                .disabled(code.isEmpty || isAnalyzing)
+                .disabled(code.isEmpty || backend.isProcessing)
 
-                if let error = errorMessage {
-                    Text(error).foregroundColor(.red).font(.caption).padding()
-                }
-
-                if !analysis.isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("AI Analysis", systemImage: "ladybug.fill")
-                            .font(.headline)
-                            .foregroundColor(.orange)
-
-                        Text(analysis)
-                            .padding()
-                            .background(Color.orange.opacity(0.1))
-                            .cornerRadius(12)
-                    }
-                    .padding()
+                if !backend.analysis.isEmpty {
+                    ToolOutputView("Analysis Results", value: backend.analysis)
                 }
             }
         }
-        .navigationTitle("Code Debugger")
-    }
-
-    private func debug() async {
-        isAnalyzing = true
-        errorMessage = nil
-        do {
-            analysis = try await aiService.debugCode(code: code)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-        isAnalyzing = false
     }
 }
 
 struct CodeDebuggerTool: Tool {
-    let id = UUID()
     let name = "Code Debugger"
-    let icon = "ant.fill"
+    let icon = "ant.circle"
     let category = ToolCategory.development
     let complexity = ToolComplexity.advanced
-    let description = "Identify bugs and optimize logic in your source code"
+    let description = "AI-powered debugging to identify and fix code issues"
     let requiresAPI = true
     var view: AnyView { AnyView(CodeDebuggerView()) }
 }
