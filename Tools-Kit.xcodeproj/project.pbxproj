@@ -344,6 +344,7 @@
 		A1B2C3D4E5F6478899AA000B /* FileManagementTemplateSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA000B /* FileManagementTemplateSectionView.swift */; };
 		A1B2C3D4E5F6478899AA000C /* FileManagementWorkspaceSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA000C /* FileManagementWorkspaceSectionView.swift */; };
 		A1B2C3D4E5F6478899AA000D /* FileManagementActionsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6478899AA000D /* FileManagementActionsSectionView.swift */; };
+		ZF0000000000000000000003 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = ZF0000000000000000000002 /* ZIPFoundation */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1075,6 +1076,7 @@
 			buildConfigurationList = 7A6D9F4389A5C85EEE4A6E47 /* Build configuration list for PBXNativeTarget "Tools-Kit" */;
 			buildPhases = (
 				C9111E28A299A9C316B4C75C /* Sources */,
+				ZF0000000000000000000004 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1470,6 +1472,17 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		ZF0000000000000000000004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ZF0000000000000000000003 /* ZIPFoundation in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
 		4F3991E4C199BDE1FC4135AC /* Debug */ = {
