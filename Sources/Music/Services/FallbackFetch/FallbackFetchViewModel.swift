@@ -207,7 +207,7 @@ final class FallbackFetchViewModel: ObservableObject {
                     level: .error,
                     stage: .parsing,
                     message: "CSV file is empty or invalid",
-                    metadata: nil
+                    metadata: nil as [String: String]?
                 )
             }
             return
@@ -282,7 +282,7 @@ final class FallbackFetchViewModel: ObservableObject {
                 level: .info,
                 stage: .ui,
                 message: "Start Fetching tapped from UI",
-                metadata: nil
+                metadata: nil as [String: String]?
             )
             await startFetching()
         }
@@ -294,7 +294,7 @@ final class FallbackFetchViewModel: ObservableObject {
             level: .info,
             stage: .ui,
             message: "Start Fetching triggered",
-            metadata: nil
+            metadata: nil as [String: String]?
         )
 
         let snapshot = await MainActor.run { (songs, youtubeAPIKey, zylaAPIKey) }
@@ -314,7 +314,7 @@ final class FallbackFetchViewModel: ObservableObject {
             level: .debug,
             stage: .ui,
             message: "First songs: \(preview)",
-            metadata: nil
+            metadata: nil as [String: String]?
         )
 
         await MainActor.run {
@@ -333,7 +333,7 @@ final class FallbackFetchViewModel: ObservableObject {
                 level: .error,
                 stage: .ui,
                 message: "ABORT: songs array is empty at runtime",
-                metadata: nil
+                metadata: nil as [String: String]?
             )
             await MainActor.run { self.errorMessage = "No songs to fetch" }
             return
@@ -344,7 +344,7 @@ final class FallbackFetchViewModel: ObservableObject {
                 level: .error,
                 stage: .ui,
                 message: "ABORT: missing YouTube Data API key",
-                metadata: nil
+                metadata: nil as [String: String]?
             )
             await MainActor.run { self.errorMessage = "Please enter your YouTube Data API Key" }
             return
@@ -355,7 +355,7 @@ final class FallbackFetchViewModel: ObservableObject {
                 level: .error,
                 stage: .ui,
                 message: "ABORT: missing Zyla Labs API key",
-                metadata: nil
+                metadata: nil as [String: String]?
             )
             await MainActor.run { self.errorMessage = "Please enter your Zyla Labs API Key" }
             return
@@ -377,7 +377,7 @@ final class FallbackFetchViewModel: ObservableObject {
                 level: .info,
                 stage: .system,
                 message: "[\(index + 1)/\(currentSongs.count)] Processing: \(song.title) — \(song.artist)",
-                metadata: nil
+                metadata: nil as [String: String]?
             )
             await updateStatus(for: song.id, status: .searching)
 
@@ -387,7 +387,7 @@ final class FallbackFetchViewModel: ObservableObject {
                     level: .info,
                     stage: .system,
                     message: "[\(index + 1)/\(currentSongs.count)] SUCCESS: \(song.title)",
-                    metadata: nil
+                    metadata: nil as [String: String]?
                 )
                 await MainActor.run {
                     results.append(result)
@@ -449,7 +449,7 @@ final class FallbackFetchViewModel: ObservableObject {
                 level: .warning,
                 stage: .zip,
                 message: "ZIP creation skipped: no downloaded files",
-                metadata: nil
+                metadata: nil as [String: String]?
             )
             await MainActor.run {
                 errorMessage = "No songs were successfully downloaded"
@@ -498,7 +498,7 @@ final class FallbackFetchViewModel: ObservableObject {
             level: .info,
             stage: .youtube,
             message: "Searching YouTube for: \(song.title) — \(song.artist)",
-            metadata: nil
+            metadata: nil as [String: String]?
         )
 
         let url = try buildYouTubeURL(song)
@@ -853,7 +853,7 @@ final class FallbackFetchViewModel: ObservableObject {
             level: .info,
             stage: .zip,
             message: "Starting ZIP creation for \(files.count) files",
-            metadata: nil
+            metadata: nil as [String: String]?
         )
 
         let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -872,7 +872,7 @@ final class FallbackFetchViewModel: ObservableObject {
                 level: .debug,
                 stage: .zip,
                 message: "Adding to ZIP: \(fileURL.lastPathComponent)",
-                metadata: nil
+                metadata: nil as [String: String]?
             )
             try archive.addEntry(
                 with: fileURL.lastPathComponent,

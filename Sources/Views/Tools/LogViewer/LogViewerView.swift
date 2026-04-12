@@ -4,15 +4,15 @@ struct LogViewerView: View {
     @StateObject private var backend = LogViewerBackend()
     @State private var showingAddLog = false
     @State private var newLogMessage = ""
-    @State private var newLogLevel: LogLevel = .info
+    @State private var newLogLevel: LogViewerLevel = .info
 
     var body: some View {
         VStack(spacing: 0) {
             HStack {
                 Picker("Filter", selection: $backend.selectedFilter) {
-                    Text("All").tag(LogLevel?.none)
-                    ForEach(LogLevel.allCases) { level in
-                        Text(level.rawValue).tag(LogLevel?.some(level))
+                    Text("All").tag(LogViewerLevel?.none)
+                    ForEach(LogViewerLevel.allCases) { level in
+                        Text(level.rawValue).tag(LogViewerLevel?.some(level))
                     }
                 }
                 .pickerStyle(.menu)
@@ -76,7 +76,7 @@ struct LogViewerView: View {
             NavigationView {
                 Form {
                     Picker("Level", selection: $newLogLevel) {
-                        ForEach(LogLevel.allCases) { level in
+                        ForEach(LogViewerLevel.allCases) { level in
                             Text(level.rawValue).tag(level)
                         }
                     }
@@ -102,7 +102,7 @@ struct LogViewerView: View {
         }
     }
 
-    private func colorForLevel(_ level: LogLevel) -> Color {
+    private func colorForLevel(_ level: LogViewerLevel) -> Color {
         switch level {
         case .info: return .blue
         case .warning: return .orange

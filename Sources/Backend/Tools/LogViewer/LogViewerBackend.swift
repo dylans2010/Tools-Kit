@@ -1,6 +1,6 @@
 import Foundation
 
-enum LogLevel: String, CaseIterable, Identifiable {
+enum LogViewerLevel: String, CaseIterable, Identifiable {
     case info = "Info"
     case warning = "Warning"
     case error = "Error"
@@ -18,19 +18,19 @@ enum LogLevel: String, CaseIterable, Identifiable {
     }
 }
 
-struct LogEntry: Identifiable {
+struct LogViewerEntry: Identifiable {
     let id = UUID()
     let timestamp: Date
-    let level: LogLevel
+    let level: LogViewerLevel
     let message: String
 }
 
 class LogViewerBackend: ObservableObject {
-    @Published var entries: [LogEntry] = []
-    @Published var selectedFilter: LogLevel? = nil
+    @Published var entries: [LogViewerEntry] = []
+    @Published var selectedFilter: LogViewerLevel? = nil
 
-    func addLog(_ message: String, level: LogLevel = .info) {
-        let entry = LogEntry(timestamp: Date(), level: level, message: message)
+    func addLog(_ message: String, level: LogViewerLevel = .info) {
+        let entry = LogViewerEntry(timestamp: Date(), level: level, message: message)
         entries.append(entry)
     }
 
@@ -38,7 +38,7 @@ class LogViewerBackend: ObservableObject {
         entries = []
     }
 
-    var filteredEntries: [LogEntry] {
+    var filteredEntries: [LogViewerEntry] {
         if let filter = selectedFilter {
             return entries.filter { $0.level == filter }
         }
