@@ -34,13 +34,13 @@ struct MapsToolView: View {
                 }
             }
         }
-        .navigationTitle("Maps Tool")
+        .navigationTitle("Latina Finder")
         .navigationBarTitleDisplayMode(.inline)
     }
 
     private var searchBar: some View {
         HStack {
-            TextField("Search for a place...", text: $viewModel.searchText)
+            TextField("Search For Latinas", text: $viewModel.searchText)
                 .textFieldStyle(.roundedBorder)
                 .onSubmit { viewModel.search() }
 
