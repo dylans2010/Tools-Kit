@@ -40,8 +40,8 @@ final class FallbackFetchViewModel: ObservableObject {
     private let finishedFetch = FinishedFetch()
 
     func importCSV(url: URL) {
-        guard url.startAccessingSecurityScopedResource() else { return }
-        defer { url.stopAccessingSecurityScopedResource() }
+        let accessed = url.startAccessingSecurityScopedResource()
+        defer { if accessed { url.stopAccessingSecurityScopedResource() } }
 
         do {
             let content = try String(contentsOf: url)
