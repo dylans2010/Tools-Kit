@@ -77,9 +77,14 @@ struct CreatePlaylistView: View {
 
     private func openArtworkCustomizer() {
         let resolvedName = name.trimmingCharacters(in: .whitespaces).isEmpty ? "Untitled" : name
-        var playlist = draftPlaylist ?? Playlist(name: resolvedName, songIDs: Array(selectedSongs))
-        playlist.name = resolvedName
-        playlist.songIDs = Array(selectedSongs)
+        var playlist: Playlist
+        if let existingDraft = draftPlaylist {
+            playlist = existingDraft
+            playlist.name = resolvedName
+            playlist.songIDs = Array(selectedSongs)
+        } else {
+            playlist = Playlist(name: resolvedName, songIDs: Array(selectedSongs))
+        }
         if playlist.artworkSongID == nil || !(playlist.artworkSongID.map(selectedSongs.contains) ?? false) {
             playlist.artworkSongID = playlist.songIDs.first
         }
