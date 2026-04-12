@@ -12,6 +12,8 @@
 		7F46638E50884AFF969EBA75 /* FileFolderContentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D892907BAC409D9E8D7684 /* FileFolderContentsView.swift */; };
 		3D0B0D2B774E4F298B2E7424 /* QuestionEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C7570717DA449692472DC7 /* QuestionEditorView.swift */; };
 		3E03416052DD4C3CA1A54E8A /* DragDropQuestionFillerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28651E16D0534324A81C2E92 /* DragDropQuestionFillerView.swift */; };
+		20B6A2D014DC4E4EAA4F0659 /* RatingQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD02A9EA505D413A96021DD2 /* RatingQuestionView.swift */; };
+		88656A686AF741EB83B8FD5F /* SliderQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711D3FB735414113B06478F1 /* MorseCodeView.swift */; };
 		F36CC1CEC21A4752B8FFDB90 /* PrimeFactorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8156480BE054D17A41ABFCF /* PrimeFactorView.swift */; };
@@ -291,6 +293,8 @@
 		10D892907BAC409D9E8D7684 /* FileFolderContentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Files/FileFolderContentsView.swift"; sourceTree = "<group>"; };
 		C4C7570717DA449692472DC7 /* QuestionEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/QuestionEditorView.swift"; sourceTree = "<group>"; };
 		28651E16D0534324A81C2E92 /* DragDropQuestionFillerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/DragDropQuestionFillerView.swift"; sourceTree = "<group>"; };
+		FD02A9EA505D413A96021DD2 /* RatingQuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/RatingQuestionView.swift"; sourceTree = "<group>"; };
+		96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Forms/SliderQuestionView.swift"; sourceTree = "<group>"; };
 		B1ABEF1CC5614B57A749E486 /* NATOView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/NATO/NATOView.swift"; sourceTree = "<group>"; };
 		711D3FB735414113B06478F1 /* MorseCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/MorseCode/MorseCodeView.swift"; sourceTree = "<group>"; };
 		D8156480BE054D17A41ABFCF /* PrimeFactorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/PrimeFactor/PrimeFactorView.swift"; sourceTree = "<group>"; };
@@ -858,6 +862,8 @@
 				14348B7A70A64EBC8BEA5262 /* TextInputQuestionView.swift */,
 				3221DDE3ED3A4F85830177FB /* DropdownQuestionView.swift */,
 				C040A34EF8984338BD59A031 /* DragDropQuestionView.swift */,
+				FD02A9EA505D413A96021DD2 /* RatingQuestionView.swift */,
+				96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -938,6 +944,8 @@
 				7F46638E50884AFF969EBA75 /* FileFolderContentsView.swift in Sources */,
 				3D0B0D2B774E4F298B2E7424 /* QuestionEditorView.swift in Sources */,
 				3E03416052DD4C3CA1A54E8A /* DragDropQuestionFillerView.swift in Sources */,
+				20B6A2D014DC4E4EAA4F0659 /* RatingQuestionView.swift in Sources */,
+				88656A686AF741EB83B8FD5F /* SliderQuestionView.swift in Sources */,
 				005CC343AB814B9885292A08 /* NATOView.swift in Sources */,
 				6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */,
 				F36CC1CEC21A4752B8FFDB90 /* PrimeFactorView.swift in Sources */,
