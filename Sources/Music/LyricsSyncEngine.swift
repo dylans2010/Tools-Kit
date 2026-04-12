@@ -13,13 +13,15 @@ final class LyricsSyncEngine: ObservableObject {
     private let service = LyricsService()
     private var cancellables = Set<AnyCancellable>()
     private var currentSongID: UUID?
+    private var loadTask: Task<Void, Never>?
 
     private init() {
         MusicPlayerManager.shared.$currentSong
             .removeDuplicates { $0?.id == $1?.id }
             .sink { [weak self] song in
                 self?.currentSongID = song?.id
-                Task { await self?.loadLyrics(for: song) }
+                self?.loadTask?.cancel()
+                self?.loadTask = Task { await self?.loadLyrics(for: song) }
             }
             .store(in: &cancellables)
 
@@ -63,14 +65,20 @@ final class LyricsSyncEngine: ObservableObject {
         currentIndex = -1
         offsetSeconds = loadOffset(for: song)
 
+        defer { isLoading = false }
+
+        guard !Task.isCancelled else { return }
+
         if let saved = service.loadSaved(for: song) {
             lines = saved
-        } else if let fetched = await service.fetchSyncedLyrics(for: song) {
-            lines = fetched
-            service.save(fetched, for: song)
+        } else {
+            guard !Task.isCancelled else { return }
+            if let fetched = await service.fetchSyncedLyrics(for: song) {
+                guard !Task.isCancelled else { return }
+                lines = fetched
+                service.save(fetched, for: song)
+            }
         }
-
-        isLoading = false
     }
 
     // MARK: - Offset

@@ -56,6 +56,7 @@ final class AudioEngineManager: ObservableObject {
     // MARK: Callbacks
     var onTrackFinished: (() -> Void)?
     var onTimeUpdate: ((TimeInterval) -> Void)?
+    var onPlaybackFailed: (() -> Void)?
 
     // MARK: Private – engine graph
     private let engine = AVAudioEngine()
@@ -150,6 +151,7 @@ final class AudioEngineManager: ObservableObject {
 
         guard let file = try? AVAudioFile(forReading: url) else {
             print("AudioEngineManager: cannot open \(url.lastPathComponent)")
+            DispatchQueue.main.async { self.onPlaybackFailed?() }
             return
         }
 
@@ -205,6 +207,8 @@ final class AudioEngineManager: ObservableObject {
     }
 
     var totalDuration: TimeInterval { Double(totalFrames) / max(1, sampleRate) }
+
+    var isActuallyPlaying: Bool { nodes[activeIndex].isPlaying }
 
     // MARK: - Crossfade
 
