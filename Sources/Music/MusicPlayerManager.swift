@@ -62,7 +62,15 @@ final class MusicPlayerManager: ObservableObject {
         audioEngine.onTimeUpdate = { [weak self] time in
             guard let self else { return }
             self.currentTime = time
+            // Keep isPlaying in sync with actual engine state
+            let actuallyPlaying = self.audioEngine.isActuallyPlaying
+            if self.isPlaying != actuallyPlaying {
+                self.isPlaying = actuallyPlaying
+            }
             if self.duration > 0 { self.updateNowPlayingInfo() }
+        }
+        audioEngine.onPlaybackFailed = { [weak self] in
+            self?.isPlaying = false
         }
     }
 
@@ -257,7 +265,9 @@ final class MusicPlayerManager: ObservableObject {
     private func handleSongEnd() {
         switch repeatMode {
         case .one:
-            load(song: queue[safe: currentIndex] ?? currentSong!)
+            if let song = queue[safe: currentIndex] ?? currentSong {
+                load(song: song)
+            }
         case .all:
             currentIndex = (currentIndex + 1) % queue.count
             load(song: queue[currentIndex])

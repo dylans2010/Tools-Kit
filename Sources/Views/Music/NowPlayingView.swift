@@ -143,18 +143,13 @@ struct NowPlayingView: View {
 
     private var artworkHero: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color.white.opacity(0.05))
-                .frame(maxWidth: .infinity)
-
             if let image = artworkImage {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
-                    .aspectRatio(1, contentMode: .fit)
+                    .frame(width: 300, height: 300)
                     .cornerRadius(20)
-                    .shadow(color: .black.opacity(0.35), radius: 24, x: 0, y: 12)
-                    .padding(4)
+                    .shadow(color: .black.opacity(0.5), radius: 20, x: 0, y: 12)
                     .transition(.opacity)
             } else {
                 RoundedRectangle(cornerRadius: 20)
@@ -165,15 +160,16 @@ struct NowPlayingView: View {
                             endPoint: .bottomTrailing
                         )
                     )
+                    .frame(width: 300, height: 300)
                     .overlay(
                         Image(systemName: "music.note")
                             .font(.system(size: 80))
                             .foregroundColor(.white.opacity(0.4))
                     )
-                    .shadow(color: .black.opacity(0.35), radius: 24, x: 0, y: 12)
-                    .padding(4)
+                    .shadow(color: .black.opacity(0.5), radius: 20, x: 0, y: 12)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
     }
 
     // MARK: - Song Info
@@ -366,24 +362,14 @@ private struct ArtworkBackground: View {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
-                    .blur(radius: 40)
-                    .opacity(0.6)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipped()
+                    .blur(radius: 50)
+                    .overlay(Color.black.opacity(0.55))
                     .ignoresSafeArea()
             } else {
-                LinearGradient(
-                    colors: [Color.black, Color.black.opacity(0.85)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
+                Color.black.ignoresSafeArea()
             }
-
-            LinearGradient(
-                colors: [Color.black.opacity(0.45), Color.black.opacity(0.9)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
         }
     }
 }
