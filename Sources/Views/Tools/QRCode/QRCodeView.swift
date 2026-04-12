@@ -143,7 +143,8 @@ private struct QRGenerationView: View {
 
                             Button(action: {
                                 let av = UIActivityViewController(activityItems: [image], applicationActivities: nil)
-                                if let vc = UIApplication.shared.windows.first?.rootViewController {
+                                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                                   let vc = windowScene.windows.first?.rootViewController {
                                     vc.present(av, animated: true)
                                 }
                             }) {
