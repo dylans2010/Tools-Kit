@@ -19,12 +19,24 @@ struct EditFormView: View {
 
             Section("Questions") {
                 ForEach($form.questions) { $question in
-                    VStack(alignment: .leading) {
-                        TextField("Question", text: $question.title)
-                        Toggle("Required", isOn: $question.required)
-                        questionOptionsEditor(for: $question)
+                    DisclosureGroup {
+                        QuestionEditorView(question: $question)
+                    } label: {
+                        HStack {
+                            Image(systemName: question.type.icon)
+                                .foregroundColor(.blue)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(question.title.isEmpty ? "Untitled Question" : question.title)
+                                    .font(.body)
+                                Text(question.type.displayName)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
                     }
                 }
+                .onDelete { form.questions.remove(atOffsets: $0) }
+                .onMove { form.questions.move(fromOffsets: $0, toOffset: $1) }
             }
 
             Section("Manifest") {
@@ -65,6 +77,7 @@ struct EditFormView: View {
             }
         }
         .navigationTitle("Edit Form")
+        .toolbar { EditButton() }
         .sheet(isPresented: $showingFillOut) {
             NavigationStack { FillOutFormView(form: form, backend: backend) }
         }
@@ -92,85 +105,6 @@ struct EditFormView: View {
         backend.update(form)
     }
 
-    @ViewBuilder
-    private func questionOptionsEditor(for question: Binding<FormQuestion>) -> some View {
-        switch question.wrappedValue.type {
-        case .multipleChoice, .dropdown, .dragDrop:
-            TextField(
-                "Options (comma separated)",
-                text: Binding(
-                    get: { question.wrappedValue.options.joined(separator: ", ") },
-                    set: { question.wrappedValue.options = splitOptions($0) }
-                )
-            )
-            .textFieldStyle(.roundedBorder)
-        case .ratingScale:
-            HStack {
-                TextField(
-                    "Min",
-                    text: Binding(
-                        get: { question.wrappedValue.options.first ?? "" },
-                        set: { updateOption(question: question, index: 0, value: $0) }
-                    )
-                )
-                .keyboardType(.numberPad)
-                .textFieldStyle(.roundedBorder)
-                TextField(
-                    "Max",
-                    text: Binding(
-                        get: { question.wrappedValue.options.count > 1 ? question.wrappedValue.options[1] : "" },
-                        set: { updateOption(question: question, index: 1, value: $0) }
-                    )
-                )
-                .keyboardType(.numberPad)
-                .textFieldStyle(.roundedBorder)
-            }
-            .font(.caption)
-        case .slider:
-            HStack {
-                TextField(
-                    "Min",
-                    text: Binding(
-                        get: { question.wrappedValue.options.first ?? "" },
-                        set: { updateOption(question: question, index: 0, value: $0) }
-                    )
-                )
-                .keyboardType(.decimalPad)
-                .textFieldStyle(.roundedBorder)
-                TextField(
-                    "Max",
-                    text: Binding(
-                        get: { question.wrappedValue.options.count > 1 ? question.wrappedValue.options[1] : "" },
-                        set: { updateOption(question: question, index: 1, value: $0) }
-                    )
-                )
-                .keyboardType(.decimalPad)
-                .textFieldStyle(.roundedBorder)
-                TextField(
-                    "Step",
-                    text: Binding(
-                        get: { question.wrappedValue.options.count > 2 ? question.wrappedValue.options[2] : "" },
-                        set: { updateOption(question: question, index: 2, value: $0) }
-                    )
-                )
-                .keyboardType(.decimalPad)
-                .textFieldStyle(.roundedBorder)
-            }
-            .font(.caption)
-        case .imageUpload, .textInput:
-            EmptyView()
-        }
-    }
-
-    private func updateOption(question: Binding<FormQuestion>, index: Int, value: String) {
-        var options = question.wrappedValue.options
-        while options.count <= index {
-            options.append("")
-        }
-        options[index] = value
-        question.wrappedValue.options = options
-    }
-
     private func splitOptions(_ value: String) -> [String] {
         value
             .split(separator: ",")
@@ -178,3 +112,4 @@ struct EditFormView: View {
             .filter { !$0.isEmpty }
     }
 }
+

@@ -4,16 +4,22 @@ import UniformTypeIdentifiers
 struct FileManagementView: View {
     @StateObject private var backend = FileManagementBackend()
     @State private var showingImporter = false
+    @State private var showingCreateFolder = false
+    @State private var showingCreateFile = false
+    @State private var showingTemplates = false
 
     var body: some View {
         ToolDetailView(tool: FileManagementTool()) {
             VStack(spacing: 16) {
                 FileManagementStatsSectionView(backend: backend)
-                FileManagementCreateFolderSectionView(backend: backend)
-                FileManagementCreateFileSectionView(backend: backend)
-                FileManagementTemplateSectionView(backend: backend)
+                FileManagementActionsSectionView(
+                    backend: backend,
+                    showingImporter: $showingImporter,
+                    showingCreateFolder: $showingCreateFolder,
+                    showingCreateFile: $showingCreateFile,
+                    showingTemplates: $showingTemplates
+                )
                 FileManagementWorkspaceSectionView(backend: backend)
-                FileManagementActionsSectionView(backend: backend, showingImporter: $showingImporter)
 
                 if !backend.aiSummary.isEmpty {
                     ToolOutputView("Inspector Summary", value: backend.aiSummary)
@@ -29,6 +35,21 @@ struct FileManagementView: View {
                 showingImporter = false
             }
         }
+        .sheet(isPresented: $showingCreateFolder) {
+            FileManagementCreateFolderSectionView(backend: backend) {
+                showingCreateFolder = false
+            }
+        }
+        .sheet(isPresented: $showingCreateFile) {
+            FileManagementCreateFileSectionView(backend: backend) {
+                showingCreateFile = false
+            }
+        }
+        .sheet(isPresented: $showingTemplates) {
+            FileManagementTemplateSectionView(backend: backend) {
+                showingTemplates = false
+            }
+        }
     }
 }
 
@@ -42,3 +63,4 @@ struct FileManagementTool: Tool {
 
     var view: AnyView { AnyView(FileManagementView()) }
 }
+

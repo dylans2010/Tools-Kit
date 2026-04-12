@@ -42,19 +42,40 @@ struct CreateFormView: View {
                 TextField("Background Hex", text: $backgroundHex)
             }
 
-            Section("Questions") {
+            Section("Add Question") {
                 Picker("Question Type", selection: $selectedType) {
                     ForEach(FormQuestionType.allCases) { type in
-                        Text(type.displayName).tag(type)
+                        Label(type.displayName, systemImage: type.icon).tag(type)
                     }
                 }
-                Button("Add Question") { addQuestion() }
-                ForEach($questions) { $question in
-                    VStack(alignment: .leading, spacing: 6) {
-                        TextField("Question", text: $question.title)
-                        Toggle("Required", isOn: $question.required)
-                        questionOptionsEditor(for: $question)
+                Button {
+                    addQuestion()
+                } label: {
+                    Label("Add Question", systemImage: "plus.circle.fill")
+                }
+            }
+
+            if !questions.isEmpty {
+                Section("Questions") {
+                    ForEach($questions) { $question in
+                        DisclosureGroup {
+                            QuestionEditorView(question: $question)
+                        } label: {
+                            HStack {
+                                Image(systemName: question.type.icon)
+                                    .foregroundColor(.blue)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(question.title.isEmpty ? "Untitled Question" : question.title)
+                                        .font(.body)
+                                    Text(question.type.displayName)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        }
                     }
+                    .onDelete { questions.remove(atOffsets: $0) }
+                    .onMove { questions.move(fromOffsets: $0, toOffset: $1) }
                 }
             }
 
@@ -78,107 +99,16 @@ struct CreateFormView: View {
             .buttonStyle(.borderedProminent)
         }
         .navigationTitle("Create Form")
-        .toolbar { Button("Close") { dismiss() } }
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
+            ToolbarItem(placement: .navigationBarTrailing) { EditButton() }
+        }
     }
 
     private func addQuestion() {
         if let manager = managers.first(where: { $0.type == selectedType }) {
             questions.append(manager.defaultQuestion())
         }
-    }
-
-    @ViewBuilder
-    private func questionOptionsEditor(for question: Binding<FormQuestion>) -> some View {
-        switch question.wrappedValue.type {
-        case .multipleChoice, .dropdown, .dragDrop:
-            TextField(
-                "Options (comma separated)",
-                text: Binding(
-                    get: { question.wrappedValue.options.joined(separator: ", ") },
-                    set: { question.wrappedValue.options = splitOptions($0) }
-                )
-            )
-            .textFieldStyle(.roundedBorder)
-        case .ratingScale:
-            HStack {
-                TextField(
-                    "Min",
-                    text: Binding(
-                        get: { question.wrappedValue.options.first ?? "" },
-                        set: { value in
-                            var options = question.wrappedValue.options
-                            if options.isEmpty { options = ["", ""] }
-                            options[0] = value
-                            question.wrappedValue.options = options
-                        }
-                    )
-                )
-                .keyboardType(.numberPad)
-                .textFieldStyle(.roundedBorder)
-                TextField(
-                    "Max",
-                    text: Binding(
-                        get: {
-                            question.wrappedValue.options.count > 1
-                                ? question.wrappedValue.options[1]
-                                : ""
-                        },
-                        set: { value in
-                            var options = question.wrappedValue.options
-                            if options.isEmpty { options = ["", ""] }
-                            if options.count < 2 { options.append("") }
-                            options[1] = value
-                            question.wrappedValue.options = options
-                        }
-                    )
-                )
-                .keyboardType(.numberPad)
-                .textFieldStyle(.roundedBorder)
-            }
-            .font(.caption)
-        case .slider:
-            HStack {
-                TextField(
-                    "Min",
-                    text: Binding(
-                        get: { question.wrappedValue.options.first ?? "" },
-                        set: { updateSliderOption(question: question, index: 0, value: $0) }
-                    )
-                )
-                .keyboardType(.decimalPad)
-                .textFieldStyle(.roundedBorder)
-                TextField(
-                    "Max",
-                    text: Binding(
-                        get: { question.wrappedValue.options.count > 1 ? question.wrappedValue.options[1] : "" },
-                        set: { updateSliderOption(question: question, index: 1, value: $0) }
-                    )
-                )
-                .keyboardType(.decimalPad)
-                .textFieldStyle(.roundedBorder)
-                TextField(
-                    "Step",
-                    text: Binding(
-                        get: { question.wrappedValue.options.count > 2 ? question.wrappedValue.options[2] : "" },
-                        set: { updateSliderOption(question: question, index: 2, value: $0) }
-                    )
-                )
-                .keyboardType(.decimalPad)
-                .textFieldStyle(.roundedBorder)
-            }
-            .font(.caption)
-        case .imageUpload, .textInput:
-            EmptyView()
-        }
-    }
-
-    private func updateSliderOption(question: Binding<FormQuestion>, index: Int, value: String) {
-        var options = question.wrappedValue.options
-        while options.count <= index {
-            options.append("")
-        }
-        options[index] = value
-        question.wrappedValue.options = options
     }
 
     private func splitOptions(_ value: String) -> [String] {
@@ -188,3 +118,4 @@ struct CreateFormView: View {
             .filter { !$0.isEmpty }
     }
 }
+

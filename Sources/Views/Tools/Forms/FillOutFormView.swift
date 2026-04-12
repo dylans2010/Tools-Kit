@@ -21,10 +21,30 @@ struct FillOutFormView: View {
 
             Section("Questions") {
                 ForEach(form.questions) { question in
-                    VStack(alignment: .leading) {
-                        Text(question.title)
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: question.type.icon)
+                                .foregroundColor(.blue)
+                                .font(.caption)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(question.title)
+                                    .font(.subheadline.bold())
+                                if !question.questionName.isEmpty {
+                                    Text("Field: \(question.questionName)")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            if question.required {
+                                Spacer()
+                                Text("Required")
+                                    .font(.caption2)
+                                    .foregroundColor(.red)
+                            }
+                        }
                         questionInput(for: question)
                     }
+                    .padding(.vertical, 4)
                 }
             }
 
@@ -46,64 +66,79 @@ struct FillOutFormView: View {
     @ViewBuilder
     private func questionInput(for question: FormQuestion) -> some View {
         switch question.type {
-        case .multipleChoice, .dropdown, .dragDrop:
-            if question.options.isEmpty {
-                TextField(
-                    "Your answer",
-                    text: Binding(
-                        get: { answers[question.id] ?? "" },
-                        set: { answers[question.id] = $0 }
-                    )
-                )
-            } else {
-                Picker("Answer", selection: Binding(
+        case .dragDrop:
+            DragDropQuestionFillerView(
+                question: question,
+                answer: Binding(
                     get: { answers[question.id] ?? "" },
                     set: { answers[question.id] = $0 }
-                )) {
+                )
+            )
+        case .multipleChoice:
+            if question.options.isEmpty {
+                TextField("Your answer", text: answerBinding(question.id))
+            } else {
+                Picker("Answer", selection: answerBinding(question.id)) {
                     Text("Select an option").tag("")
                     ForEach(question.options, id: \.self) { option in
                         Text(option).tag(option)
                     }
                 }
+                .pickerStyle(.menu)
+            }
+        case .dropdown:
+            if question.options.isEmpty {
+                TextField("Your answer", text: answerBinding(question.id))
+            } else {
+                Picker("Answer", selection: answerBinding(question.id)) {
+                    Text("Select an option").tag("")
+                    ForEach(question.options, id: \.self) { option in
+                        Text(option).tag(option)
+                    }
+                }
+                .pickerStyle(.navigationLink)
             }
         case .ratingScale:
             let ratingOptions = resolvedRatingOptions(for: question)
-            Picker("Rating", selection: Binding(
-                get: { answers[question.id] ?? "" },
-                set: { answers[question.id] = $0 }
-            )) {
+            Picker("Rating", selection: answerBinding(question.id)) {
                 Text("Select a rating").tag("")
                 ForEach(ratingOptions, id: \.self) { value in
                     Text(value).tag(value)
                 }
             }
+            .pickerStyle(.segmented)
         case .slider:
             let sliderConfig = resolvedSliderConfig(for: question)
-            Slider(
-                value: Binding(
-                    get: { Double(answers[question.id] ?? String(sliderConfig.defaultValue)) ?? sliderConfig.defaultValue },
-                    set: { answers[question.id] = String(Int($0)) }
-                ),
-                in: sliderConfig.min...sliderConfig.max,
-                step: sliderConfig.step
-            )
-            Text("Value: \(answers[question.id] ?? String(Int(sliderConfig.defaultValue)))")
-                .font(.caption)
-                .foregroundColor(.secondary)
+            VStack(alignment: .leading, spacing: 4) {
+                Slider(
+                    value: Binding(
+                        get: { Double(answers[question.id] ?? String(sliderConfig.defaultValue)) ?? sliderConfig.defaultValue },
+                        set: { answers[question.id] = String(Int($0)) }
+                    ),
+                    in: sliderConfig.min...sliderConfig.max,
+                    step: sliderConfig.step
+                )
+                Text("Value: \(answers[question.id] ?? String(Int(sliderConfig.defaultValue)))")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
         case .imageUpload:
-            Text("Attach image externally and describe reference here.")
-                .font(.caption)
-                .foregroundColor(.secondary)
-            TextField("Image notes", text: Binding(
-                get: { answers[question.id] ?? "" },
-                set: { answers[question.id] = $0 }
-            ))
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Attach image externally and describe reference here.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                TextField("Image notes", text: answerBinding(question.id))
+            }
         case .textInput:
-            TextField("Your answer", text: Binding(
-                get: { answers[question.id] ?? "" },
-                set: { answers[question.id] = $0 }
-            ))
+            TextField("Your answer", text: answerBinding(question.id))
         }
+    }
+
+    private func answerBinding(_ id: UUID) -> Binding<String> {
+        Binding(
+            get: { answers[id] ?? "" },
+            set: { answers[id] = $0 }
+        )
     }
 
     private func exportAnswers() {
@@ -138,3 +173,4 @@ struct FillOutFormView: View {
         return (min, maxValue, step, (min + maxValue) / 2)
     }
 }
+
