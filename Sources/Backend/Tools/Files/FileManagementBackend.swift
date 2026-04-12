@@ -55,13 +55,13 @@ final class FileManagementBackend: ObservableObject {
     @Published var isSummarizing = false
 
     let rootURL: URL
+    private let workspaceManager: FileWorkspaceManager
+    private let metadataService = ManagedFileMetadataService()
+    private let fileNameValidator = FileNameValidator()
 
     init() {
-        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first ?? FileManager.default.temporaryDirectory
-        rootURL = documents.appendingPathComponent("FilesWorkspace", isDirectory: true)
-        if !FileManager.default.fileExists(atPath: rootURL.path) {
-            try? FileManager.default.createDirectory(at: rootURL, withIntermediateDirectories: true)
-        }
+        workspaceManager = FileWorkspaceManager()
+        rootURL = workspaceManager.rootURL
         reload()
     }
 
@@ -71,45 +71,34 @@ final class FileManagementBackend: ObservableObject {
     var totalBytes: Int64 { items.reduce(0) { $0 + $1.size } }
 
     func reload() {
-        let urls = (try? FileManager.default.contentsOfDirectory(at: rootURL, includingPropertiesForKeys: [.isDirectoryKey, .fileSizeKey, .contentModificationDateKey], options: [.skipsHiddenFiles])) ?? []
-        items = urls.compactMap { url in
-            guard let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .fileSizeKey, .contentModificationDateKey]) else { return nil }
-            return ManagedFileItem(
-                url: url,
-                isDirectory: values.isDirectory ?? false,
-                size: Int64(values.fileSize ?? 0),
-                modifiedAt: values.contentModificationDate ?? Date()
-            )
-        }
-        .sorted { $0.url.lastPathComponent.localizedCaseInsensitiveCompare($1.url.lastPathComponent) == .orderedAscending }
+        items = metadataService.listItems(in: rootURL)
     }
 
     func createFolder(name: String) {
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-        let folderURL = rootURL.appendingPathComponent(trimmed, isDirectory: true)
+        let safeName = fileNameValidator.sanitize(name)
+        guard !safeName.isEmpty else { return }
+        let folderURL = workspaceManager.uniqueURL(for: safeName)
         try? FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
         reload()
     }
 
     func createFile(name: String, type: ManagedFileType, content: String = "") {
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-        let fileURL = rootURL.appendingPathComponent(trimmed).appendingPathExtension(type.rawValue)
+        let safeName = fileNameValidator.sanitize(name)
+        guard !safeName.isEmpty else { return }
+        let fileURL = workspaceManager.uniqueURL(for: safeName, fileExtension: type.rawValue)
         try? content.data(using: .utf8)?.write(to: fileURL)
         reload()
     }
 
     func createFromTemplate(_ template: FileTemplate) {
-        let fileURL = rootURL.appendingPathComponent(template.fileName)
+        let fileURL = workspaceManager.uniqueURL(for: template.fileName)
         try? template.contents.data(using: .utf8)?.write(to: fileURL)
         reload()
     }
 
     func importFiles(urls: [URL]) {
         for url in urls {
-            let target = rootURL.appendingPathComponent(url.lastPathComponent)
-            try? FileManager.default.removeItem(at: target)
+            let target = workspaceManager.uniqueURL(for: url.lastPathComponent)
             try? FileManager.default.copyItem(at: url, to: target)
         }
         reload()
