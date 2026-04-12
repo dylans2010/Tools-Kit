@@ -7,6 +7,8 @@ struct MusicLibraryView: View {
     @State private var selectedTab: MusicTab = .songs
     @State private var showNowPlaying = false
     @State private var showSettings = false
+    @State private var showEqualizer = false
+    @State private var showAudioControls = false
 
     enum MusicTab: String, CaseIterable {
         case songs = "Songs"
@@ -38,7 +40,17 @@ struct MusicLibraryView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .navigationTitle("Music")
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
+                    ToolbarItemGroup(placement: .navigationBarTrailing) {
+                        Button {
+                            showAudioControls = true
+                        } label: {
+                            Image(systemName: "slider.horizontal.3")
+                        }
+                        Button {
+                            showEqualizer = true
+                        } label: {
+                            Image(systemName: "waveform.path.ecg")
+                        }
                         Button { showSettings = true } label: {
                             Image(systemName: "gearshape")
                         }
@@ -46,6 +58,12 @@ struct MusicLibraryView: View {
                 }
                 .sheet(isPresented: $showSettings) {
                     MusicSettingsView()
+                }
+                .sheet(isPresented: $showEqualizer) {
+                    EqualizerView()
+                }
+                .sheet(isPresented: $showAudioControls) {
+                    AudioControlsView()
                 }
             }
             // Reserve space so list content doesn't scroll under the mini player
@@ -75,6 +93,7 @@ struct MusicLibraryView: View {
 struct PlaylistsListView: View {
     @StateObject private var library = MusicLibraryManager.shared
     @State private var showCreate = false
+    @State private var playlistToCustomize: Playlist?
 
     var body: some View {
         ZStack {
@@ -93,8 +112,22 @@ struct PlaylistsListView: View {
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }
+                                Spacer()
                             }
                             .padding(.vertical, 4)
+                        }
+                        .swipeActions(edge: .trailing) {
+                            Button(role: .destructive) {
+                                library.deletePlaylist(playlist)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                            Button {
+                                playlistToCustomize = playlist
+                            } label: {
+                                Label("Customize", systemImage: "paintbrush")
+                            }
+                            .tint(.purple)
                         }
                     }
                     .onDelete { offsets in
@@ -113,6 +146,12 @@ struct PlaylistsListView: View {
         }
         .sheet(isPresented: $showCreate) {
             CreatePlaylistView()
+        }
+        .sheet(item: $playlistToCustomize) { playlist in
+            CustomizePlaylistArtwork(playlist: Binding(
+                get: { library.playlists.first(where: { $0.id == playlist.id }) ?? playlist },
+                set: { library.updatePlaylist($0) }
+            ))
         }
     }
 
@@ -135,7 +174,11 @@ struct PlaylistsListView: View {
         ZStack {
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color(.systemGray5))
-            if let id = playlist.artworkSongID,
+            if let data = playlist.customArtworkData, let img = UIImage(data: data) {
+                Image(uiImage: img)
+                    .resizable()
+                    .scaledToFill()
+            } else if let id = playlist.artworkSongID,
                let song = library.song(by: id),
                let data = song.artworkData,
                let img = UIImage(data: data) {

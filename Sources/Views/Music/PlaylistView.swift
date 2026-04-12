@@ -5,6 +5,7 @@ struct PlaylistView: View {
     @StateObject private var library = MusicLibraryManager.shared
     @StateObject private var player = MusicPlayerManager.shared
     @State private var showAddSongs = false
+    @State private var showCustomizeArtwork = false
 
     private var songs: [Song] { library.songs(for: playlist) }
 
@@ -32,6 +33,11 @@ struct PlaylistView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack(spacing: 16) {
+                    Button {
+                        showCustomizeArtwork = true
+                    } label: {
+                        Image(systemName: "paintbrush")
+                    }
                     Button { showAddSongs = true } label: { Image(systemName: "plus") }
                     EditButton()
                 }
@@ -39,6 +45,12 @@ struct PlaylistView: View {
         }
         .sheet(isPresented: $showAddSongs) {
             AddSongsToPlaylistView(playlist: playlist)
+        }
+        .sheet(isPresented: $showCustomizeArtwork) {
+            CustomizePlaylistArtwork(playlist: Binding(
+                get: { library.playlists.first(where: { $0.id == playlist.id }) ?? playlist },
+                set: { library.updatePlaylist($0) }
+            ))
         }
     }
 
