@@ -27,7 +27,7 @@ struct MusicSettingsView: View {
                 }
 
                 // MARK: Playback
-                Section("Playback") {
+                Section {
                     Toggle("Gapless Playback", isOn: $gaplessEnabled)
                     Toggle("Crossfade Tracks", isOn: $crossfadeEnabled)
                         .disabled(true) // placeholder
@@ -52,10 +52,12 @@ struct MusicSettingsView: View {
                         }
                         .pickerStyle(.menu)
                     }
+                } header: {
+                    Text("Playback")
                 }
 
                 // MARK: Sleep Timer
-                Section("Sleep Timer") {
+                Section {
                     if let end = player.sleepTimerEndDate {
                         HStack {
                             Label("Active", systemImage: "timer")
@@ -75,38 +77,46 @@ struct MusicSettingsView: View {
                             Label("Set Sleep Timer", systemImage: "timer")
                         }
                     }
+                }  header: {
+                    Text("Sleep Timer")
                 }
 
                 // MARK: Lyrics
-                Section("Lyrics") {
+                Section {
                     Toggle("Auto-Fetch Lyrics", isOn: $autoFetchLyrics)
                     NavigationLink {
                         LyricsSettingsDetail()
                     } label: {
                         Label("Lyrics Options", systemImage: "text.quote")
                     }
+                } header: {
+                    Text("Lyrics")
                 } footer: {
                     Text("Lyrics are fetched from LRCLIB (open-source database, no API key required). You can also import .lrc files per track.")
                 }
 
                 // MARK: Spotify
-                Section("Spotify") {
+                Section {
                     Button {
                         showSpotifySheet = true
                     } label: {
                         Label("Open Spotify Link", systemImage: "music.note.list")
                     }
+                } header: {
+                    Text("Spotify")
                 } footer: {
                     Text("Paste a Spotify track, playlist, album, or artist URL to open it in the Spotify app.")
                 }
 
                 // MARK: Library
-                Section("Library") {
+                Section {
                     Button(role: .destructive) {
                         showClearLibraryAlert = true
                     } label: {
                         Label("Clear Music Library", systemImage: "trash")
                     }
+                } header: {
+                    Text("Library")
                 }
             }
             .navigationTitle("Music Settings")
@@ -135,9 +145,11 @@ struct MusicSettingsView: View {
     private var sleepTimerSheet: some View {
         NavigationStack {
             Form {
-                Section("Stop playback after") {
+                Section {
                     Stepper("Stop in \(Int(sleepMinutes)) min",
                             value: $sleepMinutes, in: 5...180, step: 5)
+                } header: {
+                    Text("Stop playback after")
                 }
                 Section {
                     Button("Start Timer") {
@@ -166,7 +178,7 @@ private struct LyricsSettingsDetail: View {
 
     var body: some View {
         Form {
-            Section("Sync") {
+            Section {
                 Toggle("Auto-Fetch from LRCLIB", isOn: $autoFetch)
                 HStack {
                     Text("Global Offset (s)")
@@ -174,11 +186,15 @@ private struct LyricsSettingsDetail: View {
                     Text(String(format: "%.1f", engine.offsetSeconds))
                         .foregroundColor(.secondary)
                 }
+            } header: {
+                Text("Sync")
             } footer: {
                 Text("A positive offset delays lyrics display; a negative offset advances it. Adjust per-track in the Now Playing lyrics view.")
             }
-            Section("About LRCLIB") {
+            Section {
                 Link("lrclib.net", destination: URL(string: "https://lrclib.net")!)
+            } header: {
+                Text("About LRCLIB")
             }
         }
         .navigationTitle("Lyrics Options")
@@ -197,7 +213,7 @@ struct SpotifyLinkSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Spotify URL") {
+                Section {
                     TextField("https://open.spotify.com/track/…", text: $urlText)
                         .keyboardType(.URL)
                         .autocorrectionDisabled()
@@ -206,6 +222,8 @@ struct SpotifyLinkSheet: View {
                         item = service.parse(urlString: urlText)
                     }
                     .disabled(urlText.isEmpty)
+                } header: {
+                    Text("Spotify URL")
                 }
 
                 if let errorMsg = service.errorMessage {
@@ -216,7 +234,7 @@ struct SpotifyLinkSheet: View {
                 }
 
                 if let item = item {
-                    Section("Found") {
+                    Section {
                         HStack {
                             Image(systemName: itemIcon(for: item.type))
                                 .foregroundColor(.green)
@@ -234,6 +252,8 @@ struct SpotifyLinkSheet: View {
                             Label(service.isSpotifyInstalled ? "Open in Spotify" : "Open spotify.com",
                                   systemImage: "music.note")
                         }
+                    } header: {
+                        Text("Found")
                     }
                 }
             }
