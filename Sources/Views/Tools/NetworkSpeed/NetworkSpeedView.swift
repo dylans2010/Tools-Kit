@@ -1,5 +1,15 @@
 import SwiftUI
 
+struct NetworkSpeedTool: Tool {
+    let name = "Network Speed"
+    let icon = "wifi"
+    let category = ToolCategory.utility
+    let complexity = ToolComplexity.basic
+    let description = "Test your device's download speed, upload speed, and ping"
+    let requiresAPI = false
+    var view: AnyView { AnyView(NetworkSpeedView()) }
+}
+
 struct NetworkSpeedView: View {
     @StateObject private var backend = NetworkSpeedBackend()
 

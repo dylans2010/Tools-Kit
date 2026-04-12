@@ -5,7 +5,7 @@ struct ReasoningToolView: View {
     @State private var problem: String = ""
 
     var body: some View {
-        ToolDetailView(tool: ReasoningToolTool()) {
+        ToolDetailView(tool: ReasoningTool()) {
             VStack(spacing: 24) {
                 ToolInputSection("Problem or Query") {
                     TextEditor(text: $problem)
@@ -35,7 +35,7 @@ struct ReasoningToolView: View {
     }
 }
 
-struct ReasoningToolTool: Tool {
+struct ReasoningTool: Tool {
     let name = "Reasoning Engine"
     let icon = "brain"
     let category = ToolCategory.ai

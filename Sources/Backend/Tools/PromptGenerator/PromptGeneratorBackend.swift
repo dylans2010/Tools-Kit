@@ -1,6 +1,6 @@
 import Foundation
 
-enum AIModel: String, CaseIterable {
+enum PromptAIModel: String, CaseIterable {
     case gpt4 = "GPT-4"
     case claude = "Claude 3"
     case dalle = "DALL-E 3"
@@ -19,7 +19,7 @@ enum PromptType: String, CaseIterable {
 class PromptGeneratorBackend: ObservableObject {
     @Published var generatedPrompt = ""
     @Published var topic = ""
-    @Published var selectedModel: AIModel = .gpt4
+    @Published var selectedModel: PromptAIModel = .gpt4
     @Published var selectedType: PromptType = .creativeWriting
     @Published var includeConstraints = true
 

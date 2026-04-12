@@ -3,6 +3,16 @@ import VisionKit
 import PDFKit
 import PencilKit
 
+struct DocumentScannerTool: Tool {
+    let name = "Document Scanner"
+    let icon = "doc.text.viewfinder"
+    let category = ToolCategory.utility
+    let complexity = ToolComplexity.basic
+    let description = "Scan, annotate, and export documents as PDFs"
+    let requiresAPI = false
+    var view: AnyView { AnyView(DocumentScannerView()) }
+}
+
 struct DocumentScannerView: View {
     @StateObject private var backend = DocumentScannerBackend()
     @State private var showingScanner = false

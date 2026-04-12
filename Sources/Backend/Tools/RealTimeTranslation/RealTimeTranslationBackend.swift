@@ -1,6 +1,6 @@
 import Foundation
 
-class RealTimeTranslationBackend: ObservableObject {
+class RealTimeTranslationBackend: ObservableObject, @unchecked Sendable {
     @Published var inputText = ""
     @Published var translatedText = ""
     @Published var sourceLanguage = "en"

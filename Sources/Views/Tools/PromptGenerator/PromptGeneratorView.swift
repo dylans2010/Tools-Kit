@@ -9,7 +9,7 @@ struct PromptGeneratorView: View {
                 TextField("Topic / Subject", text: $backend.topic)
 
                 Picker("Target Model", selection: $backend.selectedModel) {
-                    ForEach(AIModel.allCases, id: \.self) { model in
+                    ForEach(PromptAIModel.allCases, id: \.self) { model in
                         Text(model.rawValue).tag(model)
                     }
                 }
