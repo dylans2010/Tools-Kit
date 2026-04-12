@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct SongRow: View {
     let song: Song
@@ -55,8 +56,13 @@ struct SongRow: View {
 struct SongsView: View {
     @StateObject private var library = MusicLibraryManager.shared
     @StateObject private var player = MusicPlayerManager.shared
-    @State private var showImporter = false
     @State private var searchText = ""
+
+    // Import sheet state
+    @State private var showImportPicker = false
+    @State private var showSingleImporter = false
+    @State private var showZIPImporter = false
+    @State private var isImportingZIP = false
 
     private var filteredSongs: [Song] {
         guard !searchText.isEmpty else { return library.songs }
@@ -95,25 +101,152 @@ struct SongsView: View {
                 .listStyle(.plain)
                 .searchable(text: $searchText, prompt: "Search songs")
             }
+
+            // ZIP import progress overlay
+            if isImportingZIP {
+                Color(.systemBackground).opacity(0.85)
+                    .ignoresSafeArea()
+                VStack(spacing: 16) {
+                    ProgressView()
+                        .scaleEffect(1.4)
+                    Text("Importing from ZIP…")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+            }
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button { showImporter = true } label: {
+                Button { showImportPicker = true } label: {
                     Image(systemName: "plus")
                 }
             }
         }
-        .sheet(isPresented: $showImporter) {
-            FileImporterRepresentableView(allowedContentTypes: [.audio]) { urls in
-                if let url = urls.first {
-                    let accessing = url.startAccessingSecurityScopedResource()
-                    library.importSong(from: url)
+        // Import type selection sheet
+        .sheet(isPresented: $showImportPicker) {
+            importPickerSheet
+        }
+        // Single song file importer
+        .sheet(isPresented: $showSingleImporter) {
+            FileImporterRepresentableView(
+                allowedContentTypes: [.audio, .mp3,
+                    UTType(filenameExtension: "m4a") ?? .audio,
+                    UTType(filenameExtension: "aac") ?? .audio,
+                    UTType(filenameExtension: "wav") ?? .audio,
+                    UTType(filenameExtension: "flac") ?? .audio]
+            ) { urls in
+                showSingleImporter = false
+                guard let url = urls.first else { return }
+                let accessing = url.startAccessingSecurityScopedResource()
+                library.importSong(from: url)
+                if accessing { url.stopAccessingSecurityScopedResource() }
+            }
+        }
+        // ZIP file importer
+        .sheet(isPresented: $showZIPImporter) {
+            FileImporterRepresentableView(
+                allowedContentTypes: [UTType(filenameExtension: "zip") ?? .data]
+            ) { urls in
+                showZIPImporter = false
+                guard let url = urls.first else { return }
+                let accessing = url.startAccessingSecurityScopedResource()
+                isImportingZIP = true
+                Task {
+                    await library.importFromZIP(at: url)
                     if accessing { url.stopAccessingSecurityScopedResource() }
+                    await MainActor.run { isImportingZIP = false }
                 }
-                showImporter = false
             }
         }
     }
+
+    // MARK: - Import Picker Sheet
+
+    private var importPickerSheet: some View {
+        VStack(spacing: 0) {
+            Capsule()
+                .fill(Color(.systemGray4))
+                .frame(width: 36, height: 5)
+                .padding(.top, 10)
+                .padding(.bottom, 16)
+
+            Text("Import Music")
+                .font(.headline)
+                .padding(.bottom, 20)
+
+            VStack(spacing: 12) {
+                importOption(
+                    title: "Single Song",
+                    subtitle: "Add one audio file from your Files",
+                    icon: "music.note",
+                    color: .blue
+                ) {
+                    showImportPicker = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                        showSingleImporter = true
+                    }
+                }
+
+                importOption(
+                    title: "ZIP File",
+                    subtitle: "Extract all MP3 & MP4 files from a ZIP archive",
+                    icon: "doc.zipper",
+                    color: .orange
+                ) {
+                    showImportPicker = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                        showZIPImporter = true
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+
+            Spacer()
+        }
+        .presentationDetents([.height(260)])
+        .presentationDragIndicator(.hidden)
+        .presentationCornerRadius(20)
+    }
+
+    private func importOption(
+        title: String,
+        subtitle: String,
+        icon: String,
+        color: Color,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 16) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(color.opacity(0.15))
+                        .frame(width: 48, height: 48)
+                    Image(systemName: icon)
+                        .font(.system(size: 22))
+                        .foregroundColor(color)
+                }
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.primary)
+                    Text(subtitle)
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14))
+                    .foregroundColor(.secondary)
+            }
+            .padding(14)
+            .background(Color(.secondarySystemBackground))
+            .cornerRadius(14)
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Empty State
 
     private var emptyState: some View {
         VStack(spacing: 16) {
@@ -122,7 +255,7 @@ struct SongsView: View {
                 .foregroundColor(.secondary)
             Text("No Songs")
                 .font(.title2.bold())
-            Text("Tap + to import songs from your files.")
+            Text("Tap + to import songs.")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)

@@ -48,13 +48,22 @@ struct MusicLibraryView: View {
                     MusicSettingsView()
                 }
             }
+            // Reserve space so list content doesn't scroll under the mini player
+            .safeAreaInset(edge: .bottom) {
+                if player.currentSong != nil {
+                    Color.clear.frame(height: 72)
+                }
+            }
 
+            // Mini player pinned above safe-area bottom
             if player.currentSong != nil {
                 MiniPlayer(showNowPlaying: $showNowPlaying)
-                    .padding(.horizontal, 8)
-                    .padding(.bottom, 8)
+                    .padding(.horizontal, 10)
+                    .padding(.bottom, 6)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        .animation(.spring(response: 0.38, dampingFraction: 0.85), value: player.currentSong != nil)
         .sheet(isPresented: $showNowPlaying) {
             NowPlayingView()
         }
