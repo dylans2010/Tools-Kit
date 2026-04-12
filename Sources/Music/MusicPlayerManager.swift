@@ -69,16 +69,19 @@ final class MusicPlayerManager: ObservableObject {
     // MARK: - Playback Control
 
     func play(song: Song, queue: [Song] = [], startIndex: Int = 0) {
-        let localQueue = (queue.isEmpty ? [song] : queue).filter {
+        let providedQueue = queue.isEmpty ? [song] : queue
+        let playableQueue = providedQueue.filter {
             $0.fileURL.isFileURL && FileManager.default.fileExists(atPath: $0.fileURL.path)
         }
-        let sourceQueue = localQueue.isEmpty ? [song] : localQueue
-        originalQueue = sourceQueue
-        self.queue = shuffleEnabled ? shuffled(from: sourceQueue, keeping: song) : sourceQueue
-        currentIndex = self.queue.firstIndex(where: { $0.id == song.id })
-            ?? min(max(startIndex, 0), max(0, self.queue.count - 1))
-        let resolvedSong = self.queue[safe: currentIndex] ?? song
-        load(song: resolvedSong)
+        guard !playableQueue.isEmpty else { return }
+
+        let clampedIndex = min(max(startIndex, 0), max(0, playableQueue.count - 1))
+        let resolvedSong = playableQueue.first(where: { $0.id == song.id }) ?? playableQueue[clampedIndex]
+
+        originalQueue = playableQueue
+        self.queue = shuffleEnabled ? shuffled(from: playableQueue, keeping: resolvedSong) : playableQueue
+        currentIndex = self.queue.firstIndex(where: { $0.id == resolvedSong.id }) ?? 0
+        load(song: self.queue[currentIndex])
         savePlaybackState()
     }
 

@@ -126,8 +126,12 @@ struct SongsView: View {
                     Section {
                         ForEach(filteredSongs) { song in
                             SongRow(song: song) {
-                                let idx = filteredSongs.firstIndex(where: { $0.id == song.id }) ?? 0
-                                player.play(song: song, queue: filteredSongs, startIndex: idx)
+                                let playable = filteredSongs.filter {
+                                    $0.fileURL.isFileURL && FileManager.default.fileExists(atPath: $0.fileURL.path)
+                                }
+                                guard let target = playable.first(where: { $0.id == song.id }) else { return }
+                                let idx = playable.firstIndex(where: { $0.id == target.id }) ?? 0
+                                player.play(song: target, queue: playable, startIndex: idx)
                             }
                             .swipeActions(edge: .trailing) {
                                 Button(role: .destructive) {
