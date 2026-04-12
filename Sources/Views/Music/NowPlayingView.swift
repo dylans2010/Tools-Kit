@@ -11,6 +11,7 @@ struct NowPlayingView: View {
     @State private var showQueue = false
     @State private var showLyrics = false
     @State private var showLRCImportSheet = false
+    @State private var showLyricsSettings = false
 
     var body: some View {
         GeometryReader { geo in
@@ -56,6 +57,11 @@ struct NowPlayingView: View {
         .offset(y: dragOffset)
         .animation(.spring(response: 0.45, dampingFraction: 0.9), value: showLyrics)
         .sheet(isPresented: $showQueue) { QueueView() }
+        .sheet(isPresented: $showLyricsSettings) {
+            if let song = player.currentSong {
+                LyricsSettingsPanel(song: song, isVisible: $showLyricsSettings)
+            }
+        }
     }
 
     // MARK: - Background
@@ -124,6 +130,13 @@ struct NowPlayingView: View {
                 } label: {
                     Label(showLyrics ? "Show Artwork" : "Show Lyrics",
                           systemImage: showLyrics ? "photo" : "text.quote")
+                }
+                if showLyrics {
+                    Button {
+                        showLyricsSettings = true
+                    } label: {
+                        Label("Lyrics Settings", systemImage: "slider.horizontal.3")
+                    }
                 }
             } label: {
                 Image(systemName: "ellipsis.circle")
