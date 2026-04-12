@@ -286,9 +286,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		E5AEBD1200A44657A5C545F3 /* FileModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileModels.swift; sourceTree = "<group>"; };
-		CF9A900AAA944545B9AA0217 /* FileFolderBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileFolderBackend.swift; sourceTree = "<group>"; };
-		10D892907BAC409D9E8D7684 /* FileFolderContentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileFolderContentsView.swift; sourceTree = "<group>"; };
+		E5AEBD1200A44657A5C545F3 /* FileModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Files/FileModels.swift"; sourceTree = "<group>"; };
+		CF9A900AAA944545B9AA0217 /* FileFolderBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Files/FileFolderBackend.swift"; sourceTree = "<group>"; };
+		10D892907BAC409D9E8D7684 /* FileFolderContentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Files/FileFolderContentsView.swift"; sourceTree = "<group>"; };
 		C4C7570717DA449692472DC7 /* QuestionEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionEditorView.swift; sourceTree = "<group>"; };
 		28651E16D0534324A81C2E92 /* DragDropQuestionFillerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragDropQuestionFillerView.swift; sourceTree = "<group>"; };
 		B1ABEF1CC5614B57A749E486 /* NATOView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/NATO/NATOView.swift"; sourceTree = "<group>"; };
@@ -810,6 +810,9 @@
 				E39EB987ED765AEA0EBF43AF /* ProjectTaskDetailView.swift */,
 				4D7EF938890D4F8AA5D57456 /* AIModelCatalog.swift */,
 				928AD5D50EF44D6B87CD4F37 /* ProviderModelFetchSupport.swift */,
+				E5AEBD1200A44657A5C545F3 /* FileModels.swift */,
+				CF9A900AAA944545B9AA0217 /* FileFolderBackend.swift */,
+				10D892907BAC409D9E8D7684 /* FileFolderContentsView.swift */,
 				1DD2FAAB244D44438FA8D622 /* FileManagementBackend.swift */,
 				F11C6DE14DF64117B792A58D /* FilledOutFormManager.swift */,
 				3201D387DAFC42968E1ACBBE /* FormFileManager.swift */,
