@@ -11,6 +11,7 @@ struct EditFormView: View {
     @State private var showingExport = false
     @State private var selectedType: FormQuestionType = .textInput
     @State private var expandedQuestionID: UUID?
+    @State private var importPermissionError: String?
 
     private let managers: [FormOptionManager] = [
         TextInputOptionManager(),
@@ -120,13 +121,17 @@ struct EditFormView: View {
                         }
                         Divider()
                         actionRow(title: "Import Filled Answers", icon: "tray.and.arrow.down", color: .purple) {
+                            guard backend.isOwner(of: form) else {
+                                importPermissionError = "Only the form owner can import and review submitted answers."
+                                return
+                            }
                             showingAnswerImporter = true
                         }
                     }
                 }
 
                 // Reviewed answers
-                if let reviewed = backend.reviewedAnswers {
+                if let reviewed = backend.reviewedAnswers, reviewed.formID == form.id, backend.isOwner(of: form) {
                     editCard {
                         VStack(alignment: .leading, spacing: 10) {
                             cardHeader("Reviewed Answers", icon: "checkmark.seal")
@@ -162,17 +167,32 @@ struct EditFormView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingFillOut) {
             NavigationStack { FillOutFormView(form: form, backend: backend) }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showingExport) {
             ExportFormView(form: form)
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showingAnswerImporter) {
             FileImporterRepresentableView(allowedContentTypes: [UTType(filenameExtension: "form") ?? .data]) { urls in
                 guard let url = urls.first else { return }
-                if let answers = try? FilledOutFormManager.importAnswers(from: url) {
+                if let answers = try? FilledOutFormManager.importAnswers(from: url),
+                   FilledOutFormManager.canReviewAnswers(answers, for: form) {
                     backend.reviewedAnswers = answers
+                } else {
+                    importPermissionError = "This answers file does not match this form or you do not have permission to review it."
                 }
             }
+        }
+        .alert("Import Error", isPresented: Binding(
+            get: { importPermissionError != nil },
+            set: { if !$0 { importPermissionError = nil } }
+        )) {
+            Button("OK", role: .cancel) { importPermissionError = nil }
+        } message: {
+            Text(importPermissionError ?? "")
         }
     }
 
@@ -322,4 +342,3 @@ struct EditFormView: View {
             .filter { !$0.isEmpty }
     }
 }
-

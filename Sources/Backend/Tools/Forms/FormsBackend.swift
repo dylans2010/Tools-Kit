@@ -5,8 +5,10 @@ final class FormsBackend: ObservableObject {
     @Published var forms: [FormDocument] = []
     @Published var importedForm: FormDocument?
     @Published var reviewedAnswers: FilledOutFormDocument?
+    @Published private(set) var ownedFormIDs: Set<UUID> = []
 
     private let saveURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("forms-library.json")
+    private let ownershipURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("forms-ownership.json")
     private let managers: [FormOptionManager] = [
         TextInputOptionManager(),
         MultipleChoiceOptionManager(),
@@ -21,8 +23,14 @@ final class FormsBackend: ObservableObject {
         load()
     }
 
-    func add(_ form: FormDocument) {
-        forms.insert(normalized(form), at: 0)
+    func add(_ form: FormDocument, isOwned: Bool = true) {
+        let normalizedForm = normalized(form)
+        forms.insert(normalizedForm, at: 0)
+        if isOwned {
+            ownedFormIDs.insert(normalizedForm.id)
+        } else {
+            ownedFormIDs.remove(normalizedForm.id)
+        }
         save()
     }
 
@@ -34,6 +42,7 @@ final class FormsBackend: ObservableObject {
 
     func remove(_ form: FormDocument) {
         forms.removeAll { $0.id == form.id }
+        ownedFormIDs.remove(form.id)
         save()
     }
 
@@ -41,11 +50,19 @@ final class FormsBackend: ObservableObject {
         guard let data = try? Data(contentsOf: saveURL),
               let decoded = try? JSONDecoder().decode([FormDocument].self, from: data) else { return }
         forms = decoded
+        loadOwnership()
     }
 
     func save() {
         guard let data = try? JSONEncoder().encode(forms) else { return }
         try? data.write(to: saveURL)
+
+        guard let ownershipData = try? JSONEncoder().encode(Array(ownedFormIDs)) else { return }
+        try? ownershipData.write(to: ownershipURL)
+    }
+
+    func isOwner(of form: FormDocument) -> Bool {
+        ownedFormIDs.contains(form.id)
     }
 
     private func normalized(_ form: FormDocument) -> FormDocument {
@@ -63,5 +80,14 @@ final class FormsBackend: ObservableObject {
         updated.manifest.requiredQuestionCount = updated.questions.filter(\.required).count
         updated.manifest.supportsAttachments = updated.questions.contains(where: { $0.type == .imageUpload })
         return updated
+    }
+
+    private func loadOwnership() {
+        guard let data = try? Data(contentsOf: ownershipURL),
+              let decoded = try? JSONDecoder().decode([UUID].self, from: data) else {
+            ownedFormIDs = Set(forms.map(\.id))
+            return
+        }
+        ownedFormIDs = Set(decoded)
     }
 }
