@@ -20,7 +20,7 @@ struct ExportFormView: View {
                 VStack(spacing: 8) {
                     Text("Export Form")
                         .font(.title2.bold())
-                    Text("Save "\(form.name)" as a `.form` file you can share or import later.")
+                    Text("Save \(form.name) as a `.form` file you can share or import later.")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -37,7 +37,7 @@ struct ExportFormView: View {
 
                 if let exportURL {
                     ShareLink(item: exportURL) {
-                        Label("Share "\(form.name).form"", systemImage: "square.and.arrow.up")
+                        Label("Share \(form.name).form", systemImage: "square.and.arrow.up")
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(Color.blue)
