@@ -1,50 +1,47 @@
 import SwiftUI
 
 struct AudioConverterView: View {
-    @State private var showingPicker = false
-    @State private var selectedAudio: URL?
-    @State private var isConverting = false
+    @StateObject private var backend = AudioConverterBackend()
+    @State private var showingFilePicker = false
 
     var body: some View {
-        VStack(spacing: 20) {
-            if let audio = selectedAudio {
-                Label(audio.lastPathComponent, systemImage: "music.note")
-                    .font(.headline)
-            } else {
-                Button(action: { showingPicker = true }) {
-                    VStack {
-                        Image(systemName: "music.quaver.bowed.badge.plus")
-                            .font(.system(size: 60))
+        ToolDetailView(tool: AudioConverterTool()) {
+            VStack(spacing: 24) {
+                Button(action: { showingFilePicker = true }) {
+                    VStack(spacing: 12) {
+                        Image(systemName: "music.note.list")
+                            .font(.system(size: 48))
                         Text("Select Audio File")
+                            .font(.headline)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 40)
+                    .background(Color.blue.opacity(0.1))
+                    .cornerRadius(16)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .strokeBorder(Color.blue, style: StrokeStyle(lineWidth: 2, dash: [6]))
+                    )
+                }
+
+                if backend.isProcessing {
+                    VStack(spacing: 12) {
+                        ProgressView()
+                        Text(backend.status)
+                            .foregroundColor(.secondary)
                     }
                 }
-            }
-
-            if selectedAudio != nil {
-                Picker("Output Format", selection: .constant("MP3")) {
-                    Text("MP3").tag("MP3")
-                    Text("M4A").tag("M4A")
-                    Text("WAV").tag("WAV")
-                }
-                .pickerStyle(.segmented)
-                .padding()
-
-                Button(action: { isConverting = true }) {
-                    if isConverting {
-                        ProgressView().tint(.white)
-                    } else {
-                        Text("Convert Audio")
-                            .frame(maxWidth: .infinity)
-                    }
-                }
-                .buttonStyle(.borderedProminent)
-                .padding()
             }
         }
-        .navigationTitle("Audio Converter")
-        .sheet(isPresented: $showingPicker) {
-            FileImporterRepresentableView(allowedContentTypes: [.audio]) { urls in
-                selectedAudio = urls.first
+        .sheet(isPresented: $showingFilePicker) {
+            FileImporterRepresentableView(allowedContentTypes: [.audio]) { url in
+                Task {
+                    do {
+                        let _ = try await backend.convertToM4A(inputURL: url)
+                    } catch {
+                        print("Conversion failed: \(error)")
+                    }
+                }
             }
         }
     }
@@ -53,9 +50,9 @@ struct AudioConverterView: View {
 struct AudioConverterTool: Tool {
     let name = "Audio Converter"
     let icon = "waveform"
-    let category = ToolCategory.conversion
+    let category = ToolCategory.utility
     let complexity = ToolComplexity.basic
-    let description = "Convert between MP3, WAV, and M4A formats"
+    let description = "Convert audio files between different formats like M4A and WAV"
     let requiresAPI = false
     var view: AnyView { AnyView(AudioConverterView()) }
 }

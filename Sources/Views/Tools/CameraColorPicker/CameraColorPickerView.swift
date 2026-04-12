@@ -1,161 +1,82 @@
 import SwiftUI
-import AVFoundation
 
 struct CameraColorPickerView: View {
+    @StateObject private var backend = CameraColorPickerBackend()
     @StateObject private var cameraService = CameraService()
-    @StateObject private var colorPicker = RealTimeColorPicker()
 
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                CameraPreview(cameraService: cameraService)
-                    .onAppear {
-                        cameraService.delegate = colorPicker
-                        cameraService.startSession()
-                    }
-                    .onDisappear {
-                        cameraService.stopSession()
-                    }
-
-                // Center reticle
-                Circle()
-                    .stroke(Color.white, lineWidth: 2)
-                    .frame(width: 30, height: 30)
-                    .shadow(radius: 3)
-
-                Circle()
-                    .fill(colorPicker.pickedColor)
-                    .frame(width: 10, height: 10)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .cornerRadius(24)
-            .padding()
-
-            VStack(spacing: 20) {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Point the camera at any object to identify its color in real-time. The center circle shows the currently detected color.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.leading)
-
-                    HStack(spacing: 16) {
-                        Circle()
-                            .fill(colorPicker.pickedColor)
-                            .frame(width: 60, height: 60)
-                            .shadow(radius: 2)
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(colorPicker.hexCode)
-                                .font(.system(.title2, design: .monospaced))
-                                .bold()
-
-                            Text("RGB: \(colorPicker.rgbString)")
-                                .font(.caption.monospaced())
-                                .foregroundColor(.secondary)
+        ToolDetailView(tool: CameraColorPickerTool()) {
+            VStack(spacing: 24) {
+                ZStack {
+                    CameraPreview(cameraService: cameraService)
+                        .onAppear {
+                            cameraService.delegate = backend
+                            cameraService.startSession()
                         }
-
-                        Spacer()
-
-                        Button(action: { UIPasteboard.general.string = colorPicker.hexCode }) {
-                            Image(systemName: "doc.on.doc")
-                                .font(.title3)
-                                .padding()
-                                .background(Color(.secondarySystemBackground))
-                                .clipShape(Circle())
+                        .onDisappear {
+                            cameraService.stopSession()
                         }
-                    }
+                        .frame(height: 400)
+                        .cornerRadius(20)
+
+                    Circle()
+                        .stroke(Color.white, lineWidth: 2)
+                        .frame(width: 40, height: 40)
+                        .shadow(radius: 5)
                 }
-                .padding()
-                .background(Color(.secondarySystemBackground))
-                .cornerRadius(16)
 
-                if !colorPicker.recentColors.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Recently Captured")
-                            .font(.headline)
+                ToolOutputView("Selected Color", value: backend.hexValue)
 
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(backend.selectedColor)
+                    .frame(height: 60)
+
+                if !backend.history.isEmpty {
+                    ToolInputSection("History") {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 12) {
-                                ForEach(colorPicker.recentColors, id: \.self) { colorHex in
-                                    VStack(spacing: 4) {
-                                        Circle()
-                                            .fill(Color(hex: colorHex) ?? .gray)
-                                            .frame(width: 40, height: 40)
-                                        Text(colorHex)
-                                            .font(.system(size: 10, design: .monospaced))
-                                            .foregroundColor(.secondary)
-                                    }
-                                    .onTapGesture {
-                                        UIPasteboard.general.string = colorHex
-                                    }
+                                ForEach(backend.history, id: \.self) { hex in
+                                    Circle()
+                                        .fill(Color(hex: hex))
+                                        .frame(width: 44, height: 44)
+                                        .overlay(Circle().stroke(Color.secondary.opacity(0.2), lineWidth: 1))
                                 }
                             }
+                            .padding()
                         }
                     }
                 }
-
-                Button(action: colorPicker.capture) {
-                    Label("Capture Color", systemImage: "paintbrush.fill")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(16)
-                }
             }
-            .padding()
         }
-        .navigationTitle("Camera Color Picker")
     }
 }
 
-class RealTimeColorPicker: NSObject, ObservableObject, CameraServiceDelegate {
-    @Published var pickedColor = Color.white
-    @Published var hexCode = "#FFFFFF"
-    @Published var rgbString = "255, 255, 255"
-    @Published var recentColors: [String] = []
-
-    func didOutput(pixelBuffer: CVPixelBuffer) {
-        CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly)
-        defer { CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly) }
-
-        let width = CVPixelBufferGetWidth(pixelBuffer)
-        let height = CVPixelBufferGetHeight(pixelBuffer)
-        let baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer)
-        let bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
-        let buffer = baseAddress!.assumingMemoryBound(to: UInt8.self)
-
-        // Sample center pixel
-        let centerX = width / 2
-        let centerY = height / 2
-        let pixelIndex = centerY * bytesPerRow + centerX * 4
-
-        let b = buffer[pixelIndex]
-        let g = buffer[pixelIndex + 1]
-        let r = buffer[pixelIndex + 2]
-
-        DispatchQueue.main.async {
-            self.pickedColor = Color(red: Double(r)/255, green: Double(g)/255, blue: Double(b)/255)
-            self.hexCode = String(format: "#%02X%02X%02X", r, g, b)
-            self.rgbString = "\(r), \(g), \(b)"
+extension Color {
+    init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let a, r, g, b: UInt64
+        switch hex.count {
+        case 3: // RGB (12-bit)
+            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6: // RGB (24-bit)
+            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        case 8: // ARGB (32-bit)
+            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        default:
+            (a, r, g, b) = (1, 1, 1, 0)
         }
-    }
-
-    func capture() {
-        if !recentColors.contains(hexCode) {
-            recentColors.insert(hexCode, at: 0)
-            if recentColors.count > 10 { recentColors.removeLast() }
-        }
+        self.init(.sRGB, red: Double(r) / 255, green: Double(g) / 255, blue: Double(b) / 255, opacity: Double(a) / 255)
     }
 }
 
 struct CameraColorPickerTool: Tool {
-    let name = "Cam Color Picker"
-    let icon = "eyedropper.halfsquare"
+    let name = "Camera Color Picker"
+    let icon = "eyedropper"
     let category = ToolCategory.utility
     let complexity = ToolComplexity.basic
-    let description = "Extract colors in real-time using your camera"
+    let description = "Identify and capture colors from the world around you using your camera"
     let requiresAPI = false
     var view: AnyView { AnyView(CameraColorPickerView()) }
 }

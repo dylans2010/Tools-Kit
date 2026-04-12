@@ -23,6 +23,14 @@ protocol Tool: Identifiable {
     var requiresAPI: Bool { get }
 
     @ViewBuilder var view: AnyView { get }
+
+    func execute() async throws -> Any?
+}
+
+extension Tool {
+    func execute() async throws -> Any? {
+        return nil
+    }
 }
 
 extension Tool {

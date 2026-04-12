@@ -1,73 +1,51 @@
 import SwiftUI
 
 struct ReasoningToolView: View {
-    @State private var question = ""
-    @State private var reasoningResult = ""
-    @State private var isThinking = false
-    @State private var errorMessage: String?
-
-    private let aiService = AIService()
+    @StateObject private var backend = ReasoningToolBackend()
+    @State private var problem: String = ""
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                TextField("Enter a complex problem...", text: $question)
-                    .textFieldStyle(.roundedBorder)
-                    .padding()
+        ToolDetailView(tool: ReasoningToolTool()) {
+            VStack(spacing: 24) {
+                ToolInputSection("Problem or Query") {
+                    TextEditor(text: $problem)
+                        .frame(height: 120)
+                        .padding(8)
+                }
 
-                Button(action: { Task { await think() } }) {
-                    if isThinking {
-                        ProgressView("AI is thinking...")
-                            .padding()
+                Button(action: {
+                    Task { await backend.solve(problem: problem) }
+                }) {
+                    if backend.isProcessing {
+                        ProgressView()
                     } else {
-                        Text("Start Reasoning")
+                        Text("Think & Solve")
+                            .bold()
                             .frame(maxWidth: .infinity)
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .padding(.horizontal)
-                .disabled(question.isEmpty || isThinking)
+                .disabled(problem.isEmpty || backend.isProcessing)
 
-                if let error = errorMessage {
-                    Text(error).foregroundColor(.red).font(.caption).padding()
-                }
-
-                if !reasoningResult.isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Step-by-Step Reasoning", systemImage: "brain.head.profile")
-                            .font(.headline)
-
-                        Text(reasoningResult)
-                            .padding()
-                            .background(Color(.secondarySystemBackground))
-                            .cornerRadius(12)
-                    }
-                    .padding()
+                if !backend.thoughtProcess.isEmpty {
+                    ToolOutputView("Reasoning", value: backend.thoughtProcess)
                 }
             }
         }
-        .navigationTitle("Reasoning Assistant")
-    }
-
-    private func think() async {
-        isThinking = true
-        errorMessage = nil
-        do {
-            reasoningResult = try await aiService.reason(problem: question)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-        isThinking = false
     }
 }
 
-struct ReasoningTool: Tool {
-    let id = UUID()
-    let name = "Reasoning Tool"
-    let icon = "brain.head.profile"
+struct ReasoningToolTool: Tool {
+    let name = "Reasoning Engine"
+    let icon = "brain"
     let category = ToolCategory.ai
     let complexity = ToolComplexity.advanced
-    let description = "Multi-step AI reasoning for complex problem solving"
+    let description = "Chain-of-thought AI to help solve complex logical problems"
     let requiresAPI = true
     var view: AnyView { AnyView(ReasoningToolView()) }
+
+    func execute() async throws -> Any? {
+        // This allows ToolManager to execute it if needed, but the view has its own state
+        return nil
+    }
 }
