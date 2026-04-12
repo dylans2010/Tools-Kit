@@ -30,9 +30,11 @@ struct VideoCompressorView: View {
             }
         }
         .sheet(isPresented: $showingPicker) {
-            FileImporterRepresentableView(allowedContentTypes: [.movie]) { url in
+            FileImporterRepresentableView(allowedContentTypes: [.movie]) { urls in
                 Task {
-                    try? await backend.compressVideo(at: url)
+                    if let url = urls.first {
+                        try? await backend.compressVideo(at: url)
+                    }
                 }
             }
         }

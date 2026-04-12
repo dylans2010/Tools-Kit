@@ -34,10 +34,12 @@ struct AudioConverterView: View {
             }
         }
         .sheet(isPresented: $showingFilePicker) {
-            FileImporterRepresentableView(allowedContentTypes: [.audio]) { url in
+            FileImporterRepresentableView(allowedContentTypes: [.audio]) { urls in
                 Task {
                     do {
-                        let _ = try await backend.convertToM4A(inputURL: url)
+                        if let url = urls.first {
+                            let _ = try await backend.convertToM4A(inputURL: url)
+                        }
                     } catch {
                         print("Conversion failed: \(error)")
                     }
