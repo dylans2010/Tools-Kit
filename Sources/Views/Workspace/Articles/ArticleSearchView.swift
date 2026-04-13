@@ -78,6 +78,8 @@ struct ArticleSearchView: View {
 
     @State private var searchTask: Task<Void, Never>? = nil
 
+    private let debounceDelayNanoseconds: UInt64 = 500_000_000
+
     private func debounceSearch(_ query: String) {
         searchTask?.cancel()
         guard !query.trimmingCharacters(in: .whitespaces).isEmpty else {
@@ -85,7 +87,7 @@ struct ArticleSearchView: View {
             return
         }
         searchTask = Task {
-            try? await Task.sleep(nanoseconds: 500_000_000)
+            try? await Task.sleep(nanoseconds: debounceDelayNanoseconds)
             if !Task.isCancelled {
                 performSearch(query)
             }

@@ -15,6 +15,8 @@ struct PageEditorView: View {
     @State private var aiTask = ""
     @State private var autosaveTask: Task<Void, Never>? = nil
 
+    private let autosaveDelayNanoseconds: UInt64 = 2_000_000_000
+
     init(page: NotebookPage, folderID: UUID, notebookID: UUID) {
         self.page = page
         self.folderID = folderID
@@ -172,7 +174,7 @@ struct PageEditorView: View {
     private func scheduleAutosave() {
         autosaveTask?.cancel()
         autosaveTask = Task {
-            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            try? await Task.sleep(nanoseconds: autosaveDelayNanoseconds)
             if !Task.isCancelled { save() }
         }
     }
