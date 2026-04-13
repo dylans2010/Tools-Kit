@@ -4,12 +4,15 @@ struct WorkspaceHomeView: View {
     @State private var selectedTab: WorkspaceTab = .notes
 
     enum WorkspaceTab: String, CaseIterable {
-        case notes       = "Notes"
-        case forms       = "Forms"
-        case slides      = "Slides"
-        case articles    = "Articles"
+        case notes        = "Notes"
+        case forms        = "Forms"
+        case slides       = "Slides"
+        case articles     = "Articles"
         case spreadsheets = "Sheets"
-        case notebooks   = "Notebooks"
+        case notebooks    = "Notebooks"
+        case habits       = "Habits"
+        case tasks        = "Tasks"
+        case calendar     = "Calendar"
 
         var icon: String {
             switch self {
@@ -19,6 +22,9 @@ struct WorkspaceHomeView: View {
             case .articles:     return "newspaper"
             case .spreadsheets: return "tablecells"
             case .notebooks:    return "book.closed"
+            case .habits:       return "checkmark.seal.fill"
+            case .tasks:        return "checklist"
+            case .calendar:     return "calendar"
             }
         }
     }
@@ -72,6 +78,30 @@ struct WorkspaceHomeView: View {
                 Label(WorkspaceTab.notebooks.rawValue, systemImage: WorkspaceTab.notebooks.icon)
             }
             .tag(WorkspaceTab.notebooks)
+
+            NavigationStack {
+                WorkspaceHabitTrackerView()
+            }
+            .tabItem {
+                Label(WorkspaceTab.habits.rawValue, systemImage: WorkspaceTab.habits.icon)
+            }
+            .tag(WorkspaceTab.habits)
+
+            NavigationStack {
+                TasksHomeView()
+            }
+            .tabItem {
+                Label(WorkspaceTab.tasks.rawValue, systemImage: WorkspaceTab.tasks.icon)
+            }
+            .tag(WorkspaceTab.tasks)
+
+            NavigationStack {
+                CalendarHomeView()
+            }
+            .tabItem {
+                Label(WorkspaceTab.calendar.rawValue, systemImage: WorkspaceTab.calendar.icon)
+            }
+            .tag(WorkspaceTab.calendar)
         }
     }
 }
