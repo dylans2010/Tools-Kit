@@ -29,7 +29,6 @@ final class RadioPlayerManager: ObservableObject {
     private let recentKey = "radio.recentlyPlayed"
 
     private init() {
-        super.init()
         loadFavorites()
         loadRecentlyPlayed()
     }
