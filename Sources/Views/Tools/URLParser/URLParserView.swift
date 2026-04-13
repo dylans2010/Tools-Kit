@@ -8,7 +8,7 @@ struct URLParserView: View {
         ToolDetailView(tool: URLParserTool()) {
             VStack(spacing: 24) {
                 ToolInputSection("URL") {
-                    TextField("Enter URL here", text: $input)
+                    TextField("Enter URL Here", text: $input)
                         .padding()
                         .onChange(of: input) { _ in backend.parse(urlString: input) }
                 }

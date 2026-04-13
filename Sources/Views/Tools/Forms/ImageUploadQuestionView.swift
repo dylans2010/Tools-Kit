@@ -25,7 +25,7 @@ struct ImageUploadQuestionView: View {
                     answer = ""
                     pickerItem = nil
                 } label: {
-                    Label("Remove image", systemImage: "trash")
+                    Label("Remove Image", systemImage: "trash")
                         .font(.subheadline)
                 }
                 .buttonStyle(.plain)
@@ -63,7 +63,7 @@ struct ImageUploadQuestionView: View {
                        let uiImage = UIImage(data: data) {
                         selectedImage = uiImage
                         if answer.isEmpty {
-                            answer = "Image attached"
+                            answer = "Image Attached"
                         }
                     }
                 } catch {

@@ -210,7 +210,7 @@ struct FormDetailView: View {
                     Text(question.title.isEmpty ? question.type.displayName : question.title)
                         .font(.caption.weight(.semibold))
                         .foregroundColor(.secondary)
-                    Text(reviewed.answers[question.id] ?? "No answer")
+                    Text(reviewed.answers[question.id] ?? "No Answer")
                         .font(.subheadline)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }

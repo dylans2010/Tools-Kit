@@ -54,7 +54,7 @@ struct WebSocketInspectorView: View {
 
     private var statsBar: some View {
         HStack(spacing: 12) {
-            Label(String(format: "%.0f ms ping", backend.pingMs), systemImage: "speedometer")
+            Label(String(format: "%.0f ms Ping", backend.pingMs), systemImage: "speedometer")
                 .font(.caption)
                 .foregroundColor(.secondary)
             Spacer()
@@ -68,7 +68,7 @@ struct WebSocketInspectorView: View {
     private var sendSection: some View {
         ToolInputSection("Send Message") {
             HStack {
-                TextField("Message to send...", text: $backend.sendText)
+                TextField("Message To Send", text: $backend.sendText)
                     .textFieldStyle(.roundedBorder)
                     .disabled(!backend.isConnected)
                 Button(action: backend.send) {
@@ -90,7 +90,7 @@ struct WebSocketInspectorView: View {
             .padding(.horizontal)
 
             if backend.messages.isEmpty {
-                Text("No messages yet").font(.caption).foregroundColor(.secondary).padding()
+                Text("No Messages Yet").font(.caption).foregroundColor(.secondary).padding()
             } else {
                 ForEach(backend.messages) { msg in
                     messageRow(msg)

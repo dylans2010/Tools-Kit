@@ -148,9 +148,9 @@ struct AddVaultEntrySheet: View {
                 Section("Secret") {
                     HStack {
                         if showSecret {
-                            TextField("Secret value", text: $secret)
+                            TextField("Secret Value", text: $secret)
                         } else {
-                            SecureField("Secret value", text: $secret)
+                            SecureField("Secret Value", text: $secret)
                         }
                         Button {
                             showSecret.toggle()

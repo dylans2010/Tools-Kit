@@ -518,7 +518,7 @@ struct CustomizePlaylistArtwork: View {
         cardSection("Stickers") {
             VStack(spacing: 12) {
                 if stickers.isEmpty {
-                    Text("No stickers added yet")
+                    Text("No Stickers Added Yet")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .frame(maxWidth: .infinity)

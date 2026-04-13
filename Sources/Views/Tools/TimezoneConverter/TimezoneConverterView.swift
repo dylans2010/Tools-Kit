@@ -53,7 +53,7 @@ struct TimezoneConverterView: View {
                         .pickerStyle(.menu)
                     }
 
-                    TextField("Search source city...", text: $sourceSearch)
+                    TextField("Search Source City", text: $sourceSearch)
                         .font(.caption)
                         .textFieldStyle(.roundedBorder)
                 }
@@ -80,7 +80,7 @@ struct TimezoneConverterView: View {
                         .pickerStyle(.menu)
                     }
 
-                    TextField("Search target city...", text: $targetSearch)
+                    TextField("Search Target City", text: $targetSearch)
                         .font(.caption)
                         .textFieldStyle(.roundedBorder)
                 }

@@ -192,7 +192,7 @@ struct AIChatSettingsView: View {
 
     private var expertiseSection: some View {
         Section("Expertise Areas") {
-            TagEditorView(tags: $settings.expertiseAreas, placeholder: "Add expertise...")
+            TagEditorView(tags: $settings.expertiseAreas, placeholder: "Add Expertise")
         }
     }
 
@@ -257,14 +257,14 @@ struct AIChatSettingsView: View {
         Section("Storage & Reliability") {
             Toggle("Save Chat History", isOn: $settings.saveChatHistory)
             Toggle("Detailed Error Logging", isOn: $settings.logErrorsToConsole)
-            Toggle("Enable Streaming (experimental)", isOn: $settings.streamResponseText)
+            Toggle("Enable Streaming (Experimental)", isOn: $settings.streamResponseText)
         }
     }
 
     // MARK: - Memory Section
 
     private var memorySection: some View {
-        Section("Memory (CoreML-assisted)") {
+        Section("Memory (CoreML Powered)") {
             Toggle("Enable Memory", isOn: $settings.memoryEnabled)
             VStack(alignment: .leading, spacing: 4) {
                 Text("Sensitivity: \(settings.memorySensitivity, specifier: "%.2f")")
@@ -304,7 +304,7 @@ struct AIChatSettingsView: View {
         } header: {
             Text("Music Mode")
         } footer: {
-            Text("When enabled, ToolsKit launches directly into the Music library instead of the Dashboard.")
+            Text("When enabled, ToolsKit launches directly into Music instead of the Dashboard.")
                 .font(.caption)
         }
     }

@@ -23,7 +23,7 @@ struct ToolVisibilitySettingsView: View {
         List {
             Section {
                 HStack {
-                    Label("\(visibleCount) of \(registry.tools.count) tools visible", systemImage: "eye")
+                    Label("\(visibleCount) Of \(registry.tools.count) Tools Visible", systemImage: "eye")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -50,7 +50,7 @@ struct ToolVisibilitySettingsView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .searchable(text: $searchText, prompt: "Search tools")
+        .searchable(text: $searchText, prompt: "Search Tools")
         .navigationTitle("Tool Visibility")
         .navigationBarTitleDisplayMode(.inline)
     }

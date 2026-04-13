@@ -29,7 +29,7 @@ struct FillOutFormView: View {
                     Label("Your Name", systemImage: "person.circle")
                         .font(.subheadline.bold())
                         .foregroundColor(accentColor)
-                    TextField("Enter your name…", text: $responderName)
+                    TextField("Enter Your Name", text: $responderName)
                         .padding(10)
                         .background(Color(.secondarySystemBackground))
                         .cornerRadius(10)

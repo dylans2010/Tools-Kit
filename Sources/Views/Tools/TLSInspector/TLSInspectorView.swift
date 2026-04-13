@@ -18,7 +18,7 @@ struct TLSInspectorView: View {
             VStack(spacing: 16) {
                 inputSection
                 if backend.isLoading {
-                    ProgressView("Inspecting certificate…").padding()
+                    ProgressView("Inspecting Certificate…").padding()
                 } else if let info = backend.certInfo {
                     certSection(info)
                 } else if !backend.errorMessage.isEmpty {
@@ -107,8 +107,8 @@ struct TLSInspectorView: View {
 
     private func expiryText(_ info: TLSCertificateInfo) -> String {
         switch info.expiryStatus {
-        case .expired: return "Certificate expired"
-        case .expiringSoon: return "Expires in \(info.daysUntilExpiry) days – renew soon"
+        case .expired: return "Certificate Expired"
+        case .expiringSoon: return "Expires in \(info.daysUntilExpiry) days"
         case .valid: return "Expires in \(info.daysUntilExpiry) days"
         }
     }

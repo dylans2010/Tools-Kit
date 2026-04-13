@@ -19,7 +19,7 @@ struct DropdownQuestionView: View {
                 Button(role: .destructive) {
                     answer = ""
                 } label: {
-                    Label("Clear selection", systemImage: "xmark.circle")
+                    Label("Clear Selection", systemImage: "xmark.circle")
                 }
             }
         } label: {

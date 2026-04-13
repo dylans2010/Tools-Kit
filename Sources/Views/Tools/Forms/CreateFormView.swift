@@ -13,7 +13,7 @@ struct CreateFormView: View {
     @State private var cardCornerRadius: Double = 14
     @State private var cardShadowOpacity: Double = 0.05
     @State private var creatorName = ""
-    @State private var privacyNote = "Review manifest before sharing."
+    @State private var privacyNote = "Review the Manifest before sharing."
     @State private var tags = ""
     @State private var expandedQuestionID: UUID?
 
@@ -44,7 +44,7 @@ struct CreateFormView: View {
                         cardHeader("Form Details", icon: "info.circle")
                         formField("Form Name", placeholder: "My Survey", text: $name)
                         formField("Description", placeholder: "What is this form about?", text: $description)
-                        formField("Creator Name", placeholder: "Your name", text: $creatorName)
+                        formField("Creator Name", placeholder: "Your Name", text: $creatorName)
                     }
                 }
 
@@ -111,7 +111,7 @@ struct CreateFormView: View {
                             .overlay(
                                 HStack {
                                     Circle().fill(accentColor).frame(width: 16, height: 16)
-                                    Text("Live style preview")
+                                    Text("Live Style Preview")
                                         .font(.subheadline.weight(.semibold))
                                         .foregroundColor(.primary)
                                     Spacer()

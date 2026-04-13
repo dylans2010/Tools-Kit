@@ -84,7 +84,7 @@ struct NowPlayingView: View {
             Spacer()
 
             VStack(spacing: 4) {
-                Text("NOW PLAYING")
+                Text("Now Playing")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.white.opacity(0.7))
                     .tracking(2)

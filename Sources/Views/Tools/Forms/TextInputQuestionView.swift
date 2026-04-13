@@ -17,7 +17,7 @@ struct TextInputQuestionView: View {
                 }
                 .frame(minHeight: 96)
             } else {
-                TextField("Your answer…", text: $answer)
+                TextField("Your Answer…", text: $answer)
                     .padding(10)
                     .background(Color(.secondarySystemBackground))
                     .cornerRadius(10)

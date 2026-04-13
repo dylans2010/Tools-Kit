@@ -12,7 +12,7 @@ struct QuestionEditorView: View {
                     .font(.caption.bold())
                     .foregroundColor(.secondary)
                     .frame(width: 52, alignment: .leading)
-                TextField("e.g. q1 or rating_score", text: $question.questionName)
+                TextField("Question Name", text: $question.questionName)
                     .textFieldStyle(.roundedBorder)
             }
 
@@ -22,7 +22,7 @@ struct QuestionEditorView: View {
                     .font(.caption.bold())
                     .foregroundColor(.secondary)
                     .frame(width: 52, alignment: .leading)
-                TextField("Question text shown to responder", text: $question.title)
+                TextField("What's The Question", text: $question.title)
                     .textFieldStyle(.roundedBorder)
             }
 
@@ -41,19 +41,19 @@ struct QuestionEditorView: View {
         case .multipleChoice:
             NamedOptionsEditorView(
                 label: "Choices",
-                placeholder: "Choice label",
+                placeholder: "Choice Label",
                 options: $question.options
             )
         case .dropdown:
             NamedOptionsEditorView(
                 label: "Items",
-                placeholder: "Dropdown item",
+                placeholder: "Dropdown Item",
                 options: $question.options
             )
         case .dragDrop:
             NamedOptionsEditorView(
-                label: "Items to rank",
-                placeholder: "Item name",
+                label: "Items To Rank",
+                placeholder: "Item Name",
                 options: $question.options
             )
         case .ratingScale:

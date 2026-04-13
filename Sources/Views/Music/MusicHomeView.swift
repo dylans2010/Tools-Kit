@@ -63,7 +63,7 @@ struct MusicHomeView: View {
                             if !favorites.isEmpty {
                                 SongSectionCarousel(
                                     title: "Favorites",
-                                    subtitle: "Your most played",
+                                    subtitle: "Your Most Played",
                                     systemImage: "heart.fill",
                                     songs: favorites,
                                     onTap: playSong
@@ -73,7 +73,7 @@ struct MusicHomeView: View {
                             if !suggestions.isEmpty {
                                 SongSectionCarousel(
                                     title: "Suggested For You",
-                                    subtitle: "Based on your listening",
+                                    subtitle: "Based On Your Listening",
                                     systemImage: "sparkles",
                                     songs: suggestions,
                                     onTap: playSong

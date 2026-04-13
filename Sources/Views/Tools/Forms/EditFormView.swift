@@ -142,7 +142,7 @@ struct EditFormView: View {
                                     Text(question.title)
                                         .font(.caption.bold())
                                         .foregroundColor(.secondary)
-                                    Text(reviewed.answers[question.id] ?? "No answer")
+                                    Text(reviewed.answers[question.id] ?? "No Answer")
                                         .font(.subheadline)
                                 }
                                 .padding(.vertical, 4)

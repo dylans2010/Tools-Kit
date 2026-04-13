@@ -18,7 +18,7 @@ struct DragDropQuestionFillerView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             if orderedItems.isEmpty {
-                Text("No items to rank.")
+                Text("No Items To Rank")
                     .font(.caption)
                     .foregroundColor(.secondary)
             } else {

@@ -49,9 +49,9 @@ struct TextFormatterView: View {
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.blue.opacity(0.2)))
             }
             HStack {
-                Text("Input chars: \(backend.inputText.count)")
+                Text("Input Chars: \(backend.inputText.count)")
                 Spacer()
-                Text("Output chars: \(backend.outputText.count)")
+                Text("Output Chars: \(backend.outputText.count)")
             }
             .font(.caption)
             .foregroundColor(.secondary)

@@ -172,7 +172,7 @@ struct LyricsEditorView: View {
 
     private var syncInputBar: some View {
         HStack(spacing: 10) {
-            TextField("Type lyric line…", text: $currentLineInput)
+            TextField("Type Lyric Line", text: $currentLineInput)
                 .textFieldStyle(.roundedBorder)
                 .submitLabel(.done)
                 .onSubmit { markTime() }

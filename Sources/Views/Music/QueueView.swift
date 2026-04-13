@@ -106,7 +106,7 @@ struct QueueView: View {
     private var sleepTimerSheet: some View {
         NavigationStack {
             Form {
-                Section("Set sleep timer") {
+                Section("Set Sleep Timer") {
                     Stepper("Stop in \(Int(sleepMinutes)) min",
                             value: $sleepMinutes, in: 5...120, step: 5)
                 }

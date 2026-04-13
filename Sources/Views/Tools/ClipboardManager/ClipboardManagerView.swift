@@ -18,7 +18,7 @@ struct ClipboardManagerView: View {
             VStack(spacing: 16) {
                 ToolInputSection("Quick Add") {
                     HStack {
-                        TextField("Type text to save to clipboard", text: $textToCopy)
+                        TextField("Add Text", text: $textToCopy)
                             .textFieldStyle(.roundedBorder)
                         Button {
                             backend.copyToClipboard(textToCopy)
@@ -34,7 +34,7 @@ struct ClipboardManagerView: View {
 
                 ToolInputSection("Filters") {
                     HStack {
-                        TextField("Search history...", text: $searchQuery)
+                        TextField("Search History", text: $searchQuery)
                             .textFieldStyle(.roundedBorder)
                         Toggle(isOn: $showFavoritesOnly) {
                             Image(systemName: showFavoritesOnly ? "star.fill" : "star")

@@ -37,7 +37,7 @@ struct TrackerBlockerView: View {
                     Text("Tracker Blocking")
                         .font(.subheadline.weight(.medium))
                     Text(backend.isEnabled
-                         ? "\(backend.allTrackers.count) domains blocked"
+                         ? "\(backend.allTrackers.count) Domains Blocked"
                          : "Tap to enable blocking")
                         .font(.caption).foregroundColor(.secondary)
                 }

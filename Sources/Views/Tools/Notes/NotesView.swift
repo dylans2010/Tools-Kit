@@ -85,7 +85,7 @@ struct NotesView: View {
                     .foregroundColor(.secondary)
             }
 
-            Text(note.content.isEmpty ? "No content" : note.content)
+            Text(note.content.isEmpty ? "No Content" : note.content)
                 .lineLimit(2)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
@@ -166,7 +166,7 @@ struct NoteEditorView: View {
                                 }
                             }
                         }
-                        TextField("Add tag...", text: $newTag, onCommit: addTag)
+                        TextField("Add Tag", text: $newTag, onCommit: addTag)
                             .textFieldStyle(.roundedBorder)
                     }
                     .padding()

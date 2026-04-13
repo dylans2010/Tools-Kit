@@ -52,7 +52,7 @@ struct MusicSearchView: View {
             }
             .navigationTitle("Search")
             .navigationBarTitleDisplayMode(.large)
-            .searchable(text: $searchText, prompt: "Songs, artists…")
+            .searchable(text: $searchText, prompt: "Songs or Artists")
             .animation(.spring(response: 0.38, dampingFraction: 0.85), value: player.currentSong != nil)
             .sheet(isPresented: $showNowPlaying) {
                 SimpleNowPlayingView()
@@ -114,7 +114,7 @@ struct MusicSearchView: View {
                     Text(artist)
                         .font(.subheadline.weight(.semibold))
                         .foregroundColor(.primary)
-                    Text("\(songs.count) song\(songs.count == 1 ? "" : "s")")
+                    Text("\(songs.count) Song\(songs.count == 1 ? "" : "s")")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

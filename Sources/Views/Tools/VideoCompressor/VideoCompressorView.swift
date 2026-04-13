@@ -23,7 +23,7 @@ struct VideoCompressorView: View {
                 if backend.isProcessing {
                     VStack(spacing: 12) {
                         ProgressView()
-                        Text("Compressing video...")
+                        Text("Compressing Video...")
                             .foregroundColor(.secondary)
                     }
                 }

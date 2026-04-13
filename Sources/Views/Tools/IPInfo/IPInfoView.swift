@@ -20,7 +20,7 @@ struct IPInfoView: View {
                                     Spacer()
                                 }
                             } else {
-                                Label("Fetch My IP Details", systemImage: "arrow.down.circle")
+                                Label("Fetch Details", systemImage: "arrow.down.circle")
                                     .frame(maxWidth: .infinity)
                             }
                         }

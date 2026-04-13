@@ -17,7 +17,7 @@ struct LyricsExportView: View {
                 HStack {
                     Image(systemName: "doc.text")
                         .foregroundColor(.accentColor)
-                    Text("\(lines.count) lines · \(song.title)")
+                    Text("\(lines.count) Lines · \(song.title)")
                         .font(.subheadline.weight(.semibold))
                         .lineLimit(1)
                     Spacer()

@@ -106,7 +106,7 @@ private struct QRGenerationView: View {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
 
-                    TextField("Text or URL", text: $inputText)
+                    TextField("Text Or URL", text: $inputText)
                         .textFieldStyle(.roundedBorder)
                         .padding(.vertical, 4)
 
@@ -137,7 +137,7 @@ private struct QRGenerationView: View {
                             Button(action: {
                                 UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
                             }) {
-                                Label("Save to Photos", systemImage: "square.and.arrow.down")
+                                Label("Save To Photos", systemImage: "square.and.arrow.down")
                             }
                             .buttonStyle(.bordered)
 

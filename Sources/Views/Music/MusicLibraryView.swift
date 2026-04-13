@@ -143,7 +143,7 @@ struct ArtistsView: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(group.name)
                                 .font(.subheadline.weight(.semibold))
-                            Text("\(group.songs.count) \(group.songs.count == 1 ? "song" : "songs")")
+                            Text("\(group.songs.count) \(group.songs.count == 1 ? "Song" : "Songs")")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -344,7 +344,7 @@ struct PlaylistsListView: View {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(playlist.name)
                                         .font(.subheadline.weight(.semibold))
-                                    Text("\(library.songs(for: playlist).count) songs")
+                                    Text("\(library.songs(for: playlist).count) Songs")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }

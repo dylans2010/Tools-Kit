@@ -30,7 +30,7 @@ struct TextSummarizerView: View {
                     if backend.isLoading {
                         ProgressView().tint(.white)
                     } else {
-                        Label("Summarize with AI", systemImage: "sparkles")
+                        Label("Summarize With AI", systemImage: "sparkles")
                             .frame(maxWidth: .infinity)
                     }
                 }
