@@ -8,13 +8,26 @@ struct FormsView: View {
     @State private var showingImport = false
     @State private var formToDelete: FormDocument?
     @State private var showDeleteConfirm = false
+    @State private var searchText = ""
 
     private let columns = [GridItem(.adaptive(minimum: 160), spacing: 14)]
 
+    private var recentForms: [FormDocument] {
+        Array(filteredForms.prefix(4))
+    }
+
+    private var filteredForms: [FormDocument] {
+        guard !searchText.isEmpty else { return backend.forms }
+        return backend.forms.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText)
+            || $0.description.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
     var body: some View {
-        ToolDetailView(tool: FormsTool()) {
-            VStack(spacing: 20) {
-                // Action bar
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                // Action buttons
                 HStack(spacing: 10) {
                     actionButton("Create", icon: "plus.circle.fill", color: .blue) {
                         showingCreate = true
@@ -26,38 +39,59 @@ struct FormsView: View {
                         showingImport = true
                     }
                 }
+                .padding(.horizontal)
 
-                // Forms grid
-                if backend.forms.isEmpty {
-                    ContentUnavailableView(
-                        "No Forms Yet",
-                        systemImage: "list.bullet.rectangle.portrait",
-                        description: Text("Create a new form, pick a template, or import a .form file.")
+                if filteredForms.isEmpty {
+                    EmptyStateView(
+                        icon: "list.bullet.rectangle.portrait",
+                        title: searchText.isEmpty ? "No Forms Yet" : "No Results",
+                        message: searchText.isEmpty
+                            ? "Create a form, pick a template, or import a .form file."
+                            : "No forms match your search.",
+                        action: searchText.isEmpty ? { showingCreate = true } : nil,
+                        actionLabel: "Create Form"
                     )
-                    .padding(.vertical, 24)
                 } else {
-                    VStack(alignment: .leading, spacing: 12) {
-                        SectionHeader(
-                            title: "Your Forms",
-                            subtitle: "\(backend.forms.count)",
-                            icon: "list.bullet.rectangle.portrait"
-                        )
-
+                    // Recent section
+                    if !searchText.isEmpty || recentForms.count < filteredForms.count {
+                        // Show all forms in one grid
+                        sectionHeader("All Forms", count: filteredForms.count, icon: "list.bullet.rectangle.portrait")
                         LazyVGrid(columns: columns, spacing: 14) {
-                            ForEach(backend.forms) { form in
-                                NavigationLink(destination: FormDetailView(form: form, backend: backend)) {
-                                    FormCard(form: form) {
-                                        formToDelete = form
-                                        showDeleteConfirm = true
-                                    }
-                                }
-                                .buttonStyle(.plain)
+                            ForEach(filteredForms) { form in
+                                formCard(for: form)
                             }
+                        }
+                        .padding(.horizontal)
+                    } else {
+                        // Recent forms
+                        if !recentForms.isEmpty {
+                            sectionHeader("Recent", count: recentForms.count, icon: "clock")
+                            LazyVGrid(columns: columns, spacing: 14) {
+                                ForEach(recentForms) { form in
+                                    formCard(for: form)
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+
+                        // All forms (if more than recent)
+                        if filteredForms.count > recentForms.count {
+                            sectionHeader("All Forms", count: filteredForms.count, icon: "list.bullet.rectangle.portrait")
+                            LazyVGrid(columns: columns, spacing: 14) {
+                                ForEach(filteredForms) { form in
+                                    formCard(for: form)
+                                }
+                            }
+                            .padding(.horizontal)
                         }
                     }
                 }
             }
+            .padding(.vertical, 8)
         }
+        .navigationTitle("Forms")
+        .searchable(text: $searchText, prompt: "Search forms…")
+        .background(Color(.systemGroupedBackground))
         .sheet(isPresented: $showingCreate) {
             NavigationStack { CreateFormView(backend: backend) }
                 .presentationDetents([.large])
@@ -79,12 +113,47 @@ struct FormsView: View {
             titleVisibility: .visible
         ) {
             Button("Delete", role: .destructive) {
-                if let form = formToDelete {
-                    backend.remove(form)
-                }
+                if let form = formToDelete { backend.remove(form) }
             }
-            Button("Cancel", role: .cancel) { }
+            Button("Cancel", role: .cancel) {}
         }
+    }
+
+    // MARK: - Helpers
+
+    @ViewBuilder
+    private func formCard(for form: FormDocument) -> some View {
+        NavigationLink(destination: FormDetailView(form: form, backend: backend)) {
+            FormCard(form: form) {
+                formToDelete = form
+                showDeleteConfirm = true
+            }
+        }
+        .buttonStyle(.plain)
+        .contextMenu {
+            Button(role: .destructive) {
+                formToDelete = form
+                showDeleteConfirm = true
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
+    }
+
+    private func sectionHeader(_ title: String, count: Int, icon: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: icon)
+                .foregroundColor(.secondary)
+                .font(.caption)
+            Text(title)
+                .font(.headline)
+            Text("(\(count))")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            Spacer()
+        }
+        .padding(.horizontal)
+        .padding(.top, 4)
     }
 
     private func actionButton(_ title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
@@ -96,10 +165,10 @@ struct FormsView: View {
                     .font(.caption.bold())
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
+            .padding(.vertical, 14)
             .background(color.opacity(0.12))
             .foregroundColor(color)
-            .cornerRadius(12)
+            .cornerRadius(14)
         }
         .buttonStyle(.plain)
     }

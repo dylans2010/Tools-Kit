@@ -6,6 +6,7 @@ struct AIChatSettingsView: View {
     @StateObject private var memoryStore = AIChatMemoryStore.shared
     @StateObject private var modelCatalog = AIModelCatalog.shared
     @StateObject private var musicMode = MusicModeManager.shared
+    @StateObject private var workspaceMode = WorkspaceModeManager.shared
 
     private let registry = AIProviderRegistry.shared
 
@@ -29,6 +30,7 @@ struct AIChatSettingsView: View {
                 storageSection
                 memorySection
                 musicModeSection
+                workspaceModeSection
                 toolVisibilitySection
             }
             .task {
@@ -305,6 +307,33 @@ struct AIChatSettingsView: View {
             Text("Music Mode")
         } footer: {
             Text("When enabled, ToolsKit launches directly into Music instead of the Dashboard.")
+                .font(.caption)
+        }
+    }
+
+    // MARK: - Tool Visibility Section
+
+    private var workspaceModeSection: some View {
+        Section {
+            Toggle(isOn: $workspaceMode.isWorkspaceModeEnabled) {
+                HStack(spacing: 14) {
+                    Image(systemName: "rectangle.3.group")
+                        .font(.title3)
+                        .foregroundColor(.indigo)
+                        .frame(width: 32)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Turn ToolsKit Into Workspace")
+                            .font(.body)
+                        Text("Replace the Dashboard with Notes, Forms & Slides")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+        } header: {
+            Text("Workspace Mode")
+        } footer: {
+            Text("When enabled, ToolsKit launches into a productivity workspace with Notes, Forms, and Slides.")
                 .font(.caption)
         }
     }
