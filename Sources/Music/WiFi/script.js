@@ -194,16 +194,36 @@ function renderItem(item) {
   const el = document.createElement('div');
   el.className = 'queue-item';
   el.id = `qi-${item.id}`;
-  el.innerHTML = `
-    <div class="qi-header">
-      <span class="qi-name">${escapeHTML(item.file.name)}</span>
-      <span class="qi-size">${formatBytes(item.file.size)}</span>
-      <span class="qi-status pending" id="qs-${item.id}">Pending</span>
-    </div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar" id="qp-${item.id}"></div>
-    </div>
-  `;
+
+  const header = document.createElement('div');
+  header.className = 'qi-header';
+
+  const name = document.createElement('span');
+  name.className = 'qi-name';
+  name.textContent = item.file.name;
+
+  const size = document.createElement('span');
+  size.className = 'qi-size';
+  size.textContent = formatBytes(item.file.size);
+
+  const status = document.createElement('span');
+  status.className = 'qi-status pending';
+  status.id = `qs-${item.id}`;
+  status.textContent = 'Pending';
+
+  header.appendChild(name);
+  header.appendChild(size);
+  header.appendChild(status);
+
+  const barWrap = document.createElement('div');
+  barWrap.className = 'progress-bar-wrap';
+  const bar = document.createElement('div');
+  bar.className = 'progress-bar';
+  bar.id = `qp-${item.id}`;
+  barWrap.appendChild(bar);
+
+  el.appendChild(header);
+  el.appendChild(barWrap);
   list.appendChild(el);
 }
 
@@ -221,10 +241,6 @@ function updateItemUI(item) {
   if (item.status === 'done' || item.status === 'error') {
     if (wrapEl) wrapEl.dataset.done = '1';
   }
-}
-
-function escapeHTML(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function formatBytes(bytes) {
