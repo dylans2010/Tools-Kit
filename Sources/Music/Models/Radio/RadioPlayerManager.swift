@@ -11,7 +11,7 @@ enum RadioPlaybackState: Equatable {
 }
 
 @MainActor
-final class RadioPlayerManager: NSObject, ObservableObject {
+final class RadioPlayerManager: ObservableObject {
     static let shared = RadioPlayerManager()
 
     @Published var currentStation: RadioStation?
@@ -28,7 +28,7 @@ final class RadioPlayerManager: NSObject, ObservableObject {
     private let favoritesKey = "radio.favorites"
     private let recentKey = "radio.recentlyPlayed"
 
-    private override init() {
+    private init() {
         super.init()
         loadFavorites()
         loadRecentlyPlayed()
