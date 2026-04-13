@@ -64,6 +64,9 @@ struct RadioView: View {
                 filterChip(label: "All", icon: "radio", isActive: viewModel.activeFilter == .none) {
                     viewModel.clearFilter()
                 }
+                filterChip(label: "Nearby", icon: "location.fill", isActive: viewModel.activeFilter == .local) {
+                    viewModel.setFilter(viewModel.activeFilter == .local ? .none : .local)
+                }
                 ForEach(viewModel.popularTags, id: \.self) { tag in
                     let isActive: Bool = viewModel.activeFilter == .tag(tag)
                     filterChip(label: tag.capitalized, icon: nil, isActive: isActive) {

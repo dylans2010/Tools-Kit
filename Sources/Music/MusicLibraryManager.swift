@@ -124,6 +124,17 @@ final class MusicLibraryManager: ObservableObject {
         importFile(from: sourceURL, data: nil)
     }
 
+    /// Async wrapper for importing a single audio file from a URL.
+    func importAudioFile(from url: URL) async throws {
+        importFile(from: url, data: nil)
+    }
+
+    /// Import raw audio data, saving it under the given filename.
+    func importAudioData(_ data: Data, filename: String) async throws {
+        let fakeURL = URL(fileURLWithPath: filename)
+        importFile(from: fakeURL, data: data)
+    }
+
     private func importFile(from sourceURL: URL, data: Data?) {
         let preferredName = sourceURL.lastPathComponent
         let destURL = uniqueDestinationURL(for: preferredName)

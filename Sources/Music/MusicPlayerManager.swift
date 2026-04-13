@@ -25,6 +25,7 @@ final class MusicPlayerManager: ObservableObject {
     // MARK: - Private
     private let audioEngine = AudioEngineManager.shared
     private var originalQueue: [Song] = []
+    private var loadGeneration: Int = 0
     private var sleepTimerTimer: Timer?
     private var wasPlayingBeforeInterruption = false
     private let queueIDsKey = "music.player.queueIDs"
@@ -228,25 +229,38 @@ final class MusicPlayerManager: ObservableObject {
     // MARK: - Private helpers
 
     private func load(song: Song) {
-        guard song.fileURL.isFileURL, FileManager.default.fileExists(atPath: song.fileURL.path) else {
-            pause()
-            return
-        }
+        loadGeneration += 1
+        let gen = loadGeneration
         currentSong = song
         duration = song.duration
         currentTime = 0
         isPlaying = true
 
-        audioEngine.play(url: song.fileURL)
+        Task { @MainActor in
+            await loadWithRetry(song: song, generation: gen)
+        }
+    }
 
-        // Schedule crossfade to next track if enabled
+    private func loadWithRetry(song: Song, generation: Int, attempt: Int = 0) async {
+        guard loadGeneration == generation else { return }
+        guard song.fileURL.isFileURL, FileManager.default.fileExists(atPath: song.fileURL.path) else {
+            InternalLogger.shared.log("MusicPlayerManager: file missing for '\(song.title)'", level: .error)
+            if attempt == 0 {
+                try? await Task.sleep(nanoseconds: 300_000_000)
+                await loadWithRetry(song: song, generation: generation, attempt: 1)
+            } else {
+                isPlaying = false
+                InternalLogger.shared.log("MusicPlayerManager: auto-skipping '\(song.title)'", level: .warning)
+                handleSongEnd()
+            }
+            return
+        }
+        audioEngine.play(url: song.fileURL)
         if audioEngine.crossfadeEnabled {
             let nextIdx: Int?
             switch repeatMode {
-            case .one:
-                nextIdx = currentIndex
-            case .all:
-                nextIdx = (currentIndex + 1) % queue.count
+            case .one: nextIdx = currentIndex
+            case .all: nextIdx = (currentIndex + 1) % queue.count
             case .off:
                 let n = currentIndex + 1
                 nextIdx = n < queue.count ? n : nil
@@ -256,7 +270,6 @@ final class MusicPlayerManager: ObservableObject {
                 audioEngine.scheduleCrossfadeIfNeeded(nextURL: nextSong.fileURL, trackDuration: song.duration)
             }
         }
-
         updateNowPlayingInfo()
         MusicLibraryManager.shared.incrementPlayCount(for: song)
         savePlaybackState()

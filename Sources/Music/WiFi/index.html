@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tools-Kit WiFi Transfer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎵 WiFi Transfer</h1>
+      <p class="subtitle">Transfer music to your device wirelessly</p>
+    </header>
+
+    <!-- Pairing -->
+    <section id="pairing-section" class="card">
+      <h2>Enter Pairing Code</h2>
+      <p>Find the 6-digit code in the app under Import Music → WiFi Transfer.</p>
+      <div class="code-input-row">
+        <input id="pairing-code" type="text" maxlength="6" inputmode="numeric"
+               pattern="[0-9]*" placeholder="000000" autocomplete="off" />
+        <button id="pair-btn" onclick="pair()">Connect</button>
+      </div>
+      <p id="pair-error" class="error hidden"></p>
+    </section>
+
+    <!-- Upload (hidden until paired) -->
+    <section id="upload-section" class="card hidden">
+      <div class="connected-badge">✅ Connected</div>
+      <h2>Upload Music</h2>
+
+      <!-- Drop zone -->
+      <div id="drop-zone" class="drop-zone">
+        <div class="drop-icon">🎵</div>
+        <p>Drag &amp; drop audio files or ZIP archives here</p>
+        <p class="hint">Supports .mp3 .m4a .wav .aac .flac .zip</p>
+        <label class="file-btn">
+          Browse Files
+          <input id="file-input" type="file" multiple
+                 accept=".mp3,.m4a,.wav,.aac,.flac,.zip,audio/*" hidden />
+        </label>
+      </div>
+
+      <!-- Queue -->
+      <div id="queue" class="queue hidden">
+        <h3>Upload Queue</h3>
+        <div id="queue-list"></div>
+        <div class="queue-footer">
+          <span id="queue-summary"></span>
+          <button id="clear-btn" onclick="clearCompleted()">Clear Completed</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

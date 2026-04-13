@@ -6,6 +6,7 @@ enum RadioFilter: Equatable {
     case tag(String)
     case country(String)
     case language(String)
+    case local
 }
 
 @MainActor
@@ -82,6 +83,8 @@ final class RadioViewModel: ObservableObject {
                     case .language(let l):
                         result = try await RadioService.shared.fetchByLanguage(
                             language: l, offset: offset, limit: limit)
+                    case .local:
+                        result = try await LocalRadioService.shared.fetchLocalStations(limit: limit)
                     }
                 }
                 guard !Task.isCancelled else { return }

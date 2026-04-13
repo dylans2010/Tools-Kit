@@ -92,6 +92,10 @@
 		MU0200000000000000000023 /* EqualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000023 /* EqualizerView.swift */; };
 		MU0200000000000000000024 /* CustomizePlaylistArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000024 /* CustomizePlaylistArtwork.swift */; };
 		MU0200000000000000000025 /* AudioControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MU0100000000000000000025 /* AudioControlsView.swift */; };
+		WF0200000000000000000001 /* LocalRadioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WF0100000000000000000001 /* LocalRadioService.swift */; };
+		WF0200000000000000000002 /* WiFiTransferServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = WF0100000000000000000002 /* WiFiTransferServer.swift */; };
+		WF0200000000000000000003 /* ImportMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WF0100000000000000000003 /* ImportMusicView.swift */; };
+		WF0200000000000000000004 /* WiFiTransferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WF0100000000000000000004 /* WiFiTransferView.swift */; };
 		FF0200000000000000000001 /* YouTubeAPIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0100000000000000000001 /* YouTubeAPIKey.swift */; };
 		FF0200000000000000000002 /* FallbackFetchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0100000000000000000002 /* FallbackFetchViewModel.swift */; };
 		FF0200000000000000000003 /* SongsCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0100000000000000000003 /* SongsCheck.swift */; };
@@ -740,6 +744,10 @@
 		MU0100000000000000000023 /* EqualizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/EqualizerView.swift"; sourceTree = "<group>"; };
 		MU0100000000000000000024 /* CustomizePlaylistArtwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/CustomizePlaylistArtwork.swift"; sourceTree = "<group>"; };
 		MU0100000000000000000025 /* AudioControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/AudioControlsView.swift"; sourceTree = "<group>"; };
+		WF0100000000000000000001 /* LocalRadioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Models/Radio/LocalRadioService.swift"; sourceTree = "<group>"; };
+		WF0100000000000000000002 /* WiFiTransferServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/WiFiTransferServer.swift"; sourceTree = "<group>"; };
+		WF0100000000000000000003 /* ImportMusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/ImportMusicView.swift"; sourceTree = "<group>"; };
+		WF0100000000000000000004 /* WiFiTransferView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/WiFiTransferView.swift"; sourceTree = "<group>"; };
 		FF0100000000000000000001 /* YouTubeAPIKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Services/FallbackFetch/YouTubeAPIKey.swift"; sourceTree = "<group>"; };
 		FF0100000000000000000002 /* FallbackFetchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Services/FallbackFetch/FallbackFetchViewModel.swift"; sourceTree = "<group>"; };
 		FF0100000000000000000003 /* SongsCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Services/FallbackFetch/SongsCheck.swift"; sourceTree = "<group>"; };
@@ -1139,6 +1147,10 @@
 				MU0100000000000000000023 /* EqualizerView.swift */,
 				MU0100000000000000000024 /* CustomizePlaylistArtwork.swift */,
 				MU0100000000000000000025 /* AudioControlsView.swift */,
+				WF0100000000000000000001 /* LocalRadioService.swift */,
+				WF0100000000000000000002 /* WiFiTransferServer.swift */,
+				WF0100000000000000000003 /* ImportMusicView.swift */,
+				WF0100000000000000000004 /* WiFiTransferView.swift */,
 			MU0100000000000000000020 /* SpotifyFetchView.swift */,
 			FF0100000000000000000001 /* YouTubeAPIKey.swift */,
 			FF0100000000000000000002 /* FallbackFetchViewModel.swift */,
@@ -1597,6 +1609,10 @@
 				MU0200000000000000000023 /* EqualizerView.swift in Sources */,
 				MU0200000000000000000024 /* CustomizePlaylistArtwork.swift in Sources */,
 				MU0200000000000000000025 /* AudioControlsView.swift in Sources */,
+				WF0200000000000000000001 /* LocalRadioService.swift in Sources */,
+				WF0200000000000000000002 /* WiFiTransferServer.swift in Sources */,
+				WF0200000000000000000003 /* ImportMusicView.swift in Sources */,
+				WF0200000000000000000004 /* WiFiTransferView.swift in Sources */,
 				FF0200000000000000000001 /* YouTubeAPIKey.swift in Sources */,
 				FF0200000000000000000002 /* FallbackFetchViewModel.swift in Sources */,
 				FF0200000000000000000003 /* SongsCheck.swift in Sources */,
