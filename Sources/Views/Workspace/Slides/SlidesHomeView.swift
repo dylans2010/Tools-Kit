@@ -125,7 +125,7 @@ struct SlidesHomeView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Create") {
                         let title = newDeckTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-                        let _ = manager.createDeck(title: title.isEmpty ? "Untitled Deck" : title)
+                        manager.createDeck(title: title.isEmpty ? "Untitled Deck" : title)
                         newDeckTitle = ""
                         showingCreate = false
                     }

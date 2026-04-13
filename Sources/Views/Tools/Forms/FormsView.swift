@@ -52,8 +52,9 @@ struct FormsView: View {
                         actionLabel: "Create Form"
                     )
                 } else {
-                    // Recent section
-                    if !searchText.isEmpty || recentForms.count < filteredForms.count {
+                    // When searching or when there are more forms than the 4-form recent cap, show a flat "All Forms" list.
+                    let showFlatList = !searchText.isEmpty || filteredForms.count > recentForms.count
+                    if showFlatList {
                         // Show all forms in one grid
                         sectionHeader("All Forms", count: filteredForms.count, icon: "list.bullet.rectangle.portrait")
                         LazyVGrid(columns: columns, spacing: 14) {

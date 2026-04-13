@@ -23,6 +23,7 @@ final class SlideDecksManager: ObservableObject {
 
     // MARK: - CRUD
 
+    @discardableResult
     func createDeck(title: String = "Untitled Deck") -> SlideDeck {
         let deck = SlideDeck.empty(title: title)
         decks.insert(deck, at: 0)
