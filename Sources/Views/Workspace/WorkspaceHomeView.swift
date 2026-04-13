@@ -4,6 +4,21 @@ struct WorkspaceHomeView: View {
     @State private var selectedTab: WorkspaceTab = .notes
 
     enum WorkspaceTab: String, CaseIterable {
+        case notes   = "Notes"
+        case forms   = "Forms"
+        case slides  = "Slides"
+        case habits  = "Habits"
+        case tasks   = "Tasks"
+        case calendar = "Calendar"
+
+        var icon: String {
+            switch self {
+            case .notes:    return "note.text"
+            case .forms:    return "list.bullet.rectangle.portrait"
+            case .slides:   return "rectangle.on.rectangle.angled"
+            case .habits:   return "flame.fill"
+            case .tasks:    return "checklist"
+            case .calendar: return "calendar"
         case notes       = "Notes"
         case forms       = "Forms"
         case slides      = "Slides"
