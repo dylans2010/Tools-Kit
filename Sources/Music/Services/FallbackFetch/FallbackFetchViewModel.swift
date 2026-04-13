@@ -246,15 +246,16 @@ final class FallbackFetchViewModel: ObservableObject {
             }
         }
 
+        let snapshot = importedSongs
         Task {
             await LogManager.shared.log(
                 level: .info,
                 stage: .parsing,
                 message: "CSV parsed",
-                metadata: ["count": "\(importedSongs.count)"]
+                metadata: ["count": "\(snapshot.count)"]
             )
             await MainActor.run {
-                self.songs = importedSongs
+                self.songs = snapshot
             }
         }
     }
@@ -865,9 +866,7 @@ final class FallbackFetchViewModel: ObservableObject {
             try FileManager.default.removeItem(at: zipURL)
         }
 
-        guard let archive = Archive(url: zipURL, accessMode: .create) else {
-            throw FetchError.zipCreationFailed
-        }
+        let archive = try Archive(url: zipURL, accessMode: .create)
 
         for fileURL in files {
             await LogManager.shared.log(
