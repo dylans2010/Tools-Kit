@@ -82,7 +82,7 @@ private final class TLSCaptureDelegate: NSObject, URLSessionDelegate, @unchecked
 
         var info = TLSCertificateInfo()
 
-        if let cert = SecTrustGetCertificateAtIndex(trust, 0) {
+        if let certs = SecTrustCopyCertificateChain(trust) as? [SecCertificate], let cert = certs.first {
             let certData = SecCertificateCopyData(cert) as Data
             let sha = certData.sha256Hex
             info.sha256Fingerprint = sha.chunked(by: 2).joined(separator: ":")
