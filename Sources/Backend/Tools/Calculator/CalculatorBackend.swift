@@ -11,7 +11,6 @@ class CalculatorBackend: ObservableObject {
         let id = UUID()
         let expression: String
         let result: String
-        let timestamp = Date()
     }
 
     enum Operation: String {

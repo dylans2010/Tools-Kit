@@ -36,7 +36,9 @@ final class WiFiTransferServer: ObservableObject {
 
         listener?.newConnectionHandler = { [weak self] connection in
             connection.start(queue: .global(qos: .userInitiated))
-            self?.handleConnection(connection)
+            Task { @MainActor [weak self] in
+                self?.handleConnection(connection)
+            }
         }
         listener?.stateUpdateHandler = { [weak self] state in
             DispatchQueue.main.async {
@@ -100,7 +102,7 @@ final class WiFiTransferServer: ObservableObject {
                 let body = self.extractHTTPBody(from: data)
                 self.handleFinalizeUpload(body: body, connection: connection)
             default:
-                self.sendNotFound(connection: connection)
+                self.sendNotFound(connection)
             }
         }
     }

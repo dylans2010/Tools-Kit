@@ -30,11 +30,11 @@ class PortCheckerBackend: ObservableObject {
                     self.color = "green"
                     self.isChecking = false
                     connection.cancel()
-                case .failed(let error):
+                case .failed:
                     self.status = "Port \(portInt) is CLOSED or Filtered"
                     self.color = "red"
                     self.isChecking = false
-                case .waiting(let error):
+                case .waiting:
                     // Could still be connecting, but we'll timeout after 5 seconds
                     break
                 default:
