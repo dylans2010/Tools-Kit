@@ -9,6 +9,7 @@ final class MusicLibraryManager: ObservableObject {
     @Published var songs: [Song] = []
     @Published var playlists: [Playlist] = []
 
+    // UserDefaults keys (used only for general / non-folder songs and legacy playlists).
     private let songsKey = "music.songs"
     private let playlistsKey = "music.playlists"
     private let songIDsByPathKey = "music.songIDsByPath"
@@ -21,6 +22,20 @@ final class MusicLibraryManager: ObservableObject {
         return formatter
     }()
 
+    // MARK: - Metadata JSON (per-playlist folder)
+
+    private struct PlaylistMetadata: Codable {
+        var playlistName: String
+        var songs: [SongMeta]
+
+        struct SongMeta: Codable {
+            var title: String
+            var fileName: String
+        }
+    }
+
+    // MARK: - Backup helpers
+
     private struct BackupSongRecord: Codable {
         let id: UUID
         let title: String
@@ -30,6 +45,7 @@ final class MusicLibraryManager: ObservableObject {
         let dateAdded: Date
         let playCount: Int
         let fileName: String
+        let playlistName: String?
     }
 
     private struct BackupManifest: Codable {
@@ -38,12 +54,65 @@ final class MusicLibraryManager: ObservableObject {
         let playlists: [Playlist]
     }
 
+    // MARK: - Directory helpers
+
+    /// Root music directory: Documents/Music/
     private var musicDirectory: URL {
         let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("Music", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
     }
+
+    /// Sanitise a string so it is safe to use as a directory / file name.
+    /// Replaces filesystem-invalid characters and path-traversal sequences.
+    private func sanitizeFilename(_ name: String) -> String {
+        let invalid = CharacterSet(charactersIn: "/\\:*?\"<>|")
+        var sanitized = name
+            .components(separatedBy: invalid)
+            .joined(separator: "_")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        // Replace all parent-directory references regardless of encoding.
+        sanitized = sanitized.replacingOccurrences(of: "..", with: "_")
+        let result = String(sanitized.prefix(100))
+        return result.isEmpty ? "_" : result
+    }
+
+    /// Returns a unique folder URL under musicDirectory for the given playlist name.
+    /// If the folder already exists, a timestamp suffix is appended.
+    private func uniquePlaylistFolderURL(for name: String) -> URL {
+        let base = sanitizeFilename(name)
+        let safeName = base.isEmpty ? "Playlist" : base
+        let candidate = musicDirectory.appendingPathComponent(safeName, isDirectory: true)
+        if !FileManager.default.fileExists(atPath: candidate.path) {
+            return candidate
+        }
+        let stamp = Int(Date().timeIntervalSince1970)
+        return musicDirectory.appendingPathComponent("\(safeName)_\(stamp)", isDirectory: true)
+    }
+
+    /// Returns a unique file URL inside `folderURL` for the given filename.
+    private func uniqueFileURL(in folderURL: URL, for filename: String) -> URL {
+        let sanitized = sanitizeFilename(filename)
+        let safeName = sanitized.isEmpty ? "song.mp3" : sanitized
+        // Extract base name and extension directly from the sanitized string.
+        let nameURL = URL(fileURLWithPath: safeName)
+        let base = nameURL.deletingPathExtension().lastPathComponent
+        let ext = nameURL.pathExtension
+
+        var candidate = folderURL.appendingPathComponent(safeName)
+        if !FileManager.default.fileExists(atPath: candidate.path) { return candidate }
+
+        var index = 1
+        while true {
+            let newName = ext.isEmpty ? "\(base) (\(index))" : "\(base) (\(index)).\(ext)"
+            candidate = folderURL.appendingPathComponent(newName)
+            if !FileManager.default.fileExists(atPath: candidate.path) { return candidate }
+            index += 1
+        }
+    }
+
+    // MARK: - Init
 
     private init() {
         load()
@@ -76,7 +145,7 @@ final class MusicLibraryManager: ObservableObject {
         }
     }
 
-    private func extractMetadata(from url: URL, preferredID: UUID? = nil) -> Song {
+    private func extractMetadata(from url: URL, preferredID: UUID? = nil, playlistName: String? = nil) -> Song {
         let asset = AVURLAsset(url: url)
         var title = url.deletingPathExtension().lastPathComponent
         var artist = "Unknown Artist"
@@ -100,51 +169,64 @@ final class MusicLibraryManager: ObservableObject {
         if d.isFinite && d > 0 { duration = d }
 
         return Song(id: preferredID ?? stableSongID(for: url), title: title, artist: artist, duration: duration,
-                    fileURL: url, artworkData: artworkData)
+                    fileURL: url, artworkData: artworkData, playlistName: playlistName)
     }
 
-    // MARK: - ZIP Import
+    // MARK: - ZIP Import (folder-based)
 
-    /// Imports all supported audio files from a ZIP archive.
-    /// - Returns: The `Song` objects that were successfully imported.
+    /// Imports all supported audio files from a ZIP archive into a dedicated playlist folder.
+    /// Creates Documents/Music/{playlistName}/, copies all audio files there, and writes metadata.json.
+    /// - Returns: The newly created `Playlist`, or `nil` if no audio files were found.
     @discardableResult
-    func importFromZIP(at url: URL) async -> [Song] {
+    func importFromZIP(at url: URL, playlistName: String) async -> Playlist? {
+        let folderURL = uniquePlaylistFolderURL(for: playlistName.isEmpty ? "Imported Playlist" : playlistName)
+        do {
+            try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
+        } catch {
+            print("MusicLibraryManager: failed to create playlist folder: \(error)")
+            return nil
+        }
+
         let entries = ZIPExtractor.extract(from: url)
-        let allowed = Set(["mp3", "mp4", "m4a", "aac", "wav", "flac"])
-        var imported: [Song] = []
+        let allowed: Set<String> = ["mp3", "mp4", "m4a", "aac", "wav", "flac"]
+        let actualName = folderURL.lastPathComponent
+        var importedSongs: [Song] = []
 
         for entry in entries {
-            let ext = URL(fileURLWithPath: entry.filename)
-                .pathExtension
-                .lowercased()
+            let ext = URL(fileURLWithPath: entry.filename).pathExtension.lowercased()
             guard allowed.contains(ext) else { continue }
 
-            // Use only the last path component (avoid nested folder names)
-            let filename = URL(fileURLWithPath: entry.filename).lastPathComponent
-            guard !filename.isEmpty else { continue }
+            let rawName = URL(fileURLWithPath: entry.filename).lastPathComponent
+            guard !rawName.isEmpty else { continue }
 
-            let destURL = uniqueDestinationURL(for: filename)
+            let destURL = uniqueFileURL(in: folderURL, for: rawName)
             do {
                 try entry.data.write(to: destURL)
-
-                let song = extractMetadata(from: destURL)
-                let added = await MainActor.run {
-                    guard !self.songs.contains(where: {
-                        $0.fileURL.path == destURL.path
-                    }) else { return false }
-                    self.songs.append(song)
-                    self.save()
-                    return true
-                }
-                if added {
-                    imported.append(song)
-                }
+                let song = extractMetadata(from: destURL, playlistName: actualName)
+                importedSongs.append(song)
             } catch {
                 print("MusicLibraryManager: ZIP entry error \(entry.filename): \(error)")
             }
         }
 
-        return imported
+        if importedSongs.isEmpty {
+            try? FileManager.default.removeItem(at: folderURL)
+            return nil
+        }
+
+        let playlist = Playlist(name: actualName, songIDs: importedSongs.map(\.id), folderURL: folderURL)
+        writeMetadata(for: playlist, songs: importedSongs)
+
+        await MainActor.run {
+            for song in importedSongs {
+                guard !self.songs.contains(where: { $0.fileURL.path == song.fileURL.path }) else { continue }
+                self.songs.append(song)
+            }
+            self.playlists.append(playlist)
+            self.save()
+        }
+
+        return playlist
     }
 
     // MARK: - Delete
@@ -154,6 +236,8 @@ final class MusicLibraryManager: ObservableObject {
         playlists = playlists.map { pl in
             var p = pl
             p.songIDs.removeAll { $0 == song.id }
+            // Update metadata.json for folder-based playlists
+            if p.folderURL != nil { writeMetadata(for: p, songs: songs(for: p)) }
             return p
         }
         try? FileManager.default.removeItem(at: song.fileURL)
@@ -161,9 +245,17 @@ final class MusicLibraryManager: ObservableObject {
     }
 
     func clearLibrary() {
-        for song in songs {
+        // Remove all playlist folders (including their song files) from disk.
+        for playlist in playlists {
+            if let url = playlist.folderURL {
+                try? FileManager.default.removeItem(at: url)
+            }
+        }
+        // Remove individual root-level song files (not in any playlist folder).
+        for song in songs where song.playlistName == nil {
             try? FileManager.default.removeItem(at: song.fileURL)
         }
+        // Clear all in-memory state (folder-based songs are covered by folder removal above).
         songs = []
         playlists = []
         save()
@@ -173,7 +265,11 @@ final class MusicLibraryManager: ObservableObject {
 
     @discardableResult
     func createPlaylist(name: String, songIDs: [UUID] = []) -> Playlist {
-        let pl = Playlist(name: name, songIDs: songIDs)
+        let folderURL = uniquePlaylistFolderURL(for: name.isEmpty ? "Playlist" : name)
+        try? FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
+        let actualName = folderURL.lastPathComponent
+        let pl = Playlist(name: actualName, songIDs: songIDs, folderURL: folderURL)
+        writeMetadata(for: pl, songs: songs(for: pl))
         playlists.append(pl)
         save()
         return pl
@@ -183,23 +279,59 @@ final class MusicLibraryManager: ObservableObject {
         let trimmed = newTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, let idx = songs.firstIndex(where: { $0.id == id }) else { return }
         songs[idx].title = trimmed
+        // Update metadata.json if the song belongs to a playlist folder
+        if let name = songs[idx].playlistName,
+           let playlist = playlists.first(where: { $0.name == name }) {
+            writeMetadata(for: playlist, songs: songs(for: playlist))
+        }
         save()
     }
 
     func updatePlaylist(_ playlist: Playlist) {
         if let idx = playlists.firstIndex(where: { $0.id == playlist.id }) {
+            // Preserve the folderURL from the existing entry in case the caller
+            // passed a value-type copy that lost the folderURL property.
+            let existingFolderURL = playlists[idx].folderURL
             playlists[idx] = playlist
+            if playlists[idx].folderURL == nil {
+                playlists[idx].folderURL = existingFolderURL
+            }
+            writeMetadata(for: playlists[idx], songs: songs(for: playlists[idx]))
             save()
         }
     }
 
     func deletePlaylist(_ playlist: Playlist) {
         playlists.removeAll { $0.id == playlist.id }
+        if let folderURL = playlist.folderURL {
+            // Remove in-memory songs that both carry this playlist name AND are in this playlist's songIDs.
+            let playlistSongIDs = Set(playlist.songIDs)
+            songs.removeAll { $0.playlistName == playlist.name && playlistSongIDs.contains($0.id) }
+            // Remove the physical folder (and all its contents)
+            try? FileManager.default.removeItem(at: folderURL)
+        }
         save()
     }
 
     func songs(for playlist: Playlist) -> [Song] {
         playlist.songIDs.compactMap { id in songs.first { $0.id == id } }
+    }
+
+    /// Removes a song from a playlist.
+    /// For folder-based playlists the song's file is also deleted from the playlist folder
+    /// when the song's file lives directly inside that folder.
+    func removeSong(_ song: Song, fromPlaylist playlist: Playlist) {
+        if let idx = playlists.firstIndex(where: { $0.id == playlist.id }) {
+            playlists[idx].songIDs.removeAll { $0 == song.id }
+            if let folderURL = playlists[idx].folderURL,
+               song.fileURL.deletingLastPathComponent().standardizedFileURL == folderURL.standardizedFileURL {
+                // The song file lives directly inside the playlist folder – delete it.
+                try? FileManager.default.removeItem(at: song.fileURL)
+                songs.removeAll { $0.id == song.id }
+                writeMetadata(for: playlists[idx], songs: songs(for: playlists[idx]))
+            }
+        }
+        save()
     }
 
     func song(by id: UUID) -> Song? {
@@ -213,57 +345,170 @@ final class MusicLibraryManager: ObservableObject {
         }
     }
 
+    // MARK: - Metadata JSON
+
+    private func writeMetadata(for playlist: Playlist, songs songList: [Song]? = nil) {
+        guard let folderURL = playlist.folderURL else { return }
+        let list = songList ?? songs(for: playlist)
+        let songMetas = list.map { PlaylistMetadata.SongMeta(title: $0.title, fileName: $0.fileURL.lastPathComponent) }
+        let meta = PlaylistMetadata(playlistName: playlist.name, songs: songMetas)
+        guard let data = try? JSONEncoder().encode(meta) else { return }
+        let metaURL = folderURL.appendingPathComponent("metadata.json")
+        try? data.write(to: metaURL, options: .atomic)
+    }
+
     // MARK: - Persistence
 
     private func save() {
-        if let data = try? JSONEncoder().encode(songs) {
+        // Persist only general (non-folder) songs to UserDefaults.
+        let generalSongs = songs.filter { $0.playlistName == nil }
+        if let data = try? JSONEncoder().encode(generalSongs) {
             UserDefaults.standard.set(data, forKey: songsKey)
         }
-        let songIDsByPath = Dictionary(uniqueKeysWithValues: songs.map { ($0.fileURL.path, $0.id.uuidString) })
+        let songIDsByPath = Dictionary(uniqueKeysWithValues: generalSongs.map { ($0.fileURL.path, $0.id.uuidString) })
         UserDefaults.standard.set(songIDsByPath, forKey: songIDsByPathKey)
-        if let data = try? JSONEncoder().encode(playlists) {
+
+        // Partition playlists once to avoid repeated filtering.
+        var legacyPlaylists: [Playlist] = []
+        var folderPlaylists: [Playlist] = []
+        for playlist in playlists {
+            if playlist.folderURL != nil { folderPlaylists.append(playlist) }
+            else { legacyPlaylists.append(playlist) }
+        }
+
+        // Persist only legacy (non-folder) playlists to UserDefaults.
+        if let data = try? JSONEncoder().encode(legacyPlaylists) {
             UserDefaults.standard.set(data, forKey: playlistsKey)
+        }
+
+        // Write metadata.json for every folder-based playlist.
+        for playlist in folderPlaylists {
+            writeMetadata(for: playlist)
         }
     }
 
     private func load() {
-        _ = musicDirectory // ensure directory exists
+        _ = musicDirectory // ensure root exists
 
-        var persistedSongs: [Song] = []
-        if let data = UserDefaults.standard.data(forKey: songsKey),
-           let decoded = try? JSONDecoder().decode([Song].self, from: data) {
-            persistedSongs = decoded.filter { FileManager.default.fileExists(atPath: $0.fileURL.path) }
+        // --- Scan Documents/Music/ for playlist sub-folders and general songs ---
+        let topContents = (try? FileManager.default.contentsOfDirectory(
+            at: musicDirectory,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
+        )) ?? []
+
+        var rootAudioURLs: [URL] = []
+        var playlistFolderURLs: [URL] = []
+
+        for item in topContents {
+            let isDir = (try? item.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
+            if isDir {
+                playlistFolderURLs.append(item)
+            } else if allowedExtensions.contains(item.pathExtension.lowercased()) {
+                rootAudioURLs.append(item)
+            }
         }
 
-        let persistedIDsByPath = (UserDefaults.standard.dictionary(forKey: songIDsByPathKey) as? [String: String]) ?? [:]
-        let songsByPath = Dictionary(uniqueKeysWithValues: persistedSongs.map { ($0.fileURL.path, $0) })
-        let onDiskURLs = ((try? FileManager.default.contentsOfDirectory(
-            at: musicDirectory,
-            includingPropertiesForKeys: nil,
-            options: [.skipsHiddenFiles]
-        )) ?? []).filter { allowedExtensions.contains($0.pathExtension.lowercased()) }
-
-        songs = onDiskURLs.map { fileURL in
-            if let existing = songsByPath[fileURL.path] {
-                return existing
+        // Load folder-based playlists from disk.
+        var diskPlaylists: [Playlist] = []
+        var diskSongs: [Song] = []
+        for folderURL in playlistFolderURLs {
+            if let (playlist, pSongs) = loadPlaylistFromFolder(folderURL) {
+                diskPlaylists.append(playlist)
+                diskSongs.append(contentsOf: pSongs)
             }
+        }
+
+        // Load general songs (root directory) from UserDefaults + disk.
+        let persistedIDsByPath = (UserDefaults.standard.dictionary(forKey: songIDsByPathKey) as? [String: String]) ?? [:]
+        var persistedByPath: [String: Song] = [:]
+        if let data = UserDefaults.standard.data(forKey: songsKey),
+           let decoded = try? JSONDecoder().decode([Song].self, from: data) {
+            for s in decoded where FileManager.default.fileExists(atPath: s.fileURL.path) {
+                persistedByPath[s.fileURL.path] = s
+            }
+        }
+
+        let rootSongs = rootAudioURLs.map { fileURL -> Song in
+            if let existing = persistedByPath[fileURL.path] { return existing }
             let restoredID = persistedIDsByPath[fileURL.path].flatMap(UUID.init(uuidString:))
             return extractMetadata(from: fileURL, preferredID: restoredID ?? stableSongID(for: fileURL))
         }
 
+        // Merge all songs.
+        songs = rootSongs + diskSongs
+
+        // Load legacy playlists from UserDefaults; skip any whose name is already backed by a folder.
+        let folderPlaylistNames = Set(diskPlaylists.map(\.name))
+        var legacyPlaylists: [Playlist] = []
         if let data = UserDefaults.standard.data(forKey: playlistsKey),
            let decoded = try? JSONDecoder().decode([Playlist].self, from: data) {
-            let validSongIDs = Set(songs.map(\.id))
-            playlists = decoded.map { playlist in
-                var updated = playlist
-                updated.songIDs = playlist.songIDs.filter { validSongIDs.contains($0) }
-                if let artworkID = updated.artworkSongID, !validSongIDs.contains(artworkID) {
-                    updated.artworkSongID = updated.songIDs.first
+            let validIDs = Set(songs.map(\.id))
+            legacyPlaylists = decoded
+                .filter { !folderPlaylistNames.contains($0.name) }
+                .map { pl in
+                    var updated = pl
+                    updated.songIDs = pl.songIDs.filter { validIDs.contains($0) }
+                    if let aID = updated.artworkSongID, !validIDs.contains(aID) {
+                        updated.artworkSongID = updated.songIDs.first
+                    }
+                    return updated
                 }
-                return updated
+        }
+
+        playlists = diskPlaylists + legacyPlaylists
+        save()
+    }
+
+    /// Loads a playlist from a folder under Documents/Music/.
+    /// Reads metadata.json when present; falls back to scanning audio files.
+    private func loadPlaylistFromFolder(_ folderURL: URL) -> (Playlist, [Song])? {
+        let playlistName = folderURL.lastPathComponent
+        let metadataURL = folderURL.appendingPathComponent("metadata.json")
+
+        var songMetas: [PlaylistMetadata.SongMeta] = []
+        if let data = try? Data(contentsOf: metadataURL),
+           let meta = try? JSONDecoder().decode(PlaylistMetadata.self, from: data) {
+            songMetas = meta.songs
+        }
+
+        let fileURLs = ((try? FileManager.default.contentsOfDirectory(
+            at: folderURL,
+            includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles]
+        )) ?? []).filter { allowedExtensions.contains($0.pathExtension.lowercased()) }
+
+        guard !fileURLs.isEmpty else { return nil }
+
+        let metaByFilename: [String: PlaylistMetadata.SongMeta] = Dictionary(
+            songMetas.map { ($0.fileName, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        let metaOrder = songMetas.map(\.fileName)
+
+        var loadedSongs: [Song] = fileURLs.map { fileURL -> Song in
+            var song = extractMetadata(from: fileURL,
+                                       preferredID: stableSongID(for: fileURL),
+                                       playlistName: playlistName)
+            if let meta = metaByFilename[fileURL.lastPathComponent], !meta.title.isEmpty {
+                song.title = meta.title
+            }
+            return song
+        }
+
+        // Preserve metadata order when available.
+        if !metaOrder.isEmpty {
+            loadedSongs.sort { a, b in
+                let ai = metaOrder.firstIndex(of: a.fileURL.lastPathComponent) ?? Int.max
+                let bi = metaOrder.firstIndex(of: b.fileURL.lastPathComponent) ?? Int.max
+                return ai < bi
             }
         }
-        save()
+
+        let playlist = Playlist(name: playlistName,
+                                songIDs: loadedSongs.map(\.id),
+                                folderURL: folderURL)
+        return (playlist, loadedSongs)
     }
 
     private func uniqueDestinationURL(for filename: String) -> URL {
@@ -302,7 +547,8 @@ final class MusicLibraryManager: ObservableObject {
         for song in songs where FileManager.default.fileExists(atPath: song.fileURL.path) {
             let backupFileName = uniqueBackupFileName(for: song.fileURL.lastPathComponent, usedNames: &usedNames)
             let data = try Data(contentsOf: song.fileURL)
-            try addToArchive(data: data, atPath: "songs/\(backupFileName)", archive: archive)
+            let archivePath = song.playlistName.map { "playlists/\(sanitizeFilename($0))/\(backupFileName)" } ?? "songs/\(backupFileName)"
+            try addToArchive(data: data, atPath: archivePath, archive: archive)
 
             records.append(BackupSongRecord(
                 id: song.id,
@@ -312,7 +558,8 @@ final class MusicLibraryManager: ObservableObject {
                 artworkData: song.artworkData,
                 dateAdded: song.dateAdded,
                 playCount: song.playCount,
-                fileName: backupFileName
+                fileName: backupFileName,
+                playlistName: song.playlistName
             ))
         }
 
@@ -334,19 +581,52 @@ final class MusicLibraryManager: ObservableObject {
         let manifestData = try extractData(from: manifestEntry, archive: archive)
         let manifest = try JSONDecoder().decode(BackupManifest.self, from: manifestData)
 
-        let existingFiles = (try? FileManager.default.contentsOfDirectory(at: musicDirectory, includingPropertiesForKeys: nil)) ?? []
-        for fileURL in existingFiles {
+        // Remove existing library
+        for playlist in playlists {
+            if let folderURL = playlist.folderURL {
+                try? FileManager.default.removeItem(at: folderURL)
+            }
+        }
+        let rootFiles = (try? FileManager.default.contentsOfDirectory(at: musicDirectory, includingPropertiesForKeys: nil)) ?? []
+        for fileURL in rootFiles where allowedExtensions.contains(fileURL.pathExtension.lowercased()) {
             try? FileManager.default.removeItem(at: fileURL)
         }
 
+        // Pre-create playlist folders so all songs in the same playlist share the same folder URL.
+        // Track actual folder URLs keyed by sanitized playlist name to avoid timestamp collisions.
+        var restoredFoldersByName: [String: URL] = [:]
+        for record in manifest.songs {
+            guard let pName = record.playlistName else { continue }
+            if restoredFoldersByName[pName] == nil {
+                let folderURL = uniquePlaylistFolderURL(for: pName)
+                try? FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
+                restoredFoldersByName[pName] = folderURL
+            }
+        }
+
+        // Restore songs
         var restoredSongs: [Song] = []
         for record in manifest.songs {
-            guard let songEntry = archive["songs/\(record.fileName)"] else { continue }
+            let archivePath: String
+            if let pName = record.playlistName {
+                archivePath = "playlists/\(sanitizeFilename(pName))/\(record.fileName)"
+            } else {
+                archivePath = "songs/\(record.fileName)"
+            }
+            // Also try legacy path without playlist prefix
+            let entry = archive[archivePath] ?? archive["songs/\(record.fileName)"]
+            guard let songEntry = entry else { continue }
             let songData = try extractData(from: songEntry, archive: archive)
-            let destination = uniqueDestinationURL(for: record.fileName)
+
+            let destination: URL
+            if let pName = record.playlistName, let folderURL = restoredFoldersByName[pName] {
+                destination = uniqueFileURL(in: folderURL, for: record.fileName)
+            } else {
+                destination = uniqueDestinationURL(for: record.fileName)
+            }
             try songData.write(to: destination)
 
-            var restored = extractMetadata(from: destination, preferredID: record.id)
+            var restored = extractMetadata(from: destination, preferredID: record.id, playlistName: record.playlistName)
             restored.title = record.title
             restored.artist = record.artist
             restored.duration = record.duration
@@ -357,14 +637,22 @@ final class MusicLibraryManager: ObservableObject {
         }
 
         songs = restoredSongs
-        let validSongIDs = Set(restoredSongs.map(\.id))
-        playlists = manifest.playlists.map { playlist in
-            var updated = playlist
-            updated.songIDs = playlist.songIDs.filter { validSongIDs.contains($0) }
-            if let artworkID = updated.artworkSongID, !validSongIDs.contains(artworkID) {
+
+        // Restore playlists, re-attaching the actual folderURL for folder-based ones.
+        let validIDs = Set(restoredSongs.map(\.id))
+        playlists = manifest.playlists.map { pl in
+            var updated = pl
+            updated.songIDs = pl.songIDs.filter { validIDs.contains($0) }
+            if let aID = updated.artworkSongID, !validIDs.contains(aID) {
                 updated.artworkSongID = updated.songIDs.first
             }
+            // Re-attach the actual restored folder URL (may have a timestamp suffix).
+            updated.folderURL = restoredFoldersByName[pl.name]
             return updated
+        }
+
+        for playlist in playlists {
+            writeMetadata(for: playlist)
         }
         save()
         return (songs: songs.count, playlists: playlists.count)
@@ -372,8 +660,6 @@ final class MusicLibraryManager: ObservableObject {
 
     /// Builds a deterministic UUID from a song file path so song IDs remain stable
     /// when metadata is reconstructed from on-disk files after app relaunches.
-    /// SHA-256 is used to minimize collisions for different paths, then truncated to
-    /// 16 bytes because UUID storage requires 128 bits.
     private func stableSongID(for url: URL) -> UUID {
         let normalizedPath = url.standardizedFileURL.path.lowercased()
         let digest = SHA256.hash(data: Data(normalizedPath.utf8))
@@ -419,3 +705,4 @@ final class MusicLibraryManager: ObservableObject {
         return result
     }
 }
+
