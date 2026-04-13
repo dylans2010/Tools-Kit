@@ -19,6 +19,21 @@ struct WorkspaceHomeView: View {
             case .habits:   return "flame.fill"
             case .tasks:    return "checklist"
             case .calendar: return "calendar"
+        case notes       = "Notes"
+        case forms       = "Forms"
+        case slides      = "Slides"
+        case articles    = "Articles"
+        case spreadsheets = "Sheets"
+        case notebooks   = "Notebooks"
+
+        var icon: String {
+            switch self {
+            case .notes:        return "note.text"
+            case .forms:        return "list.bullet.rectangle.portrait"
+            case .slides:       return "rectangle.on.rectangle.angled"
+            case .articles:     return "newspaper"
+            case .spreadsheets: return "tablecells"
+            case .notebooks:    return "book.closed"
             }
         }
     }
@@ -50,28 +65,28 @@ struct WorkspaceHomeView: View {
             .tag(WorkspaceTab.slides)
 
             NavigationStack {
-                WorkspaceHabitTrackerView()
+                ArticlesHomeView()
             }
             .tabItem {
-                Label(WorkspaceTab.habits.rawValue, systemImage: WorkspaceTab.habits.icon)
+                Label(WorkspaceTab.articles.rawValue, systemImage: WorkspaceTab.articles.icon)
             }
-            .tag(WorkspaceTab.habits)
+            .tag(WorkspaceTab.articles)
 
             NavigationStack {
-                TasksHomeView()
+                SpreadsheetsHomeView()
             }
             .tabItem {
-                Label(WorkspaceTab.tasks.rawValue, systemImage: WorkspaceTab.tasks.icon)
+                Label(WorkspaceTab.spreadsheets.rawValue, systemImage: WorkspaceTab.spreadsheets.icon)
             }
-            .tag(WorkspaceTab.tasks)
+            .tag(WorkspaceTab.spreadsheets)
 
             NavigationStack {
-                CalendarHomeView()
+                NotebooksHomeView()
             }
             .tabItem {
-                Label(WorkspaceTab.calendar.rawValue, systemImage: WorkspaceTab.calendar.icon)
+                Label(WorkspaceTab.notebooks.rawValue, systemImage: WorkspaceTab.notebooks.icon)
             }
-            .tag(WorkspaceTab.calendar)
+            .tag(WorkspaceTab.notebooks)
         }
     }
 }
