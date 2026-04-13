@@ -65,16 +65,20 @@ final class MusicLibraryManager: ObservableObject {
     }
 
     /// Sanitise a string so it is safe to use as a directory / file name.
-    /// Also strips parent-directory traversal sequences to prevent path escape.
+    /// Replaces filesystem-invalid characters and path-traversal sequences,
+    /// then verifies the resulting component doesn't resolve outside the parent directory.
     private func sanitizeFilename(_ name: String) -> String {
         let invalid = CharacterSet(charactersIn: "/\\:*?\"<>|")
         var sanitized = name
             .components(separatedBy: invalid)
             .joined(separator: "_")
             .trimmingCharacters(in: .whitespacesAndNewlines)
-        // Replace any parent-directory references regardless of encoding.
+        // Replace all parent-directory references regardless of encoding.
         sanitized = sanitized.replacingOccurrences(of: "..", with: "_")
-        return String(sanitized.prefix(100))
+        let result = String(sanitized.prefix(100))
+        // Final check: the name must not contain a path separator after sanitization.
+        if result.contains("/") || result.contains("\\") { return "_" }
+        return result.isEmpty ? "_" : result
     }
 
     /// Returns a unique folder URL under musicDirectory for the given playlist name.
@@ -244,16 +248,17 @@ final class MusicLibraryManager: ObservableObject {
     }
 
     func clearLibrary() {
-        // Remove all playlist folders
+        // Remove all playlist folders (including their song files) from disk.
         for playlist in playlists {
             if let url = playlist.folderURL {
                 try? FileManager.default.removeItem(at: url)
             }
         }
-        // Remove remaining songs in root directory
+        // Remove individual root-level song files (not in any playlist folder).
         for song in songs where song.playlistName == nil {
             try? FileManager.default.removeItem(at: song.fileURL)
         }
+        // Clear all in-memory state (folder-based songs are covered by folder removal above).
         songs = []
         playlists = []
         save()
@@ -317,11 +322,12 @@ final class MusicLibraryManager: ObservableObject {
 
     /// Removes a song from a playlist.
     /// For folder-based playlists the song's file is also deleted from the playlist folder
-    /// when the song was originally imported into it (song.playlistName == playlist.name).
+    /// when the song's fileURL is contained within the playlist's folder.
     func removeSong(_ song: Song, fromPlaylist playlist: Playlist) {
         if let idx = playlists.firstIndex(where: { $0.id == playlist.id }) {
             playlists[idx].songIDs.removeAll { $0 == song.id }
-            if playlists[idx].folderURL != nil, song.playlistName == playlist.name {
+            if let folderURL = playlists[idx].folderURL,
+               song.fileURL.path.hasPrefix(folderURL.path + "/") {
                 // The song file lives inside the playlist folder – delete it.
                 try? FileManager.default.removeItem(at: song.fileURL)
                 songs.removeAll { $0.id == song.id }
@@ -365,14 +371,21 @@ final class MusicLibraryManager: ObservableObject {
         let songIDsByPath = Dictionary(uniqueKeysWithValues: generalSongs.map { ($0.fileURL.path, $0.id.uuidString) })
         UserDefaults.standard.set(songIDsByPath, forKey: songIDsByPathKey)
 
+        // Partition playlists once to avoid repeated filtering.
+        var legacyPlaylists: [Playlist] = []
+        var folderPlaylists: [Playlist] = []
+        for playlist in playlists {
+            if playlist.folderURL != nil { folderPlaylists.append(playlist) }
+            else { legacyPlaylists.append(playlist) }
+        }
+
         // Persist only legacy (non-folder) playlists to UserDefaults.
-        let legacyPlaylists = playlists.filter { $0.folderURL == nil }
         if let data = try? JSONEncoder().encode(legacyPlaylists) {
             UserDefaults.standard.set(data, forKey: playlistsKey)
         }
 
         // Write metadata.json for every folder-based playlist.
-        for playlist in playlists where playlist.folderURL != nil {
+        for playlist in folderPlaylists {
             writeMetadata(for: playlist)
         }
     }
