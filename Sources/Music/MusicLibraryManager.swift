@@ -65,12 +65,15 @@ final class MusicLibraryManager: ObservableObject {
     }
 
     /// Sanitise a string so it is safe to use as a directory / file name.
+    /// Also strips parent-directory traversal sequences to prevent path escape.
     private func sanitizeFilename(_ name: String) -> String {
         let invalid = CharacterSet(charactersIn: "/\\:*?\"<>|")
-        let sanitized = name
+        var sanitized = name
             .components(separatedBy: invalid)
             .joined(separator: "_")
             .trimmingCharacters(in: .whitespacesAndNewlines)
+        // Replace any parent-directory references regardless of encoding.
+        sanitized = sanitized.replacingOccurrences(of: "..", with: "_")
         return String(sanitized.prefix(100))
     }
 
@@ -240,9 +243,9 @@ final class MusicLibraryManager: ObservableObject {
 
     func clearLibrary() {
         // Remove all playlist folders
-        for playlist in playlists where playlist.folderURL != nil {
-            if let folder = playlist.folderURL {
-                try? FileManager.default.removeItem(at: folder)
+        for playlist in playlists {
+            if let url = playlist.folderURL {
+                try? FileManager.default.removeItem(at: url)
             }
         }
         // Remove remaining songs in root directory
@@ -289,11 +292,7 @@ final class MusicLibraryManager: ObservableObject {
             if playlists[idx].folderURL == nil {
                 playlists[idx].folderURL = existingFolderURL
             }
-            if let folder = playlists[idx].folderURL {
-                var withFolder = playlists[idx]
-                withFolder.folderURL = folder
-                writeMetadata(for: withFolder, songs: songs(for: withFolder))
-            }
+            writeMetadata(for: playlists[idx], songs: songs(for: playlists[idx]))
             save()
         }
     }
@@ -309,13 +308,17 @@ final class MusicLibraryManager: ObservableObject {
         save()
     }
 
+    func songs(for playlist: Playlist) -> [Song] {
+        playlist.songIDs.compactMap { id in songs.first { $0.id == id } }
+    }
+
     /// Removes a song from a playlist.
     /// For folder-based playlists the song's file is also deleted from the playlist folder
     /// when the song was originally imported into it (song.playlistName == playlist.name).
     func removeSong(_ song: Song, fromPlaylist playlist: Playlist) {
         if let idx = playlists.firstIndex(where: { $0.id == playlist.id }) {
             playlists[idx].songIDs.removeAll { $0 == song.id }
-            if let folderURL = playlists[idx].folderURL, song.playlistName == playlist.name {
+            if playlists[idx].folderURL != nil, song.playlistName == playlist.name {
                 // The song file lives inside the playlist folder – delete it.
                 try? FileManager.default.removeItem(at: song.fileURL)
                 songs.removeAll { $0.id == song.id }
@@ -323,10 +326,6 @@ final class MusicLibraryManager: ObservableObject {
             }
         }
         save()
-    }
-
-    func songs(for playlist: Playlist) -> [Song] {
-        playlist.songIDs.compactMap { id in songs.first { $0.id == id } }
     }
 
     func song(by id: UUID) -> Song? {
@@ -468,8 +467,10 @@ final class MusicLibraryManager: ObservableObject {
 
         guard !fileURLs.isEmpty else { return nil }
 
-        let metaByFilename = Dictionary(grouping: songMetas, by: \.fileName)
-            .compactMapValues(\.first)
+        let metaByFilename: [String: PlaylistMetadata.SongMeta] = Dictionary(
+            songMetas.map { ($0.fileName, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
         let metaOrder = songMetas.map(\.fileName)
 
         var loadedSongs: [Song] = fileURLs.map { fileURL -> Song in
@@ -568,12 +569,26 @@ final class MusicLibraryManager: ObservableObject {
         let manifest = try JSONDecoder().decode(BackupManifest.self, from: manifestData)
 
         // Remove existing library
-        for playlist in playlists where playlist.folderURL != nil {
-            if let folder = playlist.folderURL { try? FileManager.default.removeItem(at: folder) }
+        for playlist in playlists {
+            if let folderURL = playlist.folderURL {
+                try? FileManager.default.removeItem(at: folderURL)
+            }
         }
         let rootFiles = (try? FileManager.default.contentsOfDirectory(at: musicDirectory, includingPropertiesForKeys: nil)) ?? []
         for fileURL in rootFiles where allowedExtensions.contains(fileURL.pathExtension.lowercased()) {
             try? FileManager.default.removeItem(at: fileURL)
+        }
+
+        // Pre-create playlist folders so all songs in the same playlist share the same folder URL.
+        // Track actual folder URLs keyed by playlist name to avoid timestamp collisions.
+        var restoredFoldersByName: [String: URL] = [:]
+        for record in manifest.songs where record.playlistName != nil {
+            let pName = record.playlistName!
+            if restoredFoldersByName[pName] == nil {
+                let folderURL = uniquePlaylistFolderURL(for: pName)
+                try? FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
+                restoredFoldersByName[pName] = folderURL
+            }
         }
 
         // Restore songs
@@ -591,9 +606,7 @@ final class MusicLibraryManager: ObservableObject {
             let songData = try extractData(from: songEntry, archive: archive)
 
             let destination: URL
-            if let pName = record.playlistName {
-                let folderURL = uniquePlaylistFolderURL(for: pName)
-                try? FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
+            if let pName = record.playlistName, let folderURL = restoredFoldersByName[pName] {
                 destination = uniqueFileURL(in: folderURL, for: record.fileName)
             } else {
                 destination = uniqueDestinationURL(for: record.fileName)
@@ -612,7 +625,7 @@ final class MusicLibraryManager: ObservableObject {
 
         songs = restoredSongs
 
-        // Restore playlists, re-attaching folderURL for folder-based ones
+        // Restore playlists, re-attaching the actual folderURL for folder-based ones.
         let validIDs = Set(restoredSongs.map(\.id))
         playlists = manifest.playlists.map { pl in
             var updated = pl
@@ -620,14 +633,12 @@ final class MusicLibraryManager: ObservableObject {
             if let aID = updated.artworkSongID, !validIDs.contains(aID) {
                 updated.artworkSongID = updated.songIDs.first
             }
-            // Re-attach folderURL if any restored song belongs to this playlist
-            if restoredSongs.contains(where: { $0.playlistName == pl.name }) {
-                updated.folderURL = musicDirectory.appendingPathComponent(pl.name, isDirectory: true)
-            }
+            // Re-attach the actual restored folder URL (may have a timestamp suffix).
+            updated.folderURL = restoredFoldersByName[pl.name]
             return updated
         }
 
-        for playlist in playlists where playlist.folderURL != nil {
+        for playlist in playlists {
             writeMetadata(for: playlist)
         }
         save()
