@@ -9,9 +9,11 @@ struct Song: Identifiable, Codable, Equatable {
     var artworkData: Data?
     var dateAdded: Date
     var playCount: Int
+    /// Non-nil when the song file lives inside a playlist folder (Documents/Music/{playlistName}/).
+    var playlistName: String?
 
     init(id: UUID = UUID(), title: String, artist: String, duration: TimeInterval,
-         fileURL: URL, artworkData: Data? = nil) {
+         fileURL: URL, artworkData: Data? = nil, playlistName: String? = nil) {
         self.id = id
         self.title = title
         self.artist = artist
@@ -20,10 +22,11 @@ struct Song: Identifiable, Codable, Equatable {
         self.artworkData = artworkData
         self.dateAdded = Date()
         self.playCount = 0
+        self.playlistName = playlistName
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, title, artist, duration, fileURL, artworkData, dateAdded, playCount
+        case id, title, artist, duration, fileURL, artworkData, dateAdded, playCount, playlistName
     }
 
     init(from decoder: Decoder) throws {
@@ -36,6 +39,7 @@ struct Song: Identifiable, Codable, Equatable {
         artworkData = try container.decodeIfPresent(Data.self, forKey: .artworkData)
         dateAdded = try container.decodeIfPresent(Date.self, forKey: .dateAdded) ?? Date()
         playCount = try container.decodeIfPresent(Int.self, forKey: .playCount) ?? 0
+        playlistName = try container.decodeIfPresent(String.self, forKey: .playlistName)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -48,6 +52,7 @@ struct Song: Identifiable, Codable, Equatable {
         try container.encodeIfPresent(artworkData, forKey: .artworkData)
         try container.encode(dateAdded, forKey: .dateAdded)
         try container.encode(playCount, forKey: .playCount)
+        try container.encodeIfPresent(playlistName, forKey: .playlistName)
     }
 
     var formattedDuration: String {

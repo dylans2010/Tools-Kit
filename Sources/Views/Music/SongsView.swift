@@ -70,9 +70,9 @@ struct SongsView: View {
     @State private var showSingleImporter = false
     @State private var showZIPImporter = false
     @State private var isImportingZIP = false
-    @State private var zipImportedSongs: [Song] = []
-    @State private var showZIPPlaylistAlert = false
-    @State private var showPlaylistNameAlert = false
+    @State private var pendingZIPURL: URL?
+    @State private var pendingZIPSecurityScoped = false
+    @State private var showZIPNameAlert = false
     @State private var pendingPlaylistName = ""
     @State private var showRenameAlert = false
     @State private var renameTargetSongID: UUID?
@@ -206,37 +206,38 @@ struct SongsView: View {
                 showZIPImporter = false
                 guard let url = urls.first else { return }
                 let accessing = url.startAccessingSecurityScopedResource()
+                pendingZIPURL = url
+                pendingZIPSecurityScoped = accessing
+                // Pre-fill name from the ZIP filename (without extension)
+                pendingPlaylistName = url.deletingPathExtension().lastPathComponent
+                showZIPNameAlert = true
+            }
+        }
+        .alert("Name Your Playlist", isPresented: $showZIPNameAlert) {
+            TextField("Playlist Name", text: $pendingPlaylistName)
+            Button("Import") {
+                guard let zipURL = pendingZIPURL else { return }
+                let name = pendingPlaylistName.trimmingCharacters(in: .whitespaces)
+                let secured = pendingZIPSecurityScoped
+                pendingZIPURL = nil
+                pendingZIPSecurityScoped = false
+                pendingPlaylistName = ""
                 isImportingZIP = true
                 Task {
-                    let imported = await library.importFromZIP(at: url)
-                    if accessing { url.stopAccessingSecurityScopedResource() }
-                    await MainActor.run {
-                        isImportingZIP = false
-                        if !imported.isEmpty {
-                            zipImportedSongs = imported
-                            showZIPPlaylistAlert = true
-                        }
-                    }
+                    await library.importFromZIP(at: zipURL, playlistName: name.isEmpty ? "Imported Playlist" : name)
+                    if secured { zipURL.stopAccessingSecurityScopedResource() }
+                    await MainActor.run { isImportingZIP = false }
                 }
             }
-        }
-        .alert("Create Playlist?", isPresented: $showZIPPlaylistAlert) {
-            Button("Yes") { pendingPlaylistName = ""; showPlaylistNameAlert = true }
-            Button("No", role: .cancel) { zipImportedSongs = [] }
-        } message: {
-            let count = zipImportedSongs.count
-            Text("Add \(count) imported \(count == 1 ? "song" : "songs") to a new playlist?")
-        }
-        .alert("Name Your Playlist", isPresented: $showPlaylistNameAlert) {
-            TextField("Playlist Name", text: $pendingPlaylistName)
-            Button("Create") {
-                let name = pendingPlaylistName.trimmingCharacters(in: .whitespaces)
-                library.createPlaylist(name: name.isEmpty ? "Imported Playlist" : name,
-                                       songIDs: zipImportedSongs.map(\.id))
-                zipImportedSongs = []; pendingPlaylistName = ""
+            Button("Cancel", role: .cancel) {
+                if pendingZIPSecurityScoped { pendingZIPURL?.stopAccessingSecurityScopedResource() }
+                pendingZIPURL = nil
+                pendingZIPSecurityScoped = false
+                pendingPlaylistName = ""
             }
-            Button("Cancel", role: .cancel) { zipImportedSongs = []; pendingPlaylistName = "" }
-        } message: { Text("Enter a name for your new playlist.") }
+        } message: {
+            Text("Enter a name for the new playlist that will be created from this ZIP file.")
+        }
         .alert("Rename Song", isPresented: $showRenameAlert) {
             TextField("Song Name", text: $pendingSongName)
             Button("Save") {

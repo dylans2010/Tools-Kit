@@ -74,9 +74,7 @@ struct PlaylistView: View {
     }
 
     private func removeSong(_ song: Song) {
-        var updated = playlist
-        updated.songIDs.removeAll { $0 == song.id }
-        library.updatePlaylist(updated)
+        library.removeSong(song, fromPlaylist: playlist)
     }
 
     private func moveSongs(from source: IndexSet, to destination: Int) {
