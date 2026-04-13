@@ -128,6 +128,38 @@
 		WS020000000000000000000B /* ToolHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000B /* ToolHeaderView.swift */; };
 		WS020000000000000000000C /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000C /* CardView.swift */; };
 		WS020000000000000000000D /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000D /* EmptyStateView.swift */; };
+		WS020000000000000000000E /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000E /* Article.swift */; };
+		WS020000000000000000000F /* ArticleCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000F /* ArticleCollection.swift */; };
+		WS0200000000000000000010 /* Spreadsheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000010 /* Spreadsheet.swift */; };
+		WS0200000000000000000011 /* SpreadsheetCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000011 /* SpreadsheetCell.swift */; };
+		WS0200000000000000000012 /* Notebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000012 /* Notebook.swift */; };
+		WS0200000000000000000013 /* NotebookFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000013 /* NotebookFolder.swift */; };
+		WS0200000000000000000014 /* NotebookPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000014 /* NotebookPage.swift */; };
+		WS0200000000000000000015 /* IntegrationTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000015 /* IntegrationTool.swift */; };
+		WS0200000000000000000016 /* ArticlesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000016 /* ArticlesManager.swift */; };
+		WS0200000000000000000017 /* ArticlesHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000017 /* ArticlesHomeView.swift */; };
+		WS0200000000000000000018 /* ArticleSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000018 /* ArticleSearchView.swift */; };
+		WS0200000000000000000019 /* ArticleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000019 /* ArticleDetailView.swift */; };
+		WS020000000000000000001A /* CollectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000001A /* CollectionsView.swift */; };
+		WS020000000000000000001B /* CollectionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000001B /* CollectionDetailView.swift */; };
+		WS020000000000000000001C /* CreateCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000001C /* CreateCollectionView.swift */; };
+		WS020000000000000000001D /* SpreadsheetsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000001D /* SpreadsheetsManager.swift */; };
+		WS020000000000000000001E /* SpreadsheetsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000001E /* SpreadsheetsHomeView.swift */; };
+		WS020000000000000000001F /* SpreadsheetEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000001F /* SpreadsheetEditorView.swift */; };
+		WS0200000000000000000020 /* CellEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000020 /* CellEditorView.swift */; };
+		WS0200000000000000000021 /* FormulaBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000021 /* FormulaBarView.swift */; };
+		WS0200000000000000000022 /* SpreadsheetToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000022 /* SpreadsheetToolbarView.swift */; };
+		WS0200000000000000000023 /* NotebooksManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000023 /* NotebooksManager.swift */; };
+		WS0200000000000000000024 /* NotebooksHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000024 /* NotebooksHomeView.swift */; };
+		WS0200000000000000000025 /* NotebookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000025 /* NotebookDetailView.swift */; };
+		WS0200000000000000000026 /* FolderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000026 /* FolderDetailView.swift */; };
+		WS0200000000000000000027 /* PageEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000027 /* PageEditorView.swift */; };
+		WS0200000000000000000028 /* NotebookSidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000028 /* NotebookSidebarView.swift */; };
+		WS0200000000000000000029 /* CreateNotebookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000029 /* CreateNotebookView.swift */; };
+		WS020000000000000000002A /* CreateFolderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000002A /* CreateFolderView.swift */; };
+		WS020000000000000000002B /* CreatePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000002B /* CreatePageView.swift */; };
+		WS020000000000000000002C /* IntegrationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000002C /* IntegrationsView.swift */; };
+		WS020000000000000000002D /* IntegrationEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000002D /* IntegrationEditorView.swift */; };
 		88656A686AF741EB83B8FD5F /* SliderQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711D3FB735414113B06478F1 /* MorseCodeView.swift */; };
@@ -794,6 +826,38 @@
 		WS010000000000000000000B /* ToolHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/ToolHeaderView.swift"; sourceTree = "<group>"; };
 		WS010000000000000000000C /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/CardView.swift"; sourceTree = "<group>"; };
 		WS010000000000000000000D /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/EmptyStateView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000000E /* Article.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/Article.swift"; sourceTree = "<group>"; };
+		WS010000000000000000000F /* ArticleCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/ArticleCollection.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000010 /* Spreadsheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/Spreadsheet.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000011 /* SpreadsheetCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/SpreadsheetCell.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000012 /* Notebook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/Notebook.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000013 /* NotebookFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/NotebookFolder.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000014 /* NotebookPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/NotebookPage.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000015 /* IntegrationTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/IntegrationTool.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000016 /* ArticlesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Articles/ArticlesManager.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000017 /* ArticlesHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Articles/ArticlesHomeView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000018 /* ArticleSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Articles/ArticleSearchView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000019 /* ArticleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Articles/ArticleDetailView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000001A /* CollectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Articles/CollectionsView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000001B /* CollectionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Articles/CollectionDetailView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000001C /* CreateCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Articles/CreateCollectionView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000001D /* SpreadsheetsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Spreadsheets/SpreadsheetsManager.swift"; sourceTree = "<group>"; };
+		WS010000000000000000001E /* SpreadsheetsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Spreadsheets/SpreadsheetsHomeView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000001F /* SpreadsheetEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Spreadsheets/SpreadsheetEditorView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000020 /* CellEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Spreadsheets/CellEditorView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000021 /* FormulaBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Spreadsheets/FormulaBarView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000022 /* SpreadsheetToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Spreadsheets/SpreadsheetToolbarView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000023 /* NotebooksManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/NotebooksManager.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000024 /* NotebooksHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/NotebooksHomeView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000025 /* NotebookDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/NotebookDetailView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000026 /* FolderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/FolderDetailView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000027 /* PageEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/PageEditorView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000028 /* NotebookSidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/NotebookSidebarView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000029 /* CreateNotebookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/CreateNotebookView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000002A /* CreateFolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/CreateFolderView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000002B /* CreatePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/CreatePageView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000002C /* IntegrationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/IntegrationsView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000002D /* IntegrationEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/IntegrationEditorView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1210,6 +1274,38 @@
 				WS010000000000000000000B /* ToolHeaderView.swift */,
 				WS010000000000000000000C /* CardView.swift */,
 				WS010000000000000000000D /* EmptyStateView.swift */,
+				WS010000000000000000000E /* Article.swift */,
+				WS010000000000000000000F /* ArticleCollection.swift */,
+				WS0100000000000000000010 /* Spreadsheet.swift */,
+				WS0100000000000000000011 /* SpreadsheetCell.swift */,
+				WS0100000000000000000012 /* Notebook.swift */,
+				WS0100000000000000000013 /* NotebookFolder.swift */,
+				WS0100000000000000000014 /* NotebookPage.swift */,
+				WS0100000000000000000015 /* IntegrationTool.swift */,
+				WS0100000000000000000016 /* ArticlesManager.swift */,
+				WS0100000000000000000017 /* ArticlesHomeView.swift */,
+				WS0100000000000000000018 /* ArticleSearchView.swift */,
+				WS0100000000000000000019 /* ArticleDetailView.swift */,
+				WS010000000000000000001A /* CollectionsView.swift */,
+				WS010000000000000000001B /* CollectionDetailView.swift */,
+				WS010000000000000000001C /* CreateCollectionView.swift */,
+				WS010000000000000000001D /* SpreadsheetsManager.swift */,
+				WS010000000000000000001E /* SpreadsheetsHomeView.swift */,
+				WS010000000000000000001F /* SpreadsheetEditorView.swift */,
+				WS0100000000000000000020 /* CellEditorView.swift */,
+				WS0100000000000000000021 /* FormulaBarView.swift */,
+				WS0100000000000000000022 /* SpreadsheetToolbarView.swift */,
+				WS0100000000000000000023 /* NotebooksManager.swift */,
+				WS0100000000000000000024 /* NotebooksHomeView.swift */,
+				WS0100000000000000000025 /* NotebookDetailView.swift */,
+				WS0100000000000000000026 /* FolderDetailView.swift */,
+				WS0100000000000000000027 /* PageEditorView.swift */,
+				WS0100000000000000000028 /* NotebookSidebarView.swift */,
+				WS0100000000000000000029 /* CreateNotebookView.swift */,
+				WS010000000000000000002A /* CreateFolderView.swift */,
+				WS010000000000000000002B /* CreatePageView.swift */,
+				WS010000000000000000002C /* IntegrationsView.swift */,
+				WS010000000000000000002D /* IntegrationEditorView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -1684,6 +1780,38 @@
 				WS020000000000000000000B /* ToolHeaderView.swift in Sources */,
 				WS020000000000000000000C /* CardView.swift in Sources */,
 				WS020000000000000000000D /* EmptyStateView.swift in Sources */,
+				WS020000000000000000000E /* Article.swift in Sources */,
+				WS020000000000000000000F /* ArticleCollection.swift in Sources */,
+				WS0200000000000000000010 /* Spreadsheet.swift in Sources */,
+				WS0200000000000000000011 /* SpreadsheetCell.swift in Sources */,
+				WS0200000000000000000012 /* Notebook.swift in Sources */,
+				WS0200000000000000000013 /* NotebookFolder.swift in Sources */,
+				WS0200000000000000000014 /* NotebookPage.swift in Sources */,
+				WS0200000000000000000015 /* IntegrationTool.swift in Sources */,
+				WS0200000000000000000016 /* ArticlesManager.swift in Sources */,
+				WS0200000000000000000017 /* ArticlesHomeView.swift in Sources */,
+				WS0200000000000000000018 /* ArticleSearchView.swift in Sources */,
+				WS0200000000000000000019 /* ArticleDetailView.swift in Sources */,
+				WS020000000000000000001A /* CollectionsView.swift in Sources */,
+				WS020000000000000000001B /* CollectionDetailView.swift in Sources */,
+				WS020000000000000000001C /* CreateCollectionView.swift in Sources */,
+				WS020000000000000000001D /* SpreadsheetsManager.swift in Sources */,
+				WS020000000000000000001E /* SpreadsheetsHomeView.swift in Sources */,
+				WS020000000000000000001F /* SpreadsheetEditorView.swift in Sources */,
+				WS0200000000000000000020 /* CellEditorView.swift in Sources */,
+				WS0200000000000000000021 /* FormulaBarView.swift in Sources */,
+				WS0200000000000000000022 /* SpreadsheetToolbarView.swift in Sources */,
+				WS0200000000000000000023 /* NotebooksManager.swift in Sources */,
+				WS0200000000000000000024 /* NotebooksHomeView.swift in Sources */,
+				WS0200000000000000000025 /* NotebookDetailView.swift in Sources */,
+				WS0200000000000000000026 /* FolderDetailView.swift in Sources */,
+				WS0200000000000000000027 /* PageEditorView.swift in Sources */,
+				WS0200000000000000000028 /* NotebookSidebarView.swift in Sources */,
+				WS0200000000000000000029 /* CreateNotebookView.swift in Sources */,
+				WS020000000000000000002A /* CreateFolderView.swift in Sources */,
+				WS020000000000000000002B /* CreatePageView.swift in Sources */,
+				WS020000000000000000002C /* IntegrationsView.swift in Sources */,
+				WS020000000000000000002D /* IntegrationEditorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
