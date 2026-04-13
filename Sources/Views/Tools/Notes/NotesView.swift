@@ -5,60 +5,106 @@ struct NotesView: View {
     @State private var showingAddNote = false
     @State private var searchText = ""
     @State private var selectedFolder: String? = nil
+    @State private var viewMode: ViewMode = .grid
+
+    private enum ViewMode { case grid, list }
+
+    private let twoColumns = [GridItem(.flexible()), GridItem(.flexible())]
 
     private var folders: [String] {
         Array(Set(backend.notes.map { $0.folder })).sorted()
     }
 
     private var filteredNotes: [Note] {
-        backend.notes.filter { note in
-            (searchText.isEmpty || note.title.localizedCaseInsensitiveContains(searchText) || note.content.localizedCaseInsensitiveContains(searchText)) &&
-            (selectedFolder == nil || note.folder == selectedFolder)
-        }
+        backend.notes
+            .filter { note in
+                (searchText.isEmpty
+                    || note.title.localizedCaseInsensitiveContains(searchText)
+                    || note.content.localizedCaseInsensitiveContains(searchText))
+                && (selectedFolder == nil || note.folder == selectedFolder)
+            }
+            .sorted { a, b in
+                if a.isPinned != b.isPinned { return a.isPinned }
+                return a.updatedAt > b.updatedAt
+            }
     }
 
     var body: some View {
-        ToolDetailView(tool: NotesTool()) {
-            VStack(spacing: 16) {
-                ToolInputSection("Folders") {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                // Folder filter chips
+                if !folders.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
-                            FolderChip(title: "All", isSelected: selectedFolder == nil) { selectedFolder = nil }
+                            FolderChip(title: "All", isSelected: selectedFolder == nil) {
+                                selectedFolder = nil
+                            }
                             ForEach(folders, id: \.self) { folder in
-                                FolderChip(title: folder, isSelected: selectedFolder == folder) { selectedFolder = folder }
+                                FolderChip(title: folder, isSelected: selectedFolder == folder) {
+                                    selectedFolder = folder
+                                }
                             }
                         }
-                        .padding()
+                        .padding(.horizontal)
+                        .padding(.vertical, 10)
                     }
+                    Divider()
+                        .padding(.horizontal)
                 }
 
-                ToolInputSection("Notes") {
-                    if filteredNotes.isEmpty {
-                        ContentUnavailableView("No Notes", systemImage: "note.text", description: Text("Create your first note with the + button."))
-                            .padding()
-                    } else {
+                // Empty state
+                if filteredNotes.isEmpty {
+                    EmptyStateView(
+                        icon: "note.text",
+                        title: "No Notes Yet",
+                        message: searchText.isEmpty
+                            ? "Tap the + button to create your first note."
+                            : "No notes match your search.",
+                        action: searchText.isEmpty ? { createNote() } : nil,
+                        actionLabel: "New Note"
+                    )
+                    .padding(.top, 20)
+                } else if viewMode == .grid {
+                    LazyVGrid(columns: twoColumns, spacing: 12) {
                         ForEach(filteredNotes) { note in
                             NavigationLink(destination: NoteEditorView(note: note, backend: backend)) {
-                                noteRow(for: note)
+                                NoteCardView(note: note, onPin: { togglePin(note) }, onDelete: { deleteNote(note) }, onDuplicate: { duplicateNote(note) })
                             }
-                            .padding(.horizontal)
-                            .padding(.vertical, 8)
-                            if note.id != filteredNotes.last?.id { Divider() }
+                            .buttonStyle(.plain)
                         }
                     }
+                    .padding(.horizontal)
+                    .padding(.top, 12)
+                } else {
+                    LazyVStack(spacing: 0) {
+                        ForEach(filteredNotes) { note in
+                            NavigationLink(destination: NoteEditorView(note: note, backend: backend)) {
+                                NoteListRowView(note: note)
+                            }
+                            .buttonStyle(.plain)
+                            Divider().padding(.leading, 16)
+                        }
+                    }
+                    .padding(.top, 8)
                 }
             }
         }
         .navigationTitle("Notes")
-        .searchable(text: $searchText)
+        .searchable(text: $searchText, prompt: "Search notes…")
+        .background(Color(.systemGroupedBackground))
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    let newNote = backend.createNote()
-                    backend.selectedNote = newNote
-                    showingAddNote = true
-                } label: {
-                    Image(systemName: "plus")
+                HStack(spacing: 14) {
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            viewMode = viewMode == .grid ? .list : .grid
+                        }
+                    } label: {
+                        Image(systemName: viewMode == .grid ? "list.bullet" : "square.grid.2x2")
+                    }
+                    Button(action: createNote) {
+                        Image(systemName: "square.and.pencil")
+                    }
                 }
             }
         }
@@ -71,25 +117,139 @@ struct NotesView: View {
         }
     }
 
-    @ViewBuilder
-    private func noteRow(for note: Note) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
+    // MARK: - Actions
+
+    private func createNote() {
+        let newNote = backend.createNote()
+        backend.selectedNote = newNote
+        showingAddNote = true
+    }
+
+    private func togglePin(_ note: Note) {
+        var updated = note
+        updated.isPinned.toggle()
+        backend.updateNote(updated)
+    }
+
+    private func deleteNote(_ note: Note) {
+        backend.deleteNote(note)
+    }
+
+    private func duplicateNote(_ note: Note) {
+        var copy = note
+        copy.id = UUID()
+        copy.title = "\(note.title) (Copy)"
+        copy.createdAt = Date()
+        copy.updatedAt = Date()
+        copy.isPinned = false
+        backend.notes.append(copy)
+        backend.updateNote(copy)
+    }
+}
+
+// MARK: - Note Card (Grid)
+
+private struct NoteCardView: View {
+    let note: Note
+    let onPin: () -> Void
+    let onDelete: () -> Void
+    let onDuplicate: () -> Void
+
+    private var accentColor: Color { note.isPinned ? .orange : .blue }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top) {
                 Image(systemName: note.isPinned ? "pin.fill" : "note.text")
-                    .foregroundColor(note.isPinned ? .orange : .blue)
-                Text(note.title)
-                    .font(.headline)
+                    .font(.caption)
+                    .foregroundColor(accentColor)
                 Spacer()
                 Text(note.updatedAt, style: .date)
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }
 
-            Text(note.content.isEmpty ? "No Content" : note.content)
+            Text(note.title.isEmpty ? "Untitled" : note.title)
+                .font(.subheadline.bold())
+                .foregroundColor(.primary)
                 .lineLimit(2)
-                .font(.subheadline)
+
+            Text(note.content.isEmpty ? "No content" : note.content)
+                .font(.caption)
                 .foregroundColor(.secondary)
+                .lineLimit(3)
+
+            if !note.tags.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 4) {
+                        ForEach(note.tags.prefix(3), id: \.self) { tag in
+                            Text("#\(tag)")
+                                .font(.caption2)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(accentColor.opacity(0.1))
+                                .foregroundColor(accentColor)
+                                .cornerRadius(6)
+                        }
+                    }
+                }
+            }
         }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(14)
+        .contextMenu {
+            Button { onPin() } label: {
+                Label(note.isPinned ? "Unpin" : "Pin", systemImage: note.isPinned ? "pin.slash" : "pin")
+            }
+            Button { onDuplicate() } label: {
+                Label("Duplicate", systemImage: "doc.on.doc")
+            }
+            Divider()
+            Button(role: .destructive) { onDelete() } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
+    }
+}
+
+// MARK: - Note List Row
+
+private struct NoteListRowView: View {
+    let note: Note
+
+    var body: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    if note.isPinned {
+                        Image(systemName: "pin.fill")
+                            .font(.caption2)
+                            .foregroundColor(.orange)
+                    }
+                    Text(note.title.isEmpty ? "Untitled" : note.title)
+                        .font(.subheadline.bold())
+                        .foregroundColor(.primary)
+                }
+                Text(note.content.isEmpty ? "No content" : note.content)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+            }
+            Spacer()
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(note.updatedAt, style: .date)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                Image(systemName: "chevron.right")
+                    .font(.caption2)
+                    .foregroundColor(.tertiaryLabel)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(Color(.secondarySystemBackground))
     }
 }
 

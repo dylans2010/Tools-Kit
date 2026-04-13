@@ -2,10 +2,13 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var modeManager = MusicModeManager.shared
+    @StateObject private var workspaceMode = WorkspaceModeManager.shared
 
     var body: some View {
         if modeManager.isMusicModeEnabled {
             MusicTabView()
+        } else if workspaceMode.isWorkspaceModeEnabled {
+            WorkspaceHomeView()
         } else {
             DashboardView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

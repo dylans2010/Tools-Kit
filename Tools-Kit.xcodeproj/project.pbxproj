@@ -115,6 +115,19 @@
 		RD0200000000000000000008 /* SimpleNowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RD0100000000000000000008 /* SimpleNowPlayingView.swift */; };
 		RD0200000000000000000009 /* MusicHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RD0100000000000000000009 /* MusicHomeView.swift */; };
 		RD020000000000000000000A /* MusicSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RD010000000000000000000A /* MusicSearchView.swift */; };
+		WS0200000000000000000001 /* WorkspaceModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000001 /* WorkspaceModeManager.swift */; };
+		WS0200000000000000000002 /* WorkspaceHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000002 /* WorkspaceHomeView.swift */; };
+		WS0200000000000000000003 /* SlideDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000003 /* SlideDeck.swift */; };
+		WS0200000000000000000004 /* Slide.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000004 /* Slide.swift */; };
+		WS0200000000000000000005 /* SlideElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000005 /* SlideElement.swift */; };
+		WS0200000000000000000006 /* SlidesHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000006 /* SlidesHomeView.swift */; };
+		WS0200000000000000000007 /* SlideEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000007 /* SlideEditorView.swift */; };
+		WS0200000000000000000008 /* PresentationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000008 /* PresentationView.swift */; };
+		WS0200000000000000000009 /* SlideThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000009 /* SlideThumbnailView.swift */; };
+		WS020000000000000000000A /* SlideDecksManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000A /* SlideDecksManager.swift */; };
+		WS020000000000000000000B /* ToolHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000B /* ToolHeaderView.swift */; };
+		WS020000000000000000000C /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000C /* CardView.swift */; };
+		WS020000000000000000000D /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000D /* EmptyStateView.swift */; };
 		88656A686AF741EB83B8FD5F /* SliderQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711D3FB735414113B06478F1 /* MorseCodeView.swift */; };
@@ -768,6 +781,19 @@
 		RD0100000000000000000008 /* SimpleNowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/SimpleNowPlayingView.swift"; sourceTree = "<group>"; };
 		RD0100000000000000000009 /* MusicHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/MusicHomeView.swift"; sourceTree = "<group>"; };
 		RD010000000000000000000A /* MusicSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/MusicSearchView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000001 /* WorkspaceModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/WorkspaceModeManager.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000002 /* WorkspaceHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/WorkspaceHomeView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000003 /* SlideDeck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/SlideDeck.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000004 /* Slide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/Slide.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000005 /* SlideElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/SlideElement.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000006 /* SlidesHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Slides/SlidesHomeView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000007 /* SlideEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Slides/SlideEditorView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000008 /* PresentationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Slides/PresentationView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000009 /* SlideThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Slides/SlideThumbnailView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000000A /* SlideDecksManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Slides/SlideDecksManager.swift"; sourceTree = "<group>"; };
+		WS010000000000000000000B /* ToolHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/ToolHeaderView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000000C /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/CardView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000000D /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/EmptyStateView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1171,6 +1197,19 @@
 			RD0100000000000000000008 /* SimpleNowPlayingView.swift */,
 			RD0100000000000000000009 /* MusicHomeView.swift */,
 			RD010000000000000000000A /* MusicSearchView.swift */,
+				WS0100000000000000000001 /* WorkspaceModeManager.swift */,
+				WS0100000000000000000002 /* WorkspaceHomeView.swift */,
+				WS0100000000000000000003 /* SlideDeck.swift */,
+				WS0100000000000000000004 /* Slide.swift */,
+				WS0100000000000000000005 /* SlideElement.swift */,
+				WS0100000000000000000006 /* SlidesHomeView.swift */,
+				WS0100000000000000000007 /* SlideEditorView.swift */,
+				WS0100000000000000000008 /* PresentationView.swift */,
+				WS0100000000000000000009 /* SlideThumbnailView.swift */,
+				WS010000000000000000000A /* SlideDecksManager.swift */,
+				WS010000000000000000000B /* ToolHeaderView.swift */,
+				WS010000000000000000000C /* CardView.swift */,
+				WS010000000000000000000D /* EmptyStateView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -1632,6 +1671,19 @@
 				RD0200000000000000000008 /* SimpleNowPlayingView.swift in Sources */,
 				RD0200000000000000000009 /* MusicHomeView.swift in Sources */,
 				RD020000000000000000000A /* MusicSearchView.swift in Sources */,
+				WS0200000000000000000001 /* WorkspaceModeManager.swift in Sources */,
+				WS0200000000000000000002 /* WorkspaceHomeView.swift in Sources */,
+				WS0200000000000000000003 /* SlideDeck.swift in Sources */,
+				WS0200000000000000000004 /* Slide.swift in Sources */,
+				WS0200000000000000000005 /* SlideElement.swift in Sources */,
+				WS0200000000000000000006 /* SlidesHomeView.swift in Sources */,
+				WS0200000000000000000007 /* SlideEditorView.swift in Sources */,
+				WS0200000000000000000008 /* PresentationView.swift in Sources */,
+				WS0200000000000000000009 /* SlideThumbnailView.swift in Sources */,
+				WS020000000000000000000A /* SlideDecksManager.swift in Sources */,
+				WS020000000000000000000B /* ToolHeaderView.swift in Sources */,
+				WS020000000000000000000C /* CardView.swift in Sources */,
+				WS020000000000000000000D /* EmptyStateView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
