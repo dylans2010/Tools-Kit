@@ -224,8 +224,10 @@ struct SongsView: View {
                 pendingPlaylistName = ""
                 isImportingZIP = true
                 Task {
+                    defer {
+                        if secured { zipURL.stopAccessingSecurityScopedResource() }
+                    }
                     await library.importFromZIP(at: zipURL, playlistName: name.isEmpty ? "Imported Playlist" : name)
-                    if secured { zipURL.stopAccessingSecurityScopedResource() }
                     await MainActor.run { isImportingZIP = false }
                 }
             }

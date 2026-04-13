@@ -93,11 +93,13 @@ final class MusicLibraryManager: ObservableObject {
     /// Returns a unique file URL inside `folderURL` for the given filename.
     private func uniqueFileURL(in folderURL: URL, for filename: String) -> URL {
         let sanitized = sanitizeFilename(filename)
-        let fileURL = URL(fileURLWithPath: sanitized.isEmpty ? "song.mp3" : sanitized)
-        let base = fileURL.deletingPathExtension().lastPathComponent
-        let ext = fileURL.pathExtension
+        let safeName = sanitized.isEmpty ? "song.mp3" : sanitized
+        // Extract base name and extension directly from the sanitized string.
+        let nameURL = URL(fileURLWithPath: safeName)
+        let base = nameURL.deletingPathExtension().lastPathComponent
+        let ext = nameURL.pathExtension
 
-        var candidate = folderURL.appendingPathComponent(sanitized.isEmpty ? "song.mp3" : sanitized)
+        var candidate = folderURL.appendingPathComponent(safeName)
         if !FileManager.default.fileExists(atPath: candidate.path) { return candidate }
 
         var index = 1
@@ -300,8 +302,9 @@ final class MusicLibraryManager: ObservableObject {
     func deletePlaylist(_ playlist: Playlist) {
         playlists.removeAll { $0.id == playlist.id }
         if let folderURL = playlist.folderURL {
-            // Remove all in-memory songs that belong to this playlist folder
-            songs.removeAll { $0.playlistName == playlist.name }
+            // Remove in-memory songs that both carry this playlist name AND are in this playlist's songIDs.
+            let playlistSongIDs = Set(playlist.songIDs)
+            songs.removeAll { $0.playlistName == playlist.name && playlistSongIDs.contains($0.id) }
             // Remove the physical folder (and all its contents)
             try? FileManager.default.removeItem(at: folderURL)
         }
@@ -534,7 +537,7 @@ final class MusicLibraryManager: ObservableObject {
         for song in songs where FileManager.default.fileExists(atPath: song.fileURL.path) {
             let backupFileName = uniqueBackupFileName(for: song.fileURL.lastPathComponent, usedNames: &usedNames)
             let data = try Data(contentsOf: song.fileURL)
-            let archivePath = song.playlistName.map { "playlists/\($0)/\(backupFileName)" } ?? "songs/\(backupFileName)"
+            let archivePath = song.playlistName.map { "playlists/\(sanitizeFilename($0))/\(backupFileName)" } ?? "songs/\(backupFileName)"
             try addToArchive(data: data, atPath: archivePath, archive: archive)
 
             records.append(BackupSongRecord(
@@ -580,10 +583,10 @@ final class MusicLibraryManager: ObservableObject {
         }
 
         // Pre-create playlist folders so all songs in the same playlist share the same folder URL.
-        // Track actual folder URLs keyed by playlist name to avoid timestamp collisions.
+        // Track actual folder URLs keyed by sanitized playlist name to avoid timestamp collisions.
         var restoredFoldersByName: [String: URL] = [:]
-        for record in manifest.songs where record.playlistName != nil {
-            let pName = record.playlistName!
+        for record in manifest.songs {
+            guard let pName = record.playlistName else { continue }
             if restoredFoldersByName[pName] == nil {
                 let folderURL = uniquePlaylistFolderURL(for: pName)
                 try? FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
@@ -596,7 +599,7 @@ final class MusicLibraryManager: ObservableObject {
         for record in manifest.songs {
             let archivePath: String
             if let pName = record.playlistName {
-                archivePath = "playlists/\(pName)/\(record.fileName)"
+                archivePath = "playlists/\(sanitizeFilename(pName))/\(record.fileName)"
             } else {
                 archivePath = "songs/\(record.fileName)"
             }
