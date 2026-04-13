@@ -65,8 +65,7 @@ final class MusicLibraryManager: ObservableObject {
     }
 
     /// Sanitise a string so it is safe to use as a directory / file name.
-    /// Replaces filesystem-invalid characters and path-traversal sequences,
-    /// then verifies the resulting component doesn't resolve outside the parent directory.
+    /// Replaces filesystem-invalid characters and path-traversal sequences.
     private func sanitizeFilename(_ name: String) -> String {
         let invalid = CharacterSet(charactersIn: "/\\:*?\"<>|")
         var sanitized = name
@@ -76,8 +75,6 @@ final class MusicLibraryManager: ObservableObject {
         // Replace all parent-directory references regardless of encoding.
         sanitized = sanitized.replacingOccurrences(of: "..", with: "_")
         let result = String(sanitized.prefix(100))
-        // Final check: the name must not contain a path separator after sanitization.
-        if result.contains("/") || result.contains("\\") { return "_" }
         return result.isEmpty ? "_" : result
     }
 
@@ -322,13 +319,13 @@ final class MusicLibraryManager: ObservableObject {
 
     /// Removes a song from a playlist.
     /// For folder-based playlists the song's file is also deleted from the playlist folder
-    /// when the song's fileURL is contained within the playlist's folder.
+    /// when the song's file lives directly inside that folder.
     func removeSong(_ song: Song, fromPlaylist playlist: Playlist) {
         if let idx = playlists.firstIndex(where: { $0.id == playlist.id }) {
             playlists[idx].songIDs.removeAll { $0 == song.id }
             if let folderURL = playlists[idx].folderURL,
-               song.fileURL.path.hasPrefix(folderURL.path + "/") {
-                // The song file lives inside the playlist folder – delete it.
+               song.fileURL.deletingLastPathComponent().standardizedFileURL == folderURL.standardizedFileURL {
+                // The song file lives directly inside the playlist folder – delete it.
                 try? FileManager.default.removeItem(at: song.fileURL)
                 songs.removeAll { $0.id == song.id }
                 writeMetadata(for: playlists[idx], songs: songs(for: playlists[idx]))
