@@ -45,9 +45,11 @@ struct MusicHomeView: View {
     @StateObject private var library = MusicLibraryManager.shared
     @StateObject private var player = MusicPlayerManager.shared
     @State private var showNowPlaying = false
+    @State private var showSearch = false
     @State private var suggestions: [Song] = []
     @State private var recentlyAdded: [Song] = []
     @State private var topPlayed: [Song] = []
+    @State private var favorites: [Song] = []
 
     var body: some View {
         NavigationStack {
@@ -58,6 +60,16 @@ struct MusicHomeView: View {
                             emptyLibraryPrompt
                                 .padding(.top, 60)
                         } else {
+                            if !favorites.isEmpty {
+                                SongSectionCarousel(
+                                    title: "Favorites",
+                                    subtitle: "Your most played",
+                                    systemImage: "heart.fill",
+                                    songs: favorites,
+                                    onTap: playSong
+                                )
+                            }
+
                             if !suggestions.isEmpty {
                                 SongSectionCarousel(
                                     title: "Suggested For You",
@@ -103,9 +115,19 @@ struct MusicHomeView: View {
             }
             .navigationTitle("Home")
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button { showSearch = true } label: {
+                        Image(systemName: "magnifyingglass")
+                    }
+                }
+            }
             .animation(.spring(response: 0.38, dampingFraction: 0.85), value: player.currentSong != nil)
+            .fullScreenCover(isPresented: $showSearch) {
+                MusicSearchView()
+            }
             .sheet(isPresented: $showNowPlaying) {
-                SimpleNowPlayingView()
+                NowPlayingView()
             }
         }
         .onAppear { computeSuggestions() }
@@ -117,6 +139,7 @@ struct MusicHomeView: View {
         suggestions = MusicRecommendationEngine.suggestions(from: songs)
         recentlyAdded = MusicRecommendationEngine.recentlyAdded(from: songs)
         topPlayed = MusicRecommendationEngine.topPlayed(from: songs)
+        favorites = Array(songs.filter { $0.playCount > 0 }.sorted { $0.playCount > $1.playCount }.prefix(10))
     }
 
     private func playSong(_ song: Song) {
