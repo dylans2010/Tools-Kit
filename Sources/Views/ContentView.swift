@@ -5,10 +5,60 @@ struct ContentView: View {
 
     var body: some View {
         if modeManager.isMusicModeEnabled {
-            MusicLibraryView()
+            MusicTabView()
         } else {
             DashboardView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+}
+
+// MARK: - Music Tab Bar
+
+struct MusicTabView: View {
+    @State private var selectedTab: MusicAppTab = .home
+
+    enum MusicAppTab: String, CaseIterable {
+        case home    = "Home"
+        case library = "Library"
+        case search  = "Search"
+        case radio   = "Radio"
+
+        var icon: String {
+            switch self {
+            case .home:    return "house.fill"
+            case .library: return "music.note.list"
+            case .search:  return "magnifyingglass"
+            case .radio:   return "antenna.radiowaves.left.and.right"
+            }
+        }
+    }
+
+    var body: some View {
+        TabView(selection: $selectedTab) {
+            MusicHomeView()
+                .tabItem {
+                    Label(MusicAppTab.home.rawValue, systemImage: MusicAppTab.home.icon)
+                }
+                .tag(MusicAppTab.home)
+
+            MusicLibraryView()
+                .tabItem {
+                    Label(MusicAppTab.library.rawValue, systemImage: MusicAppTab.library.icon)
+                }
+                .tag(MusicAppTab.library)
+
+            MusicSearchView()
+                .tabItem {
+                    Label(MusicAppTab.search.rawValue, systemImage: MusicAppTab.search.icon)
+                }
+                .tag(MusicAppTab.search)
+
+            RadioView()
+                .tabItem {
+                    Label(MusicAppTab.radio.rawValue, systemImage: MusicAppTab.radio.icon)
+                }
+                .tag(MusicAppTab.radio)
         }
     }
 }

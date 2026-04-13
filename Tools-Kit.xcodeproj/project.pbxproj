@@ -101,6 +101,16 @@
 		FF0200000000000000000007 /* FinishedFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0100000000000000000007 /* FinishedFetch.swift */; };
 		FF0200000000000000000008 /* FallbackFetchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0100000000000000000008 /* FallbackFetchView.swift */; };
 		FF0200000000000000000009 /* ThirdPartyAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0100000000000000000009 /* ThirdPartyAPI.swift */; };
+		RD0200000000000000000001 /* InternalLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = RD0100000000000000000001 /* InternalLogger.swift */; };
+		RD0200000000000000000002 /* RadioStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = RD0100000000000000000002 /* RadioStation.swift */; };
+		RD0200000000000000000003 /* RadioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = RD0100000000000000000003 /* RadioService.swift */; };
+		RD0200000000000000000004 /* RadioPlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RD0100000000000000000004 /* RadioPlayerManager.swift */; };
+		RD0200000000000000000005 /* RadioViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = RD0100000000000000000005 /* RadioViewModel.swift */; };
+		RD0200000000000000000006 /* RadioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RD0100000000000000000006 /* RadioView.swift */; };
+		RD0200000000000000000007 /* NowPlayingRadioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RD0100000000000000000007 /* NowPlayingRadioView.swift */; };
+		RD0200000000000000000008 /* SimpleNowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RD0100000000000000000008 /* SimpleNowPlayingView.swift */; };
+		RD0200000000000000000009 /* MusicHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RD0100000000000000000009 /* MusicHomeView.swift */; };
+		RD020000000000000000000A /* MusicSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RD010000000000000000000A /* MusicSearchView.swift */; };
 		88656A686AF741EB83B8FD5F /* SliderQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711D3FB735414113B06478F1 /* MorseCodeView.swift */; };
@@ -740,6 +750,16 @@
 		FF0100000000000000000008 /* FallbackFetchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/FallbackFetch/FallbackFetchView.swift"; sourceTree = "<group>"; };
 		FF0100000000000000000009 /* ThirdPartyAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Services/FallbackFetch/ThirdPartyAPI.swift"; sourceTree = "<group>"; };
 		MU0100000000000000000020 /* SpotifyFetchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Views/SpotifyFetchView.swift"; sourceTree = "<group>"; };
+		RD0100000000000000000001 /* InternalLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Models/Radio/InternalLogger.swift"; sourceTree = "<group>"; };
+		RD0100000000000000000002 /* RadioStation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Models/Radio/RadioStation.swift"; sourceTree = "<group>"; };
+		RD0100000000000000000003 /* RadioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Models/Radio/RadioService.swift"; sourceTree = "<group>"; };
+		RD0100000000000000000004 /* RadioPlayerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Models/Radio/RadioPlayerManager.swift"; sourceTree = "<group>"; };
+		RD0100000000000000000005 /* RadioViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/Models/Radio/RadioViewModel.swift"; sourceTree = "<group>"; };
+		RD0100000000000000000006 /* RadioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/Radio/RadioView.swift"; sourceTree = "<group>"; };
+		RD0100000000000000000007 /* NowPlayingRadioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/Radio/NowPlayingRadioView.swift"; sourceTree = "<group>"; };
+		RD0100000000000000000008 /* SimpleNowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/SimpleNowPlayingView.swift"; sourceTree = "<group>"; };
+		RD0100000000000000000009 /* MusicHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/MusicHomeView.swift"; sourceTree = "<group>"; };
+		RD010000000000000000000A /* MusicSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Music/MusicSearchView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1129,6 +1149,16 @@
 			FF0100000000000000000007 /* FinishedFetch.swift */,
 			FF0100000000000000000008 /* FallbackFetchView.swift */,
 			FF0100000000000000000009 /* ThirdPartyAPI.swift */,
+			RD0100000000000000000001 /* InternalLogger.swift */,
+			RD0100000000000000000002 /* RadioStation.swift */,
+			RD0100000000000000000003 /* RadioService.swift */,
+			RD0100000000000000000004 /* RadioPlayerManager.swift */,
+			RD0100000000000000000005 /* RadioViewModel.swift */,
+			RD0100000000000000000006 /* RadioView.swift */,
+			RD0100000000000000000007 /* NowPlayingRadioView.swift */,
+			RD0100000000000000000008 /* SimpleNowPlayingView.swift */,
+			RD0100000000000000000009 /* MusicHomeView.swift */,
+			RD010000000000000000000A /* MusicSearchView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -1576,6 +1606,16 @@
 				FF0200000000000000000007 /* FinishedFetch.swift in Sources */,
 				FF0200000000000000000008 /* FallbackFetchView.swift in Sources */,
 				FF0200000000000000000009 /* ThirdPartyAPI.swift in Sources */,
+				RD0200000000000000000001 /* InternalLogger.swift in Sources */,
+				RD0200000000000000000002 /* RadioStation.swift in Sources */,
+				RD0200000000000000000003 /* RadioService.swift in Sources */,
+				RD0200000000000000000004 /* RadioPlayerManager.swift in Sources */,
+				RD0200000000000000000005 /* RadioViewModel.swift in Sources */,
+				RD0200000000000000000006 /* RadioView.swift in Sources */,
+				RD0200000000000000000007 /* NowPlayingRadioView.swift in Sources */,
+				RD0200000000000000000008 /* SimpleNowPlayingView.swift in Sources */,
+				RD0200000000000000000009 /* MusicHomeView.swift in Sources */,
+				RD020000000000000000000A /* MusicSearchView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
