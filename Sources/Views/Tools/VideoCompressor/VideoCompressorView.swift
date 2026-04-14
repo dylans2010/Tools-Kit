@@ -33,7 +33,11 @@ struct VideoCompressorView: View {
             FileImporterRepresentableView(allowedContentTypes: [.movie]) { urls in
                 Task {
                     if let url = urls.first {
-                        try? await backend.compressVideo(at: url)
+                        do {
+                            try await backend.compressVideo(at: url)
+                        } catch {
+                            print("VideoCompressor: compression failed: \(error)")
+                        }
                     }
                 }
             }

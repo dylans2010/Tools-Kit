@@ -25,54 +25,73 @@ struct WorkspaceHomeView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            NavigationStack {
-                WorkspaceDashboardView()
-            }
-            .tabItem {
-                Label(WorkspaceTab.overview.rawValue, systemImage: WorkspaceTab.overview.icon)
-            }
-            .tag(WorkspaceTab.overview)
-
-            NavigationStack {
-                NotesView()
-            }
-            .tabItem {
-                Label(WorkspaceTab.notes.rawValue, systemImage: WorkspaceTab.notes.icon)
-            }
-            .tag(WorkspaceTab.notes)
-
-            NavigationStack {
-                MailHomeView()
-            }
-            .tabItem {
-                Label(WorkspaceTab.mail.rawValue, systemImage: WorkspaceTab.mail.icon)
-            }
-            .tag(WorkspaceTab.mail)
-
-            NavigationStack {
-                NotebooksHomeView()
-            }
-            .tabItem {
-                Label(WorkspaceTab.notebooks.rawValue, systemImage: WorkspaceTab.notebooks.icon)
-            }
-            .tag(WorkspaceTab.notebooks)
-
-            NavigationStack {
-                TasksHomeView()
-            }
-            .tabItem {
-                Label(WorkspaceTab.tasks.rawValue, systemImage: WorkspaceTab.tasks.icon)
-            }
-            .tag(WorkspaceTab.tasks)
-
-            NavigationStack {
-                ArticlesHomeView()
-            }
-            .tabItem {
-                Label(WorkspaceTab.articles.rawValue, systemImage: WorkspaceTab.articles.icon)
-            }
-            .tag(WorkspaceTab.articles)
+            overviewTab
+            notesTab
+            mailTab
+            notebooksTab
+            tasksTab
+            articlesTab
         }
+    }
+
+    private var overviewTab: some View {
+        NavigationStack {
+            WorkspaceDashboardView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.overview.rawValue, systemImage: WorkspaceTab.overview.icon)
+        }
+        .tag(WorkspaceTab.overview)
+    }
+
+    private var notesTab: some View {
+        NavigationStack {
+            NotesView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.notes.rawValue, systemImage: WorkspaceTab.notes.icon)
+        }
+        .tag(WorkspaceTab.notes)
+    }
+
+    private var mailTab: some View {
+        NavigationStack {
+            MailHomeView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.mail.rawValue, systemImage: WorkspaceTab.mail.icon)
+        }
+        .tag(WorkspaceTab.mail)
+    }
+
+    private var notebooksTab: some View {
+        NavigationStack {
+            NotebooksHomeView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.notebooks.rawValue, systemImage: WorkspaceTab.notebooks.icon)
+        }
+        .tag(WorkspaceTab.notebooks)
+    }
+
+    private var tasksTab: some View {
+        NavigationStack {
+            TasksHomeView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.tasks.rawValue, systemImage: WorkspaceTab.tasks.icon)
+        }
+        .tag(WorkspaceTab.tasks)
+    }
+
+    private var articlesTab: some View {
+        NavigationStack {
+            ArticlesHomeView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.articles.rawValue, systemImage: WorkspaceTab.articles.icon)
+        }
+        .tag(WorkspaceTab.articles)
     }
 }
 
@@ -101,208 +120,13 @@ struct WorkspaceDashboardView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 welcomeHeader
-
-                // Quick Actions
-                dashboardSection(title: "Quick Actions", icon: "bolt.fill", color: .yellow) {
-                    HStack(spacing: 12) {
-                        quickActionButton("New Task", icon: "plus.circle.fill", color: .blue) {
-                            showingCreateTask = true
-                        }
-                        quickActionButton("New Notebook", icon: "book.closed.fill", color: .indigo) {
-                            showingCreateNotebook = true
-                        }
-                        NavigationLink(destination: ArticleSearchView()) {
-                            VStack(spacing: 8) {
-                                Image(systemName: "newspaper.fill")
-                                    .font(.title3)
-                                    .foregroundColor(.orange)
-                                    .padding(12)
-                                    .background(Color.orange.opacity(0.12))
-                                    .clipShape(Circle())
-                                Text("Find Article")
-                                    .font(.caption.bold())
-                                    .foregroundColor(.primary)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
-                            .background(Color(.secondarySystemGroupedBackground))
-                            .cornerRadius(16)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    .padding(.horizontal)
-                }
-
-                // Quick Stats
-                dashboardSection(title: "Quick Stats", icon: "chart.bar.fill", color: .teal) {
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                        WorkspaceStatCard(value: "\(notebooksManager.notebooks.count)", label: "Notebooks", icon: "book.closed.fill", color: .indigo)
-                        WorkspaceStatCard(value: "\(tasksManager.todayTasks.count)", label: "Tasks Today", icon: "checklist", color: .blue)
-                        WorkspaceStatCard(value: "\(articlesManager.recentArticles.count)", label: "Articles Saved", icon: "newspaper.fill", color: .orange)
-                        WorkspaceStatCard(value: "\(habitsManager.habits.filter { $0.isCompletedToday() }.count)/\(habitsManager.habits.count)", label: "Habits Done", icon: "flame.fill", color: .red)
-                    }
-                    .padding(.horizontal)
-                }
-
-                // More Tools Section
-                dashboardSection(title: "More Tools", icon: "square.grid.2x2.fill", color: .purple) {
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                        ForEach(moreTools, id: \.title) { tool in
-                            NavigationLink(destination: tool.destination) {
-                                VStack(spacing: 12) {
-                                    Image(systemName: tool.icon)
-                                        .font(.title2)
-                                        .foregroundColor(.white)
-                                        .frame(width: 44, height: 44)
-                                        .background(Circle().fill(tool.color))
-
-                                    Text(tool.title)
-                                        .font(.subheadline.bold())
-                                        .foregroundColor(.primary)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
-                                .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 4)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .padding(.horizontal)
-                }
-
-                // Today's Calendar Events
-                dashboardSection(title: "Today's Events", icon: "calendar", color: .green) {
-                    let todayEvents = calendarManager.events(on: Date())
-                    VStack(spacing: 10) {
-                        if todayEvents.isEmpty {
-                            Text("No Events Today")
-                                .foregroundColor(.secondary)
-                                .font(.callout)
-                                .padding(.horizontal)
-                        } else {
-                            ForEach(todayEvents.prefix(3)) { event in
-                                HStack(spacing: 12) {
-                                    RoundedRectangle(cornerRadius: 3)
-                                        .fill(Color(hex: event.priority.color) ?? .green)
-                                        .frame(width: 4, height: 40)
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(event.title)
-                                            .font(.subheadline.bold())
-                                            .lineLimit(1)
-                                        Text(event.formattedTimeRange)
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    Spacer()
-                                }
-                                .padding()
-                                .background(Color(.secondarySystemGroupedBackground))
-                                .cornerRadius(12)
-                            }
-                        }
-                        NavigationLink("View Calendar") {
-                            CalendarHomeView()
-                        }
-                        .font(.caption.bold())
-                        .padding(.horizontal)
-                    }
-                    .padding(.horizontal)
-                }
-
-                // Habits Progress
-                if !habitsManager.habits.isEmpty {
-                    dashboardSection(title: "Today's Habits", icon: "flame.fill", color: .red) {
-                        VStack(spacing: 10) {
-                            let completedCount = habitsManager.habits.filter { $0.isCompletedToday() }.count
-                            let total = habitsManager.habits.count
-                            let progress = total > 0 ? Double(completedCount) / Double(total) : 0.0
-
-                            HStack {
-                                Text("\(Int(progress * 100))% Complete")
-                                    .font(.subheadline.bold())
-                                    .foregroundColor(.red)
-                                Spacer()
-                                Text("\(completedCount)/\(total) Habits")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(.horizontal)
-
-                            ProgressView(value: progress)
-                                .tint(.red)
-                                .padding(.horizontal)
-
-                            ForEach(habitsManager.habits.prefix(4)) { habit in
-                                HStack {
-                                    Image(systemName: habit.icon)
-                                        .foregroundColor(Color(hex: habit.colorHex) ?? .blue)
-                                        .frame(width: 24)
-                                    Text(habit.name)
-                                        .font(.subheadline)
-                                        .lineLimit(1)
-                                    Spacer()
-                                    if habit.isCompletedToday() {
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .foregroundColor(.green)
-                                    } else {
-                                        Text("\(habit.todayCount())/\(habit.targetCount)")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                }
-                                .padding()
-                                .background(Color(.secondarySystemGroupedBackground))
-                                .cornerRadius(12)
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-                }
-
-                dashboardSection(title: "Recent Notebooks", icon: "book.closed.fill", color: .indigo) {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 16) {
-                            if notebooksManager.notebooks.isEmpty {
-                                Text("No Notebooks Yet").foregroundColor(.secondary).font(.callout)
-                            }
-                            ForEach(notebooksManager.notebooks.prefix(5)) { notebook in
-                                NavigationLink(destination: NotebookDetailView(notebook: notebook)) {
-                                    DashboardCard(title: notebook.name, subtitle: "\(notebook.folders.count) Folders", icon: "book.closed.fill", color: .indigo)
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-                }
-
-                dashboardSection(title: "Today's Tasks", icon: "checklist", color: .blue) {
-                    VStack(spacing: 12) {
-                        if tasksManager.todayTasks.isEmpty {
-                            Text("All Caught Up!").foregroundColor(.secondary).font(.callout).padding(.vertical, 8)
-                        }
-                        ForEach(tasksManager.todayTasks.prefix(3)) { task in
-                            HStack {
-                                Image(systemName: task.completed ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(task.completed ? .green : .secondary)
-                                Text(task.title)
-                                    .font(.subheadline)
-                                    .lineLimit(1)
-                                Spacer()
-                                if let due = task.dueDate {
-                                    Text(due, style: .time)
-                                        .font(.caption2)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                            .padding()
-                            .background(Color(.secondarySystemGroupedBackground))
-                            .cornerRadius(12)
-                        }
-                    }
-                    .padding(.horizontal)
-                }
+                quickActionsSection
+                quickStatsSection
+                moreToolsSection
+                todaysEventsSection
+                habitsSection
+                recentNotebooksSection
+                todaysTasksSection
             }
             .padding(.vertical)
         }
@@ -325,6 +149,221 @@ struct WorkspaceDashboardView: View {
         }
         .sheet(isPresented: $showingCreateNotebook) {
             CreateNotebookView()
+        }
+    }
+
+    private var quickActionsSection: some View {
+        dashboardSection(title: "Quick Actions", icon: "bolt.fill", color: .yellow) {
+            HStack(spacing: 12) {
+                quickActionButton("New Task", icon: "plus.circle.fill", color: .blue) {
+                    showingCreateTask = true
+                }
+                quickActionButton("New Notebook", icon: "book.closed.fill", color: .indigo) {
+                    showingCreateNotebook = true
+                }
+                NavigationLink(destination: ArticleSearchView()) {
+                    VStack(spacing: 8) {
+                        Image(systemName: "newspaper.fill")
+                            .font(.title3)
+                            .foregroundColor(.orange)
+                            .padding(12)
+                            .background(Color.orange.opacity(0.12))
+                            .clipShape(Circle())
+                        Text("Find Article")
+                            .font(.caption.bold())
+                            .foregroundColor(.primary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .cornerRadius(16)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    private var quickStatsSection: some View {
+        dashboardSection(title: "Quick Stats", icon: "chart.bar.fill", color: .teal) {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                WorkspaceStatCard(value: "\(notebooksManager.notebooks.count)", label: "Notebooks", icon: "book.closed.fill", color: .indigo)
+                WorkspaceStatCard(value: "\(tasksManager.todayTasks.count)", label: "Tasks Today", icon: "checklist", color: .blue)
+                WorkspaceStatCard(value: "\(articlesManager.recentArticles.count)", label: "Articles Saved", icon: "newspaper.fill", color: .orange)
+                WorkspaceStatCard(value: "\(habitsManager.habits.filter { $0.isCompletedToday() }.count)/\(habitsManager.habits.count)", label: "Habits Done", icon: "flame.fill", color: .red)
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    private var moreToolsSection: some View {
+        dashboardSection(title: "More Tools", icon: "square.grid.2x2.fill", color: .purple) {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                ForEach(moreTools, id: \.title) { tool in
+                    NavigationLink(destination: tool.destination) {
+                        VStack(spacing: 12) {
+                            Image(systemName: tool.icon)
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .frame(width: 44, height: 44)
+                                .background(Circle().fill(tool.color))
+
+                            Text(tool.title)
+                                .font(.subheadline.bold())
+                                .foregroundColor(.primary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
+                        .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 4)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    private var todaysEventsSection: some View {
+        let todayEvents = calendarManager.events(on: Date())
+        return dashboardSection(title: "Today's Events", icon: "calendar", color: .green) {
+            VStack(spacing: 10) {
+                if todayEvents.isEmpty {
+                    Text("No Events Today")
+                        .foregroundColor(.secondary)
+                        .font(.callout)
+                        .padding(.horizontal)
+                } else {
+                    ForEach(todayEvents.prefix(3)) { event in
+                        HStack(spacing: 12) {
+                            RoundedRectangle(cornerRadius: 3)
+                                .fill(Color(hex: event.priority.color) ?? .green)
+                                .frame(width: 4, height: 40)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(event.title)
+                                    .font(.subheadline.bold())
+                                    .lineLimit(1)
+                                Text(event.formattedTimeRange)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                        }
+                        .padding()
+                        .background(Color(.secondarySystemGroupedBackground))
+                        .cornerRadius(12)
+                    }
+                }
+                NavigationLink("View Calendar") {
+                    CalendarHomeView()
+                }
+                .font(.caption.bold())
+                .padding(.horizontal)
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    @ViewBuilder
+    private var habitsSection: some View {
+        if !habitsManager.habits.isEmpty {
+            dashboardSection(title: "Today's Habits", icon: "flame.fill", color: .red) {
+                habitsProgress
+            }
+        }
+    }
+
+    private var habitsProgress: some View {
+        let completedCount = habitsManager.habits.filter { $0.isCompletedToday() }.count
+        let total = habitsManager.habits.count
+        let progress = total > 0 ? Double(completedCount) / Double(total) : 0.0
+        return VStack(spacing: 10) {
+            HStack {
+                Text("\(Int(progress * 100))% Complete")
+                    .font(.subheadline.bold())
+                    .foregroundColor(.red)
+                Spacer()
+                Text("\(completedCount)/\(total) Habits")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.horizontal)
+
+            ProgressView(value: progress)
+                .tint(.red)
+                .padding(.horizontal)
+
+            ForEach(habitsManager.habits.prefix(4)) { habit in
+                HStack {
+                    Image(systemName: habit.icon)
+                        .foregroundColor(Color(hex: habit.colorHex) ?? .blue)
+                        .frame(width: 24)
+                    Text(habit.name)
+                        .font(.subheadline)
+                        .lineLimit(1)
+                    Spacer()
+                    if habit.isCompletedToday() {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                    } else {
+                        Text("\(habit.todayCount())/\(habit.targetCount)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding()
+                .background(Color(.secondarySystemGroupedBackground))
+                .cornerRadius(12)
+            }
+        }
+        .padding(.horizontal)
+    }
+
+    private var recentNotebooksSection: some View {
+        dashboardSection(title: "Recent Notebooks", icon: "book.closed.fill", color: .indigo) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    if notebooksManager.notebooks.isEmpty {
+                        Text("No Notebooks Yet").foregroundColor(.secondary).font(.callout)
+                    }
+                    ForEach(notebooksManager.notebooks.prefix(5)) { notebook in
+                        NavigationLink(destination: NotebookDetailView(notebook: notebook)) {
+                            DashboardCard(title: notebook.name, subtitle: "\(notebook.folders.count) Folders", icon: "book.closed.fill", color: .indigo)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
+
+    private var todaysTasksSection: some View {
+        dashboardSection(title: "Today's Tasks", icon: "checklist", color: .blue) {
+            VStack(spacing: 12) {
+                if tasksManager.todayTasks.isEmpty {
+                    Text("All Caught Up!").foregroundColor(.secondary).font(.callout).padding(.vertical, 8)
+                }
+                ForEach(tasksManager.todayTasks.prefix(3)) { task in
+                    HStack {
+                        Image(systemName: task.completed ? "checkmark.circle.fill" : "circle")
+                            .foregroundColor(task.completed ? .green : .secondary)
+                        Text(task.title)
+                            .font(.subheadline)
+                            .lineLimit(1)
+                        Spacer()
+                        if let due = task.dueDate {
+                            Text(due, style: .time)
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding()
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .cornerRadius(12)
+                }
+            }
+            .padding(.horizontal)
         }
     }
 
