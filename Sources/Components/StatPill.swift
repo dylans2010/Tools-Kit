@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct StatPill: View {
-    let title: String
+    let label: String
     let value: String
     let color: Color
 
@@ -10,7 +10,7 @@ struct StatPill: View {
             Text(value)
                 .font(.system(.title3, design: .rounded).bold())
                 .foregroundColor(color)
-            Text(title)
+            Text(label)
                 .font(.caption2)
                 .foregroundColor(.secondary)
         }
