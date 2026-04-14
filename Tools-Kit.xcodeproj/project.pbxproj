@@ -11,6 +11,8 @@
 		53EC1AF8723044F3BFB42AB2 /* MailFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EEEF45551F542229BE32D06 /* MailFolder.swift */; };
 		169F73E894D6416298DC841C /* MailMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E0ABB5BDAD4793B4FE4B93 /* MailMessage.swift */; };
 		A08E51C322934D398CFF8C14 /* MailThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = F236C75C5ACB4018A839FB36 /* MailThread.swift */; };
+		FC0200000000000000000001 /* FilterChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0100000000000000000001 /* FilterChip.swift */; };
+		SP0200000000000000000001 /* StatPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0100000000000000000001 /* StatPill.swift */; };
 		8229B675224E4601A7B980CD /* MailAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF38182EF444218AFF7D2D3 /* MailAIService.swift */; };
 		BC63F5FE32D0419AB791F193 /* iCloudMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */; };
 		F0BE8D2657C349B7B03F24F4 /* MailProviderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B5DD1027FA49B99C531EDE /* MailProviderProtocol.swift */; };
@@ -483,6 +485,8 @@
 		1EEEF45551F542229BE32D06 /* MailFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailFolder.swift; sourceTree = "<group>"; };
 		E1E0ABB5BDAD4793B4FE4B93 /* MailMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailMessage.swift; sourceTree = "<group>"; };
 		F236C75C5ACB4018A839FB36 /* MailThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailThread.swift; sourceTree = "<group>"; };
+		FC0100000000000000000001 /* FilterChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/FilterChip.swift; sourceTree = "<group>"; };
+		SP0100000000000000000001 /* StatPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/StatPill.swift; sourceTree = "<group>"; };
 		7BF38182EF444218AFF7D2D3 /* MailAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/AI/MailAIService.swift; sourceTree = "<group>"; };
 		E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/iCloudMailProvider.swift; sourceTree = "<group>"; };
 		C1B5DD1027FA49B99C531EDE /* MailProviderProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/MailProviderProtocol.swift; sourceTree = "<group>"; };
@@ -1384,6 +1388,8 @@
 				WS010000000000000000000B /* ToolHeaderView.swift */,
 				WS010000000000000000000C /* CardView.swift */,
 				WS010000000000000000000D /* EmptyStateView.swift */,
+				FC0100000000000000000001 /* FilterChip.swift */,
+				SP0100000000000000000001 /* StatPill.swift */,
 				WS010000000000000000000E /* Article.swift */,
 				WS010000000000000000000F /* ArticleCollection.swift */,
 				WS0100000000000000000010 /* Spreadsheet.swift */,
@@ -1935,6 +1941,8 @@
 				WS020000000000000000000B /* ToolHeaderView.swift in Sources */,
 				WS020000000000000000000C /* CardView.swift in Sources */,
 				WS020000000000000000000D /* EmptyStateView.swift in Sources */,
+				FC0200000000000000000001 /* FilterChip.swift in Sources */,
+				SP0200000000000000000001 /* StatPill.swift in Sources */,
 				WS020000000000000000000E /* Article.swift in Sources */,
 				WS020000000000000000000F /* ArticleCollection.swift in Sources */,
 				WS0200000000000000000010 /* Spreadsheet.swift in Sources */,

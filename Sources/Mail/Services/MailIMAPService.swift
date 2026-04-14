@@ -95,12 +95,15 @@ class MailIMAPService: @unchecked Sendable {
                     threadId: UUID().uuidString,
                     from: currentMessage["from"] ?? "Unknown",
                     to: ["me@icloud.com"],
+                    cc: [],
+                    bcc: [],
                     subject: currentMessage["subject"] ?? "No Subject",
                     body: currentMessage["snippet"] ?? "",
                     htmlBody: nil,
                     date: Date(),
                     isRead: false,
-                    isStarred: false
+                    isStarred: false,
+                    attachments: []
                 )
                 messages.append(msg)
                 currentMessage = [:]

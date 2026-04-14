@@ -128,7 +128,7 @@ struct MonthDayCell: View {
                         .fill(isToday ? Color.accentColor : (isSelected ? Color.accentColor.opacity(0.15) : Color.clear))
                         .frame(width: 32, height: 32)
                     Text(dayNumber)
-                        .font(.system(.subheadline, design: .rounded).bold(isToday || isSelected))
+                        .font(.system(.subheadline, design: .rounded).weight((isToday || isSelected) ? .bold : .regular))
                         .foregroundColor(isToday ? .white : (isCurrentMonth ? .primary : .secondary.opacity(0.5)))
                 }
 
