@@ -10,7 +10,7 @@ struct CreateFolderView: View {
         NavigationStack {
             Form {
                 Section("Folder Name") {
-                    TextField("e.g. Chapter 1", text: $name)
+                    TextField("Enter Folder Name", text: $name)
                 }
             }
             .navigationTitle("New Folder")

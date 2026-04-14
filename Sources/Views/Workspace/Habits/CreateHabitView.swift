@@ -45,7 +45,7 @@ struct CreateHabitView: View {
                             }
                         }
                         .buttonStyle(.plain)
-                        TextField("Habit name (e.g. Drink Water)", text: $name)
+                        TextField("Habit Name", text: $name)
                     }
 
                     Picker("Frequency", selection: $frequency) {
@@ -54,7 +54,7 @@ struct CreateHabitView: View {
                         }
                     }
 
-                    Stepper("Target: \(targetCount)x per day", value: $targetCount, in: 1...20)
+                    Stepper("Target: \(targetCount)x Per Day", value: $targetCount, in: 1...20)
                 }
 
                 Section("Color") {

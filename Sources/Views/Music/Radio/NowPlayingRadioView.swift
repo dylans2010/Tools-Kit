@@ -71,7 +71,7 @@ struct NowPlayingRadioView: View {
             }
             Spacer()
             VStack(spacing: 2) {
-                Text("RADIO")
+                Text("Radio")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.white.opacity(0.6))
                     .tracking(2)

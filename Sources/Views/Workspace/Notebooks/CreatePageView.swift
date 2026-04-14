@@ -11,7 +11,7 @@ struct CreatePageView: View {
         NavigationStack {
             Form {
                 Section("Page Title") {
-                    TextField("e.g. Meeting Notes", text: $title)
+                    TextField("Enter Page Title", text: $title)
                 }
             }
             .navigationTitle("New Page")

@@ -26,7 +26,7 @@ struct CreateEventView: View {
                 ZStack(alignment: .topTrailing) {
                     ZStack(alignment: .topLeading) {
                         if description.isEmpty {
-                            Text("Description (optional)")
+                            Text("Description (Optional)")
                                 .foregroundColor(Color(.placeholderText))
                                 .padding(.top, 8)
                                 .padding(.leading, 4)
@@ -144,7 +144,7 @@ struct AISummarySheet: View {
             HStack {
                 Image(systemName: "sparkles")
                     .foregroundColor(.purple)
-                Text("AI Event Assistant")
+                Text("Event Assistant")
                     .font(.headline)
                 Spacer()
             }
@@ -152,7 +152,7 @@ struct AISummarySheet: View {
 
             if isLoading {
                 Spacer()
-                ProgressView("Analyzing event...")
+                ProgressView("Analyzing Event...")
                 Spacer()
             } else {
                 ScrollView {

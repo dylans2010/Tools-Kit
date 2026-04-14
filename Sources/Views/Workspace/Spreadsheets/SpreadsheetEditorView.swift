@@ -261,7 +261,7 @@ struct SpreadsheetEditorView: View {
                             .padding()
                     }
                 } else {
-                    Text("Choose an AI action")
+                    Text("Choose an AI Action")
                         .foregroundColor(.secondary)
                 }
                 Spacer()

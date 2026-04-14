@@ -50,7 +50,7 @@ struct ArticleSearchView: View {
                 } else if let error = errorMessage {
                     Text(error).foregroundColor(.red).listRowSeparator(.hidden)
                 } else if results.isEmpty && !searchText.isEmpty {
-                    Text("No results found.").foregroundColor(.secondary).listRowSeparator(.hidden)
+                    Text("No Results Found").foregroundColor(.secondary).listRowSeparator(.hidden)
                 } else {
                     ForEach(results) { article in
                         NavigationLink {

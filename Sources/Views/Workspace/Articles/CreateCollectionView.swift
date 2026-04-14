@@ -23,7 +23,7 @@ struct CreateCollectionView: View {
         NavigationStack {
             Form {
                 Section("Name") {
-                    TextField("Collection name", text: $name)
+                    TextField("Collection Name", text: $name)
                 }
 
                 Section("Icon") {

@@ -91,7 +91,7 @@ struct BoardColumnView: View {
             ScrollView {
                 VStack(spacing: 10) {
                     if tasks.isEmpty {
-                        Text("No tasks")
+                        Text("No Tasks")
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .frame(maxWidth: .infinity)

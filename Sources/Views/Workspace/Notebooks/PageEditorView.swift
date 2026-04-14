@@ -47,7 +47,7 @@ struct PageEditorView: View {
                 } else {
                     ZStack(alignment: .topLeading) {
                         if content.isEmpty {
-                            Text("Start typing your notes...")
+                            Text("Start Typing...")
                                 .foregroundColor(.secondary)
                                 .padding(.horizontal, 20)
                                 .padding(.top, 12)
@@ -71,7 +71,7 @@ struct PageEditorView: View {
 
                 HStack {
                     HStack(spacing: 8) {
-                        Text("\(content.split { $0.isWhitespace }.count) words")
+                        Text("\(content.split { $0.isWhitespace }.count) Words")
                         Text("•")
                         Text("Edited \(page.updatedAt, style: .time)")
                     }

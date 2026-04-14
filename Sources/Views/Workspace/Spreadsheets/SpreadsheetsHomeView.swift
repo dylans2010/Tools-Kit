@@ -73,7 +73,7 @@ struct SpreadsheetsHomeView: View {
         NavigationStack {
             Form {
                 Section("Name") {
-                    TextField("e.g. Budget 2024", text: $newName)
+                    TextField("Spreadsheet Name", text: $newName)
                 }
             }
             .navigationTitle("New Spreadsheet")

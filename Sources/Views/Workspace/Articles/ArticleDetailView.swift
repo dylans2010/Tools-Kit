@@ -37,7 +37,7 @@ struct ArticleDetailView: View {
                     if isLoading {
                         HStack {
                             Spacer()
-                            ProgressView("Loading article…")
+                            ProgressView("Loading Article…")
                             Spacer()
                         }
                         .padding(.vertical, 40)
@@ -70,7 +70,7 @@ struct ArticleDetailView: View {
 
                     // Source link
                     if let url = URL(string: displayArticle.sourceURL) {
-                        Link("View on Wikipedia", destination: url)
+                        Link("View On Wikipedia", destination: url)
                             .font(.caption)
                             .foregroundColor(.blue)
                             .padding(.top, 8)
@@ -127,7 +127,7 @@ struct ArticleDetailView: View {
                     }
                 }
             }
-            .navigationTitle("Save to Collection")
+            .navigationTitle("Save To Collection")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

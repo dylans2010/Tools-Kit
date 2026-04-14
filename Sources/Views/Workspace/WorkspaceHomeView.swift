@@ -175,7 +175,7 @@ struct WorkspaceDashboardView: View {
                     let todayEvents = calendarManager.events(on: Date())
                     VStack(spacing: 10) {
                         if todayEvents.isEmpty {
-                            Text("No events today")
+                            Text("No Events Today")
                                 .foregroundColor(.secondary)
                                 .font(.callout)
                                 .padding(.horizontal)
@@ -222,7 +222,7 @@ struct WorkspaceDashboardView: View {
                                     .font(.subheadline.bold())
                                     .foregroundColor(.red)
                                 Spacer()
-                                Text("\(completedCount)/\(total) habits")
+                                Text("\(completedCount)/\(total) Habits")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
@@ -263,11 +263,11 @@ struct WorkspaceDashboardView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 16) {
                             if notebooksManager.notebooks.isEmpty {
-                                Text("No notebooks yet").foregroundColor(.secondary).font(.callout)
+                                Text("No Notebooks Yet").foregroundColor(.secondary).font(.callout)
                             }
                             ForEach(notebooksManager.notebooks.prefix(5)) { notebook in
                                 NavigationLink(destination: NotebookDetailView(notebook: notebook)) {
-                                    DashboardCard(title: notebook.name, subtitle: "\(notebook.folders.count) folders", icon: "book.closed.fill", color: .indigo)
+                                    DashboardCard(title: notebook.name, subtitle: "\(notebook.folders.count) Folders", icon: "book.closed.fill", color: .indigo)
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -279,7 +279,7 @@ struct WorkspaceDashboardView: View {
                 dashboardSection(title: "Today's Tasks", icon: "checklist", color: .blue) {
                     VStack(spacing: 12) {
                         if tasksManager.todayTasks.isEmpty {
-                            Text("All caught up!").foregroundColor(.secondary).font(.callout).padding(.vertical, 8)
+                            Text("All Caught Up!").foregroundColor(.secondary).font(.callout).padding(.vertical, 8)
                         }
                         ForEach(tasksManager.todayTasks.prefix(3)) { task in
                             HStack {
@@ -317,10 +317,10 @@ struct WorkspaceDashboardView: View {
 
     private var welcomeHeader: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Welcome back,")
+            Text("Welcome back!")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            Text("Your Workspace")
+            Text("Summary")
                 .font(.title2.bold())
         }
         .padding(.horizontal)

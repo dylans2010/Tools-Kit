@@ -22,7 +22,7 @@ struct CreateTaskView: View {
                     TextField("Task title", text: $title)
                     ZStack(alignment: .topLeading) {
                         if description.isEmpty {
-                            Text("Notes (optional)")
+                            Text("Notes (Optional)")
                                 .foregroundColor(Color(.placeholderText))
                                 .padding(.top, 8)
                                 .padding(.leading, 4)
@@ -43,7 +43,7 @@ struct CreateTaskView: View {
                 }
 
                 Section("Due Date") {
-                    Toggle("Set due date", isOn: $hasDueDate)
+                    Toggle("Set Due Date", isOn: $hasDueDate)
                     if hasDueDate {
                         DatePicker("Due Date", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
                             .datePickerStyle(.compact)

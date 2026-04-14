@@ -9,7 +9,7 @@ struct CreateNotebookView: View {
         NavigationStack {
             Form {
                 Section("Notebook Name") {
-                    TextField("e.g. Work Notes", text: $name)
+                    TextField("Enter Notebook Name", text: $name)
                 }
             }
             .navigationTitle("New Notebook")

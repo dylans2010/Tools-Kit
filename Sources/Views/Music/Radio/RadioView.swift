@@ -36,7 +36,7 @@ struct RadioView: View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.secondary)
-            TextField("Search stations…", text: $viewModel.searchText)
+            TextField("Search Stations", text: $viewModel.searchText)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
             if !viewModel.searchText.isEmpty {

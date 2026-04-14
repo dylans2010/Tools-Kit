@@ -62,7 +62,7 @@ private struct CollectionCard: View {
                 .font(.subheadline.bold())
                 .lineLimit(1)
 
-            Text("\(collection.articles.count) articles")
+            Text("\(collection.articles.count) Articles")
                 .font(.caption)
                 .foregroundColor(.secondary)
         }
