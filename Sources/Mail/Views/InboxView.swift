@@ -157,30 +157,45 @@ struct InboxView: View {
 
     @ViewBuilder
     private func threadRow(_ thread: MailThread) -> some View {
-        NavigationLink(destination: MailThreadView(account: account, thread: thread)) {
-            MailThreadRow(thread: thread)
-        }
-        .swipeActions(edge: .leading) {
-            Button {
-                toggleStar(thread)
-            } label: {
-                Label("Star", systemImage: thread.messages.first?.isStarred == true ? "star.slash" : "star")
+        if let message = thread.messages.last {
+            NavigationLink(
+                destination: MailThreadView(
+                    viewModel: MailViewModel(),
+                    email: EmailMessage(
+                        uid: Int(message.id) ?? 0,
+                        subject: message.subject,
+                        sender: message.from,
+                        date: message.date,
+                        preview: String(message.body.prefix(100)),
+                        isRead: message.isRead,
+                        body: message.body
+                    )
+                )
+            ) {
+                MailThreadRow(thread: thread)
             }
-            .tint(.yellow)
-        }
-        .swipeActions(edge: .trailing) {
-            Button(role: .destructive) {
-                deleteThread(thread)
-            } label: {
-                Label("Delete", systemImage: "trash")
+            .swipeActions(edge: .leading) {
+                Button {
+                    toggleStar(thread)
+                } label: {
+                    Label("Star", systemImage: thread.messages.first?.isStarred == true ? "star.slash" : "star")
+                }
+                .tint(.yellow)
             }
+            .swipeActions(edge: .trailing) {
+                Button(role: .destructive) {
+                    deleteThread(thread)
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
 
-            Button {
-                toggleRead(thread)
-            } label: {
-                Label(thread.isRead ? "Unread" : "Read", systemImage: thread.isRead ? "envelope.badge" : "envelope.open")
+                Button {
+                    toggleRead(thread)
+                } label: {
+                    Label(thread.isRead ? "Unread" : "Read", systemImage: thread.isRead ? "envelope.badge" : "envelope.open")
+                }
+                .tint(.blue)
             }
-            .tint(.blue)
         }
     }
 
