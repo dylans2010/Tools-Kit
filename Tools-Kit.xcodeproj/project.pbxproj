@@ -937,7 +937,7 @@
 		WS0100000000000000000039 /* HabitsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Habits/HabitsManager.swift"; sourceTree = "<group>"; };
 		WS010000000000000000003A /* CreateHabitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Habits/CreateHabitView.swift"; sourceTree = "<group>"; };
 		WS010000000000000000003B /* HabitDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Habits/HabitDetailView.swift"; sourceTree = "<group>"; };
-		WS010000000000000000003C /* WorkspaceHabitTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Habits/HabitTrackerView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000003C /* WorkspaceHabitTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Habits/WorkspaceHabitTrackerView.swift"; sourceTree = "<group>"; };
 		WS010000000000000000003D /* HabitAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Habits/HabitAnalyticsView.swift"; sourceTree = "<group>"; };
 		WS010000000000000000003E /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/CalendarManager.swift"; sourceTree = "<group>"; };
 		WS010000000000000000003F /* CalendarHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/CalendarHomeView.swift"; sourceTree = "<group>"; };
