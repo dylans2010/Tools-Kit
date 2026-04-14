@@ -104,6 +104,8 @@ struct WorkspaceDashboardView: View {
     @StateObject private var calendarManager = CalendarManager.shared
     @StateObject private var habitsManager = HabitsManager.shared
 
+    @StateObject private var settingsManager = AIChatSettingsManager.shared
+
     @State private var showingCreateTask = false
     @State private var showingCreateNotebook = false
     @State private var showingSettings = false
@@ -142,7 +144,7 @@ struct WorkspaceDashboardView: View {
             }
         }
         .sheet(isPresented: $showingSettings) {
-            AIChatSettingsView()
+            AIChatSettingsView(settings: $settingsManager.settings)
         }
         .sheet(isPresented: $showingCreateTask) {
             CreateTaskView { task in tasksManager.addTask(task) }
