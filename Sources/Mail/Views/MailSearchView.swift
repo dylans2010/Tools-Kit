@@ -1,14 +1,33 @@
 import SwiftUI
 
 struct MailSearchView: View {
-    let account: MailAccount
+    @ObservedObject var viewModel: MailViewModel
     @State private var searchText = ""
-    @State private var results: [MailThread] = []
+    @State private var results: [EmailMessage] = []
 
     var body: some View {
-        List(results) { thread in
-            NavigationLink(destination: MailThreadView(account: account, thread: thread)) {
-                MailThreadRow(thread: thread)
+        List(results) { email in
+            NavigationLink(destination: MailThreadView(viewModel: viewModel, email: email)) {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(email.sender)
+                            .font(.headline)
+                            .lineLimit(1)
+                        Spacer()
+                        Text(email.date, style: .date)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Text(email.subject)
+                        .font(.subheadline)
+                        .lineLimit(1)
+                    if !email.preview.isEmpty {
+                        Text(email.preview)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .lineLimit(2)
+                    }
+                }
             }
         }
         .navigationTitle("Search")
@@ -19,6 +38,10 @@ struct MailSearchView: View {
     }
 
     private func performSearch(_ query: String) {
-        // Implement local search across all folders
+        guard !query.isEmpty else { results = []; return }
+        results = viewModel.emails.filter {
+            $0.subject.localizedCaseInsensitiveContains(query) ||
+            $0.sender.localizedCaseInsensitiveContains(query)
+        }
     }
 }

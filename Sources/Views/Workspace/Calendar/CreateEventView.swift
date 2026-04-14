@@ -169,7 +169,7 @@ struct AISummarySheet: View {
                         copied = true
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copied = false }
                     } label: {
-                        Label(copied ? "Copied!" : "Copy Summary", systemName: copied ? "checkmark" : "doc.on.doc")
+                        Label(copied ? "Copied!" : "Copy Summary", systemImage: copied ? "checkmark" : "doc.on.doc")
                     }
                     .buttonStyle(.bordered)
 

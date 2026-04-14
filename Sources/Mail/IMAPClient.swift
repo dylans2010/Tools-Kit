@@ -216,12 +216,14 @@ class IMAPClient: ObservableObject {
         let data = (command + "\r\n").data(using: .utf8)!
         connection?.send(content: data, completion: .contentProcessed { [weak self] error in
             if let error {
-                DispatchQueue.main.async {
+                Task { @MainActor [weak self] in
                     self?.errorMessage = "Send error: \(error.localizedDescription)"
                 }
                 return
             }
-            self?.receiveUntilTagged(tag: tag)
+            Task { @MainActor [weak self] in
+                self?.receiveUntilTagged(tag: tag)
+            }
         })
     }
 

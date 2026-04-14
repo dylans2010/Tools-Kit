@@ -95,14 +95,14 @@ final class WiFiTransferServer: ObservableObject {
                 }
                 let bodyStr = lines.dropFirst(headerEnd + 1).joined(separator: "\r\n")
                 let body = bodyStr.data(using: .utf8) ?? Data()
-                self.handleValidateCode(body: body, connection: connection)
+                Task { @MainActor [weak self] in self?.handleValidateCode(body: body, connection: connection) }
             case ("POST", "/upload-chunk"):
-                self.handleUploadChunk(rawRequest: data, connection: connection)
+                Task { @MainActor [weak self] in self?.handleUploadChunk(rawRequest: data, connection: connection) }
             case ("POST", "/finalize-upload"):
                 let body = self.extractHTTPBody(from: data)
-                self.handleFinalizeUpload(body: body, connection: connection)
+                Task { @MainActor [weak self] in self?.handleFinalizeUpload(body: body, connection: connection) }
             default:
-                self.sendNotFound(connection)
+                Task { @MainActor [weak self] in self?.sendNotFound(connection) }
             }
         }
     }
