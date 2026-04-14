@@ -151,31 +151,36 @@ struct InboxView: View {
     @ViewBuilder
     private var threadListSection: some View {
         ForEach(filteredThreads) { thread in
-            NavigationLink(destination: MailThreadView(account: account, thread: thread)) {
-                MailThreadRow(thread: thread)
-            }
-            .swipeActions(edge: .leading) {
-                Button {
-                    toggleStar(thread)
-                } label: {
-                    Label("Star", systemImage: thread.messages.first?.isStarred == true ? "star.slash" : "star")
-                }
-                .tint(.yellow)
-            }
-            .swipeActions(edge: .trailing) {
-                Button(role: .destructive) {
-                    deleteThread(thread)
-                } label: {
-                    Label("Delete", systemImage: "trash")
-                }
+            threadRow(thread)
+        }
+    }
 
-                Button {
-                    toggleRead(thread)
-                } label: {
-                    Label(thread.isRead ? "Unread" : "Read", systemImage: thread.isRead ? "envelope.badge" : "envelope.open")
-                }
-                .tint(.blue)
+    @ViewBuilder
+    private func threadRow(_ thread: MailThread) -> some View {
+        NavigationLink(destination: MailThreadView(account: account, thread: thread)) {
+            MailThreadRow(thread: thread)
+        }
+        .swipeActions(edge: .leading) {
+            Button {
+                toggleStar(thread)
+            } label: {
+                Label("Star", systemImage: thread.messages.first?.isStarred == true ? "star.slash" : "star")
             }
+            .tint(.yellow)
+        }
+        .swipeActions(edge: .trailing) {
+            Button(role: .destructive) {
+                deleteThread(thread)
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+
+            Button {
+                toggleRead(thread)
+            } label: {
+                Label(thread.isRead ? "Unread" : "Read", systemImage: thread.isRead ? "envelope.badge" : "envelope.open")
+            }
+            .tint(.blue)
         }
     }
 
