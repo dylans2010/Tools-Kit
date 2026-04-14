@@ -18,6 +18,37 @@ struct InboxView: View {
 
     var body: some View {
         List {
+            // Sync status banner
+            if syncService.isSyncing {
+                Section {
+                    HStack(spacing: 10) {
+                        ProgressView().tint(.blue)
+                        Text("Fetching mail…")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
+                    .padding(.vertical, 4)
+                    .listRowBackground(Color.blue.opacity(0.08))
+                }
+            }
+
+            if let syncDate = syncService.lastSyncDate {
+                Section {
+                    HStack {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                            .font(.caption)
+                        Text("Last synced \(syncDate, style: .relative) ago")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
+                }
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+            }
+
             if filter == .unread && catchUpSummary == nil && !threads.isEmpty {
                 Section {
                     Button(action: runCatchUp) {
@@ -79,7 +110,7 @@ struct InboxView: View {
                 }
                 .swipeActions(edge: .leading) {
                     Button {
-                        // toggle star
+                        toggleStar(thread)
                     } label: {
                         Label("Star", systemImage: thread.messages.first?.isStarred == true ? "star.slash" : "star")
                     }
@@ -87,13 +118,13 @@ struct InboxView: View {
                 }
                 .swipeActions(edge: .trailing) {
                     Button(role: .destructive) {
-                        // delete
+                        deleteThread(thread)
                     } label: {
                         Label("Delete", systemImage: "trash")
                     }
 
                     Button {
-                        // mark read/unread
+                        toggleRead(thread)
                     } label: {
                         Label(thread.isRead ? "Unread" : "Read", systemImage: thread.isRead ? "envelope.badge" : "envelope.open")
                     }
@@ -117,7 +148,15 @@ struct InboxView: View {
         .sheet(isPresented: $showingCompose) {
             EmailComposingView(account: account)
         }
-        .onAppear(perform: loadLocal)
+        .onAppear {
+            loadLocal()
+            if threads.isEmpty {
+                Task {
+                    await syncService.sync(account: account, folder: folder)
+                    loadLocal()
+                }
+            }
+        }
     }
 
     private var filteredThreads: [MailThread] {
@@ -133,6 +172,29 @@ struct InboxView: View {
 
     private func loadLocal() {
         threads = MailStorageService.shared.loadThreads(for: "\(account.id)_\(folder.id)")
+    }
+
+    private func toggleRead(_ thread: MailThread) {
+        guard let idx = threads.firstIndex(where: { $0.id == thread.id }) else { return }
+        let targetRead = !thread.isRead
+        for msgIdx in threads[idx].messages.indices {
+            threads[idx].messages[msgIdx].isRead = targetRead
+        }
+        MailStorageService.shared.saveThreads(threads, for: "\(account.id)_\(folder.id)")
+    }
+
+    private func toggleStar(_ thread: MailThread) {
+        guard let idx = threads.firstIndex(where: { $0.id == thread.id }) else { return }
+        let currentlyStarred = threads[idx].messages.first?.isStarred ?? false
+        for msgIdx in threads[idx].messages.indices {
+            threads[idx].messages[msgIdx].isStarred = !currentlyStarred
+        }
+        MailStorageService.shared.saveThreads(threads, for: "\(account.id)_\(folder.id)")
+    }
+
+    private func deleteThread(_ thread: MailThread) {
+        threads.removeAll { $0.id == thread.id }
+        MailStorageService.shared.saveThreads(threads, for: "\(account.id)_\(folder.id)")
     }
 
     private func runCatchUp() {

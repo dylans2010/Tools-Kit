@@ -92,11 +92,147 @@ struct WorkspaceDashboardView: View {
     @StateObject private var notebooksManager = NotebooksManager.shared
     @StateObject private var tasksManager = TasksManager.shared
     @StateObject private var articlesManager = ArticlesManager.shared
+    @StateObject private var calendarManager = CalendarManager.shared
+    @StateObject private var habitsManager = HabitsManager.shared
+
+    @State private var showingCreateTask = false
+    @State private var showingCreateNotebook = false
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 welcomeHeader
+
+                // Quick Actions
+                dashboardSection(title: "Quick Actions", icon: "bolt.fill", color: .yellow) {
+                    HStack(spacing: 12) {
+                        quickActionButton("New Task", icon: "plus.circle.fill", color: .blue) {
+                            showingCreateTask = true
+                        }
+                        quickActionButton("New Notebook", icon: "book.closed.fill", color: .indigo) {
+                            showingCreateNotebook = true
+                        }
+                        NavigationLink(destination: ArticleSearchView()) {
+                            VStack(spacing: 8) {
+                                Image(systemName: "newspaper.fill")
+                                    .font(.title3)
+                                    .foregroundColor(.orange)
+                                    .padding(12)
+                                    .background(Color.orange.opacity(0.12))
+                                    .clipShape(Circle())
+                                Text("Find Article")
+                                    .font(.caption.bold())
+                                    .foregroundColor(.primary)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(Color(.secondarySystemGroupedBackground))
+                            .cornerRadius(16)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal)
+                }
+
+                // Quick Stats
+                dashboardSection(title: "Quick Stats", icon: "chart.bar.fill", color: .teal) {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                        WorkspaceStatCard(value: "\(notebooksManager.notebooks.count)", label: "Notebooks", icon: "book.closed.fill", color: .indigo)
+                        WorkspaceStatCard(value: "\(tasksManager.todayTasks.count)", label: "Tasks Today", icon: "checklist", color: .blue)
+                        WorkspaceStatCard(value: "\(articlesManager.recentArticles.count)", label: "Articles Saved", icon: "newspaper.fill", color: .orange)
+                        WorkspaceStatCard(value: "\(habitsManager.habits.filter { $0.isCompletedToday() }.count)/\(habitsManager.habits.count)", label: "Habits Done", icon: "flame.fill", color: .red)
+                    }
+                    .padding(.horizontal)
+                }
+
+                // Today's Calendar Events
+                dashboardSection(title: "Today's Events", icon: "calendar", color: .green) {
+                    let todayEvents = calendarManager.events(on: Date())
+                    VStack(spacing: 10) {
+                        if todayEvents.isEmpty {
+                            Text("No events today")
+                                .foregroundColor(.secondary)
+                                .font(.callout)
+                                .padding(.horizontal)
+                        } else {
+                            ForEach(todayEvents.prefix(3)) { event in
+                                HStack(spacing: 12) {
+                                    RoundedRectangle(cornerRadius: 3)
+                                        .fill(Color(hex: event.priority.color) ?? .green)
+                                        .frame(width: 4, height: 40)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(event.title)
+                                            .font(.subheadline.bold())
+                                            .lineLimit(1)
+                                        Text(event.formattedTimeRange)
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    Spacer()
+                                }
+                                .padding()
+                                .background(Color(.secondarySystemGroupedBackground))
+                                .cornerRadius(12)
+                            }
+                        }
+                        NavigationLink("View Calendar") {
+                            CalendarHomeView()
+                        }
+                        .font(.caption.bold())
+                        .padding(.horizontal)
+                    }
+                    .padding(.horizontal)
+                }
+
+                // Habits Progress
+                if !habitsManager.habits.isEmpty {
+                    dashboardSection(title: "Today's Habits", icon: "flame.fill", color: .red) {
+                        VStack(spacing: 10) {
+                            let completedCount = habitsManager.habits.filter { $0.isCompletedToday() }.count
+                            let total = habitsManager.habits.count
+                            let progress = total > 0 ? Double(completedCount) / Double(total) : 0.0
+
+                            HStack {
+                                Text("\(Int(progress * 100))% Complete")
+                                    .font(.subheadline.bold())
+                                    .foregroundColor(.red)
+                                Spacer()
+                                Text("\(completedCount)/\(total) habits")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.horizontal)
+
+                            ProgressView(value: progress)
+                                .tint(.red)
+                                .padding(.horizontal)
+
+                            ForEach(habitsManager.habits.prefix(4)) { habit in
+                                HStack {
+                                    Image(systemName: habit.icon)
+                                        .foregroundColor(Color(hex: habit.colorHex) ?? .blue)
+                                        .frame(width: 24)
+                                    Text(habit.name)
+                                        .font(.subheadline)
+                                        .lineLimit(1)
+                                    Spacer()
+                                    if habit.isCompletedToday() {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundColor(.green)
+                                    } else {
+                                        Text("\(habit.todayCount())/\(habit.targetCount)")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                                .padding()
+                                .background(Color(.secondarySystemGroupedBackground))
+                                .cornerRadius(12)
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                }
 
                 dashboardSection(title: "Recent Notebooks", icon: "book.closed.fill", color: .indigo) {
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -141,28 +277,17 @@ struct WorkspaceDashboardView: View {
                     }
                     .padding(.horizontal)
                 }
-
-                dashboardSection(title: "Latest Articles", icon: "newspaper.fill", color: .orange) {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 16) {
-                            if articlesManager.recentArticles.isEmpty {
-                                Text("No recent articles").foregroundColor(.secondary).font(.callout)
-                            }
-                            ForEach(articlesManager.recentArticles.prefix(5)) { article in
-                                NavigationLink(destination: ArticleDetailView(article: article)) {
-                                    DashboardCard(title: article.title, subtitle: article.summary, icon: "doc.text.fill", color: .orange)
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-                }
             }
             .padding(.vertical)
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Workspace")
+        .sheet(isPresented: $showingCreateTask) {
+            CreateTaskView { task in tasksManager.addTask(task) }
+        }
+        .sheet(isPresented: $showingCreateNotebook) {
+            CreateNotebookView()
+        }
     }
 
     private var welcomeHeader: some View {
@@ -170,10 +295,31 @@ struct WorkspaceDashboardView: View {
             Text("Welcome back,")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            Text("Jules's Workspace")
+            Text("Your Workspace")
                 .font(.title2.bold())
         }
         .padding(.horizontal)
+    }
+
+    private func quickActionButton(_ title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundColor(color)
+                    .padding(12)
+                    .background(color.opacity(0.12))
+                    .clipShape(Circle())
+                Text(title)
+                    .font(.caption.bold())
+                    .foregroundColor(.primary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(Color(.secondarySystemGroupedBackground))
+            .cornerRadius(16)
+        }
+        .buttonStyle(.plain)
     }
 
     @ViewBuilder
@@ -192,6 +338,35 @@ struct WorkspaceDashboardView: View {
 
             content()
         }
+    }
+}
+
+struct WorkspaceStatCard: View {
+    let value: String
+    let label: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundColor(color)
+                .padding(10)
+                .background(color.opacity(0.12))
+                .clipShape(Circle())
+            VStack(alignment: .leading, spacing: 2) {
+                Text(value)
+                    .font(.title3.bold())
+                Text(label)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground))
+        .cornerRadius(14)
     }
 }
 
@@ -229,20 +404,43 @@ struct DashboardCard: View {
 }
 
 struct WorkspaceMoreView: View {
+    private let tools: [(title: String, icon: String, color: Color, destination: AnyView)] = [
+        ("Calendar", "calendar", .green, AnyView(CalendarHomeView())),
+        ("Habits", "flame.fill", .red, AnyView(WorkspaceHabitTrackerView())),
+        ("Forms", "list.bullet.rectangle.portrait", .teal, AnyView(FormsView())),
+        ("Slides", "rectangle.on.rectangle.angled", .purple, AnyView(SlidesHomeView())),
+        ("Sheets", "tablecells", .blue, AnyView(SpreadsheetsHomeView()))
+    ]
+
+    let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
+
     var body: some View {
-        List {
-            Section("Other Tools") {
-                NavigationLink(destination: FormsView()) {
-                    Label("Forms", systemImage: "list.bullet.rectangle.portrait")
-                }
-                NavigationLink(destination: SlidesHomeView()) {
-                    Label("Slides", systemImage: "rectangle.on.rectangle.angled")
-                }
-                NavigationLink(destination: SpreadsheetsHomeView()) {
-                    Label("Sheets", systemImage: "tablecells")
+        ScrollView {
+            LazyVGrid(columns: columns, spacing: 16) {
+                ForEach(tools, id: \.title) { tool in
+                    NavigationLink(destination: tool.destination) {
+                        VStack(spacing: 10) {
+                            Image(systemName: tool.icon)
+                                .font(.title2)
+                                .foregroundColor(tool.color)
+                                .frame(width: 52, height: 52)
+                                .background(tool.color.opacity(0.15))
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                            Text(tool.title)
+                                .font(.caption.bold())
+                                .foregroundColor(.primary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color(.secondarySystemGroupedBackground))
+                        .cornerRadius(18)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
+            .padding()
         }
-        .navigationTitle("More")
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("More Tools")
     }
 }

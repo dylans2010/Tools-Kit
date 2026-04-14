@@ -4,10 +4,44 @@ struct ArticlesHomeView: View {
     @StateObject private var manager = ArticlesManager.shared
     @State private var showingSearch = false
     @State private var showingCollections = false
+    @State private var featuredArticles: [Article] = []
+    @State private var isLoadingFeatured = false
+
+    private let featuredTopics = ["Artificial Intelligence", "Space Exploration", "Technology", "Science"]
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
+                // Featured Articles section
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Text("Featured Articles")
+                            .font(.headline)
+                        Spacer()
+                        if isLoadingFeatured {
+                            ProgressView().scaleEffect(0.8)
+                        }
+                    }
+                    .padding(.horizontal)
+
+                    if featuredArticles.isEmpty && !isLoadingFeatured {
+                        Text("Pull to refresh or search for articles")
+                            .foregroundColor(.secondary)
+                            .font(.callout)
+                            .padding(.horizontal)
+                    } else {
+                        ForEach(featuredArticles.prefix(8)) { article in
+                            NavigationLink {
+                                ArticleDetailView(article: article)
+                            } label: {
+                                FeaturedArticleRow(article: article)
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal)
+                        }
+                    }
+                }
+
                 // Continue Reading
                 if !manager.recentArticles.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
@@ -61,14 +95,14 @@ struct ArticlesHomeView: View {
                     }
                 }
 
-                // Suggested topics
+                // Browse Topics
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Suggested Topics")
+                    Text("Browse Topics")
                         .font(.headline)
                         .padding(.horizontal)
 
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
-                        ForEach(suggestedTopics, id: \.self) { topic in
+                        ForEach(featuredTopics, id: \.self) { topic in
                             NavigationLink {
                                 ArticleSearchView(initialQuery: topic)
                             } label: {
@@ -89,18 +123,9 @@ struct ArticlesHomeView: View {
                     NavigationLink(destination: ArticleSearchView()) {
                         Image(systemName: "magnifyingglass")
                     }
-
                     Menu {
                         Button { showingCollections = true } label: {
                             Label("Collections", systemImage: "folder")
-                        }
-
-                        Divider()
-
-                        ForEach(suggestedTopics, id: \.self) { topic in
-                            NavigationLink(destination: ArticleSearchView(initialQuery: topic)) {
-                                Label(topic, systemImage: "tag")
-                            }
                         }
                     } label: {
                         Image(systemName: "ellipsis.circle")
@@ -112,32 +137,62 @@ struct ArticlesHomeView: View {
             CollectionsView()
         }
         .onAppear {
-            if manager.recentArticles.isEmpty {
-                Task {
-                    _ = try? await manager.search(query: "Trending")
-                }
+            if featuredArticles.isEmpty {
+                loadFeaturedArticles()
             }
+        }
+        .refreshable {
+            loadFeaturedArticles()
         }
     }
 
-    private let suggestedTopics = [
-        "Artificial Intelligence", "Space Exploration", "Climate Change",
-        "Quantum Computing", "History", "Biology", "Mathematics", "Philosophy"
-    ]
-
-    private func actionButton(_ title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            VStack(spacing: 6) {
-                Image(systemName: icon).font(.title3)
-                Text(title).font(.caption.bold())
+    private func loadFeaturedArticles() {
+        isLoadingFeatured = true
+        Task {
+            var results: [Article] = []
+            for topic in featuredTopics {
+                if let articles = try? await manager.search(query: topic) {
+                    results.append(contentsOf: articles.prefix(2))
+                }
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .background(color.opacity(0.12))
-            .foregroundColor(color)
-            .cornerRadius(14)
+            await MainActor.run {
+                featuredArticles = results
+                isLoadingFeatured = false
+            }
         }
-        .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Supporting Views
+
+private struct FeaturedArticleRow: View {
+    let article: Article
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.orange.opacity(0.15))
+                .frame(width: 56, height: 56)
+                .overlay(
+                    Image(systemName: "doc.text.fill")
+                        .foregroundColor(.orange)
+                )
+            VStack(alignment: .leading, spacing: 4) {
+                Text(article.title)
+                    .font(.subheadline.bold())
+                    .lineLimit(2)
+                Text(article.summary)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
+            }
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
     }
 }
 
