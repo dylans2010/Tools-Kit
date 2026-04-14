@@ -87,6 +87,7 @@ struct WorkspaceDashboardView: View {
 
     @State private var showingCreateTask = false
     @State private var showingCreateNotebook = false
+    @State private var showingSettings = false
 
     private let moreTools: [(title: String, icon: String, color: Color, destination: AnyView)] = [
         ("Calendar", "calendar", .green, AnyView(CalendarHomeView())),
@@ -307,6 +308,18 @@ struct WorkspaceDashboardView: View {
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Workspace")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showingSettings = true
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                }
+            }
+        }
+        .sheet(isPresented: $showingSettings) {
+            AIChatSettingsView()
+        }
         .sheet(isPresented: $showingCreateTask) {
             CreateTaskView { task in tasksManager.addTask(task) }
         }
