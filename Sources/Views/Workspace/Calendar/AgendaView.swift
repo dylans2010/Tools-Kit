@@ -116,9 +116,6 @@ struct EventAgendaRow: View {
                 }
             }
             Spacer()
-            Image(systemName: "chevron.right")
-                .font(.caption2)
-                .foregroundColor(.secondary)
         }
         .padding(.vertical, 10)
         .padding(.horizontal)

@@ -355,9 +355,6 @@ struct WorkspaceDashboardView: View {
                     .font(.headline)
                     .foregroundColor(color)
                 Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
             }
             .padding(.horizontal)
 

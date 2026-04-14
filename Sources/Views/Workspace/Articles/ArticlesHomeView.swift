@@ -186,9 +186,6 @@ private struct FeaturedArticleRow: View {
                     .lineLimit(2)
             }
             Spacer()
-            Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundColor(.secondary)
         }
         .padding()
         .background(Color(.secondarySystemBackground))
