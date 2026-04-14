@@ -28,6 +28,8 @@
 		9B92D995283049E1921A3007 /* InboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E1340D7B74447B9E795193 /* InboxView.swift */; };
 		43C7F01342454F8891D7E133 /* MailAccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F681856D074CB3BDD31D99 /* MailAccountsView.swift */; };
 		50C031082B944F5782BAF41E /* MailContentRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB1750052D346DFBBD0A71D /* MailContentRenderer.swift */; };
+		AA11BB22CC33DD44EE55FF01 /* MailMIMEParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF00 /* MailMIMEParser.swift */; };
+		AA11BB22CC33DD44EE55FF03 /* MailContentDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF02 /* MailContentDecoder.swift */; };
 		08AF05FE63A9400ABCE9FCE3 /* MailStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411F811D01A2429A91DBA6DD /* MailStorageService.swift */; };
 		3FB514B7935A4CE492EBF783 /* MailSMTPService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7F1899E1534EB8A85A9957 /* MailSMTPService.swift */; };
 		80010375D67C41F0932464A5 /* MailSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AB0A5BEECE24295A8AA2C5D /* MailSyncService.swift */; };
@@ -506,6 +508,8 @@
 		93E1340D7B74447B9E795193 /* InboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/InboxView.swift; sourceTree = "<group>"; };
 		F1F681856D074CB3BDD31D99 /* MailAccountsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailAccountsView.swift; sourceTree = "<group>"; };
 		7FB1750052D346DFBBD0A71D /* MailContentRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Rendering/MailContentRenderer.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF00 /* MailMIMEParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Rendering/MailMIMEParser.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF02 /* MailContentDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Rendering/MailContentDecoder.swift; sourceTree = "<group>"; };
 		411F811D01A2429A91DBA6DD /* MailStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Services/MailStorageService.swift; sourceTree = "<group>"; };
 		DD7F1899E1534EB8A85A9957 /* MailSMTPService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Services/MailSMTPService.swift; sourceTree = "<group>"; };
 		6AB0A5BEECE24295A8AA2C5D /* MailSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Services/MailSyncService.swift; sourceTree = "<group>"; };
@@ -1005,6 +1009,8 @@
 				93E1340D7B74447B9E795193 /* InboxView.swift */,
 				F1F681856D074CB3BDD31D99 /* MailAccountsView.swift */,
 				7FB1750052D346DFBBD0A71D /* MailContentRenderer.swift */,
+				AA11BB22CC33DD44EE55FF00 /* MailMIMEParser.swift */,
+				AA11BB22CC33DD44EE55FF02 /* MailContentDecoder.swift */,
 				411F811D01A2429A91DBA6DD /* MailStorageService.swift */,
 				DD7F1899E1534EB8A85A9957 /* MailSMTPService.swift */,
 				6AB0A5BEECE24295A8AA2C5D /* MailSyncService.swift */,
@@ -1560,6 +1566,8 @@
 				9B92D995283049E1921A3007 /* InboxView.swift in Sources */,
 				43C7F01342454F8891D7E133 /* MailAccountsView.swift in Sources */,
 				50C031082B944F5782BAF41E /* MailContentRenderer.swift in Sources */,
+				AA11BB22CC33DD44EE55FF01 /* MailMIMEParser.swift in Sources */,
+				AA11BB22CC33DD44EE55FF03 /* MailContentDecoder.swift in Sources */,
 				08AF05FE63A9400ABCE9FCE3 /* MailStorageService.swift in Sources */,
 				3FB514B7935A4CE492EBF783 /* MailSMTPService.swift in Sources */,
 				80010375D67C41F0932464A5 /* MailSyncService.swift in Sources */,
