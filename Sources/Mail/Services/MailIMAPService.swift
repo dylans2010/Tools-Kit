@@ -1,7 +1,7 @@
 import Foundation
 import Network
 
-class MailIMAPService {
+class MailIMAPService: @unchecked Sendable {
     private let host: String = "imap.mail.me.com"
     private let port: UInt16 = 993
     private var connection: NWConnection?
