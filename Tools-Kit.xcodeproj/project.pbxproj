@@ -180,6 +180,31 @@
 		WS020000000000000000002B /* CreatePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000002B /* CreatePageView.swift */; };
 		WS020000000000000000002C /* IntegrationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000002C /* IntegrationsView.swift */; };
 		WS020000000000000000002D /* IntegrationEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000002D /* IntegrationEditorView.swift */; };
+		WS020000000000000000002E /* WorkspaceTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000002E /* WorkspaceTask.swift */; };
+		WS020000000000000000002F /* TaskCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000002F /* TaskCategory.swift */; };
+		WS0200000000000000000030 /* Habit.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000030 /* Habit.swift */; };
+		WS0200000000000000000031 /* HabitLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000031 /* HabitLog.swift */; };
+		WS0200000000000000000032 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000032 /* CalendarEvent.swift */; };
+		WS0200000000000000000033 /* TasksManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000033 /* TasksManager.swift */; };
+		WS0200000000000000000034 /* TasksHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000034 /* TasksHomeView.swift */; };
+		WS0200000000000000000035 /* CreateTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000035 /* CreateTaskView.swift */; };
+		WS0200000000000000000036 /* TaskBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000036 /* TaskBoardView.swift */; };
+		WS0200000000000000000037 /* TaskCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000037 /* TaskCategoryView.swift */; };
+		WS0200000000000000000038 /* TaskDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000038 /* TaskDetailView.swift */; };
+		WS0200000000000000000039 /* HabitsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000039 /* HabitsManager.swift */; };
+		WS020000000000000000003A /* CreateHabitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000003A /* CreateHabitView.swift */; };
+		WS020000000000000000003B /* HabitDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000003B /* HabitDetailView.swift */; };
+		WS020000000000000000003C /* WorkspaceHabitTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000003C /* WorkspaceHabitTrackerView.swift */; };
+		WS020000000000000000003D /* HabitAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000003D /* HabitAnalyticsView.swift */; };
+		WS020000000000000000003E /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000003E /* CalendarManager.swift */; };
+		WS020000000000000000003F /* CalendarHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000003F /* CalendarHomeView.swift */; };
+		WS0200000000000000000040 /* AgendaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000040 /* AgendaView.swift */; };
+		WS0200000000000000000041 /* CalendarTodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000041 /* CalendarTodayView.swift */; };
+		WS0200000000000000000042 /* CreateEventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000042 /* CreateEventView.swift */; };
+		WS0200000000000000000043 /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000043 /* EventDetailView.swift */; };
+		WS0200000000000000000044 /* MonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000044 /* MonthView.swift */; };
+		WS0200000000000000000045 /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000045 /* WeekView.swift */; };
+		WS0200000000000000000046 /* YearView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000046 /* YearView.swift */; };
 		88656A686AF741EB83B8FD5F /* SliderQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711D3FB735414113B06478F1 /* MorseCodeView.swift */; };
@@ -898,6 +923,31 @@
 		WS010000000000000000002B /* CreatePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/CreatePageView.swift"; sourceTree = "<group>"; };
 		WS010000000000000000002C /* IntegrationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/IntegrationsView.swift"; sourceTree = "<group>"; };
 		WS010000000000000000002D /* IntegrationEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/IntegrationEditorView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000002E /* WorkspaceTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/WorkspaceTask.swift"; sourceTree = "<group>"; };
+		WS010000000000000000002F /* TaskCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/TaskCategory.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000030 /* Habit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/Habit.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000031 /* HabitLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/HabitLog.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000032 /* CalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/CalendarEvent.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000033 /* TasksManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Tasks/TasksManager.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000034 /* TasksHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Tasks/TasksHomeView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000035 /* CreateTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Tasks/CreateTaskView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000036 /* TaskBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Tasks/TaskBoardView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000037 /* TaskCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Tasks/TaskCategoryView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000038 /* TaskDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Tasks/TaskDetailView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000039 /* HabitsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Habits/HabitsManager.swift"; sourceTree = "<group>"; };
+		WS010000000000000000003A /* CreateHabitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Habits/CreateHabitView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000003B /* HabitDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Habits/HabitDetailView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000003C /* WorkspaceHabitTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Habits/HabitTrackerView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000003D /* HabitAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Habits/HabitAnalyticsView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000003E /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/CalendarManager.swift"; sourceTree = "<group>"; };
+		WS010000000000000000003F /* CalendarHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/CalendarHomeView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000040 /* AgendaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/AgendaView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000041 /* CalendarTodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/CalendarTodayView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000042 /* CreateEventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/CreateEventView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000043 /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/EventDetailView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000044 /* MonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/MonthView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000045 /* WeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/WeekView.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000046 /* YearView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/YearView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1366,6 +1416,31 @@
 				WS010000000000000000002B /* CreatePageView.swift */,
 				WS010000000000000000002C /* IntegrationsView.swift */,
 				WS010000000000000000002D /* IntegrationEditorView.swift */,
+				WS010000000000000000002E /* WorkspaceTask.swift */,
+				WS010000000000000000002F /* TaskCategory.swift */,
+				WS0100000000000000000030 /* Habit.swift */,
+				WS0100000000000000000031 /* HabitLog.swift */,
+				WS0100000000000000000032 /* CalendarEvent.swift */,
+				WS0100000000000000000033 /* TasksManager.swift */,
+				WS0100000000000000000034 /* TasksHomeView.swift */,
+				WS0100000000000000000035 /* CreateTaskView.swift */,
+				WS0100000000000000000036 /* TaskBoardView.swift */,
+				WS0100000000000000000037 /* TaskCategoryView.swift */,
+				WS0100000000000000000038 /* TaskDetailView.swift */,
+				WS0100000000000000000039 /* HabitsManager.swift */,
+				WS010000000000000000003A /* CreateHabitView.swift */,
+				WS010000000000000000003B /* HabitDetailView.swift */,
+				WS010000000000000000003C /* WorkspaceHabitTrackerView.swift */,
+				WS010000000000000000003D /* HabitAnalyticsView.swift */,
+				WS010000000000000000003E /* CalendarManager.swift */,
+				WS010000000000000000003F /* CalendarHomeView.swift */,
+				WS0100000000000000000040 /* AgendaView.swift */,
+				WS0100000000000000000041 /* CalendarTodayView.swift */,
+				WS0100000000000000000042 /* CreateEventView.swift */,
+				WS0100000000000000000043 /* EventDetailView.swift */,
+				WS0100000000000000000044 /* MonthView.swift */,
+				WS0100000000000000000045 /* WeekView.swift */,
+				WS0100000000000000000046 /* YearView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -1892,6 +1967,31 @@
 				WS020000000000000000002B /* CreatePageView.swift in Sources */,
 				WS020000000000000000002C /* IntegrationsView.swift in Sources */,
 				WS020000000000000000002D /* IntegrationEditorView.swift in Sources */,
+				WS020000000000000000002E /* WorkspaceTask.swift in Sources */,
+				WS020000000000000000002F /* TaskCategory.swift in Sources */,
+				WS0200000000000000000030 /* Habit.swift in Sources */,
+				WS0200000000000000000031 /* HabitLog.swift in Sources */,
+				WS0200000000000000000032 /* CalendarEvent.swift in Sources */,
+				WS0200000000000000000033 /* TasksManager.swift in Sources */,
+				WS0200000000000000000034 /* TasksHomeView.swift in Sources */,
+				WS0200000000000000000035 /* CreateTaskView.swift in Sources */,
+				WS0200000000000000000036 /* TaskBoardView.swift in Sources */,
+				WS0200000000000000000037 /* TaskCategoryView.swift in Sources */,
+				WS0200000000000000000038 /* TaskDetailView.swift in Sources */,
+				WS0200000000000000000039 /* HabitsManager.swift in Sources */,
+				WS020000000000000000003A /* CreateHabitView.swift in Sources */,
+				WS020000000000000000003B /* HabitDetailView.swift in Sources */,
+				WS020000000000000000003C /* WorkspaceHabitTrackerView.swift in Sources */,
+				WS020000000000000000003D /* HabitAnalyticsView.swift in Sources */,
+				WS020000000000000000003E /* CalendarManager.swift in Sources */,
+				WS020000000000000000003F /* CalendarHomeView.swift in Sources */,
+				WS0200000000000000000040 /* AgendaView.swift in Sources */,
+				WS0200000000000000000041 /* CalendarTodayView.swift in Sources */,
+				WS0200000000000000000042 /* CreateEventView.swift in Sources */,
+				WS0200000000000000000043 /* EventDetailView.swift in Sources */,
+				WS0200000000000000000044 /* MonthView.swift in Sources */,
+				WS0200000000000000000045 /* WeekView.swift in Sources */,
+				WS0200000000000000000046 /* YearView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
