@@ -231,12 +231,16 @@ class IMAPClient: ObservableObject {
         var accumulated = ""
         while true {
             guard let connection else { return }
-            let (data, _, isComplete, _): (Data?, NWConnection.ContentContext?, Bool, NWError?) =
+            let (data, _, isComplete, error): (Data?, NWConnection.ContentContext?, Bool, NWError?) =
                 await withCheckedContinuation { continuation in
                     connection.receive(minimumIncompleteLength: 1, maximumLength: 65536) { data, context, isComplete, error in
                         continuation.resume(returning: (data, context, isComplete, error))
                     }
                 }
+            if let error {
+                errorMessage = "Receive error: \(error.localizedDescription)"
+                return
+            }
             if let data, let chunk = String(data: data, encoding: .utf8) {
                 accumulated += chunk
             }
