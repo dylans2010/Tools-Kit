@@ -10,7 +10,7 @@ struct CreateTaskView: View {
     @State private var description: String = ""
     @State private var hasDueDate = false
     @State private var dueDate: Date = Date()
-    @State private var priority: TaskPriority = .medium
+    @State private var priority: WorkspaceTask.TaskPriority = .medium
     @State private var categoryID: UUID? = nil
 
     private var isEditing: Bool { existingTask != nil }
@@ -34,7 +34,7 @@ struct CreateTaskView: View {
 
                 Section("Priority") {
                     Picker("Priority", selection: $priority) {
-                        ForEach(TaskPriority.allCases, id: \.self) { p in
+                        ForEach(WorkspaceTask.TaskPriority.allCases, id: \.self) { p in
                             Label(p.rawValue, systemImage: p.icon)
                                 .tag(p)
                         }

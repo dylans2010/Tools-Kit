@@ -84,9 +84,9 @@ struct TasksHomeView: View {
 
     private var summaryCards: some View {
         HStack(spacing: 12) {
-            TaskStatPill(label: "Today", value: "\(manager.todayTasks.count)", color: .blue)
-            TaskStatPill(label: "Upcoming", value: "\(manager.upcomingTasks.count)", color: .orange)
-            TaskStatPill(label: "Done", value: "\(manager.completedTasks.count)", color: .green)
+            StatPill(title: "Today", value: "\(manager.todayTasks.count)", color: .blue)
+            StatPill(title: "Upcoming", value: "\(manager.upcomingTasks.count)", color: .orange)
+            StatPill(title: "Done", value: "\(manager.completedTasks.count)", color: .green)
         }
         .padding(.horizontal)
     }
@@ -94,11 +94,11 @@ struct TasksHomeView: View {
     private var filterBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                FilterChip(label: "All", isSelected: filterCategory == nil) {
+                FilterChip(title: "All", isSelected: filterCategory == nil) {
                     filterCategory = nil
                 }
                 ForEach(manager.categories) { cat in
-                    FilterChip(label: cat.name, color: Color(hex: cat.colorHex), isSelected: filterCategory?.id == cat.id) {
+                    FilterChip(title: cat.name, color: Color(hex: cat.colorHex), isSelected: filterCategory?.id == cat.id) {
                         filterCategory = (filterCategory?.id == cat.id) ? nil : cat
                     }
                 }
@@ -143,61 +143,28 @@ struct TasksHomeView: View {
         }
         switch sortBy {
         case .dueDate:
-            result.sort { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
+            result.sort { (t1: WorkspaceTask, t2: WorkspaceTask) in
+                (t1.dueDate ?? .distantFuture) < (t2.dueDate ?? .distantFuture)
+            }
         case .priority:
-            result.sort { priorityOrder($0.priority) > priorityOrder($1.priority) }
+            result.sort { (t1: WorkspaceTask, t2: WorkspaceTask) in
+                priorityOrder(t1.priority) > priorityOrder(t2.priority)
+            }
         case .created:
-            result.sort { $0.createdAt > $1.createdAt }
+            result.sort { (t1: WorkspaceTask, t2: WorkspaceTask) in
+                t1.createdAt > t2.createdAt
+            }
         }
         return result
     }
 
-    private func priorityOrder(_ p: TaskPriority) -> Int {
+    private func priorityOrder(_ p: WorkspaceTask.TaskPriority) -> Int {
         switch p {
         case .critical: return 4
         case .high: return 3
         case .medium: return 2
         case .low: return 1
         }
-    }
-}
-
-struct TaskStatPill: View {
-    let label: String
-    let value: String
-    let color: Color
-
-    var body: some View {
-        VStack(spacing: 2) {
-            Text(value)
-                .font(.system(.title3, design: .rounded).bold())
-                .foregroundColor(color)
-            Text(label)
-                .font(.caption2)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 10)
-        .background(color.opacity(0.1))
-        .cornerRadius(12)
-    }
-}
-    let label: String
-    var color: Color = .accentColor
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(label)
-                .font(.caption.bold())
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(isSelected ? color : Color(.secondarySystemBackground))
-                .foregroundColor(isSelected ? .white : .primary)
-                .clipShape(Capsule())
-        }
-        .buttonStyle(.plain)
     }
 }
 
