@@ -14,7 +14,7 @@ let package = Package(
         .executableTarget(
             name: "ToolsKit",
             dependencies: [
-                .product(name: "MailCore", package: "mailcore2")
+                .product(name: "MailCore2", package: "mailcore2")
             ],
             path: "Sources"
         )
