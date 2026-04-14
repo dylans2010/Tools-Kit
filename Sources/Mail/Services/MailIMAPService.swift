@@ -63,8 +63,51 @@ class MailIMAPService: @unchecked Sendable {
     }
 
     private func parseMessages(_ response: String) -> [MailMessage] {
-        // In a real app, use a proper IMAP parser. For this demo, we'd regex the response.
-        return []
+        var messages: [MailMessage] = []
+        let lines = response.components(separatedBy: "\r\n")
+
+        var currentMessage: [String: String] = [:]
+
+        for line in lines {
+            if line.contains("FETCH") && line.contains("ENVELOPE") {
+                // Extract Subject
+                if let subjectRange = line.range(of: "ENVELOPE \\(\"[^\"]*\" \"([^\"]*)\"", options: .regularExpression) {
+                    let subject = String(line[subjectRange].dropFirst(12).dropLast(1))
+                    currentMessage["subject"] = subject
+                }
+
+                // Extract From
+                if let fromRange = line.range(of: "(\"[^\"]*\" \"[^\"]*\")", options: .regularExpression) {
+                    let from = String(line[fromRange].dropFirst(1).dropLast(1))
+                    currentMessage["from"] = from
+                }
+            }
+
+            if line.contains("BODY[TEXT]") {
+                // Simple snippet extraction
+                let snippet = line.components(separatedBy: "BODY[TEXT]")[1].trimmingCharacters(in: .whitespacesAndNewlines).prefix(100)
+                currentMessage["snippet"] = String(snippet)
+            }
+
+            if line.contains(")") && !currentMessage.isEmpty {
+                let msg = MailMessage(
+                    id: UUID().uuidString,
+                    threadId: UUID().uuidString,
+                    from: currentMessage["from"] ?? "Unknown",
+                    to: ["me@icloud.com"],
+                    subject: currentMessage["subject"] ?? "No Subject",
+                    body: currentMessage["snippet"] ?? "",
+                    htmlBody: nil,
+                    date: Date(),
+                    isRead: false,
+                    isStarred: false
+                )
+                messages.append(msg)
+                currentMessage = [:]
+            }
+        }
+
+        return messages
     }
 
     func disconnect() {

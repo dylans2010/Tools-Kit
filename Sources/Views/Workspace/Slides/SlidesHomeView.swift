@@ -76,13 +76,29 @@ struct SlidesHomeView: View {
     // MARK: - Header Actions
 
     private var headerActions: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             actionButton("New Deck", icon: "plus.rectangle.on.rectangle", color: .blue) {
                 showingCreate = true
             }
-            actionButton("AI Generate", icon: "sparkles", color: .purple) {
+
+            Button {
                 showingAIGenerate = true
+            } label: {
+                VStack(spacing: 6) {
+                    Image(systemName: "sparkles")
+                        .font(.title3)
+                    Text("AI Generate")
+                        .font(.caption.bold())
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(
+                    LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
+                )
+                .foregroundColor(.white)
+                .cornerRadius(14)
             }
+            .buttonStyle(.plain)
         }
         .padding(.horizontal)
     }

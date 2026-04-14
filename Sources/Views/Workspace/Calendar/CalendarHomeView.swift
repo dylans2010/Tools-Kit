@@ -84,7 +84,7 @@ struct CalendarHomeView: View {
                             .font(.caption.bold())
                             .padding(.horizontal, 12)
                             .padding(.vertical, 7)
-                            .background(selectedView == type ? Color.accentColor : Color(.secondarySystemBackground))
+                            .background(selectedView == type ? Color.accentColor : Color(.secondarySystemGroupedBackground))
                             .foregroundColor(selectedView == type ? .white : .primary)
                             .clipShape(Capsule())
                     }

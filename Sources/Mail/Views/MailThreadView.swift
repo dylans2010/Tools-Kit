@@ -16,17 +16,28 @@ struct MailThreadView: View {
                     .padding(.horizontal)
 
                 if let summary = summary {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("AI Summary", systemImage: "sparkles")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                            .foregroundColor(.purple)
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            Image(systemName: "sparkles")
+                                .foregroundColor(.purple)
+                            Text("AI Thread Summary")
+                                .font(.headline)
+                                .foregroundColor(.purple)
+                        }
+
                         Text(summary)
                             .font(.subheadline)
+                            .lineSpacing(4)
                     }
                     .padding()
-                    .background(Color.purple.opacity(0.1))
-                    .cornerRadius(12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.purple.opacity(0.1))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
+                            )
+                    )
                     .padding(.horizontal)
                 }
 
@@ -41,6 +52,9 @@ struct MailThreadView: View {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button(action: summarize) {
                     Image(systemName: isSummarizing ? "ellipsis" : "sparkles")
+                        .foregroundStyle(
+                            LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
                 }
                 .disabled(isSummarizing)
 
@@ -105,8 +119,9 @@ struct MessageView: View {
             }
         }
         .padding()
-        .background(Color.secondary.opacity(0.05))
-        .cornerRadius(12)
+        .background(Color(.secondarySystemGroupedBackground))
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
         .padding(.horizontal)
     }
 }

@@ -211,7 +211,7 @@ struct TaskRowCard: View {
     }
 
     var body: some View {
-        CardView {
+        VStack {
             HStack(spacing: 12) {
                 Button {
                     manager.toggleComplete(task)
@@ -255,6 +255,10 @@ struct TaskRowCard: View {
             }
             .padding()
         }
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground))
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
         .padding(.horizontal)
         .swipeActions(edge: .trailing) {
             Button(role: .destructive) {

@@ -21,18 +21,56 @@ struct InboxView: View {
             if filter == .unread && catchUpSummary == nil && !threads.isEmpty {
                 Section {
                     Button(action: runCatchUp) {
-                        Label(isSummarizing ? "AI is catching up..." : "Catch Up with AI", systemImage: "sparkles")
+                        HStack {
+                            Image(systemName: "sparkles")
+                            Text(isSummarizing ? "AI is catching up..." : "Catch Up with AI")
+                                .fontWeight(.bold)
+                            Spacer()
+                            if isSummarizing {
+                                ProgressView()
+                                    .tint(.white)
+                            }
+                        }
+                        .padding()
+                        .background(
+                            LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
                     }
-                    .disabled(isSummarizing)
+                    .buttonStyle(.plain)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
                 }
             }
 
             if let summary = catchUpSummary {
-                Section(header: Text("AI Catch Up")) {
-                    Text(summary)
-                        .font(.subheadline)
-                        .padding(.vertical, 4)
+                Section {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            Image(systemName: "sparkles")
+                                .foregroundColor(.purple)
+                            Text("AI Catch Up")
+                                .font(.headline)
+                                .foregroundColor(.purple)
+                        }
+
+                        Text(summary)
+                            .font(.subheadline)
+                            .lineSpacing(4)
+                    }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.purple.opacity(0.1))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
+                            )
+                    )
                 }
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
             }
 
             ForEach(filteredThreads) { thread in
@@ -94,7 +132,7 @@ struct InboxView: View {
     }
 
     private func loadLocal() {
-        threads = MailStorageService.shared.loadThreads(for: folder.id)
+        threads = MailStorageService.shared.loadThreads(for: "\(account.id)_\(folder.id)")
     }
 
     private func runCatchUp() {
@@ -117,18 +155,18 @@ struct MailThreadRow: View {
     let thread: MailThread
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text(thread.participants.first ?? "Unknown")
                     .font(.headline)
                     .lineLimit(1)
                 Spacer()
                 Text(thread.lastMessageDate, style: .relative)
-                    .font(.caption)
+                    .font(.caption2)
                     .foregroundColor(.secondary)
             }
 
-            HStack {
+            HStack(spacing: 8) {
                 if !thread.isRead {
                     Circle()
                         .fill(Color.blue)
@@ -136,7 +174,7 @@ struct MailThreadRow: View {
                 }
                 Text(thread.subject)
                     .font(.subheadline)
-                    .fontWeight(thread.isRead ? .regular : .bold)
+                    .fontWeight(thread.isRead ? .regular : .semibold)
                     .lineLimit(1)
             }
 
@@ -144,7 +182,8 @@ struct MailThreadRow: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .lineLimit(2)
+                .lineSpacing(2)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 8)
     }
 }
