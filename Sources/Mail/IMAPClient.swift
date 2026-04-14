@@ -116,11 +116,13 @@ class IMAPClient: ObservableObject {
     }
 
     // MARK: - Fetch Full Body for a Single Email
-    func fetchBody(for uid: Int, completion: @escaping (String) -> Void) {
+    func fetchBody(for uid: Int, completion: @escaping (RenderedMailContent) -> Void) {
         let tag = nextTag()
-        send("\(tag) FETCH \(uid) BODY[TEXT]") { response in
-            let body = self.extractBody(from: response)
-            DispatchQueue.main.async { completion(body) }
+        send("\(tag) FETCH \(uid) BODY[]") { response in
+            let rawBody = self.extractBody(from: response)
+            let parsed = MailMIMEParser.parse(rawBody)
+            let rendered = MailContentRenderer.render(from: parsed)
+            DispatchQueue.main.async { completion(rendered) }
         }
     }
 

@@ -5,8 +5,9 @@ import Foundation
 /// Represents a single decoded MIME part with its content type and raw decoded body.
 struct MIMEPart {
     let contentType: String
+    let charset: String
     let transferEncoding: String
-    let content: String
+    let data: Data
 }
 
 /// The result of parsing a MIME message: the best HTML part and the best plain-text part.
@@ -35,13 +36,15 @@ struct MailMIMEParser {
 
         let headers = extractHeaders(cleaned)
         let contentType = headers["content-type"] ?? "text/plain"
+        let charset = extractCharset(from: contentType)
+        let transferEncoding = headers["content-transfer-encoding"] ?? "7bit"
 
         if contentType.lowercased().contains("multipart") {
             return parseMultipart(cleaned, contentType: contentType)
         } else {
             let body = extractBody(cleaned)
-            let encoding = headers["content-transfer-encoding"] ?? "7bit"
-            let part = MIMEPart(contentType: contentType, transferEncoding: encoding, content: body)
+            let data = decodeContent(body, transferEncoding: transferEncoding)
+            let part = MIMEPart(contentType: contentType, charset: charset, transferEncoding: transferEncoding, data: data)
             if contentType.lowercased().contains("text/html") {
                 return ParsedMIMEMessage(htmlPart: part, textPart: nil)
             } else {
@@ -76,9 +79,12 @@ struct MailMIMEParser {
 
         for part in parts {
             let partHeaders = extractHeaders(part)
-            let partContentType = (partHeaders["content-type"] ?? "text/plain").lowercased()
+            let rawContentType = partHeaders["content-type"] ?? "text/plain"
+            let partContentType = rawContentType.lowercased()
             let encoding = partHeaders["content-transfer-encoding"] ?? "7bit"
+            let charset = extractCharset(from: rawContentType)
             let body = extractBody(part)
+            let decoded = decodeContent(body, transferEncoding: encoding)
 
             if partContentType.contains("multipart") {
                 // Recursively handle nested multipart
@@ -87,11 +93,11 @@ struct MailMIMEParser {
                 if textPart == nil { textPart = nested.textPart }
             } else if partContentType.contains("text/html") {
                 if htmlPart == nil {
-                    htmlPart = MIMEPart(contentType: partContentType, transferEncoding: encoding, content: body)
+                    htmlPart = MIMEPart(contentType: partContentType, charset: charset, transferEncoding: encoding, data: decoded)
                 }
             } else if partContentType.contains("text/plain") {
                 if textPart == nil {
-                    textPart = MIMEPart(contentType: partContentType, transferEncoding: encoding, content: body)
+                    textPart = MIMEPart(contentType: partContentType, charset: charset, transferEncoding: encoding, data: decoded)
                 }
             }
         }
@@ -198,5 +204,37 @@ struct MailMIMEParser {
         }
 
         return parts
+    }
+
+    // MARK: - Helpers
+
+    private static func extractCharset(from contentType: String) -> String {
+        let segments = contentType.components(separatedBy: ";")
+        for segment in segments {
+            let trimmed = segment.trimmingCharacters(in: .whitespaces)
+            let lower = trimmed.lowercased()
+            if lower.hasPrefix("charset=") {
+                var charset = String(trimmed.dropFirst("charset=".count))
+                if charset.hasPrefix("\"") && charset.hasSuffix("\"") {
+                    charset = String(charset.dropFirst().dropLast())
+                }
+                return charset
+            }
+        }
+        return "utf-8"
+    }
+
+    private static func decodeContent(_ body: String, transferEncoding: String) -> Data {
+        let encoding = transferEncoding.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        switch encoding {
+        case "base64":
+            let cleaned = body.components(separatedBy: .whitespacesAndNewlines).joined()
+            return Data(base64Encoded: cleaned, options: .ignoreUnknownCharacters) ?? Data()
+        case "quoted-printable":
+            let decoded = MailContentDecoder.decodeQuotedPrintable(body)
+            return decoded.data(using: .utf8) ?? Data()
+        default:
+            return body.data(using: .utf8) ?? Data()
+        }
     }
 }

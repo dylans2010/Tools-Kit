@@ -3,7 +3,6 @@ import SwiftUI
 struct CalendarMonthView: View {
     @StateObject private var manager = CalendarManager.shared
     @Binding var selectedDate: Date
-    @Binding var selectedView: CalendarHomeView.CalendarViewType
     @Binding var selectedEvent: CalendarEvent?
 
     @Namespace private var animation
@@ -13,10 +12,6 @@ struct CalendarMonthView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            monthHeader
-                .padding(.top, 10)
-
-            // Day labels
             HStack(spacing: 0) {
                 ForEach(daySymbols, id: \.self) { symbol in
                     Text(symbol.prefix(1))
@@ -25,109 +20,68 @@ struct CalendarMonthView: View {
                         .frame(maxWidth: .infinity)
                 }
             }
-            .padding(.horizontal)
+            .padding(.horizontal, 12)
             .padding(.vertical, 12)
 
-            GeometryReader { geo in
-                VStack(spacing: 0) {
-                    // Calendar Grid
-                    LazyVGrid(columns: columns, spacing: 0) {
-                        ForEach(daysInGrid(), id: \.self) { date in
-                            ModernMonthDayCell(
-                                date: date,
-                                isCurrentMonth: calendar.isDate(date, equalTo: selectedDate, toGranularity: .month),
-                                isToday: calendar.isDateInToday(date),
-                                isSelected: calendar.isDate(date, inSameDayAs: selectedDate),
-                                events: manager.events(on: date),
-                                namespace: animation
-                            ) {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                    selectedDate = date
-                                }
-                            }
+            LazyVGrid(columns: columns, spacing: 0) {
+                ForEach(daysInGrid(), id: \.self) { date in
+                    ModernMonthDayCell(
+                        date: date,
+                        isCurrentMonth: calendar.isDate(date, equalTo: selectedDate, toGranularity: .month),
+                        isToday: calendar.isDateInToday(date),
+                        isSelected: calendar.isDate(date, inSameDayAs: selectedDate),
+                        events: manager.events(on: date),
+                        namespace: animation
+                    ) {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            selectedDate = date
                         }
                     }
-                    .padding(.horizontal, 0)
-                    .background(Color(.systemBackground))
-                    .ignoresSafeArea(edges: .horizontal)
+                }
+            }
+            .padding(.horizontal, 4)
+            .background(Color(.systemBackground))
+            .ignoresSafeArea(edges: .horizontal)
 
-                    Divider()
+            Divider()
 
-                    // Selected Day's Events
-                    List {
-                        let events = manager.events(on: selectedDate)
-                        if events.isEmpty {
-                            Text("No events for this day")
-                                .font(.callout)
-                                .foregroundColor(.secondary)
-                                .listRowSeparator(.hidden)
-                                .padding(.top, 20)
-                        } else {
-                            ForEach(events) { event in
-                                Button {
-                                    selectedEvent = event
-                                } label: {
-                                    HStack(spacing: 12) {
-                                        Circle()
-                                            .fill(Color(hex: event.priority.color) ?? .blue)
-                                            .frame(width: 8, height: 8)
+            List {
+                let events = manager.events(on: selectedDate)
+                if events.isEmpty {
+                    Text("No events for this day")
+                        .font(.callout)
+                        .foregroundColor(.secondary)
+                        .listRowSeparator(.hidden)
+                        .padding(.top, 20)
+                } else {
+                    ForEach(events) { event in
+                        Button {
+                            selectedEvent = event
+                        } label: {
+                            HStack(spacing: 12) {
+                                Circle()
+                                    .fill(Color(hex: event.priority.color) ?? .blue)
+                                    .frame(width: 8, height: 8)
 
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text(event.title)
-                                                .font(.subheadline.bold())
-                                            Text(event.formattedTimeRange)
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                        }
-                                        Spacer()
-                                    }
-                                    .padding(.vertical, 4)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(event.title)
+                                        .font(.subheadline.bold())
+                                    Text(event.formattedTimeRange)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
                                 }
-                                .buttonStyle(.plain)
+                                Spacer()
                             }
+                            .padding(.vertical, 4)
                         }
+                        .buttonStyle(.plain)
                     }
-                    .listStyle(.plain)
-                    .transition(.move(edge: .bottom))
                 }
             }
+            .listStyle(.plain)
+            .transition(.move(edge: .bottom))
         }
-    }
-
-    private var monthHeader: some View {
-        HStack {
-            Text(monthYearLabel)
-                .font(.largeTitle.bold())
-
-            Spacer()
-
-            HStack(spacing: 20) {
-                Button {
-                    withAnimation {
-                        selectedDate = calendar.date(byAdding: .month, value: -1, to: selectedDate) ?? selectedDate
-                    }
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.title3.bold())
-                }
-
-                Button {
-                    withAnimation {
-                        selectedDate = calendar.date(byAdding: .month, value: 1, to: selectedDate) ?? selectedDate
-                    }
-                } label: {
-                    Image(systemName: "chevron.right")
-                        .font(.title3.bold())
-                }
-            }
-        }
-        .padding(.horizontal)
-    }
-
-    private var monthYearLabel: String {
-        let f = DateFormatter()
-        f.dateFormat = "MMMM yyyy"
-        return f.string(from: selectedDate)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     private func daysInGrid() -> [Date] {

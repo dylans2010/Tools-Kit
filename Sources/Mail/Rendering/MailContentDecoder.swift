@@ -17,6 +17,15 @@ struct MailContentDecoder {
         }
     }
 
+    /// Decode raw data using the supplied MIME charset string, with sensible fallbacks.
+    static func decode(data: Data, charset: String) -> String {
+        let encoding = stringEncoding(from: charset) ?? .utf8
+        return String(data: data, encoding: encoding)
+            ?? String(data: data, encoding: .isoLatin1)
+            ?? String(data: data, encoding: .ascii)
+            ?? "[Could not decode message content]"
+    }
+
     // MARK: - Quoted-Printable Decoding
 
     /// Decode RFC 2045 quoted-printable encoded content.
@@ -134,5 +143,21 @@ struct MailContentDecoder {
             return utf8String
         }
         return input
+    }
+
+    private static func stringEncoding(from charset: String) -> String.Encoding? {
+        let lower = charset.lowercased()
+        switch lower {
+        case "utf-8", "utf8":
+            return .utf8
+        case "iso-8859-1", "latin1", "iso8859-1":
+            return .isoLatin1
+        case "windows-1252", "cp1252":
+            return .windowsCP1252
+        case "us-ascii", "ascii":
+            return .ascii
+        default:
+            return nil
+        }
     }
 }

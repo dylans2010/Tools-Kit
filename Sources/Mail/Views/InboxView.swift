@@ -10,7 +10,7 @@ struct InboxView: View {
     }
 
     @StateObject private var syncService = MailSyncService.shared
-    @State private var threads: [MailThread] = []
+    @StateObject private var storage = MailStorageService.shared
     @State private var searchText = ""
     @State private var showingCompose = false
     @State private var catchUpSummary: String?
@@ -27,8 +27,7 @@ struct InboxView: View {
         .navigationTitle(filter == .unread ? "Catch Up" : folder.name)
         .searchable(text: $searchText)
         .refreshable {
-            await syncService.sync(account: account, folder: folder)
-            loadLocal()
+            await syncService.fetchThreads(account: account, folder: folder)
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -40,14 +39,9 @@ struct InboxView: View {
         .sheet(isPresented: $showingCompose) {
             EmailComposingView(account: account)
         }
-        .onAppear {
-            loadLocal()
-            if threads.isEmpty {
-                Task {
-                    await syncService.sync(account: account, folder: folder)
-                    loadLocal()
-                }
-            }
+        .task {
+            _ = storage.loadThreads(for: folderKey)
+            await syncService.fetchThreads(account: account, folder: folder)
         }
     }
 
@@ -89,7 +83,7 @@ struct InboxView: View {
 
     @ViewBuilder
     private var catchUpSection: some View {
-        if filter == .unread && catchUpSummary == nil && !threads.isEmpty {
+        if filter == .unread && catchUpSummary == nil && !storage.threads.isEmpty {
             Section {
                 Button(action: runCatchUp) {
                     HStack {
@@ -168,7 +162,8 @@ struct InboxView: View {
                         date: message.date,
                         preview: String(message.body.prefix(100)),
                         isRead: message.isRead,
-                        body: message.body
+                        body: message.body,
+                        htmlBody: message.htmlBody
                     )
                 )
             ) {
@@ -196,13 +191,18 @@ struct InboxView: View {
                 }
                 .tint(.blue)
             }
+            .onAppear {
+                if thread.id == filteredThreads.last?.id {
+                    Task { await syncService.fetchNextPage() }
+                }
+            }
         }
     }
 
     private var filteredThreads: [MailThread] {
-        var result = threads
+        var result = storage.threads
         if filter == .unread {
-            result = threads.filter { !$0.isRead }
+            result = storage.threads.filter { !$0.isRead }
         }
         if !searchText.isEmpty {
             result = result.filter { $0.subject.localizedCaseInsensitiveContains(searchText) || $0.snippet.localizedCaseInsensitiveContains(searchText) }
@@ -210,38 +210,38 @@ struct InboxView: View {
         return result
     }
 
-    private func loadLocal() {
-        threads = MailStorageService.shared.loadThreads(for: "\(account.id)_\(folder.id)")
-    }
+    private var folderKey: String { "\(account.id)_\(folder.id)" }
 
     private func toggleRead(_ thread: MailThread) {
-        guard let idx = threads.firstIndex(where: { $0.id == thread.id }) else { return }
+        guard let idx = storage.threads.firstIndex(where: { $0.id == thread.id }) else { return }
         let targetRead = !thread.isRead
-        for msgIdx in threads[idx].messages.indices {
-            threads[idx].messages[msgIdx].isRead = targetRead
+        var updated = storage.threads
+        for msgIdx in updated[idx].messages.indices {
+            updated[idx].messages[msgIdx].isRead = targetRead
         }
-        MailStorageService.shared.saveThreads(threads, for: "\(account.id)_\(folder.id)")
+        MailStorageService.shared.saveThreads(updated, for: folderKey)
     }
 
     private func toggleStar(_ thread: MailThread) {
-        guard let idx = threads.firstIndex(where: { $0.id == thread.id }) else { return }
-        let currentlyStarred = threads[idx].messages.first?.isStarred ?? false
-        for msgIdx in threads[idx].messages.indices {
-            threads[idx].messages[msgIdx].isStarred = !currentlyStarred
+        guard let idx = storage.threads.firstIndex(where: { $0.id == thread.id }) else { return }
+        var updated = storage.threads
+        let currentlyStarred = updated[idx].messages.first?.isStarred ?? false
+        for msgIdx in updated[idx].messages.indices {
+            updated[idx].messages[msgIdx].isStarred = !currentlyStarred
         }
-        MailStorageService.shared.saveThreads(threads, for: "\(account.id)_\(folder.id)")
+        MailStorageService.shared.saveThreads(updated, for: folderKey)
     }
 
     private func deleteThread(_ thread: MailThread) {
-        threads.removeAll { $0.id == thread.id }
-        MailStorageService.shared.saveThreads(threads, for: "\(account.id)_\(folder.id)")
+        let remaining = storage.threads.filter { $0.id != thread.id }
+        MailStorageService.shared.saveThreads(remaining, for: folderKey)
     }
 
     private func runCatchUp() {
         isSummarizing = true
         Task {
             do {
-                let summary = try await MailAIService.shared.catchUp(unreadThreads: threads.filter { !$0.isRead })
+                let summary = try await MailAIService.shared.catchUp(unreadThreads: storage.threads.filter { !$0.isRead })
                 DispatchQueue.main.async {
                     self.catchUpSummary = summary
                     self.isSummarizing = false

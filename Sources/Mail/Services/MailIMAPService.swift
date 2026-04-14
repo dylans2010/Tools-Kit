@@ -31,10 +31,30 @@ class MailIMAPService: @unchecked Sendable {
         _ = try await sendCommand("LOGIN \(user) \(pass)")
     }
 
-    func fetchMessages(folder: String) async throws -> [MailMessage] {
+    func fetchThreads(account: MailAccount, folder: MailFolder, password: String, limit: Int, offset: Int) async throws -> [MailThread] {
+        try await connect()
+        try await login(user: account.email, pass: password)
+        let messages = try await fetchMessages(folder: folder.id, limit: limit, offset: offset)
+        disconnect()
+
+        let grouped = Dictionary(grouping: messages, by: { $0.threadId })
+        let threads = grouped.map { (_, msgs) in
+            MailThread(
+                id: msgs.first?.threadId ?? UUID().uuidString,
+                subject: msgs.first?.subject ?? "No Subject",
+                messages: msgs.sorted(by: { $0.date < $1.date }),
+                lastMessageDate: msgs.map(\.date).max() ?? Date()
+            )
+        }
+
+        return threads.sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
+    }
+
+    func fetchMessages(folder: String, limit: Int, offset: Int) async throws -> [MailMessage] {
         _ = try await sendCommand("SELECT \(folder)")
-        // Fetch full RFC822 body so MIME parsing works correctly
-        let response = try await sendCommand("FETCH 1:50 (FLAGS INTERNALDATE RFC822.SIZE ENVELOPE BODY[])")
+        let start = max(1, offset + 1)
+        let end = offset + limit
+        let response = try await sendCommand("UID FETCH \(start):\(end) (UID FLAGS INTERNALDATE RFC822.SIZE ENVELOPE BODY[])")
         return parseMessages(response)
     }
 
@@ -79,24 +99,27 @@ class MailIMAPService: @unchecked Sendable {
             let fetchBlock = nsResponse.substring(with: NSRange(location: start, length: end - start))
 
             // Extract ENVELOPE fields
-            let subject = extractEnvelopeField(fetchBlock, field: "subject") ?? "No Subject"
-            let from = extractEnvelopeFrom(fetchBlock) ?? "Unknown"
+            let subject = MailContentDecoder.decodeEncodedWords(extractEnvelopeField(fetchBlock, field: "subject") ?? "No Subject")
+            let from = MailContentDecoder.decodeEncodedWords(extractEnvelopeFrom(fetchBlock) ?? "Unknown")
+            let uid = extractUID(fetchBlock) ?? UUID().uuidString
+            let date = extractInternalDate(fetchBlock) ?? Date()
 
             // Extract raw BODY[] content and run through MIME pipeline
             let rawBody = extractBodyContent(fetchBlock)
-            let (htmlBody, plainBody) = decodeMIME(rawBody)
+            let parsed = MailMIMEParser.parse(rawBody)
+            let rendered = MailContentRenderer.render(from: parsed)
 
             let msg = MailMessage(
-                id: UUID().uuidString,
-                threadId: UUID().uuidString,
-                from: MailContentDecoder.decodeEncodedWords(from),
+                id: uid,
+                threadId: subject, // basic thread grouping by subject for now
+                from: from,
                 to: ["me@icloud.com"],
                 cc: [],
                 bcc: [],
-                subject: MailContentDecoder.decodeEncodedWords(subject),
-                body: plainBody,
-                htmlBody: htmlBody,
-                date: Date(),
+                subject: subject,
+                body: rendered.plainBody ?? "",
+                htmlBody: rendered.htmlBody,
+                date: date,
                 isRead: false,
                 isStarred: false,
                 attachments: []
@@ -105,36 +128,6 @@ class MailIMAPService: @unchecked Sendable {
         }
 
         return messages
-    }
-
-    // MARK: - MIME Pipeline
-
-    /// Parse raw IMAP body through MailMIMEParser → MailContentDecoder.
-    /// Returns (htmlBody, plainBody). At least one will be non-nil.
-    private func decodeMIME(_ raw: String) -> (String?, String) {
-        guard !raw.isEmpty else { return (nil, "") }
-
-        let parsed = MailMIMEParser.parse(raw)
-
-        let html: String?
-        if let htmlPart = parsed.htmlPart {
-            let decoded = MailContentDecoder.decode(htmlPart.content, transferEncoding: htmlPart.transferEncoding)
-            html = decoded.isEmpty ? nil : decoded
-        } else {
-            html = nil
-        }
-
-        let plain: String
-        if let textPart = parsed.textPart {
-            plain = MailContentDecoder.decode(textPart.content, transferEncoding: textPart.transferEncoding)
-        } else if html == nil {
-            // No MIME structure: treat the raw content as plain text
-            plain = MailContentDecoder.decodeQuotedPrintable(raw)
-        } else {
-            plain = ""
-        }
-
-        return (html, plain)
     }
 
     // MARK: - Response Parsing Helpers
@@ -162,6 +155,31 @@ class MailIMAPService: @unchecked Sendable {
         }
 
         return ""
+    }
+
+    private func extractUID(_ block: String) -> String? {
+        let uidPattern = #"UID (\d+)"#
+        if let regex = try? NSRegularExpression(pattern: uidPattern),
+           let match = regex.firstMatch(in: block, range: NSRange(block.startIndex..., in: block)),
+           let range = Range(match.range(at: 1), in: block) {
+            return String(block[range])
+        }
+        return nil
+    }
+
+    private func extractInternalDate(_ block: String) -> Date? {
+        let datePattern = #"INTERNALDATE \"([^\"]+)\""#
+        guard
+            let regex = try? NSRegularExpression(pattern: datePattern),
+            let match = regex.firstMatch(in: block, range: NSRange(block.startIndex..., in: block)),
+            let range = Range(match.range(at: 1), in: block)
+        else { return nil }
+
+        let dateString = String(block[range])
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "dd-MMM-yyyy HH:mm:ss Z"
+        return formatter.date(from: dateString)
     }
 
     private func extractEnvelopeField(_ block: String, field: String) -> String? {
