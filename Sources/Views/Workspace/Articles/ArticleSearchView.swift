@@ -13,19 +13,34 @@ struct ArticleSearchView: View {
     private let languages = [
         ("en", "English"), ("es", "Spanish"), ("fr", "French"),
         ("de", "German"), ("it", "Italian"), ("pt", "Portuguese"),
-        ("ja", "Japanese"), ("zh", "Chinese")
+        ("ja", "Japanese"), ("zh", "Chinese"), ("ar", "Arabic"),
+        ("ru", "Russian"), ("ko", "Korean"), ("nl", "Dutch"),
+        ("pl", "Polish"), ("sv", "Swedish"), ("tr", "Turkish")
     ]
 
     var body: some View {
         VStack(spacing: 0) {
-            // Language picker
-            Picker("Language", selection: $selectedLanguage) {
-                ForEach(languages, id: \.0) { code, name in
-                    Text(name).tag(code)
+            // Language scroll picker
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(languages, id: \.0) { code, name in
+                        Button {
+                            selectedLanguage = code
+                        } label: {
+                            Text(name)
+                                .font(.caption.bold())
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(selectedLanguage == code ? Color.accentColor : Color(.secondarySystemBackground))
+                                .foregroundColor(selectedLanguage == code ? .white : .primary)
+                                .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
             }
-            .pickerStyle(.segmented)
-            .padding()
 
             List {
                 if isLoading {

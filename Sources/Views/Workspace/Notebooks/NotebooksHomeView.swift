@@ -96,9 +96,6 @@ private struct NotebookRow: View {
                     .foregroundColor(.secondary)
             }
             Spacer()
-            Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundColor(.secondary)
         }
         .padding(14)
         .background(Color(.secondarySystemBackground))

@@ -15,6 +15,7 @@ struct InboxView: View {
     @State private var showingCompose = false
     @State private var catchUpSummary: String?
     @State private var isSummarizing = false
+    @State private var hasSynced = false
 
     var body: some View {
         List {
@@ -28,10 +29,25 @@ struct InboxView: View {
             }
 
             if let summary = catchUpSummary {
-                Section(header: Text("AI Catch Up")) {
-                    Text(summary)
-                        .font(.subheadline)
-                        .padding(.vertical, 4)
+                Section {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("AI Catch Up", systemImage: "sparkles")
+                            .font(.caption.bold())
+                            .foregroundStyle(
+                                LinearGradient(colors: [.purple, .blue], startPoint: .leading, endPoint: .trailing)
+                            )
+                        Text(summary)
+                            .font(.subheadline)
+                            .padding(.vertical, 4)
+                    }
+                    .padding(12)
+                    .background(
+                        LinearGradient(colors: [Color.purple.opacity(0.1), Color.blue.opacity(0.05)],
+                                      startPoint: .topLeading, endPoint: .bottomTrailing)
+                    )
+                    .cornerRadius(12)
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                    .listRowBackground(Color.clear)
                 }
             }
 
@@ -79,7 +95,16 @@ struct InboxView: View {
         .sheet(isPresented: $showingCompose) {
             EmailComposingView(account: account)
         }
-        .onAppear(perform: loadLocal)
+        .onAppear {
+            loadLocal()
+            if threads.isEmpty && !hasSynced {
+                hasSynced = true
+                Task {
+                    await syncService.sync(account: account, folder: folder)
+                    loadLocal()
+                }
+            }
+        }
     }
 
     private var filteredThreads: [MailThread] {
