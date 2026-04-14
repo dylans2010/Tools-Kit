@@ -98,6 +98,7 @@ final class PermissionAuditBackend: ObservableObject {
         let s: PermissionItem.Status
         switch status {
         case .authorized: s = .granted
+        case .limited: s = .granted
         case .denied: s = .denied
         case .notDetermined: s = .undetermined
         case .restricted: s = .restricted

@@ -43,7 +43,7 @@ struct PageEditorView: View {
                             .padding()
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .transition(.spring(response: 0.35, dampingFraction: 0.75))
+                    .transition(.opacity)
                 } else {
                     ZStack(alignment: .topLeading) {
                         if content.isEmpty {
@@ -59,7 +59,7 @@ struct PageEditorView: View {
                             .padding(.horizontal, 16)
                             .onChange(of: content) { _ in scheduleAutosave() }
                     }
-                    .transition(.spring(response: 0.35, dampingFraction: 0.75))
+                    .transition(.opacity)
                 }
             }
 

@@ -133,8 +133,10 @@ struct EmailComposingView: View {
                 }
             }
             .sheet(isPresented: $showingAISuggestions) {
-                AIWritingAssistantSheet(replyTo: replyTo, currentBody: messageBody) { suggestion in
-                    messageBody = suggestion
+                if #available(iOS 16.4, *) {
+                    AIWritingAssistantSheet(replyTo: replyTo, currentBody: messageBody) { suggestion in
+                        messageBody = suggestion
+                    }
                 }
             }
             .sheet(isPresented: $showingDocumentPicker) {
@@ -234,6 +236,7 @@ struct ToolbarButton: View {
 
 // MARK: - AI Writing Assistant Sheet
 
+@available(iOS 16.4, *)
 struct AIWritingAssistantSheet: View {
     let replyTo: MailMessage?
     let currentBody: String
