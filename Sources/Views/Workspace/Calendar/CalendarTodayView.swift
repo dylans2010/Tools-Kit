@@ -41,6 +41,7 @@ struct CalendarTodayView: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     private var dateHeader: some View {

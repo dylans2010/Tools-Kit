@@ -4,6 +4,7 @@ import WebKit
 struct EmailDetailView: View {
     @ObservedObject var viewModel: MailViewModel
     let email: EmailMessage
+    @State private var renderedContent: RenderedMailContent?
 
     var body: some View {
         ScrollView {
@@ -20,50 +21,58 @@ struct EmailDetailView: View {
 
                 Divider()
 
-                if let body = email.body {
-                    if body.contains("<html") || body.contains("<body") || body.starts(with: "<") {
-                        MailHTMLRenderer(html: body)
-                            .frame(minHeight: 400)
-                    } else {
-                        Text(cleanBody(body))
-                            .padding(.horizontal)
-                    }
-                } else {
-                    HStack {
-                        Spacer()
-                        VStack {
-                            ProgressView()
-                            Text("Loading Body...")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        Spacer()
-                    }
-                    .onAppear {
-                        viewModel.loadBody(for: email)
-                    }
-                }
+                contentView
             }
         }
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    private func cleanBody(_ body: String) -> String {
-        // Strip IMAP fetch artifacts ({123}, etc.)
-        let pattern = #"^\{\d+\}\r\n"#
-        return body.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
+    private var contentView: some View {
+        Group {
+            if let content = renderedContent ?? renderContent(from: resolvedEmail) {
+                if content.hasHTML, let html = content.htmlBody {
+                    MailWebView(htmlString: html)
+                        .frame(minHeight: 400)
+                        .padding(.horizontal, 4)
+                } else if let plain = content.plainBody {
+                    Text(plain)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                }
+            } else {
+                HStack {
+                    Spacer()
+                    VStack {
+                        ProgressView()
+                        Text("Loading Body...")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                }
+                .onAppear {
+                    viewModel.loadBody(for: email)
+                    renderedContent = renderContent(from: resolvedEmail)
+                }
+            }
+        }
     }
-}
 
-struct MailHTMLRenderer: UIViewRepresentable {
-    let html: String
-
-    func makeUIView(context: Context) -> WKWebView {
-        let webView = WKWebView()
-        return webView
+    private var resolvedEmail: EmailMessage {
+        viewModel.emails.first(where: { $0.uid == email.uid }) ?? email
     }
 
-    func updateUIView(_ uiView: WKWebView, context: Context) {
-        uiView.loadHTMLString(html, baseURL: nil)
+    private func renderContent(from message: EmailMessage) -> RenderedMailContent? {
+        if let html = message.htmlBody {
+            return MailContentRenderer.render(htmlBody: html, plainBody: message.body ?? message.preview)
+        }
+
+        if let body = message.body {
+            let parsed = MailMIMEParser.parse(body)
+            let rendered = parsed.isEmpty ? MailContentRenderer.render(htmlBody: nil, plainBody: body) : MailContentRenderer.render(from: parsed)
+            return rendered.hasHTML || rendered.plainBody != nil ? rendered : nil
+        }
+
+        return nil
     }
 }

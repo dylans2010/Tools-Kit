@@ -1,57 +1,81 @@
 import SwiftUI
 import WebKit
 
-struct MailContentRenderer: UIViewRepresentable {
-    let htmlContent: String
-    let plainTextContent: String
+struct RenderedMailContent {
+    let htmlBody: String?
+    let plainBody: String?
+    let hasHTML: Bool
+}
 
-    // MARK: - Convenience factory methods
+enum MailContentRenderer {
+    static func render(htmlBody: String?, plainBody: String?) -> RenderedMailContent {
+        let sanitizedHTML = htmlBody?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+            .map { sanitizeHTML($0) }
+            .map { wrapHTMLDocument($0) }
 
-    /// Create a renderer that displays an HTML email.
-    static func renderHTML(_ html: String) -> MailContentRenderer {
-        MailContentRenderer(htmlContent: html, plainTextContent: "")
-    }
+        let cleanedPlain = plainBody?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
 
-    /// Create a renderer that displays a plain-text email.
-    static func renderPlainText(_ text: String) -> MailContentRenderer {
-        MailContentRenderer(htmlContent: "", plainTextContent: text)
-    }
-
-    // MARK: - UIViewRepresentable
-
-    func makeUIView(context: Context) -> WKWebView {
-        let config = WKWebViewConfiguration()
-        // Disable JavaScript for security (XSS prevention)
-        let preferences = WKWebpagePreferences()
-        preferences.allowsContentJavaScript = false
-        config.defaultWebpagePreferences = preferences
-
-        let webView = WKWebView(frame: .zero, configuration: config)
-        webView.navigationDelegate = context.coordinator
-        webView.scrollView.isScrollEnabled = false // Let SwiftUI handle scrolling
-        webView.isOpaque = false
-        webView.backgroundColor = .clear
-        webView.scrollView.backgroundColor = .clear
-        return webView
-    }
-
-    func updateUIView(_ uiView: WKWebView, context: Context) {
-        let htmlString: String
-        if htmlContent.isEmpty {
-            htmlString = wrapPlainText(plainTextContent)
-        } else {
-            htmlString = injectCSS(sanitize(htmlContent))
+        if let sanitizedHTML {
+            return RenderedMailContent(htmlBody: sanitizedHTML, plainBody: cleanedPlain, hasHTML: true)
         }
-        uiView.loadHTMLString(htmlString, baseURL: nil)
+
+        if let cleanedPlain {
+            return RenderedMailContent(htmlBody: nil, plainBody: cleanedPlain, hasHTML: false)
+        }
+
+        return RenderedMailContent(htmlBody: nil, plainBody: nil, hasHTML: false)
     }
 
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+    static func render(from parsed: ParsedMIMEMessage) -> RenderedMailContent {
+        let html = parsed.htmlPart.flatMap { MailContentDecoder.decode(data: $0.data, charset: $0.charset) }
+        let plain = parsed.textPart.flatMap { MailContentDecoder.decode(data: $0.data, charset: $0.charset) }
+        return render(htmlBody: html, plainBody: plain)
     }
 
-    // MARK: - CSS injection
+    // MARK: - Sanitisation & Wrapping
 
-    private var emailCSS: String {
+    private static func sanitizeHTML(_ html: String) -> String {
+        var sanitized = html
+        let patterns = [
+            "<script[\\s\\S]*?>[\\s\\S]*?<\\/script>",
+            "on\\w+\\s*=\\s*\"[^\"]*\"",
+            "on\\w+\\s*=\\s*'[^']*'",
+            "javascript:[^\"']*"
+        ]
+        for pattern in patterns {
+            if let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) {
+                sanitized = regex.stringByReplacingMatches(
+                    in: sanitized,
+                    options: [],
+                    range: NSRange(location: 0, length: sanitized.utf16.count),
+                    withTemplate: ""
+                )
+            }
+        }
+        return sanitized
+    }
+
+    private static func wrapPlainTextHTML(_ text: String) -> String {
+        let escaped = text
+            .replacingOccurrences(of: "&", with: "&amp;")
+            .replacingOccurrences(of: "<", with: "&lt;")
+            .replacingOccurrences(of: ">", with: "&gt;")
+            .replacingOccurrences(of: "\n", with: "<br>")
+        return "<html><head>\(emailCSS)</head><body><pre style='white-space:pre-wrap;font-family:inherit'>\(escaped)</pre></body></html>"
+    }
+
+    private static func wrapHTMLDocument(_ html: String) -> String {
+        if let headRange = html.range(of: "</head>", options: .caseInsensitive) {
+            return html.replacingCharacters(in: headRange, with: emailCSS + "</head>")
+        } else if let htmlRange = html.range(of: "<html", options: .caseInsensitive) {
+            if let endOfTag = html.range(of: ">", range: htmlRange.upperBound..<html.endIndex) {
+                return html.replacingCharacters(in: endOfTag, with: "><head>" + emailCSS + "</head>")
+            }
+        }
+        return "<html><head>\(emailCSS)</head><body>\(html)</body></html>"
+    }
+
+    private static var emailCSS: String {
         """
         <style>
           :root {
@@ -102,63 +126,35 @@ struct MailContentRenderer: UIViewRepresentable {
         </style>
         """
     }
+}
 
-    private func injectCSS(_ html: String) -> String {
-        // Insert CSS into existing <head> if present, otherwise wrap the whole thing
-        if let headRange = html.range(of: "</head>", options: .caseInsensitive) {
-            return html.replacingCharacters(in: headRange, with: emailCSS + "</head>")
-        } else if let htmlRange = html.range(of: "<html", options: .caseInsensitive) {
-            // Has <html> tag but no <head> — insert after <html ...>
-            if let endOfTag = html.range(of: ">", range: htmlRange.upperBound..<html.endIndex) {
-                return html.replacingCharacters(
-                    in: endOfTag,
-                    with: "><head>" + emailCSS + "</head>"
-                )
-            }
-        }
-        // Plain HTML fragment — wrap in a full document
-        return "<html><head>\(emailCSS)</head><body>\(html)</body></html>"
+struct MailWebView: UIViewRepresentable {
+    let htmlString: String
+
+    func makeUIView(context: Context) -> WKWebView {
+        let config = WKWebViewConfiguration()
+        let preferences = WKWebpagePreferences()
+        preferences.allowsContentJavaScript = false
+        config.defaultWebpagePreferences = preferences
+
+        let webView = WKWebView(frame: .zero, configuration: config)
+        webView.navigationDelegate = context.coordinator
+        webView.isOpaque = false
+        webView.backgroundColor = .clear
+        webView.scrollView.backgroundColor = .clear
+        webView.scrollView.isScrollEnabled = false
+        return webView
     }
 
-    private func wrapPlainText(_ text: String) -> String {
-        let escaped = text
-            .replacingOccurrences(of: "&", with: "&amp;")
-            .replacingOccurrences(of: "<", with: "&lt;")
-            .replacingOccurrences(of: ">", with: "&gt;")
-            .replacingOccurrences(of: "\n", with: "<br>")
-        return "<html><head>\(emailCSS)</head><body><pre style='white-space:pre-wrap;font-family:inherit'>\(escaped)</pre></body></html>"
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+        uiView.loadHTMLString(htmlString, baseURL: nil)
     }
 
-    private func sanitize(_ html: String) -> String {
-        var sanitized = html
-        let patterns = [
-            "<script[\\s\\S]*?>[\\s\\S]*?<\\/script>",
-            "on\\w+\\s*=\\s*\"[^\"]*\"",
-            "on\\w+\\s*=\\s*'[^']*'",
-            "javascript:[^\"']*"
-        ]
-        for pattern in patterns {
-            if let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) {
-                sanitized = regex.stringByReplacingMatches(
-                    in: sanitized,
-                    options: [],
-                    range: NSRange(location: 0, length: sanitized.utf16.count),
-                    withTemplate: ""
-                )
-            }
-        }
-        return sanitized
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
     }
-
-    // MARK: - Coordinator
 
     class Coordinator: NSObject, WKNavigationDelegate {
-        var parent: MailContentRenderer
-
-        init(_ parent: MailContentRenderer) {
-            self.parent = parent
-        }
-
         func webView(
             _ webView: WKWebView,
             decidePolicyFor navigationAction: WKNavigationAction,
@@ -172,5 +168,11 @@ struct MailContentRenderer: UIViewRepresentable {
                 decisionHandler(.allow)
             }
         }
+    }
+}
+
+private extension String {
+    var nilIfEmpty: String? {
+        isEmpty ? nil : self
     }
 }

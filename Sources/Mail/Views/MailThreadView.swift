@@ -107,16 +107,14 @@ struct MailThreadView: View {
 
     @ViewBuilder
     private var bodySection: some View {
-        if let body = email.body {
-            if body.contains("<html") || body.contains("<body") || body.starts(with: "<") {
-                // HTML email — render through MailContentRenderer
-                MailContentRenderer.renderHTML(body)
+        if let content = renderedContent {
+            if content.hasHTML, let html = content.htmlBody {
+                MailWebView(htmlString: html)
                     .frame(minHeight: 300)
                     .padding(.horizontal, 4)
-            } else {
-                // Plain-text email
-                MailContentRenderer.renderPlainText(body)
-                    .frame(minHeight: 200)
+            } else if let plain = content.plainBody {
+                Text(plain)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 4)
             }
         } else {
@@ -350,5 +348,16 @@ struct MailThreadView: View {
         let colors: [Color] = [.blue, .purple, .green, .orange, .pink, .teal, .indigo]
         let index = abs(name.hashValue) % colors.count
         return colors[index]
+    }
+
+    private var renderedContent: RenderedMailContent? {
+        if let html = email.htmlBody {
+            return MailContentRenderer.render(htmlBody: html, plainBody: email.body ?? email.preview)
+        }
+        if let body = email.body {
+            let parsed = MailMIMEParser.parse(body)
+            return parsed.isEmpty ? MailContentRenderer.render(htmlBody: nil, plainBody: body) : MailContentRenderer.render(from: parsed)
+        }
+        return nil
     }
 }

@@ -35,13 +35,15 @@ class MailViewModel: ObservableObject {
     }
 
     func loadBody(for email: EmailMessage) {
-        guard email.body == nil else { return }
-        imap.fetchBody(for: email.uid) { [weak self] body in
+        guard email.body == nil && email.htmlBody == nil else { return }
+        imap.fetchBody(for: email.uid) { [weak self] content in
             guard let self,
                   let idx = self.emails.firstIndex(where: { $0.uid == email.uid }) else { return }
-            self.emails[idx].body = body
+            self.emails[idx].body = content.plainBody
+            self.emails[idx].htmlBody = content.htmlBody
             if self.selectedEmail?.uid == email.uid {
-                self.selectedEmail?.body = body
+                self.selectedEmail?.body = content.plainBody
+                self.selectedEmail?.htmlBody = content.htmlBody
             }
         }
     }

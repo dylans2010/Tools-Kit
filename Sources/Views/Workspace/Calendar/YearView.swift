@@ -3,7 +3,7 @@ import SwiftUI
 struct CalendarYearView: View {
     @StateObject private var manager = CalendarManager.shared
     @Binding var selectedDate: Date
-    @Binding var selectedView: CalendarHomeView.CalendarViewType
+    @Binding var selectedView: CalendarMode
 
     private let calendar = Calendar.current
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 16), count: 3)
@@ -30,6 +30,7 @@ struct CalendarYearView: View {
                 .padding()
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     private var yearHeader: some View {

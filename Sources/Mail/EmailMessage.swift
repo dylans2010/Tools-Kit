@@ -9,6 +9,7 @@ struct EmailMessage: Identifiable, Hashable {
     var preview: String
     var isRead: Bool
     var body: String?
+    var htmlBody: String? = nil
     var attachments: [EmailAttachment] = []
 }
 

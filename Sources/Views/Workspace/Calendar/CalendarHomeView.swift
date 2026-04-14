@@ -2,71 +2,41 @@ import SwiftUI
 
 struct CalendarHomeView: View {
     @StateObject private var manager = CalendarManager.shared
-    @State private var selectedView: CalendarViewType = .month
+    @State private var selectedView: CalendarMode = .month
     @State private var selectedDate = Date()
     @State private var showingCreate = false
     @State private var selectedEvent: CalendarEvent? = nil
 
-    enum CalendarViewType: String, CaseIterable {
-        case month = "Month"
-        case today = "Today"
-        case week = "Week"
-        case year = "Year"
-        case agenda = "Agenda"
-
-        var icon: String {
-            switch self {
-            case .today: return "sun.max"
-            case .week: return "7.square"
-            case .month: return "calendar"
-            case .year: return "calendar.badge.clock"
-            case .agenda: return "list.bullet"
-            }
-        }
-    }
-
     var body: some View {
         VStack(spacing: 0) {
+            CalendarHeaderView(selectedDate: $selectedDate, selectedView: $selectedView) {
+                showingCreate = true
+            } onToday: {
+                withAnimation { selectedDate = Date(); selectedView = .today }
+            }
+            CalendarModeSelector(selectedMode: $selectedView)
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+            Divider()
+
             Group {
                 switch selectedView {
                 case .month:
-                    CalendarMonthView(selectedDate: $selectedDate, selectedView: $selectedView, selectedEvent: $selectedEvent)
-                case .today:
-                    CalendarTodayView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
+                    CalendarMonthView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
                 case .week:
                     CalendarWeekView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
                 case .year:
                     CalendarYearView(selectedDate: $selectedDate, selectedView: $selectedView)
                 case .agenda:
                     CalendarAgendaView(selectedEvent: $selectedEvent)
+                case .today:
+                    CalendarTodayView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .animation(.spring(response: 0.35, dampingFraction: 0.75), value: selectedView)
-
-            Spacer(minLength: 0)
-
-            viewPicker
-                .padding(.bottom, 10)
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Button {
-                    withAnimation {
-                        selectedDate = Date()
-                    }
-                } label: {
-                    Text("Today")
-                        .font(.subheadline.bold())
-                }
-
-                Button { showingCreate = true } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(.blue)
-                }
-            }
-        }
+        .ignoresSafeArea(edges: .bottom)
         .sheet(isPresented: $showingCreate) {
             NavigationStack {
                 CreateEventView(prefilledDate: selectedDate) { event in
@@ -80,26 +50,117 @@ struct CalendarHomeView: View {
             }
         }
     }
+}
 
-    private var viewPicker: some View {
-        HStack(spacing: 0) {
-            ForEach(CalendarViewType.allCases, id: \.self) { type in
+enum CalendarMode: String, CaseIterable {
+    case month = "Month"
+    case week = "Week"
+    case year = "Year"
+    case agenda = "Agenda"
+    case today = "Today"
+}
+
+private struct CalendarModeSelector: View {
+    @Binding var selectedMode: CalendarMode
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(CalendarMode.allCases, id: \.self) { mode in
                 Button {
-                    selectedView = type
-                } label: {
-                    VStack(spacing: 4) {
-                        Image(systemName: type.icon)
-                            .font(.system(size: 18))
-                        Text(type.rawValue)
-                            .font(.system(size: 10, weight: .medium))
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        selectedMode = mode
                     }
-                    .frame(maxWidth: .infinity)
-                    .foregroundColor(selectedView == type ? .blue : .secondary)
+                } label: {
+                    Text(mode.rawValue)
+                        .font(.footnote.weight(.semibold))
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 12)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            Capsule()
+                                .fill(selectedMode == mode ? Color.accentColor.opacity(0.15) : Color(.secondarySystemBackground))
+                        )
+                        .foregroundColor(selectedMode == mode ? .accentColor : .primary)
                 }
                 .buttonStyle(.plain)
             }
         }
-        .padding(.top, 10)
-        .background(.ultraThinMaterial)
+    }
+}
+
+private struct CalendarHeaderView: View {
+    @Binding var selectedDate: Date
+    @Binding var selectedView: CalendarMode
+    var onAdd: () -> Void
+    var onToday: () -> Void
+
+    private let calendar = Calendar.current
+
+    var body: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(titleText)
+                    .font(.title2.bold())
+                Text(subtitleText)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            HStack(spacing: 12) {
+                Button(action: { shift(by: -1) }) {
+                    Image(systemName: "chevron.left")
+                        .font(.headline)
+                }
+
+                Button(action: { shift(by: 1) }) {
+                    Image(systemName: "chevron.right")
+                        .font(.headline)
+                }
+
+                Button(action: onToday) {
+                    Text("Today")
+                        .font(.caption.bold())
+                }
+
+                Button(action: onAdd) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(.blue)
+                }
+            }
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 12)
+    }
+
+    private var titleText: String {
+        let formatter = DateFormatter()
+        switch selectedView {
+        case .year:
+            formatter.dateFormat = "yyyy"
+        case .month, .week, .today, .agenda:
+            formatter.dateFormat = "LLLL yyyy"
+        }
+        return formatter.string(from: selectedDate)
+    }
+
+    private var subtitleText: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .full
+        formatter.timeStyle = .none
+        return formatter.string(from: selectedDate)
+    }
+
+    private func shift(by amount: Int) {
+        switch selectedView {
+        case .year:
+            selectedDate = calendar.date(byAdding: .year, value: amount, to: selectedDate) ?? selectedDate
+        case .month:
+            selectedDate = calendar.date(byAdding: .month, value: amount, to: selectedDate) ?? selectedDate
+        case .week, .agenda, .today:
+            selectedDate = calendar.date(byAdding: .weekOfYear, value: amount, to: selectedDate) ?? selectedDate
+        }
     }
 }

@@ -25,6 +25,7 @@ struct CalendarWeekView: View {
                 .padding(.vertical, 8)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     private var weekHeader: some View {

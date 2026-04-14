@@ -17,17 +17,20 @@ class iCloudMailProvider: MailProviderProtocol {
         guard let password = MailKeychainManager.shared.getPassword(for: account.email) else {
             throw NSError(domain: "MailError", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing credentials"])
         }
+        defer { imapService.disconnect() }
         try await imapService.connect()
         try await imapService.login(user: account.email, pass: password)
-        let messages = try await imapService.fetchMessages(folder: folder.id)
+        let messages = try await imapService.fetchMessages(folder: folder.id, limit: limit, offset: offset)
 
         // Basic grouping into threads by subject for V1
-        let grouped = Dictionary(grouping: messages, by: { $0.subject })
-        let threads = grouped.map { (subject, messages) in
-            MailThread(id: messages.first?.threadId ?? UUID().uuidString,
-                       subject: subject,
-                       messages: messages.sorted(by: { $0.date < $1.date }),
-                       lastMessageDate: messages.map({ $0.date }).max() ?? Date())
+        let grouped = Dictionary(grouping: messages, by: { $0.threadId })
+        let threads = grouped.map { (_, messages) in
+            MailThread(
+                id: messages.first?.threadId ?? UUID().uuidString,
+                subject: messages.first?.subject ?? "No Subject",
+                messages: messages.sorted(by: { $0.date < $1.date }),
+                lastMessageDate: messages.map({ $0.date }).max() ?? Date()
+            )
         }
         return threads.sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
     }
