@@ -7,6 +7,7 @@ struct WorkspaceHomeView: View {
         case notes = "Notes"
         case forms = "Forms"
         case slides = "Slides"
+        case mail = "Mail"
         case articles = "Articles"
         case spreadsheets = "Sheets"
         case notebooks = "Notebooks"
@@ -14,6 +15,7 @@ struct WorkspaceHomeView: View {
         var icon: String {
             switch self {
             case .notes: return "note.text"
+            case .mail: return "envelope"
             case .forms: return "list.bullet.rectangle.portrait"
             case .slides: return "rectangle.on.rectangle.angled"
             case .articles: return "newspaper"
@@ -32,6 +34,14 @@ struct WorkspaceHomeView: View {
                 Label(WorkspaceTab.notes.rawValue, systemImage: WorkspaceTab.notes.icon)
             }
             .tag(WorkspaceTab.notes)
+
+            NavigationStack {
+                MailHomeView()
+            }
+            .tabItem {
+                Label(WorkspaceTab.mail.rawValue, systemImage: WorkspaceTab.mail.icon)
+            }
+            .tag(WorkspaceTab.mail)
 
             NavigationStack {
                 FormsView()

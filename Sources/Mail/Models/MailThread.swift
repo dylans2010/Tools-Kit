@@ -1,0 +1,17 @@
+import Foundation
+
+struct MailThread: Identifiable, Codable {
+    let id: String
+    let subject: String
+    var messages: [MailMessage]
+    var lastMessageDate: Date
+    var isRead: Bool {
+        messages.allSatisfy { $0.isRead }
+    }
+    var snippet: String {
+        messages.last?.body.prefix(100).description ?? ""
+    }
+    var participants: [String] {
+        Array(Set(messages.flatMap { [$0.from] + $0.to })).sorted()
+    }
+}
