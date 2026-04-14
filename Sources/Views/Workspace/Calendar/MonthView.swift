@@ -6,59 +6,89 @@ struct CalendarMonthView: View {
     @Binding var selectedView: CalendarHomeView.CalendarViewType
     @Binding var selectedEvent: CalendarEvent?
 
+    @Namespace private var animation
     private let calendar = Calendar.current
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
-    private let daySymbols = Calendar.current.veryShortWeekdaySymbols
+    private let daySymbols = Calendar.current.shortWeekdaySymbols
 
     var body: some View {
         VStack(spacing: 0) {
             monthHeader
+                .padding(.top, 10)
 
             // Day labels
             HStack(spacing: 0) {
                 ForEach(daySymbols, id: \.self) { symbol in
-                    Text(symbol)
-                        .font(.caption2.bold())
+                    Text(symbol.prefix(1))
+                        .font(.caption.bold())
                         .foregroundColor(.secondary)
                         .frame(maxWidth: .infinity)
                 }
             }
             .padding(.horizontal)
-            .padding(.vertical, 6)
-            .background(Color(.systemBackground))
+            .padding(.vertical, 12)
 
-            Divider()
-
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 0) {
-                    ForEach(daysInGrid(), id: \.self) { date in
-                        MonthDayCell(date: date,
-                                     isCurrentMonth: calendar.isDate(date, equalTo: selectedDate, toGranularity: .month),
-                                     isToday: calendar.isDateInToday(date),
-                                     isSelected: calendar.isDate(date, inSameDayAs: selectedDate),
-                                     hasEvents: manager.hasEvents(on: date))
-                        {
-                            selectedDate = date
-                        }
-                    }
-                }
-                .padding(.horizontal, 4)
-
-                if !manager.events(on: selectedDate).isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(shortDate(selectedDate))
-                            .font(.headline)
-                            .padding(.horizontal)
-
-                        ForEach(manager.events(on: selectedDate)) { event in
-                            Button { selectedEvent = event } label: {
-                                EventAgendaRow(event: event)
+            GeometryReader { geo in
+                VStack(spacing: 0) {
+                    // Calendar Grid
+                    LazyVGrid(columns: columns, spacing: 0) {
+                        ForEach(daysInGrid(), id: \.self) { date in
+                            ModernMonthDayCell(
+                                date: date,
+                                isCurrentMonth: calendar.isDate(date, equalTo: selectedDate, toGranularity: .month),
+                                isToday: calendar.isDateInToday(date),
+                                isSelected: calendar.isDate(date, inSameDayAs: selectedDate),
+                                events: manager.events(on: date),
+                                namespace: animation
+                            ) {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    selectedDate = date
+                                }
                             }
-                            .buttonStyle(.plain)
                         }
                     }
-                    .padding(.top, 16)
-                    .padding(.bottom, 8)
+                    .padding(.horizontal, 0)
+                    .background(Color(.systemBackground))
+                    .ignoresSafeArea(edges: .horizontal)
+
+                    Divider()
+
+                    // Selected Day's Events
+                    List {
+                        let events = manager.events(on: selectedDate)
+                        if events.isEmpty {
+                            Text("No events for this day")
+                                .font(.callout)
+                                .foregroundColor(.secondary)
+                                .listRowSeparator(.hidden)
+                                .padding(.top, 20)
+                        } else {
+                            ForEach(events) { event in
+                                Button {
+                                    selectedEvent = event
+                                } label: {
+                                    HStack(spacing: 12) {
+                                        Circle()
+                                            .fill(Color(hex: event.priority.color) ?? .blue)
+                                            .frame(width: 8, height: 8)
+
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(event.title)
+                                                .font(.subheadline.bold())
+                                            Text(event.formattedTimeRange)
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
+                                        Spacer()
+                                    }
+                                    .padding(.vertical, 4)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                    .listStyle(.plain)
+                    .transition(.move(edge: .bottom))
                 }
             }
         }
@@ -66,23 +96,32 @@ struct CalendarMonthView: View {
 
     private var monthHeader: some View {
         HStack {
-            Button {
-                selectedDate = calendar.date(byAdding: .month, value: -1, to: selectedDate) ?? selectedDate
-            } label: {
-                Image(systemName: "chevron.left")
-            }
-            Spacer()
             Text(monthYearLabel)
-                .font(.headline)
+                .font(.largeTitle.bold())
+
             Spacer()
-            Button {
-                selectedDate = calendar.date(byAdding: .month, value: 1, to: selectedDate) ?? selectedDate
-            } label: {
-                Image(systemName: "chevron.right")
+
+            HStack(spacing: 20) {
+                Button {
+                    withAnimation {
+                        selectedDate = calendar.date(byAdding: .month, value: -1, to: selectedDate) ?? selectedDate
+                    }
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.title3.bold())
+                }
+
+                Button {
+                    withAnimation {
+                        selectedDate = calendar.date(byAdding: .month, value: 1, to: selectedDate) ?? selectedDate
+                    }
+                } label: {
+                    Image(systemName: "chevron.right")
+                        .font(.title3.bold())
+                }
             }
         }
         .padding(.horizontal)
-        .padding(.vertical, 10)
     }
 
     private var monthYearLabel: String {
@@ -104,47 +143,59 @@ struct CalendarMonthView: View {
         }
         return days
     }
-
-    private func shortDate(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateStyle = .long
-        return f.string(from: date)
-    }
 }
 
-struct MonthDayCell: View {
+struct ModernMonthDayCell: View {
     let date: Date
     let isCurrentMonth: Bool
     let isToday: Bool
     let isSelected: Bool
-    let hasEvents: Bool
+    let events: [CalendarEvent]
+    var namespace: Namespace.ID
     let onTap: () -> Void
+
+    private let calendar = Calendar.current
 
     var body: some View {
         Button(action: onTap) {
-            VStack(spacing: 4) {
+            VStack(spacing: 6) {
                 ZStack {
-                    Circle()
-                        .fill(isToday ? Color.accentColor : (isSelected ? Color.accentColor.opacity(0.15) : Color.clear))
-                        .frame(width: 32, height: 32)
-                    Text(dayNumber)
-                        .font(.system(.subheadline, design: .rounded).weight((isToday || isSelected) ? .bold : .regular))
-                        .foregroundColor(isToday ? .white : (isCurrentMonth ? .primary : .secondary.opacity(0.5)))
-                }
+                    if isSelected {
+                        Circle()
+                            .fill(Color.accentColor)
+                            .frame(width: 36, height: 36)
+                            .matchedGeometryEffect(id: "selection", in: namespace)
+                    } else if isToday {
+                        Circle()
+                            .stroke(Color.accentColor, lineWidth: 2)
+                            .frame(width: 36, height: 36)
+                    }
 
-                Circle()
-                    .fill(hasEvents ? Color.accentColor : Color.clear)
-                    .frame(width: 4, height: 4)
+                    Text("\(calendar.component(.day, from: date))")
+                        .font(.system(.body, design: .rounded).bold())
+                        .foregroundColor(isSelected ? .white : (isToday ? .accentColor : (isCurrentMonth ? .primary : .secondary.opacity(0.3))))
+                }
+                .frame(height: 40)
+
+                HStack(spacing: 3) {
+                    ForEach(events.prefix(3)) { event in
+                        Circle()
+                            .fill(Color(hex: event.priority.color) ?? .blue)
+                            .frame(width: 5, height: 5)
+                    }
+
+                    if events.count > 3 {
+                        Text("+\(events.count - 3)")
+                            .font(.system(size: 8, weight: .bold))
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .frame(height: 8)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 4)
+            .padding(.vertical, 8)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-    }
-
-    private var dayNumber: String {
-        let f = DateFormatter()
-        f.dateFormat = "d"
-        return f.string(from: date)
     }
 }

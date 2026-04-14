@@ -57,7 +57,6 @@ struct SlideEditorView: View {
         }
         .navigationTitle(deck.title)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(false)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack {

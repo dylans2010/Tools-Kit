@@ -8,9 +8,9 @@ struct CalendarHomeView: View {
     @State private var selectedEvent: CalendarEvent? = nil
 
     enum CalendarViewType: String, CaseIterable {
+        case month = "Month"
         case today = "Today"
         case week = "Week"
-        case month = "Month"
         case year = "Year"
         case agenda = "Agenda"
 
@@ -27,35 +27,43 @@ struct CalendarHomeView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            viewPicker
-
             Group {
                 switch selectedView {
+                case .month:
+                    CalendarMonthView(selectedDate: $selectedDate, selectedView: $selectedView, selectedEvent: $selectedEvent)
                 case .today:
                     CalendarTodayView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
                 case .week:
                     CalendarWeekView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
-                case .month:
-                    CalendarMonthView(selectedDate: $selectedDate, selectedView: $selectedView, selectedEvent: $selectedEvent)
                 case .year:
                     CalendarYearView(selectedDate: $selectedDate, selectedView: $selectedView)
                 case .agenda:
                     CalendarAgendaView(selectedEvent: $selectedEvent)
                 }
             }
-            .animation(.easeInOut(duration: 0.2), value: selectedView)
+            .animation(.spring(response: 0.35, dampingFraction: 0.75), value: selectedView)
+
+            Spacer(minLength: 0)
+
+            viewPicker
+                .padding(.bottom, 10)
         }
-        .navigationTitle("Calendar")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {
-                    selectedDate = Date()
+                    withAnimation {
+                        selectedDate = Date()
+                    }
                 } label: {
                     Text("Today")
-                        .font(.subheadline)
+                        .font(.subheadline.bold())
                 }
+
                 Button { showingCreate = true } label: {
-                    Image(systemName: "plus")
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(.blue)
                 }
             }
         }
@@ -74,25 +82,24 @@ struct CalendarHomeView: View {
     }
 
     private var viewPicker: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(CalendarViewType.allCases, id: \.self) { type in
-                    Button {
-                        selectedView = type
-                    } label: {
-                        Label(type.rawValue, systemImage: type.icon)
-                            .font(.caption.bold())
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 7)
-                            .background(selectedView == type ? Color.accentColor : Color(.secondarySystemGroupedBackground))
-                            .foregroundColor(selectedView == type ? .white : .primary)
-                            .clipShape(Capsule())
+        HStack(spacing: 0) {
+            ForEach(CalendarViewType.allCases, id: \.self) { type in
+                Button {
+                    selectedView = type
+                } label: {
+                    VStack(spacing: 4) {
+                        Image(systemName: type.icon)
+                            .font(.system(size: 18))
+                        Text(type.rawValue)
+                            .font(.system(size: 10, weight: .medium))
                     }
-                    .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity)
+                    .foregroundColor(selectedView == type ? .blue : .secondary)
                 }
+                .buttonStyle(.plain)
             }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
         }
+        .padding(.top, 10)
+        .background(.ultraThinMaterial)
     }
 }

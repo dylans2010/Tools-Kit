@@ -5,6 +5,7 @@ struct PageEditorView: View {
     let folderID: UUID
     let notebookID: UUID
     @StateObject private var manager = NotebooksManager.shared
+    @Environment(\.dismiss) private var dismiss
 
     @State private var title: String
     @State private var content: String
@@ -27,72 +28,75 @@ struct PageEditorView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 0) {
+                // Modern Title Field
+                TextField("Untitled", text: $title)
+                    .font(.largeTitle)
+                    .bold()
+                    .padding(.horizontal)
+                    .padding(.top, 20)
+                    .onChange(of: title) { _ in scheduleAutosave() }
+
                 if isPreview {
-                ScrollView {
-                    // Simple markdown-like preview
-                    Text(renderPreview(content))
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            } else {
-                TextEditor(text: $content)
-                    .font(.body)
-                    .padding()
-                    .onChange(of: content) { _ in scheduleAutosave() }
-            }
-
-                // AI result overlay
-                if !aiResult.isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Image(systemName: "sparkles")
-                            Text("AI \(aiTask)")
-                                .font(.headline)
-                            Spacer()
-                            Button { aiResult = "" } label: {
-                                Image(systemName: "xmark.circle.fill").foregroundColor(.white.opacity(0.7))
-                            }
-                        }
-
-                        if aiLoading {
-                            HStack {
-                                Spacer()
-                                ProgressView().tint(.white)
-                                Spacer()
-                            }
+                    ScrollView {
+                        Text(renderPreview(content))
                             .padding()
-                        } else {
-                            ScrollView {
-                                Text(aiResult)
-                                    .font(.callout)
-                                    .lineSpacing(4)
-                            }
-                            .frame(maxHeight: 200)
-                        }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .padding()
-                    .background(
-                        LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
-                    )
-                    .foregroundColor(.white)
-                    .cornerRadius(16)
-                    .shadow(radius: 10)
-                    .padding()
+                    .transition(.spring(response: 0.35, dampingFraction: 0.75))
+                } else {
+                    ZStack(alignment: .topLeading) {
+                        if content.isEmpty {
+                            Text("Start typing your notes...")
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal, 20)
+                                .padding(.top, 12)
+                        }
+
+                        TextEditor(text: $content)
+                            .font(.body)
+                            .scrollContentBackground(.hidden)
+                            .padding(.horizontal, 16)
+                            .onChange(of: content) { _ in scheduleAutosave() }
+                    }
+                    .transition(.spring(response: 0.35, dampingFraction: 0.75))
                 }
             }
 
+            // Footer Pill Badge
+            VStack(spacing: 12) {
+                if !aiResult.isEmpty {
+                    aiOverlay
+                }
+
+                HStack {
+                    HStack(spacing: 8) {
+                        Text("\(content.split { $0.isWhitespace }.count) words")
+                        Text("•")
+                        Text("Edited \(page.updatedAt, style: .time)")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(Capsule().fill(Color(.systemGray6)))
+                }
+                .padding(.bottom, isPreview ? 20 : 80)
+            }
+
+            // Floating Formatting Toolbar
             if !isPreview {
                 formattingToolbar
                     .padding(.bottom, 20)
             }
         }
-        .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {
-                    isPreview.toggle()
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
+                        isPreview.toggle()
+                    }
                 } label: {
                     Image(systemName: isPreview ? "pencil" : "eye")
                 }
@@ -114,38 +118,66 @@ struct PageEditorView: View {
         .onDisappear { save() }
     }
 
-    // MARK: - Formatting toolbar
-
-    private var formattingToolbar: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
-                fmtButton("H1") { insert("# ") }
-                fmtButton("H2") { insert("## ") }
-                fmtButton("B", bold: true) { wrap("**") }
-                fmtButton("I", italic: true) { wrap("_") }
-                fmtButton("• List") { insert("- ") }
-                fmtButton("1. List") { insert("1. ") }
-                fmtButton("Code") { wrap("`") }
+    private var aiOverlay: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "sparkles")
+                Text("AI \(aiTask)")
+                    .font(.headline)
+                Spacer()
+                Button { aiResult = "" } label: {
+                    Image(systemName: "xmark.circle.fill").foregroundColor(.white.opacity(0.7))
+                }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
+
+            if aiLoading {
+                HStack {
+                    Spacer()
+                    ProgressView().tint(.white)
+                    Spacer()
+                }
+                .padding()
+            } else {
+                ScrollView {
+                    Text(aiResult)
+                        .font(.callout)
+                        .lineSpacing(4)
+                }
+                .frame(maxHeight: 200)
+            }
         }
-        .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(30)
-        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
-        .padding(.horizontal)
+        .padding()
+        .background(
+            LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
+        )
+        .foregroundColor(.white)
+        .cornerRadius(16)
+        .shadow(radius: 10)
+        .padding()
     }
 
-    private func fmtButton(_ label: String, bold: Bool = false, italic: Bool = false, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(label)
-                .font(bold ? .caption.bold() : italic ? .caption.italic() : .caption)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(Color(.systemBackground))
-                .cornerRadius(6)
+    private var formattingToolbar: some View {
+        HStack(spacing: 15) {
+            toolbarIcon("bold", action: { wrap("**") })
+            toolbarIcon("italic", action: { wrap("_") })
+            toolbarIcon("h1", action: { insert("# ") })
+            toolbarIcon("h2", action: { insert("## ") })
+            toolbarIcon("list.bullet", action: { insert("- ") })
+            toolbarIcon("link", action: { insert("[text](url)") })
         }
-        .buttonStyle(.plain)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .background(.ultraThinMaterial)
+        .clipShape(Capsule())
+        .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
+    }
+
+    private func toolbarIcon(_ icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(.primary)
+        }
     }
 
     private func insert(_ markdown: String) {
@@ -156,13 +188,9 @@ struct PageEditorView: View {
         content += "\(marker)text\(marker)"
     }
 
-    // MARK: - Preview
-
     private func renderPreview(_ md: String) -> AttributedString {
         (try? AttributedString(markdown: md)) ?? AttributedString(md)
     }
-
-    // MARK: - AI
 
     private func runAI(_ task: String, _ prompt: String) {
         aiTask = task
@@ -179,14 +207,11 @@ struct PageEditorView: View {
     }
 
     private func showIntegrationPicker() {
-        // Handled via separate sheet if needed; for now use first enabled integration
         if let tool = manager.integrations.first(where: { $0.isEnabled }) {
             let prompt = tool.promptTemplate.replacingOccurrences(of: "{{content}}", with: content)
             runAI(tool.name, prompt)
         }
     }
-
-    // MARK: - Autosave
 
     private func scheduleAutosave() {
         autosaveTask?.cancel()

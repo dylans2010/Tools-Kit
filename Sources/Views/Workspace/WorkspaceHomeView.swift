@@ -10,7 +10,6 @@ struct WorkspaceHomeView: View {
         case notebooks = "Notebooks"
         case tasks = "Tasks"
         case articles = "Articles"
-        case more = "More"
 
         var icon: String {
             switch self {
@@ -20,7 +19,6 @@ struct WorkspaceHomeView: View {
             case .notebooks: return "book.closed.fill"
             case .tasks: return "checklist"
             case .articles: return "newspaper.fill"
-            case .more: return "ellipsis.circle.fill"
             }
         }
     }
@@ -74,14 +72,6 @@ struct WorkspaceHomeView: View {
                 Label(WorkspaceTab.articles.rawValue, systemImage: WorkspaceTab.articles.icon)
             }
             .tag(WorkspaceTab.articles)
-
-            NavigationStack {
-                WorkspaceMoreView()
-            }
-            .tabItem {
-                Label(WorkspaceTab.more.rawValue, systemImage: WorkspaceTab.more.icon)
-            }
-            .tag(WorkspaceTab.more)
         }
     }
 }
@@ -97,6 +87,14 @@ struct WorkspaceDashboardView: View {
 
     @State private var showingCreateTask = false
     @State private var showingCreateNotebook = false
+
+    private let moreTools: [(title: String, icon: String, color: Color, destination: AnyView)] = [
+        ("Calendar", "calendar", .green, AnyView(CalendarHomeView())),
+        ("Habits", "flame.fill", .red, AnyView(WorkspaceHabitTrackerView())),
+        ("Forms", "list.bullet.rectangle.portrait", .teal, AnyView(FormsView())),
+        ("Slides", "rectangle.on.rectangle.angled", .purple, AnyView(SlidesHomeView())),
+        ("Sheets", "tablecells", .blue, AnyView(SpreadsheetsHomeView()))
+    ]
 
     var body: some View {
         ScrollView {
@@ -141,6 +139,33 @@ struct WorkspaceDashboardView: View {
                         WorkspaceStatCard(value: "\(tasksManager.todayTasks.count)", label: "Tasks Today", icon: "checklist", color: .blue)
                         WorkspaceStatCard(value: "\(articlesManager.recentArticles.count)", label: "Articles Saved", icon: "newspaper.fill", color: .orange)
                         WorkspaceStatCard(value: "\(habitsManager.habits.filter { $0.isCompletedToday() }.count)/\(habitsManager.habits.count)", label: "Habits Done", icon: "flame.fill", color: .red)
+                    }
+                    .padding(.horizontal)
+                }
+
+                // More Tools Section
+                dashboardSection(title: "More Tools", icon: "square.grid.2x2.fill", color: .purple) {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                        ForEach(moreTools, id: \.title) { tool in
+                            NavigationLink(destination: tool.destination) {
+                                VStack(spacing: 12) {
+                                    Image(systemName: tool.icon)
+                                        .font(.title2)
+                                        .foregroundColor(.white)
+                                        .frame(width: 44, height: 44)
+                                        .background(Circle().fill(tool.color))
+
+                                    Text(tool.title)
+                                        .font(.subheadline.bold())
+                                        .foregroundColor(.primary)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
+                                .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 4)
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
                     .padding(.horizontal)
                 }
@@ -400,47 +425,5 @@ struct DashboardCard: View {
         .background(Color(.secondarySystemGroupedBackground))
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-    }
-}
-
-struct WorkspaceMoreView: View {
-    private let tools: [(title: String, icon: String, color: Color, destination: AnyView)] = [
-        ("Calendar", "calendar", .green, AnyView(CalendarHomeView())),
-        ("Habits", "flame.fill", .red, AnyView(WorkspaceHabitTrackerView())),
-        ("Forms", "list.bullet.rectangle.portrait", .teal, AnyView(FormsView())),
-        ("Slides", "rectangle.on.rectangle.angled", .purple, AnyView(SlidesHomeView())),
-        ("Sheets", "tablecells", .blue, AnyView(SpreadsheetsHomeView()))
-    ]
-
-    let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
-
-    var body: some View {
-        ScrollView {
-            LazyVGrid(columns: columns, spacing: 16) {
-                ForEach(tools, id: \.title) { tool in
-                    NavigationLink(destination: tool.destination) {
-                        VStack(spacing: 10) {
-                            Image(systemName: tool.icon)
-                                .font(.title2)
-                                .foregroundColor(tool.color)
-                                .frame(width: 52, height: 52)
-                                .background(tool.color.opacity(0.15))
-                                .clipShape(RoundedRectangle(cornerRadius: 14))
-                            Text(tool.title)
-                                .font(.caption.bold())
-                                .foregroundColor(.primary)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(Color(.secondarySystemGroupedBackground))
-                        .cornerRadius(18)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding()
-        }
-        .background(Color(.systemGroupedBackground))
-        .navigationTitle("More Tools")
     }
 }
