@@ -14,22 +14,38 @@ struct CreateEventView: View {
     @State private var location: String = ""
     @State private var priority: EventPriority = .normal
 
+    @State private var showAISummarySheet = false
+
     private var isEditing: Bool { existingEvent != nil }
 
     var body: some View {
         Form {
             Section("Event Details") {
                 TextField("Event title", text: $title)
-                ZStack(alignment: .topLeading) {
-                    if description.isEmpty {
-                        Text("Description (optional)")
-                            .foregroundColor(Color(.placeholderText))
-                            .padding(.top, 8)
-                            .padding(.leading, 4)
+
+                ZStack(alignment: .topTrailing) {
+                    ZStack(alignment: .topLeading) {
+                        if description.isEmpty {
+                            Text("Description (optional)")
+                                .foregroundColor(Color(.placeholderText))
+                                .padding(.top, 8)
+                                .padding(.leading, 4)
+                        }
+                        TextEditor(text: $description)
+                            .frame(minHeight: 100)
                     }
-                    TextEditor(text: $description)
-                        .frame(minHeight: 60)
+
+                    Button {
+                        showAISummarySheet = true
+                    } label: {
+                        Image(systemName: "sparkles")
+                            .foregroundStyle(.purple)
+                            .padding(8)
+                            .background(Circle().fill(.purple.opacity(0.1)))
+                    }
+                    .padding(8)
                 }
+
                 TextField("Location (optional)", text: $location)
             }
 
@@ -85,6 +101,13 @@ struct CreateEventView: View {
                 endTime = prefilledDate.addingTimeInterval(3600)
             }
         }
+        .sheet(isPresented: $showAISummarySheet) {
+            AISummarySheet(title: title, location: location, date: date, priority: priority, description: description) { summary in
+                self.description = summary
+            }
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+        }
     }
 
     private func save() {
@@ -100,5 +123,101 @@ struct CreateEventView: View {
         event.priority = priority
         onSave(event)
         dismiss()
+    }
+}
+
+struct AISummarySheet: View {
+    let title: String
+    let location: String
+    let date: Date
+    let priority: EventPriority
+    let description: String
+    let onUseAsDescription: (String) -> Void
+
+    @Environment(\.dismiss) var dismiss
+    @State private var aiSummary = ""
+    @State private var isLoading = false
+    @State private var copied = false
+
+    var body: some View {
+        VStack(spacing: 20) {
+            HStack {
+                Image(systemName: "sparkles")
+                    .foregroundColor(.purple)
+                Text("AI Event Assistant")
+                    .font(.headline)
+                Spacer()
+            }
+            .padding(.top)
+
+            if isLoading {
+                Spacer()
+                ProgressView("Analyzing event...")
+                Spacer()
+            } else {
+                ScrollView {
+                    Text(aiSummary)
+                        .font(.body)
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(RoundedRectangle(cornerRadius: 16).fill(Material.regular))
+                }
+
+                HStack(spacing: 12) {
+                    Button {
+                        UIPasteboard.general.string = aiSummary
+                        copied = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copied = false }
+                    } label: {
+                        Label(copied ? "Copied!" : "Copy Summary", systemName: copied ? "checkmark" : "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button {
+                        onUseAsDescription(aiSummary)
+                        dismiss()
+                    } label: {
+                        Text("Use as Description")
+                            .bold()
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                .padding(.bottom)
+            }
+        }
+        .padding(.horizontal)
+        .onAppear(perform: runAI)
+    }
+
+    private func runAI() {
+        isLoading = true
+        let prompt = """
+        Analyze this calendar event and provide:
+        1. A suggested improved description (2-3 sentences)
+        2. Any missing important details
+        3. Preparation suggestions based on the location and priority
+        4. A completeness score out of 10
+
+        Event Title: \(title)
+        Location: \(location)
+        Date & Time: \(date.description)
+        Priority: \(priority.rawValue)
+        Current Description: \(description)
+        """
+
+        Task {
+            do {
+                let result = try await AIService.shared.processText(prompt: prompt)
+                await MainActor.run {
+                    aiSummary = result
+                    isLoading = false
+                }
+            } catch {
+                await MainActor.run {
+                    aiSummary = "Error: \(error.localizedDescription)"
+                    isLoading = false
+                }
+            }
+        }
     }
 }

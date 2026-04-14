@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ML0200000000000000000001 /* IMAPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000001 /* IMAPClient.swift */; };
+		ML0200000000000000000002 /* EmailMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000002 /* EmailMessage.swift */; };
+		ML0200000000000000000003 /* MailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000003 /* MailViewModel.swift */; };
+		ML0200000000000000000004 /* EmailDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000004 /* EmailDetailView.swift */; };
 		F9864379942F4D0AAD6AB5F2 /* MailAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6554994AF5D14C2ABD0C2FD8 /* MailAccount.swift */; };
 		53EC1AF8723044F3BFB42AB2 /* MailFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EEEF45551F542229BE32D06 /* MailFolder.swift */; };
 		169F73E894D6416298DC841C /* MailMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E0ABB5BDAD4793B4FE4B93 /* MailMessage.swift */; };
@@ -481,6 +485,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		ML0100000000000000000001 /* IMAPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/IMAPClient.swift; sourceTree = "<group>"; };
+		ML0100000000000000000002 /* EmailMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/EmailMessage.swift; sourceTree = "<group>"; };
+		ML0100000000000000000003 /* MailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/MailViewModel.swift; sourceTree = "<group>"; };
+		ML0100000000000000000004 /* EmailDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/EmailDetailView.swift; sourceTree = "<group>"; };
 		6554994AF5D14C2ABD0C2FD8 /* MailAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailAccount.swift; sourceTree = "<group>"; };
 		1EEEF45551F542229BE32D06 /* MailFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailFolder.swift; sourceTree = "<group>"; };
 		E1E0ABB5BDAD4793B4FE4B93 /* MailMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailMessage.swift; sourceTree = "<group>"; };
@@ -978,6 +986,10 @@
 		8DF4BF69CF55A81CB6EBF3DE /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				ML0100000000000000000001 /* IMAPClient.swift */,
+				ML0100000000000000000002 /* EmailMessage.swift */,
+				ML0100000000000000000003 /* MailViewModel.swift */,
+				ML0100000000000000000004 /* EmailDetailView.swift */,
 				6554994AF5D14C2ABD0C2FD8 /* MailAccount.swift */,
 				1EEEF45551F542229BE32D06 /* MailFolder.swift */,
 				E1E0ABB5BDAD4793B4FE4B93 /* MailMessage.swift */,
@@ -1483,6 +1495,7 @@
 			);
 			name = Tools-Kit;
 			packageProductDependencies = (
+				MC0200000000000000000001 /* MailCore */,
 				ZF0000000000000000000002 /* ZIPFoundation */,
 			);
 			productName = Tools-Kit;
@@ -1514,6 +1527,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			packageReferences = (
+				MC0100000000000000000001 /* XCRemoteSwiftPackageReference "mailcore2" */,
 				ZF0000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 			);
 			targets = (
@@ -1527,6 +1541,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ML0200000000000000000001 /* IMAPClient.swift in Sources */,
+				ML0200000000000000000002 /* EmailMessage.swift in Sources */,
+				ML0200000000000000000003 /* MailViewModel.swift in Sources */,
+				ML0200000000000000000004 /* EmailDetailView.swift in Sources */,
 				F9864379942F4D0AAD6AB5F2 /* MailAccount.swift in Sources */,
 				53EC1AF8723044F3BFB42AB2 /* MailFolder.swift in Sources */,
 				169F73E894D6416298DC841C /* MailMessage.swift in Sources */,
@@ -2200,6 +2218,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		MC0100000000000000000001 /* XCRemoteSwiftPackageReference "mailcore2" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MailCore/mailcore2";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		ZF0000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
@@ -2211,6 +2237,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		MC0200000000000000000001 /* MailCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = MC0100000000000000000001 /* XCRemoteSwiftPackageReference "mailcore2" */;
+			productName = MailCore;
+		};
 		ZF0000000000000000000002 /* ZIPFoundation */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = ZF0000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;

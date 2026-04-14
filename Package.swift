@@ -7,7 +7,16 @@ let package = Package(
         .iOS(.v16),
         .macOS(.v12)
     ],
+    dependencies: [
+        .package(url: "https://github.com/MailCore/mailcore2", branch: "master")
+    ],
     targets: [
-        .executableTarget(name: "ToolsKit", path: "Sources")
+        .executableTarget(
+            name: "ToolsKit",
+            dependencies: [
+                .product(name: "MailCore", package: "mailcore2")
+            ],
+            path: "Sources"
+        )
     ]
 )

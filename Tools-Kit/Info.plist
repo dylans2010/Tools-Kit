@@ -27,5 +27,27 @@
     <string>Your location is used to provide accurate local weather data and forecasts.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>Your location is used to provide accurate local weather data and forecasts, even when the app is in the background.</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSExceptionDomains</key>
+        <dict>
+            <key>imap.mail.me.com</key>
+            <dict>
+                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                <false/>
+                <key>NSExceptionMinimumTLSVersion</key>
+                <string>TLSv1.2</string>
+                <key>NSRequiresCertificateTransparency</key>
+                <false/>
+            </dict>
+            <key>smtp.mail.me.com</key>
+            <dict>
+                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                <false/>
+                <key>NSExceptionMinimumTLSVersion</key>
+                <string>TLSv1.2</string>
+            </dict>
+        </dict>
+    </dict>
 </dict>
 </plist>
