@@ -182,6 +182,8 @@ struct TaskStatPill: View {
         .cornerRadius(12)
     }
 }
+
+struct FilterChip: View {
     let label: String
     var color: Color = .accentColor
     let isSelected: Bool
