@@ -48,10 +48,10 @@ struct MailThreadView: View {
                     Button { showingReply = true } label: {
                         Label("Reply", systemImage: "arrowshape.turn.up.left")
                     }
-                    Button(action: summarizeWithAI) label: {
+                    Button(action: summarizeWithAI) {
                         Label("Summarize", systemImage: "sparkles")
                     }
-                    Button(action: generateAIReply) label: {
+                    Button(action: generateAIReply) {
                         Label("Reply with AI", systemImage: "sparkle")
                     }
                 } label: {
@@ -145,7 +145,7 @@ struct MailThreadView: View {
                     .cornerRadius(12)
             }
 
-            Button(action: summarizeWithAI) label: {
+            Button(action: summarizeWithAI) {
                 if isAISummarizing {
                     ProgressView().tint(.white)
                 } else {
