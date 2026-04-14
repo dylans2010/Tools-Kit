@@ -398,10 +398,7 @@ struct AIComposerPanel: View {
 
             Spacer()
         }
-        .presentationBackground {
-            LinearGradient(colors: [.purple.opacity(0.9), .blue.opacity(0.9)],
-                           startPoint: .topLeading, endPoint: .bottomTrailing)
-        }
+        .modifier(AIComposerPresentationBackground())
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.hidden)
     }
@@ -515,6 +512,22 @@ struct AIComposerPanel: View {
             } catch {
                 await MainActor.run { isWorking = false }
             }
+        }
+    }
+}
+
+// MARK: - Presentation Background Modifier
+
+/// Applies a gradient `presentationBackground` on iOS 16.4+; no-op on earlier versions.
+private struct AIComposerPresentationBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 16.4, *) {
+            content.presentationBackground {
+                LinearGradient(colors: [.purple.opacity(0.9), .blue.opacity(0.9)],
+                               startPoint: .topLeading, endPoint: .bottomTrailing)
+            }
+        } else {
+            content
         }
     }
 }
