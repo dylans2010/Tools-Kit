@@ -1495,7 +1495,7 @@
 			);
 			name = Tools-Kit;
 			packageProductDependencies = (
-				MC0200000000000000000001 /* MailCore */,
+				MC0200000000000000000001 /* MailCore2 */,
 				ZF0000000000000000000002 /* ZIPFoundation */,
 			);
 			productName = Tools-Kit;
@@ -2237,10 +2237,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		MC0200000000000000000001 /* MailCore */ = {
+		MC0200000000000000000001 /* MailCore2 */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = MC0100000000000000000001 /* XCRemoteSwiftPackageReference "mailcore2" */;
-			productName = MailCore;
+			productName = MailCore2;
 		};
 		ZF0000000000000000000002 /* ZIPFoundation */ = {
 			isa = XCSwiftPackageProductDependency;
