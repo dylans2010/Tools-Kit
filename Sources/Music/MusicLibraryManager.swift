@@ -228,8 +228,9 @@ final class MusicLibraryManager: ObservableObject {
         let playlist = Playlist(name: actualName, songIDs: importedSongs.map(\.id), folderURL: folderURL)
         writeMetadata(for: playlist, songs: importedSongs)
 
+        let songsToAdd = importedSongs
         await MainActor.run {
-            for song in importedSongs {
+            for song in songsToAdd {
                 guard !self.songs.contains(where: { $0.fileURL.path == song.fileURL.path }) else { continue }
                 self.songs.append(song)
             }

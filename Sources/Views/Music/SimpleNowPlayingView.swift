@@ -405,7 +405,9 @@ struct SimpleNowPlayingView: View {
 private struct SystemVolumeSliderView: UIViewRepresentable {
     func makeUIView(context: Context) -> MPVolumeView {
         let v = MPVolumeView()
-        v.showsRouteButton = false
+        for sub in v.subviews where sub is UIButton {
+            sub.isHidden = true
+        }
         return v
     }
 
