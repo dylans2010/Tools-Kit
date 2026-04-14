@@ -1,0 +1,24 @@
+import Foundation
+
+struct MailMessage: Identifiable, Codable {
+    let id: String // IMAP UID or message ID
+    let threadId: String
+    let from: String
+    let to: [String]
+    let cc: [String]
+    let bcc: [String]
+    let subject: String
+    let body: String
+    let htmlBody: String?
+    let date: Date
+    let isRead: Bool
+    let isStarred: Bool
+    let attachments: [MailAttachment]
+
+    struct MailAttachment: Identifiable, Codable {
+        let id: String
+        let fileName: String
+        let contentType: String
+        let size: Int64
+    }
+}
