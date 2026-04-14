@@ -98,7 +98,7 @@ struct TasksHomeView: View {
                     filterCategory = nil
                 }
                 ForEach(manager.categories) { cat in
-                    FilterChip(title: cat.name, color: Color(hex: cat.colorHex), isSelected: filterCategory?.id == cat.id) {
+                    FilterChip(title: cat.name, color: Color(hex: cat.colorHex) ?? .blue, isSelected: filterCategory?.id == cat.id) {
                         filterCategory = (filterCategory?.id == cat.id) ? nil : cat
                     }
                 }
