@@ -13,12 +13,6 @@ enum TaskStatus: String, Codable, CaseIterable {
     case done = "Done"
 }
 
-enum TaskPriority: String, Codable, CaseIterable {
-    case low = "Low"
-    case medium = "Medium"
-    case high = "High"
-}
-
 struct Project: Identifiable, Codable {
     var id: UUID = UUID()
     var name: String
@@ -46,6 +40,12 @@ struct ProjectTask: Identifiable, Codable {
     var assignedTo: String = ""
     var createdAt: Date = Date()
     var tags: [String] = []
+
+    enum TaskPriority: String, Codable, CaseIterable {
+        case low = "Low"
+        case medium = "Medium"
+        case high = "High"
+    }
 }
 
 struct ProjectFile: Identifiable, Codable {
@@ -91,7 +91,7 @@ enum CollaboratorRole: String, Codable, CaseIterable {
 struct ProjectSettings: Codable {
     var allowFileUploads: Bool = true
     var allowAnnotations: Bool = true
-    var defaultTaskPriority: TaskPriority = .medium
+    var defaultTaskPriority: ProjectTask.TaskPriority = .medium
     var notificationsEnabled: Bool = true
     var isPublic: Bool = false
     var tags: [String] = []

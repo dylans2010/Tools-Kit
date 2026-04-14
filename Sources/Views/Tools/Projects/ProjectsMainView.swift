@@ -75,9 +75,9 @@ struct ProjectsMainView: View {
     private var projectList: some View {
         VStack(spacing: 0) {
             HStack {
-                StatPill(title: "Active", count: manager.activeProjects.count, color: .green)
-                StatPill(title: "Completed", count: manager.completedProjects.count, color: .blue)
-                StatPill(title: "Total", count: manager.projects.count, color: .secondary)
+                StatPill(title: "Active", value: "\(manager.activeProjects.count)", color: .green)
+                StatPill(title: "Completed", value: "\(manager.completedProjects.count)", color: .blue)
+                StatPill(title: "Total", value: "\(manager.projects.count)", color: .secondary)
             }
             .padding(.horizontal)
             .padding(.top, 8)
@@ -112,42 +112,6 @@ struct ProjectsMainView: View {
             .padding(.vertical, 8)
         }
         .background(Color(.systemGroupedBackground))
-    }
-}
-
-struct StatPill: View {
-    let title: String
-    let count: Int
-    let color: Color
-
-    var body: some View {
-        VStack(spacing: 2) {
-            Text("\(count)").font(.headline)
-            Text(title).font(.caption2).foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(8)
-        .background(color.opacity(0.12))
-        .cornerRadius(10)
-    }
-}
-
-struct FilterChip: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 6)
-                .background(isSelected ? Color.blue : Color(.secondarySystemGroupedBackground))
-                .foregroundColor(isSelected ? .white : .primary)
-                .cornerRadius(20)
-        }
     }
 }
 

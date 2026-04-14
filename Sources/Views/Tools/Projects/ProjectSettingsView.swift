@@ -80,7 +80,7 @@ struct ProjectSettingsView: View {
 
                 Section("Defaults") {
                     Picker("Default Task Priority", selection: $project.settings.defaultTaskPriority) {
-                        ForEach(TaskPriority.allCases, id: \.self) { priority in
+                        ForEach(ProjectTask.TaskPriority.allCases, id: \.self) { priority in
                             Text(priority.rawValue).tag(priority)
                         }
                     }

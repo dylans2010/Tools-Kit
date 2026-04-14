@@ -10,7 +10,7 @@ struct ProjectTaskDetailView: View {
     @State private var title: String
     @State private var description: String
     @State private var status: TaskStatus
-    @State private var priority: TaskPriority
+    @State private var priority: ProjectTask.TaskPriority
     @State private var dueDate: Date?
     @State private var hasDueDate: Bool
     @State private var assignedTo: String
@@ -57,7 +57,7 @@ struct ProjectTaskDetailView: View {
                     .pickerStyle(.segmented)
 
                     Picker("Priority", selection: $priority) {
-                        ForEach(TaskPriority.allCases, id: \.self) { p in
+                        ForEach(ProjectTask.TaskPriority.allCases, id: \.self) { p in
                             Text(p.rawValue).tag(p)
                         }
                     }

@@ -37,29 +37,29 @@ struct WorkspaceTask: Identifiable, Codable {
         guard let due = dueDate else { return false }
         return Calendar.current.isDateInToday(due)
     }
-}
 
-enum TaskPriority: String, Codable, CaseIterable {
-    case low = "Low"
-    case medium = "Medium"
-    case high = "High"
-    case critical = "Critical"
+    enum TaskPriority: String, Codable, CaseIterable {
+        case low = "Low"
+        case medium = "Medium"
+        case high = "High"
+        case critical = "Critical"
 
-    var icon: String {
-        switch self {
-        case .low: return "arrow.down.circle"
-        case .medium: return "minus.circle"
-        case .high: return "exclamationmark.circle"
-        case .critical: return "exclamationmark.2"
+        var icon: String {
+            switch self {
+            case .low: return "arrow.down.circle"
+            case .medium: return "minus.circle"
+            case .high: return "exclamationmark.circle"
+            case .critical: return "exclamationmark.2"
+            }
         }
-    }
 
-    var color: String {
-        switch self {
-        case .low: return "#34C759"
-        case .medium: return "#FF9500"
-        case .high: return "#FF3B30"
-        case .critical: return "#AF52DE"
+        var color: String {
+            switch self {
+            case .low: return "#34C759"
+            case .medium: return "#FF9500"
+            case .high: return "#FF3B30"
+            case .critical: return "#AF52DE"
+            }
         }
     }
 }
