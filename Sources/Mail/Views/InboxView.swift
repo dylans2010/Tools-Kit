@@ -18,119 +18,11 @@ struct InboxView: View {
 
     var body: some View {
         List {
-            // Sync status banner
-            if syncService.isSyncing {
-                Section {
-                    HStack(spacing: 10) {
-                        ProgressView().tint(.blue)
-                        Text("Fetching mail…")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                        Spacer()
-                    }
-                    .padding(.vertical, 4)
-                    .listRowBackground(Color.blue.opacity(0.08))
-                }
-            }
-
-            if let syncDate = syncService.lastSyncDate {
-                Section {
-                    HStack {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                            .font(.caption)
-                        Text("Last synced \(syncDate, style: .relative) ago")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Spacer()
-                    }
-                }
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-            }
-
-            if filter == .unread && catchUpSummary == nil && !threads.isEmpty {
-                Section {
-                    Button(action: runCatchUp) {
-                        HStack {
-                            Image(systemName: "sparkles")
-                            Text(isSummarizing ? "AI is catching up..." : "Catch Up with AI")
-                                .fontWeight(.bold)
-                            Spacer()
-                            if isSummarizing {
-                                ProgressView()
-                                    .tint(.white)
-                            }
-                        }
-                        .padding()
-                        .background(
-                            LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
-                        )
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
-                    }
-                    .buttonStyle(.plain)
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
-                }
-            }
-
-            if let summary = catchUpSummary {
-                Section {
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack {
-                            Image(systemName: "sparkles")
-                                .foregroundColor(.purple)
-                            Text("AI Catch Up")
-                                .font(.headline)
-                                .foregroundColor(.purple)
-                        }
-
-                        Text(summary)
-                            .font(.subheadline)
-                            .lineSpacing(4)
-                    }
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.purple.opacity(0.1))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
-                            )
-                    )
-                }
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-            }
-
-            ForEach(filteredThreads) { thread in
-                NavigationLink(destination: MailThreadView(account: account, thread: thread)) {
-                    MailThreadRow(thread: thread)
-                }
-                .swipeActions(edge: .leading) {
-                    Button {
-                        toggleStar(thread)
-                    } label: {
-                        Label("Star", systemImage: thread.messages.first?.isStarred == true ? "star.slash" : "star")
-                    }
-                    .tint(.yellow)
-                }
-                .swipeActions(edge: .trailing) {
-                    Button(role: .destructive) {
-                        deleteThread(thread)
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-
-                    Button {
-                        toggleRead(thread)
-                    } label: {
-                        Label(thread.isRead ? "Unread" : "Read", systemImage: thread.isRead ? "envelope.badge" : "envelope.open")
-                    }
-                    .tint(.blue)
-                }
-            }
+            syncStatusSection
+            lastSyncedSection
+            catchUpSection
+            aiSummarySection
+            threadListSection
         }
         .navigationTitle(filter == .unread ? "Catch Up" : folder.name)
         .searchable(text: $searchText)
@@ -155,6 +47,134 @@ struct InboxView: View {
                     await syncService.sync(account: account, folder: folder)
                     loadLocal()
                 }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var syncStatusSection: some View {
+        if syncService.isSyncing {
+            Section {
+                HStack(spacing: 10) {
+                    ProgressView().tint(.blue)
+                    Text("Fetching mail…")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
+                .padding(.vertical, 4)
+                .listRowBackground(Color.blue.opacity(0.08))
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var lastSyncedSection: some View {
+        if let syncDate = syncService.lastSyncDate {
+            Section {
+                HStack {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                        .font(.caption)
+                    Text("Last synced \(syncDate, style: .relative) ago")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
+            }
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+        }
+    }
+
+    @ViewBuilder
+    private var catchUpSection: some View {
+        if filter == .unread && catchUpSummary == nil && !threads.isEmpty {
+            Section {
+                Button(action: runCatchUp) {
+                    HStack {
+                        Image(systemName: "sparkles")
+                        Text(isSummarizing ? "AI is catching up..." : "Catch Up with AI")
+                            .fontWeight(.bold)
+                        Spacer()
+                        if isSummarizing {
+                            ProgressView()
+                                .tint(.white)
+                        }
+                    }
+                    .padding()
+                    .background(
+                        LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    )
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                }
+                .buttonStyle(.plain)
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var aiSummarySection: some View {
+        if let summary = catchUpSummary {
+            Section {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Image(systemName: "sparkles")
+                            .foregroundColor(.purple)
+                        Text("AI Catch Up")
+                            .font(.headline)
+                            .foregroundColor(.purple)
+                    }
+
+                    Text(summary)
+                        .font(.subheadline)
+                        .lineSpacing(4)
+                }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.purple.opacity(0.1))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
+                        )
+                )
+            }
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+        }
+    }
+
+    @ViewBuilder
+    private var threadListSection: some View {
+        ForEach(filteredThreads) { thread in
+            NavigationLink(destination: MailThreadView(account: account, thread: thread)) {
+                MailThreadRow(thread: thread)
+            }
+            .swipeActions(edge: .leading) {
+                Button {
+                    toggleStar(thread)
+                } label: {
+                    Label("Star", systemImage: thread.messages.first?.isStarred == true ? "star.slash" : "star")
+                }
+                .tint(.yellow)
+            }
+            .swipeActions(edge: .trailing) {
+                Button(role: .destructive) {
+                    deleteThread(thread)
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+
+                Button {
+                    toggleRead(thread)
+                } label: {
+                    Label(thread.isRead ? "Unread" : "Read", systemImage: thread.isRead ? "envelope.badge" : "envelope.open")
+                }
+                .tint(.blue)
             }
         }
     }

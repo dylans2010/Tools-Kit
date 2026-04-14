@@ -44,7 +44,7 @@ class IMAPClient: ObservableObject {
         )
 
         connection?.stateUpdateHandler = { [weak self] state in
-            DispatchQueue.main.async {
+            Task { @MainActor [weak self] in
                 switch state {
                 case .ready:
                     self?.readGreeting()
@@ -222,35 +222,42 @@ class IMAPClient: ObservableObject {
                 return
             }
             Task { @MainActor [weak self] in
-                self?.receiveUntilTagged(tag: tag)
+                await self?.receiveUntilTagged(tag: tag)
             }
         })
     }
 
-    private func receiveUntilTagged(tag: String, accumulated: String = "") {
-        connection?.receive(minimumIncompleteLength: 1, maximumLength: 65536) { [weak self] data, _, isComplete, error in
-            guard let self else { return }
-            var full = accumulated
-            if let data, let chunk = String(data: data, encoding: .utf8) {
-                full += chunk
-            }
-            // Keep receiving until we see the tagged response line
-            if full.contains("\(tag) OK") || full.contains("\(tag) NO") || full.contains("\(tag) BAD") {
-                DispatchQueue.main.async {
-                    if let completion = self.pendingCompletions.removeValue(forKey: tag) {
-                        completion(full)
+    private func receiveUntilTagged(tag: String) async {
+        var accumulated = ""
+        while true {
+            guard let connection else { return }
+            let (data, _, isComplete, error): (Data?, NWConnection.ContentContext?, Bool, NWError?) =
+                await withCheckedContinuation { continuation in
+                    connection.receive(minimumIncompleteLength: 1, maximumLength: 65536) { data, context, isComplete, error in
+                        continuation.resume(returning: (data, context, isComplete, error))
                     }
                 }
-            } else if !isComplete {
-                self.receiveUntilTagged(tag: tag, accumulated: full)
+            if let error {
+                errorMessage = "Receive error: \(error.localizedDescription)"
+                return
             }
+            if let data, let chunk = String(data: data, encoding: .utf8) {
+                accumulated += chunk
+            }
+            if accumulated.contains("\(tag) OK") || accumulated.contains("\(tag) NO") || accumulated.contains("\(tag) BAD") {
+                if let completion = pendingCompletions.removeValue(forKey: tag) {
+                    completion(accumulated)
+                }
+                return
+            }
+            if isComplete { return }
         }
     }
 
     private func receive(completion: @escaping (String) -> Void) {
         connection?.receive(minimumIncompleteLength: 1, maximumLength: 65536) { data, _, _, error in
             let response = data.flatMap { String(data: $0, encoding: .utf8) } ?? ""
-            DispatchQueue.main.async { completion(response) }
+            Task { @MainActor in completion(response) }
         }
     }
 
