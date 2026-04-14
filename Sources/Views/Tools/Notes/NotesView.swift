@@ -244,7 +244,7 @@ private struct NoteListRowView: View {
                     .foregroundColor(.secondary)
                 Image(systemName: "chevron.right")
                     .font(.caption2)
-                    .foregroundColor(.tertiaryLabel)
+                    .foregroundColor(Color(uiColor: .tertiaryLabel))
             }
         }
         .padding(.horizontal, 16)

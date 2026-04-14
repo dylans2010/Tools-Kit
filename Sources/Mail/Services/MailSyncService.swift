@@ -1,6 +1,6 @@
 import Foundation
 
-class MailSyncService: ObservableObject {
+class MailSyncService: ObservableObject, @unchecked Sendable {
     static let shared = MailSyncService()
 
     @Published var isSyncing = false

@@ -16,7 +16,7 @@ struct CollectionDetailView: View {
                     title: "No Articles",
                     message: "Save articles from the search view to add them here.",
                     action: nil,
-                    actionLabel: nil
+                    actionLabel: ""
                 )
             } else {
                 List {

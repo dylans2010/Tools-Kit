@@ -7,7 +7,7 @@ struct EmailComposingView: View {
 
     @State private var to = ""
     @State private var subject = ""
-    @State private var body = ""
+    @State private var messageBody = ""
     @State private var isSending = false
     @State private var showingAISuggestions = false
     @State private var aiContext = ""
@@ -24,11 +24,11 @@ struct EmailComposingView: View {
                 }
 
                 Section {
-                    TextEditor(text: $body)
+                    TextEditor(text: $messageBody)
                         .frame(minHeight: 300)
                         .overlay(
                             Group {
-                                if body.isEmpty {
+                                if messageBody.isEmpty {
                                     Text("Write your message here...")
                                         .foregroundColor(.secondary)
                                         .padding(.top, 8)
@@ -59,7 +59,7 @@ struct EmailComposingView: View {
                                 Image(systemName: "paperplane.fill")
                             }
                         }
-                        .disabled(to.isEmpty || subject.isEmpty || body.isEmpty || isSending)
+                        .disabled(to.isEmpty || subject.isEmpty || messageBody.isEmpty || isSending)
                     }
                 }
             }
@@ -67,7 +67,7 @@ struct EmailComposingView: View {
                 if let reply = replyTo {
                     to = reply.from
                     subject = "Re: \(reply.subject)"
-                    body = "\n\n--- On \(reply.date.description) \(reply.from) wrote: ---\n\(reply.body)"
+                    messageBody = "\n\n--- On \(reply.date.description) \(reply.from) wrote: ---\n\(reply.body)"
                 }
             }
             .sheet(isPresented: $showingAISuggestions) {
@@ -106,11 +106,11 @@ struct EmailComposingView: View {
                 if let reply = replyTo {
                     draft = try await MailAIService.shared.generateReply(for: reply, context: aiContext)
                 } else {
-                    draft = try await MailAIService.shared.improveDraft(body.isEmpty ? aiContext : body, tone: tone)
+                    draft = try await MailAIService.shared.improveDraft(messageBody.isEmpty ? aiContext : messageBody, tone: tone)
                 }
 
                 DispatchQueue.main.async {
-                    self.body = draft
+                    self.messageBody = draft
                     self.isGeneratingAI = false
                     self.showingAISuggestions = false
                 }
@@ -133,7 +133,7 @@ struct EmailComposingView: View {
                     cc: [],
                     bcc: [],
                     subject: subject,
-                    body: body,
+                    body: messageBody,
                     htmlBody: nil,
                     date: Date(),
                     isRead: true,
