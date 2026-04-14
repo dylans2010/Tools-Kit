@@ -33,7 +33,8 @@ class MailIMAPService: @unchecked Sendable {
 
     func fetchMessages(folder: String) async throws -> [MailMessage] {
         _ = try await sendCommand("SELECT \(folder)")
-        let response = try await sendCommand("FETCH 1:50 (FLAGS INTERNALDATE RFC822.SIZE ENVELOPE BODY[TEXT])")
+        // Fetch full RFC822 body so MIME parsing works correctly
+        let response = try await sendCommand("FETCH 1:50 (FLAGS INTERNALDATE RFC822.SIZE ENVELOPE BODY[])")
         return parseMessages(response)
     }
 
@@ -64,53 +65,148 @@ class MailIMAPService: @unchecked Sendable {
 
     private func parseMessages(_ response: String) -> [MailMessage] {
         var messages: [MailMessage] = []
-        let lines = response.components(separatedBy: "\r\n")
 
-        var currentMessage: [String: String] = [:]
+        // Split on FETCH response boundaries
+        let fetchPattern = #"\* \d+ FETCH"#
+        guard let regex = try? NSRegularExpression(pattern: fetchPattern) else { return messages }
 
-        for line in lines {
-            if line.contains("FETCH") && line.contains("ENVELOPE") {
-                // Extract Subject
-                if let subjectRange = line.range(of: "ENVELOPE \\(\"[^\"]*\" \"([^\"]*)\"", options: .regularExpression) {
-                    let subject = String(line[subjectRange].dropFirst(12).dropLast(1))
-                    currentMessage["subject"] = subject
-                }
+        let nsResponse = response as NSString
+        let matches = regex.matches(in: response, range: NSRange(location: 0, length: nsResponse.length))
 
-                // Extract From
-                if let fromRange = line.range(of: "(\"[^\"]*\" \"[^\"]*\")", options: .regularExpression) {
-                    let from = String(line[fromRange].dropFirst(1).dropLast(1))
-                    currentMessage["from"] = from
-                }
-            }
+        for (index, match) in matches.enumerated() {
+            let start = match.range.location
+            let end = index + 1 < matches.count ? matches[index + 1].range.location : nsResponse.length
+            let fetchBlock = nsResponse.substring(with: NSRange(location: start, length: end - start))
 
-            if line.contains("BODY[TEXT]") {
-                // Simple snippet extraction
-                let snippet = line.components(separatedBy: "BODY[TEXT]")[1].trimmingCharacters(in: .whitespacesAndNewlines).prefix(100)
-                currentMessage["snippet"] = String(snippet)
-            }
+            // Extract ENVELOPE fields
+            let subject = extractEnvelopeField(fetchBlock, field: "subject") ?? "No Subject"
+            let from = extractEnvelopeFrom(fetchBlock) ?? "Unknown"
 
-            if line.contains(")") && !currentMessage.isEmpty {
-                let msg = MailMessage(
-                    id: UUID().uuidString,
-                    threadId: UUID().uuidString,
-                    from: currentMessage["from"] ?? "Unknown",
-                    to: ["me@icloud.com"],
-                    cc: [],
-                    bcc: [],
-                    subject: currentMessage["subject"] ?? "No Subject",
-                    body: currentMessage["snippet"] ?? "",
-                    htmlBody: nil,
-                    date: Date(),
-                    isRead: false,
-                    isStarred: false,
-                    attachments: []
-                )
-                messages.append(msg)
-                currentMessage = [:]
-            }
+            // Extract raw BODY[] content and run through MIME pipeline
+            let rawBody = extractBodyContent(fetchBlock)
+            let (htmlBody, plainBody) = decodeMIME(rawBody)
+
+            let msg = MailMessage(
+                id: UUID().uuidString,
+                threadId: UUID().uuidString,
+                from: MailContentDecoder.decodeEncodedWords(from),
+                to: ["me@icloud.com"],
+                cc: [],
+                bcc: [],
+                subject: MailContentDecoder.decodeEncodedWords(subject),
+                body: plainBody,
+                htmlBody: htmlBody,
+                date: Date(),
+                isRead: false,
+                isStarred: false,
+                attachments: []
+            )
+            messages.append(msg)
         }
 
         return messages
+    }
+
+    // MARK: - MIME Pipeline
+
+    /// Parse raw IMAP body through MailMIMEParser → MailContentDecoder.
+    /// Returns (htmlBody, plainBody). At least one will be non-nil.
+    private func decodeMIME(_ raw: String) -> (String?, String) {
+        guard !raw.isEmpty else { return (nil, "") }
+
+        let parsed = MailMIMEParser.parse(raw)
+
+        let html: String?
+        if let htmlPart = parsed.htmlPart {
+            let decoded = MailContentDecoder.decode(htmlPart.content, transferEncoding: htmlPart.transferEncoding)
+            html = decoded.isEmpty ? nil : decoded
+        } else {
+            html = nil
+        }
+
+        let plain: String
+        if let textPart = parsed.textPart {
+            plain = MailContentDecoder.decode(textPart.content, transferEncoding: textPart.transferEncoding)
+        } else if html == nil {
+            // No MIME structure: treat the raw content as plain text
+            plain = MailContentDecoder.decodeQuotedPrintable(raw)
+        } else {
+            plain = ""
+        }
+
+        return (html, plain)
+    }
+
+    // MARK: - Response Parsing Helpers
+
+    private func extractBodyContent(_ fetchBlock: String) -> String {
+        // Match BODY[] {size}\r\n<content> or BODY[] "content"
+        let literalPattern = #"BODY\[\]\s*\{(\d+)\}\r?\n([\s\S]*)"#
+        if let regex = try? NSRegularExpression(pattern: literalPattern),
+           let match = regex.firstMatch(in: fetchBlock, range: NSRange(fetchBlock.startIndex..., in: fetchBlock)),
+           let sizeRange = Range(match.range(at: 1), in: fetchBlock),
+           let bodyRange = Range(match.range(at: 2), in: fetchBlock) {
+            let size = Int(fetchBlock[sizeRange]) ?? 0
+            let body = String(fetchBlock[bodyRange])
+            // Trim to the declared literal size (in bytes)
+            if let data = body.data(using: .utf8) {
+                let clipped = data.prefix(size)
+                return String(data: clipped, encoding: .utf8) ?? body
+            }
+            return body
+        }
+
+        // Fallback: grab everything after BODY[]
+        if let range = fetchBlock.range(of: "BODY[]") {
+            return String(fetchBlock[range.upperBound...]).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        return ""
+    }
+
+    private func extractEnvelopeField(_ block: String, field: String) -> String? {
+        // Very simplified ENVELOPE subject extraction
+        // ENVELOPE ( "date" "subject" (("name" NIL "user" "domain")) ...
+        guard let envRange = block.range(of: "ENVELOPE (") else { return nil }
+        let envContent = String(block[envRange.upperBound...])
+
+        // Split on space-delimited quoted strings
+        var strings: [String] = []
+        var inString = false
+        var current = ""
+        for char in envContent {
+            if char == "\"" {
+                if inString {
+                    strings.append(current)
+                    current = ""
+                }
+                inString.toggle()
+            } else if inString {
+                current.append(char)
+            }
+        }
+
+        // ENVELOPE position 2 (0-indexed) is the subject
+        switch field {
+        case "subject": return strings.count > 1 ? strings[1] : nil
+        default:        return nil
+        }
+    }
+
+    private func extractEnvelopeFrom(_ block: String) -> String? {
+        // Grab the email address from the FROM structure inside ENVELOPE
+        // FROM is at position 3: (("personal" NIL "mailbox" "host"))
+        let fromPattern = #"\(\("([^"]*)" NIL "([^"]*)" "([^"]*)"\)\)"#
+        if let regex = try? NSRegularExpression(pattern: fromPattern),
+           let match = regex.firstMatch(in: block, range: NSRange(block.startIndex..., in: block)) {
+            let name    = (Range(match.range(at: 1), in: block)).map { String(block[$0]) } ?? ""
+            let mailbox = (Range(match.range(at: 2), in: block)).map { String(block[$0]) } ?? ""
+            let host    = (Range(match.range(at: 3), in: block)).map { String(block[$0]) } ?? ""
+            if !mailbox.isEmpty && !host.isEmpty {
+                return name.isEmpty ? "\(mailbox)@\(host)" : "\(name) <\(mailbox)@\(host)>"
+            }
+        }
+        return nil
     }
 
     func disconnect() {
