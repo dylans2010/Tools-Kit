@@ -8,17 +8,6 @@ struct ArticlesHomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                // Action buttons
-                HStack(spacing: 10) {
-                    actionButton("Search", icon: "magnifyingglass", color: .blue) {
-                        showingSearch = true
-                    }
-                    actionButton("Collections", icon: "folder", color: .orange) {
-                        showingCollections = true
-                    }
-                }
-                .padding(.horizontal)
-
                 // Continue Reading
                 if !manager.recentArticles.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
@@ -96,16 +85,38 @@ struct ArticlesHomeView: View {
         .navigationTitle("Articles")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button { showingSearch = true } label: {
-                    Image(systemName: "magnifyingglass")
+                HStack {
+                    NavigationLink(destination: ArticleSearchView()) {
+                        Image(systemName: "magnifyingglass")
+                    }
+
+                    Menu {
+                        Button { showingCollections = true } label: {
+                            Label("Collections", systemImage: "folder")
+                        }
+
+                        Divider()
+
+                        ForEach(suggestedTopics, id: \.self) { topic in
+                            NavigationLink(destination: ArticleSearchView(initialQuery: topic)) {
+                                Label(topic, systemImage: "tag")
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
                 }
             }
         }
-        .sheet(isPresented: $showingSearch) {
-            NavigationStack { ArticleSearchView() }
-        }
         .sheet(isPresented: $showingCollections) {
-            NavigationStack { CollectionsView() }
+            CollectionsView()
+        }
+        .onAppear {
+            if manager.recentArticles.isEmpty {
+                Task {
+                    _ = try? await manager.search(query: "Trending")
+                }
+            }
         }
     }
 

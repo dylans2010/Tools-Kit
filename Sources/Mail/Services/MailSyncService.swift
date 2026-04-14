@@ -16,15 +16,22 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
         do {
             let provider = iCloudMailProvider(account: account)
             let threads = try await provider.fetchThreads(in: folder, limit: 50, offset: 0)
-            storage.saveThreads(threads, for: folder.id)
+            storage.saveThreads(threads, for: "\(account.id)_\(folder.id)")
 
             DispatchQueue.main.async {
                 self.lastSyncDate = Date()
                 self.isSyncing = false
             }
         } catch {
-            print("Sync failed: \(error)")
+            print("Sync failed for \(account.email): \(error)")
             DispatchQueue.main.async { self.isSyncing = false }
+        }
+    }
+
+    func syncAll(folder: MailFolder = .inbox) async {
+        let accounts = storage.loadAccounts()
+        for account in accounts where account.isEnabled {
+            await sync(account: account, folder: folder)
         }
     }
 }

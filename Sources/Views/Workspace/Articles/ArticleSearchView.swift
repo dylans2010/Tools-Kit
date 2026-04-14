@@ -19,13 +19,25 @@ struct ArticleSearchView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Language picker
-            Picker("Language", selection: $selectedLanguage) {
-                ForEach(languages, id: \.0) { code, name in
-                    Text(name).tag(code)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(languages, id: \.0) { code, name in
+                        Button {
+                            selectedLanguage = code
+                        } label: {
+                            Text(name)
+                                .font(.subheadline.bold())
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                                .background(selectedLanguage == code ? Color.blue : Color(.secondarySystemBackground))
+                                .foregroundColor(selectedLanguage == code ? .white : .primary)
+                                .cornerRadius(20)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
+                .padding()
             }
-            .pickerStyle(.segmented)
-            .padding()
 
             List {
                 if isLoading {

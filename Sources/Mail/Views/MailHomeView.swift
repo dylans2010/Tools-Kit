@@ -25,25 +25,33 @@ struct MailHomeView: View {
                 }
             } else {
                 List {
-                    Section(header: Text("Accounts")) {
-                        ForEach(accounts) { account in
-                            NavigationLink(destination: MailAccountsView()) {
-                                Label(account.email, systemImage: "person.crop.circle")
+                    Section(header: Text("Intelligence")) {
+                        NavigationLink(destination: InboxView(account: accounts.first!, folder: .inbox, filter: .unread)) {
+                            Label {
+                                Text("Unified Catch Up")
+                                    .fontWeight(.semibold)
+                            } icon: {
+                                Image(systemName: "sparkles")
+                                    .foregroundStyle(
+                                        LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
+                                    )
                             }
                         }
                     }
 
-                    Section(header: Text("Folders")) {
-                        FolderLink(folder: .inbox, icon: "tray.fill", account: accounts.first!)
-                        FolderLink(folder: .starred, icon: "star.fill", account: accounts.first!)
-                        FolderLink(folder: .sent, icon: "paperplane.fill", account: accounts.first!)
-                        FolderLink(folder: .drafts, icon: "doc.fill", account: accounts.first!)
-                        FolderLink(folder: .trash, icon: "trash.fill", account: accounts.first!)
+                    ForEach(accounts) { account in
+                        Section(header: Text(account.email)) {
+                            FolderLink(folder: .inbox, icon: "tray.fill", account: account)
+                            FolderLink(folder: .starred, icon: "star.fill", account: account)
+                            FolderLink(folder: .sent, icon: "paperplane.fill", account: account)
+                            FolderLink(folder: .drafts, icon: "doc.fill", account: account)
+                            FolderLink(folder: .trash, icon: "trash.fill", account: account)
+                        }
                     }
 
-                    Section(header: Text("Intelligence")) {
-                        NavigationLink(destination: InboxView(account: accounts.first!, folder: .inbox, filter: .unread)) {
-                            Label("Catch Up (Unread)", systemImage: "sparkles")
+                    Section {
+                        NavigationLink(destination: MailAccountsView()) {
+                            Label("Manage Accounts", systemImage: "gearshape")
                         }
                     }
                 }

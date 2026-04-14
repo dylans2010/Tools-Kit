@@ -26,13 +26,9 @@ struct PageEditorView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Formatting toolbar
-            formattingToolbar
-
-            Divider()
-
-            if isPreview {
+        ZStack(alignment: .bottom) {
+            VStack(spacing: 0) {
+                if isPreview {
                 ScrollView {
                     // Simple markdown-like preview
                     Text(renderPreview(content))
@@ -46,30 +42,49 @@ struct PageEditorView: View {
                     .onChange(of: content) { _ in scheduleAutosave() }
             }
 
-            // AI result overlay
-            if !aiResult.isEmpty {
-                Divider()
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("AI: \(aiTask)")
-                            .font(.caption.bold())
-                            .foregroundColor(.purple)
-                        Spacer()
-                        Button { aiResult = "" } label: {
-                            Image(systemName: "xmark.circle.fill").foregroundColor(.secondary)
+                // AI result overlay
+                if !aiResult.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Image(systemName: "sparkles")
+                            Text("AI \(aiTask)")
+                                .font(.headline)
+                            Spacer()
+                            Button { aiResult = "" } label: {
+                                Image(systemName: "xmark.circle.fill").foregroundColor(.white.opacity(0.7))
+                            }
+                        }
+
+                        if aiLoading {
+                            HStack {
+                                Spacer()
+                                ProgressView().tint(.white)
+                                Spacer()
+                            }
+                            .padding()
+                        } else {
+                            ScrollView {
+                                Text(aiResult)
+                                    .font(.callout)
+                                    .lineSpacing(4)
+                            }
+                            .frame(maxHeight: 200)
                         }
                     }
-                    if aiLoading {
-                        ProgressView()
-                    } else {
-                        ScrollView {
-                            Text(aiResult).font(.callout)
-                        }
-                        .frame(maxHeight: 180)
-                    }
+                    .padding()
+                    .background(
+                        LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    )
+                    .foregroundColor(.white)
+                    .cornerRadius(16)
+                    .shadow(radius: 10)
+                    .padding()
                 }
-                .padding()
-                .background(Color.purple.opacity(0.07))
+            }
+
+            if !isPreview {
+                formattingToolbar
+                    .padding(.bottom, 20)
             }
         }
         .navigationTitle(title)
@@ -103,7 +118,7 @@ struct PageEditorView: View {
 
     private var formattingToolbar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 6) {
+            HStack(spacing: 10) {
                 fmtButton("H1") { insert("# ") }
                 fmtButton("H2") { insert("## ") }
                 fmtButton("B", bold: true) { wrap("**") }
@@ -111,12 +126,14 @@ struct PageEditorView: View {
                 fmtButton("• List") { insert("- ") }
                 fmtButton("1. List") { insert("1. ") }
                 fmtButton("Code") { wrap("`") }
-                fmtButton("---") { insert("\n---\n") }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
         }
-        .background(Color(.systemGray6))
+        .background(Color(.secondarySystemGroupedBackground))
+        .cornerRadius(30)
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        .padding(.horizontal)
     }
 
     private func fmtButton(_ label: String, bold: Bool = false, italic: Bool = false, action: @escaping () -> Void) -> some View {
