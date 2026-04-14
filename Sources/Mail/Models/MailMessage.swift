@@ -11,8 +11,8 @@ struct MailMessage: Identifiable, Codable {
     let body: String
     let htmlBody: String?
     let date: Date
-    let isRead: Bool
-    let isStarred: Bool
+    var isRead: Bool
+    var isStarred: Bool
     let attachments: [MailAttachment]
 
     struct MailAttachment: Identifiable, Codable {

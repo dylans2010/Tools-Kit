@@ -9,6 +9,10 @@ struct CellEditorView: View {
     @State private var rawValue: String
     @State private var formula: String
     @State private var isFormulaMode: Bool
+    @State private var isBold: Bool
+    @State private var isItalic: Bool
+    @State private var alignment: SpreadsheetCell.CellAlignment
+    @State private var numberFormat: SpreadsheetCell.CellNumberFormat
 
     init(cell: SpreadsheetCell, address: String, onSave: @escaping (String, String?) -> Void, onCancel: @escaping () -> Void) {
         self.cell = cell
@@ -18,6 +22,10 @@ struct CellEditorView: View {
         _rawValue = State(initialValue: cell.value)
         _formula = State(initialValue: cell.formula ?? "")
         _isFormulaMode = State(initialValue: cell.formula != nil)
+        _isBold = State(initialValue: cell.isBold)
+        _isItalic = State(initialValue: cell.isItalic)
+        _alignment = State(initialValue: cell.textAlignment)
+        _numberFormat = State(initialValue: cell.numberFormat)
     }
 
     var body: some View {
@@ -39,6 +47,24 @@ struct CellEditorView: View {
                         TextField("Enter value", text: $rawValue)
                     }
                 }
+
+                Section("Formatting") {
+                    Toggle("Bold", isOn: $isBold)
+                    Toggle("Italic", isOn: $isItalic)
+
+                    Picker("Alignment", selection: $alignment) {
+                        Text("Left").tag(SpreadsheetCell.CellAlignment.leading)
+                        Text("Center").tag(SpreadsheetCell.CellAlignment.center)
+                        Text("Right").tag(SpreadsheetCell.CellAlignment.trailing)
+                    }
+                    .pickerStyle(.segmented)
+
+                    Picker("Number Format", selection: $numberFormat) {
+                        ForEach(SpreadsheetCell.CellNumberFormat.allCases, id: \.self) {
+                            Text($0.rawValue).tag($0)
+                        }
+                    }
+                }
             }
             .navigationTitle("Cell \(address)")
             .navigationBarTitleDisplayMode(.inline)
@@ -58,6 +84,6 @@ struct CellEditorView: View {
                 }
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.large])
     }
 }

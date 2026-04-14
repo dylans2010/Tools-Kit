@@ -12,18 +12,22 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
         guard !isSyncing else { return }
 
         DispatchQueue.main.async { self.isSyncing = true }
+        print("📬 MailSync: starting sync for \(account.email) folder=\(folder.id)")
 
         do {
+            print("📡 MailSync: connecting to provider…")
             let provider = iCloudMailProvider(account: account)
             let threads = try await provider.fetchThreads(in: folder, limit: 50, offset: 0)
+            print("✅ MailSync: fetched \(threads.count) threads")
             storage.saveThreads(threads, for: "\(account.id)_\(folder.id)")
+            print("💾 MailSync: saved threads locally")
 
             DispatchQueue.main.async {
                 self.lastSyncDate = Date()
                 self.isSyncing = false
             }
         } catch {
-            print("Sync failed for \(account.email): \(error)")
+            print("❌ MailSync: failed for \(account.email): \(error)")
             DispatchQueue.main.async { self.isSyncing = false }
         }
     }

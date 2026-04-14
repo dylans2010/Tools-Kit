@@ -41,6 +41,80 @@ struct SpreadsheetEditorView: View {
                 onDeleteColumn: {
                     if let sel = selectedCell { deleteColumn(sel.col) }
                 },
+                onBold: {
+                    guard let sel = selectedCell else { return }
+                    sheet.cells[sel.row][sel.col].isBold.toggle()
+                    manager.updateSpreadsheet(sheet)
+                },
+                onItalic: {
+                    guard let sel = selectedCell else { return }
+                    sheet.cells[sel.row][sel.col].isItalic.toggle()
+                    manager.updateSpreadsheet(sheet)
+                },
+                onAlignLeft: {
+                    guard let sel = selectedCell else { return }
+                    sheet.cells[sel.row][sel.col].textAlignment = .leading
+                    manager.updateSpreadsheet(sheet)
+                },
+                onAlignCenter: {
+                    guard let sel = selectedCell else { return }
+                    sheet.cells[sel.row][sel.col].textAlignment = .center
+                    manager.updateSpreadsheet(sheet)
+                },
+                onAlignRight: {
+                    guard let sel = selectedCell else { return }
+                    sheet.cells[sel.row][sel.col].textAlignment = .trailing
+                    manager.updateSpreadsheet(sheet)
+                },
+                onFormatNumber: {
+                    guard let sel = selectedCell else { return }
+                    sheet.cells[sel.row][sel.col].numberFormat = .number
+                    manager.updateSpreadsheet(sheet)
+                },
+                onFormatCurrency: {
+                    guard let sel = selectedCell else { return }
+                    sheet.cells[sel.row][sel.col].numberFormat = .currency
+                    manager.updateSpreadsheet(sheet)
+                },
+                onFormatPercentage: {
+                    guard let sel = selectedCell else { return }
+                    sheet.cells[sel.row][sel.col].numberFormat = .percentage
+                    manager.updateSpreadsheet(sheet)
+                },
+                onFormatDate: {
+                    guard let sel = selectedCell else { return }
+                    sheet.cells[sel.row][sel.col].numberFormat = .date
+                    manager.updateSpreadsheet(sheet)
+                },
+                onSum: {
+                    guard let sel = selectedCell else { return }
+                    let col = sel.col
+                    let values = (0..<sel.row).compactMap { r -> Double? in
+                        let v = sheet.cells[r][col].value
+                        return Double(v)
+                    }
+                    let sum = values.reduce(0, +)
+                    sheet.cells[sel.row][sel.col].value = String(sum)
+                    manager.updateSpreadsheet(sheet)
+                },
+                onAverage: {
+                    guard let sel = selectedCell else { return }
+                    let col = sel.col
+                    let values = (0..<sel.row).compactMap { r -> Double? in
+                        let v = sheet.cells[r][col].value
+                        return Double(v)
+                    }
+                    let avg = values.isEmpty ? 0 : values.reduce(0, +) / Double(values.count)
+                    sheet.cells[sel.row][sel.col].value = String(format: "%.2f", avg)
+                    manager.updateSpreadsheet(sheet)
+                },
+                onClearCell: {
+                    guard let sel = selectedCell else { return }
+                    sheet.cells[sel.row][sel.col].value = ""
+                    sheet.cells[sel.row][sel.col].formula = nil
+                    sheet.cells[sel.row][sel.col].computedValue = ""
+                    manager.updateSpreadsheet(sheet)
+                },
                 onAI: { showingAI = true }
             )
 

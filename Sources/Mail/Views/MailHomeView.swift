@@ -69,6 +69,11 @@ struct MailHomeView: View {
 
     private func loadAccounts() {
         accounts = MailStorageService.shared.loadAccounts()
+        if !accounts.isEmpty {
+            Task {
+                await MailSyncService.shared.syncAll()
+            }
+        }
     }
 }
 
