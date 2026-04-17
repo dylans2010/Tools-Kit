@@ -237,6 +237,28 @@
 		WK0200000000000000000016 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000016 /* HealthKitManager.swift */; };
 		WK0200000000000000000017 /* DataExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000017 /* DataExportService.swift */; };
 		WK0200000000000000000018 /* WorkoutsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000018 /* WorkoutsManager.swift */; };
+		WK0200000000000000000019 /* AIMentorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000019 /* AIMentorView.swift */; };
+		WK020000000000000000001A /* AIMentorChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000001A /* AIMentorChatView.swift */; };
+		WK020000000000000000001B /* MealVoiceLoggingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000001B /* MealVoiceLoggingView.swift */; };
+		WK020000000000000000001C /* MealVoiceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000001C /* MealVoiceService.swift */; };
+		WK020000000000000000001D /* WorkoutLoggingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000001D /* WorkoutLoggingView.swift */; };
+		WK020000000000000000001E /* ExerciseLoggingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000001E /* ExerciseLoggingView.swift */; };
+		WK020000000000000000001F /* LiveWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000001F /* LiveWorkoutView.swift */; };
+		WK0200000000000000000020 /* WorkoutSessionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000020 /* WorkoutSessionModel.swift */; };
+		WK0200000000000000000021 /* WorkoutCoachService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000021 /* WorkoutCoachService.swift */; };
+		WK0200000000000000000022 /* RecoveryScoreModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000022 /* RecoveryScoreModel.swift */; };
+		WK0200000000000000000023 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000023 /* AnalyticsView.swift */; };
+		WK0200000000000000000024 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000024 /* AnalyticsService.swift */; };
+		WK0200000000000000000025 /* MealPlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000025 /* MealPlanView.swift */; };
+		WK0200000000000000000026 /* GroceryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000026 /* GroceryListView.swift */; };
+		WK0200000000000000000027 /* MealPlanningService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000027 /* MealPlanningService.swift */; };
+		WK0200000000000000000028 /* WorkoutTimerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000028 /* WorkoutTimerService.swift */; };
+		WK0200000000000000000029 /* WorkoutPerformanceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000029 /* WorkoutPerformanceModel.swift */; };
+		WK020000000000000000002A /* MealPlanModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000002A /* MealPlanModel.swift */; };
+		WK020000000000000000002B /* MentorMessageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000002B /* MentorMessageModel.swift */; };
+		WK020000000000000000002C /* AIMentorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000002C /* AIMentorService.swift */; };
+		WK020000000000000000002D /* AIMentorContextBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000002D /* AIMentorContextBuilder.swift */; };
+		WK020000000000000000002E /* AIMentorMemoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000002E /* AIMentorMemoryStore.swift */; };
 		88656A686AF741EB83B8FD5F /* SliderQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711D3FB735414113B06478F1 /* MorseCodeView.swift */; };
@@ -1012,6 +1034,28 @@
 		WK0100000000000000000016 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Health/HealthKitManager.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000017 /* DataExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Services/DataExportService.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000018 /* WorkoutsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Services/WorkoutsManager.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000019 /* AIMentorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/AIMentorView.swift"; sourceTree = "<group>"; };
+		WK010000000000000000001A /* AIMentorChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/AIMentorChatView.swift"; sourceTree = "<group>"; };
+		WK010000000000000000001B /* MealVoiceLoggingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Nutrition/MealVoiceLoggingView.swift"; sourceTree = "<group>"; };
+		WK010000000000000000001C /* MealVoiceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Nutrition/MealVoiceService.swift"; sourceTree = "<group>"; };
+		WK010000000000000000001D /* WorkoutLoggingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Logging/WorkoutLoggingView.swift"; sourceTree = "<group>"; };
+		WK010000000000000000001E /* ExerciseLoggingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Logging/ExerciseLoggingView.swift"; sourceTree = "<group>"; };
+		WK010000000000000000001F /* LiveWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Logging/LiveWorkoutView.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000020 /* WorkoutSessionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Logging/WorkoutSessionModel.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000021 /* WorkoutCoachService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Services/WorkoutCoachService.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000022 /* RecoveryScoreModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Models/RecoveryScoreModel.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000023 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Analytics/AnalyticsView.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000024 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Analytics/AnalyticsService.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000025 /* MealPlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Nutrition/MealPlanView.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000026 /* GroceryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Nutrition/GroceryListView.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000027 /* MealPlanningService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Services/MealPlanningService.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000028 /* WorkoutTimerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Services/WorkoutTimerService.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000029 /* WorkoutPerformanceModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Models/WorkoutPerformanceModel.swift"; sourceTree = "<group>"; };
+		WK010000000000000000002A /* MealPlanModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Models/MealPlanModel.swift"; sourceTree = "<group>"; };
+		WK010000000000000000002B /* MentorMessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Models/MentorMessageModel.swift"; sourceTree = "<group>"; };
+		WK010000000000000000002C /* AIMentorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/AI/AIMentorService.swift"; sourceTree = "<group>"; };
+		WK010000000000000000002D /* AIMentorContextBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/AI/AIMentorContextBuilder.swift"; sourceTree = "<group>"; };
+		WK010000000000000000002E /* AIMentorMemoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Services/AIMentorMemoryStore.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1537,6 +1581,28 @@
 				WK0100000000000000000016 /* HealthKitManager.swift */,
 				WK0100000000000000000017 /* DataExportService.swift */,
 				WK0100000000000000000018 /* WorkoutsManager.swift */,
+				WK0100000000000000000019 /* AIMentorView.swift */,
+				WK010000000000000000001A /* AIMentorChatView.swift */,
+				WK010000000000000000001B /* MealVoiceLoggingView.swift */,
+				WK010000000000000000001C /* MealVoiceService.swift */,
+				WK010000000000000000001D /* WorkoutLoggingView.swift */,
+				WK010000000000000000001E /* ExerciseLoggingView.swift */,
+				WK010000000000000000001F /* LiveWorkoutView.swift */,
+				WK0100000000000000000020 /* WorkoutSessionModel.swift */,
+				WK0100000000000000000021 /* WorkoutCoachService.swift */,
+				WK0100000000000000000022 /* RecoveryScoreModel.swift */,
+				WK0100000000000000000023 /* AnalyticsView.swift */,
+				WK0100000000000000000024 /* AnalyticsService.swift */,
+				WK0100000000000000000025 /* MealPlanView.swift */,
+				WK0100000000000000000026 /* GroceryListView.swift */,
+				WK0100000000000000000027 /* MealPlanningService.swift */,
+				WK0100000000000000000028 /* WorkoutTimerService.swift */,
+				WK0100000000000000000029 /* WorkoutPerformanceModel.swift */,
+				WK010000000000000000002A /* MealPlanModel.swift */,
+				WK010000000000000000002B /* MentorMessageModel.swift */,
+				WK010000000000000000002C /* AIMentorService.swift */,
+				WK010000000000000000002D /* AIMentorContextBuilder.swift */,
+				WK010000000000000000002E /* AIMentorMemoryStore.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -2122,6 +2188,28 @@
 				WK0200000000000000000016 /* HealthKitManager.swift in Sources */,
 				WK0200000000000000000017 /* DataExportService.swift in Sources */,
 				WK0200000000000000000018 /* WorkoutsManager.swift in Sources */,
+				WK0200000000000000000019 /* AIMentorView.swift in Sources */,
+				WK020000000000000000001A /* AIMentorChatView.swift in Sources */,
+				WK020000000000000000001B /* MealVoiceLoggingView.swift in Sources */,
+				WK020000000000000000001C /* MealVoiceService.swift in Sources */,
+				WK020000000000000000001D /* WorkoutLoggingView.swift in Sources */,
+				WK020000000000000000001E /* ExerciseLoggingView.swift in Sources */,
+				WK020000000000000000001F /* LiveWorkoutView.swift in Sources */,
+				WK0200000000000000000020 /* WorkoutSessionModel.swift in Sources */,
+				WK0200000000000000000021 /* WorkoutCoachService.swift in Sources */,
+				WK0200000000000000000022 /* RecoveryScoreModel.swift in Sources */,
+				WK0200000000000000000023 /* AnalyticsView.swift in Sources */,
+				WK0200000000000000000024 /* AnalyticsService.swift in Sources */,
+				WK0200000000000000000025 /* MealPlanView.swift in Sources */,
+				WK0200000000000000000026 /* GroceryListView.swift in Sources */,
+				WK0200000000000000000027 /* MealPlanningService.swift in Sources */,
+				WK0200000000000000000028 /* WorkoutTimerService.swift in Sources */,
+				WK0200000000000000000029 /* WorkoutPerformanceModel.swift in Sources */,
+				WK020000000000000000002A /* MealPlanModel.swift in Sources */,
+				WK020000000000000000002B /* MentorMessageModel.swift in Sources */,
+				WK020000000000000000002C /* AIMentorService.swift in Sources */,
+				WK020000000000000000002D /* AIMentorContextBuilder.swift in Sources */,
+				WK020000000000000000002E /* AIMentorMemoryStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
