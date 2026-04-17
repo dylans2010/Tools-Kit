@@ -81,19 +81,16 @@ final class AuthService: ObservableObject {
         defer { isBusy = false }
 
         do {
-            let oauthProvider: String
             switch provider.lowercased() {
             case "google":
-                oauthProvider = "google"
+                _ = try await account.createOAuth2Session(provider: .google)
             case "github":
-                oauthProvider = "github"
+                _ = try await account.createOAuth2Session(provider: .github)
             case "discord":
-                oauthProvider = "discord"
+                _ = try await account.createOAuth2Session(provider: .discord)
             default:
                 throw AuthServiceError.unsupportedOAuthProvider(provider)
             }
-
-            _ = try await account.createOAuth2Session(provider: oauthProvider)
         } catch {
             lastErrorMessage = error.localizedDescription
             throw error
