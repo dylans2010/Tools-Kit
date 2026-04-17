@@ -1,5 +1,4 @@
 import Foundation
-import Appwrite
 
 final class AppwriteClient {
     static let shared = AppwriteClient()
@@ -7,18 +6,10 @@ final class AppwriteClient {
     private let endpoint: String
     private let projectID: String
 
-    let client: Client
-    let account: Account
-
     private init() {
         endpoint = Self.requiredConfigValue(forKey: "APPWRITE_ENDPOINT")
         projectID = Self.requiredConfigValue(forKey: "APPWRITE_PROJECT_ID")
         Self.validateEndpoint(endpoint)
-
-        client = Client()
-            .setEndpoint(endpoint)
-            .setProject(projectID)
-        account = Account(client)
     }
 
     private static func requiredConfigValue(forKey key: String) -> String {
