@@ -275,9 +275,8 @@ class GmailMailProvider: MailProviderProtocol {
             throw NSError(domain: "GmailMailProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Gmail refresh token"])
         }
 
-        guard let clientID = Self.configValue(forKey: "GOOGLE_OAUTH_CLIENT_ID"), !clientID.isEmpty else {
-            throw NSError(domain: "GmailMailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing GOOGLE_OAUTH_CLIENT_ID in Config.plist"])
-        }
+        let oauthConfig = try await MailOAuthConfigService.shared.resolvedConfig()
+        let clientID = oauthConfig.clientID
 
         var request = URLRequest(url: URL(string: "https://oauth2.googleapis.com/token")!)
         request.httpMethod = "POST"
@@ -341,13 +340,6 @@ class GmailMailProvider: MailProviderProtocol {
         return formatter.date(from: fallback) ?? Date()
     }
 
-    private static func configValue(forKey key: String) -> String? {
-        guard let configPath = Bundle.main.path(forResource: "Config", ofType: "plist"),
-              let config = NSDictionary(contentsOfFile: configPath) else {
-            return nil
-        }
-        return config[key] as? String
-    }
 }
 
 private struct GmailListResponse: Decodable {

@@ -244,13 +244,9 @@ private final class GmailOAuthService: NSObject, ASWebAuthenticationPresentation
     ]
 
     func authorize() async throws -> GmailOAuthResult {
-        guard let clientID = Self.configValue(forKey: "GOOGLE_OAUTH_CLIENT_ID"), !clientID.isEmpty else {
-            throw NSError(domain: "GmailOAuth", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing GOOGLE_OAUTH_CLIENT_ID in Config.plist"])
-        }
-
-        guard let redirectURI = Self.configValue(forKey: "GOOGLE_OAUTH_REDIRECT_URI"), !redirectURI.isEmpty else {
-            throw NSError(domain: "GmailOAuth", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing GOOGLE_OAUTH_REDIRECT_URI in Config.plist"])
-        }
+        let oauthConfig = try await MailOAuthConfigService.shared.resolvedConfig()
+        let clientID = oauthConfig.clientID
+        let redirectURI = oauthConfig.redirectURI
 
         let verifier = Self.randomCodeVerifier()
         let challenge = Self.codeChallenge(from: verifier)
@@ -362,14 +358,6 @@ private final class GmailOAuthService: NSObject, ASWebAuthenticationPresentation
             throw NSError(domain: "GmailOAuth", code: 500, userInfo: [NSLocalizedDescriptionKey: message])
         }
         return try JSONDecoder().decode(GoogleProfileResponse.self, from: data)
-    }
-
-    private static func configValue(forKey key: String) -> String? {
-        guard let configPath = Bundle.main.path(forResource: "Config", ofType: "plist"),
-              let config = NSDictionary(contentsOfFile: configPath) else {
-            return nil
-        }
-        return config[key] as? String
     }
 
     private static func randomCodeVerifier() -> String {
