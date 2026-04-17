@@ -1,18 +1,19 @@
 import SwiftUI
 
 struct MailAccountsView: View {
-    @State private var accounts: [MailAccount] = []
+    @StateObject private var mailStore = MailStore.shared
+    @State private var showingAddAccount = false
 
     var body: some View {
         List {
-            if accounts.isEmpty {
+            if mailStore.accounts.isEmpty {
                 VStack(spacing: 10) {
                     Image(systemName: "tray")
                         .font(.title2)
                         .foregroundColor(.secondary)
                     Text("No mail accounts")
                         .font(.headline)
-                    Text("Add an iCloud account to start syncing your inbox.")
+                    Text("Add a Gmail or iCloud account to start syncing your inbox.")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -21,28 +22,43 @@ struct MailAccountsView: View {
                 .padding(.vertical, 24)
                 .listRowBackground(Color.clear)
             } else {
-                ForEach(accounts) { account in
+                ForEach(mailStore.accounts) { account in
                     HStack(spacing: 12) {
                         Image(systemName: account.provider == .iCloud ? "icloud.fill" : "envelope.fill")
                             .font(.headline)
-                            .foregroundColor(.blue)
+                            .foregroundColor(account.provider == .iCloud ? .blue : .red)
                             .frame(width: 34, height: 34)
-                            .background(Color.blue.opacity(0.12), in: Circle())
+                            .background((account.provider == .iCloud ? Color.blue : Color.red).opacity(0.12), in: Circle())
 
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(account.email)
+                            Text(account.emailAddress)
                                 .font(.headline)
-                            Text(account.provider.rawValue.capitalized)
+                            Text(account.provider.displayName)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
 
                         Spacer()
+
+                        if account.isActive {
+                            Label("Active", systemImage: "checkmark.circle.fill")
+                                .font(.caption)
+                                .foregroundStyle(.green)
+                        } else {
+                            Button("Switch") {
+                                mailStore.setActiveAccount(account.id)
+                            }
+                            .buttonStyle(.bordered)
+                        }
                     }
                     .padding(.vertical, 6)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        mailStore.setActiveAccount(account.id)
+                    }
                     .swipeActions {
                         Button(role: .destructive) {
-                            delete(account)
+                            mailStore.removeAccount(account)
                         } label: {
                             Label("Delete", systemImage: "trash")
                         }
@@ -52,14 +68,22 @@ struct MailAccountsView: View {
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Accounts")
-        .onAppear {
-            accounts = MailStorageService.shared.loadAccounts()
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showingAddAccount = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
         }
-    }
-
-    private func delete(_ account: MailAccount) {
-        MailKeychainManager.shared.deleteCredentials(for: account.email)
-        accounts.removeAll { $0.id == account.id }
-        MailStorageService.shared.saveAccounts(accounts)
+        .sheet(isPresented: $showingAddAccount) {
+            AddMailAccountView { selected in
+                mailStore.setActiveAccount(selected.id)
+            }
+        }
+        .onAppear {
+            mailStore.reloadAccounts()
+        }
     }
 }

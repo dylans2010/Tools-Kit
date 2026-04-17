@@ -13,7 +13,7 @@ struct InboxView: View {
 
     @StateObject private var syncService = MailSyncService.shared
     @StateObject private var storage = MailStorageService.shared
-    @State private var activeAccount: MailAccount
+    @StateObject private var mailStore = MailStore.shared
     @State private var searchText = ""
     @State private var showingCompose = false
     @State private var showingAddAccount = false
@@ -28,7 +28,6 @@ struct InboxView: View {
         self.account = account
         self.folder = folder
         self.filter = filter
-        _activeAccount = State(initialValue: account)
     }
 
     var body: some View {
@@ -43,6 +42,7 @@ struct InboxView: View {
             .ignoresSafeArea()
 
             List {
+                activeAccountSection
                 prioritySection
                 aiSummarySection
                 syncStatusSection
@@ -56,6 +56,7 @@ struct InboxView: View {
         .scrollContentBackground(.hidden)
         .searchable(text: $searchText)
         .refreshable {
+            guard let activeAccount else { return }
             await syncService.fetchThreads(account: activeAccount, folder: folder)
         }
         .toolbar {
@@ -78,11 +79,13 @@ struct InboxView: View {
             }
         }
         .sheet(isPresented: $showingCompose) {
-            EmailComposingView(account: activeAccount)
+            if let activeAccount {
+                EmailComposingView(account: activeAccount)
+            }
         }
         .sheet(isPresented: $showingAddAccount) {
             AddMailAccountView { selected in
-                activeAccount = selected
+                mailStore.setActiveAccount(selected.id)
                 Task {
                     await syncService.fetchThreads(account: selected, folder: folder)
                 }
@@ -94,8 +97,51 @@ struct InboxView: View {
             }
         }
         .task {
-            _ = storage.loadThreads(for: folderKey)
+            mailStore.reloadAccounts()
+            if mailStore.activeAccount == nil {
+                mailStore.addOrUpdateAccount(account, makeActive: true)
+            }
+
+            guard let activeAccount else { return }
+            _ = storage.loadThreads(for: folderKey(for: activeAccount))
             await syncService.fetchThreads(account: activeAccount, folder: folder)
+        }
+        .onChange(of: mailStore.activeAccount?.id) { _ in
+            Task {
+                guard let activeAccount else { return }
+                _ = storage.loadThreads(for: folderKey(for: activeAccount))
+                await syncService.fetchThreads(account: activeAccount, folder: folder)
+            }
+        }
+    }
+
+    private var activeAccount: MailAccount? {
+        mailStore.activeAccount ?? account
+    }
+
+    @ViewBuilder
+    private var activeAccountSection: some View {
+        if let activeAccount {
+            Section {
+                HStack(spacing: 10) {
+                    Image(systemName: activeAccount.provider == .iCloud ? "icloud.fill" : "envelope.fill")
+                        .foregroundStyle(activeAccount.provider == .iCloud ? .blue : .red)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(activeAccount.emailAddress)
+                            .font(.subheadline.weight(.semibold))
+                        Text("Active \(activeAccount.provider.displayName) account")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button("Change") {
+                        showingAddAccount = true
+                    }
+                    .font(.caption)
+                }
+                .padding(.vertical, 4)
+            }
+            .listRowBackground(Color.clear)
         }
     }
 
@@ -294,7 +340,7 @@ struct InboxView: View {
                         .foregroundColor(.secondary)
                     Text(searchText.isEmpty ? "No messages yet" : "No matching messages")
                         .font(.headline)
-                    Text(searchText.isEmpty ? "Pull to refresh to fetch your latest iCloud emails." : "Try a different sender or subject search.")
+                    Text(searchText.isEmpty ? "Pull to refresh to fetch your latest messages." : "Try a different sender or subject search.")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -373,31 +419,34 @@ struct InboxView: View {
         return result
     }
 
-    private var folderKey: String { "\(activeAccount.id)_\(folder.id)" }
+    private func folderKey(for account: MailAccount) -> String { "\(account.id)_\(folder.id)" }
 
     private func toggleRead(_ thread: MailThread) {
         guard let idx = storage.threads.firstIndex(where: { $0.id == thread.id }) else { return }
+        guard let activeAccount else { return }
         let targetRead = !thread.isRead
         var updated = storage.threads
         for msgIdx in updated[idx].messages.indices {
             updated[idx].messages[msgIdx].isRead = targetRead
         }
-        MailStorageService.shared.saveThreads(updated, for: folderKey)
+        MailStorageService.shared.saveThreads(updated, for: folderKey(for: activeAccount))
     }
 
     private func toggleStar(_ thread: MailThread) {
         guard let idx = storage.threads.firstIndex(where: { $0.id == thread.id }) else { return }
+        guard let activeAccount else { return }
         var updated = storage.threads
         let currentlyStarred = updated[idx].messages.first?.isStarred ?? false
         for msgIdx in updated[idx].messages.indices {
             updated[idx].messages[msgIdx].isStarred = !currentlyStarred
         }
-        MailStorageService.shared.saveThreads(updated, for: folderKey)
+        MailStorageService.shared.saveThreads(updated, for: folderKey(for: activeAccount))
     }
 
     private func deleteThread(_ thread: MailThread) {
+        guard let activeAccount else { return }
         let remaining = storage.threads.filter { $0.id != thread.id }
-        MailStorageService.shared.saveThreads(remaining, for: folderKey)
+        MailStorageService.shared.saveThreads(remaining, for: folderKey(for: activeAccount))
     }
 
     private func runCatchUp() {

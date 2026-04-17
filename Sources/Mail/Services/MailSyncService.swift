@@ -14,6 +14,7 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
     private var hasMorePages = true
     private var activeAccount: MailAccount?
     private var activeFolder: MailFolder = .inbox
+    private var gmailProviders: [String: GmailMailProvider] = [:]
 
     func fetchThreads(account: MailAccount, folder: MailFolder) async {
         await performFetch(account: account, folder: folder, reset: true)
@@ -48,37 +49,42 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
         activeAccount = account
         activeFolder = folder
 
-        print("[MailSync] Starting IMAP fetch...")
+        InternalLogger.shared.log("MailSync: starting fetch for \(account.emailAddress) folder=\(folder.id)", level: .info)
 
         do {
-            defer { imapService.disconnect() }
-            guard let password = MailKeychainManager.shared.getPassword(for: account.email) else {
-                throw NSError(domain: "MailSync", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing credentials"])
+            let groupedThreads: [MailThread]
+
+            if account.provider == .gmail {
+                let provider = gmailProviders[account.id] ?? GmailMailProvider(account: account)
+                gmailProviders[account.id] = provider
+                groupedThreads = try await provider.fetchThreads(in: folder, limit: pageSize, offset: currentOffset)
+            } else {
+                defer { imapService.disconnect() }
+                guard let password = MailKeychainManager.shared.getPassword(for: account.emailAddress) else {
+                    throw NSError(domain: "MailSync", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing credentials"])
+                }
+
+                try await imapService.connect(provider: account.provider)
+                try await imapService.login(user: account.emailAddress, pass: password)
+                let messages = try await imapService.fetchMessages(folder: folder.id, limit: pageSize, offset: currentOffset)
+                groupedThreads = groupMessages(messages)
             }
 
-            try await imapService.connect(provider: account.provider)
-            print("[MailSync] IMAP connected. Fetching UIDs...")
-            try await imapService.login(user: account.email, pass: password)
-
-            let messages = try await imapService.fetchMessages(folder: folder.id, limit: pageSize, offset: currentOffset)
-            print("[MailSync] UIDs received: \(messages.count)")
-
-            let groupedThreads = groupMessages(messages)
-            print("[MailSync] Threads parsed: \(groupedThreads.count)")
+            InternalLogger.shared.log("MailSync: fetched \(groupedThreads.count) thread(s) for \(account.emailAddress)", level: .debug)
 
             let folderKey = "\(account.id)_\(folder.id)"
             let merged = mergeThreads(existing: reset ? [] : storage.threads, new: groupedThreads)
             storage.saveThreads(merged, for: folderKey)
-            print("[MailSync] Storage updated. InboxView should refresh.")
+            InternalLogger.shared.log("MailSync: storage updated for key \(folderKey)", level: .debug)
 
-            currentOffset += messages.count
-            hasMorePages = messages.count == pageSize
+            currentOffset += groupedThreads.count
+            hasMorePages = groupedThreads.count == pageSize
             await MainActor.run {
                 self.lastSyncDate = Date()
                 self.isSyncing = false
             }
         } catch {
-            print("❌ MailSync: failed for \(account.email): \(error)")
+            InternalLogger.shared.log("MailSync: failed for \(account.emailAddress) - \(error.localizedDescription)", level: .error)
             await MainActor.run {
                 self.lastError = error.localizedDescription
                 self.isSyncing = false

@@ -12,5 +12,9 @@
     <string></string>
     <key>APPWRITE_AUTH_USERS_COLLECTION_ID</key>
     <string></string>
+    <key>GOOGLE_OAUTH_CLIENT_ID</key>
+    <string></string>
+    <key>GOOGLE_OAUTH_REDIRECT_URI</key>
+    <string>appwrite-callback-69e24c32003548ff0e2e://google-oauth</string>
 </dict>
 </plist>
