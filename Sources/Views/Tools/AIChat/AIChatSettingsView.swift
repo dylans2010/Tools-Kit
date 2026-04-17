@@ -2,12 +2,18 @@ import SwiftUI
 
 struct AIChatSettingsView: View {
     @Binding var settings: AIChatSettings
+    var onSignOut: (() -> Void)? = nil
     @Environment(\.dismiss) private var dismiss
     @StateObject private var memoryStore = AIChatMemoryStore.shared
     @StateObject private var modelCatalog = AIModelCatalog.shared
+    @StateObject private var featureCheck = AIFeatureCheck.shared
     @StateObject private var musicMode = MusicModeManager.shared
     @StateObject private var workoutsMode = WorkoutsModeManager.shared
     @StateObject private var workspaceMode = WorkspaceModeManager.shared
+    @State private var isUploadingToCloud = false
+    @State private var cloudStatusMessage: String?
+    @State private var isSigningOut = false
+    @State private var signOutStatusMessage: String?
 
     private let registry = AIProviderRegistry.shared
 
@@ -19,6 +25,7 @@ struct AIChatSettingsView: View {
         NavigationStack {
             Form {
                 providerSection
+                aiUsageSection
                 apiKeySection
                 modelSection
                 systemPromptSection
@@ -32,9 +39,12 @@ struct AIChatSettingsView: View {
                 memorySection
                 appModeSection
                 toolVisibilitySection
+                cloudDataSection
+                accountSection
             }
             .task {
                 await loadProviderModels(force: false)
+                await MainActor.run { featureCheck.refresh() }
             }
             .onChange(of: settings.selectedProviderID) { _ in
                 Task { await loadProviderModels(force: false) }
@@ -90,6 +100,28 @@ struct AIChatSettingsView: View {
             }
         } header: {
             Text("API Key")
+        }
+    }
+
+    private var aiUsageSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 10) {
+                Picker("Model Source", selection: $settings.aiModelSource) {
+                    ForEach(AIModelSource.allCases, id: \.self) { source in
+                        Text(source.rawValue).tag(source)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                Text(featureCheck.usageMessage())
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(settings.aiModelSource == .ownKey ? .green : .blue)
+            }
+            .padding(.vertical, 4)
+        } header: {
+            Text("AI Usage")
+        } footer: {
+            Text("App Model uses PRODUCTION_API_KEY with a 10 request/day limit. My API Key mode is unlimited.")
         }
     }
 
@@ -344,6 +376,50 @@ struct AIChatSettingsView: View {
         }
     }
 
+    private var cloudDataSection: some View {
+        Section("Cloud Sync") {
+            Button {
+                uploadDataToCloud()
+            } label: {
+                HStack {
+                    if isUploadingToCloud {
+                        ProgressView()
+                    }
+                    Text(isUploadingToCloud ? "Uploading..." : "Upload Data To Cloud")
+                }
+            }
+            .disabled(isUploadingToCloud)
+
+            if let cloudStatusMessage {
+                Text(cloudStatusMessage)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+
+    private var accountSection: some View {
+        Section("Account") {
+            Button(role: .destructive) {
+                signOutCurrentUser()
+            } label: {
+                HStack {
+                    if isSigningOut {
+                        ProgressView()
+                    }
+                    Text(isSigningOut ? "Signing Out..." : "Sign Out")
+                }
+            }
+            .disabled(isSigningOut)
+
+            if let signOutStatusMessage {
+                Text(signOutStatusMessage)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+
     private func loadProviderModels(force: Bool) async {
         let providerID = settings.selectedProviderID
         await modelCatalog.loadModels(for: providerID, force: force)
@@ -351,6 +427,46 @@ struct AIChatSettingsView: View {
         await MainActor.run {
             if !models.contains(where: { $0.id == settings.modelID }) {
                 settings.modelID = models.first?.id ?? ""
+            }
+        }
+    }
+
+    private func uploadDataToCloud() {
+        isUploadingToCloud = true
+        cloudStatusMessage = nil
+        Task {
+            do {
+                try await UserDataManager.shared.uploadCurrentUserData()
+                await MainActor.run {
+                    cloudStatusMessage = "Data uploaded to cloud."
+                    isUploadingToCloud = false
+                }
+            } catch {
+                await MainActor.run {
+                    cloudStatusMessage = "Upload failed: \(error.localizedDescription)"
+                    isUploadingToCloud = false
+                }
+            }
+        }
+    }
+
+    private func signOutCurrentUser() {
+        isSigningOut = true
+        signOutStatusMessage = nil
+        Task {
+            do {
+                try await AuthService.shared.signOut()
+                await MainActor.run {
+                    signOutStatusMessage = "Signed out."
+                    isSigningOut = false
+                    onSignOut?()
+                    dismiss()
+                }
+            } catch {
+                await MainActor.run {
+                    signOutStatusMessage = "Sign out failed: \(error.localizedDescription)"
+                    isSigningOut = false
+                }
             }
         }
     }

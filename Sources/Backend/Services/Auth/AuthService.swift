@@ -37,6 +37,7 @@ final class AuthService: ObservableObject {
 
         do {
             _ = try await account.createEmailPasswordSession(email: email, password: password)
+            await UserDataManager.shared.syncAfterLogin()
         } catch {
             lastErrorMessage = error.localizedDescription
             throw error
@@ -69,6 +70,8 @@ final class AuthService: ObservableObject {
                 // Keep auth successful even if profile persistence is misconfigured.
                 print("Auth profile save failed: \(error.localizedDescription)")
             }
+
+            await UserDataManager.shared.syncAfterLogin()
         } catch {
             lastErrorMessage = error.localizedDescription
             throw error
@@ -91,6 +94,20 @@ final class AuthService: ObservableObject {
             default:
                 throw AuthServiceError.unsupportedOAuthProvider(provider)
             }
+
+            do {
+                let currentUser = try await account.get()
+                try await AuthDatabaseService.shared.upsertUserProfile(
+                    userId: currentUser.id,
+                    email: currentUser.email,
+                    name: currentUser.name,
+                    provider: provider.lowercased()
+                )
+            } catch {
+                print("OAuth profile save failed: \(error.localizedDescription)")
+            }
+
+            await UserDataManager.shared.syncAfterLogin()
         } catch {
             lastErrorMessage = error.localizedDescription
             throw error

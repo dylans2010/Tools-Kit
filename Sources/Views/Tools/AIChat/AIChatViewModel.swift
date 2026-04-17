@@ -15,6 +15,7 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
 
     private let registry = AIProviderRegistry.shared
     private let keyManager = APIKeyManager.shared
+    private let featureCheck = AIFeatureCheck.shared
     @MainActor private let modelCatalog = AIModelCatalog.shared
     private let historyKey = "ai_chat_history"
 
@@ -170,10 +171,6 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
             return
         }
         let providerID = settingsManager.settings.selectedProviderID
-        guard let key = keyManager.getKey(for: providerID) else {
-            error = "No API key saved for \(provider.name)."
-            return
-        }
 
         let userMessage = ChatMessage(role: "user", content: inputText)
         messages.append(userMessage)
@@ -197,6 +194,9 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
 
         Task {
             do {
+                let authorization = try await featureCheck.authorizeRequest(providerID: providerID)
+                let key = authorization.apiKey
+
                 let response: String
                 if !attachmentsToSend.isEmpty {
                     guard provider.supportsVision(model: model) else {
