@@ -1,6 +1,17 @@
 import Foundation
 import Appwrite
 
+enum AuthServiceError: LocalizedError {
+    case unsupportedOAuthProvider(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .unsupportedOAuthProvider(let provider):
+            return "Unsupported OAuth provider: \(provider)"
+        }
+    }
+}
+
 @MainActor
 final class AuthService: ObservableObject {
     static let shared = AuthService()
@@ -70,7 +81,19 @@ final class AuthService: ObservableObject {
         defer { isBusy = false }
 
         do {
-            _ = try await account.createOAuth2Session(provider: provider)
+            let oauthProvider: OAuthProvider
+            switch provider.lowercased() {
+            case "google":
+                oauthProvider = .google
+            case "github":
+                oauthProvider = .github
+            case "discord":
+                oauthProvider = .discord
+            default:
+                throw AuthServiceError.unsupportedOAuthProvider(provider)
+            }
+
+            _ = try await account.createOAuth2Session(provider: oauthProvider)
         } catch {
             lastErrorMessage = error.localizedDescription
             throw error
