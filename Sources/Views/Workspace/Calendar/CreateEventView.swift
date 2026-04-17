@@ -127,6 +127,7 @@ struct CreateEventView: View {
 }
 
 struct AISummarySheet: View {
+    @Environment(\.colorScheme) private var colorScheme
     let title: String
     let location: String
     let date: Date
@@ -140,63 +141,83 @@ struct AISummarySheet: View {
     @State private var copied = false
 
     var body: some View {
-        VStack(spacing: 20) {
-            HStack {
-                Image(systemName: "sparkles")
-                    .foregroundColor(.purple)
-                Text("Event Assistant")
-                    .font(.headline)
-                Spacer()
-            }
-            .padding(.top)
+        ZStack {
+            LinearGradient(
+                colors: colorScheme == .dark
+                    ? [Color(red: 0.10, green: 0.10, blue: 0.14), Color(red: 0.08, green: 0.08, blue: 0.12)]
+                    : [Color(red: 0.99, green: 0.98, blue: 1.0), Color(red: 0.95, green: 0.93, blue: 0.99)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
 
-            if isLoading {
-                Spacer()
-                ProgressView("Analyzing Event...")
-                Spacer()
-            } else {
-                ScrollView {
-                    Text(aiSummary)
+            VStack(spacing: 20) {
+                HStack {
+                    Image(systemName: "sparkles")
+                        .foregroundColor(.indigo)
+                    Text("Event Assistant")
+                        .font(.headline)
+                    Spacer()
+                }
+                .padding(.top)
+
+                if isLoading {
+                    Spacer()
+                    ProgressView("Analyzing Event...")
+                    Spacer()
+                } else {
+                    ScrollView {
+                        Group {
+                            if let parsed = try? AttributedString(markdown: aiSummary) {
+                                Text(parsed)
+                            } else {
+                                Text(aiSummary)
+                            }
+                        }
                         .font(.body)
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(RoundedRectangle(cornerRadius: 16).fill(Material.regular))
-                }
-
-                HStack(spacing: 12) {
-                    Button {
-                        UIPasteboard.general.string = aiSummary
-                        copied = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copied = false }
-                    } label: {
-                        Label(copied ? "Copied!" : "Copy Summary", systemImage: copied ? "checkmark" : "doc.on.doc")
                     }
-                    .buttonStyle(.bordered)
 
-                    Button {
-                        onUseAsDescription(aiSummary)
-                        dismiss()
-                    } label: {
-                        Text("Use as Description")
-                            .bold()
+                    HStack(spacing: 12) {
+                        Button {
+                            UIPasteboard.general.string = aiSummary
+                            copied = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copied = false }
+                        } label: {
+                            Label(copied ? "Copied!" : "Copy Summary", systemImage: copied ? "checkmark" : "doc.on.doc")
+                        }
+                        .buttonStyle(.bordered)
+
+                        Button {
+                            onUseAsDescription(aiSummary)
+                            dismiss()
+                        } label: {
+                            Text("Use as Description")
+                                .bold()
+                        }
+                        .buttonStyle(.borderedProminent)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .padding(.bottom)
                 }
-                .padding(.bottom)
             }
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
         .onAppear(perform: runAI)
     }
 
     private func runAI() {
         isLoading = true
         let prompt = """
-        Analyze this calendar event and provide:
-        1. A suggested improved description (2-3 sentences)
-        2. Any missing important details
-        3. Preparation suggestions based on the location and priority
-        4. A completeness score out of 10
+        Analyze this calendar event and provide concise markdown only.
+        Keep it short and practical.
+        Use exactly these sections:
+        ### Suggested Description
+        ### Missing Details
+        ### Preparation Checklist
+        ### Completeness Score
+        Use bullets where possible.
 
         Event Title: \(title)
         Location: \(location)
@@ -207,7 +228,10 @@ struct AISummarySheet: View {
 
         Task {
             do {
-                let result = try await AIService.shared.processText(prompt: prompt)
+                let result = try await AIService.shared.processText(
+                    prompt: prompt,
+                    systemPrompt: "You are a concise planning assistant. Return short markdown only."
+                )
                 await MainActor.run {
                     aiSummary = result
                     isLoading = false

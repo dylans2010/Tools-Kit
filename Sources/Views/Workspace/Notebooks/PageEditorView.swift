@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct PageEditorView: View {
+    @Environment(\.colorScheme) private var colorScheme
     let page: NotebookPage
     let folderID: UUID
     let notebookID: UUID
@@ -28,6 +29,15 @@ struct PageEditorView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
+            LinearGradient(
+                colors: colorScheme == .dark
+                    ? [Color(red: 0.08, green: 0.09, blue: 0.12), Color(red: 0.05, green: 0.06, blue: 0.10)]
+                    : [Color(red: 0.97, green: 0.98, blue: 1.0), Color(red: 0.93, green: 0.96, blue: 1.0)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
             VStack(alignment: .leading, spacing: 0) {
                 // Modern Title Field
                 TextField("Untitled", text: $title)
@@ -36,6 +46,11 @@ struct PageEditorView: View {
                     .padding(.horizontal)
                     .padding(.top, 20)
                     .onChange(of: title) { _ in scheduleAutosave() }
+
+                aiQuickActions
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                    .padding(.bottom, 4)
 
                 if isPreview {
                     ScrollView {
@@ -110,6 +125,8 @@ struct PageEditorView: View {
             Button("Rewrite Content") { runAI("Rewrite", "Rewrite and improve the following notes professionally:\n\n\(content)") }
             Button("Expand Notes") { runAI("Expand", "Expand and elaborate on these notes:\n\n\(content)") }
             Button("Generate Structure") { runAI("Structure", "Reorganize and structure these notes into a clear outline:\n\n\(content)") }
+            Button("Extract Action Items") { runAI("Action Items", "Extract action items from these notes. Return markdown checklist only:\n\n\(content)") }
+            Button("Create Study Guide") { runAI("Study Guide", "Turn these notes into a concise markdown study guide with key points and quiz questions:\n\n\(content)") }
             if !manager.integrations.filter(\.isEnabled).isEmpty {
                 Button("Use Integration…") { showingAI = false; showIntegrationPicker() }
             }
@@ -139,16 +156,40 @@ struct PageEditorView: View {
                 .padding()
             } else {
                 ScrollView {
-                    Text(aiResult)
+                    Group {
+                        if let parsed = try? AttributedString(markdown: aiResult) {
+                            Text(parsed)
+                        } else {
+                            Text(aiResult)
+                        }
+                    }
                         .font(.callout)
                         .lineSpacing(4)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .frame(maxHeight: 200)
+
+                HStack(spacing: 10) {
+                    Button {
+                        UIPasteboard.general.string = aiResult
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button {
+                        content += "\n\n" + aiResult
+                        scheduleAutosave()
+                    } label: {
+                        Label("Insert", systemImage: "plus.bubble")
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
             }
         }
         .padding()
         .background(
-            LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
+            LinearGradient(colors: [.indigo, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
         )
         .foregroundColor(.white)
         .cornerRadius(16)
@@ -180,6 +221,34 @@ struct PageEditorView: View {
         }
     }
 
+    private var aiQuickActions: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                quickActionChip("Summarize", icon: "sparkles") {
+                    runAI("Summarize", "Summarize these notes in concise markdown bullets:\n\n\(content)")
+                }
+                quickActionChip("Action Items", icon: "checklist") {
+                    runAI("Action Items", "Extract action items as markdown checklist only:\n\n\(content)")
+                }
+                quickActionChip("Structure", icon: "square.grid.2x2") {
+                    runAI("Structure", "Reorganize these notes into clear markdown sections:\n\n\(content)")
+                }
+            }
+            .padding(.vertical, 4)
+        }
+    }
+
+    private func quickActionChip(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: icon)
+                .font(.caption.weight(.semibold))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(Color.accentColor.opacity(0.14), in: Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
     private func insert(_ markdown: String) {
         content += markdown
     }
@@ -198,7 +267,10 @@ struct PageEditorView: View {
         aiResult = "Loading…"
         Task {
             do {
-                let result = try await AIService.shared.processText(prompt: prompt)
+                let result = try await AIService.shared.processText(
+                    prompt: prompt,
+                    systemPrompt: "You are a notebook copilot. Return concise markdown with clear headings and practical actions when relevant."
+                )
                 await MainActor.run { aiResult = result; aiLoading = false }
             } catch {
                 await MainActor.run { aiResult = "Error: \(error.localizedDescription)"; aiLoading = false }

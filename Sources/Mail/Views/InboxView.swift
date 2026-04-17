@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct InboxView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let account: MailAccount
     let folder: MailFolder
     var filter: InboxFilter = .all
@@ -14,18 +16,31 @@ struct InboxView: View {
     @State private var searchText = ""
     @State private var showingCompose = false
     @State private var prioritySummary: String?
+    @State private var priorityThreads: [MailThread] = []
+    @State private var showingPriorityEmails = false
     @State private var isPrioritizing = false
     @State private var catchUpSummary: String?
     @State private var isSummarizing = false
 
     var body: some View {
-        List {
-            syncStatusSection
-            syncErrorSection
-            lastSyncedSection
-            prioritySection
-            aiSummarySection
-            threadListSection
+        ZStack {
+            LinearGradient(
+                colors: colorScheme == .dark
+                    ? [Color(red: 0.08, green: 0.10, blue: 0.14), Color(red: 0.05, green: 0.08, blue: 0.11)]
+                    : [Color(red: 0.95, green: 0.98, blue: 1.0), Color(red: 0.90, green: 0.95, blue: 1.0)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            List {
+                prioritySection
+                aiSummarySection
+                syncStatusSection
+                syncErrorSection
+                lastSyncedSection
+                threadListSection
+            }
         }
         .navigationTitle(filter == .unread ? "Catch Up" : folder.name)
         .listStyle(.plain)
@@ -47,6 +62,11 @@ struct InboxView: View {
         }
         .sheet(isPresented: $showingCompose) {
             EmailComposingView(account: account)
+        }
+        .sheet(isPresented: $showingPriorityEmails) {
+            NavigationStack {
+                PriorityEmailListSheet(threads: priorityThreads)
+            }
         }
         .task {
             _ = storage.loadThreads(for: folderKey)
@@ -128,9 +148,32 @@ struct InboxView: View {
                     }
 
                     if let prioritySummary {
-                        Text(prioritySummary)
-                            .font(.subheadline)
-                            .lineSpacing(4)
+                        MailMarkdownBlock(markdown: prioritySummary)
+
+                        HStack(spacing: 10) {
+                            Button {
+                                showingPriorityEmails = true
+                            } label: {
+                                Label(
+                                    "View Priority Emails (\(priorityThreads.count))",
+                                    systemImage: "tray.full"
+                                )
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .font(.subheadline.weight(.semibold))
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(priorityThreads.isEmpty)
+
+                            Button {
+                                runPriorityBrief()
+                            } label: {
+                                Image(systemName: "arrow.clockwise")
+                                    .frame(width: 38, height: 38)
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(isPrioritizing)
+                        }
                     } else {
                         Button(action: runPriorityBrief) {
                             Label(isPrioritizing ? "Analyzing unread mail..." : "Analyze unread mail", systemImage: "sparkles")
@@ -149,7 +192,7 @@ struct InboxView: View {
                 .padding()
                 .background(
                     RoundedRectangle(cornerRadius: 18)
-                        .fill(Color.blue.opacity(0.08))
+                        .fill(colorScheme == .dark ? Color.white.opacity(0.06) : Color.blue.opacity(0.08))
                         .overlay(
                             RoundedRectangle(cornerRadius: 18)
                                 .stroke(Color.blue.opacity(0.15), lineWidth: 1)
@@ -163,7 +206,8 @@ struct InboxView: View {
 
     @ViewBuilder
     private var aiSummarySection: some View {
-        if let summary = catchUpSummary {
+        let unreadCount = storage.threads.filter { !$0.isRead }.count
+        if unreadCount > 0 {
             Section {
                 VStack(alignment: .leading, spacing: 10) {
                     HStack {
@@ -172,16 +216,38 @@ struct InboxView: View {
                         Text("Catch Up Summary")
                             .font(.headline)
                             .foregroundColor(.blue)
+                        Spacer()
+                        Button {
+                            runCatchUp()
+                        } label: {
+                            Image(systemName: "arrow.clockwise")
+                                .font(.caption.bold())
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isSummarizing)
                     }
 
-                    Text(summary)
-                        .font(.subheadline)
-                        .lineSpacing(4)
+                    if let summary = catchUpSummary {
+                        MailMarkdownBlock(markdown: summary)
+                    } else {
+                        Button(action: runCatchUp) {
+                            Label(isSummarizing ? "Generating summary..." : "Generate catch-up summary", systemImage: "wand.and.stars")
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .foregroundColor(.white)
+                                .background(
+                                    LinearGradient(colors: [.blue, .cyan], startPoint: .leading, endPoint: .trailing),
+                                    in: RoundedRectangle(cornerRadius: 12)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isSummarizing)
+                    }
                 }
                 .padding()
                 .background(
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.blue.opacity(0.08))
+                        .fill(colorScheme == .dark ? Color.white.opacity(0.06) : Color.blue.opacity(0.08))
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
                                 .stroke(LinearGradient(colors: [.blue, .cyan], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
@@ -330,14 +396,24 @@ struct InboxView: View {
         isPrioritizing = true
         Task {
             do {
-                let summary = try await MailAIService.shared.priorityBrief(unreadThreads: storage.threads.filter { !$0.isRead })
+                let unreadThreads = storage.threads.filter { !$0.isRead }
+                let digest = try await MailAIService.shared.priorityDigest(unreadThreads: unreadThreads)
+                let idLookup = Dictionary(uniqueKeysWithValues: digest.priorityThreadIDs.enumerated().map { ($0.element, $0.offset) })
+                let rankedPriorityThreads = unreadThreads
+                    .filter { idLookup[$0.id] != nil }
+                    .sorted { (lhs, rhs) in
+                        (idLookup[lhs.id] ?? Int.max) < (idLookup[rhs.id] ?? Int.max)
+                    }
+
                 await MainActor.run {
-                    self.prioritySummary = summary
+                    self.prioritySummary = digest.summaryMarkdown
+                    self.priorityThreads = rankedPriorityThreads
                     self.isPrioritizing = false
                 }
             } catch {
                 await MainActor.run {
                     self.prioritySummary = "Unable to generate a priority brief right now."
+                    self.priorityThreads = []
                     self.isPrioritizing = false
                 }
             }
@@ -355,6 +431,73 @@ struct InboxView: View {
     private func fallbackUID(from string: String) -> Int {
         let value = string.hashValue
         return value == Int.min ? 0 : abs(value)
+    }
+}
+
+private struct MailMarkdownBlock: View {
+    let markdown: String
+
+    var body: some View {
+        Group {
+            if let parsed = try? AttributedString(markdown: markdown) {
+                Text(parsed)
+            } else {
+                Text(markdown)
+            }
+        }
+        .font(.subheadline)
+        .lineSpacing(4)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private struct PriorityEmailListSheet: View {
+    let threads: [MailThread]
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        List {
+            if threads.isEmpty {
+                VStack(spacing: 10) {
+                    Image(systemName: "tray")
+                        .font(.title2)
+                        .foregroundColor(.secondary)
+                    Text("No priority emails identified")
+                        .font(.headline)
+                    Text("Run Analyze unread mail to generate a fresh priority list.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 24)
+                .listRowBackground(Color.clear)
+            } else {
+                ForEach(threads) { thread in
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(thread.subject)
+                            .font(.headline)
+                            .lineLimit(2)
+
+                        Text(thread.participants.first ?? "Unknown sender")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+
+                        Text(thread.snippet.isEmpty ? "No preview available" : thread.snippet)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .lineLimit(3)
+                    }
+                    .padding(.vertical, 6)
+                }
+            }
+        }
+        .navigationTitle("Priority Emails")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Done") { dismiss() }
+            }
+        }
     }
 }
 

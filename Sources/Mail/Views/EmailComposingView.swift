@@ -5,6 +5,7 @@ import UniformTypeIdentifiers
 // MARK: - Main Composer View
 
 struct EmailComposingView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) var dismiss
     let account: MailAccount
     var replyTo: MailMessage? = nil
@@ -28,7 +29,9 @@ struct EmailComposingView: View {
         NavigationStack {
             ZStack {
                 LinearGradient(
-                    colors: [Color(red: 0.97, green: 0.99, blue: 1.0), Color(red: 0.90, green: 0.95, blue: 1.0)],
+                    colors: colorScheme == .dark
+                        ? [Color(red: 0.08, green: 0.11, blue: 0.16), Color(red: 0.06, green: 0.08, blue: 0.13)]
+                        : [Color(red: 0.97, green: 0.99, blue: 1.0), Color(red: 0.90, green: 0.95, blue: 1.0)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -217,12 +220,12 @@ struct EmailComposingView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 22)
-                .fill(.white.opacity(0.88))
+                .fill(colorScheme == .dark ? Color.white.opacity(0.06) : Color.white.opacity(0.88))
                 .overlay(
                     RoundedRectangle(cornerRadius: 22)
-                        .stroke(Color.blue.opacity(0.14), lineWidth: 1)
+                        .stroke(colorScheme == .dark ? Color.white.opacity(0.10) : Color.blue.opacity(0.14), lineWidth: 1)
                 )
-                .shadow(color: Color.blue.opacity(0.08), radius: 18, x: 0, y: 8)
+                .shadow(color: colorScheme == .dark ? Color.black.opacity(0.35) : Color.blue.opacity(0.08), radius: 18, x: 0, y: 8)
         )
     }
 
@@ -602,7 +605,7 @@ struct AIComposerPanel: View {
             }
         }
         .modifier(AIComposerPresentationBackground())
-        .presentationDetents([.medium])
+        .presentationDetents([.medium, .large])
         .presentationDragIndicator(.hidden)
     }
 
@@ -660,7 +663,13 @@ struct AIComposerPanel: View {
     private func resultArea(_ text: String) -> some View {
         VStack(spacing: 10) {
             ScrollView {
-                Text(text)
+                Group {
+                    if let parsed = try? AttributedString(markdown: text) {
+                        Text(parsed)
+                    } else {
+                        Text(text)
+                    }
+                }
                     .font(.callout)
                     .foregroundColor(.primary)
                     .frame(maxWidth: .infinity, alignment: .leading)
