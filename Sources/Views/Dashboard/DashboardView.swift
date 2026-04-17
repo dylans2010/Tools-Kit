@@ -151,9 +151,7 @@ struct DashboardView: View {
 
     private var sendPingCard: some View {
         Button {
-            Task {
-                _ = try? await client.ping()
-            }
+            // TODO: wire up a networking client for ping behavior.
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: "antenna.radiowaves.left.and.right")

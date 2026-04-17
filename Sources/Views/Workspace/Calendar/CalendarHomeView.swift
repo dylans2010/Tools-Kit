@@ -12,61 +12,67 @@ struct CalendarHomeView: View {
     @State private var isGeneratingDigest = false
     var body: some View {
         VStack(spacing: 0) {
-        ZStack {
-            LinearGradient(
-                colors: colorScheme == .dark
-                    ? [Color(red: 0.07, green: 0.10, blue: 0.12), Color(red: 0.05, green: 0.07, blue: 0.10)]
-                    : [Color(red: 0.97, green: 1.0, blue: 0.98), Color(red: 0.93, green: 0.98, blue: 0.95)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+            ZStack {
+                LinearGradient(
+                    colors: colorScheme == .dark
+                        ? [Color(red: 0.07, green: 0.10, blue: 0.12), Color(red: 0.05, green: 0.07, blue: 0.10)]
+                        : [Color(red: 0.97, green: 1.0, blue: 0.98), Color(red: 0.93, green: 0.98, blue: 0.95)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                CalendarHeaderView(selectedDate: $selectedDate, selectedView: $selectedView) {
-                    showingCreate = true
-                } onToday: {
-                    withAnimation { selectedDate = Date(); selectedView = .today }
-                }
-
-                aiPlannerCard
-                    .padding(.horizontal)
-                    .padding(.bottom, 8)
-
-                CalendarModeSelector(selectedMode: $selectedView)
-                    .padding(.horizontal)
-                    .padding(.bottom, 8)
-
-                Divider()
-            Group {
-                Group {
-                    switch selectedView {
-                    case .month:
-                        CalendarMonthView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
-                    case .week:
-                        CalendarWeekView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
-                    case .year:
-                        CalendarYearView(selectedDate: $selectedDate, selectedView: $selectedView)
-                    case .agenda:
-                        CalendarAgendaView(selectedEvent: $selectedEvent)
-                    case .today:
-                        CalendarTodayView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
+                VStack(spacing: 0) {
+                    CalendarHeaderView(selectedDate: $selectedDate, selectedView: $selectedView) {
+                        showingCreate = true
+                    } onToday: {
+                        withAnimation {
+                            selectedDate = Date()
+                            selectedView = .today
+                        }
                     }
+
+                    aiPlannerCard
+                        .padding(.horizontal)
+                        .padding(.bottom, 8)
+
+                    CalendarModeSelector(selectedMode: $selectedView)
+                        .padding(.horizontal)
+                        .padding(.bottom, 8)
+
+                    Divider()
+
+                    Group {
+                        switch selectedView {
+                        case .month:
+                            CalendarMonthView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
+                        case .week:
+                            CalendarWeekView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
+                        case .year:
+                            CalendarYearView(selectedDate: $selectedDate, selectedView: $selectedView)
+                        case .agenda:
+                            CalendarAgendaView(selectedEvent: $selectedEvent)
+                        case .today:
+                            CalendarTodayView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .animation(.spring(response: 0.35, dampingFraction: 0.75), value: selectedView)
+                    .onAppear(perform: generateAIDigest)
+                }
             }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .animation(.spring(response: 0.35, dampingFraction: 0.75), value: selectedView)
-                .onAppear(perform: generateAIDigest)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .sheet(item: $selectedEvent) { event in
+            NavigationStack {
+                EventDetailView(event: event)
+            }
+        }
         .sheet(isPresented: $showingCreate) {
             NavigationStack {
                 CreateEventView(prefilledDate: selectedDate) { event in
                     manager.addEvent(event)
                 }
-            }
-        }
-        .sheet(item: $selectedEvent) { event in
-            NavigationStack {
-                EventDetailView(event: event)
             }
         }
     }
