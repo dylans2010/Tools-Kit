@@ -106,16 +106,16 @@ final class NutritionAIService {
         var merged = items
         guard let imageData, !imageData.isEmpty else { return merged }
 
-        let signatures: [(mod: Int, item: DetectedFoodItem)] = [
-            (3, DetectedFoodItem(name: "grilled protein", category: .protein, portionDescription: "palm-size", estimatedCalories: 220)),
-            (5, DetectedFoodItem(name: "rice or grains", category: .carbs, portionDescription: "1 cup", estimatedCalories: 210)),
-            (7, DetectedFoodItem(name: "mixed vegetables", category: .vegetables, portionDescription: "1 cup", estimatedCalories: 80)),
-            (11, DetectedFoodItem(name: "beverage", category: .drinks, portionDescription: "1 glass", estimatedCalories: 90))
+        let defaults: [DetectedFoodItem] = [
+            DetectedFoodItem(name: "grilled protein", category: .protein, portionDescription: "palm-size", estimatedCalories: 220),
+            DetectedFoodItem(name: "rice or grains", category: .carbs, portionDescription: "1 cup", estimatedCalories: 210),
+            DetectedFoodItem(name: "mixed vegetables", category: .vegetables, portionDescription: "1 cup", estimatedCalories: 80),
+            DetectedFoodItem(name: "hydration drink", category: .drinks, portionDescription: "1 glass", estimatedCalories: 20)
         ]
 
-        for signature in signatures where imageData.count % signature.mod == 0 {
-            if !merged.contains(where: { $0.category == signature.item.category }) {
-                merged.append(signature.item)
+        for fallback in defaults {
+            if !merged.contains(where: { $0.category == fallback.category }) {
+                merged.append(fallback)
             }
         }
 

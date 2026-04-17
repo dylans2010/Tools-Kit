@@ -25,7 +25,6 @@ struct StreakModel: Codable {
         let calendar = Calendar.current
         if let lastWorkoutDate {
             if calendar.isDate(lastWorkoutDate, inSameDayAs: date) {
-                markCompletion(for: date, completed: true)
                 return
             }
             if let expectedNextDay = calendar.date(byAdding: .day, value: 1, to: lastWorkoutDate),

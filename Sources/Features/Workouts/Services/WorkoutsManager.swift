@@ -98,6 +98,7 @@ final class WorkoutsManager: ObservableObject {
     private let mentorMemoryStore = AIMentorMemoryStore()
     private let coachService = WorkoutCoachService()
     private let mealPlanningService = MealPlanningService()
+    private let volumeNormalizationFactor: Double = 120.0
 
     private let calendar = Calendar.current
 
@@ -311,7 +312,7 @@ final class WorkoutsManager: ObservableObject {
         )
         workoutSessions.insert(session, at: 0)
 
-        let strengthScore = min(max(session.totalVolume / 120.0, 0), 100)
+        let strengthScore = min(max(session.totalVolume / volumeNormalizationFactor, 0), 100)
         let consistencyScore = min(Double(streak.currentDays) * 5, 100)
         let missed = estimatedMissedSessionsLast14Days()
 

@@ -14,7 +14,8 @@ final class WorkoutCoachService {
     ) -> CoachingGuidance {
         let missedSessions = recentPerformance.last?.missedSessions ?? 0
         let fatigue = recentPerformance.last?.fatigueLevel ?? 3
-        let recentAverageFatigue = recentSessions.prefix(5).map(\.fatigueLevel).reduce(0, +) / max(recentSessions.prefix(5).count, 1)
+        let fatigueWindow = recentSessions.prefix(5)
+        let recentAverageFatigue = Int((Double(fatigueWindow.map(\.fatigueLevel).reduce(0, +)) / Double(max(fatigueWindow.count, 1))).rounded())
 
         var score = 75
         score -= missedSessions * 8
