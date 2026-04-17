@@ -1,254 +1,199 @@
 import SwiftUI
 
 struct WorkoutsHomeView: View {
+    enum Tab: String, CaseIterable, Identifiable {
+        case dashboard
+        case plan
+        case nutrition
+        case health
+
+        var id: String { rawValue }
+
+        var title: String {
+            switch self {
+            case .dashboard: return "Home"
+            case .plan: return "Plan"
+            case .nutrition: return "Nutrition"
+            case .health: return "Health"
+            }
+        }
+
+        var symbol: String {
+            switch self {
+            case .dashboard: return "house.fill"
+            case .plan: return "figure.strengthtraining.functional"
+            case .nutrition: return "fork.knife.circle.fill"
+            case .health: return "heart.text.square.fill"
+            }
+        }
+    }
+
     @StateObject private var manager = WorkoutsManager.shared
+    @State private var selectedTab: Tab = .dashboard
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if manager.isOnboardingComplete {
-                    workoutsDashboard
-                } else {
-                    OnboardWorkoutView()
-                }
-            }
-            .navigationTitle("Workouts")
-            .toolbar {
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    NavigationLink {
-                        AIMentorView()
-                    } label: {
-                        Image(systemName: "sparkles")
-                    }
+        Group {
+            if manager.isOnboardingComplete {
+                TabView(selection: $selectedTab) {
+                    NavigationStack { dashboardRoot }
+                        .tag(Tab.dashboard)
+                        .tabItem { Label(Tab.dashboard.title, systemImage: Tab.dashboard.symbol) }
 
-                    NavigationLink {
-                        WorkoutsSettingsView()
-                    } label: {
-                        Image(systemName: "gearshape.fill")
-                    }
+                    NavigationStack { WorkoutPlanView() }
+                        .tag(Tab.plan)
+                        .tabItem { Label(Tab.plan.title, systemImage: Tab.plan.symbol) }
+
+                    NavigationStack { NutritionView() }
+                        .tag(Tab.nutrition)
+                        .tabItem { Label(Tab.nutrition.title, systemImage: Tab.nutrition.symbol) }
+
+                    NavigationStack { HealthDataView() }
+                        .tag(Tab.health)
+                        .tabItem { Label(Tab.health.title, systemImage: Tab.health.symbol) }
+                }
+            } else {
+                NavigationStack {
+                    OnboardWorkoutView()
+                        .navigationTitle("Workout Setup")
                 }
             }
         }
     }
 
-    private var workoutsDashboard: some View {
+    private var dashboardRoot: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
-                headerSection
-                mentorSection
-                todayPlanSection
-                loggingSection
-                streaksBadgesSection
-                nutritionSection
-                progressSection
+            VStack(alignment: .leading, spacing: 16) {
+                summaryHero
+                quickActions
+                quickLink("AI Mentor", subtitle: "Coaching, fatigue and recovery advice", symbol: "sparkles") { AIMentorView() }
+                quickLink("Progress", subtitle: "Bodyweight and consistency trends", symbol: "chart.xyaxis.line") { WorkoutProgressDashboardView() }
+                quickLink("Meal Planning", subtitle: "Personalized meals + groceries", symbol: "list.bullet.rectangle") { MealPlanView() }
+                quickLink("Badges", subtitle: "Track your achievements", symbol: "rosette") { BadgesView() }
+                quickLink("Settings", subtitle: "Goals, reminders and syncing", symbol: "gearshape.2.fill") { WorkoutsSettingsView() }
             }
             .padding()
         }
         .background(Color(.systemGroupedBackground))
+        .navigationTitle("Workouts")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink {
+                    AIMentorView()
+                } label: {
+                    Image(systemName: "sparkles.rectangle.stack")
+                }
+            }
+        }
     }
 
-    private var headerSection: some View {
+    private var summaryHero: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Welcome back")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+            HStack {
+                Label("Today", systemImage: "sun.max.fill")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text("Streak \(manager.streak.currentDays)d")
+                    .font(.caption.bold())
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(.orange.opacity(0.15), in: Capsule())
+            }
+
             Text(todaySummary)
-                .font(.title3.bold())
-        }
-    }
+                .font(.title3.weight(.semibold))
 
-    private var mentorSection: some View {
-        NavigationLink {
-            AIMentorView()
-        } label: {
-            sectionCard(
-                title: "AI Mentor",
-                subtitle: "Adaptive coaching, meal analysis, and recovery guidance",
-                icon: "sparkles"
-            )
-        }
-        .buttonStyle(.plain)
-    }
-
-    private var todayPlanSection: some View {
-        NavigationLink {
-            WorkoutPlanView()
-        } label: {
-            sectionCard(
-                title: "Today's AI Workout Plan",
-                subtitle: manager.todayWorkout?.title ?? "Generate your first AI workout",
-                icon: "figure.strengthtraining.traditional"
-            )
-        }
-        .buttonStyle(.plain)
-    }
-
-    private var loggingSection: some View {
-        VStack(spacing: 10) {
-            NavigationLink {
-                WorkoutLoggingView()
-            } label: {
-                sectionCard(
-                    title: "Workout Logging",
-                    subtitle: "Track sets, reps, load, duration",
-                    icon: "list.bullet.clipboard"
-                )
+            HStack(spacing: 12) {
+                HomeStatPill(title: "Calories", value: "\(manager.nutrition.caloriesConsumed)", subtitle: "consumed", symbol: "flame.fill")
+                HomeStatPill(title: "Workouts", value: "\(manager.progress.last?.workoutsCompleted ?? 0)", subtitle: "today", symbol: "figure.run")
+                HomeStatPill(title: "Badges", value: "\(manager.badges.filter(\.isUnlocked).count)", subtitle: "unlocked", symbol: "rosette")
             }
-            .buttonStyle(.plain)
-
-            NavigationLink {
-                LiveWorkoutView()
-            } label: {
-                sectionCard(
-                    title: "Live Workout",
-                    subtitle: "Timer, rest tracking, heart rate",
-                    icon: "timer"
-                )
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    private var streaksBadgesSection: some View {
-        VStack(spacing: 10) {
-            NavigationLink {
-                StreaksView()
-            } label: {
-                sectionCard(
-                    title: "Streaks",
-                    subtitle: "\(manager.streak.currentDays)-day streak · best \(manager.streak.longestDays)",
-                    icon: "flame.fill"
-                )
-            }
-            .buttonStyle(.plain)
-
-            NavigationLink {
-                BadgesView()
-            } label: {
-                sectionCard(
-                    title: "Badges",
-                    subtitle: "\(manager.badges.filter(\.isUnlocked).count)/\(manager.badges.count) unlocked",
-                    icon: "medal.fill"
-                )
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    private var nutritionSection: some View {
-        VStack(spacing: 10) {
-            NavigationLink {
-                NutritionView()
-            } label: {
-                sectionCard(
-                    title: "Nutrition Summary",
-                    subtitle: "\(manager.nutrition.caloriesConsumed)/\(manager.nutrition.calorieGoal) calories",
-                    icon: "fork.knife"
-                )
-            }
-            .buttonStyle(.plain)
-
-            HStack(spacing: 10) {
-                shortcutLink(title: "Scan", icon: "camera.viewfinder") { MealScannerView() }
-                shortcutLink(title: "Voice", icon: "mic.fill") { MealVoiceLoggingView() }
-                shortcutLink(title: "Manual", icon: "square.and.pencil") { NutritionView() }
-            }
-        }
-    }
-
-    private var progressSection: some View {
-        VStack(spacing: 10) {
-            NavigationLink {
-                WorkoutProgressDashboardView()
-            } label: {
-                sectionCard(
-                    title: "Progress Overview",
-                    subtitle: "Weight, consistency, and calories charts",
-                    icon: "chart.line.uptrend.xyaxis"
-                )
-            }
-            .buttonStyle(.plain)
-
-            NavigationLink {
-                AnalyticsView()
-            } label: {
-                sectionCard(
-                    title: "Advanced Analytics",
-                    subtitle: "Strength trends, insights, and goal alignment",
-                    icon: "chart.bar.xaxis"
-                )
-            }
-            .buttonStyle(.plain)
-
-            NavigationLink {
-                MealPlanView()
-            } label: {
-                sectionCard(
-                    title: "Meal Planning",
-                    subtitle: "Daily/weekly plans with auto grocery lists",
-                    icon: "list.bullet.rectangle.portrait"
-                )
-            }
-            .buttonStyle(.plain)
-
-            NavigationLink {
-                HealthDataView()
-            } label: {
-                sectionCard(
-                    title: "Apple Health Data",
-                    subtitle: "Steps, calories, workouts, weight, heart rate",
-                    icon: "heart.text.square.fill"
-                )
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    private func sectionCard(title: String, subtitle: String, icon: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundColor(.accentColor)
-                .frame(width: 32)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.headline)
-                    .foregroundColor(.primary)
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            Spacer()
-            Image(systemName: "chevron.right")
-                .foregroundColor(.secondary)
         }
         .padding()
-        .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(14)
+        .background(
+            LinearGradient(colors: [.blue.opacity(0.12), .mint.opacity(0.18)], startPoint: .topLeading, endPoint: .bottomTrailing),
+            in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+        )
     }
 
-    private func shortcutLink<Destination: View>(title: String, icon: String, @ViewBuilder destination: () -> Destination) -> some View {
+    private var quickActions: some View {
+        HStack(spacing: 10) {
+            quickIcon("Scan", symbol: "camera.viewfinder") { MealScannerView() }
+            quickIcon("Voice", symbol: "waveform.badge.mic") { MealVoiceLoggingView() }
+            quickIcon("Live", symbol: "timer") { LiveWorkoutView() }
+            quickIcon("Log", symbol: "checklist") { WorkoutLoggingView() }
+        }
+    }
+
+    private func quickIcon<Destination: View>(_ title: String, symbol: String, @ViewBuilder destination: @escaping () -> Destination) -> some View {
         NavigationLink(destination: destination()) {
-            VStack(spacing: 6) {
-                Image(systemName: icon)
+            VStack(spacing: 8) {
+                Image(systemName: symbol)
                     .font(.headline)
+                    .frame(width: 34, height: 34)
+                    .background(.thinMaterial, in: Circle())
                 Text(title)
-                    .font(.caption)
+                    .font(.caption2.bold())
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 10)
-            .background(Color(.secondarySystemGroupedBackground))
-            .cornerRadius(10)
+            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func quickLink<Destination: View>(_ title: String, subtitle: String, symbol: String, @ViewBuilder destination: @escaping () -> Destination) -> some View {
+        NavigationLink(destination: destination()) {
+            HStack(spacing: 12) {
+                Image(systemName: symbol)
+                    .font(.title3)
+                    .foregroundStyle(.accent)
+                    .frame(width: 30)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.headline)
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(12)
+            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
         .buttonStyle(.plain)
     }
 
     private var todaySummary: String {
         guard let workout = manager.todayWorkout else {
-            return "Let's generate your first workout."
+            return "Your AI planner is ready to create your first personalized workout."
         }
-
         let done = workout.exercises.filter(\.isCompleted).count
-        return "Today's summary: \(done)/\(workout.exercises.count) exercises complete"
+        return "\(done)/\(workout.exercises.count) exercises complete • \(workout.estimatedDurationMinutes) min planned"
+    }
+}
+
+private struct HomeStatPill: View {
+    let title: String
+    let value: String
+    let subtitle: String
+    let symbol: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Label(title, systemImage: symbol)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.headline)
+            Text(subtitle)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }

@@ -91,6 +91,7 @@ final class WorkoutsManager: ObservableObject {
     @Published var liveHeartRate: Double
 
     private let workoutAIService = WorkoutAIService()
+    private let aiWorkoutPlanner = AIWorkoutPlanner()
     private let nutritionAIService = NutritionAIService()
     private let healthKitManager = HealthKitManager()
     private let exportService = DataExportService()
@@ -196,6 +197,20 @@ final class WorkoutsManager: ObservableObject {
         )
         generated.notes += " \(guidance.note) Recovery score: \(guidance.recovery.score)."
         todayWorkout = generated
+
+        Task { @MainActor in
+            let userPlan = await aiWorkoutPlanner.generatePlan(
+                profile: profile,
+                progress: self.progress,
+                streak: self.streak,
+                nutrition: self.nutrition,
+                previousWorkout: self.todayWorkout
+            )
+            var final = userPlan.workoutModel
+            final.notes += " \(guidance.note) Recovery score: \(guidance.recovery.score)."
+            self.todayWorkout = final
+            self.save()
+        }
         save()
     }
 

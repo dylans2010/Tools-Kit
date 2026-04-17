@@ -87,4 +87,94 @@ class AIService {
     func generateResponse(prompt: String) async throws -> String {
         return try await processText(prompt: prompt)
     }
+
+
+    @MainActor
+    func generateStructuredJSON(
+        prompt: String,
+        jsonSchema: String,
+        preferredModel: String? = nil,
+        systemPrompt: String = "You are a precise assistant that returns valid JSON only."
+    ) async throws -> String {
+        let decoratedPrompt = """
+        Return ONLY JSON that strictly follows this schema:
+        \(jsonSchema)
+
+        User task:
+        \(prompt)
+        """
+
+        let response = try await processText(
+            prompt: decoratedPrompt,
+            systemPrompt: systemPrompt,
+            model: preferredModel
+        )
+        return normalizeJSONObject(from: response)
+    }
+
+    func processWithOpenRouter(
+        prompt: String,
+        modelID: String,
+        responseSchema: String? = nil
+    ) async throws -> String {
+        guard let apiKey = ProcessInfo.processInfo.environment["OPENROUTER_API_KEY"] else {
+            throw AIError.missingAPIKey
+        }
+
+        let url = URL(string: "https://openrouter.ai/api/v1/chat/completions")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+
+        var payload: [String: Any] = [
+            "model": modelID,
+            "messages": [
+                ["role": "system", "content": "Return clear, safe answers. If schema is supplied, output JSON only."],
+                ["role": "user", "content": prompt]
+            ]
+        ]
+
+        if let responseSchema {
+            payload["response_format"] = [
+                "type": "json_schema",
+                "json_schema": [
+                    "name": "strict_response",
+                    "strict": true,
+                    "schema": (try? JSONSerialization.jsonObject(with: Data(responseSchema.utf8))) ?? [:]
+                ]
+            ]
+        }
+
+        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+            let message = String(data: data, encoding: .utf8) ?? "Unknown OpenRouter error"
+            throw AIError.networkError(message)
+        }
+
+        guard
+            let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+            let choices = root["choices"] as? [[String: Any]],
+            let message = choices.first?["message"] as? [String: Any],
+            let content = message["content"] as? String
+        else {
+            throw AIError.invalidResponse
+        }
+
+        return normalizeJSONObject(from: content)
+    }
+
+    private func normalizeJSONObject(from response: String) -> String {
+        let trimmed = response.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.hasPrefix("```") {
+            let cleaned = trimmed
+                .replacingOccurrences(of: "```json", with: "")
+                .replacingOccurrences(of: "```", with: "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            return cleaned
+        }
+        return trimmed
+    }
 }
