@@ -155,7 +155,7 @@ struct DashboardView: View {
             Button {
                 Task {
                     do {
-                        try await AppwriteClient.shared.ping()
+                        _ = try await client.ping()
                         await MainActor.run {
                             pingStatusMessage = "Appwrite ping succeeded"
                         }

@@ -3,10 +3,10 @@
 <plist version="1.0">
 <dict>
     <key>APPWRITE_PROJECT_ID</key>
-    <string>my-project-id</string>
+    <string>69e24c32003548ff0e2e</string>
     <key>APPWRITE_PROJECT_NAME</key>
-    <string>My project name</string>
+    <string>Toolskit</string>
     <key>APPWRITE_PUBLIC_ENDPOINT</key>
-    <string>https://cloud.appwrite.io/v1</string>
+    <string>https://fra.cloud.appwrite.io/v1</string>
 </dict>
 </plist>

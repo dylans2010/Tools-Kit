@@ -1668,6 +1668,7 @@
 			name = Tools-Kit;
 			packageProductDependencies = (
 				MC0200000000000000000001 /* MailCore2 */,
+				AW0200000000000000000001 /* Appwrite */,
 				ZF0000000000000000000002 /* ZIPFoundation */,
 			);
 			productName = Tools-Kit;
@@ -1700,6 +1701,7 @@
 			projectRoot = "";
 			packageReferences = (
 				MC0100000000000000000001 /* XCRemoteSwiftPackageReference "mailcore2" */,
+				AW0100000000000000000001 /* XCRemoteSwiftPackageReference "sdk-for-apple" */,
 				ZF0000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 			);
 			targets = (
@@ -2459,6 +2461,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		AW0100000000000000000001 /* XCRemoteSwiftPackageReference "sdk-for-apple" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/appwrite/sdk-for-apple";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 16.1.0;
+			};
+		};
 		MC0100000000000000000001 /* XCRemoteSwiftPackageReference "mailcore2" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/MailCore/mailcore2";
@@ -2478,6 +2488,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		AW0200000000000000000001 /* Appwrite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AW0100000000000000000001 /* XCRemoteSwiftPackageReference "sdk-for-apple" */;
+			productName = Appwrite;
+		};
 		MC0200000000000000000001 /* MailCore2 */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = MC0100000000000000000001 /* XCRemoteSwiftPackageReference "mailcore2" */;
