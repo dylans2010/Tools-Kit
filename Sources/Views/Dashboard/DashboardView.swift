@@ -9,6 +9,7 @@ struct DashboardView: View {
     @State private var searchText = ""
     @State private var selectedCategory: ToolCategory? = nil
     @State private var showSettings = false
+    @State private var pingStatusMessage = ""
 
     private let columns = [GridItem(.adaptive(minimum: 160), spacing: 14)]
 
@@ -150,18 +151,37 @@ struct DashboardView: View {
     }
 
     private var sendPingCard: some View {
-        Button {
-            // TODO: wire up a networking client for ping behavior.
-        } label: {
-            HStack(spacing: 10) {
-                Image(systemName: "antenna.radiowaves.left.and.right")
-                Text("Send a ping")
-                    .fontWeight(.semibold)
+        VStack(alignment: .leading, spacing: 8) {
+            Button {
+                Task {
+                    do {
+                        try await AppwriteClient.shared.ping()
+                        await MainActor.run {
+                            pingStatusMessage = "Appwrite ping succeeded"
+                        }
+                    } catch {
+                        await MainActor.run {
+                            pingStatusMessage = "Appwrite ping failed"
+                        }
+                    }
+                }
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "antenna.radiowaves.left.and.right")
+                    Text("Send a ping")
+                        .fontWeight(.semibold)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
+            .buttonStyle(.borderedProminent)
+
+            if !pingStatusMessage.isEmpty {
+                Text(pingStatusMessage)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
         }
-        .buttonStyle(.borderedProminent)
         .padding(.horizontal)
     }
 
