@@ -281,7 +281,7 @@ struct AIChatSettingsView: View {
     // MARK: - App Mode Section
 
     private var appModeSection: some View {
-        Section("Turn ToolsKit Into") {
+        Section {
             Picker("Mode", selection: selectedAppMode) {
                 ForEach(AppMode.allCases) { mode in
                     Label(mode.title, systemImage: mode.icon)
@@ -310,6 +310,8 @@ struct AIChatSettingsView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+        } header: {
+            Text("Turn ToolsKit Into")
         } footer: {
             Text("Choose the launch experience for ToolsKit. Only one mode can be active at a time.")
                 .font(.caption)
