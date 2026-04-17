@@ -4,7 +4,8 @@ import Appwrite
 final class UserDataManager {
     static let shared = UserDataManager()
 
-    private let databases = Databases(client)
+    private let databases = Databases(AppwriteService.client)
+    private let appwriteAccount = AppwriteService.account
 
     private let databaseId: String?
     private let collectionId: String?
@@ -31,7 +32,7 @@ final class UserDataManager {
     func uploadCurrentUserData() async throws {
         guard let databaseId, let collectionId else { return }
 
-        let user = try await account.get()
+        let user = try await appwriteAccount.get()
         let snapshot = try buildSnapshot()
         let data = try JSONEncoder().encode(snapshot)
         let payload = data.base64EncodedString()
@@ -68,7 +69,7 @@ final class UserDataManager {
     func restoreCurrentUserData() async throws -> Bool {
         guard let databaseId, let collectionId else { return false }
 
-        let user = try await account.get()
+        let user = try await appwriteAccount.get()
         let document = try await databases.getDocument(
             databaseId: databaseId,
             collectionId: collectionId,

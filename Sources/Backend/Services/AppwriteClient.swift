@@ -5,3 +5,8 @@ let client = Client()
     .setProject("69e24c32003548ff0e2e")
 
 let account = Account(client)
+
+enum AppwriteService {
+    static let client = client
+    static let account = account
+}

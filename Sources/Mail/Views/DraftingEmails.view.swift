@@ -69,6 +69,8 @@ struct DraftingEmailsView: View {
                             Text(option.rawValue).tag(option)
                         }
                     }
+                } footer: {
+                    Text("Recipient should be a single email address for best results.")
                 }
 
                 Section("Prompt Inputs") {
