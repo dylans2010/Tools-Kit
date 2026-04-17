@@ -161,7 +161,7 @@ struct DashboardView: View {
                         }
                     } catch {
                         await MainActor.run {
-                            pingStatusMessage = "Appwrite ping failed"
+                            pingStatusMessage = "Appwrite ping failed: \(error.localizedDescription)"
                         }
                     }
                 }
