@@ -11,8 +11,6 @@ struct DashboardView: View {
     @State private var showSettings = false
     @State private var pingStatusMessage = ""
 
-    private let appwriteClient = AppwriteClient.shared
-
     private let columns = [GridItem(.adaptive(minimum: 160), spacing: 14)]
 
     var body: some View {
@@ -157,7 +155,7 @@ struct DashboardView: View {
             Button {
                 Task {
                     do {
-                        try await appwriteClient.ping()
+                        try await AppwriteClient.shared.ping()
                         await MainActor.run {
                             pingStatusMessage = "Appwrite ping succeeded"
                         }

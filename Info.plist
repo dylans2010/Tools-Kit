@@ -107,9 +107,5 @@
             </dict>
         </dict>
     </dict>
-    <key>APPWRITE_ENDPOINT</key>
-    <string>https://fra.cloud.appwrite.io/v1</string>
-    <key>APPWRITE_PROJECT_ID</key>
-    <string>YOUR_APPWRITE_PROJECT_ID</string>
 </dict>
 </plist>
