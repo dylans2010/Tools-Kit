@@ -5,6 +5,8 @@ final class HabitsManager: ObservableObject {
     static let shared = HabitsManager()
 
     @Published var habits: [Habit] = []
+    private let aiService = AIService.shared
+    private let aiDecoder = AIResponseDecoder()
 
     private var saveDir: URL {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -102,5 +104,60 @@ final class HabitsManager: ObservableObject {
     private func save() {
         guard let data = try? JSONEncoder().encode(habits) else { return }
         try? data.write(to: habitsURL, options: .atomic)
+    }
+
+    // MARK: - AI Habit Coaching
+
+    struct AIHabitInsights: Codable {
+        let suggestedHabits: [String]
+        let behaviorPatterns: [String]
+        let optimizationTips: [String]
+        let successLikelihood: [String]
+    }
+
+    private var aiSchemaString: String {
+        """
+        {
+          "type": "object",
+          "required": ["suggestedHabits", "behaviorPatterns", "optimizationTips", "successLikelihood"],
+          "properties": {
+            "suggestedHabits": { "type": "array", "items": { "type": "string" } },
+            "behaviorPatterns": { "type": "array", "items": { "type": "string" } },
+            "optimizationTips": { "type": "array", "items": { "type": "string" } },
+            "successLikelihood": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+        """
+    }
+
+    private var aiSchema: AIJSONType {
+        .object([
+            "suggestedHabits": .array(.string),
+            "behaviorPatterns": .array(.string),
+            "optimizationTips": .array(.string),
+            "successLikelihood": .array(.string)
+        ])
+    }
+
+    @MainActor
+    func generateHabitInsights(goalPrompt: String) async throws -> AIHabitInsights {
+        // Drive habit recommendations from strict JSON to keep UI deterministic.
+        let progressContext = habits.map { habit in
+            "\(habit.name): streak \(habit.currentStreak), weekly rate \(Int(habit.weeklyCompletionRate() * 100))%"
+        }.joined(separator: "\n")
+        let prompt = """
+        User goals:
+        \(goalPrompt)
+
+        Current habit performance:
+        \(progressContext)
+        """
+        let json = try await aiService.generateStructuredJSON(
+            prompt: prompt,
+            jsonSchema: aiSchemaString,
+            preferredModel: "openrouter/free",
+            systemPrompt: "You are a habit coach. Return strict JSON only."
+        )
+        return try aiDecoder.decode(AIHabitInsights.self, from: json, schema: aiSchema)
     }
 }

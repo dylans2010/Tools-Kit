@@ -6,6 +6,8 @@ final class NotebooksManager: ObservableObject {
 
     @Published var notebooks: [Notebook] = []
     @Published var integrations: [IntegrationTool] = []
+    private let aiService = AIService.shared
+    private let aiDecoder = AIResponseDecoder()
 
     private var saveDir: URL {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -129,5 +131,59 @@ final class NotebooksManager: ObservableObject {
            let decoded = try? JSONDecoder().decode([IntegrationTool].self, from: data) {
             integrations = decoded
         }
+    }
+
+    // MARK: - AI Note Intelligence
+
+    struct AINotebookInsights: Codable {
+        let summary: String
+        let expandedIdeas: [String]
+        let tags: [String]
+        let relatedNotes: [String]
+    }
+
+    private var aiSchemaString: String {
+        """
+        {
+          "type": "object",
+          "required": ["summary", "expandedIdeas", "tags", "relatedNotes"],
+          "properties": {
+            "summary": { "type": "string" },
+            "expandedIdeas": { "type": "array", "items": { "type": "string" } },
+            "tags": { "type": "array", "items": { "type": "string" } },
+            "relatedNotes": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+        """
+    }
+
+    private var aiSchema: AIJSONType {
+        .object([
+            "summary": .string,
+            "expandedIdeas": .array(.string),
+            "tags": .array(.string),
+            "relatedNotes": .array(.string)
+        ])
+    }
+
+    @MainActor
+    func generateNoteInsights(noteContent: String, notebookContext: String) async throws -> AINotebookInsights {
+        // Keep notebook AI responses machine-readable and schema-safe.
+        let prompt = """
+        Analyze this note, expand ideas, create tags, and link related notes.
+
+        Note content:
+        \(noteContent)
+
+        Notebook context:
+        \(notebookContext)
+        """
+        let json = try await aiService.generateStructuredJSON(
+            prompt: prompt,
+            jsonSchema: aiSchemaString,
+            preferredModel: "openrouter/free",
+            systemPrompt: "You are a notebook knowledge assistant. Return strict JSON only."
+        )
+        return try aiDecoder.decode(AINotebookInsights.self, from: json, schema: aiSchema)
     }
 }

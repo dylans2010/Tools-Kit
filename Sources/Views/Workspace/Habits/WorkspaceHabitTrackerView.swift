@@ -4,97 +4,141 @@ import Charts
 struct WorkspaceHabitTrackerView: View {
     @StateObject private var manager = HabitsManager.shared
     @State private var showingCreate = false
-    @State private var selectedHabit: Habit? = nil
+    @State private var selectedHabit: Habit?
     @State private var showingAnalytics = false
-
-    private let dateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateStyle = .full
-        f.timeStyle = .none
-        return f
-    }()
+    @State private var aiPrompt = ""
+    @State private var aiLoading = false
+    @State private var aiError: String?
+    @State private var aiInsights: HabitsManager.AIHabitInsights?
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                summaryHeader
-
-                if manager.habits.isEmpty {
-                    EmptyStateView(
-                        icon: "flame.fill",
-                        title: "No Habits Yet",
-                        message: "Build lasting routines by tracking your daily habits.",
-                        action: { showingCreate = true },
-                        actionLabel: "Add Habit"
-                    )
-                } else {
-                    todaySection
+            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
+                Section {
+                    VStack(spacing: 16) {
+                        summaryHeader
+                        aiInsightsCard
+                        if manager.habits.isEmpty {
+                            EmptyStateView(
+                                icon: "flame.fill",
+                                title: "No Habits Yet",
+                                message: "Add habits or ask AI for recommendations based on your goals.",
+                                action: { showingCreate = true },
+                                actionLabel: "Add Habit"
+                            )
+                        } else {
+                            VStack(spacing: 10) {
+                                ForEach(manager.habits) { habit in
+                                    HabitRowCard(habit: habit, manager: manager) {
+                                        selectedHabit = habit
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding(16)
+                } header: {
+                    HStack {
+                        Text("Habits")
+                            .font(.title3.weight(.semibold))
+                        Spacer()
+                        if !manager.habits.isEmpty {
+                            Button {
+                                showingAnalytics = true
+                            } label: {
+                                Label("Analytics", systemImage: "chart.bar")
+                            }
+                            .buttonStyle(.bordered)
+                        }
+                        Button {
+                            showingCreate = true
+                        } label: {
+                            Label("New", systemImage: "plus")
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                    .padding(16)
+                    .background(.ultraThinMaterial)
+                    .overlay(Divider(), alignment: .bottom)
                 }
             }
-            .padding(.vertical, 8)
         }
         .navigationTitle("Habits")
-        .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                if !manager.habits.isEmpty {
-                    Button {
-                        showingAnalytics = true
-                    } label: {
-                        Image(systemName: "chart.bar.fill")
-                    }
-                }
-                Button {
-                    showingCreate = true
-                } label: {
-                    Image(systemName: "plus")
-                }
-            }
-        }
         .sheet(isPresented: $showingCreate) {
-            CreateHabitView { habit in
-                manager.addHabit(habit)
-            }
+            CreateHabitView { manager.addHabit($0) }
         }
         .sheet(isPresented: $showingAnalytics) {
             HabitAnalyticsView()
         }
         .sheet(item: $selectedHabit) { habit in
-            NavigationStack {
-                HabitDetailView(habit: habit)
-            }
+            NavigationStack { HabitDetailView(habit: habit) }
         }
     }
 
     private var summaryHeader: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(dateFormatter.string(from: Date()))
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .padding(.horizontal)
-
+        HStack(spacing: 8) {
             let completed = manager.habits.filter { $0.isCompletedToday() }.count
-            let total = manager.habits.count
-            if total > 0 {
-                HStack(spacing: 16) {
-                    StatPill(label: "Done Today", value: "\(completed)/\(total)", color: .green)
-                    StatPill(label: "Completion", value: "\(Int(Double(completed)/Double(total)*100))%", color: .blue)
-                    let streaking = manager.habits.filter { $0.currentStreak > 0 }.count
-                    StatPill(label: "Streaking", value: "\(streaking)", color: .orange)
+            let total = max(manager.habits.count, 1)
+            StatPill(label: "Done", value: "\(completed)/\(manager.habits.count)", color: .green)
+            StatPill(label: "Rate", value: "\(Int((Double(completed) / Double(total)) * 100))%", color: .blue)
+            StatPill(label: "Streaking", value: "\(manager.habits.filter { $0.currentStreak > 0 }.count)", color: .orange)
+        }
+    }
+
+    private var aiInsightsCard: some View {
+        WorkspaceSurfaceCard {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("AI Habit Coach")
+                    .font(.headline)
+                TextField("Describe your goals to get habit recommendations…", text: $aiPrompt)
+                    .textFieldStyle(.roundedBorder)
+                Button("Generate Coaching", action: runAI)
+                    .buttonStyle(.borderedProminent)
+                    .disabled(aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || aiLoading)
+
+                if aiLoading {
+                    WorkspaceSkeletonLine()
+                    WorkspaceSkeletonLine(widthRatio: 0.7)
+                } else if let aiError {
+                    Text(aiError)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                } else if let aiInsights {
+                    insightList("Suggested Habits", aiInsights.suggestedHabits)
+                    insightList("Optimization", aiInsights.optimizationTips)
                 }
-                .padding(.horizontal)
             }
         }
     }
 
-    private var todaySection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Today's Habits")
-                .font(.headline)
-                .padding(.horizontal)
+    private func insightList(_ title: String, _ items: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.caption.weight(.semibold))
+            ForEach(items, id: \.self) { item in
+                Text("• \(item)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
 
-            ForEach(manager.habits) { habit in
-                HabitRowCard(habit: habit, manager: manager) {
-                    selectedHabit = habit
+    private func runAI() {
+        let prompt = aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !prompt.isEmpty else { return }
+        aiLoading = true
+        aiError = nil
+        Task {
+            do {
+                let insights = try await manager.generateHabitInsights(goalPrompt: prompt)
+                await MainActor.run {
+                    aiInsights = insights
+                    aiLoading = false
+                }
+            } catch {
+                await MainActor.run {
+                    aiError = "AI habits response was invalid. Please refine your goal."
+                    aiLoading = false
                 }
             }
         }
@@ -111,79 +155,41 @@ struct HabitRowCard: View {
     var habitColor: Color { Color(hex: habit.colorHex) ?? .blue }
 
     var body: some View {
-        VStack {
-            HStack(spacing: 14) {
+        WorkspaceSurfaceCard {
+            HStack(spacing: 12) {
                 ZStack {
                     Circle()
                         .fill(habitColor.opacity(0.15))
-                        .frame(width: 48, height: 48)
+                        .frame(width: 44, height: 44)
                     Image(systemName: habit.icon)
-                        .font(.system(size: 20))
-                        .foregroundColor(habitColor)
+                        .foregroundStyle(habitColor)
                 }
-
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(habit.name)
-                        .font(.subheadline.bold())
+                        .font(.body.weight(.semibold))
+                        .onTapGesture(perform: onTap)
                     HStack(spacing: 6) {
-                        Image(systemName: "flame.fill")
-                            .font(.caption2)
-                            .foregroundColor(.orange)
-                        Text("\(habit.currentStreak) Day Streak")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text("·")
-                            .foregroundColor(.secondary)
-                            .font(.caption)
-                        Text("\(todayCount)/\(habit.targetCount) Today")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        WorkspaceStatusBadge(title: "\(habit.currentStreak) day streak", color: .orange)
+                        WorkspaceStatusBadge(title: "\(todayCount)/\(habit.targetCount)", color: habitColor)
                     }
-
                     ProgressView(value: Double(min(todayCount, habit.targetCount)), total: Double(habit.targetCount))
                         .tint(habitColor)
                 }
-                .onTapGesture { onTap() }
-
                 Spacer()
-
                 Button {
                     manager.increment(habit: habit)
                 } label: {
                     Image(systemName: completedToday ? "checkmark.circle.fill" : "plus.circle")
-                        .font(.system(size: 32))
-                        .foregroundColor(completedToday ? habitColor : .secondary)
-                        .animation(.spring(), value: completedToday)
+                        .font(.title2)
+                        .foregroundStyle(completedToday ? habitColor : .secondary)
                 }
                 .buttonStyle(.plain)
             }
-            .padding()
         }
-        .padding()
-        .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-        .padding(.horizontal)
         .swipeActions(edge: .trailing) {
-            Button(role: .destructive) {
-                manager.deleteHabit(habit)
-            } label: {
+            Button(role: .destructive) { manager.deleteHabit(habit) } label: {
                 Label("Delete", systemImage: "trash")
             }
-            Button {
-                manager.resetToday(habit: habit)
-            } label: {
-                Label("Reset", systemImage: "arrow.counterclockwise")
-            }
-            .tint(.orange)
-        }
-        .swipeActions(edge: .leading) {
-            Button {
-                manager.decrement(habit: habit)
-            } label: {
-                Label("Undo", systemImage: "minus.circle")
-            }
-            .tint(.gray)
         }
     }
 }
