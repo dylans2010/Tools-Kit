@@ -104,7 +104,7 @@ struct WorkoutsHomeView: View {
     private var progressSection: some View {
         VStack(spacing: 10) {
             NavigationLink {
-                ProgressView()
+                WorkoutProgressDashboardView()
             } label: {
                 sectionCard(
                     title: "Progress Overview",

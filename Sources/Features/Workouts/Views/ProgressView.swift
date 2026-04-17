@@ -1,7 +1,7 @@
 import SwiftUI
 import Charts
 
-struct ProgressView: View {
+struct WorkoutProgressDashboardView: View {
     @StateObject private var manager = WorkoutsManager.shared
 
     var body: some View {

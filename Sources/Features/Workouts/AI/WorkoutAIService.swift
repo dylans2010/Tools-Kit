@@ -22,8 +22,13 @@ final class WorkoutAIService {
     }
 
     private func adjustedIntensity(recentProgress: [ProgressModel], streak: StreakModel) -> Intensity {
+        let calendar = Calendar.current
+        let now = Date()
         let weeklyWorkouts = recentProgress
-            .filter { Calendar.current.dateComponents([.day], from: $0.date, to: Date()).day ?? 99 <= 7 }
+            .filter {
+                let days = calendar.dateComponents([.day], from: $0.date, to: now).day ?? 99
+                return days >= 0 && days <= 7
+            }
             .reduce(0) { $0 + $1.workoutsCompleted }
 
         if streak.currentDays >= 14 && weeklyWorkouts >= 5 { return .high }

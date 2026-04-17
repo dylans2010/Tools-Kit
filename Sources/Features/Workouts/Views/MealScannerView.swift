@@ -9,6 +9,7 @@ struct MealScannerView: View {
     @State private var selectedImage: UIImage?
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var showingCamera = false
+    @State private var showingCameraUnavailableAlert = false
     @State private var analysis: MealAnalysis?
 
     var body: some View {
@@ -22,10 +23,15 @@ struct MealScannerView: View {
                     }
 
                     Button {
-                        showingCamera = true
+                        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                            showingCamera = true
+                        } else {
+                            showingCameraUnavailableAlert = true
+                        }
                     } label: {
                         Label("Use Camera", systemImage: "camera")
                     }
+                    .disabled(!UIImagePickerController.isSourceTypeAvailable(.camera))
                 }
 
                 if let selectedImage {
@@ -65,6 +71,11 @@ struct MealScannerView: View {
         .sheet(isPresented: $showingCamera) {
             CameraPicker(image: $selectedImage)
         }
+        .alert("Camera Not Available", isPresented: $showingCameraUnavailableAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("This device does not support camera capture. Please upload an image instead.")
+        }
         .onChange(of: selectedPhotoItem) { _ in
             Task {
                 guard let data = try? await selectedPhotoItem?.loadTransferable(type: Data.self),
@@ -85,7 +96,7 @@ private struct CameraPicker: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
-        picker.sourceType = UIImagePickerController.isSourceTypeAvailable(.camera) ? .camera : .photoLibrary
+        picker.sourceType = .camera
         picker.delegate = context.coordinator
         return picker
     }

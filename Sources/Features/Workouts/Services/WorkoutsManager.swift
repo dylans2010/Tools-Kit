@@ -219,15 +219,28 @@ final class WorkoutsManager: ObservableObject {
     }
 
     private func upsertProgress(for date: Date = Date(), _ update: (inout ProgressModel) -> Void) {
-        if let idx = progress.firstIndex(where: { calendar.isDate($0.date, inSameDayAs: date) }) {
-            update(&progress[idx])
+        let targetDay = calendar.startOfDay(for: date)
+
+        var low = 0
+        var high = progress.count
+        while low < high {
+            let mid = (low + high) / 2
+            let midDay = calendar.startOfDay(for: progress[mid].date)
+            if midDay < targetDay {
+                low = mid + 1
+            } else {
+                high = mid
+            }
+        }
+
+        if low < progress.count, calendar.isDate(progress[low].date, inSameDayAs: date) {
+            update(&progress[low])
             return
         }
 
         var new = ProgressModel(date: date)
         update(&new)
-        progress.append(new)
-        progress.sort { $0.date < $1.date }
+        progress.insert(new, at: low)
     }
 
     private func evaluateBadges() {

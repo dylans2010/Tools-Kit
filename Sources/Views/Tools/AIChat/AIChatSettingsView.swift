@@ -322,7 +322,7 @@ struct AIChatSettingsView: View {
         }
     }
 
-    // MARK: - Tool Visibility Section
+    // MARK: - Workouts Mode Section
 
     private var workoutsModeSection: some View {
         Section {
@@ -358,7 +358,7 @@ struct AIChatSettingsView: View {
         }
     }
 
-    // MARK: - Tool Visibility Section
+    // MARK: - Workspace Mode Section
 
     private var workspaceModeSection: some View {
         Section {
