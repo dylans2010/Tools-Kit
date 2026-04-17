@@ -21,7 +21,15 @@ struct MailHomeView: View {
                     )
                 }
             }
-            .navigationTitle("Mail")
+            .navigationTitle(authenticatedAccount == nil ? "iCloud Mail" : "Mail")
+            .background(
+                LinearGradient(
+                    colors: [Color(red: 0.96, green: 0.98, blue: 1.0), Color(red: 0.92, green: 0.95, blue: 1.0)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+            )
         }
         .onChange(of: viewModel.isAuthenticated) { isAuthenticated in
             if isAuthenticated, !email.isEmpty {
@@ -59,41 +67,79 @@ struct SignInView: View {
     @Binding var appPassword: String
 
     var body: some View {
-        Form {
-            Section(header: Text("iCloud Credentials")) {
-                TextField("iCloud Email", text: $email)
-                    .autocapitalization(.none)
-                    .keyboardType(.emailAddress)
-                SecureField("App-Specific Password", text: $appPassword)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Connect iCloud")
+                        .font(.largeTitle.bold())
+                    Text("Sign in with your Apple ID email and an app-specific password.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
 
-                Link("Generate App-Specific Password at appleid.apple.com",
-                     destination: URL(string: "https://appleid.apple.com")!)
-                    .font(.caption)
-                    .foregroundColor(.blue)
-            }
-
-            Section {
-                Button(action: signIn) {
-                    if viewModel.isLoading {
-                        ProgressView()
-                            .frame(maxWidth: .infinity)
-                    } else {
-                        Text("Sign In")
-                            .frame(maxWidth: .infinity)
-                            .bold()
+                VStack(spacing: 14) {
+                    HStack(spacing: 10) {
+                        Image(systemName: "envelope")
+                            .foregroundColor(.secondary)
+                        TextField("iCloud Email", text: $email)
+                            .textInputAutocapitalization(.never)
+                            .keyboardType(.emailAddress)
+                            .autocorrectionDisabled(true)
                     }
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(email.isEmpty || appPassword.isEmpty || viewModel.isLoading)
-            }
+                    .padding(12)
+                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
 
-            if let error = viewModel.errorMessage {
-                Section {
-                    Text(error)
+                    HStack(spacing: 10) {
+                        Image(systemName: "key")
+                            .foregroundColor(.secondary)
+                        SecureField("App-Specific Password", text: $appPassword)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled(true)
+                    }
+                    .padding(12)
+                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
+
+                    Link("Generate app-specific password at appleid.apple.com",
+                         destination: URL(string: "https://appleid.apple.com")!)
+                    .font(.footnote)
+                }
+
+                Button(action: signIn) {
+                    HStack {
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Image(systemName: "icloud")
+                            Text("Sign In")
+                                .fontWeight(.semibold)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Color.blue, in: RoundedRectangle(cornerRadius: 12))
+                    .foregroundStyle(.white)
+                }
+                .disabled(email.isEmpty || appPassword.isEmpty || viewModel.isLoading)
+
+                if let error = viewModel.errorMessage {
+                    Label(error, systemImage: "exclamationmark.triangle.fill")
+                        .font(.footnote)
                         .foregroundColor(.red)
+                        .padding(10)
+                        .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Tip")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(.secondary)
+                    Text("Use an @icloud.com, @me.com, or @mac.com address with an Apple app-specific password.")
                         .font(.caption)
+                        .foregroundColor(.secondary)
                 }
             }
+            .padding(20)
         }
     }
 

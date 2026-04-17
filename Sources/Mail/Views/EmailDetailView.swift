@@ -4,7 +4,6 @@ import WebKit
 struct EmailDetailView: View {
     @ObservedObject var viewModel: MailViewModel
     let email: EmailMessage
-    @State private var renderedContent: RenderedMailContent?
 
     var body: some View {
         ScrollView {
@@ -17,26 +16,40 @@ struct EmailDetailView: View {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color(.secondarySystemBackground))
+                )
                 .padding(.horizontal)
-
-                Divider()
 
                 contentView
             }
+            .padding(.top, 10)
         }
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            if resolvedEmail.body == nil && resolvedEmail.htmlBody == nil {
+                viewModel.loadBody(for: email)
+            }
+        }
     }
 
     private var contentView: some View {
         Group {
-            if let content = renderedContent ?? renderContent(from: resolvedEmail) {
+            if let content = renderContent(from: resolvedEmail) {
                 if content.hasHTML, let html = content.htmlBody {
                     MailWebView(htmlString: html)
                         .frame(minHeight: 400)
-                        .padding(.horizontal, 4)
+                        .padding(.horizontal)
                 } else if let plain = content.plainBody {
                     Text(plain)
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(Color(.secondarySystemBackground))
+                        )
                         .padding(.horizontal)
                 }
             } else {
@@ -50,10 +63,7 @@ struct EmailDetailView: View {
                     }
                     Spacer()
                 }
-                .onAppear {
-                    viewModel.loadBody(for: email)
-                    renderedContent = renderContent(from: resolvedEmail)
-                }
+                .padding(.top, 20)
             }
         }
     }

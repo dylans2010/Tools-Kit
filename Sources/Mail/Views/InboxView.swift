@@ -19,12 +19,14 @@ struct InboxView: View {
     var body: some View {
         List {
             syncStatusSection
+            syncErrorSection
             lastSyncedSection
             catchUpSection
             aiSummarySection
             threadListSection
         }
         .navigationTitle(filter == .unread ? "Catch Up" : folder.name)
+        .listStyle(.insetGrouped)
         .searchable(text: $searchText)
         .refreshable {
             await syncService.fetchThreads(account: account, folder: folder)
@@ -52,12 +54,25 @@ struct InboxView: View {
                 HStack(spacing: 10) {
                     ProgressView().tint(.blue)
                     Text("Fetching mail…")
-                        .font(.subheadline)
+                        .font(.subheadline.weight(.medium))
                         .foregroundColor(.secondary)
                     Spacer()
                 }
                 .padding(.vertical, 4)
                 .listRowBackground(Color.blue.opacity(0.08))
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var syncErrorSection: some View {
+        if let error = syncService.lastError, !error.isEmpty {
+            Section {
+                Label(error, systemImage: "exclamationmark.triangle.fill")
+                    .font(.footnote)
+                    .foregroundColor(.red)
+                    .padding(.vertical, 4)
+                    .listRowBackground(Color.red.opacity(0.08))
             }
         }
     }
@@ -144,8 +159,27 @@ struct InboxView: View {
 
     @ViewBuilder
     private var threadListSection: some View {
-        ForEach(filteredThreads) { thread in
-            threadRow(thread)
+        if filteredThreads.isEmpty {
+            Section {
+                VStack(spacing: 10) {
+                    Image(systemName: "tray")
+                        .font(.title2)
+                        .foregroundColor(.secondary)
+                    Text(searchText.isEmpty ? "No messages yet" : "No matching messages")
+                        .font(.headline)
+                    Text(searchText.isEmpty ? "Pull to refresh to fetch your latest iCloud emails." : "Try a different sender or subject search.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 24)
+                .listRowBackground(Color.clear)
+            }
+        } else {
+            ForEach(filteredThreads) { thread in
+                threadRow(thread)
+            }
         }
     }
 
@@ -156,7 +190,7 @@ struct InboxView: View {
                 destination: MailThreadView(
                     viewModel: MailViewModel(),
                     email: EmailMessage(
-                        uid: Int(message.id) ?? 0,
+                        uid: Int(message.id) ?? fallbackUID(from: message.id),
                         subject: message.subject,
                         sender: message.from,
                         date: message.date,
@@ -169,6 +203,8 @@ struct InboxView: View {
             ) {
                 MailThreadRow(thread: thread)
             }
+            .listRowInsets(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
+            .listRowBackground(Color.clear)
             .swipeActions(edge: .leading) {
                 Button {
                     toggleStar(thread)
@@ -251,41 +287,53 @@ struct InboxView: View {
             }
         }
     }
+
+    private func fallbackUID(from string: String) -> Int {
+        let value = string.hashValue
+        return value == Int.min ? 0 : abs(value)
+    }
 }
 
 struct MailThreadRow: View {
     let thread: MailThread
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(thread.participants.first ?? "Unknown")
-                    .font(.headline)
-                    .lineLimit(1)
-                Spacer()
-                Text(thread.lastMessageDate, style: .relative)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
+        HStack(alignment: .top, spacing: 12) {
+            Circle()
+                .fill(thread.isRead ? Color.gray.opacity(0.25) : Color.blue.opacity(0.2))
+                .frame(width: 38, height: 38)
+                .overlay(
+                    Text(String((thread.participants.first ?? "?").prefix(1)).uppercased())
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(thread.isRead ? .secondary : .blue)
+                )
 
-            HStack(spacing: 8) {
-                if !thread.isRead {
-                    Circle()
-                        .fill(Color.blue)
-                        .frame(width: 8, height: 8)
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text(thread.participants.first ?? "Unknown")
+                        .font(.headline)
+                        .lineLimit(1)
+                    Spacer()
+                    Text(thread.lastMessageDate, style: .relative)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
                 }
+
                 Text(thread.subject)
                     .font(.subheadline)
                     .fontWeight(thread.isRead ? .regular : .semibold)
                     .lineLimit(1)
-            }
 
-            Text(thread.snippet)
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .lineLimit(2)
-                .lineSpacing(2)
+                Text(thread.snippet.isEmpty ? "No preview available" : thread.snippet)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
+            }
         }
-        .padding(.vertical, 8)
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color(.secondarySystemBackground))
+        )
     }
 }

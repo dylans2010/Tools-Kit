@@ -30,9 +30,7 @@ struct AIChatSettingsView: View {
                 chatInterfaceSection
                 storageSection
                 memorySection
-                musicModeSection
-                workoutsModeSection
-                workspaceModeSection
+                appModeSection
                 toolVisibilitySection
             }
             .task {
@@ -280,116 +278,40 @@ struct AIChatSettingsView: View {
         }
     }
 
-    // MARK: - Music Mode Section
+    // MARK: - App Mode Section
 
-    private var musicModeSection: some View {
-        Section {
-            Toggle(isOn: Binding(
-                get: { musicMode.isMusicModeEnabled },
-                set: { enabled in
-                    musicMode.isMusicModeEnabled = enabled
-                    if enabled {
-                        workoutsMode.isWorkoutsModeEnabled = false
-                        workspaceMode.isWorkspaceModeEnabled = false
-                    }
-                }
-            )) {
-                HStack(spacing: 14) {
-                    Image(systemName: "music.note.list")
-                        .font(.title3)
-                        .foregroundColor(.pink)
-                        .frame(width: 32)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Turn ToolsKit Into Music")
-                            .font(.body)
-                        Text("Replace the Dashboard with the Music player")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        if musicMode.isLocked {
-                            Text("Locked by bundle identifier containing “Music”.")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                        }
-                    }
+    private var appModeSection: some View {
+        Section("Turn ToolsKit Into") {
+            Picker("Mode", selection: selectedAppMode) {
+                ForEach(AppMode.allCases) { mode in
+                    Label(mode.title, systemImage: mode.icon)
+                        .tag(mode)
                 }
             }
+            .pickerStyle(.navigationLink)
             .disabled(musicMode.isLocked)
-        } header: {
-            Text("Music Mode")
-        } footer: {
-            Text("When enabled, ToolsKit launches directly into Music instead of the Dashboard.")
-                .font(.caption)
-        }
-    }
 
-    // MARK: - Workouts Mode Section
-
-    private var workoutsModeSection: some View {
-        Section {
-            Toggle(isOn: Binding(
-                get: { workoutsMode.isWorkoutsModeEnabled },
-                set: { enabled in
-                    workoutsMode.isWorkoutsModeEnabled = enabled
-                    if enabled {
-                        musicMode.isMusicModeEnabled = false
-                        workspaceMode.isWorkspaceModeEnabled = false
-                    }
-                }
-            )) {
-                HStack(spacing: 14) {
-                    Image(systemName: "figure.strengthtraining.traditional")
-                        .font(.title3)
-                        .foregroundColor(.mint)
-                        .frame(width: 32)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Turn ToolsKit Into Workouts")
-                            .font(.body)
-                        Text("Replace the Dashboard with AI-powered fitness tracking")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
+            HStack(spacing: 12) {
+                Image(systemName: currentMode.icon)
+                    .foregroundColor(currentMode.tint)
+                    .frame(width: 24)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(currentMode.title)
+                        .font(.subheadline.weight(.semibold))
+                    Text(currentMode.description)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
             }
-        } header: {
-            Text("Workouts Mode")
-        } footer: {
-            Text("When enabled, ToolsKit launches into Workouts with plans, nutrition, progress, and health sync.")
-                .font(.caption)
-        }
-    }
+            .padding(.vertical, 4)
 
-    // MARK: - Workspace Mode Section
-
-    private var workspaceModeSection: some View {
-        Section {
-            Toggle(isOn: Binding(
-                get: { workspaceMode.isWorkspaceModeEnabled },
-                set: { enabled in
-                    workspaceMode.isWorkspaceModeEnabled = enabled
-                    if enabled {
-                        musicMode.isMusicModeEnabled = false
-                        workoutsMode.isWorkoutsModeEnabled = false
-                    }
-                }
-            )) {
-                HStack(spacing: 14) {
-                    Image(systemName: "rectangle.3.group")
-                        .font(.title3)
-                        .foregroundColor(.indigo)
-                        .frame(width: 32)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Turn ToolsKit Into Workspace")
-                            .font(.body)
-                        Text("Replace the Dashboard with Notes, Forms & Slides")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
+            if musicMode.isLocked {
+                Text("Music mode is locked because the app bundle identifier contains 'music'.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
-        } header: {
-            Text("Workspace Mode")
         } footer: {
-            Text("When enabled, ToolsKit launches into a productivity workspace with Notes, Forms, and Slides.")
+            Text("Choose the launch experience for ToolsKit. Only one mode can be active at a time.")
                 .font(.caption)
         }
     }
@@ -429,6 +351,93 @@ struct AIChatSettingsView: View {
                 settings.modelID = models.first?.id ?? ""
             }
         }
+    }
+}
+
+private extension AIChatSettingsView {
+    enum AppMode: String, CaseIterable, Identifiable {
+        case dashboard
+        case music
+        case workouts
+        case workspace
+
+        var id: String { rawValue }
+
+        var title: String {
+            switch self {
+            case .dashboard: return "Default Dashboard"
+            case .music: return "Music"
+            case .workouts: return "Workouts"
+            case .workspace: return "Workspace"
+            }
+        }
+
+        var icon: String {
+            switch self {
+            case .dashboard: return "square.grid.2x2"
+            case .music: return "music.note.list"
+            case .workouts: return "figure.strengthtraining.traditional"
+            case .workspace: return "rectangle.3.group"
+            }
+        }
+
+        var tint: Color {
+            switch self {
+            case .dashboard: return .blue
+            case .music: return .pink
+            case .workouts: return .mint
+            case .workspace: return .indigo
+            }
+        }
+
+        var description: String {
+            switch self {
+            case .dashboard: return "Launch into the standard dashboard with all tools."
+            case .music: return "Replace the dashboard with the Music player experience."
+            case .workouts: return "Launch into AI-powered fitness tracking and plans."
+            case .workspace: return "Launch into Notes, Forms, and Slides workspace."
+            }
+        }
+    }
+
+    var currentMode: AppMode {
+        if musicMode.isMusicModeEnabled { return .music }
+        if workoutsMode.isWorkoutsModeEnabled { return .workouts }
+        if workspaceMode.isWorkspaceModeEnabled { return .workspace }
+        return .dashboard
+    }
+
+    var selectedAppMode: Binding<AppMode> {
+        Binding(
+            get: { currentMode },
+            set: { newMode in
+                if musicMode.isLocked {
+                    musicMode.isMusicModeEnabled = true
+                    workoutsMode.isWorkoutsModeEnabled = false
+                    workspaceMode.isWorkspaceModeEnabled = false
+                    return
+                }
+
+                switch newMode {
+                case .dashboard:
+                    musicMode.isMusicModeEnabled = false
+                    workoutsMode.isWorkoutsModeEnabled = false
+                    workspaceMode.isWorkspaceModeEnabled = false
+                case .music:
+                    musicMode.isMusicModeEnabled = true
+                    workoutsMode.isWorkoutsModeEnabled = false
+                    workspaceMode.isWorkspaceModeEnabled = false
+                case .workouts:
+                    musicMode.isMusicModeEnabled = false
+                    workoutsMode.isWorkoutsModeEnabled = true
+                    workspaceMode.isWorkspaceModeEnabled = false
+                case .workspace:
+                    musicMode.isMusicModeEnabled = false
+                    workoutsMode.isWorkoutsModeEnabled = false
+                    workspaceMode.isWorkspaceModeEnabled = true
+                }
+            }
+        )
     }
 }
 

@@ -25,10 +25,15 @@ class MailIMAPService: @unchecked Sendable {
             }
             connection?.start(queue: .global())
         }
+
+        // Consume the IMAP greeting banner before issuing tagged commands.
+        _ = try await receiveChunk()
     }
 
     func login(user: String, pass: String) async throws {
-        _ = try await sendCommand("LOGIN \(user) \(pass)")
+        let escapedUser = escapeIMAPString(user)
+        let escapedPass = escapeIMAPString(pass)
+        _ = try await sendCommand("LOGIN \(escapedUser) \(escapedPass)")
     }
 
     func fetchThreads(account: MailAccount, folder: MailFolder, password: String, limit: Int, offset: Int) async throws -> [MailThread] {
@@ -51,10 +56,19 @@ class MailIMAPService: @unchecked Sendable {
     }
 
     func fetchMessages(folder: String, limit: Int, offset: Int) async throws -> [MailMessage] {
-        _ = try await sendCommand("SELECT \(folder)")
-        let start = max(1, offset + 1)
-        let end = offset + limit
-        let response = try await sendCommand("UID FETCH \(start):\(end) (UID FLAGS INTERNALDATE RFC822.SIZE ENVELOPE BODY[])")
+        _ = try await sendCommand("SELECT \(escapeMailbox(folder))")
+
+        let uids = try await searchAllUIDs().sorted()
+        guard !uids.isEmpty else { return [] }
+
+        let pageEnd = max(0, uids.count - offset)
+        let pageStart = max(0, pageEnd - limit)
+        guard pageStart < pageEnd else { return [] }
+
+        // Fetch newest first while preserving deterministic pagination.
+        let pageUIDs = Array(uids[pageStart..<pageEnd]).reversed()
+        let uidSet = pageUIDs.map(String.init).joined(separator: ",")
+        let response = try await sendCommand("UID FETCH \(uidSet) (UID FLAGS INTERNALDATE ENVELOPE BODY.PEEK[])")
         return parseMessages(response)
     }
 
@@ -63,24 +77,107 @@ class MailIMAPService: @unchecked Sendable {
         tagCounter += 1
         let fullCommand = "\(tag) \(command)\r\n"
 
+        guard let connection else {
+            throw NSError(domain: "IMAPError", code: -1, userInfo: [NSLocalizedDescriptionKey: "No active IMAP connection"])
+        }
+
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            connection.send(content: fullCommand.data(using: .utf8), completion: .contentProcessed({ error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
+                }
+            }))
+        }
+
+        var responseData = Data()
+        while true {
+            let chunk = try await receiveChunk()
+            responseData.append(chunk)
+
+            let responseText = String(decoding: responseData, as: UTF8.self)
+            if responseText.contains("\r\n\(tag) ") || responseText.hasPrefix("\(tag) ") {
+                guard let status = taggedStatus(in: responseText, tag: tag) else {
+                    continue
+                }
+                if status != "OK" {
+                    throw NSError(
+                        domain: "IMAPError",
+                        code: -1,
+                        userInfo: [NSLocalizedDescriptionKey: "IMAP command failed: \(command)"]
+                    )
+                }
+                return responseText
+            }
+        }
+    }
+
+    private func receiveChunk() async throws -> Data {
+        guard let connection else {
+            throw NSError(domain: "IMAPError", code: -1, userInfo: [NSLocalizedDescriptionKey: "No active IMAP connection"])
+        }
+
         return try await withCheckedThrowingContinuation { continuation in
-            connection?.send(content: fullCommand.data(using: .utf8), completion: .contentProcessed({ error in
-                if let error = error {
+            connection.receive(minimumIncompleteLength: 1, maximumLength: 262_144) { data, _, isComplete, error in
+                if let error {
                     continuation.resume(throwing: error)
                     return
                 }
 
-                self.connection?.receive(minimumIncompleteLength: 1, maximumLength: 65536) { data, _, _, error in
-                    if let error = error {
-                        continuation.resume(throwing: error)
-                    } else if let data = data, let response = String(data: data, encoding: .utf8) {
-                        continuation.resume(returning: response)
-                    } else {
-                        continuation.resume(throwing: NSError(domain: "IMAPError", code: -1, userInfo: nil))
-                    }
+                if let data, !data.isEmpty {
+                    continuation.resume(returning: data)
+                    return
                 }
-            }))
+
+                if isComplete {
+                    continuation.resume(throwing: NSError(domain: "IMAPError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Connection closed by server"]))
+                } else {
+                    continuation.resume(throwing: NSError(domain: "IMAPError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Empty IMAP response"]))
+                }
+            }
         }
+    }
+
+    private func taggedStatus(in response: String, tag: String) -> String? {
+        let pattern = "(?m)^\\Q\(tag)\\E\\s+(OK|NO|BAD)\\b"
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
+        let nsRange = NSRange(response.startIndex..<response.endIndex, in: response)
+        guard let match = regex.firstMatch(in: response, range: nsRange),
+              let statusRange = Range(match.range(at: 1), in: response) else {
+            return nil
+        }
+        return String(response[statusRange])
+    }
+
+    private func searchAllUIDs() async throws -> [Int] {
+        let response = try await sendCommand("UID SEARCH ALL")
+        let lines = response.components(separatedBy: "\r\n")
+        var uids: [Int] = []
+
+        for line in lines where line.hasPrefix("* SEARCH") {
+            let parts = line
+                .replacingOccurrences(of: "* SEARCH", with: "")
+                .split(separator: " ")
+            for part in parts {
+                if let uid = Int(part.trimmingCharacters(in: .whitespacesAndNewlines)) {
+                    uids.append(uid)
+                }
+            }
+        }
+
+        return uids
+    }
+
+    private func escapeIMAPString(_ value: String) -> String {
+        let escaped = value
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+        return "\"\(escaped)\""
+    }
+
+    private func escapeMailbox(_ mailbox: String) -> String {
+        mailbox.contains(" ") ? escapeIMAPString(mailbox) : mailbox
     }
 
     private func parseMessages(_ response: String) -> [MailMessage] {
@@ -103,6 +200,7 @@ class MailIMAPService: @unchecked Sendable {
             let from = MailContentDecoder.decodeEncodedWords(extractEnvelopeFrom(fetchBlock) ?? "Unknown")
             let uid = extractUID(fetchBlock) ?? UUID().uuidString
             let date = extractInternalDate(fetchBlock) ?? Date()
+            let flags = extractFlags(fetchBlock)
 
             // Extract raw BODY[] content and run through MIME pipeline
             let rawBody = extractBodyContent(fetchBlock)
@@ -111,17 +209,18 @@ class MailIMAPService: @unchecked Sendable {
 
             let msg = MailMessage(
                 id: uid,
-                threadId: subject, // basic thread grouping by subject for now
+                // Threading by UID prevents collisions that can hide unrelated emails.
+                threadId: "uid-\(uid)",
                 from: from,
-                to: ["me@icloud.com"],
+                to: [],
                 cc: [],
                 bcc: [],
                 subject: subject,
-                body: rendered.plainBody ?? "",
+                body: rendered.plainBody ?? rawBody,
                 htmlBody: rendered.htmlBody,
                 date: date,
-                isRead: false,
-                isStarred: false,
+                isRead: flags.contains("\\Seen"),
+                isStarred: flags.contains("\\Flagged"),
                 attachments: []
             )
             messages.append(msg)
@@ -155,6 +254,20 @@ class MailIMAPService: @unchecked Sendable {
         }
 
         return ""
+    }
+
+    private func extractFlags(_ block: String) -> Set<String> {
+        let pattern = #"FLAGS \(([^)]*)\)"#
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: block, range: NSRange(block.startIndex..., in: block)),
+              let range = Range(match.range(at: 1), in: block) else {
+            return []
+        }
+
+        let flags = block[range]
+            .split(separator: " ")
+            .map { String($0) }
+        return Set(flags)
     }
 
     private func extractUID(_ block: String) -> String? {
@@ -229,5 +342,6 @@ class MailIMAPService: @unchecked Sendable {
 
     func disconnect() {
         connection?.cancel()
+        connection = nil
     }
 }

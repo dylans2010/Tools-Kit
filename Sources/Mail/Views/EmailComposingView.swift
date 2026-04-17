@@ -305,6 +305,7 @@ struct AIComposerPanel: View {
     @State private var selectedAction: AIAction = .generate
     @State private var isWorking = false
     @State private var result: String?
+    @State private var errorMessage: String?
     @State private var shimmerPhase: CGFloat = -1
 
     enum AIAction: String, CaseIterable {
@@ -367,6 +368,19 @@ struct AIComposerPanel: View {
                 shimmerPlaceholder
                     .padding(.horizontal)
                     .padding(.top, 12)
+            } else if let errorMessage {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.orange)
+                    Text(errorMessage)
+                        .font(.footnote)
+                        .foregroundColor(.white)
+                    Spacer()
+                }
+                .padding(10)
+                .background(Color.orange.opacity(0.2), in: RoundedRectangle(cornerRadius: 10))
+                .padding(.horizontal)
+                .padding(.top, 12)
             } else if let text = result {
                 resultArea(text)
                     .padding(.horizontal)
@@ -484,6 +498,7 @@ struct AIComposerPanel: View {
     private func runAI() {
         isWorking = true
         result = nil
+        errorMessage = nil
 
         Task {
             do {
@@ -493,15 +508,30 @@ struct AIComposerPanel: View {
                     let base = prompt.isEmpty ? currentBody : prompt
                     text = try await MailAIService.shared.improveDraft(base, tone: "professional")
                 case .rewrite:
+                    guard !currentBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                        throw NSError(domain: "MailAI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Write a draft first, then use Rewrite."])
+                    }
                     let base = prompt.isEmpty ? currentBody : "\(prompt)\n\n\(currentBody)"
                     text = try await MailAIService.shared.improveDraft(base, tone: "professional")
                 case .shorter:
+                    guard !currentBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                        throw NSError(domain: "MailAI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Write a draft first, then use Make Shorter."])
+                    }
                     text = try await MailAIService.shared.improveDraft(currentBody, tone: "concise")
                 case .professional:
+                    guard !currentBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                        throw NSError(domain: "MailAI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Write a draft first, then use More Professional."])
+                    }
                     text = try await MailAIService.shared.improveDraft(currentBody, tone: "professional")
                 case .friendly:
+                    guard !currentBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                        throw NSError(domain: "MailAI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Write a draft first, then use More Friendly."])
+                    }
                     text = try await MailAIService.shared.improveDraft(currentBody, tone: "friendly")
                 case .continueWriting:
+                    guard !currentBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                        throw NSError(domain: "MailAI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Start writing first, then use Continue Writing."])
+                    }
                     let continuePrompt = "Continue writing the following email naturally:\n\n\(currentBody)"
                     text = try await MailAIService.shared.improveDraft(continuePrompt, tone: "natural")
                 }
@@ -510,7 +540,10 @@ struct AIComposerPanel: View {
                     isWorking = false
                 }
             } catch {
-                await MainActor.run { isWorking = false }
+                await MainActor.run {
+                    errorMessage = error.localizedDescription
+                    isWorking = false
+                }
             }
         }
     }

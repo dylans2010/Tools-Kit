@@ -5,23 +5,52 @@ struct MailAccountsView: View {
 
     var body: some View {
         List {
-            ForEach(accounts) { account in
-                VStack(alignment: .leading) {
-                    Text(account.email)
-                        .font(.headline)
-                    Text(account.provider.rawValue.capitalized)
-                        .font(.caption)
+            if accounts.isEmpty {
+                VStack(spacing: 10) {
+                    Image(systemName: "tray")
+                        .font(.title2)
                         .foregroundColor(.secondary)
+                    Text("No mail accounts")
+                        .font(.headline)
+                    Text("Add an iCloud account to start syncing your inbox.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
                 }
-                .swipeActions {
-                    Button(role: .destructive) {
-                        delete(account)
-                    } label: {
-                        Label("Delete", systemImage: "trash")
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 24)
+                .listRowBackground(Color.clear)
+            } else {
+                ForEach(accounts) { account in
+                    HStack(spacing: 12) {
+                        Image(systemName: account.provider == .iCloud ? "icloud.fill" : "envelope.fill")
+                            .font(.headline)
+                            .foregroundColor(.blue)
+                            .frame(width: 34, height: 34)
+                            .background(Color.blue.opacity(0.12), in: Circle())
+
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(account.email)
+                                .font(.headline)
+                            Text(account.provider.rawValue.capitalized)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+
+                        Spacer()
+                    }
+                    .padding(.vertical, 6)
+                    .swipeActions {
+                        Button(role: .destructive) {
+                            delete(account)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
                     }
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Accounts")
         .onAppear {
             accounts = MailStorageService.shared.loadAccounts()
