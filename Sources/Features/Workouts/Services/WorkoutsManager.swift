@@ -23,9 +23,10 @@ struct WorkoutsSnapshot: Codable {
     var workoutSessions: [WorkoutSessionModel]
     var performance: [WorkoutPerformanceModel]
     var mealPlans: [MealPlanModel]
+    var recentGeneratedWorkouts: [WorkoutModel]
 
     private enum CodingKeys: String, CodingKey {
-        case profile, todayWorkout, nutrition, streak, badges, progress, preferences, healthData, mentorMessages, workoutSessions, performance, mealPlans
+        case profile, todayWorkout, nutrition, streak, badges, progress, preferences, healthData, mentorMessages, workoutSessions, performance, mealPlans, recentGeneratedWorkouts
     }
 
     init(
@@ -40,7 +41,8 @@ struct WorkoutsSnapshot: Codable {
         mentorMessages: [MentorMessageModel],
         workoutSessions: [WorkoutSessionModel],
         performance: [WorkoutPerformanceModel],
-        mealPlans: [MealPlanModel]
+        mealPlans: [MealPlanModel],
+        recentGeneratedWorkouts: [WorkoutModel]
     ) {
         self.profile = profile
         self.todayWorkout = todayWorkout
@@ -54,6 +56,7 @@ struct WorkoutsSnapshot: Codable {
         self.workoutSessions = workoutSessions
         self.performance = performance
         self.mealPlans = mealPlans
+        self.recentGeneratedWorkouts = recentGeneratedWorkouts
     }
 
     init(from decoder: Decoder) throws {
@@ -70,6 +73,7 @@ struct WorkoutsSnapshot: Codable {
         workoutSessions = try container.decodeIfPresent([WorkoutSessionModel].self, forKey: .workoutSessions) ?? []
         performance = try container.decodeIfPresent([WorkoutPerformanceModel].self, forKey: .performance) ?? []
         mealPlans = try container.decodeIfPresent([MealPlanModel].self, forKey: .mealPlans) ?? []
+        recentGeneratedWorkouts = try container.decodeIfPresent([WorkoutModel].self, forKey: .recentGeneratedWorkouts) ?? []
     }
 }
 
@@ -89,9 +93,9 @@ final class WorkoutsManager: ObservableObject {
     @Published var performance: [WorkoutPerformanceModel]
     @Published var mealPlans: [MealPlanModel]
     @Published var liveHeartRate: Double
+    @Published var recentGeneratedWorkouts: [WorkoutModel]
 
     private let workoutAIService = WorkoutAIService()
-    private let aiWorkoutPlanner = AIWorkoutPlanner()
     private let nutritionAIService = NutritionAIService()
     private let healthKitManager = HealthKitManager()
     private let exportService = DataExportService()
@@ -126,6 +130,7 @@ final class WorkoutsManager: ObservableObject {
         self.performance = []
         self.mealPlans = []
         self.liveHeartRate = 0
+        self.recentGeneratedWorkouts = []
         load()
         prepareForToday()
     }
@@ -174,44 +179,9 @@ final class WorkoutsManager: ObservableObject {
     }
 
     func generateTodayWorkoutIfNeeded(force: Bool = false) {
-        guard let profile else { return }
-        if !force,
-           let workout = todayWorkout,
-           calendar.isDateInToday(workout.date) {
-            return
-        }
-
-        let guidance = coachService.buildGuidance(
-            streak: streak,
-            recentPerformance: Array(performance.suffix(14)),
-            recentSessions: Array(workoutSessions.suffix(14))
-        )
-
-        let adjustedDuration = max(preferences.preferredDurationMinutes + guidance.recommendedDurationDelta, 20)
-        var generated = workoutAIService.generateDailyPlan(
-            profile: profile,
-            goal: profile.goal,
-            recentProgress: progress,
-            streak: streak,
-            preferredDurationMinutes: adjustedDuration
-        )
-        generated.notes += " \(guidance.note) Recovery score: \(guidance.recovery.score)."
-        todayWorkout = generated
-
         Task { @MainActor in
-            let userPlan = await aiWorkoutPlanner.generatePlan(
-                profile: profile,
-                progress: self.progress,
-                streak: self.streak,
-                nutrition: self.nutrition,
-                previousWorkout: self.todayWorkout
-            )
-            var final = userPlan.workoutModel
-            final.notes += " \(guidance.note) Recovery score: \(guidance.recovery.score)."
-            self.todayWorkout = final
-            self.save()
+            _ = await generateAIWorkout(force: force)
         }
-        save()
     }
 
     func toggleExercise(_ exercise: ExerciseModel) {
@@ -233,41 +203,74 @@ final class WorkoutsManager: ObservableObject {
         save()
     }
 
-    func analyzeMealInput(_ rawInput: String, sourceType: MealSourceType, imageData: Data?) -> MealAnalysis {
-        nutritionAIService.analyzeMeal(rawInput: rawInput, sourceType: sourceType, imageData: imageData, profile: profile)
+    @MainActor
+    func generateAIWorkout(force: Bool = false) async -> Result<WorkoutModel, AIResponseDecoderError> {
+        guard let profile else { return .failure(.decodingFailed("Missing profile")) }
+        if !force,
+           let workout = todayWorkout,
+           calendar.isDateInToday(workout.date) {
+            return .success(workout)
+        }
+
+        let guidance = coachService.buildGuidance(
+            streak: streak,
+            recentPerformance: Array(performance.suffix(14)),
+            recentSessions: Array(workoutSessions.suffix(14))
+        )
+
+        let result = await workoutAIService.generateWorkout(
+            profile: profile,
+            progress: progress,
+            streak: streak,
+            nutrition: nutrition,
+            recentWorkouts: recentGeneratedWorkouts,
+            performances: performance,
+            guidance: guidance,
+            preferredDuration: preferences.preferredDurationMinutes
+        )
+
+        switch result {
+        case .success(var workout):
+            workout.notes += " \(guidance.note) Recovery score: \(guidance.recovery.score)."
+            todayWorkout = workout
+            recentGeneratedWorkouts.insert(workout, at: 0)
+            recentGeneratedWorkouts = Array(recentGeneratedWorkouts.prefix(3))
+            save()
+            return .success(workout)
+        case .failure(let error):
+            return .failure(error)
+        }
     }
 
-    func recalculateMealAnalysis(from items: [DetectedFoodItem]) -> MealAnalysis {
-        nutritionAIService.recalculate(from: items, profile: profile)
-    }
-
-    func addMeal(
-        name: String,
-        analysis: MealAnalysis,
-        sourceType: MealSourceType,
-        rawInput: String,
-        detectedItemsOverride: [DetectedFoodItem]? = nil
-    ) {
+    @MainActor
+    func logMeal(using input: NutritionAIInput) async -> Result<MealRecord, AIResponseDecoderError> {
         rolloverNutritionIfNeeded()
 
-        let detected = detectedItemsOverride ?? analysis.detectedItems
-        let meal = MealRecord(
-            name: name,
-            calories: analysis.calories,
-            proteinGrams: analysis.proteinGrams,
-            carbsGrams: analysis.carbsGrams,
-            fatsGrams: analysis.fatsGrams,
-            summary: analysis.summary,
-            sourceType: sourceType,
-            rawInput: rawInput,
-            detectedItems: detected,
-            timestamp: Date()
+        let result = await nutritionAIService.analyzeMeal(
+            input: input,
+            profile: profile,
+            recentMeals: nutrition.meals
         )
-        nutrition.meals.insert(meal, at: 0)
-        upsertProgress { entry in
-            entry.caloriesConsumed = nutrition.caloriesConsumed
+
+        switch result {
+        case .success(let analysis):
+            nutrition.meals.insert(analysis.record, at: 0)
+            upsertProgress { entry in
+                entry.caloriesConsumed = nutrition.caloriesConsumed
+                entry.proteinConsumed = nutrition.proteinConsumed
+                entry.carbsConsumed = nutrition.carbsConsumed
+                entry.fatsConsumed = nutrition.fatsConsumed
+            }
+            save()
+            return .success(analysis.record)
+        case .failure(let error):
+            return .failure(error)
         }
-        save()
+    }
+
+    @MainActor
+    func generateNutritionInsights() async -> Result<NutritionInsightsModel, AIResponseDecoderError> {
+        await nutritionAIService.generateInsights(for: nutrition, profile: profile)
     }
 
     func updateWeight(_ kg: Double) {
@@ -370,25 +373,26 @@ final class WorkoutsManager: ObservableObject {
         }
     }
 
-    func sendMentorMessage(_ text: String, imageData: Data?) {
+    @MainActor
+    func sendMentorMessage(_ text: String, imageData: Data?) async {
         ensureMentorMemoryLoaded()
 
         let userMessage = MentorMessageModel(role: .user, text: text, imageHint: imageData == nil ? nil : "Image attached")
         mentorMessages.append(userMessage)
 
-        let response = mentorService.respond(
-            to: text,
-            imageData: imageData,
-            profile: profile,
-            todayWorkout: todayWorkout,
-            nutrition: nutrition,
-            streak: streak,
-            badges: badges,
-            progress: progress,
-            performances: performance,
-            healthData: healthData,
-            memory: mentorMessages
-        )
+        let response = await mentorService.respond(
+                to: text,
+                imageData: imageData,
+                profile: profile,
+                todayWorkout: todayWorkout,
+                nutrition: nutrition,
+                streak: streak,
+                badges: badges,
+                progress: progress,
+                performances: performance,
+                healthData: healthData,
+                memory: mentorMessages
+            )
         mentorMessages.append(response)
         mentorMemoryStore.save(mentorMessages)
         save()
@@ -478,6 +482,9 @@ final class WorkoutsManager: ObservableObject {
                 unlock(.goalAchieved, when: abs(currentWeight - firstWeight) <= 1.5)
             }
         }
+
+        let proteinHits = progress.prefix(5).filter { $0.proteinConsumed >= nutrition.proteinGoal }.count
+        unlock(.proteinPro, when: proteinHits >= 5)
     }
 
     private func unlock(_ badge: BadgeType, when condition: Bool) {
@@ -510,7 +517,8 @@ final class WorkoutsManager: ObservableObject {
             mentorMessages: mentorMessages,
             workoutSessions: workoutSessions,
             performance: performance,
-            mealPlans: mealPlans
+            mealPlans: mealPlans,
+            recentGeneratedWorkouts: recentGeneratedWorkouts
         )
     }
 
@@ -527,6 +535,7 @@ final class WorkoutsManager: ObservableObject {
         self.workoutSessions = snapshot.workoutSessions
         self.performance = snapshot.performance
         self.mealPlans = snapshot.mealPlans
+        self.recentGeneratedWorkouts = snapshot.recentGeneratedWorkouts
         save()
     }
 

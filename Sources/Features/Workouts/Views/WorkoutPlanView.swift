@@ -4,8 +4,7 @@ struct WorkoutPlanView: View {
     @StateObject private var manager = WorkoutsManager.shared
     @State private var isGenerating = false
     @State private var generationNote = ""
-
-    private let planner = AIWorkoutPlanner()
+    @State private var errorMessage: String?
 
     var body: some View {
         List {
@@ -29,6 +28,7 @@ struct WorkoutPlanView: View {
                     Label(workout.title, systemImage: "figure.strengthtraining.traditional")
                     LabeledContent("Duration", value: "\(workout.estimatedDurationMinutes) min")
                     LabeledContent("Completion", value: "\(Int(workout.completionRate * 100))%")
+                    LabeledContent("Difficulty", value: workout.difficulty.capitalized)
                 }
 
                 Section("Exercises") {
@@ -43,7 +43,7 @@ struct WorkoutPlanView: View {
                                     Image(systemName: exercise.isCompleted ? "checkmark.circle.fill" : "circle")
                                         .foregroundStyle(exercise.isCompleted ? .green : .secondary)
                                 }
-                                Text("\(exercise.sets)x\(exercise.reps) • Rest \(exercise.restSeconds)s • ~\(exercise.durationMinutes)m")
+                                Text("\(exercise.sets)x\(exercise.reps) • \(exercise.muscleGroup) • Rest \(exercise.restSeconds)s • ~\(exercise.durationMinutes)m")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
@@ -59,6 +59,14 @@ struct WorkoutPlanView: View {
                 }
             } else {
                 ContentUnavailableView("No Workout Yet", systemImage: "figure.strengthtraining.functional", description: Text("Complete onboarding and run the AI planner."))
+            }
+
+            if let errorMessage {
+                Section("AI Error") {
+                    Text(errorMessage)
+                        .font(.footnote)
+                        .foregroundStyle(.red)
+                }
             }
         }
         .overlay {
@@ -87,15 +95,13 @@ struct WorkoutPlanView: View {
         isGenerating = true
         defer { isGenerating = false }
 
-        let userPlan = await planner.generatePlan(
-            profile: profile,
-            progress: manager.progress,
-            streak: manager.streak,
-            nutrition: manager.nutrition,
-            previousWorkout: manager.todayWorkout
-        )
-
-        manager.todayWorkout = userPlan.workoutModel
-        generationNote = "Last generated: \(Date().formatted(date: .abbreviated, time: .shortened))"
+        let result = await manager.generateAIWorkout(force: true)
+        switch result {
+        case .success:
+            generationNote = "Last generated: \(Date().formatted(date: .abbreviated, time: .shortened))"
+            errorMessage = nil
+        case .failure(let error):
+            errorMessage = error.localizedDescription
+        }
     }
 }

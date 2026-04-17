@@ -6,6 +6,7 @@ struct AIMentorChatView: View {
     @State private var inputText: String = ""
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var selectedImageData: Data?
+    @State private var isSending = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -41,10 +42,10 @@ struct AIMentorChatView: View {
                     .lineLimit(1...4)
 
                 Button("Send") {
-                    submitMessage()
+                    Task { await submitMessage() }
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSending)
             }
             .padding()
         }
@@ -61,6 +62,22 @@ struct AIMentorChatView: View {
                 .padding(10)
                 .background(message.role == .user ? Color.accentColor.opacity(0.2) : Color(.secondarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
+            if !message.insights.isEmpty && message.role == .assistant {
+                VStack(alignment: .leading, spacing: 2) {
+                    ForEach(message.insights, id: \.self) { insight in
+                        Label(insight, systemImage: "lightbulb")
+                            .font(.caption)
+                    }
+                }
+            }
+            if !message.recommendations.isEmpty && message.role == .assistant {
+                VStack(alignment: .leading, spacing: 2) {
+                    ForEach(message.recommendations, id: \.self) { rec in
+                        Label(rec, systemImage: "checkmark.seal")
+                            .font(.caption)
+                    }
+                }
+            }
             if let imageHint = message.imageHint {
                 Text(imageHint)
                     .font(.caption2)
@@ -70,10 +87,13 @@ struct AIMentorChatView: View {
         .frame(maxWidth: .infinity, alignment: message.role == .user ? .trailing : .leading)
     }
 
-    private func submitMessage() {
+    @MainActor
+    private func submitMessage() async {
         let prompt = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !prompt.isEmpty else { return }
-        manager.sendMentorMessage(prompt, imageData: selectedImageData)
+        isSending = true
+        await manager.sendMentorMessage(prompt, imageData: selectedImageData)
+        isSending = false
         inputText = ""
         selectedPhotoItem = nil
         selectedImageData = nil
