@@ -21,6 +21,7 @@ struct DashboardView: View {
                     categoryPicker
                     privateModeCard
                     musicModeCard
+                    sendPingCard
 
                     if searchText.isEmpty && selectedCategory == nil {
                         toolSection(title: "Favorites", tools: favoriteTools)
@@ -146,6 +147,24 @@ struct DashboardView: View {
         )
         .padding(.horizontal)
         .animation(.easeInOut(duration: 0.25), value: musicMode.isMusicModeEnabled)
+    }
+
+    private var sendPingCard: some View {
+        Button {
+            Task {
+                _ = try? await client.ping()
+            }
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "antenna.radiowaves.left.and.right")
+                Text("Send a ping")
+                    .fontWeight(.semibold)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+        }
+        .buttonStyle(.borderedProminent)
+        .padding(.horizontal)
     }
 
     private var categoryPicker: some View {
