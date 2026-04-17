@@ -259,6 +259,10 @@
 		WK020000000000000000002C /* AIMentorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000002C /* AIMentorService.swift */; };
 		WK020000000000000000002D /* AIMentorContextBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000002D /* AIMentorContextBuilder.swift */; };
 		WK020000000000000000002E /* AIMentorMemoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000002E /* AIMentorMemoryStore.swift */; };
+		WK020000000000000000002F /* AIWorkoutPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000002F /* AIWorkoutPlanner.swift */; };
+		WK0200000000000000000030 /* WorkoutUserPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000030 /* WorkoutUserPlan.swift */; };
+		WK0200000000000000000031 /* NutritionAILogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000031 /* NutritionAILogic.swift */; };
+		WK0200000000000000000032 /* NutritionSummaryInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000032 /* NutritionSummaryInfoView.swift */; };
 		88656A686AF741EB83B8FD5F /* SliderQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711D3FB735414113B06478F1 /* MorseCodeView.swift */; };
@@ -1056,6 +1060,10 @@
 		WK010000000000000000002C /* AIMentorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/AI/AIMentorService.swift"; sourceTree = "<group>"; };
 		WK010000000000000000002D /* AIMentorContextBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/AI/AIMentorContextBuilder.swift"; sourceTree = "<group>"; };
 		WK010000000000000000002E /* AIMentorMemoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Services/AIMentorMemoryStore.swift"; sourceTree = "<group>"; };
+		WK010000000000000000002F /* AIWorkoutPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/AI/AIWorkoutPlanner.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000030 /* WorkoutUserPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/AI/WorkoutUserPlan.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000031 /* NutritionAILogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/AI/NutritionAILogic.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000032 /* NutritionSummaryInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/NutritionSummaryInfoView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1603,6 +1611,10 @@
 				WK010000000000000000002C /* AIMentorService.swift */,
 				WK010000000000000000002D /* AIMentorContextBuilder.swift */,
 				WK010000000000000000002E /* AIMentorMemoryStore.swift */,
+				WK010000000000000000002F /* AIWorkoutPlanner.swift */,
+				WK0100000000000000000030 /* WorkoutUserPlan.swift */,
+				WK0100000000000000000031 /* NutritionAILogic.swift */,
+				WK0100000000000000000032 /* NutritionSummaryInfoView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -2210,6 +2222,10 @@
 				WK020000000000000000002C /* AIMentorService.swift in Sources */,
 				WK020000000000000000002D /* AIMentorContextBuilder.swift in Sources */,
 				WK020000000000000000002E /* AIMentorMemoryStore.swift in Sources */,
+				WK020000000000000000002F /* AIWorkoutPlanner.swift in Sources */,
+				WK0200000000000000000030 /* WorkoutUserPlan.swift in Sources */,
+				WK0200000000000000000031 /* NutritionAILogic.swift in Sources */,
+				WK0200000000000000000032 /* NutritionSummaryInfoView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
