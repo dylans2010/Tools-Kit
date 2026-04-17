@@ -49,7 +49,7 @@ struct DraftingEmailsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section(header: Text("Email Details")) {
+                Section {
                     TextField("Email Recipient", text: $recipient)
                         .textInputAutocapitalization(.never)
                         .keyboardType(.emailAddress)
@@ -69,6 +69,8 @@ struct DraftingEmailsView: View {
                             Text(option.rawValue).tag(option)
                         }
                     }
+                } header: {
+                    Text("Email Details")
                 } footer: {
                     Text("Recipient should be a single email address for best results.")
                 }
