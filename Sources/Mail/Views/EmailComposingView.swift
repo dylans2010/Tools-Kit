@@ -331,6 +331,29 @@ struct EmailComposingView: View {
         messageBody += "\(marker)text\(marker)"
     }
 
+    private func recipientChip(_ recipient: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: "person.crop.circle.fill")
+                .font(.caption)
+
+            Text(recipient)
+                .font(.caption.weight(.semibold))
+                .lineLimit(1)
+
+            Button {
+                toRecipients.removeAll { $0 == recipient }
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.caption)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(Color.blue.opacity(0.10), in: Capsule())
+        .foregroundColor(.blue)
+    }
+
     private func attachmentChip(_ attachment: MailMessage.MailAttachment) -> some View {
         HStack(spacing: 6) {
             Image(systemName: "doc.fill")
