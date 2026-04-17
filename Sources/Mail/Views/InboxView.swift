@@ -13,14 +13,23 @@ struct InboxView: View {
 
     @StateObject private var syncService = MailSyncService.shared
     @StateObject private var storage = MailStorageService.shared
+    @State private var activeAccount: MailAccount
     @State private var searchText = ""
     @State private var showingCompose = false
+    @State private var showingAddAccount = false
     @State private var prioritySummary: String?
     @State private var priorityThreads: [MailThread] = []
     @State private var showingPriorityEmails = false
     @State private var isPrioritizing = false
     @State private var catchUpSummary: String?
     @State private var isSummarizing = false
+
+    init(account: MailAccount, folder: MailFolder, filter: InboxFilter = .all) {
+        self.account = account
+        self.folder = folder
+        self.filter = filter
+        _activeAccount = State(initialValue: account)
+    }
 
     var body: some View {
         ZStack {
@@ -47,10 +56,18 @@ struct InboxView: View {
         .scrollContentBackground(.hidden)
         .searchable(text: $searchText)
         .refreshable {
-            await syncService.fetchThreads(account: account, folder: folder)
+            await syncService.fetchThreads(account: activeAccount, folder: folder)
         }
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                if filter != .unread {
+                    Button {
+                        showingAddAccount = true
+                    } label: {
+                        Image(systemName: "person.crop.circle.badge.plus")
+                    }
+                }
+
                 Button(action: toolbarAction) {
                     if filter == .unread {
                         Label(isSummarizing ? "Working" : "Catch Up", systemImage: isSummarizing ? "hourglass" : "sparkles")
@@ -61,7 +78,15 @@ struct InboxView: View {
             }
         }
         .sheet(isPresented: $showingCompose) {
-            EmailComposingView(account: account)
+            EmailComposingView(account: activeAccount)
+        }
+        .sheet(isPresented: $showingAddAccount) {
+            AddMailAccountView { selected in
+                activeAccount = selected
+                Task {
+                    await syncService.fetchThreads(account: selected, folder: folder)
+                }
+            }
         }
         .sheet(isPresented: $showingPriorityEmails) {
             NavigationStack {
@@ -70,7 +95,7 @@ struct InboxView: View {
         }
         .task {
             _ = storage.loadThreads(for: folderKey)
-            await syncService.fetchThreads(account: account, folder: folder)
+            await syncService.fetchThreads(account: activeAccount, folder: folder)
         }
     }
 
@@ -348,7 +373,7 @@ struct InboxView: View {
         return result
     }
 
-    private var folderKey: String { "\(account.id)_\(folder.id)" }
+    private var folderKey: String { "\(activeAccount.id)_\(folder.id)" }
 
     private func toggleRead(_ thread: MailThread) {
         guard let idx = storage.threads.firstIndex(where: { $0.id == thread.id }) else { return }

@@ -324,6 +324,12 @@
 		BBC0543E9EE67EE5AC4CD422 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E00A1458A464DAB575C4FE /* AppModel.swift */; };
 		BD781D5600F4E98B9B514667 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54244EAC19ED294008A5A839 /* ContentView.swift */; };
 		C4F2A9817D6E4B30A5C1D9E2 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D9E2F14C3B4A8192D0E6F1 /* LoginView.swift */; };
+		BFA001000000000000000001 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000001 /* CreateAccountView.swift */; };
+		BFA001000000000000000002 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000002 /* AuthService.swift */; };
+		BFA001000000000000000003 /* AuthDatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000003 /* AuthDatabaseService.swift */; };
+		BFA001000000000000000004 /* AddMailAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000004 /* AddMailAccountView.swift */; };
+		BFA001000000000000000005 /* GmailServerConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000005 /* GmailServerConfiguration.swift */; };
+		BFA001000000000000000006 /* GmailMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000006 /* GmailMailProvider.swift */; };
 		1391D868D54B47CB842E2A80 /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = D735D463856D4BA588299529 /* Tool.swift */; };
 		C8B89D342FDA412F89C64396 /* ToolRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45DBE4B4F95D46F58A5304BC /* ToolRegistry.swift */; };
 		90C0DAB9340E467CB6AE1F59 /* APITesterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64E5154717C4F53A3A10C60 /* APITesterBackend.swift */; };
@@ -634,6 +640,12 @@
 		1060294FE4D1B96EE4302F9E /* AppEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppEntry.swift"; sourceTree = "<group>"; };
 		54244EAC19ED294008A5A839 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A7D9E2F14C3B4A8192D0E6F1 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Auth/LoginView.swift"; sourceTree = "<group>"; };
+		BFA101000000000000000001 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Auth/CreateAccountView.swift"; sourceTree = "<group>"; };
+		BFA101000000000000000002 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Services/Auth/AuthService.swift"; sourceTree = "<group>"; };
+		BFA101000000000000000003 /* AuthDatabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Services/Auth/AuthDatabaseService.swift"; sourceTree = "<group>"; };
+		BFA101000000000000000004 /* AddMailAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mail/Views/AddMailAccountView.swift"; sourceTree = "<group>"; };
+		BFA101000000000000000005 /* GmailServerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mail/Models/Gmail/GmailServerConfiguration.swift"; sourceTree = "<group>"; };
+		BFA101000000000000000006 /* GmailMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mail/Providers/GmailMailProvider.swift"; sourceTree = "<group>"; };
 		732E3165BFBB323BD8081B3F /* Tools-Kit.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Tools-Kit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0E00A1458A464DAB575C4FE /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		D735D463856D4BA588299529 /* Tool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
@@ -1084,6 +1096,12 @@
 			children = (
 				54244EAC19ED294008A5A839 /* ContentView.swift */,
 				A7D9E2F14C3B4A8192D0E6F1 /* LoginView.swift */,
+				BFA101000000000000000001 /* CreateAccountView.swift */,
+				BFA101000000000000000002 /* AuthService.swift */,
+				BFA101000000000000000003 /* AuthDatabaseService.swift */,
+				BFA101000000000000000004 /* AddMailAccountView.swift */,
+				BFA101000000000000000005 /* GmailServerConfiguration.swift */,
+				BFA101000000000000000006 /* GmailMailProvider.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1819,6 +1837,12 @@
 				BBC0543E9EE67EE5AC4CD422 /* AppModel.swift in Sources */,
 				BD781D5600F4E98B9B514667 /* ContentView.swift in Sources */,
 				C4F2A9817D6E4B30A5C1D9E2 /* LoginView.swift in Sources */,
+				BFA001000000000000000001 /* CreateAccountView.swift in Sources */,
+				BFA001000000000000000002 /* AuthService.swift in Sources */,
+				BFA001000000000000000003 /* AuthDatabaseService.swift in Sources */,
+				BFA001000000000000000004 /* AddMailAccountView.swift in Sources */,
+				BFA001000000000000000005 /* GmailServerConfiguration.swift in Sources */,
+				BFA001000000000000000006 /* GmailMailProvider.swift in Sources */,
 
 				B1C2D3E4F5A60708090A0D01 /* AIService.swift in Sources */,
 				B1C2D3E4F5A60708090A0D02 /* CameraService.swift in Sources */,

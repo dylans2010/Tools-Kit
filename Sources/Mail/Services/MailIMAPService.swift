@@ -2,12 +2,25 @@ import Foundation
 import Network
 
 class MailIMAPService: @unchecked Sendable {
-    private let host: String = "imap.mail.me.com"
-    private let port: UInt16 = 993
+    private var host: String = "imap.mail.me.com"
+    private var port: UInt16 = 993
     private var connection: NWConnection?
     private var tagCounter = 1
 
     func connect() async throws {
+        try await connect(provider: .iCloud)
+    }
+
+    func connect(provider: MailAccount.MailProviderType) async throws {
+        switch provider {
+        case .iCloud:
+            host = "imap.mail.me.com"
+            port = 993
+        case .gmail:
+            host = GmailServerConfiguration.imapHost
+            port = GmailServerConfiguration.imapPort
+        }
+
         let endpoint = NWEndpoint.hostPort(host: NWEndpoint.Host(host), port: NWEndpoint.Port(integerLiteral: port))
         let parameters = NWParameters.tls
         connection = NWConnection(to: endpoint, using: parameters)

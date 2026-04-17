@@ -2,11 +2,24 @@ import Foundation
 import Network
 
 class MailSMTPService {
-    private let host: String = "smtp.mail.me.com"
-    private let port: UInt16 = 587
+    private var host: String = "smtp.mail.me.com"
+    private var port: UInt16 = 587
     private var connection: NWConnection?
 
     func send(message: MailMessage, user: String, pass: String) async throws {
+        try await send(message: message, user: user, pass: pass, provider: .iCloud)
+    }
+
+    func send(message: MailMessage, user: String, pass: String, provider: MailAccount.MailProviderType) async throws {
+        switch provider {
+        case .iCloud:
+            host = "smtp.mail.me.com"
+            port = 587
+        case .gmail:
+            host = GmailServerConfiguration.smtpHost
+            port = GmailServerConfiguration.smtpPort
+        }
+
         let endpoint = NWEndpoint.hostPort(host: NWEndpoint.Host(host), port: NWEndpoint.Port(integerLiteral: port))
         // SMTP 587 usually starts with plain then STARTTLS
         connection = NWConnection(to: endpoint, using: .tcp)

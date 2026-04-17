@@ -1,6 +1,6 @@
 import Foundation
 
-class iCloudMailProvider: MailProviderProtocol {
+class GmailMailProvider: MailProviderProtocol {
     let account: MailAccount
     private let imapService = MailIMAPService()
     private let smtpService = MailSMTPService()
@@ -17,21 +17,23 @@ class iCloudMailProvider: MailProviderProtocol {
         guard let password = MailKeychainManager.shared.getPassword(for: account.email) else {
             throw NSError(domain: "MailError", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing credentials"])
         }
-        defer { imapService.disconnect() }
-        try await imapService.connect(provider: .iCloud)
-        try await imapService.login(user: account.email, pass: password)
-        let messages = try await imapService.fetchMessages(folder: folder.id, limit: limit, offset: offset)
 
-        // Basic grouping into threads by subject for V1
+        defer { imapService.disconnect() }
+        try await imapService.connect(provider: .gmail)
+        try await imapService.login(user: account.email, pass: password)
+
+        let messages = try await imapService.fetchMessages(folder: folder.id, limit: limit, offset: offset)
         let grouped = Dictionary(grouping: messages, by: { $0.threadId })
-        let threads = grouped.map { (_, messages) in
+
+        let threads = grouped.map { (_, groupedMessages) in
             MailThread(
-                id: messages.first?.threadId ?? UUID().uuidString,
-                subject: messages.first?.subject ?? "No Subject",
-                messages: messages.sorted(by: { $0.date < $1.date }),
-                lastMessageDate: messages.map({ $0.date }).max() ?? Date()
+                id: groupedMessages.first?.threadId ?? UUID().uuidString,
+                subject: groupedMessages.first?.subject ?? "No Subject",
+                messages: groupedMessages.sorted(by: { $0.date < $1.date }),
+                lastMessageDate: groupedMessages.map({ $0.date }).max() ?? Date()
             )
         }
+
         return threads.sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
     }
 
@@ -39,18 +41,13 @@ class iCloudMailProvider: MailProviderProtocol {
         guard let password = MailKeychainManager.shared.getPassword(for: account.email) else {
             throw NSError(domain: "MailError", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing credentials"])
         }
-        try await smtpService.send(message: message, user: account.email, pass: password, provider: .iCloud)
+
+        try await smtpService.send(message: message, user: account.email, pass: password, provider: .gmail)
     }
 
-    func markAsRead(_ threadId: String) async throws {
-        // IMAP STORE +FLAGS (\Seen)
-    }
+    func markAsRead(_ threadId: String) async throws {}
 
-    func deleteThread(_ threadId: String) async throws {
-        // IMAP STORE +FLAGS (\Deleted) + EXPUNGE
-    }
+    func deleteThread(_ threadId: String) async throws {}
 
-    func starThread(_ threadId: String, starred: Bool) async throws {
-        // IMAP STORE +/-FLAGS (\Flagged)
-    }
+    func starThread(_ threadId: String, starred: Bool) async throws {}
 }

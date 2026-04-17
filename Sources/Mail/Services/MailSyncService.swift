@@ -56,7 +56,7 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
                 throw NSError(domain: "MailSync", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing credentials"])
             }
 
-            try await imapService.connect()
+            try await imapService.connect(provider: account.provider)
             print("[MailSync] IMAP connected. Fetching UIDs...")
             try await imapService.login(user: account.email, pass: password)
 

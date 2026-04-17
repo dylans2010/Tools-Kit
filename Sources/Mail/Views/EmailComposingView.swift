@@ -435,7 +435,13 @@ struct EmailComposingView: View {
         isSending = true
         Task {
             do {
-                let provider = iCloudMailProvider(account: account)
+                let provider: MailProviderProtocol
+                switch account.provider {
+                case .iCloud:
+                    provider = iCloudMailProvider(account: account)
+                case .gmail:
+                    provider = GmailMailProvider(account: account)
+                }
                 let message = MailMessage(
                     id: UUID().uuidString,
                     threadId: replyTo?.threadId ?? UUID().uuidString,

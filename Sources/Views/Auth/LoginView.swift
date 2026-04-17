@@ -8,6 +8,7 @@ struct LoginView: View {
     @State private var password = ""
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var showingCreateAccount = false
 
     var body: some View {
         ZStack {
@@ -137,13 +138,30 @@ struct LoginView: View {
                             iconText: "{}",
                             action: { signInWithOAuth(provider: "github") }
                         )
+
+                        SocialLoginButton(
+                            label: "Discord",
+                            iconText: "D",
+                            action: { signInWithOAuth(provider: "discord") }
+                        )
                     }
                     .padding(.horizontal, 20)
+
+                    Button("Create account") {
+                        showingCreateAccount = true
+                    }
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.85))
                 }
 
                 Spacer(minLength: 14)
             }
             .padding(.bottom, 14)
+        }
+        .sheet(isPresented: $showingCreateAccount) {
+            CreateAccountView {
+                onAuthenticated()
+            }
         }
     }
 
@@ -158,7 +176,7 @@ struct LoginView: View {
 
         Task {
             do {
-                _ = try await account.createEmailPasswordSession(email: email, password: password)
+                try await AuthService.shared.signIn(email: email, password: password)
                 await MainActor.run {
                     isLoading = false
                     onAuthenticated()
@@ -178,7 +196,7 @@ struct LoginView: View {
 
         Task {
             do {
-                _ = try await account.createOAuth2Session(provider: provider)
+                try await AuthService.shared.signInWithOAuth(provider: provider)
                 await MainActor.run {
                     isLoading = false
                     onAuthenticated()

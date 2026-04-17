@@ -8,5 +8,9 @@
     <string>Toolskit</string>
     <key>APPWRITE_PUBLIC_ENDPOINT</key>
     <string>https://fra.cloud.appwrite.io/v1</string>
+    <key>APPWRITE_AUTH_DATABASE_ID</key>
+    <string></string>
+    <key>APPWRITE_AUTH_USERS_COLLECTION_ID</key>
+    <string></string>
 </dict>
 </plist>
