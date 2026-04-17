@@ -5,11 +5,13 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
 
     @Published var isSyncing = false
     @Published var lastSyncDate: Date?
+    @Published var lastError: String?
 
     private let imapService = MailIMAPService()
     private let storage = MailStorageService.shared
     private let pageSize = 50
     private var currentOffset = 0
+    private var hasMorePages = true
     private var activeAccount: MailAccount?
     private var activeFolder: MailFolder = .inbox
 
@@ -19,6 +21,7 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
 
     func fetchNextPage() async {
         guard let account = activeAccount else { return }
+        guard hasMorePages else { return }
         await performFetch(account: account, folder: activeFolder, reset: false)
     }
 
@@ -34,8 +37,14 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
     private func performFetch(account: MailAccount, folder: MailFolder, reset: Bool) async {
         guard !isSyncing else { return }
 
-        DispatchQueue.main.async { self.isSyncing = true }
-        if reset { currentOffset = 0 }
+        await MainActor.run {
+            self.isSyncing = true
+            self.lastError = nil
+        }
+        if reset {
+            currentOffset = 0
+            hasMorePages = true
+        }
         activeAccount = account
         activeFolder = folder
 
@@ -63,13 +72,17 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
             print("[MailSync] Storage updated. InboxView should refresh.")
 
             currentOffset += messages.count
-            DispatchQueue.main.async {
+            hasMorePages = messages.count == pageSize
+            await MainActor.run {
                 self.lastSyncDate = Date()
                 self.isSyncing = false
             }
         } catch {
             print("❌ MailSync: failed for \(account.email): \(error)")
-            DispatchQueue.main.async { self.isSyncing = false }
+            await MainActor.run {
+                self.lastError = error.localizedDescription
+                self.isSyncing = false
+            }
         }
     }
 

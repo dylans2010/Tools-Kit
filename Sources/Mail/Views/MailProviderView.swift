@@ -9,8 +9,15 @@ struct MailProviderView: View {
     @State private var errorMsg: String?
 
     var body: some View {
-        Form {
-            Section(header: Text("Choose Provider")) {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Setup Mail")
+                    .font(.largeTitle.bold())
+
+                Text("Connect your provider to sync and compose emails.")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         ProviderCard(name: "iCloud", icon: "icloud.fill", isEnabled: true, isSelected: selectedProvider == .iCloud) {
@@ -18,39 +25,62 @@ struct MailProviderView: View {
                         }
                         ProviderCard(name: "Gmail", icon: "envelope.fill", isEnabled: false, isSelected: false) {}
                     }
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 4)
                 }
-            }
 
-            Section(header: Text("iCloud Credentials")) {
-                TextField("Apple ID Email", text: $email)
-                    .autocapitalization(.none)
-                    .keyboardType(.emailAddress)
-                SecureField("App-Specific Password", text: $password)
+                VStack(spacing: 12) {
+                    TextField("Apple ID Email", text: $email)
+                        .textInputAutocapitalization(.never)
+                        .keyboardType(.emailAddress)
+                        .autocorrectionDisabled(true)
+                        .padding(12)
+                        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
 
-                Link("How to create app-specific password?", destination: URL(string: "https://appleid.apple.com")!)
-                    .font(.caption)
-            }
+                    SecureField("App-Specific Password", text: $password)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled(true)
+                        .padding(12)
+                        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
 
-            Section {
+                    Link("How to create an app-specific password", destination: URL(string: "https://appleid.apple.com")!)
+                        .font(.footnote)
+                }
+
                 Button(action: save) {
-                    if isSaving {
-                        ProgressView().frame(maxWidth: .infinity)
-                    } else {
-                        Text("Sign In")
-                            .frame(maxWidth: .infinity)
+                    HStack {
+                        if isSaving {
+                            ProgressView().tint(.white)
+                        } else {
+                            Image(systemName: "checkmark.shield")
+                            Text("Sign In")
+                                .fontWeight(.semibold)
+                        }
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Color.blue, in: RoundedRectangle(cornerRadius: 12))
+                    .foregroundColor(.white)
                 }
-                .buttonStyle(.borderedProminent)
                 .disabled(email.isEmpty || password.isEmpty || isSaving)
-            }
 
-            if let error = errorMsg {
-                Section {
-                    Text(error).foregroundColor(.red)
+                if let error = errorMsg {
+                    Label(error, systemImage: "xmark.octagon.fill")
+                        .font(.footnote)
+                        .foregroundColor(.red)
+                        .padding(10)
+                        .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
                 }
             }
+            .padding(20)
         }
+        .background(
+            LinearGradient(
+                colors: [Color(red: 0.97, green: 0.98, blue: 1.0), Color(red: 0.93, green: 0.95, blue: 1.0)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+        )
         .navigationTitle("Setup Mail")
     }
 
@@ -60,6 +90,7 @@ struct MailProviderView: View {
         if success {
             let account = MailAccount(id: UUID(), email: email, provider: .iCloud, isEnabled: true)
             var current = MailStorageService.shared.loadAccounts()
+            current.removeAll { $0.email.caseInsensitiveCompare(email) == .orderedSame }
             current.append(account)
             MailStorageService.shared.saveAccounts(current)
             dismiss()
