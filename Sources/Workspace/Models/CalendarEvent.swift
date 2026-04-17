@@ -41,6 +41,13 @@ struct CalendarEvent: Identifiable, Codable {
         formatter.dateStyle = .none
         return "\(formatter.string(from: startTime)) – \(formatter.string(from: endTime))"
     }
+
+    var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
+    }
 }
 
 enum EventPriority: String, Codable, CaseIterable {
