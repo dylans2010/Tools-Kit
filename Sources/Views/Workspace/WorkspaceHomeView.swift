@@ -116,7 +116,8 @@ struct WorkspaceDashboardView: View {
         ("Forms", "list.bullet.rectangle.portrait", .teal, AnyView(FormsView())),
         ("Slides", "rectangle.on.rectangle.angled", .purple, AnyView(SlidesHomeView())),
         ("Sheets", "tablecells", .blue, AnyView(SpreadsheetsHomeView())),
-        ("Workouts", "figure.strengthtraining.traditional", .mint, AnyView(WorkoutsHomeView()))
+        ("Workouts", "figure.strengthtraining.traditional", .mint, AnyView(WorkoutsHomeView())),
+        ("AI Mentor", "sparkles", .pink, AnyView(AIMentorView()))
     ]
 
     var body: some View {

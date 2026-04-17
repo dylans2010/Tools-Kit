@@ -14,7 +14,13 @@ struct WorkoutsHomeView: View {
             }
             .navigationTitle("Workouts")
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    NavigationLink {
+                        AIMentorView()
+                    } label: {
+                        Image(systemName: "sparkles")
+                    }
+
                     NavigationLink {
                         WorkoutsSettingsView()
                     } label: {
@@ -29,7 +35,9 @@ struct WorkoutsHomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 headerSection
+                mentorSection
                 todayPlanSection
+                loggingSection
                 streaksBadgesSection
                 nutritionSection
                 progressSection
@@ -49,6 +57,19 @@ struct WorkoutsHomeView: View {
         }
     }
 
+    private var mentorSection: some View {
+        NavigationLink {
+            AIMentorView()
+        } label: {
+            sectionCard(
+                title: "AI Mentor",
+                subtitle: "Adaptive coaching, meal analysis, and recovery guidance",
+                icon: "sparkles"
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
     private var todayPlanSection: some View {
         NavigationLink {
             WorkoutPlanView()
@@ -60,6 +81,32 @@ struct WorkoutsHomeView: View {
             )
         }
         .buttonStyle(.plain)
+    }
+
+    private var loggingSection: some View {
+        VStack(spacing: 10) {
+            NavigationLink {
+                WorkoutLoggingView()
+            } label: {
+                sectionCard(
+                    title: "Workout Logging",
+                    subtitle: "Track sets, reps, load, duration",
+                    icon: "list.bullet.clipboard"
+                )
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink {
+                LiveWorkoutView()
+            } label: {
+                sectionCard(
+                    title: "Live Workout",
+                    subtitle: "Timer, rest tracking, heart rate",
+                    icon: "timer"
+                )
+            }
+            .buttonStyle(.plain)
+        }
     }
 
     private var streaksBadgesSection: some View {
@@ -89,16 +136,24 @@ struct WorkoutsHomeView: View {
     }
 
     private var nutritionSection: some View {
-        NavigationLink {
-            NutritionView()
-        } label: {
-            sectionCard(
-                title: "Nutrition Summary",
-                subtitle: "\(manager.nutrition.caloriesConsumed)/\(manager.nutrition.calorieGoal) calories",
-                icon: "fork.knife"
-            )
+        VStack(spacing: 10) {
+            NavigationLink {
+                NutritionView()
+            } label: {
+                sectionCard(
+                    title: "Nutrition Summary",
+                    subtitle: "\(manager.nutrition.caloriesConsumed)/\(manager.nutrition.calorieGoal) calories",
+                    icon: "fork.knife"
+                )
+            }
+            .buttonStyle(.plain)
+
+            HStack(spacing: 10) {
+                shortcutLink(title: "Scan", icon: "camera.viewfinder") { MealScannerView() }
+                shortcutLink(title: "Voice", icon: "mic.fill") { MealVoiceLoggingView() }
+                shortcutLink(title: "Manual", icon: "square.and.pencil") { NutritionView() }
+            }
         }
-        .buttonStyle(.plain)
     }
 
     private var progressSection: some View {
@@ -110,6 +165,28 @@ struct WorkoutsHomeView: View {
                     title: "Progress Overview",
                     subtitle: "Weight, consistency, and calories charts",
                     icon: "chart.line.uptrend.xyaxis"
+                )
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink {
+                AnalyticsView()
+            } label: {
+                sectionCard(
+                    title: "Advanced Analytics",
+                    subtitle: "Strength trends, insights, and goal alignment",
+                    icon: "chart.bar.xaxis"
+                )
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink {
+                MealPlanView()
+            } label: {
+                sectionCard(
+                    title: "Meal Planning",
+                    subtitle: "Daily/weekly plans with auto grocery lists",
+                    icon: "list.bullet.rectangle.portrait"
                 )
             }
             .buttonStyle(.plain)
@@ -148,6 +225,22 @@ struct WorkoutsHomeView: View {
         .padding()
         .background(Color(.secondarySystemGroupedBackground))
         .cornerRadius(14)
+    }
+
+    private func shortcutLink<Destination: View>(title: String, icon: String, @ViewBuilder destination: () -> Destination) -> some View {
+        NavigationLink(destination: destination()) {
+            VStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.headline)
+                Text(title)
+                    .font(.caption)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(Color(.secondarySystemGroupedBackground))
+            .cornerRadius(10)
+        }
+        .buttonStyle(.plain)
     }
 
     private var todaySummary: String {

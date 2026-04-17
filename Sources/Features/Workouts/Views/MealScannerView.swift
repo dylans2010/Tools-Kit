@@ -11,6 +11,8 @@ struct MealScannerView: View {
     @State private var showingCamera = false
     @State private var showingCameraUnavailableAlert = false
     @State private var analysis: MealAnalysis?
+    @State private var editableItems: [DetectedFoodItem] = []
+    @State private var newItemName: String = ""
 
     var body: some View {
         Form {
@@ -46,24 +48,71 @@ struct MealScannerView: View {
             Section {
                 Button("Analyze Meal") {
                     let inputName = mealName.isEmpty ? "Meal" : mealName
-                    analysis = manager.analyzeMeal(named: inputName, imageData: selectedImage?.jpegData(compressionQuality: 0.8))
+                    let result = manager.analyzeMealInput(
+                        inputName,
+                        sourceType: .image,
+                        imageData: selectedImage?.jpegData(compressionQuality: 0.8)
+                    )
+                    analysis = result
+                    editableItems = result.detectedItems
+                }
+            }
+
+            if analysis != nil {
+                Section("Detected Items") {
+                    if editableItems.isEmpty {
+                        Text("No items detected.")
+                            .foregroundColor(.secondary)
+                    }
+
+                    ForEach($editableItems) { $item in
+                        VStack(alignment: .leading, spacing: 8) {
+                            TextField("Food", text: $item.name)
+                            Picker("Category", selection: $item.category) {
+                                ForEach(FoodCategory.allCases) { category in
+                                    Text(category.rawValue.capitalized).tag(category)
+                                }
+                            }
+                            TextField("Portion", text: $item.portionDescription)
+                            Stepper("Calories: \(item.estimatedCalories)", value: $item.estimatedCalories, in: 0...1200)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    .onDelete { offsets in
+                        editableItems.remove(atOffsets: offsets)
+                    }
+
+                    HStack {
+                        TextField("Add item", text: $newItemName)
+                        Button("Add") {
+                            let trimmed = newItemName.trimmingCharacters(in: .whitespacesAndNewlines)
+                            guard !trimmed.isEmpty else { return }
+                            editableItems.append(
+                                DetectedFoodItem(name: trimmed, category: .mixed, portionDescription: "1 serving", estimatedCalories: 180)
+                            )
+                            newItemName = ""
+                        }
+                    }
                 }
 
-                if let analysis {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Estimated calories: \(analysis.calories)")
-                        Text("Protein: \(Int(analysis.proteinGrams))g · Carbs: \(Int(analysis.carbsGrams))g · Fats: \(Int(analysis.fatsGrams))g")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                        Text(analysis.summary)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                Section("Estimate") {
+                    let updated = manager.recalculateMealAnalysis(from: editableItems)
+                    LabeledContent("Calories", value: "\(updated.calories)")
+                    LabeledContent("Macros", value: "P\(Int(updated.proteinGrams)) C\(Int(updated.carbsGrams)) F\(Int(updated.fatsGrams))")
+                    Text(updated.summary)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
 
-                        Button("Add to Daily Nutrition") {
-                            manager.addMeal(name: mealName.isEmpty ? "Meal" : mealName, analysis: analysis)
-                        }
-                        .buttonStyle(.borderedProminent)
+                    Button("Confirm & Log Meal") {
+                        manager.addMeal(
+                            name: mealName.isEmpty ? "Scanned Meal" : mealName,
+                            analysis: updated,
+                            sourceType: .image,
+                            rawInput: mealName,
+                            detectedItemsOverride: editableItems
+                        )
                     }
+                    .buttonStyle(.borderedProminent)
                 }
             }
         }
