@@ -23,7 +23,7 @@ final class AuthService: ObservableObject {
 
     func restoreSession() async -> Bool {
         do {
-            _ = try await account.get()
+            _ = try await AppwriteService.account.get()
             return true
         } catch {
             return false
@@ -36,7 +36,7 @@ final class AuthService: ObservableObject {
         defer { isBusy = false }
 
         do {
-            _ = try await account.createEmailPasswordSession(email: email, password: password)
+            _ = try await AppwriteService.account.createEmailPasswordSession(email: email, password: password)
             await UserDataManager.shared.syncAfterLogin()
         } catch {
             lastErrorMessage = error.localizedDescription
@@ -50,14 +50,14 @@ final class AuthService: ObservableObject {
         defer { isBusy = false }
 
         do {
-            let createdUser = try await account.create(
+            let createdUser = try await AppwriteService.account.create(
                 userId: "unique()",
                 email: email,
                 password: password,
                 name: name.isEmpty ? nil : name
             )
 
-            _ = try await account.createEmailPasswordSession(email: email, password: password)
+            _ = try await AppwriteService.account.createEmailPasswordSession(email: email, password: password)
 
             do {
                 try await AuthDatabaseService.shared.upsertUserProfile(
@@ -86,17 +86,17 @@ final class AuthService: ObservableObject {
         do {
             switch provider.lowercased() {
             case "google":
-                _ = try await account.createOAuth2Session(provider: .google)
+                _ = try await AppwriteService.account.createOAuth2Session(provider: .google)
             case "github":
-                _ = try await account.createOAuth2Session(provider: .github)
+                _ = try await AppwriteService.account.createOAuth2Session(provider: .github)
             case "discord":
-                _ = try await account.createOAuth2Session(provider: .discord)
+                _ = try await AppwriteService.account.createOAuth2Session(provider: .discord)
             default:
                 throw AuthServiceError.unsupportedOAuthProvider(provider)
             }
 
             do {
-                let currentUser = try await account.get()
+                let currentUser = try await AppwriteService.account.get()
                 try await AuthDatabaseService.shared.upsertUserProfile(
                     userId: currentUser.id,
                     email: currentUser.email,
@@ -120,7 +120,7 @@ final class AuthService: ObservableObject {
         defer { isBusy = false }
 
         do {
-            try await account.deleteSession(sessionId: "current")
+            try await AppwriteService.account.deleteSession(sessionId: "current")
         } catch {
             lastErrorMessage = error.localizedDescription
             throw error

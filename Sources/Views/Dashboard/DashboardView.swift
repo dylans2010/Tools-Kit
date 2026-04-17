@@ -101,7 +101,7 @@ struct DashboardView: View {
 
         Task {
             do {
-                try await account.deleteSession(sessionId: "current")
+                try await AppwriteService.account.deleteSession(sessionId: "current")
                 await MainActor.run {
                     isSigningOut = false
                     signOutStatusMessage = "Signed out"
@@ -203,7 +203,7 @@ struct DashboardView: View {
             Button {
                 Task {
                     do {
-                        _ = try await client.ping()
+                        _ = try await AppwriteService.client.ping()
                         await MainActor.run {
                             pingStatusMessage = "Appwrite ping succeeded"
                         }
