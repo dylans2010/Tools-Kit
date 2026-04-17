@@ -8,15 +8,6 @@ enum MealSourceType: String, Codable, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-enum MealType: String, Codable, CaseIterable, Identifiable {
-    case breakfast
-    case lunch
-    case dinner
-    case snack
-
-    var id: String { rawValue }
-}
-
 enum FoodCategory: String, Codable, CaseIterable, Identifiable {
     case protein
     case carbs
@@ -50,7 +41,7 @@ struct DetectedFoodItem: Identifiable, Codable {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, name, category, portionDescription, estimatedCalories, portion
+        case id, name, category, portionDescription, estimatedCalories
     }
 
     init(from decoder: Decoder) throws {
@@ -58,11 +49,7 @@ struct DetectedFoodItem: Identifiable, Codable {
         id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
         name = try container.decodeIfPresent(String.self, forKey: .name) ?? "Food"
         category = try container.decodeIfPresent(FoodCategory.self, forKey: .category) ?? .mixed
-        if let portion = try container.decodeIfPresent(String.self, forKey: .portion) {
-            portionDescription = portion
-        } else {
-            portionDescription = try container.decodeIfPresent(String.self, forKey: .portionDescription) ?? "1 serving"
-        }
+        portionDescription = try container.decodeIfPresent(String.self, forKey: .portionDescription) ?? "1 serving"
         estimatedCalories = try container.decodeIfPresent(Int.self, forKey: .estimatedCalories) ?? 0
     }
 }

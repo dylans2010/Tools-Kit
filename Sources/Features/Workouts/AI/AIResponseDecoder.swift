@@ -11,7 +11,7 @@ enum AIResponseDecoderError: LocalizedError {
         case .invalidJSON:
             return "The AI response was not valid JSON."
         case .missingRequiredKeys(let keys):
-            return "The AI response was missing required fields: \(keys.joined(separator: \", \"))."
+            return "The AI response was missing required fields: \(keys.joined(separator: ", "))."
         case .typeMismatch(let path, let expected, let actual):
             return "The AI response contained an unexpected type at \(path). Expected \(expected) but found \(actual)."
         case .decodingFailed(let reason):
@@ -20,7 +20,7 @@ enum AIResponseDecoderError: LocalizedError {
     }
 }
 
-enum AIJSONType {
+indirect enum AIJSONType {
     case string
     case int
     case double
