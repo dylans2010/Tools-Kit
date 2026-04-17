@@ -110,6 +110,6 @@
     <key>APPWRITE_ENDPOINT</key>
     <string>https://fra.cloud.appwrite.io/v1</string>
     <key>APPWRITE_PROJECT_ID</key>
-    <string>69e24c32003548ff0e2e</string>
+    <string>YOUR_APPWRITE_PROJECT_ID</string>
 </dict>
 </plist>

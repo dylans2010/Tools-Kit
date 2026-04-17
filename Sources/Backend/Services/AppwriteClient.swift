@@ -30,6 +30,9 @@ final class AppwriteClient {
         guard !trimmedValue.isEmpty else {
             fatalError("Appwrite configuration value '\(key)' in Info.plist must not be empty.")
         }
+        guard !trimmedValue.hasPrefix("YOUR_") else {
+            fatalError("Appwrite configuration value '\(key)' in Info.plist is still using a placeholder. Replace it with a real value.")
+        }
 
         return trimmedValue
     }
