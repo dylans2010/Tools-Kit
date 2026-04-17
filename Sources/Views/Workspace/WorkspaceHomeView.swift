@@ -115,7 +115,8 @@ struct WorkspaceDashboardView: View {
         ("Habits", "flame.fill", .red, AnyView(WorkspaceHabitTrackerView())),
         ("Forms", "list.bullet.rectangle.portrait", .teal, AnyView(FormsView())),
         ("Slides", "rectangle.on.rectangle.angled", .purple, AnyView(SlidesHomeView())),
-        ("Sheets", "tablecells", .blue, AnyView(SpreadsheetsHomeView()))
+        ("Sheets", "tablecells", .blue, AnyView(SpreadsheetsHomeView())),
+        ("Workouts", "figure.strengthtraining.traditional", .mint, AnyView(WorkoutsHomeView()))
     ]
 
     var body: some View {
