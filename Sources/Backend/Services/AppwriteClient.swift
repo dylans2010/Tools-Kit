@@ -23,12 +23,12 @@ final class AppwriteClient {
 
     private static func requiredConfigValue(forKey key: String) -> String {
         guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String else {
-            fatalError("Missing required Appwrite configuration value '\(key)' in Info.plist.")
+            fatalError("Missing required Appwrite configuration value '\(key)' in the app Info.plist.")
         }
 
         let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedValue.isEmpty else {
-            fatalError("Appwrite configuration value '\(key)' must not be empty.")
+            fatalError("Appwrite configuration value '\(key)' in Info.plist must not be empty.")
         }
 
         return trimmedValue
@@ -39,7 +39,7 @@ final class AppwriteClient {
               let scheme = url.scheme,
               !scheme.isEmpty,
               url.host != nil else {
-            fatalError("Invalid Appwrite endpoint in Info.plist for key 'APPWRITE_ENDPOINT': \(endpoint)")
+            fatalError("Invalid Appwrite endpoint '\(endpoint)' for key 'APPWRITE_ENDPOINT' in Info.plist. Endpoint must include a URL scheme (https/http) and host.")
         }
     }
 
