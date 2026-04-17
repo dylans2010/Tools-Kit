@@ -202,8 +202,10 @@ struct InboxView: View {
             Section {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundColor(.blue)
+                        Image(systemName: "bolt.badge.clock.fill")
+                            .foregroundStyle(.white)
+                            .padding(8)
+                            .background(LinearGradient(colors: [.indigo, .blue], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 10))
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Priority Brief")
                                 .font(.headline)
@@ -218,7 +220,9 @@ struct InboxView: View {
                         }
                     }
 
-                    if let prioritySummary {
+                    if isPrioritizing {
+                        MailSummaryLoadingCard()
+                    } else if let prioritySummary {
                         MailMarkdownBlock(markdown: prioritySummary)
 
                         HStack(spacing: 10) {
@@ -263,10 +267,10 @@ struct InboxView: View {
                 .padding()
                 .background(
                     RoundedRectangle(cornerRadius: 18)
-                        .fill(colorScheme == .dark ? Color.white.opacity(0.06) : Color.blue.opacity(0.08))
+                        .fill(colorScheme == .dark ? Color.white.opacity(0.08) : Color.white.opacity(0.86))
                         .overlay(
                             RoundedRectangle(cornerRadius: 18)
-                                .stroke(Color.blue.opacity(0.15), lineWidth: 1)
+                                .stroke(LinearGradient(colors: [.indigo.opacity(0.45), .blue.opacity(0.35)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
                         )
                 )
             }
@@ -282,11 +286,13 @@ struct InboxView: View {
             Section {
                 VStack(alignment: .leading, spacing: 10) {
                     HStack {
-                        Image(systemName: "sparkles")
-                            .foregroundColor(.blue)
+                        Image(systemName: "brain.head.profile")
+                            .foregroundStyle(.white)
+                            .padding(8)
+                            .background(LinearGradient(colors: [.blue, .cyan], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 10))
                         Text("Catch Up Summary")
                             .font(.headline)
-                            .foregroundColor(.blue)
+                            .foregroundColor(.primary)
                         Spacer()
                         Button {
                             runCatchUp()
@@ -298,7 +304,9 @@ struct InboxView: View {
                         .disabled(isSummarizing)
                     }
 
-                    if let summary = catchUpSummary {
+                    if isSummarizing {
+                        MailSummaryLoadingCard()
+                    } else if let summary = catchUpSummary {
                         MailMarkdownBlock(markdown: summary)
                     } else {
                         Button(action: runCatchUp) {
@@ -318,7 +326,7 @@ struct InboxView: View {
                 .padding()
                 .background(
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(colorScheme == .dark ? Color.white.opacity(0.06) : Color.blue.opacity(0.08))
+                        .fill(colorScheme == .dark ? Color.white.opacity(0.08) : Color.white.opacity(0.86))
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
                                 .stroke(LinearGradient(colors: [.blue, .cyan], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
@@ -522,6 +530,48 @@ private struct MailMarkdownBlock: View {
         .font(.subheadline)
         .lineSpacing(4)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .textSelection(.enabled)
+        .padding(12)
+        .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+private struct MailSummaryLoadingCard: View {
+    @State private var phase: CGFloat = -1
+
+    var body: some View {
+        VStack(spacing: 8) {
+            ForEach(0..<3, id: \.self) { index in
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.primary.opacity(0.12))
+                    .frame(height: 14)
+                    .padding(.trailing, CGFloat(index) * 24)
+            }
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.primary.opacity(0.04))
+                .overlay(
+                    GeometryReader { geo in
+                        Rectangle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [.clear, .white.opacity(0.35), .clear],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .offset(x: phase * geo.size.width)
+                    }
+                )
+                .clipped()
+        )
+        .onAppear {
+            withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) {
+                phase = 1.3
+            }
+        }
     }
 }
 

@@ -2,6 +2,7 @@ import Foundation
 
 struct AIChatSettings: Codable {
     var selectedProviderID: String = "openrouter"
+    var aiModelSource: AIModelSource = .appModel
     var modelID: String = ""
     var systemPrompt: String = ""
     var useCustomPersonality: Bool = false
@@ -23,6 +24,11 @@ struct AIChatSettings: Codable {
     var memorySensitivity: Double = 0.7
     var responseTone: ResponseTone = .balanced
     var preferredResponseLength: ResponseLength = .medium
+}
+
+enum AIModelSource: String, Codable, CaseIterable {
+    case appModel = "App Model"
+    case ownKey = "My API Key"
 }
 
 enum ResponseTone: String, Codable, CaseIterable {

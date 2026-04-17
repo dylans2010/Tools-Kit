@@ -18,12 +18,14 @@
 		FC0200000000000000000001 /* FilterChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0100000000000000000001 /* FilterChip.swift */; };
 		SP0200000000000000000001 /* StatPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0100000000000000000001 /* StatPill.swift */; };
 		8229B675224E4601A7B980CD /* MailAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF38182EF444218AFF7D2D3 /* MailAIService.swift */; };
+		B1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift */; };
 		BC63F5FE32D0419AB791F193 /* iCloudMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */; };
 		F0BE8D2657C349B7B03F24F4 /* MailProviderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B5DD1027FA49B99C531EDE /* MailProviderProtocol.swift */; };
 		289C681EF0FD4E4C92CE8487 /* MailThreadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA70AEBD6344AE7A2A8D751 /* MailThreadView.swift */; };
 		39DA0853F2664BFCB925696A /* MailSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436F75E6A3244A9DA49E6704 /* MailSearchView.swift */; };
 		E6CDD8F2FEBB4ADAB83B8334 /* MailHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D36575B26D5F4015B1A75281 /* MailHomeView.swift */; };
 		F0F02DBCAE8A448EAB8ADD3D /* EmailComposingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2854071EF86249D28D8B2371 /* EmailComposingView.swift */; };
+		B1B2C3D4E5F60718293A0004 /* DraftingEmails.view.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A0004 /* DraftingEmails.view.swift */; };
 		89E5D9EA02A2490D8F089737 /* MailProviderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41D44A961365454C82AC0C56 /* MailProviderView.swift */; };
 		9B92D995283049E1921A3007 /* InboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E1340D7B74447B9E795193 /* InboxView.swift */; };
 		43C7F01342454F8891D7E133 /* MailAccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F681856D074CB3BDD31D99 /* MailAccountsView.swift */; };
@@ -410,6 +412,8 @@
 		B1C2D3E4F5A60708090A0D02 /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C02 /* CameraService.swift */; };
 		B1C2D3E4F5A60708090A0D03 /* VisionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C03 /* VisionService.swift */; };
 		B1C2D3E4F5A60708090A0D04 /* AppwriteClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C04 /* AppwriteClient.swift */; };
+		B1B2C3D4E5F60718293A0001 /* UserDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A0001 /* UserDataManager.swift */; };
+		B1B2C3D4E5F60718293A0002 /* AIFeatureCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A0002 /* AIFeatureCheck.swift */; };
 		B1C2D3E4F5A60708090A0D05 /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C05 /* Config.plist */; };
 		1D850FF7369F4F688D80DA62 /* ToolCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3614DB596A94EBEA3646F6A /* ToolCard.swift */; };
 		9899E0E87F5E483AAFE3DC1E /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8089CEDC467040D2B38719FF /* SectionHeader.swift */; };
@@ -560,12 +564,14 @@
 		FC0100000000000000000001 /* FilterChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/FilterChip.swift; sourceTree = "<group>"; };
 		SP0100000000000000000001 /* StatPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/StatPill.swift; sourceTree = "<group>"; };
 		7BF38182EF444218AFF7D2D3 /* MailAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/AI/MailAIService.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/AI/MailAIToolsSystem.swift; sourceTree = "<group>"; };
 		E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/iCloudMailProvider.swift; sourceTree = "<group>"; };
 		C1B5DD1027FA49B99C531EDE /* MailProviderProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/MailProviderProtocol.swift; sourceTree = "<group>"; };
 		7BA70AEBD6344AE7A2A8D751 /* MailThreadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailThreadView.swift; sourceTree = "<group>"; };
 		436F75E6A3244A9DA49E6704 /* MailSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailSearchView.swift; sourceTree = "<group>"; };
 		D36575B26D5F4015B1A75281 /* MailHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailHomeView.swift; sourceTree = "<group>"; };
 		2854071EF86249D28D8B2371 /* EmailComposingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/EmailComposingView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A0004 /* DraftingEmails.view.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mail/Views/DraftingEmails.view.swift"; sourceTree = "<group>"; };
 		41D44A961365454C82AC0C56 /* MailProviderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailProviderView.swift; sourceTree = "<group>"; };
 		93E1340D7B74447B9E795193 /* InboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/InboxView.swift; sourceTree = "<group>"; };
 		F1F681856D074CB3BDD31D99 /* MailAccountsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailAccountsView.swift; sourceTree = "<group>"; };
@@ -813,6 +819,8 @@
 		B1C2D3E4F5A60708090A0C02 /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Services/CameraService.swift; sourceTree = "<group>"; };
 		B1C2D3E4F5A60708090A0C03 /* VisionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Services/VisionService.swift; sourceTree = "<group>"; };
 		B1C2D3E4F5A60708090A0C04 /* AppwriteClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Services/AppwriteClient.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A0001 /* UserDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Services/UserDataManager.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A0002 /* AIFeatureCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Services/AIFeatureCheck.swift; sourceTree = "<group>"; };
 		B1C2D3E4F5A60708090A0C05 /* Config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Config.plist; sourceTree = "<group>"; };
 		4D7EF938890D4F8AA5D57456 /* AIModelCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/AIModelCatalog.swift"; sourceTree = "<group>"; };
 		928AD5D50EF44D6B87CD4F37 /* ProviderModelFetchSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/Providers/ProviderModelFetchSupport.swift"; sourceTree = "<group>"; };
@@ -1130,12 +1138,14 @@
 				E1E0ABB5BDAD4793B4FE4B93 /* MailMessage.swift */,
 				F236C75C5ACB4018A839FB36 /* MailThread.swift */,
 				7BF38182EF444218AFF7D2D3 /* MailAIService.swift */,
+				A1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift */,
 				E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */,
 				C1B5DD1027FA49B99C531EDE /* MailProviderProtocol.swift */,
 				7BA70AEBD6344AE7A2A8D751 /* MailThreadView.swift */,
 				436F75E6A3244A9DA49E6704 /* MailSearchView.swift */,
 				D36575B26D5F4015B1A75281 /* MailHomeView.swift */,
 				2854071EF86249D28D8B2371 /* EmailComposingView.swift */,
+				A1B2C3D4E5F60718293A0004 /* DraftingEmails.view.swift */,
 				41D44A961365454C82AC0C56 /* MailProviderView.swift */,
 				93E1340D7B74447B9E795193 /* InboxView.swift */,
 				F1F681856D074CB3BDD31D99 /* MailAccountsView.swift */,
@@ -1209,6 +1219,8 @@
 				B1C2D3E4F5A60708090A0C02 /* CameraService.swift */,
 				B1C2D3E4F5A60708090A0C03 /* VisionService.swift */,
 				B1C2D3E4F5A60708090A0C04 /* AppwriteClient.swift */,
+				A1B2C3D4E5F60718293A0001 /* UserDataManager.swift */,
+				A1B2C3D4E5F60718293A0002 /* AIFeatureCheck.swift */,
 
 				A1B2C3D4E5F60708090A0B02 /* WeatherService.swift */,
 				A1B2C3D4E5F60708090A0B03 /* WeatherRepository.swift */,
@@ -1756,12 +1768,14 @@
 				169F73E894D6416298DC841C /* MailMessage.swift in Sources */,
 				A08E51C322934D398CFF8C14 /* MailThread.swift in Sources */,
 				8229B675224E4601A7B980CD /* MailAIService.swift in Sources */,
+				B1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift in Sources */,
 				BC63F5FE32D0419AB791F193 /* iCloudMailProvider.swift in Sources */,
 				F0BE8D2657C349B7B03F24F4 /* MailProviderProtocol.swift in Sources */,
 				289C681EF0FD4E4C92CE8487 /* MailThreadView.swift in Sources */,
 				39DA0853F2664BFCB925696A /* MailSearchView.swift in Sources */,
 				E6CDD8F2FEBB4ADAB83B8334 /* MailHomeView.swift in Sources */,
 				F0F02DBCAE8A448EAB8ADD3D /* EmailComposingView.swift in Sources */,
+				B1B2C3D4E5F60718293A0004 /* DraftingEmails.view.swift in Sources */,
 				89E5D9EA02A2490D8F089737 /* MailProviderView.swift in Sources */,
 				9B92D995283049E1921A3007 /* InboxView.swift in Sources */,
 				43C7F01342454F8891D7E133 /* MailAccountsView.swift in Sources */,
@@ -1848,6 +1862,8 @@
 				B1C2D3E4F5A60708090A0D02 /* CameraService.swift in Sources */,
 				B1C2D3E4F5A60708090A0D03 /* VisionService.swift in Sources */,
 				B1C2D3E4F5A60708090A0D04 /* AppwriteClient.swift in Sources */,
+				B1B2C3D4E5F60718293A0001 /* UserDataManager.swift in Sources */,
+				B1B2C3D4E5F60718293A0002 /* AIFeatureCheck.swift in Sources */,
 
 				B1C2D3E4F5A60708090A0B01 /* WeatherModels.swift in Sources */,
 				B1C2D3E4F5A60708090A0B02 /* WeatherService.swift in Sources */,

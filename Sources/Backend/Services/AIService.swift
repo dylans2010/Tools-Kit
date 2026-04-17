@@ -11,8 +11,8 @@ class AIService {
     static let shared = AIService()
 
     private let registry = AIProviderRegistry.shared
-    private let keyManager = APIKeyManager.shared
     private let settingsManager = AIChatSettingsManager.shared
+    private let featureCheck = AIFeatureCheck.shared
     @MainActor private let modelCatalog = AIModelCatalog.shared
 
     // MARK: - Current provider helpers
@@ -25,10 +25,6 @@ class AIService {
         registry.provider(for: currentProviderID)
     }
 
-    private var currentAPIKey: String? {
-        keyManager.getKey(for: currentProviderID)
-    }
-
     // MARK: - Public API
 
     @MainActor
@@ -36,9 +32,8 @@ class AIService {
         guard let provider = currentProvider else {
             throw AIError.unknownProvider(currentProviderID)
         }
-        guard let apiKey = currentAPIKey else {
-            throw AIError.missingAPIKey
-        }
+        let authorization = try await featureCheck.authorizeRequest(providerID: currentProviderID)
+        let apiKey = authorization.apiKey
 
         var modelToUse = model ?? settingsManager.settings.modelID
         if modelToUse.isEmpty {
@@ -117,9 +112,8 @@ class AIService {
         modelID: String,
         responseSchema: String? = nil
     ) async throws -> String {
-        guard let apiKey = ProcessInfo.processInfo.environment["OPENROUTER_API_KEY"] else {
-            throw AIError.missingAPIKey
-        }
+        let authorization = try await featureCheck.authorizeRequest(providerID: "openrouter")
+        let apiKey = authorization.apiKey
 
         let url = URL(string: "https://openrouter.ai/api/v1/chat/completions")!
         var request = URLRequest(url: url)

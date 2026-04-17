@@ -70,7 +70,9 @@ struct DashboardView: View {
                 }
             }
             .sheet(isPresented: $showSettings) {
-                AIChatSettingsView(settings: $settingsManager.settings)
+                AIChatSettingsView(settings: $settingsManager.settings) {
+                    onSignOut?()
+                }
             }
         }
     }

@@ -24,7 +24,7 @@ class MailAIService {
 
     private func processMailPrompt(
         prompt: String,
-        systemPrompt: String = "You are a workspace mail assistant."
+        systemPrompt: String = MailAIToolsSystem.catchUpSystemPrompt
     ) async throws -> String {
         try await aiService.processText(
             prompt: prompt,
@@ -111,7 +111,7 @@ class MailAIService {
 
         let raw = try await processMailPrompt(
             prompt: prompt,
-            systemPrompt: "You are a strict email triage assistant that returns exact JSON and focuses only on priority email analysis."
+            systemPrompt: MailAIToolsSystem.prioritySystemPrompt
         )
 
         if let decoded = decodePriorityDigest(from: raw) {
@@ -170,7 +170,7 @@ class MailAIService {
         Additional context for the reply:
         \(context)
         """
-        return try await processMailPrompt(prompt: prompt, systemPrompt: "You are an expert email assistant. Write clear, helpful, and professional replies.")
+        return try await processMailPrompt(prompt: prompt, systemPrompt: MailAIToolsSystem.draftingSystemPrompt)
     }
 
     func improveDraft(_ draft: String, tone: String) async throws -> String {
@@ -181,10 +181,10 @@ class MailAIService {
         Draft:
         \(draft)
         """
-        return try await processMailPrompt(prompt: prompt, systemPrompt: "You are a highly capable email writing assistant.")
+        return try await processMailPrompt(prompt: prompt, systemPrompt: MailAIToolsSystem.draftingSystemPrompt)
     }
 
-    func composeEmail(prompt: String, systemPrompt: String = "You are a highly capable email writing assistant.") async throws -> String {
+    func composeEmail(prompt: String, systemPrompt: String = MailAIToolsSystem.draftingSystemPrompt) async throws -> String {
         try await processMailPrompt(prompt: prompt, systemPrompt: systemPrompt)
     }
 }
