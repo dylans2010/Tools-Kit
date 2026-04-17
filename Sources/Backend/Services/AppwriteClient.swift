@@ -1,48 +1,67 @@
 import Foundation
 
+enum AppwriteClientError: LocalizedError {
+    case missingConfig(String)
+    case emptyConfig(String)
+    case invalidEndpoint(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .missingConfig(let key):
+            return "Missing required Appwrite configuration value '\(key)' in Info.plist."
+        case .emptyConfig(let key):
+            return "Appwrite configuration value '\(key)' in Info.plist must not be empty."
+        case .invalidEndpoint(let value):
+            return "Invalid APPWRITE_ENDPOINT in Info.plist: '\(value)'."
+        }
+    }
+}
+
 final class AppwriteClient {
     static let shared = AppwriteClient()
 
-    private let endpoint: String
-    private let projectID: String
+    private init() {}
 
-    private init() {
-        endpoint = Self.requiredConfigValue(forKey: "APPWRITE_ENDPOINT")
-        projectID = Self.requiredConfigValue(forKey: "APPWRITE_PROJECT_ID")
-        Self.validateEndpoint(endpoint)
-    }
-
-    private static func requiredConfigValue(forKey key: String) -> String {
+    private static func requiredConfigValue(forKey key: String) throws -> String {
         guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String else {
-            fatalError("Missing required Appwrite configuration value '\(key)' in Info.plist. Add APPWRITE_ENDPOINT or APPWRITE_PROJECT_ID with your Appwrite configuration.")
+            throw AppwriteClientError.missingConfig(key)
         }
 
         let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedValue.isEmpty else {
-            fatalError("Appwrite configuration value '\(key)' in Info.plist must not be empty.")
+            throw AppwriteClientError.emptyConfig(key)
         }
 
         return trimmedValue
     }
 
-    private static func validateEndpoint(_ endpoint: String) {
+    private static func validateEndpoint(_ endpoint: String) throws {
         guard let url = URL(string: endpoint),
               let scheme = url.scheme?.lowercased(),
               ["http", "https"].contains(scheme),
               url.host != nil else {
-            fatalError("Invalid APPWRITE_ENDPOINT in Info.plist: '\(endpoint)'. Must be a valid HTTP or HTTPS URL with a host.")
+            throw AppwriteClientError.invalidEndpoint(endpoint)
         }
+    }
+
+    private static func resolvedConfiguration() throws -> (endpoint: String, projectID: String) {
+        let endpoint = try requiredConfigValue(forKey: "APPWRITE_ENDPOINT")
+        let projectID = try requiredConfigValue(forKey: "APPWRITE_PROJECT_ID")
+        try validateEndpoint(endpoint)
+        return (endpoint, projectID)
     }
 
     // Uses Appwrite endpoint health check to validate backend reachability.
     func ping() async throws {
-        guard let url = URL(string: "\(endpoint)/health") else {
+        let config = try Self.resolvedConfiguration()
+
+        guard let url = URL(string: "\(config.endpoint)/health") else {
             throw URLError(.badURL)
         }
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue(projectID, forHTTPHeaderField: "X-Appwrite-Project")
+        request.setValue(config.projectID, forHTTPHeaderField: "X-Appwrite-Project")
 
         let (_, response) = try await URLSession.shared.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse,
