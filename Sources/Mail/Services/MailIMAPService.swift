@@ -13,7 +13,7 @@ class MailIMAPService: @unchecked Sendable {
 
     func connect(provider: MailAccount.MailProviderType) async throws {
         switch provider {
-        case .iCloud:
+        case .icloud:
             host = "imap.mail.me.com"
             port = 993
         case .gmail:

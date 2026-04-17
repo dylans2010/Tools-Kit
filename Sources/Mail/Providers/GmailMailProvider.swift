@@ -81,7 +81,7 @@ class GmailMailProvider: MailProviderProtocol {
     func fetchMessage(id: String) async throws -> MailMessage {
         InternalLogger.shared.log("GmailMailProvider: fetching message \(id)", level: .debug)
         let url = baseURL.appendingPathComponent("messages/\(id)")
-            .appending(queryItems: [URLQueryItem(name: "format", value: "full")])!
+            .appending(queryItems: [URLQueryItem(name: "format", value: "full")])
 
         let response: GmailMessageResponse = try await requestJSON(url: url)
 
@@ -160,7 +160,7 @@ class GmailMailProvider: MailProviderProtocol {
 
         let payload = ["raw": rawData.base64URLEncodedString()]
         let endpoint = baseURL.appendingPathComponent("messages/send")
-        _ = try await requestJSON(url: endpoint, method: "POST", body: payload)
+        let _: EmptyResponse = try await requestJSON(url: endpoint, method: "POST", body: payload)
         InternalLogger.shared.log("GmailMailProvider: sent message via Gmail API for \(account.emailAddress)", level: .info)
     }
 
@@ -180,7 +180,7 @@ class GmailMailProvider: MailProviderProtocol {
 
     func deleteThread(_ threadId: String) async throws {
         let endpoint = baseURL.appendingPathComponent("threads/\(threadId)/trash")
-        _ = try await requestJSON(url: endpoint, method: "POST", body: [String: String]())
+        let _: EmptyResponse = try await requestJSON(url: endpoint, method: "POST", body: [String: String]())
         InternalLogger.shared.log("GmailMailProvider: moved thread \(threadId) to trash", level: .warning)
     }
 
@@ -198,7 +198,7 @@ class GmailMailProvider: MailProviderProtocol {
             "addLabelIds": add,
             "removeLabelIds": remove
         ]
-        _ = try await requestJSON(url: endpoint, method: "POST", body: body)
+        let _: EmptyResponse = try await requestJSON(url: endpoint, method: "POST", body: body)
         InternalLogger.shared.log("GmailMailProvider: modified labels for thread \(threadId)", level: .debug)
     }
 
@@ -211,9 +211,7 @@ class GmailMailProvider: MailProviderProtocol {
             items.append(URLQueryItem(name: "q", value: query))
         }
 
-        guard let url = baseURL.appendingPathComponent("messages").appending(queryItems: items) else {
-            throw NSError(domain: "GmailMailProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid Gmail list URL"])
-        }
+        let url = baseURL.appendingPathComponent("messages").appending(queryItems: items)
         return url
     }
 

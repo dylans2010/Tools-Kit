@@ -81,14 +81,14 @@ final class AuthService: ObservableObject {
         defer { isBusy = false }
 
         do {
-            let oauthProvider: OAuthProvider
+            let oauthProvider: String
             switch provider.lowercased() {
             case "google":
-                oauthProvider = .google
+                oauthProvider = "google"
             case "github":
-                oauthProvider = .github
+                oauthProvider = "github"
             case "discord":
-                oauthProvider = .discord
+                oauthProvider = "discord"
             default:
                 throw AuthServiceError.unsupportedOAuthProvider(provider)
             }

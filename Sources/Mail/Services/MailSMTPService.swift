@@ -12,7 +12,7 @@ class MailSMTPService {
 
     func send(message: MailMessage, user: String, pass: String, provider: MailAccount.MailProviderType) async throws {
         switch provider {
-        case .iCloud:
+        case .icloud:
             host = "smtp.mail.me.com"
             port = 587
         case .gmail:
