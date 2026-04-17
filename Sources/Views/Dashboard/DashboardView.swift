@@ -153,37 +153,38 @@ struct DashboardView: View {
     }
 
     private var sendPingCard: some View {
-        Button {
-            Task {
-                do {
-                    try await appwriteClient.ping()
-                    await MainActor.run {
-                        pingStatusMessage = "Appwrite ping succeeded"
-                    }
-                } catch {
-                    await MainActor.run {
-                        pingStatusMessage = "Appwrite ping failed"
+        VStack(alignment: .leading, spacing: 8) {
+            Button {
+                Task {
+                    do {
+                        try await appwriteClient.ping()
+                        await MainActor.run {
+                            pingStatusMessage = "Appwrite ping succeeded"
+                        }
+                    } catch {
+                        await MainActor.run {
+                            pingStatusMessage = "Appwrite ping failed"
+                        }
                     }
                 }
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "antenna.radiowaves.left.and.right")
+                    Text("Send a ping")
+                        .fontWeight(.semibold)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
             }
-        } label: {
-            HStack(spacing: 10) {
-                Image(systemName: "antenna.radiowaves.left.and.right")
-                Text("Send a ping")
-                    .fontWeight(.semibold)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-        }
-        .buttonStyle(.borderedProminent)
-        .padding(.horizontal)
+            .buttonStyle(.borderedProminent)
 
-        if !pingStatusMessage.isEmpty {
-            Text(pingStatusMessage)
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .padding(.horizontal)
+            if !pingStatusMessage.isEmpty {
+                Text(pingStatusMessage)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
         }
+        .padding(.horizontal)
     }
 
     private var categoryPicker: some View {

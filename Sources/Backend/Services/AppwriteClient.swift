@@ -4,17 +4,43 @@ import Appwrite
 final class AppwriteClient {
     static let shared = AppwriteClient()
 
-    private let endpoint = "https://fra.cloud.appwrite.io/v1"
-    private let projectID = "69e24c32003548ff0e2e"
+    private let endpoint: String
+    private let projectID: String
 
     let client: Client
     let account: Account
 
     private init() {
+        endpoint = Self.requiredConfigValue(forKey: "APPWRITE_ENDPOINT")
+        projectID = Self.requiredConfigValue(forKey: "APPWRITE_PROJECT_ID")
+        Self.validateEndpoint(endpoint)
+
         client = Client()
             .setEndpoint(endpoint)
             .setProject(projectID)
         account = Account(client)
+    }
+
+    private static func requiredConfigValue(forKey key: String) -> String {
+        guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String else {
+            fatalError("Missing required Appwrite configuration value '\(key)' in Info.plist.")
+        }
+
+        let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedValue.isEmpty else {
+            fatalError("Appwrite configuration value '\(key)' must not be empty.")
+        }
+
+        return trimmedValue
+    }
+
+    private static func validateEndpoint(_ endpoint: String) {
+        guard let url = URL(string: endpoint),
+              let scheme = url.scheme,
+              !scheme.isEmpty,
+              url.host != nil else {
+            fatalError("Invalid Appwrite endpoint in Info.plist for key 'APPWRITE_ENDPOINT': \(endpoint)")
+        }
     }
 
     // Uses Appwrite endpoint health check to validate backend reachability.
