@@ -30,9 +30,6 @@ final class AppwriteClient {
         guard !trimmedValue.isEmpty else {
             fatalError("Appwrite configuration value '\(key)' in Info.plist must not be empty.")
         }
-        guard !trimmedValue.hasPrefix("YOUR_") else {
-            fatalError("Appwrite configuration value '\(key)' in Info.plist is still using a placeholder. Replace it with a real value.")
-        }
 
         return trimmedValue
     }
@@ -42,7 +39,7 @@ final class AppwriteClient {
               let scheme = url.scheme?.lowercased(),
               ["http", "https"].contains(scheme),
               url.host != nil else {
-            fatalError("Invalid Appwrite endpoint '\(endpoint)' for key 'APPWRITE_ENDPOINT' in Info.plist. Endpoint must include a URL scheme (https recommended, or http for local development) and host.")
+            fatalError("Invalid APPWRITE_ENDPOINT in Info.plist: '\(endpoint)'. Use http(s) URL with host.")
         }
     }
 
