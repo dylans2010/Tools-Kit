@@ -147,7 +147,7 @@ struct WorkoutsHomeView: View {
             HStack(spacing: 12) {
                 Image(systemName: symbol)
                     .font(.title3)
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(.accentColor)
                     .frame(width: 30)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
