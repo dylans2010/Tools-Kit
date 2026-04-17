@@ -69,6 +69,10 @@
     <string>Your location is used to provide accurate local weather data and forecasts, even when the app is in the background.</string>
     <key>NSCameraUsageDescription</key>
     <string>Camera access is required for scanning documents, classifying IDs, and detecting objects.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Microphone access is required for voice meal logging and live coaching interactions.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>Speech recognition is required to convert spoken meal logs into nutrition entries.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Photo Library access is required to import media for metadata viewing, perspective correction, and compression tools.</string>
     <key>UIBackgroundModes</key>

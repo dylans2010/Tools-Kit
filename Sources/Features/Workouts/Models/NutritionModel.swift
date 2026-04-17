@@ -1,5 +1,46 @@
 import Foundation
 
+enum MealSourceType: String, Codable, CaseIterable, Identifiable {
+    case voice
+    case image
+    case manual
+
+    var id: String { rawValue }
+}
+
+enum FoodCategory: String, Codable, CaseIterable, Identifiable {
+    case protein
+    case carbs
+    case vegetables
+    case drinks
+    case fats
+    case mixed
+
+    var id: String { rawValue }
+}
+
+struct DetectedFoodItem: Identifiable, Codable {
+    var id: UUID
+    var name: String
+    var category: FoodCategory
+    var portionDescription: String
+    var estimatedCalories: Int
+
+    init(
+        id: UUID = UUID(),
+        name: String,
+        category: FoodCategory,
+        portionDescription: String,
+        estimatedCalories: Int
+    ) {
+        self.id = id
+        self.name = name
+        self.category = category
+        self.portionDescription = portionDescription
+        self.estimatedCalories = estimatedCalories
+    }
+}
+
 struct MealRecord: Identifiable, Codable {
     var id: UUID
     var name: String
@@ -9,6 +50,10 @@ struct MealRecord: Identifiable, Codable {
     var fatsGrams: Double
     var summary: String
     var consumedAt: Date
+    var sourceType: MealSourceType
+    var rawInput: String
+    var detectedItems: [DetectedFoodItem]
+    var timestamp: Date
 
     init(
         id: UUID = UUID(),
@@ -18,7 +63,11 @@ struct MealRecord: Identifiable, Codable {
         carbsGrams: Double,
         fatsGrams: Double,
         summary: String,
-        consumedAt: Date = Date()
+        consumedAt: Date = Date(),
+        sourceType: MealSourceType = .manual,
+        rawInput: String = "",
+        detectedItems: [DetectedFoodItem] = [],
+        timestamp: Date = Date()
     ) {
         self.id = id
         self.name = name
@@ -28,6 +77,30 @@ struct MealRecord: Identifiable, Codable {
         self.fatsGrams = fatsGrams
         self.summary = summary
         self.consumedAt = consumedAt
+        self.sourceType = sourceType
+        self.rawInput = rawInput
+        self.detectedItems = detectedItems
+        self.timestamp = timestamp
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, name, calories, proteinGrams, carbsGrams, fatsGrams, summary, consumedAt, sourceType, rawInput, detectedItems, timestamp
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        name = try container.decode(String.self, forKey: .name)
+        calories = try container.decode(Int.self, forKey: .calories)
+        proteinGrams = try container.decode(Double.self, forKey: .proteinGrams)
+        carbsGrams = try container.decode(Double.self, forKey: .carbsGrams)
+        fatsGrams = try container.decode(Double.self, forKey: .fatsGrams)
+        summary = try container.decode(String.self, forKey: .summary)
+        consumedAt = try container.decodeIfPresent(Date.self, forKey: .consumedAt) ?? Date()
+        sourceType = try container.decodeIfPresent(MealSourceType.self, forKey: .sourceType) ?? .manual
+        rawInput = try container.decodeIfPresent(String.self, forKey: .rawInput) ?? name
+        detectedItems = try container.decodeIfPresent([DetectedFoodItem].self, forKey: .detectedItems) ?? []
+        timestamp = try container.decodeIfPresent(Date.self, forKey: .timestamp) ?? consumedAt
     }
 }
 

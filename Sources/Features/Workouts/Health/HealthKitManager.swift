@@ -44,6 +44,10 @@ final class HealthKitManager {
         }
     }
 
+    func fetchLatestHeartRate() async -> Double? {
+        await readLatest(.heartRate, unit: HKUnit.count().unitDivided(by: .minute()))
+    }
+
     func fetchHealthData() async -> HealthImportedData {
         let start = Calendar.current.startOfDay(for: Date())
         let end = Date()
@@ -120,6 +124,7 @@ final class HealthKitManager {
 final class HealthKitManager {
     func requestAuthorization() async -> Bool { false }
     func fetchHealthData() async -> HealthImportedData { .empty }
+    func fetchLatestHeartRate() async -> Double? { nil }
 }
 
 #endif
