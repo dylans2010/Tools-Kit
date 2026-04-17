@@ -130,6 +130,7 @@ enum MailContentRenderer {
 
 struct MailWebView: UIViewRepresentable {
     let htmlString: String
+    @Binding var dynamicHeight: CGFloat
 
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
@@ -147,6 +148,14 @@ struct MailWebView: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
+        context.coordinator.onHeightChange = { height in
+            DispatchQueue.main.async {
+                dynamicHeight = max(320, height)
+            }
+        }
+
+        guard context.coordinator.loadedHTML != htmlString else { return }
+        context.coordinator.loadedHTML = htmlString
         uiView.loadHTMLString(htmlString, baseURL: nil)
     }
 
@@ -155,6 +164,9 @@ struct MailWebView: UIViewRepresentable {
     }
 
     class Coordinator: NSObject, WKNavigationDelegate {
+        var loadedHTML: String?
+        var onHeightChange: ((CGFloat) -> Void)?
+
         func webView(
             _ webView: WKWebView,
             decidePolicyFor navigationAction: WKNavigationAction,
@@ -166,6 +178,20 @@ struct MailWebView: UIViewRepresentable {
                 decisionHandler(.cancel)
             } else {
                 decisionHandler(.allow)
+            }
+        }
+
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            webView.evaluateJavaScript("Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)") { result, _ in
+                let height: CGFloat
+                if let number = result as? NSNumber {
+                    height = CGFloat(truncating: number)
+                } else if let doubleValue = result as? Double {
+                    height = CGFloat(doubleValue)
+                } else {
+                    height = 320
+                }
+                self.onHeightChange?(height)
             }
         }
     }

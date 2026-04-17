@@ -4,6 +4,7 @@ import WebKit
 struct EmailDetailView: View {
     @ObservedObject var viewModel: MailViewModel
     let email: EmailMessage
+    @State private var bodyWebViewHeight: CGFloat = 320
 
     var body: some View {
         ScrollView {
@@ -39,8 +40,10 @@ struct EmailDetailView: View {
         Group {
             if let content = renderContent(from: resolvedEmail) {
                 if content.hasHTML, let html = content.htmlBody {
-                    MailWebView(htmlString: html)
-                        .frame(minHeight: 400)
+                    MailWebView(htmlString: html, dynamicHeight: $bodyWebViewHeight)
+                        .frame(height: bodyWebViewHeight)
+                        .frame(maxWidth: .infinity)
+                        .clipShape(RoundedRectangle(cornerRadius: 18))
                         .padding(.horizontal)
                 } else if let plain = content.plainBody {
                     Text(plain)
@@ -83,6 +86,6 @@ struct EmailDetailView: View {
             return rendered.hasHTML || rendered.plainBody != nil ? rendered : nil
         }
 
-        return nil
+        return MailContentRenderer.render(htmlBody: nil, plainBody: message.preview)
     }
 }

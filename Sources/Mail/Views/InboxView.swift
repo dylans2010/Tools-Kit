@@ -13,6 +13,8 @@ struct InboxView: View {
     @StateObject private var storage = MailStorageService.shared
     @State private var searchText = ""
     @State private var showingCompose = false
+    @State private var prioritySummary: String?
+    @State private var isPrioritizing = false
     @State private var catchUpSummary: String?
     @State private var isSummarizing = false
 
@@ -21,20 +23,25 @@ struct InboxView: View {
             syncStatusSection
             syncErrorSection
             lastSyncedSection
-            catchUpSection
+            prioritySection
             aiSummarySection
             threadListSection
         }
         .navigationTitle(filter == .unread ? "Catch Up" : folder.name)
-        .listStyle(.insetGrouped)
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .searchable(text: $searchText)
         .refreshable {
             await syncService.fetchThreads(account: account, folder: folder)
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { showingCompose = true }) {
-                    Image(systemName: "square.and.pencil")
+                Button(action: toolbarAction) {
+                    if filter == .unread {
+                        Label(isSummarizing ? "Working" : "Catch Up", systemImage: isSummarizing ? "hourglass" : "sparkles")
+                    } else {
+                        Image(systemName: "square.and.pencil")
+                    }
                 }
             }
         }
@@ -97,31 +104,60 @@ struct InboxView: View {
     }
 
     @ViewBuilder
-    private var catchUpSection: some View {
-        if filter == .unread && catchUpSummary == nil && !storage.threads.isEmpty {
+    private var prioritySection: some View {
+        let unreadThreads = storage.threads.filter { !$0.isRead }
+
+        if !unreadThreads.isEmpty {
             Section {
-                Button(action: runCatchUp) {
+                VStack(alignment: .leading, spacing: 12) {
                     HStack {
-                        Image(systemName: "sparkles")
-                        Text(isSummarizing ? "AI is catching up..." : "Catch Up with AI")
-                            .fontWeight(.bold)
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.blue)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Priority Brief")
+                                .font(.headline)
+                            Text("Focus on the unread emails that matter most first.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
                         Spacer()
-                        if isSummarizing {
+                        if isPrioritizing {
                             ProgressView()
-                                .tint(.white)
+                                .tint(.blue)
                         }
                     }
-                    .padding()
-                    .background(
-                        LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
-                    )
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
+
+                    if let prioritySummary {
+                        Text(prioritySummary)
+                            .font(.subheadline)
+                            .lineSpacing(4)
+                    } else {
+                        Button(action: runPriorityBrief) {
+                            Label(isPrioritizing ? "Analyzing unread mail..." : "Analyze unread mail", systemImage: "sparkles")
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .padding(.vertical, 10)
+                                .foregroundColor(.white)
+                                .background(
+                                    LinearGradient(colors: [.blue, .cyan], startPoint: .leading, endPoint: .trailing),
+                                    in: RoundedRectangle(cornerRadius: 12)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isPrioritizing)
+                    }
                 }
-                .buttonStyle(.plain)
-                .listRowBackground(Color.clear)
-                .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 18)
+                        .fill(Color.blue.opacity(0.08))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 18)
+                                .stroke(Color.blue.opacity(0.15), lineWidth: 1)
+                        )
+                )
             }
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
         }
     }
 
@@ -132,10 +168,10 @@ struct InboxView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     HStack {
                         Image(systemName: "sparkles")
-                            .foregroundColor(.purple)
-                        Text("AI Catch Up")
+                            .foregroundColor(.blue)
+                        Text("Catch Up Summary")
                             .font(.headline)
-                            .foregroundColor(.purple)
+                            .foregroundColor(.blue)
                     }
 
                     Text(summary)
@@ -145,10 +181,10 @@ struct InboxView: View {
                 .padding()
                 .background(
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.purple.opacity(0.1))
+                        .fill(Color.blue.opacity(0.08))
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
-                                .stroke(LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
+                                .stroke(LinearGradient(colors: [.blue, .cyan], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
                         )
                 )
             }
@@ -278,13 +314,41 @@ struct InboxView: View {
         Task {
             do {
                 let summary = try await MailAIService.shared.catchUp(unreadThreads: storage.threads.filter { !$0.isRead })
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.catchUpSummary = summary
                     self.isSummarizing = false
                 }
             } catch {
-                isSummarizing = false
+                await MainActor.run {
+                    self.isSummarizing = false
+                }
             }
+        }
+    }
+
+    private func runPriorityBrief() {
+        isPrioritizing = true
+        Task {
+            do {
+                let summary = try await MailAIService.shared.priorityBrief(unreadThreads: storage.threads.filter { !$0.isRead })
+                await MainActor.run {
+                    self.prioritySummary = summary
+                    self.isPrioritizing = false
+                }
+            } catch {
+                await MainActor.run {
+                    self.prioritySummary = "Unable to generate a priority brief right now."
+                    self.isPrioritizing = false
+                }
+            }
+        }
+    }
+
+    private func toolbarAction() {
+        if filter == .unread {
+            runCatchUp()
+        } else {
+            showingCompose = true
         }
     }
 
@@ -330,10 +394,6 @@ struct MailThreadRow: View {
                     .lineLimit(2)
             }
         }
-        .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 14)
-                .fill(Color(.secondarySystemBackground))
-        )
+        .padding(.vertical, 10)
     }
 }

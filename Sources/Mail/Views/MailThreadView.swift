@@ -6,6 +6,7 @@ struct MailThreadView: View {
     let email: EmailMessage
 
     @State private var showingReply = false
+    @State private var bodyWebViewHeight: CGFloat = 320
     @State private var aiSummary: String?
     @State private var isAISummarizing = false
     @State private var aiReplyDraft: String?
@@ -118,8 +119,10 @@ struct MailThreadView: View {
     private var bodySection: some View {
         if let content = renderedContent {
             if content.hasHTML, let html = content.htmlBody {
-                MailWebView(htmlString: html)
-                    .frame(minHeight: 300)
+                MailWebView(htmlString: html, dynamicHeight: $bodyWebViewHeight)
+                    .frame(height: bodyWebViewHeight)
+                    .frame(maxWidth: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
                     .padding(.horizontal)
             } else if let plain = content.plainBody {
                 Text(plain)
@@ -184,6 +187,7 @@ struct MailThreadView: View {
     @ViewBuilder
     private var replySheet: some View {
         // Build a MailMessage from EmailMessage for the reply
+        let rendered = renderedContent
         let msg = MailMessage(
             id: email.id.uuidString,
             threadId: UUID().uuidString,
@@ -192,8 +196,8 @@ struct MailThreadView: View {
             cc: [],
             bcc: [],
             subject: email.subject,
-            body: email.body ?? "",
-            htmlBody: nil,
+            body: rendered?.plainBody ?? email.body ?? email.preview,
+            htmlBody: email.htmlBody,
             date: email.date,
             isRead: true,
             isStarred: false,
@@ -310,6 +314,8 @@ struct MailThreadView: View {
         isAISummarizing = true
         aiErrorMessage = nil
 
+        let bodyText = renderedContent?.plainBody ?? email.body ?? email.preview
+
         let thread = MailThread(
             id: email.id.uuidString,
             subject: email.subject,
@@ -322,8 +328,8 @@ struct MailThreadView: View {
                     cc: [],
                     bcc: [],
                     subject: email.subject,
-                    body: email.body ?? email.preview,
-                    htmlBody: nil,
+                    body: bodyText,
+                    htmlBody: email.htmlBody,
                     date: email.date,
                     isRead: email.isRead,
                     isStarred: false,
@@ -354,6 +360,8 @@ struct MailThreadView: View {
         isGeneratingReply = true
         aiErrorMessage = nil
 
+        let bodyText = renderedContent?.plainBody ?? email.body ?? email.preview
+
         let msg = MailMessage(
             id: email.id.uuidString,
             threadId: UUID().uuidString,
@@ -362,8 +370,8 @@ struct MailThreadView: View {
             cc: [],
             bcc: [],
             subject: email.subject,
-            body: email.body ?? email.preview,
-            htmlBody: nil,
+            body: bodyText,
+            htmlBody: email.htmlBody,
             date: email.date,
             isRead: true,
             isStarred: false,
@@ -400,8 +408,9 @@ struct MailThreadView: View {
         }
         if let body = email.body {
             let parsed = MailMIMEParser.parse(body)
-            return parsed.isEmpty ? MailContentRenderer.render(htmlBody: nil, plainBody: body) : MailContentRenderer.render(from: parsed)
+            let rendered = parsed.isEmpty ? MailContentRenderer.render(htmlBody: nil, plainBody: body) : MailContentRenderer.render(from: parsed)
+            return rendered.hasHTML || rendered.plainBody != nil ? rendered : MailContentRenderer.render(htmlBody: nil, plainBody: email.preview)
         }
-        return nil
+        return MailContentRenderer.render(htmlBody: nil, plainBody: email.preview)
     }
 }

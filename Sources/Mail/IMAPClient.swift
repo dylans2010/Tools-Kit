@@ -121,7 +121,9 @@ class IMAPClient: ObservableObject {
         send("\(tag) FETCH \(uid) BODY[]") { response in
             let rawBody = self.extractBody(from: response)
             let parsed = MailMIMEParser.parse(rawBody)
-            let rendered = MailContentRenderer.render(from: parsed)
+            let rendered = parsed.isEmpty
+                ? MailContentRenderer.render(htmlBody: nil, plainBody: rawBody)
+                : MailContentRenderer.render(from: parsed)
             DispatchQueue.main.async { completion(rendered) }
         }
     }
