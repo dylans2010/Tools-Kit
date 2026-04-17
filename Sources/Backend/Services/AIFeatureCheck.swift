@@ -54,7 +54,7 @@ final class AIFeatureCheck: ObservableObject {
         if settingsManager.settings.aiModelSource == .ownKey {
             return "\(count) Out Of Unlimited"
         }
-        return "\(count) out of \(dailyAppModelLimit)"
+        return "\(count) out of \(dailyAppModelLimit) requests"
     }
 
     func authorizeRequest(providerID: String) async throws -> AIAuthorization {

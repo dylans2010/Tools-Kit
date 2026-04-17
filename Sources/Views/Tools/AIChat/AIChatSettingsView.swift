@@ -121,7 +121,7 @@ struct AIChatSettingsView: View {
         } header: {
             Text("AI Usage")
         } footer: {
-            Text("App Model uses PRODUCTION_API_KEY with a 10 request/day limit. My API Key mode is unlimited.")
+            Text("App Model uses PRODUCTION_API_KEY with a 10 requests/day limit. My API Key mode is unlimited.")
         }
     }
 
