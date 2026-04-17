@@ -641,11 +641,11 @@
 		54244EAC19ED294008A5A839 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A7D9E2F14C3B4A8192D0E6F1 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Auth/LoginView.swift"; sourceTree = "<group>"; };
 		BFA101000000000000000001 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Auth/CreateAccountView.swift"; sourceTree = "<group>"; };
-		BFA101000000000000000002 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Services/Auth/AuthService.swift"; sourceTree = "<group>"; };
-		BFA101000000000000000003 /* AuthDatabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Services/Auth/AuthDatabaseService.swift"; sourceTree = "<group>"; };
-		BFA101000000000000000004 /* AddMailAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mail/Views/AddMailAccountView.swift"; sourceTree = "<group>"; };
-		BFA101000000000000000005 /* GmailServerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mail/Models/Gmail/GmailServerConfiguration.swift"; sourceTree = "<group>"; };
-		BFA101000000000000000006 /* GmailMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mail/Providers/GmailMailProvider.swift"; sourceTree = "<group>"; };
+		BFA101000000000000000002 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Backend/Services/Auth/AuthService.swift"; sourceTree = "<group>"; };
+		BFA101000000000000000003 /* AuthDatabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Backend/Services/Auth/AuthDatabaseService.swift"; sourceTree = "<group>"; };
+		BFA101000000000000000004 /* AddMailAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Mail/Views/AddMailAccountView.swift"; sourceTree = "<group>"; };
+		BFA101000000000000000005 /* GmailServerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Mail/Models/Gmail/GmailServerConfiguration.swift"; sourceTree = "<group>"; };
+		BFA101000000000000000006 /* GmailMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Mail/Providers/GmailMailProvider.swift"; sourceTree = "<group>"; };
 		732E3165BFBB323BD8081B3F /* Tools-Kit.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Tools-Kit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0E00A1458A464DAB575C4FE /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		D735D463856D4BA588299529 /* Tool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
