@@ -43,12 +43,20 @@ struct HealthDataView: View {
 
     private func healthTile(title: String, value: String, symbol: String, color: Color) -> some View {
         HStack(spacing: 14) {
-            Image(systemName: symbol)
-                .font(.title2)
-                .foregroundStyle(color)
-                .frame(width: 42, height: 42)
-                .background(color.opacity(0.15), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-                .symbolEffect(.pulse, options: .repeating, value: animate)
+            if #available(iOS 17, *) {
+                Image(systemName: symbol)
+                    .font(.title2)
+                    .foregroundStyle(color)
+                    .frame(width: 42, height: 42)
+                    .background(color.opacity(0.15), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .symbolEffect(.pulse, options: .repeating, value: animate)
+            } else {
+                Image(systemName: symbol)
+                    .font(.title2)
+                    .foregroundStyle(color)
+                    .frame(width: 42, height: 42)
+                    .background(color.opacity(0.15), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            }
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.caption)
