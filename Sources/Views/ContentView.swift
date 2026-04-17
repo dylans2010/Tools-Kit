@@ -2,11 +2,14 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var modeManager = MusicModeManager.shared
+    @StateObject private var workoutsMode = WorkoutsModeManager.shared
     @StateObject private var workspaceMode = WorkspaceModeManager.shared
 
     var body: some View {
         if modeManager.isMusicModeEnabled {
             MusicTabView()
+        } else if workoutsMode.isWorkoutsModeEnabled {
+            WorkoutsHomeView()
         } else if workspaceMode.isWorkspaceModeEnabled {
             WorkspaceHomeView()
         } else {

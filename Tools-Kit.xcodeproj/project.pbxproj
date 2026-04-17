@@ -213,6 +213,30 @@
 		WS0200000000000000000044 /* MonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000044 /* MonthView.swift */; };
 		WS0200000000000000000045 /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000045 /* WeekView.swift */; };
 		WS0200000000000000000046 /* YearView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000046 /* YearView.swift */; };
+		WK0200000000000000000001 /* WorkoutsModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000001 /* WorkoutsModeManager.swift */; };
+		WK0200000000000000000002 /* WorkoutsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000002 /* WorkoutsHomeView.swift */; };
+		WK0200000000000000000003 /* OnboardWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000003 /* OnboardWorkoutView.swift */; };
+		WK0200000000000000000004 /* WorkoutPlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000004 /* WorkoutPlanView.swift */; };
+		WK0200000000000000000005 /* WorkoutDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000005 /* WorkoutDetailView.swift */; };
+		WK0200000000000000000006 /* NutritionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000006 /* NutritionView.swift */; };
+		WK0200000000000000000007 /* MealScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000007 /* MealScannerView.swift */; };
+		WK0200000000000000000008 /* StreaksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000008 /* StreaksView.swift */; };
+		WK0200000000000000000009 /* BadgesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000009 /* BadgesView.swift */; };
+		WK020000000000000000000A /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000000A /* ProgressView.swift */; };
+		WK020000000000000000000B /* HealthDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000000B /* HealthDataView.swift */; };
+		WK020000000000000000000C /* WorkoutsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000000C /* WorkoutsSettingsView.swift */; };
+		WK020000000000000000000D /* UserFitnessProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000000D /* UserFitnessProfile.swift */; };
+		WK020000000000000000000E /* ExerciseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000000E /* ExerciseModel.swift */; };
+		WK020000000000000000000F /* WorkoutModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK010000000000000000000F /* WorkoutModel.swift */; };
+		WK0200000000000000000010 /* NutritionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000010 /* NutritionModel.swift */; };
+		WK0200000000000000000011 /* StreakModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000011 /* StreakModel.swift */; };
+		WK0200000000000000000012 /* BadgeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000012 /* BadgeModel.swift */; };
+		WK0200000000000000000013 /* ProgressModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000013 /* ProgressModel.swift */; };
+		WK0200000000000000000014 /* WorkoutAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000014 /* WorkoutAIService.swift */; };
+		WK0200000000000000000015 /* NutritionAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000015 /* NutritionAIService.swift */; };
+		WK0200000000000000000016 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000016 /* HealthKitManager.swift */; };
+		WK0200000000000000000017 /* DataExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000017 /* DataExportService.swift */; };
+		WK0200000000000000000018 /* WorkoutsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000018 /* WorkoutsManager.swift */; };
 		88656A686AF741EB83B8FD5F /* SliderQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711D3FB735414113B06478F1 /* MorseCodeView.swift */; };
@@ -964,6 +988,30 @@
 		WS0100000000000000000044 /* MonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/MonthView.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000045 /* WeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/WeekView.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000046 /* YearView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/YearView.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000001 /* WorkoutsModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/WorkoutsModeManager.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000002 /* WorkoutsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/WorkoutsHomeView.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000003 /* OnboardWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/OnboardWorkoutView.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000004 /* WorkoutPlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/WorkoutPlanView.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000005 /* WorkoutDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/WorkoutDetailView.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000006 /* NutritionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/NutritionView.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000007 /* MealScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/MealScannerView.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000008 /* StreaksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/StreaksView.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000009 /* BadgesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/BadgesView.swift"; sourceTree = "<group>"; };
+		WK010000000000000000000A /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/ProgressView.swift"; sourceTree = "<group>"; };
+		WK010000000000000000000B /* HealthDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/HealthDataView.swift"; sourceTree = "<group>"; };
+		WK010000000000000000000C /* WorkoutsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/WorkoutsSettingsView.swift"; sourceTree = "<group>"; };
+		WK010000000000000000000D /* UserFitnessProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Models/UserFitnessProfile.swift"; sourceTree = "<group>"; };
+		WK010000000000000000000E /* ExerciseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Models/ExerciseModel.swift"; sourceTree = "<group>"; };
+		WK010000000000000000000F /* WorkoutModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Models/WorkoutModel.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000010 /* NutritionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Models/NutritionModel.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000011 /* StreakModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Models/StreakModel.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000012 /* BadgeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Models/BadgeModel.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000013 /* ProgressModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Models/ProgressModel.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000014 /* WorkoutAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/AI/WorkoutAIService.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000015 /* NutritionAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/AI/NutritionAIService.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000016 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Health/HealthKitManager.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000017 /* DataExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Services/DataExportService.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000018 /* WorkoutsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Services/WorkoutsManager.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1465,6 +1513,30 @@
 				WS0100000000000000000044 /* MonthView.swift */,
 				WS0100000000000000000045 /* WeekView.swift */,
 				WS0100000000000000000046 /* YearView.swift */,
+				WK0100000000000000000001 /* WorkoutsModeManager.swift */,
+				WK0100000000000000000002 /* WorkoutsHomeView.swift */,
+				WK0100000000000000000003 /* OnboardWorkoutView.swift */,
+				WK0100000000000000000004 /* WorkoutPlanView.swift */,
+				WK0100000000000000000005 /* WorkoutDetailView.swift */,
+				WK0100000000000000000006 /* NutritionView.swift */,
+				WK0100000000000000000007 /* MealScannerView.swift */,
+				WK0100000000000000000008 /* StreaksView.swift */,
+				WK0100000000000000000009 /* BadgesView.swift */,
+				WK010000000000000000000A /* ProgressView.swift */,
+				WK010000000000000000000B /* HealthDataView.swift */,
+				WK010000000000000000000C /* WorkoutsSettingsView.swift */,
+				WK010000000000000000000D /* UserFitnessProfile.swift */,
+				WK010000000000000000000E /* ExerciseModel.swift */,
+				WK010000000000000000000F /* WorkoutModel.swift */,
+				WK0100000000000000000010 /* NutritionModel.swift */,
+				WK0100000000000000000011 /* StreakModel.swift */,
+				WK0100000000000000000012 /* BadgeModel.swift */,
+				WK0100000000000000000013 /* ProgressModel.swift */,
+				WK0100000000000000000014 /* WorkoutAIService.swift */,
+				WK0100000000000000000015 /* NutritionAIService.swift */,
+				WK0100000000000000000016 /* HealthKitManager.swift */,
+				WK0100000000000000000017 /* DataExportService.swift */,
+				WK0100000000000000000018 /* WorkoutsManager.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -2026,6 +2098,30 @@
 				WS0200000000000000000044 /* MonthView.swift in Sources */,
 				WS0200000000000000000045 /* WeekView.swift in Sources */,
 				WS0200000000000000000046 /* YearView.swift in Sources */,
+				WK0200000000000000000001 /* WorkoutsModeManager.swift in Sources */,
+				WK0200000000000000000002 /* WorkoutsHomeView.swift in Sources */,
+				WK0200000000000000000003 /* OnboardWorkoutView.swift in Sources */,
+				WK0200000000000000000004 /* WorkoutPlanView.swift in Sources */,
+				WK0200000000000000000005 /* WorkoutDetailView.swift in Sources */,
+				WK0200000000000000000006 /* NutritionView.swift in Sources */,
+				WK0200000000000000000007 /* MealScannerView.swift in Sources */,
+				WK0200000000000000000008 /* StreaksView.swift in Sources */,
+				WK0200000000000000000009 /* BadgesView.swift in Sources */,
+				WK020000000000000000000A /* ProgressView.swift in Sources */,
+				WK020000000000000000000B /* HealthDataView.swift in Sources */,
+				WK020000000000000000000C /* WorkoutsSettingsView.swift in Sources */,
+				WK020000000000000000000D /* UserFitnessProfile.swift in Sources */,
+				WK020000000000000000000E /* ExerciseModel.swift in Sources */,
+				WK020000000000000000000F /* WorkoutModel.swift in Sources */,
+				WK0200000000000000000010 /* NutritionModel.swift in Sources */,
+				WK0200000000000000000011 /* StreakModel.swift in Sources */,
+				WK0200000000000000000012 /* BadgeModel.swift in Sources */,
+				WK0200000000000000000013 /* ProgressModel.swift in Sources */,
+				WK0200000000000000000014 /* WorkoutAIService.swift in Sources */,
+				WK0200000000000000000015 /* NutritionAIService.swift in Sources */,
+				WK0200000000000000000016 /* HealthKitManager.swift in Sources */,
+				WK0200000000000000000017 /* DataExportService.swift in Sources */,
+				WK0200000000000000000018 /* WorkoutsManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -6,6 +6,7 @@ struct AIChatSettingsView: View {
     @StateObject private var memoryStore = AIChatMemoryStore.shared
     @StateObject private var modelCatalog = AIModelCatalog.shared
     @StateObject private var musicMode = MusicModeManager.shared
+    @StateObject private var workoutsMode = WorkoutsModeManager.shared
     @StateObject private var workspaceMode = WorkspaceModeManager.shared
 
     private let registry = AIProviderRegistry.shared
@@ -30,6 +31,7 @@ struct AIChatSettingsView: View {
                 storageSection
                 memorySection
                 musicModeSection
+                workoutsModeSection
                 workspaceModeSection
                 toolVisibilitySection
             }
@@ -282,7 +284,16 @@ struct AIChatSettingsView: View {
 
     private var musicModeSection: some View {
         Section {
-            Toggle(isOn: $musicMode.isMusicModeEnabled) {
+            Toggle(isOn: Binding(
+                get: { musicMode.isMusicModeEnabled },
+                set: { enabled in
+                    musicMode.isMusicModeEnabled = enabled
+                    if enabled {
+                        workoutsMode.isWorkoutsModeEnabled = false
+                        workspaceMode.isWorkspaceModeEnabled = false
+                    }
+                }
+            )) {
                 HStack(spacing: 14) {
                     Image(systemName: "music.note.list")
                         .font(.title3)
@@ -313,9 +324,54 @@ struct AIChatSettingsView: View {
 
     // MARK: - Tool Visibility Section
 
+    private var workoutsModeSection: some View {
+        Section {
+            Toggle(isOn: Binding(
+                get: { workoutsMode.isWorkoutsModeEnabled },
+                set: { enabled in
+                    workoutsMode.isWorkoutsModeEnabled = enabled
+                    if enabled {
+                        musicMode.isMusicModeEnabled = false
+                        workspaceMode.isWorkspaceModeEnabled = false
+                    }
+                }
+            )) {
+                HStack(spacing: 14) {
+                    Image(systemName: "figure.strengthtraining.traditional")
+                        .font(.title3)
+                        .foregroundColor(.mint)
+                        .frame(width: 32)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Turn ToolsKit Into Workouts")
+                            .font(.body)
+                        Text("Replace the Dashboard with AI-powered fitness tracking")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+        } header: {
+            Text("Workouts Mode")
+        } footer: {
+            Text("When enabled, ToolsKit launches into Workouts with plans, nutrition, progress, and health sync.")
+                .font(.caption)
+        }
+    }
+
+    // MARK: - Tool Visibility Section
+
     private var workspaceModeSection: some View {
         Section {
-            Toggle(isOn: $workspaceMode.isWorkspaceModeEnabled) {
+            Toggle(isOn: Binding(
+                get: { workspaceMode.isWorkspaceModeEnabled },
+                set: { enabled in
+                    workspaceMode.isWorkspaceModeEnabled = enabled
+                    if enabled {
+                        musicMode.isMusicModeEnabled = false
+                        workoutsMode.isWorkoutsModeEnabled = false
+                    }
+                }
+            )) {
                 HStack(spacing: 14) {
                     Image(systemName: "rectangle.3.group")
                         .font(.title3)
