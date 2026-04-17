@@ -10,9 +10,9 @@ struct MealScannerView: View {
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var showingCamera = false
     @State private var showingCameraUnavailableAlert = false
-    @State private var analysis: MealAnalysis?
-    @State private var editableItems: [DetectedFoodItem] = []
-    @State private var newItemName: String = ""
+    @State private var loggedMeal: MealRecord?
+    @State private var isAnalyzing = false
+    @State private var errorMessage: String?
 
     var body: some View {
         Form {
@@ -46,77 +46,50 @@ struct MealScannerView: View {
             }
 
             Section {
-                Button("Analyze Meal") {
-                    let inputName = mealName.isEmpty ? "Meal" : mealName
-                    let result = manager.analyzeMealInput(
-                        inputName,
-                        sourceType: .image,
-                        imageData: selectedImage?.jpegData(compressionQuality: 0.8)
-                    )
-                    analysis = result
-                    editableItems = result.detectedItems
+                Button {
+                    Task { await runAnalysis() }
+                } label: {
+                    Label("Analyze Meal with AI", systemImage: "sparkles")
+                }
+                .disabled(selectedImage == nil || isAnalyzing)
+            }
+
+            if let loggedMeal {
+                Section("AI Result") {
+                    LabeledContent("Meal", value: loggedMeal.mealType.rawValue.capitalized)
+                    LabeledContent("Calories", value: "\(loggedMeal.calories)")
+                    LabeledContent("Macros", value: "P\(Int(loggedMeal.proteinGrams)) C\(Int(loggedMeal.carbsGrams)) F\(Int(loggedMeal.fatsGrams))")
+                    if !loggedMeal.insights.isEmpty {
+                        ForEach(loggedMeal.insights, id: \.self) { insight in
+                            Label(insight, systemImage: "lightbulb")
+                                .font(.caption)
+                        }
+                    }
+                }
+
+                Section("Foods") {
+                    ForEach(loggedMeal.detectedItems) { item in
+                        VStack(alignment: .leading) {
+                            Text(item.name)
+                                .font(.subheadline.bold())
+                            Text("\(item.portionDescription) • \(item.estimatedCalories) kcal")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
             }
 
-            if analysis != nil {
-                Section("Detected Items") {
-                    if editableItems.isEmpty {
-                        Text("No items detected.")
-                            .foregroundColor(.secondary)
-                    }
-
-                    ForEach($editableItems) { $item in
-                        VStack(alignment: .leading, spacing: 8) {
-                            TextField("Food", text: $item.name)
-                            Picker("Category", selection: $item.category) {
-                                ForEach(FoodCategory.allCases) { category in
-                                    Text(category.rawValue.capitalized).tag(category)
-                                }
-                            }
-                            TextField("Portion", text: $item.portionDescription)
-                            Stepper("Calories: \(item.estimatedCalories)", value: $item.estimatedCalories, in: 0...1200)
-                        }
-                        .padding(.vertical, 4)
-                    }
-                    .onDelete { offsets in
-                        editableItems.remove(atOffsets: offsets)
-                    }
-
-                    HStack {
-                        TextField("Add item", text: $newItemName)
-                        Button("Add") {
-                            let trimmed = newItemName.trimmingCharacters(in: .whitespacesAndNewlines)
-                            guard !trimmed.isEmpty else { return }
-                            editableItems.append(
-                                DetectedFoodItem(name: trimmed, category: .mixed, portionDescription: "1 serving", estimatedCalories: 180)
-                            )
-                            newItemName = ""
-                        }
-                    }
-                }
-
-                Section("Estimate") {
-                    let updated = manager.recalculateMealAnalysis(from: editableItems)
-                    LabeledContent("Calories", value: "\(updated.calories)")
-                    LabeledContent("Macros", value: "P\(Int(updated.proteinGrams)) C\(Int(updated.carbsGrams)) F\(Int(updated.fatsGrams))")
-                    Text(updated.summary)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-
-                    Button("Confirm & Log Meal") {
-                        manager.addMeal(
-                            name: mealName.isEmpty ? "Scanned Meal" : mealName,
-                            analysis: updated,
-                            sourceType: .image,
-                            rawInput: mealName,
-                            detectedItemsOverride: editableItems
-                        )
-                    }
-                    .buttonStyle(.borderedProminent)
+            if let errorMessage {
+                Section("AI Error") {
+                    Text(errorMessage)
+                        .font(.footnote)
+                        .foregroundStyle(.red)
                 }
             }
         }
         .navigationTitle("Meal Scanner")
+        .presentationDetents([.medium, .large])
         .sheet(isPresented: $showingCamera) {
             CameraPicker(image: $selectedImage)
         }
@@ -131,6 +104,28 @@ struct MealScannerView: View {
                       let image = UIImage(data: data) else { return }
                 selectedImage = image
             }
+        }
+    }
+
+    @MainActor
+    private func runAnalysis() async {
+        guard let imageData = selectedImage?.jpegData(compressionQuality: 0.8) else { return }
+        isAnalyzing = true
+        errorMessage = nil
+        defer { isAnalyzing = false }
+
+        let input = NutritionAIInput(
+            rawText: mealName,
+            sourceType: .image,
+            imageData: imageData,
+            voiceTranscript: nil
+        )
+        let result = await manager.logMeal(using: input)
+        switch result {
+        case .success(let meal):
+            loggedMeal = meal
+        case .failure(let error):
+            errorMessage = error.localizedDescription
         }
     }
 }

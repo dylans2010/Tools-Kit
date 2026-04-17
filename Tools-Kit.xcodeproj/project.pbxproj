@@ -263,6 +263,9 @@
 		WK0200000000000000000030 /* WorkoutUserPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000030 /* WorkoutUserPlan.swift */; };
 		WK0200000000000000000031 /* NutritionAILogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000031 /* NutritionAILogic.swift */; };
 		WK0200000000000000000032 /* NutritionSummaryInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000032 /* NutritionSummaryInfoView.swift */; };
+		WK0200000000000000000033 /* AIResponseDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000033 /* AIResponseDecoder.swift */; };
+		WK0200000000000000000034 /* NutritionInsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000034 /* NutritionInsightsView.swift */; };
+		WK0200000000000000000035 /* MealDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000035 /* MealDetailView.swift */; };
 		88656A686AF741EB83B8FD5F /* SliderQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C7E3D418DC49818FC54977 /* SliderQuestionView.swift */; };
 		005CC343AB814B9885292A08 /* NATOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1ABEF1CC5614B57A749E486 /* NATOView.swift */; };
 		6E5FFDC103BA4B51AC696D41 /* MorseCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711D3FB735414113B06478F1 /* MorseCodeView.swift */; };
@@ -1064,6 +1067,9 @@
 		WK0100000000000000000030 /* WorkoutUserPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/AI/WorkoutUserPlan.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000031 /* NutritionAILogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/AI/NutritionAILogic.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000032 /* NutritionSummaryInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/NutritionSummaryInfoView.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000033 /* AIResponseDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/AI/AIResponseDecoder.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000034 /* NutritionInsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/NutritionInsightsView.swift"; sourceTree = "<group>"; };
+		WK0100000000000000000035 /* MealDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/MealDetailView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1615,6 +1621,9 @@
 				WK0100000000000000000030 /* WorkoutUserPlan.swift */,
 				WK0100000000000000000031 /* NutritionAILogic.swift */,
 				WK0100000000000000000032 /* NutritionSummaryInfoView.swift */,
+				WK0100000000000000000033 /* AIResponseDecoder.swift */,
+				WK0100000000000000000034 /* NutritionInsightsView.swift */,
+				WK0100000000000000000035 /* MealDetailView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -2226,6 +2235,9 @@
 				WK0200000000000000000030 /* WorkoutUserPlan.swift in Sources */,
 				WK0200000000000000000031 /* NutritionAILogic.swift in Sources */,
 				WK0200000000000000000032 /* NutritionSummaryInfoView.swift in Sources */,
+				WK0200000000000000000033 /* AIResponseDecoder.swift in Sources */,
+				WK0200000000000000000034 /* NutritionInsightsView.swift in Sources */,
+				WK0200000000000000000035 /* MealDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

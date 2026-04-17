@@ -11,6 +11,9 @@ struct WorkoutDetailView: View {
                 LabeledContent("Sets", value: "\(exercise.sets)")
                 LabeledContent("Reps", value: "\(exercise.reps)")
                 LabeledContent("Duration", value: "\(exercise.durationMinutes) min")
+                if !exercise.muscleGroup.isEmpty {
+                    LabeledContent("Muscle Group", value: exercise.muscleGroup)
+                }
                 LabeledContent("Rest", value: "\(exercise.restSeconds) sec")
             }
 

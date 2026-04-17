@@ -30,6 +30,8 @@ struct WorkoutsHomeView: View {
 
     @StateObject private var manager = WorkoutsManager.shared
     @State private var selectedTab: Tab = .dashboard
+    @State private var showScanSheet = false
+    @State private var showVoiceSheet = false
 
     var body: some View {
         Group {
@@ -57,6 +59,14 @@ struct WorkoutsHomeView: View {
                         .navigationTitle("Workout Setup")
                 }
             }
+        }
+        .sheet(isPresented: $showScanSheet) {
+            NavigationStack { MealScannerView() }
+                .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showVoiceSheet) {
+            NavigationStack { MealVoiceLoggingView() }
+                .presentationDetents([.medium, .large])
         }
     }
 
@@ -118,11 +128,36 @@ struct WorkoutsHomeView: View {
 
     private var quickActions: some View {
         HStack(spacing: 10) {
-            quickIcon("Scan", symbol: "camera.viewfinder") { MealScannerView() }
-            quickIcon("Voice", symbol: "waveform.badge.mic") { MealVoiceLoggingView() }
+            Button {
+                showScanSheet = true
+            } label: {
+                quickIconLabel("Scan", symbol: "camera.viewfinder")
+            }
+            .buttonStyle(.plain)
+
+            Button {
+                showVoiceSheet = true
+            } label: {
+                quickIconLabel("Voice", symbol: "waveform.badge.mic")
+            }
+            .buttonStyle(.plain)
             quickIcon("Live", symbol: "timer") { LiveWorkoutView() }
             quickIcon("Log", symbol: "checklist") { WorkoutLoggingView() }
         }
+    }
+
+    private func quickIconLabel(_ title: String, symbol: String) -> some View {
+        VStack(spacing: 8) {
+            Image(systemName: symbol)
+                .font(.headline)
+                .frame(width: 34, height: 34)
+                .background(.thinMaterial, in: Circle())
+            Text(title)
+                .font(.caption2.bold())
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private func quickIcon<Destination: View>(_ title: String, symbol: String, @ViewBuilder destination: @escaping () -> Destination) -> some View {

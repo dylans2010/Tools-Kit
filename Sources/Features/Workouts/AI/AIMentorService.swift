@@ -1,8 +1,35 @@
 import Foundation
 
+private struct AIMentorJSONResponse: Codable {
+    let response: String
+    let insights: [String]
+    let recommendations: [String]
+}
+
 final class AIMentorService {
     private let contextBuilder = AIMentorContextBuilder()
+    private let ai = AIService.shared
+    private let decoder = AIResponseDecoder()
 
+    private let schemaString = """
+    {
+      "type": "object",
+      "required": ["response", "insights", "recommendations"],
+      "properties": {
+        "response": {"type": "string"},
+        "insights": {"type": "array", "items": {"type": "string"}},
+        "recommendations": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+    """
+
+    private let schema: AIJSONType = .object([
+        "response": .string,
+        "insights": .array(.string),
+        "recommendations": .array(.string)
+    ])
+
+    @MainActor
     func respond(
         to prompt: String,
         imageData: Data?,
@@ -15,7 +42,7 @@ final class AIMentorService {
         performances: [WorkoutPerformanceModel],
         healthData: HealthImportedData,
         memory: [MentorMessageModel]
-    ) -> MentorMessageModel {
+    ) async -> MentorMessageModel {
         let context = contextBuilder.build(
             profile: profile,
             todayWorkout: todayWorkout,
@@ -28,35 +55,38 @@ final class AIMentorService {
             messages: memory
         )
 
-        let lower = prompt.lowercased()
-        let recommendation: String
-        if lower.contains("meal") || lower.contains("nutrition") {
-            recommendation = "Based on your log, prioritize protein at your next meal and keep carbs around your workouts."
-        } else if lower.contains("fatigue") || lower.contains("tired") {
-            recommendation = "Your recent pattern suggests recovery focus: shorter session, lower intensity, extra hydration and sleep."
-        } else if lower.contains("workout") || lower.contains("plan") {
-            recommendation = "Use today's workout plan, aim for progressive overload on your first two compound movements."
-        } else {
-            recommendation = "Stay consistent with workouts, hit your calories/protein targets, and review progress weekly."
+        let promptString = """
+        You are an empathetic fitness mentor. Use the context to reply in STRICT JSON with fields response, insights, and recommendations.
+
+        User question: "\(prompt)"
+        Image attached: \(imageData == nil ? "no" : "yes, length \(imageData?.count ?? 0)")
+
+        Context:
+        \(context.flattened)
+        """
+
+        do {
+            let json = try await ai.generateStructuredJSON(
+                prompt: promptString,
+                jsonSchema: schemaString,
+                preferredModel: "openrouter/free"
+            )
+            let parsed = try decoder.decode(AIMentorJSONResponse.self, from: json, schema: schema)
+            return MentorMessageModel(
+                role: .assistant,
+                text: parsed.response,
+                imageHint: imageData == nil ? nil : "Image included",
+                insights: parsed.insights,
+                recommendations: parsed.recommendations
+            )
+        } catch {
+            return MentorMessageModel(
+                role: .assistant,
+                text: "I could not decode the AI mentor response. Please try again.",
+                imageHint: imageData == nil ? nil : "Image included",
+                insights: [],
+                recommendations: []
+            )
         }
-
-        let imageHint: String?
-        if imageData?.isEmpty == false {
-            imageHint = "Image context included"
-        } else {
-            imageHint = nil
-        }
-
-        let text = [
-            recommendation,
-            "",
-            "Context snapshot:",
-            context.profileSummary,
-            context.workoutSummary,
-            context.nutritionSummary,
-            context.streakSummary
-        ].joined(separator: "\n")
-
-        return MentorMessageModel(role: .assistant, text: text, imageHint: imageHint)
     }
 }

@@ -4,7 +4,9 @@ struct MealVoiceLoggingView: View {
     @StateObject private var manager = WorkoutsManager.shared
     @StateObject private var voiceService = MealVoiceService()
 
-    @State private var analysis: MealAnalysis?
+    @State private var lastSavedMeal: MealRecord?
+    @State private var isSaving = false
+    @State private var errorMessage: String?
 
     var body: some View {
         VStack(spacing: 20) {
@@ -42,29 +44,21 @@ struct MealVoiceLoggingView: View {
 
             HStack {
                 Button("Retry") {
-                    analysis = nil
+                    lastSavedMeal = nil
                     voiceService.reset()
+                    errorMessage = nil
                 }
                 .buttonStyle(.bordered)
 
                 Button("Confirm") {
-                    let cleaned = voiceService.cleanedOutput()
-                    guard !cleaned.isEmpty else { return }
-                    let result = manager.analyzeMealInput(cleaned, sourceType: .voice, imageData: nil)
-                    analysis = result
-                    manager.addMeal(
-                        name: cleaned.components(separatedBy: ",").first?.capitalized ?? "Voice Meal",
-                        analysis: result,
-                        sourceType: .voice,
-                        rawInput: cleaned
-                    )
+                    Task { await saveVoiceMeal() }
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(voiceService.cleanedOutput().isEmpty)
+                .disabled(voiceService.cleanedOutput().isEmpty || isSaving)
             }
 
-            if let analysis {
-                Text("Saved: \(analysis.calories) kcal · \(analysis.detectedItems.count) items")
+            if let lastSavedMeal {
+                Text("Saved: \(lastSavedMeal.calories) kcal · \(lastSavedMeal.detectedItems.count) items")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
@@ -74,13 +68,43 @@ struct MealVoiceLoggingView: View {
                     .font(.footnote)
                     .foregroundColor(.red)
             }
+            if let errorMessage {
+                Text(errorMessage)
+                    .font(.footnote)
+                    .foregroundColor(.red)
+            }
 
             Spacer()
         }
         .padding()
         .navigationTitle("Voice Meal")
+        .presentationDetents([.medium, .large])
         .task {
             await voiceService.requestPermissions()
+        }
+    }
+
+    @MainActor
+    private func saveVoiceMeal() async {
+        let cleaned = voiceService.cleanedOutput()
+        guard !cleaned.isEmpty else { return }
+        isSaving = true
+        defer { isSaving = false }
+
+        let input = NutritionAIInput(
+            rawText: cleaned,
+            sourceType: .voice,
+            imageData: nil,
+            voiceTranscript: cleaned
+        )
+
+        let result = await manager.logMeal(using: input)
+        switch result {
+        case .success(let meal):
+            lastSavedMeal = meal
+            errorMessage = nil
+        case .failure(let error):
+            errorMessage = error.localizedDescription
         }
     }
 }
