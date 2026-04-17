@@ -36,16 +36,32 @@ final class UserDataManager {
         let data = try JSONEncoder().encode(snapshot)
         let payload = data.base64EncodedString()
 
-        _ = try await databases.upsertDocument(
-            databaseId: databaseId,
-            collectionId: collectionId,
-            documentId: user.id,
-            data: [
-                "snapshot": payload,
-                "updatedAt": ISO8601DateFormatter().string(from: Date()),
-                "platform": "ios"
-            ]
-        )
+        let documentData: [String: Any] = [
+            "snapshot": payload,
+            "updatedAt": ISO8601DateFormatter().string(from: Date()),
+            "platform": "ios"
+        ]
+
+        do {
+            _ = try await databases.getDocument(
+                databaseId: databaseId,
+                collectionId: collectionId,
+                documentId: user.id
+            )
+            _ = try await databases.updateDocument(
+                databaseId: databaseId,
+                collectionId: collectionId,
+                documentId: user.id,
+                data: documentData
+            )
+        } catch {
+            _ = try await databases.createDocument(
+                databaseId: databaseId,
+                collectionId: collectionId,
+                documentId: user.id,
+                data: documentData
+            )
+        }
     }
 
     @discardableResult
