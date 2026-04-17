@@ -49,7 +49,7 @@ struct DraftingEmailsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Email Details") {
+                Section(header: Text("Email Details")) {
                     TextField("Email Recipient", text: $recipient)
                         .textInputAutocapitalization(.never)
                         .keyboardType(.emailAddress)
@@ -73,7 +73,7 @@ struct DraftingEmailsView: View {
                     Text("Recipient should be a single email address for best results.")
                 }
 
-                Section("Prompt Inputs") {
+                Section(header: Text("Prompt Inputs")) {
                     TextField("Email Description", text: $description, axis: .vertical)
                         .lineLimit(3...6)
                     TextField("Additional Context", text: $additionalContext, axis: .vertical)
@@ -104,7 +104,7 @@ struct DraftingEmailsView: View {
                 }
 
                 if !generatedBody.isEmpty {
-                    Section("Generated Draft") {
+                    Section(header: Text("Generated Draft")) {
                         if let parsed = try? AttributedString(markdown: generatedBody) {
                             Text(parsed)
                         } else {
