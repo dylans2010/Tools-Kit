@@ -294,8 +294,8 @@ struct SpreadsheetEditorView: View {
     }
 
     private func buildDataString() -> String {
-        sheet.cells.prefix(50).enumerated().map { row, values in
-            "Row \(row + 1): \(values.map { $0.value.isEmpty ? "-" : $0.value }.joined(separator: ", "))"
+        sheet.cells.prefix(50).enumerated().map { rowIndex, values in
+            "Row \(rowIndex + 1): \(values.map { $0.value.isEmpty ? "-" : $0.value }.joined(separator: ", "))"
         }.joined(separator: "\n")
     }
 

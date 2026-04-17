@@ -164,6 +164,7 @@ struct TasksHomeView: View {
         guard !prompt.isEmpty else { return }
         aiLoading = true
         aiError = nil
+        let formatter = ISO8601DateFormatter()
         Task {
             do {
                 let response = try await manager.generateTasksFromPrompt(prompt)
@@ -171,7 +172,7 @@ struct TasksHomeView: View {
                     // Apply decoded AI tasks directly to the task store.
                     for planned in response.tasks {
                         let priority = priorityFromAI(planned.priority)
-                        let due = planned.dueDateISO8601.flatMap(ISO8601DateFormatter().date(from:))
+                        let due = planned.dueDateISO8601.flatMap(formatter.date(from:))
                         manager.addTask(
                             WorkspaceTask(
                                 title: planned.title,

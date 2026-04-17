@@ -10,6 +10,7 @@ struct CalendarHomeView: View {
     @State private var aiLoading = false
     @State private var aiError: String?
     @State private var aiInsights: CalendarManager.AICalendarInsights?
+    private let isoFormatter = ISO8601DateFormatter()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -121,9 +122,8 @@ struct CalendarHomeView: View {
     }
 
     private func addSuggestedEvent(_ draft: CalendarManager.AICalendarEventDraft) {
-        let formatter = ISO8601DateFormatter()
-        guard let start = formatter.date(from: draft.startISO8601),
-              let end = formatter.date(from: draft.endISO8601) else {
+        guard let start = isoFormatter.date(from: draft.startISO8601),
+              let end = isoFormatter.date(from: draft.endISO8601) else {
             aiError = "Suggested event had invalid dates."
             return
         }
