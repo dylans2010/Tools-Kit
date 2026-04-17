@@ -24,7 +24,7 @@ struct MealPlanView: View {
                     }
                 }
             } else {
-                ContentUnavailableView("No Meal Plan", systemImage: "list.bullet.clipboard")
+                ContentUnavailableView("No Meal Plan", systemImage: "list.bullet.clipboard", description: Text("Generate your meal plan to get started."))
             }
 
             Section {

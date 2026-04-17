@@ -48,7 +48,7 @@ struct WorkoutProgressDashboardView: View {
                     }
                 }
             } else {
-                ContentUnavailableView("No Progress Yet", systemImage: "chart.xyaxis.line")
+                ContentUnavailableView("No Progress Yet", systemImage: "chart.xyaxis.line", description: Text("Track your workout progress over time."))
             }
         }
         .navigationTitle("Progress")
