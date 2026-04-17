@@ -4,8 +4,32 @@ struct ContentView: View {
     @StateObject private var modeManager = MusicModeManager.shared
     @StateObject private var workoutsMode = WorkoutsModeManager.shared
     @StateObject private var workspaceMode = WorkspaceModeManager.shared
+    @State private var isAuthenticated = false
+    @State private var isCheckingSession = true
+    @State private var hasRestoredSession = false
 
     var body: some View {
+        Group {
+            if isCheckingSession {
+                ProgressView("Checking session...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if isAuthenticated {
+                authenticatedContent
+            } else {
+                LoginView {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
+                        isAuthenticated = true
+                    }
+                }
+            }
+        }
+        .task {
+            await restoreSessionIfNeeded()
+        }
+    }
+
+    @ViewBuilder
+    private var authenticatedContent: some View {
         if modeManager.isMusicModeEnabled {
             MusicTabView()
         } else if workoutsMode.isWorkoutsModeEnabled {
@@ -13,9 +37,28 @@ struct ContentView: View {
         } else if workspaceMode.isWorkspaceModeEnabled {
             WorkspaceHomeView()
         } else {
-            DashboardView()
+            DashboardView {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
+                    isAuthenticated = false
+                }
+            }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+    }
+
+    @MainActor
+    private func restoreSessionIfNeeded() async {
+        guard !hasRestoredSession else { return }
+        hasRestoredSession = true
+
+        do {
+            _ = try await account.get()
+            isAuthenticated = true
+        } catch {
+            isAuthenticated = false
+        }
+
+        isCheckingSession = false
     }
 }
 

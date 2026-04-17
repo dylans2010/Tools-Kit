@@ -1,5 +1,6 @@
 import SwiftUI
 import AVFoundation
+import Appwrite
 
 @main
 struct ToolsKitApp: App {
@@ -11,6 +12,7 @@ struct ToolsKitApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .registerOAuthHandler()
         }
     }
 }

@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct DashboardView: View {
+    let onSignOut: (() -> Void)?
+
     @StateObject private var registry = ToolRegistry()
     @StateObject private var visibility = ToolVisibilityManager.shared
     @StateObject private var settingsManager = AIChatSettingsManager.shared
@@ -10,6 +12,8 @@ struct DashboardView: View {
     @State private var selectedCategory: ToolCategory? = nil
     @State private var showSettings = false
     @State private var pingStatusMessage = ""
+    @State private var signOutStatusMessage = ""
+    @State private var isSigningOut = false
 
     private let columns = [GridItem(.adaptive(minimum: 160), spacing: 14)]
 
@@ -41,6 +45,21 @@ struct DashboardView: View {
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationTitle("Tools Kit")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        performSignOut()
+                    } label: {
+                        if isSigningOut {
+                            ProgressView()
+                        } else {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                                .font(.body)
+                        }
+                    }
+                    .disabled(isSigningOut)
+                    .accessibilityLabel("Sign out")
+                }
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         showSettings = true
@@ -63,9 +82,36 @@ struct DashboardView: View {
             Text("\(visibleTools.count) of \(registry.tools.count) tools across \(ToolCategory.allCases.count) categories")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
+            if !signOutStatusMessage.isEmpty {
+                Text(signOutStatusMessage)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
         }
         .padding(.horizontal)
         .padding(.top, 8)
+    }
+
+    private func performSignOut() {
+        guard !isSigningOut else { return }
+        isSigningOut = true
+        signOutStatusMessage = ""
+
+        Task {
+            do {
+                try await account.deleteSession(sessionId: "current")
+                await MainActor.run {
+                    isSigningOut = false
+                    signOutStatusMessage = "Signed out"
+                    onSignOut?()
+                }
+            } catch {
+                await MainActor.run {
+                    isSigningOut = false
+                    signOutStatusMessage = "Sign out failed: \(error.localizedDescription)"
+                }
+            }
+        }
     }
 
     private var privateModeCard: some View {
