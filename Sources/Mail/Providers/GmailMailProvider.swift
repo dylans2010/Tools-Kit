@@ -330,7 +330,11 @@ class GmailMailProvider: MailProviderProtocol {
     private func oauthValue(key: String) throws -> String {
         guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String,
               !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            throw NSError(domain: "GmailMailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing \(key)"])
+            throw NSError(
+                domain: "GmailMailProvider",
+                code: 500,
+                userInfo: [NSLocalizedDescriptionKey: "Missing required OAuth configuration key \(key) in Info.plist"]
+            )
         }
         return value
     }
