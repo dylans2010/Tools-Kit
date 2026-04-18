@@ -68,7 +68,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         }
 
         let listURL = baseURL.appendingPathComponent("messages").appending(queryItems: items)
-        let list: GmailListResponse = try await request(url: listURL, token: session.accessToken, body: Optional<Data>.none)
+        let list: GmailListResponse = try await request(url: listURL, body: Optional<Data>.none, token: session.accessToken)
 
         var messages: [MailMessage] = []
         for item in list.messages ?? [] {
@@ -80,7 +80,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
 
     func fetchMessage(session: MailSession, id: String) async throws -> MailMessage {
         let url = baseURL.appendingPathComponent("messages/\(id)").appending(queryItems: [URLQueryItem(name: "format", value: "full")])
-        let payload: GmailMessagePayload = try await request(url: url, token: session.accessToken, body: Optional<Data>.none)
+        let payload: GmailMessagePayload = try await request(url: url, body: Optional<Data>.none, token: session.accessToken)
 
         let headers = payload.payload?.headers.reduce(into: [String: String]()) { partial, item in
             partial[item.name.lowercased()] = item.value

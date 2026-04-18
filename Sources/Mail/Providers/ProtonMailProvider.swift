@@ -113,9 +113,9 @@ final class ProtonMailProvider: MailProvider {
 
         let raw = [
             "From: \(draft.from)",
-            "To: \(draft.to.joined(separator: \", \"))",
-            draft.cc.isEmpty ? nil : "Cc: \(draft.cc.joined(separator: \", \"))",
-            draft.bcc.isEmpty ? nil : "Bcc: \(draft.bcc.joined(separator: \", \"))",
+            "To: \(draft.to.joined(separator: ", "))",
+            draft.cc.isEmpty ? nil : "Cc: \(draft.cc.joined(separator: ", "))",
+            draft.bcc.isEmpty ? nil : "Bcc: \(draft.bcc.joined(separator: ", "))",
             "Subject: \(draft.subject)",
             "MIME-Version: 1.0",
             "Content-Type: text/plain; charset=utf-8",
