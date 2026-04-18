@@ -53,12 +53,30 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
 
         do {
             let groupedThreads: [MailThread]
+            let pageNumber = max(0, currentOffset / pageSize)
 
-            if account.provider == .gmail {
-                let provider = gmailProviders[account.id] ?? GmailMailProvider(account: account)
-                gmailProviders[account.id] = provider
-                groupedThreads = try await provider.fetchThreads(in: folder, limit: pageSize, offset: currentOffset)
-            } else {
+            switch account.provider {
+            case .gmail:
+                let provider = GmailProvider()
+                let messages = try await provider.fetchInbox(session: session(from: account), page: pageNumber)
+                groupedThreads = groupMessages(messages)
+            case .outlook:
+                let provider = OutlookProvider()
+                let messages = try await provider.fetchInbox(session: session(from: account), page: pageNumber)
+                groupedThreads = groupMessages(messages)
+            case .yahoo:
+                let provider = YahooMailProvider()
+                let messages = try await provider.fetchInbox(session: session(from: account), page: pageNumber)
+                groupedThreads = groupMessages(messages)
+            case .proton:
+                let provider = ProtonMailProvider()
+                let messages = try await provider.fetchInbox(session: session(from: account), page: pageNumber)
+                groupedThreads = groupMessages(messages)
+            case .imap:
+                let provider = IMAPProvider()
+                let messages = try await provider.fetchInbox(session: session(from: account), page: pageNumber)
+                groupedThreads = groupMessages(messages)
+            case .icloud:
                 defer { imapService.disconnect() }
                 guard let password = MailKeychainManager.shared.getPassword(for: account.emailAddress) else {
                     throw NSError(domain: "MailSync", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing credentials"])
@@ -128,5 +146,20 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
             }
         }
         return combined.values.sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
+    }
+
+    private func session(from account: MailAccount) -> MailSession {
+        MailSession(
+            id: account.id,
+            provider: account.provider,
+            email: account.emailAddress,
+            displayName: account.displayName,
+            accessToken: account.accessToken,
+            refreshToken: account.refreshToken,
+            imapHost: account.imapHost,
+            imapPort: account.imapPort,
+            smtpHost: account.smtpHost,
+            smtpPort: account.smtpPort
+        )
     }
 }

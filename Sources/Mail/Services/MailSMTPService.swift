@@ -18,6 +18,17 @@ class MailSMTPService {
         case .gmail:
             host = GmailServerConfiguration.smtpHost
             port = GmailServerConfiguration.smtpPort
+        case .outlook:
+            host = "smtp.office365.com"
+            port = 587
+        case .yahoo:
+            host = "smtp.mail.yahoo.com"
+            port = 587
+        case .proton:
+            host = "127.0.0.1"
+            port = 1025
+        case .imap:
+            break
         }
 
         let endpoint = NWEndpoint.hostPort(host: NWEndpoint.Host(host), port: NWEndpoint.Port(integerLiteral: port))

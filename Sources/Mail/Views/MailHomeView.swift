@@ -1,155 +1,157 @@
 import SwiftUI
 
 struct MailHomeView: View {
-    @StateObject private var viewModel = MailViewModel()
-    @State private var email = ""
-    @State private var appPassword = ""
+    @Environment(\.colorScheme) private var colorScheme
 
-    /// Account created after a successful iCloud login — triggers navigation to InboxView.
-    @State private var authenticatedAccount: MailAccount?
+    @StateObject private var mailStore = MailStore.shared
+    @StateObject private var storage = MailStorageService.shared
+    @State private var showAddAccount = false
 
     var body: some View {
         NavigationStack {
-            Group {
-                if let account = authenticatedAccount {
-                    InboxView(account: account, folder: .inbox)
-                } else {
-                    SignInView(
-                        viewModel: viewModel,
-                        email: $email,
-                        appPassword: $appPassword
-                    )
+            ZStack {
+                hexColor("#0D0D14")
+                    .ignoresSafeArea()
+
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        if mailStore.accounts.isEmpty {
+                            emptyState
+                        } else {
+                            ForEach(mailStore.accounts) { account in
+                                NavigationLink {
+                                    InboxView(account: account, folder: .inbox)
+                                } label: {
+                                    accountRow(account)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                    .padding(16)
                 }
             }
-            .navigationTitle(authenticatedAccount == nil ? "iCloud Mail" : "Mail")
-            .background(
-                LinearGradient(
-                    colors: [Color(red: 0.96, green: 0.98, blue: 1.0), Color(red: 0.92, green: 0.95, blue: 1.0)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
-            )
-        }
-        .onChange(of: viewModel.isAuthenticated) { isAuthenticated in
-            if isAuthenticated, !email.isEmpty {
-                let account = MailAccount(
-                    id: UUID(),
-                    email: email,
-                    provider: .iCloud,
-                    isEnabled: true
-                )
-                // Persist the account so MailStorageService / MailSyncService can use it
-                var accounts = MailStorageService.shared.loadAccounts()
-                if !accounts.contains(where: { $0.email == account.email }) {
-                    accounts.append(account)
-                    MailStorageService.shared.saveAccounts(accounts)
+            .navigationTitle("Mail")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showAddAccount = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
                 }
-                authenticatedAccount = account
-            } else if !isAuthenticated {
-                authenticatedAccount = nil
+            }
+            .sheet(isPresented: $showAddAccount) {
+                AddMailAccountView { selected in
+                    mailStore.setActiveAccount(selected.id)
+                }
+            }
+            .onAppear {
+                mailStore.reloadAccounts()
             }
         }
-        .onAppear {
-            // Restore a previously saved account if the user is already authenticated
-            if let saved = MailStorageService.shared.loadAccounts().first {
-                authenticatedAccount = saved
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "tray")
+                .font(.title2)
+                .foregroundStyle(.secondary)
+
+            Text("No mail accounts")
+                .font(.headline)
+                .foregroundStyle(.white)
+
+            Text("Tap + to connect Gmail, Outlook, Yahoo, Proton, or IMAP.")
+                .font(.subheadline)
+                .foregroundStyle(Color.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 32)
+        .background(hexColor("#1A1A24"), in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func accountRow(_ account: MailAccount) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: providerIcon(account.providerType))
+                .font(.headline)
+                .foregroundStyle(providerColor(account.providerType))
+                .frame(width: 36, height: 36)
+                .background(providerColor(account.providerType).opacity(0.16), in: Circle())
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(account.emailAddress)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
+                Text(account.providerType.displayName)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            let unread = unreadCount(for: account)
+            if unread > 0 {
+                Text("\(unread)")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(providerColor(account.providerType), in: Capsule())
+            }
+
+            if account.isActive {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
             }
         }
+        .padding(14)
+        .background(hexColor("#1A1A24"), in: RoundedRectangle(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
+        )
+        .onTapGesture {
+            mailStore.setActiveAccount(account.id)
+        }
+    }
+
+    private func unreadCount(for account: MailAccount) -> Int {
+        let key = "\(account.id)_\(MailFolder.inbox.id)"
+        return storage.loadThreads(for: key)
+            .filter { !$0.isRead }
+            .count
+    }
+
+    private func providerIcon(_ provider: MailAccount.ProviderType) -> String {
+        switch provider {
+        case .gmail: return "g.circle.fill"
+        case .outlook: return "o.circle.fill"
+        case .yahoo: return "y.circle.fill"
+        case .proton: return "lock.shield.fill"
+        case .imap: return "server.rack"
+        case .icloud: return "icloud.fill"
+        }
+    }
+
+    private func providerColor(_ provider: MailAccount.ProviderType) -> Color {
+        switch provider {
+        case .gmail: return hexColor("#EA4335")
+        case .outlook: return hexColor("#0078D4")
+        case .yahoo: return hexColor("#6C3BD1")
+        case .proton: return hexColor("#2E8B57")
+        case .imap: return hexColor("#7B7B95")
+        case .icloud: return .blue
+        }
+    }
+
+    private func hexColor(_ value: String) -> Color {
+        Color(hex: value) ?? .black
     }
 }
 
-// MARK: - Sign-In Form
-
-struct SignInView: View {
-    @ObservedObject var viewModel: MailViewModel
-    @Binding var email: String
-    @Binding var appPassword: String
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Connect iCloud")
-                        .font(.largeTitle.bold())
-                    Text("Sign in with your Apple ID email and an app-specific password.")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-
-                VStack(spacing: 14) {
-                    HStack(spacing: 10) {
-                        Image(systemName: "envelope")
-                            .foregroundColor(.secondary)
-                        TextField("iCloud Email", text: $email)
-                            .textInputAutocapitalization(.never)
-                            .keyboardType(.emailAddress)
-                            .autocorrectionDisabled(true)
-                    }
-                    .padding(12)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
-
-                    HStack(spacing: 10) {
-                        Image(systemName: "key")
-                            .foregroundColor(.secondary)
-                        SecureField("App-Specific Password", text: $appPassword)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled(true)
-                    }
-                    .padding(12)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
-
-                    Link("Generate app-specific password at appleid.apple.com",
-                         destination: URL(string: "https://appleid.apple.com")!)
-                    .font(.footnote)
-                }
-
-                Button(action: signIn) {
-                    HStack {
-                        if viewModel.isLoading {
-                            ProgressView()
-                                .tint(.white)
-                        } else {
-                            Image(systemName: "icloud")
-                            Text("Sign In")
-                                .fontWeight(.semibold)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(Color.blue, in: RoundedRectangle(cornerRadius: 12))
-                    .foregroundStyle(.white)
-                }
-                .disabled(email.isEmpty || appPassword.isEmpty || viewModel.isLoading)
-
-                if let error = viewModel.errorMessage {
-                    Label(error, systemImage: "exclamationmark.triangle.fill")
-                        .font(.footnote)
-                        .foregroundColor(.red)
-                        .padding(10)
-                        .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
-                }
-
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Tip")
-                        .font(.caption.weight(.semibold))
-                        .foregroundColor(.secondary)
-                    Text("Use an @icloud.com, @me.com, or @mac.com address with an Apple app-specific password.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-            .padding(20)
-        }
-    }
-
-    private func signIn() {
-        guard email.hasSuffix("@icloud.com")
-                || email.hasSuffix("@me.com")
-                || email.hasSuffix("@mac.com") else {
-            viewModel.errorMessage = "Please enter a valid @icloud.com, @me.com, or @mac.com email address."
-            return
-        }
-        viewModel.signIn(email: email, appPassword: appPassword)
-    }
+#Preview {
+    MailHomeView()
+        .preferredColorScheme(.dark)
 }

@@ -24,11 +24,11 @@ struct MailAccountsView: View {
             } else {
                 ForEach(mailStore.accounts) { account in
                     HStack(spacing: 12) {
-                        Image(systemName: account.provider == .iCloud ? "icloud.fill" : "envelope.fill")
+                        Image(systemName: icon(for: account.provider))
                             .font(.headline)
-                            .foregroundColor(account.provider == .iCloud ? .blue : .red)
+                            .foregroundColor(color(for: account.provider))
                             .frame(width: 34, height: 34)
-                            .background((account.provider == .iCloud ? Color.blue : Color.red).opacity(0.12), in: Circle())
+                            .background(color(for: account.provider).opacity(0.12), in: Circle())
 
                         VStack(alignment: .leading, spacing: 3) {
                             Text(account.emailAddress)
@@ -84,6 +84,28 @@ struct MailAccountsView: View {
         }
         .onAppear {
             mailStore.reloadAccounts()
+        }
+    }
+
+    private func icon(for provider: MailAccount.ProviderType) -> String {
+        switch provider {
+        case .icloud: return "icloud.fill"
+        case .gmail: return "g.circle.fill"
+        case .outlook: return "o.circle.fill"
+        case .yahoo: return "y.circle.fill"
+        case .proton: return "lock.shield.fill"
+        case .imap: return "server.rack"
+        }
+    }
+
+    private func color(for provider: MailAccount.ProviderType) -> Color {
+        switch provider {
+        case .icloud: return .blue
+        case .gmail: return .red
+        case .outlook: return .blue
+        case .yahoo: return .purple
+        case .proton: return .green
+        case .imap: return .gray
         }
     }
 }
