@@ -36,6 +36,7 @@ struct PageEditorView: View {
     private let defaultNoteSpawn = CGPoint(x: 320, y: 320)
     private let bootstrapFirstNote = CGPoint(x: 220, y: 220)
     private let bootstrapSecondNote = CGPoint(x: 560, y: 320)
+    private let defaultNotebookAISystemPrompt = "You are a notebook copilot. Return concise markdown with actionable structure and clarity."
 
     init(page: NotebookPage, folderID: UUID, notebookID: UUID) {
         self.page = page
@@ -447,7 +448,7 @@ struct PageEditorView: View {
         (try? AttributedString(markdown: md)) ?? AttributedString(md)
     }
 
-    private func runAI(_ task: String, _ prompt: String, systemPrompt: String = "You are a notebook copilot. Return concise markdown with actionable structure and clarity.", model: String? = nil) {
+    private func runAI(_ task: String, _ prompt: String, systemPrompt: String? = nil, model: String? = nil) {
         aiTask = task
         aiLoading = true
         aiResult = "Loading…"
@@ -455,7 +456,7 @@ struct PageEditorView: View {
             do {
                 let result = try await AIService.shared.processText(
                     prompt: prompt,
-                    systemPrompt: systemPrompt,
+                    systemPrompt: systemPrompt ?? defaultNotebookAISystemPrompt,
                     model: model
                 )
                 await MainActor.run { aiResult = result; aiLoading = false }

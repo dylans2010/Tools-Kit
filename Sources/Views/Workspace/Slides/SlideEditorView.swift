@@ -28,6 +28,8 @@ struct SlideEditorView: View {
     @State private var aiError: String?
     @State private var transitionBySlide: [UUID: String] = [:]
     @State private var photoPickerItem: PhotosPickerItem?
+    private let gridSnapSize: Double = 10
+    private let defaultCanvasCenter = CGPoint(x: 500, y: 280)
 
     private var selectedSlide: Slide? {
         guard selectedSlideIndex < deck.slides.count else { return nil }
@@ -171,6 +173,7 @@ struct SlideEditorView: View {
             }
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(label)
     }
 
     private var slideStrip: some View {
@@ -613,8 +616,7 @@ struct SlideEditorView: View {
             get: { selectedElement?[keyPath: keyPath] ?? element[keyPath: keyPath] },
             set: { newValue in
                 updateElementProperty(element) { current in
-                    let adjusted = snapToGrid ? (newValue / 10.0).rounded() * 10.0 : newValue
-                    current[keyPath: keyPath] = adjusted
+                    current[keyPath: keyPath] = newValue
                 }
             }
         )
@@ -678,7 +680,7 @@ struct SlideEditorView: View {
             subtitleEl.x = 200; subtitleEl.y = 260; subtitleEl.width = 560; subtitleEl.height = 50
             subtitleEl.textColor = "CCCCCC"
             slide.elements = [titleEl, subtitleEl]
-        case "Content", "Add Title + Body Block":
+        case "Content":
             var titleEl = SlideElement(kind: .text)
             titleEl.text = "Title"; titleEl.fontSize = 36
             titleEl.x = 50; titleEl.y = 60; titleEl.width = 860; titleEl.height = 60
@@ -792,12 +794,17 @@ struct SlideEditorView: View {
         if let idx = deck.slides[selectedSlideIndex].elements.firstIndex(where: { $0.id == updated.id }) {
             var normalized = updated
             if snapToGrid {
-                normalized.x = (normalized.x / 10).rounded() * 10
-                normalized.y = (normalized.y / 10).rounded() * 10
+                normalized.x = snapValue(normalized.x)
+                normalized.y = snapValue(normalized.y)
             }
             deck.slides[selectedSlideIndex].elements[idx] = normalized
         }
         saveDeck()
+    }
+
+    private func snapValue(_ value: Double) -> Double {
+        guard snapToGrid else { return value }
+        return (value / gridSnapSize).rounded() * gridSnapSize
     }
 
     private func updateSlideBackground(hex: String) {
@@ -864,8 +871,8 @@ struct SlideEditorView: View {
     private func centerSelectedElement() {
         guard let element = selectedElement else { return }
         updateElementProperty(element) { current in
-            current.x = 500
-            current.y = 280
+            current.x = defaultCanvasCenter.x
+            current.y = defaultCanvasCenter.y
         }
     }
 

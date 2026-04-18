@@ -87,7 +87,8 @@ struct IntegrationEditorView: View {
 
                 Section("AI Configuration") {
                     TextField("AI Model", text: $aiModel)
-                        .textInputAutocapitalization(.never)
+                        .autocapitalization(.none)
+                        .keyboardType(.asciiCapable)
                         .disableAutocorrection(true)
 
                     sliderRow("Temperature", value: $temperature, range: 0...1, step: 0.05)
@@ -108,7 +109,7 @@ struct IntegrationEditorView: View {
                         .frame(minHeight: 130)
                         .font(.system(.body, design: .monospaced))
                 } footer: {
-                    Text("Supported placeholders: {{content}}, {{title}}, {{attachments}}, {{word_count}}, {{timestamp}}")
+                    Text("Supported placeholders: {{content}} page body, {{title}} page title, {{attachments}} file names, {{word_count}} note size, {{timestamp}} current date/time.")
                         .font(.caption)
                 }
 
@@ -189,7 +190,7 @@ struct IntegrationEditorView: View {
 
     private func save() {
         var updated = tool ?? IntegrationTool()
-        updated.name = name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Untitled Tool" : name
+        updated.name = name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Untitled" : name
         updated.description = description.trimmingCharacters(in: .whitespacesAndNewlines)
         updated.category = category.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "General" : category
         updated.tags = splitCSV(tagsCSV)
@@ -200,7 +201,8 @@ struct IntegrationEditorView: View {
         updated.frequencyPenalty = frequencyPenalty
         updated.presencePenalty = presencePenalty
         updated.maxResponseTokens = maxResponseTokens
-        updated.aiModel = aiModel.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "openai/gpt-3.5-turbo" : aiModel
+        let trimmedModel = aiModel.trimmingCharacters(in: .whitespacesAndNewlines)
+        updated.aiModel = trimmedModel.isEmpty ? "openai/gpt-3.5-turbo" : trimmedModel
         updated.triggerMode = triggerMode
         updated.inputScope = inputScope
         updated.outputStyle = outputStyle

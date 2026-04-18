@@ -125,9 +125,10 @@ struct NotebookDetailView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(liveNotebook.name)
                             .font(.title3.weight(.bold))
-                        Text("Cleaner workspace, faster navigation, and richer notebook intelligence.")
+                        Text("\(liveNotebook.folders.count) folders, \(totalPages) pages, updated \(liveNotebook.updatedAt.formatted(date: .abbreviated, time: .shortened))")
                             .font(.caption)
                             .foregroundStyle(.secondary)
+                            .accessibilityLabel("\(liveNotebook.folders.count) folders, \(totalPages) pages, updated \(liveNotebook.updatedAt.formatted(date: .abbreviated, time: .shortened))")
                     }
                     Spacer()
                     if supportsImagePlayground {
