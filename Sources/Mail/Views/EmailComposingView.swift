@@ -51,8 +51,9 @@ struct EmailComposingView: View {
 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        if let scheduleDate, scheduleDate > Date() {
-                            scheduleSend()
+                        let referenceNow = Date()
+                        if let scheduleDate, scheduleDate > referenceNow {
+                            Task { await scheduleSend(referenceNow: referenceNow) }
                         } else {
                             sendNow()
                         }
@@ -465,20 +466,52 @@ struct EmailComposingView: View {
         }
     }
 
-    private func scheduleSend() {
-        guard let scheduleDate, scheduleDate > Date() else {
+    private func scheduleSend(referenceNow: Date) async {
+        guard let scheduleDate, scheduleDate > referenceNow else {
             sendNow()
             return
         }
 
+        var recipients = toRecipients
+        let pendingRecipient = newRecipient.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !pendingRecipient.isEmpty {
+            recipients.append(pendingRecipient)
+        }
+        guard !recipients.isEmpty else { return }
+
         isSending = true
-        let delay = scheduleDate.timeIntervalSinceNow
-        Task {
-            if delay > 0 {
-                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+        do {
+            let scheduledPrefix = "Scheduled for \(scheduleDate.formatted(date: .abbreviated, time: .shortened))\n\n"
+            let draft = MailDraft(
+                from: account.emailAddress,
+                to: recipients,
+                cc: [],
+                bcc: [],
+                subject: subject,
+                bodyText: scheduledPrefix + messageBody
+            )
+
+            switch account.providerType {
+            case .gmail:
+                try await GmailProvider().saveDraft(session: providerSession(), draft: draft)
+            case .outlook:
+                try await OutlookProvider().saveDraft(session: providerSession(), draft: draft)
+            case .yahoo:
+                try await YahooMailProvider().saveDraft(session: providerSession(), draft: draft)
+            case .proton:
+                try await ProtonMailProvider().saveDraft(session: providerSession(), draft: draft)
+            case .imap, .icloud:
+                try await IMAPProvider().saveDraft(session: providerSession(), draft: draft)
             }
+
             await MainActor.run {
-                sendNow()
+                isSending = false
+                dismiss()
+            }
+        } catch {
+            await MainActor.run {
+                isSending = false
+                sendError = error.localizedDescription
             }
         }
     }

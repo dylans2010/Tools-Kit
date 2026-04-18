@@ -256,7 +256,9 @@ final class InboxScreenViewModel: ObservableObject {
         isInitialLoading = false
 
         if cached.isEmpty {
+            isInitialLoading = true
             await refresh(forceRemote: true)
+            isInitialLoading = false
         }
     }
 
@@ -451,7 +453,7 @@ private struct InboxMessageDetailView: View {
 
     private func archiveMessage() async {
         do {
-            try await providerArchive(account: account, messageID: message.id)
+            try await providerMarkReadForArchive(account: account, messageID: message.id)
             dismiss()
         } catch {
             actionError = error.localizedDescription
@@ -473,7 +475,7 @@ private struct InboxMessageDetailView: View {
         }
     }
 
-    private func providerArchive(account: MailAccount, messageID: String) async throws {
+    private func providerMarkReadForArchive(account: MailAccount, messageID: String) async throws {
         switch account.providerType {
         case .gmail:
             try await GmailProvider().markRead(session: providerSession(), id: messageID)
@@ -513,7 +515,6 @@ private struct MessageWebView: UIViewRepresentable {
         webView.isOpaque = false
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
-        webView.scrollView.isScrollEnabled = false
         return webView
     }
 

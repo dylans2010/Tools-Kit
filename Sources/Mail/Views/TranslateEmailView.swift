@@ -16,6 +16,18 @@ struct TranslateEmailView: View {
         "English", "Spanish", "French", "German", "Italian", "Portuguese", "Japanese", "Korean", "Chinese", "Arabic"
     ]
 
+    private var trimmedSourceText: String {
+        sourceText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var canTranslate: Bool {
+        !trimmedSourceText.isEmpty && !isTranslating
+    }
+
+    private var canApply: Bool {
+        !translatedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -66,13 +78,13 @@ struct TranslateEmailView: View {
                     Button("Translate") {
                         Task { await translate() }
                     }
-                    .disabled(sourceText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isTranslating)
+                    .disabled(!canTranslate)
 
                     Button("Apply") {
                         onApply(translatedText)
                         dismiss()
                     }
-                    .disabled(translatedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(!canApply)
                 }
             }
         }

@@ -171,7 +171,9 @@ struct DrawingBoardView: View {
     private func exportDrawing() {
         let renderer = ImageRenderer(content: exportCanvas)
         if let uiImage = renderer.uiImage, let data = uiImage.pngData() {
-            onExport(DrawingExport(imageData: data, fileName: "Drawing-\(Int(Date().timeIntervalSince1970)).png"))
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd-HHmmss"
+            onExport(DrawingExport(imageData: data, fileName: "Drawing-\(formatter.string(from: Date())).png"))
             dismiss()
         }
     }
