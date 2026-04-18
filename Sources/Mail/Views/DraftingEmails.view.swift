@@ -193,8 +193,17 @@ struct DraftingEmailsView: View {
     let currentBody: String
     let onApply: (DraftingEmailResult) -> Void
 
-    private let maxEmphasisPhrases = 6
+    private let maxDisplayedEmphasisPhrases = 6
     private let quoteCharacterSet = CharacterSet(charactersIn: "\"")
+    private let confidenceBaseScore = 0.20
+    private let confidenceRecipientWeight = 0.14
+    private let confidenceSubjectWeight = 0.14
+    private let confidenceDescriptionWeight = 0.20
+    private let confidenceBackgroundWeight = 0.12
+    private let confidenceCTAWeight = 0.12
+    private let confidenceRequiredPhrasesWeight = 0.08
+    private let confidenceEmotionalToneWeight = 0.08
+    private let confidenceKeywordsWeight = 0.06
 
     private var selectedLength: EmailLength {
         let index = Int(lengthSliderValue.rounded())
@@ -203,15 +212,15 @@ struct DraftingEmailsView: View {
     }
 
     private var confidenceScore: Double {
-        var score = 0.20
-        if !recipient.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += 0.14 }
-        if !subject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += 0.14 }
-        if !description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += 0.20 }
-        if !backgroundInfo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += 0.12 }
-        if !ctaText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += 0.12 }
-        if !requiredPhrases.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += 0.08 }
-        if !emotionalTones.isEmpty { score += 0.08 }
-        if !keywords.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += 0.06 }
+        var score = confidenceBaseScore
+        if !recipient.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += confidenceRecipientWeight }
+        if !subject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += confidenceSubjectWeight }
+        if !description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += confidenceDescriptionWeight }
+        if !backgroundInfo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += confidenceBackgroundWeight }
+        if !ctaText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += confidenceCTAWeight }
+        if !requiredPhrases.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += confidenceRequiredPhrasesWeight }
+        if !emotionalTones.isEmpty { score += confidenceEmotionalToneWeight }
+        if !keywords.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += confidenceKeywordsWeight }
         return min(max(score, 0), 1)
     }
 
@@ -233,7 +242,7 @@ struct DraftingEmailsView: View {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
 
-        var phrases = Array((required + keyTerms).prefix(maxEmphasisPhrases))
+        var phrases = Array((required + keyTerms).prefix(maxDisplayedEmphasisPhrases))
         if phrases.isEmpty, !ctaText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             phrases = [ctaText.trimmingCharacters(in: .whitespacesAndNewlines)]
         }
@@ -972,7 +981,7 @@ struct DraftingEmailsView: View {
             subject = cleaned
                 .components(separatedBy: .newlines)
                 .first?
-                .trimmingCharacters(in: quoteCharacterSet) ?? cleaned
+                .trimmingCharacters(in: quoteCharacterSet) ?? ""
         case .enhanceDescription:
             description = cleaned
         case .generateVariants:
