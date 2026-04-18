@@ -67,7 +67,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             endpoint = URL(string: "https://graph.microsoft.com/v1.0/me/messages?$top=30&$orderby=receivedDateTime%20desc")!
         }
 
-        let response: GraphMessagesResponse = try await request(url: endpoint, token: session.accessToken, body: Optional<Data>.none)
+        let response: GraphMessagesResponse = try await request(url: endpoint, body: Optional<Data>.none, token: session.accessToken)
         if let next = response.nextLink {
             nextLinksByPage[page + 1] = next
         }
@@ -82,7 +82,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
                 bcc: [],
                 subject: $0.subject ?? "No Subject",
                 body: $0.body?.content ?? "",
-                htmlBody: $0.body?.contentType?.lowercased() == "html" ? $0.body?.content : nil,
+                htmlBody: $0.body?.contentType.lowercased() == "html" ? $0.body?.content : nil,
                 date: isoDate($0.receivedDateTime),
                 isRead: $0.isRead ?? false,
                 isStarred: $0.flag?.flagStatus?.lowercased() == "flagged",
@@ -93,7 +93,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
     func fetchMessage(session: MailSession, id: String) async throws -> MailMessage {
         let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)")!
-        let item: GraphMessage = try await request(url: url, token: session.accessToken, body: Optional<Data>.none)
+        let item: GraphMessage = try await request(url: url, body: Optional<Data>.none, token: session.accessToken)
         return MailMessage(
             id: item.id,
             threadId: item.conversationId,
@@ -103,7 +103,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             bcc: [],
             subject: item.subject ?? "No Subject",
             body: item.body?.content ?? "",
-            htmlBody: item.body?.contentType?.lowercased() == "html" ? item.body?.content : nil,
+            htmlBody: item.body?.contentType.lowercased() == "html" ? item.body?.content : nil,
             date: isoDate(item.receivedDateTime),
             isRead: item.isRead ?? false,
             isStarred: item.flag?.flagStatus?.lowercased() == "flagged",
@@ -207,7 +207,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
     private func fetchProfile(accessToken: String) async throws -> GraphProfile {
         let url = URL(string: "https://graph.microsoft.com/v1.0/me")!
-        return try await request(url: url, token: accessToken, body: Optional<Data>.none)
+        return try await request(url: url, body: Optional<Data>.none, token: accessToken)
     }
 
     private func request<T: Decodable, Body: Encodable>(url: URL, method: String = "GET", body: Body? = nil, token: String?) async throws -> T {
