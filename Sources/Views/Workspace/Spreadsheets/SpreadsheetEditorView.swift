@@ -296,8 +296,12 @@ struct SpreadsheetEditorView: View {
 
     private func buildDataString() -> String {
         sheet.cells.prefix(maxAIPreviewRows).enumerated().map { rowIndex, values in
-            "Row \(rowIndex + 1): \(values.map { $0.value.isEmpty ? "-" : $0.value }.joined(separator: ", "))"
+            "Row \(rowIndex + 1): \(formatPreviewRow(values))"
         }.joined(separator: "\n")
+    }
+
+    private func formatPreviewRow(_ values: [SpreadsheetCell]) -> String {
+        values.map { $0.value.isEmpty ? "-" : $0.value }.joined(separator: ", ")
     }
 
     private func columnLabel(_ col: Int) -> String {

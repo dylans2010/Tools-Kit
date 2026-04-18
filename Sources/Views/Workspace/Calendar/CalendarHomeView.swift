@@ -125,7 +125,7 @@ struct CalendarHomeView: View {
         guard let start = isoFormatter.date(from: draft.startISO8601),
               let end = isoFormatter.date(from: draft.endISO8601) else {
             // Surface validation errors directly in the visible AI error state.
-            aiError = "We couldn’t add this suggestion because the start or end time was unclear. Please regenerate the plan."
+            aiError = "We couldn’t add this suggestion because the start or end time was unclear. Please run the scheduler again."
             return
         }
         let event = CalendarEvent(

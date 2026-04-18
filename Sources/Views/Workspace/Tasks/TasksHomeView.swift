@@ -176,7 +176,7 @@ struct TasksHomeView: View {
                         manager.addTask(
                             WorkspaceTask(
                                 title: planned.title,
-                                description: planned.details + (planned.subtasks.isEmpty ? "" : "\n" + planned.subtasks.map { "• \($0)" }.joined(separator: "\n")),
+                                description: formattedTaskDescription(details: planned.details, subtasks: planned.subtasks),
                                 dueDate: due,
                                 priority: priority
                             )
@@ -211,6 +211,11 @@ struct TasksHomeView: View {
         }
         result.sort { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
         return result
+    }
+
+    private func formattedTaskDescription(details: String, subtasks: [String]) -> String {
+        guard !subtasks.isEmpty else { return details }
+        return details + "\n" + subtasks.map { "• \($0)" }.joined(separator: "\n")
     }
 }
 

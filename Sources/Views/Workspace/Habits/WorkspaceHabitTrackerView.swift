@@ -78,9 +78,10 @@ struct WorkspaceHabitTrackerView: View {
     private var summaryHeader: some View {
         HStack(spacing: 8) {
             let completed = manager.habits.filter { $0.isCompletedToday() }.count
-            let total = max(manager.habits.count, 1)
-            StatPill(label: "Done", value: "\(completed)/\(manager.habits.count)", color: .green)
-            StatPill(label: "Rate", value: "\(Int((Double(completed) / Double(total)) * 100))%", color: .blue)
+            let habitCount = manager.habits.count
+            let safeTotal = max(habitCount, 1)
+            StatPill(label: "Done", value: "\(completed)/\(habitCount)", color: .green)
+            StatPill(label: "Rate", value: "\(Int((Double(completed) / Double(safeTotal)) * 100))%", color: .blue)
             StatPill(label: "Streaking", value: "\(manager.habits.filter { $0.currentStreak > 0 }.count)", color: .orange)
         }
     }

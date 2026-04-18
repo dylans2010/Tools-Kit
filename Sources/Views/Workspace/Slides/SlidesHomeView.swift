@@ -163,7 +163,7 @@ struct SlidesHomeView: View {
                     slide.elements = item.elements.map { element in
                         let aiKind = SlideElement.ElementKind(rawValue: element.kind)
                         let resolvedKind = aiKind ?? .text
-                        // Fallback keeps rendering resilient when AI returns unsupported element kinds.
+                        // Unsupported element kinds are downgraded to text so position/size/content still render, but advanced kind-specific behavior is not preserved.
                         var model = SlideElement(kind: resolvedKind)
                         model.text = element.text
                         model.x = element.x
