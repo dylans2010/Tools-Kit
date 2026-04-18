@@ -1090,8 +1090,8 @@
 		ME0100000000000000000005 /* DailyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DailyService.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000006 /* MeetingResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingResolver.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000007 /* MeetSessionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetSessionController.swift"; sourceTree = "<group>"; };
-		ME0100000000000000000008 /* JoinMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Meet/JoinMeetingView.swift"; sourceTree = "<group>"; };
-		ME0100000000000000000009 /* CreateMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Meet/CreateMeetingView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000008 /* JoinMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JoinMeetingView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000009 /* CreateMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CreateMeetingView.swift"; sourceTree = "<group>"; };
 		ME010000000000000000000A /* MeetingLobbyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Meet/MeetingLobbyView.swift"; sourceTree = "<group>"; };
 		ME010000000000000000000B /* MeetingWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Meet/MeetingWebView.swift"; sourceTree = "<group>"; };
 		ME010000000000000000000C /* MeetingControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Meet/MeetingControlsView.swift"; sourceTree = "<group>"; };
