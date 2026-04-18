@@ -158,9 +158,9 @@ actor DailyService {
     private func roomNameCandidates(for meetingID: String) -> [String] {
         let deterministicRoomName = roomName(for: meetingID)
         let directRoomName = meetingID.lowercased()
-        var candidates = [deterministicRoomName]
-        if directRoomName != deterministicRoomName {
-            candidates.append(directRoomName)
+        var candidates = [directRoomName]
+        if deterministicRoomName != directRoomName {
+            candidates.append(deterministicRoomName)
         }
         return candidates
     }
