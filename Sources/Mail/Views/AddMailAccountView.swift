@@ -82,7 +82,7 @@ struct AddMailAccountView: View {
                 if let account = signedInAccount {
                     InboxView(account: account, folder: .inbox)
                 } else {
-                    EmptyView()
+                    ContentUnavailableView("Unable to open inbox", systemImage: "exclamationmark.triangle", description: Text("Please go back and try connecting your account again."))
                 }
             }
             .sheet(isPresented: $showProtonGuide) {
