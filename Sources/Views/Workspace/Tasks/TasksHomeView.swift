@@ -176,7 +176,7 @@ struct TasksHomeView: View {
                         manager.addTask(
                             WorkspaceTask(
                                 title: planned.title,
-                                description: ([planned.details] + planned.subtasks.map { "• \($0)" }).joined(separator: "\n"),
+                                description: planned.details + (planned.subtasks.isEmpty ? "" : "\n" + planned.subtasks.map { "• \($0)" }.joined(separator: "\n")),
                                 dueDate: due,
                                 priority: priority
                             )

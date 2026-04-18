@@ -125,9 +125,7 @@ struct CalendarHomeView: View {
         guard let start = isoFormatter.date(from: draft.startISO8601),
               let end = isoFormatter.date(from: draft.endISO8601) else {
             // Surface validation errors directly in the visible AI error state.
-            Task { @MainActor in
-                aiError = "Could not parse event dates from AI response. Please try again."
-            }
+            aiError = "Could not parse event dates from AI response. Please try again."
             return
         }
         let event = CalendarEvent(
