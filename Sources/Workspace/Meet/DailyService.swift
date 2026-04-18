@@ -159,7 +159,8 @@ actor DailyService {
         let deterministicRoomName = roomName(for: meetingID)
         let directRoomName = meetingID.lowercased()
         // Try direct room names first because Daily-generated IDs map directly to room names.
-        // Keep deterministic prefixed names as fallback for older ID-to-room mappings.
+        // Keep deterministic prefixed names as fallback for meetings created before we switched
+        // from local prefixed IDs to Daily-generated IDs.
         var candidates = [directRoomName]
         if deterministicRoomName != directRoomName {
             candidates.append(deterministicRoomName)

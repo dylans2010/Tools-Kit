@@ -10,29 +10,35 @@ struct MeetingControlsView: View {
     let onToggleScreenShare: () -> Void
     let onLeaveMeeting: () -> Void
 
+    private var muteControl: (title: String, icon: String) {
+        isMuted ? ("Unmute", "mic.slash.fill") : ("Mute", "mic.fill")
+    }
+
+    private var cameraControl: (title: String, icon: String) {
+        isCameraEnabled ? ("Disable Camera", "video.slash.fill") : ("Enable Camera", "video.fill")
+    }
+
+    private var screenShareControl: (title: String, icon: String) {
+        isScreenSharing ? ("Stop Share", "rectangle.on.rectangle.slash") : ("Share Screen", "rectangle.on.rectangle")
+    }
+
     var body: some View {
         VStack(spacing: 12) {
             HStack(spacing: 12) {
                 Button(action: onToggleMute) {
-                    Label(isMuted ? "Unmute" : "Mute", systemImage: isMuted ? "mic.slash.fill" : "mic.fill")
+                    Label(muteControl.title, systemImage: muteControl.icon)
                 }
                     .buttonStyle(.bordered)
 
                 Button(action: onToggleCamera) {
-                    Label(
-                        isCameraEnabled ? "Disable Camera" : "Enable Camera",
-                        systemImage: isCameraEnabled ? "video.slash.fill" : "video.fill"
-                    )
+                    Label(cameraControl.title, systemImage: cameraControl.icon)
                 }
                     .buttonStyle(.bordered)
             }
 
             HStack(spacing: 12) {
                 Button(action: onToggleScreenShare) {
-                    Label(
-                        isScreenSharing ? "Stop Share" : "Share Screen",
-                        systemImage: isScreenSharing ? "rectangle.on.rectangle.slash" : "rectangle.on.rectangle"
-                    )
+                    Label(screenShareControl.title, systemImage: screenShareControl.icon)
                 }
                     .buttonStyle(.bordered)
 

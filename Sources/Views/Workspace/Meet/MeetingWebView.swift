@@ -7,6 +7,7 @@ struct MeetingWebView: View {
     @State private var isChatSheetPresented = false
     @State private var isSettingsSheetPresented = false
     @State private var isSummarySheetPresented = false
+    private let sheetDetents: Set<PresentationDetent> = [.medium, .large]
 
     var body: some View {
         VStack(spacing: 12) {
@@ -78,19 +79,19 @@ struct MeetingWebView: View {
                     }
                 )
             }
-            .presentationDetents([.medium, .large])
+            .presentationDetents(sheetDetents)
         }
         .sheet(isPresented: $isSettingsSheetPresented) {
             NavigationStack {
                 MeetingSettingsView(settings: $controller.settings)
             }
-            .presentationDetents([.medium, .large])
+            .presentationDetents(sheetDetents)
         }
         .sheet(isPresented: $isSummarySheetPresented) {
             NavigationStack {
                 MeetingSummaryView(summary: controller.summary)
             }
-            .presentationDetents([.medium, .large])
+            .presentationDetents(sheetDetents)
         }
     }
 }
