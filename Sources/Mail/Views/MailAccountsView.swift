@@ -13,7 +13,7 @@ struct MailAccountsView: View {
                         .foregroundColor(.secondary)
                     Text("No mail accounts")
                         .font(.headline)
-                    Text("Add a Gmail or iCloud account to start syncing your inbox.")
+                    Text("Add a Gmail, iCloud, Yahoo, or Outlook account to start syncing your inbox.")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -24,11 +24,11 @@ struct MailAccountsView: View {
             } else {
                 ForEach(mailStore.accounts) { account in
                     HStack(spacing: 12) {
-                        Image(systemName: account.provider == .iCloud ? "icloud.fill" : "envelope.fill")
+                        Image(systemName: providerIcon(for: account.provider))
                             .font(.headline)
-                            .foregroundColor(account.provider == .iCloud ? .blue : .red)
+                            .foregroundColor(providerColor(for: account.provider))
                             .frame(width: 34, height: 34)
-                            .background((account.provider == .iCloud ? Color.blue : Color.red).opacity(0.12), in: Circle())
+                            .background(providerColor(for: account.provider).opacity(0.12), in: Circle())
 
                         VStack(alignment: .leading, spacing: 3) {
                             Text(account.emailAddress)
@@ -84,6 +84,32 @@ struct MailAccountsView: View {
         }
         .onAppear {
             mailStore.reloadAccounts()
+        }
+    }
+
+    private func providerIcon(for provider: MailAccount.MailProviderType) -> String {
+        switch provider {
+        case .icloud:
+            return "icloud.fill"
+        case .gmail:
+            return "envelope.fill"
+        case .yahoo:
+            return "y.circle.fill"
+        case .outlook:
+            return "o.circle.fill"
+        }
+    }
+
+    private func providerColor(for provider: MailAccount.MailProviderType) -> Color {
+        switch provider {
+        case .icloud:
+            return .blue
+        case .gmail:
+            return .red
+        case .yahoo:
+            return .purple
+        case .outlook:
+            return .indigo
         }
     }
 }

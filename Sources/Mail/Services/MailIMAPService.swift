@@ -19,6 +19,12 @@ class MailIMAPService: @unchecked Sendable {
         case .gmail:
             host = GmailServerConfiguration.imapHost
             port = GmailServerConfiguration.imapPort
+        case .yahoo:
+            host = YahooServerConfiguration.imapHost
+            port = YahooServerConfiguration.imapPort
+        case .outlook:
+            host = OutlookServerConfiguration.imapHost
+            port = OutlookServerConfiguration.imapPort
         }
 
         let endpoint = NWEndpoint.hostPort(host: NWEndpoint.Host(host), port: NWEndpoint.Port(integerLiteral: port))

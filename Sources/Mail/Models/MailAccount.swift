@@ -12,11 +12,15 @@ struct MailAccount: Identifiable, Codable {
     enum ProviderType: String, Codable, CaseIterable {
         case gmail
         case icloud
+        case yahoo
+        case outlook
 
         var displayName: String {
             switch self {
             case .gmail: return "Gmail"
             case .icloud: return "iCloud"
+            case .yahoo: return "Yahoo"
+            case .outlook: return "Outlook"
             }
         }
 
@@ -27,6 +31,10 @@ struct MailAccount: Identifiable, Codable {
                 return GmailServerConfiguration.isGmailAddress(normalized)
             case .icloud:
                 return normalized.hasSuffix("@icloud.com") || normalized.hasSuffix("@me.com") || normalized.hasSuffix("@mac.com")
+            case .yahoo:
+                return YahooServerConfiguration.isYahooAddress(normalized)
+            case .outlook:
+                return OutlookServerConfiguration.isOutlookAddress(normalized)
             }
         }
 

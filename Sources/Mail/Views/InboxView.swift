@@ -124,8 +124,8 @@ struct InboxView: View {
         if let activeAccount {
             Section {
                 HStack(spacing: 10) {
-                    Image(systemName: activeAccount.provider == .iCloud ? "icloud.fill" : "envelope.fill")
-                        .foregroundStyle(activeAccount.provider == .iCloud ? .blue : .red)
+                    Image(systemName: providerIcon(for: activeAccount.provider))
+                        .foregroundStyle(providerColor(for: activeAccount.provider))
                     VStack(alignment: .leading, spacing: 2) {
                         Text(activeAccount.emailAddress)
                             .font(.subheadline.weight(.semibold))
@@ -142,6 +142,32 @@ struct InboxView: View {
                 .padding(.vertical, 4)
             }
             .listRowBackground(Color.clear)
+        }
+    }
+
+    private func providerIcon(for provider: MailAccount.MailProviderType) -> String {
+        switch provider {
+        case .icloud:
+            return "icloud.fill"
+        case .gmail:
+            return "envelope.fill"
+        case .yahoo:
+            return "y.circle.fill"
+        case .outlook:
+            return "o.circle.fill"
+        }
+    }
+
+    private func providerColor(for provider: MailAccount.MailProviderType) -> Color {
+        switch provider {
+        case .icloud:
+            return .blue
+        case .gmail:
+            return .red
+        case .yahoo:
+            return .purple
+        case .outlook:
+            return .indigo
         }
     }
 

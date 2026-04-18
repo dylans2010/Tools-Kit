@@ -20,9 +20,11 @@ struct AddMailAccountView: View {
                 Section("Connect a new account") {
                     providerRow(provider: .gmail, subtitle: "Secure OAuth with Gmail API scopes")
                     providerRow(provider: .iCloud, subtitle: "Use app-specific password")
+                    providerRow(provider: .yahoo, subtitle: "Use app password for IMAP/SMTP")
+                    providerRow(provider: .outlook, subtitle: "Use app password for IMAP/SMTP")
 
-                    if selectedProvider == .iCloud {
-                        TextField("iCloud Email", text: $email)
+                    if selectedProvider != .gmail {
+                        TextField("\(selectedProvider.displayName) Email", text: $email)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .keyboardType(.emailAddress)
@@ -65,8 +67,8 @@ struct AddMailAccountView: View {
                     } else {
                         ForEach(mailStore.accounts) { account in
                             HStack(spacing: 12) {
-                                Image(systemName: account.provider == .iCloud ? "icloud.fill" : "envelope.fill")
-                                    .foregroundStyle(account.provider == .iCloud ? .blue : .red)
+                                Image(systemName: providerIcon(for: account.provider))
+                                    .foregroundStyle(providerColor(for: account.provider))
                                 VStack(alignment: .leading, spacing: 3) {
                                     Text(account.emailAddress)
                                         .font(.subheadline.weight(.semibold))
@@ -117,7 +119,7 @@ struct AddMailAccountView: View {
         if isWorking {
             return "Working..."
         }
-        return selectedProvider == .gmail ? "Connect Gmail" : "Add iCloud"
+        return selectedProvider == .gmail ? "Connect Gmail" : "Add \(selectedProvider.displayName)"
     }
 
     private var isActionDisabled: Bool {
@@ -137,8 +139,8 @@ struct AddMailAccountView: View {
             errorMessage = nil
         } label: {
             HStack {
-                Image(systemName: provider == .iCloud ? "icloud.fill" : "envelope.fill")
-                    .foregroundStyle(provider == .iCloud ? .blue : .red)
+                Image(systemName: providerIcon(for: provider))
+                    .foregroundStyle(providerColor(for: provider))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(provider.displayName)
                         .foregroundStyle(.primary)
@@ -202,8 +204,8 @@ struct AddMailAccountView: View {
 
                 let account = MailAccount(
                     emailAddress: normalizedEmail,
-                    providerType: .iCloud,
-                    displayName: "iCloud",
+                    providerType: selectedProvider,
+                    displayName: selectedProvider.displayName,
                     isActive: true
                 )
 
@@ -220,6 +222,32 @@ struct AddMailAccountView: View {
                 }
                 InternalLogger.shared.log("AddMailAccountView: failed to add account - \(error.localizedDescription)", level: .error)
             }
+        }
+    }
+
+    private func providerIcon(for provider: MailAccount.MailProviderType) -> String {
+        switch provider {
+        case .icloud:
+            return "icloud.fill"
+        case .gmail:
+            return "envelope.fill"
+        case .yahoo:
+            return "y.circle.fill"
+        case .outlook:
+            return "o.circle.fill"
+        }
+    }
+
+    private func providerColor(for provider: MailAccount.MailProviderType) -> Color {
+        switch provider {
+        case .icloud:
+            return .blue
+        case .gmail:
+            return .red
+        case .yahoo:
+            return .purple
+        case .outlook:
+            return .indigo
         }
     }
 }

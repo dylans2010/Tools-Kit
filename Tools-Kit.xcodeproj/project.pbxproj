@@ -332,6 +332,10 @@
 		BFA001000000000000000004 /* AddMailAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000004 /* AddMailAccountView.swift */; };
 		BFA001000000000000000005 /* GmailServerConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000005 /* GmailServerConfiguration.swift */; };
 		BFA001000000000000000006 /* GmailMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000006 /* GmailMailProvider.swift */; };
+		BFA001000000000000000007 /* YahooServerConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000007 /* YahooServerConfiguration.swift */; };
+		BFA001000000000000000008 /* OutlookServerConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000008 /* OutlookServerConfiguration.swift */; };
+		BFA001000000000000000009 /* YahooMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000009 /* YahooMailProvider.swift */; };
+		BFA00100000000000000000A /* OutlookMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA10100000000000000000A /* OutlookMailProvider.swift */; };
 		1391D868D54B47CB842E2A80 /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = D735D463856D4BA588299529 /* Tool.swift */; };
 		C8B89D342FDA412F89C64396 /* ToolRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45DBE4B4F95D46F58A5304BC /* ToolRegistry.swift */; };
 		90C0DAB9340E467CB6AE1F59 /* APITesterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64E5154717C4F53A3A10C60 /* APITesterBackend.swift */; };
@@ -652,6 +656,10 @@
 		BFA101000000000000000004 /* AddMailAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Mail/Views/AddMailAccountView.swift"; sourceTree = "<group>"; };
 		BFA101000000000000000005 /* GmailServerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Mail/Models/Gmail/GmailServerConfiguration.swift"; sourceTree = "<group>"; };
 		BFA101000000000000000006 /* GmailMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Mail/Providers/GmailMailProvider.swift"; sourceTree = "<group>"; };
+		BFA101000000000000000007 /* YahooServerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Mail/Models/Yahoo/YahooServerConfiguration.swift"; sourceTree = "<group>"; };
+		BFA101000000000000000008 /* OutlookServerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Mail/Models/Outlook/OutlookServerConfiguration.swift"; sourceTree = "<group>"; };
+		BFA101000000000000000009 /* YahooMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Mail/Providers/YahooMailProvider.swift"; sourceTree = "<group>"; };
+		BFA10100000000000000000A /* OutlookMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Mail/Providers/OutlookMailProvider.swift"; sourceTree = "<group>"; };
 		732E3165BFBB323BD8081B3F /* Tools-Kit.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Tools-Kit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0E00A1458A464DAB575C4FE /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		D735D463856D4BA588299529 /* Tool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
@@ -1110,6 +1118,10 @@
 				BFA101000000000000000004 /* AddMailAccountView.swift */,
 				BFA101000000000000000005 /* GmailServerConfiguration.swift */,
 				BFA101000000000000000006 /* GmailMailProvider.swift */,
+				BFA101000000000000000007 /* YahooServerConfiguration.swift */,
+				BFA101000000000000000008 /* OutlookServerConfiguration.swift */,
+				BFA101000000000000000009 /* YahooMailProvider.swift */,
+				BFA10100000000000000000A /* OutlookMailProvider.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1857,6 +1869,10 @@
 				BFA001000000000000000004 /* AddMailAccountView.swift in Sources */,
 				BFA001000000000000000005 /* GmailServerConfiguration.swift in Sources */,
 				BFA001000000000000000006 /* GmailMailProvider.swift in Sources */,
+				BFA001000000000000000007 /* YahooServerConfiguration.swift in Sources */,
+				BFA001000000000000000008 /* OutlookServerConfiguration.swift in Sources */,
+				BFA001000000000000000009 /* YahooMailProvider.swift in Sources */,
+				BFA00100000000000000000A /* OutlookMailProvider.swift in Sources */,
 
 				B1C2D3E4F5A60708090A0D01 /* AIService.swift in Sources */,
 				B1C2D3E4F5A60708090A0D02 /* CameraService.swift in Sources */,

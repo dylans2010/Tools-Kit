@@ -450,6 +450,10 @@ struct EmailComposingView: View {
                     provider = iCloudMailProvider(account: account)
                 case .gmail:
                     provider = GmailMailProvider(account: account)
+                case .yahoo:
+                    provider = YahooMailProvider(account: account)
+                case .outlook:
+                    provider = OutlookMailProvider(account: account)
                 }
                 let message = MailMessage(
                     id: UUID().uuidString,
