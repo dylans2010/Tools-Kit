@@ -81,6 +81,8 @@ struct AddMailAccountView: View {
             ) {
                 if let account = signedInAccount {
                     InboxView(account: account, folder: .inbox)
+                } else {
+                    EmptyView()
                 }
             }
             .sheet(isPresented: $showProtonGuide) {
