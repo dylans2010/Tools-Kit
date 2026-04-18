@@ -16,8 +16,10 @@ struct CreateMeetingView: View {
                         _ = controller.generateMeetingID()
                     }
                     Spacer()
-                    Text(controller.meetingIdInput.isEmpty ? "" : controller.meetingIdInput)
-                        .font(.caption.monospaced())
+                    if !controller.meetingIdInput.isEmpty {
+                        Text(controller.meetingIdInput)
+                            .font(.caption.monospaced())
+                    }
                 }
 
                 Button {

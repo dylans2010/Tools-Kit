@@ -58,6 +58,6 @@ struct MeetingChatView: View {
     }
 
     private var filteredMessages: [MeetingMessage] {
-        messages.filter { $0.threadId == selectedThreadID || $0.isSystem }
+        messages.filter { $0.threadId == selectedThreadID }
     }
 }

@@ -1,6 +1,7 @@
 import Foundation
 
 actor DailyService {
+    static let defaultDailyDomain = "toolskit.daily.co"
     static let shared = DailyService()
 
     enum ServiceError: LocalizedError {
@@ -26,7 +27,11 @@ actor DailyService {
     private var activeSessions: [String: MeetingSession] = [:]
     private var developerAPIKey: String?
 
-    private let dailyDomain = "toolskit.daily.co"
+    private let dailyDomain: String
+
+    init(dailyDomain: String = DailyService.defaultDailyDomain) {
+        self.dailyDomain = dailyDomain
+    }
 
     func setDeveloperAPIKey(_ value: String) async {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -51,7 +56,15 @@ actor DailyService {
             createdAt: Date(),
             debugTraceId: UUID().uuidString
         )
-        let internalURL = URL(string: "https://\(dailyDomain)/\(roomName)?tk_session=\(session.sessionId)")!
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = dailyDomain
+        components.path = "/\(roomName)"
+        components.queryItems = [URLQueryItem(name: "tk_session", value: session.sessionId)]
+        guard let internalURL = components.url else {
+            await log("Room URL generation failed for meeting ID \(normalizedID).", level: .error)
+            throw ServiceError.invalidMeetingID
+        }
         recordsByMeetingID[normalizedID] = RoomRecord(session: session, internalRoomURL: internalURL)
 
         await log("Room created for meeting ID \(normalizedID). trace=\(session.debugTraceId)", level: .info)

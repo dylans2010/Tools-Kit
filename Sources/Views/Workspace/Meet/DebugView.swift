@@ -1,17 +1,6 @@
 #if DEBUG
 import SwiftUI
 
-struct MeetDeveloperToolsView: View {
-    var body: some View {
-        List {
-            NavigationLink("Meet Debug Console") {
-                DebugView()
-            }
-        }
-        .navigationTitle("Developer Tools")
-    }
-}
-
 struct DebugView: View {
     @StateObject private var controller = MeetSessionController.shared
     @StateObject private var logger = DebugLogger.shared

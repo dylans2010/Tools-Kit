@@ -240,6 +240,7 @@
 		ME020000000000000000000F /* MeetingSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000000F /* MeetingSettingsView.swift */; };
 		ME0200000000000000000010 /* MeetingSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000010 /* MeetingSummaryView.swift */; };
 		ME0200000000000000000011 /* DebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000011 /* DebugView.swift */; };
+		ME0200000000000000000012 /* MeetDeveloperToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000012 /* MeetDeveloperToolsView.swift */; };
 		WK0200000000000000000001 /* WorkoutsModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000001 /* WorkoutsModeManager.swift */; };
 		WK0200000000000000000002 /* WorkoutsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000002 /* WorkoutsHomeView.swift */; };
 		WK0200000000000000000003 /* OnboardWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000003 /* OnboardWorkoutView.swift */; };
@@ -1099,6 +1100,7 @@
 		ME010000000000000000000F /* MeetingSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Meet/MeetingSettingsView.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000010 /* MeetingSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Meet/MeetingSummaryView.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000011 /* DebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Meet/DebugView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000012 /* MeetDeveloperToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Meet/MeetDeveloperToolsView.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000001 /* WorkoutsModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/WorkoutsModeManager.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000002 /* WorkoutsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/WorkoutsHomeView.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000003 /* OnboardWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/OnboardWorkoutView.swift"; sourceTree = "<group>"; };
@@ -1192,6 +1194,7 @@
 				ME010000000000000000000F /* MeetingSettingsView.swift */,
 				ME0100000000000000000010 /* MeetingSummaryView.swift */,
 				ME0100000000000000000011 /* DebugView.swift */,
+				ME0100000000000000000012 /* MeetDeveloperToolsView.swift */,
 			);
 			path = Meet;
 			sourceTree = "<group>";
@@ -2396,6 +2399,7 @@
 				ME020000000000000000000F /* MeetingSettingsView.swift in Sources */,
 				ME0200000000000000000010 /* MeetingSummaryView.swift in Sources */,
 				ME0200000000000000000011 /* DebugView.swift in Sources */,
+				ME0200000000000000000012 /* MeetDeveloperToolsView.swift in Sources */,
 				WK0200000000000000000001 /* WorkoutsModeManager.swift in Sources */,
 				WK0200000000000000000002 /* WorkoutsHomeView.swift in Sources */,
 				WK0200000000000000000003 /* OnboardWorkoutView.swift in Sources */,

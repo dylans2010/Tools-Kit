@@ -10,7 +10,7 @@ struct JoinMeetingView: View {
                 TextField("Meeting ID", text: $controller.meetingIdInput)
                     .textInputAutocapitalization(.characters)
                     .autocorrectionDisabled()
-                    .onChange(of: controller.meetingIdInput) { _ in
+                    .onChange(of: controller.meetingIdInput, initial: false) { _, _ in
                         _ = controller.validateMeetingID()
                     }
 
@@ -43,8 +43,8 @@ struct JoinMeetingView: View {
         .navigationDestination(isPresented: $navigateToLobby) {
             MeetingLobbyView(controller: controller)
         }
-        .onChange(of: controller.phase) { newValue in
-            navigateToLobby = (newValue == .lobby || newValue == .inMeeting)
+        .onChange(of: controller.phase, initial: false) { _, newValue in
+            navigateToLobby = (newValue == .lobby)
         }
     }
 }

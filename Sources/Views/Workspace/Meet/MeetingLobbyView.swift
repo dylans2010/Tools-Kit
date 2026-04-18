@@ -42,7 +42,6 @@ struct MeetingLobbyView: View {
                 Button("Join Now") {
                     Task {
                         await controller.startMeeting()
-                        navigateToMeeting = true
                     }
                 }
                 .disabled(controller.lobbyState.isCheckingDevices || controller.lobbyState.isLoadingParticipants)
@@ -55,7 +54,7 @@ struct MeetingLobbyView: View {
         .task {
             await controller.runLobbyChecks()
         }
-        .onChange(of: controller.phase) { newValue in
+        .onChange(of: controller.phase, initial: false) { _, newValue in
             navigateToMeeting = (newValue == .inMeeting)
         }
     }

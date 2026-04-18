@@ -14,7 +14,7 @@ struct MeetingControlsView: View {
             HStack(spacing: 12) {
                 Button(isMuted ? "Unmute" : "Mute", action: onToggleMute)
                     .buttonStyle(.bordered)
-                Button(isCameraEnabled ? "Camera Off" : "Camera On", action: onToggleCamera)
+                Button(isCameraEnabled ? "Disable Camera" : "Enable Camera", action: onToggleCamera)
                     .buttonStyle(.bordered)
             }
 
