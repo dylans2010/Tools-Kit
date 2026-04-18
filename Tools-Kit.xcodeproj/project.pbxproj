@@ -32,6 +32,8 @@
 		E6CDD8F2FEBB4ADAB83B8334 /* MailHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D36575B26D5F4015B1A75281 /* MailHomeView.swift */; };
 		F0F02DBCAE8A448EAB8ADD3D /* EmailComposingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2854071EF86249D28D8B2371 /* EmailComposingView.swift */; };
 		B1B2C3D4E5F60718293A0004 /* DraftingEmails.view.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A0004 /* DraftingEmails.view.swift */; };
+		DW0200000000000000000001 /* DrawingBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DW0100000000000000000001 /* DrawingBoardView.swift */; };
+		TV0200000000000000000001 /* TranslateEmailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TV0100000000000000000001 /* TranslateEmailView.swift */; };
 		89E5D9EA02A2490D8F089737 /* MailProviderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41D44A961365454C82AC0C56 /* MailProviderView.swift */; };
 		9B92D995283049E1921A3007 /* InboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E1340D7B74447B9E795193 /* InboxView.swift */; };
 		43C7F01342454F8891D7E133 /* MailAccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F681856D074CB3BDD31D99 /* MailAccountsView.swift */; };
@@ -584,6 +586,8 @@
 		D36575B26D5F4015B1A75281 /* MailHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailHomeView.swift; sourceTree = "<group>"; };
 		2854071EF86249D28D8B2371 /* EmailComposingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/EmailComposingView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A0004 /* DraftingEmails.view.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mail/Views/DraftingEmails.view.swift"; sourceTree = "<group>"; };
+		DW0100000000000000000001 /* DrawingBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mail/Views/Drawing/DrawingBoardView.swift"; sourceTree = "<group>"; };
+		TV0100000000000000000001 /* TranslateEmailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/TranslateEmailView.swift; sourceTree = "<group>"; };
 		41D44A961365454C82AC0C56 /* MailProviderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailProviderView.swift; sourceTree = "<group>"; };
 		93E1340D7B74447B9E795193 /* InboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/InboxView.swift; sourceTree = "<group>"; };
 		F1F681856D074CB3BDD31D99 /* MailAccountsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailAccountsView.swift; sourceTree = "<group>"; };
@@ -1164,6 +1168,8 @@
 				D36575B26D5F4015B1A75281 /* MailHomeView.swift */,
 				2854071EF86249D28D8B2371 /* EmailComposingView.swift */,
 				A1B2C3D4E5F60718293A0004 /* DraftingEmails.view.swift */,
+				DW0100000000000000000001 /* DrawingBoardView.swift */,
+				TV0100000000000000000001 /* TranslateEmailView.swift */,
 				41D44A961365454C82AC0C56 /* MailProviderView.swift */,
 				93E1340D7B74447B9E795193 /* InboxView.swift */,
 				F1F681856D074CB3BDD31D99 /* MailAccountsView.swift */,
@@ -1800,6 +1806,8 @@
 				E6CDD8F2FEBB4ADAB83B8334 /* MailHomeView.swift in Sources */,
 				F0F02DBCAE8A448EAB8ADD3D /* EmailComposingView.swift in Sources */,
 				B1B2C3D4E5F60718293A0004 /* DraftingEmails.view.swift in Sources */,
+				DW0200000000000000000001 /* DrawingBoardView.swift in Sources */,
+				TV0200000000000000000001 /* TranslateEmailView.swift in Sources */,
 				89E5D9EA02A2490D8F089737 /* MailProviderView.swift in Sources */,
 				9B92D995283049E1921A3007 /* InboxView.swift in Sources */,
 				43C7F01342454F8891D7E133 /* MailAccountsView.swift in Sources */,

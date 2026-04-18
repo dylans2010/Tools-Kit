@@ -2,61 +2,74 @@ import SwiftUI
 import PhotosUI
 import UniformTypeIdentifiers
 
-// MARK: - Main Composer View
-
 struct EmailComposingView: View {
-    @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.dismiss) private var dismiss
+
     let account: MailAccount
     var replyTo: MailMessage? = nil
 
-    // Recipients
     @State private var toRecipients: [String] = []
     @State private var newRecipient = ""
     @State private var subject = ""
     @State private var messageBody = ""
     @State private var draftAttachments: [MailMessage.MailAttachment] = []
 
-    // State
     @State private var isSending = false
+    @State private var sendError: String?
     @State private var showingAIPanel = false
     @State private var showingAttachmentPicker = false
-    @State private var selectedPhotoItem: PhotosPickerItem? = nil
-    @State private var sendError: String?
+    @State private var showingAudioPicker = false
+    @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var showingTranslateSheet = false
+    @State private var showingLinkSheet = false
+    @State private var showingScheduleSheet = false
+    @State private var showingDrawingSheet = false
+    @State private var showingPreviewSheet = false
+
+    @State private var scheduleDate: Date?
+    @State private var pendingLinkText = ""
+    @State private var pendingLinkURL = "https://"
+
     @FocusState private var bodyFocused: Bool
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                LinearGradient(
-                    colors: colorScheme == .dark
-                        ? [Color(red: 0.08, green: 0.11, blue: 0.16), Color(red: 0.06, green: 0.08, blue: 0.13)]
-                        : [Color(red: 0.97, green: 0.99, blue: 1.0), Color(red: 0.90, green: 0.95, blue: 1.0)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
+            Form {
+                recipientsSection
+                subjectSection
+                bodySection
+                toolsSection
+                attachmentsSection
+                scheduleSection
+            }
+            .navigationTitle(replyTo == nil ? "Compose" : "Reply")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") { dismiss() }
+                }
 
-                ScrollView {
-                    VStack(spacing: 16) {
-                        composerHero
-                        recipientsCard
-                        subjectCard
-                        bodyCard
-                        attachmentsCard
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        if scheduleDate != nil {
+                            Task { await handleScheduledOrImmediateSend() }
+                        } else {
+                            sendNow()
+                        }
+                    } label: {
+                        if isSending {
+                            ProgressView()
+                        } else {
+                            Label(scheduleDate != nil ? "Schedule" : "Send", systemImage: scheduleDate != nil ? "calendar.badge.clock" : "paperplane.fill")
+                        }
                     }
-                    .padding(.horizontal)
-                    .padding(.vertical, 16)
+                    .disabled(cannotSend)
                 }
             }
-            .navigationTitle(replyTo == nil ? "New Message" : "Reply")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { toolbarContent }
-            .safeAreaInset(edge: .bottom) { bottomToolbar }
             .onAppear(perform: prefillReply)
-            .onChange(of: selectedPhotoItem) { newItem in
-                guard let newItem else { return }
-                Task { await importPhoto(newItem) }
+            .onChange(of: selectedPhotoItem) { item in
+                guard let item else { return }
+                Task { await importPhoto(item) }
             }
             .sheet(isPresented: $showingAIPanel) {
                 DraftingEmailsView(currentBody: messageBody) { result in
@@ -75,6 +88,35 @@ struct EmailComposingView: View {
                     }
                 }
             }
+            .sheet(isPresented: $showingTranslateSheet) {
+                TranslateEmailView(sourceText: messageBody) { translated in
+                    messageBody = translated
+                }
+            }
+            .sheet(isPresented: $showingLinkSheet) {
+                linkComposerSheet
+                    .presentationDetents([.medium])
+                    .presentationDragIndicator(.visible)
+            }
+            .sheet(isPresented: $showingScheduleSheet) {
+                scheduleSheet
+                    .presentationDetents([.medium])
+                    .presentationDragIndicator(.visible)
+            }
+            .sheet(isPresented: $showingPreviewSheet) {
+                markdownPreviewSheet
+            }
+            .sheet(isPresented: $showingDrawingSheet) {
+                DrawingBoardView { export in
+                    let attachment = MailMessage.MailAttachment(
+                        id: UUID().uuidString,
+                        fileName: export.fileName,
+                        contentType: "image/png",
+                        size: Int64(export.imageData.count)
+                    )
+                    draftAttachments.append(attachment)
+                }
+            }
             .sheet(isPresented: $showingAttachmentPicker) {
                 FileImporterRepresentableView(
                     allowedContentTypes: [.data, .image, .pdf, .text],
@@ -82,6 +124,15 @@ struct EmailComposingView: View {
                 ) { urls in
                     handleImportedAttachments(urls)
                     showingAttachmentPicker = false
+                }
+            }
+            .sheet(isPresented: $showingAudioPicker) {
+                FileImporterRepresentableView(
+                    allowedContentTypes: [.audio],
+                    allowsMultipleSelection: true
+                ) { urls in
+                    handleImportedAttachments(urls)
+                    showingAudioPicker = false
                 }
             }
             .alert("Send Failed", isPresented: Binding(
@@ -93,231 +144,213 @@ struct EmailComposingView: View {
                 Text(sendError ?? "")
             }
         }
-        .presentationDetents([.large])
-        .presentationDragIndicator(.visible)
     }
 
-    // MARK: - Recipients
-
-    private var composerHero: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(replyTo == nil ? "Compose Mail" : "Reply in Style")
-                        .font(.title2.bold())
-                    Text("Draft faster with polished formatting, attachments, and AI polish tools.")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                Spacer()
-                Image(systemName: replyTo == nil ? "square.and.pencil" : "arrowshape.turn.up.left")
-                    .font(.title2)
-                    .foregroundStyle(
-                        LinearGradient(colors: [.blue, .cyan], startPoint: .topLeading, endPoint: .bottomTrailing)
-                    )
-            }
-
-            HStack(spacing: 10) {
-                Label("Selected model", systemImage: "brain.head.profile")
-                    .font(.caption.weight(.semibold))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(.white.opacity(0.75), in: Capsule())
-                Text("Uses the AI Chat settings model")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 24)
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 24)
-                        .stroke(LinearGradient(colors: [.blue.opacity(0.35), .cyan.opacity(0.25)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
-                )
-        )
-    }
-
-    private var recipientsCard: some View {
-        editorCard(title: "Recipients", systemImage: "person.2.fill") {
-            HStack(alignment: .top, spacing: 10) {
-                Text("To")
-                    .font(.caption.weight(.semibold))
-                    .foregroundColor(.secondary)
-                    .padding(.top, 12)
-
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(toRecipients, id: \.self) { recipient in
-                            recipientChip(recipient)
-                        }
-                        TextField("Add recipient", text: $newRecipient)
-                            .textInputAutocapitalization(.never)
-                            .disableAutocorrection(true)
-                            .keyboardType(.emailAddress)
-                            .onSubmit { commitRecipient() }
-                            .frame(minWidth: 160)
-                            .padding(.vertical, 10)
+    private var recipientsSection: some View {
+        Section("Recipients") {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(toRecipients, id: \.self) { recipient in
+                        recipientChip(recipient)
                     }
+                    TextField("Add recipient", text: $newRecipient)
+                        .textInputAutocapitalization(.never)
+                        .disableAutocorrection(true)
+                        .keyboardType(.emailAddress)
+                        .onSubmit { commitRecipient() }
+                        .frame(minWidth: 180)
                 }
+                .padding(.vertical, 4)
             }
         }
     }
 
-    // MARK: - Subject
-
-    private var subjectCard: some View {
-        editorCard(title: "Subject", systemImage: "textformat.size") {
+    private var subjectSection: some View {
+        Section("Subject") {
             TextField("Write a subject", text: $subject)
-                .font(.headline)
                 .textInputAutocapitalization(.sentences)
                 .disableAutocorrection(true)
         }
     }
 
-    // MARK: - Body Editor
-
-    private var bodyCard: some View {
-        editorCard(title: "Message", systemImage: "text.alignleft") {
+    private var bodySection: some View {
+        Section("Message") {
             ZStack(alignment: .topLeading) {
                 if messageBody.isEmpty && !bodyFocused {
                     Text("Write your message…")
                         .foregroundColor(Color(.placeholderText))
-                        .padding(.top, 14)
-                        .padding(.leading, 18)
+                        .padding(.top, 8)
+                        .padding(.leading, 6)
                 }
+
                 TextEditor(text: $messageBody)
                     .focused($bodyFocused)
-                    .scrollContentBackground(.hidden)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .frame(minHeight: 260)
+                    .frame(minHeight: 280)
             }
         }
     }
 
-    private var attachmentsCard: some View {
-        Group {
-            if !draftAttachments.isEmpty {
-                editorCard(title: "Attachments", systemImage: "paperclip") {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
-                            ForEach(draftAttachments) { attachment in
-                                attachmentChip(attachment)
-                            }
+    private var toolsSection: some View {
+        Section("Tools") {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    toolButton("AI Draft", icon: "sparkles") { showingAIPanel = true }
+                    toolButton("Audio Notes", icon: "waveform") { showingAudioPicker = true }
+                    toolButton("Translate", icon: "globe") { showingTranslateSheet = true }
+                    toolButton("Clear Formatting", icon: "textformat.clear") { clearFormatting() }
+                    toolButton("Schedule Send", icon: "calendar.badge.clock") { showingScheduleSheet = true }
+                    toolButton("File Scanning", icon: "doc.text.viewfinder") { showingAttachmentPicker = true }
+                    toolButton("Quoting", icon: "text.quote") { insertQuote() }
+                    toolButton("Preview", icon: "doc.richtext") { showingPreviewSheet = true }
+                    toolButton("Hyperlink", icon: "link") { showingLinkSheet = true }
+                    toolButton("Drawing", icon: "pencil.and.outline") { showingDrawingSheet = true }
+                    toolButton("Attach", icon: "paperclip") { showingAttachmentPicker = true }
+                }
+                .padding(.vertical, 4)
+            }
+
+            PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                Label("Add Photo", systemImage: "photo.on.rectangle")
+            }
+        }
+    }
+
+    private var attachmentsSection: some View {
+        Section("Attachments") {
+            if draftAttachments.isEmpty {
+                Text("No attachments yet")
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(draftAttachments) { attachment in
+                    HStack {
+                        Image(systemName: "paperclip")
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(attachment.fileName)
+                            Text(ByteCountFormatter.string(fromByteCount: attachment.size, countStyle: .file))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
-                        .padding(.vertical, 2)
+                        Spacer()
+                        Button(role: .destructive) {
+                            draftAttachments.removeAll { $0.id == attachment.id }
+                        } label: {
+                            Image(systemName: "trash")
+                        }
                     }
                 }
             }
         }
     }
 
-    private func editorCard<Content: View>(title: String, systemImage: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 10) {
-                Image(systemName: systemImage)
-                    .foregroundStyle(LinearGradient(colors: [.blue, .cyan], startPoint: .topLeading, endPoint: .bottomTrailing))
-                Text(title)
-                    .font(.headline)
-                Spacer()
+    private var scheduleSection: some View {
+        Group {
+            if let scheduleDate, scheduleDate > Date() {
+                Section("Scheduled") {
+                    HStack {
+                        Label(scheduleDate.formatted(date: .abbreviated, time: .shortened), systemImage: "calendar")
+                        Spacer()
+                        Button("Clear") {
+                            self.scheduleDate = nil
+                        }
+                        .foregroundStyle(.red)
+                    }
+                }
             }
-
-            content()
         }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 22)
-                .fill(colorScheme == .dark ? Color.white.opacity(0.06) : Color.white.opacity(0.88))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 22)
-                        .stroke(colorScheme == .dark ? Color.white.opacity(0.10) : Color.blue.opacity(0.14), lineWidth: 1)
-                )
-                .shadow(color: colorScheme == .dark ? Color.black.opacity(0.35) : Color.blue.opacity(0.08), radius: 18, x: 0, y: 8)
-        )
     }
 
-    // MARK: - Toolbar
-
-    @ToolbarContentBuilder
-    private var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .navigationBarLeading) {
-            Button("Cancel") { dismiss() }
-        }
-
-        ToolbarItem(placement: .navigationBarTrailing) {
-            HStack(spacing: 16) {
-                // AI button
-                Button { showingAIPanel = true } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "sparkles")
-                        Text("AI")
-                            .font(.subheadline.bold())
+    private var linkComposerSheet: some View {
+        NavigationStack {
+            Form {
+                TextField("Link text", text: $pendingLinkText)
+                TextField("URL", text: $pendingLinkURL)
+                    .textInputAutocapitalization(.never)
+                    .disableAutocorrection(true)
+                    .keyboardType(.URL)
+            }
+            .navigationTitle("Insert Link")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") { showingLinkSheet = false }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Insert") {
+                        let text = pendingLinkText.trimmingCharacters(in: .whitespacesAndNewlines)
+                        let url = pendingLinkURL.trimmingCharacters(in: .whitespacesAndNewlines)
+                        guard !text.isEmpty, !url.isEmpty else { return }
+                        insert("[\(text)](\(url))")
+                        showingLinkSheet = false
                     }
-                    .foregroundStyle(
-                        LinearGradient(colors: [.blue, .cyan], startPoint: .leading, endPoint: .trailing)
+                    .disabled(pendingLinkText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || pendingLinkURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+        }
+    }
+
+    private var scheduleSheet: some View {
+        NavigationStack {
+            Form {
+                DatePicker("Send at", selection: Binding(
+                    get: { scheduleDate ?? Date().addingTimeInterval(3600) },
+                    set: { scheduleDate = $0 }
+                ), in: Date()..., displayedComponents: [.date, .hourAndMinute])
+            }
+            .navigationTitle("Schedule Send")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") { showingScheduleSheet = false }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showingScheduleSheet = false }
+                }
+            }
+        }
+    }
+
+    private var markdownPreviewSheet: some View {
+        NavigationStack {
+            ScrollView {
+                if let attributed = try? AttributedString(
+                    markdown: messageBody,
+                    options: AttributedString.MarkdownParsingOptions(
+                        interpretedSyntax: .full,
+                        failurePolicy: .returnPartiallyParsedIfPossible
                     )
+                ) {
+                    Text(attributed)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                } else {
+                    Text(messageBody)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
                 }
-
-                // Send button
-                Button(action: send) {
-                    if isSending {
-                        ProgressView().tint(.white)
-                    } else {
-                        Image(systemName: "paperplane.fill")
-                    }
+            }
+            .navigationTitle("Preview")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showingPreviewSheet = false }
                 }
-                .disabled(cannotSend)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 7)
-                .background(
-                    LinearGradient(colors: cannotSend ? [Color.gray.opacity(0.45), Color.gray.opacity(0.35)] : [.blue, .cyan], startPoint: .leading, endPoint: .trailing),
-                    in: Capsule()
-                )
-                .foregroundColor(.white)
             }
         }
     }
 
     private var cannotSend: Bool {
-        (toRecipients.isEmpty && newRecipient.isEmpty) || subject.isEmpty || isSending
+        mergedRecipients().isEmpty || subject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSending
     }
 
-    // MARK: - Bottom Formatting Toolbar
-
-    private var bottomToolbar: some View {
-        VStack(spacing: 0) {
-            Divider()
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 4) {
-                    ComposeToolbarButton(icon: "bold",              label: "Bold")       { wrap("**") }
-                    ComposeToolbarButton(icon: "italic",            label: "Italic")     { wrap("_") }
-                    ComposeToolbarButton(icon: "underline",         label: "Underline")  { wrap("__") }
-                    Divider().frame(height: 24)
-                    ComposeToolbarButton(icon: "text.quote",        label: "Quote")      { insert("\n> ") }
-                    ComposeToolbarButton(icon: "list.bullet",       label: "Bullets")    { insert("\n• ") }
-                    ComposeToolbarButton(icon: "list.number",       label: "Numbers")    { insert("\n1. ") }
-                    ComposeToolbarButton(icon: "checklist",         label: "Checklist")  { insert("\n- [ ] ") }
-                    Divider().frame(height: 24)
-                    ComposeToolbarButton(icon: "link",              label: "Link")       { insert("[text](url)") }
-                    ComposeToolbarButton(icon: "paperclip",         label: "Attach")     { showingAttachmentPicker = true }
-                    PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
-                        Label("Photo", systemImage: "photo.on.rectangle")
-                            .labelStyle(.iconOnly)
-                            .font(.system(size: 19))
-                            .foregroundColor(.primary)
-                            .frame(width: 40, height: 40)
-                    }
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-            }
+    private func toolButton(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: icon)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+                .background(Color.blue.opacity(0.12), in: Capsule())
         }
-        .background(Material.bar)
+        .buttonStyle(.plain)
     }
-
-    // MARK: - Helpers
 
     private func prefillReply() {
         guard let reply = replyTo else { return }
@@ -329,29 +362,17 @@ struct EmailComposingView: View {
     }
 
     private func commitRecipient() {
-        let trimmed = newRecipient.trimmingCharacters(in: .whitespaces)
+        let trimmed = newRecipient.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         toRecipients.append(trimmed)
         newRecipient = ""
     }
 
-    private func insert(_ text: String) {
-        messageBody += text
-    }
-
-    private func wrap(_ marker: String) {
-        messageBody += "\(marker)text\(marker)"
-    }
-
     private func recipientChip(_ recipient: String) -> some View {
         HStack(spacing: 6) {
-            Image(systemName: "person.crop.circle.fill")
-                .font(.caption)
-
             Text(recipient)
                 .font(.caption.weight(.semibold))
                 .lineLimit(1)
-
             Button {
                 toRecipients.removeAll { $0 == recipient }
             } label: {
@@ -361,29 +382,40 @@ struct EmailComposingView: View {
             .buttonStyle(.plain)
         }
         .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .background(Color.blue.opacity(0.10), in: Capsule())
+        .padding(.vertical, 6)
+        .background(Color.blue.opacity(0.12), in: Capsule())
         .foregroundColor(.blue)
     }
 
-    private func attachmentChip(_ attachment: MailMessage.MailAttachment) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: "doc.fill")
-                .font(.caption)
-            Text(attachment.fileName)
-                .font(.caption.weight(.semibold))
-                .lineLimit(1)
-            Button {
-                draftAttachments.removeAll { $0.id == attachment.id }
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.caption)
-            }
+    private func insert(_ text: String) {
+        if messageBody.isEmpty {
+            messageBody = text
+        } else {
+            messageBody += "\n\(text)"
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .background(Color.blue.opacity(0.10), in: Capsule())
-        .foregroundColor(.blue)
+    }
+
+    private func insertQuote() {
+        let quoted = messageBody
+            .split(separator: "\n")
+            .map { "> \($0)" }
+            .joined(separator: "\n")
+        messageBody = quoted.isEmpty ? "> " : quoted
+    }
+
+    private func clearFormatting() {
+        var normalized = messageBody
+        let replacements: [(String, String)] = [
+            ("\\*\\*", ""),
+            ("__", ""),
+            ("`", ""),
+            ("\\[(.*?)\\]\\((.*?)\\)", "$1 ($2)")
+        ]
+
+        for (pattern, template) in replacements {
+            normalized = normalized.replacingOccurrences(of: pattern, with: template, options: .regularExpression)
+        }
+        messageBody = normalized
     }
 
     private func handleImportedAttachments(_ urls: [URL]) {
@@ -422,9 +454,7 @@ struct EmailComposingView: View {
                     selectedPhotoItem = nil
                 }
             } else {
-                await MainActor.run {
-                    selectedPhotoItem = nil
-                }
+                await MainActor.run { selectedPhotoItem = nil }
             }
         } catch {
             await MainActor.run {
@@ -434,11 +464,54 @@ struct EmailComposingView: View {
         }
     }
 
-    private func send() {
-        var recipients = toRecipients
-        if !newRecipient.trimmingCharacters(in: .whitespaces).isEmpty {
-            recipients.append(newRecipient.trimmingCharacters(in: .whitespaces))
+    private func handleScheduledOrImmediateSend() async {
+        let now = Date()
+        guard let scheduleDate, scheduleDate > now else {
+            sendNow()
+            return
         }
+
+        let recipients = mergedRecipients()
+        guard !recipients.isEmpty else { return }
+
+        isSending = true
+        do {
+            let draft = MailDraft(
+                from: account.emailAddress,
+                to: recipients,
+                cc: [],
+                bcc: [],
+                subject: subject,
+                bodyText: messageBody
+            )
+
+            switch account.providerType {
+            case .gmail:
+                try await GmailProvider().saveDraft(session: providerSession(), draft: draft)
+            case .outlook:
+                try await OutlookProvider().saveDraft(session: providerSession(), draft: draft)
+            case .yahoo:
+                try await YahooMailProvider().saveDraft(session: providerSession(), draft: draft)
+            case .proton:
+                try await ProtonMailProvider().saveDraft(session: providerSession(), draft: draft)
+            case .imap, .icloud:
+                try await IMAPProvider().saveDraft(session: providerSession(), draft: draft)
+            }
+
+            await MainActor.run {
+                isSending = false
+                dismiss()
+            }
+        } catch {
+            await MainActor.run {
+                isSending = false
+                sendError = error.localizedDescription
+            }
+        }
+    }
+
+    private func sendNow() {
+        let recipients = mergedRecipients()
         guard !recipients.isEmpty else { return }
 
         isSending = true
@@ -459,60 +532,22 @@ struct EmailComposingView: View {
                     isStarred: false,
                     attachments: draftAttachments
                 )
+
                 switch account.provider {
                 case .gmail:
                     try await GmailMailProvider(account: account).sendMessage(message)
                 case .icloud:
                     try await iCloudMailProvider(account: account).sendMessage(message)
                 case .outlook:
-                    try await OutlookProvider().sendMessage(
-                        session: providerSession(),
-                        draft: MailDraft(
-                            from: account.emailAddress,
-                            to: recipients,
-                            cc: [],
-                            bcc: [],
-                            subject: subject,
-                            bodyText: messageBody
-                        )
-                    )
+                    try await OutlookProvider().sendMessage(session: providerSession(), draft: mailDraft(recipients: recipients))
                 case .yahoo:
-                    try await YahooMailProvider().sendMessage(
-                        session: providerSession(),
-                        draft: MailDraft(
-                            from: account.emailAddress,
-                            to: recipients,
-                            cc: [],
-                            bcc: [],
-                            subject: subject,
-                            bodyText: messageBody
-                        )
-                    )
+                    try await YahooMailProvider().sendMessage(session: providerSession(), draft: mailDraft(recipients: recipients))
                 case .proton:
-                    try await ProtonMailProvider().sendMessage(
-                        session: providerSession(),
-                        draft: MailDraft(
-                            from: account.emailAddress,
-                            to: recipients,
-                            cc: [],
-                            bcc: [],
-                            subject: subject,
-                            bodyText: messageBody
-                        )
-                    )
+                    try await ProtonMailProvider().sendMessage(session: providerSession(), draft: mailDraft(recipients: recipients))
                 case .imap:
-                    try await IMAPProvider().sendMessage(
-                        session: providerSession(),
-                        draft: MailDraft(
-                            from: account.emailAddress,
-                            to: recipients,
-                            cc: [],
-                            bcc: [],
-                            subject: subject,
-                            bodyText: messageBody
-                        )
-                    )
+                    try await IMAPProvider().sendMessage(session: providerSession(), draft: mailDraft(recipients: recipients))
                 }
+
                 await MainActor.run {
                     isSending = false
                     dismiss()
@@ -524,6 +559,17 @@ struct EmailComposingView: View {
                 }
             }
         }
+    }
+
+    private func mailDraft(recipients: [String]) -> MailDraft {
+        MailDraft(
+            from: account.emailAddress,
+            to: recipients,
+            cc: [],
+            bcc: [],
+            subject: subject,
+            bodyText: messageBody
+        )
     }
 
     private func providerSession() -> MailSession {
@@ -540,23 +586,13 @@ struct EmailComposingView: View {
             smtpPort: account.smtpPort ?? 587
         )
     }
-}
 
-// MARK: - Compose Toolbar Button
-
-private struct ComposeToolbarButton: View {
-    let icon: String
-    let label: String
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: icon)
-                .font(.system(size: 18))
-                .foregroundColor(.primary)
-                .frame(width: 40, height: 40)
-                .contentShape(Rectangle())
+    private func mergedRecipients() -> [String] {
+        var recipients = toRecipients
+        let pendingRecipient = newRecipient.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !pendingRecipient.isEmpty {
+            recipients.append(pendingRecipient)
         }
-        .accessibilityLabel(label)
+        return recipients
     }
 }
