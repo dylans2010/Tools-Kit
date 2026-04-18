@@ -10,8 +10,8 @@ struct MeetingWebView: View {
                 if let url = controller.webViewURL() {
                     InternalMeetingWebView(
                         url: url,
-                        onJoinStart: { controller.webViewDidStartJoining() },
-                        onJoinSuccess: { controller.webViewDidJoin() },
+                        onPageLoadStart: { controller.webViewDidStartLoadingPage() },
+                        onPageLoadSuccess: { controller.webViewDidFinishLoadingPage() },
                         onJoinFailure: { controller.webViewDidFail($0) },
                         onCallEnded: { controller.webViewDidLeaveUnexpectedly() }
                     )
@@ -65,15 +65,15 @@ struct MeetingWebView: View {
 
 private struct InternalMeetingWebView: UIViewRepresentable {
     let url: URL
-    let onJoinStart: () -> Void
-    let onJoinSuccess: () -> Void
+    let onPageLoadStart: () -> Void
+    let onPageLoadSuccess: () -> Void
     let onJoinFailure: (String) -> Void
     let onCallEnded: () -> Void
 
     func makeCoordinator() -> Coordinator {
         Coordinator(
-            onJoinStart: onJoinStart,
-            onJoinSuccess: onJoinSuccess,
+            onPageLoadStart: onPageLoadStart,
+            onPageLoadSuccess: onPageLoadSuccess,
             onJoinFailure: onJoinFailure,
             onCallEnded: onCallEnded
         )
@@ -97,29 +97,29 @@ private struct InternalMeetingWebView: UIViewRepresentable {
     }
 
     final class Coordinator: NSObject, WKNavigationDelegate {
-        private let onJoinStart: () -> Void
-        private let onJoinSuccess: () -> Void
+        private let onPageLoadStart: () -> Void
+        private let onPageLoadSuccess: () -> Void
         private let onJoinFailure: (String) -> Void
         private let onCallEnded: () -> Void
 
         init(
-            onJoinStart: @escaping () -> Void,
-            onJoinSuccess: @escaping () -> Void,
+            onPageLoadStart: @escaping () -> Void,
+            onPageLoadSuccess: @escaping () -> Void,
             onJoinFailure: @escaping (String) -> Void,
             onCallEnded: @escaping () -> Void
         ) {
-            self.onJoinStart = onJoinStart
-            self.onJoinSuccess = onJoinSuccess
+            self.onPageLoadStart = onPageLoadStart
+            self.onPageLoadSuccess = onPageLoadSuccess
             self.onJoinFailure = onJoinFailure
             self.onCallEnded = onCallEnded
         }
 
         func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-            onJoinStart()
+            onPageLoadStart()
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            onJoinSuccess()
+            onPageLoadSuccess()
         }
 
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {

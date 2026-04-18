@@ -2,6 +2,8 @@ import Foundation
 
 actor DailyService {
     static let dailyAPIBaseURL = URL(string: "https://api.daily.co/v1")!
+    static let apiRequestTimeoutInterval: TimeInterval = 20
+    static let dailyTokenParameterName = "t"
     static let shared = DailyService()
 
     enum ServiceError: LocalizedError {
@@ -40,6 +42,10 @@ actor DailyService {
         let url: String
     }
 
+    private struct MeetingTokenResponse: Decodable {
+        let token: String
+    }
+
     private struct ErrorResponse: Decodable {
         let info: String?
         let error: String?
@@ -66,10 +72,7 @@ actor DailyService {
 
         let roomName = roomName(for: normalizedID)
         let room = try await createOrFetchRoom(named: roomName)
-        guard let roomURL = URL(string: room.url) else {
-            await log("Daily returned invalid room URL for \(roomName).", level: .error)
-            throw ServiceError.invalidResponse
-        }
+        let roomURL = try await securedRoomURL(from: room)
 
         let session = MeetingSession(
             meetingId: normalizedID,
@@ -98,9 +101,7 @@ actor DailyService {
             await log("Meeting ID resolve failed for \(normalizedID).", level: .error)
             throw ServiceError.notFound
         }
-        guard let roomURL = URL(string: room.url) else {
-            throw ServiceError.invalidResponse
-        }
+        let roomURL = try await securedRoomURL(from: room)
 
         let session = MeetingSession(
             meetingId: normalizedID,
@@ -154,13 +155,14 @@ actor DailyService {
     }
 
     private func roomName(for meetingID: String) -> String {
+        // Deterministic Meeting ID -> Daily room mapping to keep ID-only join flow.
         "meet-\(meetingID.lowercased())"
     }
 
     private func createOrFetchRoom(named roomName: String) async throws -> RoomResponse {
         let payload: [String: Any] = [
             "name": roomName,
-            "privacy": "public"
+            "privacy": "private"
         ]
 
         let result = try await performDailyRequest(method: "POST", path: "rooms", body: payload)
@@ -201,10 +203,10 @@ actor DailyService {
             throw ServiceError.missingAPIKey
         }
 
-        let url = DailyService.dailyAPIBaseURL.appending(path: path)
+        let url = buildAPIURL(path: path)
         var request = URLRequest(url: url)
         request.httpMethod = method
-        request.timeoutInterval = 20
+        request.timeoutInterval = DailyService.apiRequestTimeoutInterval
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
 
@@ -237,6 +239,55 @@ actor DailyService {
         let details = try? JSONDecoder().decode(ErrorResponse.self, from: data)
         let message = details?.error ?? details?.info
         return .requestFailed(statusCode: statusCode, message: message)
+    }
+
+    private func createMeetingToken(for roomName: String) async throws -> String {
+        let payload: [String: Any] = [
+            "properties": [
+                "room_name": roomName
+            ]
+        ]
+
+        let result = try await performDailyRequest(method: "POST", path: "meeting-tokens", body: payload)
+        switch result.statusCode {
+        case 200, 201:
+            do {
+                return try JSONDecoder().decode(MeetingTokenResponse.self, from: result.data).token
+            } catch {
+                throw ServiceError.invalidResponse
+            }
+        default:
+            throw try mapFailure(statusCode: result.statusCode, data: result.data)
+        }
+    }
+
+    private func validatedRoomURL(from value: String, roomName: String) async throws -> URL {
+        guard let roomURL = URL(string: value) else {
+            await log("Daily returned invalid room URL for \(roomName).", level: .error)
+            throw ServiceError.invalidResponse
+        }
+        return roomURL
+    }
+
+    private func securedRoomURL(from room: RoomResponse) async throws -> URL {
+        let baseURL = try await validatedRoomURL(from: room.url, roomName: room.name)
+        let token = try await createMeetingToken(for: room.name)
+        guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
+            throw ServiceError.invalidResponse
+        }
+        var queryItems = components.queryItems ?? []
+        // Avoid duplicate token query items when regenerating secured URLs.
+        queryItems.removeAll(where: { $0.name == DailyService.dailyTokenParameterName })
+        queryItems.append(URLQueryItem(name: DailyService.dailyTokenParameterName, value: token))
+        components.queryItems = queryItems
+        guard let securedURL = components.url else {
+            throw ServiceError.invalidResponse
+        }
+        return securedURL
+    }
+
+    private func buildAPIURL(path: String) -> URL {
+        DailyService.dailyAPIBaseURL.appendingPathComponent(path)
     }
 
     private func log(_ message: String, level: DebugLogLevel) async {
