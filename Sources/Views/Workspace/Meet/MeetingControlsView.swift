@@ -13,17 +13,32 @@ struct MeetingControlsView: View {
     var body: some View {
         VStack(spacing: 12) {
             HStack(spacing: 12) {
-                Button(isMuted ? "Unmute" : "Mute", action: onToggleMute)
+                Button(action: onToggleMute) {
+                    Label(isMuted ? "Unmute" : "Mute", systemImage: isMuted ? "mic.slash.fill" : "mic.fill")
+                }
                     .buttonStyle(.bordered)
-                Button(isCameraEnabled ? "Disable Camera" : "Enable Camera", action: onToggleCamera)
+
+                Button(action: onToggleCamera) {
+                    Label(
+                        isCameraEnabled ? "Disable Camera" : "Enable Camera",
+                        systemImage: isCameraEnabled ? "video.slash.fill" : "video.fill"
+                    )
+                }
                     .buttonStyle(.bordered)
             }
 
             HStack(spacing: 12) {
-                Button(isScreenSharing ? "Stop Share" : "Share Screen", action: onToggleScreenShare)
+                Button(action: onToggleScreenShare) {
+                    Label(
+                        isScreenSharing ? "Stop Share" : "Share Screen",
+                        systemImage: isScreenSharing ? "rectangle.on.rectangle.slash" : "rectangle.on.rectangle"
+                    )
+                }
                     .buttonStyle(.bordered)
 
-                Button("Leave", role: .destructive, action: onLeaveMeeting)
+                Button(role: .destructive, action: onLeaveMeeting) {
+                    Label("Leave", systemImage: "phone.down.fill")
+                }
                     .buttonStyle(.borderedProminent)
             }
         }

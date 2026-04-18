@@ -56,6 +56,9 @@ struct MeetingChatView: View {
                 }
             }
         }
+        .padding(.horizontal)
+        .navigationTitle("Meeting Chat")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private var filteredMessages: [MeetingMessage] {

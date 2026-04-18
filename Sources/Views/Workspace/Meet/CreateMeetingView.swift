@@ -6,22 +6,18 @@ struct CreateMeetingView: View {
     @StateObject private var controller = MeetSessionController.shared
 
     var body: some View {
-        Form {
+        List {
             Section("Create Session") {
                 TextField("Meeting ID (optional)", text: $controller.meetingIdInput)
                     .textInputAutocapitalization(.characters)
                     .autocorrectionDisabled()
 
-                HStack {
-                    Button("Generate ID") {
-                        _ = controller.generateMeetingID()
-                    }
-                    Spacer()
-                    if !controller.meetingIdInput.isEmpty {
-                        Text(controller.meetingIdInput)
-                            .font(.caption.monospaced())
-                    }
+                Button {
+                    Task { await controller.generateMeetingID() }
+                } label: {
+                    Label("Generate ID from Daily", systemImage: "sparkles")
                 }
+                .disabled(controller.isBusy)
 
                 Button {
                     Task { await controller.createMeeting() }
@@ -29,9 +25,10 @@ struct CreateMeetingView: View {
                     if controller.isBusy {
                         ProgressView()
                     } else {
-                        Text("Create Meeting")
+                        Label("Create Meeting", systemImage: "video.badge.plus")
                     }
                 }
+                .buttonStyle(.borderedProminent)
                 .disabled(controller.isBusy)
             }
 
@@ -51,6 +48,7 @@ struct CreateMeetingView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Create Meeting")
     }
 }

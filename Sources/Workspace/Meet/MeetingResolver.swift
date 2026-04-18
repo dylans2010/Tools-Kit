@@ -10,11 +10,19 @@ actor MeetingResolver {
         self.dailyService = dailyService
     }
 
-    func createSession(with meetingId: String) async throws -> MeetingSession {
-        await log("Create session attempt for meeting ID \(meetingId).", level: .info)
+    func createSession(with meetingId: String?) async throws -> MeetingSession {
+        let logMeetingID = (meetingId?.isEmpty == false) ? meetingId ?? "" : "<generated-by-daily>"
+        await log("Create session attempt for meeting ID \(logMeetingID).", level: .info)
         let session = try await dailyService.createRoom(for: meetingId)
         await log("Create session success for \(session.meetingId).", level: .info)
         return session
+    }
+
+    func generateMeetingID() async throws -> String {
+        await log("Generate meeting ID using Daily API.", level: .info)
+        let generatedID = try await dailyService.generateMeetingID()
+        await log("Generated Daily meeting ID \(generatedID).", level: .info)
+        return generatedID
     }
 
     func joinSession(with meetingId: String) async throws -> MeetingSession {

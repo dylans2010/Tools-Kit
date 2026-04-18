@@ -4,9 +4,10 @@ import Daily
 struct JoinMeetingView: View {
     @StateObject private var controller = MeetSessionController.shared
     @State private var navigateToLobby = false
+    @State private var showCreateMeetingSheet = false
 
     var body: some View {
-        Form {
+        List {
             Section("Join Meeting") {
                 TextField("Meeting ID", text: $controller.meetingIdInput)
                     .textInputAutocapitalization(.characters)
@@ -21,15 +22,18 @@ struct JoinMeetingView: View {
                     if controller.isBusy {
                         ProgressView()
                     } else {
-                        Text("Join")
+                        Label("Join", systemImage: "video.fill")
                     }
                 }
+                .buttonStyle(.borderedProminent)
                 .disabled(controller.isBusy || !controller.isMeetingIDFormatValid)
             }
 
             Section("Meeting Setup") {
-                NavigationLink("Create Meeting") {
-                    CreateMeetingView()
+                Button {
+                    showCreateMeetingSheet = true
+                } label: {
+                    Label("Create Meeting", systemImage: "plus.circle")
                 }
             }
 
@@ -40,9 +44,16 @@ struct JoinMeetingView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Meet")
         .navigationDestination(isPresented: $navigateToLobby) {
             MeetingLobbyView(controller: controller)
+        }
+        .sheet(isPresented: $showCreateMeetingSheet) {
+            NavigationStack {
+                CreateMeetingView()
+            }
+            .presentationDetents([.medium, .large])
         }
         .onChange(of: controller.phase, initial: false) { _, newValue in
             navigateToLobby = (newValue == .lobby)

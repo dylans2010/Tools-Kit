@@ -1,6 +1,4 @@
 import Daily
-
-#if DEBUG
 import SwiftUI
 
 struct DebugView: View {
@@ -63,4 +61,3 @@ struct DebugView: View {
         }
     }
 }
-#endif

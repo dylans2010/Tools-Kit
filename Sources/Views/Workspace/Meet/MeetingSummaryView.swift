@@ -26,5 +26,8 @@ struct MeetingSummaryView: View {
                     .foregroundColor(.secondary)
             }
         }
+        .listStyle(.insetGrouped)
+        .navigationTitle("Meeting Summary")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

@@ -31,5 +31,7 @@ struct MeetingSettingsView: View {
                 }
             }
         }
+        .navigationTitle("Meeting Settings")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
