@@ -123,7 +123,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             saveToSentItems: true
         )
 
-        let _: EmptyGraph = try await request(url: url, method: "POST", body: body, token: session.accessToken)
+        try await requestVoid(url: url, method: "POST", body: body, token: session.accessToken)
     }
 
     func saveDraft(session: MailSession, draft: MailDraft) async throws {
@@ -140,7 +140,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
     func deleteMessage(session: MailSession, id: String) async throws {
         let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)")!
-        let _: EmptyGraph = try await request(url: url, method: "DELETE", token: session.accessToken)
+        try await requestVoid(url: url, method: "DELETE", token: session.accessToken)
     }
 
     func markRead(session: MailSession, id: String) async throws {
@@ -227,13 +227,25 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Graph request failed"])
         }
 
-        if T.self == EmptyGraph.self {
-            guard let empty = EmptyGraph() as? T else {
-                throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid empty response cast"])
-            }
-            return empty
-        }
         return try JSONDecoder().decode(T.self, from: data)
+    }
+
+    private func requestVoid<Body: Encodable>(url: URL, method: String = "GET", body: Body? = nil, token: String?) async throws {
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        if let token {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        if let body {
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try JSONEncoder().encode(body)
+        }
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+            throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Graph request failed"])
+        }
     }
 
     private func isoDate(_ value: String?) -> Date {
@@ -331,5 +343,3 @@ private struct GraphDraftBody: Encodable {
     let toRecipients: [GraphRecipient]
     let ccRecipients: [GraphRecipient]
 }
-
-private struct EmptyGraph: Codable {}

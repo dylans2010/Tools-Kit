@@ -215,6 +215,7 @@ struct InboxView: View {
                 Button("See all", action: seeAll)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(hexColor("#9EA4FF"))
+                    .accessibilityLabel("See all \(title) emails")
             }
 
             ForEach(Array(threads.prefix(cardPreviewCount))) { item in
@@ -557,7 +558,8 @@ private struct ReplyComposerView: View {
             let withoutHandlers = withoutScripts
                 .replacingOccurrences(of: "\\son[a-zA-Z]+\\s*=\\s*\"[^\"]*\"", with: "", options: .regularExpression)
                 .replacingOccurrences(of: "\\son[a-zA-Z]+\\s*=\\s*'[^']*'", with: "", options: .regularExpression)
-            return withoutHandlers.replacingOccurrences(of: "(href|src)\\s*=\\s*['\"]javascript:[^'\"]*['\"]", with: "", options: .regularExpression)
+            let withoutJSLinks = withoutHandlers.replacingOccurrences(of: "(href|src)\\s*=\\s*['\"]javascript:[^'\"]*['\"]", with: "", options: .regularExpression)
+            return withoutJSLinks.replacingOccurrences(of: "(href|src)\\s*=\\s*['\"]data:[^'\"]*['\"]", with: "", options: .regularExpression)
         }
         return "<pre>\(originalMessage.body)</pre>"
     }

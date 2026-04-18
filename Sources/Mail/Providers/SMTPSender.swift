@@ -58,7 +58,7 @@ enum SMTPSender {
             "To: \(draft.to.joined(separator: \", \"))",
             draft.cc.isEmpty ? nil : "Cc: \(draft.cc.joined(separator: \", \"))",
             draft.bcc.isEmpty ? nil : "Bcc: \(draft.bcc.joined(separator: \", \"))",
-            "Subject: \(draft.subject)",
+            "Subject: \(encodedHeader(draft.subject))",
             "Date: \(rfc2822Date(Date()))",
             "MIME-Version: 1.0"
         ].compactMap { $0 }
@@ -138,5 +138,12 @@ enum SMTPSender {
 
     private static func responseCode(_ response: String) -> Int? {
         Int(response.prefix(3))
+    }
+
+    private static func encodedHeader(_ value: String) -> String {
+        guard let data = value.data(using: .utf8) else { return value }
+        let needsEncoding = value.unicodeScalars.contains(where: { $0.value > 127 })
+        guard needsEncoding else { return value }
+        return "=?UTF-8?B?\(data.base64EncodedString())?="
     }
 }

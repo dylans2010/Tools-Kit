@@ -110,25 +110,25 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         let raw = buildRFC2822(draft: draft)
         let body = GmailSendBody(raw: Data(raw.utf8).base64URLEncodedString())
         let url = baseURL.appendingPathComponent("messages/send")
-        let _: EmptyAPI = try await request(url: url, method: "POST", body: body, token: session.accessToken)
+        try await requestVoid(url: url, method: "POST", body: body, token: session.accessToken)
     }
 
     func saveDraft(session: MailSession, draft: MailDraft) async throws {
         let raw = buildRFC2822(draft: draft)
         let body = GmailDraftBody(message: GmailSendBody(raw: Data(raw.utf8).base64URLEncodedString()))
         let url = baseURL.appendingPathComponent("drafts")
-        let _: EmptyAPI = try await request(url: url, method: "POST", body: body, token: session.accessToken)
+        try await requestVoid(url: url, method: "POST", body: body, token: session.accessToken)
     }
 
     func deleteMessage(session: MailSession, id: String) async throws {
         let url = baseURL.appendingPathComponent("messages/\(id)")
-        let _: EmptyAPI = try await request(url: url, method: "DELETE", token: session.accessToken)
+        try await requestVoid(url: url, method: "DELETE", token: session.accessToken)
     }
 
     func markRead(session: MailSession, id: String) async throws {
         let body = GmailModifyBody(addLabelIds: [], removeLabelIds: ["UNREAD"])
         let url = baseURL.appendingPathComponent("messages/\(id)/modify")
-        let _: EmptyAPI = try await request(url: url, method: "POST", body: body, token: session.accessToken)
+        try await requestVoid(url: url, method: "POST", body: body, token: session.accessToken)
     }
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor { ASPresentationAnchor() }
@@ -214,13 +214,25 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Gmail API request failed"])
         }
 
-        if T.self == EmptyAPI.self {
-            guard let empty = EmptyAPI() as? T else {
-                throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid empty response cast"])
-            }
-            return empty
-        }
         return try JSONDecoder().decode(T.self, from: data)
+    }
+
+    private func requestVoid<Body: Encodable>(url: URL, method: String = "GET", body: Body? = nil, token: String?) async throws {
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        if let token {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        if let body {
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try JSONEncoder().encode(body)
+        }
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+            throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Gmail API request failed"])
+        }
     }
 
     private func preferredBody(_ part: GmailMIMEPart?) -> (plain: String, html: String?) {
@@ -293,7 +305,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             "To: \(draft.to.joined(separator: \", \"))",
             draft.cc.isEmpty ? nil : "Cc: \(draft.cc.joined(separator: \", \"))",
             draft.bcc.isEmpty ? nil : "Bcc: \(draft.bcc.joined(separator: \", \"))",
-            "Subject: \(draft.subject)",
+            "Subject: \(encodedHeader(draft.subject))",
             "MIME-Version: 1.0"
         ].compactMap { $0 }
 
@@ -316,6 +328,13 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         }
 
         return lines.joined(separator: "\r\n")
+    }
+
+    private func encodedHeader(_ value: String) -> String {
+        guard let data = value.data(using: .utf8) else { return value }
+        let needsEncoding = value.unicodeScalars.contains(where: { $0.value > 127 })
+        guard needsEncoding else { return value }
+        return "=?UTF-8?B?\(data.base64EncodedString())?="
     }
 
     private func randomCodeVerifier() -> String {
@@ -400,8 +419,6 @@ private struct GmailModifyBody: Encodable {
     let addLabelIds: [String]
     let removeLabelIds: [String]
 }
-
-private struct EmptyAPI: Codable {}
 
 private extension Data {
     func base64URLEncodedString() -> String {
