@@ -95,6 +95,8 @@ final class NotebooksManager: ObservableObject {
     // MARK: - Integrations
 
     func saveIntegration(_ tool: IntegrationTool) {
+        var tool = tool
+        tool.updatedAt = Date()
         if let idx = integrations.firstIndex(where: { $0.id == tool.id }) {
             integrations[idx] = tool
         } else {
