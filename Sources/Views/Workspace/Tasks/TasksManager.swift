@@ -6,6 +6,8 @@ final class TasksManager: ObservableObject {
 
     @Published var tasks: [WorkspaceTask] = []
     @Published var categories: [TaskCategory] = []
+    private let aiService = AIService.shared
+    private let aiDecoder = AIResponseDecoder()
 
     private var saveDir: URL {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -120,5 +122,74 @@ final class TasksManager: ObservableObject {
     private func saveCategories() {
         guard let data = try? JSONEncoder().encode(categories) else { return }
         try? data.write(to: categoriesURL, options: .atomic)
+    }
+
+    // MARK: - AI Planning
+
+    struct AITaskPlan: Codable {
+        let title: String
+        let details: String
+        let priority: String
+        let dueDateISO8601: String?
+        let subtasks: [String]
+    }
+
+    struct AITasksResponse: Codable {
+        let tasks: [AITaskPlan]
+        let workloadSummary: String
+    }
+
+    private var aiSchemaString: String {
+        """
+        {
+          "type": "object",
+          "required": ["tasks", "workloadSummary"],
+          "properties": {
+            "tasks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["title", "details", "priority", "subtasks"],
+                "properties": {
+                  "title": { "type": "string" },
+                  "details": { "type": "string" },
+                  "priority": { "type": "string" },
+                  "dueDateISO8601": { "type": ["string", "null"] },
+                  "subtasks": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            },
+            "workloadSummary": { "type": "string" }
+          }
+        }
+        """
+    }
+
+    private var aiSchema: AIJSONType {
+        .object([
+            "tasks": .array(.object([
+                "title": .string,
+                "details": .string,
+                "priority": .string,
+                "subtasks": .array(.string)
+            ])),
+            "workloadSummary": .string
+        ])
+    }
+
+    @MainActor
+    func generateTasksFromPrompt(_ prompt: String) async throws -> AITasksResponse {
+        // Force strict JSON output for task generation and workload balancing.
+        let enrichedPrompt = """
+        Convert this natural language plan into actionable tasks, break down larger tasks, rebalance priorities, and suggest due dates:
+        \(prompt)
+        """
+        let json = try await aiService.generateStructuredJSON(
+            prompt: enrichedPrompt,
+            jsonSchema: aiSchemaString,
+            preferredModel: "openrouter/free",
+            systemPrompt: "You are a task planning assistant. Return strict JSON only."
+        )
+        return try aiDecoder.decode(AITasksResponse.self, from: json, schema: aiSchema)
     }
 }

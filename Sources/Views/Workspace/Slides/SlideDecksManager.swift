@@ -5,6 +5,8 @@ final class SlideDecksManager: ObservableObject {
     static let shared = SlideDecksManager()
 
     @Published var decks: [SlideDeck] = []
+    private let aiService = AIService.shared
+    private let aiDecoder = AIResponseDecoder()
 
     private var saveDir: URL {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -70,5 +72,111 @@ final class SlideDecksManager: ObservableObject {
                 return try? JSONDecoder().decode(SlideDeck.self, from: data)
             }
             .sorted { $0.updatedAt > $1.updatedAt }
+    }
+
+    // MARK: - AI Deck Generation
+
+    struct AIDeckElement: Codable {
+        let kind: String
+        let text: String
+        let x: Double
+        let y: Double
+        let width: Double
+        let height: Double
+        let fontSize: Double
+        let textColor: String
+        let fillColor: String
+    }
+
+    struct AIDeckSlide: Codable {
+        let title: String
+        let background: String
+        let elements: [AIDeckElement]
+    }
+
+    struct AIDeckPayload: Codable {
+        let title: String
+        let slides: [AIDeckSlide]
+        let speakerNotes: [String]
+    }
+
+    private var aiSchemaString: String {
+        """
+        {
+          "type": "object",
+          "required": ["title", "slides", "speakerNotes"],
+          "properties": {
+            "title": { "type": "string" },
+            "speakerNotes": { "type": "array", "items": { "type": "string" } },
+            "slides": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["title", "background", "elements"],
+                "properties": {
+                  "title": { "type": "string" },
+                  "background": { "type": "string" },
+                  "elements": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["kind", "text", "x", "y", "width", "height", "fontSize", "textColor", "fillColor"],
+                      "properties": {
+                        "kind": { "type": "string" },
+                        "text": { "type": "string" },
+                        "x": { "type": "number" },
+                        "y": { "type": "number" },
+                        "width": { "type": "number" },
+                        "height": { "type": "number" },
+                        "fontSize": { "type": "number" },
+                        "textColor": { "type": "string" },
+                        "fillColor": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        """
+    }
+
+    private var aiSchema: AIJSONType {
+        .object([
+            "title": .string,
+            "slides": .array(.object([
+                "title": .string,
+                "background": .string,
+                "elements": .array(.object([
+                    "kind": .string,
+                    "text": .string,
+                    "x": .double,
+                    "y": .double,
+                    "width": .double,
+                    "height": .double,
+                    "fontSize": .double,
+                    "textColor": .string,
+                    "fillColor": .string
+                ]))
+            ])),
+            "speakerNotes": .array(.string)
+        ])
+    }
+
+    @MainActor
+    func generateDeckFromPrompt(_ prompt: String) async throws -> AIDeckPayload {
+        // Generate full presentation structure using strict schema validation.
+        let request = """
+        Build a complete deck from this prompt, improve clarity, and include polished slide structure:
+        \(prompt)
+        """
+        let json = try await aiService.generateStructuredJSON(
+            prompt: request,
+            jsonSchema: aiSchemaString,
+            preferredModel: "openrouter/free",
+            systemPrompt: "You are a presentation designer. Return strict JSON only."
+        )
+        return try aiDecoder.decode(AIDeckPayload.self, from: json, schema: aiSchema)
     }
 }

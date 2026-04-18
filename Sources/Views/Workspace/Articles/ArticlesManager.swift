@@ -6,6 +6,8 @@ final class ArticlesManager: ObservableObject {
 
     @Published var collections: [ArticleCollection] = []
     @Published var recentArticles: [Article] = []
+    private let aiService = AIService.shared
+    private let aiDecoder = AIResponseDecoder()
 
     private var saveDir: URL {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -132,5 +134,57 @@ final class ArticlesManager: ObservableObject {
            let decoded = try? JSONDecoder().decode([Article].self, from: data) {
             recentArticles = decoded
         }
+    }
+
+    // MARK: - AI Article Intelligence
+
+    struct AIArticleInsights: Codable {
+        let summary: String
+        let keyPoints: [String]
+        let rewrite: String
+        let expandedSections: [String]
+    }
+
+    private var aiSchemaString: String {
+        """
+        {
+          "type": "object",
+          "required": ["summary", "keyPoints", "rewrite", "expandedSections"],
+          "properties": {
+            "summary": { "type": "string" },
+            "keyPoints": { "type": "array", "items": { "type": "string" } },
+            "rewrite": { "type": "string" },
+            "expandedSections": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+        """
+    }
+
+    private var aiSchema: AIJSONType {
+        .object([
+            "summary": .string,
+            "keyPoints": .array(.string),
+            "rewrite": .string,
+            "expandedSections": .array(.string)
+        ])
+    }
+
+    @MainActor
+    func generateArticleInsights(articleText: String, instruction: String) async throws -> AIArticleInsights {
+        // Keep article workflows strictly JSON-driven for reliable rendering.
+        let prompt = """
+        Instruction:
+        \(instruction)
+
+        Article content:
+        \(articleText)
+        """
+        let json = try await aiService.generateStructuredJSON(
+            prompt: prompt,
+            jsonSchema: aiSchemaString,
+            preferredModel: "openrouter/free",
+            systemPrompt: "You are an editorial assistant. Return strict JSON only."
+        )
+        return try aiDecoder.decode(AIArticleInsights.self, from: json, schema: aiSchema)
     }
 }

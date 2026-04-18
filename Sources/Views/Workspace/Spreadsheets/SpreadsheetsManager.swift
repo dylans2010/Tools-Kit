@@ -5,6 +5,8 @@ final class SpreadsheetsManager: ObservableObject {
     static let shared = SpreadsheetsManager()
 
     @Published var spreadsheets: [Spreadsheet] = []
+    private let aiService = AIService.shared
+    private let aiDecoder = AIResponseDecoder()
 
     private var saveDir: URL {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -138,5 +140,60 @@ final class SpreadsheetsManager: ObservableObject {
                   let sheet = try? JSONDecoder().decode(Spreadsheet.self, from: data) else { return nil }
             return sheet
         }
+    }
+
+    // MARK: - AI Analysis
+
+    struct SpreadsheetAIPayload: Codable {
+        let summary: String
+        let formulaSuggestions: [String]
+        let columnTypes: [String]
+        let rangeInsights: [String]
+        let chartSuggestions: [String]
+    }
+
+    private var aiSchemaString: String {
+        """
+        {
+          "type": "object",
+          "required": ["summary", "formulaSuggestions", "columnTypes", "rangeInsights", "chartSuggestions"],
+          "properties": {
+            "summary": { "type": "string" },
+            "formulaSuggestions": { "type": "array", "items": { "type": "string" } },
+            "columnTypes": { "type": "array", "items": { "type": "string" } },
+            "rangeInsights": { "type": "array", "items": { "type": "string" } },
+            "chartSuggestions": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+        """
+    }
+
+    private var aiSchema: AIJSONType {
+        .object([
+            "summary": .string,
+            "formulaSuggestions": .array(.string),
+            "columnTypes": .array(.string),
+            "rangeInsights": .array(.string),
+            "chartSuggestions": .array(.string)
+        ])
+    }
+
+    @MainActor
+    func analyzeSpreadsheet(prompt: String, dataPreview: String) async throws -> SpreadsheetAIPayload {
+        // Drive spreadsheet insights and formula generation from validated JSON.
+        let request = """
+        User request:
+        \(prompt)
+
+        Spreadsheet data sample:
+        \(dataPreview)
+        """
+        let json = try await aiService.generateStructuredJSON(
+            prompt: request,
+            jsonSchema: aiSchemaString,
+            preferredModel: "openrouter/free",
+            systemPrompt: "You are a spreadsheet analyst. Return strict JSON only."
+        )
+        return try aiDecoder.decode(SpreadsheetAIPayload.self, from: json, schema: aiSchema)
     }
 }

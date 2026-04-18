@@ -3,76 +3,37 @@ import SwiftUI
 struct TasksHomeView: View {
     @StateObject private var manager = TasksManager.shared
     @State private var showingCreate = false
-    @State private var selectedTask: WorkspaceTask? = nil
+    @State private var selectedTask: WorkspaceTask?
     @State private var showingBoard = false
     @State private var showingCategories = false
-    @State private var filterCategory: TaskCategory? = nil
-    @State private var sortBy: SortOption = .dueDate
-
-    enum SortOption: String, CaseIterable {
-        case dueDate = "Due Date"
-        case priority = "Priority"
-        case created = "Created"
-    }
+    @State private var filterCategory: TaskCategory?
+    @State private var aiPrompt = ""
+    @State private var aiError: String?
+    @State private var aiSummary = ""
+    @State private var aiLoading = false
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                summaryCards
-
-                filterBar
-
-                if !manager.todayTasks.isEmpty {
-                    taskSection(title: "Today & Overdue", tasks: filterAndSort(manager.todayTasks), isOverdueSection: true)
-                }
-
-                if !manager.upcomingTasks.isEmpty {
-                    taskSection(title: "Upcoming", tasks: filterAndSort(manager.upcomingTasks), isOverdueSection: false)
-                }
-
-                if !manager.completedTasks.isEmpty {
-                    completedSection
-                }
-
-                if manager.tasks.isEmpty {
-                    EmptyStateView(
-                        icon: "checklist",
-                        title: "No Tasks",
-                        message: "Stay productive by adding tasks and tracking your progress.",
-                        action: { showingCreate = true },
-                        actionLabel: "Add Task"
-                    )
+            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
+                Section {
+                    VStack(spacing: 16) {
+                        summaryCards
+                        aiPlannerCard
+                        contentSections
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 16)
+                } header: {
+                    stickyHeader
                 }
             }
-            .padding(.vertical, 8)
         }
         .navigationTitle("Tasks")
-        .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Menu {
-                    Button { showingBoard = true } label: {
-                        Label("Board View", systemImage: "square.grid.3x1.fill.below.line.grid.1x2")
-                    }
-                    Button { showingCategories = true } label: {
-                        Label("Manage Categories", systemImage: "folder")
-                    }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                }
-                Button { showingCreate = true } label: {
-                    Image(systemName: "plus")
-                }
-            }
-        }
         .sheet(isPresented: $showingCreate) {
-            CreateTaskView { task in
-                manager.addTask(task)
-            }
+            CreateTaskView { manager.addTask($0) }
         }
         .sheet(item: $selectedTask) { task in
-            NavigationStack {
-                WorkspaceTaskDetailView(task: task)
-            }
+            NavigationStack { WorkspaceTaskDetailView(task: task) }
         }
         .sheet(isPresented: $showingBoard) {
             NavigationStack { TaskBoardView() }
@@ -82,57 +43,164 @@ struct TasksHomeView: View {
         }
     }
 
-    private var summaryCards: some View {
-        HStack(spacing: 12) {
-            StatPill(label: "Today", value: "\(manager.todayTasks.count)", color: .blue)
-            StatPill(label: "Upcoming", value: "\(manager.upcomingTasks.count)", color: .orange)
-            StatPill(label: "Done", value: "\(manager.completedTasks.count)", color: .green)
+    private var stickyHeader: some View {
+        VStack(spacing: 8) {
+            HStack {
+                Text("Task Dashboard")
+                    .font(.title3.weight(.semibold))
+                Spacer()
+                Button { showingBoard = true } label: {
+                    Label("Board", systemImage: "square.grid.2x2")
+                }
+                .buttonStyle(.bordered)
+                Button { showingCreate = true } label: {
+                    Label("New", systemImage: "plus")
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    FilterChip(title: "All", isSelected: filterCategory == nil) { filterCategory = nil }
+                    ForEach(manager.categories) { cat in
+                        FilterChip(title: cat.name, color: Color(hex: cat.colorHex) ?? .blue, isSelected: filterCategory?.id == cat.id) {
+                            filterCategory = (filterCategory?.id == cat.id) ? nil : cat
+                        }
+                    }
+                    Button {
+                        showingCategories = true
+                    } label: {
+                        Label("Categories", systemImage: "folder")
+                            .font(.caption.weight(.medium))
+                    }
+                    .buttonStyle(.bordered)
+                }
+            }
         }
-        .padding(.horizontal)
+        .padding(16)
+        .background(.ultraThinMaterial)
+        .overlay(Divider(), alignment: .bottom)
     }
 
-    private var filterBar: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                FilterChip(title: "All", isSelected: filterCategory == nil) {
-                    filterCategory = nil
+    private var summaryCards: some View {
+        HStack(spacing: 8) {
+            StatPill(label: "Today", value: "\(manager.todayTasks.count)", color: .blue)
+            StatPill(label: "Upcoming", value: "\(manager.upcomingTasks.count)", color: .orange)
+            StatPill(label: "Completed", value: "\(manager.completedTasks.count)", color: .green)
+        }
+    }
+
+    private var aiPlannerCard: some View {
+        WorkspaceSurfaceCard {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("AI Planning Assistant")
+                    .font(.headline)
+                TextField("Turn raw notes into structured tasks…", text: $aiPrompt, axis: .vertical)
+                    .textFieldStyle(.roundedBorder)
+                if aiLoading {
+                    WorkspaceSkeletonLine()
+                    WorkspaceSkeletonLine(widthRatio: 0.7)
+                } else if let aiError {
+                    Text(aiError)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                } else if !aiSummary.isEmpty {
+                    Text(aiSummary)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
-                ForEach(manager.categories) { cat in
-                    FilterChip(title: cat.name, color: Color(hex: cat.colorHex) ?? .blue, isSelected: filterCategory?.id == cat.id) {
-                        filterCategory = (filterCategory?.id == cat.id) ? nil : cat
+                HStack {
+                    Button("Generate Plan", action: runAIPlanner)
+                        .buttonStyle(.borderedProminent)
+                        .disabled(aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || aiLoading)
+                    Spacer()
+                    if !aiSummary.isEmpty {
+                        Button("Clear") {
+                            aiSummary = ""
+                            aiError = nil
+                        }
+                        .buttonStyle(.bordered)
                     }
                 }
             }
-            .padding(.horizontal)
         }
     }
 
-    private func taskSection(title: String, tasks: [WorkspaceTask], isOverdueSection: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.headline)
-                .padding(.horizontal)
+    @ViewBuilder
+    private var contentSections: some View {
+        if manager.tasks.isEmpty {
+            EmptyStateView(
+                icon: "checklist",
+                title: "No Tasks Yet",
+                message: "Create tasks or ask AI to generate a complete task plan.",
+                action: { showingCreate = true },
+                actionLabel: "Create Task"
+            )
+        } else {
+            if !manager.todayTasks.isEmpty {
+                WorkspaceSectionHeader(title: "Today")
+                taskList(filterAndSort(manager.todayTasks))
+            }
+            if !manager.upcomingTasks.isEmpty {
+                WorkspaceSectionHeader(title: "Upcoming")
+                taskList(filterAndSort(manager.upcomingTasks))
+            }
+            if !manager.completedTasks.isEmpty {
+                WorkspaceSectionHeader(title: "Completed")
+                taskList(Array(manager.completedTasks.prefix(8)))
+            }
+        }
+    }
 
+    private func taskList(_ tasks: [WorkspaceTask]) -> some View {
+        VStack(spacing: 8) {
             ForEach(tasks) { task in
-                TaskRowCard(task: task, manager: manager) {
-                    selectedTask = task
+                TaskRowCard(task: task, manager: manager) { selectedTask = task }
+            }
+        }
+    }
+
+    private func runAIPlanner() {
+        let prompt = aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !prompt.isEmpty else { return }
+        aiLoading = true
+        aiError = nil
+        let formatter = ISO8601DateFormatter()
+        Task {
+            do {
+                let response = try await manager.generateTasksFromPrompt(prompt)
+                await MainActor.run {
+                    // Apply decoded AI tasks directly to the task store.
+                    for planned in response.tasks {
+                        let priority = priorityFromAI(planned.priority)
+                        let due = planned.dueDateISO8601.flatMap(formatter.date(from:))
+                        manager.addTask(
+                            WorkspaceTask(
+                                title: planned.title,
+                                description: formattedTaskDescription(details: planned.details, subtasks: planned.subtasks),
+                                dueDate: due,
+                                priority: priority
+                            )
+                        )
+                    }
+                    aiSummary = response.workloadSummary
+                    aiPrompt = ""
+                    aiLoading = false
+                }
+            } catch {
+                await MainActor.run {
+                    aiError = "We couldn’t turn that request into tasks. Try adding scope, deadline, and priority hints."
+                    aiLoading = false
                 }
             }
         }
     }
 
-    private var completedSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Completed")
-                .font(.headline)
-                .foregroundColor(.secondary)
-                .padding(.horizontal)
-
-            ForEach(manager.completedTasks.prefix(5)) { task in
-                TaskRowCard(task: task, manager: manager) {
-                    selectedTask = task
-                }
-            }
+    private func priorityFromAI(_ value: String) -> WorkspaceTask.TaskPriority {
+        switch value.lowercased() {
+        case "critical": return .critical
+        case "high": return .high
+        case "low": return .low
+        default: return .medium
         }
     }
 
@@ -141,30 +209,13 @@ struct TasksHomeView: View {
         if let cat = filterCategory {
             result = result.filter { $0.categoryID == cat.id }
         }
-        switch sortBy {
-        case .dueDate:
-            result.sort { (t1: WorkspaceTask, t2: WorkspaceTask) in
-                (t1.dueDate ?? .distantFuture) < (t2.dueDate ?? .distantFuture)
-            }
-        case .priority:
-            result.sort { (t1: WorkspaceTask, t2: WorkspaceTask) in
-                priorityOrder(t1.priority) > priorityOrder(t2.priority)
-            }
-        case .created:
-            result.sort { (t1: WorkspaceTask, t2: WorkspaceTask) in
-                t1.createdAt > t2.createdAt
-            }
-        }
+        result.sort { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
         return result
     }
 
-    private func priorityOrder(_ p: WorkspaceTask.TaskPriority) -> Int {
-        switch p {
-        case .critical: return 4
-        case .high: return 3
-        case .medium: return 2
-        case .low: return 1
-        }
+    private func formattedTaskDescription(details: String, subtasks: [String]) -> String {
+        guard !subtasks.isEmpty else { return details }
+        return details + "\n" + subtasks.map { "• \($0)" }.joined(separator: "\n")
     }
 }
 
@@ -173,81 +224,101 @@ struct TaskRowCard: View {
     @ObservedObject var manager: TasksManager
     let onTap: () -> Void
 
-    private var priorityColor: Color {
-        Color(hex: task.priority.color) ?? .blue
-    }
+    private var priorityColor: Color { Color(hex: task.priority.color) ?? .blue }
+    private static let shortDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        return formatter
+    }()
 
     var body: some View {
-        VStack {
+        WorkspaceSurfaceCard {
             HStack(spacing: 12) {
-                Button {
-                    manager.toggleComplete(task)
-                } label: {
+                Button { manager.toggleComplete(task) } label: {
                     Image(systemName: task.completed ? "checkmark.circle.fill" : "circle")
-                        .font(.system(size: 24))
-                        .foregroundColor(task.completed ? .green : .secondary)
+                        .font(.title3)
+                        .foregroundStyle(task.completed ? .green : .secondary)
                 }
                 .buttonStyle(.plain)
-
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(task.title)
-                        .font(.subheadline.bold())
+                        .font(.body.weight(.semibold))
                         .strikethrough(task.completed)
-                        .foregroundColor(task.completed ? .secondary : .primary)
-
+                        .onTapGesture(perform: onTap)
                     HStack(spacing: 8) {
+                        WorkspaceStatusBadge(title: task.priority.rawValue, color: priorityColor)
                         if let due = task.dueDate {
-                            Label(shortDate(due), systemImage: "calendar")
-                                .font(.caption)
-                                .foregroundColor(task.isOverdue ? .red : .secondary)
-                        }
-                        if let cat = manager.category(for: task) {
-                            Text(cat.name)
-                                .font(.caption)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color(hex: cat.colorHex)?.opacity(0.2) ?? Color.blue.opacity(0.2))
-                                .foregroundColor(Color(hex: cat.colorHex) ?? .blue)
-                                .clipShape(Capsule())
+                            WorkspaceStatusBadge(title: shortDate(due), color: task.isOverdue ? .red : .secondary)
                         }
                     }
                 }
-                .onTapGesture { onTap() }
-
                 Spacer()
-
-                Image(systemName: task.priority.icon)
-                    .foregroundColor(priorityColor)
-                    .font(.caption)
+                Button("Open", action: onTap)
+                    .buttonStyle(.bordered)
             }
-            .padding()
         }
-        .padding()
-        .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-        .padding(.horizontal)
         .swipeActions(edge: .trailing) {
-            Button(role: .destructive) {
-                manager.deleteTask(task)
-            } label: {
+            Button(role: .destructive) { manager.deleteTask(task) } label: {
                 Label("Delete", systemImage: "trash")
             }
-        }
-        .swipeActions(edge: .leading) {
-            Button {
-                manager.toggleComplete(task)
-            } label: {
-                Label(task.completed ? "Undo" : "Done", systemImage: task.completed ? "arrow.uturn.backward" : "checkmark")
-            }
-            .tint(.green)
         }
     }
 
     private func shortDate(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateStyle = .short
-        f.timeStyle = .none
-        return f.string(from: date)
+        Self.shortDateFormatter.string(from: date)
+    }
+}
+
+struct WorkspaceSurfaceCard<Content: View>: View {
+    @ViewBuilder let content: Content
+    var body: some View {
+        content
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color(.secondarySystemBackground))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+            )
+    }
+}
+
+struct WorkspaceSectionHeader: View {
+    let title: String
+    var body: some View {
+        HStack {
+            Text(title).font(.headline)
+            Spacer()
+        }
+    }
+}
+
+struct WorkspaceStatusBadge: View {
+    let title: String
+    let color: Color
+    var body: some View {
+        Text(title)
+            .font(.caption.weight(.semibold))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.14))
+            .foregroundStyle(color)
+            .clipShape(Capsule())
+    }
+}
+
+struct WorkspaceSkeletonLine: View {
+    var widthRatio: CGFloat = 1
+    var body: some View {
+        GeometryReader { proxy in
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color.gray.opacity(0.2))
+                .frame(width: max(40, proxy.size.width * widthRatio), height: 12, alignment: .leading)
+                .redacted(reason: .placeholder)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(height: 12)
     }
 }

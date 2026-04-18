@@ -5,6 +5,8 @@ final class CalendarManager: ObservableObject {
     static let shared = CalendarManager()
 
     @Published var events: [CalendarEvent] = []
+    private let aiService = AIService.shared
+    private let aiDecoder = AIResponseDecoder()
 
     private var saveDir: URL {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -82,5 +84,87 @@ final class CalendarManager: ObservableObject {
     private func save() {
         guard let data = try? JSONEncoder().encode(events) else { return }
         try? data.write(to: eventsURL, options: .atomic)
+    }
+
+    // MARK: - AI Scheduling
+
+    struct AICalendarEventDraft: Codable {
+        let title: String
+        let details: String
+        let startISO8601: String
+        let endISO8601: String
+        let location: String
+    }
+
+    struct AICalendarInsights: Codable {
+        let parsedEvents: [AICalendarEventDraft]
+        let autoScheduledTasks: [String]
+        let conflicts: [String]
+        let optimalScheduling: [String]
+    }
+
+    private var aiSchemaString: String {
+        """
+        {
+          "type": "object",
+          "required": ["parsedEvents", "autoScheduledTasks", "conflicts", "optimalScheduling"],
+          "properties": {
+            "parsedEvents": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["title", "details", "startISO8601", "endISO8601", "location"],
+                "properties": {
+                  "title": { "type": "string" },
+                  "details": { "type": "string" },
+                  "startISO8601": { "type": "string" },
+                  "endISO8601": { "type": "string" },
+                  "location": { "type": "string" }
+                }
+              }
+            },
+            "autoScheduledTasks": { "type": "array", "items": { "type": "string" } },
+            "conflicts": { "type": "array", "items": { "type": "string" } },
+            "optimalScheduling": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+        """
+    }
+
+    private var aiSchema: AIJSONType {
+        .object([
+            "parsedEvents": .array(.object([
+                "title": .string,
+                "details": .string,
+                "startISO8601": .string,
+                "endISO8601": .string,
+                "location": .string
+            ])),
+            "autoScheduledTasks": .array(.string),
+            "conflicts": .array(.string),
+            "optimalScheduling": .array(.string)
+        ])
+    }
+
+    @MainActor
+    func generateSchedulingInsights(from prompt: String) async throws -> AICalendarInsights {
+        // Parse and optimize schedules via validated JSON payloads.
+        let existing = upcomingEvents(limit: 20).map {
+            "\($0.title) | \($0.formattedDate) | \($0.formattedTimeRange)"
+        }.joined(separator: "\n")
+        let request = """
+        User scheduling request:
+        \(prompt)
+
+        Existing events:
+        \(existing)
+        """
+        let json = try await aiService.generateStructuredJSON(
+            prompt: request,
+            jsonSchema: aiSchemaString,
+            preferredModel: "openrouter/free",
+            systemPrompt: "You are a scheduling assistant. Return strict JSON only."
+        )
+        return try aiDecoder.decode(AICalendarInsights.self, from: json, schema: aiSchema)
     }
 }
