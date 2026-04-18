@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "ToolsKit",
     platforms: [
-        .iOS(.v16),
+        .iOS(.v17),
         .macOS(.v12)
     ],
     dependencies: [
