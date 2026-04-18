@@ -14,7 +14,7 @@ enum DailySDKContractMap {
     static let requiredInfoPlistKeys = [
         "NSCameraUsageDescription",
         "NSMicrophoneUsageDescription",
-        "UIBackgroundModes(audio)"
+        "UIBackgroundModes: [audio]"
     ]
 
     // AGENT DECISION: Official docs endpoint was unreachable in this environment, so signatures are resolved from

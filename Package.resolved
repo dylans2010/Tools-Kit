@@ -10,6 +10,15 @@
       }
     },
     {
+      "identity" : "daily-client-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/daily-co/daily-client-ios.git",
+      "state" : {
+        "revision" : "276f9aff6bbdb36d58e763b7c0d77167ab5f51ca",
+        "version" : "0.37.0"
+      }
+    },
+    {
       "identity" : "mailcore2",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/MailCore/mailcore2",
