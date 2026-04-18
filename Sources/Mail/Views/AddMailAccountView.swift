@@ -27,7 +27,7 @@ struct AddMailAccountView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "#0A0A0F") ?? .black
+                (Color(hex: "#0A0A0F") ?? .black)
                     .ignoresSafeArea()
 
                 AnimatedMeshBackground()
