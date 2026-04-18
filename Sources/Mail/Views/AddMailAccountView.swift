@@ -69,8 +69,19 @@ struct AddMailAccountView: View {
             }
             .animation(.spring(response: 0.4, dampingFraction: 0.86), value: toastMessage)
             .navigationBarHidden(true)
-            .navigationDestination(item: $signedInAccount) { account in
-                InboxView(account: account, folder: .inbox)
+            .navigationDestination(
+                isPresented: Binding(
+                    get: { signedInAccount != nil },
+                    set: { isPresented in
+                        if !isPresented {
+                            signedInAccount = nil
+                        }
+                    }
+                )
+            ) {
+                if let account = signedInAccount {
+                    InboxView(account: account, folder: .inbox)
+                }
             }
             .sheet(isPresented: $showProtonGuide) {
                 protonGuideSheet
