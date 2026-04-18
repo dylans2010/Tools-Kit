@@ -31,7 +31,11 @@ struct PageEditorView: View {
     @State private var canvasNotes: [CanvasNote] = []
     @State private var canvasZoom: CGFloat = 1.0
 
+    // 1.5s debounce before autosave write.
     private let autosaveDelayNanoseconds: UInt64 = 1_500_000_000
+    private let defaultNoteSpawn = CGPoint(x: 320, y: 320)
+    private let bootstrapFirstNote = CGPoint(x: 220, y: 220)
+    private let bootstrapSecondNote = CGPoint(x: 560, y: 320)
 
     init(page: NotebookPage, folderID: UUID, notebookID: UUID) {
         self.page = page
@@ -220,7 +224,7 @@ struct PageEditorView: View {
         VStack(spacing: 8) {
             HStack(spacing: 10) {
                 Button {
-                    canvasNotes.append(CanvasNote(text: "New Note", position: CGPoint(x: 320, y: 320)))
+                    canvasNotes.append(CanvasNote(text: "New Note", position: defaultNoteSpawn))
                     scheduleAutosave()
                 } label: {
                     Label("Add Note", systemImage: "plus.square.on.square")
@@ -470,8 +474,8 @@ struct PageEditorView: View {
     private func bootstrapCanvas() {
         guard canvasNotes.isEmpty else { return }
         canvasNotes = [
-            CanvasNote(text: "Key Idea", position: CGPoint(x: 220, y: 220)),
-            CanvasNote(text: "Details", position: CGPoint(x: 560, y: 320))
+            CanvasNote(text: "Key Idea", position: bootstrapFirstNote),
+            CanvasNote(text: "Details", position: bootstrapSecondNote)
         ]
     }
 

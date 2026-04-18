@@ -11,6 +11,7 @@ struct FillOutFormView: View {
     @State private var showValidationAlert = false
     @State private var showCompletedSheet = false
     @State private var validationMessage: String?
+    private let requiredValidationMessage = "Please answer all required questions before submitting."
 
     private var accentColor: Color {
         Color(hex: form.accentHexColor) ?? .blue
@@ -103,7 +104,7 @@ struct FillOutFormView: View {
         .alert("Required Questions Missing", isPresented: $showValidationAlert) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text("Please answer all required questions before submitting.")
+            Text(requiredValidationMessage)
         }
         .sheet(isPresented: $showCompletedSheet) {
             completionSheet
@@ -164,7 +165,7 @@ struct FillOutFormView: View {
     private func submitForm() {
         guard unansweredRequired.isEmpty else {
             withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                validationMessage = "Please answer all required questions before submitting."
+                validationMessage = requiredValidationMessage
             }
             showValidationAlert = true
             return

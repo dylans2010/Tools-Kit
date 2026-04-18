@@ -52,7 +52,9 @@ struct ImportFormView: View {
                     backend.importedForm = imported
                     backend.add(imported, isOwned: false)
                     importError = nil
-                    dismiss()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        dismiss()
+                    }
                 } catch {
                     importError = "Import failed: \(error.localizedDescription)"
                 }

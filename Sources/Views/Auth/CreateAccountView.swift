@@ -12,6 +12,7 @@ struct CreateAccountView: View {
     @State private var isWorking = false
     @State private var errorMessage: String?
     @State private var errorPulse = false
+    private let errorPulseDuration: Double = 0.28
 
     var body: some View {
         NavigationStack {
@@ -50,7 +51,7 @@ struct CreateAccountView: View {
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                     .scaleEffect(errorPulse ? 1.02 : 1)
-                    .animation(.spring(response: 0.28, dampingFraction: 0.62), value: errorPulse)
+                    .animation(.spring(response: errorPulseDuration, dampingFraction: 0.62), value: errorPulse)
                 }
 
                 Button(action: createAccount) {
@@ -164,7 +165,7 @@ struct CreateAccountView: View {
 
     private func animateError() {
         errorPulse = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + errorPulseDuration) {
             errorPulse = false
         }
     }
