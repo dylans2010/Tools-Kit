@@ -53,28 +53,28 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
 
         do {
             let groupedThreads: [MailThread]
-            let pageIndex = max(0, currentOffset / pageSize)
+            let pageNumber = max(0, currentOffset / pageSize)
 
             switch account.provider {
             case .gmail:
                 let provider = GmailProvider()
-                let messages = try await provider.fetchInbox(session: session(from: account), page: pageIndex)
+                let messages = try await provider.fetchInbox(session: session(from: account), page: pageNumber)
                 groupedThreads = groupMessages(messages)
             case .outlook:
                 let provider = OutlookProvider()
-                let messages = try await provider.fetchInbox(session: session(from: account), page: pageIndex)
+                let messages = try await provider.fetchInbox(session: session(from: account), page: pageNumber)
                 groupedThreads = groupMessages(messages)
             case .yahoo:
                 let provider = YahooMailProvider()
-                let messages = try await provider.fetchInbox(session: session(from: account), page: pageIndex)
+                let messages = try await provider.fetchInbox(session: session(from: account), page: pageNumber)
                 groupedThreads = groupMessages(messages)
             case .proton:
                 let provider = ProtonMailProvider()
-                let messages = try await provider.fetchInbox(session: session(from: account), page: pageIndex)
+                let messages = try await provider.fetchInbox(session: session(from: account), page: pageNumber)
                 groupedThreads = groupMessages(messages)
             case .imap:
                 let provider = IMAPProvider()
-                let messages = try await provider.fetchInbox(session: session(from: account), page: pageIndex)
+                let messages = try await provider.fetchInbox(session: session(from: account), page: pageNumber)
                 groupedThreads = groupMessages(messages)
             case .icloud:
                 defer { imapService.disconnect() }

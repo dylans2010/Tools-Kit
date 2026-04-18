@@ -296,11 +296,11 @@ struct AddMailAccountView: View {
             let session: MailSession
             switch provider {
             case .gmail:
-                session = try await GmailProvider().authenticate(credentials: oauthCredentials())
+                session = try await GmailProvider().authenticate(credentials: .oauth())
             case .outlook:
-                session = try await OutlookProvider().authenticate(credentials: oauthCredentials())
+                session = try await OutlookProvider().authenticate(credentials: .oauth())
             case .yahoo:
-                session = try await YahooMailProvider().authenticate(credentials: oauthCredentials())
+                session = try await YahooMailProvider().authenticate(credentials: .oauth())
             case .proton, .imap, .icloud:
                 return
             }
@@ -389,18 +389,6 @@ struct AddMailAccountView: View {
         }
     }
 
-    private func oauthCredentials() -> MailCredentials {
-        MailCredentials(
-            email: "",
-            password: nil,
-            host: nil,
-            port: nil,
-            smtpHost: nil,
-            smtpPort: nil,
-            accessToken: nil,
-            refreshToken: nil
-        )
-    }
 }
 
 private struct AnimatedMeshBackground: View {

@@ -45,7 +45,14 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
         }
 
         let token = try await exchangeCode(code: code, verifier: verifier, clientID: clientID, redirectURI: redirectURI)
-        let email = credentials.email.isEmpty ? (token.xoauthYahooGuid ?? "yahoo-user") : credentials.email
+        let email: String
+        if !credentials.email.isEmpty {
+            email = credentials.email
+        } else if let guid = token.xoauthYahooGuid, !guid.isEmpty {
+            email = guid
+        } else {
+            throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Unable to resolve Yahoo account identity"])
+        }
 
         return MailSession(
             provider: .yahoo,

@@ -10,6 +10,19 @@ struct MailCredentials: Sendable {
     var smtpPort: UInt16?
     var accessToken: String?
     var refreshToken: String?
+
+    static func oauth(email: String = "") -> MailCredentials {
+        MailCredentials(
+            email: email,
+            password: nil,
+            host: nil,
+            port: nil,
+            smtpHost: nil,
+            smtpPort: nil,
+            accessToken: nil,
+            refreshToken: nil
+        )
+    }
 }
 
 struct MailSession: Identifiable, Codable, Sendable {
