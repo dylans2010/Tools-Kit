@@ -447,7 +447,7 @@ struct PageEditorView: View {
         (try? AttributedString(markdown: md)) ?? AttributedString(md)
     }
 
-    private func runAI(_ task: String, _ prompt: String) {
+    private func runAI(_ task: String, _ prompt: String, systemPrompt: String = "You are a notebook copilot. Return concise markdown with actionable structure and clarity.", model: String? = nil) {
         aiTask = task
         aiLoading = true
         aiResult = "Loading…"
@@ -455,7 +455,8 @@ struct PageEditorView: View {
             do {
                 let result = try await AIService.shared.processText(
                     prompt: prompt,
-                    systemPrompt: "You are a notebook copilot. Return concise markdown with actionable structure and clarity."
+                    systemPrompt: systemPrompt,
+                    model: model
                 )
                 await MainActor.run { aiResult = result; aiLoading = false }
             } catch {
@@ -466,9 +467,29 @@ struct PageEditorView: View {
 
     private func showIntegrationPicker() {
         if let tool = manager.integrations.first(where: { $0.isEnabled }) {
-            let prompt = tool.promptTemplate.replacingOccurrences(of: "{{content}}", with: content)
-            runAI(tool.name, prompt)
+            runIntegration(tool)
         }
+    }
+
+    private func runIntegration(_ tool: IntegrationTool) {
+        let attachmentsContext = tool.includeAttachmentsContext ? attachments.joined(separator: ", ") : "Not included"
+        var prompt = tool.promptTemplate
+            .replacingOccurrences(of: "{{content}}", with: content)
+            .replacingOccurrences(of: "{{title}}", with: title)
+            .replacingOccurrences(of: "{{attachments}}", with: attachmentsContext)
+            .replacingOccurrences(of: "{{word_count}}", with: "\(content.split { $0.isWhitespace }.count)")
+            .replacingOccurrences(of: "{{timestamp}}", with: Date().formatted(date: .abbreviated, time: .shortened))
+
+        if !tool.requiredVariables.isEmpty {
+            prompt += "\n\nRequired variables:\n" + tool.requiredVariables.map { "- \($0)" }.joined(separator: "\n")
+        }
+
+        if !tool.postProcessingRules.isEmpty {
+            prompt += "\n\nPost-processing rules:\n" + tool.postProcessingRules.map { "- \($0)" }.joined(separator: "\n")
+        }
+
+        prompt += "\n\nOutput style: \(tool.outputStyle.rawValue)."
+        runAI(tool.name, prompt, systemPrompt: tool.systemPrompt, model: tool.aiModel)
     }
 
     private func bootstrapCanvas() {
