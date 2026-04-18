@@ -296,6 +296,18 @@ struct DraftingEmailsView: View {
         }
     }
 
+    private var ctaTypeBinding: Binding<CTAType> {
+        Binding(
+            get: { ctaType },
+            set: { newValue in
+                ctaType = newValue
+                if newValue != .custom {
+                    ctaText = newValue.suggestion
+                }
+            }
+        )
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -565,17 +577,12 @@ struct DraftingEmailsView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 labelRow("CTA Builder", icon: "paperplane.circle")
-                Picker("CTA Type", selection: $ctaType) {
+                Picker("CTA Type", selection: ctaTypeBinding) {
                     ForEach(CTAType.allCases) { type in
                         Text(type.rawValue).tag(type)
                     }
                 }
                 .pickerStyle(.menu)
-                .onChange(of: ctaType) { selected in
-                    if selected != .custom {
-                        ctaText = selected.suggestion
-                    }
-                }
 
                 iconTextField("CTA Text", text: $ctaText, icon: "text.cursor", autocapitalization: .sentences)
             }
