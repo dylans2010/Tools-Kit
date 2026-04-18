@@ -226,17 +226,16 @@ final class MusicPlayerManager: ObservableObject {
         savePlaybackState()
     }
 
-    func stopAndDeactivateSession() {
-        Task { @MainActor in
-            if self.isPlaying {
-                self.pause()
-            }
-            RadioPlayerManager.shared.stop()
-            do {
-                try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
-            } catch {
-                InternalLogger.shared.log("MusicPlayerManager: AVAudioSession deactivate error \(error)", level: .error)
-            }
+    @MainActor
+    func stopAndDeactivateSession() async {
+        if isPlaying {
+            pause()
+        }
+        RadioPlayerManager.shared.stop()
+        do {
+            try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+        } catch {
+            InternalLogger.shared.log("MusicPlayerManager: AVAudioSession deactivate error \(error)", level: .error)
         }
     }
 
