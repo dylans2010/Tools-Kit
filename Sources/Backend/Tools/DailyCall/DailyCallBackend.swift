@@ -189,8 +189,8 @@ final class DailyCallBackend: NSObject, ObservableObject {
         }
     }
 
-    private func participantDisplayName(_ participant: Participant) -> String {
-        participant.info.isLocal ? "You" : "\(participant.id)"
+    private nonisolated func participantDisplayName(_ participant: Participant) -> String {
+        participant.info.username ?? (participant.info.isLocal ? "You" : "\(participant.id)")
     }
     #endif
 }
@@ -206,18 +206,19 @@ extension DailyCallBackend: CallClientDelegate {
     }
 
     nonisolated func callClient(_ callClient: CallClient, participantJoined participant: Participant) {
-        let participantID = "\(participant.id)"
+        let participantName = participantDisplayName(participant)
         Task { @MainActor in
-            appendEvent("\(participantID) joined.")
+            appendEvent("\(participantName) joined.")
             refreshParticipants()
         }
     }
 
     nonisolated func callClient(_ callClient: CallClient, participantLeft participant: Participant, withReason reason: ParticipantLeftReason) {
         let participantID = "\(participant.id)"
+        let participantName = participantDisplayName(participant)
         let reasonDescription = String(describing: reason)
         Task { @MainActor in
-            appendEvent("\(participantID) left (\(reasonDescription)).")
+            appendEvent("\(participantName) left (\(reasonDescription)).")
             if activeSpeakerID == participantID {
                 activeSpeakerID = nil
             }
@@ -233,11 +234,12 @@ extension DailyCallBackend: CallClientDelegate {
 
     nonisolated func callClient(_ callClient: CallClient, activeSpeakerChanged activeSpeaker: Participant?) {
         let speakerID = activeSpeaker.map { "\($0.id)" }
+        let speakerName = activeSpeaker.map(participantDisplayName)
         Task { @MainActor in
             activeSpeakerID = speakerID
             refreshParticipants()
-            if let speakerID {
-                appendEvent("Active speaker: \(speakerID).")
+            if let speakerName {
+                appendEvent("Active speaker: \(speakerName).")
             }
         }
     }
