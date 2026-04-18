@@ -65,7 +65,9 @@ struct EmailComposingView: View {
                 scheduleSection
             }
             .navigationTitle(replyTo == nil ? "Compose" : "Reply")
-            .navigationBarTitleDisplayMode(.inline)
+             .navigationBarTitleDisplayMode(.inline)
+            .scrollContentBackground(.hidden)
+            .background(Color(.systemGroupedBackground))
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
@@ -213,20 +215,20 @@ struct EmailComposingView: View {
     }
 
     private var toolsSection: some View {
-        Section("Tools") {
+        Section {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
-                    toolButton("AI Draft", icon: "sparkles") { showingAIPanel = true }
-                    toolButton("Audio Notes", icon: "waveform") { showingAudioPicker = true }
-                    toolButton("Translate", icon: "globe") { showingTranslateSheet = true }
-                    toolButton("Clear Formatting", icon: "textformat.clear") { clearFormatting() }
-                    toolButton("Schedule Send", icon: "calendar.badge.clock") { showingScheduleSheet = true }
-                    toolButton("File Scanning", icon: "doc.text.viewfinder") { showingAttachmentPicker = true }
-                    toolButton("Quoting", icon: "text.quote") { insertQuote() }
-                    toolButton("Preview", icon: "doc.richtext") { showingPreviewSheet = true }
-                    toolButton("Hyperlink", icon: "link") { showingLinkSheet = true }
-                    toolButton("Drawing", icon: "pencil.and.outline") { showingDrawingSheet = true }
-                    toolButton("Attach", icon: "paperclip") { showingAttachmentPicker = true }
+                    toolButton(icon: "sparkles", label: "AI Draft") { showingAIPanel = true }
+                    toolButton(icon: "waveform", label: "Audio Notes") { showingAudioPicker = true }
+                    toolButton(icon: "globe", label: "Translate") { showingTranslateSheet = true }
+                    toolButton(icon: "textformat.clear", label: "Clear Formatting") { clearFormatting() }
+                    toolButton(icon: "calendar.badge.clock", label: "Schedule Send") { showingScheduleSheet = true }
+                    toolButton(icon: "doc.text.viewfinder", label: "File Scanning") { showingAttachmentPicker = true }
+                    toolButton(icon: "text.quote", label: "Quoting") { insertQuote() }
+                    toolButton(icon: "doc.richtext", label: "Preview") { showingPreviewSheet = true }
+                    toolButton(icon: "link", label: "Hyperlink") { showingLinkSheet = true }
+                    toolButton(icon: "pencil.and.outline", label: "Drawing") { showingDrawingSheet = true }
+                    toolButton(icon: "paperclip", label: "Attach") { showingAttachmentPicker = true }
                 }
                 .padding(.vertical, 4)
             }
@@ -235,27 +237,24 @@ struct EmailComposingView: View {
                 Label("Add Photo", systemImage: "photo.on.rectangle")
             }
 
-            VStack(alignment: .leading, spacing: 8) {
-                Label("Formatting Toolbar", systemImage: "textformat")
-                    .font(.subheadline.weight(.semibold))
-
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 10) {
-                        ForEach(formattingActions) { action in
-                            Button {
-                                insertMarkdown(action.insertion)
-                            } label: {
-                                Label(action.title, systemImage: action.icon)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 8)
-                                    .background(Color.indigo.opacity(0.14), in: Capsule())
-                            }
-                            .buttonStyle(.plain)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(formattingActions) { action in
+                        Button {
+                            insertMarkdown(action.insertion)
+                        } label: {
+                            Image(systemName: action.icon)
+                                .frame(width: 34, height: 34)
+                                .background(Color.indigo.opacity(0.14), in: Circle())
                         }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(action.title)
                     }
-                    .padding(.vertical, 2)
                 }
+                .padding(.vertical, 2)
             }
+        } header: {
+            Text("Tools")
         }
     }
 
@@ -386,14 +385,15 @@ struct EmailComposingView: View {
         mergedRecipients().isEmpty || subject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSending
     }
 
-    private func toolButton(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
+    private func toolButton(icon: String, label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Label(title, systemImage: icon)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 8)
-                .background(Color.blue.opacity(0.12), in: Capsule())
+            Image(systemName: icon)
+                .font(.body)
+                .frame(width: 36, height: 36)
+                .background(Color.blue.opacity(0.12), in: Circle())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(label)
     }
 
     private func prefillReply() {

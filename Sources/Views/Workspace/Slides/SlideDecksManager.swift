@@ -168,14 +168,14 @@ final class SlideDecksManager: ObservableObject {
     func generateDeckFromPrompt(_ prompt: String) async throws -> AIDeckPayload {
         // Generate full presentation structure using strict schema validation.
         let request = """
-        Build a complete deck from this prompt, improve clarity, and include polished slide structure:
+        Build a complete deck from this prompt. Accept natural language, infer missing details like audience/structure/slide count when absent, and keep the structure polished:
         \(prompt)
         """
         let json = try await aiService.generateStructuredJSON(
             prompt: request,
             jsonSchema: aiSchemaString,
             preferredModel: "openrouter/free",
-            systemPrompt: "You are a presentation designer. Return strict JSON only."
+            systemPrompt: "You are a presentation designer that can interpret vague natural language. Infer missing details safely. Return strict JSON only."
         )
         return try aiDecoder.decode(AIDeckPayload.self, from: json, schema: aiSchema)
     }

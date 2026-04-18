@@ -183,7 +183,7 @@ final class ArticlesManager: ObservableObject {
             prompt: prompt,
             jsonSchema: aiSchemaString,
             preferredModel: "openrouter/free",
-            systemPrompt: "You are an editorial assistant. Return strict JSON only."
+            systemPrompt: "You are an editorial assistant that handles natural language requests, even short or informal. Return strict JSON only."
         )
         return try aiDecoder.decode(AIArticleInsights.self, from: json, schema: aiSchema)
     }

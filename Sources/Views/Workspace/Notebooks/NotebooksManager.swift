@@ -170,7 +170,7 @@ final class NotebooksManager: ObservableObject {
     func generateNoteInsights(noteContent: String, notebookContext: String) async throws -> AINotebookInsights {
         // Keep notebook AI responses machine-readable and schema-safe.
         let prompt = """
-        Analyze this note, expand ideas, create tags, and link related notes.
+        Analyze this note (natural language, shorthand, or rough notes are allowed), expand ideas, create tags, and link related notes.
 
         Note content:
         \(noteContent)
@@ -182,7 +182,7 @@ final class NotebooksManager: ObservableObject {
             prompt: prompt,
             jsonSchema: aiSchemaString,
             preferredModel: "openrouter/free",
-            systemPrompt: "You are a notebook knowledge assistant. Return strict JSON only."
+            systemPrompt: "You are a notebook knowledge assistant that understands informal natural language. Return strict JSON only."
         )
         return try aiDecoder.decode(AINotebookInsights.self, from: json, schema: aiSchema)
     }

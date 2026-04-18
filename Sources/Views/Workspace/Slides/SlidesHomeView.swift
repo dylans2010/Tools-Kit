@@ -11,11 +11,11 @@ struct SlidesHomeView: View {
     @State private var deckToDelete: SlideDeck?
     @State private var showDeleteConfirm = false
 
-    private let columns = [GridItem(.adaptive(minimum: 200), spacing: 12)]
+    private let columns = [GridItem(.adaptive(minimum: 160), spacing: 12)]
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
+            VStack(spacing: 14) {
                 heroCard
                 if manager.decks.isEmpty {
                     EmptyStateView(
@@ -56,34 +56,31 @@ struct SlidesHomeView: View {
 
     private var heroCard: some View {
         WorkspaceSurfaceCard {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Slides Studio")
-                            .font(.title2.bold())
-                        Text("Create polished decks with role-specific AI presentation builders.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Button {
-                        showingAIGenerate = true
-                    } label: {
-                        Label("Generate", systemImage: "sparkles")
-                    }
-                    .buttonStyle(.bordered)
-                    Button {
-                        showingCreate = true
-                    } label: {
-                        Label("New", systemImage: "plus")
-                    }
-                    .buttonStyle(.borderedProminent)
+            HStack(spacing: 10) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Slides")
+                        .font(.title3.bold())
+                    Text("iOS-first editor with natural-language AI generation.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
-                HStack(spacing: 8) {
-                    aiPresetButton("Investor Pitch", icon: "briefcase.fill", prompt: "Build an investor pitch deck with problem, solution, market, traction, and ask.")
-                    aiPresetButton("Product Launch", icon: "megaphone.fill", prompt: "Build a product launch deck with story, customer value, rollout, and metrics.")
-                    aiPresetButton("Workshop", icon: "graduationcap.fill", prompt: "Build a workshop deck with learning outcomes, agenda, activities, and recap.")
+                Spacer()
+                Button {
+                    showingAIGenerate = true
+                } label: {
+                    Image(systemName: "sparkles")
+                        .font(.headline)
+                        .frame(width: 36, height: 36)
                 }
+                .buttonStyle(.bordered)
+                Button {
+                    showingCreate = true
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.headline)
+                        .frame(width: 36, height: 36)
+                }
+                .buttonStyle(.borderedProminent)
             }
         }
     }
@@ -114,18 +111,29 @@ struct SlidesHomeView: View {
                 }
             }
         }
+        .presentationDetents([.medium])
     }
 
     private var aiGenerateSheet: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Describe your presentation goal")
+                Text("Describe your presentation in plain language")
                     .font(.headline)
+                Text("No need for rigid structure; short requests are supported.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 TextEditor(text: $aiPrompt)
                     .frame(minHeight: 120)
                     .padding(8)
                     .background(Color(.secondarySystemBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                HStack(spacing: 8) {
+                    aiPresetButton("Pitch", icon: "briefcase.fill", prompt: "Create a startup investor deck from my idea.")
+                    aiPresetButton("Launch", icon: "megaphone.fill", prompt: "Create a product launch presentation.")
+                    aiPresetButton("Class", icon: "graduationcap.fill", prompt: "Create a teaching deck for beginners.")
+                }
+
                 if aiLoading {
                     WorkspaceSkeletonLine()
                     WorkspaceSkeletonLine(widthRatio: 0.7)
@@ -146,10 +154,13 @@ struct SlidesHomeView: View {
                     }
                     .buttonStyle(.bordered)
                 }
+                Spacer(minLength: 0)
             }
             .padding(16)
             .navigationTitle("AI Presentation")
+            .navigationBarTitleDisplayMode(.inline)
         }
+        .presentationDetents([.medium, .large])
     }
 
     private func generateFromAI() {
@@ -159,7 +170,6 @@ struct SlidesHomeView: View {
         aiError = nil
         Task {
             do {
-                // The deck payload is validated against a strict JSON schema before rendering.
                 let payload = try await manager.generateDeckFromPrompt(prompt)
                 var deck = SlideDeck(title: payload.title)
                 deck.slides = payload.slides.enumerated().map { index, item in
@@ -168,7 +178,6 @@ struct SlidesHomeView: View {
                     slide.elements = item.elements.map { element in
                         let aiKind = SlideElement.ElementKind(rawValue: element.kind)
                         let resolvedKind = aiKind ?? .text
-                        // Unsupported element kinds are downgraded to text so position/size/content still render, but advanced kind-specific behavior is not preserved.
                         var model = SlideElement(kind: resolvedKind)
                         model.text = element.text
                         model.x = element.x
@@ -191,7 +200,7 @@ struct SlidesHomeView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiError = "Could not generate this deck. Try a more specific prompt like topic, audience, and slide count."
+                    aiError = "Could not generate this deck yet. Try any plain-language goal and AI will infer structure."
                     aiLoading = false
                 }
             }
@@ -203,10 +212,13 @@ struct SlidesHomeView: View {
             aiPrompt = prompt
             showingAIGenerate = true
         } label: {
-            Label(title, systemImage: icon)
+            Image(systemName: icon)
                 .font(.caption.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
         }
         .buttonStyle(.bordered)
+        .accessibilityLabel(title)
     }
 }
 

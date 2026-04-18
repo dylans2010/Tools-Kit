@@ -153,7 +153,7 @@ final class CalendarManager: ObservableObject {
             "\($0.title) | \($0.formattedDate) | \($0.formattedTimeRange)"
         }.joined(separator: "\n")
         let request = """
-        User scheduling request:
+        User scheduling request (may be informal natural language):
         \(prompt)
 
         Existing events:
@@ -163,7 +163,7 @@ final class CalendarManager: ObservableObject {
             prompt: request,
             jsonSchema: aiSchemaString,
             preferredModel: "openrouter/free",
-            systemPrompt: "You are a scheduling assistant. Return strict JSON only."
+            systemPrompt: "You are a scheduling assistant that handles natural language and infers missing time details when possible. Return strict JSON only."
         )
         return try aiDecoder.decode(AICalendarInsights.self, from: json, schema: aiSchema)
     }

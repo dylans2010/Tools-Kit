@@ -4,6 +4,7 @@ struct NotebooksHomeView: View {
     @StateObject private var manager = NotebooksManager.shared
     @State private var showingCreate = false
     @State private var showingIntegrations = false
+    @State private var showingAISheet = false
     @State private var aiPrompt = ""
     @State private var aiLoading = false
     @State private var aiError: String?
@@ -11,106 +12,136 @@ struct NotebooksHomeView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
-                heroCard
-                aiCard
-                if manager.notebooks.isEmpty {
-                    EmptyStateView(
-                        icon: "book.closed",
-                        title: "No Notebooks",
-                        message: "Create your first notebook to start writing and organizing notes.",
-                        action: { showingCreate = true },
-                        actionLabel: "Create Notebook"
-                    )
-                } else {
-                    VStack(spacing: 10) {
-                        ForEach(manager.notebooks) { notebook in
-                            NavigationLink {
-                                NotebookDetailView(notebook: notebook)
-                            } label: {
-                                NotebookRow(notebook: notebook)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
+            VStack(spacing: 14) {
+                compactHeader
+                notebooksSection
             }
             .padding(16)
         }
         .navigationTitle("Notebooks")
         .sheet(isPresented: $showingCreate) { CreateNotebookView() }
         .sheet(isPresented: $showingIntegrations) { NavigationStack { IntegrationsView() } }
+        .sheet(isPresented: $showingAISheet) { aiSheet }
     }
 
-    private var heroCard: some View {
+    private var compactHeader: some View {
         WorkspaceSurfaceCard {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Notebooks")
-                            .font(.title2.bold())
-                        Text("Capture ideas with structured AI assistance and connected note intelligence.")
+            HStack(spacing: 10) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Notebooks")
+                        .font(.title3.bold())
+                    Text("Keep ideas organized with less clutter.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button {
+                    showingIntegrations = true
+                } label: {
+                    Image(systemName: "puzzlepiece.extension")
+                        .frame(width: 36, height: 36)
+                }
+                .buttonStyle(.bordered)
+                Button {
+                    showingAISheet = true
+                } label: {
+                    Image(systemName: "sparkles")
+                        .frame(width: 36, height: 36)
+                }
+                .buttonStyle(.bordered)
+                Button {
+                    showingCreate = true
+                } label: {
+                    Image(systemName: "plus")
+                        .frame(width: 36, height: 36)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var notebooksSection: some View {
+        if manager.notebooks.isEmpty {
+            EmptyStateView(
+                icon: "book.closed",
+                title: "No Notebooks",
+                message: "Create your first notebook to start writing and organizing notes.",
+                action: { showingCreate = true },
+                actionLabel: "Create Notebook"
+            )
+        } else {
+            VStack(spacing: 10) {
+                ForEach(manager.notebooks) { notebook in
+                    NavigationLink {
+                        NotebookDetailView(notebook: notebook)
+                    } label: {
+                        NotebookRow(notebook: notebook)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    private var aiSheet: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("AI Note Tools")
+                        .font(.headline)
+                    Text("Write naturally. You can give rough thoughts and AI will infer structure.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    TextField("e.g. turn this brainstorm into clear notes", text: $aiPrompt, axis: .vertical)
+                        .textFieldStyle(.roundedBorder)
+
+                    HStack(spacing: 8) {
+                        aiAction("Summarize", icon: "text.alignleft") {
+                            runAI(using: "Summarize this naturally and keep key ideas.")
+                        }
+                        aiAction("Tags", icon: "tag.fill") {
+                            runAI(using: "Suggest tags and categories from this note.")
+                        }
+                        aiAction("Study", icon: "brain.head.profile") {
+                            runAI(using: "Turn this into a study guide with recall prompts.")
+                        }
+                    }
+
+                    HStack {
+                        Button("Analyze", action: runAI)
+                            .buttonStyle(.borderedProminent)
+                            .disabled(aiLoading || aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        Spacer()
+                    }
+
+                    if aiLoading {
+                        WorkspaceSkeletonLine()
+                        WorkspaceSkeletonLine(widthRatio: 0.8)
+                    } else if let aiError {
+                        Text(aiError)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    } else if let aiInsights {
+                        Text(aiInsights.summary)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
+                        insightList("Tags", aiInsights.tags)
+                        insightList("Related", aiInsights.relatedNotes)
                     }
-                    Spacer()
-                    Button {
-                        showingIntegrations = true
-                    } label: {
-                        Label("Integrations", systemImage: "puzzlepiece.extension")
-                    }
-                    .buttonStyle(.bordered)
-                    Button {
-                        showingCreate = true
-                    } label: {
-                        Label("New", systemImage: "plus")
-                    }
-                    .buttonStyle(.borderedProminent)
                 }
-                HStack(spacing: 8) {
-                    aiAction("Summarize", icon: "text.alignleft") {
-                        runAI(using: "Summarize this note into executive bullets and a 3-line brief.")
-                    }
-                    aiAction("Research Tags", icon: "tag.fill") {
-                        runAI(using: "Generate taxonomy tags, topics, and searchable keywords.")
-                    }
-                    aiAction("Study Mode", icon: "brain.head.profile") {
-                        runAI(using: "Convert this note into study guide format with recall prompts.")
-                    }
+                .padding(16)
+            }
+            .navigationTitle("AI Assistant")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showingAISheet = false }
                 }
             }
         }
-    }
-
-    private var aiCard: some View {
-        WorkspaceSurfaceCard {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("AI Note Assistant")
-                    .font(.headline)
-                TextField("Summarize notes, generate tags, link related ideas…", text: $aiPrompt)
-                    .textFieldStyle(.roundedBorder)
-                HStack {
-                    Button("Analyze", action: runAI)
-                        .buttonStyle(.borderedProminent)
-                        .disabled(aiLoading || aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    Spacer()
-                }
-                if aiLoading {
-                    WorkspaceSkeletonLine()
-                    WorkspaceSkeletonLine(widthRatio: 0.8)
-                } else if let aiError {
-                    Text(aiError)
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                } else if let aiInsights {
-                    Text(aiInsights.summary)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    insightList("Tags", aiInsights.tags)
-                    insightList("Related", aiInsights.relatedNotes)
-                }
-            }
-        }
+        .presentationDetents([.medium, .large])
     }
 
     private func insightList(_ title: String, _ values: [String]) -> some View {
@@ -146,7 +177,7 @@ struct NotebooksHomeView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiError = "We couldn’t analyze this note yet. Try adding more detail and run analysis again."
+                    aiError = "Couldn’t analyze that yet. Natural language input is supported—try again with any phrasing."
                     aiLoading = false
                 }
             }
@@ -155,10 +186,13 @@ struct NotebooksHomeView: View {
 
     private func aiAction(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Label(title, systemImage: icon)
+            Image(systemName: icon)
                 .font(.caption.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
         }
         .buttonStyle(.bordered)
+        .accessibilityLabel(title)
     }
 }
 

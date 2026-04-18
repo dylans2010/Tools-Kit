@@ -181,14 +181,14 @@ final class TasksManager: ObservableObject {
     func generateTasksFromPrompt(_ prompt: String) async throws -> AITasksResponse {
         // Force strict JSON output for task generation and workload balancing.
         let enrichedPrompt = """
-        Convert this natural language plan into actionable tasks, break down larger tasks, rebalance priorities, and suggest due dates:
+        Convert this natural language plan into actionable tasks, even if brief or vague. Infer missing scope/time when reasonable, break down larger tasks, rebalance priorities, and suggest due dates:
         \(prompt)
         """
         let json = try await aiService.generateStructuredJSON(
             prompt: enrichedPrompt,
             jsonSchema: aiSchemaString,
             preferredModel: "openrouter/free",
-            systemPrompt: "You are a task planning assistant. Return strict JSON only."
+            systemPrompt: "You are a task planning assistant that understands natural language notes and partial requests. Return strict JSON only."
         )
         return try aiDecoder.decode(AITasksResponse.self, from: json, schema: aiSchema)
     }
