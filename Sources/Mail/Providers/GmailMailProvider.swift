@@ -275,7 +275,8 @@ class GmailMailProvider: MailProviderProtocol {
             throw NSError(domain: "GmailMailProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Gmail refresh token"])
         }
 
-        let clientID = try oauthValue(key: "GOOGLE_OAUTH_CLIENT_ID")
+        let remoteVariables = await fetchRemoteVariables()
+        let clientID = try oauthValue(primaryKey: "GMAIL_OAUTH_CLIENT_ID", fallbackKey: "GOOGLE_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
 
         var request = URLRequest(url: URL(string: "https://oauth2.googleapis.com/token")!)
         request.httpMethod = "POST"
@@ -327,16 +328,101 @@ class GmailMailProvider: MailProviderProtocol {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
     }
 
-    private func oauthValue(key: String) throws -> String {
-        guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String,
-              !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            throw NSError(
-                domain: "GmailMailProvider",
-                code: 500,
-                userInfo: [NSLocalizedDescriptionKey: "Missing required OAuth configuration key \(key) in Info.plist"]
-            )
+    private func oauthValue(primaryKey: String, fallbackKey: String? = nil, remoteVariables: [String: String] = [:]) throws -> String {
+        if let value = localConfigValue(forKey: primaryKey) {
+            return value
         }
-        return value
+        if let value = infoPlistValue(forKey: primaryKey) {
+            return value
+        }
+        if let value = remoteConfigValue(forKey: primaryKey, remoteVariables: remoteVariables) {
+            return value
+        }
+
+        if let fallbackKey {
+            if let value = localConfigValue(forKey: fallbackKey) {
+                return value
+            }
+            if let value = infoPlistValue(forKey: fallbackKey) {
+                return value
+            }
+            if let value = remoteConfigValue(forKey: fallbackKey, remoteVariables: remoteVariables) {
+                return value
+            }
+        }
+
+        throw NSError(
+            domain: "GmailMailProvider",
+            code: 500,
+            userInfo: [NSLocalizedDescriptionKey: "Missing required OAuth config key \(primaryKey)"]
+        )
+    }
+
+    private func localConfigValue(forKey key: String) -> String? {
+        guard
+            let url = Bundle.main.url(forResource: "Config", withExtension: "plist"),
+            let data = try? Data(contentsOf: url),
+            let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
+            let value = plist[key] as? String
+        else {
+            return nil
+        }
+
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    private func infoPlistValue(forKey key: String) -> String? {
+        guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String else {
+            return nil
+        }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    private func remoteConfigValue(forKey key: String, remoteVariables: [String: String]) -> String? {
+        guard let value = remoteVariables[key] else { return nil }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    private func fetchRemoteVariables() async -> [String: String] {
+        guard
+            let rawURL = localConfigValue(forKey: "APPWRITE_MAIL_CONFIG_URL"),
+            let url = URL(string: rawURL)
+        else {
+            return [:]
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        if let bearer = localConfigValue(forKey: "APPWRITE_MAIL_CONFIG_BEARER") {
+            request.setValue("Bearer \(bearer)", forHTTPHeaderField: "Authorization")
+        }
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+                return [:]
+            }
+
+            if let direct = try? JSONDecoder().decode([String: String].self, from: data) {
+                return direct
+            }
+
+            if
+                let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                let payload = object["data"] as? [String: String]
+            {
+                return payload
+            }
+
+            return [:]
+        } catch {
+            return [:]
+        }
     }
 
     private func parseGmailDate(internalDate: String?, fallback: String?) -> Date {
