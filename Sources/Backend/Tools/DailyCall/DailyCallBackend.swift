@@ -164,16 +164,16 @@ final class DailyCallBackend: NSObject, ObservableObject {
 
     private func refreshParticipants() {
         guard let callClient else { return }
-        let all = callClient.participants.all.values.sorted { lhs, rhs in
-            let l = lhs.info.userName ?? "\(lhs.id)"
-            let r = rhs.info.userName ?? "\(rhs.id)"
+        let all = callClient.participants.all.values.sorted(by: { lhs, rhs in
+            let l = participantDisplayName(lhs)
+            let r = participantDisplayName(rhs)
             return l.localizedCaseInsensitiveCompare(r) == .orderedAscending
-        }
+        })
 
         participants = all.map { participant in
             DailyCallParticipant(
                 id: "\(participant.id)",
-                name: participant.info.userName ?? (participant.info.isLocal ? "You" : "Participant"),
+                name: participantDisplayName(participant),
                 isLocal: participant.info.isLocal,
                 isAudioPlayable: participant.media?.microphone.state == .playable,
                 isVideoPlayable: participant.media?.camera.state == .playable
@@ -188,51 +188,76 @@ final class DailyCallBackend: NSObject, ObservableObject {
             activeSpeakerVideoTrack = all.first(where: { !$0.info.isLocal })?.media?.camera.track
         }
     }
+
+    private func participantDisplayName(_ participant: Participant) -> String {
+        participant.info.isLocal ? "You" : "\(participant.id)"
+    }
     #endif
 }
 
 #if canImport(Daily)
 extension DailyCallBackend: CallClientDelegate {
-    func callClient(_ callClient: CallClient, callStateUpdated state: CallState) {
-        callStateDescription = String(describing: state)
-        isJoined = (state == .joined)
-        appendEvent("Call state changed to \(state).")
-    }
-
-    func callClient(_ callClient: CallClient, participantJoined participant: Participant) {
-        appendEvent("\(participant.info.userName ?? "\(participant.id)") joined.")
-        refreshParticipants()
-    }
-
-    func callClient(_ callClient: CallClient, participantLeft participant: Participant, withReason reason: ParticipantLeftReason) {
-        appendEvent("\(participant.info.userName ?? "\(participant.id)") left (\(reason)).")
-        if activeSpeakerID == "\(participant.id)" {
-            activeSpeakerID = nil
-        }
-        refreshParticipants()
-    }
-
-    func callClient(_ callClient: CallClient, participantUpdated participant: Participant) {
-        refreshParticipants()
-    }
-
-    func callClient(_ callClient: CallClient, activeSpeakerChanged activeSpeaker: Participant?) {
-        activeSpeakerID = activeSpeaker.map { "\($0.id)" }
-        refreshParticipants()
-        if let activeSpeaker {
-            appendEvent("Active speaker: \(activeSpeaker.info.userName ?? "\(activeSpeaker.id)").")
+    nonisolated func callClient(_ callClient: CallClient, callStateUpdated state: CallState) {
+        Task { @MainActor in
+            callStateDescription = String(describing: state)
+            isJoined = (state == .joined)
+            appendEvent("Call state changed to \(state).")
         }
     }
 
-    func callClient(_ callClient: CallClient, inputsUpdated inputs: InputSettings) {
-        isCameraEnabled = inputs.camera.isEnabled
-        isMicrophoneEnabled = inputs.microphone.isEnabled
-        refreshParticipants()
+    nonisolated func callClient(_ callClient: CallClient, participantJoined participant: Participant) {
+        let participantID = "\(participant.id)"
+        Task { @MainActor in
+            appendEvent("\(participantID) joined.")
+            refreshParticipants()
+        }
     }
 
-    func callClient(_ callClient: CallClient, error: CallClientError) {
-        errorMessage = error.localizedDescription
-        appendEvent("Error: \(error.localizedDescription)")
+    nonisolated func callClient(_ callClient: CallClient, participantLeft participant: Participant, withReason reason: ParticipantLeftReason) {
+        let participantID = "\(participant.id)"
+        let reasonDescription = String(describing: reason)
+        Task { @MainActor in
+            appendEvent("\(participantID) left (\(reasonDescription)).")
+            if activeSpeakerID == participantID {
+                activeSpeakerID = nil
+            }
+            refreshParticipants()
+        }
+    }
+
+    nonisolated func callClient(_ callClient: CallClient, participantUpdated participant: Participant) {
+        Task { @MainActor in
+            refreshParticipants()
+        }
+    }
+
+    nonisolated func callClient(_ callClient: CallClient, activeSpeakerChanged activeSpeaker: Participant?) {
+        let speakerID = activeSpeaker.map { "\($0.id)" }
+        Task { @MainActor in
+            activeSpeakerID = speakerID
+            refreshParticipants()
+            if let speakerID {
+                appendEvent("Active speaker: \(speakerID).")
+            }
+        }
+    }
+
+    nonisolated func callClient(_ callClient: CallClient, inputsUpdated inputs: InputSettings) {
+        let cameraEnabled = inputs.camera.isEnabled
+        let microphoneEnabled = inputs.microphone.isEnabled
+        Task { @MainActor in
+            isCameraEnabled = cameraEnabled
+            isMicrophoneEnabled = microphoneEnabled
+            refreshParticipants()
+        }
+    }
+
+    nonisolated func callClient(_ callClient: CallClient, error: CallClientError) {
+        let description = error.localizedDescription
+        Task { @MainActor in
+            errorMessage = description
+            appendEvent("Error: \(description)")
+        }
     }
 
     // AGENT DECISION: Network-quality and recording delegate callbacks are not resolved from reachable docs in this
