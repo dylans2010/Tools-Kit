@@ -232,7 +232,7 @@ struct AddMailAccountView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
-                .background(Color(hex: "#2A3D31") ?? .green, in: RoundedRectangle(cornerRadius: 12))
+                .background(Color(hex: "#2A3D31") ?? .black, in: RoundedRectangle(cornerRadius: 12))
                 .foregroundStyle(.white)
             }
             .padding(20)
