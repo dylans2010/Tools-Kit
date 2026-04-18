@@ -8,9 +8,8 @@ struct ParticipantsView: View {
         List {
             if participants.isEmpty {
                 ContentUnavailableView(
-                    label: {
-                        Label("No Participants Yet", systemImage: "person.3.sequence")
-                    },
+                    "No Participants Yet",
+                    systemImage: "person.3.sequence",
                     description: {
                         Text("Participants will appear once people join the meeting.")
                     }

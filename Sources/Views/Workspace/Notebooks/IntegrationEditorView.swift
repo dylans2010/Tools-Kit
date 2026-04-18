@@ -100,7 +100,7 @@ struct IntegrationEditorView: View {
                     Stepper("Timeout: \(timeoutSeconds)s", value: $timeoutSeconds, in: 10...300, step: 5)
                 }
 
-                Section(header: Text("Prompt Design")) {
+                Section {
                     TextEditor(text: $systemPrompt)
                         .frame(minHeight: 90)
                         .font(.system(.body, design: .monospaced))
@@ -108,33 +108,41 @@ struct IntegrationEditorView: View {
                     TextEditor(text: $promptTemplate)
                         .frame(minHeight: 130)
                         .font(.system(.body, design: .monospaced))
+                } header: {
+                    Text("Prompt Design")
                 } footer: {
                     Text("Supported placeholders: {{content}} page body, {{title}} page title, {{attachments}} file names, {{word_count}} note size, {{timestamp}} current date/time.")
                         .font(.caption)
                 }
 
-                Section("Advanced Inputs") {
+                Section {
                     TextEditor(text: $requiredVariablesText)
                         .frame(minHeight: 70)
                         .font(.system(.body, design: .monospaced))
+                } header: {
+                    Text("Advanced Inputs")
                 } footer: {
                     Text("One required variable per line (e.g. tone, audience, objective).")
                         .font(.caption)
                 }
 
-                Section("Examples") {
+                Section {
                     TextEditor(text: $exampleInputsText)
                         .frame(minHeight: 90)
                         .font(.system(.body, design: .monospaced))
+                } header: {
+                    Text("Examples")
                 } footer: {
                     Text("Provide sample user inputs, one per line, to guide reproducible behavior.")
                         .font(.caption)
                 }
 
-                Section("Post-processing Rules") {
+                Section {
                     TextEditor(text: $postProcessingText)
                         .frame(minHeight: 90)
                         .font(.system(.body, design: .monospaced))
+                } header: {
+                    Text("Post-processing Rules")
                 } footer: {
                     Text("Optional rules to enforce final formatting/cleanup after AI output.")
                         .font(.caption)
