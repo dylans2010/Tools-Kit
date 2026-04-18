@@ -18,7 +18,7 @@ final class MusicModeManager: ObservableObject {
             if isMusicModeEnabled {
                 MusicPlayerManager.shared.setupAudioSession()
             } else {
-                MusicPlayerManager.shared.stopPlaybackForNonMusicMode()
+                MusicPlayerManager.shared.stopAndDeactivateSession()
             }
         }
     }

@@ -226,7 +226,7 @@ final class MusicPlayerManager: ObservableObject {
         savePlaybackState()
     }
 
-    func stopPlaybackForNonMusicMode() {
+    func stopAndDeactivateSession() {
         if isPlaying {
             pause()
         }
@@ -236,7 +236,7 @@ final class MusicPlayerManager: ObservableObject {
         do {
             try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
         } catch {
-            print("MusicPlayerManager: AVAudioSession deactivate error \(error)")
+            InternalLogger.shared.log("MusicPlayerManager: AVAudioSession deactivate error \(error)", level: .error)
         }
     }
 
