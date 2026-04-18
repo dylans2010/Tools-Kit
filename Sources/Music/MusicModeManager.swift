@@ -17,6 +17,8 @@ final class MusicModeManager: ObservableObject {
             UserDefaults.standard.set(isMusicModeEnabled, forKey: key)
             if isMusicModeEnabled {
                 MusicPlayerManager.shared.setupAudioSession()
+            } else {
+                MusicPlayerManager.shared.stopPlaybackForNonMusicMode()
             }
         }
     }

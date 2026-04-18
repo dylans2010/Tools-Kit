@@ -226,6 +226,20 @@ final class MusicPlayerManager: ObservableObject {
         savePlaybackState()
     }
 
+    func stopPlaybackForNonMusicMode() {
+        if isPlaying {
+            pause()
+        }
+        Task { @MainActor in
+            RadioPlayerManager.shared.stop()
+        }
+        do {
+            try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+        } catch {
+            print("MusicPlayerManager: AVAudioSession deactivate error \(error)")
+        }
+    }
+
     // MARK: - Private helpers
 
     private func load(song: Song) {
