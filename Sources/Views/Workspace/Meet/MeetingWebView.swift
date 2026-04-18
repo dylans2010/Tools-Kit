@@ -4,6 +4,10 @@ import Daily
 
 struct MeetingWebView: View {
     @ObservedObject var controller: MeetSessionController
+    @State private var isChatSheetPresented = false
+    @State private var isSettingsSheetPresented = false
+    @State private var isSummarySheetPresented = false
+    private let sheetDetents: Set<PresentationDetent> = [.medium, .large]
 
     var body: some View {
         VStack(spacing: 12) {
@@ -39,10 +43,33 @@ struct MeetingWebView: View {
                 }
             )
 
-            TabView {
-                ParticipantsView(participants: controller.participants)
-                    .tabItem { Label("Participants", systemImage: "person.3") }
+            ParticipantsView(participants: controller.participants)
+                .frame(maxHeight: .infinity)
+        }
+        .navigationTitle("Meeting")
+        .toolbar {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button {
+                    isChatSheetPresented = true
+                } label: {
+                    Label("Chat", systemImage: "message")
+                }
 
+                Button {
+                    isSettingsSheetPresented = true
+                } label: {
+                    Label("Settings", systemImage: "slider.horizontal.3")
+                }
+
+                Button {
+                    isSummarySheetPresented = true
+                } label: {
+                    Label("Summary", systemImage: "doc.text.magnifyingglass")
+                }
+            }
+        }
+        .sheet(isPresented: $isChatSheetPresented) {
+            NavigationStack {
                 MeetingChatView(
                     threads: controller.chatThreads,
                     messages: controller.messages,
@@ -51,16 +78,21 @@ struct MeetingWebView: View {
                         controller.sendMessage(text, threadId: threadID)
                     }
                 )
-                .tabItem { Label("Chat", systemImage: "message") }
-
-                MeetingSettingsView(settings: $controller.settings)
-                    .tabItem { Label("Settings", systemImage: "slider.horizontal.3") }
-
-                MeetingSummaryView(summary: controller.summary)
-                    .tabItem { Label("Summary", systemImage: "doc.text.magnifyingglass") }
             }
+            .presentationDetents(sheetDetents)
         }
-        .navigationTitle("Meeting")
+        .sheet(isPresented: $isSettingsSheetPresented) {
+            NavigationStack {
+                MeetingSettingsView(settings: $controller.settings)
+            }
+            .presentationDetents(sheetDetents)
+        }
+        .sheet(isPresented: $isSummarySheetPresented) {
+            NavigationStack {
+                MeetingSummaryView(summary: controller.summary)
+            }
+            .presentationDetents(sheetDetents)
+        }
     }
 }
 

@@ -1,6 +1,4 @@
 import Daily
-
-#if DEBUG
 import SwiftUI
 
 struct MeetDeveloperToolsView: View {
@@ -13,4 +11,3 @@ struct MeetDeveloperToolsView: View {
         .navigationTitle("Developer Tools")
     }
 }
-#endif

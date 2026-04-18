@@ -38,9 +38,6 @@ final class DebugLogger: ObservableObject {
         if entries.count > maxEntries {
             entries = Array(entries.prefix(maxEntries))
         }
-#if DEBUG
-        print("[Meet][\(level.rawValue.uppercased())] \(message)")
-#endif
     }
 
     func clear() {

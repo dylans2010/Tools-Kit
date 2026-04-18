@@ -62,8 +62,19 @@ actor DailyService {
         await log("Developer API key updated (in-memory only).", level: .debug)
     }
 
-    func createRoom(for meetingId: String) async throws -> MeetingSession {
-        let normalizedID = normalizeMeetingID(meetingId)
+    func createRoom(for meetingId: String?) async throws -> MeetingSession {
+        let trimmedID = meetingId?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+        if trimmedID.isEmpty {
+            let room = try await createGeneratedRoom()
+            let normalizedGeneratedID = normalizeMeetingID(room.name)
+            guard !normalizedGeneratedID.isEmpty else { throw ServiceError.invalidMeetingID }
+            let session = try await storeRoom(room, meetingID: normalizedGeneratedID)
+            await log("Room created with Daily-generated meeting ID \(session.meetingId). trace=\(session.debugTraceId)", level: .info)
+            return session
+        }
+
+        let normalizedID = normalizeMeetingID(trimmedID)
         guard !normalizedID.isEmpty else { throw ServiceError.invalidMeetingID }
 
         if let existing = recordsByMeetingID[normalizedID]?.session {
@@ -71,21 +82,17 @@ actor DailyService {
             return existing
         }
 
-        let roomName = roomName(for: normalizedID)
-        let room = try await createOrFetchRoom(named: roomName)
-        let roomURL = try await securedRoomURL(from: room)
-
-        let session = MeetingSession(
-            meetingId: normalizedID,
-            roomName: roomName,
-            sessionId: UUID().uuidString,
-            createdAt: Date(),
-            debugTraceId: UUID().uuidString
-        )
-        recordsByMeetingID[normalizedID] = RoomRecord(session: session, roomURL: roomURL)
-
+        let room = try await createOrFetchRoom(named: roomName(for: normalizedID))
+        let session = try await storeRoom(room, meetingID: normalizedID)
         await log("Room created for meeting ID \(normalizedID). trace=\(session.debugTraceId)", level: .info)
         return session
+    }
+
+    func generateMeetingID() async throws -> String {
+        // Daily generates IDs by creating a room. We intentionally cache the resulting
+        // session so a later create call with this ID reuses it instead of provisioning again.
+        let session = try await createRoom(for: nil)
+        return session.meetingId
     }
 
     func resolveMeetingID(_ meetingId: String) async throws -> MeetingSession {
@@ -97,21 +104,11 @@ actor DailyService {
             return record.session
         }
 
-        let roomName = roomName(for: normalizedID)
-        guard let room = try await fetchRoom(named: roomName) else {
+        guard let room = try await fetchRoomForMeetingID(normalizedID) else {
             await log("Meeting ID resolve failed for \(normalizedID).", level: .error)
             throw ServiceError.notFound
         }
-        let roomURL = try await securedRoomURL(from: room)
-
-        let session = MeetingSession(
-            meetingId: normalizedID,
-            roomName: room.name,
-            sessionId: UUID().uuidString,
-            createdAt: Date(),
-            debugTraceId: UUID().uuidString
-        )
-        recordsByMeetingID[normalizedID] = RoomRecord(session: session, roomURL: roomURL)
+        let session = try await storeRoom(room, meetingID: normalizedID)
 
         await log("Meeting ID resolved for \(normalizedID).", level: .info)
         return session
@@ -160,6 +157,28 @@ actor DailyService {
         "meet-\(meetingID.lowercased())"
     }
 
+    private func roomNameCandidates(for meetingID: String) -> [String] {
+        let deterministicRoomName = roomName(for: meetingID)
+        let directRoomName = meetingID.lowercased()
+        // Try direct room names first because Daily-generated IDs map directly to room names.
+        // Keep deterministic prefixed names as fallback for meetings created before we switched
+        // from local prefixed IDs to Daily-generated IDs.
+        var candidates = [directRoomName]
+        if deterministicRoomName != directRoomName {
+            candidates.append(deterministicRoomName)
+        }
+        return candidates
+    }
+
+    private func fetchRoomForMeetingID(_ meetingID: String) async throws -> RoomResponse? {
+        for candidate in roomNameCandidates(for: meetingID) {
+            if let room = try await fetchRoom(named: candidate) {
+                return room
+            }
+        }
+        return nil
+    }
+
     private func createOrFetchRoom(named roomName: String) async throws -> RoomResponse {
         let payload: [String: Any] = [
             "name": roomName,
@@ -181,6 +200,19 @@ actor DailyService {
         }
     }
 
+    private func createGeneratedRoom() async throws -> RoomResponse {
+        let payload: [String: Any] = [
+            "privacy": "private"
+        ]
+        let result = try await performDailyRequest(method: "POST", path: "rooms", body: payload)
+        switch result.statusCode {
+        case 200, 201:
+            return try decodeRoom(from: result.data)
+        default:
+            throw try mapFailure(statusCode: result.statusCode, data: result.data)
+        }
+    }
+
     private func fetchRoom(named roomName: String) async throws -> RoomResponse? {
         let encodedName = roomName.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? roomName
         let result = try await performDailyRequest(method: "GET", path: "rooms/\(encodedName)", body: nil)
@@ -193,6 +225,24 @@ actor DailyService {
         default:
             throw try mapFailure(statusCode: result.statusCode, data: result.data)
         }
+    }
+
+    private func storeRoom(_ room: RoomResponse, meetingID: String) async throws -> MeetingSession {
+        // Defensive dedupe for concurrent create/resolve calls that target the same meeting ID.
+        if let existing = recordsByMeetingID[meetingID]?.session {
+            return existing
+        }
+
+        let roomURL = try await securedRoomURL(from: room)
+        let session = MeetingSession(
+            meetingId: meetingID,
+            roomName: room.name,
+            sessionId: UUID().uuidString,
+            createdAt: Date(),
+            debugTraceId: UUID().uuidString
+        )
+        recordsByMeetingID[meetingID] = RoomRecord(session: session, roomURL: roomURL)
+        return session
     }
 
     private func performDailyRequest(

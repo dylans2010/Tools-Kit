@@ -6,7 +6,7 @@ struct MeetingLobbyView: View {
     @State private var navigateToMeeting = false
 
     var body: some View {
-        Form {
+        List {
             Section("Session") {
                 if let session = controller.currentSession {
                     LabeledContent("Meeting ID", value: session.meetingId)
@@ -40,14 +40,18 @@ struct MeetingLobbyView: View {
             }
 
             Section {
-                Button("Join Now") {
+                Button {
                     Task {
                         await controller.startMeeting()
                     }
+                } label: {
+                    Label("Join Now", systemImage: "arrow.right.circle.fill")
                 }
+                .buttonStyle(.borderedProminent)
                 .disabled(controller.lobbyState.isCheckingDevices || controller.lobbyState.isLoadingParticipants)
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Lobby")
         .navigationDestination(isPresented: $navigateToMeeting) {
             MeetingWebView(controller: controller)
