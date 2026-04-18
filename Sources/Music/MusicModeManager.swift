@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 
+@MainActor
 final class MusicModeManager: ObservableObject {
     static let shared = MusicModeManager()
 
@@ -18,9 +19,7 @@ final class MusicModeManager: ObservableObject {
             if isMusicModeEnabled {
                 MusicPlayerManager.shared.setupAudioSession()
             } else {
-                Task { @MainActor in
-                    MusicPlayerManager.shared.stopAndDeactivateSession()
-                }
+                MusicPlayerManager.shared.stopAndDeactivateSession()
             }
         }
     }
