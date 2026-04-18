@@ -8,7 +8,13 @@ struct MeetingWebView: View {
         VStack(spacing: 12) {
             Group {
                 if let url = controller.webViewURL() {
-                    InternalMeetingWebView(url: url)
+                    InternalMeetingWebView(
+                        url: url,
+                        onPageLoadStart: { controller.webViewDidStartLoadingPage() },
+                        onPageLoadSuccess: { controller.webViewDidFinishLoadingPage() },
+                        onJoinFailure: { controller.webViewDidFail($0) },
+                        onCallEnded: { controller.webViewDidLeaveUnexpectedly() }
+                    )
                 } else {
                     ContentUnavailableView(
                         "Session Unavailable",
@@ -59,17 +65,73 @@ struct MeetingWebView: View {
 
 private struct InternalMeetingWebView: UIViewRepresentable {
     let url: URL
+    let onPageLoadStart: () -> Void
+    let onPageLoadSuccess: () -> Void
+    let onJoinFailure: (String) -> Void
+    let onCallEnded: () -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(
+            onPageLoadStart: onPageLoadStart,
+            onPageLoadSuccess: onPageLoadSuccess,
+            onJoinFailure: onJoinFailure,
+            onCallEnded: onCallEnded
+        )
+    }
 
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
-        return WKWebView(frame: .zero, configuration: configuration)
+        configuration.allowsInlineMediaPlayback = true
+        configuration.mediaTypesRequiringUserActionForPlayback = []
+        let webView = WKWebView(frame: .zero, configuration: configuration)
+        webView.navigationDelegate = context.coordinator
+        return webView
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
         if uiView.url != url {
             let request = URLRequest(url: url)
             uiView.load(request)
+        }
+    }
+
+    final class Coordinator: NSObject, WKNavigationDelegate {
+        private let onPageLoadStart: () -> Void
+        private let onPageLoadSuccess: () -> Void
+        private let onJoinFailure: (String) -> Void
+        private let onCallEnded: () -> Void
+
+        init(
+            onPageLoadStart: @escaping () -> Void,
+            onPageLoadSuccess: @escaping () -> Void,
+            onJoinFailure: @escaping (String) -> Void,
+            onCallEnded: @escaping () -> Void
+        ) {
+            self.onPageLoadStart = onPageLoadStart
+            self.onPageLoadSuccess = onPageLoadSuccess
+            self.onJoinFailure = onJoinFailure
+            self.onCallEnded = onCallEnded
+        }
+
+        func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+            onPageLoadStart()
+        }
+
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            onPageLoadSuccess()
+        }
+
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            onJoinFailure(error.localizedDescription)
+        }
+
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            onJoinFailure(error.localizedDescription)
+        }
+
+        func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            onCallEnded()
         }
     }
 }
