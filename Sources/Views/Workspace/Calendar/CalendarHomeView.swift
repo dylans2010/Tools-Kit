@@ -124,7 +124,10 @@ struct CalendarHomeView: View {
     private func addSuggestedEvent(_ draft: CalendarManager.AICalendarEventDraft) {
         guard let start = isoFormatter.date(from: draft.startISO8601),
               let end = isoFormatter.date(from: draft.endISO8601) else {
-            aiError = "Could not parse event dates from AI response. Please try again."
+            // Surface validation errors directly in the visible AI error state.
+            Task { @MainActor in
+                aiError = "Could not parse event dates from AI response. Please try again."
+            }
             return
         }
         let event = CalendarEvent(
@@ -136,6 +139,7 @@ struct CalendarHomeView: View {
             location: draft.location
         )
         manager.addEvent(event)
+        aiError = nil
     }
 }
 
