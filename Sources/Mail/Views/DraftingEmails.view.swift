@@ -63,7 +63,7 @@ struct DraftingEmailsView: View {
         var id: String { rawValue }
     }
 
-    enum EmotionalTone: String, CaseIterable, Hashable, Identifiable {
+    enum EmotionalTone: String, CaseIterable, Identifiable {
         case empathetic = "Empathetic"
         case confident = "Confident"
         case diplomatic = "Diplomatic"
@@ -151,6 +151,11 @@ struct DraftingEmailsView: View {
         let priority: PriorityLevel
     }
 
+    struct DraftVariant: Identifiable {
+        let id = UUID()
+        let text: String
+    }
+
     @Environment(\.dismiss) private var dismiss
 
     @State private var recipient = ""
@@ -180,13 +185,16 @@ struct DraftingEmailsView: View {
 
     @State private var isGenerating = false
     @State private var generatedBody = ""
-    @State private var generatedVariants: [String] = []
+    @State private var generatedVariants: [DraftVariant] = []
     @State private var draftExplanation = ""
     @State private var errorMessage: String?
     @State private var activeTool: AITool?
 
     let currentBody: String
     let onApply: (DraftingEmailResult) -> Void
+
+    private let maxEmphasisPhrases = 6
+    private let quoteCharacterSet = CharacterSet(charactersIn: "\"")
 
     private var selectedLength: EmailLength {
         let index = Int(lengthSliderValue.rounded())
@@ -225,7 +233,7 @@ struct DraftingEmailsView: View {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
 
-        var phrases = Array((required + keyTerms).prefix(6))
+        var phrases = Array((required + keyTerms).prefix(maxEmphasisPhrases))
         if phrases.isEmpty, !ctaText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             phrases = [ctaText.trimmingCharacters(in: .whitespacesAndNewlines)]
         }
@@ -624,13 +632,7 @@ struct DraftingEmailsView: View {
             }
 
             Group {
-                if let attributed = try? AttributedString(markdown: previewDraft) {
-                    Text(attributed)
-                        .font(.subheadline)
-                } else {
-                    Text(previewDraft)
-                        .font(.subheadline)
-                }
+                markdownText(previewDraft, font: .subheadline)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(12)
@@ -669,11 +671,7 @@ struct DraftingEmailsView: View {
                     .foregroundStyle(.secondary)
             } else {
                 Group {
-                    if let parsed = try? AttributedString(markdown: generatedBody) {
-                        Text(parsed)
-                    } else {
-                        Text(generatedBody)
-                    }
+                    markdownText(generatedBody)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(12)
@@ -699,12 +697,12 @@ struct DraftingEmailsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Label("Variants", systemImage: "square.stack.3d.up")
                         .font(.subheadline.weight(.semibold))
-                    ForEach(Array(generatedVariants.enumerated()), id: \.offset) { index, variant in
+                    ForEach(Array(generatedVariants.enumerated()), id: \.element.id) { index, variant in
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Variant \(index + 1)")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(.secondary)
-                            Text(variant)
+                            Text(variant.text)
                                 .font(.footnote)
                         }
                         .padding(10)
@@ -841,6 +839,17 @@ struct DraftingEmailsView: View {
         .background(Color(.secondarySystemGroupedBackground), in: Capsule())
     }
 
+    private func markdownText(_ content: String, font: Font? = nil) -> some View {
+        Group {
+            if let attributed = try? AttributedString(markdown: content) {
+                Text(attributed)
+            } else {
+                Text(content)
+            }
+        }
+        .font(font)
+    }
+
     private func applyPreset(_ preset: StrategyPreset) {
         intent = preset.intent
         baseTone = preset.tone
@@ -963,7 +972,7 @@ struct DraftingEmailsView: View {
             subject = cleaned
                 .components(separatedBy: .newlines)
                 .first?
-                .trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? cleaned
+                .trimmingCharacters(in: quoteCharacterSet) ?? cleaned
         case .enhanceDescription:
             description = cleaned
         case .generateVariants:
@@ -971,6 +980,7 @@ struct DraftingEmailsView: View {
                 .components(separatedBy: "---VARIANT---")
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty }
+                .map(DraftVariant.init(text:))
         case .rewriteTone, .shortenExpand, .fixGrammarClarity:
             generatedBody = cleaned
         case .explainDraft:
