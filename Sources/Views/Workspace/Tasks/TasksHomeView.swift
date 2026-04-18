@@ -220,6 +220,11 @@ struct TaskRowCard: View {
     let onTap: () -> Void
 
     private var priorityColor: Color { Color(hex: task.priority.color) ?? .blue }
+    private static let shortDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        return formatter
+    }()
 
     var body: some View {
         WorkspaceSurfaceCard {
@@ -255,9 +260,7 @@ struct TaskRowCard: View {
     }
 
     private func shortDate(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateStyle = .short
-        return f.string(from: date)
+        Self.shortDateFormatter.string(from: date)
     }
 }
 

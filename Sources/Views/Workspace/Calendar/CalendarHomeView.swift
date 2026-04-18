@@ -124,7 +124,7 @@ struct CalendarHomeView: View {
     private func addSuggestedEvent(_ draft: CalendarManager.AICalendarEventDraft) {
         guard let start = isoFormatter.date(from: draft.startISO8601),
               let end = isoFormatter.date(from: draft.endISO8601) else {
-            aiError = "Suggested event had invalid dates."
+            aiError = "Could not parse event dates from AI response. Please try again."
             return
         }
         let event = CalendarEvent(
@@ -203,7 +203,12 @@ private struct CalendarHeaderView: View {
 
     private var titleText: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = selectedView == .year ? "yyyy" : "LLLL yyyy"
+        switch selectedView {
+        case .year:
+            formatter.dateFormat = "yyyy"
+        case .month, .week, .agenda, .today:
+            formatter.dateFormat = "LLLL yyyy"
+        }
         return formatter.string(from: selectedDate)
     }
 

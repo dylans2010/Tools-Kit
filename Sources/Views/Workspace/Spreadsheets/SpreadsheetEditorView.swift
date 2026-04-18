@@ -15,6 +15,7 @@ struct SpreadsheetEditorView: View {
     private let colWidth: CGFloat = 120
     private let rowHeight: CGFloat = 40
     private let headerWidth: CGFloat = 52
+    private let maxAIPreviewRows = 50
 
     init(spreadsheet: Spreadsheet, manager: SpreadsheetsManager) {
         self.spreadsheet = spreadsheet
@@ -294,7 +295,7 @@ struct SpreadsheetEditorView: View {
     }
 
     private func buildDataString() -> String {
-        sheet.cells.prefix(50).enumerated().map { rowIndex, values in
+        sheet.cells.prefix(maxAIPreviewRows).enumerated().map { rowIndex, values in
             "Row \(rowIndex + 1): \(values.map { $0.value.isEmpty ? "-" : $0.value }.joined(separator: ", "))"
         }.joined(separator: "\n")
     }

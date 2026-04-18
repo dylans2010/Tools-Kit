@@ -161,7 +161,12 @@ struct SlidesHomeView: View {
                     var slide = Slide(title: item.title.isEmpty ? "Slide \(index + 1)" : item.title)
                     slide.backgroundColorHex = item.background
                     slide.elements = item.elements.map { element in
-                        var model = SlideElement(kind: SlideElement.ElementKind(rawValue: element.kind) ?? .text)
+                        let resolvedKind = SlideElement.ElementKind(rawValue: element.kind) ?? .text
+                        // Keep a visible diagnostic when AI returns unsupported element kinds.
+                        if SlideElement.ElementKind(rawValue: element.kind) == nil {
+                            print("SlidesHomeView: unsupported AI element kind \(element.kind), falling back to text")
+                        }
+                        var model = SlideElement(kind: resolvedKind)
                         model.text = element.text
                         model.x = element.x
                         model.y = element.y

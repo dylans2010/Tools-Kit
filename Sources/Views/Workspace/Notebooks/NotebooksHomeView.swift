@@ -116,7 +116,9 @@ struct NotebooksHomeView: View {
         aiError = nil
         Task {
             do {
-                let context = manager.notebooks.map { $0.name }.joined(separator: ", ")
+                let context = manager.notebooks.map {
+                    "\($0.name) | folders: \($0.folders.count) | pages: \($0.folders.flatMap(\.pages).count) | updated: \($0.updatedAt)"
+                }.joined(separator: "\n")
                 let insights = try await manager.generateNoteInsights(noteContent: prompt, notebookContext: context)
                 await MainActor.run {
                     aiInsights = insights
