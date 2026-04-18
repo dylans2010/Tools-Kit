@@ -446,7 +446,7 @@ struct EmailComposingView: View {
             do {
                 let provider: MailProviderProtocol
                 switch account.provider {
-                case .icloud:
+                case .icloud, .imap, .proton, .yahoo, .outlook:
                     provider = iCloudMailProvider(account: account)
                 case .gmail:
                     provider = GmailMailProvider(account: account)

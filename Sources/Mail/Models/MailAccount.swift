@@ -7,15 +7,27 @@ struct MailAccount: Identifiable, Codable {
     var displayName: String
     var accessToken: String?
     var refreshToken: String?
+    var imapHost: String?
+    var imapPort: UInt16?
+    var smtpHost: String?
+    var smtpPort: UInt16?
     var isActive: Bool
 
     enum ProviderType: String, Codable, CaseIterable {
         case gmail
+        case outlook
+        case yahoo
+        case proton
+        case imap
         case icloud
 
         var displayName: String {
             switch self {
             case .gmail: return "Gmail"
+            case .outlook: return "Outlook"
+            case .yahoo: return "Yahoo Mail"
+            case .proton: return "Proton Mail"
+            case .imap: return "IMAP / Other"
             case .icloud: return "iCloud"
             }
         }
@@ -25,6 +37,14 @@ struct MailAccount: Identifiable, Codable {
             switch self {
             case .gmail:
                 return GmailServerConfiguration.isGmailAddress(normalized)
+            case .outlook:
+                return normalized.hasSuffix("@outlook.com") || normalized.hasSuffix("@hotmail.com") || normalized.hasSuffix("@live.com")
+            case .yahoo:
+                return normalized.hasSuffix("@yahoo.com") || normalized.hasSuffix("@ymail.com")
+            case .proton:
+                return normalized.contains("@")
+            case .imap:
+                return normalized.contains("@")
             case .icloud:
                 return normalized.hasSuffix("@icloud.com") || normalized.hasSuffix("@me.com") || normalized.hasSuffix("@mac.com")
             }
@@ -47,6 +67,10 @@ struct MailAccount: Identifiable, Codable {
         displayName: String,
         accessToken: String? = nil,
         refreshToken: String? = nil,
+        imapHost: String? = nil,
+        imapPort: UInt16? = nil,
+        smtpHost: String? = nil,
+        smtpPort: UInt16? = nil,
         isActive: Bool = false
     ) {
         self.id = id
@@ -55,6 +79,10 @@ struct MailAccount: Identifiable, Codable {
         self.displayName = displayName
         self.accessToken = accessToken
         self.refreshToken = refreshToken
+        self.imapHost = imapHost
+        self.imapPort = imapPort
+        self.smtpHost = smtpHost
+        self.smtpPort = smtpPort
         self.isActive = isActive
     }
 
@@ -67,6 +95,10 @@ struct MailAccount: Identifiable, Codable {
             displayName: provider.displayName,
             accessToken: nil,
             refreshToken: nil,
+            imapHost: nil,
+            imapPort: nil,
+            smtpHost: nil,
+            smtpPort: nil,
             isActive: isEnabled
         )
     }

@@ -133,6 +133,10 @@ final class MailStore: ObservableObject {
                 displayName: incoming.displayName,
                 accessToken: incoming.accessToken,
                 refreshToken: incoming.refreshToken,
+                imapHost: incoming.imapHost,
+                imapPort: incoming.imapPort,
+                smtpHost: incoming.smtpHost,
+                smtpPort: incoming.smtpPort,
                 isActive: incoming.isActive
             )
             accounts[existing] = mergedAccount
@@ -200,5 +204,31 @@ final class MailStore: ObservableObject {
             return copy
         }
         storage.saveAccounts(sanitized)
+    }
+}
+
+@MainActor
+final class AccountManager {
+    static let shared = AccountManager()
+
+    private init() {}
+
+    @discardableResult
+    func addAccount(_ session: MailSession) -> MailAccount {
+        let account = MailAccount(
+            id: session.id,
+            emailAddress: session.email,
+            providerType: session.provider,
+            displayName: session.displayName,
+            accessToken: session.accessToken,
+            refreshToken: session.refreshToken,
+            imapHost: session.imapHost,
+            imapPort: session.imapPort,
+            smtpHost: session.smtpHost,
+            smtpPort: session.smtpPort,
+            isActive: true
+        )
+        MailStore.shared.addOrUpdateAccount(account, makeActive: true)
+        return MailStore.shared.activeAccount ?? account
     }
 }
