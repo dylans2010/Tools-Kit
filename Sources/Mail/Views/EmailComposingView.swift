@@ -444,13 +444,6 @@ struct EmailComposingView: View {
         isSending = true
         Task {
             do {
-                let provider: MailProviderProtocol
-                switch account.provider {
-                case .icloud, .imap, .proton, .yahoo, .outlook:
-                    provider = iCloudMailProvider(account: account)
-                case .gmail:
-                    provider = GmailMailProvider(account: account)
-                }
                 let message = MailMessage(
                     id: UUID().uuidString,
                     threadId: replyTo?.threadId ?? UUID().uuidString,
@@ -466,7 +459,60 @@ struct EmailComposingView: View {
                     isStarred: false,
                     attachments: draftAttachments
                 )
-                try await provider.sendMessage(message)
+                switch account.provider {
+                case .gmail:
+                    try await GmailMailProvider(account: account).sendMessage(message)
+                case .icloud:
+                    try await iCloudMailProvider(account: account).sendMessage(message)
+                case .outlook:
+                    try await OutlookProvider().sendMessage(
+                        session: providerSession(),
+                        draft: MailDraft(
+                            from: account.emailAddress,
+                            to: recipients,
+                            cc: [],
+                            bcc: [],
+                            subject: subject,
+                            bodyText: messageBody
+                        )
+                    )
+                case .yahoo:
+                    try await YahooMailProvider().sendMessage(
+                        session: providerSession(),
+                        draft: MailDraft(
+                            from: account.emailAddress,
+                            to: recipients,
+                            cc: [],
+                            bcc: [],
+                            subject: subject,
+                            bodyText: messageBody
+                        )
+                    )
+                case .proton:
+                    try await ProtonMailProvider().sendMessage(
+                        session: providerSession(),
+                        draft: MailDraft(
+                            from: account.emailAddress,
+                            to: recipients,
+                            cc: [],
+                            bcc: [],
+                            subject: subject,
+                            bodyText: messageBody
+                        )
+                    )
+                case .imap:
+                    try await IMAPProvider().sendMessage(
+                        session: providerSession(),
+                        draft: MailDraft(
+                            from: account.emailAddress,
+                            to: recipients,
+                            cc: [],
+                            bcc: [],
+                            subject: subject,
+                            bodyText: messageBody
+                        )
+                    )
+                }
                 await MainActor.run {
                     isSending = false
                     dismiss()
@@ -478,6 +524,21 @@ struct EmailComposingView: View {
                 }
             }
         }
+    }
+
+    private func providerSession() -> MailSession {
+        MailSession(
+            id: account.id,
+            provider: account.providerType,
+            email: account.emailAddress,
+            displayName: account.displayName,
+            accessToken: account.accessToken,
+            refreshToken: account.refreshToken,
+            imapHost: account.imapHost ?? "imap.mail.me.com",
+            imapPort: account.imapPort ?? 993,
+            smtpHost: account.smtpHost ?? "smtp.mail.me.com",
+            smtpPort: account.smtpPort ?? 587
+        )
     }
 }
 
