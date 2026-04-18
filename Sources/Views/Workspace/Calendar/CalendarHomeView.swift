@@ -6,6 +6,7 @@ struct CalendarHomeView: View {
     @State private var selectedDate = Date()
     @State private var showingCreate = false
     @State private var selectedEvent: CalendarEvent?
+    @State private var showingAISheet = false
     @State private var aiPrompt = ""
     @State private var aiLoading = false
     @State private var aiError: String?
@@ -14,16 +15,13 @@ struct CalendarHomeView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            headerCard
+            compactHeader
                 .padding(.horizontal, 12)
                 .padding(.top, 10)
 
-            aiPlannerCard
-                .padding(12)
-
             CalendarModeSelector(selectedMode: $selectedView)
                 .padding(.horizontal, 12)
-                .padding(.bottom, 8)
+                .padding(.vertical, 8)
 
             Divider()
 
@@ -52,71 +50,90 @@ struct CalendarHomeView: View {
                 CreateEventView(prefilledDate: selectedDate) { manager.addEvent($0) }
             }
         }
+        .sheet(isPresented: $showingAISheet) {
+            aiPlanningSheet
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+        }
     }
 
-    private var headerCard: some View {
+    private var compactHeader: some View {
         WorkspaceSurfaceCard {
-            VStack(spacing: 10) {
+            VStack(spacing: 8) {
                 CalendarHeaderView(selectedDate: $selectedDate, selectedView: $selectedView) {
                     showingCreate = true
                 } onToday: {
                     selectedDate = Date()
                     selectedView = .today
                 }
+
                 HStack(spacing: 8) {
-                    aiQuickAction("Focus Week", icon: "calendar.badge.clock") {
-                        runAIPlanner(using: "Build a focused weekly schedule with deep-work blocks and recovery windows.")
+                    quickIconButton("calendar.badge.clock", label: "Focus Week") {
+                        runAIPlanner(using: "Plan my week with focus blocks and break time.")
                     }
-                    aiQuickAction("Conflict Solver", icon: "arrow.triangle.branch") {
-                        runAIPlanner(using: "Resolve upcoming schedule conflicts and suggest best alternatives.")
+                    quickIconButton("arrow.triangle.branch", label: "Conflict Solver") {
+                        runAIPlanner(using: "Find scheduling conflicts and suggest alternatives.")
                     }
-                    aiQuickAction("Auto Plan", icon: "wand.and.stars") {
-                        runAIPlanner(using: "Convert my goals into a practical calendar with priorities and buffer time.")
+                    quickIconButton("sparkles", label: "AI Tools") {
+                        showingAISheet = true
                     }
                 }
             }
         }
     }
 
-    private var aiPlannerCard: some View {
-        WorkspaceSurfaceCard {
+    private var aiPlanningSheet: some View {
+        NavigationStack {
             VStack(alignment: .leading, spacing: 10) {
-                Text("AI Scheduler")
+                Text("AI Calendar Tools")
                     .font(.headline)
-                TextField("Convert text into events or optimize your week…", text: $aiPrompt)
+                Text("Use natural language like \"schedule study time this week\" and AI will infer details.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                TextField("Ask naturally…", text: $aiPrompt, axis: .vertical)
                     .textFieldStyle(.roundedBorder)
-                Button("Run Scheduler", action: runAIPlanner)
+
+                Button("Generate Plan", action: runAIPlanner)
                     .buttonStyle(.borderedProminent)
                     .disabled(aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || aiLoading)
 
                 if aiLoading {
                     WorkspaceSkeletonLine()
-                    WorkspaceSkeletonLine(widthRatio: 0.7)
                 } else if let aiError {
                     Text(aiError)
                         .font(.caption)
                         .foregroundStyle(.red)
                 } else if let aiInsights {
-                    insightList("Conflicts", aiInsights.conflicts)
-                    insightList("Optimal Scheduling", aiInsights.optimalScheduling)
-                    insightList("Auto-Scheduled Tasks", aiInsights.autoScheduledTasks)
                     if let first = aiInsights.parsedEvents.first {
                         Button("Add First Suggested Event") { addSuggestedEvent(first) }
                             .buttonStyle(.bordered)
                     }
+                    compactInsightRow(title: "Conflicts", items: aiInsights.conflicts)
+                    compactInsightRow(title: "Optimized", items: aiInsights.optimalScheduling)
+                }
+
+                Spacer(minLength: 0)
+            }
+            .padding(16)
+            .navigationTitle("AI Planner")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showingAISheet = false }
                 }
             }
         }
     }
 
-    private func insightList(_ title: String, _ items: [String]) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+    private func compactInsightRow(title: String, items: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
             Text(title)
                 .font(.caption.weight(.semibold))
-            ForEach(items, id: \.self) { item in
+            ForEach(items.prefix(2), id: \.self) { item in
                 Text("• \(item)")
-                    .font(.caption)
+                    .font(.caption2)
                     .foregroundStyle(.secondary)
+                    .lineLimit(2)
             }
         }
     }
@@ -139,7 +156,7 @@ struct CalendarHomeView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiError = "We could not build a schedule from that request. Try including exact dates, times, and priorities."
+                    aiError = "Couldn’t build a schedule yet. Natural language is supported, so rough requests are okay."
                     aiLoading = false
                 }
             }
@@ -149,8 +166,7 @@ struct CalendarHomeView: View {
     private func addSuggestedEvent(_ draft: CalendarManager.AICalendarEventDraft) {
         guard let start = isoFormatter.date(from: draft.startISO8601),
               let end = isoFormatter.date(from: draft.endISO8601) else {
-            // Surface validation errors directly in the visible AI error state.
-            aiError = "We couldn’t add this suggestion because the start or end time was unclear. Please run the scheduler again."
+            aiError = "Couldn’t parse event time this round. Please try again."
             return
         }
         let event = CalendarEvent(
@@ -165,12 +181,14 @@ struct CalendarHomeView: View {
         aiError = nil
     }
 
-    private func aiQuickAction(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
+    private func quickIconButton(_ icon: String, label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Label(title, systemImage: icon)
-                .font(.caption.weight(.semibold))
+            Image(systemName: icon)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
         }
         .buttonStyle(.bordered)
+        .accessibilityLabel(label)
     }
 }
 
@@ -214,12 +232,12 @@ private struct CalendarHeaderView: View {
     private let calendar = Calendar.current
 
     var body: some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 2) {
+        HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 1) {
                 Text(titleText)
-                    .font(.title3.weight(.semibold))
+                    .font(.headline)
                 Text(subtitleText)
-                    .font(.caption)
+                    .font(.caption2)
                     .foregroundStyle(.secondary)
             }
             Spacer()
@@ -227,13 +245,14 @@ private struct CalendarHeaderView: View {
             Button(action: { shift(by: 1) }) { Image(systemName: "chevron.right") }
             Button("Today", action: onToday)
                 .buttonStyle(.bordered)
+                .controlSize(.small)
             Button(action: onAdd) {
                 Image(systemName: "plus.circle.fill")
                     .font(.title3)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
     }
 
     private var titleText: String {

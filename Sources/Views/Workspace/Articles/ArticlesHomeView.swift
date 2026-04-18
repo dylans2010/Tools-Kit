@@ -3,6 +3,7 @@ import SwiftUI
 struct ArticlesHomeView: View {
     @StateObject private var manager = ArticlesManager.shared
     @State private var showingCollections = false
+    @State private var showingAISheet = false
     @State private var featuredArticles: [Article] = []
     @State private var isLoadingFeatured = false
     @State private var aiPrompt = ""
@@ -14,9 +15,8 @@ struct ArticlesHomeView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
-                heroCard
-                aiCard
+            VStack(spacing: 14) {
+                compactHeader
                 featuredSection
                 if !manager.recentArticles.isEmpty { recentSection }
                 if !manager.collections.isEmpty { collectionSection }
@@ -25,90 +25,104 @@ struct ArticlesHomeView: View {
         }
         .navigationTitle("Articles")
         .sheet(isPresented: $showingCollections) { CollectionsView() }
+        .sheet(isPresented: $showingAISheet) { aiAssistantSheet }
         .onAppear { if featuredArticles.isEmpty { loadFeaturedArticles() } }
         .refreshable { loadFeaturedArticles() }
     }
 
-    private var heroCard: some View {
+    private var compactHeader: some View {
         WorkspaceSurfaceCard {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Articles")
-                            .font(.title2.bold())
-                        Text("Discover, distill, and rewrite content with editorial AI workflows.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    NavigationLink(destination: ArticleSearchView()) {
-                        Label("Search", systemImage: "magnifyingglass")
-                    }
-                    .buttonStyle(.bordered)
-                    Button { showingCollections = true } label: {
-                        Label("Collections", systemImage: "folder")
-                    }
-                    .buttonStyle(.borderedProminent)
+            HStack(spacing: 10) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Articles")
+                        .font(.title3.bold())
+                    Text("Read, summarize, and rewrite with quick AI help.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
-                HStack(spacing: 8) {
-                    aiQuickAction("Executive Brief", icon: "doc.text.magnifyingglass") {
-                        runAI(using: "Create an executive brief: summary, risks, opportunities, and recommendations.")
-                    }
-                    aiQuickAction("Debate Lens", icon: "bubble.left.and.bubble.right") {
-                        runAI(using: "Analyze arguments, assumptions, and counterpoints from this text.")
-                    }
-                    aiQuickAction("Learning Notes", icon: "lightbulb.max.fill") {
-                        runAI(using: "Convert this article into learning notes with glossary and action steps.")
-                    }
+                Spacer()
+                NavigationLink(destination: ArticleSearchView()) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.headline)
+                        .frame(width: 36, height: 36)
                 }
+                .buttonStyle(.bordered)
+                Button { showingCollections = true } label: {
+                    Image(systemName: "folder")
+                        .font(.headline)
+                        .frame(width: 36, height: 36)
+                }
+                .buttonStyle(.bordered)
+                Button { showingAISheet = true } label: {
+                    Image(systemName: "sparkles")
+                        .font(.headline)
+                        .frame(width: 36, height: 36)
+                }
+                .buttonStyle(.borderedProminent)
             }
         }
     }
 
-    private var aiCard: some View {
-        WorkspaceSurfaceCard {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("AI Reading Assistant")
-                    .font(.headline)
-                TextField("Paste article text or ask for a rewrite tone…", text: $aiPrompt)
-                    .textFieldStyle(.roundedBorder)
-                Button("Analyze", action: runAI)
-                    .buttonStyle(.borderedProminent)
-                    .disabled(aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || aiLoading)
-
-                if aiLoading {
-                    WorkspaceSkeletonLine()
-                    WorkspaceSkeletonLine(widthRatio: 0.8)
-                } else if let aiError {
-                    Text(aiError)
+    private var aiAssistantSheet: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("AI Article Tools")
+                        .font(.headline)
+                    Text("Use natural language—short requests like \"give me key takeaways\" or \"rewrite for beginners\" work.")
                         .font(.caption)
-                        .foregroundStyle(.red)
-                } else if let aiInsights {
-                    Text(aiInsights.summary)
-                        .font(.subheadline)
                         .foregroundStyle(.secondary)
-                    if !aiInsights.rewrite.isEmpty {
-                        Text("Rewrite")
-                            .font(.caption.weight(.semibold))
-                        Text(aiInsights.rewrite)
+
+                    TextField("Ask naturally or paste article text…", text: $aiPrompt, axis: .vertical)
+                        .textFieldStyle(.roundedBorder)
+
+                    quickActionGrid
+
+                    Button("Analyze", action: runAI)
+                        .buttonStyle(.borderedProminent)
+                        .disabled(aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || aiLoading)
+
+                    if aiLoading {
+                        WorkspaceSkeletonLine()
+                        WorkspaceSkeletonLine(widthRatio: 0.8)
+                    } else if let aiError {
+                        Text(aiError)
                             .font(.caption)
+                            .foregroundStyle(.red)
+                    } else if let aiInsights {
+                        Text(aiInsights.summary)
+                            .font(.subheadline)
                             .foregroundStyle(.secondary)
-                    }
-                    ForEach(aiInsights.keyPoints, id: \.self) { point in
-                        Text("• \(point)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    if !aiInsights.expandedSections.isEmpty {
-                        Text("Expanded Sections")
-                            .font(.caption.weight(.semibold))
-                        ForEach(aiInsights.expandedSections, id: \.self) { section in
-                            Text("• \(section)")
+                        ForEach(aiInsights.keyPoints, id: \.self) { point in
+                            Text("• \(point)")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
                     }
                 }
+                .padding(16)
+            }
+            .navigationTitle("AI Assistant")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showingAISheet = false }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private var quickActionGrid: some View {
+        HStack(spacing: 8) {
+            aiQuickAction("Executive Brief", icon: "doc.text.magnifyingglass") {
+                runAI(using: "Give me an executive brief from this article.")
+            }
+            aiQuickAction("Debate Lens", icon: "bubble.left.and.bubble.right") {
+                runAI(using: "Explain both sides and main assumptions.")
+            }
+            aiQuickAction("Study Notes", icon: "lightbulb.max.fill") {
+                runAI(using: "Turn this into study notes and action steps.")
             }
         }
     }
@@ -201,7 +215,7 @@ struct ArticlesHomeView: View {
             do {
                 let insights = try await manager.generateArticleInsights(
                     articleText: text,
-                    instruction: "Summarize, extract key points, rewrite clearly, and expand missing details."
+                    instruction: "Understand intent from natural language, summarize clearly, extract key points, rewrite in requested tone if implied, and expand missing context."
                 )
                 await MainActor.run {
                     aiInsights = insights
@@ -209,7 +223,7 @@ struct ArticlesHomeView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiError = "Could not process that article text. Try a shorter passage or clearer rewrite request."
+                    aiError = "We couldn’t process that yet. You can type naturally and keep it short; we’ll infer details."
                     aiLoading = false
                 }
             }
@@ -218,10 +232,13 @@ struct ArticlesHomeView: View {
 
     private func aiQuickAction(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Label(title, systemImage: icon)
+            Image(systemName: icon)
                 .font(.caption.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
         }
         .buttonStyle(.bordered)
+        .accessibilityLabel(title)
     }
 }
 

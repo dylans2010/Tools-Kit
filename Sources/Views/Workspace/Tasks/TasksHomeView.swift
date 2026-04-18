@@ -6,6 +6,7 @@ struct TasksHomeView: View {
     @State private var selectedTask: WorkspaceTask?
     @State private var showingBoard = false
     @State private var showingCategories = false
+    @State private var showingAISheet = false
     @State private var filterCategory: TaskCategory?
     @State private var aiPrompt = ""
     @State private var aiError: String?
@@ -14,10 +15,9 @@ struct TasksHomeView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
-                stickyHeader
+            VStack(spacing: 14) {
+                compactHeader
                 summaryCards
-                aiPlannerCard
                 contentSections
             }
             .padding(.horizontal, 16)
@@ -36,40 +36,45 @@ struct TasksHomeView: View {
         .sheet(isPresented: $showingCategories) {
             NavigationStack { TaskCategoryView() }
         }
+        .sheet(isPresented: $showingAISheet) {
+            aiToolsSheet
+        }
     }
 
-    private var stickyHeader: some View {
+    private var compactHeader: some View {
         WorkspaceSurfaceCard {
             VStack(spacing: 10) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Task Command Center")
+                        Text("Tasks")
                             .font(.title3.bold())
-                        Text("Plan, prioritize, and execute with AI-guided workflows.")
-                            .font(.subheadline)
+                        Text("Simpler planning with compact controls.")
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Button { showingBoard = true } label: {
-                        Label("Board", systemImage: "square.grid.2x2")
+                        Image(systemName: "square.grid.2x2")
+                            .frame(width: 36, height: 36)
+                    }
+                    .buttonStyle(.bordered)
+                    Button { showingCategories = true } label: {
+                        Image(systemName: "folder")
+                            .frame(width: 36, height: 36)
+                    }
+                    .buttonStyle(.bordered)
+                    Button { showingAISheet = true } label: {
+                        Image(systemName: "sparkles")
+                            .frame(width: 36, height: 36)
                     }
                     .buttonStyle(.bordered)
                     Button { showingCreate = true } label: {
-                        Label("New", systemImage: "plus")
+                        Image(systemName: "plus")
+                            .frame(width: 36, height: 36)
                     }
                     .buttonStyle(.borderedProminent)
                 }
-                HStack(spacing: 8) {
-                    aiQuickAction("Sprint Plan", icon: "calendar.badge.plus") {
-                        runAIPlanner(with: "Create a 7-day sprint plan with priority, scope, and due dates.")
-                    }
-                    aiQuickAction("Backlog Triage", icon: "line.3.horizontal.decrease.circle") {
-                        runAIPlanner(with: "Triage backlog items and suggest top priority execution order.")
-                    }
-                    aiQuickAction("Risk Scan", icon: "exclamationmark.triangle") {
-                        runAIPlanner(with: "Identify risks, blockers, and mitigation tasks for this plan.")
-                    }
-                }
+
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         FilterChip(title: "All", isSelected: filterCategory == nil) { filterCategory = nil }
@@ -78,17 +83,75 @@ struct TasksHomeView: View {
                                 filterCategory = (filterCategory?.id == cat.id) ? nil : cat
                             }
                         }
-                        Button {
-                            showingCategories = true
-                        } label: {
-                            Label("Categories", systemImage: "folder")
-                                .font(.caption.weight(.medium))
-                        }
-                        .buttonStyle(.bordered)
                     }
                 }
             }
         }
+    }
+
+    private var aiToolsSheet: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("AI Task Tools")
+                        .font(.headline)
+                    Text("Type naturally, even rough notes. AI will infer timeline, priority, and subtasks.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    TextField("e.g. I need a lightweight product launch plan", text: $aiPrompt, axis: .vertical)
+                        .textFieldStyle(.roundedBorder)
+
+                    HStack(spacing: 8) {
+                        aiQuickAction("Sprint", icon: "calendar.badge.plus") {
+                            runAIPlanner(with: "Plan next week from this input with realistic milestones.")
+                        }
+                        aiQuickAction("Triage", icon: "line.3.horizontal.decrease.circle") {
+                            runAIPlanner(with: "Prioritize this backlog and suggest execution order.")
+                        }
+                        aiQuickAction("Risks", icon: "exclamationmark.triangle") {
+                            runAIPlanner(with: "Identify blockers and add mitigation tasks.")
+                        }
+                    }
+
+                    if aiLoading {
+                        WorkspaceSkeletonLine()
+                        WorkspaceSkeletonLine(widthRatio: 0.7)
+                    } else if let aiError {
+                        Text(aiError)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    } else if !aiSummary.isEmpty {
+                        Text(aiSummary)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    HStack {
+                        Button("Generate Plan", action: runAIPlanner)
+                            .buttonStyle(.borderedProminent)
+                            .disabled(aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || aiLoading)
+                        Spacer()
+                        if !aiSummary.isEmpty {
+                            Button("Clear") {
+                                aiSummary = ""
+                                aiError = nil
+                            }
+                            .buttonStyle(.bordered)
+                        }
+                    }
+                }
+                .padding(16)
+            }
+            .navigationTitle("AI Assistant")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showingAISheet = false }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
     }
 
     private var summaryCards: some View {
@@ -96,42 +159,6 @@ struct TasksHomeView: View {
             StatPill(label: "Today", value: "\(manager.todayTasks.count)", color: .blue)
             StatPill(label: "Upcoming", value: "\(manager.upcomingTasks.count)", color: .orange)
             StatPill(label: "Completed", value: "\(manager.completedTasks.count)", color: .green)
-        }
-    }
-
-    private var aiPlannerCard: some View {
-        WorkspaceSurfaceCard {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("AI Planning Assistant")
-                    .font(.headline)
-                TextField("Turn raw notes into structured tasks…", text: $aiPrompt, axis: .vertical)
-                    .textFieldStyle(.roundedBorder)
-                if aiLoading {
-                    WorkspaceSkeletonLine()
-                    WorkspaceSkeletonLine(widthRatio: 0.7)
-                } else if let aiError {
-                    Text(aiError)
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                } else if !aiSummary.isEmpty {
-                    Text(aiSummary)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-                HStack {
-                    Button("Generate Plan", action: runAIPlanner)
-                        .buttonStyle(.borderedProminent)
-                        .disabled(aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || aiLoading)
-                    Spacer()
-                    if !aiSummary.isEmpty {
-                        Button("Clear") {
-                            aiSummary = ""
-                            aiError = nil
-                        }
-                        .buttonStyle(.bordered)
-                    }
-                }
-            }
         }
     }
 
@@ -183,7 +210,6 @@ struct TasksHomeView: View {
             do {
                 let response = try await manager.generateTasksFromPrompt(prompt)
                 await MainActor.run {
-                    // Apply decoded AI tasks directly to the task store.
                     for planned in response.tasks {
                         let priority = priorityFromAI(planned.priority)
                         let due = planned.dueDateISO8601.flatMap(formatter.date(from:))
@@ -202,7 +228,7 @@ struct TasksHomeView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiError = "We couldn’t turn that request into tasks. Try adding scope, deadline, and priority hints."
+                    aiError = "Couldn’t convert this yet. Natural language is supported, so short plain requests are fine."
                     aiLoading = false
                 }
             }
@@ -234,10 +260,13 @@ struct TasksHomeView: View {
 
     private func aiQuickAction(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Label(title, systemImage: icon)
+            Image(systemName: icon)
                 .font(.caption.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
         }
         .buttonStyle(.bordered)
+        .accessibilityLabel(title)
     }
 }
 
