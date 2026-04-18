@@ -153,6 +153,7 @@ struct DraftingEmailsView: View {
 
     struct DraftVariant: Identifiable {
         let id = UUID()
+        let order: Int
         let text: String
     }
 
@@ -195,7 +196,7 @@ struct DraftingEmailsView: View {
 
     private let maxDisplayedEmphasisPhrases = 6
     private let quoteCharacterSet = CharacterSet(charactersIn: "\"")
-    private let confidenceBaseScore = 0.20
+    private let confidenceBaseScore = 0.06
     private let confidenceRecipientWeight = 0.14
     private let confidenceSubjectWeight = 0.14
     private let confidenceDescriptionWeight = 0.20
@@ -706,9 +707,9 @@ struct DraftingEmailsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Label("Variants", systemImage: "square.stack.3d.up")
                         .font(.subheadline.weight(.semibold))
-                    ForEach(Array(generatedVariants.enumerated()), id: \.element.id) { index, variant in
+                    ForEach(generatedVariants) { variant in
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("Variant \(index + 1)")
+                            Text("Variant \(variant.order)")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(.secondary)
                             Text(variant.text)
@@ -989,7 +990,10 @@ struct DraftingEmailsView: View {
                 .components(separatedBy: "---VARIANT---")
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty }
-                .map(DraftVariant.init(text:))
+                .enumerated()
+                .map { index, text in
+                    DraftVariant(order: index + 1, text: text)
+                }
         case .rewriteTone, .shortenExpand, .fixGrammarClarity:
             generatedBody = cleaned
         case .explainDraft:
