@@ -33,6 +33,15 @@ struct DraftingEmailsView: View {
         case detailed = "Detailed"
 
         var id: String { rawValue }
+
+        var rewriteMode: String {
+            switch self {
+            case .short, .medium:
+                return "shorten"
+            case .long, .detailed:
+                return "expand"
+            }
+        }
     }
 
     enum PriorityLevel: String, CaseIterable, Identifiable {
@@ -195,7 +204,7 @@ struct DraftingEmailsView: View {
     let onApply: (DraftingEmailResult) -> Void
 
     private let maxDisplayedEmphasisPhrases = 6
-    private let quoteCharacterSet = CharacterSet(charactersIn: "\"")
+    private let doubleQuoteCharacterSet = CharacterSet(charactersIn: "\"")
     private let confidenceBaseScore = 0.06
     private let confidenceRecipientWeight = 0.14
     private let confidenceSubjectWeight = 0.14
@@ -260,9 +269,7 @@ struct DraftingEmailsView: View {
             }
         }()
 
-        let intro = subject.isEmpty
-            ? "Hi \(audience == .executive ? "Team" : "there"),"
-            : "Hi,"
+        let intro = greetingText
 
         let bodySummary = description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             ? "This message will focus on a clear \(intent.rawValue.lowercased()) objective for a \(audience.rawValue.lowercased()) audience."
@@ -282,6 +289,16 @@ struct DraftingEmailsView: View {
 
         \(cta)
         """
+    }
+
+    private var greetingText: String {
+        guard subject.isEmpty else { return "Hi," }
+        switch audience {
+        case .executive:
+            return "Hi Team,"
+        default:
+            return "Hi there,"
+        }
     }
 
     private var strategyPresets: [StrategyPreset] {
@@ -937,7 +954,7 @@ struct DraftingEmailsView: View {
             \(generationContext())
             """
         case .shortenExpand:
-            let mode = (selectedLength == .long || selectedLength == .detailed) ? "expand" : "shorten"
+            let mode = selectedLength.rewriteMode
             return """
             \(mode.capitalized) the draft according to the selected length target: \(selectedLength.rawValue).
             Preserve intent and key constraints.
@@ -982,7 +999,7 @@ struct DraftingEmailsView: View {
             subject = cleaned
                 .components(separatedBy: .newlines)
                 .first?
-                .trimmingCharacters(in: quoteCharacterSet) ?? ""
+                .trimmingCharacters(in: doubleQuoteCharacterSet) ?? ""
         case .enhanceDescription:
             description = cleaned
         case .generateVariants:
