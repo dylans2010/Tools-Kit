@@ -31,7 +31,7 @@ struct PageEditorView: View {
     @State private var canvasNotes: [CanvasNote] = []
     @State private var canvasZoom: CGFloat = 1.0
 
-    // 1.5s debounce before autosave write.
+    // 1.5 seconds in nanoseconds for autosave debounce.
     private let autosaveDelayNanoseconds: UInt64 = 1_500_000_000
     private let defaultNoteSpawn = CGPoint(x: 320, y: 320)
     private let bootstrapFirstNote = CGPoint(x: 220, y: 220)

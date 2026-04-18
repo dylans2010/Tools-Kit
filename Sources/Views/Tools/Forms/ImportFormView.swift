@@ -6,6 +6,7 @@ struct ImportFormView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showPicker = false
     @State private var importError: String?
+    private let dismissDelaySeconds: Double = 0.35
 
     var body: some View {
         VStack(spacing: 16) {
@@ -52,7 +53,7 @@ struct ImportFormView: View {
                     backend.importedForm = imported
                     backend.add(imported, isOwned: false)
                     importError = nil
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + dismissDelaySeconds) {
                         dismiss()
                     }
                 } catch {
