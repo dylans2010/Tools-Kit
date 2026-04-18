@@ -1,5 +1,6 @@
 import AVFoundation
 import Foundation
+import Daily
 
 struct MeetPermissionService {
     func checkMicrophonePermission() async -> MeetPermissionState {

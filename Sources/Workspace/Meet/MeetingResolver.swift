@@ -1,4 +1,5 @@
 import Foundation
+import Daily
 
 actor MeetingResolver {
     static let shared = MeetingResolver()

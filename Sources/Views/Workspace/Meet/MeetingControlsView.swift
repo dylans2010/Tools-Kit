@@ -1,4 +1,5 @@
 import SwiftUI
+import Daily
 
 struct MeetingControlsView: View {
     let isMuted: Bool

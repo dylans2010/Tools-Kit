@@ -1,4 +1,5 @@
 import Foundation
+import Daily
 
 actor DailyService {
     static let dailyAPIBaseURL = URL(string: "https://api.daily.co/v1")!

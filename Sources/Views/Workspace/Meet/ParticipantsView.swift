@@ -1,4 +1,5 @@
 import SwiftUI
+import Daily
 
 struct ParticipantsView: View {
     let participants: [MeetingParticipant]

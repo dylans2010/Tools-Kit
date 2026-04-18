@@ -1,4 +1,5 @@
 import SwiftUI
+import Daily
 
 struct MeetingLobbyView: View {
     @ObservedObject var controller: MeetSessionController
