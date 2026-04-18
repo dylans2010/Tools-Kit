@@ -52,7 +52,7 @@ struct ContentView: View {
         hasRestoredSession = true
 
         do {
-            _ = try await account.get()
+            _ = try await AppwriteService.account.get()
             isAuthenticated = true
         } catch {
             isAuthenticated = false

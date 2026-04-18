@@ -15,7 +15,7 @@ enum AuthDatabaseError: LocalizedError {
 final class AuthDatabaseService {
     static let shared = AuthDatabaseService()
 
-    private let databases = Databases(client)
+    private let databases = Databases(AppwriteService.client)
     private let databaseId: String?
     private let usersCollectionId: String?
 
