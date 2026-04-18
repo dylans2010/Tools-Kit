@@ -158,6 +158,8 @@ actor DailyService {
     private func roomNameCandidates(for meetingID: String) -> [String] {
         let deterministicRoomName = roomName(for: meetingID)
         let directRoomName = meetingID.lowercased()
+        // Try direct room names first because Daily-generated IDs map directly to room names.
+        // Keep deterministic prefixed names as fallback for older ID-to-room mappings.
         var candidates = [directRoomName]
         if deterministicRoomName != directRoomName {
             candidates.append(deterministicRoomName)
@@ -223,6 +225,7 @@ actor DailyService {
     }
 
     private func storeRoom(_ room: RoomResponse, meetingID: String) async throws -> MeetingSession {
+        // Defensive dedupe for concurrent create/resolve calls that target the same meeting ID.
         if let existing = recordsByMeetingID[meetingID]?.session {
             return existing
         }
