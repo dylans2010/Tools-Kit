@@ -28,6 +28,7 @@ final class MeetSessionController: ObservableObject {
     private let resolver: MeetingResolver
     private let permissionService = MeetPermissionService()
     private var internalMeetingURL: URL?
+    private var hasReportedWebJoin = false
 
     init(resolver: MeetingResolver = .shared) {
         self.resolver = resolver
@@ -104,29 +105,21 @@ final class MeetSessionController: ObservableObject {
         lobbyState.microphonePermission = await mic
         lobbyState.cameraPermission = await cam
         lobbyState.isCheckingDevices = false
-
-        if participants.isEmpty {
-            participants = [
-                MeetingParticipant(
-                    id: UUID().uuidString,
-                    displayName: "You",
-                    joinedAt: Date(),
-                    isSpeaking: false,
-                    isMuted: isMicrophoneMuted,
-                    hasVideo: isCameraEnabled
-                )
-            ]
-        }
-
         lobbyState.isLoadingParticipants = false
     }
 
     func startMeeting() async {
         guard let currentSession else { return }
+        guard internalMeetingURL != nil else {
+            phase = .failed
+            errorMessage = "Meeting URL is not available."
+            return
+        }
         await resolver.beginSession(currentSession)
         phase = .inMeeting
-        addSystemMessage("Meeting connected.")
-        DebugLogger.shared.log("WebRTC state changed: connected", category: "MeetSession")
+        hasReportedWebJoin = false
+        addSystemMessage("Joining meeting…")
+        DebugLogger.shared.log("WebRTC state changed: joining-meeting", category: "MeetSession")
         await refreshDebugSnapshot()
     }
 
@@ -136,12 +129,14 @@ final class MeetSessionController: ObservableObject {
         phase = .ended
         addSystemMessage("Meeting ended.")
         DebugLogger.shared.log("WebRTC state changed: disconnected", category: "MeetSession")
+        hasReportedWebJoin = false
+        participants = []
         await refreshDebugSnapshot()
     }
 
     func toggleMute() {
         isMicrophoneMuted.toggle()
-        if let index = participants.firstIndex(where: { $0.displayName == "You" }) {
+        if let index = participants.firstIndex(where: { $0.id == "local" }) {
             participants[index].isMuted = isMicrophoneMuted
         }
         DebugLogger.shared.log(isMicrophoneMuted ? "Microphone muted." : "Microphone unmuted.", category: "MeetSession")
@@ -149,7 +144,7 @@ final class MeetSessionController: ObservableObject {
 
     func toggleCamera() {
         isCameraEnabled.toggle()
-        if let index = participants.firstIndex(where: { $0.displayName == "You" }) {
+        if let index = participants.firstIndex(where: { $0.id == "local" }) {
             participants[index].hasVideo = isCameraEnabled
         }
         DebugLogger.shared.log(isCameraEnabled ? "Camera enabled." : "Camera disabled.", category: "MeetSession")
@@ -192,6 +187,46 @@ final class MeetSessionController: ObservableObject {
         debugSnapshot = await resolver.fetchDebugSnapshot()
     }
 
+    func webViewDidStartJoining() {
+        DebugLogger.shared.log("WebRTC state changed: joining-meeting", category: "MeetSession")
+    }
+
+    func webViewDidJoin() {
+        guard !hasReportedWebJoin else { return }
+        hasReportedWebJoin = true
+        ensureLocalParticipant()
+        addSystemMessage("Meeting connected.")
+        DebugLogger.shared.log("WebRTC state changed: joined-meeting", category: "MeetSession")
+    }
+
+    func webViewDidLeaveUnexpectedly() {
+        guard phase == .inMeeting else { return }
+        if let currentSession {
+            Task {
+                await resolver.endSession(currentSession)
+                await refreshDebugSnapshot()
+            }
+        }
+        phase = .ended
+        hasReportedWebJoin = false
+        participants = []
+        addSystemMessage("Meeting connection ended.")
+        DebugLogger.shared.log("WebRTC state changed: left-meeting", category: "MeetSession")
+    }
+
+    func webViewDidFail(_ message: String) {
+        if let currentSession {
+            Task {
+                await resolver.endSession(currentSession)
+                await refreshDebugSnapshot()
+            }
+        }
+        hasReportedWebJoin = false
+        phase = .failed
+        errorMessage = message
+        DebugLogger.shared.log("Join failed: \(message)", level: .error, category: "MeetSession")
+    }
+
     func webViewURL() -> URL? {
         internalMeetingURL
     }
@@ -201,11 +236,13 @@ final class MeetSessionController: ObservableObject {
         meetingIdInput = session.meetingId
         internalMeetingURL = await resolver.internalRoomURL(for: session)
         phase = .lobby
+        hasReportedWebJoin = false
         summary = MeetingSummaryState(
             recap: "AI recap will be generated after this meeting session.",
             actionItems: ["Capture blockers", "Summarize next steps"],
             transcriptPreview: "Transcript preview entry point is ready for integration."
         )
+        participants = []
         messages = []
         await refreshDebugSnapshot()
         addSystemMessage("Session prepared for meeting ID \(session.meetingId).")
@@ -230,5 +267,24 @@ final class MeetSessionController: ObservableObject {
             .uppercased()
         let allowed = CharacterSet.alphanumerics
         return (4...24).contains(candidate.count) && candidate.unicodeScalars.allSatisfy { allowed.contains($0) }
+    }
+
+    private func ensureLocalParticipant() {
+        if let index = participants.firstIndex(where: { $0.id == "local" }) {
+            participants[index].isMuted = isMicrophoneMuted
+            participants[index].hasVideo = isCameraEnabled
+            return
+        }
+        participants.insert(
+            MeetingParticipant(
+                id: "local",
+                displayName: "You",
+                joinedAt: Date(),
+                isSpeaking: false,
+                isMuted: isMicrophoneMuted,
+                hasVideo: isCameraEnabled
+            ),
+            at: 0
+        )
     }
 }
