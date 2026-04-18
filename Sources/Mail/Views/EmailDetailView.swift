@@ -35,14 +35,26 @@ struct EmailDetailView: View {
                     }
 
                     if !summary.isEmpty {
-                        Text(summary)
-                            .font(.subheadline)
-                            .padding(12)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Summary", systemImage: "sparkles")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.white.opacity(0.95))
+                            markdownText(summary, font: .subheadline)
+                                .foregroundStyle(.white)
+                        }
+                        .padding(14)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(
+                            LinearGradient(
+                                colors: [Color.blue.opacity(0.82), Color.red.opacity(0.78)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            in: RoundedRectangle(cornerRadius: 14)
+                        )
                     }
 
-                    contentView(minHeight: max(geo.size.height * 0.78, 420))
+                    contentView(minHeight: max(geo.size.height * 0.4, 220))
 
                     if let actionError {
                         Text(actionError)
@@ -130,15 +142,36 @@ struct EmailDetailView: View {
                         .frame(maxWidth: .infinity)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 } else if let plain = content.plainBody {
-                    Text(plain)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .frame(minHeight: minHeight, alignment: .topLeading)
+                    ScrollView(.vertical, showsIndicators: false) {
+                        markdownText(plain)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .textSelection(.enabled)
+                    }
+                    .frame(minHeight: minHeight, alignment: .topLeading)
                 }
             } else {
                 ProgressView("Loading Body...")
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top, 20)
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func markdownText(_ source: String, font: Font = .body) -> some View {
+        if let attributed = try? AttributedString(
+            markdown: source,
+            options: AttributedString.MarkdownParsingOptions(
+                interpretedSyntax: .full,
+                failurePolicy: .returnPartiallyParsedIfPossible
+            )
+        ) {
+            Text(attributed)
+                .font(font)
+        } else {
+            Text(source)
+                .font(font)
         }
     }
 

@@ -18,6 +18,7 @@ struct InboxView: View {
     @State private var showingCompose = false
     @State private var showingAddAccount = false
     @State private var showingFetchingLabel = false
+    @State private var selectedMessage: MailMessage?
 
     var body: some View {
         ZStack {
@@ -142,11 +143,12 @@ struct InboxView: View {
             } else {
                 ForEach(visibleThreads) { thread in
                     if let message = thread.messages.last {
-                        NavigationLink {
-                            InboxMessageDetailView(account: activeAccount ?? account, message: message)
+                        Button {
+                            selectedMessage = message
                         } label: {
                             inboxRow(thread: thread, message: message)
                         }
+                        .buttonStyle(.plain)
                         .listRowBackground(Color.clear)
                     }
                 }
@@ -154,6 +156,9 @@ struct InboxView: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+        .navigationDestination(item: $selectedMessage) { message in
+            InboxMessageDetailView(account: activeAccount ?? account, message: message)
+        }
     }
 
     private func inboxRow(thread: MailThread, message: MailMessage) -> some View {
