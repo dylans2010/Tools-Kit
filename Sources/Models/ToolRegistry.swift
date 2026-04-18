@@ -83,6 +83,7 @@ class ToolRegistry: ObservableObject {
             OCRTool(),
             ImageProcessorTool(),
             MeetingNotesTool(),
+            DailyCallTool(),
             JWTDecoderTool(),
             HashGeneratorTool(),
             DiffCheckerTool(),

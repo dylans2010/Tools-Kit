@@ -432,6 +432,8 @@
 		4A14DF0AA14643979475F227 /* WebhookTesterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 789744A07C4847959848A33D /* WebhookTesterBackend.swift */; };
 		853B0E7EABAE4476A0D2839F /* NotesBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F39AF3124148D4AFFBC420 /* NotesBackend.swift */; };
 		850A018A28F44D1A860D48F4 /* MeetingNotesBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C6D05F67F2145E2868DC2E6 /* MeetingNotesBackend.swift */; };
+		DL0200000000000000000001 /* DailyCallBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DL0100000000000000000001 /* DailyCallBackend.swift */; };
+		DL0200000000000000000002 /* DailySDKContractMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DL0100000000000000000002 /* DailySDKContractMap.swift */; };
 		3372E290033A4643959AA842 /* PDFToolsBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508DD13A2DE74B9AA69A426F /* PDFToolsBackend.swift */; };
 		EB2AFACBFCA04677B145D859 /* MetadataRemoverBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC2449F47F6946C6836E42F7 /* MetadataRemoverBackend.swift */; };
 		049BDC11CF2448F4AB3A8812 /* WebsiteScreenshotBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB917278DC6342C69B6DB99C /* WebsiteScreenshotBackend.swift */; };
@@ -454,6 +456,7 @@
 		21D40DF664DE468CAB2EC027 /* WebhookTesterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F35053247F64FFB8ABD8296 /* WebhookTesterView.swift */; };
 		9AE858FE9A74403FAD55CA10 /* NotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E91993DEE804DAEBBFB0C0E /* NotesView.swift */; };
 		FF1D1015017C483A96506F7E /* MeetingNotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBB9341F9164E3098D23E8C /* MeetingNotesView.swift */; };
+		DL0200000000000000000003 /* DailyCallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DL0100000000000000000003 /* DailyCallView.swift */; };
 		E208E69B893C4EC787055D7F /* PDFToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011E855AF0F14D94AB4E22BE /* PDFToolsView.swift */; };
 		2DA398996DAD45209CE4206B /* MetadataRemoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B188E5E5C02945B3A4CF6189 /* MetadataRemoverView.swift */; };
 		06C0F62C40B54ED8B4AA8407 /* ImageProcessorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7B979355124F9D8C98395E /* ImageProcessorView.swift */; };
@@ -742,6 +745,8 @@
 		789744A07C4847959848A33D /* WebhookTesterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/WebhookTester/WebhookTesterBackend.swift"; sourceTree = "<group>"; };
 		96F39AF3124148D4AFFBC420 /* NotesBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Notes/NotesBackend.swift"; sourceTree = "<group>"; };
 		1C6D05F67F2145E2868DC2E6 /* MeetingNotesBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/MeetingNotes/MeetingNotesBackend.swift"; sourceTree = "<group>"; };
+		DL0100000000000000000001 /* DailyCallBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/DailyCall/DailyCallBackend.swift"; sourceTree = "<group>"; };
+		DL0100000000000000000002 /* DailySDKContractMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/DailyCall/DailySDKContractMap.swift"; sourceTree = "<group>"; };
 		508DD13A2DE74B9AA69A426F /* PDFToolsBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/PDFTools/PDFToolsBackend.swift"; sourceTree = "<group>"; };
 		FC2449F47F6946C6836E42F7 /* MetadataRemoverBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/MetadataRemover/MetadataRemoverBackend.swift"; sourceTree = "<group>"; };
 		BB917278DC6342C69B6DB99C /* WebsiteScreenshotBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/WebsiteScreenshot/WebsiteScreenshotBackend.swift"; sourceTree = "<group>"; };
@@ -764,6 +769,7 @@
 		6F35053247F64FFB8ABD8296 /* WebhookTesterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/WebhookTester/WebhookTesterView.swift"; sourceTree = "<group>"; };
 		0E91993DEE804DAEBBFB0C0E /* NotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Notes/NotesView.swift"; sourceTree = "<group>"; };
 		CEBB9341F9164E3098D23E8C /* MeetingNotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/MeetingNotes/MeetingNotesView.swift"; sourceTree = "<group>"; };
+		DL0100000000000000000003 /* DailyCallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/DailyCall/DailyCallView.swift"; sourceTree = "<group>"; };
 		011E855AF0F14D94AB4E22BE /* PDFToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/PDFTools/PDFToolsView.swift"; sourceTree = "<group>"; };
 		B188E5E5C02945B3A4CF6189 /* MetadataRemoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/MetadataRemover/MetadataRemoverView.swift"; sourceTree = "<group>"; };
 		AC7B979355124F9D8C98395E /* ImageProcessorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/ImageProcessor/ImageProcessorView.swift"; sourceTree = "<group>"; };
@@ -1315,6 +1321,8 @@
 				789744A07C4847959848A33D /* WebhookTesterBackend.swift */,
 				96F39AF3124148D4AFFBC420 /* NotesBackend.swift */,
 				1C6D05F67F2145E2868DC2E6 /* MeetingNotesBackend.swift */,
+				DL0100000000000000000001 /* DailyCallBackend.swift */,
+				DL0100000000000000000002 /* DailySDKContractMap.swift */,
 				508DD13A2DE74B9AA69A426F /* PDFToolsBackend.swift */,
 				FC2449F47F6946C6836E42F7 /* MetadataRemoverBackend.swift */,
 				BB917278DC6342C69B6DB99C /* WebsiteScreenshotBackend.swift */,
@@ -1337,6 +1345,7 @@
 				6F35053247F64FFB8ABD8296 /* WebhookTesterView.swift */,
 				0E91993DEE804DAEBBFB0C0E /* NotesView.swift */,
 				CEBB9341F9164E3098D23E8C /* MeetingNotesView.swift */,
+				DL0100000000000000000003 /* DailyCallView.swift */,
 				011E855AF0F14D94AB4E22BE /* PDFToolsView.swift */,
 				B188E5E5C02945B3A4CF6189 /* MetadataRemoverView.swift */,
 				AC7B979355124F9D8C98395E /* ImageProcessorView.swift */,
@@ -1726,6 +1735,7 @@
 			packageProductDependencies = (
 				MC0200000000000000000001 /* MailCore2 */,
 				AW0200000000000000000001 /* Appwrite */,
+				DY0200000000000000000001 /* Daily */,
 				ZF0000000000000000000002 /* ZIPFoundation */,
 			);
 			productName = Tools-Kit;
@@ -1759,6 +1769,7 @@
 			packageReferences = (
 				MC0100000000000000000001 /* XCRemoteSwiftPackageReference "mailcore2" */,
 				AW0100000000000000000001 /* XCRemoteSwiftPackageReference "sdk-for-apple" */,
+				DY0100000000000000000001 /* XCRemoteSwiftPackageReference "daily-client-ios" */,
 				ZF0000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 			);
 			targets = (
@@ -1970,6 +1981,8 @@
 				4A14DF0AA14643979475F227 /* WebhookTesterBackend.swift in Sources */,
 				853B0E7EABAE4476A0D2839F /* NotesBackend.swift in Sources */,
 				850A018A28F44D1A860D48F4 /* MeetingNotesBackend.swift in Sources */,
+				DL0200000000000000000001 /* DailyCallBackend.swift in Sources */,
+				DL0200000000000000000002 /* DailySDKContractMap.swift in Sources */,
 				3372E290033A4643959AA842 /* PDFToolsBackend.swift in Sources */,
 				EB2AFACBFCA04677B145D859 /* MetadataRemoverBackend.swift in Sources */,
 				049BDC11CF2448F4AB3A8812 /* WebsiteScreenshotBackend.swift in Sources */,
@@ -1992,6 +2005,7 @@
 				21D40DF664DE468CAB2EC027 /* WebhookTesterView.swift in Sources */,
 				9AE858FE9A74403FAD55CA10 /* NotesView.swift in Sources */,
 				FF1D1015017C483A96506F7E /* MeetingNotesView.swift in Sources */,
+				DL0200000000000000000003 /* DailyCallView.swift in Sources */,
 				E208E69B893C4EC787055D7F /* PDFToolsView.swift in Sources */,
 				2DA398996DAD45209CE4206B /* MetadataRemoverView.swift in Sources */,
 				06C0F62C40B54ED8B4AA8407 /* ImageProcessorView.swift in Sources */,
@@ -2545,6 +2559,14 @@
 				minimumVersion = 16.1.0;
 			};
 		};
+		DY0100000000000000000001 /* XCRemoteSwiftPackageReference "daily-client-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/daily-co/daily-client-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.37.0;
+			};
+		};
 		MC0100000000000000000001 /* XCRemoteSwiftPackageReference "mailcore2" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/MailCore/mailcore2";
@@ -2568,6 +2590,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AW0100000000000000000001 /* XCRemoteSwiftPackageReference "sdk-for-apple" */;
 			productName = Appwrite;
+		};
+		DY0200000000000000000001 /* Daily */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DY0100000000000000000001 /* XCRemoteSwiftPackageReference "daily-client-ios" */;
+			productName = Daily;
 		};
 		MC0200000000000000000001 /* MailCore2 */ = {
 			isa = XCSwiftPackageProductDependency;
