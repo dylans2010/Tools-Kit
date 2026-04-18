@@ -53,7 +53,6 @@ struct JoinMeetingView: View {
             NavigationStack {
                 CreateMeetingView()
             }
-            .presentationDetents([.medium, .large])
         }
         .onChange(of: controller.phase, initial: false) { _, newValue in
             navigateToLobby = (newValue == .lobby)

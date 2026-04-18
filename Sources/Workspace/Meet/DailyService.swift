@@ -89,6 +89,8 @@ actor DailyService {
     }
 
     func generateMeetingID() async throws -> String {
+        // Daily generates IDs by creating a room. We intentionally cache the resulting
+        // session so a later create call with this ID reuses it instead of provisioning again.
         let session = try await createRoom(for: nil)
         return session.meetingId
     }
