@@ -1,4 +1,5 @@
 import SwiftUI
+import Daily
 
 struct MeetingChatView: View {
     let threads: [MeetingChatThread]
