@@ -15,17 +15,17 @@ enum AuthDatabaseError: LocalizedError {
 final class AuthDatabaseService {
     static let shared = AuthDatabaseService()
 
-    private let databases = Databases(AppwriteService.client)
+    private let tables = TablesDB(AppwriteService.client)
     private let databaseId: String?
-    private let usersCollectionId: String?
+    private let usersTableId: String?
 
     private init() {
         self.databaseId = Self.configValue(forKey: "APPWRITE_AUTH_DATABASE_ID")
-        self.usersCollectionId = Self.configValue(forKey: "APPWRITE_AUTH_USERS_COLLECTION_ID")
+        self.usersTableId = Self.configValue(forKey: "APPWRITE_AUTH_USERS_COLLECTION_ID")
     }
 
     func upsertUserProfile(userId: String, email: String, name: String?, provider: String) async throws {
-        guard let databaseId, let usersCollectionId else {
+        guard let databaseId, let usersTableId else {
             throw AuthDatabaseError.missingConfig
         }
 
@@ -36,10 +36,10 @@ final class AuthDatabaseService {
             "updatedAt": ISO8601DateFormatter().string(from: Date())
         ]
 
-        _ = try await databases.upsertDocument(
+        _ = try await tables.upsertRow(
             databaseId: databaseId,
-            collectionId: usersCollectionId,
-            documentId: userId,
+            tableId: usersTableId,
+            rowId: userId,
             data: payload
         )
     }

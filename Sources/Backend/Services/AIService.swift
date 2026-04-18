@@ -12,7 +12,7 @@ class AIService {
 
     private let registry = AIProviderRegistry.shared
     private let settingsManager = AIChatSettingsManager.shared
-    private let featureCheck = AIFeatureCheck.shared
+    @MainActor private let featureCheck = AIFeatureCheck.shared
     @MainActor private let modelCatalog = AIModelCatalog.shared
 
     // MARK: - Current provider helpers

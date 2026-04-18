@@ -15,7 +15,7 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
 
     private let registry = AIProviderRegistry.shared
     private let keyManager = APIKeyManager.shared
-    private let featureCheck = AIFeatureCheck.shared
+    @MainActor private let featureCheck = AIFeatureCheck.shared
     @MainActor private let modelCatalog = AIModelCatalog.shared
     private let historyKey = "ai_chat_history"
 
