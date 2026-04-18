@@ -1,7 +1,6 @@
 import Foundation
 import Combine
 
-@MainActor
 final class MusicModeManager: ObservableObject {
     static let shared = MusicModeManager()
 
