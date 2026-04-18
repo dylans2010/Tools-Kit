@@ -343,6 +343,14 @@ struct DraftingEmailsView: View {
         )
     }
 
+    private var draftingDetents: Set<PresentationDetent> {
+        if #available(iOS 16.0, *) {
+            return [.height(320), .medium]
+        } else {
+            return [.medium]
+        }
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -390,7 +398,15 @@ struct DraftingEmailsView: View {
                 .padding(.horizontal)
                 .padding(.vertical, 14)
             }
-            .background(Color(.systemGroupedBackground).ignoresSafeArea())
+            .scrollIndicators(.hidden)
+            .background(
+                LinearGradient(
+                    colors: [Color(.systemGroupedBackground), Color(.secondarySystemGroupedBackground)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+            )
             .navigationTitle("AI Writing Assistant")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -412,7 +428,7 @@ struct DraftingEmailsView: View {
                 }
             }
         }
-        .presentationDetents([.large])
+        .presentationDetents(draftingDetents)
         .presentationDragIndicator(.visible)
     }
 

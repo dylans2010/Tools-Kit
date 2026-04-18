@@ -10,7 +10,6 @@ struct InboxView: View {
         case all, unread
     }
 
-    @StateObject private var syncService = MailSyncService.shared
     @StateObject private var storage = MailStorageService.shared
     @StateObject private var mailStore = MailStore.shared
     @StateObject private var viewModel = InboxScreenViewModel()
@@ -19,9 +18,6 @@ struct InboxView: View {
     @State private var showingCompose = false
     @State private var showingAddAccount = false
     @State private var showingFetchingLabel = false
-    @State private var showPriorityAll = false
-    @State private var showCatchUpAll = false
-    private let cardPreviewCount = 4
 
     var body: some View {
         ZStack {
@@ -42,7 +38,7 @@ struct InboxView: View {
         .searchable(text: $searchText)
         .refreshable {
             showingFetchingLabel = true
-            await viewModel.refresh()
+            await viewModel.refresh(forceRemote: true)
             showingFetchingLabel = false
         }
         .toolbar {
@@ -69,18 +65,8 @@ struct InboxView: View {
             AddMailAccountView { selected in
                 mailStore.setActiveAccount(selected.id)
                 Task {
-                    await viewModel.refresh()
+                    await viewModel.loadCachedThenRefreshIfNeeded()
                 }
-            }
-        }
-        .sheet(isPresented: $showPriorityAll) {
-            NavigationStack {
-                ThreadListSheet(title: "Priority", threads: priorityThreads)
-            }
-        }
-        .sheet(isPresented: $showCatchUpAll) {
-            NavigationStack {
-                ThreadListSheet(title: "Catch Up", threads: catchUpThreads)
             }
         }
         .task {
@@ -89,25 +75,15 @@ struct InboxView: View {
                 mailStore.addOrUpdateAccount(account, makeActive: true)
             }
 
-            if let active = activeAccount {
-                viewModel.configure(account: active, folder: folder)
-                let key = folderKey(for: active)
-                _ = storage.loadThreads(for: key)
-                viewModel.localThreads = storage.threads
-                await viewModel.initialLoad()
-                _ = storage.loadThreads(for: key)
-                viewModel.localThreads = storage.threads
-            }
+            guard let active = activeAccount else { return }
+            viewModel.configure(account: active, folder: folder)
+            await viewModel.loadCachedThenRefreshIfNeeded()
         }
         .onChange(of: mailStore.activeAccount?.id) { _ in
             Task {
                 guard let active = activeAccount else { return }
                 viewModel.configure(account: active, folder: folder)
-                _ = storage.loadThreads(for: folderKey(for: active))
-                viewModel.localThreads = storage.threads
-                await viewModel.refresh()
-                _ = storage.loadThreads(for: folderKey(for: active))
-                viewModel.localThreads = storage.threads
+                await viewModel.loadCachedThenRefreshIfNeeded()
             }
         }
     }
@@ -131,14 +107,6 @@ struct InboxView: View {
         return base
     }
 
-    private var priorityThreads: [MailThread] {
-        Array(viewModel.localThreads.filter { !$0.isRead }.prefix(cardPreviewCount))
-    }
-
-    private var catchUpThreads: [MailThread] {
-        Array(viewModel.localThreads.prefix(cardPreviewCount))
-    }
-
     private var contentList: some View {
         List {
             if showingFetchingLabel {
@@ -153,8 +121,6 @@ struct InboxView: View {
                 }
                 .listRowBackground(hexColor("#161622"))
             }
-
-            sectionCards
 
             if visibleThreads.isEmpty {
                 Section {
@@ -182,7 +148,6 @@ struct InboxView: View {
                             inboxRow(thread: thread, message: message)
                         }
                         .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
                     }
                 }
             }
@@ -191,90 +156,38 @@ struct InboxView: View {
         .scrollContentBackground(.hidden)
     }
 
-    private var sectionCards: some View {
-        Section {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    compactCard(title: "Priority", threads: priorityThreads, seeAll: { showPriorityAll = true })
-                    compactCard(title: "Catch Up", threads: catchUpThreads, seeAll: { showCatchUpAll = true })
-                }
-                .padding(.vertical, 2)
-            }
-        }
-        .listRowBackground(Color.clear)
-        .listRowSeparator(.hidden)
-    }
-
-    private func compactCard(title: String, threads: [MailThread], seeAll: @escaping () -> Void) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white)
-                Spacer()
-                Button("See all", action: seeAll)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(hexColor("#9EA4FF"))
-                    .accessibilityLabel("See all \(title) emails")
-            }
-
-            ForEach(Array(threads.prefix(cardPreviewCount))) { item in
-                Text(item.subject)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
-
-            if threads.isEmpty {
-                Text("No items")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .padding(10)
-        .frame(width: 160, height: 90, alignment: .topLeading)
-        .background(hexColor("#1E1E2E"), in: RoundedRectangle(cornerRadius: 12))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.white.opacity(0.08), lineWidth: 0.5)
-        )
-    }
-
     private func inboxRow(thread: MailThread, message: MailMessage) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            Circle()
-                .fill(thread.isRead ? Color.clear : providerColor((activeAccount ?? account).providerType))
-                .frame(width: 8, height: 8)
-                .padding(.top, 6)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(thread.isRead ? Color.clear : providerColor((activeAccount ?? account).providerType))
+                        .frame(width: 8, height: 8)
 
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .firstTextBaseline) {
                     Text(senderName(from: message.from))
-                        .font(.subheadline.weight(.bold))
+                        .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white)
                         .lineLimit(1)
-
-                    Spacer()
-
-                    Text(relativeTimestamp(message.date))
-                        .font(.caption2)
-                        .foregroundStyle(hexColor("#8888AA"))
                 }
 
-                Text(message.subject)
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
+                Spacer()
 
-                Text(message.body.isEmpty ? "No preview" : message.body)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
+                Text(relativeTimestamp(message.date))
+                    .font(.caption2)
+                    .foregroundStyle(hexColor("#8888AA"))
             }
+
+            Text(message.subject)
+                .font(.subheadline)
+                .foregroundStyle(.white)
+                .lineLimit(1)
+
+            Text(message.body.isEmpty ? "No preview" : message.body)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
         }
-        .padding(12)
-        .background(hexColor("#161622"), in: RoundedRectangle(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.20), radius: 5, x: 0, y: 2)
+        .padding(.vertical, 6)
     }
 
     private var skeletonList: some View {
@@ -282,14 +195,11 @@ struct InboxView: View {
             ForEach(0..<8, id: \.self) { _ in
                 SkeletonMailRow()
                     .listRowBackground(Color.clear)
-                    .listRowInsets(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
             }
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
     }
-
-    private func folderKey(for account: MailAccount) -> String { "\(account.id)_\(folder.id)" }
 
     private func relativeTimestamp(_ date: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
@@ -325,6 +235,7 @@ final class InboxScreenViewModel: ObservableObject {
     @Published var localThreads: [MailThread] = []
     @Published var isInitialLoading = true
 
+    private let storage = MailStorageService.shared
     private var account: MailAccount?
     private var folder: MailFolder = .inbox
 
@@ -333,19 +244,30 @@ final class InboxScreenViewModel: ObservableObject {
         self.folder = folder
     }
 
-    func initialLoad() async {
+    func loadCachedThenRefreshIfNeeded() async {
         guard let account else {
             isInitialLoading = false
             return
         }
-        isInitialLoading = true
-        await MailSyncService.shared.fetchThreads(account: account, folder: folder)
+
+        let key = "\(account.id)_\(folder.id)"
+        let cached = storage.loadThreads(for: key)
+        localThreads = cached
         isInitialLoading = false
+
+        if cached.isEmpty {
+            await refresh(forceRemote: true)
+        }
     }
 
-    func refresh() async {
+    func refresh(forceRemote: Bool) async {
         guard let account else { return }
-        await MailSyncService.shared.fetchThreads(account: account, folder: folder)
+        if forceRemote {
+            await MailSyncService.shared.fetchThreads(account: account, folder: folder)
+        }
+
+        let key = "\(account.id)_\(folder.id)"
+        localThreads = storage.loadThreads(for: key)
     }
 }
 
@@ -392,244 +314,193 @@ private struct SkeletonMailRow: View {
     }
 }
 
-private struct ThreadListSheet: View {
-    let title: String
-    let threads: [MailThread]
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        List(threads) { thread in
-            VStack(alignment: .leading, spacing: 5) {
-                Text(thread.subject)
-                    .font(.headline)
-                Text(thread.participants.first ?? "Unknown")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text(thread.snippet)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-            }
-            .padding(.vertical, 4)
-        }
-        .navigationTitle(title)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Done") { dismiss() }
-            }
-        }
-    }
-}
-
 private struct InboxMessageDetailView: View {
     let account: MailAccount
     let message: MailMessage
 
+    @Environment(\.dismiss) private var dismiss
+
     @State private var showReply = false
+    @State private var isSummarizing = false
+    @State private var summary: String?
+    @State private var actionError: String?
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
-                Text(message.subject)
-                    .font(.title3.bold())
-                    .foregroundStyle(.white)
+        GeometryReader { geo in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    header
 
-                Text(message.from)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    if isSummarizing {
+                        ProgressView("Summarizing…")
+                            .tint(.white)
+                    }
 
-                if let htmlBody = message.htmlBody, !htmlBody.isEmpty {
-                    MessageWebView(html: htmlBody)
-                        .frame(height: 280)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                } else {
-                    Text(message.body)
-                        .font(.body)
-                        .foregroundStyle(.white)
-                }
-
-                Button {
-                    showReply = true
-                } label: {
-                    Label("Reply", systemImage: "arrowshape.turn.up.left")
-                        .font(.subheadline.weight(.semibold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(Color(hex: "#23233A") ?? .black, in: RoundedRectangle(cornerRadius: 12))
-                        .foregroundStyle(.white)
-                }
-            }
-            .padding(16)
-        }
-        .background(Color(hex: "#0D0D14") ?? .black)
-        .navigationTitle("Message")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(isPresented: $showReply) {
-            ReplyComposerView(account: account, originalMessage: message)
-        }
-    }
-}
-
-private struct ReplyComposerView: View {
-    let account: MailAccount
-    let originalMessage: MailMessage
-
-    @State private var responseText = ""
-    @State private var markdownPreview = AttributedString("")
-    @State private var isSending = false
-    @State private var error: String?
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Response")
-                        .font(.caption.smallCaps().weight(.semibold))
-                        .foregroundStyle(.secondary)
-
-                    ZStack(alignment: .topLeading) {
-                        TextEditor(text: $responseText)
-                            .frame(minHeight: 140)
-                            .padding(6)
-                            .background(Color(hex: "#1A1A26") ?? .black, in: RoundedRectangle(cornerRadius: 12))
+                    if let summary, !summary.isEmpty {
+                        Text(summary)
+                            .font(.subheadline)
                             .foregroundStyle(.white)
-                            .onChange(of: responseText) { value in
-                                markdownPreview = (try? AttributedString(markdown: value)) ?? AttributedString(value)
-                            }
+                            .padding(12)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
+                    }
 
-                        if responseText.isEmpty {
-                            Text("Write your reply…")
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 14)
-                                .allowsHitTesting(false)
+                    if let htmlBody = message.htmlBody, !htmlBody.isEmpty {
+                        MessageWebView(html: htmlBody)
+                            .frame(minHeight: max(geo.size.height * 0.78, 420))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    } else {
+                        Text(message.body)
+                            .font(.body)
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(minHeight: max(geo.size.height * 0.72, 380), alignment: .topLeading)
+                    }
+
+                    if let actionError {
+                        Text(actionError)
+                            .font(.footnote)
+                            .foregroundStyle(.red)
+                    }
+                }
+                .padding(16)
+            }
+            .background(Color(hex: "#0D0D14") ?? .black)
+            .navigationTitle("Message")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button {
+                            summarize()
+                        } label: {
+                            Label("Summarize", systemImage: "text.justify.leading")
                         }
+
+                        Button {
+                            showReply = true
+                        } label: {
+                            Label("Reply", systemImage: "arrowshape.turn.up.left")
+                        }
+
+                        Button {
+                            Task { await archiveMessage() }
+                        } label: {
+                            Label("Archive", systemImage: "archivebox")
+                        }
+
+                        Button(role: .destructive) {
+                            Task { await deleteMessage() }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
                     }
-
-                    Text(markdownPreview)
-                        .font(.subheadline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(10)
-                        .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 10))
                 }
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Original Message")
-                        .font(.caption.smallCaps().weight(.semibold))
-                        .foregroundStyle(.secondary)
-
-                    MessageWebView(html: sanitizedOriginalHTML)
-                        .frame(minHeight: 220)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-
-                if let error {
-                    Text(error)
-                        .font(.footnote)
-                        .foregroundStyle(.red)
-                }
-
-                Button {
-                    Task { await sendReply() }
-                } label: {
-                    HStack {
-                        if isSending { ProgressView().tint(.white) }
-                        Text("Send Reply")
-                            .font(.subheadline.weight(.semibold))
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(Color(hex: "#2A3A6A") ?? .blue, in: RoundedRectangle(cornerRadius: 12))
-                    .foregroundStyle(.white)
-                }
-                .disabled(isSending || responseText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
-            .padding(16)
+            .sheet(isPresented: $showReply) {
+                EmailComposingView(account: account, replyTo: message)
+            }
         }
-        .background(Color(hex: "#0D0D14") ?? .black)
-        .navigationTitle("Reply")
-        .navigationBarTitleDisplayMode(.inline)
     }
 
-    private var sanitizedOriginalHTML: String {
-        if let html = originalMessage.htmlBody, !html.isEmpty {
-            let withoutScripts = html.replacingOccurrences(of: "<script[\\s\\S]*?</script>", with: "", options: .regularExpression)
-            let withoutHandlers = withoutScripts
-                .replacingOccurrences(of: "\\son[a-zA-Z]+\\s*=\\s*\"[^\"]*\"", with: "", options: .regularExpression)
-                .replacingOccurrences(of: "\\son[a-zA-Z]+\\s*=\\s*'[^']*'", with: "", options: .regularExpression)
-            let withoutJSLinks = withoutHandlers.replacingOccurrences(of: "(href|src)\\s*=\\s*['\"]javascript:[^'\"]*['\"]", with: "", options: .regularExpression)
-            return withoutJSLinks.replacingOccurrences(of: "(href|src)\\s*=\\s*['\"]data:[^'\"]*['\"]", with: "", options: .regularExpression)
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(message.subject)
+                .font(.title3.bold())
+                .foregroundStyle(.white)
+
+            Text(message.from)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
-        return "<pre>\(originalMessage.body)</pre>"
     }
 
-    private func sendReply() async {
-        isSending = true
-        defer { isSending = false }
+    private func summarize() {
+        guard !isSummarizing else { return }
+        isSummarizing = true
+        summary = nil
+        actionError = nil
 
-        let draft = MailDraft(
-            from: account.emailAddress,
-            to: [extractEmail(from: originalMessage.from)],
-            subject: "Re: \(originalMessage.subject)",
-            bodyText: responseText,
-            bodyHTML: nil
-        )
+        Task {
+            do {
+                let input = message.body.isEmpty ? message.subject : message.body
+                let response = try await AIService.shared.summarize(text: input)
+                await MainActor.run {
+                    summary = response
+                    isSummarizing = false
+                }
+            } catch {
+                await MainActor.run {
+                    actionError = error.localizedDescription
+                    isSummarizing = false
+                }
+            }
+        }
+    }
 
+    private func deleteMessage() async {
         do {
-            let session = MailSession(
-                id: account.id,
-                provider: account.providerType,
-                email: account.emailAddress,
-                displayName: account.displayName,
-                accessToken: account.accessToken,
-                refreshToken: account.refreshToken,
-                imapHost: nil,
-                imapPort: nil,
-                smtpHost: nil,
-                smtpPort: nil
-            )
-
-            switch account.providerType {
-            case .gmail:
-                try await GmailProvider().sendMessage(session: session, draft: draft)
-            case .outlook:
-                try await OutlookProvider().sendMessage(session: session, draft: draft)
-            case .yahoo:
-                try await YahooMailProvider().sendMessage(session: session, draft: draft)
-            case .proton:
-                try await ProtonMailProvider().sendMessage(session: session, draft: draft)
-            case .imap, .icloud:
-                try await IMAPProvider().sendMessage(
-                    session: MailSession(
-                        id: account.id,
-                        provider: .imap,
-                        email: account.emailAddress,
-                        displayName: account.displayName,
-                        accessToken: nil,
-                        refreshToken: nil,
-                        imapHost: account.imapHost ?? "imap.mail.me.com",
-                        imapPort: account.imapPort ?? 993,
-                        smtpHost: account.smtpHost ?? "smtp.mail.me.com",
-                        smtpPort: account.smtpPort ?? 587
-                    ),
-                    draft: draft
-                )
-            }
+            try await providerDelete(account: account, messageID: message.id)
+            dismiss()
         } catch {
-            self.error = error.localizedDescription
+            actionError = error.localizedDescription
         }
     }
 
-    private func extractEmail(from source: String) -> String {
-        if let start = source.lastIndex(of: "<"), let end = source.lastIndex(of: ">"), start < end {
-            let inner = source[source.index(after: start)..<end]
-            let candidate = String(inner)
-            if candidate.contains("@") {
-                return candidate
-            }
+    private func archiveMessage() async {
+        do {
+            try await providerArchive(account: account, messageID: message.id)
+            dismiss()
+        } catch {
+            actionError = error.localizedDescription
         }
-        return source
+    }
+
+    private func providerDelete(account: MailAccount, messageID: String) async throws {
+        switch account.providerType {
+        case .gmail:
+            try await GmailProvider().deleteMessage(session: providerSession(), id: messageID)
+        case .outlook:
+            try await OutlookProvider().deleteMessage(session: providerSession(), id: messageID)
+        case .yahoo:
+            try await YahooMailProvider().deleteMessage(session: providerSession(), id: messageID)
+        case .proton:
+            try await ProtonMailProvider().deleteMessage(session: providerSession(), id: messageID)
+        case .imap, .icloud:
+            try await IMAPProvider().deleteMessage(session: providerSession(), id: messageID)
+        }
+    }
+
+    private func providerArchive(account: MailAccount, messageID: String) async throws {
+        switch account.providerType {
+        case .gmail:
+            try await GmailProvider().markRead(session: providerSession(), id: messageID)
+        case .outlook:
+            try await OutlookProvider().markRead(session: providerSession(), id: messageID)
+        case .yahoo:
+            try await YahooMailProvider().markRead(session: providerSession(), id: messageID)
+        case .proton:
+            try await ProtonMailProvider().markRead(session: providerSession(), id: messageID)
+        case .imap, .icloud:
+            try await IMAPProvider().markRead(session: providerSession(), id: messageID)
+        }
+    }
+
+    private func providerSession() -> MailSession {
+        MailSession(
+            id: account.id,
+            provider: account.providerType,
+            email: account.emailAddress,
+            displayName: account.displayName,
+            accessToken: account.accessToken,
+            refreshToken: account.refreshToken,
+            imapHost: account.imapHost ?? "imap.mail.me.com",
+            imapPort: account.imapPort ?? 993,
+            smtpHost: account.smtpHost ?? "smtp.mail.me.com",
+            smtpPort: account.smtpPort ?? 587
+        )
     }
 }
 
@@ -642,6 +513,7 @@ private struct MessageWebView: UIViewRepresentable {
         webView.isOpaque = false
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
+        webView.scrollView.isScrollEnabled = false
         return webView
     }
 
