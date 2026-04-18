@@ -275,8 +275,7 @@ class GmailMailProvider: MailProviderProtocol {
             throw NSError(domain: "GmailMailProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Gmail refresh token"])
         }
 
-        let oauthConfig = try await MailOAuthConfigService.shared.resolvedConfig()
-        let clientID = oauthConfig.clientID
+        let clientID = try oauthValue(key: "GOOGLE_OAUTH_CLIENT_ID")
 
         var request = URLRequest(url: URL(string: "https://oauth2.googleapis.com/token")!)
         request.httpMethod = "POST"
@@ -326,6 +325,14 @@ class GmailMailProvider: MailProviderProtocol {
         return value
             .split(separator: ",")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+    }
+
+    private func oauthValue(key: String) throws -> String {
+        guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String,
+              !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw NSError(domain: "GmailMailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing \(key)"])
+        }
+        return value
     }
 
     private func parseGmailDate(internalDate: String?, fallback: String?) -> Date {

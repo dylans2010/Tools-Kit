@@ -1,6 +1,6 @@
 import Foundation
 
-struct MailAccount: Identifiable, Codable {
+struct MailAccount: Identifiable, Codable, Hashable {
     let id: String
     var emailAddress: String
     var providerType: ProviderType
