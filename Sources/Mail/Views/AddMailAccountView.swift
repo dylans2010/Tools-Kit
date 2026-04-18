@@ -27,7 +27,7 @@ struct AddMailAccountView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "#0A0A0F")
+                Color(hex: "#0A0A0F") ?? .black
                     .ignoresSafeArea()
 
                 AnimatedMeshBackground()
@@ -101,7 +101,7 @@ struct AddMailAccountView: View {
                 Image(systemName: "envelope.badge.fill")
                     .font(.system(size: 74, weight: .semibold))
                     .foregroundStyle(
-                        LinearGradient(colors: [Color.white, Color(hex: "#BFBFFF")], startPoint: .top, endPoint: .bottom)
+                        LinearGradient(colors: [Color.white, Color(hex: "#BFBFFF") ?? .white], startPoint: .top, endPoint: .bottom)
                     )
             }
             .frame(height: 150)
@@ -112,7 +112,7 @@ struct AddMailAccountView: View {
 
             Text("Connect your accounts to get started")
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(Color(hex: "#9A9AAF"))
+                .foregroundStyle(Color(hex: "#9A9AAF") ?? .gray)
         }
     }
 
@@ -130,7 +130,7 @@ struct AddMailAccountView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(provider.displayName)
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color(hex: "#A8A8C0"))
+                        .foregroundStyle(Color(hex: "#A8A8C0") ?? .gray)
                     Text(title)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white)
@@ -150,7 +150,7 @@ struct AddMailAccountView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
             .frame(maxWidth: .infinity)
-            .background(Color(hex: "#1A1A26"), in: Capsule())
+            .background(Color(hex: "#1A1A26") ?? .black, in: Capsule())
             .overlay(
                 Capsule().stroke(Color.white.opacity(0.08), lineWidth: 0.6)
             )
@@ -190,12 +190,12 @@ struct AddMailAccountView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .background(Color(hex: "#2A2A3A"), in: RoundedRectangle(cornerRadius: 14))
+                        .background(Color(hex: "#2A2A3A") ?? .black, in: RoundedRectangle(cornerRadius: 14))
                     }
                     .disabled(loadingProvider != nil || imapHost.isEmpty || imapUser.isEmpty || imapPassword.isEmpty)
                 }
                 .padding(14)
-                .background(Color(hex: "#141420"), in: RoundedRectangle(cornerRadius: 16))
+                .background(Color(hex: "#141420") ?? .black, in: RoundedRectangle(cornerRadius: 16))
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
@@ -213,7 +213,7 @@ struct AddMailAccountView: View {
 
                 Text("To connect Proton Mail, install Proton Bridge and keep it running on this device first.")
                     .font(.subheadline)
-                    .foregroundStyle(Color(hex: "#B0B0C8"))
+                    .foregroundStyle(Color(hex: "#B0B0C8") ?? .gray)
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("1. Install Proton Bridge")
@@ -232,12 +232,12 @@ struct AddMailAccountView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
-                .background(Color(hex: "#2A3D31"), in: RoundedRectangle(cornerRadius: 12))
+                .background(Color(hex: "#2A3D31") ?? .black, in: RoundedRectangle(cornerRadius: 12))
                 .foregroundStyle(.white)
             }
             .padding(20)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(hex: "#0D0D14"))
+            .background(Color(hex: "#0D0D14") ?? .black)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Close") { showProtonGuide = false }
@@ -252,7 +252,7 @@ struct AddMailAccountView: View {
             .autocorrectionDisabled(true)
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
-            .background(Color(hex: "#1A1A26"), in: RoundedRectangle(cornerRadius: 10))
+            .background(Color(hex: "#1A1A26") ?? .black, in: RoundedRectangle(cornerRadius: 10))
             .foregroundStyle(.white)
     }
 
@@ -262,17 +262,17 @@ struct AddMailAccountView: View {
             .autocorrectionDisabled(true)
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
-            .background(Color(hex: "#1A1A26"), in: RoundedRectangle(cornerRadius: 10))
+            .background(Color(hex: "#1A1A26") ?? .black, in: RoundedRectangle(cornerRadius: 10))
             .foregroundStyle(.white)
     }
 
     private func providerBrandColor(_ provider: MailAccount.ProviderType) -> Color {
         switch provider {
-        case .gmail: return Color(hex: "#EA4335")
-        case .outlook: return Color(hex: "#0078D4")
-        case .yahoo: return Color(hex: "#6C3BD1")
-        case .proton: return Color(hex: "#2E8B57")
-        case .imap: return Color(hex: "#8A8AA5")
+        case .gmail: return Color(hex: "#EA4335") ?? .red
+        case .outlook: return Color(hex: "#0078D4") ?? .blue
+        case .yahoo: return Color(hex: "#6C3BD1") ?? .purple
+        case .proton: return Color(hex: "#2E8B57") ?? .green
+        case .imap: return Color(hex: "#8A8AA5") ?? .gray
         case .icloud: return .blue
         }
     }
@@ -403,36 +403,12 @@ private struct AnimatedMeshBackground: View {
                 let p2 = CGPoint(x: w * (0.72 + 0.12 * cos(t * 0.07)), y: h * (0.35 + 0.07 * sin(t * 0.05)))
                 let p3 = CGPoint(x: w * (0.50 + 0.12 * sin(t * 0.04)), y: h * (0.75 + 0.08 * cos(t * 0.08)))
 
-                context.fill(Path(ellipseIn: CGRect(x: p1.x - 160, y: p1.y - 160, width: 320, height: 320)), with: .color(Color(hex: "#6F4CFF").opacity(0.45)))
-                context.fill(Path(ellipseIn: CGRect(x: p2.x - 180, y: p2.y - 180, width: 360, height: 360)), with: .color(Color(hex: "#4E7BFF").opacity(0.40)))
-                context.fill(Path(ellipseIn: CGRect(x: p3.x - 190, y: p3.y - 190, width: 380, height: 380)), with: .color(Color(hex: "#4338CA").opacity(0.38)))
+                context.fill(Path(ellipseIn: CGRect(x: p1.x - 160, y: p1.y - 160, width: 320, height: 320)), with: .color((Color(hex: "#6F4CFF") ?? .indigo).opacity(0.45)))
+                context.fill(Path(ellipseIn: CGRect(x: p2.x - 180, y: p2.y - 180, width: 360, height: 360)), with: .color((Color(hex: "#4E7BFF") ?? .blue).opacity(0.40)))
+                context.fill(Path(ellipseIn: CGRect(x: p3.x - 190, y: p3.y - 190, width: 380, height: 380)), with: .color((Color(hex: "#4338CA") ?? .purple).opacity(0.38)))
             }
             .blur(radius: 78)
         }
-    }
-}
-
-private extension Color {
-    init(hex: String) {
-        let value = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: value).scanHexInt64(&int)
-
-        let r, g, b: UInt64
-        switch value.count {
-        case 6:
-            (r, g, b) = ((int >> 16) & 0xFF, (int >> 8) & 0xFF, int & 0xFF)
-        default:
-            (r, g, b) = (0, 0, 0)
-        }
-
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            opacity: 1
-        )
     }
 }
 
