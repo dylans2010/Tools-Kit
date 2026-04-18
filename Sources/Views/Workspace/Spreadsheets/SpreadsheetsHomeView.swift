@@ -135,7 +135,7 @@ struct SpreadsheetsHomeView: View {
                     insightRow("Formulas", aiResult.formulaSuggestions)
                     insightRow("Charts", aiResult.chartSuggestions)
                 }
-                Button("Analyze Request", action: runAI)
+                Button("Analyze Request") { runAI() }
                     .buttonStyle(.borderedProminent)
                     .disabled(aiLoading || aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }

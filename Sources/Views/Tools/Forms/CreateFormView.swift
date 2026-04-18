@@ -61,7 +61,8 @@ struct CreateFormView: View {
                         }
                         HStack(spacing: 8) {
                             statusChip("Required \(questions.filter(\.required).count)", icon: "asterisk.circle", color: .red)
-                            statusChip("Attach \(questions.contains(where: { $0.type == .imageUpload }) ? \"Yes\" : \"No\")", icon: "paperclip", color: .purple)
+                            let attachText = questions.contains(where: { $0.type == .imageUpload }) ? "Yes" : "No"
+                            statusChip("Attach \(attachText)", icon: "paperclip", color: .purple)
                             statusChip("Manifest Ready", icon: "checkmark.shield", color: .green)
                         }
                     }
