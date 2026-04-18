@@ -172,7 +172,7 @@ struct InboxView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 22)
                 }
-                .listRowBackground(.clear)
+                .listRowBackground(Color.clear)
             } else {
                 ForEach(visibleThreads) { thread in
                     if let message = thread.messages.last {
@@ -181,7 +181,7 @@ struct InboxView: View {
                         } label: {
                             inboxRow(thread: thread, message: message)
                         }
-                        .listRowBackground(.clear)
+                        .listRowBackground(Color.clear)
                         .listRowInsets(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
                     }
                 }
@@ -201,7 +201,7 @@ struct InboxView: View {
                 .padding(.vertical, 2)
             }
         }
-        .listRowBackground(.clear)
+        .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
     }
 
@@ -281,7 +281,7 @@ struct InboxView: View {
         List {
             ForEach(0..<8, id: \.self) { _ in
                 SkeletonMailRow()
-                    .listRowBackground(.clear)
+                    .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
             }
         }

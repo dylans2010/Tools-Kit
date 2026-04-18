@@ -67,7 +67,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             endpoint = URL(string: "https://graph.microsoft.com/v1.0/me/messages?$top=30&$orderby=receivedDateTime%20desc")!
         }
 
-        let response: GraphMessagesResponse = try await request(url: endpoint, token: session.accessToken)
+        let response: GraphMessagesResponse = try await request(url: endpoint, token: session.accessToken, body: Optional<Data>.none)
         if let next = response.nextLink {
             nextLinksByPage[page + 1] = next
         }
@@ -76,9 +76,9 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             MailMessage(
                 id: $0.id,
                 threadId: $0.conversationId,
-                from: $0.from?.emailAddress?.address ?? "Unknown",
-                to: $0.toRecipients?.compactMap { $0.emailAddress?.address } ?? [],
-                cc: $0.ccRecipients?.compactMap { $0.emailAddress?.address } ?? [],
+                from: $0.from?.emailAddress.address ?? "Unknown",
+                to: $0.toRecipients?.compactMap { $0.emailAddress.address } ?? [],
+                cc: $0.ccRecipients?.compactMap { $0.emailAddress.address } ?? [],
                 bcc: [],
                 subject: $0.subject ?? "No Subject",
                 body: $0.body?.content ?? "",
@@ -93,13 +93,13 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
     func fetchMessage(session: MailSession, id: String) async throws -> MailMessage {
         let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)")!
-        let item: GraphMessage = try await request(url: url, token: session.accessToken)
+        let item: GraphMessage = try await request(url: url, token: session.accessToken, body: Optional<Data>.none)
         return MailMessage(
             id: item.id,
             threadId: item.conversationId,
-            from: item.from?.emailAddress?.address ?? "Unknown",
-            to: item.toRecipients?.compactMap { $0.emailAddress?.address } ?? [],
-            cc: item.ccRecipients?.compactMap { $0.emailAddress?.address } ?? [],
+            from: item.from?.emailAddress.address ?? "Unknown",
+            to: item.toRecipients?.compactMap { $0.emailAddress.address } ?? [],
+            cc: item.ccRecipients?.compactMap { $0.emailAddress.address } ?? [],
             bcc: [],
             subject: item.subject ?? "No Subject",
             body: item.body?.content ?? "",
@@ -140,7 +140,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
     func deleteMessage(session: MailSession, id: String) async throws {
         let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)")!
-        try await requestVoid(url: url, method: "DELETE", token: session.accessToken)
+        try await requestVoid(url: url, method: "DELETE", body: Optional<Data>.none, token: session.accessToken)
     }
 
     func markRead(session: MailSession, id: String) async throws {
@@ -207,7 +207,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
     private func fetchProfile(accessToken: String) async throws -> GraphProfile {
         let url = URL(string: "https://graph.microsoft.com/v1.0/me")!
-        return try await request(url: url, token: accessToken)
+        return try await request(url: url, token: accessToken, body: Optional<Data>.none)
     }
 
     private func request<T: Decodable, Body: Encodable>(url: URL, method: String = "GET", body: Body? = nil, token: String?) async throws -> T {
