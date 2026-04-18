@@ -795,7 +795,7 @@ struct DraftingEmailsView: View {
         systemImage: String,
         isExpanded: Binding<Bool>,
         accent: Color,
-        @ViewBuilder content: () -> Content
+        @ViewBuilder content: @escaping () -> Content
     ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             DisclosureGroup(isExpanded: isExpanded) {
