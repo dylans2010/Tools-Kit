@@ -11,7 +11,12 @@ actor MeetingResolver {
     }
 
     func createSession(with meetingId: String?) async throws -> MeetingSession {
-        let logMeetingID = (meetingId?.isEmpty == false) ? meetingId ?? "" : "<generated-by-daily>"
+        let logMeetingID: String
+        if let meetingId, !meetingId.isEmpty {
+            logMeetingID = meetingId
+        } else {
+            logMeetingID = "<generated-by-daily>"
+        }
         await log("Create session attempt for meeting ID \(logMeetingID).", level: .info)
         let session = try await dailyService.createRoom(for: meetingId)
         await log("Create session success for \(session.meetingId).", level: .info)

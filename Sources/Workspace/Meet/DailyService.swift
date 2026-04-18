@@ -156,12 +156,13 @@ actor DailyService {
     }
 
     private func roomNameCandidates(for meetingID: String) -> [String] {
-        let normalized = meetingID.lowercased()
-        var candidates = [roomName(for: meetingID)]
-        if normalized != roomName(for: meetingID) {
-            candidates.append(normalized)
+        let deterministicRoomName = roomName(for: meetingID)
+        let directRoomName = meetingID.lowercased()
+        var candidates = [deterministicRoomName]
+        if directRoomName != deterministicRoomName {
+            candidates.append(directRoomName)
         }
-        return Array(Set(candidates))
+        return candidates
     }
 
     private func fetchRoomForMeetingID(_ meetingID: String) async throws -> RoomResponse? {
