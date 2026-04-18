@@ -51,9 +51,8 @@ struct EmailComposingView: View {
 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        let referenceNow = Date()
-                        if let scheduleDate, scheduleDate > referenceNow {
-                            Task { await scheduleSend(referenceNow: referenceNow) }
+                        if scheduleDate != nil {
+                            Task { await handleScheduledOrImmediateSend() }
                         } else {
                             sendNow()
                         }
@@ -340,8 +339,7 @@ struct EmailComposingView: View {
     }
 
     private var cannotSend: Bool {
-        let mergedRecipients = toRecipients + [newRecipient.trimmingCharacters(in: .whitespacesAndNewlines)].filter { !$0.isEmpty }
-        return mergedRecipients.isEmpty || subject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSending
+        mergedRecipients().isEmpty || subject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSending
     }
 
     private func toolButton(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
@@ -411,7 +409,7 @@ struct EmailComposingView: View {
             ("\\*\\*", ""),
             ("__", ""),
             ("`", ""),
-            ("\\[(.*?)\\]\\((.*?)\\)", "$1")
+            ("\\[(.*?)\\]\\((.*?)\\)", "$1 ($2)")
         ]
 
         for (pattern, template) in replacements {
@@ -466,29 +464,25 @@ struct EmailComposingView: View {
         }
     }
 
-    private func scheduleSend(referenceNow: Date) async {
-        guard let scheduleDate, scheduleDate > referenceNow else {
+    private func handleScheduledOrImmediateSend() async {
+        let now = Date()
+        guard let scheduleDate, scheduleDate > now else {
             sendNow()
             return
         }
 
-        var recipients = toRecipients
-        let pendingRecipient = newRecipient.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !pendingRecipient.isEmpty {
-            recipients.append(pendingRecipient)
-        }
+        let recipients = mergedRecipients()
         guard !recipients.isEmpty else { return }
 
         isSending = true
         do {
-            let scheduledPrefix = "Scheduled for \(scheduleDate.formatted(date: .abbreviated, time: .shortened))\n\n"
             let draft = MailDraft(
                 from: account.emailAddress,
                 to: recipients,
                 cc: [],
                 bcc: [],
                 subject: subject,
-                bodyText: scheduledPrefix + messageBody
+                bodyText: messageBody
             )
 
             switch account.providerType {
@@ -517,11 +511,7 @@ struct EmailComposingView: View {
     }
 
     private func sendNow() {
-        var recipients = toRecipients
-        let pendingRecipient = newRecipient.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !pendingRecipient.isEmpty {
-            recipients.append(pendingRecipient)
-        }
+        let recipients = mergedRecipients()
         guard !recipients.isEmpty else { return }
 
         isSending = true
@@ -595,5 +585,14 @@ struct EmailComposingView: View {
             smtpHost: account.smtpHost ?? "smtp.mail.me.com",
             smtpPort: account.smtpPort ?? 587
         )
+    }
+
+    private func mergedRecipients() -> [String] {
+        var recipients = toRecipients
+        let pendingRecipient = newRecipient.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !pendingRecipient.isEmpty {
+            recipients.append(pendingRecipient)
+        }
+        return recipients
     }
 }

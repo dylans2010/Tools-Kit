@@ -4,7 +4,7 @@ import WebKit
 struct EmailDetailView: View {
     @ObservedObject var viewModel: MailViewModel
     let email: EmailMessage
-    var account: MailAccount? = nil
+    var account: MailAccount?
 
     @Environment(\.dismiss) private var dismiss
 
@@ -13,6 +13,12 @@ struct EmailDetailView: View {
     @State private var summary = ""
     @State private var isSummarizing = false
     @State private var actionError: String?
+
+    init(viewModel: MailViewModel, email: EmailMessage, account: MailAccount? = nil) {
+        self.viewModel = viewModel
+        self.email = email
+        self.account = account
+    }
 
     var body: some View {
         GeometryReader { geo in
@@ -43,6 +49,12 @@ struct EmailDetailView: View {
                             .font(.footnote)
                             .foregroundStyle(.red)
                     }
+
+                    if account == nil {
+                        Text("Connect a mail account to enable Reply, Delete, and Archive actions.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 .padding(16)
             }
@@ -64,13 +76,13 @@ struct EmailDetailView: View {
                         .disabled(account == nil)
 
                         Button {
-                            archiveEmail()
+                            Task { await archiveEmail() }
                         } label: {
                             Label("Archive", systemImage: "archivebox")
                         }
 
                         Button(role: .destructive) {
-                            deleteEmail()
+                            Task { await deleteEmail() }
                         } label: {
                             Label("Delete", systemImage: "trash")
                         }
@@ -157,18 +169,36 @@ struct EmailDetailView: View {
         }
     }
 
-    private func deleteEmail() {
-        if let idx = viewModel.emails.firstIndex(where: { $0.uid == email.uid }) {
-            viewModel.emails.remove(at: idx)
+    private func deleteEmail() async {
+        guard let account else {
+            actionError = "A linked account is required to delete this email."
+            return
         }
-        dismiss()
+        do {
+            try await providerDelete(account: account, messageID: String(email.uid))
+            if let idx = viewModel.emails.firstIndex(where: { $0.uid == email.uid }) {
+                viewModel.emails.remove(at: idx)
+            }
+            dismiss()
+        } catch {
+            actionError = error.localizedDescription
+        }
     }
 
-    private func archiveEmail() {
-        if let idx = viewModel.emails.firstIndex(where: { $0.uid == email.uid }) {
-            viewModel.emails[idx].isRead = true
+    private func archiveEmail() async {
+        guard let account else {
+            actionError = "A linked account is required to archive this email."
+            return
         }
-        dismiss()
+        do {
+            try await providerArchiveMarkRead(account: account, messageID: String(email.uid))
+            if let idx = viewModel.emails.firstIndex(where: { $0.uid == email.uid }) {
+                viewModel.emails[idx].isRead = true
+            }
+            dismiss()
+        } catch {
+            actionError = error.localizedDescription
+        }
     }
 
     private func renderContent(from message: EmailMessage) -> RenderedMailContent? {
@@ -183,5 +213,50 @@ struct EmailDetailView: View {
         }
 
         return MailContentRenderer.render(htmlBody: nil, plainBody: message.preview)
+    }
+
+    private func providerDelete(account: MailAccount, messageID: String) async throws {
+        switch account.providerType {
+        case .gmail:
+            try await GmailProvider().deleteMessage(session: providerSession(account: account), id: messageID)
+        case .outlook:
+            try await OutlookProvider().deleteMessage(session: providerSession(account: account), id: messageID)
+        case .yahoo:
+            try await YahooMailProvider().deleteMessage(session: providerSession(account: account), id: messageID)
+        case .proton:
+            try await ProtonMailProvider().deleteMessage(session: providerSession(account: account), id: messageID)
+        case .imap, .icloud:
+            try await IMAPProvider().deleteMessage(session: providerSession(account: account), id: messageID)
+        }
+    }
+
+    private func providerArchiveMarkRead(account: MailAccount, messageID: String) async throws {
+        switch account.providerType {
+        case .gmail:
+            try await GmailProvider().markRead(session: providerSession(account: account), id: messageID)
+        case .outlook:
+            try await OutlookProvider().markRead(session: providerSession(account: account), id: messageID)
+        case .yahoo:
+            try await YahooMailProvider().markRead(session: providerSession(account: account), id: messageID)
+        case .proton:
+            try await ProtonMailProvider().markRead(session: providerSession(account: account), id: messageID)
+        case .imap, .icloud:
+            try await IMAPProvider().markRead(session: providerSession(account: account), id: messageID)
+        }
+    }
+
+    private func providerSession(account: MailAccount) -> MailSession {
+        MailSession(
+            id: account.id,
+            provider: account.providerType,
+            email: account.emailAddress,
+            displayName: account.displayName,
+            accessToken: account.accessToken,
+            refreshToken: account.refreshToken,
+            imapHost: account.imapHost ?? "imap.mail.me.com",
+            imapPort: account.imapPort ?? 993,
+            smtpHost: account.smtpHost ?? "smtp.mail.me.com",
+            smtpPort: account.smtpPort ?? 587
+        )
     }
 }

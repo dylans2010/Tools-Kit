@@ -34,6 +34,12 @@ struct DrawingBoardView: View {
     @State private var strokes: [Stroke] = []
     @State private var inProgressStroke: Stroke?
 
+    private static let fileNameFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd_HHmmssSSS"
+        return formatter
+    }()
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 12) {
@@ -171,9 +177,7 @@ struct DrawingBoardView: View {
     private func exportDrawing() {
         let renderer = ImageRenderer(content: exportCanvas)
         if let uiImage = renderer.uiImage, let data = uiImage.pngData() {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd-HHmmss"
-            onExport(DrawingExport(imageData: data, fileName: "Drawing-\(formatter.string(from: Date())).png"))
+            onExport(DrawingExport(imageData: data, fileName: "Drawing-\(Self.fileNameFormatter.string(from: Date())).png"))
             dismiss()
         }
     }

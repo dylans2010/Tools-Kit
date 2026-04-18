@@ -38,7 +38,7 @@ struct InboxView: View {
         .searchable(text: $searchText)
         .refreshable {
             showingFetchingLabel = true
-            await viewModel.refresh(forceRemote: true)
+            await viewModel.refresh(fetchFromServer: true)
             showingFetchingLabel = false
         }
         .toolbar {
@@ -165,7 +165,7 @@ struct InboxView: View {
                         .frame(width: 8, height: 8)
 
                     Text(senderName(from: message.from))
-                        .font(.subheadline.weight(.semibold))
+                        .font(.subheadline.weight(.bold))
                         .foregroundStyle(.white)
                         .lineLimit(1)
                 }
@@ -253,18 +253,19 @@ final class InboxScreenViewModel: ObservableObject {
         let key = "\(account.id)_\(folder.id)"
         let cached = storage.loadThreads(for: key)
         localThreads = cached
-        isInitialLoading = false
 
         if cached.isEmpty {
             isInitialLoading = true
-            await refresh(forceRemote: true)
+            await refresh(fetchFromServer: true)
+            isInitialLoading = false
+        } else {
             isInitialLoading = false
         }
     }
 
-    func refresh(forceRemote: Bool) async {
+    func refresh(fetchFromServer: Bool) async {
         guard let account else { return }
-        if forceRemote {
+        if fetchFromServer {
             await MailSyncService.shared.fetchThreads(account: account, folder: folder)
         }
 

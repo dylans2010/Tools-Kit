@@ -344,11 +344,7 @@ struct DraftingEmailsView: View {
     }
 
     private var draftingDetents: Set<PresentationDetent> {
-        if #available(iOS 16.0, *) {
-            return [.height(320), .medium]
-        } else {
-            return [.medium]
-        }
+        [.height(320), .medium]
     }
 
     var body: some View {
