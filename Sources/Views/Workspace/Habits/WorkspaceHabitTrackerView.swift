@@ -137,7 +137,7 @@ struct WorkspaceHabitTrackerView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiError = "AI habits response was invalid. Please refine your goal."
+                    aiError = "Could not generate coaching tips. Try a goal with timeline and current obstacles."
                     aiLoading = false
                 }
             }

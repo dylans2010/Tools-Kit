@@ -188,7 +188,7 @@ struct TasksHomeView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiError = "Could not decode AI task plan. Update prompt and retry."
+                    aiError = "We couldn’t turn that request into tasks. Try adding scope, deadline, and priority hints."
                     aiLoading = false
                 }
             }

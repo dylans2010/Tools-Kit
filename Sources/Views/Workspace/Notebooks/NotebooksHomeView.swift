@@ -126,7 +126,7 @@ struct NotebooksHomeView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiError = "AI note analysis failed schema validation. Try again."
+                    aiError = "We couldn’t analyze this note yet. Try adding more detail and run analysis again."
                     aiLoading = false
                 }
             }

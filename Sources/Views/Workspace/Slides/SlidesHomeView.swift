@@ -163,10 +163,7 @@ struct SlidesHomeView: View {
                     slide.elements = item.elements.map { element in
                         let aiKind = SlideElement.ElementKind(rawValue: element.kind)
                         let resolvedKind = aiKind ?? .text
-                        // Keep a visible diagnostic when AI returns unsupported element kinds.
-                        if aiKind == nil {
-                            print("SlidesHomeView: unsupported AI element kind \(element.kind), falling back to text")
-                        }
+                        // Fallback keeps rendering resilient when AI returns unsupported element kinds.
                         var model = SlideElement(kind: resolvedKind)
                         model.text = element.text
                         model.x = element.x
@@ -189,7 +186,7 @@ struct SlidesHomeView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiError = "Could not decode AI deck. Refine prompt and retry."
+                    aiError = "Could not generate this deck. Try a more specific prompt like topic, audience, and slide count."
                     aiLoading = false
                 }
             }

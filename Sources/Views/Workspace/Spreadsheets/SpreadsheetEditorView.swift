@@ -287,7 +287,7 @@ struct SpreadsheetEditorView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiError = "AI response could not be validated. Please retry with a clearer prompt."
+                    aiError = "Analysis could not be completed. Try selecting a clear range and asking a focused question."
                     aiLoading = false
                 }
             }

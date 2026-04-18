@@ -114,7 +114,7 @@ struct CalendarHomeView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiError = "Scheduling response failed validation. Please retry."
+                    aiError = "We could not build a schedule from that request. Try including exact dates, times, and priorities."
                     aiLoading = false
                 }
             }
@@ -125,7 +125,7 @@ struct CalendarHomeView: View {
         guard let start = isoFormatter.date(from: draft.startISO8601),
               let end = isoFormatter.date(from: draft.endISO8601) else {
             // Surface validation errors directly in the visible AI error state.
-            aiError = "Could not parse event dates from AI response. Please try again."
+            aiError = "We couldn’t add this suggestion because the start or end time was unclear. Please regenerate the plan."
             return
         }
         let event = CalendarEvent(

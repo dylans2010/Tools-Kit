@@ -173,7 +173,7 @@ struct ArticlesHomeView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiError = "Article AI response was invalid JSON. Please retry."
+                    aiError = "Could not process that article text. Try a shorter passage or clearer rewrite request."
                     aiLoading = false
                 }
             }
