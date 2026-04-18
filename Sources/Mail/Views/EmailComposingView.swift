@@ -31,6 +31,28 @@ struct EmailComposingView: View {
     @State private var pendingLinkURL = "https://"
 
     @FocusState private var bodyFocused: Bool
+    
+    private struct MarkdownFormatAction: Identifiable {
+        let id = UUID()
+        let title: String
+        let icon: String
+        let insertion: String
+    }
+
+    private let formattingActions: [MarkdownFormatAction] = [
+        MarkdownFormatAction(title: "Bold", icon: "bold", insertion: "**bold text**"),
+        MarkdownFormatAction(title: "Italic", icon: "italic", insertion: "_italic text_"),
+        MarkdownFormatAction(title: "Strike", icon: "strikethrough", insertion: "~~strikethrough~~"),
+        MarkdownFormatAction(title: "Inline Code", icon: "chevron.left.forwardslash.chevron.right", insertion: "`code`"),
+        MarkdownFormatAction(title: "Heading", icon: "textformat.size", insertion: "## Heading"),
+        MarkdownFormatAction(title: "Bullet List", icon: "list.bullet", insertion: "- First item\n- Second item"),
+        MarkdownFormatAction(title: "Checklist", icon: "checklist", insertion: "- [ ] Todo item"),
+        MarkdownFormatAction(title: "Numbered", icon: "list.number", insertion: "1. First\n2. Second"),
+        MarkdownFormatAction(title: "Quote", icon: "text.quote", insertion: "> Quoted text"),
+        MarkdownFormatAction(title: "Code Block", icon: "terminal", insertion: "```\ncode block\n```"),
+        MarkdownFormatAction(title: "Table", icon: "tablecells", insertion: "| Column A | Column B |\n| --- | --- |\n| Value 1 | Value 2 |"),
+        MarkdownFormatAction(title: "Divider", icon: "minus", insertion: "---")
+    ]
 
     var body: some View {
         NavigationStack {
@@ -211,6 +233,28 @@ struct EmailComposingView: View {
 
             PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
                 Label("Add Photo", systemImage: "photo.on.rectangle")
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Label("Formatting Toolbar", systemImage: "textformat")
+                    .font(.subheadline.weight(.semibold))
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(formattingActions) { action in
+                            Button {
+                                insertMarkdown(action.insertion)
+                            } label: {
+                                Label(action.title, systemImage: action.icon)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 8)
+                                    .background(Color.indigo.opacity(0.14), in: Capsule())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
             }
         }
     }
@@ -393,6 +437,11 @@ struct EmailComposingView: View {
         } else {
             messageBody += "\n\(text)"
         }
+    }
+    
+    private func insertMarkdown(_ snippet: String) {
+        bodyFocused = true
+        insert(snippet)
     }
 
     private func insertQuote() {

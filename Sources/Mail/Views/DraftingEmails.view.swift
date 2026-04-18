@@ -451,7 +451,20 @@ struct DraftingEmailsView: View {
             }
         }
         .padding()
-        .background(cardBackground)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(
+                    LinearGradient(
+                        colors: [Color.blue.opacity(0.18), Color.purple.opacity(0.14), Color.cyan.opacity(0.12)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18)
+                        .stroke(Color.white.opacity(0.16), lineWidth: 1)
+                )
+        )
     }
 
     private var coreInfoContent: some View {
@@ -795,11 +808,18 @@ struct DraftingEmailsView: View {
 
     private var cardBackground: some View {
         RoundedRectangle(cornerRadius: 18)
-            .fill(Color(.systemBackground))
+            .fill(
+                LinearGradient(
+                    colors: [Color(.systemBackground), Color(.secondarySystemBackground)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
             .overlay(
                 RoundedRectangle(cornerRadius: 18)
                     .stroke(Color.primary.opacity(0.08), lineWidth: 1)
             )
+            .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
     }
 
     private func collapsibleSection<Content: View>(
