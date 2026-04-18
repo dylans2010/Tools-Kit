@@ -120,7 +120,7 @@ private struct DailySDKVideoView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> VideoView {
         let view = VideoView()
-        view.videoScaleMode = .fill
+        view.videoScaleMode = .fit
         return view
     }
 

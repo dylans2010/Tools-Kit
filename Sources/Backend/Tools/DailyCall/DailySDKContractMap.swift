@@ -11,10 +11,10 @@ enum DailySDKContractMap {
     static let joinSignature = "join(url: URL, token: MeetingToken?, settings: ClientSettingsUpdate?) async throws -> Void"
     static let teardownSequence = "stopLocalAudioLevelObserver -> stopRemoteParticipantsAudioLevelObserver -> leave -> delegate=nil -> release client"
     static let supportsCustomRendering = "Yes via VideoView (commonly wrapped by a SwiftUI UIViewRepresentable, often named DailyVideoView)"
-    static let requiredInfoPlistKeys = [
+    static let requiredInfoPlistConfiguration = [
         "NSCameraUsageDescription",
         "NSMicrophoneUsageDescription",
-        "UIBackgroundModes: [audio]"
+        "UIBackgroundModes (array) includes \"audio\""
     ]
 
     // AGENT DECISION: Official docs endpoint was unreachable in this environment, so signatures are resolved from

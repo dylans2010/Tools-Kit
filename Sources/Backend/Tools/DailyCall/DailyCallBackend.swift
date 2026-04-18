@@ -14,6 +14,8 @@ struct DailyCallParticipant: Identifiable, Equatable {
 
 @MainActor
 final class DailyCallBackend: NSObject, ObservableObject {
+    private let maxEventLogEntries = 100
+
     @Published var roomURL = ""
     @Published var meetingToken = ""
     @Published var username = ""
@@ -135,8 +137,8 @@ final class DailyCallBackend: NSObject, ObservableObject {
 
     private func appendEvent(_ message: String) {
         eventLog.insert("[\(Date.now.formatted(date: .omitted, time: .standard))] \(message)", at: 0)
-        if eventLog.count > 100 {
-            eventLog = Array(eventLog.prefix(100))
+        if eventLog.count > maxEventLogEntries {
+            eventLog = Array(eventLog.prefix(maxEventLogEntries))
         }
     }
 
