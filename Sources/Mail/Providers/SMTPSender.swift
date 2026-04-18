@@ -55,9 +55,9 @@ enum SMTPSender {
         let boundary = "Boundary-\(UUID().uuidString)"
         var lines: [String] = [
             "From: \(draft.from)",
-            "To: \(draft.to.joined(separator: \", \"))",
-            draft.cc.isEmpty ? nil : "Cc: \(draft.cc.joined(separator: \", \"))",
-            draft.bcc.isEmpty ? nil : "Bcc: \(draft.bcc.joined(separator: \", \"))",
+            "To: \(draft.to.joined(separator: ", "))",
+            draft.cc.isEmpty ? nil : "Cc: \(draft.cc.joined(separator: ", "))",
+            draft.bcc.isEmpty ? nil : "Bcc: \(draft.bcc.joined(separator: ", "))",
             "Subject: \(encodedHeader(draft.subject))",
             "Date: \(rfc2822Date(Date()))",
             "MIME-Version: 1.0"

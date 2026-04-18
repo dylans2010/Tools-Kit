@@ -68,7 +68,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         }
 
         let listURL = baseURL.appendingPathComponent("messages").appending(queryItems: items)
-        let list: GmailListResponse = try await request(url: listURL, token: session.accessToken)
+        let list: GmailListResponse = try await request(url: listURL, token: session.accessToken, body: Optional<Data>.none)
 
         var messages: [MailMessage] = []
         for item in list.messages ?? [] {
@@ -80,7 +80,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
 
     func fetchMessage(session: MailSession, id: String) async throws -> MailMessage {
         let url = baseURL.appendingPathComponent("messages/\(id)").appending(queryItems: [URLQueryItem(name: "format", value: "full")])
-        let payload: GmailMessagePayload = try await request(url: url, token: session.accessToken)
+        let payload: GmailMessagePayload = try await request(url: url, token: session.accessToken, body: Optional<Data>.none)
 
         let headers = payload.payload?.headers.reduce(into: [String: String]()) { partial, item in
             partial[item.name.lowercased()] = item.value
@@ -122,7 +122,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
 
     func deleteMessage(session: MailSession, id: String) async throws {
         let url = baseURL.appendingPathComponent("messages/\(id)")
-        try await requestVoid(url: url, method: "DELETE", token: session.accessToken)
+        try await requestVoid(url: url, method: "DELETE", body: Optional<Data>.none, token: session.accessToken)
     }
 
     func markRead(session: MailSession, id: String) async throws {
@@ -302,9 +302,9 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         let boundary = "Boundary-\(UUID().uuidString)"
         var lines = [
             "From: \(draft.from)",
-            "To: \(draft.to.joined(separator: \", \"))",
-            draft.cc.isEmpty ? nil : "Cc: \(draft.cc.joined(separator: \", \"))",
-            draft.bcc.isEmpty ? nil : "Bcc: \(draft.bcc.joined(separator: \", \"))",
+            "To: \(draft.to.joined(separator: ", "))",
+            draft.cc.isEmpty ? nil : "Cc: \(draft.cc.joined(separator: ", "))",
+            draft.bcc.isEmpty ? nil : "Bcc: \(draft.bcc.joined(separator: ", "))",
             "Subject: \(encodedHeader(draft.subject))",
             "MIME-Version: 1.0"
         ].compactMap { $0 }
