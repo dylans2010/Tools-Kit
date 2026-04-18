@@ -38,6 +38,10 @@ struct CreateFormView: View {
         Color(hex: backgroundHex) ?? Color(.secondarySystemGroupedBackground)
     }
 
+    private var attachStatusText: String {
+        questions.contains(where: { $0.type == .imageUpload }) ? "Yes" : "No"
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -61,8 +65,7 @@ struct CreateFormView: View {
                         }
                         HStack(spacing: 8) {
                             statusChip("Required \(questions.filter(\.required).count)", icon: "asterisk.circle", color: .red)
-                            let attachText = questions.contains(where: { $0.type == .imageUpload }) ? "Yes" : "No"
-                            statusChip("Attach \(attachText)", icon: "paperclip", color: .purple)
+                            statusChip("Attach \(attachStatusText)", icon: "paperclip", color: .purple)
                             statusChip("Manifest Ready", icon: "checkmark.shield", color: .green)
                         }
                     }
