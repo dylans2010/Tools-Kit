@@ -1,0 +1,232 @@
+import Foundation
+import Combine
+
+@MainActor
+final class MeetSessionController: ObservableObject {
+    static let shared = MeetSessionController()
+
+    @Published var meetingIdInput = ""
+    @Published var currentSession: MeetingSession?
+    @Published var phase: MeetSessionPhase = .idle
+    @Published var isBusy = false
+    @Published var errorMessage: String?
+
+    @Published var isMicrophoneMuted = false
+    @Published var isCameraEnabled = true
+    @Published var isScreenSharing = false
+
+    @Published var participants: [MeetingParticipant] = []
+    @Published var chatThreads: [MeetingChatThread] = [MeetingChatThread(id: "general", title: "General")]
+    @Published var messages: [MeetingMessage] = []
+
+    @Published var lobbyState = MeetingLobbyState()
+    @Published var settings = MeetingSettingsState()
+    @Published var summary = MeetingSummaryState()
+    @Published private(set) var debugSnapshot: DailyDebugSnapshot = .empty
+
+    private let resolver: MeetingResolver
+    private let permissionService = MeetPermissionService()
+    private var internalMeetingURL: URL?
+
+    init(resolver: MeetingResolver = .shared) {
+        self.resolver = resolver
+    }
+
+    var isMeetingIDFormatValid: Bool {
+        let candidate = meetingIdInput
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .uppercased()
+        let allowed = CharacterSet.alphanumerics
+        return (4...24).contains(candidate.count) && candidate.unicodeScalars.allSatisfy { allowed.contains($0) }
+    }
+
+    func validateMeetingID(_ value: String? = nil) -> Bool {
+        let candidate = (value ?? meetingIdInput)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .uppercased()
+        let allowed = CharacterSet.alphanumerics
+        let isValid = (4...24).contains(candidate.count) && candidate.unicodeScalars.allSatisfy { allowed.contains($0) }
+        if !isValid {
+            errorMessage = "Meeting ID must be 4-24 letters or numbers."
+        } else if errorMessage == "Meeting ID must be 4-24 letters or numbers." {
+            errorMessage = nil
+        }
+        return isValid
+    }
+
+    func generateMeetingID() -> String {
+        let alphabet = Array("ABCDEFGHJKLMNPQRSTUVWXYZ23456789")
+        let id = String((0..<8).map { _ in alphabet.randomElement()! })
+        meetingIdInput = id
+        return id
+    }
+
+    func createMeeting() async {
+        let proposedID = meetingIdInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? generateMeetingID()
+            : meetingIdInput
+
+        guard validateMeetingID(proposedID) else { return }
+
+        isBusy = true
+        errorMessage = nil
+        defer { isBusy = false }
+
+        do {
+            let session = try await resolver.createSession(with: proposedID)
+            await transitionToLobby(session)
+            DebugLogger.shared.log("Room creation completed for \(session.meetingId).", category: "MeetSession")
+        } catch {
+            phase = .failed
+            errorMessage = error.localizedDescription
+            DebugLogger.shared.log("Room creation failed: \(error.localizedDescription)", level: .error, category: "MeetSession")
+        }
+    }
+
+    func joinMeeting() async {
+        guard validateMeetingID() else { return }
+
+        isBusy = true
+        errorMessage = nil
+        defer { isBusy = false }
+
+        do {
+            let session = try await resolver.joinSession(with: meetingIdInput)
+            await transitionToLobby(session)
+        } catch {
+            phase = .failed
+            errorMessage = error.localizedDescription
+            DebugLogger.shared.log("Join failed: \(error.localizedDescription)", level: .error, category: "MeetSession")
+        }
+    }
+
+    func runLobbyChecks() async {
+        lobbyState.isLoadingParticipants = true
+        lobbyState.isCheckingDevices = true
+
+        async let mic = permissionService.checkMicrophonePermission()
+        async let cam = permissionService.checkCameraPermission()
+
+        lobbyState.microphonePermission = await mic
+        lobbyState.cameraPermission = await cam
+        lobbyState.isCheckingDevices = false
+
+        if participants.isEmpty {
+            participants = [
+                MeetingParticipant(
+                    id: UUID().uuidString,
+                    displayName: "You",
+                    joinedAt: Date(),
+                    isSpeaking: false,
+                    isMuted: isMicrophoneMuted,
+                    hasVideo: isCameraEnabled
+                )
+            ]
+        }
+
+        lobbyState.isLoadingParticipants = false
+    }
+
+    func startMeeting() async {
+        guard let currentSession else { return }
+        await resolver.beginSession(currentSession)
+        phase = .inMeeting
+        addSystemMessage("Meeting connected.")
+        DebugLogger.shared.log("WebRTC state changed: connected", category: "MeetSession")
+        await refreshDebugSnapshot()
+    }
+
+    func leaveMeeting() async {
+        guard let currentSession else { return }
+        await resolver.endSession(currentSession)
+        phase = .ended
+        addSystemMessage("Meeting ended.")
+        DebugLogger.shared.log("WebRTC state changed: disconnected", category: "MeetSession")
+        await refreshDebugSnapshot()
+    }
+
+    func toggleMute() {
+        isMicrophoneMuted.toggle()
+        if let index = participants.firstIndex(where: { $0.displayName == "You" }) {
+            participants[index].isMuted = isMicrophoneMuted
+        }
+        DebugLogger.shared.log(isMicrophoneMuted ? "Microphone muted." : "Microphone unmuted.", category: "MeetSession")
+    }
+
+    func toggleCamera() {
+        isCameraEnabled.toggle()
+        if let index = participants.firstIndex(where: { $0.displayName == "You" }) {
+            participants[index].hasVideo = isCameraEnabled
+        }
+        DebugLogger.shared.log(isCameraEnabled ? "Camera enabled." : "Camera disabled.", category: "MeetSession")
+    }
+
+    func toggleScreenShare() {
+        isScreenSharing.toggle()
+        DebugLogger.shared.log(isScreenSharing ? "Screen share started." : "Screen share stopped.", category: "MeetSession")
+    }
+
+    func sendMessage(_ text: String, threadId: String = "general") {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        messages.append(
+            MeetingMessage(
+                id: UUID().uuidString,
+                threadId: threadId,
+                senderName: "You",
+                text: trimmed,
+                sentAt: Date(),
+                isSystem: false
+            )
+        )
+    }
+
+    func addThread(named title: String) {
+        let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        chatThreads.append(MeetingChatThread(id: UUID().uuidString, title: trimmed))
+    }
+
+    func updateDeveloperAPIKey(_ value: String) async {
+        await resolver.updateDeveloperAPIKey(value)
+        await refreshDebugSnapshot()
+    }
+
+    func refreshDebugSnapshot() async {
+        debugSnapshot = await resolver.fetchDebugSnapshot()
+    }
+
+    func webViewURL() -> URL? {
+        internalMeetingURL
+    }
+
+    private func transitionToLobby(_ session: MeetingSession) async {
+        currentSession = session
+        meetingIdInput = session.meetingId
+        internalMeetingURL = await resolver.internalRoomURL(for: session)
+        phase = .lobby
+        summary = MeetingSummaryState(
+            recap: "AI recap will be generated after this meeting session.",
+            actionItems: ["Capture blockers", "Summarize next steps"],
+            transcriptPreview: "Transcript preview entry point is ready for integration."
+        )
+        messages = []
+        await refreshDebugSnapshot()
+        addSystemMessage("Session prepared for meeting ID \(session.meetingId).")
+    }
+
+    private func addSystemMessage(_ text: String) {
+        messages.append(
+            MeetingMessage(
+                id: UUID().uuidString,
+                threadId: "general",
+                senderName: "System",
+                text: text,
+                sentAt: Date(),
+                isSystem: true
+            )
+        )
+    }
+}
