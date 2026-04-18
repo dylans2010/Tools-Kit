@@ -9,6 +9,7 @@ struct LoginView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var showingCreateAccount = false
+    @State private var errorPulse = false
 
     var body: some View {
         ZStack {
@@ -36,6 +37,7 @@ struct LoginView: View {
                         .foregroundStyle(.white.opacity(0.72))
                 }
                 .padding(.horizontal, 24)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
                 VStack(spacing: 14) {
                     VStack(alignment: .leading, spacing: 8) {
@@ -78,10 +80,23 @@ struct LoginView: View {
                     }
 
                     if let errorMessage {
-                        Text(errorMessage)
-                            .font(.system(size: 13, weight: .medium, design: .rounded))
-                            .foregroundStyle(Color(red: 1.0, green: 0.57, blue: 0.57))
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        HStack(spacing: 8) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                            Text(errorMessage)
+                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        }
+                        .foregroundStyle(Color(red: 1.0, green: 0.57, blue: 0.57))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.red.opacity(0.14))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.red.opacity(0.35), lineWidth: 1)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .scaleEffect(errorPulse ? 1.02 : 1)
+                        .animation(.spring(response: 0.28, dampingFraction: 0.62), value: errorPulse)
                     }
 
                     Button {
@@ -168,6 +183,7 @@ struct LoginView: View {
     private func signInWithEmail() {
         guard !email.isEmpty, !password.isEmpty else {
             errorMessage = "Enter both email and password."
+            animateError()
             return
         }
 
@@ -185,6 +201,7 @@ struct LoginView: View {
                 await MainActor.run {
                     isLoading = false
                     errorMessage = error.localizedDescription
+                    animateError()
                 }
             }
         }
@@ -205,8 +222,16 @@ struct LoginView: View {
                 await MainActor.run {
                     isLoading = false
                     errorMessage = error.localizedDescription
+                    animateError()
                 }
             }
+        }
+    }
+
+    private func animateError() {
+        errorPulse = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
+            errorPulse = false
         }
     }
 }

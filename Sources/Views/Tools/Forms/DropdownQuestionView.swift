@@ -33,7 +33,7 @@ struct DropdownQuestionView: View {
             }
             .padding(12)
             .background(Color(.secondarySystemBackground))
-            .cornerRadius(10)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
     }
 }

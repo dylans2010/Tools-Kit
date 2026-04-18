@@ -14,19 +14,14 @@ struct TasksHomeView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
-                Section {
-                    VStack(spacing: 16) {
-                        summaryCards
-                        aiPlannerCard
-                        contentSections
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 16)
-                } header: {
-                    stickyHeader
-                }
+            VStack(spacing: 16) {
+                stickyHeader
+                summaryCards
+                aiPlannerCard
+                contentSections
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 16)
         }
         .navigationTitle("Tasks")
         .sheet(isPresented: $showingCreate) {
@@ -44,41 +39,56 @@ struct TasksHomeView: View {
     }
 
     private var stickyHeader: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Text("Task Dashboard")
-                    .font(.title3.weight(.semibold))
-                Spacer()
-                Button { showingBoard = true } label: {
-                    Label("Board", systemImage: "square.grid.2x2")
-                }
-                .buttonStyle(.bordered)
-                Button { showingCreate = true } label: {
-                    Label("New", systemImage: "plus")
-                }
-                .buttonStyle(.borderedProminent)
-            }
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    FilterChip(title: "All", isSelected: filterCategory == nil) { filterCategory = nil }
-                    ForEach(manager.categories) { cat in
-                        FilterChip(title: cat.name, color: Color(hex: cat.colorHex) ?? .blue, isSelected: filterCategory?.id == cat.id) {
-                            filterCategory = (filterCategory?.id == cat.id) ? nil : cat
-                        }
+        WorkspaceSurfaceCard {
+            VStack(spacing: 10) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Task Command Center")
+                            .font(.title3.bold())
+                        Text("Plan, prioritize, and execute with AI-guided workflows.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     }
-                    Button {
-                        showingCategories = true
-                    } label: {
-                        Label("Categories", systemImage: "folder")
-                            .font(.caption.weight(.medium))
+                    Spacer()
+                    Button { showingBoard = true } label: {
+                        Label("Board", systemImage: "square.grid.2x2")
                     }
                     .buttonStyle(.bordered)
+                    Button { showingCreate = true } label: {
+                        Label("New", systemImage: "plus")
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                HStack(spacing: 8) {
+                    aiQuickAction("Sprint Plan", icon: "calendar.badge.plus") {
+                        runAIPlanner(with: "Create a 7-day sprint plan with priority, scope, and due dates.")
+                    }
+                    aiQuickAction("Backlog Triage", icon: "line.3.horizontal.decrease.circle") {
+                        runAIPlanner(with: "Triage backlog items and suggest top priority execution order.")
+                    }
+                    aiQuickAction("Risk Scan", icon: "exclamationmark.triangle") {
+                        runAIPlanner(with: "Identify risks, blockers, and mitigation tasks for this plan.")
+                    }
+                }
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        FilterChip(title: "All", isSelected: filterCategory == nil) { filterCategory = nil }
+                        ForEach(manager.categories) { cat in
+                            FilterChip(title: cat.name, color: Color(hex: cat.colorHex) ?? .blue, isSelected: filterCategory?.id == cat.id) {
+                                filterCategory = (filterCategory?.id == cat.id) ? nil : cat
+                            }
+                        }
+                        Button {
+                            showingCategories = true
+                        } label: {
+                            Label("Categories", systemImage: "folder")
+                                .font(.caption.weight(.medium))
+                        }
+                        .buttonStyle(.bordered)
+                    }
                 }
             }
         }
-        .padding(16)
-        .background(.ultraThinMaterial)
-        .overlay(Divider(), alignment: .bottom)
     }
 
     private var summaryCards: some View {
@@ -160,7 +170,11 @@ struct TasksHomeView: View {
     }
 
     private func runAIPlanner() {
-        let prompt = aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        runAIPlanner(with: aiPrompt)
+    }
+
+    private func runAIPlanner(with promptInput: String) {
+        let prompt = promptInput.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !prompt.isEmpty else { return }
         aiLoading = true
         aiError = nil
@@ -216,6 +230,14 @@ struct TasksHomeView: View {
     private func formattedTaskDescription(details: String, subtasks: [String]) -> String {
         guard !subtasks.isEmpty else { return details }
         return details + "\n" + subtasks.map { "• \($0)" }.joined(separator: "\n")
+    }
+
+    private func aiQuickAction(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: icon)
+                .font(.caption.weight(.semibold))
+        }
+        .buttonStyle(.bordered)
     }
 }
 

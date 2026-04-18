@@ -13,55 +13,29 @@ struct WorkspaceHabitTrackerView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
-                Section {
-                    VStack(spacing: 16) {
-                        summaryHeader
-                        aiInsightsCard
-                        if manager.habits.isEmpty {
-                            EmptyStateView(
-                                icon: "flame.fill",
-                                title: "No Habits Yet",
-                                message: "Add habits or ask AI for recommendations based on your goals.",
-                                action: { showingCreate = true },
-                                actionLabel: "Add Habit"
-                            )
-                        } else {
-                            VStack(spacing: 10) {
-                                ForEach(manager.habits) { habit in
-                                    HabitRowCard(habit: habit, manager: manager) {
-                                        selectedHabit = habit
-                                    }
-                                }
+            VStack(spacing: 16) {
+                heroCard
+                summaryHeader
+                aiInsightsCard
+                if manager.habits.isEmpty {
+                    EmptyStateView(
+                        icon: "flame.fill",
+                        title: "No Habits Yet",
+                        message: "Add habits or ask AI for recommendations based on your goals.",
+                        action: { showingCreate = true },
+                        actionLabel: "Add Habit"
+                    )
+                } else {
+                    VStack(spacing: 10) {
+                        ForEach(manager.habits) { habit in
+                            HabitRowCard(habit: habit, manager: manager) {
+                                selectedHabit = habit
                             }
                         }
                     }
-                    .padding(16)
-                } header: {
-                    HStack {
-                        Text("Habits")
-                            .font(.title3.weight(.semibold))
-                        Spacer()
-                        if !manager.habits.isEmpty {
-                            Button {
-                                showingAnalytics = true
-                            } label: {
-                                Label("Analytics", systemImage: "chart.bar")
-                            }
-                            .buttonStyle(.bordered)
-                        }
-                        Button {
-                            showingCreate = true
-                        } label: {
-                            Label("New", systemImage: "plus")
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
-                    .padding(16)
-                    .background(.ultraThinMaterial)
-                    .overlay(Divider(), alignment: .bottom)
                 }
             }
+            .padding(16)
         }
         .navigationTitle("Habits")
         .sheet(isPresented: $showingCreate) {
@@ -72,6 +46,48 @@ struct WorkspaceHabitTrackerView: View {
         }
         .sheet(item: $selectedHabit) { habit in
             NavigationStack { HabitDetailView(habit: habit) }
+        }
+    }
+
+    private var heroCard: some View {
+        WorkspaceSurfaceCard {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Habit Coach")
+                            .font(.title2.bold())
+                        Text("Build stronger routines with behavior-aware AI coaching.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    if !manager.habits.isEmpty {
+                        Button {
+                            showingAnalytics = true
+                        } label: {
+                            Label("Analytics", systemImage: "chart.bar")
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    Button {
+                        showingCreate = true
+                    } label: {
+                        Label("New", systemImage: "plus")
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                HStack(spacing: 8) {
+                    aiQuickAction("Morning Routine", icon: "sun.max.fill") {
+                        runAI(with: "Design a realistic morning routine for focus, fitness, and consistency.")
+                    }
+                    aiQuickAction("Break Bad Habit", icon: "shield.lefthalf.filled") {
+                        runAI(with: "Give a replacement habit strategy to break a bad habit pattern.")
+                    }
+                    aiQuickAction("Streak Recovery", icon: "flame.circle.fill") {
+                        runAI(with: "Create a 7-day streak recovery plan after missed days.")
+                    }
+                }
+            }
         }
     }
 
@@ -125,7 +141,11 @@ struct WorkspaceHabitTrackerView: View {
     }
 
     private func runAI() {
-        let prompt = aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        runAI(with: aiPrompt)
+    }
+
+    private func runAI(with input: String) {
+        let prompt = input.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !prompt.isEmpty else { return }
         aiLoading = true
         aiError = nil
@@ -143,6 +163,14 @@ struct WorkspaceHabitTrackerView: View {
                 }
             }
         }
+    }
+
+    private func aiQuickAction(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: icon)
+                .font(.caption.weight(.semibold))
+        }
+        .buttonStyle(.bordered)
     }
 }
 

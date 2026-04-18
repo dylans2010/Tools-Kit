@@ -10,6 +10,7 @@ struct FillOutFormView: View {
     @State private var exportURL: URL?
     @State private var showValidationAlert = false
     @State private var showCompletedSheet = false
+    @State private var validationMessage: String?
 
     private var accentColor: Color {
         Color(hex: form.accentHexColor) ?? .blue
@@ -21,9 +22,42 @@ struct FillOutFormView: View {
         }
     }
 
+    private var completionRatio: Double {
+        guard !form.questions.isEmpty else { return 0 }
+        let answered = form.questions.filter { !(answers[$0.id] ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }.count
+        return Double(answered) / Double(form.questions.count)
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Text("Progress")
+                            .font(.subheadline.bold())
+                        Spacer()
+                        Text("\(Int(completionRatio * 100))%")
+                            .font(.caption.weight(.semibold))
+                            .foregroundColor(accentColor)
+                    }
+                    ProgressView(value: completionRatio)
+                        .tint(accentColor)
+                    if let validationMessage {
+                        Text(validationMessage)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .padding(10)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.red.opacity(0.08))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+                }
+                .padding(16)
+                .background(Color(.systemBackground))
+                .cornerRadius(14)
+                .shadow(color: .black.opacity(0.04), radius: 4, y: 2)
+
                 // Responder card
                 VStack(alignment: .leading, spacing: 10) {
                     Label("Your Name", systemImage: "person.circle")
@@ -129,9 +163,13 @@ struct FillOutFormView: View {
 
     private func submitForm() {
         guard unansweredRequired.isEmpty else {
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                validationMessage = "Please answer all required questions before submitting."
+            }
             showValidationAlert = true
             return
         }
+        withAnimation(.easeOut(duration: 0.2)) { validationMessage = nil }
         let doc = FilledOutFormDocument(
             formID: form.id,
             formName: form.name,

@@ -16,6 +16,9 @@ struct CreateFormView: View {
     @State private var privacyNote = "Review the Manifest before sharing."
     @State private var tags = ""
     @State private var expandedQuestionID: UUID?
+    @State private var aiPrompt = ""
+    @State private var aiLoading = false
+    @State private var aiError: String?
 
     private let managers: [FormOptionManager] = [
         TextInputOptionManager(),
@@ -38,6 +41,32 @@ struct CreateFormView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
+                formCard {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Create Smart Form")
+                                    .font(.title2.bold())
+                                Text("Design production-ready forms with better UX, metadata, and AI-assisted drafting.")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Label("\(questions.count) Q", systemImage: "list.number")
+                                .font(.caption.weight(.semibold))
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(accentColor.opacity(0.14))
+                                .clipShape(Capsule())
+                        }
+                        HStack(spacing: 8) {
+                            statusChip("Required \(questions.filter(\.required).count)", icon: "asterisk.circle", color: .red)
+                            statusChip("Attach \(questions.contains(where: { $0.type == .imageUpload }) ? \"Yes\" : \"No\")", icon: "paperclip", color: .purple)
+                            statusChip("Manifest Ready", icon: "checkmark.shield", color: .green)
+                        }
+                    }
+                }
+
                 // Basics
                 formCard {
                     VStack(alignment: .leading, spacing: 12) {
@@ -118,6 +147,32 @@ struct CreateFormView: View {
                                 }
                                 .padding(.horizontal, 14)
                             )
+                    }
+                }
+
+                formCard {
+                    VStack(alignment: .leading, spacing: 12) {
+                        cardHeader("AI Question Builder", icon: "sparkles")
+                        TextField("e.g. Build a customer onboarding quality survey", text: $aiPrompt, axis: .vertical)
+                            .textFieldStyle(.roundedBorder)
+                        if aiLoading {
+                            ProgressView("Generating questions…")
+                                .font(.caption)
+                        } else if let aiError {
+                            Text(aiError)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                        }
+                        HStack {
+                            Button("Generate Questions", action: generateAIQuestions)
+                                .buttonStyle(.borderedProminent)
+                                .disabled(aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || aiLoading)
+                            Spacer()
+                            Button("Template: Feedback") {
+                                aiPrompt = "Create 6 customer feedback questions with one rating, one dropdown, and one text follow-up."
+                            }
+                            .buttonStyle(.bordered)
+                        }
                     }
                 }
 
@@ -326,6 +381,16 @@ struct CreateFormView: View {
         }
     }
 
+    private func statusChip(_ text: String, icon: String, color: Color) -> some View {
+        Label(text, systemImage: icon)
+            .font(.caption.weight(.semibold))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(color.opacity(0.12))
+            .foregroundColor(color)
+            .clipShape(Capsule())
+    }
+
     private func addQuestion() {
         if let manager = managers.first(where: { $0.type == selectedType }) {
             let newQuestion = manager.defaultQuestion()
@@ -354,5 +419,44 @@ struct CreateFormView: View {
         )
         backend.add(form)
         dismiss()
+    }
+
+    private func generateAIQuestions() {
+        let prompt = aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !prompt.isEmpty else { return }
+        aiLoading = true
+        aiError = nil
+        Task {
+            do {
+                let output = try await AIService.shared.processText(
+                    prompt: """
+                    Create a concise list of form questions from this request:
+                    \(prompt)
+
+                    Return only plain text bullets, one question per line.
+                    """,
+                    systemPrompt: "You are a form UX designer. Keep questions specific and practical."
+                )
+                let generated = output
+                    .split(separator: "\n")
+                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .map { $0.replacingOccurrences(of: "^-\\s*", with: "", options: .regularExpression) }
+                    .map { $0.replacingOccurrences(of: "^\\d+[.)]\\s*", with: "", options: .regularExpression) }
+                    .filter { !$0.isEmpty }
+                    .prefix(8)
+                await MainActor.run {
+                    for title in generated where !questions.contains(where: { $0.title.caseInsensitiveCompare(title) == .orderedSame }) {
+                        questions.append(FormQuestion(title: title, type: .textInput, required: false))
+                    }
+                    if let last = questions.last { expandedQuestionID = last.id }
+                    aiLoading = false
+                }
+            } catch {
+                await MainActor.run {
+                    aiError = "Could not generate questions right now. Try a more specific request."
+                    aiLoading = false
+                }
+            }
+        }
     }
 }

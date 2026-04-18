@@ -10,6 +10,7 @@ struct WorkspaceHomeView: View {
         case notebooks = "Notebooks"
         case tasks = "Tasks"
         case articles = "Articles"
+        case files = "Files"
 
         var icon: String {
             switch self {
@@ -19,6 +20,7 @@ struct WorkspaceHomeView: View {
             case .notebooks: return "book.closed.fill"
             case .tasks: return "checklist"
             case .articles: return "newspaper.fill"
+            case .files: return "folder.fill"
             }
         }
     }
@@ -31,6 +33,7 @@ struct WorkspaceHomeView: View {
             notebooksTab
             tasksTab
             articlesTab
+            filesTab
         }
     }
 
@@ -93,6 +96,16 @@ struct WorkspaceHomeView: View {
         }
         .tag(WorkspaceTab.articles)
     }
+
+    private var filesTab: some View {
+        NavigationStack {
+            FileManagementView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.files.rawValue, systemImage: WorkspaceTab.files.icon)
+        }
+        .tag(WorkspaceTab.files)
+    }
 }
 
 // MARK: - Dashboard View
@@ -113,6 +126,7 @@ struct WorkspaceDashboardView: View {
     private let moreTools: [(title: String, icon: String, color: Color, destination: AnyView)] = [
         ("Calendar", "calendar", .green, AnyView(CalendarHomeView())),
         ("Habits", "flame.fill", .red, AnyView(WorkspaceHabitTrackerView())),
+        ("Files", "folder.fill", .yellow, AnyView(FileManagementView())),
         ("Forms", "list.bullet.rectangle.portrait", .teal, AnyView(FormsView())),
         ("Slides", "rectangle.on.rectangle.angled", .purple, AnyView(SlidesHomeView())),
         ("Sheets", "tablecells", .blue, AnyView(SpreadsheetsHomeView())),
