@@ -6,22 +6,12 @@ struct QuestionEditorView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            // Question name (short identifier)
-            HStack {
-                Text("Name")
-                    .font(.caption.bold())
-                    .foregroundColor(.secondary)
-                    .frame(width: 52, alignment: .leading)
+            LabeledContent("Name") {
                 TextField("Question Name", text: $question.questionName)
                     .textFieldStyle(.roundedBorder)
             }
 
-            // Question title / prompt text
-            HStack {
-                Text("Question")
-                    .font(.caption.bold())
-                    .foregroundColor(.secondary)
-                    .frame(width: 52, alignment: .leading)
+            LabeledContent("Question") {
                 TextField("What's The Question", text: $question.title)
                     .textFieldStyle(.roundedBorder)
             }
@@ -113,6 +103,9 @@ struct NamedOptionsEditorView: View {
                 .buttonStyle(.plain)
             }
         }
+        .padding(10)
+        .background(Color(.tertiarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 
@@ -152,6 +145,9 @@ struct RatingScaleEditorView: View {
             }
             .font(.caption)
         }
+        .padding(10)
+        .background(Color(.tertiarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     private func setOption(_ index: Int, _ value: String) {
@@ -192,6 +188,9 @@ struct SliderEditorView: View {
             }
             .font(.caption)
         }
+        .padding(10)
+        .background(Color(.tertiarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     private func makeBinding(_ index: Int) -> Binding<String> {

@@ -47,8 +47,7 @@ struct SliderQuestionView: View {
             }
         }
         .padding(12)
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(10)
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
     private func formatValue(_ val: Double) -> String {

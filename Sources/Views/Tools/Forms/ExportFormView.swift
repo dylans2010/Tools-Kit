@@ -13,7 +13,9 @@ struct ExportFormView: View {
             VStack(spacing: 24) {
                 Image(systemName: "square.and.arrow.up.circle.fill")
                     .font(.system(size: 64))
-                    .foregroundColor(.blue)
+                    .foregroundStyle(
+                        LinearGradient(colors: [.blue, .indigo], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    )
 
                 VStack(spacing: 8) {
                     Text("Export Form")
@@ -38,7 +40,9 @@ struct ExportFormView: View {
                         Label("Share \(form.name).form", systemImage: "square.and.arrow.up")
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.blue)
+                            .background(
+                                LinearGradient(colors: [.blue, .indigo], startPoint: .leading, endPoint: .trailing)
+                            )
                             .foregroundColor(.white)
                             .cornerRadius(14)
                             .padding(.horizontal, 24)
@@ -50,7 +54,9 @@ struct ExportFormView: View {
                         Label("Prepare Export", systemImage: "gearshape.2")
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.blue)
+                            .background(
+                                LinearGradient(colors: [.blue, .indigo], startPoint: .leading, endPoint: .trailing)
+                            )
                             .foregroundColor(.white)
                             .cornerRadius(14)
                             .padding(.horizontal, 24)

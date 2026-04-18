@@ -11,59 +11,75 @@ struct NotebooksHomeView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
-                Section {
-                    VStack(spacing: 16) {
-                        aiCard
-                        if manager.notebooks.isEmpty {
-                            EmptyStateView(
-                                icon: "book.closed",
-                                title: "No Notebooks",
-                                message: "Create your first notebook to start writing and organizing notes.",
-                                action: { showingCreate = true },
-                                actionLabel: "Create Notebook"
-                            )
-                        } else {
-                            VStack(spacing: 10) {
-                                ForEach(manager.notebooks) { notebook in
-                                    NavigationLink {
-                                        NotebookDetailView(notebook: notebook)
-                                    } label: {
-                                        NotebookRow(notebook: notebook)
-                                    }
-                                    .buttonStyle(.plain)
-                                }
+            VStack(spacing: 16) {
+                heroCard
+                aiCard
+                if manager.notebooks.isEmpty {
+                    EmptyStateView(
+                        icon: "book.closed",
+                        title: "No Notebooks",
+                        message: "Create your first notebook to start writing and organizing notes.",
+                        action: { showingCreate = true },
+                        actionLabel: "Create Notebook"
+                    )
+                } else {
+                    VStack(spacing: 10) {
+                        ForEach(manager.notebooks) { notebook in
+                            NavigationLink {
+                                NotebookDetailView(notebook: notebook)
+                            } label: {
+                                NotebookRow(notebook: notebook)
                             }
+                            .buttonStyle(.plain)
                         }
                     }
-                    .padding(16)
-                } header: {
-                    HStack {
-                        Text("Notebooks")
-                            .font(.title3.weight(.semibold))
-                        Spacer()
-                        Button {
-                            showingIntegrations = true
-                        } label: {
-                            Label("Integrations", systemImage: "puzzlepiece.extension")
-                        }
-                        .buttonStyle(.bordered)
-                        Button {
-                            showingCreate = true
-                        } label: {
-                            Label("New", systemImage: "plus")
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
-                    .padding(16)
-                    .background(.ultraThinMaterial)
-                    .overlay(Divider(), alignment: .bottom)
                 }
             }
+            .padding(16)
         }
         .navigationTitle("Notebooks")
         .sheet(isPresented: $showingCreate) { CreateNotebookView() }
         .sheet(isPresented: $showingIntegrations) { NavigationStack { IntegrationsView() } }
+    }
+
+    private var heroCard: some View {
+        WorkspaceSurfaceCard {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Notebooks")
+                            .font(.title2.bold())
+                        Text("Capture ideas with structured AI assistance and connected note intelligence.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button {
+                        showingIntegrations = true
+                    } label: {
+                        Label("Integrations", systemImage: "puzzlepiece.extension")
+                    }
+                    .buttonStyle(.bordered)
+                    Button {
+                        showingCreate = true
+                    } label: {
+                        Label("New", systemImage: "plus")
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                HStack(spacing: 8) {
+                    aiAction("Summarize", icon: "text.alignleft") {
+                        runAI(using: "Summarize this note into executive bullets and a 3-line brief.")
+                    }
+                    aiAction("Research Tags", icon: "tag.fill") {
+                        runAI(using: "Generate taxonomy tags, topics, and searchable keywords.")
+                    }
+                    aiAction("Study Mode", icon: "brain.head.profile") {
+                        runAI(using: "Convert this note into study guide format with recall prompts.")
+                    }
+                }
+            }
+        }
     }
 
     private var aiCard: some View {
@@ -110,7 +126,11 @@ struct NotebooksHomeView: View {
     }
 
     private func runAI() {
-        let prompt = aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        runAI(using: aiPrompt)
+    }
+
+    private func runAI(using input: String) {
+        let prompt = input.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !prompt.isEmpty else { return }
         aiLoading = true
         aiError = nil
@@ -131,6 +151,14 @@ struct NotebooksHomeView: View {
                 }
             }
         }
+    }
+
+    private func aiAction(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: icon)
+                .font(.caption.weight(.semibold))
+        }
+        .buttonStyle(.bordered)
     }
 }
 

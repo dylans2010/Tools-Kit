@@ -27,7 +27,8 @@ struct FormsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                // Action buttons
+                heroHeader
+
                 HStack(spacing: 10) {
                     actionButton("Create", icon: "plus.circle.fill", color: .blue) {
                         showingCreate = true
@@ -120,6 +121,38 @@ struct FormsView: View {
         }
     }
 
+    private var heroHeader: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Forms Studio")
+                        .font(.title2.bold())
+                    Text("Create, ship, import, review, and export secure `.form` workflows.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                Text("\(backend.forms.count)")
+                    .font(.headline.bold())
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color.blue.opacity(0.12))
+                    .clipShape(Capsule())
+            }
+            HStack(spacing: 8) {
+                quickTag("Owner-safe Imports", icon: "lock.shield", color: .indigo)
+                quickTag("Manifest Metadata", icon: "doc.badge.gearshape", color: .orange)
+                quickTag("Attachment Aware", icon: "paperclip", color: .purple)
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color(.secondarySystemBackground))
+        )
+        .padding(.horizontal)
+    }
+
     // MARK: - Helpers
 
     @ViewBuilder
@@ -172,6 +205,16 @@ struct FormsView: View {
             .cornerRadius(14)
         }
         .buttonStyle(.plain)
+    }
+
+    private func quickTag(_ title: String, icon: String, color: Color) -> some View {
+        Label(title, systemImage: icon)
+            .font(.caption.weight(.semibold))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(color.opacity(0.12))
+            .foregroundColor(color)
+            .clipShape(Capsule())
     }
 }
 

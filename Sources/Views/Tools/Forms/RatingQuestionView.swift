@@ -88,5 +88,6 @@ struct RatingQuestionView: View {
                 }
             }
         }
+        .padding(4)
     }
 }

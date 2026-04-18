@@ -11,6 +11,8 @@ struct CreateAccountView: View {
     @State private var confirmPassword = ""
     @State private var isWorking = false
     @State private var errorMessage: String?
+    @State private var errorPulse = false
+    private let errorPulseDuration: Double = 0.28
 
     var body: some View {
         NavigationStack {
@@ -33,10 +35,23 @@ struct CreateAccountView: View {
                 }
 
                 if let errorMessage {
-                    Text(errorMessage)
-                        .font(.caption)
-                        .foregroundStyle(Color.red.opacity(0.9))
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                        Text(errorMessage)
+                            .font(.caption.weight(.semibold))
+                    }
+                    .foregroundStyle(Color.red.opacity(0.95))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.red.opacity(0.15))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.red.opacity(0.35), lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .scaleEffect(errorPulse ? 1.02 : 1)
+                    .animation(.spring(response: errorPulseDuration, dampingFraction: 0.62), value: errorPulse)
                 }
 
                 Button(action: createAccount) {
@@ -117,11 +132,13 @@ struct CreateAccountView: View {
 
         guard !normalizedEmail.isEmpty, !password.isEmpty else {
             errorMessage = "Email and password are required."
+            animateError()
             return
         }
 
         guard password == confirmPassword else {
             errorMessage = "Passwords do not match."
+            animateError()
             return
         }
 
@@ -140,8 +157,16 @@ struct CreateAccountView: View {
                 await MainActor.run {
                     isWorking = false
                     errorMessage = error.localizedDescription
+                    animateError()
                 }
             }
+        }
+    }
+
+    private func animateError() {
+        errorPulse = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + errorPulseDuration) {
+            errorPulse = false
         }
     }
 }

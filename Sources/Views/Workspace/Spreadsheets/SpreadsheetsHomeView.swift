@@ -6,59 +6,43 @@ struct SpreadsheetsHomeView: View {
     @State private var newName = ""
     @State private var sheetToDelete: Spreadsheet?
     @State private var showDeleteConfirm = false
+    @State private var aiPrompt = ""
+    @State private var aiLoading = false
+    @State private var aiError: String?
+    @State private var aiResult: SpreadsheetsManager.SpreadsheetAIPayload?
     private let columns = [GridItem(.adaptive(minimum: 200), spacing: 12)]
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
-                Section {
-                    VStack(spacing: 16) {
-                        if manager.spreadsheets.isEmpty {
-                            EmptyStateView(
-                                icon: "tablecells",
-                                title: "No Spreadsheets",
-                                message: "Create a spreadsheet or import data to begin analysis.",
-                                action: { showingCreate = true },
-                                actionLabel: "Create Spreadsheet"
-                            )
-                        } else {
-                            LazyVGrid(columns: columns, spacing: 12) {
-                                ForEach(manager.spreadsheets) { sheet in
-                                    NavigationLink {
-                                        SpreadsheetEditorView(spreadsheet: sheet, manager: manager)
-                                    } label: {
-                                        SpreadsheetCard(sheet: sheet) {
-                                            sheetToDelete = sheet
-                                            showDeleteConfirm = true
-                                        }
-                                    }
-                                    .buttonStyle(.plain)
+            VStack(spacing: 16) {
+                featureHero
+                aiPlannerCard
+
+                if manager.spreadsheets.isEmpty {
+                    EmptyStateView(
+                        icon: "tablecells",
+                        title: "No Spreadsheets",
+                        message: "Create a spreadsheet or import data to begin analysis.",
+                        action: { showingCreate = true },
+                        actionLabel: "Create Spreadsheet"
+                    )
+                } else {
+                    LazyVGrid(columns: columns, spacing: 12) {
+                        ForEach(manager.spreadsheets) { sheet in
+                            NavigationLink {
+                                SpreadsheetEditorView(spreadsheet: sheet, manager: manager)
+                            } label: {
+                                SpreadsheetCard(sheet: sheet) {
+                                    sheetToDelete = sheet
+                                    showDeleteConfirm = true
                                 }
                             }
+                            .buttonStyle(.plain)
                         }
                     }
-                    .padding(16)
-                } header: {
-                    VStack(spacing: 8) {
-                        HStack {
-                            Text("Spreadsheets")
-                                .font(.title3.weight(.semibold))
-                            Spacer()
-                            Button { showingCreate = true } label: {
-                                Label("New Sheet", systemImage: "plus")
-                            }
-                            .buttonStyle(.borderedProminent)
-                        }
-                        Text("Build structured datasets with AI-powered formulas and insights.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .padding(16)
-                    .background(.ultraThinMaterial)
-                    .overlay(Divider(), alignment: .bottom)
                 }
             }
+            .padding(16)
         }
         .navigationTitle("Spreadsheets")
         .sheet(isPresented: $showingCreate) {
@@ -93,6 +77,113 @@ struct SpreadsheetsHomeView: View {
                 if let sheetToDelete { manager.deleteSpreadsheet(sheetToDelete) }
             }
             Button("Cancel", role: .cancel) {}
+        }
+    }
+
+    private var featureHero: some View {
+        WorkspaceSurfaceCard {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Spreadsheets")
+                            .font(.title2.bold())
+                        Text("Build clear datasets with formula intelligence and instant AI insights.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button {
+                        showingCreate = true
+                    } label: {
+                        Label("New Sheet", systemImage: "plus")
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                HStack(spacing: 8) {
+                    aiAction("Forecast", icon: "chart.line.uptrend.xyaxis") {
+                        runAI("Forecast trends from this business table.")
+                    }
+                    aiAction("Audit", icon: "checkmark.shield") {
+                        runAI("Audit this sheet for data quality issues and anomalies.")
+                    }
+                    aiAction("Formulas", icon: "function") {
+                        runAI("Suggest formulas for KPIs, totals, and ratios.")
+                    }
+                }
+            }
+        }
+    }
+
+    private var aiPlannerCard: some View {
+        WorkspaceSurfaceCard {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("AI Spreadsheet Copilot")
+                    .font(.headline)
+                TextField("Ask for formulas, chart plans, or data cleanup strategy…", text: $aiPrompt)
+                    .textFieldStyle(.roundedBorder)
+                if aiLoading {
+                    WorkspaceSkeletonLine()
+                    WorkspaceSkeletonLine(widthRatio: 0.7)
+                } else if let aiError {
+                    Text(aiError)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                } else if let aiResult {
+                    Text(aiResult.summary)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    insightRow("Formulas", aiResult.formulaSuggestions)
+                    insightRow("Charts", aiResult.chartSuggestions)
+                }
+                Button("Analyze Request", action: runAI)
+                    .buttonStyle(.borderedProminent)
+                    .disabled(aiLoading || aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+        }
+    }
+
+    private func insightRow(_ title: String, _ values: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.caption.weight(.semibold))
+            ForEach(values.prefix(3), id: \.self) { value in
+                Text("• \(value)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func aiAction(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: icon)
+                .font(.caption.weight(.semibold))
+        }
+        .buttonStyle(.bordered)
+    }
+
+    private func runAI(_ preset: String? = nil) {
+        let prompt = (preset ?? aiPrompt).trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !prompt.isEmpty else { return }
+        aiLoading = true
+        aiError = nil
+        Task {
+            do {
+                let preview = manager.spreadsheets.first.map { sheet in
+                    "Sheet \(sheet.name), \(sheet.rows)x\(sheet.columns)"
+                } ?? "No current spreadsheet data. Suggest setup guidance."
+                let result = try await manager.analyzeSpreadsheet(prompt: prompt, dataPreview: preview)
+                await MainActor.run {
+                    aiResult = result
+                    if preset != nil { aiPrompt = prompt }
+                    aiLoading = false
+                }
+            } catch {
+                await MainActor.run {
+                    aiError = "Could not generate spreadsheet guidance. Try a more specific ask."
+                    aiLoading = false
+                }
+            }
         }
     }
 }

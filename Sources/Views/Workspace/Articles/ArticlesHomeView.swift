@@ -14,39 +14,55 @@ struct ArticlesHomeView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
-                Section {
-                    VStack(spacing: 16) {
-                        aiCard
-                        featuredSection
-                        if !manager.recentArticles.isEmpty { recentSection }
-                        if !manager.collections.isEmpty { collectionSection }
-                    }
-                    .padding(16)
-                } header: {
-                    HStack {
-                        Text("Articles")
-                            .font(.title3.weight(.semibold))
-                        Spacer()
-                        NavigationLink(destination: ArticleSearchView()) {
-                            Label("Search", systemImage: "magnifyingglass")
-                        }
-                        .buttonStyle(.bordered)
-                        Button { showingCollections = true } label: {
-                            Label("Collections", systemImage: "folder")
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
-                    .padding(16)
-                    .background(.ultraThinMaterial)
-                    .overlay(Divider(), alignment: .bottom)
-                }
+            VStack(spacing: 16) {
+                heroCard
+                aiCard
+                featuredSection
+                if !manager.recentArticles.isEmpty { recentSection }
+                if !manager.collections.isEmpty { collectionSection }
             }
+            .padding(16)
         }
         .navigationTitle("Articles")
         .sheet(isPresented: $showingCollections) { CollectionsView() }
         .onAppear { if featuredArticles.isEmpty { loadFeaturedArticles() } }
         .refreshable { loadFeaturedArticles() }
+    }
+
+    private var heroCard: some View {
+        WorkspaceSurfaceCard {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Articles")
+                            .font(.title2.bold())
+                        Text("Discover, distill, and rewrite content with editorial AI workflows.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    NavigationLink(destination: ArticleSearchView()) {
+                        Label("Search", systemImage: "magnifyingglass")
+                    }
+                    .buttonStyle(.bordered)
+                    Button { showingCollections = true } label: {
+                        Label("Collections", systemImage: "folder")
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                HStack(spacing: 8) {
+                    aiQuickAction("Executive Brief", icon: "doc.text.magnifyingglass") {
+                        runAI(using: "Create an executive brief: summary, risks, opportunities, and recommendations.")
+                    }
+                    aiQuickAction("Debate Lens", icon: "bubble.left.and.bubble.right") {
+                        runAI(using: "Analyze arguments, assumptions, and counterpoints from this text.")
+                    }
+                    aiQuickAction("Learning Notes", icon: "lightbulb.max.fill") {
+                        runAI(using: "Convert this article into learning notes with glossary and action steps.")
+                    }
+                }
+            }
+        }
     }
 
     private var aiCard: some View {
@@ -71,10 +87,26 @@ struct ArticlesHomeView: View {
                     Text(aiInsights.summary)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                    if !aiInsights.rewrite.isEmpty {
+                        Text("Rewrite")
+                            .font(.caption.weight(.semibold))
+                        Text(aiInsights.rewrite)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     ForEach(aiInsights.keyPoints, id: \.self) { point in
                         Text("• \(point)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
+                    }
+                    if !aiInsights.expandedSections.isEmpty {
+                        Text("Expanded Sections")
+                            .font(.caption.weight(.semibold))
+                        ForEach(aiInsights.expandedSections, id: \.self) { section in
+                            Text("• \(section)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
             }
@@ -157,7 +189,11 @@ struct ArticlesHomeView: View {
     }
 
     private func runAI() {
-        let text = aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        runAI(using: aiPrompt)
+    }
+
+    private func runAI(using input: String) {
+        let text = input.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
         aiLoading = true
         aiError = nil
@@ -178,6 +214,14 @@ struct ArticlesHomeView: View {
                 }
             }
         }
+    }
+
+    private func aiQuickAction(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: icon)
+                .font(.caption.weight(.semibold))
+        }
+        .buttonStyle(.bordered)
     }
 }
 

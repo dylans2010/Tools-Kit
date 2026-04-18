@@ -15,62 +15,33 @@ struct SlidesHomeView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
-                Section {
-                    VStack(spacing: 16) {
-                        if manager.decks.isEmpty {
-                            EmptyStateView(
-                                icon: "rectangle.on.rectangle.angled",
-                                title: "No Presentations",
-                                message: "Create a deck manually or generate one from AI.",
-                                action: { showingCreate = true },
-                                actionLabel: "Create Deck"
-                            )
-                        } else {
-                            LazyVGrid(columns: columns, spacing: 12) {
-                                ForEach(manager.decks) { deck in
-                                    NavigationLink {
-                                        SlideEditorView(deck: deck, manager: manager)
-                                    } label: {
-                                        DeckCard(deck: deck) {
-                                            deckToDelete = deck
-                                            showDeleteConfirm = true
-                                        }
-                                    }
-                                    .buttonStyle(.plain)
+            VStack(spacing: 16) {
+                heroCard
+                if manager.decks.isEmpty {
+                    EmptyStateView(
+                        icon: "rectangle.on.rectangle.angled",
+                        title: "No Presentations",
+                        message: "Create a deck manually or generate one from AI.",
+                        action: { showingCreate = true },
+                        actionLabel: "Create Deck"
+                    )
+                } else {
+                    LazyVGrid(columns: columns, spacing: 12) {
+                        ForEach(manager.decks) { deck in
+                            NavigationLink {
+                                SlideEditorView(deck: deck, manager: manager)
+                            } label: {
+                                DeckCard(deck: deck) {
+                                    deckToDelete = deck
+                                    showDeleteConfirm = true
                                 }
                             }
+                            .buttonStyle(.plain)
                         }
                     }
-                    .padding(16)
-                } header: {
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack {
-                            Text("Slides")
-                                .font(.title3.weight(.semibold))
-                            Spacer()
-                            Button {
-                                showingAIGenerate = true
-                            } label: {
-                                Label("Generate", systemImage: "sparkles")
-                            }
-                            .buttonStyle(.bordered)
-                            Button {
-                                showingCreate = true
-                            } label: {
-                                Label("New", systemImage: "plus")
-                            }
-                            .buttonStyle(.borderedProminent)
-                        }
-                        Text("Prompt-to-deck generation with structured slides and speaker notes.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(16)
-                    .background(.ultraThinMaterial)
-                    .overlay(Divider(), alignment: .bottom)
                 }
             }
+            .padding(16)
         }
         .navigationTitle("Slides")
         .sheet(isPresented: $showingCreate) { createDeckSheet }
@@ -80,6 +51,40 @@ struct SlidesHomeView: View {
                 if let deckToDelete { manager.deleteDeck(deckToDelete) }
             }
             Button("Cancel", role: .cancel) {}
+        }
+    }
+
+    private var heroCard: some View {
+        WorkspaceSurfaceCard {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Slides Studio")
+                            .font(.title2.bold())
+                        Text("Create polished decks with role-specific AI presentation builders.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button {
+                        showingAIGenerate = true
+                    } label: {
+                        Label("Generate", systemImage: "sparkles")
+                    }
+                    .buttonStyle(.bordered)
+                    Button {
+                        showingCreate = true
+                    } label: {
+                        Label("New", systemImage: "plus")
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                HStack(spacing: 8) {
+                    aiPresetButton("Investor Pitch", icon: "briefcase.fill", prompt: "Build an investor pitch deck with problem, solution, market, traction, and ask.")
+                    aiPresetButton("Product Launch", icon: "megaphone.fill", prompt: "Build a product launch deck with story, customer value, rollout, and metrics.")
+                    aiPresetButton("Workshop", icon: "graduationcap.fill", prompt: "Build a workshop deck with learning outcomes, agenda, activities, and recap.")
+                }
+            }
         }
     }
 
@@ -191,6 +196,17 @@ struct SlidesHomeView: View {
                 }
             }
         }
+    }
+
+    private func aiPresetButton(_ title: String, icon: String, prompt: String) -> some View {
+        Button {
+            aiPrompt = prompt
+            showingAIGenerate = true
+        } label: {
+            Label(title, systemImage: icon)
+                .font(.caption.weight(.semibold))
+        }
+        .buttonStyle(.bordered)
     }
 }
 

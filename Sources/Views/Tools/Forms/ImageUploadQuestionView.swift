@@ -18,7 +18,7 @@ struct ImageUploadQuestionView: View {
                     .scaledToFill()
                     .frame(maxWidth: .infinity, maxHeight: 200)
                     .clipped()
-                    .cornerRadius(10)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
                 Button(role: .destructive) {
                     selectedImage = nil
@@ -46,14 +46,14 @@ struct ImageUploadQuestionView: View {
                     }
                     .padding(24)
                     .background(Color(.secondarySystemBackground))
-                    .cornerRadius(10)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 }
             }
 
             TextField("Image description / notes (optional)", text: $answer)
                 .padding(10)
                 .background(Color(.secondarySystemBackground))
-                .cornerRadius(8)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
         .onChange(of: pickerItem) { newItem in
             Task {

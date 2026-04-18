@@ -14,13 +14,9 @@ struct CalendarHomeView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            CalendarHeaderView(selectedDate: $selectedDate, selectedView: $selectedView) {
-                showingCreate = true
-            } onToday: {
-                selectedDate = Date()
-                selectedView = .today
-            }
-            .background(.ultraThinMaterial)
+            headerCard
+                .padding(.horizontal, 12)
+                .padding(.top, 10)
 
             aiPlannerCard
                 .padding(12)
@@ -58,6 +54,30 @@ struct CalendarHomeView: View {
         }
     }
 
+    private var headerCard: some View {
+        WorkspaceSurfaceCard {
+            VStack(spacing: 10) {
+                CalendarHeaderView(selectedDate: $selectedDate, selectedView: $selectedView) {
+                    showingCreate = true
+                } onToday: {
+                    selectedDate = Date()
+                    selectedView = .today
+                }
+                HStack(spacing: 8) {
+                    aiQuickAction("Focus Week", icon: "calendar.badge.clock") {
+                        runAIPlanner(using: "Build a focused weekly schedule with deep-work blocks and recovery windows.")
+                    }
+                    aiQuickAction("Conflict Solver", icon: "arrow.triangle.branch") {
+                        runAIPlanner(using: "Resolve upcoming schedule conflicts and suggest best alternatives.")
+                    }
+                    aiQuickAction("Auto Plan", icon: "wand.and.stars") {
+                        runAIPlanner(using: "Convert my goals into a practical calendar with priorities and buffer time.")
+                    }
+                }
+            }
+        }
+    }
+
     private var aiPlannerCard: some View {
         WorkspaceSurfaceCard {
             VStack(alignment: .leading, spacing: 10) {
@@ -79,6 +99,7 @@ struct CalendarHomeView: View {
                 } else if let aiInsights {
                     insightList("Conflicts", aiInsights.conflicts)
                     insightList("Optimal Scheduling", aiInsights.optimalScheduling)
+                    insightList("Auto-Scheduled Tasks", aiInsights.autoScheduledTasks)
                     if let first = aiInsights.parsedEvents.first {
                         Button("Add First Suggested Event") { addSuggestedEvent(first) }
                             .buttonStyle(.bordered)
@@ -101,7 +122,11 @@ struct CalendarHomeView: View {
     }
 
     private func runAIPlanner() {
-        let prompt = aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        runAIPlanner(using: aiPrompt)
+    }
+
+    private func runAIPlanner(using input: String) {
+        let prompt = input.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !prompt.isEmpty else { return }
         aiLoading = true
         aiError = nil
@@ -138,6 +163,14 @@ struct CalendarHomeView: View {
         )
         manager.addEvent(event)
         aiError = nil
+    }
+
+    private func aiQuickAction(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: icon)
+                .font(.caption.weight(.semibold))
+        }
+        .buttonStyle(.bordered)
     }
 }
 
