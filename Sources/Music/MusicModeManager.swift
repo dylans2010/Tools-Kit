@@ -17,6 +17,10 @@ final class MusicModeManager: ObservableObject {
             UserDefaults.standard.set(isMusicModeEnabled, forKey: key)
             if isMusicModeEnabled {
                 MusicPlayerManager.shared.setupAudioSession()
+            } else {
+                Task { @MainActor in
+                    await MusicPlayerManager.shared.stopAndDeactivateSession()
+                }
             }
         }
     }
