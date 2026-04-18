@@ -53,6 +53,14 @@ struct IntegrationTool: Codable, Identifiable, Equatable {
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
 
+    private enum CodingKeys: String, CodingKey {
+        case id, name, description, category, tags, promptTemplate, systemPrompt
+        case temperature, topP, frequencyPenalty, presencePenalty, maxResponseTokens
+        case aiModel, triggerMode, inputScope, outputStyle, includeAttachmentsContext
+        case runInBackground, allowWebResults, timeoutSeconds, requiredVariables
+        case exampleInputs, postProcessingRules, isEnabled, createdAt, updatedAt
+    }
+
     init() {}
 
     init(from decoder: Decoder) throws {

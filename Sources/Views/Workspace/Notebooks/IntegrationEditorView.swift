@@ -100,7 +100,7 @@ struct IntegrationEditorView: View {
                     Stepper("Timeout: \(timeoutSeconds)s", value: $timeoutSeconds, in: 10...300, step: 5)
                 }
 
-                Section("Prompt Design") {
+                Section(header: Text("Prompt Design")) {
                     TextEditor(text: $systemPrompt)
                         .frame(minHeight: 90)
                         .font(.system(.body, design: .monospaced))
