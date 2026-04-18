@@ -21,6 +21,7 @@ struct InboxView: View {
     @State private var showingFetchingLabel = false
     @State private var showPriorityAll = false
     @State private var showCatchUpAll = false
+    private let cardPreviewCount = 4
 
     var body: some View {
         ZStack {
@@ -131,11 +132,11 @@ struct InboxView: View {
     }
 
     private var priorityThreads: [MailThread] {
-        Array(viewModel.localThreads.filter { !$0.isRead }.prefix(4))
+        Array(viewModel.localThreads.filter { !$0.isRead }.prefix(cardPreviewCount))
     }
 
     private var catchUpThreads: [MailThread] {
-        Array(viewModel.localThreads.prefix(4))
+        Array(viewModel.localThreads.prefix(cardPreviewCount))
     }
 
     private var contentList: some View {
@@ -178,7 +179,7 @@ struct InboxView: View {
                         NavigationLink {
                             InboxMessageDetailView(account: activeAccount ?? account, message: message)
                         } label: {
-                            inboxRow(message)
+                            inboxRow(thread: thread, message: message)
                         }
                         .listRowBackground(.clear)
                         .listRowInsets(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
@@ -216,7 +217,7 @@ struct InboxView: View {
                     .foregroundStyle(hexColor("#9EA4FF"))
             }
 
-            ForEach(Array(threads.prefix(4))) { item in
+            ForEach(Array(threads.prefix(cardPreviewCount))) { item in
                 Text(item.subject)
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -238,10 +239,10 @@ struct InboxView: View {
         )
     }
 
-    private func inboxRow(_ message: MailMessage) -> some View {
+    private func inboxRow(thread: MailThread, message: MailMessage) -> some View {
         HStack(alignment: .top, spacing: 10) {
             Circle()
-                .fill(message.isRead ? Color.clear : providerColor((activeAccount ?? account).providerType))
+                .fill(thread.isRead ? Color.clear : providerColor((activeAccount ?? account).providerType))
                 .frame(width: 8, height: 8)
                 .padding(.top, 6)
 
@@ -552,7 +553,11 @@ private struct ReplyComposerView: View {
 
     private var sanitizedOriginalHTML: String {
         if let html = originalMessage.htmlBody, !html.isEmpty {
-            return html.replacingOccurrences(of: "<script[\\s\\S]*?</script>", with: "", options: .regularExpression)
+            let withoutScripts = html.replacingOccurrences(of: "<script[\\s\\S]*?</script>", with: "", options: .regularExpression)
+            let withoutHandlers = withoutScripts
+                .replacingOccurrences(of: "\\son[a-zA-Z]+\\s*=\\s*\"[^\"]*\"", with: "", options: .regularExpression)
+                .replacingOccurrences(of: "\\son[a-zA-Z]+\\s*=\\s*'[^']*'", with: "", options: .regularExpression)
+            return withoutHandlers.replacingOccurrences(of: "(href|src)\\s*=\\s*['\"]javascript:[^'\"]*['\"]", with: "", options: .regularExpression)
         }
         return "<pre>\(originalMessage.body)</pre>"
     }
@@ -615,9 +620,12 @@ private struct ReplyComposerView: View {
     }
 
     private func extractEmail(from source: String) -> String {
-        if let start = source.firstIndex(of: "<"), let end = source.firstIndex(of: ">"), start < end {
+        if let start = source.lastIndex(of: "<"), let end = source.lastIndex(of: ">"), start < end {
             let inner = source[source.index(after: start)..<end]
-            return String(inner)
+            let candidate = String(inner)
+            if candidate.contains("@") {
+                return candidate
+            }
         }
         return source
     }

@@ -296,11 +296,11 @@ struct AddMailAccountView: View {
             let session: MailSession
             switch provider {
             case .gmail:
-                session = try await GmailProvider().authenticate(credentials: MailCredentials(email: "", password: nil, host: nil, port: nil, smtpHost: nil, smtpPort: nil, accessToken: nil, refreshToken: nil))
+                session = try await GmailProvider().authenticate(credentials: oauthCredentials())
             case .outlook:
-                session = try await OutlookProvider().authenticate(credentials: MailCredentials(email: "", password: nil, host: nil, port: nil, smtpHost: nil, smtpPort: nil, accessToken: nil, refreshToken: nil))
+                session = try await OutlookProvider().authenticate(credentials: oauthCredentials())
             case .yahoo:
-                session = try await YahooMailProvider().authenticate(credentials: MailCredentials(email: "", password: nil, host: nil, port: nil, smtpHost: nil, smtpPort: nil, accessToken: nil, refreshToken: nil))
+                session = try await YahooMailProvider().authenticate(credentials: oauthCredentials())
             case .proton, .imap, .icloud:
                 return
             }
@@ -387,6 +387,19 @@ struct AddMailAccountView: View {
                 }
             }
         }
+    }
+
+    private func oauthCredentials() -> MailCredentials {
+        MailCredentials(
+            email: "",
+            password: nil,
+            host: nil,
+            port: nil,
+            smtpHost: nil,
+            smtpPort: nil,
+            accessToken: nil,
+            refreshToken: nil
+        )
     }
 }
 

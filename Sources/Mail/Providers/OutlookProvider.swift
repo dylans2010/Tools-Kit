@@ -228,7 +228,10 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         }
 
         if T.self == EmptyGraph.self {
-            return EmptyGraph() as! T
+            guard let empty = EmptyGraph() as? T else {
+                throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid empty response cast"])
+            }
+            return empty
         }
         return try JSONDecoder().decode(T.self, from: data)
     }

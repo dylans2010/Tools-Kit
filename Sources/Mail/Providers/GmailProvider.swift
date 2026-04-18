@@ -10,6 +10,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
 
     private var authSession: ASWebAuthenticationSession?
     private let baseURL = URL(string: "https://gmail.googleapis.com/gmail/v1/users/me")!
+    private let daysPerPage = 14
 
     private static let scope = "https://mail.google.com/"
 
@@ -63,7 +64,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
     func fetchInbox(session: MailSession, page: Int) async throws -> [MailMessage] {
         var items = [URLQueryItem(name: "maxResults", value: "30")]
         if page > 0 {
-            items.append(URLQueryItem(name: "q", value: "newer_than:\(page * 14)d"))
+            items.append(URLQueryItem(name: "q", value: "newer_than:\(page * daysPerPage)d"))
         }
 
         let listURL = baseURL.appendingPathComponent("messages").appending(queryItems: items)
@@ -214,7 +215,10 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         }
 
         if T.self == EmptyAPI.self {
-            return EmptyAPI() as! T
+            guard let empty = EmptyAPI() as? T else {
+                throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid empty response cast"])
+            }
+            return empty
         }
         return try JSONDecoder().decode(T.self, from: data)
     }

@@ -111,7 +111,17 @@ final class ProtonMailProvider: MailProvider {
         _ = try await receive(context.connection)
         _ = try await command(context: &context, value: "LOGIN \(quoted(session.email)) \(quoted(password))")
 
-        let raw = "Subject: \(draft.subject)\r\n\r\n\(draft.bodyText)"
+        let raw = [
+            "From: \(draft.from)",
+            "To: \(draft.to.joined(separator: \", \"))",
+            draft.cc.isEmpty ? nil : "Cc: \(draft.cc.joined(separator: \", \"))",
+            draft.bcc.isEmpty ? nil : "Bcc: \(draft.bcc.joined(separator: \", \"))",
+            "Subject: \(draft.subject)",
+            "MIME-Version: 1.0",
+            "Content-Type: text/plain; charset=utf-8",
+            "",
+            draft.bodyText
+        ].compactMap { $0 }.joined(separator: "\r\n")
         let literalSize = Data(raw.utf8).count
         _ = try await command(context: &context, value: "APPEND Drafts {\(literalSize)}")
         try await send(context.connection, "\(raw)\r\n")

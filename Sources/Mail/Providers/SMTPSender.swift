@@ -56,12 +56,12 @@ enum SMTPSender {
         var lines: [String] = [
             "From: \(draft.from)",
             "To: \(draft.to.joined(separator: \", \"))",
-            draft.cc.isEmpty ? "" : "Cc: \(draft.cc.joined(separator: \", \"))",
-            draft.bcc.isEmpty ? "" : "Bcc: \(draft.bcc.joined(separator: \", \"))",
+            draft.cc.isEmpty ? nil : "Cc: \(draft.cc.joined(separator: \", \"))",
+            draft.bcc.isEmpty ? nil : "Bcc: \(draft.bcc.joined(separator: \", \"))",
             "Subject: \(draft.subject)",
             "Date: \(rfc2822Date(Date()))",
             "MIME-Version: 1.0"
-        ]
+        ].compactMap { $0 }
 
         if let html = draft.bodyHTML, !html.isEmpty {
             lines.append("Content-Type: multipart/alternative; boundary=\"\(boundary)\"")

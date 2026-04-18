@@ -42,12 +42,17 @@ struct MailAccount: Identifiable, Codable {
             case .yahoo:
                 return normalized.hasSuffix("@yahoo.com") || normalized.hasSuffix("@ymail.com")
             case .proton:
-                return normalized.contains("@")
+                return Self.isValidEmail(normalized)
             case .imap:
-                return normalized.contains("@")
+                return Self.isValidEmail(normalized)
             case .icloud:
                 return normalized.hasSuffix("@icloud.com") || normalized.hasSuffix("@me.com") || normalized.hasSuffix("@mac.com")
             }
+        }
+
+        private static func isValidEmail(_ value: String) -> Bool {
+            let pattern = #"^[A-Z0-9a-z._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$"#
+            return value.range(of: pattern, options: .regularExpression) != nil
         }
 
         static let iCloud: ProviderType = .icloud
