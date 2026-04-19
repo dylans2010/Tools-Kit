@@ -785,6 +785,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private func setInputEnabled(
         _ inputs: [String: Bool]
     ) async {
+        // Daily types are unavailable in this build; we keep string keys only for
+        // fallback diagnostics so the UI can surface which input toggle was requested.
         let inputNames = inputs.keys.sorted().joined(separator: ", ")
         guard !inputNames.isEmpty else { return }
         errorMessage = "Daily SDK is unavailable, so \(inputNames) state cannot be updated."
