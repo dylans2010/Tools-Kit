@@ -39,9 +39,7 @@ struct AIChatSettingsView: View {
                 memorySection
                 appModeSection
                 toolVisibilitySection
-#if DEBUG
                 developerToolsSection
-#endif
                 cloudDataSection
                 accountSection
             }
@@ -379,7 +377,7 @@ struct AIChatSettingsView: View {
         }
     }
 
-#if DEBUG
+
     private var developerToolsSection: some View {
         Section("Developer") {
             NavigationLink("Developer Tools") {
@@ -387,7 +385,6 @@ struct AIChatSettingsView: View {
             }
         }
     }
-#endif
 
     private var cloudDataSection: some View {
         Section("Cloud Sync") {
