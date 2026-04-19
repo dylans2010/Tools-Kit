@@ -11,9 +11,9 @@ final class MeetingVideoTrack {}
 @MainActor
 final class MeetingStateManager: NSObject, ObservableObject {
     static let shared = MeetingStateManager()
-    private static let sensitiveTerms = ["t", "token", "auth", "authorization", "password", "secret", "api_key", "apikey", "key", "bearer"]
+    private static let sensitiveTerms = ["token", "auth", "authorization", "password", "secret", "api_key", "apikey", "key", "bearer"]
     private static let sensitiveQueryParameterNames: Set<String> = Set(sensitiveTerms)
-    private static let sensitiveUserInfoKeyFragments = Array(Set(sensitiveTerms + ["credential", "cookie"]))
+    private static let sensitiveUserInfoKeyFragments: Set<String> = Set(sensitiveTerms + ["credential", "cookie"])
     private static let sensitiveURLValuePattern: String = {
         let escaped = sensitiveTerms.map(NSRegularExpression.escapedPattern(for:))
         return "(?i)([?&](?:\(escaped.joined(separator: "|")))=)[^&\\s]+"
@@ -188,8 +188,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
         var didBeginSession = false
         do {
-            resetMeetingRuntimeStateForJoin()
             await leaveDailyRoom(reason: "pre-join reset")
+            resetMeetingRuntimeStateForJoin()
             await resolver.beginSession(currentSession)
             didBeginSession = true
             try await joinDailyRoom(url: roomURL, session: currentSession)
@@ -547,7 +547,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         if var queryItems = components.queryItems {
             queryItems = queryItems.map { item in
                 let lowercasedName = item.name.lowercased()
-                if Self.sensitiveQueryParameterNames.contains(lowercasedName) {
+                if lowercasedName == DailyService.dailyTokenParameterName || Self.sensitiveQueryParameterNames.contains(lowercasedName) {
                     return URLQueryItem(name: item.name, value: "<redacted>")
                 }
                 return URLQueryItem(name: item.name, value: sanitizePotentialSecretContent(item.value ?? ""))
