@@ -10,6 +10,11 @@ final class MeetingVideoTrack {}
 
 @MainActor
 final class MeetingStateManager: NSObject, ObservableObject {
+    private static let unauthorizedJoinErrorMarkers: Set<String> = [
+        "unauthorized",
+        "not authorized",
+        "roomlookup"
+    ]
     static let shared = MeetingStateManager()
     private static let sensitiveQueryParameterNames: Set<String> = [
         "t", "token", "access_token", "refresh_token", "session", "session_token",
@@ -174,8 +179,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
             await transitionToLobby(session)
         } catch {
             phase = .failed
-            errorMessage = error.localizedDescription
-            DebugLogger.shared.log("Join failed: \(error.localizedDescription)", level: .error, category: "Meet")
+            errorMessage = userFacingJoinErrorMessage(for: error)
+            DebugLogger.shared.log("Join failed: \(fullErrorDetails(error))", level: .error, category: "Meet")
         }
     }
 
@@ -250,15 +255,16 @@ final class MeetingStateManager: NSObject, ObservableObject {
             errorMessage = "Microphone and camera permissions are required to join."
             return
         }
-        guard let roomURL = await resolver.internalRoomURL(for: currentSession) else {
-            errorMessage = "Meeting session is missing a Daily room URL."
+        let roomURL = await resolver.internalRoomURL(for: currentSession)
+        if let validationError = validatePreJoin(session: currentSession, roomURL: roomURL) {
+            errorMessage = validationError
             phase = .failed
+            DebugLogger.shared.log("Blocked join by pre-join validation for meeting \(currentSession.meetingId): \(validationError)", level: .warning, category: "Meet")
             return
         }
-        guard hasDailyToken(in: roomURL) else {
-            errorMessage = "Meeting session is missing a valid Daily token."
+        guard let roomURL else {
+            errorMessage = "Meeting room was not found. Verify the meeting ID and try again."
             phase = .failed
-            DebugLogger.shared.log("Blocked join because secured Daily URL token was missing for meeting \(currentSession.meetingId).", level: .error, category: "Meet")
             return
         }
 
@@ -278,7 +284,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
             await refreshDebugSnapshot()
         } catch {
             phase = .failed
-            errorMessage = error.localizedDescription
+            errorMessage = userFacingJoinErrorMessage(for: error)
             DebugLogger.shared.log("Failed to start Daily session. \(fullErrorDetails(error))", level: .error, category: "Meet")
             await refreshDebugSnapshot()
         }
@@ -494,6 +500,13 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private func joinDailyRoom(url: URL, session: MeetingSession) async throws {
         #if canImport(Daily)
         let callClient = try await createFreshCallClient(session: session)
+        let joinToken: MeetingToken?
+        if let meetingToken = session.meetingToken?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !meetingToken.isEmpty {
+            joinToken = MeetingToken(stringValue: meetingToken)
+        } else {
+            joinToken = nil
+        }
         let settings = ClientSettingsUpdate(
             inputs: .set(
                 camera: .set(isEnabled: .set(isCameraEnabled)),
@@ -502,7 +515,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         )
         DebugLogger.shared.log("Daily join attempt meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId) url=\(redactedURLString(url))", level: .info, category: "Meet")
         do {
-            try await callClient.join(url: url, token: nil, settings: settings)
+            try await callClient.join(url: url, token: joinToken, settings: settings)
             DebugLogger.shared.log("Daily join success meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId)", level: .info, category: "Meet")
             refreshParticipantsFromDaily()
         } catch {
@@ -613,11 +626,60 @@ final class MeetingStateManager: NSObject, ObservableObject {
         diagnostics.packetLossPercent = 0
     }
 
-    private func hasDailyToken(in url: URL) -> Bool {
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
-        // Daily secured room URLs are expected to include the query parameter named by
-        // DailyService.dailyTokenParameterName ("t") and a non-empty value.
-        return components.queryItems?.contains(where: { $0.name == DailyService.dailyTokenParameterName && $0.value?.isEmpty == false }) ?? false
+    private func validatePreJoin(session: MeetingSession, roomURL: URL?) -> String? {
+        let roomName = session.roomName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if roomName.isEmpty {
+            return "Meeting session is invalid. Please rejoin from the meeting list."
+        }
+
+        guard let roomURL else {
+            return "Meeting room was not found. Verify the meeting ID and try again."
+        }
+        guard isValidDailyRoomURL(roomURL) else {
+            return "Meeting room configuration is invalid. Please request a new meeting link."
+        }
+
+        guard session.isJoinable else {
+            return "You are not authorized to join this meeting."
+        }
+
+        if session.requiresMeetingToken {
+            guard let meetingToken = session.meetingToken,
+                  MeetingSession.isLikelyValidMeetingToken(meetingToken) else {
+                return "Meeting authorization is missing or invalid. Please refresh and try again."
+            }
+        }
+
+        return nil
+    }
+
+    private func isValidDailyRoomURL(_ url: URL) -> Bool {
+        guard url.scheme?.lowercased() == "https",
+              let host = url.host?.lowercased() else { return false }
+        return host == "daily.co" || host.hasSuffix(".daily.co")
+    }
+
+    private func userFacingJoinErrorMessage(for error: Error) -> String {
+        if let serviceError = error as? DailyService.ServiceError {
+            if case let .requestFailed(statusCode, _) = serviceError, statusCode == 401 || statusCode == 403 {
+                return "You are not authorized to join this meeting."
+            }
+        }
+
+        let message = error.localizedDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+        let lowercasedMessage = message.lowercased()
+        // Fallback to message-based detection because Daily SDK callback errors are not always bridged
+        // with stable typed status codes across all failure paths.
+        if Self.unauthorizedJoinErrorMarkers.contains(where: { lowercasedMessage.contains($0) }) {
+            return "You are not authorized to join this meeting."
+        }
+        if lowercasedMessage.contains("token")
+            && (lowercasedMessage.contains("invalid")
+                || lowercasedMessage.contains("expired")
+                || lowercasedMessage.contains("missing")) {
+            return "Meeting authorization is invalid or expired. Please refresh and try again."
+        }
+        return message
     }
 
     private func fullErrorDetails(_ errorPayload: Any) -> String {
@@ -788,7 +850,7 @@ extension MeetingStateManager: CallClientDelegate {
         Task { @MainActor in
             guard !(await isStaleCallback(callClient: callClient)) else { return }
             DebugLogger.shared.log("Daily delegate error callback received.", level: .error, category: "Meet")
-            errorMessage = error.localizedDescription
+            errorMessage = userFacingJoinErrorMessage(for: error)
             DebugLogger.shared.log("Daily delegate error payload: \(fullErrorDetails(error))", level: .error, category: "Meet")
         }
     }

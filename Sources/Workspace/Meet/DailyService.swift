@@ -12,6 +12,7 @@ actor DailyService {
         case missingAPIKey
         case notFound
         case invalidResponse
+        case malformedMeetingToken
         case requestFailed(statusCode: Int, message: String?)
         case networkFailure(underlying: Error)
 
@@ -25,6 +26,8 @@ actor DailyService {
                 return "Meeting ID was not found."
             case .invalidResponse:
                 return "Daily API returned an invalid response."
+            case .malformedMeetingToken:
+                return "Daily API returned a malformed meeting token."
             case let .requestFailed(statusCode, message):
                 return message ?? "Daily API request failed with status \(statusCode)."
             case let .networkFailure(underlying):
@@ -41,6 +44,7 @@ actor DailyService {
     private struct RoomResponse: Decodable {
         let name: String
         let url: String
+        let privacy: String?
     }
 
     private struct MeetingTokenResponse: Decodable {
@@ -252,10 +256,38 @@ actor DailyService {
             return existing
         }
 
-        let roomURL = try await securedRoomURL(from: room)
+        let roomURL = try await validatedRoomURL(from: room.url, roomName: room.name)
+        let requiresMeetingToken = await roomRequiresMeetingToken(room)
+        var meetingToken: String?
+        var isJoinable = true
+
+        if requiresMeetingToken {
+            do {
+                let token = try await createMeetingToken(for: room.name)
+                let trimmedToken = token.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !MeetingSession.isLikelyValidMeetingToken(trimmedToken) {
+                    await log("Meeting token generation returned malformed token for room \(room.name).", level: .error)
+                    throw ServiceError.malformedMeetingToken
+                }
+                meetingToken = trimmedToken
+            } catch let error as ServiceError {
+                if case let .requestFailed(statusCode, _) = error, statusCode == 401 || statusCode == 403 {
+                    // Convert authorization failures into non-joinable state so join is blocked in pre-validation,
+                    // while preserving resolver success and avoiding runtime join crashes.
+                    isJoinable = false
+                    await log("Meeting token generation unauthorized for room \(room.name). status=\(statusCode). Session marked not joinable for UI-safe handling.", level: .error)
+                } else {
+                    throw error
+                }
+            }
+        }
+
         let session = MeetingSession(
             meetingId: meetingID,
             roomName: room.name,
+            isJoinable: isJoinable,
+            requiresMeetingToken: requiresMeetingToken,
+            meetingToken: meetingToken,
             sessionId: UUID().uuidString,
             createdAt: Date(),
             debugTraceId: UUID().uuidString
@@ -337,21 +369,22 @@ actor DailyService {
         return roomURL
     }
 
-    private func securedRoomURL(from room: RoomResponse) async throws -> URL {
-        let baseURL = try await validatedRoomURL(from: room.url, roomName: room.name)
-        let token = try await createMeetingToken(for: room.name)
-        guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
-            throw ServiceError.invalidResponse
+    private func roomRequiresMeetingToken(_ room: RoomResponse) async -> Bool {
+        guard let privacy = room.privacy?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
+              !privacy.isEmpty else {
+            // Default to secure/private expectations when privacy is not returned.
+            await log("Room privacy was missing for \(room.name); defaulting to token-required mode.", level: .warning)
+            return true
         }
-        var queryItems = components.queryItems ?? []
-        // Avoid duplicate token query items when regenerating secured URLs.
-        queryItems.removeAll(where: { $0.name == DailyService.dailyTokenParameterName })
-        queryItems.append(URLQueryItem(name: DailyService.dailyTokenParameterName, value: token))
-        components.queryItems = queryItems
-        guard let securedURL = components.url else {
-            throw ServiceError.invalidResponse
+        switch privacy {
+        case "public":
+            return false
+        case "private":
+            return true
+        default:
+            // Unknown privacy values are treated as requiring token-based authorization.
+            return true
         }
-        return securedURL
     }
 
     private func buildAPIURL(path: String) -> URL {
