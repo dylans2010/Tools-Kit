@@ -138,7 +138,7 @@ struct MeetingContainerView: View {
         }
         .sheet(isPresented: $showNotes) {
             NavigationStack {
-                MeetingNotesView(manager: manager)
+                WorkspaceMeetingNotesView(manager: manager)
             }
             .presentationDetents([.medium, .large])
         }
