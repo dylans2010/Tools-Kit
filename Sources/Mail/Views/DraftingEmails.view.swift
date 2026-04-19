@@ -402,7 +402,7 @@ struct DraftingEmailsView: View {
             .scrollIndicators(.hidden)
             .background(
                 LinearGradient(
-                    colors: [Color(.systemGroupedBackground), Color(.secondarySystemGroupedBackground), Color(.tertiarySystemGroupedBackground)],
+                    colors: [Color(.systemGroupedBackground), Color(.secondarySystemGroupedBackground)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -417,7 +417,7 @@ struct DraftingEmailsView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Close") { dismiss() }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Menu {
                         Button("Reset Workspace", role: .destructive) {
                             resetWorkspace()
@@ -425,8 +425,7 @@ struct DraftingEmailsView: View {
                     } label: {
                         Image(systemName: "ellipsis.circle")
                     }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
+
                     Button {
                         generateDraft()
                     } label: {

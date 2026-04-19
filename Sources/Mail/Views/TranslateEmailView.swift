@@ -140,7 +140,7 @@ struct TranslateEmailView: View {
                 Label("Input", systemImage: "text.quote")
                     .font(.headline)
                 Spacer()
-                Text("\(trimmedSourceText.count) chars")
+                Text("\(sourceText.trimmingCharacters(in: .whitespacesAndNewlines).count) chars")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

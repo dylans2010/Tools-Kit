@@ -206,6 +206,8 @@ final class AIFeatureCheck: ObservableObject {
     }
 
     private static func looksLikeConfigKey(_ key: String) -> Bool {
-        key == key.uppercased() && key.contains("_")
+        guard key.range(of: #"^[A-Z][A-Z0-9_]*$"#, options: .regularExpression) != nil else { return false }
+        let allowedPrefixes = ["APPWRITE_", "GOOGLE_", "GMAIL_", "PRODUCTION_", "DAILY_", "MAIL_", "OUTLOOK_", "YAHOO_"]
+        return allowedPrefixes.contains { key.hasPrefix($0) }
     }
 }
