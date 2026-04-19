@@ -7,6 +7,7 @@ struct MeetingContainerView: View {
     @State private var showParticipants = false
     @State private var showSettings = false
     @State private var showAdmin = false
+    @State private var selectedParticipant: MeetingParticipant?
 
     var body: some View {
         VStack(spacing: 12) {
@@ -45,7 +46,10 @@ struct MeetingContainerView: View {
         }
         .sheet(isPresented: $showParticipants) {
             NavigationStack {
-                ParticipantsView(participants: manager.participants)
+                ParticipantsView(participants: manager.participants) { participant in
+                    guard manager.isCurrentUserHost, participant.id != "local" else { return }
+                    selectedParticipant = participant
+                }
                     .navigationTitle("Participants")
             }
             .presentationDetents([.medium, .large])
@@ -63,6 +67,12 @@ struct MeetingContainerView: View {
         .sheet(isPresented: $showAdmin) {
             NavigationStack {
                 AdminControlsView(manager: manager)
+            }
+            .presentationDetents([.medium, .large])
+        }
+        .sheet(item: $selectedParticipant) { participant in
+            NavigationStack {
+                ParticipantAdminPanelView(manager: manager, participant: participant)
             }
             .presentationDetents([.medium, .large])
         }

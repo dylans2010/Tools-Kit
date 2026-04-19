@@ -38,6 +38,7 @@ struct ParticipantsView: View {
                         }
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("Manage participant \(participant.displayName)")
                 }
             }
         }
