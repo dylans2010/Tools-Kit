@@ -30,7 +30,11 @@ struct JoinMeetingView: View {
 
             Section("Scheduled Meetings") {
                 if manager.scheduledMeetings.isEmpty {
-                    ContentUnavailableView("No scheduled meetings", systemImage: "calendar.badge.exclamationmark")
+                    ContentUnavailableView(
+                        "No scheduled meetings",
+                        systemImage: "calendar.badge.exclamationmark",
+                        description: Text("You have no meetings scheduled.")
+                    )
                 } else {
                     ForEach(manager.scheduledMeetings) { scheduled in
                         VStack(alignment: .leading, spacing: 6) {
