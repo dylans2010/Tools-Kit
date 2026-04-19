@@ -7,7 +7,7 @@ struct DebugView: View {
 
     var body: some View {
         Form {
-            Section("API Key (Persistent)") {
+            Section("Daily API Key") {
                 SecureField("Daily API key", text: $persistedAPIKey)
                 Button("Apply") {
                     Task { await manager.updateDeveloperAPIKey(persistedAPIKey) }
