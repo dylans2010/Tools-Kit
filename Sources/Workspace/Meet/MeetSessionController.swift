@@ -11,7 +11,7 @@ final class MeetingVideoTrack {}
 @MainActor
 final class MeetingStateManager: NSObject, ObservableObject {
     static let shared = MeetingStateManager()
-    private static let sensitiveTerms = ["token", "auth", "authorization", "password", "secret", "api_key", "apikey", "key", "bearer"]
+    private static let sensitiveTerms = ["token", "auth", "authorization", "password", "secret", "api_key", "apikey", "bearer"]
     private static let sensitiveQueryParameterNames: Set<String> = Set(sensitiveTerms)
     private static let sensitiveUserInfoKeyFragments: Set<String> = Set(sensitiveTerms + ["credential", "cookie"])
     private static let sensitiveURLValuePattern: String = {
@@ -186,20 +186,13 @@ final class MeetingStateManager: NSObject, ObservableObject {
         errorMessage = nil
         defer { isBusy = false }
 
-        var didBeginSession = false
         do {
             await leaveDailyRoom(reason: "pre-join reset")
             resetMeetingRuntimeStateForJoin()
-            await resolver.beginSession(currentSession)
-            didBeginSession = true
-            try await joinDailyRoom(url: roomURL, session: currentSession)
+            try await beginAndJoinSession(currentSession, roomURL: roomURL)
             phase = .inMeeting
             await refreshDebugSnapshot()
         } catch {
-            if didBeginSession {
-                await resolver.endSession(currentSession)
-            }
-            await leaveDailyRoom(reason: "join failure cleanup")
             phase = .failed
             errorMessage = error.localizedDescription
             DebugLogger.shared.log("Failed to start Daily session. \(fullErrorDetails(error))", level: .error, category: "Meet")
@@ -538,6 +531,17 @@ final class MeetingStateManager: NSObject, ObservableObject {
         let localized = sanitizePotentialSecretContent(error.localizedDescription)
         let userInfo = sanitizedUserInfoDescription(nsError.userInfo)
         return "error=\(reflectedError) domain=\(nsError.domain) code=\(nsError.code) localized=\"\(localized)\" userInfo=\(userInfo)"
+    }
+
+    private func beginAndJoinSession(_ session: MeetingSession, roomURL: URL) async throws {
+        await resolver.beginSession(session)
+        do {
+            try await joinDailyRoom(url: roomURL, session: session)
+        } catch {
+            await resolver.endSession(session)
+            await leaveDailyRoom(reason: "join failure cleanup")
+            throw error
+        }
     }
 
     private func redactedURLString(_ url: URL) -> String {
