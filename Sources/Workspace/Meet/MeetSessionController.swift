@@ -658,11 +658,37 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     private func userFriendlyJoinErrorMessage(_ error: Error) -> String {
-        let combined = "\(error.localizedDescription.lowercased()) \(String(reflecting: error).lowercased())"
+        if let serviceError = error as? DailyService.ServiceError {
+            switch serviceError {
+            case .notFound:
+                return "This meeting could not be found."
+            case .missingAPIKey:
+                return "Meeting service configuration is incomplete. Please contact support."
+            case let .requestFailed(statusCode, _):
+                if statusCode == 401 || statusCode == 403 {
+                    return "You are not authorized to join this meeting. Ask the host for a valid invite."
+                }
+                if statusCode == 404 {
+                    return "This meeting could not be found."
+                }
+            case .invalidMeetingID:
+                return "Meeting ID must be 4-24 letters, numbers, or dashes."
+            case .invalidResponse:
+                return "Meeting details are invalid. Please request a fresh invite."
+            case .networkFailure:
+                return "Network connection failed while joining. Please try again."
+            }
+        }
+
+        let nsError = error as NSError
+        if nsError.code == 401 || nsError.code == 403 {
+            return "You are not authorized to join this meeting. Ask the host for a valid invite."
+        }
+        let combined = "\(error.localizedDescription.lowercased()) \(String(reflecting: error).lowercased()) \(nsError.domain.lowercased())"
         if combined.contains("unauthorized") || combined.contains("not authorized") || combined.contains("roomlookup") {
             return "You are not authorized to join this meeting. Ask the host for a valid invite."
         }
-        if combined.contains("token") {
+        if combined.contains("token") || combined.contains("credential") {
             return "Unable to verify meeting access. Please refresh your invite and try again."
         }
         if combined.contains("not found") {
