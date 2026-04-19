@@ -11,11 +11,18 @@ final class MeetingVideoTrack {}
 @MainActor
 final class MeetingStateManager: NSObject, ObservableObject {
     static let shared = MeetingStateManager()
-    private static let sensitiveTerms = ["token", "auth", "authorization", "password", "secret", "api_key", "apikey", "bearer"]
-    private static let sensitiveQueryParameterNames: Set<String> = Set(sensitiveTerms)
-    private static let sensitiveUserInfoKeyFragments: Set<String> = Set(sensitiveTerms + ["credential", "cookie"])
+    private static let sensitiveQueryParameterNames: Set<String> = [
+        "t", "token", "access_token", "refresh_token", "session", "session_token",
+        "auth", "authorization", "password", "secret", "client_secret",
+        "api_key", "apikey", "key", "bearer"
+    ]
+    private static let sensitiveUserInfoKeyFragments: Set<String> = [
+        "token", "access_token", "refresh_token", "session_token",
+        "authorization", "password", "secret", "client_secret",
+        "api_key", "apikey", "credential", "cookie", "bearer"
+    ]
     private static let sensitiveURLValuePattern: String = {
-        let escaped = sensitiveTerms.map(NSRegularExpression.escapedPattern(for:))
+        let escaped = sensitiveQueryParameterNames.map(NSRegularExpression.escapedPattern(for:))
         return "(?i)([?&](?:\(escaped.joined(separator: "|")))=)[^&\\s]+"
     }()
 
@@ -538,8 +545,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
         do {
             try await joinDailyRoom(url: roomURL, session: session)
         } catch {
-            await resolver.endSession(session)
             await leaveDailyRoom(reason: "join failure cleanup")
+            await resolver.endSession(session)
             throw error
         }
     }
@@ -579,6 +586,18 @@ final class MeetingStateManager: NSObject, ObservableObject {
         var sanitized = value
         sanitized = sanitized.replacingOccurrences(
             of: Self.sensitiveURLValuePattern,
+            with: "$1<redacted>",
+            options: .regularExpression
+        )
+        let fragmentTokenPattern = #"(?i)([#&](?:token|access_token|refresh_token|session|session_token|client_secret|api_key|apikey|key)=)[^&\s]+"#
+        sanitized = sanitized.replacingOccurrences(
+            of: fragmentTokenPattern,
+            with: "$1<redacted>",
+            options: .regularExpression
+        )
+        let bearerPattern = #"(?i)(\bbearer\s+)[^\s,;]+"#
+        sanitized = sanitized.replacingOccurrences(
+            of: bearerPattern,
             with: "$1<redacted>",
             options: .regularExpression
         )
