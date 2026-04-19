@@ -254,7 +254,7 @@ actor DailyService {
         }
 
         let roomURL = try await validatedRoomURL(from: room.url, roomName: room.name)
-        let requiresMeetingToken = roomRequiresMeetingToken(room)
+        let requiresMeetingToken = await roomRequiresMeetingToken(room)
         var meetingToken: String?
         var isJoinable = true
 
@@ -262,8 +262,8 @@ actor DailyService {
             do {
                 let token = try await createMeetingToken(for: room.name)
                 let trimmedToken = token.trimmingCharacters(in: .whitespacesAndNewlines)
-                if trimmedToken.isEmpty {
-                    await log("Meeting token generation returned an empty token for room \(room.name); treating as invalid Daily response.", level: .error)
+                if !MeetingSession.isLikelyValidMeetingToken(trimmedToken) {
+                    await log("Meeting token generation returned malformed token for room \(room.name); treating as invalid Daily response.", level: .error)
                     throw ServiceError.invalidResponse
                 }
                 meetingToken = trimmedToken
@@ -366,10 +366,11 @@ actor DailyService {
         return roomURL
     }
 
-    private func roomRequiresMeetingToken(_ room: RoomResponse) -> Bool {
+    private func roomRequiresMeetingToken(_ room: RoomResponse) async -> Bool {
         guard let privacy = room.privacy?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
               !privacy.isEmpty else {
             // Default to secure/private expectations when privacy is not returned.
+            await log("Room privacy was missing for \(room.name); defaulting to token-required mode.", level: .warning)
             return true
         }
         switch privacy {

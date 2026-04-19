@@ -1,6 +1,8 @@
 import Foundation
 
 struct MeetingSession: Identifiable, Equatable, Codable {
+    private static let minimumOpaqueMeetingTokenLength = 24
+
     var id: String { sessionId }
 
     let meetingId: String
@@ -50,11 +52,23 @@ struct MeetingSession: Identifiable, Equatable, Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.meetingId = try container.decode(String.self, forKey: .meetingId)
         self.roomName = try container.decode(String.self, forKey: .roomName)
-        self.isJoinable = try container.decodeIfPresent(Bool.self, forKey: .isJoinable) ?? true
+        self.isJoinable = try container.decodeIfPresent(Bool.self, forKey: .isJoinable) ?? false
         self.requiresMeetingToken = try container.decodeIfPresent(Bool.self, forKey: .requiresMeetingToken) ?? false
         self.meetingToken = try container.decodeIfPresent(String.self, forKey: .meetingToken)
         self.sessionId = try container.decode(String.self, forKey: .sessionId)
         self.createdAt = try container.decode(Date.self, forKey: .createdAt)
         self.debugTraceId = try container.decode(String.self, forKey: .debugTraceId)
+    }
+
+    static func isLikelyValidMeetingToken(_ token: String) -> Bool {
+        let trimmed = token.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return false }
+        guard !trimmed.contains(where: { $0.isWhitespace }) else { return false }
+        let jwtSegments = trimmed.split(separator: ".")
+        if jwtSegments.count == 3 {
+            let allowed = CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_")
+            return jwtSegments.allSatisfy { !$0.isEmpty && $0.unicodeScalars.allSatisfy { allowed.contains($0) } }
+        }
+        return trimmed.count >= minimumOpaqueMeetingTokenLength
     }
 }

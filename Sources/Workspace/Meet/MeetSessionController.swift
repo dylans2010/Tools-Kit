@@ -10,9 +10,6 @@ final class MeetingVideoTrack {}
 
 @MainActor
 final class MeetingStateManager: NSObject, ObservableObject {
-    // Conservative minimum for opaque non-JWT tokens chosen to reject obviously malformed short values.
-    // Daily tokens are typically JWTs, but this allows longer opaque formats without requiring JWT shape.
-    private static let minimumOpaqueMeetingTokenLength = 24
     static let shared = MeetingStateManager()
     private static let sensitiveQueryParameterNames: Set<String> = [
         "t", "token", "access_token", "refresh_token", "session", "session_token",
@@ -256,6 +253,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         let roomURL = await resolver.internalRoomURL(for: currentSession)
         if let validationError = validatePreJoin(session: currentSession, roomURL: roomURL) {
             errorMessage = validationError
+            phase = .failed
             DebugLogger.shared.log("Blocked join by pre-join validation for meeting \(currentSession.meetingId): \(validationError)", level: .warning, category: "Meet")
             return
         }
@@ -638,7 +636,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
         if session.requiresMeetingToken {
             guard let meetingToken = session.meetingToken,
-                  isLikelyValidMeetingToken(meetingToken) else {
+                  MeetingSession.isLikelyValidMeetingToken(meetingToken) else {
                 return "Meeting authorization is missing or invalid. Please refresh and try again."
             }
         }
@@ -650,16 +648,6 @@ final class MeetingStateManager: NSObject, ObservableObject {
         guard url.scheme?.lowercased() == "https",
               let host = url.host?.lowercased() else { return false }
         return host.contains(".daily.co")
-    }
-
-    private func isLikelyValidMeetingToken(_ token: String) -> Bool {
-        let trimmed = token.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return false }
-        // Daily meeting tokens are typically JWTs; allow non-JWT opaque tokens with a minimum length.
-        // This explicitly rejects internal whitespace that trimming would not remove.
-        guard !trimmed.contains(where: { $0.isWhitespace }) else { return false }
-        let jwtSegments = trimmed.split(separator: ".")
-        return jwtSegments.count == 3 || trimmed.count >= Self.minimumOpaqueMeetingTokenLength
     }
 
     private func userFacingJoinErrorMessage(for error: Error) -> String {
