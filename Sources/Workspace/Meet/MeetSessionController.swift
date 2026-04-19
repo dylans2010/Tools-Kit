@@ -196,15 +196,17 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     func toggleMute() {
-        let nextMuted = !isMicrophoneMuted
+        let previousMuted = isMicrophoneMuted
+        let nextMuted = !previousMuted
         isMicrophoneMuted = nextMuted
-        Task { await setMicrophoneEnabled(!nextMuted) }
+        Task { await setMicrophoneEnabled(!nextMuted, fallbackMutedState: previousMuted) }
     }
 
     func toggleCamera() {
-        let nextEnabled = !isCameraEnabled
+        let previousEnabled = isCameraEnabled
+        let nextEnabled = !previousEnabled
         isCameraEnabled = nextEnabled
-        Task { await setCameraEnabled(nextEnabled) }
+        Task { await setCameraEnabled(nextEnabled, fallbackCameraState: previousEnabled) }
     }
 
     func toggleScreenShare() {
@@ -214,8 +216,10 @@ final class MeetingStateManager: NSObject, ObservableObject {
     func sendMessage(_ text: String, threadId: String = "general") {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
+        guard let localParticipantID else { return }
+        guard phase == .inMeeting else { return }
 
-        let senderName = participants.first(where: { $0.id == localParticipantID })?.displayName ?? (localParticipantID ?? "unknown")
+        let senderName = participants.first(where: { $0.id == localParticipantID })?.displayName ?? localParticipantID
         messages.append(
             MeetingMessage(
                 id: UUID().uuidString,
@@ -364,25 +368,25 @@ final class MeetingStateManager: NSObject, ObservableObject {
         return (4...24).contains(candidate.count) && candidate.unicodeScalars.allSatisfy { allowed.contains($0) }
     }
 
-    private func setMicrophoneEnabled(_ enabled: Bool) async {
+    private func setMicrophoneEnabled(_ enabled: Bool, fallbackMutedState: Bool) async {
         #if canImport(Daily)
         guard let callClient else { return }
         do {
             try await callClient.setInputsEnabled([.microphone: enabled])
         } catch {
-            isMicrophoneMuted = !enabled
+            isMicrophoneMuted = fallbackMutedState
             errorMessage = "Failed to update microphone state: \(error.localizedDescription)"
         }
         #endif
     }
 
-    private func setCameraEnabled(_ enabled: Bool) async {
+    private func setCameraEnabled(_ enabled: Bool, fallbackCameraState: Bool) async {
         #if canImport(Daily)
         guard let callClient else { return }
         do {
             try await callClient.setInputsEnabled([.camera: enabled])
         } catch {
-            isCameraEnabled = !enabled
+            isCameraEnabled = fallbackCameraState
             errorMessage = "Failed to update camera state: \(error.localizedDescription)"
         }
         #endif
@@ -391,6 +395,10 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private func leaveDailyRoom() async {
         #if canImport(Daily)
         guard let callClient else { return }
+        defer {
+            callClient.delegate = nil
+            self.callClient = nil
+        }
         do {
             try await callClient.stopLocalAudioLevelObserver()
             try await callClient.stopRemoteParticipantsAudioLevelObserver()
@@ -398,8 +406,6 @@ final class MeetingStateManager: NSObject, ObservableObject {
         } catch {
             DebugLogger.shared.log("Daily leave failed: \(error.localizedDescription)", level: .warning, category: "Meet")
         }
-        callClient.delegate = nil
-        self.callClient = nil
         #endif
     }
 
