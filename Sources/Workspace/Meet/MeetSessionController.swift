@@ -168,34 +168,44 @@ final class MeetingStateManager: NSObject, ObservableObject {
             phase = .failed
             return
         }
+        guard hasDailyToken(in: roomURL) else {
+            errorMessage = "Meeting session is missing a valid Daily token."
+            phase = .failed
+            DebugLogger.shared.log("Blocked join because secured Daily URL token was missing for meeting \(currentSession.meetingId).", level: .error, category: "Meet")
+            return
+        }
 
         isBusy = true
         errorMessage = nil
         defer { isBusy = false }
 
+        var didBeginSession = false
         do {
+            resetMeetingRuntimeStateForJoin()
+            await leaveDailyRoom(reason: "pre-join reset")
             await resolver.beginSession(currentSession)
-            try await joinDailyRoom(url: roomURL)
+            didBeginSession = true
+            try await joinDailyRoom(url: roomURL, session: currentSession)
             phase = .inMeeting
             await refreshDebugSnapshot()
         } catch {
+            if didBeginSession {
+                await resolver.endSession(currentSession)
+            }
+            await leaveDailyRoom(reason: "join failure cleanup")
             phase = .failed
             errorMessage = error.localizedDescription
-            DebugLogger.shared.log("Failed to start Daily session: \(error.localizedDescription)", level: .error, category: "Meet")
+            DebugLogger.shared.log("Failed to start Daily session. \(fullErrorDetails(error))", level: .error, category: "Meet")
+            await refreshDebugSnapshot()
         }
     }
 
     func leaveMeeting() async {
         guard let currentSession else { return }
-        await leaveDailyRoom()
+        await leaveDailyRoom(reason: "user leave")
         await resolver.endSession(currentSession)
         phase = .ended
-        participants = []
-        participantVideoTracks = [:]
-        breakoutRooms = []
-        participantRoles = [:]
-        localParticipantID = nil
-        localParticipantDisplayName = ""
+        resetMeetingRuntimeStateForJoin()
         await refreshDebugSnapshot()
     }
 
@@ -372,45 +382,57 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
     #endif
 
-    private func leaveDailyRoom() async {
+    private func leaveDailyRoom(reason: String) async {
         #if canImport(Daily)
         guard let callClient else { return }
+        DebugLogger.shared.log("Destroying Daily call client (\(reason)).", level: .debug, category: "Meet")
         defer {
             callClient.delegate = nil
             self.callClient = nil
+            DebugLogger.shared.log("Daily call client destroyed.", level: .debug, category: "Meet")
         }
         do {
             try await callClient.stopLocalAudioLevelObserver()
             try await callClient.stopRemoteParticipantsAudioLevelObserver()
             try await callClient.leave()
         } catch {
-            DebugLogger.shared.log("Daily leave failed: \(error.localizedDescription)", level: .warning, category: "Meet")
+            DebugLogger.shared.log("Daily leave failed during \(reason). \(fullErrorDetails(error))", level: .warning, category: "Meet")
         }
         #endif
     }
 
-    private func joinDailyRoom(url: URL) async throws {
+    private func joinDailyRoom(url: URL, session: MeetingSession) async throws {
         #if canImport(Daily)
-        let callClient = try await ensureCallClient()
+        let callClient = try await createFreshCallClient(session: session)
         let settings = ClientSettingsUpdate(
             inputs: .set(
                 camera: .set(isEnabled: .set(isCameraEnabled)),
                 microphone: .set(isEnabled: .set(!isMicrophoneMuted))
             )
         )
-        try await callClient.join(url: url, token: nil, settings: settings)
-        refreshParticipantsFromDaily()
+        DebugLogger.shared.log("Daily join attempt meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId) url=\(url.absoluteString)", level: .info, category: "Meet")
+        do {
+            try await callClient.join(url: url, token: nil, settings: settings)
+            DebugLogger.shared.log("Daily join success meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId)", level: .info, category: "Meet")
+            refreshParticipantsFromDaily()
+        } catch {
+            DebugLogger.shared.log("Daily join failed meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId). \(fullErrorDetails(error))", level: .error, category: "Meet")
+            throw error
+        }
         #else
         throw NSError(domain: "Meet", code: -1, userInfo: [NSLocalizedDescriptionKey: "Daily SDK is unavailable in this build."])
         #endif
     }
 
     #if canImport(Daily)
-    private func ensureCallClient() async throws -> CallClient {
-        if let callClient { return callClient }
+    private func createFreshCallClient(session: MeetingSession) async throws -> CallClient {
+        if callClient != nil {
+            await leaveDailyRoom(reason: "force fresh client before join")
+        }
         let callClient = CallClient()
         callClient.delegate = self
         self.callClient = callClient
+        DebugLogger.shared.log("Daily call client created meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId)", level: .debug, category: "Meet")
         return callClient
     }
 
@@ -479,6 +501,32 @@ final class MeetingStateManager: NSObject, ObservableObject {
         )
     }
     #endif
+
+    private func resetMeetingRuntimeStateForJoin() {
+        participants = []
+        participantVideoTracks = [:]
+        breakoutRooms = []
+        participantRoles = [:]
+        localParticipantID = nil
+        localParticipantDisplayName = ""
+        activeSpeakerID = nil
+        messages = []
+        chatThreads = []
+        diagnostics.connectionState = "Unknown"
+        diagnostics.networkQuality = "Unknown"
+        diagnostics.latencyMs = 0
+        diagnostics.packetLossPercent = 0
+    }
+
+    private func hasDailyToken(in url: URL) -> Bool {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
+        return components.queryItems?.contains(where: { $0.name == DailyService.dailyTokenParameterName && !($0.value ?? "").isEmpty }) ?? false
+    }
+
+    private func fullErrorDetails(_ error: Error) -> String {
+        let nsError = error as NSError
+        return "error=\(String(reflecting: error)) domain=\(nsError.domain) code=\(nsError.code) localized=\"\(error.localizedDescription)\" userInfo=\(nsError.userInfo)"
+    }
 }
 
 #if canImport(Daily)
@@ -547,6 +595,7 @@ extension MeetingStateManager: CallClientDelegate {
     nonisolated func callClient(_ callClient: CallClient, error: CallClientError) {
         Task { @MainActor in
             errorMessage = error.localizedDescription
+            DebugLogger.shared.log("Daily delegate error payload: \(fullErrorDetails(error))", level: .error, category: "Meet")
         }
     }
 }
