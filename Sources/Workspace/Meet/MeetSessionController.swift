@@ -174,7 +174,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
             await transitionToLobby(session)
         } catch {
             phase = .failed
-            errorMessage = error.localizedDescription
+            errorMessage = userFriendlyJoinErrorMessage(error)
             DebugLogger.shared.log("Join failed: \(error.localizedDescription)", level: .error, category: "Meet")
         }
     }
@@ -255,10 +255,10 @@ final class MeetingStateManager: NSObject, ObservableObject {
             phase = .failed
             return
         }
-        guard hasDailyToken(in: roomURL) else {
-            errorMessage = "Meeting session is missing a valid Daily token."
+        guard validatePreJoinSession(currentSession, roomURL: roomURL) else {
+            errorMessage = preJoinValidationErrorMessage(for: currentSession, roomURL: roomURL)
             phase = .failed
-            DebugLogger.shared.log("Blocked join because secured Daily URL token was missing for meeting \(currentSession.meetingId).", level: .error, category: "Meet")
+            DebugLogger.shared.log("Blocked join for meeting \(currentSession.meetingId) due to failed pre-join validation.", level: .error, category: "Meet")
             return
         }
 
@@ -278,7 +278,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
             await refreshDebugSnapshot()
         } catch {
             phase = .failed
-            errorMessage = error.localizedDescription
+            errorMessage = userFriendlyJoinErrorMessage(error)
             DebugLogger.shared.log("Failed to start Daily session. \(fullErrorDetails(error))", level: .error, category: "Meet")
             await refreshDebugSnapshot()
         }
@@ -502,7 +502,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
         )
         DebugLogger.shared.log("Daily join attempt meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId) url=\(redactedURLString(url))", level: .info, category: "Meet")
         do {
-            try await callClient.join(url: url, token: nil, settings: settings)
+            let token = session.meetingToken.map { MeetingToken(stringValue: $0) }
+            try await callClient.join(url: url, token: token, settings: settings)
             DebugLogger.shared.log("Daily join success meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId)", level: .info, category: "Meet")
             refreshParticipantsFromDaily()
         } catch {
@@ -618,6 +619,56 @@ final class MeetingStateManager: NSObject, ObservableObject {
         // Daily secured room URLs are expected to include the query parameter named by
         // DailyService.dailyTokenParameterName ("t") and a non-empty value.
         return components.queryItems?.contains(where: { $0.name == DailyService.dailyTokenParameterName && $0.value?.isEmpty == false }) ?? false
+    }
+
+    private func validatePreJoinSession(_ session: MeetingSession, roomURL: URL) -> Bool {
+        let trimmedRoomName = session.roomName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedRoomName.isEmpty else { return false }
+        guard session.isJoinable else { return false }
+        guard roomURL.scheme?.lowercased() == "https" else { return false }
+        guard roomURL.host?.isEmpty == false else { return false }
+
+        if session.requiresMeetingToken {
+            let hasSessionToken = !(session.meetingToken?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+            guard hasSessionToken else { return false }
+            guard hasDailyToken(in: roomURL) else { return false }
+        }
+
+        return true
+    }
+
+    private func preJoinValidationErrorMessage(for session: MeetingSession, roomURL: URL) -> String {
+        let trimmedRoomName = session.roomName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedRoomName.isEmpty {
+            return "Meeting session is invalid. The room mapping is missing."
+        }
+        if !session.isJoinable {
+            return "You are not authorized to join this meeting."
+        }
+        if roomURL.scheme?.lowercased() != "https" || roomURL.host?.isEmpty != false {
+            return "Meeting session is invalid. Please rejoin from a fresh invite."
+        }
+        if session.requiresMeetingToken {
+            let hasSessionToken = !(session.meetingToken?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+            if !hasSessionToken || !hasDailyToken(in: roomURL) {
+                return "You are not authorized to join this meeting. A valid join token is required."
+            }
+        }
+        return "Meeting session validation failed."
+    }
+
+    private func userFriendlyJoinErrorMessage(_ error: Error) -> String {
+        let combined = "\(error.localizedDescription.lowercased()) \(String(reflecting: error).lowercased())"
+        if combined.contains("unauthorized") || combined.contains("not authorized") || combined.contains("roomlookup") {
+            return "You are not authorized to join this meeting. Ask the host for a valid invite."
+        }
+        if combined.contains("token") {
+            return "Unable to verify meeting access. Please refresh your invite and try again."
+        }
+        if combined.contains("not found") {
+            return "This meeting could not be found."
+        }
+        return "Unable to join the meeting right now. Please try again."
     }
 
     private func fullErrorDetails(_ errorPayload: Any) -> String {
@@ -788,7 +839,10 @@ extension MeetingStateManager: CallClientDelegate {
         Task { @MainActor in
             guard !(await isStaleCallback(callClient: callClient)) else { return }
             DebugLogger.shared.log("Daily delegate error callback received.", level: .error, category: "Meet")
-            errorMessage = error.localizedDescription
+            errorMessage = userFriendlyJoinErrorMessage(error)
+            if phase == .inMeeting {
+                phase = .failed
+            }
             DebugLogger.shared.log("Daily delegate error payload: \(fullErrorDetails(error))", level: .error, category: "Meet")
         }
     }

@@ -5,6 +5,9 @@ struct MeetingSession: Identifiable, Equatable, Codable {
 
     let meetingId: String
     let roomName: String
+    let isJoinable: Bool
+    let requiresMeetingToken: Bool
+    let meetingToken: String?
     let sessionId: String
     let createdAt: Date
     let debugTraceId: String
