@@ -263,13 +263,10 @@ actor DailyService {
                 let token = try await createMeetingToken(for: room.name)
                 let trimmedToken = token.trimmingCharacters(in: .whitespacesAndNewlines)
                 if trimmedToken.isEmpty {
-                    // Keep session resolution successful but mark not joinable so UI can show a friendly
-                    // authorization error without attempting Daily join.
-                    isJoinable = false
-                    await log("Meeting token generation returned an empty token for room \(room.name); session will be marked not joinable.", level: .error)
-                } else {
-                    meetingToken = trimmedToken
+                    await log("Meeting token generation returned an empty token for room \(room.name); treating as invalid Daily response.", level: .error)
+                    throw ServiceError.invalidResponse
                 }
+                meetingToken = trimmedToken
             } catch let error as ServiceError {
                 if case let .requestFailed(statusCode, _) = error, statusCode == 401 || statusCode == 403 {
                     // Convert authorization failures into non-joinable state so join is blocked in pre-validation,
@@ -375,7 +372,15 @@ actor DailyService {
             // Default to secure/private expectations when privacy is not returned.
             return true
         }
-        return privacy != "public"
+        switch privacy {
+        case "public":
+            return false
+        case "private":
+            return true
+        default:
+            // Unknown privacy values are treated as requiring token-based authorization.
+            return true
+        }
     }
 
     private func buildAPIURL(path: String) -> URL {

@@ -10,7 +10,8 @@ final class MeetingVideoTrack {}
 
 @MainActor
 final class MeetingStateManager: NSObject, ObservableObject {
-    // Conservative minimum for opaque non-JWT tokens; avoids accepting obviously malformed short strings.
+    // Conservative minimum for opaque non-JWT tokens chosen to reject obviously malformed short values.
+    // Daily tokens are typically JWTs, but this allows longer opaque formats without requiring JWT shape.
     private static let minimumOpaqueMeetingTokenLength = 24
     static let shared = MeetingStateManager()
     private static let sensitiveQueryParameterNames: Set<String> = [
@@ -636,7 +637,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         }
 
         if session.requiresMeetingToken {
-            guard let meetingToken = session.meetingToken?.trimmingCharacters(in: .whitespacesAndNewlines),
+            guard let meetingToken = session.meetingToken,
                   isLikelyValidMeetingToken(meetingToken) else {
                 return "Meeting authorization is missing or invalid. Please refresh and try again."
             }
@@ -662,8 +663,16 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     private func userFacingJoinErrorMessage(for error: Error) -> String {
+        if let serviceError = error as? DailyService.ServiceError {
+            if case let .requestFailed(statusCode, _) = serviceError, statusCode == 401 || statusCode == 403 {
+                return "You are not authorized to join this meeting."
+            }
+        }
+
         let message = error.localizedDescription.trimmingCharacters(in: .whitespacesAndNewlines)
         let lowercasedMessage = message.lowercased()
+        // Fallback to message-based detection because Daily SDK callback errors are not always bridged
+        // with stable typed status codes across all failure paths.
         if lowercasedMessage.contains("unauthorized")
             || lowercasedMessage.contains("not authorized")
             || lowercasedMessage.contains("roomlookup") {
