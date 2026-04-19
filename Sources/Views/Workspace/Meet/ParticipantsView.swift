@@ -3,6 +3,7 @@ import SwiftUI
 struct ParticipantsView: View {
     let participants: [MeetingParticipant]
     var onSelectParticipant: ((MeetingParticipant) -> Void)? = nil
+    var canManageParticipant: ((MeetingParticipant) -> Bool)? = nil
 
     var body: some View {
         List {
@@ -14,6 +15,7 @@ struct ParticipantsView: View {
                 )
             } else {
                 ForEach(participants) { participant in
+                    let canManage = canManageParticipant?(participant) ?? false
                     Button {
                         onSelectParticipant?(participant)
                     } label: {
@@ -38,7 +40,8 @@ struct ParticipantsView: View {
                         }
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Manage participant \(participant.displayName)")
+                    .disabled(onSelectParticipant != nil && !canManage)
+                    .accessibilityLabel((canManage ? "Manage participant " : "View participant ") + participant.displayName)
                 }
             }
         }
