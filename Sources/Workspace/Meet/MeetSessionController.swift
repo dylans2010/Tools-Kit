@@ -768,6 +768,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         #else
         await setInputEnabled(["screenVideo": enabled])
         #endif
+        isScreenSharing = false
     }
 
     #if canImport(Daily)
