@@ -30,6 +30,7 @@ struct MeetingLobbyView: View {
 
             Section {
                 Button {
+                    DebugLogger.shared.log("Join button tapped from lobby.", level: .info, category: "Meet")
                     Task { await manager.startMeeting() }
                 } label: {
                     if manager.isJoining {

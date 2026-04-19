@@ -279,7 +279,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         } catch {
             phase = .failed
             errorMessage = error.localizedDescription
-            DebugLogger.shared.log("Failed to start Daily session. \(fullErrorDetails(error as! Error))", level: .error, category: "Meet")
+            DebugLogger.shared.log("Failed to start Daily session. \(fullErrorDetails(error))", level: .error, category: "Meet")
             await refreshDebugSnapshot()
         }
     }
@@ -486,7 +486,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
             try await callClient.stopRemoteParticipantsAudioLevelObserver()
             try await callClient.leave()
         } catch {
-            DebugLogger.shared.log("Daily leave failed during \(reason). \(fullErrorDetails(error as! Error))", level: .warning, category: "Meet")
+            DebugLogger.shared.log("Daily leave failed during \(reason). \(fullErrorDetails(error))", level: .warning, category: "Meet")
         }
         #endif
     }
@@ -506,7 +506,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
             DebugLogger.shared.log("Daily join success meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId)", level: .info, category: "Meet")
             refreshParticipantsFromDaily()
         } catch {
-            DebugLogger.shared.log("Daily join failed meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId). \(fullErrorDetails(error as! Error))", level: .error, category: "Meet")
+            DebugLogger.shared.log("Daily join failed meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId). \(fullErrorDetails(error))", level: .error, category: "Meet")
             throw error
         }
         #else
@@ -516,6 +516,11 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
     #if canImport(Daily)
     private func createFreshCallClient(session: MeetingSession) async throws -> CallClient {
+        DebugLogger.shared.log(
+            "Preparing Daily call client before join meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId) existingClient=\(callClient != nil)",
+            level: .debug,
+            category: "Meet"
+        )
         if callClient != nil {
             await leaveDailyRoom(reason: "force fresh client before join")
         }
@@ -615,12 +620,17 @@ final class MeetingStateManager: NSObject, ObservableObject {
         return components.queryItems?.contains(where: { $0.name == DailyService.dailyTokenParameterName && $0.value?.isEmpty == false }) ?? false
     }
 
-    private func fullErrorDetails(_ error: Error) -> String {
-        let nsError = error as NSError
-        let reflectedError = sanitizePotentialSecretContent(String(reflecting: error))
-        let localized = sanitizePotentialSecretContent(error.localizedDescription)
-        let userInfo = sanitizedUserInfoDescription(nsError.userInfo)
-        return "error=\(reflectedError) domain=\(nsError.domain) code=\(nsError.code) localized=\"\(localized)\" userInfo=\(userInfo)"
+    private func fullErrorDetails(_ errorPayload: Any) -> String {
+        if let error = errorPayload as? Error {
+            let nsError = error as NSError
+            let reflectedError = sanitizePotentialSecretContent(String(reflecting: error))
+            let localized = sanitizePotentialSecretContent(error.localizedDescription)
+            let userInfo = sanitizedUserInfoDescription(nsError.userInfo)
+            return "error=\(reflectedError) domain=\(nsError.domain) code=\(nsError.code) localized=\"\(localized)\" userInfo=\(userInfo)"
+        }
+
+        let rawDescription = sanitizePotentialSecretContent(String(describing: errorPayload))
+        return "nonErrorType=\(String(describing: type(of: errorPayload))) raw=\"\(rawDescription)\""
     }
 
     private func beginAndJoinSession(_ session: MeetingSession, roomURL: URL) async throws {
@@ -777,8 +787,9 @@ extension MeetingStateManager: CallClientDelegate {
     nonisolated func callClient(_ callClient: CallClient, error: CallClientError) {
         Task { @MainActor in
             guard !(await isStaleCallback(callClient: callClient)) else { return }
+            DebugLogger.shared.log("Daily delegate error callback received.", level: .error, category: "Meet")
             errorMessage = error.localizedDescription
-            DebugLogger.shared.log("Daily delegate error payload: \(fullErrorDetails(error as! Error))", level: .error, category: "Meet")
+            DebugLogger.shared.log("Daily delegate error payload: \(fullErrorDetails(error))", level: .error, category: "Meet")
         }
     }
 }
