@@ -514,22 +514,24 @@ struct WorkspaceMailRouterView: View {
                 description: Text("Add an account to open Inbox as your default mail workspace.")
             )
             .navigationTitle("Mail")
-            .toolbar {
-                ToolbarItemGroup(placement: .topBarTrailing) {
+            .toolbar(content: {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                     } label: {
                         Image(systemName: "square.and.pencil")
                     }
                     .disabled(true)
                     .accessibilityLabel("Compose unavailable without mail account")
+                }
 
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showingManageAccounts = true
                     } label: {
                         Image(systemName: "person.crop.circle.badge.gearshape")
                     }
                 }
-            }
+            })
             .sheet(isPresented: $showingManageAccounts) {
                 ManageAccountsView { selectedAccount in
                     mailStore.setActiveAccount(selectedAccount.id)

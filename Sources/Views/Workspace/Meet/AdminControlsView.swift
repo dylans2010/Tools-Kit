@@ -15,15 +15,15 @@ struct AdminControlsView: View {
                 .buttonStyle(.bordered)
                 Toggle("Lock Meeting", isOn: Binding(
                     get: { manager.isMeetingLocked },
-                    set: { Task { await manager.setMeetingLocked($0) } }
+                    set: { newValue, _ in Task { await manager.setMeetingLocked(newValue) } }
                 ))
                 Toggle("Enable Chat", isOn: Binding(
                     get: { manager.isChatEnabled },
-                    set: { Task { await manager.setChatEnabled($0) } }
+                    set: { newValue, _ in Task { await manager.setChatEnabled(newValue) } }
                 ))
                 Toggle("Allow Screen Sharing", isOn: Binding(
                     get: { manager.isScreenShareAllowed },
-                    set: { Task { await manager.setScreenShareAllowed($0) } }
+                    set: { newValue, _ in Task { await manager.setScreenShareAllowed(newValue) } }
                 ))
                 if manager.isCurrentUserHost {
                     Button("End Meeting for All", role: .destructive) {

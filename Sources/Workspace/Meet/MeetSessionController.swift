@@ -766,13 +766,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     private func setScreenShareEnabled(_ enabled: Bool) async {
-        #if canImport(Daily)
-        await setInputEnabled([.screenVideo: enabled])
-        #else
-        // Fallback builds cannot reference Daily's OutboundMediaType, so string keys
-        // are used only to describe the attempted toggle in diagnostic messaging.
         await setInputEnabled(["screenVideo": enabled])
-        #endif
         isScreenSharing = enabled
     }
 
@@ -785,6 +779,33 @@ final class MeetingStateManager: NSObject, ObservableObject {
             try await callClient.setInputsEnabled(inputs)
         } catch {
             errorMessage = "Failed to update media state: \(error.localizedDescription)"
+        }
+    }
+
+    private func setInputEnabled(
+        _ inputs: [String: Bool]
+    ) async {
+        var mappedInputs: [OutboundMediaType: Bool] = [:]
+        var unsupportedInputs: [String] = []
+        for (inputName, isEnabled) in inputs {
+            switch inputName {
+            case "microphone":
+                mappedInputs[.microphone] = isEnabled
+            case "camera":
+                mappedInputs[.camera] = isEnabled
+            default:
+                unsupportedInputs.append(inputName)
+            }
+        }
+
+        if !mappedInputs.isEmpty {
+            await setInputEnabled(mappedInputs)
+        }
+
+        if !unsupportedInputs.isEmpty {
+            let inputNames = unsupportedInputs.sorted().joined(separator: ", ")
+            errorMessage = "Unsupported media input toggle requested: \(inputNames)."
+            DebugLogger.shared.log("Unsupported Daily input toggle requested: \(inputNames).", level: .warning, category: "Meet")
         }
     }
     #else
