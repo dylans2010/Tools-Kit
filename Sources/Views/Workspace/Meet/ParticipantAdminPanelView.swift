@@ -18,7 +18,7 @@ struct ParticipantAdminPanelView: View {
                 Text(participant.displayName)
                 Picker("Role", selection: $selectedRole) {
                     ForEach(MeetingParticipantRole.allCases) { role in
-                        Text(role.rawValue).tag(role)
+                        Text(role.displayName).tag(role)
                     }
                 }
                 .onChange(of: selectedRole, initial: false) { _, newRole in

@@ -21,7 +21,7 @@ struct VideoTileView: View {
                 HStack(spacing: 6) {
                     Image(systemName: participant.isMuted ? "mic.slash.fill" : "mic.fill")
                         .foregroundStyle(participant.isMuted ? .red : .green)
-                    Text(participant.role.rawValue)
+                    Text(participant.role.displayName)
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }

@@ -23,7 +23,7 @@ struct ParticipantsView: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(participant.displayName)
                                     .font(.subheadline.weight(.semibold))
-                                Text(participant.role.rawValue)
+                                Text(participant.role.displayName)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
@@ -41,7 +41,7 @@ struct ParticipantsView: View {
                     }
                     .buttonStyle(.plain)
                     .disabled(onSelectParticipant != nil && !canManage)
-                    .accessibilityLabel((canManage ? "Manage participant " : "View participant ") + participant.displayName)
+                    .accessibilityLabel("\(canManage ? "Manage" : "View") participant \(participant.displayName)")
                 }
             }
         }

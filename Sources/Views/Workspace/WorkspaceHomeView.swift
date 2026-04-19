@@ -521,6 +521,7 @@ struct WorkspaceMailRouterView: View {
                             Image(systemName: "square.and.pencil")
                         }
                         .disabled(true)
+                        .accessibilityLabel("Compose unavailable without mail account")
 
                         Button {
                             showingManageAccounts = true

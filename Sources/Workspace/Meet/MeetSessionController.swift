@@ -91,6 +91,7 @@ final class MeetingStateManager: ObservableObject {
         defer { isBusy = false }
 
         do {
+            // Meeting IDs are always backend-generated; users only provide the meeting name.
             let session = try await resolver.createSession(with: nil)
             await transitionToLobby(session)
             meetingIdInput = session.meetingId
