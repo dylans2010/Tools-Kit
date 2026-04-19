@@ -12,6 +12,7 @@ actor DailyService {
         case missingAPIKey
         case notFound
         case invalidResponse
+        case malformedMeetingToken
         case requestFailed(statusCode: Int, message: String?)
         case networkFailure(underlying: Error)
 
@@ -25,6 +26,8 @@ actor DailyService {
                 return "Meeting ID was not found."
             case .invalidResponse:
                 return "Daily API returned an invalid response."
+            case .malformedMeetingToken:
+                return "Daily API returned a malformed meeting token."
             case let .requestFailed(statusCode, message):
                 return message ?? "Daily API request failed with status \(statusCode)."
             case let .networkFailure(underlying):
@@ -263,8 +266,8 @@ actor DailyService {
                 let token = try await createMeetingToken(for: room.name)
                 let trimmedToken = token.trimmingCharacters(in: .whitespacesAndNewlines)
                 if !MeetingSession.isLikelyValidMeetingToken(trimmedToken) {
-                    await log("Meeting token generation returned malformed token for room \(room.name); treating as invalid Daily response.", level: .error)
-                    throw ServiceError.invalidResponse
+                    await log("Meeting token generation returned malformed token for room \(room.name).", level: .error)
+                    throw ServiceError.malformedMeetingToken
                 }
                 meetingToken = trimmedToken
             } catch let error as ServiceError {

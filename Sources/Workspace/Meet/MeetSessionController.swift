@@ -10,6 +10,11 @@ final class MeetingVideoTrack {}
 
 @MainActor
 final class MeetingStateManager: NSObject, ObservableObject {
+    private static let unauthorizedJoinErrorMarkers: Set<String> = [
+        "unauthorized",
+        "not authorized",
+        "roomlookup"
+    ]
     static let shared = MeetingStateManager()
     private static let sensitiveQueryParameterNames: Set<String> = [
         "t", "token", "access_token", "refresh_token", "session", "session_token",
@@ -257,7 +262,11 @@ final class MeetingStateManager: NSObject, ObservableObject {
             DebugLogger.shared.log("Blocked join by pre-join validation for meeting \(currentSession.meetingId): \(validationError)", level: .warning, category: "Meet")
             return
         }
-        guard let roomURL else { return }
+        guard let roomURL else {
+            errorMessage = "Meeting room was not found. Verify the meeting ID and try again."
+            phase = .failed
+            return
+        }
 
         isJoining = true
         isBusy = true
@@ -647,7 +656,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private func isValidDailyRoomURL(_ url: URL) -> Bool {
         guard url.scheme?.lowercased() == "https",
               let host = url.host?.lowercased() else { return false }
-        return host.contains(".daily.co")
+        return host == "daily.co" || host.hasSuffix(".daily.co")
     }
 
     private func userFacingJoinErrorMessage(for error: Error) -> String {
@@ -661,9 +670,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         let lowercasedMessage = message.lowercased()
         // Fallback to message-based detection because Daily SDK callback errors are not always bridged
         // with stable typed status codes across all failure paths.
-        if lowercasedMessage.contains("unauthorized")
-            || lowercasedMessage.contains("not authorized")
-            || lowercasedMessage.contains("roomlookup") {
+        if Self.unauthorizedJoinErrorMarkers.contains(where: { lowercasedMessage.contains($0) }) {
             return "You are not authorized to join this meeting."
         }
         if lowercasedMessage.contains("token")
