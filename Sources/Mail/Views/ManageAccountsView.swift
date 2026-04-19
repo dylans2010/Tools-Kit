@@ -3,7 +3,7 @@ import SwiftUI
 struct ManageAccountsView: View {
     @Environment(\.dismiss) private var dismiss
 
-    var onAccountsChanged: (() -> Void)? = nil
+    var onAccountSelected: ((MailAccount) -> Void)? = nil
 
     @StateObject private var mailStore = MailStore.shared
 
@@ -24,13 +24,13 @@ struct ManageAccountsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(.systemGroupedBackground)
-                    .ignoresSafeArea()
+                backgroundGradient.ignoresSafeArea()
 
-                ScrollView(showsIndicators: false) {
+                ScrollView {
                     VStack(spacing: 16) {
-                        connectedAccountsCard
-                        connectProvidersCard
+                        hero
+                        connectedAccountsSection
+                        providerSection
                     }
                     .padding(16)
                 }
@@ -42,21 +42,20 @@ struct ManageAccountsView: View {
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.white)
                             .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
+                            .padding(.vertical, 11)
                             .background(Color.red.opacity(0.9), in: Capsule())
                             .padding(.bottom, 18)
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
             .navigationTitle("Manage Accounts")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button("Done") { dismiss() }
                 }
             }
-            .animation(.spring(response: 0.35, dampingFraction: 0.88), value: toastMessage)
             .sheet(isPresented: $showProtonGuide) {
                 protonGuideSheet
             }
@@ -66,41 +65,103 @@ struct ManageAccountsView: View {
         }
     }
 
-    private var connectedAccountsCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
+    private var hero: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Mail Identity Hub")
+                .font(.system(size: 26, weight: .bold, design: .rounded))
+            Text("Add, remove, and switch providers from one place. OAuth keys are resolved from app config and Appwrite-backed variable endpoints.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            HStack(spacing: 8) {
+                statChip("Accounts", "\(mailStore.accounts.count)")
+                statChip("Active", mailStore.activeAccount?.providerType.displayName ?? "None")
+            }
+        }
+        .padding(16)
+        .glassCard()
+    }
+
+    private var connectedAccountsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
             Label("Connected Accounts", systemImage: "person.2.fill")
                 .font(.headline)
 
             if mailStore.accounts.isEmpty {
-                ContentUnavailableView(
-                    "No accounts connected",
-                    systemImage: "tray",
-                    description: Text("Use the provider buttons below to connect Gmail, Outlook, Yahoo, Proton, or IMAP.")
-                )
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
+                Text("No accounts connected yet. Add one from the providers below.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(12)
+                    .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
             } else {
                 ForEach(mailStore.accounts) { account in
                     accountRow(account)
-                    if account.id != mailStore.accounts.last?.id {
-                        Divider()
-                    }
                 }
             }
         }
         .padding(16)
-        .background(cardBackground)
+        .glassCard()
+    }
+
+    private var providerSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("Add Provider", systemImage: "plus.circle.fill")
+                .font(.headline)
+
+            ForEach(providerOrder, id: \.self) { provider in
+                providerButton(for: provider)
+            }
+
+            if expandedIMAP {
+                imapForm
+            }
+        }
+        .padding(16)
+        .glassCard()
+    }
+
+    private func providerButton(for provider: MailAccount.ProviderType) -> some View {
+        Button {
+            Task { await handleProviderTap(provider) }
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: providerIcon(provider))
+                    .frame(width: 28)
+                    .foregroundStyle(providerColor(provider))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(provider.displayName)
+                        .font(.subheadline.weight(.semibold))
+                    Text(buttonSubtitle(provider))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+
+                if loadingProvider == provider {
+                    ProgressView()
+                } else {
+                    Image(systemName: "plus")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+        .disabled(loadingProvider != nil)
     }
 
     private func accountRow(_ account: MailAccount) -> some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             Image(systemName: providerIcon(account.providerType))
-                .font(.headline)
                 .foregroundStyle(providerColor(account.providerType))
-                .frame(width: 34, height: 34)
-                .background(providerColor(account.providerType).opacity(0.12), in: Circle())
+                .frame(width: 28, height: 28)
+                .background(providerColor(account.providerType).opacity(0.14), in: Circle())
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(account.emailAddress)
                     .font(.subheadline.weight(.semibold))
                 Text(account.providerType.displayName)
@@ -111,138 +172,74 @@ struct ManageAccountsView: View {
             Spacer()
 
             if account.isActive {
-                Label("Active", systemImage: "checkmark.circle.fill")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.green)
+                Text("Active")
+                    .font(.caption2.weight(.semibold))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.green.opacity(0.2), in: Capsule())
             } else {
-                Button("Set Active") {
+                Button("Use") {
                     mailStore.setActiveAccount(account.id)
-                    onAccountsChanged?()
+                    onAccountSelected?(account)
                 }
                 .buttonStyle(.bordered)
             }
 
             Button(role: .destructive) {
                 mailStore.removeAccount(account)
-                onAccountsChanged?()
             } label: {
                 Image(systemName: "trash")
             }
-            .buttonStyle(.borderless)
+            .buttonStyle(.bordered)
         }
-    }
-
-    private var connectProvidersCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Connect New Provider", systemImage: "plus.circle.fill")
-                .font(.headline)
-
-            ForEach(providerOrder, id: \.self) { provider in
-                providerButton(provider)
-            }
-
-            if expandedIMAP {
-                imapForm
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-        }
-        .padding(16)
-        .background(cardBackground)
-    }
-
-    @ViewBuilder
-    private func providerButton(_ provider: MailAccount.ProviderType) -> some View {
-        Button {
-            Task { await handleTap(provider) }
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: providerIcon(provider))
-                    .font(.headline)
-                    .foregroundStyle(providerColor(provider))
-                    .frame(width: 24)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(provider.displayName)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.primary)
-                    Text(providerSubtitle(provider))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
-
-                if loadingProvider == provider {
-                    ProgressView()
-                }
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .frame(maxWidth: .infinity)
-            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
-        }
-        .buttonStyle(.plain)
-        .disabled(loadingProvider != nil)
+        .padding(10)
+        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
     }
 
     private var imapForm: some View {
-        VStack(spacing: 10) {
-            field("IMAP Host", text: $imapHost)
-            field("IMAP Port", text: $imapPort)
-            field("SMTP Host", text: $smtpHost)
-            field("SMTP Port", text: $smtpPort)
-            field("Username / Email", text: $imapUser)
-            secureField("Password", text: $imapPassword)
+        VStack(spacing: 8) {
+            darkField("IMAP Host", text: $imapHost)
+            darkField("IMAP Port", text: $imapPort)
+            darkField("SMTP Host", text: $smtpHost)
+            darkField("SMTP Port", text: $smtpPort)
+            darkField("Email / Username", text: $imapUser)
+            darkSecureField("Password", text: $imapPassword)
 
             Button {
                 Task { await connectIMAP() }
             } label: {
                 HStack {
                     if loadingProvider == .imap {
-                        ProgressView()
+                        ProgressView().tint(.white)
                     }
                     Text("Connect IMAP Account")
-                        .font(.subheadline.weight(.semibold))
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
+                .padding(.vertical, 10)
+                .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
             }
-            .buttonStyle(.borderedProminent)
             .disabled(loadingProvider != nil || imapHost.isEmpty || imapUser.isEmpty || imapPassword.isEmpty)
         }
         .padding(12)
-        .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+        .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 12))
     }
 
     private var protonGuideSheet: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 12) {
                 Text("Proton Bridge Required")
                     .font(.title3.bold())
-
-                Text("Install Proton Bridge and keep it running first. Then use your Bridge username/password in the IMAP fields and continue.")
+                Text("Install Proton Bridge, sign in there, then use its generated username/password in the IMAP fields.")
                     .foregroundStyle(.secondary)
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("1. Install Proton Bridge")
-                    Text("2. Sign in with your Proton account")
-                    Text("3. Enter Bridge username/password in IMAP fields")
-                    Text("4. Continue to connect")
-                }
-                .font(.subheadline)
-
-                Spacer()
 
                 Button("Continue") {
                     showProtonGuide = false
-                    Task { await connectProtonBridge() }
                 }
                 .buttonStyle(.borderedProminent)
-                .frame(maxWidth: .infinity)
+
+                Spacer()
             }
-            .padding(20)
-            .navigationTitle("Proton Setup")
-            .navigationBarTitleDisplayMode(.inline)
+            .padding(18)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Close") { showProtonGuide = false }
@@ -251,31 +248,37 @@ struct ManageAccountsView: View {
         }
     }
 
-    private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 16)
-            .fill(Color(.systemBackground))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
-            )
+    private var backgroundGradient: LinearGradient {
+        LinearGradient(
+            colors: [Color(hex: "#090E17") ?? .black, Color(hex: "#151E2C") ?? .black],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
     }
 
-    private func field(_ title: String, text: Binding<String>) -> some View {
-        TextField(title, text: text)
-            .textInputAutocapitalization(.never)
-            .autocorrectionDisabled(true)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
+    private func statChip(_ title: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text(title)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.caption.weight(.semibold))
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Color.white.opacity(0.07), in: Capsule())
     }
 
-    private func secureField(_ title: String, text: Binding<String>) -> some View {
-        SecureField(title, text: text)
-            .textInputAutocapitalization(.never)
-            .autocorrectionDisabled(true)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
+    private func buttonSubtitle(_ provider: MailAccount.ProviderType) -> String {
+        switch provider {
+        case .gmail: return "OAuth sign in"
+        case .outlook: return "Microsoft OAuth"
+        case .yahoo: return "Yahoo OAuth"
+        case .proton: return "Bridge-assisted IMAP"
+        case .imap: return "Custom server"
+        case .icloud: return "Apple mail"
+        }
     }
 
     private func providerIcon(_ provider: MailAccount.ProviderType) -> String {
@@ -295,23 +298,30 @@ struct ManageAccountsView: View {
         case .outlook: return Color(hex: "#0078D4") ?? .blue
         case .yahoo: return Color(hex: "#6C3BD1") ?? .purple
         case .proton: return Color(hex: "#2E8B57") ?? .green
-        case .imap: return Color(hex: "#8A8AA5") ?? .gray
+        case .imap: return Color(hex: "#9AA0B5") ?? .gray
         case .icloud: return .blue
         }
     }
 
-    private func providerSubtitle(_ provider: MailAccount.ProviderType) -> String {
-        switch provider {
-        case .gmail: return "Google OAuth"
-        case .outlook: return "Microsoft OAuth"
-        case .yahoo: return "Yahoo OAuth"
-        case .proton: return "Proton Bridge"
-        case .imap: return "Manual server setup"
-        case .icloud: return "Apple Mail"
-        }
+    private func darkField(_ title: String, text: Binding<String>) -> some View {
+        TextField(title, text: text)
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled(true)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 9)
+            .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
     }
 
-    private func handleTap(_ provider: MailAccount.ProviderType) async {
+    private func darkSecureField(_ title: String, text: Binding<String>) -> some View {
+        SecureField(title, text: text)
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled(true)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 9)
+            .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
+    }
+
+    private func handleProviderTap(_ provider: MailAccount.ProviderType) async {
         if provider == .imap {
             withAnimation(.easeInOut(duration: 0.2)) {
                 expandedIMAP.toggle()
@@ -321,6 +331,9 @@ struct ManageAccountsView: View {
 
         if provider == .proton {
             showProtonGuide = true
+            withAnimation(.easeInOut(duration: 0.2)) {
+                expandedIMAP = true
+            }
             return
         }
 
@@ -340,40 +353,8 @@ struct ManageAccountsView: View {
                 return
             }
 
-            _ = await MainActor.run { AccountManager.shared.addAccount(session) }
-            onAccountsChanged?()
-            mailStore.reloadAccounts()
-        } catch {
-            showError(error.localizedDescription)
-        }
-    }
-
-    private func connectProtonBridge() async {
-        loadingProvider = .proton
-        defer { loadingProvider = nil }
-
-        guard !imapUser.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              !imapPassword.isEmpty else {
-            showError("Enter your Proton Bridge username and password in IMAP fields first.")
-            return
-        }
-
-        do {
-            let credentials = MailCredentials(
-                email: imapUser.trimmingCharacters(in: .whitespacesAndNewlines),
-                password: imapPassword,
-                host: "127.0.0.1",
-                port: 1143,
-                smtpHost: "127.0.0.1",
-                smtpPort: 1025,
-                accessToken: nil,
-                refreshToken: nil
-            )
-            let session = try await ProtonMailProvider().authenticate(credentials: credentials)
-            _ = MailKeychainManager.shared.saveCredentials(email: session.email, password: imapPassword)
-            _ = await MainActor.run { AccountManager.shared.addAccount(session) }
-            onAccountsChanged?()
-            mailStore.reloadAccounts()
+            let account = await MainActor.run { AccountManager.shared.addAccount(session) }
+            onAccountSelected?(account)
         } catch {
             showError(error.localizedDescription)
         }
@@ -403,25 +384,39 @@ struct ManageAccountsView: View {
                 throw NSError(domain: "Mail", code: 500, userInfo: [NSLocalizedDescriptionKey: "Failed to save credentials to keychain"])
             }
 
-            _ = await MainActor.run { AccountManager.shared.addAccount(session) }
-            onAccountsChanged?()
-            mailStore.reloadAccounts()
+            let account = await MainActor.run { AccountManager.shared.addAccount(session) }
+            onAccountSelected?(account)
         } catch {
             showError(error.localizedDescription)
         }
     }
 
     private func showError(_ message: String) {
-        withAnimation {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.86)) {
             toastMessage = message
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            withAnimation {
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.86)) {
                 if toastMessage == message {
                     toastMessage = nil
                 }
             }
         }
+    }
+}
+
+private extension View {
+    func glassCard() -> some View {
+        self
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.white.opacity(0.04))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
+            )
     }
 }
 

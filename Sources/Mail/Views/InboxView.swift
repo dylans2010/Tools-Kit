@@ -63,7 +63,8 @@ struct InboxView: View {
             }
         }
         .sheet(isPresented: $showingManageAccounts) {
-            ManageAccountsView {
+            ManageAccountsView { selected in
+                mailStore.setActiveAccount(selected.id)
                 Task {
                     await viewModel.loadCachedThenRefreshIfNeeded()
                 }
