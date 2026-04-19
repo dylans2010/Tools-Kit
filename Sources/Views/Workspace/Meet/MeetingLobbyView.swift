@@ -28,24 +28,11 @@ struct MeetingLobbyView: View {
                 permissionRow(title: "Camera", state: manager.lobbyState.cameraPermission, icon: "video")
             }
 
-            Section {
-                Button {
-                    DebugLogger.shared.log("Join button tapped from lobby.", level: .info, category: "Meet")
+            Section("Prejoin") {
+                PreJoinView(manager: manager) {
+                    DebugLogger.shared.log("Join button tapped from prejoin.", level: .info, category: "Meet")
                     Task { await manager.startMeeting() }
-                } label: {
-                    if manager.isJoining {
-                        ProgressView()
-                    } else {
-                        Label("Join Now", systemImage: "arrow.right.circle.fill")
-                    }
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(
-                    manager.isJoining ||
-                    manager.isBusy ||
-                    manager.lobbyState.isCheckingDevices ||
-                    manager.lobbyState.isLoadingParticipants
-                )
             }
         }
         .listStyle(.insetGrouped)

@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ChatMessageBubbleView: View {
     let message: MeetingMessage
+    var onReact: ((String) -> Void)? = nil
+    private let quickReactions = ["👍", "❤️", "😂"]
 
     var body: some View {
         HStack {
@@ -17,6 +19,31 @@ struct ChatMessageBubbleView: View {
                 Text(message.sentAt, style: .time)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
+                if !message.isSystem {
+                    Text(message.deliveryState.rawValue.capitalized)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                if !message.reactions.isEmpty {
+                    HStack(spacing: 6) {
+                        ForEach(message.reactions.keys.sorted(), id: \.self) { emoji in
+                            Text("\(emoji) \(message.reactions[emoji] ?? 0)")
+                                .font(.caption2)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color(.tertiarySystemBackground), in: Capsule())
+                        }
+                    }
+                }
+                if let onReact, !message.isSystem {
+                    HStack(spacing: 4) {
+                        ForEach(quickReactions, id: \.self) { emoji in
+                            Button(emoji) { onReact(emoji) }
+                                .font(.caption2)
+                                .buttonStyle(.plain)
+                        }
+                    }
+                }
             }
             .padding(10)
             .background(

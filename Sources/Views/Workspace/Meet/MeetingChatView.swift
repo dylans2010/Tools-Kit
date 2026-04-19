@@ -6,6 +6,7 @@ struct MeetingChatView: View {
     let isChatEnabled: Bool
     let onAddThread: (String) -> Void
     let onSendMessage: (String, String) -> Void
+    let onReactToMessage: (String, String) -> Void
 
     @State private var selectedThreadID: String?
     @State private var composerText = ""
@@ -32,7 +33,10 @@ struct MeetingChatView: View {
                 ScrollView {
                     LazyVStack(spacing: 8) {
                         ForEach(filteredMessages) { message in
-                            ChatMessageBubbleView(message: message)
+                            ChatMessageBubbleView(
+                                message: message,
+                                onReact: { emoji in onReactToMessage(message.id, emoji) }
+                            )
                                 .id(message.id)
                         }
                     }

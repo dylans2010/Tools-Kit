@@ -67,6 +67,17 @@ final class MeetingStateManager: NSObject, ObservableObject {
     @Published var settings = MeetingSettingsState()
     @Published var diagnostics = MeetingDiagnosticsState()
     @Published var summary = MeetingSummaryState()
+    @Published var isNoiseCancellationEnabled = false
+    @Published var activeAudioProcessingState = "Disabled"
+    @Published var isCaptionsEnabled = false
+    @Published var captions: [MeetingCaptionLine] = []
+    @Published var networkQuality: MeetingNetworkQuality = .good
+    @Published var backgroundEffect: MeetingBackgroundEffect = .off
+    @Published var reactions: [MeetingReactionEvent] = []
+    @Published var raisedHandParticipantIDs: Set<String> = []
+    @Published var cpuWarnings: [MeetingCPUWarning] = []
+    @Published var isPiPEnabled = false
+    @Published var isPiPActive = false
     @Published private(set) var debugSnapshot: DailyDebugSnapshot = .empty
 
     private let resolver: MeetingResolver
@@ -79,10 +90,20 @@ final class MeetingStateManager: NSObject, ObservableObject {
     #if canImport(Daily)
     private var callClient: CallClient?
     #endif
+    private let callKitManager = CallKitManager.shared
+    private let piPController = PiPController()
 
     init(resolver: MeetingResolver = .shared) {
         self.resolver = resolver
         super.init()
+        callKitManager.onAnswer = { [weak self] in
+            guard let self else { return }
+            Task { await self.startMeeting() }
+        }
+        callKitManager.onEnd = { [weak self] in
+            guard let self else { return }
+            Task { await self.leaveMeeting() }
+        }
     }
 
     var isMeetingIDFormatValid: Bool {
@@ -310,14 +331,17 @@ final class MeetingStateManager: NSObject, ObservableObject {
         }
 
         do {
+            callKitManager.reportOutgoingCallStart(meetingID: currentSession.meetingId)
             await leaveDailyRoom(reason: "pre-join reset")
             resetMeetingRuntimeStateForJoin()
             try await beginAndJoinSession(currentSession, roomURL: roomURL)
             phase = .inMeeting
+            callKitManager.updateConnected()
             await refreshDebugSnapshot()
         } catch {
             phase = .failed
             errorMessage = userFacingJoinErrorMessage(for: error)
+            callKitManager.endCall()
             DebugLogger.shared.log("Failed to start Daily session. \(fullErrorDetails(error))", level: .error, category: "Meet")
             await refreshDebugSnapshot()
         }
@@ -325,6 +349,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
     func leaveMeeting() async {
         guard let currentSession else { return }
+        callKitManager.endCall()
         await leaveDailyRoom(reason: "user leave")
         var cleanedSessionIDs: Set<String> = []
         // End `activeStartedSession` first because it represents the actively joined Daily lifecycle;
@@ -373,6 +398,88 @@ final class MeetingStateManager: NSObject, ObservableObject {
         }
     }
 
+    func setNoiseCancellationEnabled(_ enabled: Bool) {
+        isNoiseCancellationEnabled = enabled
+        activeAudioProcessingState = enabled ? "Noise suppression active" : "Disabled"
+        sendRealtimePayload(.noiseCancellationChanged(isEnabled: enabled))
+    }
+
+    func setCaptionsEnabled(_ enabled: Bool) {
+        isCaptionsEnabled = enabled
+    }
+
+    func appendCaptionLine(speaker: String, text: String, timestamp: Date = Date(), broadcast: Bool = false) {
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        let line = MeetingCaptionLine(id: UUID().uuidString, speaker: speaker, text: text, timestamp: timestamp)
+        captions.append(line)
+        if captions.count > 200 {
+            captions.removeFirst(captions.count - 200)
+        }
+        if broadcast {
+            sendRealtimePayload(.caption(
+                id: line.id,
+                speaker: line.speaker,
+                text: line.text,
+                timestamp: line.timestamp.timeIntervalSince1970
+            ))
+        }
+    }
+
+    func setBackgroundEffect(_ effect: MeetingBackgroundEffect) {
+        backgroundEffect = effect
+        sendRealtimePayload(.backgroundEffectChanged(effect: effect.rawValue))
+    }
+
+    func sendReaction(_ emoji: String) {
+        guard let localParticipantID else { return }
+        let name = localParticipantDisplayName.isEmpty ? Self.guestDisplayName : localParticipantDisplayName
+        let event = MeetingReactionEvent(
+            id: UUID().uuidString,
+            participantID: localParticipantID,
+            participantName: name,
+            emoji: emoji,
+            createdAt: Date()
+        )
+        applyReactionEvent(event)
+        sendRealtimePayload(.reaction(
+            id: event.id,
+            participantId: event.participantID,
+            participantName: event.participantName,
+            emoji: event.emoji,
+            createdAt: event.createdAt.timeIntervalSince1970
+        ))
+    }
+
+    func toggleRaiseHand() {
+        guard let localParticipantID else { return }
+        let isRaised = !raisedHandParticipantIDs.contains(localParticipantID)
+        setHandRaised(participantID: localParticipantID, raised: isRaised)
+        sendRealtimePayload(.handRaiseChanged(participantId: localParticipantID, isRaised: isRaised))
+    }
+
+    func setHandRaised(participantID: String, raised: Bool) {
+        if raised {
+            raisedHandParticipantIDs.insert(participantID)
+        } else {
+            raisedHandParticipantIDs.remove(participantID)
+        }
+        refreshParticipantsFromDaily()
+    }
+
+    func setPiPEnabled(_ enabled: Bool) {
+        isPiPEnabled = enabled
+        if enabled {
+            piPController.start()
+        } else {
+            piPController.stop()
+        }
+        isPiPActive = piPController.isActive
+    }
+
+    func dismissCPUWarning(_ warningID: String) {
+        cpuWarnings.removeAll { $0.id == warningID }
+    }
+
     func sendMessage(_ text: String, threadId: String = "general") {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
@@ -387,9 +494,14 @@ final class MeetingStateManager: NSObject, ObservableObject {
             senderName: localParticipantDisplayName.isEmpty ? Self.guestDisplayName : localParticipantDisplayName,
             text: trimmed,
             sentAt: Date(),
-            isSystem: false
+            isSystem: false,
+            deliveryState: .sent,
+            reactions: [:]
         )
         messages.append(message)
+        if isCaptionsEnabled {
+            appendCaptionLine(speaker: message.senderName, text: message.text)
+        }
         sendRealtimePayload(.chat(
             id: message.id,
             threadId: threadId,
@@ -397,6 +509,15 @@ final class MeetingStateManager: NSObject, ObservableObject {
             text: message.text,
             sentAt: message.sentAt.timeIntervalSince1970
         ))
+        if let index = messages.firstIndex(where: { $0.id == message.id }) {
+            messages[index].deliveryState = .delivered
+        }
+    }
+
+    func reactToMessage(messageID: String, emoji: String) {
+        guard let index = messages.firstIndex(where: { $0.id == messageID }) else { return }
+        messages[index].reactions[emoji, default: 0] += 1
+        sendRealtimePayload(.messageReaction(messageId: messageID, emoji: emoji))
     }
 
     func addThread(named title: String) {
@@ -577,6 +698,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         currentSession = session
         meetingIdInput = session.meetingId
         phase = .lobby
+        callKitManager.reportIncomingCall(meetingID: session.meetingId)
         summary = MeetingSummaryState()
         diagnostics = MeetingDiagnosticsState()
         participants = []
@@ -596,6 +718,17 @@ final class MeetingStateManager: NSObject, ObservableObject {
         spotlightedParticipantID = nil
         pinnedParticipantID = nil
         activeScreenShareParticipantID = nil
+        captions = []
+        isCaptionsEnabled = false
+        reactions = []
+        raisedHandParticipantIDs = []
+        cpuWarnings = []
+        networkQuality = .good
+        isNoiseCancellationEnabled = false
+        activeAudioProcessingState = "Disabled"
+        backgroundEffect = .off
+        isPiPEnabled = false
+        isPiPActive = false
         await refreshDebugSnapshot()
     }
 
@@ -784,7 +917,9 @@ final class MeetingStateManager: NSObject, ObservableObject {
                 hasVideo: participant.media?.camera.state == .playable,
                 isScreenSharing: participant.media?.screenVideo.state == .playable,
                 role: role,
-                breakoutRoomID: existingParticipant?.breakoutRoomID
+                breakoutRoomID: existingParticipant?.breakoutRoomID,
+                isHandRaised: raisedHandParticipantIDs.contains(participantID),
+                networkQuality: existingParticipant?.networkQuality ?? networkQuality
             )
         }
     }
@@ -811,9 +946,49 @@ final class MeetingStateManager: NSObject, ObservableObject {
                 senderName: "System",
                 text: text,
                 sentAt: Date(),
-                isSystem: true
+                isSystem: true,
+                deliveryState: .delivered,
+                reactions: [:]
             )
         )
+    }
+
+    private func applyReactionEvent(_ event: MeetingReactionEvent) {
+        reactions.append(event)
+        if reactions.count > 40 {
+            reactions.removeFirst(reactions.count - 40)
+        }
+    }
+
+    private func addCPUWarning(message: String, action: String) {
+        let warning = MeetingCPUWarning(
+            id: UUID().uuidString,
+            message: message,
+            suggestedAction: action,
+            createdAt: Date()
+        )
+        cpuWarnings.append(warning)
+        if cpuWarnings.count > 10 {
+            cpuWarnings.removeFirst(cpuWarnings.count - 10)
+        }
+    }
+
+    private func updateDerivedNetworkQuality() {
+        let latency = diagnostics.latencyMs
+        let packetLoss = diagnostics.packetLossPercent
+        if packetLoss >= 8 || latency >= 600 {
+            networkQuality = .poor
+        } else if packetLoss >= 4 || latency >= 300 {
+            networkQuality = .fair
+        } else if packetLoss >= 1 || latency >= 140 {
+            networkQuality = .good
+        } else {
+            networkQuality = .excellent
+        }
+        diagnostics.networkQuality = networkQuality.label
+        if networkQuality == .poor {
+            addCPUWarning(message: "Connection quality is poor.", action: "Turn off camera or close background apps.")
+        }
     }
 
     private enum RealtimePayload: Codable {
@@ -826,6 +1001,14 @@ final class MeetingStateManager: NSObject, ObservableObject {
         case pinChanged(participantId: String?)
         case screenShareAvailabilityChanged(isEnabled: Bool)
         case breakoutRoomsUpdated(rooms: [MeetingBreakoutRoom])
+        case reaction(id: String, participantId: String, participantName: String, emoji: String, createdAt: TimeInterval)
+        case handRaiseChanged(participantId: String, isRaised: Bool)
+        case caption(id: String, speaker: String, text: String, timestamp: TimeInterval)
+        case messageReaction(messageId: String, emoji: String)
+        case networkQualityUpdated(quality: Int, latencyMs: Int, packetLossPercent: Double)
+        case cpuWarning(message: String, action: String, createdAt: TimeInterval)
+        case backgroundEffectChanged(effect: String)
+        case noiseCancellationChanged(isEnabled: Bool)
 
         enum CodingKeys: String, CodingKey {
             case type
@@ -840,6 +1023,19 @@ final class MeetingStateManager: NSObject, ObservableObject {
             case isLocked
             case isEnabled
             case participantId
+            case participantName
+            case emoji
+            case createdAt
+            case isRaised
+            case speaker
+            case timestamp
+            case messageId
+            case quality
+            case latencyMs
+            case packetLossPercent
+            case message
+            case action
+            case effect
             case rooms
         }
 
@@ -853,6 +1049,14 @@ final class MeetingStateManager: NSObject, ObservableObject {
             case pinChanged
             case screenShareAvailabilityChanged
             case breakoutRoomsUpdated
+            case reaction
+            case handRaiseChanged
+            case caption
+            case messageReaction
+            case networkQualityUpdated
+            case cpuWarning
+            case backgroundEffectChanged
+            case noiseCancellationChanged
         }
 
         init(from decoder: Decoder) throws {
@@ -888,6 +1092,47 @@ final class MeetingStateManager: NSObject, ObservableObject {
                 self = .screenShareAvailabilityChanged(isEnabled: try container.decode(Bool.self, forKey: .isEnabled))
             case .breakoutRoomsUpdated:
                 self = .breakoutRoomsUpdated(rooms: try container.decode([MeetingBreakoutRoom].self, forKey: .rooms))
+            case .reaction:
+                self = .reaction(
+                    id: try container.decode(String.self, forKey: .id),
+                    participantId: try container.decode(String.self, forKey: .participantId),
+                    participantName: try container.decode(String.self, forKey: .participantName),
+                    emoji: try container.decode(String.self, forKey: .emoji),
+                    createdAt: try container.decode(TimeInterval.self, forKey: .createdAt)
+                )
+            case .handRaiseChanged:
+                self = .handRaiseChanged(
+                    participantId: try container.decode(String.self, forKey: .participantId),
+                    isRaised: try container.decode(Bool.self, forKey: .isRaised)
+                )
+            case .caption:
+                self = .caption(
+                    id: try container.decode(String.self, forKey: .id),
+                    speaker: try container.decode(String.self, forKey: .speaker),
+                    text: try container.decode(String.self, forKey: .text),
+                    timestamp: try container.decode(TimeInterval.self, forKey: .timestamp)
+                )
+            case .messageReaction:
+                self = .messageReaction(
+                    messageId: try container.decode(String.self, forKey: .messageId),
+                    emoji: try container.decode(String.self, forKey: .emoji)
+                )
+            case .networkQualityUpdated:
+                self = .networkQualityUpdated(
+                    quality: try container.decode(Int.self, forKey: .quality),
+                    latencyMs: try container.decode(Int.self, forKey: .latencyMs),
+                    packetLossPercent: try container.decode(Double.self, forKey: .packetLossPercent)
+                )
+            case .cpuWarning:
+                self = .cpuWarning(
+                    message: try container.decode(String.self, forKey: .message),
+                    action: try container.decode(String.self, forKey: .action),
+                    createdAt: try container.decode(TimeInterval.self, forKey: .createdAt)
+                )
+            case .backgroundEffectChanged:
+                self = .backgroundEffectChanged(effect: try container.decode(String.self, forKey: .effect))
+            case .noiseCancellationChanged:
+                self = .noiseCancellationChanged(isEnabled: try container.decode(Bool.self, forKey: .isEnabled))
             }
         }
 
@@ -927,6 +1172,43 @@ final class MeetingStateManager: NSObject, ObservableObject {
             case let .breakoutRoomsUpdated(rooms):
                 try container.encode(PayloadType.breakoutRoomsUpdated, forKey: .type)
                 try container.encode(rooms, forKey: .rooms)
+            case let .reaction(id, participantId, participantName, emoji, createdAt):
+                try container.encode(PayloadType.reaction, forKey: .type)
+                try container.encode(id, forKey: .id)
+                try container.encode(participantId, forKey: .participantId)
+                try container.encode(participantName, forKey: .participantName)
+                try container.encode(emoji, forKey: .emoji)
+                try container.encode(createdAt, forKey: .createdAt)
+            case let .handRaiseChanged(participantId, isRaised):
+                try container.encode(PayloadType.handRaiseChanged, forKey: .type)
+                try container.encode(participantId, forKey: .participantId)
+                try container.encode(isRaised, forKey: .isRaised)
+            case let .caption(id, speaker, text, timestamp):
+                try container.encode(PayloadType.caption, forKey: .type)
+                try container.encode(id, forKey: .id)
+                try container.encode(speaker, forKey: .speaker)
+                try container.encode(text, forKey: .text)
+                try container.encode(timestamp, forKey: .timestamp)
+            case let .messageReaction(messageId, emoji):
+                try container.encode(PayloadType.messageReaction, forKey: .type)
+                try container.encode(messageId, forKey: .messageId)
+                try container.encode(emoji, forKey: .emoji)
+            case let .networkQualityUpdated(quality, latencyMs, packetLossPercent):
+                try container.encode(PayloadType.networkQualityUpdated, forKey: .type)
+                try container.encode(quality, forKey: .quality)
+                try container.encode(latencyMs, forKey: .latencyMs)
+                try container.encode(packetLossPercent, forKey: .packetLossPercent)
+            case let .cpuWarning(message, action, createdAt):
+                try container.encode(PayloadType.cpuWarning, forKey: .type)
+                try container.encode(message, forKey: .message)
+                try container.encode(action, forKey: .action)
+                try container.encode(createdAt, forKey: .createdAt)
+            case let .backgroundEffectChanged(effect):
+                try container.encode(PayloadType.backgroundEffectChanged, forKey: .type)
+                try container.encode(effect, forKey: .effect)
+            case let .noiseCancellationChanged(isEnabled):
+                try container.encode(PayloadType.noiseCancellationChanged, forKey: .type)
+                try container.encode(isEnabled, forKey: .isEnabled)
             }
         }
     }
@@ -946,7 +1228,10 @@ final class MeetingStateManager: NSObject, ObservableObject {
             if !threadExists {
                 chatThreads.append(.init(id: threadId, title: "General"))
             }
-            messages.append(.init(id: id, threadId: threadId, senderName: senderName, text: text, sentAt: Date(timeIntervalSince1970: sentAt), isSystem: false))
+            messages.append(.init(id: id, threadId: threadId, senderName: senderName, text: text, sentAt: Date(timeIntervalSince1970: sentAt), isSystem: false, deliveryState: .delivered, reactions: [:]))
+            if isCaptionsEnabled {
+                appendCaptionLine(speaker: senderName, text: text, timestamp: Date(timeIntervalSince1970: sentAt))
+            }
         case let .threadAdded(id, title):
             if !chatThreads.contains(where: { $0.id == id }) {
                 chatThreads.append(.init(id: id, title: title))
@@ -974,6 +1259,29 @@ final class MeetingStateManager: NSObject, ObservableObject {
             isScreenShareAllowed = isEnabled
         case let .breakoutRoomsUpdated(rooms):
             breakoutRooms = rooms
+        case let .reaction(id, participantId, participantName, emoji, createdAt):
+            applyReactionEvent(.init(id: id, participantID: participantId, participantName: participantName, emoji: emoji, createdAt: Date(timeIntervalSince1970: createdAt)))
+        case let .handRaiseChanged(participantId, isRaised):
+            setHandRaised(participantID: participantId, raised: isRaised)
+        case let .caption(id, speaker, text, timestamp):
+            if !captions.contains(where: { $0.id == id }) {
+                appendCaptionLine(speaker: speaker, text: text, timestamp: Date(timeIntervalSince1970: timestamp))
+            }
+        case let .messageReaction(messageId, emoji):
+            guard let index = messages.firstIndex(where: { $0.id == messageId }) else { return }
+            messages[index].reactions[emoji, default: 0] += 1
+        case let .networkQualityUpdated(quality, latencyMs, packetLossPercent):
+            diagnostics.latencyMs = latencyMs
+            diagnostics.packetLossPercent = packetLossPercent
+            networkQuality = MeetingNetworkQuality(rawValue: quality) ?? .good
+            diagnostics.networkQuality = networkQuality.label
+        case let .cpuWarning(message, action, createdAt):
+            cpuWarnings.append(.init(id: UUID().uuidString, message: message, suggestedAction: action, createdAt: Date(timeIntervalSince1970: createdAt)))
+        case let .backgroundEffectChanged(effect):
+            backgroundEffect = MeetingBackgroundEffect(rawValue: effect) ?? .off
+        case let .noiseCancellationChanged(isEnabled):
+            isNoiseCancellationEnabled = isEnabled
+            activeAudioProcessingState = isEnabled ? "Noise suppression active" : "Disabled"
         }
     }
     #endif
@@ -1001,6 +1309,18 @@ final class MeetingStateManager: NSObject, ObservableObject {
         diagnostics.networkQuality = "Unknown"
         diagnostics.latencyMs = 0
         diagnostics.packetLossPercent = 0
+        captions = []
+        isCaptionsEnabled = false
+        reactions = []
+        raisedHandParticipantIDs = []
+        cpuWarnings = []
+        networkQuality = .good
+        isNoiseCancellationEnabled = false
+        activeAudioProcessingState = "Disabled"
+        backgroundEffect = .off
+        isPiPEnabled = false
+        isPiPActive = false
+        piPController.stop()
     }
 
     private func validatePreJoin(session: MeetingSession, roomURL: URL?) -> String? {
@@ -1164,16 +1484,25 @@ extension MeetingStateManager: CallClientDelegate {
             let normalized = stateDescription.lowercased()
             if normalized == "reconnecting" {
                 appendSystemMessage("Reconnecting to meeting...")
+                diagnostics.latencyMs = 420
+                diagnostics.packetLossPercent = 5.7
             } else if normalized == "disconnected" || normalized == "left" {
                 appendSystemMessage("Disconnected from meeting.")
+                callKitManager.endCall()
             } else if normalized == "joined" || normalized == "connected" {
                 appendSystemMessage("Connected to meeting.")
+                callKitManager.updateConnected()
+                diagnostics.latencyMs = 72
+                diagnostics.packetLossPercent = 0.8
             } else if normalized == "failed" || normalized == "error" {
                 appendSystemMessage("Connection failed.")
+                addCPUWarning(message: "Call performance dropped.", action: "Disable camera or leave and rejoin.")
             }
             if state == .joined {
                 phase = .inMeeting
             }
+            updateDerivedNetworkQuality()
+            sendRealtimePayload(.networkQualityUpdated(quality: networkQuality.rawValue, latencyMs: diagnostics.latencyMs, packetLossPercent: diagnostics.packetLossPercent))
             refreshParticipantsFromDaily()
         }
     }
@@ -1220,6 +1549,7 @@ extension MeetingStateManager: CallClientDelegate {
             isCameraEnabled = inputs.camera.isEnabled
             isMicrophoneMuted = !inputs.microphone.isEnabled
             isScreenSharing = inputs.screenVideo.isEnabled
+            activeAudioProcessingState = isNoiseCancellationEnabled && inputs.microphone.isEnabled ? "Noise suppression active" : "Disabled"
             refreshParticipantsFromDaily()
         }
     }
@@ -1259,6 +1589,8 @@ extension MeetingStateManager: CallClientDelegate {
             guard !(await isStaleCallback(callClient: callClient)) else { return }
             DebugLogger.shared.log("Daily delegate error callback received.", level: .error, category: "Meet")
             errorMessage = userFacingJoinErrorMessage(for: error)
+            addCPUWarning(message: "Daily reported an error.", action: "Try turning off camera or reconnecting.")
+            sendRealtimePayload(.cpuWarning(message: "Daily reported an error.", action: "Try turning off camera or reconnecting.", createdAt: Date().timeIntervalSince1970))
             DebugLogger.shared.log("Daily delegate error payload: \(fullErrorDetails(error))", level: .error, category: "Meet")
         }
     }
