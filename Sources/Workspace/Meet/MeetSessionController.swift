@@ -749,6 +749,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
         #if canImport(Daily)
         await setInputEnabled([.microphone: enabled])
         #else
+        // Fallback builds cannot reference Daily's OutboundMediaType, so string keys
+        // are used only to describe the attempted toggle in diagnostic messaging.
         await setInputEnabled(["microphone": enabled])
         #endif
     }
@@ -757,6 +759,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
         #if canImport(Daily)
         await setInputEnabled([.camera: enabled])
         #else
+        // Fallback builds cannot reference Daily's OutboundMediaType, so string keys
+        // are used only to describe the attempted toggle in diagnostic messaging.
         await setInputEnabled(["camera": enabled])
         #endif
     }
@@ -765,6 +769,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
         #if canImport(Daily)
         await setInputEnabled([.screenVideo: enabled])
         #else
+        // Fallback builds cannot reference Daily's OutboundMediaType, so string keys
+        // are used only to describe the attempted toggle in diagnostic messaging.
         await setInputEnabled(["screenVideo": enabled])
         #endif
         isScreenSharing = enabled
