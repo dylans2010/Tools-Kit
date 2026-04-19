@@ -16,7 +16,7 @@ enum MeetPermissionState: String {
 
 enum MeetingParticipantRole: String, CaseIterable, Identifiable, Codable {
     case host
-    case coHost = "co-host"
+    case admin
     case participant
 
     var id: String { rawValue }
@@ -24,7 +24,7 @@ enum MeetingParticipantRole: String, CaseIterable, Identifiable, Codable {
     var displayName: String {
         switch self {
         case .host: return "Host"
-        case .coHost: return "Co-Host"
+        case .admin: return "Admin"
         case .participant: return "Participant"
         }
     }
@@ -37,6 +37,7 @@ struct MeetingParticipant: Identifiable, Equatable {
     var isSpeaking: Bool
     var isMuted: Bool
     var hasVideo: Bool
+    var isScreenSharing: Bool
     var role: MeetingParticipantRole
     var breakoutRoomID: String?
 }
@@ -68,7 +69,7 @@ enum ScheduledMeetingActivationState: String, Equatable, Codable {
     case active
 }
 
-struct MeetingBreakoutRoom: Identifiable, Equatable {
+struct MeetingBreakoutRoom: Identifiable, Equatable, Codable {
     let id: String
     var name: String
     var participantIds: [String]
@@ -124,6 +125,14 @@ enum MeetingAdminAction: Equatable {
     case setParticipantVideoEnabled(participantId: String, enabled: Bool)
     case removeParticipant(participantId: String)
     case assignRole(participantId: String, role: MeetingParticipantRole)
+    case lockMeeting(Bool)
+    case setChatEnabled(Bool)
+    case spotlightParticipant(participantId: String?)
+    case pinParticipant(participantId: String?)
+    case setScreenShareEnabled(Bool)
+    case endMeetingForAll
+    case createBreakoutRoom(name: String)
+    case assignParticipantToBreakout(participantId: String, roomId: String?)
 }
 
 struct DailyDebugMapping: Identifiable {

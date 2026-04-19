@@ -4,10 +4,17 @@ struct JoinMeetingView: View {
     @StateObject private var manager = MeetingStateManager.shared
     @State private var navigateToLobby = false
     @State private var showCreateMeetingSheet = false
+    @AppStorage("meet_display_name") private var storedDisplayName = ""
 
     var body: some View {
         List {
             Section("Join Meeting") {
+                TextField("Enter your name", text: $manager.displayNameInput)
+                    .textInputAutocapitalization(.words)
+                    .autocorrectionDisabled()
+                    .onChange(of: manager.displayNameInput, initial: false) { _, newValue in
+                        storedDisplayName = newValue
+                    }
                 TextField("Meeting ID", text: $manager.meetingIdInput)
                     .textInputAutocapitalization(.characters)
                     .autocorrectionDisabled()
@@ -25,7 +32,11 @@ struct JoinMeetingView: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(manager.isBusy || !manager.isMeetingIDFormatValid)
+                .disabled(
+                    manager.isBusy ||
+                    !manager.isMeetingIDFormatValid ||
+                    manager.displayNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                )
             }
 
             Section("Scheduled Meetings") {
@@ -94,6 +105,11 @@ struct JoinMeetingView: View {
         }
         .onChange(of: manager.phase, initial: false) { _, newValue in
             navigateToLobby = (newValue == .lobby)
+        }
+        .onAppear {
+            if manager.displayNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                manager.displayNameInput = storedDisplayName
+            }
         }
     }
 }

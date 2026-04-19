@@ -12,6 +12,7 @@ struct MeetingControlsView: View {
     var onOpenParticipants: (() -> Void)? = nil
     var onOpenSettings: (() -> Void)? = nil
     var onOpenAdmin: (() -> Void)? = nil
+    var onOpenNotes: (() -> Void)? = nil
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -31,6 +32,9 @@ struct MeetingControlsView: View {
                 }
                 if let onOpenAdmin {
                     controlButton("Admin", icon: "person.badge.shield.checkmark.fill", action: onOpenAdmin)
+                }
+                if let onOpenNotes {
+                    controlButton("Notes", icon: "note.text", action: onOpenNotes)
                 }
 
                 Button(role: .destructive, action: onLeaveMeeting) {

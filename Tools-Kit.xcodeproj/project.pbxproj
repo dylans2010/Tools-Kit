@@ -254,6 +254,10 @@
 		ME020000000000000000001E /* BreakoutRoomCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000001E /* BreakoutRoomCardView.swift */; };
 		ME020000000000000000001F /* MeetingStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000001F /* MeetingStateView.swift */; };
 		ME0200000000000000000020 /* MeetingDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000020 /* MeetingDiagnosticsView.swift */; };
+		ME0200000000000000000021 /* MeetingNotesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000021 /* MeetingNotesManager.swift */; };
+		ME0200000000000000000022 /* MeetingNotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000022 /* MeetingNotesView.swift */; };
+		ME0200000000000000000023 /* NotesEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000023 /* NotesEditorView.swift */; };
+		ME0200000000000000000024 /* AIAssistantPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000024 /* AIAssistantPanelView.swift */; };
 		WK0200000000000000000001 /* WorkoutsModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000001 /* WorkoutsModeManager.swift */; };
 		WK0200000000000000000002 /* WorkoutsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000002 /* WorkoutsHomeView.swift */; };
 		WK0200000000000000000003 /* OnboardWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000003 /* OnboardWorkoutView.swift */; };
@@ -1125,6 +1129,10 @@
 		ME010000000000000000001E /* BreakoutRoomCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BreakoutRoomCardView.swift"; sourceTree = "<group>"; };
 		ME010000000000000000001F /* MeetingStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingStateView.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000020 /* MeetingDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingDiagnosticsView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000021 /* MeetingNotesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingNotesManager.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000022 /* MeetingNotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingNotesView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000023 /* NotesEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotesEditorView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000024 /* AIAssistantPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIAssistantPanelView.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000001 /* WorkoutsModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/WorkoutsModeManager.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000002 /* WorkoutsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/WorkoutsHomeView.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000003 /* OnboardWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/OnboardWorkoutView.swift"; sourceTree = "<group>"; };
@@ -1232,6 +1240,9 @@
 				ME010000000000000000001E /* BreakoutRoomCardView.swift */,
 				ME010000000000000000001F /* MeetingStateView.swift */,
 				ME0100000000000000000020 /* MeetingDiagnosticsView.swift */,
+				ME0100000000000000000022 /* MeetingNotesView.swift */,
+				ME0100000000000000000023 /* NotesEditorView.swift */,
+				ME0100000000000000000024 /* AIAssistantPanelView.swift */,
 			);
 			path = Meet;
 			sourceTree = "<group>";
@@ -1254,6 +1265,7 @@
 				ME0100000000000000000005 /* DailyService.swift */,
 				ME0100000000000000000006 /* MeetingResolver.swift */,
 				ME0100000000000000000007 /* MeetSessionController.swift */,
+				ME0100000000000000000021 /* MeetingNotesManager.swift */,
 			);
 			path = Meet;
 			sourceTree = "<group>";
@@ -2448,6 +2460,10 @@
 				ME020000000000000000001E /* BreakoutRoomCardView.swift in Sources */,
 				ME020000000000000000001F /* MeetingStateView.swift in Sources */,
 				ME0200000000000000000020 /* MeetingDiagnosticsView.swift in Sources */,
+				ME0200000000000000000021 /* MeetingNotesManager.swift in Sources */,
+				ME0200000000000000000022 /* MeetingNotesView.swift in Sources */,
+				ME0200000000000000000023 /* NotesEditorView.swift in Sources */,
+				ME0200000000000000000024 /* AIAssistantPanelView.swift in Sources */,
 				WK0200000000000000000001 /* WorkoutsModeManager.swift in Sources */,
 				WK0200000000000000000002 /* WorkoutsHomeView.swift in Sources */,
 				WK0200000000000000000003 /* OnboardWorkoutView.swift in Sources */,
