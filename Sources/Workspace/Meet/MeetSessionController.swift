@@ -767,7 +767,6 @@ final class MeetingStateManager: NSObject, ObservableObject {
         DebugLogger.shared.log("Screen share toggle requested but OutboundMediaType.screenVideo is unavailable.", level: .warning, category: "Meet")
         #else
         await setInputEnabled(["screenVideo": enabled])
-        isScreenSharing = enabled
         #endif
     }
 
