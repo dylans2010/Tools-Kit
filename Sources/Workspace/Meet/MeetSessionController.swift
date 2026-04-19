@@ -766,37 +766,71 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     private func setScreenShareEnabled(_ enabled: Bool) async {
-        #if canImport(Daily)
-        await setInputEnabled([.screenVideo: enabled])
-        #else
-        // Fallback builds cannot reference Daily's OutboundMediaType, so string keys
-        // are used only to describe the attempted toggle in diagnostic messaging.
-        await setInputEnabled(["screenVideo": enabled])
-        #endif
-        isScreenSharing = enabled
+        let screenShareUpdated = await setInputEnabled(["screenVideo": enabled])
+        if screenShareUpdated {
+            isScreenSharing = enabled
+        }
     }
 
     #if canImport(Daily)
+    @discardableResult
     private func setInputEnabled(
         _ inputs: [OutboundMediaType: Bool]
-    ) async {
-        guard let callClient else { return }
+    ) async -> Bool {
+        guard !inputs.isEmpty else { return false }
+        guard let callClient else { return false }
         do {
             try await callClient.setInputsEnabled(inputs)
+            return true
         } catch {
             errorMessage = "Failed to update media state: \(error.localizedDescription)"
+            return false
         }
     }
-    #else
+
+    @discardableResult
     private func setInputEnabled(
         _ inputs: [String: Bool]
-    ) async {
+    ) async -> Bool {
+        guard !inputs.isEmpty else { return false }
+        var mappedInputs: [OutboundMediaType: Bool] = [:]
+        var unsupportedInputs: [String] = []
+        for (inputName, isEnabled) in inputs {
+            switch inputName {
+            case "microphone":
+                mappedInputs[.microphone] = isEnabled
+            case "camera":
+                mappedInputs[.camera] = isEnabled
+            default:
+                unsupportedInputs.append(inputName)
+            }
+        }
+
+        let supportedInputsApplied = await setInputEnabled(mappedInputs)
+        let hasUnsupportedInputs = !unsupportedInputs.isEmpty
+        if hasUnsupportedInputs {
+            let inputNames = unsupportedInputs.sorted().joined(separator: ", ")
+            let message = "Unsupported Daily media inputs requested: \(inputNames)."
+            DebugLogger.shared.log(message, level: .warning, category: "Meet")
+            errorMessage = supportedInputsApplied
+                ? "Unsupported media inputs were ignored: \(inputNames)."
+                : "Unsupported media inputs requested: \(inputNames)."
+        }
+
+        return supportedInputsApplied && !hasUnsupportedInputs
+    }
+    #else
+    @discardableResult
+    private func setInputEnabled(
+        _ inputs: [String: Bool]
+    ) async -> Bool {
         // Daily types are unavailable in this build; we keep string keys only for
         // fallback diagnostics so the UI can surface which input toggle was requested.
         let inputNames = inputs.keys.sorted().joined(separator: ", ")
-        guard !inputNames.isEmpty else { return }
+        guard !inputNames.isEmpty else { return false }
         errorMessage = "Daily SDK is unavailable, so \(inputNames) state cannot be updated."
         DebugLogger.shared.log("\(inputNames) update blocked because Daily SDK is unavailable.", level: .warning, category: "Meet")
+        return false
     }
     #endif
 
