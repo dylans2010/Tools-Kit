@@ -11,6 +11,9 @@ final class MeetingVideoTrack {}
 @MainActor
 final class MeetingStateManager: NSObject, ObservableObject {
     static let shared = MeetingStateManager()
+    private static let sensitiveQueryParameterNames: Set<String> = ["t", "token", "auth", "authorization", "password", "secret", "api_key", "apikey", "key", "bearer"]
+    private static let sensitiveUserInfoKeyFragments = ["token", "authorization", "password", "secret", "apikey", "api_key", "key", "credential", "cookie", "bearer"]
+    private static let sensitiveURLValuePattern = #"(?i)([?&](?:t|token|auth|authorization|password|secret|api_key|apikey|key|bearer)=)[^&\s]+"#
 
     @Published var meetingIdInput = ""
     @Published var meetingNameInput = ""
@@ -520,6 +523,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
     private func hasDailyToken(in url: URL) -> Bool {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
+        // Daily secured room URLs are expected to include the query parameter named by
+        // DailyService.dailyTokenParameterName ("t") and a non-empty value.
         return components.queryItems?.contains(where: { $0.name == DailyService.dailyTokenParameterName && !($0.value ?? "").isEmpty }) ?? false
     }
 
@@ -535,11 +540,10 @@ final class MeetingStateManager: NSObject, ObservableObject {
         guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return sanitizePotentialSecretContent(url.absoluteString)
         }
-        let sensitiveNames: Set<String> = ["t", "token", "auth", "authorization", "password", "secret", "api_key", "apikey"]
         if var queryItems = components.queryItems {
             queryItems = queryItems.map { item in
                 let lowercasedName = item.name.lowercased()
-                if sensitiveNames.contains(lowercasedName) {
+                if Self.sensitiveQueryParameterNames.contains(lowercasedName) {
                     return URLQueryItem(name: item.name, value: "<redacted>")
                 }
                 return URLQueryItem(name: item.name, value: sanitizePotentialSecretContent(item.value ?? ""))
@@ -551,11 +555,10 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
     private func sanitizedUserInfoDescription(_ userInfo: [String: Any]) -> String {
         guard !userInfo.isEmpty else { return "[:]" }
-        let sensitiveKeyFragments = ["token", "authorization", "password", "secret", "apikey", "api_key", "credential", "cookie", "bearer"]
         var sanitized: [String: String] = [:]
         for (key, value) in userInfo {
             let lowercasedKey = key.lowercased()
-            if sensitiveKeyFragments.contains(where: { lowercasedKey.contains($0) }) {
+            if Self.sensitiveUserInfoKeyFragments.contains(where: { lowercasedKey.contains($0) }) {
                 sanitized[key] = "<redacted>"
                 continue
             }
@@ -566,9 +569,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
     private func sanitizePotentialSecretContent(_ value: String) -> String {
         var sanitized = value
-        let tokenPattern = #"(?i)([?&](?:t|token|auth|authorization|password|secret|api_key|apikey)=)[^&\s]+"#
         sanitized = sanitized.replacingOccurrences(
-            of: tokenPattern,
+            of: Self.sensitiveURLValuePattern,
             with: "$1<redacted>",
             options: .regularExpression
         )
