@@ -368,7 +368,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         let inputNames = inputs.keys.sorted().joined(separator: ", ")
         guard !inputNames.isEmpty else { return }
         errorMessage = "Daily SDK is unavailable, so \(inputNames) state cannot be updated."
-        DebugLogger.shared.log("\(inputNames.capitalized) update blocked because Daily SDK is unavailable.", level: .warning, category: "Meet")
+        DebugLogger.shared.log("\(inputNames) update blocked because Daily SDK is unavailable.", level: .warning, category: "Meet")
     }
     #endif
 
