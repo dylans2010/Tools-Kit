@@ -11,7 +11,7 @@ struct MeetingContainerView: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            VideoGridView(participants: manager.participants)
+            VideoGridView(participants: manager.participants, videoTracks: manager.participantVideoTracks)
                 .frame(maxHeight: 340)
 
             MeetingControlsView(
@@ -49,11 +49,12 @@ struct MeetingContainerView: View {
                 ParticipantsView(
                     participants: manager.participants,
                     onSelectParticipant: { participant in
-                        guard manager.isCurrentUserHost, participant.id != "local" else { return }
+                        guard manager.isCurrentUserHost, let localParticipantID = manager.localParticipantID, participant.id != localParticipantID else { return }
                         selectedParticipant = participant
                     },
                     canManageParticipant: { participant in
-                        manager.isCurrentUserHost && participant.id != "local"
+                        guard manager.isCurrentUserHost, let localParticipantID = manager.localParticipantID else { return false }
+                        return participant.id != localParticipantID
                     }
                 )
                 .navigationTitle("Participants")

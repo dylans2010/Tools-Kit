@@ -1,13 +1,18 @@
 import SwiftUI
 
+#if canImport(Daily)
+import Daily
+#endif
+
 struct VideoTileView: View {
     let participant: MeetingParticipant
+    let track: MeetingVideoTrack?
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            RoundedRectangle(cornerRadius: 12)
-                .fill(participant.hasVideo ? Color.blue.opacity(0.2) : Color.gray.opacity(0.2))
+            videoSurface
                 .frame(height: 120)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
@@ -29,4 +34,33 @@ struct VideoTileView: View {
             .padding(8)
         }
     }
+
+    @ViewBuilder
+    private var videoSurface: some View {
+        #if canImport(Daily)
+        if let track {
+            MeetingDailyVideoView(track: track)
+        } else {
+            Color.gray.opacity(0.2)
+        }
+        #else
+        Color.gray.opacity(0.2)
+        #endif
+    }
 }
+
+#if canImport(Daily)
+private struct MeetingDailyVideoView: UIViewRepresentable {
+    let track: VideoTrack
+
+    func makeUIView(context: Context) -> VideoView {
+        let view = VideoView()
+        view.videoScaleMode = .fit
+        return view
+    }
+
+    func updateUIView(_ uiView: VideoView, context: Context) {
+        uiView.track = track
+    }
+}
+#endif

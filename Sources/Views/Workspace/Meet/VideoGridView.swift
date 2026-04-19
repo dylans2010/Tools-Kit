@@ -2,6 +2,7 @@ import SwiftUI
 
 struct VideoGridView: View {
     let participants: [MeetingParticipant]
+    let videoTracks: [String: MeetingVideoTrack]
 
     private var columns: [GridItem] {
         let count = max(1, participants.count)
@@ -14,7 +15,7 @@ struct VideoGridView: View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 10) {
                 ForEach(participants) { participant in
-                    VideoTileView(participant: participant)
+                    VideoTileView(participant: participant, track: videoTracks[participant.id])
                 }
             }
             .padding(8)
