@@ -410,7 +410,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
                 microphone: .set(isEnabled: .set(!isMicrophoneMuted))
             )
         )
-        DebugLogger.shared.log("Daily join attempt meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId) url=\(url.absoluteString)", level: .info, category: "Meet")
+        DebugLogger.shared.log("Daily join attempt meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId) url=\(redactedURLString(url))", level: .info, category: "Meet")
         do {
             try await callClient.join(url: url, token: nil, settings: settings)
             DebugLogger.shared.log("Daily join success meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId)", level: .info, category: "Meet")
@@ -525,7 +525,54 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
     private func fullErrorDetails(_ error: Error) -> String {
         let nsError = error as NSError
-        return "error=\(String(reflecting: error)) domain=\(nsError.domain) code=\(nsError.code) localized=\"\(error.localizedDescription)\" userInfo=\(nsError.userInfo)"
+        let reflectedError = sanitizePotentialSecretContent(String(reflecting: error))
+        let localized = sanitizePotentialSecretContent(error.localizedDescription)
+        let userInfo = sanitizedUserInfoDescription(nsError.userInfo)
+        return "error=\(reflectedError) domain=\(nsError.domain) code=\(nsError.code) localized=\"\(localized)\" userInfo=\(userInfo)"
+    }
+
+    private func redactedURLString(_ url: URL) -> String {
+        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return sanitizePotentialSecretContent(url.absoluteString)
+        }
+        let sensitiveNames: Set<String> = ["t", "token", "auth", "authorization", "password", "secret", "api_key", "apikey"]
+        if var queryItems = components.queryItems {
+            queryItems = queryItems.map { item in
+                let lowercasedName = item.name.lowercased()
+                if sensitiveNames.contains(lowercasedName) {
+                    return URLQueryItem(name: item.name, value: "<redacted>")
+                }
+                return URLQueryItem(name: item.name, value: sanitizePotentialSecretContent(item.value ?? ""))
+            }
+            components.queryItems = queryItems
+        }
+        return components.url?.absoluteString ?? sanitizePotentialSecretContent(url.absoluteString)
+    }
+
+    private func sanitizedUserInfoDescription(_ userInfo: [String: Any]) -> String {
+        guard !userInfo.isEmpty else { return "[:]" }
+        let sensitiveKeyFragments = ["token", "authorization", "password", "secret", "apikey", "api_key", "credential", "cookie", "bearer"]
+        var sanitized: [String: String] = [:]
+        for (key, value) in userInfo {
+            let lowercasedKey = key.lowercased()
+            if sensitiveKeyFragments.contains(where: { lowercasedKey.contains($0) }) {
+                sanitized[key] = "<redacted>"
+                continue
+            }
+            sanitized[key] = sanitizePotentialSecretContent(String(describing: value))
+        }
+        return String(describing: sanitized)
+    }
+
+    private func sanitizePotentialSecretContent(_ value: String) -> String {
+        var sanitized = value
+        let tokenPattern = #"(?i)([?&](?:t|token|auth|authorization|password|secret|api_key|apikey)=)[^&\s]+"#
+        sanitized = sanitized.replacingOccurrences(
+            of: tokenPattern,
+            with: "$1<redacted>",
+            options: .regularExpression
+        )
+        return sanitized
     }
 }
 
