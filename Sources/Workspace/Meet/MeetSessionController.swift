@@ -629,10 +629,12 @@ final class MeetingStateManager: NSObject, ObservableObject {
             return "error=\(reflectedError) domain=\(nsError.domain) code=\(nsError.code) localized=\"\(localized)\" userInfo=\(userInfo)"
         }
 
-        let nsError = errorValue as NSError
         let rawDescription = sanitizePotentialSecretContent(String(describing: errorValue))
-        let userInfo = sanitizedUserInfoDescription(nsError.userInfo)
-        return "nonErrorType=\(String(describing: type(of: errorValue))) raw=\"\(rawDescription)\" domain=\(nsError.domain) code=\(nsError.code) userInfo=\(userInfo)"
+        if let nsError = errorValue as? NSError {
+            let userInfo = sanitizedUserInfoDescription(nsError.userInfo)
+            return "nonErrorType=\(String(describing: type(of: errorValue))) raw=\"\(rawDescription)\" domain=\(nsError.domain) code=\(nsError.code) userInfo=\(userInfo)"
+        }
+        return "nonErrorType=\(String(describing: type(of: errorValue))) raw=\"\(rawDescription)\""
     }
 
     private func beginAndJoinSession(_ session: MeetingSession, roomURL: URL) async throws {
