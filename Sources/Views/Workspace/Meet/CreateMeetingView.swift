@@ -2,6 +2,8 @@ import SwiftUI
 
 struct CreateMeetingView: View {
     @StateObject private var manager = MeetingStateManager.shared
+    @State private var scheduleForLater = false
+    @State private var scheduledAt = Date().addingTimeInterval(60 * 15)
 
     var body: some View {
         ZStack {
@@ -14,28 +16,48 @@ struct CreateMeetingView: View {
                         .textInputAutocapitalization(.words)
                         .autocorrectionDisabled()
 
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Generated Meeting ID")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        if let meetingId = manager.currentSession?.meetingId {
-                            Text(meetingId)
-                                .font(.headline.monospaced())
-                                .textSelection(.enabled)
+                    Toggle("Schedule for later", isOn: $scheduleForLater)
+
+                    if scheduleForLater {
+                        DatePicker(
+                            "Scheduled time",
+                            selection: $scheduledAt,
+                            in: Date()...,
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
+                    } else {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Generated Meeting ID")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            if let meetingId = manager.currentSession?.meetingId {
+                                Text(meetingId)
+                                    .font(.headline.monospaced())
+                                    .textSelection(.enabled)
+                            }
                         }
                     }
 
                     Button {
-                        Task { await manager.createMeeting() }
+                        Task {
+                            await manager.createMeeting(
+                                scheduleForLater: scheduleForLater,
+                                scheduledAt: scheduledAt
+                            )
+                        }
                     } label: {
                         if manager.isBusy {
                             ProgressView()
                         } else {
-                            Label("Create Meeting", systemImage: "video.badge.plus")
+                            Label(scheduleForLater ? "Save Schedule" : "Create Meeting", systemImage: scheduleForLater ? "calendar.badge.plus" : "video.badge.plus")
                         }
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(manager.isBusy || manager.meetingNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(
+                        manager.isBusy ||
+                        manager.meetingNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                        (scheduleForLater && scheduledAt < Date())
+                    )
                 }
             }
             .listStyle(.insetGrouped)

@@ -58,8 +58,14 @@ struct MeetingChatThread: Identifiable, Equatable {
 struct ScheduledMeeting: Identifiable, Equatable {
     let id: String
     let name: String
-    let meetingId: String
+    var meetingId: String?
     let scheduledAt: Date
+    var activationState: ScheduledMeetingActivationState
+}
+
+enum ScheduledMeetingActivationState: String, Equatable, Codable {
+    case pending
+    case active
 }
 
 struct MeetingBreakoutRoom: Identifiable, Equatable {

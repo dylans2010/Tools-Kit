@@ -4,6 +4,7 @@ actor DailyService {
     static let dailyAPIBaseURL = URL(string: "https://api.daily.co/v1")!
     static let apiRequestTimeoutInterval: TimeInterval = 20
     static let dailyTokenParameterName = "t"
+    static let persistedAPIKeyStorageKey = "daily_api_key"
     static let shared = DailyService()
 
     enum ServiceError: LocalizedError {
@@ -55,14 +56,6 @@ actor DailyService {
     private var activeSessions: [String: MeetingSession] = [:]
     private var breakoutRoomsBySession: [String: [MeetingBreakoutRoom]] = [:]
     private var participantRolesBySession: [String: [String: MeetingParticipantRole]] = [:]
-    private var developerAPIKey: String?
-    private var cachedAppwriteAPIKey: String?
-
-    func setDeveloperAPIKey(_ value: String) async {
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        developerAPIKey = trimmed.isEmpty ? nil : trimmed
-        await log("Developer API key updated (in-memory only).", level: .debug)
-    }
 
     func createRoom(for meetingId: String?) async throws -> MeetingSession {
         let trimmedID = meetingId?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -366,127 +359,13 @@ actor DailyService {
     }
 
     private func resolvedAPIKey() async throws -> String {
-        if let developerAPIKey {
-            return developerAPIKey
+        let persistedValue = UserDefaults.standard.string(forKey: DailyService.persistedAPIKeyStorageKey)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !persistedValue.isEmpty {
+            return persistedValue
         }
-
-        if let cachedAppwriteAPIKey, !cachedAppwriteAPIKey.isEmpty {
-            return cachedAppwriteAPIKey
-        }
-
-        let remoteVariables = await fetchRemoteVariables()
-        if let remoteKey = remoteConfigValue(forKey: "DAILY_API", remoteVariables: remoteVariables) {
-            cachedAppwriteAPIKey = remoteKey
-            return remoteKey
-        }
-
-        if let localKey = localConfigValue(forKey: "DAILY_API") {
-            cachedAppwriteAPIKey = localKey
-            return localKey
-        }
-
+        await log("Missing Daily API key in persistent storage key '\(DailyService.persistedAPIKeyStorageKey)'.", level: .error)
         throw ServiceError.missingAPIKey
-    }
-
-    private func fetchRemoteVariables() async -> [String: String] {
-        guard
-            let rawURL = localConfigValue(forKey: "APPWRITE_MAIL_CONFIG_URL"),
-            let url = URL(string: rawURL)
-        else {
-            return [:]
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-
-        if let bearer = localConfigValue(forKey: "APPWRITE_MAIL_CONFIG_BEARER") {
-            request.setValue("Bearer \(bearer)", forHTTPHeaderField: "Authorization")
-        }
-
-        do {
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
-                return [:]
-            }
-            return decodeRemoteVariables(from: data)
-        } catch {
-            return [:]
-        }
-    }
-
-    private func remoteConfigValue(forKey key: String, remoteVariables: [String: String]) -> String? {
-        guard let value = remoteVariables[key] else { return nil }
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
-    }
-
-    private func localConfigValue(forKey key: String) -> String? {
-        if let value = Bundle.main.object(forInfoDictionaryKey: key) as? String {
-            let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !trimmed.isEmpty { return trimmed }
-        }
-
-        guard
-            let url = Bundle.main.url(forResource: "Config", withExtension: "plist"),
-            let data = try? Data(contentsOf: url),
-            let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
-            let value = plist[key] as? String
-        else {
-            return nil
-        }
-
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
-    }
-
-    private func decodeRemoteVariables(from data: Data) -> [String: String] {
-        if let direct = try? JSONDecoder().decode([String: String].self, from: data) {
-            return direct
-                .mapValues { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                .filter { !$0.value.isEmpty }
-        }
-
-        guard let object = try? JSONSerialization.jsonObject(with: data) else {
-            return [:]
-        }
-
-        var values: [String: String] = [:]
-        collectRemoteVariables(from: object, into: &values, parentKey: nil)
-        return values
-            .mapValues { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.value.isEmpty }
-    }
-
-    private func collectRemoteVariables(from object: Any, into output: inout [String: String], parentKey: String?) {
-        switch object {
-        case let dictionary as [String: Any]:
-            if let key = dictionary["key"] as? String, let value = dictionary["value"] as? String {
-                output[key] = value
-            }
-            if let parentKey, let value = dictionary["value"] as? String, looksLikeConfigKey(parentKey) {
-                output[parentKey] = value
-            }
-
-            for (key, value) in dictionary {
-                if let stringValue = value as? String, looksLikeConfigKey(key) {
-                    output[key] = stringValue
-                }
-                collectRemoteVariables(from: value, into: &output, parentKey: key)
-            }
-        case let array as [Any]:
-            for item in array {
-                collectRemoteVariables(from: item, into: &output, parentKey: parentKey)
-            }
-        default:
-            break
-        }
-    }
-
-    private func looksLikeConfigKey(_ key: String) -> Bool {
-        guard key.range(of: #"^[A-Z][A-Z0-9_]*$"#, options: .regularExpression) != nil else { return false }
-        let allowedPrefixes = ["APPWRITE_", "GOOGLE_", "GMAIL_", "PRODUCTION_", "DAILY_", "MAIL_", "OUTLOOK_", "YAHOO_"]
-        return allowedPrefixes.contains { key.hasPrefix($0) }
     }
 
     private func log(_ message: String, level: DebugLogLevel) async {
