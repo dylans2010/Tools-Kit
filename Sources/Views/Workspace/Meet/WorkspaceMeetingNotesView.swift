@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct MeetingNotesView: View {
+struct WorkspaceMeetingNotesView: View {
     @ObservedObject var manager: MeetingStateManager
     @StateObject private var notesManager = MeetingNotesManager.shared
 
