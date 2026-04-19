@@ -326,6 +326,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
         guard let currentSession else { return }
         await leaveDailyRoom(reason: "user leave")
         var endedSessionIDs: Set<String> = []
+        // end `activeStartedSession` first because it represents the actively joined Daily lifecycle;
+        // when `currentSession` differs (for example after session rotation), both need explicit cleanup.
         if let activeStartedSession {
             await resolver.endSession(activeStartedSession)
             endedSessionIDs.insert(activeStartedSession.sessionId)

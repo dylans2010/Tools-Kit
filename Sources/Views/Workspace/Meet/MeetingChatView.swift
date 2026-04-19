@@ -59,6 +59,14 @@ struct MeetingChatView: View {
                 }
                 .buttonStyle(.bordered)
                 .disabled(threads.isEmpty || !isChatEnabled)
+                .overlay(alignment: .bottom) {
+                    if !isChatEnabled {
+                        Text("Chat off")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .offset(y: 18)
+                    }
+                }
             }
             .padding(.horizontal)
             if !isChatEnabled {
