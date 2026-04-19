@@ -215,17 +215,17 @@ final class MeetingStateManager: NSObject, ObservableObject {
         isScreenSharing.toggle()
     }
 
-    func sendMessage(_ text: String, threadId _: String = "general") {
+    func sendMessage(_ text: String, threadId: String = "general") {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         guard phase == .inMeeting else { return }
         errorMessage = "Chat send is unavailable until Daily chat event integration is configured."
-        DebugLogger.shared.log("Blocked local-only chat send to avoid non-Daily simulated state.", level: .warning, category: "Meet")
+        DebugLogger.shared.log("Blocked local-only chat send for thread \(threadId) to avoid non-Daily simulated state.", level: .warning, category: "Meet")
     }
 
-    func addThread(named _: String) {
+    func addThread(named title: String) {
         errorMessage = "Thread creation is unavailable until Daily chat thread events are configured."
-        DebugLogger.shared.log("Blocked local-only thread creation to avoid simulated state.", level: .warning, category: "Meet")
+        DebugLogger.shared.log("Blocked local-only thread creation (\(title)) to avoid simulated state.", level: .warning, category: "Meet")
     }
 
     func setAudioDevice(_ device: String) {
@@ -274,14 +274,14 @@ final class MeetingStateManager: NSObject, ObservableObject {
         await resolver.applyAdminAction(.assignRole(participantId: participantID, role: role), in: currentSession)
     }
 
-    func createBreakoutRoom(named _: String) async {
+    func createBreakoutRoom(named name: String) async {
         errorMessage = "Breakout management requires Daily breakout-room event integration."
-        DebugLogger.shared.log("Blocked local-only breakout creation to avoid simulated state.", level: .warning, category: "Meet")
+        DebugLogger.shared.log("Blocked local-only breakout creation (\(name)) to avoid simulated state.", level: .warning, category: "Meet")
     }
 
-    func assignParticipant(_: String, to _: String?) async {
+    func assignParticipant(_ participantID: String, to roomID: String?) async {
         errorMessage = "Breakout assignment requires Daily breakout-room event integration."
-        DebugLogger.shared.log("Blocked local-only breakout assignment to avoid simulated state.", level: .warning, category: "Meet")
+        DebugLogger.shared.log("Blocked local-only breakout assignment for participant \(participantID) room \(roomID ?? "main") to avoid simulated state.", level: .warning, category: "Meet")
     }
 
     var meetingStateLabel: String {
