@@ -15,6 +15,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         "not authorized",
         "roomlookup"
     ]
+    private static let guestDisplayName = "Guest"
     static let shared = MeetingStateManager()
     private static let sensitiveQueryParameterNames: Set<String> = [
         "t", "token", "access_token", "refresh_token", "session", "session_token",
@@ -326,7 +327,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         guard let currentSession else { return }
         await leaveDailyRoom(reason: "user leave")
         var endedSessionIDs: Set<String> = []
-        // end `activeStartedSession` first because it represents the actively joined Daily lifecycle;
+        // End `activeStartedSession` first because it represents the actively joined Daily lifecycle;
         // when `currentSession` differs (for example after session rotation), both need explicit cleanup.
         if let activeStartedSession {
             await resolver.endSession(activeStartedSession)
@@ -383,7 +384,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         let message = MeetingMessage(
             id: UUID().uuidString,
             threadId: threadId,
-            senderName: localParticipantDisplayName.isEmpty ? "Guest" : localParticipantDisplayName,
+            senderName: localParticipantDisplayName.isEmpty ? Self.guestDisplayName : localParticipantDisplayName,
             text: trimmed,
             sentAt: Date(),
             isSystem: false
@@ -791,7 +792,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private nonisolated func participantDisplayName(_ participant: Participant) -> String {
         let trimmed = participant.info.username?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         if !trimmed.isEmpty { return trimmed }
-        return "Guest"
+        return Self.guestDisplayName
     }
 
     private nonisolated func participantIDString(_ participant: Participant) -> String {
