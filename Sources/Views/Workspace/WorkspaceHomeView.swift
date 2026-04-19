@@ -152,7 +152,7 @@ struct WorkspaceDashboardView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Workspace")
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     showingSettings = true
                 } label: {
