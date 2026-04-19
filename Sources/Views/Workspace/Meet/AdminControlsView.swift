@@ -43,9 +43,9 @@ struct AdminControlsView: View {
             Section(header: Text("Spotlight / Pin")) {
                 Picker("Spotlight", selection: Binding(
                     get: { selectedSpotlightParticipantID },
-                    set: {
-                        selectedSpotlightParticipantID = $0
-                        Task { await manager.spotlightParticipant($0) }
+                    set: { newValue in
+                        selectedSpotlightParticipantID = newValue
+                        Task { await manager.spotlightParticipant(newValue) }
                     }
                 )) {
                     Text("None").tag(String?.none)
@@ -55,9 +55,9 @@ struct AdminControlsView: View {
                 }
                 Picker("Pin", selection: Binding(
                     get: { selectedPinnedParticipantID },
-                    set: {
-                        selectedPinnedParticipantID = $0
-                        Task { await manager.pinParticipant($0) }
+                    set: { newValue in
+                        selectedPinnedParticipantID = newValue
+                        Task { await manager.pinParticipant(newValue) }
                     }
                 )) {
                     Text("None").tag(String?.none)

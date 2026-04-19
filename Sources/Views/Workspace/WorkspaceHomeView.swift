@@ -514,7 +514,7 @@ struct WorkspaceMailRouterView: View {
                 description: Text("Add an account to open Inbox as your default mail workspace.")
             )
             .navigationTitle("Mail")
-            .toolbar(content: {
+            .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                     } label: {
@@ -531,7 +531,7 @@ struct WorkspaceMailRouterView: View {
                         Image(systemName: "person.crop.circle.badge.gearshape")
                     }
                 }
-            })
+            }
             .sheet(isPresented: $showingManageAccounts) {
                 ManageAccountsView { selectedAccount in
                     mailStore.setActiveAccount(selectedAccount.id)
