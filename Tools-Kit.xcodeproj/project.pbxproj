@@ -255,7 +255,7 @@
 		ME020000000000000000001F /* MeetingStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000001F /* MeetingStateView.swift */; };
 		ME0200000000000000000020 /* MeetingDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000020 /* MeetingDiagnosticsView.swift */; };
 		ME0200000000000000000021 /* MeetingNotesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000021 /* MeetingNotesManager.swift */; };
-		ME0200000000000000000022 /* MeetingNotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000022 /* MeetingNotesView.swift */; };
+		ME0200000000000000000022 /* WorkspaceMeetingNotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000022 /* WorkspaceMeetingNotesView.swift */; };
 		ME0200000000000000000023 /* NotesEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000023 /* NotesEditorView.swift */; };
 		ME0200000000000000000024 /* AIAssistantPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000024 /* AIAssistantPanelView.swift */; };
 		ME0200000000000000000025 /* CallKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000025 /* CallKitManager.swift */; };
@@ -1142,7 +1142,7 @@
 		ME010000000000000000001F /* MeetingStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingStateView.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000020 /* MeetingDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingDiagnosticsView.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000021 /* MeetingNotesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingNotesManager.swift"; sourceTree = "<group>"; };
-		ME0100000000000000000022 /* MeetingNotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingNotesView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000022 /* WorkspaceMeetingNotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WorkspaceMeetingNotesView.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000023 /* NotesEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotesEditorView.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000024 /* AIAssistantPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIAssistantPanelView.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000025 /* CallKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CallKitManager.swift"; sourceTree = "<group>"; };
@@ -1264,7 +1264,7 @@
 				ME010000000000000000001E /* BreakoutRoomCardView.swift */,
 				ME010000000000000000001F /* MeetingStateView.swift */,
 				ME0100000000000000000020 /* MeetingDiagnosticsView.swift */,
-				ME0100000000000000000022 /* MeetingNotesView.swift */,
+				ME0100000000000000000022 /* WorkspaceMeetingNotesView.swift */,
 				ME0100000000000000000023 /* NotesEditorView.swift */,
 				ME0100000000000000000024 /* AIAssistantPanelView.swift */,
 				ME0100000000000000000028 /* NoiseControlView.swift */,
@@ -2497,7 +2497,7 @@
 				ME020000000000000000001F /* MeetingStateView.swift in Sources */,
 				ME0200000000000000000020 /* MeetingDiagnosticsView.swift in Sources */,
 				ME0200000000000000000021 /* MeetingNotesManager.swift in Sources */,
-				ME0200000000000000000022 /* MeetingNotesView.swift in Sources */,
+				ME0200000000000000000022 /* WorkspaceMeetingNotesView.swift in Sources */,
 				ME0200000000000000000023 /* NotesEditorView.swift in Sources */,
 				ME0200000000000000000024 /* AIAssistantPanelView.swift in Sources */,
 				ME0200000000000000000025 /* CallKitManager.swift in Sources */,
