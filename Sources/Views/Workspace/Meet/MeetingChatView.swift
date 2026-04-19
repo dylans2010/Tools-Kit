@@ -61,6 +61,12 @@ struct MeetingChatView: View {
                 .disabled(threads.isEmpty || !isChatEnabled)
             }
             .padding(.horizontal)
+            if !isChatEnabled {
+                Text("Chat is disabled by an admin.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal)
+            }
 
             ChatInputView(text: $composerText, isEnabled: isChatEnabled) {
                 let text = composerText.trimmingCharacters(in: .whitespacesAndNewlines)

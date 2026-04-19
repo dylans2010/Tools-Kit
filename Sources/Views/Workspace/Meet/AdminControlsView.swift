@@ -49,7 +49,7 @@ struct AdminControlsView: View {
                     }
                 )) {
                     Text("None").tag(String?.none)
-                    ForEach(manager.participants.filter { !$0.isScreenSharing }) { participant in
+                    ForEach(spotlightCandidates) { participant in
                         Text(participant.displayName).tag(String?.some(participant.id))
                     }
                 }
@@ -85,5 +85,9 @@ struct AdminControlsView: View {
             }
             .presentationDetents([.medium, .large])
         }
+    }
+
+    private var spotlightCandidates: [MeetingParticipant] {
+        manager.participants.filter { !$0.isScreenSharing }
     }
 }

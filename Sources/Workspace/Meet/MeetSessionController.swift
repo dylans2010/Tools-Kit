@@ -323,10 +323,15 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     func leaveMeeting() async {
-        guard currentSession != nil else { return }
+        guard let currentSession else { return }
         await leaveDailyRoom(reason: "user leave")
         if let activeStartedSession {
             await resolver.endSession(activeStartedSession)
+            if activeStartedSession.sessionId != currentSession.sessionId {
+                await resolver.endSession(currentSession)
+            }
+        } else {
+            await resolver.endSession(currentSession)
         }
         self.activeStartedSession = nil
         phase = .ended
@@ -444,6 +449,10 @@ final class MeetingStateManager: NSObject, ObservableObject {
             errorMessage = "Only the host can assign admin roles."
             return
         }
+        if participantID == hostParticipantID, role != .host {
+            errorMessage = "Reassign host before removing host role."
+            return
+        }
         guard let currentSession else { return }
         await resolver.applyAdminAction(.assignRole(participantId: participantID, role: role), in: currentSession)
         switch role {
@@ -454,9 +463,6 @@ final class MeetingStateManager: NSObject, ObservableObject {
             adminParticipantIDs.insert(participantID)
         case .participant:
             adminParticipantIDs.remove(participantID)
-            if hostParticipantID == participantID {
-                hostParticipantID = localParticipantID
-            }
         }
         sendRealtimePayload(.rolesUpdated(hostId: hostParticipantID, adminIds: Array(adminParticipantIDs)))
     }
