@@ -1,5 +1,4 @@
 import Foundation
-import Daily
 
 actor MeetingResolver {
     static let shared = MeetingResolver()
@@ -55,6 +54,14 @@ actor MeetingResolver {
 
     func fetchDebugSnapshot() async -> DailyDebugSnapshot {
         await dailyService.debugSnapshot()
+    }
+
+    func applyAdminAction(_ action: MeetingAdminAction, in session: MeetingSession) async {
+        await dailyService.applyAdminAction(action, in: session)
+    }
+
+    func updateBreakoutRooms(_ rooms: [MeetingBreakoutRoom], in session: MeetingSession) async {
+        await dailyService.updateBreakoutRooms(rooms, in: session)
     }
 
     private func log(_ message: String, level: DebugLogLevel) async {

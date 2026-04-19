@@ -1,5 +1,4 @@
 import SwiftUI
-import Daily
 
 struct MeetingControlsView: View {
     let isMuted: Bool
@@ -9,44 +8,46 @@ struct MeetingControlsView: View {
     let onToggleCamera: () -> Void
     let onToggleScreenShare: () -> Void
     let onLeaveMeeting: () -> Void
-
-    private var muteControl: (title: String, icon: String) {
-        isMuted ? ("Unmute", "mic.slash.fill") : ("Mute", "mic.fill")
-    }
-
-    private var cameraControl: (title: String, icon: String) {
-        isCameraEnabled ? ("Disable Camera", "video.slash.fill") : ("Enable Camera", "video.fill")
-    }
-
-    private var screenShareControl: (title: String, icon: String) {
-        isScreenSharing ? ("Stop Share", "rectangle.on.rectangle.slash") : ("Share Screen", "rectangle.on.rectangle")
-    }
+    var onOpenChat: (() -> Void)? = nil
+    var onOpenParticipants: (() -> Void)? = nil
+    var onOpenSettings: (() -> Void)? = nil
+    var onOpenAdmin: (() -> Void)? = nil
 
     var body: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 12) {
-                Button(action: onToggleMute) {
-                    Label(muteControl.title, systemImage: muteControl.icon)
-                }
-                    .buttonStyle(.bordered)
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                controlButton(isMuted ? "Unmute" : "Mute", icon: isMuted ? "mic.slash.fill" : "mic.fill", action: onToggleMute)
+                controlButton(isCameraEnabled ? "Camera Off" : "Camera On", icon: isCameraEnabled ? "video.slash.fill" : "video.fill", action: onToggleCamera)
+                controlButton(isScreenSharing ? "Stop Share" : "Share", icon: isScreenSharing ? "rectangle.on.rectangle.slash" : "rectangle.on.rectangle", action: onToggleScreenShare)
 
-                Button(action: onToggleCamera) {
-                    Label(cameraControl.title, systemImage: cameraControl.icon)
+                if let onOpenChat {
+                    controlButton("Chat", icon: "message.fill", action: onOpenChat)
                 }
-                    .buttonStyle(.bordered)
-            }
-
-            HStack(spacing: 12) {
-                Button(action: onToggleScreenShare) {
-                    Label(screenShareControl.title, systemImage: screenShareControl.icon)
+                if let onOpenParticipants {
+                    controlButton("People", icon: "person.3.fill", action: onOpenParticipants)
                 }
-                    .buttonStyle(.bordered)
+                if let onOpenSettings {
+                    controlButton("Settings", icon: "slider.horizontal.3", action: onOpenSettings)
+                }
+                if let onOpenAdmin {
+                    controlButton("Admin", icon: "person.badge.shield.checkmark.fill", action: onOpenAdmin)
+                }
 
                 Button(role: .destructive, action: onLeaveMeeting) {
                     Label("Leave", systemImage: "phone.down.fill")
+                        .font(.subheadline.weight(.semibold))
                 }
-                    .buttonStyle(.borderedProminent)
+                .buttonStyle(.borderedProminent)
             }
+            .padding(.horizontal, 4)
         }
+    }
+
+    private func controlButton(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: icon)
+                .font(.subheadline.weight(.semibold))
+        }
+        .buttonStyle(.bordered)
     }
 }

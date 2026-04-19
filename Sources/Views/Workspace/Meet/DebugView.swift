@@ -1,26 +1,25 @@
-import Daily
 import SwiftUI
 
 struct DebugView: View {
-    @StateObject private var controller = MeetSessionController.shared
+    @StateObject private var manager = MeetingStateManager.shared
     @StateObject private var logger = DebugLogger.shared
-    @State private var apiKeyInput = ""
+    @AppStorage("meet.debug.apiKey") private var persistedAPIKey = ""
 
     var body: some View {
         Form {
-            Section("API Key (In-Memory)") {
-                SecureField("Daily API key", text: $apiKeyInput)
+            Section("Daily API Key") {
+                SecureField("Daily API key", text: $persistedAPIKey)
                 Button("Apply") {
-                    Task { await controller.updateDeveloperAPIKey(apiKeyInput) }
+                    Task { await manager.updateDeveloperAPIKey(persistedAPIKey) }
                 }
             }
 
-            Section("Session Inspection") {
-                if controller.debugSnapshot.mappings.isEmpty {
+            Section("Session Traces") {
+                if manager.debugSnapshot.mappings.isEmpty {
                     Text("No session mappings yet.")
                         .foregroundColor(.secondary)
                 } else {
-                    ForEach(controller.debugSnapshot.mappings) { mapping in
+                    ForEach(manager.debugSnapshot.mappings) { mapping in
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Meeting ID: \(mapping.meetingId)")
                                 .font(.subheadline.bold())
@@ -34,7 +33,7 @@ struct DebugView: View {
                 }
             }
 
-            Section("API Logs") {
+            Section("API Logs / WebRTC Events") {
                 if logger.entries.isEmpty {
                     Text("No logs yet.")
                         .foregroundColor(.secondary)
@@ -57,7 +56,8 @@ struct DebugView: View {
         }
         .navigationTitle("Meet Debug Console")
         .task {
-            await controller.refreshDebugSnapshot()
+            await manager.updateDeveloperAPIKey(persistedAPIKey)
+            await manager.refreshDebugSnapshot()
         }
     }
 }

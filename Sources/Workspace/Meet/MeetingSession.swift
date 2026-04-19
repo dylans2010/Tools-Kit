@@ -1,5 +1,4 @@
 import Foundation
-import Daily
 
 struct MeetingSession: Identifiable, Equatable, Codable {
     var id: String { sessionId }

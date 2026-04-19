@@ -1,5 +1,4 @@
 import SwiftUI
-import Daily
 
 struct MeetingChatView: View {
     let threads: [MeetingChatThread]
@@ -12,7 +11,7 @@ struct MeetingChatView: View {
     @State private var newThreadTitle = ""
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 12) {
             Picker("Thread", selection: $selectedThreadID) {
                 ForEach(threads) { thread in
                     Text(thread.title).tag(thread.id)
@@ -20,43 +19,46 @@ struct MeetingChatView: View {
             }
             .pickerStyle(.segmented)
 
-            List(filteredMessages) { message in
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text(message.senderName)
-                            .font(.caption.bold())
-                            .foregroundColor(message.isSystem ? .orange : .primary)
-                        Spacer()
-                        Text(message.sentAt, style: .time)
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(spacing: 8) {
+                        ForEach(filteredMessages) { message in
+                            ChatMessageBubbleView(message: message)
+                                .id(message.id)
+                        }
                     }
-                    Text(message.text)
-                        .font(.subheadline)
+                    .padding(.horizontal)
+                    .padding(.vertical, 6)
+                }
+                .onChange(of: filteredMessages.count, initial: false) { _, _ in
+                    if let last = filteredMessages.last {
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            proxy.scrollTo(last.id, anchor: .bottom)
+                        }
+                    }
                 }
             }
 
             HStack {
                 TextField("New thread", text: $newThreadTitle)
+                    .textFieldStyle(.roundedBorder)
                 Button("Add") {
                     let title = newThreadTitle.trimmingCharacters(in: .whitespacesAndNewlines)
                     guard !title.isEmpty else { return }
                     onAddThread(title)
                     newThreadTitle = ""
                 }
+                .buttonStyle(.bordered)
             }
+            .padding(.horizontal)
 
-            HStack {
-                TextField("Message", text: $composerText)
-                Button("Send") {
-                    let text = composerText.trimmingCharacters(in: .whitespacesAndNewlines)
-                    guard !text.isEmpty else { return }
-                    onSendMessage(text, selectedThreadID)
-                    composerText = ""
-                }
+            ChatInputView(text: $composerText) {
+                let text = composerText.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !text.isEmpty else { return }
+                onSendMessage(text, selectedThreadID)
+                composerText = ""
             }
         }
-        .padding(.horizontal)
         .navigationTitle("Meeting Chat")
         .navigationBarTitleDisplayMode(.inline)
     }

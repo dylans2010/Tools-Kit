@@ -1,5 +1,4 @@
 import SwiftUI
-import Daily
 
 struct MeetingSettingsView: View {
     @Binding var settings: MeetingSettingsState
