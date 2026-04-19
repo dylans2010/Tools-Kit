@@ -502,6 +502,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         )
         DebugLogger.shared.log("Daily join attempt meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId) url=\(redactedURLString(url))", level: .info, category: "Meet")
         do {
+            // Private rooms require a meeting token; public rooms intentionally pass nil.
             let token = session.meetingToken.map { MeetingToken(stringValue: $0) }
             try await callClient.join(url: url, token: token, settings: settings)
             DebugLogger.shared.log("Daily join success meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId)", level: .info, category: "Meet")
@@ -627,12 +628,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         guard session.isJoinable else { return false }
         guard roomURL.scheme?.lowercased() == "https" else { return false }
         guard roomURL.host?.isEmpty == false else { return false }
-
-        if session.requiresMeetingToken {
-            let hasSessionToken = !(session.meetingToken?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
-            guard hasSessionToken else { return false }
-            guard hasDailyToken(in: roomURL) else { return false }
-        }
+        guard hasValidSessionToken(session, roomURL: roomURL) else { return false }
 
         return true
     }
@@ -648,13 +644,16 @@ final class MeetingStateManager: NSObject, ObservableObject {
         if roomURL.scheme?.lowercased() != "https" || roomURL.host?.isEmpty != false {
             return "Meeting session is invalid. Please rejoin from a fresh invite."
         }
-        if session.requiresMeetingToken {
-            let hasSessionToken = !(session.meetingToken?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
-            if !hasSessionToken || !hasDailyToken(in: roomURL) {
-                return "You are not authorized to join this meeting. A valid join token is required."
-            }
+        if !hasValidSessionToken(session, roomURL: roomURL) {
+            return "You are not authorized to join this meeting. A valid join token is required."
         }
         return "Meeting session validation failed."
+    }
+
+    private func hasValidSessionToken(_ session: MeetingSession, roomURL: URL) -> Bool {
+        guard session.requiresMeetingToken else { return true }
+        let hasSessionToken = !(session.meetingToken?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+        return hasSessionToken && hasDailyToken(in: roomURL)
     }
 
     private func userFriendlyJoinErrorMessage(_ error: Error) -> String {
@@ -861,7 +860,7 @@ extension MeetingStateManager: CallClientDelegate {
             guard !(await isStaleCallback(callClient: callClient)) else { return }
             DebugLogger.shared.log("Daily delegate error callback received.", level: .error, category: "Meet")
             errorMessage = userFriendlyJoinErrorMessage(error)
-            if phase == .inMeeting {
+            if phase != .failed && phase != .ended {
                 phase = .failed
             }
             DebugLogger.shared.log("Daily delegate error payload: \(fullErrorDetails(error))", level: .error, category: "Meet")
