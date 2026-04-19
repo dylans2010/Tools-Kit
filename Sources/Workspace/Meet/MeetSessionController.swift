@@ -338,9 +338,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         #if canImport(Daily)
         await setInputEnabled([.microphone: enabled])
         #else
-        _ = enabled
-        errorMessage = "Daily SDK is unavailable, so microphone state cannot be updated."
-        DebugLogger.shared.log("Microphone update blocked because Daily SDK is unavailable.", level: .warning, category: "Meet")
+        await setInputEnabled(["microphone": enabled])
         #endif
     }
 
@@ -348,15 +346,13 @@ final class MeetingStateManager: NSObject, ObservableObject {
         #if canImport(Daily)
         await setInputEnabled([.camera: enabled])
         #else
-        _ = enabled
-        errorMessage = "Daily SDK is unavailable, so camera state cannot be updated."
-        DebugLogger.shared.log("Camera update blocked because Daily SDK is unavailable.", level: .warning, category: "Meet")
+        await setInputEnabled(["camera": enabled])
         #endif
     }
 
     #if canImport(Daily)
-    private func setInputEnabled<Key: Hashable>(
-        _ inputs: [Key: Bool]
+    private func setInputEnabled(
+        _ inputs: [OutboundMediaType: Bool]
     ) async {
         guard let callClient else { return }
         do {
@@ -369,7 +365,10 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private func setInputEnabled(
         _ inputs: [String: Bool]
     ) async {
-        _ = inputs
+        let inputNames = inputs.keys.sorted().joined(separator: ", ")
+        guard !inputNames.isEmpty else { return }
+        errorMessage = "Daily SDK is unavailable, so \(inputNames) state cannot be updated."
+        DebugLogger.shared.log("\(inputNames) update blocked because Daily SDK is unavailable.", level: .warning, category: "Meet")
     }
     #endif
 

@@ -26,14 +26,15 @@ struct VideoGridView: View {
                     description: Text("Tiles render only active Daily media tracks.")
                 )
                 .padding(.top, 16)
+                .padding(8)
             } else {
                 LazyVGrid(columns: columns, spacing: 10) {
                     ForEach(liveVideoParticipants) { participant in
                         VideoTileView(participant: participant, track: videoTracks[participant.id])
                     }
                 }
+                .padding(8)
             }
-            .padding(8)
         }
         .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
     }
