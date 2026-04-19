@@ -320,20 +320,17 @@ actor DailyService {
     }
 
     private func securedRoomURL(from room: RoomResponse) async throws -> URL {
+        // According to instructions, Room URL must be https://<domain>.daily.co/<roomName>
+        // RoomResponse already contains the URL. We ensure it's valid.
         let baseURL = try await validatedRoomURL(from: room.url, roomName: room.name)
-        let token = try await createMeetingToken(for: room.name)
-        guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
-            throw ServiceError.invalidResponse
-        }
-        var queryItems = components.queryItems ?? []
-        // Avoid duplicate token query items when regenerating secured URLs.
-        queryItems.removeAll(where: { $0.name == DailyService.dailyTokenParameterName })
-        queryItems.append(URLQueryItem(name: DailyService.dailyTokenParameterName, value: token))
-        components.queryItems = queryItems
-        guard let securedURL = components.url else {
-            throw ServiceError.invalidResponse
-        }
-        return securedURL
+
+        // We might still need the token for joining, but the DailyCallManager handles it.
+        // However, the service layer should provide the token if needed.
+        return baseURL
+    }
+
+    func getMeetingToken(for roomName: String) async throws -> String {
+        try await createMeetingToken(for: roomName)
     }
 
     private func buildAPIURL(path: String) -> URL {
@@ -465,8 +462,15 @@ actor DailyService {
     }
 
     private func log(_ message: String, level: DebugLogLevel) async {
-        await MainActor.run {
-            DebugLogger.shared.log(message, level: level, category: "DailyService")
+        switch level {
+        case .info:
+            MeetingLogger.info(message, category: MeetingLogger.daily)
+        case .debug:
+            MeetingLogger.debug(message, category: MeetingLogger.daily)
+        case .error:
+            MeetingLogger.error(message, category: MeetingLogger.daily)
+        case .warning:
+            MeetingLogger.info("WARNING: \(message)", category: MeetingLogger.daily)
         }
     }
 }

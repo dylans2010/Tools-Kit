@@ -1,9 +1,9 @@
 import SwiftUI
 
 struct WorkspaceHomeView: View {
-    @State private var selectedTab: WorkspaceTab = .overview
+    @AppStorage("workspace.selectedTab") private var selectedTab: WorkspaceTab = .overview
 
-    enum WorkspaceTab: String, CaseIterable {
+    enum WorkspaceTab: String, CaseIterable, Codable {
         case overview = "Overview"
         case notes = "Notes"
         case mail = "Mail"
@@ -59,7 +59,11 @@ struct WorkspaceHomeView: View {
 
     private var mailTab: some View {
         NavigationStack {
-            ManageAccountsView()
+            if let firstAccount = MailStore.shared.accounts.first {
+                InboxView(account: firstAccount, folder: .inbox)
+            } else {
+                ManageAccountsView()
+            }
         }
         .tabItem {
             Label(WorkspaceTab.mail.rawValue, systemImage: WorkspaceTab.mail.icon)

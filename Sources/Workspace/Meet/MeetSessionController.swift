@@ -1,293 +1,166 @@
 import Foundation
 import Combine
 import Daily
+import SwiftUI
 
 @MainActor
 final class MeetSessionController: ObservableObject {
     static let shared = MeetSessionController()
-    private let localParticipantID = "local"
 
     @Published var meetingIdInput = ""
+    @Published var meetingNameInput = ""
     @Published var currentSession: MeetingSession?
     @Published var phase: MeetSessionPhase = .idle
     @Published var isBusy = false
     @Published var errorMessage: String?
 
-    @Published var isMicrophoneMuted = false
-    @Published var isCameraEnabled = true
-    @Published var isScreenSharing = false
+    @Published var persistedMeetings: [PersistedMeeting] = []
 
-    @Published var participants: [MeetingParticipant] = []
-    @Published var chatThreads: [MeetingChatThread] = [MeetingChatThread(id: "general", title: "General")]
     @Published var messages: [MeetingMessage] = []
+    @Published var unreadMessageCount: Int = 0
 
     @Published var lobbyState = MeetingLobbyState()
     @Published var settings = MeetingSettingsState()
     @Published var summary = MeetingSummaryState()
-    @Published private(set) var debugSnapshot: DailyDebugSnapshot = .empty
 
+    public let callManager = DailyCallManager()
     private let resolver: MeetingResolver
     private let permissionService = MeetPermissionService()
-    private var internalMeetingURL: URL?
-    private var hasReportedRoomLoad = false
+    private var cancellables = Set<AnyCancellable>()
 
     init(resolver: MeetingResolver = .shared) {
         self.resolver = resolver
+        loadPersistedMeetings()
+
+        // Listen for messages from DailyCallManager
+        NotificationCenter.default.publisher(for: .dailyAppMessageReceived)
+            .sink { [weak self] notification in
+                guard let self = self,
+                      let userInfo = notification.userInfo,
+                      let message = userInfo["message"] as? [String: Any],
+                      let from = userInfo["from"] as? ParticipantID else { return }
+                self.handleAppMessage(message, from: from)
+            }
+            .store(in: &cancellables)
+
+        // Observe call manager state
+        callManager.$callState
+            .sink { [weak self] state in
+                guard let self = self else { return }
+                switch state {
+                case .left: self.phase = .ended
+                case .error: self.phase = .failed
+                default: break
+                }
+            }
+            .store(in: &cancellables)
     }
 
-    var isMeetingIDFormatValid: Bool {
-        isMeetingIDValid(meetingIdInput)
-    }
-
-    func validateMeetingID(_ value: String? = nil) -> Bool {
-        let isValid = isMeetingIDValid(value ?? meetingIdInput)
-        if !isValid {
-            errorMessage = "Meeting ID must be 4-24 letters, numbers, or dashes."
-        } else if errorMessage == "Meeting ID must be 4-24 letters, numbers, or dashes." {
-            errorMessage = nil
+    func loadPersistedMeetings() {
+        if let data = UserDefaults.standard.data(forKey: "com.app.meet.persistedMeetings"),
+           let decoded = try? JSONDecoder().decode([PersistedMeeting].self, from: data) {
+            self.persistedMeetings = decoded
         }
-        return isValid
     }
 
-    func generateMeetingID() async {
+    func savePersistedMeeting(_ meeting: PersistedMeeting) {
+        persistedMeetings.append(meeting)
+        if let data = try? JSONEncoder().encode(persistedMeetings) {
+            UserDefaults.standard.set(data, forKey: "com.app.meet.persistedMeetings")
+        }
+    }
+
+    func createMeeting(name: String, scheduledTime: Date? = nil) async {
         isBusy = true
         errorMessage = nil
         defer { isBusy = false }
 
         do {
-            meetingIdInput = try await resolver.generateMeetingID()
+            let session = try await resolver.createSession(with: nil)
+            let encryptedID = try MeetingCrypto.encryptMeetingID(session.roomName)
+            let persisted = PersistedMeeting(displayName: name, encryptedID: encryptedID, scheduledTime: scheduledTime)
+            savePersistedMeeting(persisted)
+
+            self.currentSession = session
+            self.phase = .lobby
+            MeetingLogger.info("Meeting created and persisted: \(name)", category: MeetingLogger.shared)
         } catch {
             errorMessage = error.localizedDescription
-            DebugLogger.shared.log("Meeting ID generation failed: \(error.localizedDescription)", level: .error, category: "MeetSession")
+            MeetingLogger.error("Failed to create meeting: \(error.localizedDescription)", category: MeetingLogger.shared)
         }
     }
 
-    func createMeeting() async {
-        let proposedID = meetingIdInput.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !proposedID.isEmpty, !validateMeetingID(proposedID) { return }
-
+    func joinMeeting(encryptedID: String) async {
         isBusy = true
         errorMessage = nil
         defer { isBusy = false }
 
         do {
-            let session = try await resolver.createSession(with: proposedID.isEmpty ? nil : proposedID)
-            await transitionToLobby(session)
-            DebugLogger.shared.log("Room creation completed for \(session.meetingId).", category: "MeetSession")
+            let rawRoomName = try MeetingCrypto.decryptMeetingID(encryptedID)
+            let session = try await resolver.joinSession(with: rawRoomName)
+            self.currentSession = session
+            self.phase = .lobby
+        } catch {
+            errorMessage = "Invalid Meeting ID or Decryption failed."
+            MeetingLogger.error("Join failed: \(error.localizedDescription)", category: MeetingLogger.shared)
+        }
+    }
+
+    func startMeeting() async {
+        guard let session = currentSession else { return }
+
+        do {
+            let urlString = "https://\(try await getDailyDomain()).daily.co/\(session.roomName)"
+            guard let url = URL(string: urlString) else { throw DailyService.ServiceError.invalidResponse }
+
+            let token = try await DailyService.shared.getMeetingToken(for: session.roomName)
+
+            try await callManager.join(url: url, token: token, userName: UIDevice.current.name)
+            self.phase = .inMeeting
+            self.unreadMessageCount = 0
         } catch {
             phase = .failed
             errorMessage = error.localizedDescription
-            DebugLogger.shared.log("Room creation failed: \(error.localizedDescription)", level: .error, category: "MeetSession")
         }
     }
 
-    func joinMeeting() async {
-        guard validateMeetingID() else { return }
+    func leaveMeeting() async {
+        await callManager.leave()
+        phase = .ended
+    }
 
-        isBusy = true
-        errorMessage = nil
-        defer { isBusy = false }
-
-        do {
-            let session = try await resolver.joinSession(with: meetingIdInput)
-            await transitionToLobby(session)
-        } catch {
-            phase = .failed
-            errorMessage = error.localizedDescription
-            DebugLogger.shared.log("Join failed: \(error.localizedDescription)", level: .error, category: "MeetSession")
-        }
+    private func getDailyDomain() async throws -> String {
+        // In a real app, this would be fetched from config or parsed from a known URL
+        return "your-domain" // Placeholder
     }
 
     func runLobbyChecks() async {
-        lobbyState.isLoadingParticipants = true
         lobbyState.isCheckingDevices = true
-
         async let mic = permissionService.checkMicrophonePermission()
         async let cam = permissionService.checkCameraPermission()
-
         lobbyState.microphonePermission = await mic
         lobbyState.cameraPermission = await cam
         lobbyState.isCheckingDevices = false
         lobbyState.isLoadingParticipants = false
     }
 
-    func startMeeting() async {
-        guard let currentSession else { return }
-        guard internalMeetingURL != nil else {
-            phase = .failed
-            errorMessage = "Failed to prepare a Daily room. Check Meet Debug Console for details."
-            return
+    func sendChatMessage(_ text: String) {
+        let message = ["type": "chat", "text": text, "sender": UIDevice.current.name]
+        Task {
+            try? await callManager.sendAppMessage(message)
+            let localMsg = MeetingMessage(id: UUID().uuidString, threadId: "general", senderName: "You", text: text, sentAt: Date(), isSystem: false)
+            messages.append(localMsg)
         }
-        await resolver.beginSession(currentSession)
-        phase = .inMeeting
-        hasReportedRoomLoad = false
-        ensureLocalParticipant()
-        addSystemMessage("Preparing Daily room...")
-        DebugLogger.shared.log("WebRTC state changed: joining-meeting", category: "MeetSession")
-        await refreshDebugSnapshot()
     }
 
-    func leaveMeeting() async {
-        guard let currentSession else { return }
-        await resolver.endSession(currentSession)
-        phase = .ended
-        addSystemMessage("Meeting ended.")
-        DebugLogger.shared.log("WebRTC state changed: disconnected", category: "MeetSession")
-        hasReportedRoomLoad = false
-        participants = []
-        await refreshDebugSnapshot()
-    }
-
-    func toggleMute() {
-        isMicrophoneMuted.toggle()
-        if let index = participants.firstIndex(where: { $0.id == localParticipantID }) {
-            participants[index].isMuted = isMicrophoneMuted
-        }
-        DebugLogger.shared.log(isMicrophoneMuted ? "Microphone muted." : "Microphone unmuted.", category: "MeetSession")
-    }
-
-    func toggleCamera() {
-        isCameraEnabled.toggle()
-        if let index = participants.firstIndex(where: { $0.id == localParticipantID }) {
-            participants[index].hasVideo = isCameraEnabled
-        }
-        DebugLogger.shared.log(isCameraEnabled ? "Camera enabled." : "Camera disabled.", category: "MeetSession")
-    }
-
-    func toggleScreenShare() {
-        isScreenSharing.toggle()
-        DebugLogger.shared.log(isScreenSharing ? "Screen share started." : "Screen share stopped.", category: "MeetSession")
-    }
-
-    func sendMessage(_ text: String, threadId: String = "general") {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-
-        messages.append(
-            MeetingMessage(
-                id: UUID().uuidString,
-                threadId: threadId,
-                senderName: "You",
-                text: trimmed,
-                sentAt: Date(),
-                isSystem: false
-            )
-        )
-    }
-
-    func addThread(named title: String) {
-        let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-
-        chatThreads.append(MeetingChatThread(id: UUID().uuidString, title: trimmed))
-    }
-
-    func updateDeveloperAPIKey(_ value: String) async {
-        await resolver.updateDeveloperAPIKey(value)
-        await refreshDebugSnapshot()
-    }
-
-    func refreshDebugSnapshot() async {
-        debugSnapshot = await resolver.fetchDebugSnapshot()
-    }
-
-    func webViewDidStartLoadingPage() {
-        DebugLogger.shared.log("Daily room page loading started.", category: "MeetSession")
-    }
-
-    func webViewDidFinishLoadingPage() {
-        guard !hasReportedRoomLoad else { return }
-        hasReportedRoomLoad = true
-        addSystemMessage("Daily room loaded. Tap Join in the meeting page to enter the call.")
-        DebugLogger.shared.log("Daily room page finished loading.", category: "MeetSession")
-    }
-
-    func webViewDidLeaveUnexpectedly() {
-        guard phase == .inMeeting else { return }
-        if let currentSession {
-            Task {
-                await resolver.endSession(currentSession)
-                await refreshDebugSnapshot()
+    private func handleAppMessage(_ message: [String: Any], from: ParticipantID) {
+        if let type = message["type"] as? String, type == "chat", let text = message["text"] as? String {
+            let sender = (message["sender"] as? String) ?? "Guest"
+            let msg = MeetingMessage(id: UUID().uuidString, threadId: "general", senderName: sender, text: text, sentAt: Date(), isSystem: false)
+            messages.append(msg)
+            if phase != .inMeeting { // Or if chat view is not visible
+                 unreadMessageCount += 1
             }
         }
-        phase = .ended
-        hasReportedRoomLoad = false
-        participants = []
-        addSystemMessage("Meeting connection ended.")
-        DebugLogger.shared.log("WebRTC state changed: left-meeting", category: "MeetSession")
-    }
-
-    func webViewDidFail(_ message: String) {
-        if let currentSession {
-            Task {
-                await resolver.endSession(currentSession)
-                await refreshDebugSnapshot()
-            }
-        }
-        hasReportedRoomLoad = false
-        phase = .failed
-        errorMessage = message
-        DebugLogger.shared.log("Join failed: \(message)", level: .error, category: "MeetSession")
-    }
-
-    func webViewURL() -> URL? {
-        internalMeetingURL
-    }
-
-    private func transitionToLobby(_ session: MeetingSession) async {
-        currentSession = session
-        meetingIdInput = session.meetingId
-        internalMeetingURL = await resolver.internalRoomURL(for: session)
-        phase = .lobby
-        hasReportedRoomLoad = false
-        summary = MeetingSummaryState(
-            recap: "AI recap will be generated after this meeting session.",
-            actionItems: ["Capture blockers", "Summarize next steps"],
-            transcriptPreview: "Transcript preview entry point is ready for integration."
-        )
-        participants = []
-        messages = []
-        await refreshDebugSnapshot()
-        addSystemMessage("Session prepared for meeting ID \(session.meetingId).")
-    }
-
-    private func addSystemMessage(_ text: String) {
-        messages.append(
-            MeetingMessage(
-                id: UUID().uuidString,
-                threadId: "general",
-                senderName: "System",
-                text: text,
-                sentAt: Date(),
-                isSystem: true
-            )
-        )
-    }
-
-    private func isMeetingIDValid(_ value: String) -> Bool {
-        let candidate = value
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .uppercased()
-        let allowed = CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-")
-        return (4...24).contains(candidate.count) && candidate.unicodeScalars.allSatisfy { allowed.contains($0) }
-    }
-
-    private func ensureLocalParticipant() {
-        if let index = participants.firstIndex(where: { $0.id == localParticipantID }) {
-            participants[index].isMuted = isMicrophoneMuted
-            participants[index].hasVideo = isCameraEnabled
-            return
-        }
-        participants.insert(
-            MeetingParticipant(
-                id: localParticipantID,
-                displayName: "You",
-                joinedAt: Date(),
-                isSpeaking: false,
-                isMuted: isMicrophoneMuted,
-                hasVideo: isCameraEnabled
-            ),
-            at: 0
-        )
     }
 }

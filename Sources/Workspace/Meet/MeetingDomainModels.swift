@@ -1,7 +1,36 @@
 import Foundation
 import Daily
 
-enum MeetSessionPhase: String {
+/// Represents a meeting session with its metadata.
+public struct MeetingSession: Identifiable, Equatable, Codable {
+    public var id: String { sessionId }
+
+    public let meetingId: String
+    public let roomName: String
+    public let sessionId: String
+    public let createdAt: Date
+    public let debugTraceId: String
+}
+
+/// Represents a persisted meeting for the meeting browser.
+public struct PersistedMeeting: Identifiable, Codable {
+    public let id: UUID
+    public let displayName: String
+    public let encryptedID: String
+    public var scheduledTime: Date?
+    public let createdAt: Date
+
+    public init(id: UUID = UUID(), displayName: String, encryptedID: String, scheduledTime: Date? = nil, createdAt: Date = Date()) {
+        self.id = id
+        self.displayName = displayName
+        self.encryptedID = encryptedID
+        self.scheduledTime = scheduledTime
+        self.createdAt = createdAt
+    }
+}
+
+/// Enum representing the phase of a meeting session.
+public enum MeetSessionPhase: String, Codable {
     case idle
     case lobby
     case inMeeting
@@ -9,83 +38,84 @@ enum MeetSessionPhase: String {
     case failed
 }
 
-enum MeetPermissionState: String {
+/// Enum representing the state of permissions.
+public enum MeetPermissionState: String, Codable {
     case unknown
     case granted
     case denied
 }
 
-struct MeetingParticipant: Identifiable, Equatable {
-    let id: String
-    let displayName: String
-    let joinedAt: Date
-    var isSpeaking: Bool
-    var isMuted: Bool
-    var hasVideo: Bool
+/// Model for a meeting message.
+public struct MeetingMessage: Identifiable, Equatable, Codable {
+    public let id: String
+    public let threadId: String
+    public let senderName: String
+    public let text: String
+    public let sentAt: Date
+    public let isSystem: Bool
 }
 
-struct MeetingMessage: Identifiable, Equatable {
-    let id: String
-    let threadId: String
-    let senderName: String
-    let text: String
-    let sentAt: Date
-    let isSystem: Bool
+/// Model for a chat thread.
+public struct MeetingChatThread: Identifiable, Equatable, Codable {
+    public let id: String
+    public let title: String
 }
 
-struct MeetingChatThread: Identifiable, Equatable {
-    let id: String
-    let title: String
-}
-
-enum MeetingLayoutPreference: String, CaseIterable, Identifiable {
+/// Preferences for meeting layout.
+public enum MeetingLayoutPreference: String, CaseIterable, Identifiable, Codable {
     case grid = "Grid"
     case speaker = "Speaker"
     case sidebar = "Sidebar"
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 }
 
-enum MeetingQualitySetting: String, CaseIterable, Identifiable {
+/// Settings for meeting quality.
+public enum MeetingQualitySetting: String, CaseIterable, Identifiable, Codable {
     case auto = "Auto"
     case standard = "Standard"
     case high = "High"
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 }
 
-struct MeetingSettingsState {
-    var selectedAudioDevice = "Default Microphone"
-    var selectedVideoDevice = "Default Camera"
-    var layoutPreference: MeetingLayoutPreference = .grid
-    var qualitySetting: MeetingQualitySetting = .auto
+/// State for meeting settings.
+public struct MeetingSettingsState: Codable {
+    public var selectedAudioDevice = "Default Microphone"
+    public var selectedVideoDevice = "Default Camera"
+    public var layoutPreference: MeetingLayoutPreference = .grid
+    public var qualitySetting: MeetingQualitySetting = .auto
 }
 
-struct MeetingSummaryState {
-    var recap = "AI recap will appear after the meeting."
-    var actionItems: [String] = []
-    var transcriptPreview = "Transcript preview is not available yet."
+/// State for meeting summary and AI recap.
+public struct MeetingSummaryState: Codable {
+    public var recap = "AI recap will appear after the meeting."
+    public var actionItems: [String] = []
+    public var transcriptPreview = "Transcript preview is not available yet."
 }
 
-struct MeetingLobbyState {
-    var isLoadingParticipants = true
-    var isCheckingDevices = true
-    var microphonePermission: MeetPermissionState = .unknown
-    var cameraPermission: MeetPermissionState = .unknown
+/// State for the meeting lobby.
+public struct MeetingLobbyState {
+    public var isLoadingParticipants = true
+    public var isCheckingDevices = true
+    public var microphonePermission: MeetPermissionState = .unknown
+    public var cameraPermission: MeetPermissionState = .unknown
 }
 
-struct DailyDebugMapping: Identifiable {
-    let id: String
-    let meetingId: String
-    let roomName: String
-    let sessionId: String
-    let createdAt: Date
-    let debugTraceId: String
+/// Snapshot for debugging Daily sessions.
+public struct DailyDebugMapping: Identifiable {
+    public let id: String
+    public let meetingId: String
+    public let roomName: String
+    public let sessionId: String
+    public let createdAt: Date
+    public let debugTraceId: String
 }
 
-struct DailyDebugSnapshot {
-    let mappings: [DailyDebugMapping]
-    let activeSessions: [MeetingSession]
+/// Container for Daily debug mappings.
+public struct DailyDebugSnapshot {
+    public let mappings: [DailyDebugMapping]
+    public let activeSessions: [MeetingSession]
 
-    static let empty = DailyDebugSnapshot(mappings: [], activeSessions: [])
+    public static let empty = DailyDebugSnapshot(mappings: [], activeSessions: [])
 }

@@ -47,7 +47,7 @@ struct InboxView: View {
                 Button {
                     showingManageAccounts = true
                 } label: {
-                    Image(systemName: "person.crop.circle.badge.gearshape")
+                    Image(systemName: "person.badge.plus")
                 }
 
                 Button {
