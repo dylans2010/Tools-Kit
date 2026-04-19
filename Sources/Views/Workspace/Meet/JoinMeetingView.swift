@@ -60,7 +60,7 @@ struct JoinMeetingView: View {
                                 Task { await manager.joinScheduledMeeting(scheduled) }
                             }
                             .buttonStyle(.bordered)
-                            .disabled(manager.isBusy || (scheduled.activationState != .active && Date() < scheduled.scheduledAt))
+                            .disabled(manager.isBusy)
                         }
                         .padding(.vertical, 4)
                     }
