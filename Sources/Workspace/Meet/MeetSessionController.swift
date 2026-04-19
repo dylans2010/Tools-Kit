@@ -215,7 +215,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
-        let senderName = participants.first(where: { $0.id == localParticipantID })?.displayName ?? "Me"
+        let senderName = participants.first(where: { $0.id == localParticipantID })?.displayName ?? (localParticipantID ?? "unknown")
         messages.append(
             MeetingMessage(
                 id: UUID().uuidString,
@@ -413,8 +413,6 @@ final class MeetingStateManager: NSObject, ObservableObject {
             )
         )
         try await callClient.join(url: url, token: nil, settings: settings)
-        callClient.startLocalAudioLevelObserver(intervalMs: 500, completion: nil)
-        callClient.startRemoteParticipantsAudioLevelObserver(intervalMs: 500, completion: nil)
         refreshParticipantsFromDaily()
         #else
         throw NSError(domain: "Meet", code: -1, userInfo: [NSLocalizedDescriptionKey: "Daily SDK is unavailable in this build."])
@@ -449,15 +447,16 @@ final class MeetingStateManager: NSObject, ObservableObject {
             let participantID = "\(participant.id)"
             let isLocal = participant.info.isLocal
             let role = participantRoles[participantID] ?? (isLocal ? .host : .participant)
+            let existingParticipant = participants.first(where: { $0.id == participantID })
             return MeetingParticipant(
                 id: participantID,
                 displayName: participantDisplayName(participant),
-                joinedAt: Date(),
+                joinedAt: existingParticipant?.joinedAt ?? Date(),
                 isSpeaking: participantID == activeSpeakerID,
                 isMuted: participant.media?.microphone.state != .playable,
                 hasVideo: participant.media?.camera.state == .playable,
                 role: role,
-                breakoutRoomID: participants.first(where: { $0.id == participantID })?.breakoutRoomID
+                breakoutRoomID: existingParticipant?.breakoutRoomID
             )
         }
     }

@@ -60,9 +60,7 @@ private struct MeetingDailyVideoView: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: VideoView, context: Context) {
-        if uiView.track !== track {
-            uiView.track = track
-        }
+        uiView.track = track
     }
 }
 #endif
