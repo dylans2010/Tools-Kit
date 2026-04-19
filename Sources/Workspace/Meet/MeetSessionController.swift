@@ -1,10 +1,16 @@
 import Foundation
 import Combine
 
+#if canImport(Daily)
+import Daily
+typealias MeetingVideoTrack = VideoTrack
+#else
+final class MeetingVideoTrack {}
+#endif
+
 @MainActor
-final class MeetingStateManager: ObservableObject {
+final class MeetingStateManager: NSObject, ObservableObject {
     static let shared = MeetingStateManager()
-    private let localParticipantID = "local"
 
     @Published var meetingIdInput = ""
     @Published var meetingNameInput = ""
@@ -18,6 +24,8 @@ final class MeetingStateManager: ObservableObject {
     @Published var isScreenSharing = false
 
     @Published var participants: [MeetingParticipant] = []
+    @Published var participantVideoTracks: [String: MeetingVideoTrack] = [:]
+    @Published var localParticipantID: String?
     @Published var chatThreads: [MeetingChatThread] = [MeetingChatThread(id: "general", title: "General")]
     @Published var messages: [MeetingMessage] = []
     @Published var scheduledMeetings: [ScheduledMeeting] = []
@@ -31,13 +39,16 @@ final class MeetingStateManager: ObservableObject {
 
     private let resolver: MeetingResolver
     private let permissionService = MeetPermissionService()
+    private var participantRoles: [String: MeetingParticipantRole] = [:]
+    private var activeSpeakerID: String?
+
+    #if canImport(Daily)
+    private var callClient: CallClient?
+    #endif
 
     init(resolver: MeetingResolver = .shared) {
         self.resolver = resolver
-        self.scheduledMeetings = [
-            ScheduledMeeting(id: UUID().uuidString, name: "Daily Standup", meetingId: "TEAM-STANDUP", scheduledAt: Date().addingTimeInterval(900)),
-            ScheduledMeeting(id: UUID().uuidString, name: "Design Review", meetingId: "DESIGN-REVIEW", scheduledAt: Date().addingTimeInterval(3600))
-        ]
+        super.init()
     }
 
     var isMeetingIDFormatValid: Bool {
@@ -45,15 +56,16 @@ final class MeetingStateManager: ObservableObject {
     }
 
     var availableAudioDevices: [String] {
-        ["Default Microphone", "Built-in Microphone", "Bluetooth Headset"]
+        MeetPermissionService.availableAudioDevices()
     }
 
     var availableVideoDevices: [String] {
-        ["Default Camera", "Front Camera", "Back Camera"]
+        MeetPermissionService.availableVideoDevices()
     }
 
     var isCurrentUserHost: Bool {
-        participants.first(where: { $0.id == localParticipantID })?.role == .host
+        guard let localParticipantID else { return false }
+        return participants.first(where: { $0.id == localParticipantID })?.role == .host
     }
 
     func validateMeetingID(_ value: String? = nil) -> Bool {
@@ -91,7 +103,6 @@ final class MeetingStateManager: ObservableObject {
         defer { isBusy = false }
 
         do {
-            // Meeting IDs are always backend-generated; users only provide the meeting name.
             let session = try await resolver.createSession(with: nil)
             await transitionToLobby(session)
             meetingIdInput = session.meetingId
@@ -149,35 +160,51 @@ final class MeetingStateManager: ObservableObject {
 
     func startMeeting() async {
         guard let currentSession else { return }
-        await resolver.beginSession(currentSession)
-        phase = .inMeeting
-        ensureLocalParticipant()
-        addSystemMessage("Connected to Daily media session.")
-        await refreshDebugSnapshot()
+        guard let roomURL = await resolver.internalRoomURL(for: currentSession) else {
+            errorMessage = "Meeting session is missing a Daily room URL."
+            phase = .failed
+            return
+        }
+
+        isBusy = true
+        errorMessage = nil
+        defer { isBusy = false }
+
+        do {
+            await resolver.beginSession(currentSession)
+            try await joinDailyRoom(url: roomURL)
+            phase = .inMeeting
+            await refreshDebugSnapshot()
+        } catch {
+            phase = .failed
+            errorMessage = error.localizedDescription
+            DebugLogger.shared.log("Failed to start Daily session: \(error.localizedDescription)", level: .error, category: "Meet")
+        }
     }
 
     func leaveMeeting() async {
         guard let currentSession else { return }
+        await leaveDailyRoom()
         await resolver.endSession(currentSession)
         phase = .ended
-        addSystemMessage("Meeting ended.")
         participants = []
+        participantVideoTracks = [:]
         breakoutRooms = []
+        participantRoles = [:]
+        localParticipantID = nil
         await refreshDebugSnapshot()
     }
 
     func toggleMute() {
-        isMicrophoneMuted.toggle()
-        if let index = participants.firstIndex(where: { $0.id == localParticipantID }) {
-            participants[index].isMuted = isMicrophoneMuted
-        }
+        let nextMuted = !isMicrophoneMuted
+        isMicrophoneMuted = nextMuted
+        Task { await setMicrophoneEnabled(!nextMuted) }
     }
 
     func toggleCamera() {
-        isCameraEnabled.toggle()
-        if let index = participants.firstIndex(where: { $0.id == localParticipantID }) {
-            participants[index].hasVideo = isCameraEnabled
-        }
+        let nextEnabled = !isCameraEnabled
+        isCameraEnabled = nextEnabled
+        Task { await setCameraEnabled(nextEnabled) }
     }
 
     func toggleScreenShare() {
@@ -188,11 +215,12 @@ final class MeetingStateManager: ObservableObject {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
+        let senderName = participants.first(where: { $0.id == localParticipantID })?.displayName ?? "Me"
         messages.append(
             MeetingMessage(
                 id: UUID().uuidString,
                 threadId: threadId,
-                senderName: "You",
+                senderName: senderName,
                 text: trimmed,
                 sentAt: Date(),
                 isSystem: false
@@ -252,6 +280,8 @@ final class MeetingStateManager: ObservableObject {
     func removeParticipant(participantID: String) async {
         guard let currentSession else { return }
         participants.removeAll { $0.id == participantID }
+        participantVideoTracks.removeValue(forKey: participantID)
+        participantRoles.removeValue(forKey: participantID)
         for index in breakoutRooms.indices {
             breakoutRooms[index].participantIds.removeAll { $0 == participantID }
         }
@@ -261,6 +291,7 @@ final class MeetingStateManager: ObservableObject {
 
     func assignRole(participantID: String, role: MeetingParticipantRole) async {
         guard let currentSession else { return }
+        participantRoles[participantID] = role
         guard let index = participants.firstIndex(where: { $0.id == participantID }) else { return }
         participants[index].role = role
         await resolver.applyAdminAction(.assignRole(participantId: participantID, role: role), in: currentSession)
@@ -314,35 +345,15 @@ final class MeetingStateManager: ObservableObject {
         currentSession = session
         meetingIdInput = session.meetingId
         phase = .lobby
-        summary = MeetingSummaryState(
-            recap: "AI recap will be generated after this meeting session.",
-            actionItems: ["Capture blockers", "Summarize next steps"],
-            transcriptPreview: "Transcript preview entry point is ready for integration."
-        )
-        diagnostics = MeetingDiagnosticsState(
-            connectionState: "Connecting",
-            networkQuality: "Good",
-            latencyMs: 48,
-            packetLossPercent: 0.5
-        )
+        summary = MeetingSummaryState()
+        diagnostics = MeetingDiagnosticsState(connectionState: "Connecting", networkQuality: "Unknown", latencyMs: 0, packetLossPercent: 0)
         participants = []
+        participantVideoTracks = [:]
         breakoutRooms = []
         messages = []
+        participantRoles = [:]
+        localParticipantID = nil
         await refreshDebugSnapshot()
-        addSystemMessage("Session prepared for meeting ID \(session.meetingId).")
-    }
-
-    private func addSystemMessage(_ text: String) {
-        messages.append(
-            MeetingMessage(
-                id: UUID().uuidString,
-                threadId: "general",
-                senderName: "System",
-                text: text,
-                sentAt: Date(),
-                isSystem: true
-            )
-        )
     }
 
     private func isMeetingIDValid(_ value: String) -> Bool {
@@ -353,40 +364,168 @@ final class MeetingStateManager: ObservableObject {
         return (4...24).contains(candidate.count) && candidate.unicodeScalars.allSatisfy { allowed.contains($0) }
     }
 
-    private func ensureLocalParticipant() {
-        if let index = participants.firstIndex(where: { $0.id == localParticipantID }) {
-            participants[index].isMuted = isMicrophoneMuted
-            participants[index].hasVideo = isCameraEnabled
-            participants[index].role = .host
-            return
+    private func setMicrophoneEnabled(_ enabled: Bool) async {
+        #if canImport(Daily)
+        guard let callClient else { return }
+        do {
+            try await callClient.setInputsEnabled([.microphone: enabled])
+        } catch {
+            isMicrophoneMuted = !enabled
+            errorMessage = "Failed to update microphone state: \(error.localizedDescription)"
         }
-        participants.insert(
-            MeetingParticipant(
-                id: localParticipantID,
-                displayName: "You",
-                joinedAt: Date(),
-                isSpeaking: false,
-                isMuted: isMicrophoneMuted,
-                hasVideo: isCameraEnabled,
-                role: .host,
-                breakoutRoomID: nil
-            ),
-            at: 0
-        )
+        #endif
+    }
 
-        participants.append(
-            MeetingParticipant(
-                id: "guest-1",
-                displayName: "Alex",
-                joinedAt: Date(),
-                isSpeaking: true,
-                isMuted: false,
-                hasVideo: true,
-                role: .participant,
-                breakoutRoomID: nil
+    private func setCameraEnabled(_ enabled: Bool) async {
+        #if canImport(Daily)
+        guard let callClient else { return }
+        do {
+            try await callClient.setInputsEnabled([.camera: enabled])
+        } catch {
+            isCameraEnabled = !enabled
+            errorMessage = "Failed to update camera state: \(error.localizedDescription)"
+        }
+        #endif
+    }
+
+    private func leaveDailyRoom() async {
+        #if canImport(Daily)
+        guard let callClient else { return }
+        do {
+            try await callClient.stopLocalAudioLevelObserver()
+            try await callClient.stopRemoteParticipantsAudioLevelObserver()
+            try await callClient.leave()
+        } catch {
+            DebugLogger.shared.log("Daily leave failed: \(error.localizedDescription)", level: .warning, category: "Meet")
+        }
+        callClient.delegate = nil
+        self.callClient = nil
+        #endif
+    }
+
+    private func joinDailyRoom(url: URL) async throws {
+        #if canImport(Daily)
+        let callClient = try await ensureCallClient()
+        let settings = ClientSettingsUpdate(
+            inputs: .set(
+                camera: .set(isEnabled: .set(isCameraEnabled)),
+                microphone: .set(isEnabled: .set(!isMicrophoneMuted))
             )
         )
+        try await callClient.join(url: url, token: nil, settings: settings)
+        callClient.startLocalAudioLevelObserver(intervalMs: 500, completion: nil)
+        callClient.startRemoteParticipantsAudioLevelObserver(intervalMs: 500, completion: nil)
+        refreshParticipantsFromDaily()
+        #else
+        throw NSError(domain: "Meet", code: -1, userInfo: [NSLocalizedDescriptionKey: "Daily SDK is unavailable in this build."])
+        #endif
+    }
+
+    #if canImport(Daily)
+    private func ensureCallClient() async throws -> CallClient {
+        if let callClient { return callClient }
+        let callClient = CallClient()
+        callClient.delegate = self
+        self.callClient = callClient
+        return callClient
+    }
+
+    private func refreshParticipantsFromDaily() {
+        guard let callClient else { return }
+
+        let allParticipants = callClient.participants.all.values.sorted {
+            participantDisplayName($0).localizedCaseInsensitiveCompare(participantDisplayName($1)) == .orderedAscending
+        }
+
+        participantVideoTracks = Dictionary(uniqueKeysWithValues: allParticipants.compactMap { participant in
+            guard let track = participant.media?.camera.track else { return nil }
+            return ("\(participant.id)", track)
+        })
+
+        let currentLocalParticipantID = allParticipants.first(where: { $0.info.isLocal }).map { "\($0.id)" }
+        localParticipantID = currentLocalParticipantID
+
+        participants = allParticipants.map { participant in
+            let participantID = "\(participant.id)"
+            let isLocal = participant.info.isLocal
+            let role = participantRoles[participantID] ?? (isLocal ? .host : .participant)
+            return MeetingParticipant(
+                id: participantID,
+                displayName: participantDisplayName(participant),
+                joinedAt: Date(),
+                isSpeaking: participantID == activeSpeakerID,
+                isMuted: participant.media?.microphone.state != .playable,
+                hasVideo: participant.media?.camera.state == .playable,
+                role: role,
+                breakoutRoomID: participants.first(where: { $0.id == participantID })?.breakoutRoomID
+            )
+        }
+    }
+
+    private nonisolated func participantDisplayName(_ participant: Participant) -> String {
+        let trimmed = participant.info.username?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !trimmed.isEmpty { return trimmed }
+        return "\(participant.id)"
+    }
+    #endif
+}
+
+#if canImport(Daily)
+extension MeetingStateManager: CallClientDelegate {
+    nonisolated func callClient(_ callClient: CallClient, callStateUpdated state: CallState) {
+        Task { @MainActor in
+            diagnostics.connectionState = String(describing: state)
+            if state == .joined {
+                phase = .inMeeting
+            }
+            refreshParticipantsFromDaily()
+        }
+    }
+
+    nonisolated func callClient(_ callClient: CallClient, participantJoined participant: Participant) {
+        Task { @MainActor in
+            refreshParticipantsFromDaily()
+        }
+    }
+
+    nonisolated func callClient(_ callClient: CallClient, participantLeft participant: Participant, withReason reason: ParticipantLeftReason) {
+        Task { @MainActor in
+            let participantID = "\(participant.id)"
+            participantVideoTracks.removeValue(forKey: participantID)
+            if activeSpeakerID == participantID {
+                activeSpeakerID = nil
+            }
+            refreshParticipantsFromDaily()
+        }
+    }
+
+    nonisolated func callClient(_ callClient: CallClient, participantUpdated participant: Participant) {
+        Task { @MainActor in
+            refreshParticipantsFromDaily()
+        }
+    }
+
+    nonisolated func callClient(_ callClient: CallClient, activeSpeakerChanged activeSpeaker: Participant?) {
+        Task { @MainActor in
+            activeSpeakerID = activeSpeaker.map { "\($0.id)" }
+            refreshParticipantsFromDaily()
+        }
+    }
+
+    nonisolated func callClient(_ callClient: CallClient, inputsUpdated inputs: InputSettings) {
+        Task { @MainActor in
+            isCameraEnabled = inputs.camera.isEnabled
+            isMicrophoneMuted = !inputs.microphone.isEnabled
+            refreshParticipantsFromDaily()
+        }
+    }
+
+    nonisolated func callClient(_ callClient: CallClient, error: CallClientError) {
+        Task { @MainActor in
+            errorMessage = error.localizedDescription
+        }
     }
 }
+#endif
 
 typealias MeetSessionController = MeetingStateManager

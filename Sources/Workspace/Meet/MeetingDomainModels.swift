@@ -93,9 +93,9 @@ struct MeetingSettingsState {
 }
 
 struct MeetingSummaryState {
-    var recap = "AI recap will appear after the meeting."
+    var recap = ""
     var actionItems: [String] = []
-    var transcriptPreview = "Transcript preview is not available yet."
+    var transcriptPreview = ""
 }
 
 struct MeetingLobbyState {
@@ -106,10 +106,10 @@ struct MeetingLobbyState {
 }
 
 struct MeetingDiagnosticsState {
-    var connectionState = "Connected"
-    var networkQuality = "Good"
-    var latencyMs: Int = 42
-    var packetLossPercent: Double = 0.2
+    var connectionState = "Unknown"
+    var networkQuality = "Unknown"
+    var latencyMs: Int = 0
+    var packetLossPercent: Double = 0
 }
 
 enum MeetingAdminAction: Equatable {
