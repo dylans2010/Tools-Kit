@@ -74,14 +74,6 @@ enum MeetingLayoutPreference: String, CaseIterable, Identifiable {
     case sidebar = "Sidebar"
 
     var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .host: return "Host"
-        case .coHost: return "Co-Host"
-        case .participant: return "Participant"
-        }
-    }
 }
 
 enum MeetingQualitySetting: String, CaseIterable, Identifiable {
@@ -90,14 +82,6 @@ enum MeetingQualitySetting: String, CaseIterable, Identifiable {
     case high = "High"
 
     var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .host: return "Host"
-        case .coHost: return "Co-Host"
-        case .participant: return "Participant"
-        }
-    }
 }
 
 struct MeetingSettingsState {
