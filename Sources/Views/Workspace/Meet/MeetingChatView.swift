@@ -3,6 +3,7 @@ import SwiftUI
 struct MeetingChatView: View {
     let threads: [MeetingChatThread]
     let messages: [MeetingMessage]
+    let isChatEnabled: Bool
     let onAddThread: (String) -> Void
     let onSendMessage: (String, String) -> Void
 
@@ -57,11 +58,25 @@ struct MeetingChatView: View {
                     newThreadTitle = ""
                 }
                 .buttonStyle(.bordered)
-                .disabled(threads.isEmpty)
+                .disabled(threads.isEmpty || !isChatEnabled)
+                .overlay(alignment: .bottom) {
+                    if !isChatEnabled {
+                        Text("Chat off")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .offset(y: 18)
+                    }
+                }
             }
             .padding(.horizontal)
+            if !isChatEnabled {
+                Text("Chat is disabled by an admin.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal)
+            }
 
-            ChatInputView(text: $composerText) {
+            ChatInputView(text: $composerText, isEnabled: isChatEnabled) {
                 let text = composerText.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !text.isEmpty else { return }
                 guard let selectedThreadID else { return }

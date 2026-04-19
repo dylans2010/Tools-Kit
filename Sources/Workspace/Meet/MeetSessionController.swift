@@ -15,6 +15,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         "not authorized",
         "roomlookup"
     ]
+    private static let guestDisplayName = "Guest"
     static let shared = MeetingStateManager()
     private static let sensitiveQueryParameterNames: Set<String> = [
         "t", "token", "access_token", "refresh_token", "session", "session_token",
@@ -42,15 +43,25 @@ final class MeetingStateManager: NSObject, ObservableObject {
     @Published var isMicrophoneMuted = false
     @Published var isCameraEnabled = true
     @Published var isScreenSharing = false
+    @Published var displayNameInput = ""
 
     @Published var participants: [MeetingParticipant] = []
     @Published var participantVideoTracks: [String: MeetingVideoTrack] = [:]
+    @Published var participantScreenShareTracks: [String: MeetingVideoTrack] = [:]
     @Published var localParticipantID: String?
     @Published var localParticipantDisplayName = ""
     @Published var chatThreads: [MeetingChatThread] = []
     @Published var messages: [MeetingMessage] = []
     @Published var scheduledMeetings: [ScheduledMeeting] = []
     @Published var breakoutRooms: [MeetingBreakoutRoom] = []
+    @Published var hostParticipantID: String?
+    @Published var adminParticipantIDs: Set<String> = []
+    @Published var isMeetingLocked = false
+    @Published var isChatEnabled = true
+    @Published var isScreenShareAllowed = true
+    @Published var spotlightedParticipantID: String?
+    @Published var pinnedParticipantID: String?
+    @Published var activeScreenShareParticipantID: String?
 
     @Published var lobbyState = MeetingLobbyState()
     @Published var settings = MeetingSettingsState()
@@ -63,6 +74,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private var participantRoles: [String: MeetingParticipantRole] = [:]
     private var activeSpeakerID: String?
     private var activeStartedSession: MeetingSession?
+    private var pendingCreatorHostAssignment = false
 
     #if canImport(Daily)
     private var callClient: CallClient?
@@ -87,7 +99,16 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
     var isCurrentUserHost: Bool {
         guard let localParticipantID else { return false }
-        return participants.first(where: { $0.id == localParticipantID })?.role == .host
+        return hostParticipantID == localParticipantID
+    }
+
+    var isCurrentUserAdmin: Bool {
+        guard let localParticipantID else { return false }
+        return isCurrentUserHost || adminParticipantIDs.contains(localParticipantID)
+    }
+
+    var canAccessAdminControls: Bool {
+        isCurrentUserAdmin
     }
 
     func validateMeetingID(_ value: String? = nil) -> Bool {
@@ -147,6 +168,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
         do {
             let session = try await resolver.createSession(with: nil)
+            pendingCreatorHostAssignment = true
             await transitionToLobby(session)
             meetingIdInput = session.meetingId
             scheduledMeetings.insert(
@@ -176,6 +198,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
         do {
             let session = try await resolver.joinSession(with: meetingIdInput)
+            pendingCreatorHostAssignment = false
             await transitionToLobby(session)
         } catch {
             phase = .failed
@@ -206,6 +229,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
             do {
                 let session = try await resolver.createSession(with: nil)
+                pendingCreatorHostAssignment = true
                 scheduledMeeting.meetingId = session.meetingId
                 scheduledMeeting.activationState = .active
                 scheduledMeetings[index] = scheduledMeeting
@@ -247,12 +271,21 @@ final class MeetingStateManager: NSObject, ObservableObject {
     func startMeeting() async {
         guard !isJoining else { return }
         guard let currentSession else { return }
+        let trimmedDisplayName = displayNameInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedDisplayName.isEmpty else {
+            errorMessage = "Display name is required before joining."
+            return
+        }
         guard !lobbyState.isCheckingDevices, !lobbyState.isLoadingParticipants else {
             errorMessage = "Please wait for lobby checks to complete before joining."
             return
         }
         guard lobbyState.microphonePermission != .denied, lobbyState.cameraPermission != .denied else {
             errorMessage = "Microphone and camera permissions are required to join."
+            return
+        }
+        guard !isMeetingLocked || canAccessAdminControls else {
+            errorMessage = "This meeting is locked."
             return
         }
         let roomURL = await resolver.internalRoomURL(for: currentSession)
@@ -293,16 +326,31 @@ final class MeetingStateManager: NSObject, ObservableObject {
     func leaveMeeting() async {
         guard let currentSession else { return }
         await leaveDailyRoom(reason: "user leave")
+        var cleanedSessionIDs: Set<String> = []
+        // End `activeStartedSession` first because it represents the actively joined Daily lifecycle;
+        // when `currentSession` differs (for example after session rotation), both need explicit cleanup.
         if let activeStartedSession {
             await resolver.endSession(activeStartedSession)
-            self.activeStartedSession = nil
-        } else {
+            cleanedSessionIDs.insert(activeStartedSession.sessionId)
+        }
+        if !cleanedSessionIDs.contains(currentSession.sessionId) {
             await resolver.endSession(currentSession)
         }
+        self.activeStartedSession = nil
         phase = .ended
         self.currentSession = nil
         resetMeetingRuntimeStateForJoin()
         await refreshDebugSnapshot()
+    }
+
+    func endMeetingForEveryone() async {
+        guard isCurrentUserHost else {
+            errorMessage = "Only the host can end the meeting for everyone."
+            return
+        }
+        guard let currentSession else { return }
+        await resolver.applyAdminAction(.endMeetingForAll, in: currentSession)
+        await leaveMeeting()
     }
 
     func toggleMute() {
@@ -314,20 +362,49 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     func toggleScreenShare() {
-        isScreenSharing.toggle()
+        Task {
+            guard isScreenShareAllowed || isCurrentUserAdmin else {
+                await MainActor.run {
+                    errorMessage = "Screen sharing is currently disabled by an admin."
+                }
+                return
+            }
+            await setScreenShareEnabled(!isScreenSharing)
+        }
     }
 
     func sendMessage(_ text: String, threadId: String = "general") {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         guard phase == .inMeeting else { return }
-        errorMessage = "Chat is currently unavailable. This feature requires Daily session support."
-        DebugLogger.shared.log("Blocked local-only chat send for thread \(threadId) to avoid non-Daily simulated state.", level: .warning, category: "Meet")
+        guard isChatEnabled || isCurrentUserAdmin else {
+            errorMessage = "Chat is currently disabled."
+            return
+        }
+        let message = MeetingMessage(
+            id: UUID().uuidString,
+            threadId: threadId,
+            senderName: localParticipantDisplayName.isEmpty ? Self.guestDisplayName : localParticipantDisplayName,
+            text: trimmed,
+            sentAt: Date(),
+            isSystem: false
+        )
+        messages.append(message)
+        sendRealtimePayload(.chat(
+            id: message.id,
+            threadId: threadId,
+            senderName: message.senderName,
+            text: message.text,
+            sentAt: message.sentAt.timeIntervalSince1970
+        ))
     }
 
     func addThread(named title: String) {
-        errorMessage = "Creating new threads is currently unavailable. This feature requires Daily session support."
-        DebugLogger.shared.log("Blocked local-only thread creation (\(title)) to avoid simulated state.", level: .warning, category: "Meet")
+        let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        let threadID = "thread-\(UUID().uuidString)"
+        chatThreads.append(.init(id: threadID, title: trimmed))
+        sendRealtimePayload(.threadAdded(id: threadID, title: trimmed))
     }
 
     func setAudioDevice(_ device: String) {
@@ -347,38 +424,127 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     func muteAllParticipants() async {
+        guard canAccessAdminControls else { return }
         guard let currentSession else { return }
         await resolver.applyAdminAction(.muteAll, in: currentSession)
     }
 
     func setParticipantMuted(participantID: String, muted: Bool) async {
+        guard canAccessAdminControls else { return }
         guard let currentSession else { return }
         await resolver.applyAdminAction(.setParticipantMuted(participantId: participantID, muted: muted), in: currentSession)
     }
 
     func setParticipantVideoEnabled(participantID: String, enabled: Bool) async {
+        guard canAccessAdminControls else { return }
         guard let currentSession else { return }
         await resolver.applyAdminAction(.setParticipantVideoEnabled(participantId: participantID, enabled: enabled), in: currentSession)
     }
 
     func removeParticipant(participantID: String) async {
+        guard canAccessAdminControls else { return }
         guard let currentSession else { return }
         await resolver.applyAdminAction(.removeParticipant(participantId: participantID), in: currentSession)
     }
 
     func assignRole(participantID: String, role: MeetingParticipantRole) async {
+        guard isCurrentUserHost else {
+            errorMessage = "Only the host can assign admin roles."
+            return
+        }
+        if participantID == hostParticipantID, role != .host {
+            errorMessage = "Reassign host before removing host role."
+            return
+        }
         guard let currentSession else { return }
         await resolver.applyAdminAction(.assignRole(participantId: participantID, role: role), in: currentSession)
+        switch role {
+        case .host:
+            hostParticipantID = participantID
+            adminParticipantIDs.remove(participantID)
+        case .admin:
+            adminParticipantIDs.insert(participantID)
+        case .participant:
+            adminParticipantIDs.remove(participantID)
+        }
+        sendRealtimePayload(.rolesUpdated(hostId: hostParticipantID, adminIds: Array(adminParticipantIDs)))
+    }
+
+    func setMeetingLocked(_ locked: Bool) async {
+        guard canAccessAdminControls else { return }
+        guard let currentSession else { return }
+        await resolver.applyAdminAction(.lockMeeting(locked), in: currentSession)
+        isMeetingLocked = locked
+        sendRealtimePayload(.meetingLockChanged(isLocked: locked))
+    }
+
+    func setChatEnabled(_ enabled: Bool) async {
+        guard canAccessAdminControls else { return }
+        guard let currentSession else { return }
+        await resolver.applyAdminAction(.setChatEnabled(enabled), in: currentSession)
+        isChatEnabled = enabled
+        sendRealtimePayload(.chatAvailabilityChanged(isEnabled: enabled))
+    }
+
+    func spotlightParticipant(_ participantID: String?) async {
+        guard canAccessAdminControls else { return }
+        guard let currentSession else { return }
+        await resolver.applyAdminAction(.spotlightParticipant(participantId: participantID), in: currentSession)
+        spotlightedParticipantID = participantID
+        sendRealtimePayload(.spotlightChanged(participantId: participantID))
+    }
+
+    func pinParticipant(_ participantID: String?) async {
+        guard canAccessAdminControls else { return }
+        guard let currentSession else { return }
+        await resolver.applyAdminAction(.pinParticipant(participantId: participantID), in: currentSession)
+        pinnedParticipantID = participantID
+        sendRealtimePayload(.pinChanged(participantId: participantID))
+    }
+
+    func setScreenShareAllowed(_ enabled: Bool) async {
+        guard canAccessAdminControls else { return }
+        guard let currentSession else { return }
+        await resolver.applyAdminAction(.setScreenShareEnabled(enabled), in: currentSession)
+        isScreenShareAllowed = enabled
+        if !enabled && isScreenSharing {
+            await setScreenShareEnabled(false)
+        }
+        sendRealtimePayload(.screenShareAvailabilityChanged(isEnabled: enabled))
     }
 
     func createBreakoutRoom(named name: String) async {
-        errorMessage = "Breakout room management is currently unavailable. This feature requires Daily session support."
-        DebugLogger.shared.log("Blocked local-only breakout creation (\(name)) to avoid simulated state.", level: .warning, category: "Meet")
+        guard canAccessAdminControls else {
+            errorMessage = "Only host or admins can manage breakout rooms."
+            return
+        }
+        guard let currentSession else { return }
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        await resolver.applyAdminAction(.createBreakoutRoom(name: trimmed), in: currentSession)
+        let room = MeetingBreakoutRoom(id: UUID().uuidString, name: trimmed, participantIds: [])
+        breakoutRooms.append(room)
+        await syncBreakoutRooms()
+        sendRealtimePayload(.breakoutRoomsUpdated(rooms: breakoutRooms))
     }
 
     func assignParticipant(_ participantID: String, to roomID: String?) async {
-        errorMessage = "Assigning participants to breakout rooms is currently unavailable. This feature requires Daily session support."
-        DebugLogger.shared.log("Blocked local-only breakout assignment for participant \(participantID) room \(roomID ?? "main") to avoid simulated state.", level: .warning, category: "Meet")
+        guard canAccessAdminControls else {
+            errorMessage = "Only host or admins can move participants between breakout rooms."
+            return
+        }
+        guard let currentSession else { return }
+        await resolver.applyAdminAction(.assignParticipantToBreakout(participantId: participantID, roomId: roomID), in: currentSession)
+        breakoutRooms = breakoutRooms.map { room in
+            var updated = room
+            updated.participantIds.removeAll { $0 == participantID }
+            if room.id == roomID {
+                updated.participantIds.append(participantID)
+            }
+            return updated
+        }
+        await syncBreakoutRooms()
+        sendRealtimePayload(.breakoutRoomsUpdated(rooms: breakoutRooms))
     }
 
     var meetingStateLabel: String {
@@ -415,12 +581,21 @@ final class MeetingStateManager: NSObject, ObservableObject {
         diagnostics = MeetingDiagnosticsState()
         participants = []
         participantVideoTracks = [:]
+        participantScreenShareTracks = [:]
         breakoutRooms = []
         messages = []
-        chatThreads = []
+        chatThreads = [MeetingChatThread(id: "general", title: "General")]
         participantRoles = [:]
         localParticipantID = nil
         localParticipantDisplayName = ""
+        hostParticipantID = nil
+        adminParticipantIDs = []
+        isMeetingLocked = false
+        isChatEnabled = true
+        isScreenShareAllowed = true
+        spotlightedParticipantID = nil
+        pinnedParticipantID = nil
+        activeScreenShareParticipantID = nil
         await refreshDebugSnapshot()
     }
 
@@ -454,6 +629,15 @@ final class MeetingStateManager: NSObject, ObservableObject {
         #else
         await setInputEnabled(["camera": enabled])
         #endif
+    }
+
+    private func setScreenShareEnabled(_ enabled: Bool) async {
+        #if canImport(Daily)
+        await setInputEnabled([.screenVideo: enabled])
+        #else
+        await setInputEnabled(["screenVideo": enabled])
+        #endif
+        isScreenSharing = enabled
     }
 
     #if canImport(Daily)
@@ -500,6 +684,10 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private func joinDailyRoom(url: URL, session: MeetingSession) async throws {
         #if canImport(Daily)
         let callClient = try await createFreshCallClient(session: session)
+        let trimmedDisplayName = displayNameInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedDisplayName.isEmpty {
+            callClient.set(username: trimmedDisplayName, completion: nil)
+        }
         let joinToken: MeetingToken?
         if let meetingToken = session.meetingToken?.trimmingCharacters(in: .whitespacesAndNewlines),
            !meetingToken.isEmpty {
@@ -558,16 +746,34 @@ final class MeetingStateManager: NSObject, ObservableObject {
             guard let track = participant.media?.camera.track else { return nil }
             return (participantIDString(participant), track)
         })
+        participantScreenShareTracks = Dictionary(uniqueKeysWithValues: sortedParticipants.compactMap { participant in
+            guard let track = participant.media?.screenVideo.track else { return nil }
+            return (participantIDString(participant), track)
+        })
+        activeScreenShareParticipantID = sortedParticipants
+            .first(where: { $0.media?.screenVideo.state == .playable })
+            .map { participantIDString($0) }
 
         let currentLocalParticipant = sortedParticipants.first(where: { $0.info.isLocal })
         let currentLocalParticipantID = currentLocalParticipant.map { participantIDString($0) }
         localParticipantID = currentLocalParticipantID
         localParticipantDisplayName = currentLocalParticipant.map(participantDisplayName) ?? ""
+        if pendingCreatorHostAssignment, let currentLocalParticipantID {
+            hostParticipantID = currentLocalParticipantID
+            pendingCreatorHostAssignment = false
+            sendRealtimePayload(.rolesUpdated(hostId: hostParticipantID, adminIds: Array(adminParticipantIDs)))
+        }
 
         participants = sortedParticipants.map { participant in
             let participantID = participantIDString(participant)
-            let isLocal = participant.info.isLocal
-            let role = participantRoles[participantID] ?? (isLocal ? .host : .participant)
+            let role: MeetingParticipantRole
+            if participantID == hostParticipantID {
+                role = .host
+            } else if adminParticipantIDs.contains(participantID) {
+                role = .admin
+            } else {
+                role = .participant
+            }
             let existingParticipant = participants.first(where: { $0.id == participantID })
             return MeetingParticipant(
                 id: participantID,
@@ -576,6 +782,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
                 isSpeaking: participantID == activeSpeakerID,
                 isMuted: participant.media?.microphone.state != .playable,
                 hasVideo: participant.media?.camera.state == .playable,
+                isScreenSharing: participant.media?.screenVideo.state == .playable,
                 role: role,
                 breakoutRoomID: existingParticipant?.breakoutRoomID
             )
@@ -585,7 +792,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private nonisolated func participantDisplayName(_ participant: Participant) -> String {
         let trimmed = participant.info.username?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         if !trimmed.isEmpty { return trimmed }
-        return participantIDString(participant)
+        return Self.guestDisplayName
     }
 
     private nonisolated func participantIDString(_ participant: Participant) -> String {
@@ -608,18 +815,188 @@ final class MeetingStateManager: NSObject, ObservableObject {
             )
         )
     }
+
+    private enum RealtimePayload: Codable {
+        case chat(id: String, threadId: String, senderName: String, text: String, sentAt: TimeInterval)
+        case threadAdded(id: String, title: String)
+        case rolesUpdated(hostId: String?, adminIds: [String])
+        case meetingLockChanged(isLocked: Bool)
+        case chatAvailabilityChanged(isEnabled: Bool)
+        case spotlightChanged(participantId: String?)
+        case pinChanged(participantId: String?)
+        case screenShareAvailabilityChanged(isEnabled: Bool)
+        case breakoutRoomsUpdated(rooms: [MeetingBreakoutRoom])
+
+        enum CodingKeys: String, CodingKey {
+            case type
+            case id
+            case threadId
+            case senderName
+            case text
+            case sentAt
+            case title
+            case hostId
+            case adminIds
+            case isLocked
+            case isEnabled
+            case participantId
+            case rooms
+        }
+
+        enum PayloadType: String, Codable {
+            case chat
+            case threadAdded
+            case rolesUpdated
+            case meetingLockChanged
+            case chatAvailabilityChanged
+            case spotlightChanged
+            case pinChanged
+            case screenShareAvailabilityChanged
+            case breakoutRoomsUpdated
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            switch try container.decode(PayloadType.self, forKey: .type) {
+            case .chat:
+                self = .chat(
+                    id: try container.decode(String.self, forKey: .id),
+                    threadId: try container.decode(String.self, forKey: .threadId),
+                    senderName: try container.decode(String.self, forKey: .senderName),
+                    text: try container.decode(String.self, forKey: .text),
+                    sentAt: try container.decode(TimeInterval.self, forKey: .sentAt)
+                )
+            case .threadAdded:
+                self = .threadAdded(
+                    id: try container.decode(String.self, forKey: .id),
+                    title: try container.decode(String.self, forKey: .title)
+                )
+            case .rolesUpdated:
+                self = .rolesUpdated(
+                    hostId: try container.decodeIfPresent(String.self, forKey: .hostId),
+                    adminIds: try container.decode([String].self, forKey: .adminIds)
+                )
+            case .meetingLockChanged:
+                self = .meetingLockChanged(isLocked: try container.decode(Bool.self, forKey: .isLocked))
+            case .chatAvailabilityChanged:
+                self = .chatAvailabilityChanged(isEnabled: try container.decode(Bool.self, forKey: .isEnabled))
+            case .spotlightChanged:
+                self = .spotlightChanged(participantId: try container.decodeIfPresent(String.self, forKey: .participantId))
+            case .pinChanged:
+                self = .pinChanged(participantId: try container.decodeIfPresent(String.self, forKey: .participantId))
+            case .screenShareAvailabilityChanged:
+                self = .screenShareAvailabilityChanged(isEnabled: try container.decode(Bool.self, forKey: .isEnabled))
+            case .breakoutRoomsUpdated:
+                self = .breakoutRoomsUpdated(rooms: try container.decode([MeetingBreakoutRoom].self, forKey: .rooms))
+            }
+        }
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            switch self {
+            case let .chat(id, threadId, senderName, text, sentAt):
+                try container.encode(PayloadType.chat, forKey: .type)
+                try container.encode(id, forKey: .id)
+                try container.encode(threadId, forKey: .threadId)
+                try container.encode(senderName, forKey: .senderName)
+                try container.encode(text, forKey: .text)
+                try container.encode(sentAt, forKey: .sentAt)
+            case let .threadAdded(id, title):
+                try container.encode(PayloadType.threadAdded, forKey: .type)
+                try container.encode(id, forKey: .id)
+                try container.encode(title, forKey: .title)
+            case let .rolesUpdated(hostId, adminIds):
+                try container.encode(PayloadType.rolesUpdated, forKey: .type)
+                try container.encodeIfPresent(hostId, forKey: .hostId)
+                try container.encode(adminIds, forKey: .adminIds)
+            case let .meetingLockChanged(isLocked):
+                try container.encode(PayloadType.meetingLockChanged, forKey: .type)
+                try container.encode(isLocked, forKey: .isLocked)
+            case let .chatAvailabilityChanged(isEnabled):
+                try container.encode(PayloadType.chatAvailabilityChanged, forKey: .type)
+                try container.encode(isEnabled, forKey: .isEnabled)
+            case let .spotlightChanged(participantId):
+                try container.encode(PayloadType.spotlightChanged, forKey: .type)
+                try container.encodeIfPresent(participantId, forKey: .participantId)
+            case let .pinChanged(participantId):
+                try container.encode(PayloadType.pinChanged, forKey: .type)
+                try container.encodeIfPresent(participantId, forKey: .participantId)
+            case let .screenShareAvailabilityChanged(isEnabled):
+                try container.encode(PayloadType.screenShareAvailabilityChanged, forKey: .type)
+                try container.encode(isEnabled, forKey: .isEnabled)
+            case let .breakoutRoomsUpdated(rooms):
+                try container.encode(PayloadType.breakoutRoomsUpdated, forKey: .type)
+                try container.encode(rooms, forKey: .rooms)
+            }
+        }
+    }
+
+    private func sendRealtimePayload(_ payload: RealtimePayload) {
+        guard let callClient else { return }
+        guard let data = try? JSONEncoder().encode(payload) else { return }
+        callClient.sendAppMessage(json: data, to: .all, completion: nil)
+    }
+
+    private func applyRealtimePayload(_ payload: RealtimePayload, from participantId: String?) {
+        switch payload {
+        case let .chat(id, threadId, senderName, text, sentAt):
+            // Ignore duplicates because app messages can be retried/replayed by transport reconnects.
+            if messages.contains(where: { $0.id == id }) { return }
+            let threadExists = chatThreads.contains { $0.id == threadId }
+            if !threadExists {
+                chatThreads.append(.init(id: threadId, title: "General"))
+            }
+            messages.append(.init(id: id, threadId: threadId, senderName: senderName, text: text, sentAt: Date(timeIntervalSince1970: sentAt), isSystem: false))
+        case let .threadAdded(id, title):
+            if !chatThreads.contains(where: { $0.id == id }) {
+                chatThreads.append(.init(id: id, title: title))
+            }
+        case let .rolesUpdated(hostId, adminIds):
+            hostParticipantID = hostId
+            adminParticipantIDs = Set(adminIds)
+            participantRoles = Dictionary(uniqueKeysWithValues: adminIds.map { ($0, .admin) })
+            if let hostId {
+                participantRoles[hostId] = .host
+            }
+            // Local sender already has up-to-date role state; remote updates should force a participant refresh.
+            if let participantId, participantId != localParticipantID {
+                refreshParticipantsFromDaily()
+            }
+        case let .meetingLockChanged(isLocked):
+            isMeetingLocked = isLocked
+        case let .chatAvailabilityChanged(isEnabled):
+            isChatEnabled = isEnabled
+        case let .spotlightChanged(participantId):
+            spotlightedParticipantID = participantId
+        case let .pinChanged(participantId):
+            pinnedParticipantID = participantId
+        case let .screenShareAvailabilityChanged(isEnabled):
+            isScreenShareAllowed = isEnabled
+        case let .breakoutRoomsUpdated(rooms):
+            breakoutRooms = rooms
+        }
+    }
     #endif
 
     private func resetMeetingRuntimeStateForJoin() {
         participants = []
         participantVideoTracks = [:]
+        participantScreenShareTracks = [:]
         breakoutRooms = []
         participantRoles = [:]
         localParticipantID = nil
         localParticipantDisplayName = ""
         activeSpeakerID = nil
+        hostParticipantID = nil
+        adminParticipantIDs = []
+        isMeetingLocked = false
+        isChatEnabled = true
+        isScreenShareAllowed = true
+        spotlightedParticipantID = nil
+        pinnedParticipantID = nil
+        activeScreenShareParticipantID = nil
         messages = []
-        chatThreads = []
+        chatThreads = [MeetingChatThread(id: "general", title: "General")]
         diagnostics.connectionState = "Unknown"
         diagnostics.networkQuality = "Unknown"
         diagnostics.latencyMs = 0
@@ -842,7 +1219,38 @@ extension MeetingStateManager: CallClientDelegate {
             guard !(await isStaleCallback(callClient: callClient)) else { return }
             isCameraEnabled = inputs.camera.isEnabled
             isMicrophoneMuted = !inputs.microphone.isEnabled
+            isScreenSharing = inputs.screenVideo.isEnabled
             refreshParticipantsFromDaily()
+        }
+    }
+
+    nonisolated func callClient(_ callClient: CallClient, appMessageAsJson jsonData: Data, from participantId: ParticipantID) {
+        Task { @MainActor in
+            guard !(await isStaleCallback(callClient: callClient)) else { return }
+            guard let payload = try? JSONDecoder().decode(RealtimePayload.self, from: jsonData) else { return }
+            applyRealtimePayload(payload, from: "\(participantId)")
+        }
+    }
+
+    nonisolated func callClient(_ callClient: CallClient, appMessageFromRestApiAsJson jsonData: Data) {
+        Task { @MainActor in
+            guard !(await isStaleCallback(callClient: callClient)) else { return }
+            guard let payload = try? JSONDecoder().decode(RealtimePayload.self, from: jsonData) else { return }
+            applyRealtimePayload(payload, from: nil)
+        }
+    }
+
+    nonisolated func callClientDidDetectStartOfSystemBroadcast(_ callClient: CallClient) {
+        Task { @MainActor in
+            guard !(await isStaleCallback(callClient: callClient)) else { return }
+            await setScreenShareEnabled(true)
+        }
+    }
+
+    nonisolated func callClientDidDetectEndOfSystemBroadcast(_ callClient: CallClient) {
+        Task { @MainActor in
+            guard !(await isStaleCallback(callClient: callClient)) else { return }
+            await setScreenShareEnabled(false)
         }
     }
 

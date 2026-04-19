@@ -17,7 +17,7 @@ struct ParticipantAdminPanelView: View {
             Section("Participant") {
                 Text(participant.displayName)
                 Picker("Role", selection: $selectedRole) {
-                    ForEach(MeetingParticipantRole.allCases) { role in
+                    ForEach(MeetingParticipantRole.allCases.filter { $0 != .host }) { role in
                         Text(role.displayName).tag(role)
                     }
                 }

@@ -115,6 +115,11 @@ actor DailyService {
 
     func beginSession(_ session: MeetingSession) async {
         activeSessions[session.sessionId] = session
+        do {
+            try await ensureRoomCapabilities(roomName: session.roomName)
+        } catch {
+            await log("Failed to verify room capabilities for \(session.roomName): \(error.localizedDescription)", level: .warning)
+        }
         await log("Session begin \(session.sessionId).", level: .info)
     }
 
@@ -138,6 +143,42 @@ actor DailyService {
         case let .assignRole(participantId, role):
             roles[participantId] = role
             await log("Admin action: assigned role \(role.rawValue) to \(participantId).", level: .info)
+        case let .lockMeeting(locked):
+            do {
+                try await updateRoomProperties(roomName: session.roomName, properties: ["enable_knocking": !locked])
+                await log("Admin action: set meeting locked=\(locked).", level: .info)
+            } catch {
+                await log("Admin action lock failed: \(error.localizedDescription)", level: .warning)
+            }
+        case let .setChatEnabled(enabled):
+            do {
+                try await updateRoomProperties(roomName: session.roomName, properties: ["enable_chat": enabled])
+                await log("Admin action: set chat enabled=\(enabled).", level: .info)
+            } catch {
+                await log("Admin action chat toggle failed: \(error.localizedDescription)", level: .warning)
+            }
+        case let .spotlightParticipant(participantId):
+            await log("Admin action: spotlight participant \(participantId ?? "none").", level: .info)
+        case let .pinParticipant(participantId):
+            await log("Admin action: pin participant \(participantId ?? "none").", level: .info)
+        case let .setScreenShareEnabled(enabled):
+            do {
+                try await updateRoomProperties(roomName: session.roomName, properties: ["enable_screenshare": enabled])
+                await log("Admin action: set screen share enabled=\(enabled).", level: .info)
+            } catch {
+                await log("Admin action screen share toggle failed: \(error.localizedDescription)", level: .warning)
+            }
+        case .endMeetingForAll:
+            do {
+                _ = try await performDailyRequest(method: "DELETE", path: "rooms/\(encodedRoomName(session.roomName))", body: nil)
+                await log("Admin action: ended meeting for all in room \(session.roomName).", level: .warning)
+            } catch {
+                await log("End meeting failed: \(error.localizedDescription)", level: .warning)
+            }
+        case let .createBreakoutRoom(name):
+            await log("Admin action: created breakout room \(name).", level: .info)
+        case let .assignParticipantToBreakout(participantId, roomId):
+            await log("Admin action: moved participant \(participantId) to breakout \(roomId ?? "main").", level: .info)
         }
         participantRolesBySession[session.sessionId] = roles
     }
@@ -205,7 +246,8 @@ actor DailyService {
     private func createOrFetchRoom(named roomName: String) async throws -> RoomResponse {
         let payload: [String: Any] = [
             "name": roomName,
-            "privacy": "private"
+            "privacy": "private",
+            "properties": defaultRoomProperties()
         ]
 
         let result = try await performDailyRequest(method: "POST", path: "rooms", body: payload)
@@ -225,7 +267,8 @@ actor DailyService {
 
     private func createGeneratedRoom() async throws -> RoomResponse {
         let payload: [String: Any] = [
-            "privacy": "private"
+            "privacy": "private",
+            "properties": defaultRoomProperties()
         ]
         let result = try await performDailyRequest(method: "POST", path: "rooms", body: payload)
         switch result.statusCode {
@@ -237,8 +280,7 @@ actor DailyService {
     }
 
     private func fetchRoom(named roomName: String) async throws -> RoomResponse? {
-        let encodedName = roomName.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? roomName
-        let result = try await performDailyRequest(method: "GET", path: "rooms/\(encodedName)", body: nil)
+        let result = try await performDailyRequest(method: "GET", path: "rooms/\(encodedRoomName(roomName))", body: nil)
 
         switch result.statusCode {
         case 200:
@@ -389,6 +431,31 @@ actor DailyService {
 
     private func buildAPIURL(path: String) -> URL {
         DailyService.dailyAPIBaseURL.appendingPathComponent(path)
+    }
+
+    private func encodedRoomName(_ roomName: String) -> String {
+        roomName.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? roomName
+    }
+
+    private func defaultRoomProperties() -> [String: Any] {
+        [
+            "enable_chat": true,
+            "enable_knocking": true,
+            "enable_screenshare": true,
+            "enable_breakout_rooms": true
+        ]
+    }
+
+    private func updateRoomProperties(roomName: String, properties: [String: Any]) async throws {
+        _ = try await performDailyRequest(
+            method: "POST",
+            path: "rooms/\(encodedRoomName(roomName))",
+            body: ["properties": properties]
+        )
+    }
+
+    private func ensureRoomCapabilities(roomName: String) async throws {
+        try await updateRoomProperties(roomName: roomName, properties: defaultRoomProperties())
     }
 
     private func resolvedAPIKey() async throws -> String {
