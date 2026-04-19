@@ -811,9 +811,9 @@ final class MeetingStateManager: NSObject, ObservableObject {
             let inputNames = unsupportedInputs.sorted().joined(separator: ", ")
             let message = "Unsupported Daily media inputs requested: \(inputNames)."
             DebugLogger.shared.log(message, level: .warning, category: "Meet")
-            if !supportedInputsApplied {
-                errorMessage = "Unsupported media inputs requested: \(inputNames)."
-            }
+            errorMessage = supportedInputsApplied
+                ? "Some media inputs were applied, but unsupported inputs were ignored: \(inputNames)."
+                : "Unsupported media inputs requested: \(inputNames)."
         }
 
         return supportedInputsApplied
