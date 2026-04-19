@@ -16,7 +16,7 @@ struct InboxView: View {
 
     @State private var searchText = ""
     @State private var showingCompose = false
-    @State private var showingAddAccount = false
+    @State private var showingManageAccounts = false
     @State private var showingFetchingLabel = false
     @State private var selectedMessage: MailMessage?
 
@@ -45,9 +45,9 @@ struct InboxView: View {
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {
-                    showingAddAccount = true
+                    showingManageAccounts = true
                 } label: {
-                    Image(systemName: "person.crop.circle.badge.plus")
+                    Image(systemName: "person.crop.circle.badge.gearshape")
                 }
 
                 Button {
@@ -62,9 +62,8 @@ struct InboxView: View {
                 EmailComposingView(account: activeAccount)
             }
         }
-        .sheet(isPresented: $showingAddAccount) {
-            AddMailAccountView { selected in
-                mailStore.setActiveAccount(selected.id)
+        .sheet(isPresented: $showingManageAccounts) {
+            ManageAccountsView {
                 Task {
                     await viewModel.loadCachedThenRefreshIfNeeded()
                 }

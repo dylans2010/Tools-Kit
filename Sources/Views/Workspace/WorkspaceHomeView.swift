@@ -59,7 +59,7 @@ struct WorkspaceHomeView: View {
 
     private var mailTab: some View {
         NavigationStack {
-            AddMailAccountView()
+            ManageAccountsView()
         }
         .tabItem {
             Label(WorkspaceTab.mail.rawValue, systemImage: WorkspaceTab.mail.icon)

@@ -8,9 +8,20 @@ struct TranslateEmailView: View {
 
     @State private var sourceLanguage = "English"
     @State private var targetLanguage = "Spanish"
+    @State private var outputStyle: OutputStyle = .natural
+    @State private var preserveFormatting = true
+
     @State private var translatedText = ""
     @State private var isTranslating = false
     @State private var errorMessage: String?
+
+    enum OutputStyle: String, CaseIterable, Identifiable {
+        case natural = "Natural"
+        case formal = "Formal"
+        case concise = "Concise"
+
+        var id: String { rawValue }
+    }
 
     private let languages = [
         "English", "Spanish", "French", "German", "Italian", "Portuguese", "Japanese", "Korean", "Chinese", "Arabic"
@@ -32,58 +43,10 @@ struct TranslateEmailView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 14) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Languages", systemImage: "globe")
-                            .font(.headline)
-
-                        HStack(spacing: 10) {
-                            modernLanguagePicker("From", selection: $sourceLanguage)
-                            Image(systemName: "arrow.left.arrow.right")
-                                .foregroundStyle(.secondary)
-                            modernLanguagePicker("To", selection: $targetLanguage)
-                        }
-                    }
-                    .padding()
-                    .background(cardBackground)
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("Input", systemImage: "text.quote")
-                            .font(.headline)
-                        ScrollView {
-                            Text(sourceText.isEmpty ? "Message body is empty." : sourceText)
-                                .foregroundStyle(sourceText.isEmpty ? .secondary : .primary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .textSelection(.enabled)
-                        }
-                        .frame(minHeight: 140)
-                        .padding(12)
-                        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
-                    }
-                    .padding()
-                    .background(cardBackground)
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("Output", systemImage: "character.bubble")
-                            .font(.headline)
-                        if isTranslating {
-                            ProgressView("Translating…")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.vertical, 32)
-                        } else if translatedText.isEmpty {
-                            Text("Translation will appear here.")
-                                .foregroundStyle(.secondary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.vertical, 32)
-                        } else {
-                            markdownView(translatedText)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(12)
-                                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
-                                .textSelection(.enabled)
-                        }
-                    }
-                    .padding()
-                    .background(cardBackground)
+                    languageCard
+                    styleCard
+                    inputCard
+                    outputCard
 
                     if let errorMessage {
                         Text(errorMessage)
@@ -125,6 +88,113 @@ struct TranslateEmailView: View {
                 }
             }
         }
+    }
+
+    private var languageCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Languages", systemImage: "globe")
+                .font(.headline)
+
+            HStack(spacing: 10) {
+                modernLanguagePicker("From", selection: $sourceLanguage)
+
+                Button {
+                    swap(&sourceLanguage, &targetLanguage)
+                } label: {
+                    Image(systemName: "arrow.left.arrow.right.circle.fill")
+                        .font(.title3)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
+                .padding(.top, 16)
+
+                modernLanguagePicker("To", selection: $targetLanguage)
+            }
+        }
+        .padding()
+        .background(cardBackground)
+    }
+
+    private var styleCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("Output", systemImage: "slider.horizontal.3")
+                .font(.headline)
+
+            Picker("Style", selection: $outputStyle) {
+                ForEach(OutputStyle.allCases) { style in
+                    Text(style.rawValue).tag(style)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Toggle("Preserve formatting and links", isOn: $preserveFormatting)
+                .toggleStyle(.switch)
+        }
+        .padding()
+        .background(cardBackground)
+    }
+
+    private var inputCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Label("Input", systemImage: "text.quote")
+                    .font(.headline)
+                Spacer()
+                Text("\(sourceText.trimmingCharacters(in: .whitespacesAndNewlines).count) chars")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            ScrollView {
+                Text(sourceText.isEmpty ? "Message body is empty." : sourceText)
+                    .foregroundStyle(sourceText.isEmpty ? .secondary : .primary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+            }
+            .frame(minHeight: 130)
+            .padding(12)
+            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+        }
+        .padding()
+        .background(cardBackground)
+    }
+
+    private var outputCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Label("Output", systemImage: "character.bubble")
+                    .font(.headline)
+                Spacer()
+                if !translatedText.isEmpty {
+                    Button {
+                        UIPasteboard.general.string = translatedText
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.borderless)
+                }
+            }
+
+            if isTranslating {
+                ProgressView("Translating…")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 32)
+            } else if translatedText.isEmpty {
+                Text("Translation will appear here.")
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 32)
+            } else {
+                markdownView(translatedText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(12)
+                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                    .textSelection(.enabled)
+            }
+        }
+        .padding()
+        .background(cardBackground)
     }
 
     private func modernLanguagePicker(_ label: String, selection: Binding<String>) -> some View {
@@ -182,10 +252,23 @@ struct TranslateEmailView: View {
         errorMessage = nil
         translatedText = ""
 
+        let styleInstruction: String = {
+            switch outputStyle {
+            case .natural: return "Use a natural, native-sounding tone."
+            case .formal: return "Use a formal and professional tone."
+            case .concise: return "Keep the translation concise while preserving meaning."
+            }
+        }()
+
+        let formattingInstruction = preserveFormatting
+            ? "Preserve original formatting, bullets, and links."
+            : "You may simplify formatting if needed."
+
         do {
             let prompt = """
             Translate the following email from \(sourceLanguage) to \(targetLanguage).
-            Preserve meaning, formatting, and links.
+            \(styleInstruction)
+            \(formattingInstruction)
 
             Email:
             \(sourceText)
