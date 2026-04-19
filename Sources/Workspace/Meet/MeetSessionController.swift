@@ -620,8 +620,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
         return components.queryItems?.contains(where: { $0.name == DailyService.dailyTokenParameterName && $0.value?.isEmpty == false }) ?? false
     }
 
-    private func fullErrorDetails(_ errorValue: Any) -> String {
-        if let error = errorValue as? Error {
+    private func fullErrorDetails(_ errorPayload: Any) -> String {
+        if let error = errorPayload as? Error {
             let nsError = error as NSError
             let reflectedError = sanitizePotentialSecretContent(String(reflecting: error))
             let localized = sanitizePotentialSecretContent(error.localizedDescription)
@@ -629,12 +629,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
             return "error=\(reflectedError) domain=\(nsError.domain) code=\(nsError.code) localized=\"\(localized)\" userInfo=\(userInfo)"
         }
 
-        let rawDescription = sanitizePotentialSecretContent(String(describing: errorValue))
-        if let nsError = errorValue as? NSError {
-            let userInfo = sanitizedUserInfoDescription(nsError.userInfo)
-            return "nonErrorType=\(String(describing: type(of: errorValue))) raw=\"\(rawDescription)\" domain=\(nsError.domain) code=\(nsError.code) userInfo=\(userInfo)"
-        }
-        return "nonErrorType=\(String(describing: type(of: errorValue))) raw=\"\(rawDescription)\""
+        let rawDescription = sanitizePotentialSecretContent(String(describing: errorPayload))
+        return "nonErrorType=\(String(describing: type(of: errorPayload))) raw=\"\(rawDescription)\""
     }
 
     private func beginAndJoinSession(_ session: MeetingSession, roomURL: URL) async throws {
