@@ -356,7 +356,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
     #if canImport(Daily)
     private func setInputEnabled(
-        _ inputs: [InputSettings.Key: Bool]
+        _ inputs: [String: Bool]
     ) async {
         guard let callClient else { return }
         do {
