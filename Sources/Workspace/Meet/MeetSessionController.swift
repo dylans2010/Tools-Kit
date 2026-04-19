@@ -179,7 +179,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
             await transitionToLobby(session)
         } catch {
             phase = .failed
-            errorMessage = userFacingJoinErrorMessage(for: error as Error)
+            errorMessage = userFacingJoinErrorMessage(for: error)
             DebugLogger.shared.log("Join failed: \(fullErrorDetails(error))", level: .error, category: "Meet")
         }
     }
@@ -284,7 +284,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
             await refreshDebugSnapshot()
         } catch {
             phase = .failed
-            errorMessage = userFacingJoinErrorMessage(for: error as Error)
+            errorMessage = userFacingJoinErrorMessage(for: error)
             DebugLogger.shared.log("Failed to start Daily session. \(fullErrorDetails(error))", level: .error, category: "Meet")
             await refreshDebugSnapshot()
         }
@@ -659,7 +659,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         return host == "daily.co" || host.hasSuffix(".daily.co")
     }
 
-    private func userFacingJoinErrorMessage(for error: Error) -> String {
+    private func userFacingJoinErrorMessage(for error: any Swift.Error) -> String {
         if let serviceError = error as? DailyService.ServiceError {
             if case let .requestFailed(statusCode, _) = serviceError, statusCode == 401 || statusCode == 403 {
                 return "You are not authorized to join this meeting."
@@ -683,7 +683,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     private func fullErrorDetails(_ errorPayload: Any) -> String {
-        if let error = errorPayload as? Error {
+        if let error = errorPayload as? any Swift.Error {
             let nsError = error as NSError
             let reflectedError = sanitizePotentialSecretContent(String(reflecting: error))
             let localized = sanitizePotentialSecretContent(error.localizedDescription)
@@ -850,7 +850,7 @@ extension MeetingStateManager: CallClientDelegate {
         Task { @MainActor in
             guard !(await isStaleCallback(callClient: callClient)) else { return }
             DebugLogger.shared.log("Daily delegate error callback received.", level: .error, category: "Meet")
-            errorMessage = userFacingJoinErrorMessage(for: error as Error)
+            errorMessage = userFacingJoinErrorMessage(for: error)
             DebugLogger.shared.log("Daily delegate error payload: \(fullErrorDetails(error))", level: .error, category: "Meet")
         }
     }
