@@ -151,15 +151,13 @@ struct WorkspaceDashboardView: View {
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Workspace")
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    showingSettings = true
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                }
+        .navigationBarItems(
+            trailing: Button {
+                showingSettings = true
+            } label: {
+                Image(systemName: "gearshape.fill")
             }
-        }
+        )
         .sheet(isPresented: $showingSettings) {
             AIChatSettingsView(settings: $settingsManager.settings)
         }
@@ -514,24 +512,22 @@ struct WorkspaceMailRouterView: View {
                 description: Text("Add an account to open Inbox as your default mail workspace.")
             )
             .navigationTitle("Mail")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+            .navigationBarItems(
+                trailing: HStack(spacing: 16) {
                     Button {
                     } label: {
                         Image(systemName: "square.and.pencil")
                     }
                     .disabled(true)
                     .accessibilityLabel("Compose unavailable without mail account")
-                }
 
-                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showingManageAccounts = true
                     } label: {
                         Image(systemName: "person.crop.circle.badge.gearshape")
                     }
                 }
-            }
+            )
             .sheet(isPresented: $showingManageAccounts) {
                 ManageAccountsView { selectedAccount in
                     mailStore.setActiveAccount(selectedAccount.id)
