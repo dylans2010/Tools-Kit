@@ -465,10 +465,10 @@ final class MeetingStateManager: NSObject, ObservableObject {
         "\(participant.id)"
     }
 
-    private func appendSystemMessage(_ text: String, threadId: String = "general") {
+    private func appendSystemMessage(_ text: String, threadId: String = "system", threadTitle: String = "System Messages") {
         let threadExists = chatThreads.contains { $0.id == threadId }
         if !threadExists {
-            chatThreads.append(MeetingChatThread(id: threadId, title: "General"))
+            chatThreads.append(MeetingChatThread(id: threadId, title: threadTitle))
         }
         messages.append(
             MeetingMessage(
