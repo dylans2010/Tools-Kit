@@ -76,7 +76,7 @@ struct MeetingChatView: View {
                 selectedThreadID = threads.first?.id
             }
         }
-        .onChange(of: threads.map(\.id), initial: false) { _, ids in
+        .onChange(of: threadIDs, initial: false) { _, ids in
             if let selectedThreadID, ids.contains(selectedThreadID) {
                 return
             }
@@ -94,5 +94,9 @@ struct MeetingChatView: View {
             get: { selectedThreadID ?? threads.first?.id ?? "" },
             set: { selectedThreadID = $0 }
         )
+    }
+
+    private var threadIDs: [String] {
+        threads.map(\.id)
     }
 }

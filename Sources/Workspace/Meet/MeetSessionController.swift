@@ -204,7 +204,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     func toggleMute() {
-        Task { await setMicrophoneEnabled(isMicrophoneMuted) }
+        Task { await setMicrophoneEnabled(!isMicrophoneMuted) }
     }
 
     func toggleCamera() {
