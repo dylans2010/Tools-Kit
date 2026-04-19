@@ -102,15 +102,15 @@ final class AIFeatureCheck: ObservableObject {
             return cachedProductionAPIKey
         }
 
-        if let local = Self.localConfigValue(forKey: "PRODUCTION_API_KEY") {
-            cachedProductionAPIKey = local
-            return local
-        }
-
         let remote = await fetchRemoteVariables()
         if let remoteKey = remote["PRODUCTION_API_KEY"]?.trimmingCharacters(in: .whitespacesAndNewlines), !remoteKey.isEmpty {
             cachedProductionAPIKey = remoteKey
             return remoteKey
+        }
+
+        if let local = Self.localConfigValue(forKey: "PRODUCTION_API_KEY") {
+            cachedProductionAPIKey = local
+            return local
         }
 
         throw AIFeatureCheckError.missingProductionAPIKey

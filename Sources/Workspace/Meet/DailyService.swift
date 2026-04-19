@@ -55,6 +55,7 @@ actor DailyService {
     private var recordsByMeetingID: [String: RoomRecord] = [:]
     private var activeSessions: [String: MeetingSession] = [:]
     private var developerAPIKey: String?
+    private var cachedAppwriteAPIKey: String?
 
     func setDeveloperAPIKey(_ value: String) async {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -250,9 +251,7 @@ actor DailyService {
         path: String,
         body: [String: Any]?
     ) async throws -> (data: Data, statusCode: Int) {
-        guard let apiKey = developerAPIKey else {
-            throw ServiceError.missingAPIKey
-        }
+        let apiKey = try await resolvedAPIKey()
 
         let url = buildAPIURL(path: path)
         var request = URLRequest(url: url)
@@ -339,6 +338,88 @@ actor DailyService {
 
     private func buildAPIURL(path: String) -> URL {
         DailyService.dailyAPIBaseURL.appendingPathComponent(path)
+    }
+
+    private func resolvedAPIKey() async throws -> String {
+        if let developerAPIKey {
+            return developerAPIKey
+        }
+
+        if let cachedAppwriteAPIKey, !cachedAppwriteAPIKey.isEmpty {
+            return cachedAppwriteAPIKey
+        }
+
+        let remoteVariables = await fetchRemoteVariables()
+        if let remoteKey = remoteConfigValue(forKey: "DAILY_API", remoteVariables: remoteVariables) {
+            cachedAppwriteAPIKey = remoteKey
+            return remoteKey
+        }
+
+        if let localKey = localConfigValue(forKey: "DAILY_API") {
+            cachedAppwriteAPIKey = localKey
+            return localKey
+        }
+
+        throw ServiceError.missingAPIKey
+    }
+
+    private func fetchRemoteVariables() async -> [String: String] {
+        guard
+            let rawURL = localConfigValue(forKey: "APPWRITE_MAIL_CONFIG_URL"),
+            let url = URL(string: rawURL)
+        else {
+            return [:]
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        if let bearer = localConfigValue(forKey: "APPWRITE_MAIL_CONFIG_BEARER") {
+            request.setValue("Bearer \(bearer)", forHTTPHeaderField: "Authorization")
+        }
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+                return [:]
+            }
+
+            if let direct = try? JSONDecoder().decode([String: String].self, from: data) {
+                return direct
+            }
+
+            if
+                let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                let payload = object["data"] as? [String: String]
+            {
+                return payload
+            }
+
+            return [:]
+        } catch {
+            return [:]
+        }
+    }
+
+    private func remoteConfigValue(forKey key: String, remoteVariables: [String: String]) -> String? {
+        guard let value = remoteVariables[key] else { return nil }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    private func localConfigValue(forKey key: String) -> String? {
+        guard
+            let url = Bundle.main.url(forResource: "Config", withExtension: "plist"),
+            let data = try? Data(contentsOf: url),
+            let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
+            let value = plist[key] as? String
+        else {
+            return nil
+        }
+
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
     }
 
     private func log(_ message: String, level: DebugLogLevel) async {
