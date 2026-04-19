@@ -326,14 +326,14 @@ final class MeetingStateManager: NSObject, ObservableObject {
     func leaveMeeting() async {
         guard let currentSession else { return }
         await leaveDailyRoom(reason: "user leave")
-        var endedSessionIDs: Set<String> = []
+        var cleanedSessionIDs: Set<String> = []
         // End `activeStartedSession` first because it represents the actively joined Daily lifecycle;
         // when `currentSession` differs (for example after session rotation), both need explicit cleanup.
         if let activeStartedSession {
             await resolver.endSession(activeStartedSession)
-            endedSessionIDs.insert(activeStartedSession.sessionId)
+            cleanedSessionIDs.insert(activeStartedSession.sessionId)
         }
-        if !endedSessionIDs.contains(currentSession.sessionId) {
+        if !cleanedSessionIDs.contains(currentSession.sessionId) {
             await resolver.endSession(currentSession)
         }
         self.activeStartedSession = nil
@@ -940,6 +940,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private func applyRealtimePayload(_ payload: RealtimePayload, from participantId: String?) {
         switch payload {
         case let .chat(id, threadId, senderName, text, sentAt):
+            // Ignore duplicates because app messages can be retried/replayed by transport reconnects.
             if messages.contains(where: { $0.id == id }) { return }
             let threadExists = chatThreads.contains { $0.id == threadId }
             if !threadExists {
@@ -957,6 +958,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
             if let hostId {
                 participantRoles[hostId] = .host
             }
+            // Local sender already has up-to-date role state; remote updates should force a participant refresh.
             if let participantId, participantId != localParticipantID {
                 refreshParticipantsFromDaily()
             }
