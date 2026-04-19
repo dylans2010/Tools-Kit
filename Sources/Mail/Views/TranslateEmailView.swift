@@ -273,7 +273,7 @@ struct TranslateEmailView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private func simplePicker<T: CaseIterable & Identifiable & RawRepresentable>(_ title: String, selection: Binding<T>) -> some View where T.RawValue == String {
+    private func simplePicker<T: CaseIterable & Identifiable & RawRepresentable & Hashable>(_ title: String, selection: Binding<T>) -> some View where T.RawValue == String {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.caption2.weight(.semibold))
