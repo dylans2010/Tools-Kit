@@ -258,6 +258,18 @@
 		ME0200000000000000000022 /* MeetingNotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000022 /* MeetingNotesView.swift */; };
 		ME0200000000000000000023 /* NotesEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000023 /* NotesEditorView.swift */; };
 		ME0200000000000000000024 /* AIAssistantPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000024 /* AIAssistantPanelView.swift */; };
+		ME0200000000000000000025 /* CallKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000025 /* CallKitManager.swift */; };
+		ME0200000000000000000026 /* CallKitProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000026 /* CallKitProvider.swift */; };
+		ME0200000000000000000027 /* PiPController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000027 /* PiPController.swift */; };
+		ME0200000000000000000028 /* NoiseControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000028 /* NoiseControlView.swift */; };
+		ME0200000000000000000029 /* LiveCaptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000029 /* LiveCaptionsView.swift */; };
+		ME020000000000000000002A /* NetworkStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000002A /* NetworkStatusView.swift */; };
+		ME020000000000000000002B /* PiPOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000002B /* PiPOverlayView.swift */; };
+		ME020000000000000000002C /* BackgroundEffectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000002C /* BackgroundEffectsView.swift */; };
+		ME020000000000000000002D /* ReactionsOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000002D /* ReactionsOverlayView.swift */; };
+		ME020000000000000000002E /* HandRaiseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000002E /* HandRaiseView.swift */; };
+		ME020000000000000000002F /* PerformanceWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000002F /* PerformanceWarningView.swift */; };
+		ME0200000000000000000030 /* PreJoinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000030 /* PreJoinView.swift */; };
 		WK0200000000000000000001 /* WorkoutsModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000001 /* WorkoutsModeManager.swift */; };
 		WK0200000000000000000002 /* WorkoutsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000002 /* WorkoutsHomeView.swift */; };
 		WK0200000000000000000003 /* OnboardWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000003 /* OnboardWorkoutView.swift */; };
@@ -1133,6 +1145,18 @@
 		ME0100000000000000000022 /* MeetingNotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingNotesView.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000023 /* NotesEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotesEditorView.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000024 /* AIAssistantPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIAssistantPanelView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000025 /* CallKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CallKitManager.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000026 /* CallKitProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CallKitProvider.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000027 /* PiPController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PiPController.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000028 /* NoiseControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NoiseControlView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000029 /* LiveCaptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LiveCaptionsView.swift"; sourceTree = "<group>"; };
+		ME010000000000000000002A /* NetworkStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkStatusView.swift"; sourceTree = "<group>"; };
+		ME010000000000000000002B /* PiPOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PiPOverlayView.swift"; sourceTree = "<group>"; };
+		ME010000000000000000002C /* BackgroundEffectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BackgroundEffectsView.swift"; sourceTree = "<group>"; };
+		ME010000000000000000002D /* ReactionsOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReactionsOverlayView.swift"; sourceTree = "<group>"; };
+		ME010000000000000000002E /* HandRaiseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HandRaiseView.swift"; sourceTree = "<group>"; };
+		ME010000000000000000002F /* PerformanceWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PerformanceWarningView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000030 /* PreJoinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreJoinView.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000001 /* WorkoutsModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/WorkoutsModeManager.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000002 /* WorkoutsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/WorkoutsHomeView.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000003 /* OnboardWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/OnboardWorkoutView.swift"; sourceTree = "<group>"; };
@@ -1243,6 +1267,15 @@
 				ME0100000000000000000022 /* MeetingNotesView.swift */,
 				ME0100000000000000000023 /* NotesEditorView.swift */,
 				ME0100000000000000000024 /* AIAssistantPanelView.swift */,
+				ME0100000000000000000028 /* NoiseControlView.swift */,
+				ME0100000000000000000029 /* LiveCaptionsView.swift */,
+				ME010000000000000000002A /* NetworkStatusView.swift */,
+				ME010000000000000000002B /* PiPOverlayView.swift */,
+				ME010000000000000000002C /* BackgroundEffectsView.swift */,
+				ME010000000000000000002D /* ReactionsOverlayView.swift */,
+				ME010000000000000000002E /* HandRaiseView.swift */,
+				ME010000000000000000002F /* PerformanceWarningView.swift */,
+				ME0100000000000000000030 /* PreJoinView.swift */,
 			);
 			path = Meet;
 			sourceTree = "<group>";
@@ -1266,6 +1299,9 @@
 				ME0100000000000000000006 /* MeetingResolver.swift */,
 				ME0100000000000000000007 /* MeetSessionController.swift */,
 				ME0100000000000000000021 /* MeetingNotesManager.swift */,
+				ME0100000000000000000025 /* CallKitManager.swift */,
+				ME0100000000000000000026 /* CallKitProvider.swift */,
+				ME0100000000000000000027 /* PiPController.swift */,
 			);
 			path = Meet;
 			sourceTree = "<group>";
@@ -2464,6 +2500,18 @@
 				ME0200000000000000000022 /* MeetingNotesView.swift in Sources */,
 				ME0200000000000000000023 /* NotesEditorView.swift in Sources */,
 				ME0200000000000000000024 /* AIAssistantPanelView.swift in Sources */,
+				ME0200000000000000000025 /* CallKitManager.swift in Sources */,
+				ME0200000000000000000026 /* CallKitProvider.swift in Sources */,
+				ME0200000000000000000027 /* PiPController.swift in Sources */,
+				ME0200000000000000000028 /* NoiseControlView.swift in Sources */,
+				ME0200000000000000000029 /* LiveCaptionsView.swift in Sources */,
+				ME020000000000000000002A /* NetworkStatusView.swift in Sources */,
+				ME020000000000000000002B /* PiPOverlayView.swift in Sources */,
+				ME020000000000000000002C /* BackgroundEffectsView.swift in Sources */,
+				ME020000000000000000002D /* ReactionsOverlayView.swift in Sources */,
+				ME020000000000000000002E /* HandRaiseView.swift in Sources */,
+				ME020000000000000000002F /* PerformanceWarningView.swift in Sources */,
+				ME0200000000000000000030 /* PreJoinView.swift in Sources */,
 				WK0200000000000000000001 /* WorkoutsModeManager.swift in Sources */,
 				WK0200000000000000000002 /* WorkoutsHomeView.swift in Sources */,
 				WK0200000000000000000003 /* OnboardWorkoutView.swift in Sources */,

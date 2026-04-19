@@ -44,6 +44,44 @@ struct MeetingContainerView: View {
                 onOpenNotes: { showNotes = true }
             )
 
+            NoiseControlView(
+                isEnabled: manager.isNoiseCancellationEnabled,
+                processingState: manager.activeAudioProcessingState,
+                onToggle: { manager.setNoiseCancellationEnabled($0) }
+            )
+            NetworkStatusView(
+                quality: manager.networkQuality,
+                latencyMs: manager.diagnostics.latencyMs,
+                packetLossPercent: manager.diagnostics.packetLossPercent
+            )
+            PiPOverlayView(
+                isEnabled: manager.isPiPEnabled,
+                isActive: manager.isPiPActive,
+                onToggle: { manager.setPiPEnabled($0) }
+            )
+            BackgroundEffectsView(
+                selectedEffect: manager.backgroundEffect,
+                onSelectEffect: { manager.setBackgroundEffect($0) }
+            )
+            ReactionsOverlayView(
+                reactions: manager.reactions,
+                onSendReaction: { manager.sendReaction($0) }
+            )
+            HandRaiseView(
+                participants: manager.participants,
+                localParticipantID: manager.localParticipantID,
+                canManageOthers: manager.canAccessAdminControls,
+                onToggleLocalHand: { manager.toggleRaiseHand() },
+                onLowerHand: { manager.setHandRaised(participantID: $0, raised: false) }
+            )
+            LiveCaptionsView(
+                isEnabled: manager.isCaptionsEnabled,
+                captions: manager.captions,
+                onToggleVisibility: { manager.setCaptionsEnabled($0) }
+            )
+            if !manager.cpuWarnings.isEmpty {
+                PerformanceWarningView(warnings: manager.cpuWarnings, onDismiss: manager.dismissCPUWarning)
+            }
             MeetingStateView(manager: manager)
             MeetingDiagnosticsView(diagnostics: manager.diagnostics)
         }
@@ -56,7 +94,8 @@ struct MeetingContainerView: View {
                     messages: manager.messages,
                     isChatEnabled: manager.isChatEnabled || manager.canAccessAdminControls,
                     onAddThread: { manager.addThread(named: $0) },
-                    onSendMessage: { text, threadID in manager.sendMessage(text, threadId: threadID) }
+                    onSendMessage: { text, threadID in manager.sendMessage(text, threadId: threadID) },
+                    onReactToMessage: { messageID, emoji in manager.reactToMessage(messageID: messageID, emoji: emoji) }
                 )
             }
             .presentationDetents([.medium, .large])
@@ -72,6 +111,9 @@ struct MeetingContainerView: View {
                     canManageParticipant: { participant in
                         guard manager.canAccessAdminControls, let localParticipantID = manager.localParticipantID else { return false }
                         return participant.id != localParticipantID
+                    },
+                    onToggleParticipantHand: { participantID in
+                        manager.setHandRaised(participantID: participantID, raised: false)
                     }
                 )
                 .navigationTitle("Participants")

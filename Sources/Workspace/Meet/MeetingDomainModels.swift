@@ -40,6 +40,13 @@ struct MeetingParticipant: Identifiable, Equatable {
     var isScreenSharing: Bool
     var role: MeetingParticipantRole
     var breakoutRoomID: String?
+    var isHandRaised: Bool
+    var networkQuality: MeetingNetworkQuality
+}
+
+enum MeetingMessageDeliveryState: String, Equatable {
+    case sent
+    case delivered
 }
 
 struct MeetingMessage: Identifiable, Equatable {
@@ -49,6 +56,8 @@ struct MeetingMessage: Identifiable, Equatable {
     let text: String
     let sentAt: Date
     let isSystem: Bool
+    var deliveryState: MeetingMessageDeliveryState
+    var reactions: [String: Int]
 }
 
 struct MeetingChatThread: Identifiable, Equatable {
@@ -117,6 +126,64 @@ struct MeetingDiagnosticsState {
     var networkQuality = "Unknown"
     var latencyMs: Int = 0
     var packetLossPercent: Double = 0
+}
+
+enum MeetingNetworkQuality: Int, CaseIterable, Codable, Equatable {
+    case poor = 1
+    case fair = 2
+    case good = 3
+    case excellent = 4
+
+    var label: String {
+        switch self {
+        case .poor: return "Poor"
+        case .fair: return "Fair"
+        case .good: return "Good"
+        case .excellent: return "Excellent"
+        }
+    }
+}
+
+enum MeetingBackgroundEffect: String, CaseIterable, Codable, Equatable, Identifiable {
+    case off
+    case blur
+    case studio
+    case office
+    case beach
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .off: return "Off"
+        case .blur: return "Blur"
+        case .studio: return "Studio"
+        case .office: return "Office"
+        case .beach: return "Beach"
+        }
+    }
+}
+
+struct MeetingCaptionLine: Identifiable, Equatable {
+    let id: String
+    let speaker: String
+    let text: String
+    let timestamp: Date
+}
+
+struct MeetingReactionEvent: Identifiable, Equatable {
+    let id: String
+    let participantID: String
+    let participantName: String
+    let emoji: String
+    let createdAt: Date
+}
+
+struct MeetingCPUWarning: Identifiable, Equatable {
+    let id: String
+    let message: String
+    let suggestedAction: String
+    let createdAt: Date
 }
 
 enum MeetingAdminAction: Equatable {
