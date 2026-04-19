@@ -347,6 +347,10 @@ struct DraftingEmailsView: View {
         [.height(320), .medium]
     }
 
+    private var canApplyGenerated: Bool {
+        !generatedBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -392,22 +396,35 @@ struct DraftingEmailsView: View {
                     generatedOutputCard
                 }
                 .padding(.horizontal)
-                .padding(.vertical, 14)
+                .padding(.top, 14)
+                .padding(.bottom, 96)
             }
             .scrollIndicators(.hidden)
             .background(
                 LinearGradient(
-                    colors: [Color(.systemGroupedBackground), Color(.secondarySystemGroupedBackground)],
+                    colors: [Color(.systemGroupedBackground), Color(.secondarySystemGroupedBackground), Color(.tertiarySystemGroupedBackground)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
                 .ignoresSafeArea()
             )
-            .navigationTitle("AI Writing Assistant")
+            .safeAreaInset(edge: .bottom) {
+                bottomActionBar
+            }
+            .navigationTitle("Draft Assistant")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Close") { dismiss() }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button("Reset Workspace", role: .destructive) {
+                            resetWorkspace()
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -780,6 +797,39 @@ struct DraftingEmailsView: View {
         .background(cardBackground)
     }
 
+    private var bottomActionBar: some View {
+        HStack(spacing: 10) {
+            Button {
+                generateDraft()
+            } label: {
+                Label("Generate", systemImage: "sparkles")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .disabled(isGenerating || activeTool != nil)
+
+            Button {
+                onApply(
+                    DraftingEmailResult(
+                        recipient: recipient,
+                        subject: subject,
+                        body: generatedBody
+                    )
+                )
+                dismiss()
+            } label: {
+                Label("Apply Draft", systemImage: "checkmark.circle.fill")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(!canApplyGenerated)
+        }
+        .padding(.horizontal)
+        .padding(.top, 10)
+        .padding(.bottom, 14)
+        .background(.ultraThinMaterial)
+    }
+
     private var toneChipGrid: some View {
         let columns = [GridItem(.adaptive(minimum: 110), spacing: 8)]
         return LazyVGrid(columns: columns, spacing: 8) {
@@ -1115,5 +1165,29 @@ struct DraftingEmailsView: View {
                 }
             }
         }
+    }
+
+    private func resetWorkspace() {
+        recipient = ""
+        subject = ""
+        emailType = .business
+        baseTone = .professional
+        lengthSliderValue = 1
+        priority = .medium
+        intent = .inform
+        audience = .internalTeam
+        emotionalTones = []
+        description = ""
+        backgroundInfo = ""
+        keywords = ""
+        wordLimit = ""
+        requiredPhrases = ""
+        formattingStyle = .hybrid
+        ctaType = .reply
+        ctaText = CTAType.reply.suggestion
+        generatedBody = ""
+        generatedVariants = []
+        draftExplanation = ""
+        errorMessage = nil
     }
 }

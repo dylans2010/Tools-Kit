@@ -188,6 +188,11 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
     }
 
     private func localConfigValue(forKey key: String) -> String? {
+        if let value = Bundle.main.object(forInfoDictionaryKey: key) as? String {
+            let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !trimmed.isEmpty { return trimmed }
+        }
+
         guard
             let url = Bundle.main.url(forResource: "Config", withExtension: "plist"),
             let data = try? Data(contentsOf: url),
@@ -236,22 +241,57 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
                 return [:]
             }
-
-            if let direct = try? JSONDecoder().decode([String: String].self, from: data) {
-                return direct
-            }
-
-            if
-                let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                let payload = object["data"] as? [String: String]
-            {
-                return payload
-            }
-
-            return [:]
+            return decodeRemoteVariables(from: data)
         } catch {
             return [:]
         }
+    }
+
+    private func decodeRemoteVariables(from data: Data) -> [String: String] {
+        if let direct = try? JSONDecoder().decode([String: String].self, from: data) {
+            return direct
+                .mapValues { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.value.isEmpty }
+        }
+
+        guard let object = try? JSONSerialization.jsonObject(with: data) else {
+            return [:]
+        }
+
+        var values: [String: String] = [:]
+        collectRemoteVariables(from: object, into: &values, parentKey: nil)
+        return values
+            .mapValues { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.value.isEmpty }
+    }
+
+    private func collectRemoteVariables(from object: Any, into output: inout [String: String], parentKey: String?) {
+        switch object {
+        case let dictionary as [String: Any]:
+            if let key = dictionary["key"] as? String, let value = dictionary["value"] as? String {
+                output[key] = value
+            }
+            if let parentKey, let value = dictionary["value"] as? String, looksLikeConfigKey(parentKey) {
+                output[parentKey] = value
+            }
+
+            for (key, value) in dictionary {
+                if let stringValue = value as? String, looksLikeConfigKey(key) {
+                    output[key] = stringValue
+                }
+                collectRemoteVariables(from: value, into: &output, parentKey: key)
+            }
+        case let array as [Any]:
+            for item in array {
+                collectRemoteVariables(from: item, into: &output, parentKey: parentKey)
+            }
+        default:
+            break
+        }
+    }
+
+    private func looksLikeConfigKey(_ key: String) -> Bool {
+        key == key.uppercased() && key.contains("_")
     }
 
     private func validateRedirectURI(_ redirectURI: String) throws {
