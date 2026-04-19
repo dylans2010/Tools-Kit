@@ -202,7 +202,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         } catch {
             phase = .failed
             errorMessage = error.localizedDescription
-            DebugLogger.shared.log("Failed to start Daily session. \(fullErrorDetails(error as Error))", level: .error, category: "Meet")
+            DebugLogger.shared.log("Failed to start Daily session. \(fullErrorDetails(error as! Error))", level: .error, category: "Meet")
             await refreshDebugSnapshot()
         }
     }
@@ -403,7 +403,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
             try await callClient.stopRemoteParticipantsAudioLevelObserver()
             try await callClient.leave()
         } catch {
-            DebugLogger.shared.log("Daily leave failed during \(reason). \(fullErrorDetails(error as Error))", level: .warning, category: "Meet")
+            DebugLogger.shared.log("Daily leave failed during \(reason). \(fullErrorDetails(error as! Error))", level: .warning, category: "Meet")
         }
         #endif
     }
@@ -423,7 +423,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
             DebugLogger.shared.log("Daily join success meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId)", level: .info, category: "Meet")
             refreshParticipantsFromDaily()
         } catch {
-            DebugLogger.shared.log("Daily join failed meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId). \(fullErrorDetails(error as Error))", level: .error, category: "Meet")
+            DebugLogger.shared.log("Daily join failed meeting=\(session.meetingId) session=\(session.sessionId) trace=\(session.debugTraceId). \(fullErrorDetails(error as! Error))", level: .error, category: "Meet")
             throw error
         }
         #else
@@ -671,7 +671,7 @@ extension MeetingStateManager: CallClientDelegate {
     nonisolated func callClient(_ callClient: CallClient, error: CallClientError) {
         Task { @MainActor in
             errorMessage = error.localizedDescription
-            DebugLogger.shared.log("Daily delegate error payload: \(fullErrorDetails(error as Error))", level: .error, category: "Meet")
+            DebugLogger.shared.log("Daily delegate error payload: \(fullErrorDetails(error as! Error))", level: .error, category: "Meet")
         }
     }
 }
