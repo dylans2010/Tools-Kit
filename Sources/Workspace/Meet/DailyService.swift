@@ -350,7 +350,15 @@ actor DailyService {
     private func roomAccessCredentials(from room: RoomResponse) async throws -> RoomAccessCredentials {
         let baseURL = try await validatedRoomURL(from: room.url, roomName: room.name)
         let roomPrivacy = room.privacy?.lowercased()
-        let requiresMeetingToken = roomPrivacy != "public"
+        let requiresMeetingToken: Bool
+        if let roomPrivacy {
+            requiresMeetingToken = roomPrivacy != "public"
+        } else {
+            // Daily rooms should always include privacy. If it is absent, default to secure
+            // behavior by requiring a token rather than assuming guest/public access.
+            requiresMeetingToken = true
+            await log("Room privacy missing for \(room.name); defaulting to token-required join.", level: .warning)
+        }
         let token = requiresMeetingToken ? try await createMeetingToken(for: room.name) : nil
         if requiresMeetingToken, (token?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true) {
             throw ServiceError.invalidResponse

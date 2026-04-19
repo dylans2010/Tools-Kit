@@ -685,9 +685,6 @@ final class MeetingStateManager: NSObject, ObservableObject {
             return "You are not authorized to join this meeting. Ask the host for a valid invite."
         }
         let combined = "\(error.localizedDescription.lowercased()) \(String(reflecting: error).lowercased()) \(nsError.domain.lowercased())"
-        if combined.contains("unauthorized") || combined.contains("not authorized") || combined.contains("roomlookup") {
-            return "You are not authorized to join this meeting. Ask the host for a valid invite."
-        }
         if combined.contains("token") || combined.contains("credential") {
             return "Unable to verify meeting access. Please refresh your invite and try again."
         }
