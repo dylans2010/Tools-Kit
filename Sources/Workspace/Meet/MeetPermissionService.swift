@@ -5,7 +5,7 @@ struct MeetPermissionService {
     static func availableAudioDevices() -> [String] {
         let session = AVAudioSession.sharedInstance()
         let routeNames = session.availableInputs?.compactMap(\.portName) ?? []
-        let unique = Array(Set(routeNames)).sorted()
+        let unique = Set(routeNames).sorted()
         return unique.isEmpty ? ["System Default"] : unique
     }
 
@@ -16,7 +16,7 @@ struct MeetPermissionService {
             position: .unspecified
         )
         let names = discovery.devices.map(\.localizedName)
-        let unique = Array(Set(names)).sorted()
+        let unique = Set(names).sorted()
         return unique.isEmpty ? ["System Default"] : unique
     }
 

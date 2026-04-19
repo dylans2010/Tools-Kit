@@ -26,6 +26,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     @Published var participants: [MeetingParticipant] = []
     @Published var participantVideoTracks: [String: MeetingVideoTrack] = [:]
     @Published var localParticipantID: String?
+    @Published var localParticipantDisplayName = ""
     @Published var chatThreads: [MeetingChatThread] = [MeetingChatThread(id: "general", title: "General")]
     @Published var messages: [MeetingMessage] = []
     @Published var scheduledMeetings: [ScheduledMeeting] = []
@@ -192,6 +193,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         breakoutRooms = []
         participantRoles = [:]
         localParticipantID = nil
+        localParticipantDisplayName = ""
         await refreshDebugSnapshot()
     }
 
@@ -219,7 +221,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
         guard let localParticipantID else { return }
         guard phase == .inMeeting else { return }
 
-        let senderName = participants.first(where: { $0.id == localParticipantID })?.displayName ?? localParticipantID
+        let senderName = participants.first(where: { $0.id == localParticipantID })?.displayName
+            ?? (localParticipantDisplayName.isEmpty ? localParticipantID : localParticipantDisplayName)
         messages.append(
             MeetingMessage(
                 id: UUID().uuidString,
@@ -350,13 +353,14 @@ final class MeetingStateManager: NSObject, ObservableObject {
         meetingIdInput = session.meetingId
         phase = .lobby
         summary = MeetingSummaryState()
-        diagnostics = MeetingDiagnosticsState(connectionState: "Connecting", networkQuality: "Unknown", latencyMs: 0, packetLossPercent: 0)
+        diagnostics = MeetingDiagnosticsState()
         participants = []
         participantVideoTracks = [:]
         breakoutRooms = []
         messages = []
         participantRoles = [:]
         localParticipantID = nil
+        localParticipantDisplayName = ""
         await refreshDebugSnapshot()
     }
 
@@ -412,7 +416,6 @@ final class MeetingStateManager: NSObject, ObservableObject {
         onFailure()
     }
     #endif
-    }
 
     private func leaveDailyRoom() async {
         #if canImport(Daily)
@@ -459,19 +462,24 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private func refreshParticipantsFromDaily() {
         guard let callClient else { return }
 
-        let allParticipants = callClient.participants.all.values.sorted {
-            participantDisplayName($0).localizedCaseInsensitiveCompare(participantDisplayName($1)) == .orderedAscending
+        let allParticipants = callClient.participants.all.values
+        let participantsWithNames = allParticipants.map { (participant: $0, displayName: participantDisplayName($0)) }
+        let sortedParticipantsWithNames = participantsWithNames.sorted {
+            $0.displayName.localizedCaseInsensitiveCompare($1.displayName) == .orderedAscending
         }
+        let sortedParticipants = sortedParticipantsWithNames.map(\.participant)
 
-        participantVideoTracks = Dictionary(uniqueKeysWithValues: allParticipants.compactMap { participant in
+        participantVideoTracks = Dictionary(uniqueKeysWithValues: sortedParticipants.compactMap { participant in
             guard let track = participant.media?.camera.track else { return nil }
             return (participantIDString(participant), track)
         })
 
-        let currentLocalParticipantID = allParticipants.first(where: { $0.info.isLocal }).map { participantIDString($0) }
+        let currentLocalParticipant = sortedParticipants.first(where: { $0.info.isLocal })
+        let currentLocalParticipantID = currentLocalParticipant.map { participantIDString($0) }
         localParticipantID = currentLocalParticipantID
+        localParticipantDisplayName = currentLocalParticipant.map(participantDisplayName) ?? ""
 
-        participants = allParticipants.map { participant in
+        participants = sortedParticipants.map { participant in
             let participantID = participantIDString(participant)
             let isLocal = participant.info.isLocal
             let role = participantRoles[participantID] ?? (isLocal ? .host : .participant)
