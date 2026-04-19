@@ -47,7 +47,7 @@ struct InboxView: View {
                 Button {
                     showingManageAccounts = true
                 } label: {
-                    Image(systemName: "person.crop.circle.badge.gearshape")
+                    Image(systemName: "person.2.crop.square.stack")
                 }
 
                 Button {
@@ -63,7 +63,8 @@ struct InboxView: View {
             }
         }
         .sheet(isPresented: $showingManageAccounts) {
-            ManageAccountsView {
+            ManageAccountsView { selected in
+                mailStore.setActiveAccount(selected.id)
                 Task {
                     await viewModel.loadCachedThenRefreshIfNeeded()
                 }

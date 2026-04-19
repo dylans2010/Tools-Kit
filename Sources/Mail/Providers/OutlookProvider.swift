@@ -12,8 +12,9 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     private var nextLinksByPage: [Int: String] = [:]
 
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
-        let clientID = try oauthValue(key: "MICROSOFT_OAUTH_CLIENT_ID")
-        let redirectURI = try oauthValue(key: "MICROSOFT_OAUTH_REDIRECT_URI")
+        let remoteVariables = await fetchRemoteVariables()
+        let clientID = try oauthValue(primaryKey: "MICROSOFT_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
+        let redirectURI = try oauthValue(primaryKey: "MICROSOFT_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
 
         let verifier = randomCodeVerifier()
         let challenge = codeChallenge(from: verifier)
@@ -151,12 +152,85 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor { ASPresentationAnchor() }
 
-    private func oauthValue(key: String) throws -> String {
-        guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String,
-              !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing \(key)"])
+    private func oauthValue(primaryKey: String, remoteVariables: [String: String] = [:]) throws -> String {
+        if let value = localConfigValue(forKey: primaryKey) {
+            return value
         }
-        return value
+        if let value = infoPlistValue(forKey: primaryKey) {
+            return value
+        }
+        if let value = remoteConfigValue(forKey: primaryKey, remoteVariables: remoteVariables) {
+            return value
+        }
+
+        throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing \(primaryKey)"])
+    }
+
+    private func localConfigValue(forKey key: String) -> String? {
+        guard
+            let url = Bundle.main.url(forResource: "Config", withExtension: "plist"),
+            let data = try? Data(contentsOf: url),
+            let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
+            let value = plist[key] as? String
+        else {
+            return nil
+        }
+
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    private func infoPlistValue(forKey key: String) -> String? {
+        guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String else {
+            return nil
+        }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    private func remoteConfigValue(forKey key: String, remoteVariables: [String: String]) -> String? {
+        guard let value = remoteVariables[key] else { return nil }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    private func fetchRemoteVariables() async -> [String: String] {
+        guard
+            let rawURL = localConfigValue(forKey: "APPWRITE_MAIL_CONFIG_URL"),
+            let url = URL(string: rawURL)
+        else {
+            return [:]
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        if let bearer = localConfigValue(forKey: "APPWRITE_MAIL_CONFIG_BEARER") {
+            request.setValue("Bearer \(bearer)", forHTTPHeaderField: "Authorization")
+        }
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+                return [:]
+            }
+
+            if let direct = try? JSONDecoder().decode([String: String].self, from: data) {
+                return direct
+            }
+
+            if
+                let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                let payload = object["data"] as? [String: String]
+            {
+                return payload
+            }
+
+            return [:]
+        } catch {
+            return [:]
+        }
     }
 
     private func startOAuth(url: URL, callbackScheme: String?) async throws -> URL {
