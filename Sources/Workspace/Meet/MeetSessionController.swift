@@ -179,7 +179,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
             await transitionToLobby(session)
         } catch {
             phase = .failed
-            errorMessage = userFacingJoinErrorMessage(for: error)
+            errorMessage = userFacingJoinErrorMessage(for: error as Error)
             DebugLogger.shared.log("Join failed: \(fullErrorDetails(error))", level: .error, category: "Meet")
         }
     }
@@ -284,7 +284,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
             await refreshDebugSnapshot()
         } catch {
             phase = .failed
-            errorMessage = userFacingJoinErrorMessage(for: error)
+            errorMessage = userFacingJoinErrorMessage(for: error as Error)
             DebugLogger.shared.log("Failed to start Daily session. \(fullErrorDetails(error))", level: .error, category: "Meet")
             await refreshDebugSnapshot()
         }
@@ -850,7 +850,7 @@ extension MeetingStateManager: CallClientDelegate {
         Task { @MainActor in
             guard !(await isStaleCallback(callClient: callClient)) else { return }
             DebugLogger.shared.log("Daily delegate error callback received.", level: .error, category: "Meet")
-            errorMessage = userFacingJoinErrorMessage(for: error)
+            errorMessage = userFacingJoinErrorMessage(for: error as Error)
             DebugLogger.shared.log("Daily delegate error payload: \(fullErrorDetails(error))", level: .error, category: "Meet")
         }
     }
