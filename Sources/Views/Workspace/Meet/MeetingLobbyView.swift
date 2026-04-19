@@ -32,10 +32,19 @@ struct MeetingLobbyView: View {
                 Button {
                     Task { await manager.startMeeting() }
                 } label: {
-                    Label("Join Now", systemImage: "arrow.right.circle.fill")
+                    if manager.isJoining {
+                        ProgressView()
+                    } else {
+                        Label("Join Now", systemImage: "arrow.right.circle.fill")
+                    }
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(manager.lobbyState.isCheckingDevices || manager.lobbyState.isLoadingParticipants)
+                .disabled(
+                    manager.isJoining ||
+                    manager.isBusy ||
+                    manager.lobbyState.isCheckingDevices ||
+                    manager.lobbyState.isLoadingParticipants
+                )
             }
         }
         .listStyle(.insetGrouped)

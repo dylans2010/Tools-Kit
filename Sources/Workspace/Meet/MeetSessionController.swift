@@ -31,6 +31,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     @Published var currentSession: MeetingSession?
     @Published var phase: MeetSessionPhase = .idle
     @Published var isBusy = false
+    @Published private(set) var isJoining = false
     @Published var errorMessage: String?
 
     @Published var isMicrophoneMuted = false
@@ -56,6 +57,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private let permissionService = MeetPermissionService()
     private var participantRoles: [String: MeetingParticipantRole] = [:]
     private var activeSpeakerID: String?
+    private var activeStartedSession: MeetingSession?
 
     #if canImport(Daily)
     private var callClient: CallClient?
@@ -107,9 +109,30 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     func createMeeting() async {
+        await createMeeting(scheduleForLater: false, scheduledAt: Date())
+    }
+
+    func createMeeting(scheduleForLater: Bool, scheduledAt: Date) async {
         let trimmedName = meetingNameInput.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedName.isEmpty else {
             errorMessage = "Meeting name is required."
+            return
+        }
+
+        if scheduleForLater {
+            scheduledMeetings.insert(
+                ScheduledMeeting(
+                    id: UUID().uuidString,
+                    name: trimmedName,
+                    meetingId: nil,
+                    scheduledAt: scheduledAt,
+                    activationState: .pending
+                ),
+                at: 0
+            )
+            errorMessage = nil
+            phase = .idle
+            DebugLogger.shared.log("Scheduled meeting saved for \(scheduledAt.formatted(date: .abbreviated, time: .shortened)) with deferred activation.", category: "Meet")
             return
         }
 
@@ -126,7 +149,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
                     id: UUID().uuidString,
                     name: trimmedName,
                     meetingId: session.meetingId,
-                    scheduledAt: Date()
+                    scheduledAt: Date(),
+                    activationState: .active
                 ),
                 at: 0
             )
@@ -156,7 +180,45 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     func joinScheduledMeeting(_ scheduled: ScheduledMeeting) async {
-        meetingIdInput = scheduled.meetingId
+        guard let index = scheduledMeetings.firstIndex(where: { $0.id == scheduled.id }) else {
+            errorMessage = "Unable to find the scheduled meeting."
+            return
+        }
+
+        var scheduledMeeting = scheduledMeetings[index]
+        let now = Date()
+        guard now >= scheduledMeeting.scheduledAt else {
+            errorMessage = "This meeting is scheduled for \(scheduledMeeting.scheduledAt.formatted(date: .abbreviated, time: .shortened)) and is not active yet."
+            return
+        }
+
+        if scheduledMeeting.activationState != .active || scheduledMeeting.meetingId == nil {
+            isBusy = true
+            errorMessage = nil
+            defer { isBusy = false }
+
+            do {
+                let session = try await resolver.createSession(with: nil)
+                scheduledMeeting.meetingId = session.meetingId
+                scheduledMeeting.activationState = .active
+                scheduledMeetings[index] = scheduledMeeting
+                meetingIdInput = session.meetingId
+                await transitionToLobby(session)
+                DebugLogger.shared.log("Scheduled meeting activated at join time. meetingId=\(session.meetingId)", category: "Meet")
+            } catch {
+                phase = .failed
+                errorMessage = error.localizedDescription
+                DebugLogger.shared.log("Scheduled activation failed: \(error.localizedDescription)", level: .error, category: "Meet")
+            }
+            return
+        }
+
+        guard let activeMeetingID = scheduledMeeting.meetingId else {
+            errorMessage = "Scheduled meeting is not active yet."
+            return
+        }
+
+        meetingIdInput = activeMeetingID
         await joinMeeting()
     }
 
@@ -176,7 +238,16 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     func startMeeting() async {
+        guard !isJoining else { return }
         guard let currentSession else { return }
+        guard !lobbyState.isCheckingDevices, !lobbyState.isLoadingParticipants else {
+            errorMessage = "Please wait for lobby checks to complete before joining."
+            return
+        }
+        guard lobbyState.microphonePermission != .denied, lobbyState.cameraPermission != .denied else {
+            errorMessage = "Microphone and camera permissions are required to join."
+            return
+        }
         guard let roomURL = await resolver.internalRoomURL(for: currentSession) else {
             errorMessage = "Meeting session is missing a Daily room URL."
             phase = .failed
@@ -189,9 +260,13 @@ final class MeetingStateManager: NSObject, ObservableObject {
             return
         }
 
+        isJoining = true
         isBusy = true
         errorMessage = nil
-        defer { isBusy = false }
+        defer {
+            isBusy = false
+            isJoining = false
+        }
 
         do {
             await leaveDailyRoom(reason: "pre-join reset")
@@ -210,8 +285,14 @@ final class MeetingStateManager: NSObject, ObservableObject {
     func leaveMeeting() async {
         guard let currentSession else { return }
         await leaveDailyRoom(reason: "user leave")
-        await resolver.endSession(currentSession)
+        if let activeStartedSession {
+            await resolver.endSession(activeStartedSession)
+            self.activeStartedSession = nil
+        } else {
+            await resolver.endSession(currentSession)
+        }
         phase = .ended
+        self.currentSession = nil
         resetMeetingRuntimeStateForJoin()
         await refreshDebugSnapshot()
     }
@@ -251,11 +332,6 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
     func setVideoQuality(_ quality: MeetingQualitySetting) {
         settings.qualitySetting = quality
-    }
-
-    func updateDeveloperAPIKey(_ value: String) async {
-        await resolver.updateDeveloperAPIKey(value)
-        await refreshDebugSnapshot()
     }
 
     func refreshDebugSnapshot() async {
@@ -319,6 +395,11 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     private func transitionToLobby(_ session: MeetingSession) async {
+        await leaveDailyRoom(reason: "transition to lobby reset")
+        if let activeStartedSession {
+            await resolver.endSession(activeStartedSession)
+            self.activeStartedSession = nil
+        }
         currentSession = session
         meetingIdInput = session.meetingId
         phase = .lobby
@@ -541,12 +622,20 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     private func beginAndJoinSession(_ session: MeetingSession, roomURL: URL) async throws {
+        if let activeStartedSession, activeStartedSession.sessionId != session.sessionId {
+            await resolver.endSession(activeStartedSession)
+            self.activeStartedSession = nil
+        }
         await resolver.beginSession(session)
+        activeStartedSession = session
         do {
             try await joinDailyRoom(url: roomURL, session: session)
         } catch {
             await leaveDailyRoom(reason: "join failure cleanup")
             await resolver.endSession(session)
+            if activeStartedSession?.sessionId == session.sessionId {
+                activeStartedSession = nil
+            }
             throw error
         }
     }
@@ -607,8 +696,16 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
 #if canImport(Daily)
 extension MeetingStateManager: CallClientDelegate {
+    nonisolated private func isStaleCallback(callClient: CallClient) async -> Bool {
+        await MainActor.run {
+            guard let current = self.callClient else { return true }
+            return current !== callClient
+        }
+    }
+
     nonisolated func callClient(_ callClient: CallClient, callStateUpdated state: CallState) {
         Task { @MainActor in
+            guard !(await isStaleCallback(callClient: callClient)) else { return }
             let stateDescription = String(describing: state)
             diagnostics.connectionState = stateDescription
             let normalized = stateDescription.lowercased()
@@ -630,6 +727,7 @@ extension MeetingStateManager: CallClientDelegate {
 
     nonisolated func callClient(_ callClient: CallClient, participantJoined participant: Participant) {
         Task { @MainActor in
+            guard !(await isStaleCallback(callClient: callClient)) else { return }
             appendSystemMessage("\(participantDisplayName(participant)) joined.")
             refreshParticipantsFromDaily()
         }
@@ -637,6 +735,7 @@ extension MeetingStateManager: CallClientDelegate {
 
     nonisolated func callClient(_ callClient: CallClient, participantLeft participant: Participant, withReason reason: ParticipantLeftReason) {
         Task { @MainActor in
+            guard !(await isStaleCallback(callClient: callClient)) else { return }
             let participantID = participantIDString(participant)
             participantVideoTracks.removeValue(forKey: participantID)
             if activeSpeakerID == participantID {
@@ -649,12 +748,14 @@ extension MeetingStateManager: CallClientDelegate {
 
     nonisolated func callClient(_ callClient: CallClient, participantUpdated participant: Participant) {
         Task { @MainActor in
+            guard !(await isStaleCallback(callClient: callClient)) else { return }
             refreshParticipantsFromDaily()
         }
     }
 
     nonisolated func callClient(_ callClient: CallClient, activeSpeakerChanged activeSpeaker: Participant?) {
         Task { @MainActor in
+            guard !(await isStaleCallback(callClient: callClient)) else { return }
             activeSpeakerID = activeSpeaker.map { participantIDString($0) }
             refreshParticipantsFromDaily()
         }
@@ -662,6 +763,7 @@ extension MeetingStateManager: CallClientDelegate {
 
     nonisolated func callClient(_ callClient: CallClient, inputsUpdated inputs: InputSettings) {
         Task { @MainActor in
+            guard !(await isStaleCallback(callClient: callClient)) else { return }
             isCameraEnabled = inputs.camera.isEnabled
             isMicrophoneMuted = !inputs.microphone.isEnabled
             refreshParticipantsFromDaily()
@@ -670,6 +772,7 @@ extension MeetingStateManager: CallClientDelegate {
 
     nonisolated func callClient(_ callClient: CallClient, error: CallClientError) {
         Task { @MainActor in
+            guard !(await isStaleCallback(callClient: callClient)) else { return }
             errorMessage = error.localizedDescription
             DebugLogger.shared.log("Daily delegate error payload: \(fullErrorDetails(error as! Error))", level: .error, category: "Meet")
         }

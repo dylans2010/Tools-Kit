@@ -48,10 +48,6 @@ actor MeetingResolver {
         await dailyService.internalRoomURL(for: session)
     }
 
-    func updateDeveloperAPIKey(_ value: String) async {
-        await dailyService.setDeveloperAPIKey(value)
-    }
-
     func fetchDebugSnapshot() async -> DailyDebugSnapshot {
         await dailyService.debugSnapshot()
     }

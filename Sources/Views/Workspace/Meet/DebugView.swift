@@ -3,15 +3,12 @@ import SwiftUI
 struct DebugView: View {
     @StateObject private var manager = MeetingStateManager.shared
     @StateObject private var logger = DebugLogger.shared
-    @AppStorage("meet.debug.apiKey") private var persistedAPIKey = ""
+    @AppStorage("daily_api_key") private var persistedAPIKey = ""
 
     var body: some View {
         Form {
             Section("Daily API Key") {
                 SecureField("Daily API key", text: $persistedAPIKey)
-                Button("Apply") {
-                    Task { await manager.updateDeveloperAPIKey(persistedAPIKey) }
-                }
             }
 
             Section("Session Traces") {
@@ -56,7 +53,6 @@ struct DebugView: View {
         }
         .navigationTitle("Meet Debug Console")
         .task {
-            await manager.updateDeveloperAPIKey(persistedAPIKey)
             await manager.refreshDebugSnapshot()
         }
     }

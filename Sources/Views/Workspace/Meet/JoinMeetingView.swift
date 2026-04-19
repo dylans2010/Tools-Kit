@@ -40,17 +40,27 @@ struct JoinMeetingView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             Text(scheduled.name)
                                 .font(.headline)
-                            Text("ID: \(scheduled.meetingId)")
-                                .font(.caption.monospaced())
-                                .foregroundStyle(.secondary)
+                            if let meetingId = scheduled.meetingId {
+                                Text("ID: \(meetingId)")
+                                    .font(.caption.monospaced())
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Text("ID: Pending activation")
+                                    .font(.caption.monospaced())
+                                    .foregroundStyle(.secondary)
+                            }
                             Text(scheduled.scheduledAt, style: .time)
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
+                            Text(scheduled.activationState == .active ? "Active" : "Scheduled")
+                                .font(.caption2)
+                                .foregroundStyle(scheduled.activationState == .active ? .green : .orange)
 
                             Button("Join This Meeting") {
                                 Task { await manager.joinScheduledMeeting(scheduled) }
                             }
                             .buttonStyle(.bordered)
+                            .disabled(manager.isBusy || (scheduled.activationState != .active && Date() < scheduled.scheduledAt))
                         }
                         .padding(.vertical, 4)
                     }
