@@ -10,6 +10,7 @@ final class MeetingVideoTrack {}
 
 @MainActor
 final class MeetingStateManager: NSObject, ObservableObject {
+    private static let minimumOpaqueMeetingTokenLength = 24
     static let shared = MeetingStateManager()
     private static let sensitiveQueryParameterNames: Set<String> = [
         "t", "token", "access_token", "refresh_token", "session", "session_token",
@@ -651,9 +652,11 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
     private func isLikelyValidMeetingToken(_ token: String) -> Bool {
         let trimmed = token.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty, !trimmed.contains(where: { $0.isWhitespace }) else { return false }
+        guard !trimmed.isEmpty else { return false }
+        // Daily meeting tokens are typically JWTs; allow non-JWT opaque tokens with a minimum length.
+        guard !trimmed.contains(where: { $0.isWhitespace }) else { return false }
         let jwtSegments = trimmed.split(separator: ".")
-        return jwtSegments.count == 3 || trimmed.count >= 24
+        return jwtSegments.count == 3 || trimmed.count >= Self.minimumOpaqueMeetingTokenLength
     }
 
     private func userFacingJoinErrorMessage(for error: Error) -> String {
