@@ -11,9 +11,13 @@ final class MeetingVideoTrack {}
 @MainActor
 final class MeetingStateManager: NSObject, ObservableObject {
     static let shared = MeetingStateManager()
-    private static let sensitiveQueryParameterNames: Set<String> = ["t", "token", "auth", "authorization", "password", "secret", "api_key", "apikey", "key", "bearer"]
-    private static let sensitiveUserInfoKeyFragments = ["token", "authorization", "password", "secret", "apikey", "api_key", "key", "credential", "cookie", "bearer"]
-    private static let sensitiveURLValuePattern = #"(?i)([?&](?:t|token|auth|authorization|password|secret|api_key|apikey|key|bearer)=)[^&\s]+"#
+    private static let sensitiveTerms = ["t", "token", "auth", "authorization", "password", "secret", "api_key", "apikey", "key", "bearer"]
+    private static let sensitiveQueryParameterNames: Set<String> = Set(sensitiveTerms)
+    private static let sensitiveUserInfoKeyFragments = Array(Set(sensitiveTerms + ["credential", "cookie"]))
+    private static let sensitiveURLValuePattern: String = {
+        let escaped = sensitiveTerms.map(NSRegularExpression.escapedPattern(for:))
+        return "(?i)([?&](?:\(escaped.joined(separator: "|")))=)[^&\\s]+"
+    }()
 
     @Published var meetingIdInput = ""
     @Published var meetingNameInput = ""
@@ -525,7 +529,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
         // Daily secured room URLs are expected to include the query parameter named by
         // DailyService.dailyTokenParameterName ("t") and a non-empty value.
-        return components.queryItems?.contains(where: { $0.name == DailyService.dailyTokenParameterName && !($0.value ?? "").isEmpty }) ?? false
+        return components.queryItems?.contains(where: { $0.name == DailyService.dailyTokenParameterName && $0.value?.isEmpty == false }) ?? false
     }
 
     private func fullErrorDetails(_ error: Error) -> String {
