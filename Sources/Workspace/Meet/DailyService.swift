@@ -10,6 +10,7 @@ actor DailyService {
     enum ServiceError: LocalizedError {
         case invalidMeetingID
         case missingAPIKey
+        case missingRequiredToken
         case notFound
         case invalidResponse
         case requestFailed(statusCode: Int, message: String?)
@@ -21,6 +22,8 @@ actor DailyService {
                 return "Invalid meeting ID."
             case .missingAPIKey:
                 return "Daily API key is required."
+            case .missingRequiredToken:
+                return "A valid meeting token is required to join this room."
             case .notFound:
                 return "Meeting ID was not found."
             case .invalidResponse:
@@ -361,7 +364,7 @@ actor DailyService {
         }
         let token = requiresMeetingToken ? try await createMeetingToken(for: room.name) : nil
         if requiresMeetingToken, (token?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true) {
-            throw ServiceError.invalidResponse
+            throw ServiceError.missingRequiredToken
         }
         guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
             throw ServiceError.invalidResponse

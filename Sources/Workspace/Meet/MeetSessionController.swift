@@ -664,6 +664,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
                 return "This meeting could not be found."
             case .missingAPIKey:
                 return "Meeting service configuration is incomplete. Please contact support."
+            case .missingRequiredToken:
+                return "You are not authorized to join this meeting. A valid join token is required."
             case let .requestFailed(statusCode, _):
                 if statusCode == 401 || statusCode == 403 {
                     return "You are not authorized to join this meeting. Ask the host for a valid invite."
@@ -684,11 +686,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         if nsError.code == 401 || nsError.code == 403 {
             return "You are not authorized to join this meeting. Ask the host for a valid invite."
         }
-        let combined = "\(error.localizedDescription.lowercased()) \(String(reflecting: error).lowercased()) \(nsError.domain.lowercased())"
-        if combined.contains("token") || combined.contains("credential") {
-            return "Unable to verify meeting access. Please refresh your invite and try again."
-        }
-        if combined.contains("not found") {
+        if nsError.code == 404 {
             return "This meeting could not be found."
         }
         return "Unable to join the meeting right now. Please try again."
