@@ -804,16 +804,19 @@ final class MeetingStateManager: NSObject, ObservableObject {
             }
         }
 
-        let hasMappedInputs = !mappedInputs.isEmpty
-        let supportedInputsApplied = hasMappedInputs ? await setInputEnabled(mappedInputs) : false
+        let supportedInputsApplied = mappedInputs.isEmpty ? false : await setInputEnabled(mappedInputs)
         let hasUnsupportedInputs = !unsupportedInputs.isEmpty
         if hasUnsupportedInputs {
             let inputNames = unsupportedInputs.sorted().joined(separator: ", ")
-            errorMessage = "Unsupported media inputs requested: \(inputNames)."
-            DebugLogger.shared.log("Unsupported Daily media inputs requested: \(inputNames).", level: .warning, category: "Meet")
+            if supportedInputsApplied {
+                DebugLogger.shared.log("Unsupported Daily media inputs requested: \(inputNames).", level: .warning, category: "Meet")
+            } else {
+                errorMessage = "Unsupported media inputs requested: \(inputNames)."
+                DebugLogger.shared.log("Unsupported Daily media inputs requested: \(inputNames).", level: .warning, category: "Meet")
+            }
         }
 
-        return hasMappedInputs && supportedInputsApplied && !hasUnsupportedInputs
+        return supportedInputsApplied
     }
     #else
     @discardableResult
