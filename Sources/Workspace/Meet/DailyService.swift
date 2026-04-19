@@ -263,15 +263,19 @@ actor DailyService {
                 let token = try await createMeetingToken(for: room.name)
                 let trimmedToken = token.trimmingCharacters(in: .whitespacesAndNewlines)
                 if trimmedToken.isEmpty {
+                    // Keep session resolution successful but mark not joinable so UI can show a friendly
+                    // authorization error without attempting Daily join.
                     isJoinable = false
-                    await log("Meeting token generation returned an empty token for room \(room.name).", level: .error)
+                    await log("Meeting token generation returned an empty token for room \(room.name); session will be marked not joinable.", level: .error)
                 } else {
                     meetingToken = trimmedToken
                 }
             } catch let error as ServiceError {
                 if case let .requestFailed(statusCode, _) = error, statusCode == 401 || statusCode == 403 {
+                    // Convert authorization failures into non-joinable state so join is blocked in pre-validation,
+                    // while preserving resolver success and avoiding runtime join crashes.
                     isJoinable = false
-                    await log("Meeting token generation unauthorized for room \(room.name). status=\(statusCode)", level: .error)
+                    await log("Meeting token generation unauthorized for room \(room.name). status=\(statusCode). Session marked not joinable for UI-safe handling.", level: .error)
                 } else {
                     throw error
                 }

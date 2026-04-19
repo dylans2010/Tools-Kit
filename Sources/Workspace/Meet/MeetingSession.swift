@@ -5,8 +5,11 @@ struct MeetingSession: Identifiable, Equatable, Codable {
 
     let meetingId: String
     let roomName: String
+    /// False when backend resolution succeeded but auth prerequisites (for example token issuance) failed.
     let isJoinable: Bool
+    /// Indicates that Daily room policy requires a meeting token at join time.
     let requiresMeetingToken: Bool
+    /// Token returned by backend session resolution for Daily join authorization (typically JWT-like).
     let meetingToken: String?
     let sessionId: String
     let createdAt: Date

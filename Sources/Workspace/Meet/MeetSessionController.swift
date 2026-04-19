@@ -10,6 +10,7 @@ final class MeetingVideoTrack {}
 
 @MainActor
 final class MeetingStateManager: NSObject, ObservableObject {
+    // Conservative minimum for opaque non-JWT tokens; avoids accepting obviously malformed short strings.
     private static let minimumOpaqueMeetingTokenLength = 24
     static let shared = MeetingStateManager()
     private static let sensitiveQueryParameterNames: Set<String> = [
@@ -654,6 +655,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         let trimmed = token.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return false }
         // Daily meeting tokens are typically JWTs; allow non-JWT opaque tokens with a minimum length.
+        // This explicitly rejects internal whitespace that trimming would not remove.
         guard !trimmed.contains(where: { $0.isWhitespace }) else { return false }
         let jwtSegments = trimmed.split(separator: ".")
         return jwtSegments.count == 3 || trimmed.count >= Self.minimumOpaqueMeetingTokenLength
