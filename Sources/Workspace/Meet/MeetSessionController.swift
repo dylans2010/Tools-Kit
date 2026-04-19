@@ -221,8 +221,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         guard let localParticipantID else { return }
         guard phase == .inMeeting else { return }
 
-        let senderName = participants.first(where: { $0.id == localParticipantID })?.displayName
-            ?? (localParticipantDisplayName.isEmpty ? localParticipantID : localParticipantDisplayName)
+        let senderName = localSenderName(for: localParticipantID)
         messages.append(
             MeetingMessage(
                 id: UUID().uuidString,
@@ -372,6 +371,11 @@ final class MeetingStateManager: NSObject, ObservableObject {
         return (4...24).contains(candidate.count) && candidate.unicodeScalars.allSatisfy { allowed.contains($0) }
     }
 
+    private func localSenderName(for localParticipantID: String) -> String {
+        participants.first(where: { $0.id == localParticipantID })?.displayName
+            ?? (localParticipantDisplayName.isEmpty ? localParticipantID : localParticipantDisplayName)
+    }
+
     private func setMicrophoneEnabled(_ enabled: Bool, fallbackMutedState: Bool) async {
         #if canImport(Daily)
         await setInputEnabled([.microphone: enabled]) {
@@ -380,6 +384,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         #else
         _ = enabled
         isMicrophoneMuted = fallbackMutedState
+        DebugLogger.shared.log("Microphone update skipped because Daily SDK is unavailable.", level: .warning, category: "Meet")
         #endif
     }
 
@@ -391,6 +396,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         #else
         _ = enabled
         isCameraEnabled = fallbackCameraState
+        DebugLogger.shared.log("Camera update skipped because Daily SDK is unavailable.", level: .warning, category: "Meet")
         #endif
     }
 
@@ -413,7 +419,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         onFailure: @escaping @MainActor () -> Void
     ) async {
         _ = inputs
-        onFailure()
+        _ = onFailure
     }
     #endif
 
