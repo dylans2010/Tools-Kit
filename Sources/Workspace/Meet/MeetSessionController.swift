@@ -16,6 +16,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
         "roomlookup"
     ]
     private static let guestDisplayName = "Guest"
+    private static let dailyErrorWarningMessage = "Daily reported an error."
+    private static let dailyErrorWarningAction = "Try turning off camera or reconnecting."
     static let shared = MeetingStateManager()
     private static let sensitiveQueryParameterNames: Set<String> = [
         "t", "token", "access_token", "refresh_token", "session", "session_token",
@@ -1484,19 +1486,14 @@ extension MeetingStateManager: CallClientDelegate {
             let normalized = stateDescription.lowercased()
             if normalized == "reconnecting" {
                 appendSystemMessage("Reconnecting to meeting...")
-                diagnostics.latencyMs = 420
-                diagnostics.packetLossPercent = 5.7
             } else if normalized == "disconnected" || normalized == "left" {
                 appendSystemMessage("Disconnected from meeting.")
                 callKitManager.endCall()
             } else if normalized == "joined" || normalized == "connected" {
                 appendSystemMessage("Connected to meeting.")
                 callKitManager.updateConnected()
-                diagnostics.latencyMs = 72
-                diagnostics.packetLossPercent = 0.8
             } else if normalized == "failed" || normalized == "error" {
                 appendSystemMessage("Connection failed.")
-                addCPUWarning(message: "Call performance dropped.", action: "Disable camera or leave and rejoin.")
             }
             if state == .joined {
                 phase = .inMeeting
@@ -1589,8 +1586,8 @@ extension MeetingStateManager: CallClientDelegate {
             guard !(await isStaleCallback(callClient: callClient)) else { return }
             DebugLogger.shared.log("Daily delegate error callback received.", level: .error, category: "Meet")
             errorMessage = userFacingJoinErrorMessage(for: error)
-            addCPUWarning(message: "Daily reported an error.", action: "Try turning off camera or reconnecting.")
-            sendRealtimePayload(.cpuWarning(message: "Daily reported an error.", action: "Try turning off camera or reconnecting.", createdAt: Date().timeIntervalSince1970))
+            addCPUWarning(message: Self.dailyErrorWarningMessage, action: Self.dailyErrorWarningAction)
+            sendRealtimePayload(.cpuWarning(message: Self.dailyErrorWarningMessage, action: Self.dailyErrorWarningAction, createdAt: Date().timeIntervalSince1970))
             DebugLogger.shared.log("Daily delegate error payload: \(fullErrorDetails(error))", level: .error, category: "Meet")
         }
     }
