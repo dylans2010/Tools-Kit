@@ -531,7 +531,7 @@ struct WorkspaceMailRouterView: View {
                 }
             }
             .sheet(isPresented: $showingManageAccounts) {
-                ManageAccountsView {
+                ManageAccountsView { _ in
                     mailStore.reloadAccounts()
                 }
             }
