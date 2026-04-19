@@ -18,7 +18,11 @@ struct BreakoutRoomsView: View {
 
             Section("Rooms") {
                 if manager.breakoutRooms.isEmpty {
-                    ContentUnavailableView("No breakout rooms", systemImage: "square.3.layers.3d")
+                    ContentUnavailableView(
+                        "No breakout rooms",
+                        systemImage: "square.3.layers.3d",
+                        description: Text("No breakout rooms are available.")
+                    )
                 } else {
                     ForEach(manager.breakoutRooms) { room in
                         BreakoutRoomCardView(room: room, participants: manager.participants)
