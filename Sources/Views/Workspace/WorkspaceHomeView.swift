@@ -59,7 +59,7 @@ struct WorkspaceHomeView: View {
 
     private var mailTab: some View {
         NavigationStack {
-            ManageAccountsView()
+            WorkspaceMailRouterView()
         }
         .tabItem {
             Label(WorkspaceTab.mail.rawValue, systemImage: WorkspaceTab.mail.icon)
@@ -496,5 +496,49 @@ struct DashboardCard: View {
         .background(Color(.secondarySystemGroupedBackground))
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+    }
+}
+
+struct WorkspaceMailRouterView: View {
+    @StateObject private var mailStore = MailStore.shared
+    @State private var showingManageAccounts = false
+
+    var body: some View {
+        Group {
+            if let active = mailStore.activeAccount {
+                InboxView(account: active, folder: .inbox)
+            } else {
+                ContentUnavailableView(
+                    "No Mail Account Connected",
+                    systemImage: "envelope.badge",
+                    description: Text("Add an account to open Inbox as your default mail workspace.")
+                )
+                .navigationTitle("Mail")
+                .toolbar {
+                    ToolbarItemGroup(placement: .topBarTrailing) {
+                        Button {
+                        } label: {
+                            Image(systemName: "square.and.pencil")
+                        }
+                        .disabled(true)
+                        .accessibilityLabel("Compose unavailable without mail account")
+
+                        Button {
+                            showingManageAccounts = true
+                        } label: {
+                            Image(systemName: "person.crop.circle.badge.gearshape")
+                        }
+                    }
+                }
+                .sheet(isPresented: $showingManageAccounts) {
+                    ManageAccountsView {
+                        mailStore.reloadAccounts()
+                    }
+                }
+            }
+        }
+        .onAppear {
+            mailStore.reloadAccounts()
+        }
     }
 }

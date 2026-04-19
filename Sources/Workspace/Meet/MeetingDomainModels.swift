@@ -1,5 +1,4 @@
 import Foundation
-import Daily
 
 enum MeetSessionPhase: String {
     case idle
@@ -15,6 +14,22 @@ enum MeetPermissionState: String {
     case denied
 }
 
+enum MeetingParticipantRole: String, CaseIterable, Identifiable, Codable {
+    case host
+    case coHost = "co-host"
+    case participant
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .host: return "Host"
+        case .coHost: return "Co-Host"
+        case .participant: return "Participant"
+        }
+    }
+}
+
 struct MeetingParticipant: Identifiable, Equatable {
     let id: String
     let displayName: String
@@ -22,6 +37,8 @@ struct MeetingParticipant: Identifiable, Equatable {
     var isSpeaking: Bool
     var isMuted: Bool
     var hasVideo: Bool
+    var role: MeetingParticipantRole
+    var breakoutRoomID: String?
 }
 
 struct MeetingMessage: Identifiable, Equatable {
@@ -36,6 +53,25 @@ struct MeetingMessage: Identifiable, Equatable {
 struct MeetingChatThread: Identifiable, Equatable {
     let id: String
     let title: String
+}
+
+struct ScheduledMeeting: Identifiable, Equatable {
+    let id: String
+    let name: String
+    var meetingId: String?
+    let scheduledAt: Date
+    var activationState: ScheduledMeetingActivationState
+}
+
+enum ScheduledMeetingActivationState: String, Equatable, Codable {
+    case pending
+    case active
+}
+
+struct MeetingBreakoutRoom: Identifiable, Equatable {
+    let id: String
+    var name: String
+    var participantIds: [String]
 }
 
 enum MeetingLayoutPreference: String, CaseIterable, Identifiable {
@@ -55,16 +91,17 @@ enum MeetingQualitySetting: String, CaseIterable, Identifiable {
 }
 
 struct MeetingSettingsState {
-    var selectedAudioDevice = "Default Microphone"
-    var selectedVideoDevice = "Default Camera"
+    var selectedAudioDevice = ""
+    var selectedVideoDevice = ""
     var layoutPreference: MeetingLayoutPreference = .grid
     var qualitySetting: MeetingQualitySetting = .auto
+    var outputVolume: Double = 0.75
 }
 
 struct MeetingSummaryState {
-    var recap = "AI recap will appear after the meeting."
+    var recap = ""
     var actionItems: [String] = []
-    var transcriptPreview = "Transcript preview is not available yet."
+    var transcriptPreview = ""
 }
 
 struct MeetingLobbyState {
@@ -72,6 +109,21 @@ struct MeetingLobbyState {
     var isCheckingDevices = true
     var microphonePermission: MeetPermissionState = .unknown
     var cameraPermission: MeetPermissionState = .unknown
+}
+
+struct MeetingDiagnosticsState {
+    var connectionState = "Unknown"
+    var networkQuality = "Unknown"
+    var latencyMs: Int = 0
+    var packetLossPercent: Double = 0
+}
+
+enum MeetingAdminAction: Equatable {
+    case muteAll
+    case setParticipantMuted(participantId: String, muted: Bool)
+    case setParticipantVideoEnabled(participantId: String, enabled: Bool)
+    case removeParticipant(participantId: String)
+    case assignRole(participantId: String, role: MeetingParticipantRole)
 }
 
 struct DailyDebugMapping: Identifiable {

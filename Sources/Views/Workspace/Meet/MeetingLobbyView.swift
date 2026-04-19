@@ -1,77 +1,74 @@
 import SwiftUI
-import Daily
 
 struct MeetingLobbyView: View {
-    @ObservedObject var controller: MeetSessionController
+    @ObservedObject var manager: MeetingStateManager
     @State private var navigateToMeeting = false
 
     var body: some View {
         List {
             Section("Session") {
-                if let session = controller.currentSession {
+                if let session = manager.currentSession {
                     LabeledContent("Meeting ID", value: session.meetingId)
-                        .font(.headline)
+                        .font(.headline.monospaced())
                 }
             }
 
             Section("Participants") {
-                if controller.lobbyState.isLoadingParticipants {
-                    HStack {
+                HStack(spacing: 10) {
+                    if manager.lobbyState.isLoadingParticipants {
                         ProgressView()
-                        Text("Loading participants...")
-                            .foregroundColor(.secondary)
                     }
-                } else {
-                    Text("\(controller.participants.count) participant(s) ready")
+                    Text(manager.lobbyState.isLoadingParticipants ? "Loading participants..." : "\(manager.participants.count) participant(s) ready")
+                        .foregroundStyle(.secondary)
                 }
             }
 
             Section("Device Checks") {
-                permissionRow(
-                    title: "Microphone",
-                    state: controller.lobbyState.microphonePermission,
-                    systemImage: "mic"
-                )
-                permissionRow(
-                    title: "Camera",
-                    state: controller.lobbyState.cameraPermission,
-                    systemImage: "video"
-                )
+                permissionRow(title: "Microphone", state: manager.lobbyState.microphonePermission, icon: "mic")
+                permissionRow(title: "Camera", state: manager.lobbyState.cameraPermission, icon: "video")
             }
 
             Section {
                 Button {
-                    Task {
-                        await controller.startMeeting()
-                    }
+                    DebugLogger.shared.log("Join button tapped from lobby.", level: .info, category: "Meet")
+                    Task { await manager.startMeeting() }
                 } label: {
-                    Label("Join Now", systemImage: "arrow.right.circle.fill")
+                    if manager.isJoining {
+                        ProgressView()
+                    } else {
+                        Label("Join Now", systemImage: "arrow.right.circle.fill")
+                    }
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(controller.lobbyState.isCheckingDevices || controller.lobbyState.isLoadingParticipants)
+                .disabled(
+                    manager.isJoining ||
+                    manager.isBusy ||
+                    manager.lobbyState.isCheckingDevices ||
+                    manager.lobbyState.isLoadingParticipants
+                )
             }
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Lobby")
         .navigationDestination(isPresented: $navigateToMeeting) {
-            MeetingWebView(controller: controller)
+            MeetingContainerView(manager: manager)
         }
         .task {
-            await controller.runLobbyChecks()
+            await manager.runLobbyChecks()
         }
-        .onChange(of: controller.phase, initial: false) { _, newValue in
+        .onChange(of: manager.phase, initial: false) { _, newValue in
             navigateToMeeting = (newValue == .inMeeting)
         }
     }
 
-    private func permissionRow(title: String, state: MeetPermissionState, systemImage: String) -> some View {
+    private func permissionRow(title: String, state: MeetPermissionState, icon: String) -> some View {
         HStack {
-            Image(systemName: systemImage)
-                .foregroundColor(.secondary)
+            Image(systemName: icon)
+                .foregroundStyle(.secondary)
             Text(title)
             Spacer()
             Text(state.rawValue.capitalized)
-                .foregroundColor(state == .granted ? .green : (state == .denied ? .red : .secondary))
+                .foregroundStyle(state == .granted ? .green : (state == .denied ? .red : .secondary))
         }
     }
 }

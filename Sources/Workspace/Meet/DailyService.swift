@@ -1,10 +1,10 @@
 import Foundation
-import Daily
 
 actor DailyService {
     static let dailyAPIBaseURL = URL(string: "https://api.daily.co/v1")!
     static let apiRequestTimeoutInterval: TimeInterval = 20
     static let dailyTokenParameterName = "t"
+    static let persistedAPIKeyStorageKey = "daily_api_key"
     static let shared = DailyService()
 
     enum ServiceError: LocalizedError {
@@ -12,6 +12,7 @@ actor DailyService {
         case missingAPIKey
         case notFound
         case invalidResponse
+        case malformedMeetingToken
         case requestFailed(statusCode: Int, message: String?)
         case networkFailure(underlying: Error)
 
@@ -25,6 +26,8 @@ actor DailyService {
                 return "Meeting ID was not found."
             case .invalidResponse:
                 return "Daily API returned an invalid response."
+            case .malformedMeetingToken:
+                return "Daily API returned a malformed meeting token."
             case let .requestFailed(statusCode, message):
                 return message ?? "Daily API request failed with status \(statusCode)."
             case let .networkFailure(underlying):
@@ -41,6 +44,7 @@ actor DailyService {
     private struct RoomResponse: Decodable {
         let name: String
         let url: String
+        let privacy: String?
     }
 
     private struct MeetingTokenResponse: Decodable {
@@ -54,14 +58,8 @@ actor DailyService {
 
     private var recordsByMeetingID: [String: RoomRecord] = [:]
     private var activeSessions: [String: MeetingSession] = [:]
-    private var developerAPIKey: String?
-    private var cachedAppwriteAPIKey: String?
-
-    func setDeveloperAPIKey(_ value: String) async {
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        developerAPIKey = trimmed.isEmpty ? nil : trimmed
-        await log("Developer API key updated (in-memory only).", level: .debug)
-    }
+    private var breakoutRoomsBySession: [String: [MeetingBreakoutRoom]] = [:]
+    private var participantRolesBySession: [String: [String: MeetingParticipantRole]] = [:]
 
     func createRoom(for meetingId: String?) async throws -> MeetingSession {
         let trimmedID = meetingId?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -123,6 +121,30 @@ actor DailyService {
     func endSession(_ session: MeetingSession) async {
         activeSessions.removeValue(forKey: session.sessionId)
         await log("Session end \(session.sessionId).", level: .info)
+    }
+
+    func applyAdminAction(_ action: MeetingAdminAction, in session: MeetingSession) async {
+        var roles = participantRolesBySession[session.sessionId] ?? [:]
+        switch action {
+        case .muteAll:
+            await log("Admin action: mute all in session \(session.sessionId).", level: .info)
+        case let .setParticipantMuted(participantId, muted):
+            await log("Admin action: set muted=\(muted) for \(participantId).", level: .info)
+        case let .setParticipantVideoEnabled(participantId, enabled):
+            await log("Admin action: set video enabled=\(enabled) for \(participantId).", level: .info)
+        case let .removeParticipant(participantId):
+            roles.removeValue(forKey: participantId)
+            await log("Admin action: removed participant \(participantId).", level: .warning)
+        case let .assignRole(participantId, role):
+            roles[participantId] = role
+            await log("Admin action: assigned role \(role.rawValue) to \(participantId).", level: .info)
+        }
+        participantRolesBySession[session.sessionId] = roles
+    }
+
+    func updateBreakoutRooms(_ rooms: [MeetingBreakoutRoom], in session: MeetingSession) async {
+        breakoutRoomsBySession[session.sessionId] = rooms
+        await log("Breakout rooms updated for session \(session.sessionId).", level: .info)
     }
 
     func internalRoomURL(for session: MeetingSession) async -> URL? {
@@ -234,10 +256,38 @@ actor DailyService {
             return existing
         }
 
-        let roomURL = try await securedRoomURL(from: room)
+        let roomURL = try await validatedRoomURL(from: room.url, roomName: room.name)
+        let requiresMeetingToken = await roomRequiresMeetingToken(room)
+        var meetingToken: String?
+        var isJoinable = true
+
+        if requiresMeetingToken {
+            do {
+                let token = try await createMeetingToken(for: room.name)
+                let trimmedToken = token.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !MeetingSession.isLikelyValidMeetingToken(trimmedToken) {
+                    await log("Meeting token generation returned malformed token for room \(room.name).", level: .error)
+                    throw ServiceError.malformedMeetingToken
+                }
+                meetingToken = trimmedToken
+            } catch let error as ServiceError {
+                if case let .requestFailed(statusCode, _) = error, statusCode == 401 || statusCode == 403 {
+                    // Convert authorization failures into non-joinable state so join is blocked in pre-validation,
+                    // while preserving resolver success and avoiding runtime join crashes.
+                    isJoinable = false
+                    await log("Meeting token generation unauthorized for room \(room.name). status=\(statusCode). Session marked not joinable for UI-safe handling.", level: .error)
+                } else {
+                    throw error
+                }
+            }
+        }
+
         let session = MeetingSession(
             meetingId: meetingID,
             roomName: room.name,
+            isJoinable: isJoinable,
+            requiresMeetingToken: requiresMeetingToken,
+            meetingToken: meetingToken,
             sessionId: UUID().uuidString,
             createdAt: Date(),
             debugTraceId: UUID().uuidString
@@ -319,21 +369,22 @@ actor DailyService {
         return roomURL
     }
 
-    private func securedRoomURL(from room: RoomResponse) async throws -> URL {
-        let baseURL = try await validatedRoomURL(from: room.url, roomName: room.name)
-        let token = try await createMeetingToken(for: room.name)
-        guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
-            throw ServiceError.invalidResponse
+    private func roomRequiresMeetingToken(_ room: RoomResponse) async -> Bool {
+        guard let privacy = room.privacy?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
+              !privacy.isEmpty else {
+            // Default to secure/private expectations when privacy is not returned.
+            await log("Room privacy was missing for \(room.name); defaulting to token-required mode.", level: .warning)
+            return true
         }
-        var queryItems = components.queryItems ?? []
-        // Avoid duplicate token query items when regenerating secured URLs.
-        queryItems.removeAll(where: { $0.name == DailyService.dailyTokenParameterName })
-        queryItems.append(URLQueryItem(name: DailyService.dailyTokenParameterName, value: token))
-        components.queryItems = queryItems
-        guard let securedURL = components.url else {
-            throw ServiceError.invalidResponse
+        switch privacy {
+        case "public":
+            return false
+        case "private":
+            return true
+        default:
+            // Unknown privacy values are treated as requiring token-based authorization.
+            return true
         }
-        return securedURL
     }
 
     private func buildAPIURL(path: String) -> URL {
@@ -341,127 +392,13 @@ actor DailyService {
     }
 
     private func resolvedAPIKey() async throws -> String {
-        if let developerAPIKey {
-            return developerAPIKey
+        let persistedValue = UserDefaults.standard.string(forKey: DailyService.persistedAPIKeyStorageKey)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !persistedValue.isEmpty {
+            return persistedValue
         }
-
-        if let cachedAppwriteAPIKey, !cachedAppwriteAPIKey.isEmpty {
-            return cachedAppwriteAPIKey
-        }
-
-        let remoteVariables = await fetchRemoteVariables()
-        if let remoteKey = remoteConfigValue(forKey: "DAILY_API", remoteVariables: remoteVariables) {
-            cachedAppwriteAPIKey = remoteKey
-            return remoteKey
-        }
-
-        if let localKey = localConfigValue(forKey: "DAILY_API") {
-            cachedAppwriteAPIKey = localKey
-            return localKey
-        }
-
+        await log("Missing Daily API key in persistent storage key '\(DailyService.persistedAPIKeyStorageKey)'.", level: .error)
         throw ServiceError.missingAPIKey
-    }
-
-    private func fetchRemoteVariables() async -> [String: String] {
-        guard
-            let rawURL = localConfigValue(forKey: "APPWRITE_MAIL_CONFIG_URL"),
-            let url = URL(string: rawURL)
-        else {
-            return [:]
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-
-        if let bearer = localConfigValue(forKey: "APPWRITE_MAIL_CONFIG_BEARER") {
-            request.setValue("Bearer \(bearer)", forHTTPHeaderField: "Authorization")
-        }
-
-        do {
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
-                return [:]
-            }
-            return decodeRemoteVariables(from: data)
-        } catch {
-            return [:]
-        }
-    }
-
-    private func remoteConfigValue(forKey key: String, remoteVariables: [String: String]) -> String? {
-        guard let value = remoteVariables[key] else { return nil }
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
-    }
-
-    private func localConfigValue(forKey key: String) -> String? {
-        if let value = Bundle.main.object(forInfoDictionaryKey: key) as? String {
-            let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !trimmed.isEmpty { return trimmed }
-        }
-
-        guard
-            let url = Bundle.main.url(forResource: "Config", withExtension: "plist"),
-            let data = try? Data(contentsOf: url),
-            let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
-            let value = plist[key] as? String
-        else {
-            return nil
-        }
-
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
-    }
-
-    private func decodeRemoteVariables(from data: Data) -> [String: String] {
-        if let direct = try? JSONDecoder().decode([String: String].self, from: data) {
-            return direct
-                .mapValues { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                .filter { !$0.value.isEmpty }
-        }
-
-        guard let object = try? JSONSerialization.jsonObject(with: data) else {
-            return [:]
-        }
-
-        var values: [String: String] = [:]
-        collectRemoteVariables(from: object, into: &values, parentKey: nil)
-        return values
-            .mapValues { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.value.isEmpty }
-    }
-
-    private func collectRemoteVariables(from object: Any, into output: inout [String: String], parentKey: String?) {
-        switch object {
-        case let dictionary as [String: Any]:
-            if let key = dictionary["key"] as? String, let value = dictionary["value"] as? String {
-                output[key] = value
-            }
-            if let parentKey, let value = dictionary["value"] as? String, looksLikeConfigKey(parentKey) {
-                output[parentKey] = value
-            }
-
-            for (key, value) in dictionary {
-                if let stringValue = value as? String, looksLikeConfigKey(key) {
-                    output[key] = stringValue
-                }
-                collectRemoteVariables(from: value, into: &output, parentKey: key)
-            }
-        case let array as [Any]:
-            for item in array {
-                collectRemoteVariables(from: item, into: &output, parentKey: parentKey)
-            }
-        default:
-            break
-        }
-    }
-
-    private func looksLikeConfigKey(_ key: String) -> Bool {
-        guard key.range(of: #"^[A-Z][A-Z0-9_]*$"#, options: .regularExpression) != nil else { return false }
-        let allowedPrefixes = ["APPWRITE_", "GOOGLE_", "GMAIL_", "PRODUCTION_", "DAILY_", "MAIL_", "OUTLOOK_", "YAHOO_"]
-        return allowedPrefixes.contains { key.hasPrefix($0) }
     }
 
     private func log(_ message: String, level: DebugLogLevel) async {

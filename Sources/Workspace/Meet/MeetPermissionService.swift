@@ -1,8 +1,25 @@
 import AVFoundation
 import Foundation
-import Daily
 
 struct MeetPermissionService {
+    static func availableAudioDevices() -> [String] {
+        let session = AVAudioSession.sharedInstance()
+        let routeNames = session.availableInputs?.compactMap(\.portName) ?? []
+        let unique = Set(routeNames).sorted()
+        return unique
+    }
+
+    static func availableVideoDevices() -> [String] {
+        let discovery = AVCaptureDevice.DiscoverySession(
+            deviceTypes: [.builtInWideAngleCamera, .builtInDualCamera, .builtInDualWideCamera, .builtInTripleCamera],
+            mediaType: .video,
+            position: .unspecified
+        )
+        let names = discovery.devices.map(\.localizedName)
+        let unique = Set(names).sorted()
+        return unique
+    }
+
     func checkMicrophonePermission() async -> MeetPermissionState {
         await withCheckedContinuation { continuation in
             let status = AVCaptureDevice.authorizationStatus(for: .audio)

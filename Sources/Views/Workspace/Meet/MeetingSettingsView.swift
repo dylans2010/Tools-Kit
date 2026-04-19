@@ -1,20 +1,29 @@
 import SwiftUI
-import Daily
 
 struct MeetingSettingsView: View {
     @Binding var settings: MeetingSettingsState
 
-    private let audioDevices = ["Default Microphone", "Built-in Microphone", "Bluetooth Microphone"]
-    private let videoDevices = ["Default Camera", "Front Camera", "Back Camera"]
+    let availableAudioDevices: [String]
+    let availableVideoDevices: [String]
 
     var body: some View {
         Form {
             Section("Devices") {
-                Picker("Audio", selection: $settings.selectedAudioDevice) {
-                    ForEach(audioDevices, id: \.self) { Text($0) }
+                if availableAudioDevices.isEmpty {
+                    Text("No audio devices reported by runtime.")
+                        .foregroundStyle(.secondary)
+                } else {
+                    Picker("Audio", selection: $settings.selectedAudioDevice) {
+                        ForEach(availableAudioDevices, id: \.self) { Text($0) }
+                    }
                 }
-                Picker("Video", selection: $settings.selectedVideoDevice) {
-                    ForEach(videoDevices, id: \.self) { Text($0) }
+                if availableVideoDevices.isEmpty {
+                    Text("No video devices reported by runtime.")
+                        .foregroundStyle(.secondary)
+                } else {
+                    Picker("Video", selection: $settings.selectedVideoDevice) {
+                        ForEach(availableVideoDevices, id: \.self) { Text($0) }
+                    }
                 }
             }
 

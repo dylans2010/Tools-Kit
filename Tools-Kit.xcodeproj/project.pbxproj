@@ -240,6 +240,20 @@
 		ME0200000000000000000010 /* MeetingSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000010 /* MeetingSummaryView.swift */; };
 		ME0200000000000000000011 /* DebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000011 /* DebugView.swift */; };
 		ME0200000000000000000012 /* MeetDeveloperToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000012 /* MeetDeveloperToolsView.swift */; };
+		ME0200000000000000000013 /* MeetingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000013 /* MeetingContainerView.swift */; };
+		ME0200000000000000000014 /* VideoGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000014 /* VideoGridView.swift */; };
+		ME0200000000000000000015 /* VideoTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000015 /* VideoTileView.swift */; };
+		ME0200000000000000000016 /* AudioSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000016 /* AudioSettingsView.swift */; };
+		ME0200000000000000000017 /* VideoSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000017 /* VideoSettingsView.swift */; };
+		ME0200000000000000000018 /* ChatInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000018 /* ChatInputView.swift */; };
+		ME0200000000000000000019 /* ChatMessageBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000019 /* ChatMessageBubbleView.swift */; };
+		ME020000000000000000001A /* AdminControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000001A /* AdminControlsView.swift */; };
+		ME020000000000000000001B /* ParticipantAdminPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000001B /* ParticipantAdminPanelView.swift */; };
+		ME020000000000000000001C /* BreakoutRoomsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000001C /* BreakoutRoomsView.swift */; };
+		ME020000000000000000001D /* BreakoutRoomManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000001D /* BreakoutRoomManagerView.swift */; };
+		ME020000000000000000001E /* BreakoutRoomCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000001E /* BreakoutRoomCardView.swift */; };
+		ME020000000000000000001F /* MeetingStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME010000000000000000001F /* MeetingStateView.swift */; };
+		ME0200000000000000000020 /* MeetingDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000020 /* MeetingDiagnosticsView.swift */; };
 		WK0200000000000000000001 /* WorkoutsModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000001 /* WorkoutsModeManager.swift */; };
 		WK0200000000000000000002 /* WorkoutsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000002 /* WorkoutsHomeView.swift */; };
 		WK0200000000000000000003 /* OnboardWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK0100000000000000000003 /* OnboardWorkoutView.swift */; };
@@ -1097,6 +1111,20 @@
 		ME0100000000000000000010 /* MeetingSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingSummaryView.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000011 /* DebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DebugView.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000012 /* MeetDeveloperToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetDeveloperToolsView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000013 /* MeetingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingContainerView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000014 /* VideoGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoGridView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000015 /* VideoTileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoTileView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000016 /* AudioSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioSettingsView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000017 /* VideoSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoSettingsView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000018 /* ChatInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatInputView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000019 /* ChatMessageBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatMessageBubbleView.swift"; sourceTree = "<group>"; };
+		ME010000000000000000001A /* AdminControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdminControlsView.swift"; sourceTree = "<group>"; };
+		ME010000000000000000001B /* ParticipantAdminPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ParticipantAdminPanelView.swift"; sourceTree = "<group>"; };
+		ME010000000000000000001C /* BreakoutRoomsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BreakoutRoomsView.swift"; sourceTree = "<group>"; };
+		ME010000000000000000001D /* BreakoutRoomManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BreakoutRoomManagerView.swift"; sourceTree = "<group>"; };
+		ME010000000000000000001E /* BreakoutRoomCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BreakoutRoomCardView.swift"; sourceTree = "<group>"; };
+		ME010000000000000000001F /* MeetingStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingStateView.swift"; sourceTree = "<group>"; };
+		ME0100000000000000000020 /* MeetingDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingDiagnosticsView.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000001 /* WorkoutsModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/WorkoutsModeManager.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000002 /* WorkoutsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/WorkoutsHomeView.swift"; sourceTree = "<group>"; };
 		WK0100000000000000000003 /* OnboardWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Features/Workouts/Views/OnboardWorkoutView.swift"; sourceTree = "<group>"; };
@@ -1190,6 +1218,20 @@
 				ME0100000000000000000010 /* MeetingSummaryView.swift */,
 				ME0100000000000000000011 /* DebugView.swift */,
 				ME0100000000000000000012 /* MeetDeveloperToolsView.swift */,
+				ME0100000000000000000013 /* MeetingContainerView.swift */,
+				ME0100000000000000000014 /* VideoGridView.swift */,
+				ME0100000000000000000015 /* VideoTileView.swift */,
+				ME0100000000000000000016 /* AudioSettingsView.swift */,
+				ME0100000000000000000017 /* VideoSettingsView.swift */,
+				ME0100000000000000000018 /* ChatInputView.swift */,
+				ME0100000000000000000019 /* ChatMessageBubbleView.swift */,
+				ME010000000000000000001A /* AdminControlsView.swift */,
+				ME010000000000000000001B /* ParticipantAdminPanelView.swift */,
+				ME010000000000000000001C /* BreakoutRoomsView.swift */,
+				ME010000000000000000001D /* BreakoutRoomManagerView.swift */,
+				ME010000000000000000001E /* BreakoutRoomCardView.swift */,
+				ME010000000000000000001F /* MeetingStateView.swift */,
+				ME0100000000000000000020 /* MeetingDiagnosticsView.swift */,
 			);
 			path = Meet;
 			sourceTree = "<group>";
@@ -2392,6 +2434,20 @@
 				ME0200000000000000000010 /* MeetingSummaryView.swift in Sources */,
 				ME0200000000000000000011 /* DebugView.swift in Sources */,
 				ME0200000000000000000012 /* MeetDeveloperToolsView.swift in Sources */,
+				ME0200000000000000000013 /* MeetingContainerView.swift in Sources */,
+				ME0200000000000000000014 /* VideoGridView.swift in Sources */,
+				ME0200000000000000000015 /* VideoTileView.swift in Sources */,
+				ME0200000000000000000016 /* AudioSettingsView.swift in Sources */,
+				ME0200000000000000000017 /* VideoSettingsView.swift in Sources */,
+				ME0200000000000000000018 /* ChatInputView.swift in Sources */,
+				ME0200000000000000000019 /* ChatMessageBubbleView.swift in Sources */,
+				ME020000000000000000001A /* AdminControlsView.swift in Sources */,
+				ME020000000000000000001B /* ParticipantAdminPanelView.swift in Sources */,
+				ME020000000000000000001C /* BreakoutRoomsView.swift in Sources */,
+				ME020000000000000000001D /* BreakoutRoomManagerView.swift in Sources */,
+				ME020000000000000000001E /* BreakoutRoomCardView.swift in Sources */,
+				ME020000000000000000001F /* MeetingStateView.swift in Sources */,
+				ME0200000000000000000020 /* MeetingDiagnosticsView.swift in Sources */,
 				WK0200000000000000000001 /* WorkoutsModeManager.swift in Sources */,
 				WK0200000000000000000002 /* WorkoutsHomeView.swift in Sources */,
 				WK0200000000000000000003 /* OnboardWorkoutView.swift in Sources */,
