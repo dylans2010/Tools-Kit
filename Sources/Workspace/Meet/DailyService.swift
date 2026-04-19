@@ -1,5 +1,4 @@
 import Foundation
-import Daily
 
 actor DailyService {
     static let dailyAPIBaseURL = URL(string: "https://api.daily.co/v1")!
@@ -54,6 +53,8 @@ actor DailyService {
 
     private var recordsByMeetingID: [String: RoomRecord] = [:]
     private var activeSessions: [String: MeetingSession] = [:]
+    private var breakoutRoomsBySession: [String: [MeetingBreakoutRoom]] = [:]
+    private var participantRolesBySession: [String: [String: MeetingParticipantRole]] = [:]
     private var developerAPIKey: String?
     private var cachedAppwriteAPIKey: String?
 
@@ -123,6 +124,30 @@ actor DailyService {
     func endSession(_ session: MeetingSession) async {
         activeSessions.removeValue(forKey: session.sessionId)
         await log("Session end \(session.sessionId).", level: .info)
+    }
+
+    func applyAdminAction(_ action: MeetingAdminAction, in session: MeetingSession) async {
+        var roles = participantRolesBySession[session.sessionId] ?? [:]
+        switch action {
+        case .muteAll:
+            await log("Admin action: mute all in session \(session.sessionId).", level: .info)
+        case let .setParticipantMuted(participantId, muted):
+            await log("Admin action: set muted=\(muted) for \(participantId).", level: .info)
+        case let .setParticipantVideoEnabled(participantId, enabled):
+            await log("Admin action: set video enabled=\(enabled) for \(participantId).", level: .info)
+        case let .removeParticipant(participantId):
+            roles.removeValue(forKey: participantId)
+            await log("Admin action: removed participant \(participantId).", level: .warning)
+        case let .assignRole(participantId, role):
+            roles[participantId] = role
+            await log("Admin action: assigned role \(role.rawValue) to \(participantId).", level: .info)
+        }
+        participantRolesBySession[session.sessionId] = roles
+    }
+
+    func updateBreakoutRooms(_ rooms: [MeetingBreakoutRoom], in session: MeetingSession) async {
+        breakoutRoomsBySession[session.sessionId] = rooms
+        await log("Breakout rooms updated for session \(session.sessionId).", level: .info)
     }
 
     func internalRoomURL(for session: MeetingSession) async -> URL? {

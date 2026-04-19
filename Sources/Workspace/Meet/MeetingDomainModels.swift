@@ -1,5 +1,4 @@
 import Foundation
-import Daily
 
 enum MeetSessionPhase: String {
     case idle
@@ -15,6 +14,14 @@ enum MeetPermissionState: String {
     case denied
 }
 
+enum MeetingParticipantRole: String, CaseIterable, Identifiable, Codable {
+    case host
+    case coHost = "Co-Host"
+    case participant
+
+    var id: String { rawValue }
+}
+
 struct MeetingParticipant: Identifiable, Equatable {
     let id: String
     let displayName: String
@@ -22,6 +29,8 @@ struct MeetingParticipant: Identifiable, Equatable {
     var isSpeaking: Bool
     var isMuted: Bool
     var hasVideo: Bool
+    var role: MeetingParticipantRole
+    var breakoutRoomID: String?
 }
 
 struct MeetingMessage: Identifiable, Equatable {
@@ -36,6 +45,19 @@ struct MeetingMessage: Identifiable, Equatable {
 struct MeetingChatThread: Identifiable, Equatable {
     let id: String
     let title: String
+}
+
+struct ScheduledMeeting: Identifiable, Equatable {
+    let id: String
+    let name: String
+    let meetingId: String
+    let scheduledAt: Date
+}
+
+struct MeetingBreakoutRoom: Identifiable, Equatable {
+    let id: String
+    var name: String
+    var participantIds: [String]
 }
 
 enum MeetingLayoutPreference: String, CaseIterable, Identifiable {
@@ -59,6 +81,7 @@ struct MeetingSettingsState {
     var selectedVideoDevice = "Default Camera"
     var layoutPreference: MeetingLayoutPreference = .grid
     var qualitySetting: MeetingQualitySetting = .auto
+    var outputVolume: Double = 0.75
 }
 
 struct MeetingSummaryState {
@@ -72,6 +95,21 @@ struct MeetingLobbyState {
     var isCheckingDevices = true
     var microphonePermission: MeetPermissionState = .unknown
     var cameraPermission: MeetPermissionState = .unknown
+}
+
+struct MeetingDiagnosticsState {
+    var connectionState = "Connected"
+    var networkQuality = "Good"
+    var latencyMs: Int = 42
+    var packetLossPercent: Double = 0.2
+}
+
+enum MeetingAdminAction: Equatable {
+    case muteAll
+    case setParticipantMuted(participantId: String, muted: Bool)
+    case setParticipantVideoEnabled(participantId: String, enabled: Bool)
+    case removeParticipant(participantId: String)
+    case assignRole(participantId: String, role: MeetingParticipantRole)
 }
 
 struct DailyDebugMapping: Identifiable {

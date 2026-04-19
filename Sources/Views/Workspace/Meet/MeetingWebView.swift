@@ -1,6 +1,5 @@
 import SwiftUI
 import WebKit
-import Daily
 
 struct MeetingWebView: View {
     @ObservedObject var controller: MeetSessionController

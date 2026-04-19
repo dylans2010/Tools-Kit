@@ -1,54 +1,44 @@
 import SwiftUI
-import UIKit
-import Daily
 
 struct CreateMeetingView: View {
-    @StateObject private var controller = MeetSessionController.shared
+    @StateObject private var manager = MeetingStateManager.shared
 
     var body: some View {
-        List {
-            Section("Create Session") {
-                TextField("Meeting ID (optional)", text: $controller.meetingIdInput)
-                    .textInputAutocapitalization(.characters)
-                    .autocorrectionDisabled()
+        ZStack {
+            LinearGradient(colors: [Color.blue.opacity(0.15), Color.purple.opacity(0.15)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                .ignoresSafeArea()
 
-                Button {
-                    Task { await controller.generateMeetingID() }
-                } label: {
-                    Label("Generate ID from Daily", systemImage: "sparkles")
-                }
-                .disabled(controller.isBusy)
+            List {
+                Section("Meeting") {
+                    TextField("Meeting Name", text: $manager.meetingNameInput)
+                        .textInputAutocapitalization(.words)
+                        .autocorrectionDisabled()
 
-                Button {
-                    Task { await controller.createMeeting() }
-                } label: {
-                    if controller.isBusy {
-                        ProgressView()
-                    } else {
-                        Label("Create Meeting", systemImage: "video.badge.plus")
-                    }
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(controller.isBusy)
-            }
-
-            if let session = controller.currentSession {
-                Section("Meeting ID") {
-                    HStack {
-                        Text(session.meetingId)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Generated Meeting ID")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text(manager.currentSession?.meetingId ?? "Generated after creation")
                             .font(.headline.monospaced())
-                        Spacer()
-                        Button("Copy") {
-                            UIPasteboard.general.string = session.meetingId
+                            .textSelection(.enabled)
+                    }
+
+                    Button {
+                        Task { await manager.createMeeting() }
+                    } label: {
+                        if manager.isBusy {
+                            ProgressView()
+                        } else {
+                            Label("Create Meeting", systemImage: "video.badge.plus")
                         }
                     }
-                    Text("Share only this ID.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    .buttonStyle(.borderedProminent)
+                    .disabled(manager.isBusy || manager.meetingNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
+            .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
         }
-        .listStyle(.insetGrouped)
         .navigationTitle("Create Meeting")
     }
 }

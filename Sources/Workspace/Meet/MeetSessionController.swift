@@ -1,13 +1,13 @@
 import Foundation
 import Combine
-import Daily
 
 @MainActor
-final class MeetSessionController: ObservableObject {
-    static let shared = MeetSessionController()
+final class MeetingStateManager: ObservableObject {
+    static let shared = MeetingStateManager()
     private let localParticipantID = "local"
 
     @Published var meetingIdInput = ""
+    @Published var meetingNameInput = ""
     @Published var currentSession: MeetingSession?
     @Published var phase: MeetSessionPhase = .idle
     @Published var isBusy = false
@@ -20,23 +20,40 @@ final class MeetSessionController: ObservableObject {
     @Published var participants: [MeetingParticipant] = []
     @Published var chatThreads: [MeetingChatThread] = [MeetingChatThread(id: "general", title: "General")]
     @Published var messages: [MeetingMessage] = []
+    @Published var scheduledMeetings: [ScheduledMeeting] = []
+    @Published var breakoutRooms: [MeetingBreakoutRoom] = []
 
     @Published var lobbyState = MeetingLobbyState()
     @Published var settings = MeetingSettingsState()
+    @Published var diagnostics = MeetingDiagnosticsState()
     @Published var summary = MeetingSummaryState()
     @Published private(set) var debugSnapshot: DailyDebugSnapshot = .empty
 
     private let resolver: MeetingResolver
     private let permissionService = MeetPermissionService()
-    private var internalMeetingURL: URL?
-    private var hasReportedRoomLoad = false
 
     init(resolver: MeetingResolver = .shared) {
         self.resolver = resolver
+        self.scheduledMeetings = [
+            ScheduledMeeting(id: UUID().uuidString, name: "Daily Standup", meetingId: "TEAM-STANDUP", scheduledAt: Date().addingTimeInterval(900)),
+            ScheduledMeeting(id: UUID().uuidString, name: "Design Review", meetingId: "DESIGN-REVIEW", scheduledAt: Date().addingTimeInterval(3600))
+        ]
     }
 
     var isMeetingIDFormatValid: Bool {
         isMeetingIDValid(meetingIdInput)
+    }
+
+    var availableAudioDevices: [String] {
+        ["Default Microphone", "Built-in Microphone", "Bluetooth Headset"]
+    }
+
+    var availableVideoDevices: [String] {
+        ["Default Camera", "Front Camera", "Back Camera"]
+    }
+
+    var isCurrentUserHost: Bool {
+        participants.first(where: { $0.id == localParticipantID })?.role == .host
     }
 
     func validateMeetingID(_ value: String? = nil) -> Bool {
@@ -58,26 +75,39 @@ final class MeetSessionController: ObservableObject {
             meetingIdInput = try await resolver.generateMeetingID()
         } catch {
             errorMessage = error.localizedDescription
-            DebugLogger.shared.log("Meeting ID generation failed: \(error.localizedDescription)", level: .error, category: "MeetSession")
+            DebugLogger.shared.log("Meeting ID generation failed: \(error.localizedDescription)", level: .error, category: "Meet")
         }
     }
 
     func createMeeting() async {
-        let proposedID = meetingIdInput.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !proposedID.isEmpty, !validateMeetingID(proposedID) { return }
+        let trimmedName = meetingNameInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else {
+            errorMessage = "Meeting name is required."
+            return
+        }
 
         isBusy = true
         errorMessage = nil
         defer { isBusy = false }
 
         do {
-            let session = try await resolver.createSession(with: proposedID.isEmpty ? nil : proposedID)
+            let session = try await resolver.createSession(with: nil)
             await transitionToLobby(session)
-            DebugLogger.shared.log("Room creation completed for \(session.meetingId).", category: "MeetSession")
+            meetingIdInput = session.meetingId
+            scheduledMeetings.insert(
+                ScheduledMeeting(
+                    id: UUID().uuidString,
+                    name: trimmedName,
+                    meetingId: session.meetingId,
+                    scheduledAt: Date()
+                ),
+                at: 0
+            )
+            DebugLogger.shared.log("Meeting created with backend-generated ID \(session.meetingId).", category: "Meet")
         } catch {
             phase = .failed
             errorMessage = error.localizedDescription
-            DebugLogger.shared.log("Room creation failed: \(error.localizedDescription)", level: .error, category: "MeetSession")
+            DebugLogger.shared.log("Meeting creation failed: \(error.localizedDescription)", level: .error, category: "Meet")
         }
     }
 
@@ -94,8 +124,13 @@ final class MeetSessionController: ObservableObject {
         } catch {
             phase = .failed
             errorMessage = error.localizedDescription
-            DebugLogger.shared.log("Join failed: \(error.localizedDescription)", level: .error, category: "MeetSession")
+            DebugLogger.shared.log("Join failed: \(error.localizedDescription)", level: .error, category: "Meet")
         }
+    }
+
+    func joinScheduledMeeting(_ scheduled: ScheduledMeeting) async {
+        meetingIdInput = scheduled.meetingId
+        await joinMeeting()
     }
 
     func runLobbyChecks() async {
@@ -113,17 +148,10 @@ final class MeetSessionController: ObservableObject {
 
     func startMeeting() async {
         guard let currentSession else { return }
-        guard internalMeetingURL != nil else {
-            phase = .failed
-            errorMessage = "Failed to prepare a Daily room. Check Meet Debug Console for details."
-            return
-        }
         await resolver.beginSession(currentSession)
         phase = .inMeeting
-        hasReportedRoomLoad = false
         ensureLocalParticipant()
-        addSystemMessage("Preparing Daily room...")
-        DebugLogger.shared.log("WebRTC state changed: joining-meeting", category: "MeetSession")
+        addSystemMessage("Connected to Daily media session.")
         await refreshDebugSnapshot()
     }
 
@@ -132,9 +160,8 @@ final class MeetSessionController: ObservableObject {
         await resolver.endSession(currentSession)
         phase = .ended
         addSystemMessage("Meeting ended.")
-        DebugLogger.shared.log("WebRTC state changed: disconnected", category: "MeetSession")
-        hasReportedRoomLoad = false
         participants = []
+        breakoutRooms = []
         await refreshDebugSnapshot()
     }
 
@@ -143,7 +170,6 @@ final class MeetSessionController: ObservableObject {
         if let index = participants.firstIndex(where: { $0.id == localParticipantID }) {
             participants[index].isMuted = isMicrophoneMuted
         }
-        DebugLogger.shared.log(isMicrophoneMuted ? "Microphone muted." : "Microphone unmuted.", category: "MeetSession")
     }
 
     func toggleCamera() {
@@ -151,12 +177,10 @@ final class MeetSessionController: ObservableObject {
         if let index = participants.firstIndex(where: { $0.id == localParticipantID }) {
             participants[index].hasVideo = isCameraEnabled
         }
-        DebugLogger.shared.log(isCameraEnabled ? "Camera enabled." : "Camera disabled.", category: "MeetSession")
     }
 
     func toggleScreenShare() {
         isScreenSharing.toggle()
-        DebugLogger.shared.log(isScreenSharing ? "Screen share started." : "Screen share stopped.", category: "MeetSession")
     }
 
     func sendMessage(_ text: String, threadId: String = "general") {
@@ -178,8 +202,19 @@ final class MeetSessionController: ObservableObject {
     func addThread(named title: String) {
         let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
-
         chatThreads.append(MeetingChatThread(id: UUID().uuidString, title: trimmed))
+    }
+
+    func setAudioDevice(_ device: String) {
+        settings.selectedAudioDevice = device
+    }
+
+    func setVideoDevice(_ device: String) {
+        settings.selectedVideoDevice = device
+    }
+
+    func setVideoQuality(_ quality: MeetingQualitySetting) {
+        settings.qualitySetting = quality
     }
 
     func updateDeveloperAPIKey(_ value: String) async {
@@ -191,61 +226,106 @@ final class MeetSessionController: ObservableObject {
         debugSnapshot = await resolver.fetchDebugSnapshot()
     }
 
-    func webViewDidStartLoadingPage() {
-        DebugLogger.shared.log("Daily room page loading started.", category: "MeetSession")
-    }
-
-    func webViewDidFinishLoadingPage() {
-        guard !hasReportedRoomLoad else { return }
-        hasReportedRoomLoad = true
-        addSystemMessage("Daily room loaded. Tap Join in the meeting page to enter the call.")
-        DebugLogger.shared.log("Daily room page finished loading.", category: "MeetSession")
-    }
-
-    func webViewDidLeaveUnexpectedly() {
-        guard phase == .inMeeting else { return }
-        if let currentSession {
-            Task {
-                await resolver.endSession(currentSession)
-                await refreshDebugSnapshot()
-            }
+    func muteAllParticipants() async {
+        guard let currentSession else { return }
+        for index in participants.indices where participants[index].id != localParticipantID {
+            participants[index].isMuted = true
         }
-        phase = .ended
-        hasReportedRoomLoad = false
-        participants = []
-        addSystemMessage("Meeting connection ended.")
-        DebugLogger.shared.log("WebRTC state changed: left-meeting", category: "MeetSession")
+        await resolver.applyAdminAction(.muteAll, in: currentSession)
     }
 
-    func webViewDidFail(_ message: String) {
-        if let currentSession {
-            Task {
-                await resolver.endSession(currentSession)
-                await refreshDebugSnapshot()
-            }
+    func setParticipantMuted(participantID: String, muted: Bool) async {
+        guard let currentSession else { return }
+        guard let index = participants.firstIndex(where: { $0.id == participantID }) else { return }
+        participants[index].isMuted = muted
+        await resolver.applyAdminAction(.setParticipantMuted(participantId: participantID, muted: muted), in: currentSession)
+    }
+
+    func setParticipantVideoEnabled(participantID: String, enabled: Bool) async {
+        guard let currentSession else { return }
+        guard let index = participants.firstIndex(where: { $0.id == participantID }) else { return }
+        participants[index].hasVideo = enabled
+        await resolver.applyAdminAction(.setParticipantVideoEnabled(participantId: participantID, enabled: enabled), in: currentSession)
+    }
+
+    func removeParticipant(participantID: String) async {
+        guard let currentSession else { return }
+        participants.removeAll { $0.id == participantID }
+        for index in breakoutRooms.indices {
+            breakoutRooms[index].participantIds.removeAll { $0 == participantID }
         }
-        hasReportedRoomLoad = false
-        phase = .failed
-        errorMessage = message
-        DebugLogger.shared.log("Join failed: \(message)", level: .error, category: "MeetSession")
+        await resolver.applyAdminAction(.removeParticipant(participantId: participantID), in: currentSession)
+        await syncBreakoutRooms()
     }
 
-    func webViewURL() -> URL? {
-        internalMeetingURL
+    func assignRole(participantID: String, role: MeetingParticipantRole) async {
+        guard let currentSession else { return }
+        guard let index = participants.firstIndex(where: { $0.id == participantID }) else { return }
+        participants[index].role = role
+        await resolver.applyAdminAction(.assignRole(participantId: participantID, role: role), in: currentSession)
+    }
+
+    func createBreakoutRoom(named name: String) async {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        breakoutRooms.append(MeetingBreakoutRoom(id: UUID().uuidString, name: trimmed, participantIds: []))
+        await syncBreakoutRooms()
+    }
+
+    func assignParticipant(_ participantID: String, to roomID: String?) async {
+        for index in breakoutRooms.indices {
+            breakoutRooms[index].participantIds.removeAll { $0 == participantID }
+        }
+
+        if let roomID, let roomIndex = breakoutRooms.firstIndex(where: { $0.id == roomID }) {
+            breakoutRooms[roomIndex].participantIds.append(participantID)
+        }
+
+        if let participantIndex = participants.firstIndex(where: { $0.id == participantID }) {
+            participants[participantIndex].breakoutRoomID = roomID
+        }
+
+        await syncBreakoutRooms()
+    }
+
+    var meetingStateLabel: String {
+        switch phase {
+        case .idle: return "Idle"
+        case .lobby: return "Lobby"
+        case .inMeeting: return "In Meeting"
+        case .ended: return "Ended"
+        case .failed: return "Failed"
+        }
+    }
+
+    func webViewDidStartLoadingPage() {}
+    func webViewDidFinishLoadingPage() {}
+    func webViewDidLeaveUnexpectedly() {}
+    func webViewDidFail(_ message: String) { errorMessage = message }
+    func webViewURL() -> URL? { nil }
+
+    private func syncBreakoutRooms() async {
+        guard let currentSession else { return }
+        await resolver.updateBreakoutRooms(breakoutRooms, in: currentSession)
     }
 
     private func transitionToLobby(_ session: MeetingSession) async {
         currentSession = session
         meetingIdInput = session.meetingId
-        internalMeetingURL = await resolver.internalRoomURL(for: session)
         phase = .lobby
-        hasReportedRoomLoad = false
         summary = MeetingSummaryState(
             recap: "AI recap will be generated after this meeting session.",
             actionItems: ["Capture blockers", "Summarize next steps"],
             transcriptPreview: "Transcript preview entry point is ready for integration."
         )
+        diagnostics = MeetingDiagnosticsState(
+            connectionState: "Connecting",
+            networkQuality: "Good",
+            latencyMs: 48,
+            packetLossPercent: 0.5
+        )
         participants = []
+        breakoutRooms = []
         messages = []
         await refreshDebugSnapshot()
         addSystemMessage("Session prepared for meeting ID \(session.meetingId).")
@@ -276,6 +356,7 @@ final class MeetSessionController: ObservableObject {
         if let index = participants.firstIndex(where: { $0.id == localParticipantID }) {
             participants[index].isMuted = isMicrophoneMuted
             participants[index].hasVideo = isCameraEnabled
+            participants[index].role = .host
             return
         }
         participants.insert(
@@ -285,9 +366,26 @@ final class MeetSessionController: ObservableObject {
                 joinedAt: Date(),
                 isSpeaking: false,
                 isMuted: isMicrophoneMuted,
-                hasVideo: isCameraEnabled
+                hasVideo: isCameraEnabled,
+                role: .host,
+                breakoutRoomID: nil
             ),
             at: 0
         )
+
+        participants.append(
+            MeetingParticipant(
+                id: "guest-1",
+                displayName: "Alex",
+                joinedAt: Date(),
+                isSpeaking: true,
+                isMuted: false,
+                hasVideo: true,
+                role: .participant,
+                breakoutRoomID: nil
+            )
+        )
     }
 }
+
+typealias MeetSessionController = MeetingStateManager
