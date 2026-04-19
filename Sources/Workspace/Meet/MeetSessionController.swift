@@ -792,6 +792,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private func setInputEnabled(
         _ inputs: [String: Bool]
     ) async -> Bool {
+        guard !inputs.isEmpty else { return false }
         var mappedInputs: [OutboundMediaType: Bool] = [:]
         var unsupportedInputs: [String] = []
         for (inputName, isEnabled) in inputs {
