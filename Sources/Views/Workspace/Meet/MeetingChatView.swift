@@ -19,7 +19,7 @@ struct MeetingChatView: View {
                     description: Text("Threads appear only when received from live session events.")
                 )
             } else {
-                Picker("Thread", selection: selectedThreadBinding) {
+                Picker("Thread", selection: selectedThreadBinding(defaultID: threads[0].id)) {
                     ForEach(threads) { thread in
                         Text(thread.title).tag(thread.id)
                     }
@@ -90,9 +90,9 @@ struct MeetingChatView: View {
         return messages.filter { $0.threadId == selectedThreadID }
     }
 
-    private var selectedThreadBinding: Binding<String> {
+    private func selectedThreadBinding(defaultID: String) -> Binding<String> {
         Binding<String>(
-            get: { selectedThreadID ?? threads.first?.id ?? "" },
+            get: { selectedThreadID ?? defaultID },
             set: { selectedThreadID = $0 }
         )
     }

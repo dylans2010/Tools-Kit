@@ -157,9 +157,15 @@ final class MeetingStateManager: NSObject, ObservableObject {
         lobbyState.cameraPermission = await cam
         if settings.selectedAudioDevice.isEmpty {
             settings.selectedAudioDevice = availableAudioDevices.first ?? ""
+            if settings.selectedAudioDevice.isEmpty {
+                DebugLogger.shared.log("No runtime audio devices reported.", level: .warning, category: "Meet")
+            }
         }
         if settings.selectedVideoDevice.isEmpty {
             settings.selectedVideoDevice = availableVideoDevices.first ?? ""
+            if settings.selectedVideoDevice.isEmpty {
+                DebugLogger.shared.log("No runtime video devices reported.", level: .warning, category: "Meet")
+            }
         }
         lobbyState.isCheckingDevices = false
         lobbyState.isLoadingParticipants = false
@@ -219,12 +225,12 @@ final class MeetingStateManager: NSObject, ObservableObject {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         guard phase == .inMeeting else { return }
-        errorMessage = "Chat send is unavailable until Daily chat event integration is configured."
+        errorMessage = "Chat is currently unavailable."
         DebugLogger.shared.log("Blocked local-only chat send for thread \(threadId) to avoid non-Daily simulated state.", level: .warning, category: "Meet")
     }
 
     func addThread(named title: String) {
-        errorMessage = "Thread creation is unavailable until Daily chat thread events are configured."
+        errorMessage = "Creating new threads is currently unavailable."
         DebugLogger.shared.log("Blocked local-only thread creation (\(title)) to avoid simulated state.", level: .warning, category: "Meet")
     }
 
@@ -275,12 +281,12 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     func createBreakoutRoom(named name: String) async {
-        errorMessage = "Breakout management requires Daily breakout-room event integration."
+        errorMessage = "Breakout room management is currently unavailable."
         DebugLogger.shared.log("Blocked local-only breakout creation (\(name)) to avoid simulated state.", level: .warning, category: "Meet")
     }
 
     func assignParticipant(_ participantID: String, to roomID: String?) async {
-        errorMessage = "Breakout assignment requires Daily breakout-room event integration."
+        errorMessage = "Assigning participants to breakout rooms is currently unavailable."
         DebugLogger.shared.log("Blocked local-only breakout assignment for participant \(participantID) room \(roomID ?? "main") to avoid simulated state.", level: .warning, category: "Meet")
     }
 
@@ -486,9 +492,9 @@ extension MeetingStateManager: CallClientDelegate {
             diagnostics.connectionState = stateDescription
             let normalized = stateDescription.lowercased()
             if normalized == "reconnecting" {
-                appendSystemMessage("Connection is reconnecting.")
+                appendSystemMessage("Reconnecting to meeting...")
             } else if normalized == "disconnected" || normalized == "left" {
-                appendSystemMessage("Connection disconnected.")
+                appendSystemMessage("Disconnected from meeting.")
             } else if normalized == "joined" || normalized == "connected" {
                 appendSystemMessage("Connected to meeting.")
             } else if normalized == "failed" || normalized == "error" {
