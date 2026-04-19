@@ -804,7 +804,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
             }
         }
 
-        let supportedInputsApplied = mappedInputs.isEmpty ? true : await setInputEnabled(mappedInputs)
+        let hasMappedInputs = !mappedInputs.isEmpty
+        let supportedInputsApplied = hasMappedInputs ? await setInputEnabled(mappedInputs) : false
         let hasUnsupportedInputs = !unsupportedInputs.isEmpty
         if hasUnsupportedInputs {
             let inputNames = unsupportedInputs.sorted().joined(separator: ", ")
@@ -812,7 +813,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
             DebugLogger.shared.log("Unsupported Daily media inputs requested: \(inputNames).", level: .warning, category: "Meet")
         }
 
-        return supportedInputsApplied && !hasUnsupportedInputs
+        return hasMappedInputs && supportedInputsApplied && !hasUnsupportedInputs
     }
     #else
     @discardableResult
