@@ -215,17 +215,15 @@ final class MeetingStateManager: NSObject, ObservableObject {
         isScreenSharing.toggle()
     }
 
-    func sendMessage(_ text: String, threadId: String = "general") {
+    func sendMessage(_ text: String, threadId _: String = "general") {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         guard phase == .inMeeting else { return }
-        _ = threadId
         errorMessage = "Chat send is unavailable until Daily chat event integration is configured."
         DebugLogger.shared.log("Blocked local-only chat send to avoid non-Daily simulated state.", level: .warning, category: "Meet")
     }
 
-    func addThread(named title: String) {
-        _ = title
+    func addThread(named _: String) {
         errorMessage = "Thread creation is unavailable until Daily chat thread events are configured."
         DebugLogger.shared.log("Blocked local-only thread creation to avoid simulated state.", level: .warning, category: "Meet")
     }
@@ -276,15 +274,12 @@ final class MeetingStateManager: NSObject, ObservableObject {
         await resolver.applyAdminAction(.assignRole(participantId: participantID, role: role), in: currentSession)
     }
 
-    func createBreakoutRoom(named name: String) async {
-        _ = name
+    func createBreakoutRoom(named _: String) async {
         errorMessage = "Breakout management requires Daily breakout-room event integration."
         DebugLogger.shared.log("Blocked local-only breakout creation to avoid simulated state.", level: .warning, category: "Meet")
     }
 
-    func assignParticipant(_ participantID: String, to roomID: String?) async {
-        _ = participantID
-        _ = roomID
+    func assignParticipant(_: String, to _: String?) async {
         errorMessage = "Breakout assignment requires Daily breakout-room event integration."
         DebugLogger.shared.log("Blocked local-only breakout assignment to avoid simulated state.", level: .warning, category: "Meet")
     }
@@ -490,13 +485,13 @@ extension MeetingStateManager: CallClientDelegate {
             let stateDescription = String(describing: state)
             diagnostics.connectionState = stateDescription
             let normalized = stateDescription.lowercased()
-            if normalized.contains("reconnect") {
+            if normalized == "reconnecting" {
                 appendSystemMessage("Connection is reconnecting.")
-            } else if normalized.contains("disconnect") || normalized.contains("left") {
+            } else if normalized == "disconnected" || normalized == "left" {
                 appendSystemMessage("Connection disconnected.")
-            } else if normalized.contains("join") || normalized.contains("connect") {
+            } else if normalized == "joined" || normalized == "connected" {
                 appendSystemMessage("Connected to meeting.")
-            } else if normalized.contains("error") || normalized.contains("fail") {
+            } else if normalized == "failed" || normalized == "error" {
                 appendSystemMessage("Connection failed.")
             }
             if state == .joined {

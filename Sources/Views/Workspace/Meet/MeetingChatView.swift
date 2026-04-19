@@ -77,10 +77,11 @@ struct MeetingChatView: View {
             }
         }
         .onChange(of: threadIDs, initial: false) { _, ids in
-            if let selectedThreadID, ids.contains(selectedThreadID) {
-                return
+            if let selectedThreadID, !ids.contains(selectedThreadID) {
+                self.selectedThreadID = ids.first
+            } else if selectedThreadID == nil {
+                selectedThreadID = ids.first
             }
-            self.selectedThreadID = ids.first
         }
     }
 
