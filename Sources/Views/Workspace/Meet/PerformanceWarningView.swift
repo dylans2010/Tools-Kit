@@ -3,10 +3,11 @@ import SwiftUI
 struct PerformanceWarningView: View {
     let warnings: [MeetingCPUWarning]
     let onDismiss: (String) -> Void
+    private let maxVisibleWarnings = 2
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            ForEach(warnings.suffix(2)) { warning in
+            ForEach(warnings.suffix(maxVisibleWarnings)) { warning in
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(warning.message)

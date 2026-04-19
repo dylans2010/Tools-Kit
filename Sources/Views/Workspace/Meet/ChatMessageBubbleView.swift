@@ -27,7 +27,7 @@ struct ChatMessageBubbleView: View {
                 if !message.reactions.isEmpty {
                     HStack(spacing: 6) {
                         ForEach(message.reactions.keys.sorted(), id: \.self) { emoji in
-                            Text("\(emoji) \(message.reactions[emoji] ?? 0)")
+                            Text("\(emoji) \(message.reactions[emoji, default: 0])")
                                 .font(.caption2)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)

@@ -22,12 +22,8 @@ struct PreJoinView: View {
             TextField("Enter your name", text: $manager.displayNameInput)
                 .textFieldStyle(.roundedBorder)
 
-            Toggle("Microphone", isOn: Binding(get: { !manager.isMicrophoneMuted }, set: { newValue in
-                if newValue == manager.isMicrophoneMuted { manager.toggleMute() }
-            }))
-            Toggle("Camera", isOn: Binding(get: { manager.isCameraEnabled }, set: { newValue in
-                if newValue != manager.isCameraEnabled { manager.toggleCamera() }
-            }))
+            Toggle("Microphone", isOn: Binding(get: { !manager.isMicrophoneMuted }, set: { _ in manager.toggleMute() }))
+            Toggle("Camera", isOn: Binding(get: { manager.isCameraEnabled }, set: { _ in manager.toggleCamera() }))
 
             Picker("Microphone Device", selection: Binding(get: { manager.settings.selectedAudioDevice }, set: { manager.setAudioDevice($0) })) {
                 ForEach(manager.availableAudioDevices, id: \.self) { device in

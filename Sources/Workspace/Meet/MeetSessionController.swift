@@ -18,6 +18,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private static let guestDisplayName = "Guest"
     private static let dailyErrorWarningMessage = "Daily reported an error."
     private static let dailyErrorWarningAction = "Try turning off camera or reconnecting."
+    private static let poorConnectionWarningMessage = "Connection quality is poor."
     static let shared = MeetingStateManager()
     private static let sensitiveQueryParameterNames: Set<String> = [
         "t", "token", "access_token", "refresh_token", "session", "session_token",
@@ -88,6 +89,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private var activeSpeakerID: String?
     private var activeStartedSession: MeetingSession?
     private var pendingCreatorHostAssignment = false
+    private var lastBroadcastNetworkSignature = ""
 
     #if canImport(Daily)
     private var callClient: CallClient?
@@ -333,11 +335,11 @@ final class MeetingStateManager: NSObject, ObservableObject {
         }
 
         do {
-            callKitManager.reportOutgoingCallStart(meetingID: currentSession.meetingId)
             await leaveDailyRoom(reason: "pre-join reset")
             resetMeetingRuntimeStateForJoin()
             try await beginAndJoinSession(currentSession, roomURL: roomURL)
             phase = .inMeeting
+            callKitManager.reportOutgoingCallStart(meetingID: currentSession.meetingId)
             callKitManager.updateConnected()
             await refreshDebugSnapshot()
         } catch {
@@ -414,9 +416,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         let line = MeetingCaptionLine(id: UUID().uuidString, speaker: speaker, text: text, timestamp: timestamp)
         captions.append(line)
-        if captions.count > 200 {
-            captions.removeFirst(captions.count - 200)
-        }
+        if captions.count > 200 { captions.removeFirst() }
         if broadcast {
             sendRealtimePayload(.caption(
                 id: line.id,
@@ -501,9 +501,6 @@ final class MeetingStateManager: NSObject, ObservableObject {
             reactions: [:]
         )
         messages.append(message)
-        if isCaptionsEnabled {
-            appendCaptionLine(speaker: message.senderName, text: message.text)
-        }
         sendRealtimePayload(.chat(
             id: message.id,
             threadId: threadId,
@@ -511,9 +508,6 @@ final class MeetingStateManager: NSObject, ObservableObject {
             text: message.text,
             sentAt: message.sentAt.timeIntervalSince1970
         ))
-        if let index = messages.firstIndex(where: { $0.id == message.id }) {
-            messages[index].deliveryState = .delivered
-        }
     }
 
     func reactToMessage(messageID: String, emoji: String) {
@@ -731,6 +725,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         backgroundEffect = .off
         isPiPEnabled = false
         isPiPActive = false
+        lastBroadcastNetworkSignature = ""
         await refreshDebugSnapshot()
     }
 
@@ -957,9 +952,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
     private func applyReactionEvent(_ event: MeetingReactionEvent) {
         reactions.append(event)
-        if reactions.count > 40 {
-            reactions.removeFirst(reactions.count - 40)
-        }
+        if reactions.count > 40 { reactions.removeFirst() }
     }
 
     private func addCPUWarning(message: String, action: String) {
@@ -970,9 +963,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
             createdAt: Date()
         )
         cpuWarnings.append(warning)
-        if cpuWarnings.count > 10 {
-            cpuWarnings.removeFirst(cpuWarnings.count - 10)
-        }
+        if cpuWarnings.count > 10 { cpuWarnings.removeFirst() }
     }
 
     private func updateDerivedNetworkQuality() {
@@ -989,7 +980,12 @@ final class MeetingStateManager: NSObject, ObservableObject {
         }
         diagnostics.networkQuality = networkQuality.label
         if networkQuality == .poor {
-            addCPUWarning(message: "Connection quality is poor.", action: "Turn off camera or close background apps.")
+            let alreadyHasConnectionWarning = cpuWarnings.contains {
+                $0.message == Self.poorConnectionWarningMessage
+            }
+            if !alreadyHasConnectionWarning {
+                addCPUWarning(message: Self.poorConnectionWarningMessage, action: "Turn off camera or close background apps.")
+            }
         }
     }
 
@@ -1231,9 +1227,6 @@ final class MeetingStateManager: NSObject, ObservableObject {
                 chatThreads.append(.init(id: threadId, title: "General"))
             }
             messages.append(.init(id: id, threadId: threadId, senderName: senderName, text: text, sentAt: Date(timeIntervalSince1970: sentAt), isSystem: false, deliveryState: .delivered, reactions: [:]))
-            if isCaptionsEnabled {
-                appendCaptionLine(speaker: senderName, text: text, timestamp: Date(timeIntervalSince1970: sentAt))
-            }
         case let .threadAdded(id, title):
             if !chatThreads.contains(where: { $0.id == id }) {
                 chatThreads.append(.init(id: id, title: title))
@@ -1278,7 +1271,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
             networkQuality = MeetingNetworkQuality(rawValue: quality) ?? .good
             diagnostics.networkQuality = networkQuality.label
         case let .cpuWarning(message, action, createdAt):
-            cpuWarnings.append(.init(id: UUID().uuidString, message: message, suggestedAction: action, createdAt: Date(timeIntervalSince1970: createdAt)))
+            addCPUWarning(message: message, action: action)
         case let .backgroundEffectChanged(effect):
             backgroundEffect = MeetingBackgroundEffect(rawValue: effect) ?? .off
         case let .noiseCancellationChanged(isEnabled):
@@ -1322,6 +1315,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         backgroundEffect = .off
         isPiPEnabled = false
         isPiPActive = false
+        lastBroadcastNetworkSignature = ""
         piPController.stop()
     }
 
@@ -1488,10 +1482,8 @@ extension MeetingStateManager: CallClientDelegate {
                 appendSystemMessage("Reconnecting to meeting...")
             } else if normalized == "disconnected" || normalized == "left" {
                 appendSystemMessage("Disconnected from meeting.")
-                callKitManager.endCall()
             } else if normalized == "joined" || normalized == "connected" {
                 appendSystemMessage("Connected to meeting.")
-                callKitManager.updateConnected()
             } else if normalized == "failed" || normalized == "error" {
                 appendSystemMessage("Connection failed.")
             }
@@ -1499,7 +1491,11 @@ extension MeetingStateManager: CallClientDelegate {
                 phase = .inMeeting
             }
             updateDerivedNetworkQuality()
-            sendRealtimePayload(.networkQualityUpdated(quality: networkQuality.rawValue, latencyMs: diagnostics.latencyMs, packetLossPercent: diagnostics.packetLossPercent))
+            let networkStateSignature = "\(networkQuality.rawValue)-\(diagnostics.latencyMs)-\(diagnostics.packetLossPercent)"
+            if lastBroadcastNetworkSignature != networkStateSignature {
+                lastBroadcastNetworkSignature = networkStateSignature
+                sendRealtimePayload(.networkQualityUpdated(quality: networkQuality.rawValue, latencyMs: diagnostics.latencyMs, packetLossPercent: diagnostics.packetLossPercent))
+            }
             refreshParticipantsFromDaily()
         }
     }

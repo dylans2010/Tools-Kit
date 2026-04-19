@@ -14,7 +14,7 @@ struct ReactionsOverlayView: View {
                         .buttonStyle(.bordered)
                 }
             }
-            if let recent = reactions.suffix(5).last {
+            if let recent = reactions.last {
                 Text("\(recent.participantName) reacted \(recent.emoji)")
                     .font(.caption)
                     .foregroundStyle(.secondary)

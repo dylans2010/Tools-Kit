@@ -26,7 +26,11 @@ final class CallKitManager: NSObject, ObservableObject {
         let update = CXCallUpdate()
         update.remoteHandle = CXHandle(type: .generic, value: "Meeting \(meetingID)")
         update.hasVideo = true
-        providerWrapper.provider.reportNewIncomingCall(with: callUUID, update: update, completion: nil)
+        providerWrapper.provider.reportNewIncomingCall(with: callUUID, update: update) { error in
+            if let error {
+                NSLog("CallKit incoming call report failed: \(error.localizedDescription)")
+            }
+        }
     }
 
     func reportOutgoingCallStart(meetingID: String) {
@@ -38,7 +42,11 @@ final class CallKitManager: NSObject, ObservableObject {
         let action = CXStartCallAction(call: callUUID, handle: handle)
         action.isVideo = true
         let transaction = CXTransaction(action: action)
-        callController.request(transaction, completion: nil)
+        callController.request(transaction) { error in
+            if let error {
+                NSLog("CallKit start call transaction failed: \(error.localizedDescription)")
+            }
+        }
         providerWrapper.provider.reportOutgoingCall(with: callUUID, startedConnectingAt: Date())
     }
 
@@ -51,7 +59,11 @@ final class CallKitManager: NSObject, ObservableObject {
         guard let callUUID = currentCallUUID else { return }
         let action = CXEndCallAction(call: callUUID)
         let transaction = CXTransaction(action: action)
-        callController.request(transaction, completion: nil)
+        callController.request(transaction) { error in
+            if let error {
+                NSLog("CallKit end call transaction failed: \(error.localizedDescription)")
+            }
+        }
         currentCallUUID = nil
     }
 }
