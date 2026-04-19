@@ -7,7 +7,7 @@ struct DraftingEmailResult {
 }
 
 struct DraftingEmailsView: View {
-    enum MailStyle: String, CaseIterable, Identifiable {
+    enum MailStyle: String, CaseIterable, Identifiable, Hashable {
         case professional = "Professional"
         case friendly = "Friendly"
         case executive = "Executive"
@@ -16,7 +16,7 @@ struct DraftingEmailsView: View {
         var id: String { rawValue }
     }
 
-    enum MailGoal: String, CaseIterable, Identifiable {
+    enum MailGoal: String, CaseIterable, Identifiable, Hashable {
         case statusUpdate = "Status Update"
         case followUp = "Follow Up"
         case proposal = "Proposal"
@@ -26,7 +26,7 @@ struct DraftingEmailsView: View {
         var id: String { rawValue }
     }
 
-    enum OutputLength: String, CaseIterable, Identifiable {
+    enum OutputLength: String, CaseIterable, Identifiable, Hashable {
         case short = "Short"
         case medium = "Medium"
         case long = "Long"

@@ -6,7 +6,7 @@ struct TranslateEmailView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    enum TranslationTone: String, CaseIterable, Identifiable {
+    enum TranslationTone: String, CaseIterable, Identifiable, Hashable {
         case preserve = "Preserve Tone"
         case formal = "Formal"
         case neutral = "Neutral"
@@ -15,7 +15,7 @@ struct TranslateEmailView: View {
         var id: String { rawValue }
     }
 
-    enum TranslationMode: String, CaseIterable, Identifiable {
+    enum TranslationMode: String, CaseIterable, Identifiable, Hashable {
         case direct = "Direct"
         case polished = "Polished"
         case concise = "Concise"
