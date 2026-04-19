@@ -777,6 +777,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private func setInputEnabled(
         _ inputs: [OutboundMediaType: Bool]
     ) async -> Bool {
+        guard !inputs.isEmpty else { return false }
         guard let callClient else { return false }
         do {
             try await callClient.setInputsEnabled(inputs)
@@ -804,15 +805,14 @@ final class MeetingStateManager: NSObject, ObservableObject {
             }
         }
 
-        let supportedInputsApplied = mappedInputs.isEmpty ? false : await setInputEnabled(mappedInputs)
+        let supportedInputsApplied = await setInputEnabled(mappedInputs)
         let hasUnsupportedInputs = !unsupportedInputs.isEmpty
         if hasUnsupportedInputs {
             let inputNames = unsupportedInputs.sorted().joined(separator: ", ")
-            if supportedInputsApplied {
-                DebugLogger.shared.log("Unsupported Daily media inputs requested: \(inputNames).", level: .warning, category: "Meet")
-            } else {
+            let message = "Unsupported Daily media inputs requested: \(inputNames)."
+            DebugLogger.shared.log(message, level: .warning, category: "Meet")
+            if !supportedInputsApplied {
                 errorMessage = "Unsupported media inputs requested: \(inputNames)."
-                DebugLogger.shared.log("Unsupported Daily media inputs requested: \(inputNames).", level: .warning, category: "Meet")
             }
         }
 
