@@ -187,6 +187,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
         var scheduledMeeting = scheduledMeetings[index]
         let now = Date()
+        // Meeting activation is deterministic: scheduled meetings become join-eligible
+        // exactly at their scheduled timestamp.
         guard now >= scheduledMeeting.scheduledAt else {
             errorMessage = "This meeting is scheduled for \(scheduledMeeting.scheduledAt.formatted(date: .abbreviated, time: .shortened)) and is not active yet."
             return
@@ -698,6 +700,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
 extension MeetingStateManager: CallClientDelegate {
     nonisolated private func isStaleCallback(callClient: CallClient) async -> Bool {
         await MainActor.run {
+            // A nil active client means there is no current session, so any callback
+            // arriving now must belong to an old/destroyed client.
             guard let current = self.callClient else { return true }
             return current !== callClient
         }

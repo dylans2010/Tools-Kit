@@ -364,6 +364,7 @@ actor DailyService {
         if !persistedValue.isEmpty {
             return persistedValue
         }
+        await log("Missing Daily API key in persistent storage key '\(DailyService.persistedAPIKeyStorageKey)'.", level: .error)
         throw ServiceError.missingAPIKey
     }
 
