@@ -88,6 +88,8 @@ struct AdminControlsView: View {
     }
 
     private var spotlightCandidates: [MeetingParticipant] {
+        // Keep active screen-share presenters out of spotlight picker to avoid conflicting
+        // dominant-layout intents between presenter mode and spotlight mode.
         manager.participants.filter { !$0.isScreenSharing }
     }
 }

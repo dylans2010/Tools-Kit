@@ -325,12 +325,12 @@ final class MeetingStateManager: NSObject, ObservableObject {
     func leaveMeeting() async {
         guard let currentSession else { return }
         await leaveDailyRoom(reason: "user leave")
+        var endedSessionIDs: Set<String> = []
         if let activeStartedSession {
             await resolver.endSession(activeStartedSession)
-            if activeStartedSession.sessionId != currentSession.sessionId {
-                await resolver.endSession(currentSession)
-            }
-        } else {
+            endedSessionIDs.insert(activeStartedSession.sessionId)
+        }
+        if !endedSessionIDs.contains(currentSession.sessionId) {
             await resolver.endSession(currentSession)
         }
         self.activeStartedSession = nil
