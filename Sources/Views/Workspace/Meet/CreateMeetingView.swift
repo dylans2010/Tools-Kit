@@ -18,9 +18,11 @@ struct CreateMeetingView: View {
                         Text("Generated Meeting ID")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                        Text(manager.currentSession?.meetingId ?? "Generated after creation")
-                            .font(.headline.monospaced())
-                            .textSelection(.enabled)
+                        if let meetingId = manager.currentSession?.meetingId {
+                            Text(meetingId)
+                                .font(.headline.monospaced())
+                                .textSelection(.enabled)
+                        }
                     }
 
                     Button {

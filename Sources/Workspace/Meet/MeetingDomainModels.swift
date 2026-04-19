@@ -85,8 +85,8 @@ enum MeetingQualitySetting: String, CaseIterable, Identifiable {
 }
 
 struct MeetingSettingsState {
-    var selectedAudioDevice = "Default Microphone"
-    var selectedVideoDevice = "Default Camera"
+    var selectedAudioDevice = ""
+    var selectedVideoDevice = ""
     var layoutPreference: MeetingLayoutPreference = .grid
     var qualitySetting: MeetingQualitySetting = .auto
     var outputVolume: Double = 0.75

@@ -5,9 +5,14 @@ struct AudioSettingsView: View {
 
     var body: some View {
         Section("Audio") {
-            Picker("Microphone", selection: $manager.settings.selectedAudioDevice) {
-                ForEach(manager.availableAudioDevices, id: \.self) { device in
-                    Text(device).tag(device)
+            if manager.availableAudioDevices.isEmpty {
+                Text("No audio devices reported by runtime.")
+                    .foregroundStyle(.secondary)
+            } else {
+                Picker("Microphone", selection: $manager.settings.selectedAudioDevice) {
+                    ForEach(manager.availableAudioDevices, id: \.self) { device in
+                        Text(device).tag(device)
+                    }
                 }
             }
 

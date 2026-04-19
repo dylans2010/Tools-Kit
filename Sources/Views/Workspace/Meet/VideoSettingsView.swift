@@ -5,9 +5,14 @@ struct VideoSettingsView: View {
 
     var body: some View {
         Section("Video") {
-            Picker("Camera", selection: $manager.settings.selectedVideoDevice) {
-                ForEach(manager.availableVideoDevices, id: \.self) { device in
-                    Text(device).tag(device)
+            if manager.availableVideoDevices.isEmpty {
+                Text("No video devices reported by runtime.")
+                    .foregroundStyle(.secondary)
+            } else {
+                Picker("Camera", selection: $manager.settings.selectedVideoDevice) {
+                    ForEach(manager.availableVideoDevices, id: \.self) { device in
+                        Text(device).tag(device)
+                    }
                 }
             }
 

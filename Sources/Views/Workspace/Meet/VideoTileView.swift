@@ -40,11 +40,9 @@ struct VideoTileView: View {
         #if canImport(Daily)
         if let track {
             MeetingDailyVideoView(track: track)
-        } else {
-            Color.gray.opacity(0.2)
         }
         #else
-        Color.gray.opacity(0.2)
+        EmptyView()
         #endif
     }
 }

@@ -10,10 +10,7 @@ struct MeetingSummaryView: View {
             }
 
             Section("Action Items") {
-                if summary.actionItems.isEmpty {
-                    Text("Action items will appear here.")
-                        .foregroundColor(.secondary)
-                } else {
+                if !summary.actionItems.isEmpty {
                     ForEach(summary.actionItems, id: \.self) { item in
                         Label(item, systemImage: "checkmark.circle")
                     }
