@@ -49,11 +49,12 @@ struct MeetingContainerView: View {
                 ParticipantsView(
                     participants: manager.participants,
                     onSelectParticipant: { participant in
-                        guard manager.isCurrentUserHost, participant.id != manager.localParticipantID else { return }
+                        guard manager.isCurrentUserHost, let localParticipantID = manager.localParticipantID, participant.id != localParticipantID else { return }
                         selectedParticipant = participant
                     },
                     canManageParticipant: { participant in
-                        manager.isCurrentUserHost && participant.id != manager.localParticipantID
+                        guard manager.isCurrentUserHost, let localParticipantID = manager.localParticipantID else { return false }
+                        return participant.id != localParticipantID
                     }
                 )
                 .navigationTitle("Participants")

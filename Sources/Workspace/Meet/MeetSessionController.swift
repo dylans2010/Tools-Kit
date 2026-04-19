@@ -370,26 +370,48 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
     private func setMicrophoneEnabled(_ enabled: Bool, fallbackMutedState: Bool) async {
         #if canImport(Daily)
-        guard let callClient else { return }
-        do {
-            try await callClient.setInputsEnabled([.microphone: enabled])
-        } catch {
+        await setInputEnabled([.microphone: enabled]) {
             isMicrophoneMuted = fallbackMutedState
-            errorMessage = "Failed to update microphone state: \(error.localizedDescription)"
         }
+        #else
+        _ = enabled
+        isMicrophoneMuted = fallbackMutedState
         #endif
     }
 
     private func setCameraEnabled(_ enabled: Bool, fallbackCameraState: Bool) async {
         #if canImport(Daily)
+        await setInputEnabled([.camera: enabled]) {
+            isCameraEnabled = fallbackCameraState
+        }
+        #else
+        _ = enabled
+        isCameraEnabled = fallbackCameraState
+        #endif
+    }
+
+    #if canImport(Daily)
+    private func setInputEnabled(
+        _ inputs: [InputSettings.Key: Bool],
+        onFailure: @escaping @MainActor () -> Void
+    ) async {
         guard let callClient else { return }
         do {
-            try await callClient.setInputsEnabled([.camera: enabled])
+            try await callClient.setInputsEnabled(inputs)
         } catch {
-            isCameraEnabled = fallbackCameraState
-            errorMessage = "Failed to update camera state: \(error.localizedDescription)"
+            onFailure()
+            errorMessage = "Failed to update media state: \(error.localizedDescription)"
         }
-        #endif
+    }
+    #else
+    private func setInputEnabled(
+        _ inputs: [String: Bool],
+        onFailure: @escaping @MainActor () -> Void
+    ) async {
+        _ = inputs
+        onFailure()
+    }
+    #endif
     }
 
     private func leaveDailyRoom() async {
@@ -443,14 +465,14 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
         participantVideoTracks = Dictionary(uniqueKeysWithValues: allParticipants.compactMap { participant in
             guard let track = participant.media?.camera.track else { return nil }
-            return ("\(participant.id)", track)
+            return (participantIDString(participant), track)
         })
 
-        let currentLocalParticipantID = allParticipants.first(where: { $0.info.isLocal }).map { "\($0.id)" }
+        let currentLocalParticipantID = allParticipants.first(where: { $0.info.isLocal }).map { participantIDString($0) }
         localParticipantID = currentLocalParticipantID
 
         participants = allParticipants.map { participant in
-            let participantID = "\(participant.id)"
+            let participantID = participantIDString(participant)
             let isLocal = participant.info.isLocal
             let role = participantRoles[participantID] ?? (isLocal ? .host : .participant)
             let existingParticipant = participants.first(where: { $0.id == participantID })
@@ -470,7 +492,11 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private nonisolated func participantDisplayName(_ participant: Participant) -> String {
         let trimmed = participant.info.username?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         if !trimmed.isEmpty { return trimmed }
-        return "\(participant.id)"
+        return participantIDString(participant)
+    }
+
+    private nonisolated func participantIDString(_ participant: Participant) -> String {
+        "\(participant.id)"
     }
     #endif
 }
@@ -495,7 +521,7 @@ extension MeetingStateManager: CallClientDelegate {
 
     nonisolated func callClient(_ callClient: CallClient, participantLeft participant: Participant, withReason reason: ParticipantLeftReason) {
         Task { @MainActor in
-            let participantID = "\(participant.id)"
+            let participantID = participantIDString(participant)
             participantVideoTracks.removeValue(forKey: participantID)
             if activeSpeakerID == participantID {
                 activeSpeakerID = nil
@@ -512,7 +538,7 @@ extension MeetingStateManager: CallClientDelegate {
 
     nonisolated func callClient(_ callClient: CallClient, activeSpeakerChanged activeSpeaker: Participant?) {
         Task { @MainActor in
-            activeSpeakerID = activeSpeaker.map { "\($0.id)" }
+            activeSpeakerID = activeSpeaker.map { participantIDString($0) }
             refreshParticipantsFromDaily()
         }
     }
