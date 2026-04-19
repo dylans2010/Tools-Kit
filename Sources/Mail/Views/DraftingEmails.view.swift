@@ -287,7 +287,7 @@ struct DraftingEmailsView: View {
             .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
     }
 
-    private func pickerChip<T: CaseIterable & Identifiable & RawRepresentable>(title: String, selection: Binding<T>) -> some View where T.RawValue == String {
+    private func pickerChip<T: CaseIterable & Identifiable & RawRepresentable & Hashable>(title: String, selection: Binding<T>) -> some View where T.RawValue == String {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.caption2.weight(.semibold))
