@@ -763,19 +763,25 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
     private func setScreenShareEnabled(_ enabled: Bool) async {
         #if canImport(Daily)
-        if enabled {
-            errorMessage = "Screen sharing is unavailable in this Daily SDK build because `OutboundMediaType.screenVideo` is not exposed. Update to a Daily SDK version that supports screen-video input toggling."
-            DebugLogger.shared.log("Screen share enable blocked: OutboundMediaType.screenVideo is unavailable in the imported Daily SDK.", level: .warning, category: "Meet")
-            isScreenSharing = false
-            return
-        }
-        isScreenSharing = false
+        await setInputEnabledByName(["screenVideo": enabled])
         #else
         await setInputEnabled(["screenVideo": enabled])
         #endif
+        isScreenSharing = enabled
     }
 
     #if canImport(Daily)
+    private func setInputEnabledByName(
+        _ inputs: [String: Bool]
+    ) async {
+        guard let callClient else { return }
+        do {
+            try await callClient.setInputsEnabled(inputs)
+        } catch {
+            errorMessage = "Failed to update media state: \(error.localizedDescription)"
+        }
+    }
+
     private func setInputEnabled(
         _ inputs: [OutboundMediaType: Bool]
     ) async {
