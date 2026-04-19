@@ -11,7 +11,7 @@ struct MeetPermissionService {
 
     static func availableVideoDevices() -> [String] {
         let discovery = AVCaptureDevice.DiscoverySession(
-            deviceTypes: [.builtInWideAngleCamera, .builtInDualCamera, .builtInDualWideCamera, .builtInTripleCamera, .externalUnknown],
+            deviceTypes: [.builtInWideAngleCamera, .builtInDualCamera, .builtInDualWideCamera, .builtInTripleCamera],
             mediaType: .video,
             position: .unspecified
         )
