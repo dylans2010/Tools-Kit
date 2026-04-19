@@ -749,6 +749,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
         #if canImport(Daily)
         await setInputEnabled([.microphone: enabled])
         #else
+        // Fallback builds cannot reference Daily's OutboundMediaType, so string keys
+        // are used only to describe the attempted toggle in diagnostic messaging.
         await setInputEnabled(["microphone": enabled])
         #endif
     }
@@ -757,31 +759,24 @@ final class MeetingStateManager: NSObject, ObservableObject {
         #if canImport(Daily)
         await setInputEnabled([.camera: enabled])
         #else
+        // Fallback builds cannot reference Daily's OutboundMediaType, so string keys
+        // are used only to describe the attempted toggle in diagnostic messaging.
         await setInputEnabled(["camera": enabled])
         #endif
     }
 
     private func setScreenShareEnabled(_ enabled: Bool) async {
         #if canImport(Daily)
-        await setInputEnabledByName(["screenVideo": enabled])
+        await setInputEnabled([.screenVideo: enabled])
         #else
+        // Fallback builds cannot reference Daily's OutboundMediaType, so string keys
+        // are used only to describe the attempted toggle in diagnostic messaging.
         await setInputEnabled(["screenVideo": enabled])
         #endif
         isScreenSharing = enabled
     }
 
     #if canImport(Daily)
-    private func setInputEnabledByName(
-        _ inputs: [String: Bool]
-    ) async {
-        guard let callClient else { return }
-        do {
-            try await callClient.setInputsEnabled(inputs)
-        } catch {
-            errorMessage = "Failed to update media state: \(error.localizedDescription)"
-        }
-    }
-
     private func setInputEnabled(
         _ inputs: [OutboundMediaType: Bool]
     ) async {
@@ -796,6 +791,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
     private func setInputEnabled(
         _ inputs: [String: Bool]
     ) async {
+        // Daily types are unavailable in this build; we keep string keys only for
+        // fallback diagnostics so the UI can surface which input toggle was requested.
         let inputNames = inputs.keys.sorted().joined(separator: ", ")
         guard !inputNames.isEmpty else { return }
         errorMessage = "Daily SDK is unavailable, so \(inputNames) state cannot be updated."

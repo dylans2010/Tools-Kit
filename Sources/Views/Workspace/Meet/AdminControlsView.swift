@@ -8,7 +8,7 @@ struct AdminControlsView: View {
 
     var body: some View {
         List {
-            Section("Global Controls") {
+            Section(header: Text("Global Controls")) {
                 Button("Mute All Participants") {
                     Task { await manager.muteAllParticipants() }
                 }
@@ -32,7 +32,7 @@ struct AdminControlsView: View {
                 }
             }
 
-            Section("Participants") {
+            Section(header: Text("Participants")) {
                 ForEach(manager.participants.filter { $0.role != .host }) { participant in
                     NavigationLink(participant.displayName) {
                         ParticipantAdminPanelView(manager: manager, participant: participant)
@@ -40,7 +40,7 @@ struct AdminControlsView: View {
                 }
             }
 
-            Section("Spotlight / Pin") {
+            Section(header: Text("Spotlight / Pin")) {
                 Picker("Spotlight", selection: Binding(
                     get: { selectedSpotlightParticipantID },
                     set: {
@@ -67,7 +67,7 @@ struct AdminControlsView: View {
                 }
             }
 
-            Section("Breakout Rooms") {
+            Section(header: Text("Breakout Rooms")) {
                 Button("Manage Breakout Rooms") {
                     showingBreakoutManager = true
                 }
