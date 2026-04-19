@@ -72,16 +72,10 @@ struct MeetingChatView: View {
         .navigationTitle("Meeting Chat")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            if selectedThreadID == nil {
-                selectedThreadID = threads.first?.id
-            }
+            ensureSelectedThreadIsValid(for: threadIDs)
         }
         .onChange(of: threadIDs, initial: false) { _, ids in
-            if let selectedThreadID, !ids.contains(selectedThreadID) {
-                self.selectedThreadID = ids.first
-            } else if selectedThreadID == nil {
-                selectedThreadID = ids.first
-            }
+            ensureSelectedThreadIsValid(for: ids)
         }
     }
 
@@ -99,5 +93,12 @@ struct MeetingChatView: View {
 
     private var threadIDs: [String] {
         threads.map(\.id)
+    }
+
+    private func ensureSelectedThreadIsValid(for ids: [String]) {
+        if let selectedThreadID, ids.contains(selectedThreadID) {
+            return
+        }
+        selectedThreadID = ids.first
     }
 }

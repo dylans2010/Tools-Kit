@@ -155,18 +155,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
         lobbyState.microphonePermission = await mic
         lobbyState.cameraPermission = await cam
-        if settings.selectedAudioDevice.isEmpty {
-            settings.selectedAudioDevice = availableAudioDevices.first ?? ""
-            if settings.selectedAudioDevice.isEmpty {
-                DebugLogger.shared.log("No runtime audio devices reported.", level: .warning, category: "Meet")
-            }
-        }
-        if settings.selectedVideoDevice.isEmpty {
-            settings.selectedVideoDevice = availableVideoDevices.first ?? ""
-            if settings.selectedVideoDevice.isEmpty {
-                DebugLogger.shared.log("No runtime video devices reported.", level: .warning, category: "Meet")
-            }
-        }
+        initializeDeviceSelectionIfNeeded(deviceType: "audio", availableDevices: availableAudioDevices, selectedDevice: &settings.selectedAudioDevice)
+        initializeDeviceSelectionIfNeeded(deviceType: "video", availableDevices: availableVideoDevices, selectedDevice: &settings.selectedVideoDevice)
         lobbyState.isCheckingDevices = false
         lobbyState.isLoadingParticipants = false
     }
@@ -225,12 +215,12 @@ final class MeetingStateManager: NSObject, ObservableObject {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         guard phase == .inMeeting else { return }
-        errorMessage = "Chat is currently unavailable."
+        errorMessage = "Chat is currently unavailable. This feature requires Daily session support."
         DebugLogger.shared.log("Blocked local-only chat send for thread \(threadId) to avoid non-Daily simulated state.", level: .warning, category: "Meet")
     }
 
     func addThread(named title: String) {
-        errorMessage = "Creating new threads is currently unavailable."
+        errorMessage = "Creating new threads is currently unavailable. This feature requires Daily session support."
         DebugLogger.shared.log("Blocked local-only thread creation (\(title)) to avoid simulated state.", level: .warning, category: "Meet")
     }
 
@@ -281,12 +271,12 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     func createBreakoutRoom(named name: String) async {
-        errorMessage = "Breakout room management is currently unavailable."
+        errorMessage = "Breakout room management is currently unavailable. This feature requires Daily session support."
         DebugLogger.shared.log("Blocked local-only breakout creation (\(name)) to avoid simulated state.", level: .warning, category: "Meet")
     }
 
     func assignParticipant(_ participantID: String, to roomID: String?) async {
-        errorMessage = "Assigning participants to breakout rooms is currently unavailable."
+        errorMessage = "Assigning participants to breakout rooms is currently unavailable. This feature requires Daily session support."
         DebugLogger.shared.log("Blocked local-only breakout assignment for participant \(participantID) room \(roomID ?? "main") to avoid simulated state.", level: .warning, category: "Meet")
     }
 
@@ -334,6 +324,14 @@ final class MeetingStateManager: NSObject, ObservableObject {
             .uppercased()
         let allowed = CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-")
         return (4...24).contains(candidate.count) && candidate.unicodeScalars.allSatisfy { allowed.contains($0) }
+    }
+
+    private func initializeDeviceSelectionIfNeeded(deviceType: String, availableDevices: [String], selectedDevice: inout String) {
+        guard selectedDevice.isEmpty else { return }
+        selectedDevice = availableDevices.first ?? ""
+        if selectedDevice.isEmpty {
+            DebugLogger.shared.log("No runtime \(deviceType) devices reported.", level: .warning, category: "Meet")
+        }
     }
 
     private func setMicrophoneEnabled(_ enabled: Bool) async {
@@ -535,9 +533,6 @@ extension MeetingStateManager: CallClientDelegate {
     nonisolated func callClient(_ callClient: CallClient, activeSpeakerChanged activeSpeaker: Participant?) {
         Task { @MainActor in
             activeSpeakerID = activeSpeaker.map { participantIDString($0) }
-            if let activeSpeaker {
-                appendSystemMessage("Active speaker: \(participantDisplayName(activeSpeaker)).")
-            }
             refreshParticipantsFromDaily()
         }
     }
