@@ -358,7 +358,7 @@ actor DailyService {
             requiresMeetingToken = roomPrivacy != "public"
         } else {
             // Daily rooms should always include privacy. If it is absent, default to secure
-            // behavior by requiring a token rather than assuming guest/public access.
+            // behavior by requiring a token rather than assuming public access.
             requiresMeetingToken = true
             await log("Room privacy missing for \(room.name); defaulting to token-required join.", level: .warning)
         }

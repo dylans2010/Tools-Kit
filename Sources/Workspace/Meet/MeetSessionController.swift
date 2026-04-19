@@ -860,7 +860,7 @@ extension MeetingStateManager: CallClientDelegate {
             guard !(await isStaleCallback(callClient: callClient)) else { return }
             DebugLogger.shared.log("Daily delegate error callback received.", level: .error, category: "Meet")
             errorMessage = userFriendlyJoinErrorMessage(error)
-            if phase != .failed && phase != .ended {
+            if phase != .ended {
                 phase = .failed
             }
             DebugLogger.shared.log("Daily delegate error payload: \(fullErrorDetails(error))", level: .error, category: "Meet")
