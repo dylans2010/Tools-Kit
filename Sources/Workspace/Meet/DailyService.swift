@@ -41,6 +41,7 @@ actor DailyService {
     private struct RoomResponse: Decodable {
         let name: String
         let url: String
+        let privacy: String?
     }
 
     private struct MeetingTokenResponse: Decodable {
@@ -252,10 +253,37 @@ actor DailyService {
             return existing
         }
 
-        let roomURL = try await securedRoomURL(from: room)
+        let roomURL = try await validatedRoomURL(from: room.url, roomName: room.name)
+        let requiresMeetingToken = roomRequiresMeetingToken(room)
+        var meetingToken: String?
+        var isJoinable = true
+
+        if requiresMeetingToken {
+            do {
+                let token = try await createMeetingToken(for: room.name)
+                let trimmedToken = token.trimmingCharacters(in: .whitespacesAndNewlines)
+                if trimmedToken.isEmpty {
+                    isJoinable = false
+                    await log("Meeting token generation returned an empty token for room \(room.name).", level: .error)
+                } else {
+                    meetingToken = trimmedToken
+                }
+            } catch let error as ServiceError {
+                if case let .requestFailed(statusCode, _) = error, statusCode == 401 || statusCode == 403 {
+                    isJoinable = false
+                    await log("Meeting token generation unauthorized for room \(room.name). status=\(statusCode)", level: .error)
+                } else {
+                    throw error
+                }
+            }
+        }
+
         let session = MeetingSession(
             meetingId: meetingID,
             roomName: room.name,
+            isJoinable: isJoinable,
+            requiresMeetingToken: requiresMeetingToken,
+            meetingToken: meetingToken,
             sessionId: UUID().uuidString,
             createdAt: Date(),
             debugTraceId: UUID().uuidString
@@ -337,21 +365,13 @@ actor DailyService {
         return roomURL
     }
 
-    private func securedRoomURL(from room: RoomResponse) async throws -> URL {
-        let baseURL = try await validatedRoomURL(from: room.url, roomName: room.name)
-        let token = try await createMeetingToken(for: room.name)
-        guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
-            throw ServiceError.invalidResponse
+    private func roomRequiresMeetingToken(_ room: RoomResponse) -> Bool {
+        guard let privacy = room.privacy?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
+              !privacy.isEmpty else {
+            // Default to secure/private expectations when privacy is not returned.
+            return true
         }
-        var queryItems = components.queryItems ?? []
-        // Avoid duplicate token query items when regenerating secured URLs.
-        queryItems.removeAll(where: { $0.name == DailyService.dailyTokenParameterName })
-        queryItems.append(URLQueryItem(name: DailyService.dailyTokenParameterName, value: token))
-        components.queryItems = queryItems
-        guard let securedURL = components.url else {
-            throw ServiceError.invalidResponse
-        }
-        return securedURL
+        return privacy != "public"
     }
 
     private func buildAPIURL(path: String) -> URL {
