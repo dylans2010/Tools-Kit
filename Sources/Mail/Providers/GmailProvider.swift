@@ -347,10 +347,12 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
     }
 
     private func validateCallback(_ callbackComponents: URLComponents?, expectedRedirectURI: String) throws {
+        let expectedComponents = URLComponents(string: expectedRedirectURI)
         guard
             let callbackComponents,
             let callbackScheme = callbackComponents.scheme?.lowercased(),
-            callbackComponents.path == "/oauthredirect"
+            let expectedPath = expectedComponents?.path,
+            callbackComponents.path == expectedPath
         else {
             throw NSError(
                 domain: "GmailProvider",
@@ -359,7 +361,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             )
         }
 
-        let expectedScheme = URL(string: expectedRedirectURI)?.scheme?.lowercased()
+        let expectedScheme = expectedComponents?.scheme?.lowercased()
         guard let expectedScheme, callbackScheme == expectedScheme else {
             throw NSError(
                 domain: "GmailProvider",
