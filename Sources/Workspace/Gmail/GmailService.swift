@@ -85,17 +85,17 @@ final class GmailService: @unchecked Sendable {
         )
     }
 
-    func sendEmail(to: [String], subject: String, body: String, cc: [String] = [], bcc: [String] = [], from: String? = nil) async throws {
+    func sendEmail(to: [String], subject: String, messageBody: String, cc: [String] = [], bcc: [String] = [], from: String? = nil) async throws {
         let sender = from ?? loadTokens()?.emailAddress ?? ""
-        let rawPayload = buildRFC2822(from: sender, to: to, cc: cc, bcc: bcc, subject: subject, body: body)
+        let rawPayload = buildRFC2822(from: sender, to: to, cc: cc, bcc: bcc, subject: subject, body: messageBody)
         let body = GmailSendRequest(raw: Data(rawPayload.utf8).gmailBase64URLEncodedString())
         let url = baseURL.appendingPathComponent("messages/send")
         try await requestVoid(url: url, method: "POST", body: body)
     }
 
-    func saveDraft(to: [String], subject: String, body: String, cc: [String] = [], bcc: [String] = [], from: String? = nil) async throws {
+    func saveDraft(to: [String], subject: String, messageBody: String, cc: [String] = [], bcc: [String] = [], from: String? = nil) async throws {
         let sender = from ?? loadTokens()?.emailAddress ?? ""
-        let rawPayload = buildRFC2822(from: sender, to: to, cc: cc, bcc: bcc, subject: subject, body: body)
+        let rawPayload = buildRFC2822(from: sender, to: to, cc: cc, bcc: bcc, subject: subject, body: messageBody)
         let body = GmailDraftRequest(message: GmailSendRequest(raw: Data(rawPayload.utf8).gmailBase64URLEncodedString()))
         let url = baseURL.appendingPathComponent("drafts")
         try await requestVoid(url: url, method: "POST", body: body)

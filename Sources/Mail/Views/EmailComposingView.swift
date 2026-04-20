@@ -636,7 +636,7 @@ struct EmailComposingView: View {
                 ).saveDraft(
                     to: recipients,
                     subject: subject,
-                    body: messageBody,
+                    messageBody: messageBody,
                     from: account.emailAddress
                 )
             case .outlook:
@@ -694,7 +694,7 @@ struct EmailComposingView: View {
                     ).sendEmail(
                         to: message.to,
                         subject: message.subject,
-                        body: message.body,
+                        messageBody: message.body,
                         cc: message.cc,
                         bcc: message.bcc,
                         from: account.emailAddress

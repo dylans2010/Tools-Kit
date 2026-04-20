@@ -4,6 +4,7 @@ import Foundation
 
 enum GmailAuthError: LocalizedError {
     case invalidRedirectURL
+    case sessionStartFailed
     case missingAuthorizationCode
     case invalidState
     case missingRefreshToken
@@ -13,6 +14,8 @@ enum GmailAuthError: LocalizedError {
         switch self {
         case .invalidRedirectURL:
             return "Invalid Gmail OAuth redirect URL."
+        case .sessionStartFailed:
+            return "Unable to start Google OAuth session."
         case .missingAuthorizationCode:
             return "Missing authorization code from Gmail OAuth redirect."
         case .invalidState:
@@ -100,7 +103,7 @@ final class GmailAuthManager: NSObject, ASWebAuthenticationPresentationContextPr
             session.presentationContextProvider = self
             authSession = session
             guard session.start() else {
-                continuation.resume(throwing: GmailAuthError.invalidRedirectURL)
+                continuation.resume(throwing: GmailAuthError.sessionStartFailed)
                 return
             }
         }

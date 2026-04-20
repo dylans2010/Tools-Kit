@@ -58,15 +58,11 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
 
             switch account.provider {
             case .gmail:
-                let accountId = account.id
-                let fallbackAccessToken = account.accessToken
-                let fallbackRefreshToken = account.refreshToken
-                let fallbackEmail = account.emailAddress
                 let gmail = GmailService(
-                    accountId: accountId,
-                    fallbackAccessToken: fallbackAccessToken,
-                    fallbackRefreshToken: fallbackRefreshToken,
-                    fallbackEmail: fallbackEmail
+                    accountId: account.id,
+                    fallbackAccessToken: account.accessToken,
+                    fallbackRefreshToken: account.refreshToken,
+                    fallbackEmail: account.emailAddress
                 )
                 let pageToken = gmailPageTokensByAccount[account.id]?[currentOffset] ?? nil
                 let page = try await gmail.fetchInbox(maxResults: pageSize, pageToken: pageToken)
