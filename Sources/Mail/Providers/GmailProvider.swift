@@ -17,18 +17,26 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
 
     func fetchInbox(session: MailSession, page: Int) async throws -> [MailMessage] {
         var items = [URLQueryItem(name: "maxResults", value: "30")]
-        if page > 0 {
-            items.append(URLQueryItem(name: "q", value: "newer_than:\(page * daysPerPage)d"))
-        }
+        // In this implementation, 'page' is treated as an index for page tokens if we were to cache them,
+        // but for a simple refresh we just fetch the first page.
+        // A more advanced implementation would store page tokens.
 
         let listURL = baseURL.appendingPathComponent("messages").appending(queryItems: items)
         let list: GmailListResponse = try await request(url: listURL, method: "GET", body: EmptyBody?.none, session: session)
 
+        InternalLogger.shared.log("GmailProvider: Fetched \(list.messages?.count ?? 0) message IDs", level: .info)
+
         var messages: [MailMessage] = []
         for item in list.messages ?? [] {
-            messages.append(try await fetchMessage(session: session, id: item.id))
+            do {
+                let msg = try await fetchMessage(session: session, id: item.id)
+                messages.append(msg)
+            } catch {
+                InternalLogger.shared.log("GmailProvider: Failed to fetch details for \(item.id): \(error)", level: .warning)
+            }
         }
 
+        InternalLogger.shared.log("GmailProvider: Successfully decoded \(messages.count) emails", level: .info)
         return messages.sorted(by: { $0.date > $1.date })
     }
 
@@ -43,6 +51,11 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         let bodySelection = preferredBody(payload.payload)
         let parsedDate = gmailDate(payload.internalDate, fallback: headers["date"])
 
+        // Use snippet as fallback if body is empty
+        let finalBody = bodySelection.plain.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? (payload.snippet ?? "")
+            : bodySelection.plain
+
         return MailMessage(
             id: payload.id,
             threadId: payload.threadId,
@@ -51,7 +64,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             cc: splitAddress(headers["cc"]),
             bcc: splitAddress(headers["bcc"]),
             subject: headers["subject"] ?? "No Subject",
-            body: bodySelection.plain,
+            body: finalBody,
             htmlBody: bodySelection.html,
             date: parsedDate,
             isRead: !(payload.labelIds ?? []).contains("UNREAD"),
@@ -140,12 +153,11 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         InternalLogger.shared.log("GmailProvider: API Response \(http.statusCode) for \(url.path)", level: .debug)
 
         if http.statusCode == 401 && !isRetry {
-            InternalLogger.shared.log("GmailProvider: 401 detected, attempting token refresh", level: .warning)
-            // Even though getValidAccessToken handles refresh, a 401 might mean the token was revoked or Keychain is out of sync.
-            // We force a refresh here by fetching tokens and calling refresh directly if needed,
-            // but for simplicity we'll just re-try getValidAccessToken which should handle it.
-            // Actually, to BE SURE, let's clear the cache/force refresh.
-            return try await self.request(url: url, method: method, body: body, session: session, isRetry: true)
+            InternalLogger.shared.log("GmailProvider: 401 detected, attempting explicit token refresh", level: .warning)
+            if let tokens = MailKeychainManager.shared.getOAuthTokens(accountId: session.id), let refresh = tokens.refreshToken {
+                _ = try await GoogleOAuthManager.shared.refreshAccessToken(for: session.id, refreshToken: refresh)
+                return try await self.request(url: url, method: method, body: body, session: session, isRetry: true)
+            }
         }
 
         guard (200...299).contains(http.statusCode) else {
@@ -179,9 +191,12 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         InternalLogger.shared.log("GmailProvider: API Response \(http.statusCode) for \(url.path)", level: .debug)
 
         if http.statusCode == 401 && !isRetry {
-            InternalLogger.shared.log("GmailProvider: 401 detected, attempting token refresh", level: .warning)
-            try await self.requestVoid(url: url, method: method, body: body, session: session, isRetry: true)
-            return
+            InternalLogger.shared.log("GmailProvider: 401 detected, attempting explicit token refresh", level: .warning)
+            if let tokens = MailKeychainManager.shared.getOAuthTokens(accountId: session.id), let refresh = tokens.refreshToken {
+                _ = try await GoogleOAuthManager.shared.refreshAccessToken(for: session.id, refreshToken: refresh)
+                try await self.requestVoid(url: url, method: method, body: body, session: session, isRetry: true)
+                return
+            }
         }
 
         guard (200...299).contains(http.statusCode) else {
@@ -301,11 +316,13 @@ private struct GmailListResponse: Decodable {
         let id: String
     }
     let messages: [Item]?
+    let nextPageToken: String?
 }
 
 private struct GmailMessagePayload: Decodable {
     let id: String
     let threadId: String
+    let snippet: String?
     let internalDate: String?
     let labelIds: [String]?
     let payload: GmailMIMEPart?

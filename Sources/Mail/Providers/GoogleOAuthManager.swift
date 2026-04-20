@@ -71,11 +71,19 @@ final class GoogleOAuthManager: NSObject, ASWebAuthenticationPresentationContext
         let profile = try await fetchProfile(accessToken: tokenResponse.accessToken)
 
         let expirationDate = tokenResponse.expiresIn.map { Date().addingTimeInterval(TimeInterval($0)) }
+        let sessionID = UUID().uuidString
 
         InternalLogger.shared.log("GoogleOAuth: Authentication successful for \(profile.email). Expiration: \(expirationDate?.description ?? "none")", level: .info)
 
+        // Save tokens to Keychain
+        _ = MailKeychainManager.shared.saveOAuthTokens(
+            accountId: sessionID,
+            accessToken: tokenResponse.accessToken,
+            refreshToken: tokenResponse.refreshToken
+        )
+
         return MailSession(
-            id: UUID().uuidString,
+            id: sessionID,
             provider: .gmail,
             email: profile.email,
             displayName: profile.name ?? "Gmail",

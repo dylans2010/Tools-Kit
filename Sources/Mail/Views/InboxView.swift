@@ -12,7 +12,7 @@ struct InboxView: View {
 
     @StateObject private var storage = MailStorageService.shared
     @StateObject private var mailStore = MailStore.shared
-    @StateObject private var viewModel = InboxScreenViewModel()
+    @StateObject private var viewModel = InboxViewModel()
 
     @State private var searchText = ""
     @State private var showingCompose = false
@@ -232,50 +232,6 @@ struct InboxView: View {
 
     private func hexColor(_ value: String) -> Color {
         Color(hex: value) ?? .black
-    }
-}
-
-@MainActor
-final class InboxScreenViewModel: ObservableObject {
-    @Published var localThreads: [MailThread] = []
-    @Published var isInitialLoading = true
-
-    private let storage = MailStorageService.shared
-    private var account: MailAccount?
-    private var folder: MailFolder = .inbox
-
-    func configure(account: MailAccount, folder: MailFolder) {
-        self.account = account
-        self.folder = folder
-    }
-
-    func loadCachedThenRefreshIfNeeded() async {
-        guard let account else {
-            isInitialLoading = false
-            return
-        }
-
-        let key = "\(account.id)_\(folder.id)"
-        let cached = storage.loadThreads(for: key)
-        localThreads = cached
-
-        if cached.isEmpty {
-            isInitialLoading = true
-            await refresh(fetchFromServer: true)
-            isInitialLoading = false
-        } else {
-            isInitialLoading = false
-        }
-    }
-
-    func refresh(fetchFromServer: Bool) async {
-        guard let account else { return }
-        if fetchFromServer {
-            await MailSyncService.shared.fetchThreads(account: account, folder: folder)
-        }
-
-        let key = "\(account.id)_\(folder.id)"
-        localThreads = storage.loadThreads(for: key)
     }
 }
 

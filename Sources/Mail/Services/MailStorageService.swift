@@ -114,6 +114,16 @@ final class MailStore: ObservableObject {
 
         if let existing = accounts.firstIndex(where: { $0.id == incoming.id || $0.emailAddress.caseInsensitiveCompare(incoming.emailAddress) == .orderedSame }) {
             let existingId = accounts[existing].id
+
+            // Handle token migration if IDs differ (e.g., during re-authentication)
+            if existingId != incoming.id {
+                InternalLogger.shared.log("MailStore: Migrating tokens from \(incoming.id) to \(existingId) for \(incoming.emailAddress)", level: .info)
+                if let tokens = MailKeychainManager.shared.getOAuthTokens(accountId: incoming.id) {
+                    _ = MailKeychainManager.shared.saveOAuthTokens(accountId: existingId, accessToken: tokens.accessToken, refreshToken: tokens.refreshToken)
+                    MailKeychainManager.shared.deleteOAuthTokens(accountId: incoming.id)
+                }
+            }
+
             let mergedAccount = MailAccount(
                 id: existingId,
                 emailAddress: incoming.emailAddress,

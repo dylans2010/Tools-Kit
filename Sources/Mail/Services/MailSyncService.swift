@@ -57,7 +57,7 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
 
             switch account.provider {
             case .gmail:
-                let provider = await GmailProvider()
+                let provider = GmailProvider()
                 let messages = try await provider.fetchInbox(session: session(from: account), page: pageNumber)
                 groupedThreads = groupMessages(messages)
             case .outlook:

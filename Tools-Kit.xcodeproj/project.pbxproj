@@ -22,6 +22,7 @@
 		BC63F5FE32D0419AB791F193 /* iCloudMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */; };
 		F0BE8D2657C349B7B03F24F4 /* MailProviderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B5DD1027FA49B99C531EDE /* MailProviderProtocol.swift */; };
 		AC0200000000000000000001 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0100000000000000000001 /* AppConfig.swift */; };
+		IV0200000000000000000001 /* InboxViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = IV0100000000000000000001 /* InboxViewModel.swift */; };
 		MP0200000000000000000001 /* GmailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000001 /* GmailProvider.swift */; };
 		MP0200000000000000000002 /* OutlookProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000002 /* OutlookProvider.swift */; };
 		MP0200000000000000000003 /* YahooMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000003 /* YahooMailProvider.swift */; };
@@ -642,6 +643,7 @@
 		E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/iCloudMailProvider.swift; sourceTree = "<group>"; };
 		C1B5DD1027FA49B99C531EDE /* MailProviderProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/MailProviderProtocol.swift; sourceTree = "<group>"; };
 		AC0100000000000000000001 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Core/AppConfig.swift; sourceTree = "<group>"; };
+		IV0100000000000000000001 /* InboxViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/InboxViewModel.swift; sourceTree = "<group>"; };
 		MP0100000000000000000001 /* GmailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/GmailProvider.swift; sourceTree = "<group>"; };
 		MP0100000000000000000002 /* OutlookProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/OutlookProvider.swift; sourceTree = "<group>"; };
 		MP0100000000000000000003 /* YahooMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/YahooMailProvider.swift; sourceTree = "<group>"; };
@@ -1390,6 +1392,7 @@
 				TV0100000000000000000001 /* TranslateEmailView.swift */,
 				MT0100000000000000000001 /* MailTableView.swift */,
 				41D44A961365454C82AC0C56 /* MailProviderView.swift */,
+				IV0100000000000000000001 /* InboxViewModel.swift */,
 				93E1340D7B74447B9E795193 /* InboxView.swift */,
 				7FB1750052D346DFBBD0A71D /* MailContentRenderer.swift */,
 				AA11BB22CC33DD44EE55FF00 /* MailMIMEParser.swift */,
@@ -2050,6 +2053,7 @@
 				TV0200000000000000000001 /* TranslateEmailView.swift in Sources */,
 				MT0200000000000000000001 /* MailTableView.swift in Sources */,
 				89E5D9EA02A2490D8F089737 /* MailProviderView.swift in Sources */,
+				IV0200000000000000000001 /* InboxViewModel.swift in Sources */,
 				9B92D995283049E1921A3007 /* InboxView.swift in Sources */,
 				50C031082B944F5782BAF41E /* MailContentRenderer.swift in Sources */,
 				AA11BB22CC33DD44EE55FF01 /* MailMIMEParser.swift in Sources */,
