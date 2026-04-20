@@ -39,6 +39,7 @@ struct AIChatSettingsView: View {
                 memorySection
                 appModeSection
                 toolVisibilitySection
+                supportSection
                 developerToolsSection
                 cloudDataSection
                 accountSection
@@ -385,6 +386,14 @@ struct AIChatSettingsView: View {
             }
             NavigationLink("Feedback Admin") {
                 FeedbackAdminView(allowDeveloperToolsAccess: true)
+            }
+        }
+    }
+
+    private var supportSection: some View {
+        Section("Support") {
+            NavigationLink("Send Feedback") {
+                FeedbackView()
             }
         }
     }
