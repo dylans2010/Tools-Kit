@@ -106,3 +106,11 @@ protocol MailProviderProtocol {
     func deleteThread(_ threadId: String) async throws
     func starThread(_ threadId: String, starred: Bool) async throws
 }
+
+protocol StandardMailProvider {
+    func fetchInbox() async throws -> [MailMessage]
+    func fetchMessage(id: String) async throws -> MailMessage
+    func sendEmail(_ draft: MailDraft) async throws
+    func refreshToken() async throws
+    func listAccounts() async -> [MailAccount]
+}

@@ -74,21 +74,10 @@ final class ProtonMailProvider: MailProvider {
         _ = try await command(context: &context, value: "SELECT INBOX")
         let fetch = try await command(context: &context, value: "UID FETCH \(id) (UID ENVELOPE INTERNALDATE BODY.PEEK[])")
 
-        return parseEnvelopeMessages(fetch).first ?? MailMessage(
-            id: id,
-            threadId: "uid-\(id)",
-            from: "Unknown",
-            to: [],
-            cc: [],
-            bcc: [],
-            subject: "No Subject",
-            body: "",
-            htmlBody: nil,
-            date: Date(),
-            isRead: false,
-            isStarred: false,
-            attachments: []
-        )
+        if let message = parseEnvelopeMessages(fetch).first {
+            return message
+        }
+        throw NSError(domain: "ProtonProvider", code: 404, userInfo: [NSLocalizedDescriptionKey: "Message not found"])
     }
 
     func sendMessage(session: MailSession, draft: MailDraft) async throws {

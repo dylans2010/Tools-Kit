@@ -3,17 +3,23 @@ import CryptoKit
 import Foundation
 import SwiftUI
 
-final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresentationContextProviding {
+final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASWebAuthenticationPresentationContextProviding {
     var displayName: String { "Yahoo Mail" }
     var iconAssetName: String { "mail.and.text.magnifyingglass" }
     var primaryColor: Color { Color(red: 0.38, green: 0.20, blue: 0.67) }
 
     private var authSession: ASWebAuthenticationSession?
     private let imapFallback = IMAPProvider()
+    private let boundSession: MailSession?
+
+    init(session: MailSession? = nil) {
+        self.boundSession = session
+        super.init()
+    }
 
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
         let remoteVariables = await fetchRemoteVariables()
-        let clientID = try oauthValue(primaryKey: "YAHOO_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
+        let clientID = try oauthValue(primaryKey: "YAHOO_CLIENT_ID", remoteVariables: remoteVariables)
         let redirectURI = try oauthValue(primaryKey: "YAHOO_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
 
         let verifier = randomCodeVerifier()
@@ -35,6 +41,7 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
             throw NSError(domain: "YahooProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid OAuth URL"])
         }
 
+        InternalLogger.shared.log("OAuth start provider=yahoo callbackScheme=\(URL(string: redirectURI)?.scheme ?? "unknown")", level: .info)
         let callback = try await startOAuth(url: url, callbackScheme: URL(string: redirectURI)?.scheme)
         let callbackComponents = URLComponents(url: callback, resolvingAgainstBaseURL: false)
         let returnedState = callbackComponents?.queryItems?.first(where: { $0.name == "state" })?.value
@@ -45,6 +52,8 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
             throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing authorization code"])
         }
 
+        InternalLogger.shared.log("OAuth callback provider=yahoo state=validated", level: .info)
+        InternalLogger.shared.log("OAuth token exchange provider=yahoo", level: .info)
         let token = try await exchangeCode(code: code, verifier: verifier, clientID: clientID, redirectURI: redirectURI)
         let email: String
         if !credentials.email.isEmpty {
@@ -69,6 +78,7 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
     }
 
     func fetchInbox(session: MailSession, page: Int) async throws -> [MailMessage] {
+        try validateSessionProvider(session, expected: .yahoo)
         do {
             let pageSize = 30
             let start = page * pageSize
@@ -99,6 +109,7 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
     }
 
     func fetchMessage(session: MailSession, id: String) async throws -> MailMessage {
+        try validateSessionProvider(session, expected: .yahoo)
         do {
             let url = URL(string: "https://api.mail.yahoo.com/ws/mail/v1.1/jsonrpc")!
             let response: YahooMessageEnvelope = try await apiRequest(url: url, payload: YahooMessageRequest(mid: id), token: session.accessToken)
@@ -120,33 +131,25 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
             )
         } catch {
             let list = try await fallbackInbox(session: session, page: 0)
-            return list.first(where: { $0.id == id }) ?? list.first ?? MailMessage(
-                id: id,
-                threadId: "msg-\(id)",
-                from: "Unknown",
-                to: [],
-                cc: [],
-                bcc: [],
-                subject: "No Subject",
-                body: "",
-                htmlBody: nil,
-                date: Date(),
-                isRead: false,
-                isStarred: false,
-                attachments: []
-            )
+            if let matched = list.first(where: { $0.id == id }) {
+                return matched
+            }
+            throw NSError(domain: "YahooProvider", code: 404, userInfo: [NSLocalizedDescriptionKey: "Yahoo message not found"])
         }
     }
 
     func sendMessage(session: MailSession, draft: MailDraft) async throws {
+        try validateSessionProvider(session, expected: .yahoo)
         try await imapFallback.sendMessage(session: fallbackSession(session), draft: draft)
     }
 
     func saveDraft(session: MailSession, draft: MailDraft) async throws {
+        try validateSessionProvider(session, expected: .yahoo)
         try await imapFallback.saveDraft(session: fallbackSession(session), draft: draft)
     }
 
     func deleteMessage(session: MailSession, id: String) async throws {
+        try validateSessionProvider(session, expected: .yahoo)
         do {
             let url = URL(string: "https://api.mail.yahoo.com/ws/mail/v1.1/jsonrpc")!
             let _: YahooDeleteResponse = try await apiRequest(url: url, payload: YahooDeleteRequest(mid: id), token: session.accessToken)
@@ -156,6 +159,7 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
     }
 
     func markRead(session: MailSession, id: String) async throws {
+        try validateSessionProvider(session, expected: .yahoo)
         do {
             let url = URL(string: "https://api.mail.yahoo.com/ws/mail/v1.1/jsonrpc")!
             let _: YahooUpdateResponse = try await apiRequest(url: url, payload: YahooUpdateReadRequest(mid: id, unread: false), token: session.accessToken)
@@ -233,11 +237,7 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
     }
 
     private func infoPlistValue(forKey key: String) -> String? {
-        guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String else {
-            return nil
-        }
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
+        AppConfig.string(for: key)
     }
 
     private func remoteConfigValue(forKey key: String, remoteVariables: [String: String]) -> String? {
@@ -336,9 +336,10 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        if let token {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        guard let token, !token.isEmpty else {
+            throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Yahoo access token"])
         }
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.httpBody = try JSONEncoder().encode(payload)
 
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -366,6 +367,108 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
             .replacingOccurrences(of: "+", with: "-")
             .replacingOccurrences(of: "/", with: "_")
             .replacingOccurrences(of: "=", with: "")
+    }
+
+    func refreshSessionToken(session: MailSession) async throws -> MailSession {
+        try validateSessionProvider(session, expected: .yahoo)
+        guard let refreshToken = session.refreshToken, !refreshToken.isEmpty else {
+            throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Yahoo refresh token"])
+        }
+        let remoteVariables = await fetchRemoteVariables()
+        let clientID = try oauthValue(primaryKey: "YAHOO_CLIENT_ID", remoteVariables: remoteVariables)
+        let redirectURI = try oauthValue(primaryKey: "YAHOO_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+
+        var request = URLRequest(url: URL(string: "https://api.login.yahoo.com/oauth2/get_token")!)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        let fields = [
+            URLQueryItem(name: "client_id", value: clientID),
+            URLQueryItem(name: "grant_type", value: "refresh_token"),
+            URLQueryItem(name: "refresh_token", value: refreshToken),
+            URLQueryItem(name: "redirect_uri", value: redirectURI)
+        ]
+        request.httpBody = fields
+            .map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")" }
+            .joined(separator: "&")
+            .data(using: .utf8)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+            throw NSError(domain: "YahooProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Yahoo token refresh failed"])
+        }
+        let refreshed = try JSONDecoder().decode(YahooToken.self, from: data)
+        let resolvedRefresh = refreshed.refreshToken ?? refreshToken
+        _ = MailKeychainManager.shared.saveOAuthTokens(accountId: session.id, accessToken: refreshed.accessToken, refreshToken: resolvedRefresh)
+        await MainActor.run {
+            MailStore.shared.updateAccountTokens(accountId: session.id, accessToken: refreshed.accessToken, refreshToken: resolvedRefresh)
+        }
+        InternalLogger.shared.log("OAuth token exchange provider=yahoo status=refreshed", level: .info)
+        return MailSession(
+            id: session.id,
+            provider: session.provider,
+            email: session.email,
+            displayName: session.displayName,
+            accessToken: refreshed.accessToken,
+            refreshToken: resolvedRefresh,
+            imapHost: session.imapHost,
+            imapPort: session.imapPort,
+            smtpHost: session.smtpHost,
+            smtpPort: session.smtpPort
+        )
+    }
+
+    func fetchInbox() async throws -> [MailMessage] {
+        let session = try await resolvedSession()
+        return try await fetchInbox(session: session, page: 0)
+    }
+
+    func fetchMessage(id: String) async throws -> MailMessage {
+        let session = try await resolvedSession()
+        return try await fetchMessage(session: session, id: id)
+    }
+
+    func sendEmail(_ draft: MailDraft) async throws {
+        let session = try await resolvedSession()
+        try await sendMessage(session: session, draft: draft)
+    }
+
+    func refreshToken() async throws {
+        let session = try await resolvedSession()
+        _ = try await refreshSessionToken(session: session)
+    }
+
+    func listAccounts() async -> [MailAccount] {
+        await MainActor.run {
+            MailStore.shared.accounts.filter { $0.provider == .yahoo }
+        }
+    }
+
+    private func resolvedSession() async throws -> MailSession {
+        if let boundSession {
+            return boundSession
+        }
+        let active = await MainActor.run { MailStore.shared.activeAccount }
+        guard let active else {
+            throw NSError(domain: "YahooProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "No active Yahoo account"])
+        }
+        return MailSession(
+            id: active.id,
+            provider: active.provider,
+            email: active.emailAddress,
+            displayName: active.displayName,
+            accessToken: active.accessToken,
+            refreshToken: active.refreshToken,
+            imapHost: active.imapHost,
+            imapPort: active.imapPort,
+            smtpHost: active.smtpHost,
+            smtpPort: active.smtpPort
+        )
+    }
+
+    private func validateSessionProvider(_ session: MailSession, expected: MailAccount.ProviderType) throws {
+        guard session.provider == expected else {
+            throw NSError(domain: "YahooProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid session provider"])
+        }
     }
 }
 
