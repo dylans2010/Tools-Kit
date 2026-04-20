@@ -30,6 +30,7 @@ struct EmailComposingView: View {
     @State private var messageComposerMode: MessageComposerMode = .render
 
     @State private var scheduleDate: Date?
+    @State private var selectedFromAccountID: String = ""
     @State private var pendingLinkText = ""
     @State private var pendingLinkURL = "https://"
 
@@ -66,6 +67,7 @@ struct EmailComposingView: View {
     var body: some View {
         NavigationStack {
             Form {
+                fromSection
                 recipientsSection
                 subjectSection
                 bodySection
@@ -105,6 +107,9 @@ struct EmailComposingView: View {
                 }
             }
             .onAppear(perform: prefillReply)
+            .onAppear {
+                selectedFromAccountID = account.id
+            }
             .sheet(isPresented: $showingAIPanel) {
                 DraftingEmailsView(currentBody: messageBody) { result in
                     let trimmedRecipient = result.recipient.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -185,6 +190,16 @@ struct EmailComposingView: View {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(sendError ?? "")
+            }
+        }
+    }
+
+    private var fromSection: some View {
+        Section("From") {
+            Picker("Sender", selection: $selectedFromAccountID) {
+                ForEach(MailStore.shared.accounts) { account in
+                    Text("\(account.displayName) (\(account.emailAddress))").tag(account.id)
+                }
             }
         }
     }
@@ -618,7 +633,7 @@ struct EmailComposingView: View {
         isSending = true
         do {
             let draft = MailDraft(
-                from: account.emailAddress,
+                from: selectedAccount.emailAddress,
                 to: recipients,
                 cc: [],
                 bcc: [],
@@ -626,17 +641,17 @@ struct EmailComposingView: View {
                 bodyText: messageBody
             )
 
-            switch account.providerType {
+            switch selectedAccount.providerType {
             case .gmail:
-                try await GmailProvider().saveDraft(session: providerSession(), draft: draft)
+                try await GmailProvider().saveDraft(session: providerSession(for: selectedAccount), draft: draft)
             case .outlook:
-                try await OutlookProvider().saveDraft(session: providerSession(), draft: draft)
+                try await OutlookProvider().saveDraft(session: providerSession(for: selectedAccount), draft: draft)
             case .yahoo:
-                try await YahooMailProvider().saveDraft(session: providerSession(), draft: draft)
+                try await YahooMailProvider().saveDraft(session: providerSession(for: selectedAccount), draft: draft)
             case .proton:
-                try await ProtonMailProvider().saveDraft(session: providerSession(), draft: draft)
+                try await ProtonMailProvider().saveDraft(session: providerSession(for: selectedAccount), draft: draft)
             case .imap, .icloud:
-                try await IMAPProvider().saveDraft(session: providerSession(), draft: draft)
+                try await IMAPProvider().saveDraft(session: providerSession(for: selectedAccount), draft: draft)
             }
 
             await MainActor.run {
@@ -658,10 +673,11 @@ struct EmailComposingView: View {
         isSending = true
         Task {
             do {
+                let selectedAccount = self.selectedAccount
                 let message = MailMessage(
                     id: UUID().uuidString,
                     threadId: replyTo?.threadId ?? UUID().uuidString,
-                    from: account.email,
+                    from: selectedAccount.email,
                     to: recipients,
                     cc: [],
                     bcc: [],
@@ -674,19 +690,19 @@ struct EmailComposingView: View {
                     attachments: draftAttachments
                 )
 
-                switch account.provider {
+                switch selectedAccount.provider {
                 case .gmail:
-                    try await GmailMailProvider(account: account).sendMessage(message)
+                    try await GmailMailProvider(account: selectedAccount).sendMessage(message)
                 case .icloud:
-                    try await iCloudMailProvider(account: account).sendMessage(message)
+                    try await iCloudMailProvider(account: selectedAccount).sendMessage(message)
                 case .outlook:
-                    try await OutlookProvider().sendMessage(session: providerSession(), draft: mailDraft(recipients: recipients))
+                    try await OutlookProvider().sendMessage(session: providerSession(for: selectedAccount), draft: mailDraft(recipients: recipients))
                 case .yahoo:
-                    try await YahooMailProvider().sendMessage(session: providerSession(), draft: mailDraft(recipients: recipients))
+                    try await YahooMailProvider().sendMessage(session: providerSession(for: selectedAccount), draft: mailDraft(recipients: recipients))
                 case .proton:
-                    try await ProtonMailProvider().sendMessage(session: providerSession(), draft: mailDraft(recipients: recipients))
+                    try await ProtonMailProvider().sendMessage(session: providerSession(for: selectedAccount), draft: mailDraft(recipients: recipients))
                 case .imap:
-                    try await IMAPProvider().sendMessage(session: providerSession(), draft: mailDraft(recipients: recipients))
+                    try await IMAPProvider().sendMessage(session: providerSession(for: selectedAccount), draft: mailDraft(recipients: recipients))
                 }
 
                 await MainActor.run {
@@ -704,7 +720,7 @@ struct EmailComposingView: View {
 
     private func mailDraft(recipients: [String]) -> MailDraft {
         MailDraft(
-            from: account.emailAddress,
+            from: selectedAccount.emailAddress,
             to: recipients,
             cc: [],
             bcc: [],
@@ -713,7 +729,11 @@ struct EmailComposingView: View {
         )
     }
 
-    private func providerSession() -> MailSession {
+    private var selectedAccount: MailAccount {
+        MailStore.shared.accounts.first(where: { $0.id == selectedFromAccountID }) ?? account
+    }
+
+    private func providerSession(for account: MailAccount) -> MailSession {
         MailSession(
             id: account.id,
             provider: account.providerType,

@@ -27,6 +27,9 @@
 		MP0200000000000000000003 /* YahooMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000003 /* YahooMailProvider.swift */; };
 		GP0200000000000000000001 /* GoogleMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = GP0100000000000000000001 /* GoogleMailProvider.swift */; };
 		MS0200000000000000000001 /* MicrosoftMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000001 /* MicrosoftMailProvider.swift */; };
+		MS0200000000000000000002 /* UniversalInboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000002 /* UniversalInboxView.swift */; };
+		MS0200000000000000000003 /* OAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000003 /* OAuthManager.swift */; };
+		MS0200000000000000000004 /* AccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000004 /* AccountManager.swift */; };
 		MP0200000000000000000004 /* ProtonMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000004 /* ProtonMailProvider.swift */; };
 		MP0200000000000000000005 /* IMAPProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000005 /* IMAPProvider.swift */; };
 		MP0200000000000000000006 /* SMTPSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000006 /* SMTPSender.swift */; };
@@ -647,6 +650,9 @@
 		MP0100000000000000000003 /* YahooMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/YahooMailProvider.swift; sourceTree = "<group>"; };
 		GP0100000000000000000001 /* GoogleMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/GoogleMailProvider.swift; sourceTree = "<group>"; };
 		MS0100000000000000000001 /* MicrosoftMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/MicrosoftMailProvider.swift; sourceTree = "<group>"; };
+		MS0100000000000000000002 /* UniversalInboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/UniversalInboxView.swift; sourceTree = "<group>"; };
+		MS0100000000000000000003 /* OAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Services/OAuthManager.swift; sourceTree = "<group>"; };
+		MS0100000000000000000004 /* AccountManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Services/AccountManager.swift; sourceTree = "<group>"; };
 		MP0100000000000000000004 /* ProtonMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/ProtonMailProvider.swift; sourceTree = "<group>"; };
 		MP0100000000000000000005 /* IMAPProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/IMAPProvider.swift; sourceTree = "<group>"; };
 		MP0100000000000000000006 /* SMTPSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/SMTPSender.swift; sourceTree = "<group>"; };
@@ -1373,6 +1379,7 @@
 				MP0100000000000000000003 /* YahooMailProvider.swift */,
 				GP0100000000000000000001 /* GoogleMailProvider.swift */,
 				MS0100000000000000000001 /* MicrosoftMailProvider.swift */,
+				MS0100000000000000000002 /* UniversalInboxView.swift */,
 				MP0100000000000000000004 /* ProtonMailProvider.swift */,
 				MP0100000000000000000005 /* IMAPProvider.swift */,
 				MP0100000000000000000006 /* SMTPSender.swift */,
@@ -1395,6 +1402,8 @@
 				AA11BB22CC33DD44EE55FF00 /* MailMIMEParser.swift */,
 				AA11BB22CC33DD44EE55FF02 /* MailContentDecoder.swift */,
 				411F811D01A2429A91DBA6DD /* MailStorageService.swift */,
+				MS0100000000000000000003 /* OAuthManager.swift */,
+				MS0100000000000000000004 /* AccountManager.swift */,
 				DD7F1899E1534EB8A85A9957 /* MailSMTPService.swift */,
 				6AB0A5BEECE24295A8AA2C5D /* MailSyncService.swift */,
 				E5803F11250B4895BDFCD61F /* MailIMAPService.swift */,
@@ -2033,6 +2042,7 @@
 				MP0200000000000000000003 /* YahooMailProvider.swift in Sources */,
 				GP0200000000000000000001 /* GoogleMailProvider.swift in Sources */,
 				MS0200000000000000000001 /* MicrosoftMailProvider.swift in Sources */,
+				MS0200000000000000000002 /* UniversalInboxView.swift in Sources */,
 				MP0200000000000000000004 /* ProtonMailProvider.swift in Sources */,
 				MP0200000000000000000005 /* IMAPProvider.swift in Sources */,
 				MP0200000000000000000006 /* SMTPSender.swift in Sources */,
@@ -2055,6 +2065,8 @@
 				AA11BB22CC33DD44EE55FF01 /* MailMIMEParser.swift in Sources */,
 				AA11BB22CC33DD44EE55FF03 /* MailContentDecoder.swift in Sources */,
 				08AF05FE63A9400ABCE9FCE3 /* MailStorageService.swift in Sources */,
+				MS0200000000000000000003 /* OAuthManager.swift in Sources */,
+				MS0200000000000000000004 /* AccountManager.swift in Sources */,
 				3FB514B7935A4CE492EBF783 /* MailSMTPService.swift in Sources */,
 				80010375D67C41F0932464A5 /* MailSyncService.swift in Sources */,
 				3DEFEFD38FC3482E8ACB0ABF /* MailIMAPService.swift in Sources */,

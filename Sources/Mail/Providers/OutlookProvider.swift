@@ -64,6 +64,48 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     }
 
     func fetchInbox(session: MailSession, page: Int) async throws -> [MailMessage] {
+        do {
+            return try await fetchInboxImpl(session: session, page: page, forceRefresh: false)
+        } catch {
+            let ns = error as NSError
+            guard ns.code == 401 else { throw error }
+            return try await fetchInboxImpl(session: session, page: page, forceRefresh: true)
+        }
+    }
+
+    func fetchMessage(session: MailSession, id: String) async throws -> MailMessage {
+        do {
+            return try await fetchMessageImpl(session: session, id: id, forceRefresh: false)
+        } catch {
+            let ns = error as NSError
+            guard ns.code == 401 else { throw error }
+            return try await fetchMessageImpl(session: session, id: id, forceRefresh: true)
+        }
+    }
+
+    func sendMessage(session: MailSession, draft: MailDraft) async throws {
+        do {
+            try await sendMessageImpl(session: session, draft: draft, forceRefresh: false)
+        } catch {
+            let ns = error as NSError
+            guard ns.code == 401 else { throw error }
+            try await sendMessageImpl(session: session, draft: draft, forceRefresh: true)
+        }
+    }
+
+    func saveDraft(session: MailSession, draft: MailDraft) async throws {
+        try await saveDraftImpl(session: session, draft: draft, forceRefresh: false)
+    }
+
+    func deleteMessage(session: MailSession, id: String) async throws {
+        try await deleteMessageImpl(session: session, id: id, forceRefresh: false)
+    }
+
+    func markRead(session: MailSession, id: String) async throws {
+        try await markReadImpl(session: session, id: id, forceRefresh: false)
+    }
+
+    private func fetchInboxImpl(session: MailSession, page: Int, forceRefresh: Bool) async throws -> [MailMessage] {
         try validateSessionProvider(session, expected: .outlook)
         let endpoint: URL
         if page == 0 {
@@ -77,116 +119,59 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             endpoint = URL(string: "https://graph.microsoft.com/v1.0/me/messages?$top=30&$orderby=receivedDateTime%20desc")!
         }
 
-        let token = try await getAccessToken(for: session)
+        let token = try await AccountManager.shared.token(for: session.id, provider: .outlook, forceRefresh: forceRefresh)
         let response: GraphMessagesResponse = try await request(url: endpoint, body: Optional<Data>.none, token: token)
-        if let next = response.nextLink {
-            nextLinksByPage[page + 1] = next
-        }
-
+        if let next = response.nextLink { nextLinksByPage[page + 1] = next }
         return response.value.map {
-            MailMessage(
-                id: $0.id,
-                threadId: $0.conversationId,
-                from: $0.from?.emailAddress.address ?? "Unknown",
-                to: $0.toRecipients?.compactMap { $0.emailAddress.address } ?? [],
-                cc: $0.ccRecipients?.compactMap { $0.emailAddress.address } ?? [],
-                bcc: [],
-                subject: $0.subject ?? "No Subject",
-                body: $0.body?.content ?? "",
-                htmlBody: $0.body?.contentType.lowercased() == "html" ? $0.body?.content : nil,
-                date: isoDate($0.receivedDateTime),
-                isRead: $0.isRead ?? false,
-                isStarred: $0.flag?.flagStatus?.lowercased() == "flagged",
-                attachments: []
-            )
+            MailMessage(id: $0.id, threadId: $0.conversationId, from: $0.from?.emailAddress.address ?? "Unknown", to: $0.toRecipients?.compactMap { $0.emailAddress.address } ?? [], cc: $0.ccRecipients?.compactMap { $0.emailAddress.address } ?? [], bcc: [], subject: $0.subject ?? "No Subject", body: $0.body?.content ?? "", htmlBody: $0.body?.contentType.lowercased() == "html" ? $0.body?.content : nil, date: isoDate($0.receivedDateTime), isRead: $0.isRead ?? false, isStarred: $0.flag?.flagStatus?.lowercased() == "flagged", attachments: [])
         }
     }
 
-    func fetchMessage(session: MailSession, id: String) async throws -> MailMessage {
+    private func fetchMessageImpl(session: MailSession, id: String, forceRefresh: Bool) async throws -> MailMessage {
         try validateSessionProvider(session, expected: .outlook)
         guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)") else {
             throw NSError(domain: "OutlookProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid message identifier"])
         }
-        let token = try await getAccessToken(for: session)
+        let token = try await AccountManager.shared.token(for: session.id, provider: .outlook, forceRefresh: forceRefresh)
         let item: GraphMessage = try await request(url: url, body: Optional<Data>.none, token: token)
-        return MailMessage(
-            id: item.id,
-            threadId: item.conversationId,
-            from: item.from?.emailAddress.address ?? "Unknown",
-            to: item.toRecipients?.compactMap { $0.emailAddress.address } ?? [],
-            cc: item.ccRecipients?.compactMap { $0.emailAddress.address } ?? [],
-            bcc: [],
-            subject: item.subject ?? "No Subject",
-            body: item.body?.content ?? "",
-            htmlBody: item.body?.contentType.lowercased() == "html" ? item.body?.content : nil,
-            date: isoDate(item.receivedDateTime),
-            isRead: item.isRead ?? false,
-            isStarred: item.flag?.flagStatus?.lowercased() == "flagged",
-            attachments: []
-        )
+        return MailMessage(id: item.id, threadId: item.conversationId, from: item.from?.emailAddress.address ?? "Unknown", to: item.toRecipients?.compactMap { $0.emailAddress.address } ?? [], cc: item.ccRecipients?.compactMap { $0.emailAddress.address } ?? [], bcc: [], subject: item.subject ?? "No Subject", body: item.body?.content ?? "", htmlBody: item.body?.contentType.lowercased() == "html" ? item.body?.content : nil, date: isoDate(item.receivedDateTime), isRead: item.isRead ?? false, isStarred: item.flag?.flagStatus?.lowercased() == "flagged", attachments: [])
     }
 
-    func sendMessage(session: MailSession, draft: MailDraft) async throws {
+    private func sendMessageImpl(session: MailSession, draft: MailDraft, forceRefresh: Bool) async throws {
         try validateSessionProvider(session, expected: .outlook)
-        guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/sendMail") else {
-            throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid Microsoft send endpoint"])
-        }
-        let body = GraphSendMailBody(
-            message: .init(
-                subject: draft.subject,
-                body: .init(contentType: draft.bodyHTML == nil ? "Text" : "HTML", content: draft.bodyHTML ?? draft.bodyText),
-                toRecipients: draft.to.map { .init(emailAddress: .init(address: $0)) },
-                ccRecipients: draft.cc.map { .init(emailAddress: .init(address: $0)) }
-            ),
-            saveToSentItems: true
-        )
-
-        let token = try await getAccessToken(for: session)
+        guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/sendMail") else { throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid Microsoft send endpoint"]) }
+        let body = GraphSendMailBody(message: .init(subject: draft.subject, body: .init(contentType: draft.bodyHTML == nil ? "Text" : "HTML", content: draft.bodyHTML ?? draft.bodyText), toRecipients: draft.to.map { .init(emailAddress: .init(address: $0)) }, ccRecipients: draft.cc.map { .init(emailAddress: .init(address: $0)) }), saveToSentItems: true)
+        let token = try await AccountManager.shared.token(for: session.id, provider: .outlook, forceRefresh: forceRefresh)
         try await requestVoid(url: url, method: "POST", body: body, token: token)
     }
 
-    func saveDraft(session: MailSession, draft: MailDraft) async throws {
+    private func saveDraftImpl(session: MailSession, draft: MailDraft, forceRefresh: Bool) async throws {
         try validateSessionProvider(session, expected: .outlook)
-        guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages") else {
-            throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid Microsoft draft endpoint"])
-        }
-        let body = GraphDraftBody(
-            subject: draft.subject,
-            body: .init(contentType: draft.bodyHTML == nil ? "Text" : "HTML", content: draft.bodyHTML ?? draft.bodyText),
-            toRecipients: draft.to.map { .init(emailAddress: .init(address: $0)) },
-            ccRecipients: draft.cc.map { .init(emailAddress: .init(address: $0)) }
-        )
-
-        let token = try await getAccessToken(for: session)
+        guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages") else { throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid Microsoft draft endpoint"]) }
+        let body = GraphDraftBody(subject: draft.subject, body: .init(contentType: draft.bodyHTML == nil ? "Text" : "HTML", content: draft.bodyHTML ?? draft.bodyText), toRecipients: draft.to.map { .init(emailAddress: .init(address: $0)) }, ccRecipients: draft.cc.map { .init(emailAddress: .init(address: $0)) })
+        let token = try await AccountManager.shared.token(for: session.id, provider: .outlook, forceRefresh: forceRefresh)
         let _: GraphMessage = try await request(url: url, method: "POST", body: body, token: token)
     }
 
-    func deleteMessage(session: MailSession, id: String) async throws {
+    private func deleteMessageImpl(session: MailSession, id: String, forceRefresh: Bool) async throws {
         try validateSessionProvider(session, expected: .outlook)
-        guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)") else {
-            throw NSError(domain: "OutlookProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid message identifier"])
-        }
-        let token = try await getAccessToken(for: session)
+        guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)") else { throw NSError(domain: "OutlookProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid message identifier"]) }
+        let token = try await AccountManager.shared.token(for: session.id, provider: .outlook, forceRefresh: forceRefresh)
         try await requestVoid(url: url, method: "DELETE", body: Optional<Data>.none, token: token)
     }
 
-    func markRead(session: MailSession, id: String) async throws {
+    private func markReadImpl(session: MailSession, id: String, forceRefresh: Bool) async throws {
         try validateSessionProvider(session, expected: .outlook)
-        guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)") else {
-            throw NSError(domain: "OutlookProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid message identifier"])
-        }
+        guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)") else { throw NSError(domain: "OutlookProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid message identifier"]) }
         let body = ["isRead": true]
-        let token = try await getAccessToken(for: session)
+        let token = try await AccountManager.shared.token(for: session.id, provider: .outlook, forceRefresh: forceRefresh)
         let _: GraphMessage = try await request(url: url, method: "PATCH", body: body, token: token)
     }
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor { ASPresentationAnchor() }
 
     private func getAccessToken(for session: MailSession) async throws -> String {
-        guard let tokens = MailKeychainManager.shared.getOAuthTokens(accountId: session.id) else {
-            throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "No tokens found"])
-        }
-        return tokens.accessToken
+        try await AccountManager.shared.token(for: session.id, provider: .outlook)
     }
 
     private func oauthValue(primaryKey: String, fallbackKey: String? = nil, remoteVariables: [String: String] = [:]) throws -> String {
@@ -344,6 +329,9 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+            if let http = response as? HTTPURLResponse, http.statusCode == 401 {
+                throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Microsoft access token rejected"])
+            }
             throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Graph request failed"])
         }
 
@@ -365,6 +353,9 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+            if let http = response as? HTTPURLResponse, http.statusCode == 401 {
+                throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Microsoft access token rejected"])
+            }
             throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Graph request failed"])
         }
     }
