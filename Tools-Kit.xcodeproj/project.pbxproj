@@ -31,6 +31,7 @@
 		MP0200000000000000000005 /* IMAPProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000005 /* IMAPProvider.swift */; };
 		MP0200000000000000000006 /* SMTPSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000006 /* SMTPSender.swift */; };
 		MP0200000000000000000007 /* GmailAuthSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000007 /* GmailAuthSupport.swift */; };
+		MP0200000000000000000008 /* GoogleOAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000008 /* GoogleOAuthManager.swift */; };
 		289C681EF0FD4E4C92CE8487 /* MailThreadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA70AEBD6344AE7A2A8D751 /* MailThreadView.swift */; };
 		39DA0853F2664BFCB925696A /* MailSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436F75E6A3244A9DA49E6704 /* MailSearchView.swift */; };
 		E6CDD8F2FEBB4ADAB83B8334 /* ManageAccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D36575B26D5F4015B1A75281 /* ManageAccountsView.swift */; };
@@ -650,6 +651,7 @@
 		MP0100000000000000000005 /* IMAPProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/IMAPProvider.swift; sourceTree = "<group>"; };
 		MP0100000000000000000006 /* SMTPSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/SMTPSender.swift; sourceTree = "<group>"; };
 		MP0100000000000000000007 /* GmailAuthSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/GmailAuthSupport.swift; sourceTree = "<group>"; };
+		MP0100000000000000000008 /* GoogleOAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/GoogleOAuthManager.swift; sourceTree = "<group>"; };
 		7BA70AEBD6344AE7A2A8D751 /* MailThreadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailThreadView.swift; sourceTree = "<group>"; };
 		436F75E6A3244A9DA49E6704 /* MailSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailSearchView.swift; sourceTree = "<group>"; };
 		D36575B26D5F4015B1A75281 /* ManageAccountsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/ManageAccountsView.swift; sourceTree = "<group>"; };
@@ -1375,6 +1377,7 @@
 				MP0100000000000000000005 /* IMAPProvider.swift */,
 				MP0100000000000000000006 /* SMTPSender.swift */,
 				MP0100000000000000000007 /* GmailAuthSupport.swift */,
+				MP0100000000000000000008 /* GoogleOAuthManager.swift */,
 				7BA70AEBD6344AE7A2A8D751 /* MailThreadView.swift */,
 				436F75E6A3244A9DA49E6704 /* MailSearchView.swift */,
 				D36575B26D5F4015B1A75281 /* ManageAccountsView.swift */,
@@ -2034,6 +2037,7 @@
 				MP0200000000000000000005 /* IMAPProvider.swift in Sources */,
 				MP0200000000000000000006 /* SMTPSender.swift in Sources */,
 				MP0200000000000000000007 /* GmailAuthSupport.swift in Sources */,
+				MP0200000000000000000008 /* GoogleOAuthManager.swift in Sources */,
 				289C681EF0FD4E4C92CE8487 /* MailThreadView.swift in Sources */,
 				39DA0853F2664BFCB925696A /* MailSearchView.swift in Sources */,
 				E6CDD8F2FEBB4ADAB83B8334 /* ManageAccountsView.swift in Sources */,
