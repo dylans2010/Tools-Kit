@@ -5,10 +5,12 @@ enum GmailAuthSupport {
 
     static func cleanedAccessToken(from rawToken: String?) -> String? {
         guard let rawToken else { return nil }
+        let lowercasedScheme = bearerScheme.lowercased()
+        let lowercasedPrefix = "\(lowercasedScheme) "
         let trimmed = rawToken.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleaned: String
-        if trimmed.lowercased().hasPrefix("\(bearerScheme.lowercased()) ") {
-            cleaned = String(trimmed.dropFirst("\(bearerScheme.lowercased()) ".count)).trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.lowercased().hasPrefix(lowercasedPrefix) {
+            cleaned = String(trimmed.dropFirst(lowercasedPrefix.count)).trimmingCharacters(in: .whitespacesAndNewlines)
         } else {
             cleaned = trimmed
         }
