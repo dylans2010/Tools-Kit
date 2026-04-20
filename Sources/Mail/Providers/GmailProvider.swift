@@ -23,12 +23,35 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
 
         let listURL = baseURL.appendingPathComponent("messages").appending(queryItems: items)
         let list: GmailListResponse = try await request(url: listURL, method: "GET", body: EmptyBody?.none, session: session)
+        let messageIDs = (list.messages ?? []).map(\.id)
 
-        var messages: [MailMessage] = []
-        for item in list.messages ?? [] {
-            messages.append(try await fetchMessage(session: session, id: item.id))
+        InternalLogger.shared.log("GmailProvider: inbox list fetched count=\(messageIDs.count) account=\(session.email)", level: .info)
+        if let firstMessageID = messageIDs.first {
+            InternalLogger.shared.log("GmailProvider: first message id=\(firstMessageID) account=\(session.email)", level: .debug)
         }
 
+        let messages = try await withThrowingTaskGroup(of: MailMessage?.self) { group in
+            for id in messageIDs {
+                group.addTask { [self] in
+                    do {
+                        return try await fetchMessage(session: session, id: id)
+                    } catch {
+                        InternalLogger.shared.log("GmailProvider: failed to decode/fetch message id=\(id) error=\(error.localizedDescription)", level: .error)
+                        return nil
+                    }
+                }
+            }
+
+            var decodedMessages: [MailMessage] = []
+            for try await message in group {
+                if let message {
+                    decodedMessages.append(message)
+                }
+            }
+            return decodedMessages
+        }
+
+        InternalLogger.shared.log("GmailProvider: decoded inbox messages count=\(messages.count) account=\(session.email)", level: .info)
         return messages.sorted(by: { $0.date > $1.date })
     }
 
@@ -36,9 +59,9 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         let url = baseURL.appendingPathComponent("messages/\(id)").appending(queryItems: [URLQueryItem(name: "format", value: "full")])
         let payload: GmailMessagePayload = try await request(url: url, method: "GET", body: EmptyBody?.none, session: session)
 
-        let headers = payload.payload?.headers.reduce(into: [String: String]()) { partial, item in
+        let headers = (payload.payload?.headers ?? []).reduce(into: [String: String]()) { partial, item in
             partial[item.name.lowercased()] = item.value
-        } ?? [:]
+        }
 
         let bodySelection = preferredBody(payload.payload)
         let parsedDate = gmailDate(payload.internalDate, fallback: headers["date"])
@@ -313,7 +336,7 @@ private struct GmailMessagePayload: Decodable {
 
 private struct GmailMIMEPart: Decodable {
     let mimeType: String?
-    let headers: [GmailHeader]
+    let headers: [GmailHeader]?
     let body: GmailBody?
     let parts: [GmailMIMEPart]?
 }
