@@ -6,6 +6,16 @@ enum AppwriteService {
 
     private static let endpoint = configValue(forKey: "APPWRITE_PUBLIC_ENDPOINT") ?? defaultEndpoint
     private static let projectID = configValue(forKey: "APPWRITE_PROJECT_ID") ?? defaultProjectID
+    private static let config: [String: Any]? = {
+        guard
+            let url = Bundle.main.url(forResource: "Config", withExtension: "plist"),
+            let data = try? Data(contentsOf: url)
+        else {
+            return nil
+        }
+
+        return try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any]
+    }()
 
     static let client = Client()
         .setEndpoint(endpoint)
@@ -14,10 +24,7 @@ enum AppwriteService {
 
     private static func configValue(forKey key: String) -> String? {
         guard
-            let url = Bundle.main.url(forResource: "Config", withExtension: "plist"),
-            let data = try? Data(contentsOf: url),
-            let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
-            let value = plist[key] as? String
+            let value = config?[key] as? String
         else {
             return nil
         }
