@@ -1,6 +1,7 @@
 import Foundation
 import Appwrite
 import UIKit
+import OSLog
 
 enum FeedbackServiceError: LocalizedError {
     case missingConfig
@@ -189,7 +190,7 @@ final class FeedbackService {
     private static func parseDate(_ value: String) -> Date? {
         if let date = isoFormatter.date(from: value) { return date }
         if let date = fallbackISOFormatter.date(from: value) { return date }
-        print("FeedbackService warning: Failed to parse date value: \(value)")
+        logger.warning("Failed to parse feedback date value: \(value, privacy: .public)")
         return nil
     }
 
@@ -248,6 +249,7 @@ final class FeedbackService {
     }()
 
     private static let maxFeedbackLimit = 200
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "ToolsKit", category: "FeedbackService")
 
     private static func resolvedUserName(from user: User<[String: AnyCodable]>?) -> String {
         [user?.name, user?.email]
@@ -258,7 +260,7 @@ final class FeedbackService {
     private func resolvedCreatedAt(from dataValue: String, fallbackValue: String, documentId: String) -> Date {
         if let parsed = Self.parseDate(dataValue) { return parsed }
         if let parsedFallback = Self.parseDate(fallbackValue) { return parsedFallback }
-        print("FeedbackService warning: Falling back to .distantPast for createdAt on document \(documentId)")
+        Self.logger.warning("Falling back to distantPast for createdAt on document: \(documentId, privacy: .public)")
         return .distantPast
     }
 }
