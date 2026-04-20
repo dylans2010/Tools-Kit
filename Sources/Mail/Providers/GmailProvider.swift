@@ -400,7 +400,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         }
 
         let token = try JSONDecoder().decode(OAuthTokenResponse.self, from: data)
-        guard isBearerTokenType(token.tokenType) else {
+        guard GmailAuthSupport.isBearerTokenType(token.tokenType, loggerContext: "GmailProvider") else {
             throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google token exchange returned unsupported token type"])
         }
         return token
@@ -592,7 +592,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google token refresh failed"])
         }
         let refreshed = try JSONDecoder().decode(OAuthTokenResponse.self, from: data)
-        guard isBearerTokenType(refreshed.tokenType) else {
+        guard GmailAuthSupport.isBearerTokenType(refreshed.tokenType, loggerContext: "GmailProvider") else {
             throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google token refresh returned unsupported token type"])
         }
         let resolvedRefresh = refreshed.refreshToken ?? refreshToken
@@ -622,36 +622,12 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
     }
 
     private func applyAuthorizationHeader(to request: inout URLRequest, token: String?) throws {
-        let accessToken = try normalizedAccessToken(from: token)
+        let accessToken = try GmailAuthSupport.normalizedAccessToken(
+            from: token,
+            errorDomain: "GmailProvider",
+            errorMessage: "Missing Google access token"
+        )
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-    }
-
-    private func normalizedAccessToken(from rawToken: String?) throws -> String {
-        guard let rawToken else {
-            throw NSError(domain: "GmailProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Google access token"])
-        }
-
-        let trimmed = rawToken.trimmingCharacters(in: .whitespacesAndNewlines)
-        let cleaned: String
-        if trimmed.lowercased().hasPrefix("bearer ") {
-            cleaned = String(trimmed.dropFirst("bearer ".count)).trimmingCharacters(in: .whitespacesAndNewlines)
-        } else {
-            cleaned = trimmed
-        }
-
-        guard !cleaned.isEmpty else {
-            throw NSError(domain: "GmailProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Google access token"])
-        }
-
-        return cleaned
-    }
-
-    private func isBearerTokenType(_ tokenType: String?) -> Bool {
-        guard let tokenType else {
-            InternalLogger.shared.log("GmailProvider: Google token_type missing; proceeding with access token", level: .warning)
-            return true
-        }
-        return tokenType.trimmingCharacters(in: .whitespacesAndNewlines).caseInsensitiveCompare("Bearer") == .orderedSame
     }
 }
 

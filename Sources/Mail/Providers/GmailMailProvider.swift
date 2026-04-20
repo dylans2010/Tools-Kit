@@ -254,7 +254,7 @@ class GmailMailProvider: MailProviderProtocol {
 
     private func validAccessToken() async throws -> String {
         if let accessToken {
-            if let normalized = cleanedAccessToken(from: accessToken) {
+            if let normalized = GmailAuthSupport.cleanedAccessToken(from: accessToken) {
                 self.accessToken = normalized
                 return normalized
             }
@@ -262,7 +262,7 @@ class GmailMailProvider: MailProviderProtocol {
         }
 
         if let stored = MailKeychainManager.shared.getOAuthTokens(accountId: account.id) {
-            if let normalized = cleanedAccessToken(from: stored.accessToken) {
+            if let normalized = GmailAuthSupport.cleanedAccessToken(from: stored.accessToken) {
                 accessToken = normalized
                 refreshToken = stored.refreshToken
                 return normalized
@@ -305,7 +305,7 @@ class GmailMailProvider: MailProviderProtocol {
         }
 
         let refreshed = try JSONDecoder().decode(GmailRefreshResponse.self, from: data)
-        guard isBearerTokenType(refreshed.tokenType) else {
+        guard GmailAuthSupport.isBearerTokenType(refreshed.tokenType, loggerContext: "GmailMailProvider") else {
             throw NSError(domain: "GmailMailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Gmail token refresh returned unsupported token type"])
         }
         let normalizedToken = try normalizedAccessToken(from: refreshed.accessToken)
@@ -329,30 +329,11 @@ class GmailMailProvider: MailProviderProtocol {
     }
 
     private func normalizedAccessToken(from rawToken: String?) throws -> String {
-        guard let cleaned = cleanedAccessToken(from: rawToken) else {
-            throw NSError(domain: "GmailMailProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Gmail OAuth access token"])
-        }
-        return cleaned
-    }
-
-    private func cleanedAccessToken(from rawToken: String?) -> String? {
-        guard let rawToken else { return nil }
-        let trimmed = rawToken.trimmingCharacters(in: .whitespacesAndNewlines)
-        let cleaned: String
-        if trimmed.lowercased().hasPrefix("bearer ") {
-            cleaned = String(trimmed.dropFirst("bearer ".count)).trimmingCharacters(in: .whitespacesAndNewlines)
-        } else {
-            cleaned = trimmed
-        }
-        return cleaned.isEmpty ? nil : cleaned
-    }
-
-    private func isBearerTokenType(_ tokenType: String?) -> Bool {
-        guard let tokenType else {
-            InternalLogger.shared.log("GmailMailProvider: Google token_type missing; proceeding with access token", level: .warning)
-            return true
-        }
-        return tokenType.trimmingCharacters(in: .whitespacesAndNewlines).caseInsensitiveCompare("Bearer") == .orderedSame
+        try GmailAuthSupport.normalizedAccessToken(
+            from: rawToken,
+            errorDomain: "GmailMailProvider",
+            errorMessage: "Missing Gmail OAuth access token"
+        )
     }
 
     private func parseAddressList(_ value: String?) -> [String] {
