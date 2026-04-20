@@ -129,10 +129,18 @@ protocol MailProvider {
 protocol MailProviderProtocol {
     var account: MailAccount { get }
 
+    /// Fetches normalized inbox messages for the provider account.
+    /// - Returns: Provider messages normalized to `EmailMessage`.
     func fetchInbox() async throws -> [EmailMessage]
+    /// Fetches a single normalized message by provider message identifier.
+    /// - Parameter id: Provider-specific message identifier.
+    /// - Returns: A normalized `EmailMessage`.
     func fetchMessage(id: String) async throws -> EmailMessage
+    /// Sends an email using provider-specific payload/context.
     func sendEmail() async throws
+    /// Refreshes provider OAuth tokens when available.
     func refreshToken() async throws
+    /// Lists currently known connected email accounts.
     func listAccounts() -> [EmailAccount]
 
     func fetchFolders() async throws -> [MailFolder]
@@ -191,6 +199,9 @@ extension MailProviderProtocol {
     }
 }
 
+/// Produces a deterministic positive integer UID from a provider message ID.
+/// Numeric IDs are preserved; non-numeric IDs are SHA256-hashed and reduced into
+/// a bounded positive `Int` to keep compatibility with legacy UID-based views.
 func stableMailUID(from id: String) -> Int {
     if let parsed = Int(id), parsed > 0 { return parsed }
     let digest = SHA256.hash(data: Data(id.utf8))

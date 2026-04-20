@@ -178,6 +178,8 @@ final class MailStore: ObservableObject {
         InternalLogger.shared.log("MailStore: OAuth tokens updated for \(accounts[idx].emailAddress)", level: .debug)
     }
 
+    /// Returns the preferred account for compose/reply flows.
+    /// Active account is prioritized, then the first available account.
     func preferredAccountForCompose() -> MailAccount? {
         activeAccount ?? accounts.first
     }

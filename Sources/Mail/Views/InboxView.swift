@@ -273,7 +273,9 @@ struct InboxView: View {
                     }
                     .sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
             }.value
-            unifiedThreads = all
+            await MainActor.run {
+                unifiedThreads = all
+            }
         }
     }
 }
