@@ -11,7 +11,7 @@ struct FeedbackView: View {
     private let minLength = 10
 
     var body: some View {
-        Group {
+        VStack {
             if submissionSucceeded {
                 FeedbackSuccessView {
                     message = ""
