@@ -17,13 +17,13 @@
     <key>APPWRITE_USERDATA_COLLECTION_ID</key>
     <string></string>
     <key>APPWRITE_FEEDBACK_DATABASE_ID</key>
-    <string></string>
+    <string>69e5a351000212788e59</string>
     <key>APPWRITE_FEEDBACK_COLLECTION_ID</key>
-    <string></string>
+    <string>69e5a351000212788e59</string>
     <key>PRODUCTION_API_KEY</key>
-    <string></string>
+    <string>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</string>
     <key>DAILY_API</key>
-    <string></string>
+    <string>5d814fa31dd434af6efd10d004caa4338310c0a9e749cbbe2e543646708b3fae</string>
     <key>APPWRITE_MAIL_CONFIG_URL</key>
     <string></string>
     <key>APPWRITE_MAIL_CONFIG_BEARER</key>
