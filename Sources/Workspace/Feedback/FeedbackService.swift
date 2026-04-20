@@ -167,13 +167,14 @@ final class FeedbackService {
 
     private func feedback(from document: Document<FeedbackDocumentData>) -> Feedback {
         let data = document.data
+        let createdAt = resolvedCreatedAt(from: data.createdAt, fallbackValue: document.createdAt, documentId: document.id)
         return Feedback(
             id: document.id,
             userId: data.userId?.nilIfBlank,
             userName: data.userName,
             message: data.message,
             category: data.category,
-            createdAt: Self.parseDate(data.createdAt) ?? Self.parseDate(document.createdAt) ?? .distantPast,
+            createdAt: createdAt,
             device: data.device,
             appVersion: data.appVersion,
             status: data.status,
@@ -252,6 +253,13 @@ final class FeedbackService {
         [user?.name, user?.email]
             .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
             .first(where: { !$0.isEmpty }) ?? "Anonymous"
+    }
+
+    private func resolvedCreatedAt(from dataValue: String, fallbackValue: String, documentId: String) -> Date {
+        if let parsed = Self.parseDate(dataValue) { return parsed }
+        if let parsedFallback = Self.parseDate(fallbackValue) { return parsedFallback }
+        print("FeedbackService warning: Falling back to .distantPast for createdAt on document \(documentId)")
+        return .distantPast
     }
 }
 
