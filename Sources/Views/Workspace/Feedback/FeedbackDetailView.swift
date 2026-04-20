@@ -108,10 +108,10 @@ struct FeedbackDetailView: View {
                     try await FeedbackService.shared.updatePriority(feedbackId: feedback.id, priority: priority)
                 }
 
-                if assignedTo != (feedback.assignedTo ?? "") {
+                if assigneeTrimmed != (feedback.assignedTo ?? "").trimmingCharacters(in: .whitespacesAndNewlines) {
                     try await FeedbackService.shared.assignFeedback(
                         feedbackId: feedback.id,
-                        assignee: assignedTo
+                        assignee: assigneeTrimmed
                     )
                 }
 
