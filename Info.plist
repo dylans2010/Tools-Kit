@@ -127,12 +127,12 @@
 	<key>MICROSOFT_CLIENT_ID</key>
 	<string>85e1d7da-8be9-42ae-ac6a-93acac534432</string>
 	<key>YAHOO_CLIENT_ID</key>
-	<string>YOUR_YAHOO_CLIENT_ID</string>
+	<string>dj0yJmk9cGVXT2dIY1BqMFlLJmQ9WVdrOVRrRndkR2x4VTNVbWNHbzlNQT09JnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PTc4</string>
 	<key>GOOGLE_OAUTH_REDIRECT_URI</key>
 	<string>com.googleusercontent.apps.127870730797-8rnpb3le5n3j34ur7uvsfma75592nr07:/oauthredirect</string>
 	<key>MICROSOFT_OAUTH_REDIRECT_URI</key>
 	<string>com.ToolsKit.microsoft:/oauthredirect</string>
 	<key>YAHOO_OAUTH_REDIRECT_URI</key>
-	<string>com.ToolsKit.yahoo:/oauthredirect</string>
+	<string>toolskit://oauth/yahoo</string>
 </dict>
 </plist>
