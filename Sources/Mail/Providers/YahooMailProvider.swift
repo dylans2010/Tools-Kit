@@ -19,7 +19,7 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
 
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
         let remoteVariables = await fetchRemoteVariables()
-        let clientID = try oauthValue(primaryKey: "YAHOO_CLIENT_ID", remoteVariables: remoteVariables)
+        let clientID = try oauthValue(primaryKey: "YAHOO_CLIENT_ID", fallbackKey: "YAHOO_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
         let redirectURI = try oauthValue(primaryKey: "YAHOO_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
 
         let verifier = randomCodeVerifier()
@@ -208,7 +208,7 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         )
     }
 
-    private func oauthValue(primaryKey: String, remoteVariables: [String: String] = [:]) throws -> String {
+    private func oauthValue(primaryKey: String, fallbackKey: String? = nil, remoteVariables: [String: String] = [:]) throws -> String {
         if let value = localConfigValue(forKey: primaryKey) {
             return value
         }
@@ -217,6 +217,18 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         }
         if let value = remoteConfigValue(forKey: primaryKey, remoteVariables: remoteVariables) {
             return value
+        }
+
+        if let fallbackKey {
+            if let value = localConfigValue(forKey: fallbackKey) {
+                return value
+            }
+            if let value = infoPlistValue(forKey: fallbackKey) {
+                return value
+            }
+            if let value = remoteConfigValue(forKey: fallbackKey, remoteVariables: remoteVariables) {
+                return value
+            }
         }
 
         throw NSError(domain: "YahooProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing \(primaryKey)"])
@@ -375,7 +387,7 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
             throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Yahoo refresh token"])
         }
         let remoteVariables = await fetchRemoteVariables()
-        let clientID = try oauthValue(primaryKey: "YAHOO_CLIENT_ID", remoteVariables: remoteVariables)
+        let clientID = try oauthValue(primaryKey: "YAHOO_CLIENT_ID", fallbackKey: "YAHOO_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
         let redirectURI = try oauthValue(primaryKey: "YAHOO_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
 
         var request = URLRequest(url: URL(string: "https://api.login.yahoo.com/oauth2/get_token")!)
