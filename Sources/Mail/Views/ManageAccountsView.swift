@@ -347,7 +347,7 @@ struct ManageAccountsView: View {
             let session: MailSession
             switch provider {
             case .gmail:
-                session = try await GmailProvider().authenticate(credentials: .oauth())
+                session = try await GoogleOAuthManager.shared.authenticate()
             case .outlook:
                 session = try await OutlookProvider().authenticate(credentials: .oauth())
             case .yahoo:

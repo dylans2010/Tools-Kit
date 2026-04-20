@@ -5,8 +5,7 @@ struct MailAccount: Identifiable, Codable, Hashable {
     var emailAddress: String
     var providerType: ProviderType
     var displayName: String
-    var accessToken: String?
-    var refreshToken: String?
+    var accessTokenExpiration: Date?
     var imapHost: String?
     var imapPort: UInt16?
     var smtpHost: String?
@@ -70,8 +69,7 @@ struct MailAccount: Identifiable, Codable, Hashable {
         emailAddress: String,
         providerType: ProviderType,
         displayName: String,
-        accessToken: String? = nil,
-        refreshToken: String? = nil,
+        accessTokenExpiration: Date? = nil,
         imapHost: String? = nil,
         imapPort: UInt16? = nil,
         smtpHost: String? = nil,
@@ -82,8 +80,7 @@ struct MailAccount: Identifiable, Codable, Hashable {
         self.emailAddress = emailAddress
         self.providerType = providerType
         self.displayName = displayName
-        self.accessToken = accessToken
-        self.refreshToken = refreshToken
+        self.accessTokenExpiration = accessTokenExpiration
         self.imapHost = imapHost
         self.imapPort = imapPort
         self.smtpHost = smtpHost
@@ -98,8 +95,7 @@ struct MailAccount: Identifiable, Codable, Hashable {
             emailAddress: email,
             providerType: provider,
             displayName: provider.displayName,
-            accessToken: nil,
-            refreshToken: nil,
+            accessTokenExpiration: nil,
             imapHost: nil,
             imapPort: nil,
             smtpHost: nil,

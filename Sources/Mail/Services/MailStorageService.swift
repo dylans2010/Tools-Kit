@@ -90,14 +90,6 @@ final class MailStore: ObservableObject {
     func reloadAccounts() {
         var loaded = storage.loadAccounts()
 
-        // Hydrate sensitive OAuth tokens from Keychain only.
-        for idx in loaded.indices {
-            if let tokens = MailKeychainManager.shared.getOAuthTokens(accountId: loaded[idx].id) {
-                loaded[idx].accessToken = tokens.accessToken
-                loaded[idx].refreshToken = tokens.refreshToken
-            }
-        }
-
         if let selected = loaded.first(where: { $0.isActive }) {
             activeAccount = selected
         } else {
@@ -120,10 +112,6 @@ final class MailStore: ObservableObject {
             incoming.displayName = incoming.providerType.displayName
         }
 
-        if let token = incoming.accessToken, !token.isEmpty {
-            _ = MailKeychainManager.shared.saveOAuthTokens(accountId: incoming.id, accessToken: token, refreshToken: incoming.refreshToken)
-        }
-
         if let existing = accounts.firstIndex(where: { $0.id == incoming.id || $0.emailAddress.caseInsensitiveCompare(incoming.emailAddress) == .orderedSame }) {
             let existingId = accounts[existing].id
             let mergedAccount = MailAccount(
@@ -131,8 +119,7 @@ final class MailStore: ObservableObject {
                 emailAddress: incoming.emailAddress,
                 providerType: incoming.providerType,
                 displayName: incoming.displayName,
-                accessToken: incoming.accessToken,
-                refreshToken: incoming.refreshToken,
+                accessTokenExpiration: incoming.accessTokenExpiration,
                 imapHost: incoming.imapHost,
                 imapPort: incoming.imapPort,
                 smtpHost: incoming.smtpHost,
@@ -166,14 +153,12 @@ final class MailStore: ObservableObject {
         }
     }
 
-    func updateAccountTokens(accountId: String, accessToken: String, refreshToken: String?) {
+    func updateAccountTokens(accountId: String, accessToken: String, refreshToken: String?, expiration: Date?) {
         guard let idx = accounts.firstIndex(where: { $0.id == accountId }) else { return }
-        accounts[idx].accessToken = accessToken
-        if let refreshToken {
-            accounts[idx].refreshToken = refreshToken
-        }
 
-        _ = MailKeychainManager.shared.saveOAuthTokens(accountId: accountId, accessToken: accessToken, refreshToken: refreshToken ?? accounts[idx].refreshToken)
+        accounts[idx].accessTokenExpiration = expiration
+
+        _ = MailKeychainManager.shared.saveOAuthTokens(accountId: accountId, accessToken: accessToken, refreshToken: refreshToken)
         persistAccounts()
         InternalLogger.shared.log("MailStore: OAuth tokens updated for \(accounts[idx].emailAddress)", level: .debug)
     }
@@ -197,13 +182,7 @@ final class MailStore: ObservableObject {
     }
 
     private func persistAccounts() {
-        let sanitized = accounts.map { account -> MailAccount in
-            var copy = account
-            copy.accessToken = nil
-            copy.refreshToken = nil
-            return copy
-        }
-        storage.saveAccounts(sanitized)
+        storage.saveAccounts(accounts)
     }
 }
 
@@ -220,8 +199,7 @@ final class AccountManager {
             emailAddress: session.email,
             providerType: session.provider,
             displayName: session.displayName,
-            accessToken: session.accessToken,
-            refreshToken: session.refreshToken,
+            accessTokenExpiration: session.accessTokenExpiration,
             imapHost: session.imapHost,
             imapPort: session.imapPort,
             smtpHost: session.smtpHost,

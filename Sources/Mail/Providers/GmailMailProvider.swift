@@ -2,21 +2,11 @@ import Foundation
 
 class GmailMailProvider: MailProviderProtocol {
     let account: MailAccount
-    private var accessToken: String?
-    private var refreshToken: String?
     private var pageTokensByOffset: [Int: String?] = [0: nil]
     private let baseURL = URL(string: "https://gmail.googleapis.com/gmail/v1/users/me")!
 
     init(account: MailAccount) {
         self.account = account
-        self.accessToken = account.accessToken
-        self.refreshToken = account.refreshToken
-
-        if self.accessToken == nil {
-            let stored = MailKeychainManager.shared.getOAuthTokens(accountId: account.id)
-            self.accessToken = stored?.accessToken
-            self.refreshToken = stored?.refreshToken ?? account.refreshToken
-        }
     }
 
     func fetchFolders() async throws -> [MailFolder] {
@@ -215,12 +205,12 @@ class GmailMailProvider: MailProviderProtocol {
         return url
     }
 
-    private func requestJSON<T: Decodable>(url: URL, method: String = "GET", body: Encodable? = nil) async throws -> T {
+    private func requestJSON<T: Decodable>(url: URL, method: String = "GET", body: Encodable? = nil, isRetry: Bool = false) async throws -> T {
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
-        let token = try await validAccessToken()
+        let token = try await GoogleOAuthManager.shared.getValidAccessToken(for: account.id)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
         if let body {
@@ -233,10 +223,10 @@ class GmailMailProvider: MailProviderProtocol {
             throw NSError(domain: "GmailMailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Unexpected Gmail response"])
         }
 
-        if http.statusCode == 401 {
+        if http.statusCode == 401 && !isRetry {
             InternalLogger.shared.log("GmailMailProvider: token expired, attempting refresh for \(account.emailAddress)", level: .warning)
-            try await refreshAccessToken()
-            return try await requestJSON(url: url, method: method, body: body)
+            // getValidAccessToken handles refresh, so we just retry
+            return try await requestJSON(url: url, method: method, body: body, isRetry: true)
         }
 
         guard (200...299).contains(http.statusCode) else {
@@ -252,232 +242,11 @@ class GmailMailProvider: MailProviderProtocol {
         return try JSONDecoder().decode(T.self, from: data)
     }
 
-    private func validAccessToken() async throws -> String {
-        if let accessToken {
-            if let normalized = GmailAuthSupport.cleanedAccessToken(from: accessToken) {
-                self.accessToken = normalized
-                return normalized
-            }
-            InternalLogger.shared.log("GmailMailProvider: cached access token is empty/invalid after normalization, falling back to keychain or refresh", level: .warning)
-        }
-
-        if let stored = MailKeychainManager.shared.getOAuthTokens(accountId: account.id) {
-            if let normalized = GmailAuthSupport.cleanedAccessToken(from: stored.accessToken) {
-                accessToken = normalized
-                refreshToken = stored.refreshToken
-                return normalized
-            }
-        }
-
-        try await refreshAccessToken()
-        return try normalizedAccessToken(from: accessToken)
-    }
-
-    private func refreshAccessToken() async throws {
-        guard let refreshToken = refreshToken, !refreshToken.isEmpty else {
-            throw NSError(domain: "GmailMailProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Gmail refresh token"])
-        }
-
-        let remoteVariables = await fetchRemoteVariables()
-        let clientID = try googleClientID(remoteVariables: remoteVariables)
-
-        var request = URLRequest(url: URL(string: "https://oauth2.googleapis.com/token")!)
-        request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-
-        let bodyItems = [
-            URLQueryItem(name: "client_id", value: clientID),
-            URLQueryItem(name: "grant_type", value: "refresh_token"),
-            URLQueryItem(name: "refresh_token", value: refreshToken)
-        ]
-        let bodyString = bodyItems
-            .map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")" }
-            .joined(separator: "&")
-        request.httpBody = bodyString.data(using: .utf8)
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse else {
-            throw NSError(domain: "GmailMailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Token refresh failed"])
-        }
-        guard (200...299).contains(http.statusCode) else {
-            let msg = String(data: data, encoding: .utf8) ?? "Unable to refresh Gmail token"
-            throw NSError(domain: "GmailMailProvider", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: msg])
-        }
-
-        let refreshed = try JSONDecoder().decode(GmailRefreshResponse.self, from: data)
-        guard GmailAuthSupport.isBearerTokenType(refreshed.tokenType, loggerContext: "GmailMailProvider") else {
-            throw NSError(domain: "GmailMailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google token refresh returned unsupported token type: \(refreshed.tokenType ?? "nil")"])
-        }
-        let normalizedToken = try normalizedAccessToken(from: refreshed.accessToken)
-        accessToken = normalizedToken
-        let resolvedRefreshToken = refreshed.refreshToken ?? refreshToken
-        self.refreshToken = resolvedRefreshToken
-
-        _ = MailKeychainManager.shared.saveOAuthTokens(
-            accountId: account.id,
-            accessToken: normalizedToken,
-            refreshToken: resolvedRefreshToken
-        )
-        await MainActor.run {
-            MailStore.shared.updateAccountTokens(
-                accountId: account.id,
-                accessToken: normalizedToken,
-                refreshToken: resolvedRefreshToken
-            )
-        }
-        InternalLogger.shared.log("GmailMailProvider: refreshed access token for \(account.emailAddress)", level: .info)
-    }
-
-    private func normalizedAccessToken(from rawToken: String?) throws -> String {
-        try GmailAuthSupport.normalizedAccessToken(
-            from: rawToken,
-            errorDomain: "GmailMailProvider",
-            errorMessage: "Missing Gmail OAuth access token"
-        )
-    }
-
     private func parseAddressList(_ value: String?) -> [String] {
         guard let value, !value.isEmpty else { return [] }
         return value
             .split(separator: ",")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-    }
-
-    private func oauthValue(primaryKey: String, fallbackKey: String? = nil, remoteVariables: [String: String] = [:]) throws -> String {
-        if let value = localConfigValue(forKey: primaryKey) {
-            return value
-        }
-        if let value = infoPlistValue(forKey: primaryKey) {
-            return value
-        }
-        if let value = remoteConfigValue(forKey: primaryKey, remoteVariables: remoteVariables) {
-            return value
-        }
-
-        if let fallbackKey {
-            if let value = localConfigValue(forKey: fallbackKey) {
-                return value
-            }
-            if let value = infoPlistValue(forKey: fallbackKey) {
-                return value
-            }
-            if let value = remoteConfigValue(forKey: fallbackKey, remoteVariables: remoteVariables) {
-                return value
-            }
-        }
-
-        throw NSError(
-            domain: "GmailMailProvider",
-            code: 500,
-            userInfo: [NSLocalizedDescriptionKey: "Missing required OAuth config key \(primaryKey)"]
-        )
-    }
-
-    private func googleClientID(remoteVariables: [String: String]) throws -> String {
-        try oauthValue(
-            primaryKey: "GOOGLE_CLIENT_ID",
-            remoteVariables: remoteVariables
-        )
-    }
-
-    private func localConfigValue(forKey key: String) -> String? {
-        guard
-            let url = Bundle.main.url(forResource: "Config", withExtension: "plist"),
-            let data = try? Data(contentsOf: url),
-            let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
-            let value = plist[key] as? String
-        else {
-            return nil
-        }
-
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
-    }
-
-    private func infoPlistValue(forKey key: String) -> String? {
-        AppConfig.string(for: key)
-    }
-
-    private func remoteConfigValue(forKey key: String, remoteVariables: [String: String]) -> String? {
-        guard let value = remoteVariables[key] else { return nil }
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
-    }
-
-    private func fetchRemoteVariables() async -> [String: String] {
-        guard
-            let rawURL = localConfigValue(forKey: "APPWRITE_MAIL_CONFIG_URL"),
-            let url = URL(string: rawURL)
-        else {
-            return [:]
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-
-        if let bearer = localConfigValue(forKey: "APPWRITE_MAIL_CONFIG_BEARER") {
-            request.setValue("Bearer \(bearer)", forHTTPHeaderField: "Authorization")
-        }
-
-        do {
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
-                return [:]
-            }
-            return decodeRemoteVariables(from: data)
-        } catch {
-            return [:]
-        }
-    }
-
-    private func decodeRemoteVariables(from data: Data) -> [String: String] {
-        if let direct = try? JSONDecoder().decode([String: String].self, from: data) {
-            return direct
-                .mapValues { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                .filter { !$0.value.isEmpty }
-        }
-
-        guard let object = try? JSONSerialization.jsonObject(with: data) else {
-            return [:]
-        }
-
-        var values: [String: String] = [:]
-        collectRemoteVariables(from: object, into: &values, parentKey: nil)
-        return values
-            .mapValues { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.value.isEmpty }
-    }
-
-    private func collectRemoteVariables(from object: Any, into output: inout [String: String], parentKey: String?) {
-        switch object {
-        case let dictionary as [String: Any]:
-            if let key = dictionary["key"] as? String, let value = dictionary["value"] as? String {
-                output[key] = value
-            }
-            if let parentKey, let value = dictionary["value"] as? String, looksLikeConfigKey(parentKey) {
-                output[parentKey] = value
-            }
-
-            for (key, value) in dictionary {
-                if let stringValue = value as? String, looksLikeConfigKey(key) {
-                    output[key] = stringValue
-                }
-                collectRemoteVariables(from: value, into: &output, parentKey: key)
-            }
-        case let array as [Any]:
-            for item in array {
-                collectRemoteVariables(from: item, into: &output, parentKey: parentKey)
-            }
-        default:
-            break
-        }
-    }
-
-    private func looksLikeConfigKey(_ key: String) -> Bool {
-        guard key.range(of: #"^[A-Z][A-Z0-9_]*$"#, options: .regularExpression) != nil else { return false }
-        let allowedPrefixes = ["APPWRITE_", "GOOGLE_", "GMAIL_", "PRODUCTION_", "DAILY_", "MAIL_", "OUTLOOK_", "YAHOO_"]
-        return allowedPrefixes.contains { key.hasPrefix($0) }
     }
 
     private func parseGmailDate(internalDate: String?, fallback: String?) -> Date {
@@ -561,18 +330,6 @@ private struct GmailBody: Decodable {
         )
         guard let rawData = Data(base64Encoded: padded) else { return nil }
         return String(data: rawData, encoding: .utf8)
-    }
-}
-
-private struct GmailRefreshResponse: Decodable {
-    let accessToken: String
-    let refreshToken: String?
-    let tokenType: String?
-
-    enum CodingKeys: String, CodingKey {
-        case accessToken = "access_token"
-        case refreshToken = "refresh_token"
-        case tokenType = "token_type"
     }
 }
 

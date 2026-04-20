@@ -8,6 +8,8 @@ struct MailCredentials: Sendable {
     var port: UInt16?
     var smtpHost: String?
     var smtpPort: UInt16?
+    // Raw tokens are only used during the initial authentication phase.
+    // They are NOT stored in these persistent models.
     var accessToken: String?
     var refreshToken: String?
 
@@ -30,8 +32,7 @@ struct MailSession: Identifiable, Codable, Sendable {
     var provider: MailAccount.ProviderType
     var email: String
     var displayName: String
-    var accessToken: String?
-    var refreshToken: String?
+    var accessTokenExpiration: Date?
     var imapHost: String?
     var imapPort: UInt16?
     var smtpHost: String?
@@ -42,8 +43,7 @@ struct MailSession: Identifiable, Codable, Sendable {
         provider: MailAccount.ProviderType,
         email: String,
         displayName: String,
-        accessToken: String? = nil,
-        refreshToken: String? = nil,
+        accessTokenExpiration: Date? = nil,
         imapHost: String? = nil,
         imapPort: UInt16? = nil,
         smtpHost: String? = nil,
@@ -53,8 +53,7 @@ struct MailSession: Identifiable, Codable, Sendable {
         self.provider = provider
         self.email = email
         self.displayName = displayName
-        self.accessToken = accessToken
-        self.refreshToken = refreshToken
+        self.accessTokenExpiration = accessTokenExpiration
         self.imapHost = imapHost
         self.imapPort = imapPort
         self.smtpHost = smtpHost
