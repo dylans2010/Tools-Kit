@@ -75,6 +75,7 @@ final class GoogleOAuthManager: NSObject, ASWebAuthenticationPresentationContext
         InternalLogger.shared.log("GoogleOAuth: Authentication successful for \(profile.email). Expiration: \(expirationDate?.description ?? "none")", level: .info)
 
         return MailSession(
+            id: UUID().uuidString,
             provider: .gmail,
             email: profile.email,
             displayName: profile.name ?? "Gmail",
