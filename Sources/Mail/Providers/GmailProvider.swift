@@ -647,7 +647,10 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
     }
 
     private func isBearerTokenType(_ tokenType: String?) -> Bool {
-        guard let tokenType else { return true }
+        guard let tokenType else {
+            InternalLogger.shared.log("GmailProvider: Google token_type missing; proceeding with access token", level: .warning)
+            return true
+        }
         return tokenType.trimmingCharacters(in: .whitespacesAndNewlines).caseInsensitiveCompare("Bearer") == .orderedSame
     }
 }
