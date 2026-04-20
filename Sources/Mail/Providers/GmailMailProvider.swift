@@ -215,7 +215,12 @@ class GmailMailProvider: MailProviderProtocol {
         return url
     }
 
-    private func requestJSON<T: Decodable>(url: URL, method: String = "GET", body: Encodable? = nil) async throws -> T {
+    private func requestJSON<T: Decodable>(
+        url: URL,
+        method: String = "GET",
+        body: Encodable? = nil,
+        allowRefreshRetry: Bool = true
+    ) async throws -> T {
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
@@ -233,10 +238,10 @@ class GmailMailProvider: MailProviderProtocol {
             throw NSError(domain: "GmailMailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Unexpected Gmail response"])
         }
 
-        if http.statusCode == 401 {
+        if http.statusCode == 401, allowRefreshRetry {
             InternalLogger.shared.log("GmailMailProvider: token expired, attempting refresh for \(account.emailAddress)", level: .warning)
             try await refreshAccessToken()
-            return try await requestJSON(url: url, method: method, body: body)
+            return try await requestJSON(url: url, method: method, body: body, allowRefreshRetry: false)
         }
 
         guard (200...299).contains(http.statusCode) else {
