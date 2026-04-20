@@ -39,9 +39,7 @@ final class FeedbackService {
         let isoNow = Self.isoFormatter.string(from: now)
         let user = try? await account.get()
 
-        let userName = [user?.name, user?.email]
-            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .first(where: { !$0.isEmpty }) ?? "Anonymous"
+        let userName = Self.resolvedUserName(from: user)
 
         let payload: [String: Any] = [
             "userId": user?.id ?? "",
@@ -189,7 +187,9 @@ final class FeedbackService {
 
     private static func parseDate(_ value: String) -> Date {
         if let date = isoFormatter.date(from: value) { return date }
-        return fallbackISOFormatter.date(from: value) ?? .distantPast
+        if let date = fallbackISOFormatter.date(from: value) { return date }
+        print("FeedbackService warning: Failed to parse date value: \(value)")
+        return Date()
     }
 
     private static func appVersionString() -> String {
@@ -207,8 +207,9 @@ final class FeedbackService {
 
     private static func deviceDescriptor() -> String {
         let identifier = modelIdentifier()
+        let systemName = UIDevice.current.systemName
         let osVersion = UIDevice.current.systemVersion
-        return "\(identifier) (iOS \(osVersion))"
+        return "\(identifier) (\(systemName) \(osVersion))"
     }
 
     private static func modelIdentifier() -> String {
@@ -246,6 +247,12 @@ final class FeedbackService {
     }()
 
     private static let maxFeedbackLimit = 200
+
+    private static func resolvedUserName(from user: User<[String: AnyCodable]>?) -> String {
+        [user?.name, user?.email]
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .first(where: { !$0.isEmpty }) ?? "Anonymous"
+    }
 }
 
 private struct FeedbackDocumentData: Codable {
