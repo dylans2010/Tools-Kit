@@ -74,8 +74,20 @@ final class GoogleOAuthManager: NSObject, ASWebAuthenticationPresentationContext
 
         InternalLogger.shared.log("GoogleOAuth: Authentication successful for \(profile.email). Expiration: \(expirationDate?.description ?? "none")", level: .info)
 
+        let sessionID = UUID().uuidString
+        let saveResult = MailKeychainManager.shared.saveOAuthTokens(
+            accountId: sessionID,
+            accessToken: tokenResponse.accessToken,
+            refreshToken: tokenResponse.refreshToken
+        )
+        guard saveResult else {
+            throw NSError(domain: "GoogleOAuthManager", code: 500, userInfo: [NSLocalizedDescriptionKey: "Failed to store OAuth tokens in keychain"])
+        }
+
+        InternalLogger.shared.log("GoogleOAuth: Stored OAuth tokens for account session \(sessionID)", level: .info)
+
         return MailSession(
-            id: UUID().uuidString,
+            id: sessionID,
             provider: .gmail,
             email: profile.email,
             displayName: profile.name ?? "Gmail",
