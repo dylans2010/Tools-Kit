@@ -39,8 +39,8 @@ struct LoginView: View {
                     .opacity(animateHero ? 1 : 0.7)
 
                     VStack(spacing: 14) {
-                        inputField(title: "Email", placeholder: "you@example.com", text: $email, secure: false, keyboard: .emailAddress)
-                        inputField(title: "Password", placeholder: "Enter password", text: $password, secure: true, keyboard: .default)
+                        inputField(label: "Email", placeholder: "you@example.com", text: $email, secure: false, keyboard: .emailAddress)
+                        inputField(label: "Password", placeholder: "Enter password", text: $password, secure: true, keyboard: .default)
 
                         if let errorMessage {
                             Label(errorMessage, systemImage: "exclamationmark.triangle.fill")
@@ -122,9 +122,9 @@ struct LoginView: View {
     }
 
     @ViewBuilder
-    private func inputField(title: String, placeholder: String, text: Binding<String>, secure: Bool, keyboard: UIKeyboardType) -> some View {
+    private func inputField(label: String, placeholder: String, text: Binding<String>, secure: Bool, keyboard: UIKeyboardType) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
+            Text(label)
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white.opacity(0.74))
 
