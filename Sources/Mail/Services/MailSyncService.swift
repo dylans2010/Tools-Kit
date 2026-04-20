@@ -14,7 +14,7 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
     private var hasMorePages = true
     private var activeAccount: MailAccount?
     private var activeFolder: MailFolder = .inbox
-    private var gmailProviders: [String: GmailMailProvider] = [:]
+    private var gmailPageTokensByAccount: [String: [Int: String?]] = [:]
 
     func fetchThreads(account: MailAccount, folder: MailFolder) async {
         await performFetch(account: account, folder: folder, reset: true)
@@ -45,6 +45,7 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
         if reset {
             currentOffset = 0
             hasMorePages = true
+            gmailPageTokensByAccount[account.id] = [0: nil]
         }
         activeAccount = account
         activeFolder = folder
@@ -57,9 +58,35 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
 
             switch account.provider {
             case .gmail:
-                let provider = await GmailProvider()
-                let messages = try await provider.fetchInbox(session: session(from: account), page: pageNumber)
+                let gmail = GmailService(
+                    accountId: account.id,
+                    fallbackAccessToken: account.accessToken,
+                    fallbackRefreshToken: account.refreshToken,
+                    fallbackEmail: account.emailAddress
+                )
+                let pageToken = gmailPageTokensByAccount[account.id]?[currentOffset] ?? nil
+                let page = try await gmail.fetchInbox(maxResults: pageSize, pageToken: pageToken)
+                let messages = try await withThrowingTaskGroup(of: MailMessage.self, returning: [MailMessage].self) { group in
+                    for messageRef in page.messages {
+                        let messageId = messageRef.id
+                        group.addTask {
+                            try await gmail.fetchMessage(id: messageId)
+                        }
+                    }
+
+                    var collected: [MailMessage] = []
+                    for try await message in group {
+                        collected.append(message)
+                    }
+                    return collected
+                }
                 groupedThreads = groupMessages(messages)
+                if let nextPageToken = page.nextPageToken {
+                    gmailPageTokensByAccount[account.id, default: [0: nil]][currentOffset + pageSize] = nextPageToken
+                    hasMorePages = true
+                } else {
+                    hasMorePages = false
+                }
             case .outlook:
                 let provider = await OutlookProvider()
                 let messages = try await provider.fetchInbox(session: session(from: account), page: pageNumber)
@@ -96,7 +123,9 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
             InternalLogger.shared.log("MailSync: storage updated for key \(folderKey)", level: .debug)
 
             currentOffset += groupedThreads.count
-            hasMorePages = groupedThreads.count == pageSize
+            if account.provider != .gmail {
+                hasMorePages = groupedThreads.count == pageSize
+            }
             await MainActor.run {
                 self.lastSyncDate = Date()
                 self.isSyncing = false

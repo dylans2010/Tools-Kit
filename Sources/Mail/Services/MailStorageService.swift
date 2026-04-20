@@ -181,6 +181,9 @@ final class MailStore: ObservableObject {
     func removeAccount(_ account: MailAccount) {
         MailKeychainManager.shared.deleteCredentials(for: account.emailAddress)
         MailKeychainManager.shared.deleteOAuthTokens(accountId: account.id)
+        if account.providerType == .gmail {
+            GmailTokenStore.shared.delete(accountId: account.id)
+        }
 
         accounts.removeAll { $0.id == account.id }
         if activeAccount?.id == account.id {
