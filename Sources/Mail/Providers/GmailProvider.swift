@@ -24,12 +24,13 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         let challenge = codeChallenge(from: verifier)
         let state = UUID().uuidString
 
-        var components = URLComponents(string: "https://accounts.google.com/o/oauth2/auth")!
+        var components = URLComponents(string: "https://accounts.google.com/o/oauth2/v2/auth")!
         components.queryItems = [
             URLQueryItem(name: "client_id", value: clientID),
             URLQueryItem(name: "redirect_uri", value: redirectURI),
             URLQueryItem(name: "response_type", value: "code"),
             URLQueryItem(name: "scope", value: Self.scope),
+            URLQueryItem(name: "include_granted_scopes", value: "true"),
             URLQueryItem(name: "access_type", value: "offline"),
             URLQueryItem(name: "prompt", value: "consent"),
             URLQueryItem(name: "state", value: state),
@@ -56,13 +57,18 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         InternalLogger.shared.log("OAuth callback provider=google state=validated", level: .info)
         InternalLogger.shared.log("OAuth token exchange provider=google", level: .info)
         let token = try await exchangeCode(code: code, verifier: verifier, clientID: clientID, redirectURI: redirectURI)
-        let profile = try await fetchProfile(accessToken: token.accessToken)
+        let normalizedAccessToken = try GmailAuthSupport.normalizedAccessToken(
+            from: token.accessToken,
+            errorDomain: "GmailProvider",
+            errorMessage: "Missing Google access token"
+        )
+        let profile = try await fetchProfile(accessToken: normalizedAccessToken)
 
         return MailSession(
             provider: .gmail,
             email: profile.email,
             displayName: profile.name ?? "Gmail",
-            accessToken: token.accessToken,
+            accessToken: normalizedAccessToken,
             refreshToken: token.refreshToken
         )
     }
@@ -75,7 +81,9 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         }
 
         let listURL = baseURL.appendingPathComponent("messages").appending(queryItems: items)
-        let list: GmailListResponse = try await request(url: listURL, body: Optional<Data>.none, token: session.accessToken)
+        let list: GmailListResponse = try await withRecoveredAuthorization(session: session) { token in
+            try await request(url: listURL, body: Optional<Data>.none, token: token)
+        }
 
         var messages: [MailMessage] = []
         for item in list.messages ?? [] {
@@ -88,7 +96,9 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
     func fetchMessage(session: MailSession, id: String) async throws -> MailMessage {
         try validateSessionProvider(session, expected: .gmail)
         let url = baseURL.appendingPathComponent("messages/\(id)").appending(queryItems: [URLQueryItem(name: "format", value: "full")])
-        let payload: GmailMessagePayload = try await request(url: url, body: Optional<Data>.none, token: session.accessToken)
+        let payload: GmailMessagePayload = try await withRecoveredAuthorization(session: session) { token in
+            try await request(url: url, body: Optional<Data>.none, token: token)
+        }
 
         let headers = payload.payload?.headers.reduce(into: [String: String]()) { partial, item in
             partial[item.name.lowercased()] = item.value
@@ -119,7 +129,9 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         let raw = buildRFC2822(draft: draft)
         let body = GmailSendBody(raw: Data(raw.utf8).base64URLEncodedString())
         let url = baseURL.appendingPathComponent("messages/send")
-        try await requestVoid(url: url, method: "POST", body: body, token: session.accessToken)
+        try await withRecoveredAuthorization(session: session) { token in
+            try await requestVoid(url: url, method: "POST", body: body, token: token)
+        }
     }
 
     func saveDraft(session: MailSession, draft: MailDraft) async throws {
@@ -127,20 +139,26 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         let raw = buildRFC2822(draft: draft)
         let body = GmailDraftBody(message: GmailSendBody(raw: Data(raw.utf8).base64URLEncodedString()))
         let url = baseURL.appendingPathComponent("drafts")
-        try await requestVoid(url: url, method: "POST", body: body, token: session.accessToken)
+        try await withRecoveredAuthorization(session: session) { token in
+            try await requestVoid(url: url, method: "POST", body: body, token: token)
+        }
     }
 
     func deleteMessage(session: MailSession, id: String) async throws {
         try validateSessionProvider(session, expected: .gmail)
         let url = baseURL.appendingPathComponent("messages/\(id)")
-        try await requestVoid(url: url, method: "DELETE", body: Optional<Data>.none, token: session.accessToken)
+        try await withRecoveredAuthorization(session: session) { token in
+            try await requestVoid(url: url, method: "DELETE", body: Optional<Data>.none, token: token)
+        }
     }
 
     func markRead(session: MailSession, id: String) async throws {
         try validateSessionProvider(session, expected: .gmail)
         let body = GmailModifyBody(addLabelIds: [], removeLabelIds: ["UNREAD"])
         let url = baseURL.appendingPathComponent("messages/\(id)/modify")
-        try await requestVoid(url: url, method: "POST", body: body, token: session.accessToken)
+        try await withRecoveredAuthorization(session: session) { token in
+            try await requestVoid(url: url, method: "POST", body: body, token: token)
+        }
     }
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor { ASPresentationAnchor() }
@@ -389,10 +407,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             URLQueryItem(name: "code_verifier", value: verifier)
         ]
 
-        request.httpBody = fields
-            .map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")" }
-            .joined(separator: "&")
-            .data(using: .utf8)
+        request.httpBody = formURLEncodedBody(from: fields)
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
@@ -428,7 +443,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
-            throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Gmail API request failed"])
+            throw NSError(domain: "GmailProvider", code: (response as? HTTPURLResponse)?.statusCode ?? 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Gmail API request failed"])
         }
 
         return try JSONDecoder().decode(T.self, from: data)
@@ -446,7 +461,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
-            throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Gmail API request failed"])
+            throw NSError(domain: "GmailProvider", code: (response as? HTTPURLResponse)?.statusCode ?? 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Gmail API request failed"])
         }
     }
 
@@ -582,23 +597,25 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             URLQueryItem(name: "grant_type", value: "refresh_token"),
             URLQueryItem(name: "refresh_token", value: refreshToken)
         ]
-        request.httpBody = bodyItems
-            .map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")" }
-            .joined(separator: "&")
-            .data(using: .utf8)
+        request.httpBody = formURLEncodedBody(from: bodyItems)
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
-            throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google token refresh failed"])
+            throw NSError(domain: "GmailProvider", code: (response as? HTTPURLResponse)?.statusCode ?? 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Google token refresh failed"])
         }
         let refreshed = try JSONDecoder().decode(OAuthTokenResponse.self, from: data)
         guard GmailAuthSupport.isBearerTokenType(refreshed.tokenType, loggerContext: "GmailProvider") else {
             throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google token refresh returned unsupported token type: \(refreshed.tokenType ?? "nil")"])
         }
+        let normalizedAccessToken = try GmailAuthSupport.normalizedAccessToken(
+            from: refreshed.accessToken,
+            errorDomain: "GmailProvider",
+            errorMessage: "Missing Google refreshed access token"
+        )
         let resolvedRefresh = refreshed.refreshToken ?? refreshToken
-        _ = MailKeychainManager.shared.saveOAuthTokens(accountId: session.id, accessToken: refreshed.accessToken, refreshToken: resolvedRefresh)
+        _ = MailKeychainManager.shared.saveOAuthTokens(accountId: session.id, accessToken: normalizedAccessToken, refreshToken: resolvedRefresh)
         await MainActor.run {
-            MailStore.shared.updateAccountTokens(accountId: session.id, accessToken: refreshed.accessToken, refreshToken: resolvedRefresh)
+            MailStore.shared.updateAccountTokens(accountId: session.id, accessToken: normalizedAccessToken, refreshToken: resolvedRefresh)
         }
         InternalLogger.shared.log("OAuth token exchange provider=google status=refreshed", level: .info)
         return MailSession(
@@ -606,13 +623,32 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             provider: session.provider,
             email: session.email,
             displayName: session.displayName,
-            accessToken: refreshed.accessToken,
+            accessToken: normalizedAccessToken,
             refreshToken: resolvedRefresh,
             imapHost: session.imapHost,
             imapPort: session.imapPort,
             smtpHost: session.smtpHost,
             smtpPort: session.smtpPort
         )
+    }
+
+    private func withRecoveredAuthorization<T>(session: MailSession, operation: @escaping (String) async throws -> T) async throws -> T {
+        let originalToken = try GmailAuthSupport.normalizedAccessToken(
+            from: session.accessToken,
+            errorDomain: "GmailProvider",
+            errorMessage: "Missing Google access token"
+        )
+        do {
+            return try await operation(originalToken)
+        } catch let error as NSError where error.code == 401 {
+            let refreshedSession = try await refreshSessionToken(session: session)
+            let refreshedToken = try GmailAuthSupport.normalizedAccessToken(
+                from: refreshedSession.accessToken,
+                errorDomain: "GmailProvider",
+                errorMessage: "Missing Google refreshed access token"
+            )
+            return try await operation(refreshedToken)
+        }
     }
 
     private func validateSessionProvider(_ session: MailSession, expected: MailAccount.ProviderType) throws {
@@ -628,6 +664,12 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             errorMessage: "Missing Google access token"
         )
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+    }
+
+    private func formURLEncodedBody(from queryItems: [URLQueryItem]) -> Data? {
+        var components = URLComponents()
+        components.queryItems = queryItems
+        return components.percentEncodedQuery?.data(using: .utf8)
     }
 }
 
