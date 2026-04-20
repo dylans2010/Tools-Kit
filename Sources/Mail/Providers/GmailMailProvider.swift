@@ -45,9 +45,9 @@ class GmailMailProvider: MailProviderProtocol {
 
         let pageToken = pageTokensByOffset[offset] ?? nil
         let listURL = try buildListURL(limit: limit, pageToken: pageToken, query: nil)
-        let listResponse: GmailListResponse = try await requestJSON(url: listURL)
+        let listResponse: GmailInboxPage = try await requestJSON(url: listURL)
 
-        let ids = listResponse.messages?.map(\.id) ?? []
+        let ids = listResponse.messages?.map { $0.id } ?? []
         var threadsByID: [String: [MailMessage]] = [:]
         for id in ids {
             let message = try await fetchMessage(id: id)
@@ -117,9 +117,9 @@ class GmailMailProvider: MailProviderProtocol {
     func searchEmails(query: String, limit: Int = 25) async throws -> [MailThread] {
         InternalLogger.shared.log("GmailMailProvider: searching gmail with query='\(query)'", level: .info)
         let listURL = try buildListURL(limit: limit, pageToken: nil, query: query)
-        let listResponse: GmailListResponse = try await requestJSON(url: listURL)
+        let listResponse: GmailInboxPage = try await requestJSON(url: listURL)
 
-        let ids = listResponse.messages?.map(\.id) ?? []
+        let ids = listResponse.messages?.map { $0.id } ?? []
         var threadsByID: [String: [MailMessage]] = [:]
         for id in ids {
             let message = try await fetchMessage(id: id)
@@ -158,9 +158,10 @@ class GmailMailProvider: MailProviderProtocol {
             throw NSError(domain: "GmailMailProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Failed to encode outgoing email"])
         }
 
-        let payload = ["raw": rawData.base64URLEncodedString()]
+        let payload = GmailSendRequest(raw: rawData.gmailBase64URLEncodedString())
         let endpoint = baseURL.appendingPathComponent("messages/send")
-        let _: EmptyResponse = try await requestJSON(url: endpoint, method: "POST", body: payload)
+        let payloadData = try JSONEncoder().encode(payload)
+        let _: GmailEmptyResponse = try await requestJSON(url: endpoint, method: "POST", bodyData: payloadData)
         InternalLogger.shared.log("GmailMailProvider: sent message via Gmail API for \(account.emailAddress)", level: .info)
     }
 
@@ -180,7 +181,8 @@ class GmailMailProvider: MailProviderProtocol {
 
     func deleteThread(_ threadId: String) async throws {
         let endpoint = baseURL.appendingPathComponent("threads/\(threadId)/trash")
-        let _: EmptyResponse = try await requestJSON(url: endpoint, method: "POST", body: [String: String]())
+        let emptyBodyData = try JSONEncoder().encode([String: String]())
+        let _: GmailEmptyResponse = try await requestJSON(url: endpoint, method: "POST", bodyData: emptyBodyData)
         InternalLogger.shared.log("GmailMailProvider: moved thread \(threadId) to trash", level: .warning)
     }
 
@@ -194,11 +196,9 @@ class GmailMailProvider: MailProviderProtocol {
 
     private func modifyThread(threadId: String, add: [String], remove: [String]) async throws {
         let endpoint = baseURL.appendingPathComponent("threads/\(threadId)/modify")
-        let body: [String: [String]] = [
-            "addLabelIds": add,
-            "removeLabelIds": remove
-        ]
-        let _: EmptyResponse = try await requestJSON(url: endpoint, method: "POST", body: body)
+        let body = GmailModifyRequest(addLabelIds: add, removeLabelIds: remove)
+        let bodyData = try JSONEncoder().encode(body)
+        let _: GmailEmptyResponse = try await requestJSON(url: endpoint, method: "POST", bodyData: bodyData)
         InternalLogger.shared.log("GmailMailProvider: modified labels for thread \(threadId)", level: .debug)
     }
 
@@ -215,7 +215,7 @@ class GmailMailProvider: MailProviderProtocol {
         return url
     }
 
-    private func requestJSON<T: Decodable>(url: URL, method: String = "GET", body: Encodable? = nil) async throws -> T {
+    private func requestJSON<T: Decodable>(url: URL, method: String = "GET", bodyData: Data? = nil) async throws -> T {
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
@@ -223,9 +223,9 @@ class GmailMailProvider: MailProviderProtocol {
         let token = try await validAccessToken()
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
-        if let body {
+        if let bodyData {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.httpBody = try JSONEncoder().encode(AnyEncodable(body))
+            request.httpBody = bodyData
         }
 
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -236,7 +236,7 @@ class GmailMailProvider: MailProviderProtocol {
         if http.statusCode == 401 {
             InternalLogger.shared.log("GmailMailProvider: token expired, attempting refresh for \(account.emailAddress)", level: .warning)
             try await refreshAccessToken()
-            return try await requestJSON(url: url, method: method, body: body)
+            return try await requestJSON(url: url, method: method, bodyData: bodyData)
         }
 
         guard (200...299).contains(http.statusCode) else {
@@ -245,8 +245,8 @@ class GmailMailProvider: MailProviderProtocol {
             throw NSError(domain: "GmailMailProvider", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: message])
         }
 
-        if T.self == EmptyResponse.self {
-            return EmptyResponse() as! T
+        if T.self == GmailEmptyResponse.self {
+            return GmailEmptyResponse() as! T
         }
 
         return try JSONDecoder().decode(T.self, from: data)
@@ -300,7 +300,7 @@ class GmailMailProvider: MailProviderProtocol {
             throw NSError(domain: "GmailMailProvider", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: msg])
         }
 
-        let refreshed = try JSONDecoder().decode(GmailRefreshResponse.self, from: data)
+        let refreshed = try JSONDecoder().decode(GmailOAuthTokenResponse.self, from: data)
         accessToken = refreshed.accessToken
         let resolvedRefreshToken = refreshed.refreshToken ?? refreshToken
         self.refreshToken = resolvedRefreshToken
@@ -478,110 +478,4 @@ class GmailMailProvider: MailProviderProtocol {
         return formatter.date(from: fallback) ?? Date()
     }
 
-}
-
-private struct GmailListResponse: Decodable {
-    let messages: [GmailMessageRef]?
-    let nextPageToken: String?
-}
-
-private struct GmailMessageRef: Decodable {
-    let id: String
-    let threadId: String
-}
-
-private struct GmailMessageResponse: Decodable {
-    let id: String
-    let threadId: String
-    let labelIds: [String]?
-    let snippet: String?
-    let internalDate: String?
-    let payload: GmailPayload?
-}
-
-private struct GmailPayload: Decodable {
-    let mimeType: String?
-    let body: GmailBody?
-    let headers: [GmailHeader]?
-    let parts: [GmailPayload]?
-
-    func flattenedHeaders() -> [String: String] {
-        var result: [String: String] = [:]
-        for header in headers ?? [] {
-            result[header.name.lowercased()] = header.value
-        }
-        return result
-    }
-
-    func firstBody(for mimeType: String) -> GmailBody? {
-        if self.mimeType == mimeType, let body, body.data != nil {
-            return body
-        }
-        for part in parts ?? [] {
-            if let match = part.firstBody(for: mimeType) {
-                return match
-            }
-        }
-        return nil
-    }
-}
-
-private struct GmailHeader: Decodable {
-    let name: String
-    let value: String
-}
-
-private struct GmailBody: Decodable {
-    let size: Int?
-    let data: String?
-
-    func decodedBody() -> String? {
-        guard let data else { return nil }
-        let normalized = data
-            .replacingOccurrences(of: "-", with: "+")
-            .replacingOccurrences(of: "_", with: "/")
-        let padded = normalized.padding(
-            toLength: ((normalized.count + 3) / 4) * 4,
-            withPad: "=",
-            startingAt: 0
-        )
-        guard let rawData = Data(base64Encoded: padded) else { return nil }
-        return String(data: rawData, encoding: .utf8)
-    }
-}
-
-private struct GmailRefreshResponse: Decodable {
-    let accessToken: String
-    let refreshToken: String?
-
-    enum CodingKeys: String, CodingKey {
-        case accessToken = "access_token"
-        case refreshToken = "refresh_token"
-    }
-}
-
-private struct EmptyResponse: Decodable {
-    init() {}
-}
-
-private struct AnyEncodable: Encodable {
-    private let encodeClosure: (Encoder) throws -> Void
-
-    init(_ wrapped: Encodable) {
-        self.encodeClosure = wrapped.encode
-    }
-
-    func encode(to encoder: Encoder) throws {
-        try encodeClosure(encoder)
-    }
-}
-
-private extension Data {
-    func base64URLEncodedString() -> String {
-        let standard = self.base64EncodedString()
-        return standard
-            .replacingOccurrences(of: "+", with: "-")
-            .replacingOccurrences(of: "/", with: "_")
-            .replacingOccurrences(of: "=", with: "")
-    }
 }
