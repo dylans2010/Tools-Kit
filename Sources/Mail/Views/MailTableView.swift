@@ -146,8 +146,9 @@ struct MailTableView: View {
     }
 }
 
-private extension Collection {
-    subscript(safe index: Index) -> Element? {
-        indices.contains(index) ? self[index] : nil
+private extension Array {
+    subscript(safe index: Int) -> Element? {
+        guard index >= startIndex && index < endIndex else { return nil }
+        return self[index]
     }
 }

@@ -68,7 +68,7 @@ struct MeetingControlsView: View {
         }
     }
 
-    private func controlIconButton(title: String, subtitle: String, icon: String, tint: Color, action: @escaping () -> Void) -> some View {
+    private func controlIconButton(title: String, subtitle: String = "", icon: String, tint: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             VStack(spacing: 4) {
                 Image(systemName: icon)

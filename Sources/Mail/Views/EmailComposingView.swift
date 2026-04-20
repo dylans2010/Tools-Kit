@@ -541,9 +541,10 @@ struct EmailComposingView: View {
     }
     
     private func insertMarkdown(_ snippet: String) {
-        messageComposerMode = .render
-        bodyFocused = false
         insert(snippet)
+        if messageComposerMode == .markdown {
+            bodyFocused = true
+        }
     }
 
     private func insertQuote() {
