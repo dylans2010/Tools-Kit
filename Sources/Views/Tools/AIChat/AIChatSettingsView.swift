@@ -383,6 +383,9 @@ struct AIChatSettingsView: View {
             NavigationLink("Developer Tools") {
                 MeetDeveloperToolsView()
             }
+            NavigationLink("Feedback Admin") {
+                FeedbackAdminView(allowDeveloperToolsAccess: true)
+            }
         }
     }
 

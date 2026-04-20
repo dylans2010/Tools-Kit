@@ -127,6 +127,7 @@ struct WorkspaceDashboardView: View {
         ("Calendar", "calendar", .green, AnyView(CalendarHomeView())),
         ("Habits", "flame.fill", .red, AnyView(WorkspaceHabitTrackerView())),
         ("Files", "folder.fill", .yellow, AnyView(FileManagementView())),
+        ("Feedback", "bubble.left.and.bubble.right.fill", .orange, AnyView(FeedbackView())),
         ("Forms", "list.bullet.rectangle.portrait", .teal, AnyView(FormsView())),
         ("Slides", "rectangle.on.rectangle.angled", .purple, AnyView(SlidesHomeView())),
         ("Sheets", "tablecells", .blue, AnyView(SpreadsheetsHomeView())),
