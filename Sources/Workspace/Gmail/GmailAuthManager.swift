@@ -36,6 +36,7 @@ final class GmailAuthManager: NSObject, ASWebAuthenticationPresentationContextPr
     private override init() {}
 
     func signIn(accountId: String) async throws -> GmailTokenBundle {
+        InternalLogger.shared.log("[google][auth] oauth_start", level: .info)
         let verifier = randomCodeVerifier()
         let challenge = codeChallenge(from: verifier)
         let state = UUID().uuidString
@@ -58,9 +59,11 @@ final class GmailAuthManager: NSObject, ASWebAuthenticationPresentationContextPr
         }
 
         let callbackURL = try await startOAuth(url: authURL)
+        InternalLogger.shared.log("[google][auth] oauth_callback_received", level: .info)
         let code = try authorizationCode(from: callbackURL, expectedState: state)
         let exchanged = try await exchangeAuthorizationCode(code: code, verifier: verifier)
         let email = try await fetchProfileEmail(accessToken: exchanged.accessToken)
+        InternalLogger.shared.log("[google][auth] token_exchange_success", level: .info)
 
         let refreshToken = exchanged.refreshToken ?? GmailTokenStore.shared.load(accountId: accountId)?.refreshToken
         guard let refreshToken, !refreshToken.isEmpty else {

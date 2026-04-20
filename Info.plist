@@ -34,6 +34,47 @@
             <key>CFBundleTypeRole</key>
             <string>Editor</string>
             <key>CFBundleURLName</key>
+            <string>google-oauth-callback</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.ToolsKit.google</string>
+            </array>
+        </dict>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLName</key>
+            <string>microsoft-oauth-callback</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.ToolsKit.microsoft</string>
+            </array>
+        </dict>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLName</key>
+            <string>yahoo-oauth-callback</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.ToolsKit.yahoo</string>
+            </array>
+        </dict>
+    </array>
+    <key>GOOGLE_OAUTH_CLIENT_ID</key>
+    <string>$(GOOGLE_OAUTH_CLIENT_ID)</string>
+    <key>GOOGLE_OAUTH_REDIRECT_URI</key>
+    <string>com.ToolsKit.google:/oauthredirect</string>
+    <key>MICROSOFT_OAUTH_CLIENT_ID</key>
+    <string>$(MICROSOFT_OAUTH_CLIENT_ID)</string>
+    <key>MICROSOFT_OAUTH_REDIRECT_URI</key>
+    <string>com.ToolsKit.microsoft:/oauthredirect</string>
+    <key>YAHOO_OAUTH_CLIENT_ID</key>
+    <string>$(YAHOO_OAUTH_CLIENT_ID)</string>
+    <key>YAHOO_OAUTH_REDIRECT_URI</key>
+    <string>com.ToolsKit.yahoo:/oauthredirect</string>
+    <key>CFBundleDocumentTypes</key>
+    <array>
             <string>google-oauth</string>
             <key>CFBundleURLSchemes</key>
             <array>

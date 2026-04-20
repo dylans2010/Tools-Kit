@@ -1,21 +1,16 @@
 import Foundation
 
 enum GmailModuleConfig {
-    private static let fallbackClientID = "127870730797-v3g6ftqrp3q86pkfoa6uomsb8inj79ku.apps.googleusercontent.com"
-    private static let fallbackRedirectScheme = "com.googleusercontent.apps.127870730797-v3g6ftqrp3q86pkfoa6uomsb8inj79ku"
-
     static var clientID: String {
-        configuredValue(primaryKey: "GMAIL_OAUTH_CLIENT_ID", fallbackKey: "GOOGLE_OAUTH_CLIENT_ID") ?? fallbackClientID
+        AppConfig.googleClientID
     }
 
     static var redirectScheme: String {
-        if let configuredURI = configuredValue(primaryKey: "GMAIL_OAUTH_REDIRECT_URI", fallbackKey: "GOOGLE_OAUTH_REDIRECT_URI"),
-           let components = URLComponents(string: configuredURI),
-           let scheme = components.scheme,
-           !scheme.isEmpty {
+        if let components = URLComponents(string: AppConfig.googleRedirectURI),
+           let scheme = components.scheme, !scheme.isEmpty {
             return scheme
         }
-        return fallbackRedirectScheme
+        return "com.ToolsKit.google"
     }
 
     static let redirectPath = "/oauthredirect"
@@ -24,39 +19,11 @@ enum GmailModuleConfig {
     }
     static let oauthScopes = [
         "https://www.googleapis.com/auth/gmail.readonly",
-        "https://www.googleapis.com/auth/gmail.send"
+        "https://www.googleapis.com/auth/gmail.modify",
+        "https://www.googleapis.com/auth/gmail.send",
+        "https://www.googleapis.com/auth/userinfo.email",
+        "https://www.googleapis.com/auth/userinfo.profile"
     ]
-
-    private static func configuredValue(primaryKey: String, fallbackKey: String? = nil) -> String? {
-        if let value = infoPlistValue(forKey: primaryKey) { return value }
-        if let value = configPlistValue(forKey: primaryKey) { return value }
-
-        if let fallbackKey {
-            if let value = infoPlistValue(forKey: fallbackKey) { return value }
-            if let value = configPlistValue(forKey: fallbackKey) { return value }
-        }
-        return nil
-    }
-
-    private static func infoPlistValue(forKey key: String) -> String? {
-        guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String else { return nil }
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
-    }
-
-    private static func configPlistValue(forKey key: String) -> String? {
-        guard
-            let url = Bundle.main.url(forResource: "Config", withExtension: "plist"),
-            let data = try? Data(contentsOf: url),
-            let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
-            let value = plist[key] as? String
-        else {
-            return nil
-        }
-
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
-    }
 }
 
 struct GmailTokenBundle: Codable, Sendable {

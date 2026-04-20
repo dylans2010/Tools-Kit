@@ -12,9 +12,9 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
     private let imapFallback = IMAPProvider()
 
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
-        let remoteVariables = await fetchRemoteVariables()
-        let clientID = try oauthValue(primaryKey: "YAHOO_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
-        let redirectURI = try oauthValue(primaryKey: "YAHOO_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+        InternalLogger.shared.log("[yahoo][auth] oauth_start", level: .info)
+        let clientID = try AppConfig.requiredString("YAHOO_OAUTH_CLIENT_ID")
+        let redirectURI = try AppConfig.requiredString("YAHOO_OAUTH_REDIRECT_URI")
 
         let verifier = randomCodeVerifier()
         let challenge = codeChallenge(from: verifier)
@@ -36,6 +36,7 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
         }
 
         let callback = try await startOAuth(url: url, callbackScheme: URL(string: redirectURI)?.scheme)
+        InternalLogger.shared.log("[yahoo][auth] oauth_callback_received", level: .info)
         let callbackComponents = URLComponents(url: callback, resolvingAgainstBaseURL: false)
         let returnedState = callbackComponents?.queryItems?.first(where: { $0.name == "state" })?.value
         guard returnedState == state else {
@@ -46,6 +47,7 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
         }
 
         let token = try await exchangeCode(code: code, verifier: verifier, clientID: clientID, redirectURI: redirectURI)
+        InternalLogger.shared.log("[yahoo][auth] token_exchange_success", level: .info)
         let email: String
         if !credentials.email.isEmpty {
             email = credentials.email
@@ -306,6 +308,7 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
     }
 
     private func exchangeCode(code: String, verifier: String, clientID: String, redirectURI: String) async throws -> YahooToken {
+        InternalLogger.shared.log("[yahoo][auth] token_exchange_request", level: .debug)
         var request = URLRequest(url: URL(string: "https://api.login.yahoo.com/oauth2/get_token")!)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
@@ -324,14 +327,21 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
             .data(using: .utf8)
 
         let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
-            throw NSError(domain: "YahooProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Token exchange failed"])
+        guard let http = response as? HTTPURLResponse else {
+            throw NSError(domain: "YahooProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Token exchange failed"])
+        }
+        if http.statusCode == 401 {
+            throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Yahoo session expired. Please re-login."])
+        }
+        guard (200...299).contains(http.statusCode) else {
+            throw NSError(domain: "YahooProvider", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Token exchange failed"])
         }
 
         return try JSONDecoder().decode(YahooToken.self, from: data)
     }
 
     private func apiRequest<T: Decodable, Body: Encodable>(url: URL, payload: Body, token: String?) async throws -> T {
+        InternalLogger.shared.log("[yahoo][api] request path=\(url.path)", level: .debug)
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -342,8 +352,15 @@ final class YahooMailProvider: NSObject, MailProvider, ASWebAuthenticationPresen
         request.httpBody = try JSONEncoder().encode(payload)
 
         let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
-            throw NSError(domain: "YahooProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Yahoo API failed"])
+        guard let http = response as? HTTPURLResponse else {
+            throw NSError(domain: "YahooProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Yahoo API failed"])
+        }
+        if http.statusCode == 401 {
+            InternalLogger.shared.log("[yahoo][api] unauthorized_401", level: .error)
+            throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Yahoo session expired. Please re-login."])
+        }
+        guard (200...299).contains(http.statusCode) else {
+            throw NSError(domain: "YahooProvider", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Yahoo API failed"])
         }
         return try JSONDecoder().decode(T.self, from: data)
     }

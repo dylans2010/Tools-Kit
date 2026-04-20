@@ -178,6 +178,12 @@ final class MailStore: ObservableObject {
         InternalLogger.shared.log("MailStore: OAuth tokens updated for \(accounts[idx].emailAddress)", level: .debug)
     }
 
+    /// Returns the preferred account for compose/reply flows.
+    /// Active account is prioritized, then the first available account.
+    func preferredAccountForCompose() -> MailAccount? {
+        activeAccount ?? accounts.first
+    }
+
     func removeAccount(_ account: MailAccount) {
         MailKeychainManager.shared.deleteCredentials(for: account.emailAddress)
         MailKeychainManager.shared.deleteOAuthTokens(accountId: account.id)
@@ -216,6 +222,36 @@ final class AccountManager {
 
     private init() {}
 
+    func addAccount(provider: MailAccount.ProviderType) async throws -> MailAccount {
+        let session: MailSession
+        switch provider {
+        case .gmail:
+            let tempAccountId = "gmail:\(UUID().uuidString)"
+            let tokens = try await GmailAuthManager.shared.signIn(accountId: tempAccountId)
+            let stableAccountId = "gmail:\(tokens.emailAddress.lowercased())"
+            if stableAccountId != tempAccountId {
+                _ = GmailTokenStore.shared.save(tokens, accountId: stableAccountId)
+                GmailTokenStore.shared.delete(accountId: tempAccountId)
+            }
+            session = MailSession(
+                id: stableAccountId,
+                provider: .gmail,
+                email: tokens.emailAddress,
+                displayName: "Gmail",
+                accessToken: tokens.accessToken,
+                refreshToken: tokens.refreshToken
+            )
+        case .outlook:
+            session = try await OutlookProvider().authenticate(credentials: .oauth())
+        case .yahoo:
+            session = try await YahooMailProvider().authenticate(credentials: .oauth())
+        default:
+            throw NSError(domain: "AccountManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "Unsupported provider for managed OAuth flow"])
+        }
+
+        return addAccount(session)
+    }
+
     @discardableResult
     func addAccount(_ session: MailSession) -> MailAccount {
         let account = MailAccount(
@@ -233,5 +269,23 @@ final class AccountManager {
         )
         MailStore.shared.addOrUpdateAccount(account, makeActive: true)
         return MailStore.shared.activeAccount ?? account
+    }
+
+    func removeAccount(id: String) {
+        guard let account = MailStore.shared.accounts.first(where: { $0.id == id }) else { return }
+        MailStore.shared.removeAccount(account)
+    }
+
+    func fetchAccounts() -> [EmailAccount] {
+        MailStore.shared.reloadAccounts()
+        return MailStore.shared.accounts.map { $0.asEmailAccount() }
+    }
+
+    func setActiveAccount(id: String) {
+        MailStore.shared.setActiveAccount(id)
+    }
+
+    func getActiveAccount() -> EmailAccount? {
+        MailStore.shared.activeAccount?.asEmailAccount()
     }
 }

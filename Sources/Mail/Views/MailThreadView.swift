@@ -203,10 +203,13 @@ struct MailThreadView: View {
             isStarred: false,
             attachments: []
         )
-        // Use the first enabled saved account or a placeholder
-        let account = MailStorageService.shared.loadAccounts().first
-            ?? MailAccount(id: UUID(), email: "", provider: .iCloud, isEnabled: true)
-        EmailComposingView(account: account, replyTo: msg)
+        if let account = MailStore.shared.preferredAccountForCompose() {
+            EmailComposingView(account: account, replyTo: msg)
+        } else {
+            NavigationStack {
+                ContentUnavailableView("No Account Connected", systemImage: "person.crop.circle.badge.exclamationmark", description: Text("Connect an account from Manage Accounts before replying."))
+            }
+        }
     }
 
     // MARK: - AI Cards

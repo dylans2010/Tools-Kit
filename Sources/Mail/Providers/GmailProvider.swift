@@ -12,12 +12,18 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
     private let baseURL = URL(string: "https://gmail.googleapis.com/gmail/v1/users/me")!
     private let daysPerPage = 14
 
-    private static let scope = "https://mail.google.com/"
+    private static let scopes = [
+        "https://www.googleapis.com/auth/gmail.readonly",
+        "https://www.googleapis.com/auth/gmail.modify",
+        "https://www.googleapis.com/auth/gmail.send",
+        "https://www.googleapis.com/auth/userinfo.email",
+        "https://www.googleapis.com/auth/userinfo.profile"
+    ]
 
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
-        let remoteVariables = await fetchRemoteVariables()
-        let clientID = try oauthValue(primaryKey: "GMAIL_OAUTH_CLIENT_ID", fallbackKey: "GOOGLE_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
-        let redirectURI = try oauthValue(primaryKey: "GMAIL_OAUTH_REDIRECT_URI", fallbackKey: "GOOGLE_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+        InternalLogger.shared.log("[google][auth] oauth_start", level: .info)
+        let clientID = try AppConfig.requiredString("GOOGLE_OAUTH_CLIENT_ID")
+        let redirectURI = try AppConfig.requiredString("GOOGLE_OAUTH_REDIRECT_URI")
         try validateRedirectURI(redirectURI)
 
         let verifier = randomCodeVerifier()
@@ -29,7 +35,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             URLQueryItem(name: "client_id", value: clientID),
             URLQueryItem(name: "redirect_uri", value: redirectURI),
             URLQueryItem(name: "response_type", value: "code"),
-            URLQueryItem(name: "scope", value: Self.scope),
+            URLQueryItem(name: "scope", value: Self.scopes.joined(separator: " ")),
             URLQueryItem(name: "access_type", value: "offline"),
             URLQueryItem(name: "prompt", value: "consent"),
             URLQueryItem(name: "state", value: state),
@@ -42,6 +48,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         }
 
         let callback = try await startOAuth(url: url, callbackScheme: URL(string: redirectURI)?.scheme)
+        InternalLogger.shared.log("[google][auth] oauth_callback_received", level: .info)
         let callbackComponents = URLComponents(url: callback, resolvingAgainstBaseURL: false)
         let returnedState = callbackComponents?.queryItems?.first(where: { $0.name == "state" })?.value
         guard returnedState == state else {
@@ -52,6 +59,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         }
 
         let token = try await exchangeCode(code: code, verifier: verifier, clientID: clientID, redirectURI: redirectURI)
+        InternalLogger.shared.log("[google][auth] token_exchange_success", level: .info)
         let profile = try await fetchProfile(accessToken: token.accessToken)
 
         return MailSession(

@@ -9,17 +9,7 @@ struct ManageAccountsView: View {
 
     @State private var loadingProvider: MailAccount.ProviderType?
     @State private var toastMessage: String?
-    @State private var showProtonGuide = false
-
-    @State private var imapHost = ""
-    @State private var imapPort = "993"
-    @State private var smtpHost = ""
-    @State private var smtpPort = "465"
-    @State private var imapUser = ""
-    @State private var imapPassword = ""
-    @State private var expandedIMAP = false
-
-    private let providerOrder: [MailAccount.ProviderType] = [.gmail, .outlook, .yahoo, .proton, .imap]
+    private let providerOrder: [MailAccount.ProviderType] = [.gmail, .outlook, .yahoo]
 
     var body: some View {
         NavigationStack {
@@ -60,9 +50,6 @@ struct ManageAccountsView: View {
                             .font(.headline.weight(.semibold))
                     }
                 }
-            }
-            .sheet(isPresented: $showProtonGuide) {
-                protonGuideSheet
             }
             .onAppear {
                 mailStore.reloadAccounts()
@@ -129,10 +116,6 @@ struct ManageAccountsView: View {
                 providerButton(for: provider)
             }
 
-            if expandedIMAP {
-                imapForm
-                    .transition(.move(edge: .top).combined(with: .opacity))
-            }
         }
         .padding(16)
         .glassCard()
@@ -158,7 +141,7 @@ struct ManageAccountsView: View {
                 if loadingProvider == provider {
                     ProgressView()
                 } else {
-                    Image(systemName: provider == .imap ? (expandedIMAP ? "chevron.up" : "chevron.down") : "plus")
+                    Image(systemName: "plus")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(.secondary)
                 }
@@ -213,58 +196,6 @@ struct ManageAccountsView: View {
         .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
     }
 
-    private var imapForm: some View {
-        VStack(spacing: 8) {
-            darkField("IMAP Host", text: $imapHost)
-            darkField("IMAP Port", text: $imapPort)
-            darkField("SMTP Host", text: $smtpHost)
-            darkField("SMTP Port", text: $smtpPort)
-            darkField("Email / Username", text: $imapUser)
-            darkSecureField("Password", text: $imapPassword)
-
-            Button {
-                Task { await connectIMAP() }
-            } label: {
-                HStack {
-                    if loadingProvider == .imap {
-                        ProgressView().tint(.white)
-                    }
-                    Text("Connect IMAP Account")
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
-            }
-            .disabled(loadingProvider != nil || imapHost.isEmpty || imapUser.isEmpty || imapPassword.isEmpty)
-        }
-        .padding(12)
-        .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 12))
-    }
-
-    private var protonGuideSheet: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Proton Bridge Required")
-                    .font(.title3.bold())
-                Text("Install Proton Bridge, sign in there, then use its generated username/password in the IMAP fields.")
-                    .foregroundStyle(.secondary)
-
-                Button("Continue") {
-                    showProtonGuide = false
-                }
-                .buttonStyle(.borderedProminent)
-
-                Spacer()
-            }
-            .padding(18)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Close") { showProtonGuide = false }
-                }
-            }
-        }
-    }
-
     private var backgroundGradient: LinearGradient {
         LinearGradient(
             colors: [Color(hex: "#090E17") ?? .black, Color(hex: "#151E2C") ?? .black],
@@ -278,9 +209,7 @@ struct ManageAccountsView: View {
         case .gmail: return "OAuth sign in"
         case .outlook: return "Microsoft OAuth"
         case .yahoo: return "Yahoo OAuth"
-        case .proton: return "Bridge-assisted IMAP"
-        case .imap: return "Custom server"
-        case .icloud: return "Apple mail"
+        case .proton, .imap, .icloud: return "Unsupported"
         }
     }
 
@@ -325,84 +254,17 @@ struct ManageAccountsView: View {
     }
 
     private func handleProviderTap(_ provider: MailAccount.ProviderType) async {
-        if provider == .imap {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                expandedIMAP.toggle()
-            }
-            return
-        }
-
-        if provider == .proton {
-            showProtonGuide = true
-            withAnimation(.easeInOut(duration: 0.2)) {
-                expandedIMAP = true
-            }
-            return
-        }
-
         loadingProvider = provider
         defer { loadingProvider = nil }
 
         do {
-            let session: MailSession
             switch provider {
-            case .gmail:
-                let tempAccountId = "gmail:\(UUID().uuidString)"
-                let tokens = try await GmailAuthManager.shared.signIn(accountId: tempAccountId)
-                let stableAccountId = "gmail:\(tokens.emailAddress.lowercased())"
-                if stableAccountId != tempAccountId {
-                    _ = GmailTokenStore.shared.save(tokens, accountId: stableAccountId)
-                    GmailTokenStore.shared.delete(accountId: tempAccountId)
-                }
-                session = MailSession(
-                    id: stableAccountId,
-                    provider: .gmail,
-                    email: tokens.emailAddress,
-                    displayName: "Gmail",
-                    accessToken: tokens.accessToken,
-                    refreshToken: tokens.refreshToken
-                )
-            case .outlook:
-                session = try await OutlookProvider().authenticate(credentials: .oauth())
-            case .yahoo:
-                session = try await YahooMailProvider().authenticate(credentials: .oauth())
+            case .gmail, .outlook, .yahoo:
+                let account = try await AccountManager.shared.addAccount(provider: provider)
+                onAccountSelected?(account)
             case .proton, .imap, .icloud:
-                return
+                showError("This provider is not supported in account management.")
             }
-
-            let account = await MainActor.run { AccountManager.shared.addAccount(session) }
-            onAccountSelected?(account)
-        } catch {
-            showError(error.localizedDescription)
-        }
-    }
-
-    private func connectIMAP() async {
-        loadingProvider = .imap
-        defer { loadingProvider = nil }
-
-        let imapPortValue = UInt16(imapPort) ?? 993
-        let smtpPortValue = UInt16(smtpPort) ?? 465
-
-        do {
-            let credentials = MailCredentials(
-                email: imapUser.trimmingCharacters(in: .whitespacesAndNewlines),
-                password: imapPassword,
-                host: imapHost.trimmingCharacters(in: .whitespacesAndNewlines),
-                port: imapPortValue,
-                smtpHost: smtpHost.trimmingCharacters(in: .whitespacesAndNewlines),
-                smtpPort: smtpPortValue,
-                accessToken: nil,
-                refreshToken: nil
-            )
-
-            let session = try await IMAPProvider().authenticate(credentials: credentials)
-            guard MailKeychainManager.shared.saveCredentials(email: session.email, password: imapPassword) else {
-                throw NSError(domain: "Mail", code: 500, userInfo: [NSLocalizedDescriptionKey: "Failed to save credentials to keychain"])
-            }
-
-            let account = await MainActor.run { AccountManager.shared.addAccount(session) }
-            onAccountSelected?(account)
         } catch {
             showError(error.localizedDescription)
         }
