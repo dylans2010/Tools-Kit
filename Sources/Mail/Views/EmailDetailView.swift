@@ -103,7 +103,7 @@ struct EmailDetailView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showReplyComposer) {
+            .fullScreenCover(isPresented: $showReplyComposer) {
                 if let account {
                     EmailComposingView(
                         account: account,

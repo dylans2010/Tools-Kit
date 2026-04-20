@@ -22,8 +22,6 @@ struct NetworkStatusView: View {
                     .foregroundStyle(.orange)
             }
         }
-        .padding(12)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
     }
 
     private var qualityBars: some View {

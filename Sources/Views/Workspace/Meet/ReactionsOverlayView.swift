@@ -8,10 +8,12 @@ struct ReactionsOverlayView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            Label("Quick Reactions", systemImage: "face.smiling")
+                .font(.subheadline.weight(.semibold))
             HStack {
                 ForEach(quickReactions, id: \.self) { emoji in
                     Button(emoji) { onSendReaction(emoji) }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(.borderedProminent)
                 }
             }
             if let recent = reactions.last {
@@ -20,7 +22,5 @@ struct ReactionsOverlayView: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(12)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
     }
 }

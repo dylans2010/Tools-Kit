@@ -23,34 +23,39 @@ struct VideoGridView: View {
 
     var body: some View {
         ScrollView {
-            if let activeScreenShareParticipantID,
-               let sharer = participants.first(where: { $0.id == activeScreenShareParticipantID }),
-               let screenTrack = screenShareTracks[activeScreenShareParticipantID] {
-                VStack(alignment: .leading, spacing: 8) {
-                    Label("\(sharer.displayName) is sharing screen", systemImage: "rectangle.on.rectangle")
-                        .font(.caption.weight(.semibold))
-                    VideoTileView(participant: sharer, track: screenTrack)
+            VStack(alignment: .leading, spacing: 10) {
+                if let activeScreenShareParticipantID,
+                   let sharer = participants.first(where: { $0.id == activeScreenShareParticipantID }),
+                   let screenTrack = screenShareTracks[activeScreenShareParticipantID] {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("\(sharer.displayName) is sharing", systemImage: "rectangle.on.rectangle")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        VideoTileView(participant: sharer, track: screenTrack)
+                    }
+                    .padding(10)
+                    .background(Color(.tertiarySystemFill), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
-                .padding(8)
-            }
-            if liveVideoParticipants.isEmpty {
-                ContentUnavailableView(
-                    "No live Daily video tracks",
-                    systemImage: "video.slash",
-                    description: Text("Tiles render only active Daily media tracks.")
-                )
-                .padding(.top, 16)
-                .padding(8)
-            } else {
-                LazyVGrid(columns: columns, spacing: 10) {
-                    ForEach(orderedParticipants) { participant in
-                        VideoTileView(participant: participant, track: videoTracks[participant.id])
+
+                if liveVideoParticipants.isEmpty {
+                    ContentUnavailableView(
+                        "No active video",
+                        systemImage: "video.slash",
+                        description: Text("Turn on your camera or wait for participants to publish a video track.")
+                    )
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 26)
+                } else {
+                    LazyVGrid(columns: columns, spacing: 10) {
+                        ForEach(orderedParticipants) { participant in
+                            VideoTileView(participant: participant, track: videoTracks[participant.id])
+                        }
                     }
                 }
-                .padding(8)
             }
+            .padding(12)
         }
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private var orderedParticipants: [MeetingParticipant] {

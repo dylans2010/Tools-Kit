@@ -58,6 +58,10 @@ struct TranslateEmailView: View {
         sourceText.split { $0.isWhitespace || $0.isNewline }.count
     }
 
+    private var translatedWordCount: Int {
+        translatedText.split { $0.isWhitespace || $0.isNewline }.count
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -69,8 +73,8 @@ struct TranslateEmailView: View {
                     qualityCard
 
                     if let errorMessage {
-                        Text(errorMessage)
-                            .font(.footnote)
+                        Label(errorMessage, systemImage: "exclamationmark.triangle.fill")
+                            .font(.footnote.weight(.semibold))
                             .foregroundStyle(.red)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(12)
@@ -84,14 +88,27 @@ struct TranslateEmailView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Close") { dismiss() }
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.down")
+                            .font(.headline.weight(.semibold))
+                    }
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button("Translate") { Task { await translate() } }
-                        .disabled(!canTranslate)
-                    Button("Apply") {
+                    Button {
+                        Task { await translate() }
+                    } label: {
+                        Label("Translate", systemImage: "globe")
+                            .symbolEffect(.bounce.byLayer, isActive: isTranslating)
+                    }
+                    .disabled(!canTranslate)
+
+                    Button {
                         onApply(translatedText)
                         dismiss()
+                    } label: {
+                        Label("Apply", systemImage: "checkmark.circle.fill")
                     }
                     .disabled(!canApply)
                 }
@@ -103,12 +120,12 @@ struct TranslateEmailView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Smart Translation")
                 .font(.system(size: 24, weight: .bold, design: .rounded))
-            Text("Translate with style control, readability checks, and optional back-translation.")
+            Text("Translate with tone control, readability checks, and back-translation validation.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             HStack(spacing: 8) {
-                statPill("Source Words", "\(estimatedSourceWords)")
-                statPill("Tone", tone.rawValue)
+                statPill("Source", "\(estimatedSourceWords) words")
+                statPill("Result", translatedText.isEmpty ? "—" : "\(translatedWordCount) words")
                 statPill("Mode", mode.rawValue)
             }
         }
@@ -124,9 +141,11 @@ struct TranslateEmailView: View {
             HStack(spacing: 10) {
                 languagePicker("From", selection: $sourceLanguage)
                 Button {
-                    let from = sourceLanguage
-                    sourceLanguage = targetLanguage
-                    targetLanguage = from
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                        let from = sourceLanguage
+                        sourceLanguage = targetLanguage
+                        targetLanguage = from
+                    }
                 } label: {
                     Image(systemName: "arrow.left.arrow.right")
                         .padding(10)
@@ -141,8 +160,12 @@ struct TranslateEmailView: View {
                 simplePicker("Mode", selection: $mode)
             }
 
-            Toggle("Preserve formatting and bullet structure", isOn: $preserveFormatting)
-            Toggle("Include cultural nuance notes", isOn: $includeCulturalNotes)
+            Toggle(isOn: $preserveFormatting) {
+                Label("Preserve formatting and bullet structure", systemImage: "text.alignleft")
+            }
+            Toggle(isOn: $includeCulturalNotes) {
+                Label("Include cultural nuance notes", systemImage: "text.badge.star")
+            }
         }
         .padding(16)
         .cardSurface()
@@ -190,21 +213,16 @@ struct TranslateEmailView: View {
                     .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
 
                 HStack(spacing: 10) {
-                    Button("Copy") {
+                    actionButton("Copy", symbol: "doc.on.doc") {
                         UIPasteboard.general.string = translatedText
                     }
-                    .buttonStyle(.bordered)
-
-                    Button("Back-Translate") {
+                    actionButton("Back-Translate", symbol: "arrow.uturn.backward") {
                         Task { await runBackTranslation() }
                     }
-                    .buttonStyle(.bordered)
                     .disabled(isGeneratingChecks)
-
-                    Button("Quality Check") {
+                    actionButton("Quality Check", symbol: "checkmark.shield") {
                         Task { await runQualityCheck() }
                     }
-                    .buttonStyle(.bordered)
                     .disabled(isGeneratingChecks)
                 }
             }
@@ -224,25 +242,11 @@ struct TranslateEmailView: View {
             }
 
             if !backTranslation.isEmpty {
-                Text("Back Translation")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                Text(backTranslation)
-                    .font(.subheadline)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(10)
-                    .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
+                qualityBlock(title: "Back Translation", body: backTranslation)
             }
 
             if !qualityNotes.isEmpty {
-                Text("Quality Notes")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                Text(qualityNotes)
-                    .font(.subheadline)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(10)
-                    .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
+                qualityBlock(title: "Quality Notes", body: qualityNotes)
             }
 
             if backTranslation.isEmpty && qualityNotes.isEmpty {
@@ -253,6 +257,26 @@ struct TranslateEmailView: View {
         }
         .padding(16)
         .cardSurface()
+    }
+
+    private func qualityBlock(title: String, body: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(body)
+                .font(.subheadline)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(10)
+                .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
+        }
+    }
+
+    private func actionButton(_ title: String, symbol: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: symbol)
+        }
+        .buttonStyle(.bordered)
     }
 
     private func languagePicker(_ label: String, selection: Binding<String>) -> some View {
@@ -322,6 +346,8 @@ struct TranslateEmailView: View {
         backTranslation = ""
         qualityNotes = ""
 
+        defer { isTranslating = false }
+
         do {
             let prompt = """
             Translate this email from \(sourceLanguage) to \(targetLanguage).
@@ -339,8 +365,6 @@ struct TranslateEmailView: View {
         } catch {
             errorMessage = error.localizedDescription
         }
-
-        isTranslating = false
     }
 
     @MainActor

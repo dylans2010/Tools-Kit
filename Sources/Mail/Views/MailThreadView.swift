@@ -67,7 +67,7 @@ struct MailThreadView: View {
         .safeAreaInset(edge: .bottom) {
             replyBar
         }
-        .sheet(isPresented: $showingReply) {
+        .fullScreenCover(isPresented: $showingReply) {
             replySheet
         }
     }

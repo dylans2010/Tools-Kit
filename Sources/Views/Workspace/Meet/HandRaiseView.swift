@@ -9,6 +9,8 @@ struct HandRaiseView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            Label("Raised Hands", systemImage: "hand.raised.fill")
+                .font(.subheadline.weight(.semibold))
             Button(localIsRaised ? "Lower Hand" : "Raise Hand", action: onToggleLocalHand)
                 .buttonStyle(.borderedProminent)
 
@@ -30,8 +32,6 @@ struct HandRaiseView: View {
                 }
             }
         }
-        .padding(12)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
     }
 
     private var raisedParticipants: [MeetingParticipant] {

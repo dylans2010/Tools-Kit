@@ -6,7 +6,7 @@ struct PiPOverlayView: View {
     let onToggle: (Bool) -> Void
 
     var body: some View {
-        HStack {
+        HStack(spacing: 10) {
             Toggle("Picture in Picture", isOn: Binding(get: { isEnabled }, set: onToggle))
             if isActive {
                 Label("Active", systemImage: "pip.fill")
@@ -14,7 +14,5 @@ struct PiPOverlayView: View {
                     .foregroundStyle(.green)
             }
         }
-        .padding(12)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
     }
 }

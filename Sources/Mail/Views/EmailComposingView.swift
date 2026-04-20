@@ -64,13 +64,18 @@ struct EmailComposingView: View {
                 attachmentsSection
                 scheduleSection
             }
-            .navigationTitle(replyTo == nil ? "Compose" : "Reply")
-             .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle(replyTo == nil ? "Compose Email" : "Reply")
+            .navigationBarTitleDisplayMode(.inline)
             .scrollContentBackground(.hidden)
             .background(Color(.systemGroupedBackground))
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") { dismiss() }
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.down")
+                            .font(.headline.weight(.semibold))
+                    }
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
@@ -85,6 +90,7 @@ struct EmailComposingView: View {
                             ProgressView()
                         } else {
                             Label(scheduleDate != nil ? "Schedule" : "Send", systemImage: scheduleDate != nil ? "calendar.badge.clock" : "paperplane.fill")
+                                .symbolEffect(.bounce.byLayer, isActive: !isSending)
                         }
                     }
                     .disabled(cannotSend)

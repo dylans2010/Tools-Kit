@@ -6,7 +6,7 @@ struct BackgroundEffectsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Background Effects")
+            Label("Background Effects", systemImage: "sparkles.rectangle.stack")
                 .font(.subheadline.weight(.semibold))
             Picker("Background", selection: Binding(get: { selectedEffect }, set: onSelectEffect)) {
                 ForEach(MeetingBackgroundEffect.allCases) { effect in
@@ -15,7 +15,5 @@ struct BackgroundEffectsView: View {
             }
             .pickerStyle(.segmented)
         }
-        .padding(12)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
     }
 }

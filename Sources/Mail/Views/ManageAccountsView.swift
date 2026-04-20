@@ -27,8 +27,8 @@ struct ManageAccountsView: View {
                 backgroundGradient.ignoresSafeArea()
 
                 ScrollView {
-                    VStack(spacing: 16) {
-                        hero
+                    VStack(spacing: 14) {
+                        accountStats
                         connectedAccountsSection
                         providerSection
                     }
@@ -53,7 +53,12 @@ struct ManageAccountsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Done") { dismiss() }
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.down")
+                            .font(.headline.weight(.semibold))
+                    }
                 }
             }
             .sheet(isPresented: $showProtonGuide) {
@@ -65,20 +70,29 @@ struct ManageAccountsView: View {
         }
     }
 
-    private var hero: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Mail Identity Hub")
-                .font(.system(size: 26, weight: .bold, design: .rounded))
-            Text("Add, remove, and switch providers from one place. OAuth keys are resolved from app config and Appwrite-backed variable endpoints.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
-            HStack(spacing: 8) {
-                statChip("Accounts", "\(mailStore.accounts.count)")
-                statChip("Active", mailStore.activeAccount?.providerType.displayName ?? "None")
-            }
+    private var accountStats: some View {
+        HStack(spacing: 10) {
+            statCard(title: "Connected", value: "\(mailStore.accounts.count)", symbol: "person.2.fill")
+            statCard(title: "Active", value: mailStore.activeAccount?.providerType.displayName ?? "None", symbol: "checkmark.seal.fill")
         }
-        .padding(16)
+    }
+
+    private func statCard(title: String, value: String, symbol: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: symbol)
+                .foregroundStyle(.cyan)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(value)
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .glassCard()
     }
 
@@ -95,8 +109,10 @@ struct ManageAccountsView: View {
                     .padding(12)
                     .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
             } else {
-                ForEach(mailStore.accounts) { account in
-                    accountRow(account)
+                VStack(spacing: 8) {
+                    ForEach(mailStore.accounts) { account in
+                        accountRow(account)
+                    }
                 }
             }
         }
@@ -115,6 +131,7 @@ struct ManageAccountsView: View {
 
             if expandedIMAP {
                 imapForm
+                    .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
         .padding(16)
@@ -141,7 +158,7 @@ struct ManageAccountsView: View {
                 if loadingProvider == provider {
                     ProgressView()
                 } else {
-                    Image(systemName: "plus")
+                    Image(systemName: provider == .imap ? (expandedIMAP ? "chevron.up" : "chevron.down") : "plus")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(.secondary)
                 }
@@ -254,20 +271,6 @@ struct ManageAccountsView: View {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
-    }
-
-    private func statChip(_ title: String, _ value: String) -> some View {
-        VStack(alignment: .leading, spacing: 1) {
-            Text(title)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            Text(value)
-                .font(.caption.weight(.semibold))
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
-        .background(Color.white.opacity(0.07), in: Capsule())
     }
 
     private func buttonSubtitle(_ provider: MailAccount.ProviderType) -> String {

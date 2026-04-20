@@ -7,7 +7,9 @@ struct LiveCaptionsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Toggle("Live Captions", isOn: Binding(get: { isEnabled }, set: onToggleVisibility))
+            Label("Live Captions", systemImage: "captions.bubble.fill")
+                .font(.subheadline.weight(.semibold))
+            Toggle("Show captions", isOn: Binding(get: { isEnabled }, set: onToggleVisibility))
             if isEnabled {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 6) {
@@ -25,7 +27,5 @@ struct LiveCaptionsView: View {
                 .frame(maxHeight: 120)
             }
         }
-        .padding(12)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
     }
 }
