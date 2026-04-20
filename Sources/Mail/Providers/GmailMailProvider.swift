@@ -359,16 +359,8 @@ class GmailMailProvider: MailProviderProtocol {
     }
 
     private func googleClientID(remoteVariables: [String: String]) throws -> String {
-        if let value = try? oauthValue(
-            primaryKey: "GOOGLE_OAUTH_CLIENT_ID",
-            fallbackKey: "GOOGLE_CLIENT_ID",
-            remoteVariables: remoteVariables
-        ) {
-            return value
-        }
-
-        return try oauthValue(
-            primaryKey: "GMAIL_OAUTH_CLIENT_ID",
+        try oauthValue(
+            primaryKey: "GOOGLE_CLIENT_ID",
             remoteVariables: remoteVariables
         )
     }
