@@ -64,12 +64,14 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
             throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Unable to resolve Yahoo account identity"])
         }
 
+        let sessionID = UUID().uuidString
+        _ = MailKeychainManager.shared.saveOAuthTokens(accountId: sessionID, accessToken: token.accessToken, refreshToken: token.refreshToken)
+
         return MailSession(
+            id: sessionID,
             provider: .yahoo,
             email: email,
             displayName: "Yahoo Mail",
-            accessToken: token.accessToken,
-            refreshToken: token.refreshToken,
             imapHost: "imap.mail.yahoo.com",
             imapPort: 993,
             smtpHost: "smtp.mail.yahoo.com",
@@ -84,7 +86,8 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
             let start = page * pageSize
             let url = URL(string: "https://api.mail.yahoo.com/ws/mail/v1.1/jsonrpc")!
             let request = YahooListRequest(startInfo: start, numInfo: pageSize)
-            let response: YahooListEnvelope = try await apiRequest(url: url, payload: request, token: session.accessToken)
+            let token = try await getAccessToken(for: session)
+            let response: YahooListEnvelope = try await apiRequest(url: url, payload: request, token: token)
 
             return response.result.messages.map {
                 MailMessage(
@@ -112,7 +115,8 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         try validateSessionProvider(session, expected: .yahoo)
         do {
             let url = URL(string: "https://api.mail.yahoo.com/ws/mail/v1.1/jsonrpc")!
-            let response: YahooMessageEnvelope = try await apiRequest(url: url, payload: YahooMessageRequest(mid: id), token: session.accessToken)
+            let token = try await getAccessToken(for: session)
+            let response: YahooMessageEnvelope = try await apiRequest(url: url, payload: YahooMessageRequest(mid: id), token: token)
             let item = response.result.message
             return MailMessage(
                 id: item.messageId,
@@ -152,7 +156,8 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         try validateSessionProvider(session, expected: .yahoo)
         do {
             let url = URL(string: "https://api.mail.yahoo.com/ws/mail/v1.1/jsonrpc")!
-            let _: YahooDeleteResponse = try await apiRequest(url: url, payload: YahooDeleteRequest(mid: id), token: session.accessToken)
+            let token = try await getAccessToken(for: session)
+            let _: YahooDeleteResponse = try await apiRequest(url: url, payload: YahooDeleteRequest(mid: id), token: token)
         } catch {
             try await imapFallback.deleteMessage(session: fallbackSession(session), id: id)
         }
@@ -162,7 +167,8 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         try validateSessionProvider(session, expected: .yahoo)
         do {
             let url = URL(string: "https://api.mail.yahoo.com/ws/mail/v1.1/jsonrpc")!
-            let _: YahooUpdateResponse = try await apiRequest(url: url, payload: YahooUpdateReadRequest(mid: id, unread: false), token: session.accessToken)
+            let token = try await getAccessToken(for: session)
+            let _: YahooUpdateResponse = try await apiRequest(url: url, payload: YahooUpdateReadRequest(mid: id, unread: false), token: token)
         } catch {
             try await imapFallback.markRead(session: fallbackSession(session), id: id)
         }
@@ -173,6 +179,13 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
     }
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor { ASPresentationAnchor() }
+
+    private func getAccessToken(for session: MailSession) async throws -> String {
+        guard let tokens = MailKeychainManager.shared.getOAuthTokens(accountId: session.id) else {
+            throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "No tokens found"])
+        }
+        return tokens.accessToken
+    }
 
     private func fallbackInbox(session: MailSession, page: Int) async throws -> [MailMessage] {
         guard let password = MailKeychainManager.shared.getPassword(for: session.email) else {
@@ -199,8 +212,6 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
             provider: .imap,
             email: session.email,
             displayName: session.displayName,
-            accessToken: nil,
-            refreshToken: nil,
             imapHost: "imap.mail.yahoo.com",
             imapPort: 993,
             smtpHost: "smtp.mail.yahoo.com",
@@ -383,7 +394,8 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
 
     func refreshSessionToken(session: MailSession) async throws -> MailSession {
         try validateSessionProvider(session, expected: .yahoo)
-        guard let refreshToken = session.refreshToken, !refreshToken.isEmpty else {
+        guard let tokens = MailKeychainManager.shared.getOAuthTokens(accountId: session.id),
+              let refreshToken = tokens.refreshToken, !refreshToken.isEmpty else {
             throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Yahoo refresh token"])
         }
         let remoteVariables = await fetchRemoteVariables()
@@ -412,7 +424,7 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         let resolvedRefresh = refreshed.refreshToken ?? refreshToken
         _ = MailKeychainManager.shared.saveOAuthTokens(accountId: session.id, accessToken: refreshed.accessToken, refreshToken: resolvedRefresh)
         await MainActor.run {
-            MailStore.shared.updateAccountTokens(accountId: session.id, accessToken: refreshed.accessToken, refreshToken: resolvedRefresh)
+            MailStore.shared.updateAccountTokens(accountId: session.id, accessToken: refreshed.accessToken, refreshToken: resolvedRefresh, expiration: nil)
         }
         InternalLogger.shared.log("OAuth token exchange provider=yahoo status=refreshed", level: .info)
         return MailSession(
@@ -420,8 +432,6 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
             provider: session.provider,
             email: session.email,
             displayName: session.displayName,
-            accessToken: refreshed.accessToken,
-            refreshToken: resolvedRefresh,
             imapHost: session.imapHost,
             imapPort: session.imapPort,
             smtpHost: session.smtpHost,
@@ -468,8 +478,6 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
             provider: active.provider,
             email: active.emailAddress,
             displayName: active.displayName,
-            accessToken: active.accessToken,
-            refreshToken: active.refreshToken,
             imapHost: active.imapHost,
             imapPort: active.imapPort,
             smtpHost: active.smtpHost,

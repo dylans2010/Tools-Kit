@@ -52,12 +52,14 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         let token = try await exchangeCode(code: code, verifier: verifier, clientID: clientID, redirectURI: redirectURI)
         let profile = try await fetchProfile(accessToken: token.accessToken)
 
+        let sessionID = UUID().uuidString
+        _ = MailKeychainManager.shared.saveOAuthTokens(accountId: sessionID, accessToken: token.accessToken, refreshToken: token.refreshToken)
+
         return MailSession(
+            id: sessionID,
             provider: .outlook,
             email: profile.mail ?? profile.userPrincipalName ?? credentials.email,
-            displayName: profile.displayName ?? "Outlook",
-            accessToken: token.accessToken,
-            refreshToken: token.refreshToken
+            displayName: profile.displayName ?? "Outlook"
         )
     }
 
@@ -75,7 +77,8 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             endpoint = URL(string: "https://graph.microsoft.com/v1.0/me/messages?$top=30&$orderby=receivedDateTime%20desc")!
         }
 
-        let response: GraphMessagesResponse = try await request(url: endpoint, body: Optional<Data>.none, token: session.accessToken)
+        let token = try await getAccessToken(for: session)
+        let response: GraphMessagesResponse = try await request(url: endpoint, body: Optional<Data>.none, token: token)
         if let next = response.nextLink {
             nextLinksByPage[page + 1] = next
         }
@@ -104,7 +107,8 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)") else {
             throw NSError(domain: "OutlookProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid message identifier"])
         }
-        let item: GraphMessage = try await request(url: url, body: Optional<Data>.none, token: session.accessToken)
+        let token = try await getAccessToken(for: session)
+        let item: GraphMessage = try await request(url: url, body: Optional<Data>.none, token: token)
         return MailMessage(
             id: item.id,
             threadId: item.conversationId,
@@ -137,7 +141,8 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             saveToSentItems: true
         )
 
-        try await requestVoid(url: url, method: "POST", body: body, token: session.accessToken)
+        let token = try await getAccessToken(for: session)
+        try await requestVoid(url: url, method: "POST", body: body, token: token)
     }
 
     func saveDraft(session: MailSession, draft: MailDraft) async throws {
@@ -152,7 +157,8 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             ccRecipients: draft.cc.map { .init(emailAddress: .init(address: $0)) }
         )
 
-        let _: GraphMessage = try await request(url: url, method: "POST", body: body, token: session.accessToken)
+        let token = try await getAccessToken(for: session)
+        let _: GraphMessage = try await request(url: url, method: "POST", body: body, token: token)
     }
 
     func deleteMessage(session: MailSession, id: String) async throws {
@@ -160,7 +166,8 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)") else {
             throw NSError(domain: "OutlookProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid message identifier"])
         }
-        try await requestVoid(url: url, method: "DELETE", body: Optional<Data>.none, token: session.accessToken)
+        let token = try await getAccessToken(for: session)
+        try await requestVoid(url: url, method: "DELETE", body: Optional<Data>.none, token: token)
     }
 
     func markRead(session: MailSession, id: String) async throws {
@@ -169,10 +176,18 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             throw NSError(domain: "OutlookProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid message identifier"])
         }
         let body = ["isRead": true]
-        let _: GraphMessage = try await request(url: url, method: "PATCH", body: body, token: session.accessToken)
+        let token = try await getAccessToken(for: session)
+        let _: GraphMessage = try await request(url: url, method: "PATCH", body: body, token: token)
     }
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor { ASPresentationAnchor() }
+
+    private func getAccessToken(for session: MailSession) async throws -> String {
+        guard let tokens = MailKeychainManager.shared.getOAuthTokens(accountId: session.id) else {
+            throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "No tokens found"])
+        }
+        return tokens.accessToken
+    }
 
     private func oauthValue(primaryKey: String, fallbackKey: String? = nil, remoteVariables: [String: String] = [:]) throws -> String {
         if let value = localConfigValue(forKey: primaryKey) {
@@ -376,7 +391,8 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
     func refreshSessionToken(session: MailSession) async throws -> MailSession {
         try validateSessionProvider(session, expected: .outlook)
-        guard let refreshToken = session.refreshToken, !refreshToken.isEmpty else {
+        guard let tokens = MailKeychainManager.shared.getOAuthTokens(accountId: session.id),
+              let refreshToken = tokens.refreshToken, !refreshToken.isEmpty else {
             throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Microsoft refresh token"])
         }
         let remoteVariables = await fetchRemoteVariables()
@@ -406,20 +422,14 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         let resolvedRefresh = refreshed.refreshToken ?? refreshToken
         _ = MailKeychainManager.shared.saveOAuthTokens(accountId: session.id, accessToken: refreshed.accessToken, refreshToken: resolvedRefresh)
         await MainActor.run {
-            MailStore.shared.updateAccountTokens(accountId: session.id, accessToken: refreshed.accessToken, refreshToken: resolvedRefresh)
+            MailStore.shared.updateAccountTokens(accountId: session.id, accessToken: refreshed.accessToken, refreshToken: resolvedRefresh, expiration: nil)
         }
         InternalLogger.shared.log("OAuth token exchange provider=microsoft status=refreshed", level: .info)
         return MailSession(
             id: session.id,
             provider: session.provider,
             email: session.email,
-            displayName: session.displayName,
-            accessToken: refreshed.accessToken,
-            refreshToken: resolvedRefresh,
-            imapHost: session.imapHost,
-            imapPort: session.imapPort,
-            smtpHost: session.smtpHost,
-            smtpPort: session.smtpPort
+            displayName: session.displayName
         )
     }
 
