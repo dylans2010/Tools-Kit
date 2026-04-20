@@ -401,7 +401,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
 
         let token = try JSONDecoder().decode(OAuthTokenResponse.self, from: data)
         guard GmailAuthSupport.isBearerTokenType(token.tokenType, loggerContext: "GmailProvider") else {
-            throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google token exchange returned unsupported token type: \(token.tokenType ?? "nil")"])
+            throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google OAuth token exchange returned unsupported token type: \(token.tokenType ?? "nil")"])
         }
         return token
     }

@@ -258,7 +258,7 @@ class GmailMailProvider: MailProviderProtocol {
                 self.accessToken = normalized
                 return normalized
             }
-            InternalLogger.shared.log("GmailMailProvider: cached access token is empty/invalid after normalization, falling back to keychain/refresh", level: .warning)
+            InternalLogger.shared.log("GmailMailProvider: cached access token is empty/invalid after normalization, falling back to keychain or refresh", level: .warning)
         }
 
         if let stored = MailKeychainManager.shared.getOAuthTokens(accountId: account.id) {
@@ -306,7 +306,7 @@ class GmailMailProvider: MailProviderProtocol {
 
         let refreshed = try JSONDecoder().decode(GmailRefreshResponse.self, from: data)
         guard GmailAuthSupport.isBearerTokenType(refreshed.tokenType, loggerContext: "GmailMailProvider") else {
-            throw NSError(domain: "GmailMailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Gmail token refresh returned unsupported token type: \(refreshed.tokenType ?? "nil")"])
+            throw NSError(domain: "GmailMailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google token refresh returned unsupported token type: \(refreshed.tokenType ?? "nil")"])
         }
         let normalizedToken = try normalizedAccessToken(from: refreshed.accessToken)
         accessToken = normalizedToken
