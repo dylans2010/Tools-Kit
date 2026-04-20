@@ -8,12 +8,12 @@ struct MeetingSettingsView: View {
 
     var body: some View {
         Form {
-            Section("Devices") {
+            Section {
                 if availableAudioDevices.isEmpty {
                     Text("No audio devices reported by runtime.")
                         .foregroundStyle(.secondary)
                 } else {
-                    Picker("Audio", selection: $settings.selectedAudioDevice) {
+                    Picker("Audio Device", selection: $settings.selectedAudioDevice) {
                         ForEach(availableAudioDevices, id: \.self) { Text($0) }
                     }
                 }
@@ -21,13 +21,17 @@ struct MeetingSettingsView: View {
                     Text("No video devices reported by runtime.")
                         .foregroundStyle(.secondary)
                 } else {
-                    Picker("Video", selection: $settings.selectedVideoDevice) {
+                    Picker("Video Device", selection: $settings.selectedVideoDevice) {
                         ForEach(availableVideoDevices, id: \.self) { Text($0) }
                     }
                 }
+            } header: {
+                Label("Devices", systemImage: "camera.metering.center.weighted")
+            } footer: {
+                Text("Pick active microphone and camera sources for this meeting.")
             }
 
-            Section("Preferences") {
+            Section {
                 Picker("Layout", selection: $settings.layoutPreference) {
                     ForEach(MeetingLayoutPreference.allCases) { preference in
                         Text(preference.rawValue).tag(preference)
@@ -38,6 +42,10 @@ struct MeetingSettingsView: View {
                         Text(quality.rawValue).tag(quality)
                     }
                 }
+            } header: {
+                Label("Preferences", systemImage: "slider.horizontal.3")
+            } footer: {
+                Text("Adjust layout and quality to balance clarity and performance.")
             }
         }
         .navigationTitle("Meeting Settings")

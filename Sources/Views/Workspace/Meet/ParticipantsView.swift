@@ -20,34 +20,44 @@ struct ParticipantsView: View {
                     Button {
                         onSelectParticipant?(participant)
                     } label: {
-                        HStack {
+                        HStack(alignment: .top, spacing: 10) {
+                            Image(systemName: "person.crop.circle.fill")
+                                .font(.title3)
+                                .foregroundStyle(.blue)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(participant.displayName)
                                     .font(.subheadline.weight(.semibold))
                                 Text(participant.role.displayName)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
+                                HStack(spacing: 6) {
+                                    Label(participant.networkQuality.label, systemImage: "antenna.radiowaves.left.and.right")
+                                        .font(.caption2)
+                                        .foregroundStyle(participant.networkQuality == .poor ? .orange : .secondary)
+                                    Label(participant.isMuted ? "Muted" : "Unmuted", systemImage: participant.isMuted ? "mic.slash.fill" : "mic.fill")
+                                        .font(.caption2)
+                                        .foregroundStyle(participant.isMuted ? .red : .green)
+                                    Label(participant.hasVideo ? "Video On" : "Video Off", systemImage: participant.hasVideo ? "video.fill" : "video.slash.fill")
+                                        .font(.caption2)
+                                        .foregroundStyle(participant.hasVideo ? .green : .secondary)
+                                }
                             }
                             Spacer()
                             if participant.isHandRaised {
-                                Text("✋")
-                                    .font(.caption)
+                                Label("Hand", systemImage: "hand.raised.fill")
+                                    .font(.caption2)
+                                    .foregroundStyle(.orange)
                             }
                             if participant.isSpeaking {
                                 Label("Speaking", systemImage: "waveform")
                                     .font(.caption)
                                     .foregroundStyle(.green)
                             }
-                            Text(participant.networkQuality.label)
-                                .font(.caption2)
-                                .foregroundStyle(participant.networkQuality == .poor ? .orange : .secondary)
-                            Image(systemName: participant.isMuted ? "mic.slash.fill" : "mic.fill")
-                                .foregroundStyle(participant.isMuted ? .red : .green)
-                            Image(systemName: participant.hasVideo ? "video.fill" : "video.slash.fill")
-                                .foregroundStyle(participant.hasVideo ? .green : .secondary)
                             if participant.isHandRaised, let onToggleParticipantHand, canManage {
-                                Button("Lower") {
+                                Button {
                                     onToggleParticipantHand(participant.id)
+                                } label: {
+                                    Label("Lower", systemImage: "hand.raised.slash")
                                 }
                                 .font(.caption2)
                                 .buttonStyle(.bordered)

@@ -14,8 +14,14 @@ struct MeetingContainerView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 14) {
+            VStack(spacing: 12) {
                 headerSummary
+
+                sectionHeader(
+                    title: "Live Stage",
+                    subtitle: "Focus on active speakers and shared screens.",
+                    symbol: "rectangle.3.group.bubble.left.fill"
+                )
 
                 VideoGridView(
                     participants: manager.participants,
@@ -25,9 +31,16 @@ struct MeetingContainerView: View {
                     spotlightedParticipantID: manager.spotlightedParticipantID,
                     pinnedParticipantID: manager.pinnedParticipantID
                 )
-                .frame(minHeight: 240, maxHeight: 430)
+                .frame(minHeight: 220, maxHeight: 390)
 
                 surfaceCard {
+                    VStack(alignment: .leading, spacing: 10) {
+                        sectionHeader(
+                            title: "Meeting Controls",
+                            subtitle: "Mic, camera, screen sharing, and quick actions.",
+                            symbol: "switch.2"
+                        )
+
                     MeetingControlsView(
                         isMuted: manager.isMicrophoneMuted,
                         isCameraEnabled: manager.isCameraEnabled,
@@ -48,7 +61,14 @@ struct MeetingContainerView: View {
                         onOpenAdmin: manager.canAccessAdminControls ? { showAdmin = true } : nil,
                         onOpenNotes: { showNotes = true }
                     )
+                    }
                 }
+
+                sectionHeader(
+                    title: "Quick Controls",
+                    subtitle: "Tune audio, network, picture-in-picture, and effects.",
+                    symbol: "slider.horizontal.3"
+                )
 
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                     surfaceCard {
@@ -118,8 +138,14 @@ struct MeetingContainerView: View {
                     }
                     .padding(.top, 8)
                 } label: {
-                    Label("More meeting tools", systemImage: "wand.and.stars")
-                        .font(.subheadline.weight(.semibold))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Label("More meeting tools", systemImage: "wand.and.stars")
+                            .font(.subheadline.weight(.semibold))
+                        Text("Reactions, raised hands, captions, and diagnostics.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .accessibilityLabel("More meeting tools")
                 .padding(12)
@@ -231,6 +257,25 @@ struct MeetingContainerView: View {
         .padding(.vertical, 8)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private func sectionHeader(title: String, subtitle: String, symbol: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: symbol)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.blue)
+                .frame(width: 24, height: 24)
+                .background(Color.blue.opacity(0.12), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func surfaceCard<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {

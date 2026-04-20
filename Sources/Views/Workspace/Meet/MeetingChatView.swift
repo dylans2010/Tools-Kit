@@ -14,6 +14,16 @@ struct MeetingChatView: View {
 
     var body: some View {
         VStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Label("Threaded Chat", systemImage: "message.badge.waveform")
+                    .font(.headline)
+                Text("Select a thread, then send focused updates and reactions.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+
             if threads.isEmpty {
                 ContentUnavailableView(
                     "No chat threads from Daily",
@@ -55,11 +65,13 @@ struct MeetingChatView: View {
             HStack {
                 TextField("New thread", text: $newThreadTitle)
                     .textFieldStyle(.roundedBorder)
-                Button("Add") {
+                Button {
                     let title = newThreadTitle.trimmingCharacters(in: .whitespacesAndNewlines)
                     guard !title.isEmpty else { return }
                     onAddThread(title)
                     newThreadTitle = ""
+                } label: {
+                    Label("Add", systemImage: "plus.circle.fill")
                 }
                 .buttonStyle(.bordered)
                 .disabled(threads.isEmpty || !isChatEnabled)

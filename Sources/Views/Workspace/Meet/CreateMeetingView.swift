@@ -11,7 +11,7 @@ struct CreateMeetingView: View {
                 .ignoresSafeArea()
 
             List {
-                Section("Meeting") {
+                Section {
                     TextField("Meeting Name", text: $manager.meetingNameInput)
                         .textInputAutocapitalization(.words)
                         .autocorrectionDisabled()
@@ -58,6 +58,10 @@ struct CreateMeetingView: View {
                         manager.meetingNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
                         (scheduleForLater && scheduledAt < Date())
                     )
+                } header: {
+                    Label("Meeting", systemImage: "video.fill.badge.plus")
+                } footer: {
+                    Text(scheduleForLater ? "Save a scheduled session participants can join later." : "Create an instant meeting room now.")
                 }
             }
             .listStyle(.insetGrouped)

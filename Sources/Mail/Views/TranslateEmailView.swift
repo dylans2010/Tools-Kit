@@ -160,10 +160,20 @@ struct TranslateEmailView: View {
             }
 
             Toggle(isOn: $preserveFormatting) {
-                Label("Preserve formatting and bullet structure", systemImage: "text.alignleft")
+                VStack(alignment: .leading, spacing: 2) {
+                    Label("Preserve formatting and bullet structure", systemImage: "text.alignleft")
+                    Text("Keeps list spacing, line breaks, and structure aligned with source.")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
             }
             Toggle(isOn: $includeCulturalNotes) {
-                Label("Include cultural nuance notes", systemImage: "text.badge.star")
+                VStack(alignment: .leading, spacing: 2) {
+                    Label("Include cultural nuance notes", systemImage: "text.badge.star")
+                    Text("Adds short context notes when wording may vary by region.")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
         .padding(16)
@@ -192,7 +202,7 @@ struct TranslateEmailView: View {
     private var outputCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Label("Translated", systemImage: "character.bubble")
+            Label("Translated", systemImage: "character.bubble")
                     .font(.headline)
                 Spacer()
                 if isTranslating {
