@@ -399,12 +399,16 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Token exchange failed"])
         }
 
-        return try JSONDecoder().decode(OAuthTokenResponse.self, from: data)
+        let token = try JSONDecoder().decode(OAuthTokenResponse.self, from: data)
+        guard GmailAuthSupport.isBearerTokenType(token.tokenType, loggerContext: "GmailProvider") else {
+            throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google OAuth token exchange returned unsupported token type: \(token.tokenType ?? "nil")"])
+        }
+        return token
     }
 
     private func fetchProfile(accessToken: String) async throws -> GoogleProfile {
         var request = URLRequest(url: URL(string: "https://www.googleapis.com/oauth2/v2/userinfo")!)
-        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        try applyAuthorizationHeader(to: &request, token: accessToken)
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
             throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Profile request failed"])
@@ -416,10 +420,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        guard let token, !token.isEmpty else {
-            throw NSError(domain: "GmailProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Google access token"])
-        }
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        try applyAuthorizationHeader(to: &request, token: token)
         if let body {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = try JSONEncoder().encode(body)
@@ -437,10 +438,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        guard let token, !token.isEmpty else {
-            throw NSError(domain: "GmailProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Google access token"])
-        }
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        try applyAuthorizationHeader(to: &request, token: token)
         if let body {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = try JSONEncoder().encode(body)
@@ -594,6 +592,9 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google token refresh failed"])
         }
         let refreshed = try JSONDecoder().decode(OAuthTokenResponse.self, from: data)
+        guard GmailAuthSupport.isBearerTokenType(refreshed.tokenType, loggerContext: "GmailProvider") else {
+            throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google token refresh returned unsupported token type: \(refreshed.tokenType ?? "nil")"])
+        }
         let resolvedRefresh = refreshed.refreshToken ?? refreshToken
         _ = MailKeychainManager.shared.saveOAuthTokens(accountId: session.id, accessToken: refreshed.accessToken, refreshToken: resolvedRefresh)
         await MainActor.run {
@@ -619,15 +620,26 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             throw NSError(domain: "GmailProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid session provider"])
         }
     }
+
+    private func applyAuthorizationHeader(to request: inout URLRequest, token: String?) throws {
+        let accessToken = try GmailAuthSupport.normalizedAccessToken(
+            from: token,
+            errorDomain: "GmailProvider",
+            errorMessage: "Missing Google access token"
+        )
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+    }
 }
 
 private struct OAuthTokenResponse: Decodable {
     let accessToken: String
     let refreshToken: String?
+    let tokenType: String?
 
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
+        case tokenType = "token_type"
     }
 }
 

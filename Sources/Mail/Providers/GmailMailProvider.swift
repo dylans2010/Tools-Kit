@@ -253,21 +253,24 @@ class GmailMailProvider: MailProviderProtocol {
     }
 
     private func validAccessToken() async throws -> String {
-        if let accessToken, !accessToken.isEmpty {
-            return accessToken
+        if let accessToken {
+            if let normalized = GmailAuthSupport.cleanedAccessToken(from: accessToken) {
+                self.accessToken = normalized
+                return normalized
+            }
+            InternalLogger.shared.log("GmailMailProvider: cached access token is empty/invalid after normalization, falling back to keychain or refresh", level: .warning)
         }
 
         if let stored = MailKeychainManager.shared.getOAuthTokens(accountId: account.id) {
-            accessToken = stored.accessToken
-            refreshToken = stored.refreshToken
-            return stored.accessToken
+            if let normalized = GmailAuthSupport.cleanedAccessToken(from: stored.accessToken) {
+                accessToken = normalized
+                refreshToken = stored.refreshToken
+                return normalized
+            }
         }
 
         try await refreshAccessToken()
-        guard let accessToken, !accessToken.isEmpty else {
-            throw NSError(domain: "GmailMailProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Gmail OAuth access token"])
-        }
-        return accessToken
+        return try normalizedAccessToken(from: accessToken)
     }
 
     private func refreshAccessToken() async throws {
@@ -302,23 +305,35 @@ class GmailMailProvider: MailProviderProtocol {
         }
 
         let refreshed = try JSONDecoder().decode(GmailRefreshResponse.self, from: data)
-        accessToken = refreshed.accessToken
+        guard GmailAuthSupport.isBearerTokenType(refreshed.tokenType, loggerContext: "GmailMailProvider") else {
+            throw NSError(domain: "GmailMailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google token refresh returned unsupported token type: \(refreshed.tokenType ?? "nil")"])
+        }
+        let normalizedToken = try normalizedAccessToken(from: refreshed.accessToken)
+        accessToken = normalizedToken
         let resolvedRefreshToken = refreshed.refreshToken ?? refreshToken
         self.refreshToken = resolvedRefreshToken
 
         _ = MailKeychainManager.shared.saveOAuthTokens(
             accountId: account.id,
-            accessToken: refreshed.accessToken,
+            accessToken: normalizedToken,
             refreshToken: resolvedRefreshToken
         )
         await MainActor.run {
             MailStore.shared.updateAccountTokens(
                 accountId: account.id,
-                accessToken: refreshed.accessToken,
+                accessToken: normalizedToken,
                 refreshToken: resolvedRefreshToken
             )
         }
         InternalLogger.shared.log("GmailMailProvider: refreshed access token for \(account.emailAddress)", level: .info)
+    }
+
+    private func normalizedAccessToken(from rawToken: String?) throws -> String {
+        try GmailAuthSupport.normalizedAccessToken(
+            from: rawToken,
+            errorDomain: "GmailMailProvider",
+            errorMessage: "Missing Gmail OAuth access token"
+        )
     }
 
     private func parseAddressList(_ value: String?) -> [String] {
@@ -552,10 +567,12 @@ private struct GmailBody: Decodable {
 private struct GmailRefreshResponse: Decodable {
     let accessToken: String
     let refreshToken: String?
+    let tokenType: String?
 
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
+        case tokenType = "token_type"
     }
 }
 
