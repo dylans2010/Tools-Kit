@@ -203,7 +203,7 @@ struct MailThreadView: View {
             isStarred: false,
             attachments: []
         )
-        if let account = MailStore.shared.activeAccount ?? MailStorageService.shared.loadAccounts().first {
+        if let account = MailStore.shared.preferredAccountForCompose() {
             EmailComposingView(account: account, replyTo: msg)
         } else {
             NavigationStack {

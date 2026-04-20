@@ -149,7 +149,7 @@ extension MailProviderProtocol {
         return threads.compactMap { thread in
             guard let last = thread.messages.last else { return nil }
             return EmailMessage(
-                uid: stableUID(from: last.id),
+                uid: stableMailUID(from: last.id),
                 subject: last.subject,
                 sender: last.from,
                 date: last.date,
@@ -166,7 +166,7 @@ extension MailProviderProtocol {
         let threads = try await fetchThreads(in: .inbox, limit: 50, offset: 0)
         if let message = threads.flatMap(\.messages).first(where: { $0.id == id }) {
             return EmailMessage(
-                uid: stableUID(from: message.id),
+                uid: stableMailUID(from: message.id),
                 subject: message.subject,
                 sender: message.from,
                 date: message.date,
@@ -189,15 +189,17 @@ extension MailProviderProtocol {
     func listAccounts() -> [EmailAccount] {
         []
     }
+}
 
-    private func stableUID(from id: String) -> Int {
-        if let parsed = Int(id), parsed > 0 { return parsed }
-        let digest = SHA256.hash(data: Data(id.utf8))
-        let prefix = digest.prefix(8)
-        let hashed = prefix.reduce(into: UInt64(0)) { result, byte in
-            result = (result << 8) | UInt64(byte)
-        }
-        let safe = hashed % UInt64(Int.max - 1)
-        return Int(max(safe, 1))
+func stableMailUID(from id: String) -> Int {
+    if let parsed = Int(id), parsed > 0 { return parsed }
+    let digest = SHA256.hash(data: Data(id.utf8))
+    let bytes = Array(digest.prefix(8))
+    var value: UInt64 = 0
+    withUnsafeMutableBytes(of: &value) { buffer in
+        buffer.copyBytes(from: bytes)
     }
+    let hashed = UInt64(bigEndian: value)
+    let safe = hashed % UInt64(Int.max - 1)
+    return Int(max(safe, 1))
 }

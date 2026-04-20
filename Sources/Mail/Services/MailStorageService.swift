@@ -178,6 +178,10 @@ final class MailStore: ObservableObject {
         InternalLogger.shared.log("MailStore: OAuth tokens updated for \(accounts[idx].emailAddress)", level: .debug)
     }
 
+    func preferredAccountForCompose() -> MailAccount? {
+        activeAccount ?? accounts.first
+    }
+
     func removeAccount(_ account: MailAccount) {
         MailKeychainManager.shared.deleteCredentials(for: account.emailAddress)
         MailKeychainManager.shared.deleteOAuthTokens(accountId: account.id)
