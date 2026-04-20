@@ -79,7 +79,7 @@ final class FeedbackService {
             throw FeedbackServiceError.missingConfig
         }
 
-        var queries: [String] = [Query.orderDesc("createdAt"), Query.limit(200)]
+        var queries: [String] = [Query.orderDesc("createdAt"), Query.limit(Self.maxFeedbackLimit)]
 
         if let category {
             queries.append(Query.equal("category", value: category.rawValue))
@@ -100,7 +100,7 @@ final class FeedbackService {
             nestedType: FeedbackDocumentData.self
         )
 
-        return response.documents.map(feedback(from:)).sorted { $0.createdAt > $1.createdAt }
+        return response.documents.map(feedback(from:))
     }
 
     func fetchMyFeedback() async throws -> [Feedback] {
@@ -117,12 +117,12 @@ final class FeedbackService {
                 Query.equal("userId", value: currentUser.id),
                 Query.equal("userCanViewStatus", value: true),
                 Query.orderDesc("createdAt"),
-                Query.limit(200)
+                Query.limit(Self.maxFeedbackLimit)
             ],
             nestedType: FeedbackDocumentData.self
         )
 
-        return response.documents.map(feedback(from:)).sorted { $0.createdAt > $1.createdAt }
+        return response.documents.map(feedback(from:))
     }
 
     func updateStatus(feedbackId: String, status: FeedbackStatus) async throws {
@@ -244,6 +244,8 @@ final class FeedbackService {
     private static let fallbackISOFormatter: ISO8601DateFormatter = {
         ISO8601DateFormatter()
     }()
+
+    private static let maxFeedbackLimit = 200
 }
 
 private struct FeedbackDocumentData: Codable {
