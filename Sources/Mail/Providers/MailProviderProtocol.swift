@@ -2,6 +2,14 @@ import Foundation
 import SwiftUI
 
 enum AppConfig {
+    private static func mustString(_ key: String) -> String {
+        do {
+            return try requiredString(key)
+        } catch {
+            preconditionFailure(error.localizedDescription)
+        }
+    }
+
     static func requiredString(_ key: String) throws -> String {
         guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String else {
             throw NSError(domain: "AppConfig", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing \(key) in Info.plist"])
@@ -13,13 +21,13 @@ enum AppConfig {
         return trimmed
     }
 
-    static var googleClientID: String { (try? requiredString("GOOGLE_OAUTH_CLIENT_ID")) ?? "" }
-    static var microsoftClientID: String { (try? requiredString("MICROSOFT_OAUTH_CLIENT_ID")) ?? "" }
-    static var yahooClientID: String { (try? requiredString("YAHOO_OAUTH_CLIENT_ID")) ?? "" }
+    static var googleClientID: String { mustString("GOOGLE_OAUTH_CLIENT_ID") }
+    static var microsoftClientID: String { mustString("MICROSOFT_OAUTH_CLIENT_ID") }
+    static var yahooClientID: String { mustString("YAHOO_OAUTH_CLIENT_ID") }
 
-    static var googleRedirectURI: String { (try? requiredString("GOOGLE_OAUTH_REDIRECT_URI")) ?? "com.ToolsKit.google:/oauthredirect" }
-    static var microsoftRedirectURI: String { (try? requiredString("MICROSOFT_OAUTH_REDIRECT_URI")) ?? "com.ToolsKit.microsoft:/oauthredirect" }
-    static var yahooRedirectURI: String { (try? requiredString("YAHOO_OAUTH_REDIRECT_URI")) ?? "com.ToolsKit.yahoo:/oauthredirect" }
+    static var googleRedirectURI: String { mustString("GOOGLE_OAUTH_REDIRECT_URI") }
+    static var microsoftRedirectURI: String { mustString("MICROSOFT_OAUTH_REDIRECT_URI") }
+    static var yahooRedirectURI: String { mustString("YAHOO_OAUTH_REDIRECT_URI") }
 }
 
 struct MailCredentials: Sendable {
