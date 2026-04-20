@@ -205,12 +205,22 @@ struct DraftingEmailsView: View {
             }
 
             Toggle(isOn: $includeCTA) {
-                Label("Include clear call-to-action", systemImage: "checkmark.seal")
+                VStack(alignment: .leading, spacing: 2) {
+                    Label("Include clear call-to-action", systemImage: "checkmark.seal")
+                    Text("Ends with a direct ask or next step.")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
             }
             .tint(.blue)
 
             Toggle(isOn: $includeBulletSummary) {
-                Label("Include short bullet summary", systemImage: "list.bullet.rectangle")
+                VStack(alignment: .leading, spacing: 2) {
+                    Label("Include short bullet summary", systemImage: "list.bullet.rectangle")
+                    Text("Adds concise bullets for quick readability.")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
             }
             .tint(.teal)
 

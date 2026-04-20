@@ -1,6 +1,7 @@
 import SwiftUI
-import PhotosUI
 import UniformTypeIdentifiers
+import VisionKit
+import UIKit
 
 struct EmailComposingView: View {
     @Environment(\.dismiss) private var dismiss
@@ -19,18 +20,27 @@ struct EmailComposingView: View {
     @State private var showingAIPanel = false
     @State private var showingAttachmentPicker = false
     @State private var showingAudioPicker = false
-    @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var showingTranslateSheet = false
     @State private var showingLinkSheet = false
     @State private var showingScheduleSheet = false
     @State private var showingDrawingSheet = false
     @State private var showingPreviewSheet = false
+    @State private var showingDocumentScanner = false
+    @State private var showingTableBuilder = false
+    @State private var messageComposerMode: MessageComposerMode = .render
 
     @State private var scheduleDate: Date?
     @State private var pendingLinkText = ""
     @State private var pendingLinkURL = "https://"
 
     @FocusState private var bodyFocused: Bool
+
+    private enum MessageComposerMode: String, CaseIterable, Identifiable {
+        case render = "Rendered"
+        case markdown = "Markdown"
+
+        var id: String { rawValue }
+    }
     
     private struct MarkdownFormatAction: Identifiable {
         let id = UUID()
@@ -50,7 +60,6 @@ struct EmailComposingView: View {
         MarkdownFormatAction(title: "Numbered", icon: "list.number", insertion: "1. First\n2. Second"),
         MarkdownFormatAction(title: "Quote", icon: "text.quote", insertion: "> Quoted text"),
         MarkdownFormatAction(title: "Code Block", icon: "terminal", insertion: "```\ncode block\n```"),
-        MarkdownFormatAction(title: "Table", icon: "tablecells", insertion: "| Column A | Column B |\n| --- | --- |\n| Value 1 | Value 2 |"),
         MarkdownFormatAction(title: "Divider", icon: "minus", insertion: "---")
     ]
 
@@ -96,10 +105,6 @@ struct EmailComposingView: View {
                 }
             }
             .onAppear(perform: prefillReply)
-            .onChange(of: selectedPhotoItem) { item in
-                guard let item else { return }
-                Task { await importPhoto(item) }
-            }
             .sheet(isPresented: $showingAIPanel) {
                 DraftingEmailsView(currentBody: messageBody) { result in
                     let trimmedRecipient = result.recipient.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -129,11 +134,20 @@ struct EmailComposingView: View {
             }
             .sheet(isPresented: $showingScheduleSheet) {
                 scheduleSheet
-                    .presentationDetents([.medium])
+                    .presentationDetents([.height(250)])
                     .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showingPreviewSheet) {
                 markdownPreviewSheet
+            }
+            .sheet(isPresented: $showingTableBuilder) {
+                MailTableView { generatedTable in
+                    insertMarkdown(generatedTable)
+                }
+                .presentationDetents([.medium, .large])
+            }
+            .sheet(isPresented: $showingDocumentScanner) {
+                mailDocumentScannerSheet
             }
             .sheet(isPresented: $showingDrawingSheet) {
                 DrawingBoardView { export in
@@ -204,42 +218,75 @@ struct EmailComposingView: View {
 
     private var bodySection: some View {
         Section("Message") {
-            ZStack(alignment: .topLeading) {
-                if messageBody.isEmpty && !bodyFocused {
-                    Text("Write your message…")
-                        .foregroundColor(Color(.placeholderText))
-                        .padding(.top, 8)
-                        .padding(.leading, 6)
+            Picker("Composer Mode", selection: $messageComposerMode) {
+                ForEach(MessageComposerMode.allCases) { mode in
+                    Text(mode.rawValue).tag(mode)
                 }
+            }
+            .pickerStyle(.segmented)
 
-                TextEditor(text: $messageBody)
-                    .focused($bodyFocused)
-                    .frame(minHeight: 280)
+            if messageComposerMode == .render {
+                ScrollView {
+                    Group {
+                        if let attributed = parsedMarkdownBody {
+                            Text(attributed)
+                        } else if !messageBody.isEmpty {
+                            Text(messageBody)
+                        } else {
+                            Text("Write your message…")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(10)
+                }
+                .frame(minHeight: 280)
+                .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10))
+
+                Button {
+                    messageComposerMode = .markdown
+                    bodyFocused = true
+                } label: {
+                    Label("Edit Markdown", systemImage: "square.and.pencil")
+                        .font(.caption.weight(.semibold))
+                }
+                .buttonStyle(.bordered)
+            } else {
+                ZStack(alignment: .topLeading) {
+                    if messageBody.isEmpty && !bodyFocused {
+                        Text("Write your message…")
+                            .foregroundColor(Color(.placeholderText))
+                            .padding(.top, 8)
+                            .padding(.leading, 6)
+                    }
+
+                    TextEditor(text: $messageBody)
+                        .focused($bodyFocused)
+                        .frame(minHeight: 280)
+                }
             }
         }
     }
 
     private var toolsSection: some View {
         Section {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    toolButton(icon: "sparkles", label: "AI Draft") { showingAIPanel = true }
-                    toolButton(icon: "waveform", label: "Audio Notes") { showingAudioPicker = true }
-                    toolButton(icon: "globe", label: "Translate") { showingTranslateSheet = true }
-                    toolButton(icon: "textformat.clear", label: "Clear Formatting") { clearFormatting() }
-                    toolButton(icon: "calendar.badge.clock", label: "Schedule Send") { showingScheduleSheet = true }
-                    toolButton(icon: "doc.text.viewfinder", label: "File Scanning") { showingAttachmentPicker = true }
-                    toolButton(icon: "text.quote", label: "Quoting") { insertQuote() }
-                    toolButton(icon: "doc.richtext", label: "Preview") { showingPreviewSheet = true }
-                    toolButton(icon: "link", label: "Hyperlink") { showingLinkSheet = true }
-                    toolButton(icon: "pencil.and.outline", label: "Drawing") { showingDrawingSheet = true }
-                    toolButton(icon: "paperclip", label: "Attach") { showingAttachmentPicker = true }
-                }
-                .padding(.vertical, 4)
-            }
+            Text("Compose faster with smart actions and clean formatting tools.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
 
-            PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
-                Label("Add Photo", systemImage: "photo.on.rectangle")
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                modernToolButton(icon: "sparkles", title: "AI Draft", subtitle: "Generate content") { showingAIPanel = true }
+                modernToolButton(icon: "globe", title: "Translate", subtitle: "Change language") { showingTranslateSheet = true }
+                modernToolButton(icon: "calendar.badge.clock", title: "Schedule", subtitle: "Send later") { showingScheduleSheet = true }
+                modernToolButton(icon: "doc.viewfinder", title: "Scan", subtitle: "Scan documents") { showingDocumentScanner = true }
+                modernToolButton(icon: "paperclip", title: "Attach", subtitle: "Add files") { showingAttachmentPicker = true }
+                modernToolButton(icon: "waveform", title: "Audio Notes", subtitle: "Attach audio") { showingAudioPicker = true }
+                modernToolButton(icon: "tablecells", title: "Table", subtitle: "Build table UI") { showingTableBuilder = true }
+                modernToolButton(icon: "doc.richtext", title: "Preview", subtitle: "Rendered output") { showingPreviewSheet = true }
+                modernToolButton(icon: "link", title: "Link", subtitle: "Insert hyperlink") { showingLinkSheet = true }
+                modernToolButton(icon: "text.quote", title: "Quote", subtitle: "Quote body") { insertQuote() }
+                modernToolButton(icon: "textformat.clear", title: "Clear", subtitle: "Remove markdown") { clearFormatting() }
+                modernToolButton(icon: "pencil.and.outline", title: "Drawing", subtitle: "Attach sketch") { showingDrawingSheet = true }
             }
 
             ScrollView(.horizontal, showsIndicators: false) {
@@ -386,19 +433,68 @@ struct EmailComposingView: View {
         }
     }
 
+    @ViewBuilder
+    private var mailDocumentScannerSheet: some View {
+        if VNDocumentCameraViewController.isSupported {
+            MailDocumentScannerRepresentable { scannedImages in
+                appendScannedAttachments(scannedImages)
+                showingDocumentScanner = false
+            }
+            .ignoresSafeArea()
+        } else {
+            NavigationStack {
+                ContentUnavailableView(
+                    "Scanner Unavailable",
+                    systemImage: "camera.metering.unknown",
+                    description: Text("Document scanning is not supported on this device.")
+                )
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Done") { showingDocumentScanner = false }
+                    }
+                }
+            }
+            .presentationDetents([.medium])
+        }
+    }
+
     private var cannotSend: Bool {
         mergedRecipients().isEmpty || subject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSending
     }
 
-    private func toolButton(icon: String, label: String, action: @escaping () -> Void) -> some View {
+    private var parsedMarkdownBody: AttributedString? {
+        try? AttributedString(
+            markdown: messageBody,
+            options: AttributedString.MarkdownParsingOptions(
+                interpretedSyntax: .full,
+                failurePolicy: .returnPartiallyParsedIfPossible
+            )
+        )
+    }
+
+    private func modernToolButton(icon: String, title: String, subtitle: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Image(systemName: icon)
-                .font(.body)
-                .frame(width: 36, height: 36)
-                .background(Color.blue.opacity(0.12), in: Circle())
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.subheadline.weight(.semibold))
+                    .frame(width: 30, height: 30)
+                    .background(Color.blue.opacity(0.14), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(title)
+                        .font(.caption.weight(.semibold))
+                        .lineLimit(1)
+                    Text(subtitle)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(8)
+            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(label)
+        .accessibilityLabel(title)
     }
 
     private func prefillReply() {
@@ -445,8 +541,10 @@ struct EmailComposingView: View {
     }
     
     private func insertMarkdown(_ snippet: String) {
-        bodyFocused = true
         insert(snippet)
+        if messageComposerMode == .markdown {
+            bodyFocused = true
+        }
     }
 
     private func insertQuote() {
@@ -494,27 +592,16 @@ struct EmailComposingView: View {
         }
     }
 
-    private func importPhoto(_ item: PhotosPickerItem) async {
-        do {
-            if let data = try await item.loadTransferable(type: Data.self) {
-                let attachment = MailMessage.MailAttachment(
-                    id: UUID().uuidString,
-                    fileName: "Photo-\(draftAttachments.count + 1).jpg",
-                    contentType: "image/jpeg",
-                    size: Int64(data.count)
-                )
-                await MainActor.run {
-                    draftAttachments.append(attachment)
-                    selectedPhotoItem = nil
-                }
-            } else {
-                await MainActor.run { selectedPhotoItem = nil }
-            }
-        } catch {
-            await MainActor.run {
-                sendError = error.localizedDescription
-                selectedPhotoItem = nil
-            }
+    private func appendScannedAttachments(_ images: [UIImage]) {
+        for image in images {
+            guard let data = image.jpegData(compressionQuality: 0.88) else { continue }
+            let attachment = MailMessage.MailAttachment(
+                id: UUID().uuidString,
+                fileName: "Scan-\(draftAttachments.count + 1).jpg",
+                contentType: "image/jpeg",
+                size: Int64(data.count)
+            )
+            draftAttachments.append(attachment)
         }
     }
 
@@ -648,5 +735,45 @@ struct EmailComposingView: View {
             recipients.append(pendingRecipient)
         }
         return recipients
+    }
+}
+
+private struct MailDocumentScannerRepresentable: UIViewControllerRepresentable {
+    let onComplete: ([UIImage]) -> Void
+
+    func makeUIViewController(context: Context) -> VNDocumentCameraViewController {
+        let controller = VNDocumentCameraViewController()
+        controller.delegate = context.coordinator
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: VNDocumentCameraViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onComplete: onComplete)
+    }
+
+    final class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
+        let onComplete: ([UIImage]) -> Void
+
+        init(onComplete: @escaping ([UIImage]) -> Void) {
+            self.onComplete = onComplete
+        }
+
+        func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
+            onComplete([])
+        }
+
+        func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
+            onComplete([])
+        }
+
+        func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
+            var scannedImages: [UIImage] = []
+            for index in 0..<scan.pageCount {
+                scannedImages.append(scan.imageOfPage(at: index))
+            }
+            onComplete(scannedImages)
+        }
     }
 }

@@ -8,7 +8,7 @@ struct JoinMeetingView: View {
 
     var body: some View {
         List {
-            Section("Join Meeting") {
+            Section {
                 TextField("Enter your name", text: $manager.displayNameInput)
                     .textInputAutocapitalization(.words)
                     .autocorrectionDisabled()
@@ -37,9 +37,13 @@ struct JoinMeetingView: View {
                     !manager.isMeetingIDFormatValid ||
                     manager.displayNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                 )
+            } header: {
+                Label("Join Meeting", systemImage: "video.badge.ellipsis")
+            } footer: {
+                Text("Enter your name and meeting ID to join quickly.")
             }
 
-            Section("Scheduled Meetings") {
+            Section {
                 if manager.scheduledMeetings.isEmpty {
                     ContentUnavailableView(
                         "No scheduled meetings",
@@ -76,20 +80,26 @@ struct JoinMeetingView: View {
                         .padding(.vertical, 4)
                     }
                 }
+            } header: {
+                Label("Scheduled Meetings", systemImage: "calendar.badge.clock")
             }
 
-            Section("Meeting Setup") {
+            Section {
                 Button {
                     showCreateMeetingSheet = true
                 } label: {
                     Label("Create Meeting", systemImage: "plus.circle")
                 }
+            } header: {
+                Label("Meeting Setup", systemImage: "gearshape.2")
             }
 
             if let errorMessage = manager.errorMessage, !errorMessage.isEmpty {
-                Section("Status") {
+                Section {
                     Text(errorMessage)
                         .foregroundColor(.red)
+                } header: {
+                    Label("Status", systemImage: "exclamationmark.triangle.fill")
                 }
             }
         }
