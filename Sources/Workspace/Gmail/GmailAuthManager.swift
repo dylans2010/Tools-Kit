@@ -163,8 +163,9 @@ final class GmailAuthManager: NSObject, ASWebAuthenticationPresentationContextPr
     }
 
     private func formEncodedBody(_ items: [URLQueryItem]) -> Data? {
+        let allowed = CharacterSet.urlQueryAllowed.subtracting(CharacterSet(charactersIn: "+&="))
         items
-            .map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")" }
+            .map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: allowed) ?? "")" }
             .joined(separator: "&")
             .data(using: .utf8)
     }

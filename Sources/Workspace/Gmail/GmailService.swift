@@ -175,7 +175,10 @@ final class GmailService {
         }
 
         if T.self == GmailEmptyResponse.self {
-            return GmailEmptyResponse() as! T
+            guard let empty = GmailEmptyResponse() as? T else {
+                throw GmailServiceError.invalidResponse
+            }
+            return empty
         }
 
         return try JSONDecoder().decode(T.self, from: data)
@@ -262,8 +265,9 @@ final class GmailService {
     }
 
     private func formEncodedBody(_ items: [URLQueryItem]) -> Data? {
+        let allowed = CharacterSet.urlQueryAllowed.subtracting(CharacterSet(charactersIn: "+&="))
         items
-            .map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")" }
+            .map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: allowed) ?? "")" }
             .joined(separator: "&")
             .data(using: .utf8)
     }
