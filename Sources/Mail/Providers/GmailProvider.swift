@@ -401,7 +401,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
 
         let token = try JSONDecoder().decode(OAuthTokenResponse.self, from: data)
         guard GmailAuthSupport.isBearerTokenType(token.tokenType, loggerContext: "GmailProvider") else {
-            throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google token exchange returned unsupported token type"])
+            throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google token exchange returned unsupported token type: \(token.tokenType ?? "nil")"])
         }
         return token
     }
@@ -593,7 +593,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         }
         let refreshed = try JSONDecoder().decode(OAuthTokenResponse.self, from: data)
         guard GmailAuthSupport.isBearerTokenType(refreshed.tokenType, loggerContext: "GmailProvider") else {
-            throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google token refresh returned unsupported token type"])
+            throw NSError(domain: "GmailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Google token refresh returned unsupported token type: \(refreshed.tokenType ?? "nil")"])
         }
         let resolvedRefresh = refreshed.refreshToken ?? refreshToken
         _ = MailKeychainManager.shared.saveOAuthTokens(accountId: session.id, accessToken: refreshed.accessToken, refreshToken: resolvedRefresh)

@@ -26,8 +26,8 @@ enum GmailAuthSupport {
 
     static func isBearerTokenType(_ tokenType: String?, loggerContext: String) -> Bool {
         guard let tokenType else {
-            InternalLogger.shared.log("\(loggerContext): Google token_type missing; proceeding with access token", level: .warning)
-            return true
+            InternalLogger.shared.log("\(loggerContext): Google token_type missing; rejecting token response", level: .error)
+            return false
         }
         return tokenType.trimmingCharacters(in: .whitespacesAndNewlines).caseInsensitiveCompare(bearerScheme) == .orderedSame
     }

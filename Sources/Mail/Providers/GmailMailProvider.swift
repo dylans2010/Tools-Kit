@@ -306,7 +306,7 @@ class GmailMailProvider: MailProviderProtocol {
 
         let refreshed = try JSONDecoder().decode(GmailRefreshResponse.self, from: data)
         guard GmailAuthSupport.isBearerTokenType(refreshed.tokenType, loggerContext: "GmailMailProvider") else {
-            throw NSError(domain: "GmailMailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Gmail token refresh returned unsupported token type"])
+            throw NSError(domain: "GmailMailProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Gmail token refresh returned unsupported token type: \(refreshed.tokenType ?? "nil")"])
         }
         let normalizedToken = try normalizedAccessToken(from: refreshed.accessToken)
         accessToken = normalizedToken
