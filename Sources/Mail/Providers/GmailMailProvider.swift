@@ -181,7 +181,8 @@ class GmailMailProvider: MailProviderProtocol {
 
     func deleteThread(_ threadId: String) async throws {
         let endpoint = baseURL.appendingPathComponent("threads/\(threadId)/trash")
-        let _: GmailEmptyResponse = try await requestJSON(url: endpoint, method: "POST")
+        let emptyBodyData = try JSONEncoder().encode([String: String]())
+        let _: GmailEmptyResponse = try await requestJSON(url: endpoint, method: "POST", bodyData: emptyBodyData)
         InternalLogger.shared.log("GmailMailProvider: moved thread \(threadId) to trash", level: .warning)
     }
 
