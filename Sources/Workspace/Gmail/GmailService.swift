@@ -118,18 +118,18 @@ final class GmailService: @unchecked Sendable {
             throw GmailServiceError.missingTokens
         }
 
-        var request = URLRequest(url: URL(string: "https://oauth2.googleapis.com/token")!)
-        request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        var urlRequest = URLRequest(url: URL(string: "https://oauth2.googleapis.com/token")!)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
         let fields = [
             URLQueryItem(name: "client_id", value: GmailModuleConfig.clientID),
             URLQueryItem(name: "grant_type", value: "refresh_token"),
             URLQueryItem(name: "refresh_token", value: current.refreshToken)
         ]
-        request.httpBody = gmailFormURLEncodedBody(fields)
+        urlRequest.httpBody = gmailFormURLEncodedBody(fields)
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
         guard let http = response as? HTTPURLResponse else {
             throw GmailServiceError.invalidResponse
         }
@@ -152,16 +152,16 @@ final class GmailService: @unchecked Sendable {
     private func request<T: Decodable, Body: Encodable>(url: URL, method: String = "GET", body: Body? = nil, retried: Bool = false) async throws -> T {
         let token = try await validAccessToken()
 
-        var request = URLRequest(url: url)
-        request.httpMethod = method
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = method
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
+        urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         if let body {
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.httpBody = try JSONEncoder().encode(body)
+            urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            urlRequest.httpBody = try JSONEncoder().encode(body)
         }
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
         guard let http = response as? HTTPURLResponse else {
             throw GmailServiceError.invalidResponse
         }
@@ -182,16 +182,16 @@ final class GmailService: @unchecked Sendable {
     private func requestVoid<Body: Encodable>(url: URL, method: String = "GET", body: Body? = nil, retried: Bool = false) async throws {
         let token = try await validAccessToken()
 
-        var request = URLRequest(url: url)
-        request.httpMethod = method
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = method
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
+        urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         if let body {
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.httpBody = try JSONEncoder().encode(body)
+            urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            urlRequest.httpBody = try JSONEncoder().encode(body)
         }
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
         guard let http = response as? HTTPURLResponse else {
             throw GmailServiceError.invalidResponse
         }
