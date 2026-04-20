@@ -12,7 +12,6 @@ struct DraftingEmailsView: View {
         case friendly = "Friendly"
         case executive = "Executive"
         case persuasive = "Persuasive"
-        case concise = "Concise"
 
         var id: String { rawValue }
     }
@@ -417,8 +416,8 @@ struct DraftingEmailsView: View {
     private func generateDraft() async {
         guard !isGenerating else { return }
         isGenerating = true
-        errorMessage = nil
         defer { isGenerating = false }
+        errorMessage = nil
 
         do {
             let prompt = """

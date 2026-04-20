@@ -341,12 +341,11 @@ struct TranslateEmailView: View {
     private func translate() async {
         guard !isTranslating else { return }
         isTranslating = true
+        defer { isTranslating = false }
         errorMessage = nil
         translatedText = ""
         backTranslation = ""
         qualityNotes = ""
-
-        defer { isTranslating = false }
 
         do {
             let prompt = """

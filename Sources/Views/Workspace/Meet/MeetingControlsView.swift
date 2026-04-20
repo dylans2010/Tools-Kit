@@ -20,13 +20,13 @@ struct MeetingControlsView: View {
                 controlIconButton(
                     title: isMuted ? "Unmute" : "Mute",
                     icon: isMuted ? "mic.slash.fill" : "mic.fill",
-                    tint: isMuted ? .orange : .green,
+                    tint: isMuted ? .red : .blue,
                     action: onToggleMute
                 )
                 controlIconButton(
                     title: isCameraEnabled ? "Camera Off" : "Camera On",
                     icon: isCameraEnabled ? "video.slash.fill" : "video.fill",
-                    tint: isCameraEnabled ? .orange : .green,
+                    tint: isCameraEnabled ? .blue : .red,
                     action: onToggleCamera
                 )
                 controlIconButton(
