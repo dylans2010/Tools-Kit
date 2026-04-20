@@ -21,6 +21,7 @@ final class GmailService: @unchecked Sendable {
     private let tokenStore: GmailTokenStore
     private let accountId: String
     private let baseURL = URL(string: "https://gmail.googleapis.com/gmail/v1/users/me")!
+    private let fallbackTokenExpiryInterval: TimeInterval = 300
     private var fallbackAccessToken: String?
     private var fallbackRefreshToken: String?
     private var fallbackEmail: String?
@@ -89,7 +90,7 @@ final class GmailService: @unchecked Sendable {
         let rawPayload = buildRFC2822(from: sender, to: to, cc: cc, bcc: bcc, subject: subject, body: body)
         let body = GmailSendRequest(raw: Data(rawPayload.utf8).gmailBase64URLEncodedString())
         let url = baseURL.appendingPathComponent("messages/send")
-        let _: GmailEmptyResponse = try await request(url: url, method: "POST", body: body)
+        try await requestVoid(url: url, method: "POST", body: body)
     }
 
     func saveDraft(to: [String], subject: String, body: String, cc: [String] = [], bcc: [String] = [], from: String? = nil) async throws {
@@ -97,18 +98,18 @@ final class GmailService: @unchecked Sendable {
         let rawPayload = buildRFC2822(from: sender, to: to, cc: cc, bcc: bcc, subject: subject, body: body)
         let body = GmailDraftRequest(message: GmailSendRequest(raw: Data(rawPayload.utf8).gmailBase64URLEncodedString()))
         let url = baseURL.appendingPathComponent("drafts")
-        let _: GmailEmptyResponse = try await request(url: url, method: "POST", body: body)
+        try await requestVoid(url: url, method: "POST", body: body)
     }
 
     func markMessageRead(id: String) async throws {
         let url = baseURL.appendingPathComponent("messages/\(id)/modify")
         let body = GmailModifyRequest(addLabelIds: [], removeLabelIds: ["UNREAD"])
-        let _: GmailEmptyResponse = try await request(url: url, method: "POST", body: body)
+        try await requestVoid(url: url, method: "POST", body: body)
     }
 
     func deleteMessage(id: String) async throws {
         let url = baseURL.appendingPathComponent("messages/\(id)")
-        let _: GmailEmptyResponse = try await request(url: url, method: "DELETE")
+        try await requestVoid(url: url, method: "DELETE")
     }
 
     @discardableResult
@@ -175,12 +176,36 @@ final class GmailService: @unchecked Sendable {
             throw GmailServiceError.apiError(message)
         }
 
-        if T.self == GmailEmptyResponse.self {
-            // Safe because this branch is guarded by an exact runtime type check above.
-            return GmailEmptyResponse() as! T
+        return try JSONDecoder().decode(T.self, from: data)
+    }
+
+    private func requestVoid<Body: Encodable>(url: URL, method: String = "GET", body: Body? = nil, retried: Bool = false) async throws {
+        let token = try await validAccessToken()
+
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        if let body {
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try JSONEncoder().encode(body)
         }
 
-        return try JSONDecoder().decode(T.self, from: data)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw GmailServiceError.invalidResponse
+        }
+
+        if http.statusCode == 401, !retried {
+            _ = try await refreshAccessToken()
+            try await requestVoid(url: url, method: method, body: body, retried: true)
+            return
+        }
+
+        guard (200...299).contains(http.statusCode) else {
+            let message = String(data: data, encoding: .utf8) ?? "Gmail API request failed."
+            throw GmailServiceError.apiError(message)
+        }
     }
 
     private func validAccessToken() async throws -> String {
@@ -206,7 +231,7 @@ final class GmailService: @unchecked Sendable {
             let fallback = GmailTokenBundle(
                 accessToken: access,
                 refreshToken: refresh,
-                expiresAt: Date().addingTimeInterval(300),
+                expiresAt: Date().addingTimeInterval(fallbackTokenExpiryInterval),
                 emailAddress: fallbackEmail ?? ""
             )
             _ = tokenStore.save(fallback, accountId: accountId)
@@ -217,7 +242,7 @@ final class GmailService: @unchecked Sendable {
             let migrated = GmailTokenBundle(
                 accessToken: legacy.accessToken,
                 refreshToken: refresh,
-                expiresAt: Date().addingTimeInterval(300),
+                expiresAt: Date().addingTimeInterval(fallbackTokenExpiryInterval),
                 emailAddress: fallbackEmail ?? ""
             )
             _ = tokenStore.save(migrated, accountId: accountId)

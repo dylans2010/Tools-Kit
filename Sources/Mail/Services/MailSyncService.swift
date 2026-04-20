@@ -70,12 +70,11 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
                 )
                 let pageToken = gmailPageTokensByAccount[account.id]?[currentOffset] ?? nil
                 let page = try await gmail.fetchInbox(maxResults: pageSize, pageToken: pageToken)
-                let messageService = gmail
                 let messages = try await withThrowingTaskGroup(of: MailMessage.self, returning: [MailMessage].self) { group in
                     for messageRef in page.messages {
                         let messageId = messageRef.id
                         group.addTask {
-                            try await messageService.fetchMessage(id: messageId)
+                            try await gmail.fetchMessage(id: messageId)
                         }
                     }
 

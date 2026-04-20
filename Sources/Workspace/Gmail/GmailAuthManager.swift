@@ -99,7 +99,10 @@ final class GmailAuthManager: NSObject, ASWebAuthenticationPresentationContextPr
             session.prefersEphemeralWebBrowserSession = true
             session.presentationContextProvider = self
             authSession = session
-            _ = session.start()
+            guard session.start() else {
+                continuation.resume(throwing: GmailAuthError.invalidRedirectURL)
+                return
+            }
         }
     }
 
