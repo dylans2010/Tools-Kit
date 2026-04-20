@@ -234,6 +234,10 @@
 		WS020000000000000000004C /* FeedbackRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000004C /* FeedbackRowView.swift */; };
 		WS020000000000000000004D /* FeedbackDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000004D /* FeedbackDetailView.swift */; };
 		WS020000000000000000004E /* MyFeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000004E /* MyFeedbackView.swift */; };
+		WS020000000000000000004F /* GmailModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000004F /* GmailModels.swift */; };
+		WS0200000000000000000050 /* GmailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000050 /* GmailService.swift */; };
+		WS0200000000000000000051 /* GmailTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000051 /* GmailTokenStore.swift */; };
+		WS0200000000000000000052 /* GmailAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000052 /* GmailAuthManager.swift */; };
 		ME0200000000000000000001 /* MeetingSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000001 /* MeetingSession.swift */; };
 		ME0200000000000000000002 /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000002 /* DebugLogger.swift */; };
 		ME0200000000000000000003 /* MeetingDomainModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = ME0100000000000000000003 /* MeetingDomainModels.swift */; };
@@ -1133,6 +1137,10 @@
 		WS010000000000000000004C /* FeedbackRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Feedback/FeedbackRowView.swift"; sourceTree = "<group>"; };
 		WS010000000000000000004D /* FeedbackDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Feedback/FeedbackDetailView.swift"; sourceTree = "<group>"; };
 		WS010000000000000000004E /* MyFeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Feedback/MyFeedbackView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000004F /* GmailModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Gmail/GmailModels.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000050 /* GmailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Gmail/GmailService.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000051 /* GmailTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Gmail/GmailTokenStore.swift"; sourceTree = "<group>"; };
+		WS0100000000000000000052 /* GmailAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Gmail/GmailAuthManager.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000001 /* MeetingSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingSession.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000002 /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DebugLogger.swift"; sourceTree = "<group>"; };
 		ME0100000000000000000003 /* MeetingDomainModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeetingDomainModels.swift"; sourceTree = "<group>"; };
@@ -1849,6 +1857,10 @@
 				WS010000000000000000004C /* FeedbackRowView.swift */,
 				WS010000000000000000004D /* FeedbackDetailView.swift */,
 				WS010000000000000000004E /* MyFeedbackView.swift */,
+				WS010000000000000000004F /* GmailModels.swift */,
+				WS0100000000000000000050 /* GmailService.swift */,
+				WS0100000000000000000051 /* GmailTokenStore.swift */,
+				WS0100000000000000000052 /* GmailAuthManager.swift */,
 				WK0100000000000000000001 /* WorkoutsModeManager.swift */,
 				WK0100000000000000000002 /* WorkoutsHomeView.swift */,
 				WK0100000000000000000003 /* OnboardWorkoutView.swift */,
@@ -2512,6 +2524,10 @@
 				WS020000000000000000004C /* FeedbackRowView.swift in Sources */,
 				WS020000000000000000004D /* FeedbackDetailView.swift in Sources */,
 				WS020000000000000000004E /* MyFeedbackView.swift in Sources */,
+				WS020000000000000000004F /* GmailModels.swift in Sources */,
+				WS0200000000000000000050 /* GmailService.swift in Sources */,
+				WS0200000000000000000051 /* GmailTokenStore.swift in Sources */,
+				WS0200000000000000000052 /* GmailAuthManager.swift in Sources */,
 				ME0200000000000000000001 /* MeetingSession.swift in Sources */,
 				ME0200000000000000000002 /* DebugLogger.swift in Sources */,
 				ME0200000000000000000003 /* MeetingDomainModels.swift in Sources */,
