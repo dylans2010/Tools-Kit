@@ -56,7 +56,7 @@
 	<key>YAHOO_CLIENT_ID</key>
 	<string>YOUR_YAHOO_CLIENT_ID</string>
 	<key>GOOGLE_OAUTH_REDIRECT_URI</key>
-	<string>com.ToolsKit.google:/oauthredirect</string>
+	<string>com.googleusercontent.apps.127870730797-v3g6ftqrp3q86pkfoa6uomsb8inj79ku:/oauthredirect</string>
 	<key>MICROSOFT_OAUTH_REDIRECT_URI</key>
 	<string>com.ToolsKit.microsoft:/oauthredirect</string>
 	<key>YAHOO_OAUTH_REDIRECT_URI</key>
@@ -70,7 +70,7 @@
 			<string>oauth-callback</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.ToolsKit.google</string>
+				<string>com.googleusercontent.apps.127870730797-v3g6ftqrp3q86pkfoa6uomsb8inj79ku</string>
 				<string>com.ToolsKit.microsoft</string>
 				<string>com.ToolsKit.yahoo</string>
 			</array>
