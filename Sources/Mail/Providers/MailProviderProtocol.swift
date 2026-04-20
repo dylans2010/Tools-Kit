@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import CryptoKit
 
 enum AppConfig {
     private static func mustString(_ key: String) -> String {
@@ -191,10 +192,12 @@ extension MailProviderProtocol {
 
     private func stableUID(from id: String) -> Int {
         if let parsed = Int(id), parsed > 0 { return parsed }
-        let hashed = id.unicodeScalars.reduce(into: UInt64(5381)) { result, scalar in
-            result = ((result << 5) &+ result) &+ UInt64(scalar.value)
+        let digest = SHA256.hash(data: Data(id.utf8))
+        let prefix = digest.prefix(8)
+        let hashed = prefix.reduce(into: UInt64(0)) { result, byte in
+            result = (result << 8) | UInt64(byte)
         }
-        let safe = hashed % UInt64(Int.max)
+        let safe = hashed % UInt64(Int.max - 1)
         return Int(max(safe, 1))
     }
 }

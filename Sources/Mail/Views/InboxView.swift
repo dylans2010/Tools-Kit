@@ -263,16 +263,18 @@ struct InboxView: View {
     }
 
     private func loadUnifiedThreads() {
-        let all = mailStore.accounts
-            .flatMap { account in
-                MailStorageService.shared.loadThreads(for: folderStorageKey(account: account))
+        let accounts = mailStore.accounts
+        let folderID = folder.id
+        DispatchQueue.global(qos: .userInitiated).async {
+            let all = accounts
+                .flatMap { account in
+                    MailStorageService.shared.loadThreads(for: "\(account.id)_\(folderID)")
+                }
+                .sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
+            DispatchQueue.main.async {
+                self.unifiedThreads = all
             }
-            .sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
-        unifiedThreads = all
-    }
-
-    private func folderStorageKey(account: MailAccount) -> String {
-        "\(account.id)_\(folder.id)"
+        }
     }
 }
 
