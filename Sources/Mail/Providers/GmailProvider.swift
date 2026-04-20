@@ -17,7 +17,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
         let remoteVariables = await fetchRemoteVariables()
         let clientID = try googleClientID(remoteVariables: remoteVariables)
-        let redirectURI = try oauthValue(primaryKey: "GMAIL_OAUTH_REDIRECT_URI", fallbackKey: "GOOGLE_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+        let redirectURI = try oauthValue(primaryKey: "GOOGLE_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
         try validateRedirectURI(redirectURI, clientID: clientID)
 
         let verifier = randomCodeVerifier()
@@ -44,6 +44,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         InternalLogger.shared.log("OAuth start provider=google callbackScheme=\(URL(string: redirectURI)?.scheme ?? "unknown")", level: .info)
         let callback = try await startOAuth(url: url, callbackScheme: URL(string: redirectURI)?.scheme)
         let callbackComponents = URLComponents(url: callback, resolvingAgainstBaseURL: false)
+        try validateCallback(callbackComponents, expectedRedirectURI: redirectURI)
         let returnedState = callbackComponents?.queryItems?.first(where: { $0.name == "state" })?.value
         guard returnedState == state else {
             throw NSError(domain: "GmailProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Invalid OAuth state"])
@@ -197,16 +198,8 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
     }
 
     private func googleClientID(remoteVariables: [String: String]) throws -> String {
-        if let value = try? oauthValue(
-            primaryKey: "GOOGLE_OAUTH_CLIENT_ID",
-            fallbackKey: "GOOGLE_CLIENT_ID",
-            remoteVariables: remoteVariables
-        ) {
-            return value
-        }
-
-        return try oauthValue(
-            primaryKey: "GMAIL_OAUTH_CLIENT_ID",
+        try oauthValue(
+            primaryKey: "GOOGLE_CLIENT_ID",
             remoteVariables: remoteVariables
         )
     }
@@ -350,6 +343,29 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
                     ]
                 )
             }
+        }
+    }
+
+    private func validateCallback(_ callbackComponents: URLComponents?, expectedRedirectURI: String) throws {
+        guard
+            let callbackComponents,
+            let callbackScheme = callbackComponents.scheme?.lowercased(),
+            callbackComponents.path == "/oauthredirect"
+        else {
+            throw NSError(
+                domain: "GmailProvider",
+                code: 401,
+                userInfo: [NSLocalizedDescriptionKey: "Invalid OAuth callback URL"]
+            )
+        }
+
+        let expectedScheme = URL(string: expectedRedirectURI)?.scheme?.lowercased()
+        guard let expectedScheme, callbackScheme == expectedScheme else {
+            throw NSError(
+                domain: "GmailProvider",
+                code: 401,
+                userInfo: [NSLocalizedDescriptionKey: "OAuth callback scheme mismatch"]
+            )
         }
     }
 

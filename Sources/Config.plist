@@ -28,13 +28,9 @@
     <string></string>
     <key>APPWRITE_MAIL_CONFIG_BEARER</key>
     <string></string>
-    <key>GOOGLE_OAUTH_CLIENT_ID</key>
-    <string>127870730797-nobmh9gdvjck07n30q1ia3e7tb5u9msf.apps.googleusercontent.com</string>
+    <key>GOOGLE_CLIENT_ID</key>
+    <string>127870730797-8rnpb3le5n3j34ur7uvsfma75592nr07.apps.googleusercontent.com</string>
     <key>GOOGLE_OAUTH_REDIRECT_URI</key>
-    <string>com.googleusercontent.apps.127870730797-nobmh9gdvjck07n30q1ia3e7tb5u9msf:/oauthredirect</string>
-    <key>GMAIL_OAUTH_CLIENT_ID</key>
-    <string></string>
-    <key>GMAIL_OAUTH_REDIRECT_URI</key>
-    <string></string>
+    <string>com.googleusercontent.apps.127870730797-8rnpb3le5n3j34ur7uvsfma75592nr07:/oauthredirect</string>
 </dict>
 </plist>
