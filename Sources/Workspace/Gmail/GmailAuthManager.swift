@@ -135,7 +135,7 @@ final class GmailAuthManager: NSObject, ASWebAuthenticationPresentationContextPr
             URLQueryItem(name: "grant_type", value: "authorization_code"),
             URLQueryItem(name: "code_verifier", value: verifier)
         ]
-        request.httpBody = formEncodedBody(fields)
+        request.httpBody = gmailFormURLEncodedBody(fields)
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse else {
@@ -160,14 +160,6 @@ final class GmailAuthManager: NSObject, ASWebAuthenticationPresentationContextPr
             throw GmailAuthError.tokenExchangeFailed(details)
         }
         return try JSONDecoder().decode(GmailProfileResponse.self, from: data).emailAddress
-    }
-
-    private func formEncodedBody(_ items: [URLQueryItem]) -> Data? {
-        let allowed = CharacterSet.urlQueryAllowed.subtracting(CharacterSet(charactersIn: "+&="))
-        items
-            .map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: allowed) ?? "")" }
-            .joined(separator: "&")
-            .data(using: .utf8)
     }
 
     private func randomCodeVerifier() -> String {

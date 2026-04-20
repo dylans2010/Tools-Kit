@@ -17,7 +17,7 @@ enum GmailServiceError: LocalizedError {
     }
 }
 
-final class GmailService {
+final class GmailService: @unchecked Sendable {
     private let tokenStore: GmailTokenStore
     private let accountId: String
     private let baseURL = URL(string: "https://gmail.googleapis.com/gmail/v1/users/me")!
@@ -65,6 +65,7 @@ final class GmailService {
         let plainBody = response.payload?.firstBody(for: "text/plain")?.decodedBody() ?? ""
         let htmlBody = response.payload?.firstBody(for: "text/html")?.decodedBody()
         let labels = Set(response.labelIds ?? [])
+        let attachments = extractAttachments(from: response.payload)
 
         return MailMessage(
             id: response.id,
@@ -79,7 +80,7 @@ final class GmailService {
             date: date,
             isRead: !labels.contains("UNREAD"),
             isStarred: labels.contains("STARRED"),
-            attachments: []
+            attachments: attachments
         )
     }
 
@@ -125,7 +126,7 @@ final class GmailService {
             URLQueryItem(name: "grant_type", value: "refresh_token"),
             URLQueryItem(name: "refresh_token", value: current.refreshToken)
         ]
-        request.httpBody = formEncodedBody(fields)
+        request.httpBody = gmailFormURLEncodedBody(fields)
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse else {
@@ -262,12 +263,34 @@ final class GmailService {
         return lines.joined(separator: "\r\n")
     }
 
-    private func formEncodedBody(_ items: [URLQueryItem]) -> Data? {
-        let allowed = CharacterSet.urlQueryAllowed.subtracting(CharacterSet(charactersIn: "+&="))
-        items
-            .map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: allowed) ?? "")" }
-            .joined(separator: "&")
-            .data(using: .utf8)
+    private func extractAttachments(from payload: GmailPayload?) -> [MailMessage.MailAttachment] {
+        guard let payload else { return [] }
+
+        var attachments: [MailMessage.MailAttachment] = []
+        var queue: [GmailPayload] = [payload]
+        var index = 0
+
+        while !queue.isEmpty {
+            let part = queue.removeFirst()
+            if let children = part.parts {
+                queue.append(contentsOf: children)
+            }
+
+            let filename = (part.filename ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !filename.isEmpty else { continue }
+
+            attachments.append(
+                MailMessage.MailAttachment(
+                    id: "\(filename)-\(index)",
+                    fileName: filename,
+                    contentType: part.mimeType ?? "application/octet-stream",
+                    size: Int64(part.body?.size ?? 0)
+                )
+            )
+            index += 1
+        }
+
+        return attachments
     }
 }
 

@@ -86,6 +86,7 @@ struct GmailMessageResponse: Decodable, Sendable {
 
 struct GmailPayload: Decodable, Sendable {
     let mimeType: String?
+    let filename: String?
     let body: GmailBody?
     let headers: [GmailHeader]?
     let parts: [GmailPayload]?
@@ -117,6 +118,7 @@ struct GmailHeader: Decodable, Sendable {
 }
 
 struct GmailBody: Decodable, Sendable {
+    let size: Int?
     let data: String?
 }
 
@@ -183,4 +185,12 @@ extension Data {
             .replacingOccurrences(of: "/", with: "_")
             .replacingOccurrences(of: "=", with: "")
     }
+}
+
+func gmailFormURLEncodedBody(_ items: [URLQueryItem]) -> Data? {
+    let allowed = CharacterSet.urlQueryAllowed.subtracting(CharacterSet(charactersIn: "+&="))
+    return items
+        .map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: allowed) ?? "")" }
+        .joined(separator: "&")
+        .data(using: .utf8)
 }
