@@ -61,7 +61,7 @@ struct FeedbackAdminView: View {
                     .font(.caption)
                     .foregroundStyle(.red)
             } else if filteredAndSortedFeedback.isEmpty {
-                ContentUnavailableView("No Feedback", systemImage: "tray")
+                ContentUnavailableView("No Feedback", systemImage: "tray", description: Text("No feedback entries available."))
             } else {
                 ForEach(filteredAndSortedFeedback) { feedback in
                     NavigationLink {

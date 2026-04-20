@@ -171,7 +171,7 @@ final class FeedbackService {
         let createdAt = resolvedCreatedAt(from: data.createdAt, fallbackValue: document.createdAt, documentId: document.id)
         return Feedback(
             id: document.id,
-            userId: data.userId?.nilIfBlank,
+            userId: data.userId.nilIfBlank,
             userName: data.userName,
             message: data.message,
             category: data.category,
@@ -182,7 +182,7 @@ final class FeedbackService {
             priority: data.priority,
             internalNotes: data.internalNotes,
             lastUpdatedAt: data.lastUpdatedAt.flatMap(Self.parseDate),
-            assignedTo: data.assignedTo?.nilIfBlank,
+            assignedTo: data.assignedTo.nilIfBlank,
             userCanViewStatus: data.userCanViewStatus
         )
     }

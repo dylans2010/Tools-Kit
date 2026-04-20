@@ -11,7 +11,7 @@ struct FeedbackView: View {
     private let minLength = 10
 
     var body: some View {
-        Group {
+        SwiftUI.Group {
             if submissionSucceeded {
                 FeedbackSuccessView {
                     message = ""
