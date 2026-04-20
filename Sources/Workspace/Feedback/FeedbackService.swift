@@ -173,7 +173,7 @@ final class FeedbackService {
             userName: data.userName,
             message: data.message,
             category: data.category,
-            createdAt: Self.parseDate(data.createdAt),
+            createdAt: Self.parseDate(data.createdAt) ?? Self.parseDate(document.createdAt) ?? .distantPast,
             device: data.device,
             appVersion: data.appVersion,
             status: data.status,
@@ -185,19 +185,19 @@ final class FeedbackService {
         )
     }
 
-    private static func parseDate(_ value: String) -> Date {
+    private static func parseDate(_ value: String) -> Date? {
         if let date = isoFormatter.date(from: value) { return date }
         if let date = fallbackISOFormatter.date(from: value) { return date }
         print("FeedbackService warning: Failed to parse date value: \(value)")
-        return Date()
+        return nil
     }
 
     private static func appVersionString() -> String {
         let bundle = Bundle.main
-        let shortVersion = (bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
-        let buildVersion = (bundle.object(forInfoDictionaryKey: "CFBundleVersion") as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let shortVersion = (bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String).nilIfBlank
+        let buildVersion = (bundle.object(forInfoDictionaryKey: "CFBundleVersion") as? String).nilIfBlank
 
-        switch (shortVersion?.isEmpty == false ? shortVersion : nil, buildVersion?.isEmpty == false ? buildVersion : nil) {
+        switch (shortVersion, buildVersion) {
         case let (short?, build?): return "\(short) (\(build))"
         case let (short?, nil): return short
         case let (nil, build?): return build
