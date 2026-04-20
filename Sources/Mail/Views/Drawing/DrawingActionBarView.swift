@@ -16,8 +16,10 @@ struct DrawingActionBarView: View {
                 .disabled(!canUndo)
             Button("Redo", action: onRedo)
                 .disabled(!canRedo)
-            Button("Clear", role: .destructive, action: onClear)
-                .disabled(!canClear)
+            Button(role: .destructive, action: onClear) {
+                Label("Clear", systemImage: "trash")
+            }
+            .disabled(!canClear)
 
             Spacer()
 

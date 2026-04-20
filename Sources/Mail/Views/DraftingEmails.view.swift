@@ -126,7 +126,6 @@ struct DraftingEmailsView: View {
                         Task { await generateDraft() }
                     } label: {
                         Label("Generate", systemImage: "wand.and.stars")
-                            .symbolEffect(.pulse.byLayer, isActive: isGenerating)
                     }
                     .disabled(!canGenerate)
 

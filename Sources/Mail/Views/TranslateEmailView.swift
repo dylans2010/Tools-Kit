@@ -100,7 +100,6 @@ struct TranslateEmailView: View {
                         Task { await translate() }
                     } label: {
                         Label("Translate", systemImage: "globe")
-                            .symbolEffect(.bounce.byLayer, isActive: isTranslating)
                     }
                     .disabled(!canTranslate)
 

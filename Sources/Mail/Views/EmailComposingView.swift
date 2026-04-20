@@ -90,7 +90,6 @@ struct EmailComposingView: View {
                             ProgressView()
                         } else {
                             Label(scheduleDate != nil ? "Schedule" : "Send", systemImage: scheduleDate != nil ? "calendar.badge.clock" : "paperplane.fill")
-                                .symbolEffect(.bounce.byLayer, isActive: !isSending)
                         }
                     }
                     .disabled(cannotSend)
