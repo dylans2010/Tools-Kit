@@ -6,13 +6,13 @@ struct NoiseControlView: View {
     let onToggle: (Bool) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Toggle("Noise Cancellation", isOn: Binding(get: { isEnabled }, set: onToggle))
-            Label(processingState, systemImage: isEnabled ? "waveform.and.mic" : "mic")
+        VStack(alignment: .leading, spacing: 10) {
+            Label("Noise Cancellation", systemImage: "waveform.and.mic")
+                .font(.subheadline.weight(.semibold))
+            Toggle("Enable filtering", isOn: Binding(get: { isEnabled }, set: onToggle))
+            Label(processingState, systemImage: isEnabled ? "checkmark.circle.fill" : "mic.slash")
                 .font(.caption)
                 .foregroundStyle(isEnabled ? .green : .secondary)
         }
-        .padding(12)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
     }
 }

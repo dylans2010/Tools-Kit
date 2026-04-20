@@ -57,7 +57,7 @@ struct InboxView: View {
                 }
             }
         }
-        .sheet(isPresented: $showingCompose) {
+        .fullScreenCover(isPresented: $showingCompose) {
             if let activeAccount {
                 EmailComposingView(account: activeAccount)
             }
@@ -407,7 +407,7 @@ private struct InboxMessageDetailView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showReply) {
+            .fullScreenCover(isPresented: $showReply) {
                 EmailComposingView(account: account, replyTo: message)
             }
         }

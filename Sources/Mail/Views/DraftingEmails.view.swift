@@ -50,11 +50,14 @@ struct DraftingEmailsView: View {
     @State private var selectedGoal: MailGoal = .statusUpdate
     @State private var selectedStyle: MailStyle = .professional
     @State private var selectedLength: OutputLength = .medium
+    @State private var includeCTA = true
+    @State private var includeBulletSummary = false
 
     @State private var generatedBody = ""
     @State private var alternatives: [String] = []
     @State private var isGenerating = false
     @State private var isGeneratingAlternatives = false
+    @State private var isProcessingTool = false
     @State private var errorMessage: String?
 
     let currentBody: String
@@ -65,11 +68,15 @@ struct DraftingEmailsView: View {
     }
 
     private var canApply: Bool {
-        !generatedBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !trimmedGeneratedBody.isEmpty
     }
 
     private var draftWordCount: Int {
         generatedBody.split { $0.isWhitespace || $0.isNewline }.count
+    }
+
+    private var trimmedGeneratedBody: String {
+        generatedBody.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private var presets: [PromptPreset] {
@@ -81,6 +88,14 @@ struct DraftingEmailsView: View {
         ]
     }
 
+    private let rewriteTools: [(title: String, symbol: String, instruction: String)] = [
+        ("Shorten", "scissors", "Rewrite this email to be shorter while preserving all key intent and details."),
+        ("Expand", "arrow.up.left.and.arrow.down.right", "Expand this email with additional helpful context while staying clear."),
+        ("Polish", "sparkles", "Polish this email for grammar, flow, and clarity while preserving meaning."),
+        ("Softer", "face.smiling", "Rewrite this email with a warmer and more empathetic tone."),
+        ("Direct", "bolt.fill", "Rewrite this email to be more direct and action-oriented.")
+    ]
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -88,6 +103,7 @@ struct DraftingEmailsView: View {
                     headerCard
                     setupCard
                     optionsCard
+                    toolbeltCard
                     outputCard
                     alternativesCard
                 }
@@ -98,14 +114,26 @@ struct DraftingEmailsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Close") { dismiss() }
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.down")
+                            .font(.headline.weight(.semibold))
+                    }
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button("Generate") { Task { await generateDraft() } }
-                        .disabled(!canGenerate)
-                    Button("Apply") {
+                    Button {
+                        Task { await generateDraft() }
+                    } label: {
+                        Label("Generate", systemImage: "wand.and.stars")
+                    }
+                    .disabled(!canGenerate)
+
+                    Button {
                         onApply(.init(recipient: recipient, subject: subject, body: generatedBody))
                         dismiss()
+                    } label: {
+                        Label("Apply", systemImage: "checkmark.circle.fill")
                     }
                     .disabled(!canApply)
                 }
@@ -115,14 +143,16 @@ struct DraftingEmailsView: View {
                     generatedBody = currentBody
                 }
             }
+            .animation(.easeInOut(duration: 0.22), value: isGenerating)
+            .animation(.easeInOut(duration: 0.22), value: isProcessingTool)
         }
     }
 
     private var headerCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Write Better Emails Faster")
+            Text("AI Draft Studio")
                 .font(.system(size: 24, weight: .bold, design: .rounded))
-            Text("Set the intent and style, then generate a polished draft with alternates.")
+            Text("Set intent, tune tone, then generate polished drafts and quick rewrites.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
@@ -153,30 +183,11 @@ struct DraftingEmailsView: View {
             Label("Message Setup", systemImage: "slider.horizontal.3")
                 .font(.headline)
 
-            Group {
-                textField("Recipient", text: $recipient)
-                textField("Subject", text: $subject)
-            }
+            textField("Recipient", text: $recipient)
+            textField("Subject", text: $subject)
 
-            VStack(alignment: .leading, spacing: 6) {
-                Text("What should this email achieve?")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                TextEditor(text: $context)
-                    .frame(minHeight: 120)
-                    .padding(8)
-                    .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
-            }
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Must Include (optional)")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                TextEditor(text: $mustInclude)
-                    .frame(minHeight: 72)
-                    .padding(8)
-                    .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
-            }
+            editorBlock(title: "What should this email achieve?", text: $context, minHeight: 120)
+            editorBlock(title: "Must Include (optional)", text: $mustInclude, minHeight: 80)
         }
         .padding(18)
         .draftingCardSurface()
@@ -193,10 +204,53 @@ struct DraftingEmailsView: View {
                 pickerChip(title: "Length", selection: $selectedLength)
             }
 
+            Toggle(isOn: $includeCTA) {
+                Label("Include clear call-to-action", systemImage: "checkmark.seal")
+            }
+            .tint(.blue)
+
+            Toggle(isOn: $includeBulletSummary) {
+                Label("Include short bullet summary", systemImage: "list.bullet.rectangle")
+            }
+            .tint(.teal)
+
             HStack(spacing: 10) {
                 metricPill(title: "Words", value: "\(draftWordCount)")
                 metricPill(title: "Goal", value: selectedGoal.rawValue)
                 metricPill(title: "Tone", value: selectedStyle.rawValue)
+            }
+        }
+        .padding(18)
+        .draftingCardSurface()
+    }
+
+    private var toolbeltCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label("Rewrite Tools", systemImage: "wand.and.rays")
+                    .font(.headline)
+                Spacer()
+                if isProcessingTool {
+                    ProgressView()
+                }
+            }
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(rewriteTools, id: \.title) { tool in
+                        Button {
+                            Task { await applyRewriteTool(tool.instruction) }
+                        } label: {
+                            Label(tool.title, systemImage: tool.symbol)
+                                .font(.caption.weight(.semibold))
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 8)
+                                .background(Color.white.opacity(0.08), in: Capsule())
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(trimmedGeneratedBody.isEmpty || isProcessingTool)
+                    }
+                }
             }
         }
         .padding(18)
@@ -215,7 +269,7 @@ struct DraftingEmailsView: View {
             }
 
             TextEditor(text: $generatedBody)
-                .frame(minHeight: 220)
+                .frame(minHeight: 230)
                 .padding(8)
                 .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
 
@@ -238,13 +292,9 @@ struct DraftingEmailsView: View {
                 Button {
                     Task { await generateAlternatives() }
                 } label: {
-                    if isGeneratingAlternatives {
-                        ProgressView()
-                    } else {
-                        Text("Generate 2")
-                    }
+                    Label("Generate 2", systemImage: "arrow.triangle.branch")
                 }
-                .disabled(generatedBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isGeneratingAlternatives)
+                .disabled(trimmedGeneratedBody.isEmpty || isGeneratingAlternatives)
             }
 
             if alternatives.isEmpty {
@@ -276,6 +326,18 @@ struct DraftingEmailsView: View {
         }
         .padding(18)
         .draftingCardSurface()
+    }
+
+    private func editorBlock(title: String, text: Binding<String>, minHeight: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+            TextEditor(text: text)
+                .frame(minHeight: minHeight)
+                .padding(8)
+                .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
+        }
     }
 
     private func textField(_ title: String, text: Binding<String>) -> some View {
@@ -331,6 +393,7 @@ struct DraftingEmailsView: View {
     private func generateDraft() async {
         guard !isGenerating else { return }
         isGenerating = true
+        defer { isGenerating = false }
         errorMessage = nil
 
         do {
@@ -339,6 +402,8 @@ struct DraftingEmailsView: View {
             Goal: \(selectedGoal.rawValue).
             Recipient: \(recipient.isEmpty ? "Not specified" : recipient)
             Subject hint: \(subject.isEmpty ? "Generate one" : subject)
+            Include CTA: \(includeCTA ? "yes" : "no")
+            Include summary bullets: \(includeBulletSummary ? "yes" : "no")
 
             Context:
             \(context)
@@ -362,8 +427,30 @@ struct DraftingEmailsView: View {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
 
-        isGenerating = false
+    @MainActor
+    private func applyRewriteTool(_ instruction: String) async {
+        guard !isProcessingTool else { return }
+        let text = generatedBody.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+
+        isProcessingTool = true
+        errorMessage = nil
+        defer { isProcessingTool = false }
+
+        do {
+            let prompt = """
+            \(instruction)
+
+            Email:
+            \(text)
+            """
+            let result = try await AIService.shared.processText(prompt: prompt)
+            generatedBody = result.trimmingCharacters(in: .whitespacesAndNewlines)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
     @MainActor

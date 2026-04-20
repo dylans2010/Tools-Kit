@@ -93,14 +93,11 @@ struct DrawingBoardView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Close") { dismiss() }
-                }
-
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Export PNG") {
-                        exportDrawing()
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.down")
                     }
-                    .disabled(strokes.isEmpty)
                 }
             }
         }
@@ -108,75 +105,41 @@ struct DrawingBoardView: View {
 
     private var controls: some View {
         VStack(spacing: 10) {
-            Picker("Tool", selection: $selectedTool) {
-                ForEach(Tool.allCases) { tool in
-                    Text(tool.rawValue).tag(tool)
-                }
-            }
-            .pickerStyle(.segmented)
+            DrawingInspectorPanelView(
+                selectedTool: $selectedTool,
+                selectedColor: $selectedColor,
+                lineWidth: $lineWidth,
+                strokeOpacity: $strokeOpacity,
+                useDashedStroke: $useDashedStroke,
+                fillShapes: $fillShapes,
+                showGrid: $showGrid,
+                snapToGrid: $snapToGrid
+            )
 
-            HStack {
-                ColorPicker("Color", selection: $selectedColor)
-                Spacer()
-                Text("Size")
-                Slider(value: $lineWidth, in: 1...16)
-                    .frame(width: 140)
-                Text(Int(lineWidth).description)
-                    .font(.caption)
-                    .frame(width: 26)
-            }
-            
-            HStack(spacing: 10) {
-                Text("Opacity")
-                    .font(.subheadline)
-                Slider(value: $strokeOpacity, in: 0.2...1)
-                Text("\(Int(strokeOpacity * 100))%")
-                    .font(.caption)
-                    .frame(width: 38)
-            }
-            
-            HStack {
-                Toggle("Dashed", isOn: $useDashedStroke)
-                Toggle("Fill Shapes", isOn: $fillShapes)
-            }
-            .font(.caption.weight(.semibold))
-            
-            HStack {
-                Toggle("Grid", isOn: $showGrid)
-                Toggle("Snap", isOn: $snapToGrid)
-            }
-            .font(.caption.weight(.semibold))
-            
-            Picker("Background", selection: $backgroundStyle) {
-                ForEach(CanvasBackground.allCases) { style in
-                    Text(style.rawValue).tag(style)
-                }
-            }
-            .pickerStyle(.segmented)
+            DrawingBackgroundSelectorView(backgroundStyle: $backgroundStyle)
 
-            HStack {
-                Button("Undo") {
+            DrawingActionBarView(
+                canUndo: !strokes.isEmpty,
+                canRedo: !redoStrokes.isEmpty,
+                canClear: !(strokes.isEmpty && inProgressStroke == nil),
+                canExport: !strokes.isEmpty,
+                onUndo: {
                     guard let last = strokes.popLast() else { return }
                     redoStrokes.append(last)
-                }
-                .disabled(strokes.isEmpty)
-                
-                Button("Redo") {
+                },
+                onRedo: {
                     guard let last = redoStrokes.popLast() else { return }
                     strokes.append(last)
-                }
-                .disabled(redoStrokes.isEmpty)
-
-                Spacer()
-
-                Button("Clear", role: .destructive) {
+                },
+                onClear: {
                     strokes.removeAll()
                     redoStrokes.removeAll()
                     inProgressStroke = nil
+                },
+                onExport: {
+                    exportDrawing()
                 }
-                .disabled(strokes.isEmpty && inProgressStroke == nil)
-            }
-            .font(.subheadline.weight(.semibold))
+            )
         }
     }
 

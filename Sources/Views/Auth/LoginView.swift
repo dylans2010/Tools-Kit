@@ -9,182 +9,149 @@ struct LoginView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var showingCreateAccount = false
-    @State private var errorPulse = false
-    private let errorPulseDuration: Double = 0.28
+    @State private var animateHero = false
 
     var body: some View {
         ZStack {
             LinearGradient(
                 colors: [
-                    Color(red: 0.06, green: 0.08, blue: 0.13),
-                    Color(red: 0.10, green: 0.14, blue: 0.20),
-                    Color(red: 0.12, green: 0.11, blue: 0.18)
+                    Color(red: 0.05, green: 0.08, blue: 0.14),
+                    Color(red: 0.09, green: 0.13, blue: 0.22),
+                    Color(red: 0.12, green: 0.10, blue: 0.20)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
 
-            VStack(spacing: 20) {
-                Spacer(minLength: 24)
-
-                VStack(spacing: 10) {
-                    Text("Welcome back")
-                        .font(.system(size: 34, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-
-                    Text("Sign in to continue to Tools Kit")
-                        .font(.system(size: 15, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.72))
-                }
-                .padding(.horizontal, 24)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                VStack(spacing: 14) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Email")
-                            .font(.system(size: 13, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.74))
-
-                        TextField("you@example.com", text: $email)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
-                            .keyboardType(.emailAddress)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 12)
-                            .background(Color.white.opacity(0.10))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .strokeBorder(Color.white.opacity(0.14), lineWidth: 1)
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 22) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Welcome back")
+                            .font(.system(size: 36, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
+                        Text("Sign in to continue to Tools Kit")
+                            .font(.system(size: 15, weight: .medium, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.72))
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .offset(y: animateHero ? 0 : -8)
+                    .opacity(animateHero ? 1 : 0.7)
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Password")
-                            .font(.system(size: 13, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.74))
+                    VStack(spacing: 14) {
+                        inputField(label: "Email", placeholder: "you@example.com", text: $email, secure: false, keyboard: .emailAddress)
+                        inputField(label: "Password", placeholder: "Enter password", text: $password, secure: true, keyboard: .default)
 
-                        SecureField("Enter password", text: $password)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 12)
-                            .background(Color.white.opacity(0.10))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .strokeBorder(Color.white.opacity(0.14), lineWidth: 1)
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                            .foregroundStyle(.white)
-                    }
-
-                    if let errorMessage {
-                        HStack(spacing: 8) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                            Text(errorMessage)
+                        if let errorMessage {
+                            Label(errorMessage, systemImage: "exclamationmark.triangle.fill")
                                 .font(.system(size: 13, weight: .semibold, design: .rounded))
+                                .foregroundStyle(Color(red: 1.0, green: 0.57, blue: 0.57))
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 10)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(Color.red.opacity(0.14), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                .transition(.opacity.combined(with: .move(edge: .top)))
                         }
-                        .foregroundStyle(Color(red: 1.0, green: 0.57, blue: 0.57))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 10)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.red.opacity(0.14))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.red.opacity(0.35), lineWidth: 1)
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                        .scaleEffect(errorPulse ? 1.02 : 1)
-                        .animation(.spring(response: errorPulseDuration, dampingFraction: 0.62), value: errorPulse)
-                    }
 
-                    Button {
-                        signInWithEmail()
-                    } label: {
-                        HStack {
-                            if isLoading {
-                                ProgressView()
-                                    .tint(.white)
+                        Button {
+                            signInWithEmail()
+                        } label: {
+                            HStack {
+                                if isLoading {
+                                    ProgressView().tint(.white)
+                                }
+                                Text(isLoading ? "Signing in..." : "Sign In")
+                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
                             }
-                            Text(isLoading ? "Signing in..." : "Sign In")
-                                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 13)
-                        .background(
-                            LinearGradient(
-                                colors: [
-                                    Color(red: 0.12, green: 0.47, blue: 0.95),
-                                    Color(red: 0.15, green: 0.67, blue: 0.94)
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 13)
+                            .background(
+                                LinearGradient(
+                                    colors: [
+                                        Color(red: 0.12, green: 0.47, blue: 0.95),
+                                        Color(red: 0.15, green: 0.67, blue: 0.94)
+                                    ],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                ),
+                                in: RoundedRectangle(cornerRadius: 14, style: .continuous)
                             )
-                        )
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .foregroundStyle(.white)
+                        }
+                        .disabled(isLoading)
                     }
-                    .disabled(isLoading)
+                    .padding(20)
+                    .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
+                    )
+
+                    VStack(spacing: 12) {
+                        Text("or continue with")
+                            .font(.system(size: 13, weight: .medium, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.62))
+
+                        HStack(spacing: 10) {
+                            SocialLoginButton(label: "Google", iconText: "G") { signInWithOAuth(provider: "google") }
+                            SocialLoginButton(label: "GitHub", iconText: "{}") { signInWithOAuth(provider: "github") }
+                            SocialLoginButton(label: "Discord", iconText: "D") { signInWithOAuth(provider: "discord") }
+                        }
+
+                        Button("Create account") {
+                            showingCreateAccount = true
+                        }
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.9))
+                    }
                 }
-                .padding(20)
-                .background(Color.white.opacity(0.07))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18)
-                        .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 .padding(.horizontal, 20)
-
-                VStack(spacing: 12) {
-                    Text("or continue with")
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.62))
-
-                    HStack(spacing: 10) {
-                        SocialLoginButton(
-                            label: "Google",
-                            iconText: "G",
-                            action: { signInWithOAuth(provider: "google") }
-                        )
-
-                        SocialLoginButton(
-                            label: "GitHub",
-                            iconText: "{}",
-                            action: { signInWithOAuth(provider: "github") }
-                        )
-
-                        SocialLoginButton(
-                            label: "Discord",
-                            iconText: "D",
-                            action: { signInWithOAuth(provider: "discord") }
-                        )
-                    }
-                    .padding(.horizontal, 20)
-
-                    Button("Create account") {
-                        showingCreateAccount = true
-                    }
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.85))
-                }
-
-                Spacer(minLength: 14)
+                .padding(.vertical, 28)
             }
-            .padding(.bottom, 14)
         }
         .sheet(isPresented: $showingCreateAccount) {
             CreateAccountView {
                 onAuthenticated()
             }
         }
+        .onAppear {
+            withAnimation(.spring(response: 0.55, dampingFraction: 0.86)) {
+                animateHero = true
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func inputField(label: String, placeholder: String, text: Binding<String>, secure: Bool, keyboard: UIKeyboardType) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(label)
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.74))
+
+            Group {
+                if secure {
+                    SecureField(placeholder, text: text)
+                } else {
+                    TextField(placeholder, text: text)
+                }
+            }
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled()
+            .keyboardType(keyboard)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(Color.white.opacity(0.10), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.14), lineWidth: 1)
+            )
+            .foregroundStyle(.white)
+        }
     }
 
     private func signInWithEmail() {
         guard !email.isEmpty, !password.isEmpty else {
             errorMessage = "Enter both email and password."
-            animateError()
             return
         }
 
@@ -202,7 +169,6 @@ struct LoginView: View {
                 await MainActor.run {
                     isLoading = false
                     errorMessage = error.localizedDescription
-                    animateError()
                 }
             }
         }
@@ -223,16 +189,8 @@ struct LoginView: View {
                 await MainActor.run {
                     isLoading = false
                     errorMessage = error.localizedDescription
-                    animateError()
                 }
             }
-        }
-    }
-
-    private func animateError() {
-        errorPulse = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + errorPulseDuration) {
-            errorPulse = false
         }
     }
 }
@@ -261,12 +219,11 @@ private struct SocialLoginButton: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
             .frame(maxWidth: .infinity)
-            .background(Color.white.opacity(0.09))
+            .background(Color.white.opacity(0.09), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .strokeBorder(Color.white.opacity(0.13), lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
     }
 }
