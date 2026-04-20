@@ -82,21 +82,10 @@ final class IMAPProvider: MailProvider {
         _ = try await sendCommand(context: &context, command: "SELECT INBOX")
 
         let response = try await sendCommand(context: &context, command: "UID FETCH \(id) (UID FLAGS INTERNALDATE ENVELOPE BODY.PEEK[])")
-        return parseFetchMessages(response).first ?? MailMessage(
-            id: id,
-            threadId: "uid-\(id)",
-            from: "Unknown",
-            to: [],
-            cc: [],
-            bcc: [],
-            subject: "No Subject",
-            body: "",
-            htmlBody: nil,
-            date: Date(),
-            isRead: false,
-            isStarred: false,
-            attachments: []
-        )
+        if let message = parseFetchMessages(response).first {
+            return message
+        }
+        throw NSError(domain: "IMAPProvider", code: 404, userInfo: [NSLocalizedDescriptionKey: "Message not found"])
     }
 
     func sendMessage(session: MailSession, draft: MailDraft) async throws {

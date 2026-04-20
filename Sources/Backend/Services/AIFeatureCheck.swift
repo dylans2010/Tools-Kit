@@ -144,9 +144,8 @@ final class AIFeatureCheck: ObservableObject {
     }
 
     private static func localConfigValue(forKey key: String) -> String? {
-        if let value = Bundle.main.object(forInfoDictionaryKey: key) as? String {
-            let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !trimmed.isEmpty { return trimmed }
+        if let value = AppConfig.string(for: key) {
+            return value
         }
 
         guard

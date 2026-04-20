@@ -13,7 +13,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
         let remoteVariables = await fetchRemoteVariables()
-        let clientID = try oauthValue(primaryKey: "MICROSOFT_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
+        let clientID = try oauthValue(primaryKey: "MICROSOFT_CLIENT_ID", fallbackKey: "MICROSOFT_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
         let redirectURI = try oauthValue(primaryKey: "MICROSOFT_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
 
         let verifier = randomCodeVerifier()
@@ -36,6 +36,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid OAuth URL"])
         }
 
+        InternalLogger.shared.log("OAuth start provider=microsoft callbackScheme=\(URL(string: redirectURI)?.scheme ?? "unknown")", level: .info)
         let callback = try await startOAuth(url: url, callbackScheme: URL(string: redirectURI)?.scheme)
         let callbackComponents = URLComponents(url: callback, resolvingAgainstBaseURL: false)
         let returnedState = callbackComponents?.queryItems?.first(where: { $0.name == "state" })?.value
@@ -46,6 +47,8 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing authorization code"])
         }
 
+        InternalLogger.shared.log("OAuth callback provider=microsoft state=validated", level: .info)
+        InternalLogger.shared.log("OAuth token exchange provider=microsoft", level: .info)
         let token = try await exchangeCode(code: code, verifier: verifier, clientID: clientID, redirectURI: redirectURI)
         let profile = try await fetchProfile(accessToken: token.accessToken)
 
@@ -59,11 +62,15 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     }
 
     func fetchInbox(session: MailSession, page: Int) async throws -> [MailMessage] {
+        try validateSessionProvider(session, expected: .outlook)
         let endpoint: URL
         if page == 0 {
             endpoint = URL(string: "https://graph.microsoft.com/v1.0/me/messages?$top=30&$orderby=receivedDateTime%20desc")!
         } else if let next = nextLinksByPage[page] {
-            endpoint = URL(string: next)!
+            guard let parsed = URL(string: next) else {
+                throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid pagination URL"])
+            }
+            endpoint = parsed
         } else {
             endpoint = URL(string: "https://graph.microsoft.com/v1.0/me/messages?$top=30&$orderby=receivedDateTime%20desc")!
         }
@@ -93,7 +100,10 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     }
 
     func fetchMessage(session: MailSession, id: String) async throws -> MailMessage {
-        let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)")!
+        try validateSessionProvider(session, expected: .outlook)
+        guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)") else {
+            throw NSError(domain: "OutlookProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid message identifier"])
+        }
         let item: GraphMessage = try await request(url: url, body: Optional<Data>.none, token: session.accessToken)
         return MailMessage(
             id: item.id,
@@ -113,7 +123,10 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     }
 
     func sendMessage(session: MailSession, draft: MailDraft) async throws {
-        let url = URL(string: "https://graph.microsoft.com/v1.0/me/sendMail")!
+        try validateSessionProvider(session, expected: .outlook)
+        guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/sendMail") else {
+            throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid Microsoft send endpoint"])
+        }
         let body = GraphSendMailBody(
             message: .init(
                 subject: draft.subject,
@@ -128,7 +141,10 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     }
 
     func saveDraft(session: MailSession, draft: MailDraft) async throws {
-        let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages")!
+        try validateSessionProvider(session, expected: .outlook)
+        guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages") else {
+            throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid Microsoft draft endpoint"])
+        }
         let body = GraphDraftBody(
             subject: draft.subject,
             body: .init(contentType: draft.bodyHTML == nil ? "Text" : "HTML", content: draft.bodyHTML ?? draft.bodyText),
@@ -140,19 +156,25 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     }
 
     func deleteMessage(session: MailSession, id: String) async throws {
-        let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)")!
+        try validateSessionProvider(session, expected: .outlook)
+        guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)") else {
+            throw NSError(domain: "OutlookProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid message identifier"])
+        }
         try await requestVoid(url: url, method: "DELETE", body: Optional<Data>.none, token: session.accessToken)
     }
 
     func markRead(session: MailSession, id: String) async throws {
-        let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)")!
+        try validateSessionProvider(session, expected: .outlook)
+        guard let url = URL(string: "https://graph.microsoft.com/v1.0/me/messages/\(id)") else {
+            throw NSError(domain: "OutlookProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid message identifier"])
+        }
         let body = ["isRead": true]
         let _: GraphMessage = try await request(url: url, method: "PATCH", body: body, token: session.accessToken)
     }
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor { ASPresentationAnchor() }
 
-    private func oauthValue(primaryKey: String, remoteVariables: [String: String] = [:]) throws -> String {
+    private func oauthValue(primaryKey: String, fallbackKey: String? = nil, remoteVariables: [String: String] = [:]) throws -> String {
         if let value = localConfigValue(forKey: primaryKey) {
             return value
         }
@@ -161,6 +183,18 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         }
         if let value = remoteConfigValue(forKey: primaryKey, remoteVariables: remoteVariables) {
             return value
+        }
+
+        if let fallbackKey {
+            if let value = localConfigValue(forKey: fallbackKey) {
+                return value
+            }
+            if let value = infoPlistValue(forKey: fallbackKey) {
+                return value
+            }
+            if let value = remoteConfigValue(forKey: fallbackKey, remoteVariables: remoteVariables) {
+                return value
+            }
         }
 
         throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing \(primaryKey)"])
@@ -181,11 +215,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     }
 
     private func infoPlistValue(forKey key: String) -> String? {
-        guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String else {
-            return nil
-        }
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
+        AppConfig.string(for: key)
     }
 
     private func remoteConfigValue(forKey key: String, remoteVariables: [String: String]) -> String? {
@@ -288,9 +318,10 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        if let token {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        guard let token, !token.isEmpty else {
+            throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Microsoft access token"])
         }
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         if let body {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = try JSONEncoder().encode(body)
@@ -308,9 +339,10 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        if let token {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        guard let token, !token.isEmpty else {
+            throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Microsoft access token"])
         }
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         if let body {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = try JSONEncoder().encode(body)
@@ -340,6 +372,61 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             .replacingOccurrences(of: "+", with: "-")
             .replacingOccurrences(of: "/", with: "_")
             .replacingOccurrences(of: "=", with: "")
+    }
+
+    func refreshSessionToken(session: MailSession) async throws -> MailSession {
+        try validateSessionProvider(session, expected: .outlook)
+        guard let refreshToken = session.refreshToken, !refreshToken.isEmpty else {
+            throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Microsoft refresh token"])
+        }
+        let remoteVariables = await fetchRemoteVariables()
+        let clientID = try oauthValue(primaryKey: "MICROSOFT_CLIENT_ID", fallbackKey: "MICROSOFT_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
+        let redirectURI = try oauthValue(primaryKey: "MICROSOFT_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+
+        var request = URLRequest(url: URL(string: "https://login.microsoftonline.com/common/oauth2/v2.0/token")!)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        let fields = [
+            URLQueryItem(name: "client_id", value: clientID),
+            URLQueryItem(name: "grant_type", value: "refresh_token"),
+            URLQueryItem(name: "refresh_token", value: refreshToken),
+            URLQueryItem(name: "redirect_uri", value: redirectURI),
+            URLQueryItem(name: "scope", value: "Mail.ReadWrite Mail.Send offline_access")
+        ]
+        request.httpBody = fields
+            .map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")" }
+            .joined(separator: "&")
+            .data(using: .utf8)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+            throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Microsoft token refresh failed"])
+        }
+        let refreshed = try JSONDecoder().decode(GraphToken.self, from: data)
+        let resolvedRefresh = refreshed.refreshToken ?? refreshToken
+        _ = MailKeychainManager.shared.saveOAuthTokens(accountId: session.id, accessToken: refreshed.accessToken, refreshToken: resolvedRefresh)
+        await MainActor.run {
+            MailStore.shared.updateAccountTokens(accountId: session.id, accessToken: refreshed.accessToken, refreshToken: resolvedRefresh)
+        }
+        InternalLogger.shared.log("OAuth token exchange provider=microsoft status=refreshed", level: .info)
+        return MailSession(
+            id: session.id,
+            provider: session.provider,
+            email: session.email,
+            displayName: session.displayName,
+            accessToken: refreshed.accessToken,
+            refreshToken: resolvedRefresh,
+            imapHost: session.imapHost,
+            imapPort: session.imapPort,
+            smtpHost: session.smtpHost,
+            smtpPort: session.smtpPort
+        )
+    }
+
+    private func validateSessionProvider(_ session: MailSession, expected: MailAccount.ProviderType) throws {
+        guard session.provider == expected else {
+            throw NSError(domain: "OutlookProvider", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid session provider"])
+        }
     }
 }
 

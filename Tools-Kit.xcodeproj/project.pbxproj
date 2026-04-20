@@ -21,9 +21,12 @@
 		B1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift */; };
 		BC63F5FE32D0419AB791F193 /* iCloudMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */; };
 		F0BE8D2657C349B7B03F24F4 /* MailProviderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B5DD1027FA49B99C531EDE /* MailProviderProtocol.swift */; };
+		AC0200000000000000000001 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0100000000000000000001 /* AppConfig.swift */; };
 		MP0200000000000000000001 /* GmailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000001 /* GmailProvider.swift */; };
 		MP0200000000000000000002 /* OutlookProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000002 /* OutlookProvider.swift */; };
 		MP0200000000000000000003 /* YahooMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000003 /* YahooMailProvider.swift */; };
+		GP0200000000000000000001 /* GoogleMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = GP0100000000000000000001 /* GoogleMailProvider.swift */; };
+		MS0200000000000000000001 /* MicrosoftMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000001 /* MicrosoftMailProvider.swift */; };
 		MP0200000000000000000004 /* ProtonMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000004 /* ProtonMailProvider.swift */; };
 		MP0200000000000000000005 /* IMAPProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000005 /* IMAPProvider.swift */; };
 		MP0200000000000000000006 /* SMTPSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = MP0100000000000000000006 /* SMTPSender.swift */; };
@@ -636,9 +639,12 @@
 		A1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/AI/MailAIToolsSystem.swift; sourceTree = "<group>"; };
 		E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/iCloudMailProvider.swift; sourceTree = "<group>"; };
 		C1B5DD1027FA49B99C531EDE /* MailProviderProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/MailProviderProtocol.swift; sourceTree = "<group>"; };
+		AC0100000000000000000001 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Core/AppConfig.swift; sourceTree = "<group>"; };
 		MP0100000000000000000001 /* GmailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/GmailProvider.swift; sourceTree = "<group>"; };
 		MP0100000000000000000002 /* OutlookProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/OutlookProvider.swift; sourceTree = "<group>"; };
 		MP0100000000000000000003 /* YahooMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/YahooMailProvider.swift; sourceTree = "<group>"; };
+		GP0100000000000000000001 /* GoogleMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/GoogleMailProvider.swift; sourceTree = "<group>"; };
+		MS0100000000000000000001 /* MicrosoftMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/MicrosoftMailProvider.swift; sourceTree = "<group>"; };
 		MP0100000000000000000004 /* ProtonMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/ProtonMailProvider.swift; sourceTree = "<group>"; };
 		MP0100000000000000000005 /* IMAPProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/IMAPProvider.swift; sourceTree = "<group>"; };
 		MP0100000000000000000006 /* SMTPSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/SMTPSender.swift; sourceTree = "<group>"; };
@@ -1357,9 +1363,12 @@
 				A1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift */,
 				E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */,
 				C1B5DD1027FA49B99C531EDE /* MailProviderProtocol.swift */,
+				AC0100000000000000000001 /* AppConfig.swift */,
 				MP0100000000000000000001 /* GmailProvider.swift */,
 				MP0100000000000000000002 /* OutlookProvider.swift */,
 				MP0100000000000000000003 /* YahooMailProvider.swift */,
+				GP0100000000000000000001 /* GoogleMailProvider.swift */,
+				MS0100000000000000000001 /* MicrosoftMailProvider.swift */,
 				MP0100000000000000000004 /* ProtonMailProvider.swift */,
 				MP0100000000000000000005 /* IMAPProvider.swift */,
 				MP0100000000000000000006 /* SMTPSender.swift */,
@@ -2012,9 +2021,12 @@
 				B1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift in Sources */,
 				BC63F5FE32D0419AB791F193 /* iCloudMailProvider.swift in Sources */,
 				F0BE8D2657C349B7B03F24F4 /* MailProviderProtocol.swift in Sources */,
+				AC0200000000000000000001 /* AppConfig.swift in Sources */,
 				MP0200000000000000000001 /* GmailProvider.swift in Sources */,
 				MP0200000000000000000002 /* OutlookProvider.swift in Sources */,
 				MP0200000000000000000003 /* YahooMailProvider.swift in Sources */,
+				GP0200000000000000000001 /* GoogleMailProvider.swift in Sources */,
+				MS0200000000000000000001 /* MicrosoftMailProvider.swift in Sources */,
 				MP0200000000000000000004 /* ProtonMailProvider.swift in Sources */,
 				MP0200000000000000000005 /* IMAPProvider.swift in Sources */,
 				MP0200000000000000000006 /* SMTPSender.swift in Sources */,

@@ -276,7 +276,7 @@ class GmailMailProvider: MailProviderProtocol {
         }
 
         let remoteVariables = await fetchRemoteVariables()
-        let clientID = try oauthValue(primaryKey: "GMAIL_OAUTH_CLIENT_ID", fallbackKey: "GOOGLE_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
+        let clientID = try oauthValue(primaryKey: "GOOGLE_CLIENT_ID", fallbackKey: "GMAIL_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
 
         var request = URLRequest(url: URL(string: "https://oauth2.googleapis.com/token")!)
         request.httpMethod = "POST"
@@ -359,11 +359,6 @@ class GmailMailProvider: MailProviderProtocol {
     }
 
     private func localConfigValue(forKey key: String) -> String? {
-        if let value = Bundle.main.object(forInfoDictionaryKey: key) as? String {
-            let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !trimmed.isEmpty { return trimmed }
-        }
-
         guard
             let url = Bundle.main.url(forResource: "Config", withExtension: "plist"),
             let data = try? Data(contentsOf: url),
@@ -378,11 +373,7 @@ class GmailMailProvider: MailProviderProtocol {
     }
 
     private func infoPlistValue(forKey key: String) -> String? {
-        guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String else {
-            return nil
-        }
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
+        AppConfig.string(for: key)
     }
 
     private func remoteConfigValue(forKey key: String, remoteVariables: [String: String]) -> String? {
