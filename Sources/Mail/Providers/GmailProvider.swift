@@ -22,7 +22,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         }
 
         let listURL = baseURL.appendingPathComponent("messages").appending(queryItems: items)
-        let list: GmailListResponse = try await request(url: listURL, session: session)
+        let list: GmailListResponse = try await request(url: listURL, method: "GET", body: EmptyBody?.none, session: session)
 
         var messages: [MailMessage] = []
         for item in list.messages ?? [] {
@@ -34,7 +34,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
 
     func fetchMessage(session: MailSession, id: String) async throws -> MailMessage {
         let url = baseURL.appendingPathComponent("messages/\(id)").appending(queryItems: [URLQueryItem(name: "format", value: "full")])
-        let payload: GmailMessagePayload = try await request(url: url, session: session)
+        let payload: GmailMessagePayload = try await request(url: url, method: "GET", body: EmptyBody?.none, session: session)
 
         let headers = payload.payload?.headers.reduce(into: [String: String]()) { partial, item in
             partial[item.name.lowercased()] = item.value
@@ -76,7 +76,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
 
     func deleteMessage(session: MailSession, id: String) async throws {
         let url = baseURL.appendingPathComponent("messages/\(id)")
-        try await requestVoid(url: url, method: "DELETE", session: session)
+        try await requestVoid(url: url, method: "DELETE", body: EmptyBody?.none, session: session)
     }
 
     func markRead(session: MailSession, id: String) async throws {
@@ -87,7 +87,36 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor { ASPresentationAnchor() }
 
+    func refreshSessionToken(session: MailSession) async throws -> MailSession {
+        guard let tokens = MailKeychainManager.shared.getOAuthTokens(accountId: session.id),
+              let refreshToken = tokens.refreshToken else {
+            throw NSError(domain: "GmailProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "No refresh token available"])
+        }
+        let result = try await GoogleOAuthManager.shared.refreshAccessToken(for: session.id, refreshToken: refreshToken)
+        return MailSession(
+            id: session.id,
+            provider: session.provider,
+            email: session.email,
+            displayName: session.displayName,
+            accessTokenExpiration: result.expiration,
+            imapHost: session.imapHost,
+            imapPort: session.imapPort,
+            smtpHost: session.smtpHost,
+            smtpPort: session.smtpPort
+        )
+    }
+
     // MARK: - API Request Helpers
+
+    private struct EmptyBody: Encodable {}
+
+    private func request<T: Decodable>(url: URL, session: MailSession) async throws -> T {
+        try await request(url: url, method: "GET", body: EmptyBody?.none, session: session)
+    }
+
+    private func requestVoid(url: URL, method: String = "GET", session: MailSession) async throws {
+        try await requestVoid(url: url, method: method, body: EmptyBody?.none, session: session)
+    }
 
     private func request<T: Decodable, Body: Encodable>(url: URL, method: String = "GET", body: Body? = nil, session: MailSession, isRetry: Bool = false) async throws -> T {
         var request = URLRequest(url: url)

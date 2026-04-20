@@ -25,11 +25,11 @@ final class IMAPProvider: MailProvider {
         _ = try await sendCommand(context: &context, command: "SELECT INBOX")
 
         return MailSession(
+            id: UUID().uuidString,
             provider: .imap,
             email: credentials.email,
             displayName: credentials.email,
-            accessToken: nil,
-            refreshToken: nil,
+            accessTokenExpiration: nil,
             imapHost: host,
             imapPort: port,
             smtpHost: credentials.smtpHost,
