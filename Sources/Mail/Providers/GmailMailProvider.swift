@@ -276,7 +276,7 @@ class GmailMailProvider: MailProviderProtocol {
         }
 
         let remoteVariables = await fetchRemoteVariables()
-        let clientID = try oauthValue(primaryKey: "GOOGLE_CLIENT_ID", fallbackKey: "GMAIL_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
+        let clientID = try googleClientID(remoteVariables: remoteVariables)
 
         var request = URLRequest(url: URL(string: "https://oauth2.googleapis.com/token")!)
         request.httpMethod = "POST"
@@ -355,6 +355,21 @@ class GmailMailProvider: MailProviderProtocol {
             domain: "GmailMailProvider",
             code: 500,
             userInfo: [NSLocalizedDescriptionKey: "Missing required OAuth config key \(primaryKey)"]
+        )
+    }
+
+    private func googleClientID(remoteVariables: [String: String]) throws -> String {
+        if let value = try? oauthValue(
+            primaryKey: "GOOGLE_OAUTH_CLIENT_ID",
+            fallbackKey: "GOOGLE_CLIENT_ID",
+            remoteVariables: remoteVariables
+        ) {
+            return value
+        }
+
+        return try oauthValue(
+            primaryKey: "GMAIL_OAUTH_CLIENT_ID",
+            remoteVariables: remoteVariables
         )
     }
 

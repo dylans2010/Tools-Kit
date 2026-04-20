@@ -16,7 +16,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
 
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
         let remoteVariables = await fetchRemoteVariables()
-        let clientID = try oauthValue(primaryKey: "GOOGLE_CLIENT_ID", fallbackKey: "GMAIL_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
+        let clientID = try googleClientID(remoteVariables: remoteVariables)
         let redirectURI = try oauthValue(primaryKey: "GMAIL_OAUTH_REDIRECT_URI", fallbackKey: "GOOGLE_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
         try validateRedirectURI(redirectURI, clientID: clientID)
 
@@ -193,6 +193,21 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             userInfo: [
                 NSLocalizedDescriptionKey: "Missing OAuth config key \(primaryKey)"
             ]
+        )
+    }
+
+    private func googleClientID(remoteVariables: [String: String]) throws -> String {
+        if let value = try? oauthValue(
+            primaryKey: "GOOGLE_OAUTH_CLIENT_ID",
+            fallbackKey: "GOOGLE_CLIENT_ID",
+            remoteVariables: remoteVariables
+        ) {
+            return value
+        }
+
+        return try oauthValue(
+            primaryKey: "GMAIL_OAUTH_CLIENT_ID",
+            remoteVariables: remoteVariables
         )
     }
 
@@ -536,7 +551,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
             throw NSError(domain: "GmailProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Google refresh token"])
         }
         let remoteVariables = await fetchRemoteVariables()
-        let clientID = try oauthValue(primaryKey: "GOOGLE_CLIENT_ID", fallbackKey: "GMAIL_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
+        let clientID = try googleClientID(remoteVariables: remoteVariables)
 
         var request = URLRequest(url: URL(string: "https://oauth2.googleapis.com/token")!)
         request.httpMethod = "POST"
