@@ -18,7 +18,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         let remoteVariables = await fetchRemoteVariables()
         let clientID = try oauthValue(primaryKey: "GOOGLE_CLIENT_ID", fallbackKey: "GMAIL_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
         let redirectURI = try oauthValue(primaryKey: "GMAIL_OAUTH_REDIRECT_URI", fallbackKey: "GOOGLE_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
-        try validateRedirectURI(redirectURI)
+        try validateRedirectURI(redirectURI, clientID: clientID)
 
         let verifier = randomCodeVerifier()
         let challenge = codeChallenge(from: verifier)
@@ -296,15 +296,45 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
         return allowedPrefixes.contains { key.hasPrefix($0) }
     }
 
-    private func validateRedirectURI(_ redirectURI: String) throws {
-        if redirectURI.lowercased().hasPrefix("appwrite-callback-") {
+    private func validateRedirectURI(_ redirectURI: String, clientID: String) throws {
+        guard
+            let components = URLComponents(string: redirectURI),
+            let scheme = components.scheme?.lowercased(),
+            components.path == "/oauthredirect"
+        else {
             throw NSError(
                 domain: "GmailProvider",
                 code: 500,
                 userInfo: [
-                    NSLocalizedDescriptionKey: "Invalid Gmail OAuth redirect URI. Direct Gmail OAuth cannot use an Appwrite callback URI. Set GMAIL_OAUTH_REDIRECT_URI to a native Google OAuth redirect URI (for example, com.googleusercontent.apps.<client-id>:/oauthredirect)."
+                    NSLocalizedDescriptionKey: "Invalid Gmail OAuth redirect URI. It must use the native Google iOS format: com.googleusercontent.apps.<client-id>:/oauthredirect."
                 ]
             )
+        }
+
+        let expectedPrefix = "com.googleusercontent.apps."
+        guard scheme.hasPrefix(expectedPrefix) else {
+            throw NSError(
+                domain: "GmailProvider",
+                code: 500,
+                userInfo: [
+                    NSLocalizedDescriptionKey: "Invalid Gmail OAuth redirect URI. It must use the native Google iOS format: com.googleusercontent.apps.<client-id>:/oauthredirect."
+                ]
+            )
+        }
+
+        let loweredClientID = clientID.lowercased()
+        if loweredClientID.hasSuffix(".apps.googleusercontent.com") {
+            let clientPrefix = String(loweredClientID.dropLast(".apps.googleusercontent.com".count))
+            let expectedScheme = "\(expectedPrefix)\(clientPrefix)"
+            guard scheme == expectedScheme else {
+                throw NSError(
+                    domain: "GmailProvider",
+                    code: 500,
+                    userInfo: [
+                        NSLocalizedDescriptionKey: "Invalid Gmail OAuth redirect URI. The scheme must match the client ID and use this format: \(expectedScheme):/oauthredirect."
+                    ]
+                )
+            }
         }
     }
 
