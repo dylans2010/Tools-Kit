@@ -347,21 +347,26 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
     }
 
     private func validateCallback(_ callbackComponents: URLComponents?, expectedRedirectURI: String) throws {
-        let expectedComponents = URLComponents(string: expectedRedirectURI)
+        guard let expectedComponents = URLComponents(string: expectedRedirectURI) else {
+            throw NSError(
+                domain: "GmailProvider",
+                code: 500,
+                userInfo: [NSLocalizedDescriptionKey: "Invalid configured Google redirect URI"]
+            )
+        }
         guard
             let callbackComponents,
             let callbackScheme = callbackComponents.scheme?.lowercased(),
-            let expectedPath = expectedComponents?.path,
-            callbackComponents.path == expectedPath
+            callbackComponents.path == expectedComponents.path
         else {
             throw NSError(
                 domain: "GmailProvider",
                 code: 401,
-                userInfo: [NSLocalizedDescriptionKey: "Invalid OAuth callback URL"]
+                userInfo: [NSLocalizedDescriptionKey: "OAuth callback URL missing or path mismatch"]
             )
         }
 
-        let expectedScheme = expectedComponents?.scheme?.lowercased()
+        let expectedScheme = expectedComponents.scheme?.lowercased()
         guard let expectedScheme, callbackScheme == expectedScheme else {
             throw NSError(
                 domain: "GmailProvider",
