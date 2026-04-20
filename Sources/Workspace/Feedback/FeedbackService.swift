@@ -147,7 +147,7 @@ final class FeedbackService {
 
     func assignFeedback(feedbackId: String, assignee: String?) async throws {
         try await updateFeedback(feedbackId: feedbackId, data: [
-            "assignedTo": (assignee ?? "").trimmingCharacters(in: .whitespacesAndNewlines),
+            "assignedTo": Self.normalizedAssignee(assignee),
             "lastUpdatedAt": Self.isoFormatter.string(from: Date())
         ])
     }
@@ -262,6 +262,10 @@ final class FeedbackService {
         if let parsedFallback = Self.parseDate(fallbackValue) { return parsedFallback }
         Self.logger.warning("Falling back to distantPast for createdAt on document: \(documentId, privacy: .public)")
         return .distantPast
+    }
+
+    private static func normalizedAssignee(_ assignee: String?) -> String {
+        (assignee ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 
