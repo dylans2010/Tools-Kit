@@ -31,10 +31,10 @@
     <key>GOOGLE_OAUTH_CLIENT_ID</key>
     <string>127870730797-nobmh9gdvjck07n30q1ia3e7tb5u9msf.apps.googleusercontent.com</string>
     <key>GOOGLE_OAUTH_REDIRECT_URI</key>
-    <string>appwrite-callback-69e24c32003548ff0e2e://google-oauth</string>
+    <string>com.googleusercontent.apps.127870730797-v3g6ftqrp3q86pkfoa6uomsb8inj79ku:/oauthredirect</string>
     <key>GMAIL_OAUTH_CLIENT_ID</key>
-    <string></string>
+    <string>127870730797-v3g6ftqrp3q86pkfoa6uomsb8inj79ku.apps.googleusercontent.com</string>
     <key>GMAIL_OAUTH_REDIRECT_URI</key>
-    <string></string>
+    <string>com.googleusercontent.apps.127870730797-v3g6ftqrp3q86pkfoa6uomsb8inj79ku:/oauthredirect</string>
 </dict>
 </plist>

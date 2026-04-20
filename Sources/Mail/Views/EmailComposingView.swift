@@ -628,7 +628,17 @@ struct EmailComposingView: View {
 
             switch account.providerType {
             case .gmail:
-                try await GmailProvider().saveDraft(session: providerSession(), draft: draft)
+                try await GmailService(
+                    accountId: account.id,
+                    fallbackAccessToken: account.accessToken,
+                    fallbackRefreshToken: account.refreshToken,
+                    fallbackEmail: account.emailAddress
+                ).saveDraft(
+                    to: recipients,
+                    subject: subject,
+                    body: messageBody,
+                    from: account.emailAddress
+                )
             case .outlook:
                 try await OutlookProvider().saveDraft(session: providerSession(), draft: draft)
             case .yahoo:
@@ -676,7 +686,19 @@ struct EmailComposingView: View {
 
                 switch account.provider {
                 case .gmail:
-                    try await GmailMailProvider(account: account).sendMessage(message)
+                    try await GmailService(
+                        accountId: account.id,
+                        fallbackAccessToken: account.accessToken,
+                        fallbackRefreshToken: account.refreshToken,
+                        fallbackEmail: account.emailAddress
+                    ).sendEmail(
+                        to: message.to,
+                        subject: message.subject,
+                        body: message.body,
+                        cc: message.cc,
+                        bcc: message.bcc,
+                        from: account.emailAddress
+                    )
                 case .icloud:
                     try await iCloudMailProvider(account: account).sendMessage(message)
                 case .outlook:

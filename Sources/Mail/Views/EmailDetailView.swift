@@ -251,7 +251,12 @@ struct EmailDetailView: View {
     private func providerDelete(account: MailAccount, messageID: String) async throws {
         switch account.providerType {
         case .gmail:
-            try await GmailProvider().deleteMessage(session: providerSession(account: account), id: messageID)
+            try await GmailService(
+                accountId: account.id,
+                fallbackAccessToken: account.accessToken,
+                fallbackRefreshToken: account.refreshToken,
+                fallbackEmail: account.emailAddress
+            ).deleteMessage(id: messageID)
         case .outlook:
             try await OutlookProvider().deleteMessage(session: providerSession(account: account), id: messageID)
         case .yahoo:
@@ -266,7 +271,12 @@ struct EmailDetailView: View {
     private func providerArchiveMarkRead(account: MailAccount, messageID: String) async throws {
         switch account.providerType {
         case .gmail:
-            try await GmailProvider().markRead(session: providerSession(account: account), id: messageID)
+            try await GmailService(
+                accountId: account.id,
+                fallbackAccessToken: account.accessToken,
+                fallbackRefreshToken: account.refreshToken,
+                fallbackEmail: account.emailAddress
+            ).markMessageRead(id: messageID)
         case .outlook:
             try await OutlookProvider().markRead(session: providerSession(account: account), id: messageID)
         case .yahoo:

@@ -7,6 +7,9 @@ struct ToolsKitApp: App {
         WindowGroup {
             ContentView()
                 .registerOAuthHandler()
+                .onOpenURL { url in
+                    _ = GmailAuthManager.shared.receiveRedirectURL(url)
+                }
         }
     }
 }

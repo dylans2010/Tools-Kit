@@ -347,7 +347,21 @@ struct ManageAccountsView: View {
             let session: MailSession
             switch provider {
             case .gmail:
-                session = try await GmailProvider().authenticate(credentials: .oauth())
+                let tempAccountId = "gmail:\(UUID().uuidString)"
+                let tokens = try await GmailAuthManager.shared.signIn(accountId: tempAccountId)
+                let stableAccountId = "gmail:\(tokens.emailAddress.lowercased())"
+                if stableAccountId != tempAccountId {
+                    _ = GmailTokenStore.shared.save(tokens, accountId: stableAccountId)
+                    GmailTokenStore.shared.delete(accountId: tempAccountId)
+                }
+                session = MailSession(
+                    id: stableAccountId,
+                    provider: .gmail,
+                    email: tokens.emailAddress,
+                    displayName: "Gmail",
+                    accessToken: tokens.accessToken,
+                    refreshToken: tokens.refreshToken
+                )
             case .outlook:
                 session = try await OutlookProvider().authenticate(credentials: .oauth())
             case .yahoo:
