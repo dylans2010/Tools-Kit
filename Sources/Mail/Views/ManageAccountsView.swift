@@ -347,16 +347,17 @@ struct ManageAccountsView: View {
             let session: MailSession
             switch provider {
             case .gmail:
-                session = try await GoogleOAuthManager.shared.authenticate()
+                session = try await OAuthManager.shared.authenticate(provider: .gmail)
             case .outlook:
-                session = try await OutlookProvider().authenticate(credentials: .oauth())
+                session = try await OAuthManager.shared.authenticate(provider: .outlook)
             case .yahoo:
-                session = try await YahooMailProvider().authenticate(credentials: .oauth())
+                session = try await OAuthManager.shared.authenticate(provider: .yahoo)
             case .proton, .imap, .icloud:
                 return
             }
 
-            let account = await MainActor.run { AccountManager.shared.addAccount(session) }
+            await AccountManager.shared.registerAuthenticatedAccount(session)
+            let account = await MainActor.run { AccountManager.shared.activeAccount ?? AccountManager.shared.addAccount(session) }
             onAccountSelected?(account)
         } catch {
             showError(error.localizedDescription)

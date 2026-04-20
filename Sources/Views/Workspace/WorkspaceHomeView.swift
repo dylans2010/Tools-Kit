@@ -505,7 +505,7 @@ struct WorkspaceMailRouterView: View {
     var body: some View {
         Group {
             if let active = mailStore.activeAccount {
-                InboxView(account: active, folder: .inbox)
+                UniversalInboxView()
             } else {
                 ContentUnavailableView(
                     "No Mail Account Connected",

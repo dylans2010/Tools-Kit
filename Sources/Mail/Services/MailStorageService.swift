@@ -185,28 +185,3 @@ final class MailStore: ObservableObject {
         storage.saveAccounts(accounts)
     }
 }
-
-@MainActor
-final class AccountManager {
-    static let shared = AccountManager()
-
-    private init() {}
-
-    @discardableResult
-    func addAccount(_ session: MailSession) -> MailAccount {
-        let account = MailAccount(
-            id: session.id,
-            emailAddress: session.email,
-            providerType: session.provider,
-            displayName: session.displayName,
-            accessTokenExpiration: session.accessTokenExpiration,
-            imapHost: session.imapHost,
-            imapPort: session.imapPort,
-            smtpHost: session.smtpHost,
-            smtpPort: session.smtpPort,
-            isActive: true
-        )
-        MailStore.shared.addOrUpdateAccount(account, makeActive: true)
-        return MailStore.shared.activeAccount ?? account
-    }
-}

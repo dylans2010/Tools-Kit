@@ -82,31 +82,14 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
     func fetchInbox(session: MailSession, page: Int) async throws -> [MailMessage] {
         try validateSessionProvider(session, expected: .yahoo)
         do {
-            let pageSize = 30
-            let start = page * pageSize
-            let url = URL(string: "https://api.mail.yahoo.com/ws/mail/v1.1/jsonrpc")!
-            let request = YahooListRequest(startInfo: start, numInfo: pageSize)
-            let token = try await getAccessToken(for: session)
-            let response: YahooListEnvelope = try await apiRequest(url: url, payload: request, token: token)
-
-            return response.result.messages.map {
-                MailMessage(
-                    id: $0.messageId,
-                    threadId: $0.threadId ?? "msg-\($0.messageId)",
-                    from: $0.from,
-                    to: [],
-                    cc: [],
-                    bcc: [],
-                    subject: $0.subject,
-                    body: $0.snippet ?? "",
-                    htmlBody: nil,
-                    date: yahooDate($0.receivedDate),
-                    isRead: !$0.unread,
-                    isStarred: $0.flagged,
-                    attachments: []
-                )
-            }
+            return try await fetchInboxPrimary(session: session, page: page, forceRefresh: false)
         } catch {
+            let ns = error as NSError
+            if ns.code == 401 {
+                do {
+                    return try await fetchInboxPrimary(session: session, page: page, forceRefresh: true)
+                } catch {}
+            }
             return try await fallbackInbox(session: session, page: page)
         }
     }
@@ -114,26 +97,12 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
     func fetchMessage(session: MailSession, id: String) async throws -> MailMessage {
         try validateSessionProvider(session, expected: .yahoo)
         do {
-            let url = URL(string: "https://api.mail.yahoo.com/ws/mail/v1.1/jsonrpc")!
-            let token = try await getAccessToken(for: session)
-            let response: YahooMessageEnvelope = try await apiRequest(url: url, payload: YahooMessageRequest(mid: id), token: token)
-            let item = response.result.message
-            return MailMessage(
-                id: item.messageId,
-                threadId: item.threadId ?? "msg-\(item.messageId)",
-                from: item.from,
-                to: item.to,
-                cc: item.cc,
-                bcc: item.bcc,
-                subject: item.subject,
-                body: item.bodyText ?? "",
-                htmlBody: item.bodyHTML,
-                date: yahooDate(item.receivedDate),
-                isRead: !item.unread,
-                isStarred: item.flagged,
-                attachments: []
-            )
+            return try await fetchMessagePrimary(session: session, id: id, forceRefresh: false)
         } catch {
+            let ns = error as NSError
+            if ns.code == 401 {
+                do { return try await fetchMessagePrimary(session: session, id: id, forceRefresh: true) } catch {}
+            }
             let list = try await fallbackInbox(session: session, page: 0)
             if let matched = list.first(where: { $0.id == id }) {
                 return matched
@@ -156,9 +125,16 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         try validateSessionProvider(session, expected: .yahoo)
         do {
             let url = URL(string: "https://api.mail.yahoo.com/ws/mail/v1.1/jsonrpc")!
-            let token = try await getAccessToken(for: session)
+            let token = try await getAccessToken(for: session, forceRefresh: false)
             let _: YahooDeleteResponse = try await apiRequest(url: url, payload: YahooDeleteRequest(mid: id), token: token)
         } catch {
+            let ns = error as NSError
+            if ns.code == 401 {
+                let token = try await getAccessToken(for: session, forceRefresh: true)
+                let url = URL(string: "https://api.mail.yahoo.com/ws/mail/v1.1/jsonrpc")!
+                let _: YahooDeleteResponse = try await apiRequest(url: url, payload: YahooDeleteRequest(mid: id), token: token)
+                return
+            }
             try await imapFallback.deleteMessage(session: fallbackSession(session), id: id)
         }
     }
@@ -167,9 +143,16 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         try validateSessionProvider(session, expected: .yahoo)
         do {
             let url = URL(string: "https://api.mail.yahoo.com/ws/mail/v1.1/jsonrpc")!
-            let token = try await getAccessToken(for: session)
+            let token = try await getAccessToken(for: session, forceRefresh: false)
             let _: YahooUpdateResponse = try await apiRequest(url: url, payload: YahooUpdateReadRequest(mid: id, unread: false), token: token)
         } catch {
+            let ns = error as NSError
+            if ns.code == 401 {
+                let token = try await getAccessToken(for: session, forceRefresh: true)
+                let url = URL(string: "https://api.mail.yahoo.com/ws/mail/v1.1/jsonrpc")!
+                let _: YahooUpdateResponse = try await apiRequest(url: url, payload: YahooUpdateReadRequest(mid: id, unread: false), token: token)
+                return
+            }
             try await imapFallback.markRead(session: fallbackSession(session), id: id)
         }
     }
@@ -180,11 +163,29 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor { ASPresentationAnchor() }
 
-    private func getAccessToken(for session: MailSession) async throws -> String {
-        guard let tokens = MailKeychainManager.shared.getOAuthTokens(accountId: session.id) else {
-            throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "No tokens found"])
+    private func getAccessToken(for session: MailSession, forceRefresh: Bool) async throws -> String {
+        try await AccountManager.shared.token(for: session.id, provider: .yahoo, forceRefresh: forceRefresh)
+    }
+
+    private func fetchInboxPrimary(session: MailSession, page: Int, forceRefresh: Bool) async throws -> [MailMessage] {
+        let pageSize = 30
+        let start = page * pageSize
+        let url = URL(string: "https://api.mail.yahoo.com/ws/mail/v1.1/jsonrpc")!
+        let request = YahooListRequest(startInfo: start, numInfo: pageSize)
+        let token = try await getAccessToken(for: session, forceRefresh: forceRefresh)
+        let response: YahooListEnvelope = try await apiRequest(url: url, payload: request, token: token)
+
+        return response.result.messages.map {
+            MailMessage(id: $0.messageId, threadId: $0.threadId ?? "msg-\($0.messageId)", from: $0.from, to: [], cc: [], bcc: [], subject: $0.subject, body: $0.snippet ?? "", htmlBody: nil, date: yahooDate($0.receivedDate), isRead: !$0.unread, isStarred: $0.flagged, attachments: [])
         }
-        return tokens.accessToken
+    }
+
+    private func fetchMessagePrimary(session: MailSession, id: String, forceRefresh: Bool) async throws -> MailMessage {
+        let url = URL(string: "https://api.mail.yahoo.com/ws/mail/v1.1/jsonrpc")!
+        let token = try await getAccessToken(for: session, forceRefresh: forceRefresh)
+        let response: YahooMessageEnvelope = try await apiRequest(url: url, payload: YahooMessageRequest(mid: id), token: token)
+        let item = response.result.message
+        return MailMessage(id: item.messageId, threadId: item.threadId ?? "msg-\(item.messageId)", from: item.from, to: item.to, cc: item.cc, bcc: item.bcc, subject: item.subject, body: item.bodyText ?? "", htmlBody: item.bodyHTML, date: yahooDate(item.receivedDate), isRead: !item.unread, isStarred: item.flagged, attachments: [])
     }
 
     private func fallbackInbox(session: MailSession, page: Int) async throws -> [MailMessage] {
@@ -367,6 +368,9 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+            if let http = response as? HTTPURLResponse, http.statusCode == 401 {
+                throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Yahoo access token rejected"])
+            }
             throw NSError(domain: "YahooProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Yahoo API failed"])
         }
         return try JSONDecoder().decode(T.self, from: data)
