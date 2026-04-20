@@ -393,25 +393,23 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
     private func preferredBody(_ part: GmailMIMEPart?) -> (plain: String, html: String?) {
         guard let part else { return ("", nil) }
 
-        if part.mimeType?.lowercased() == "text/html", let decoded = part.body?.decodedData {
-            let html = String(decoding: decoded, as: UTF8.self)
+        if part.mimeType?.lowercased() == "text/html", let html = part.body?.decodedBody() {
             return (plainText(from: html), html)
         }
 
-        if part.mimeType?.lowercased() == "text/plain", let decoded = part.body?.decodedData {
-            return (String(decoding: decoded, as: UTF8.self), nil)
+        if part.mimeType?.lowercased() == "text/plain", let decoded = part.body?.decodedBody() {
+            return (decoded, nil)
         }
 
         for child in part.parts ?? [] where child.mimeType?.lowercased() == "text/html" {
-            if let decoded = child.body?.decodedData {
-                let html = String(decoding: decoded, as: UTF8.self)
+            if let html = child.body?.decodedBody() {
                 return (plainText(from: html), html)
             }
         }
 
         for child in part.parts ?? [] where child.mimeType?.lowercased() == "text/plain" {
-            if let decoded = child.body?.decodedData {
-                return (String(decoding: decoded, as: UTF8.self), nil)
+            if let decoded = child.body?.decodedBody() {
+                return (decoded, nil)
             }
         }
 
@@ -542,24 +540,6 @@ private struct GmailMIMEPart: Decodable {
     let headers: [GmailHeader]
     let body: GmailBody?
     let parts: [GmailMIMEPart]?
-}
-
-private struct GmailHeader: Decodable {
-    let name: String
-    let value: String
-}
-
-private struct GmailBody: Decodable {
-    let data: String?
-
-    var decodedData: Data? {
-        guard let data else { return nil }
-        let normalized = data
-            .replacingOccurrences(of: "-", with: "+")
-            .replacingOccurrences(of: "_", with: "/")
-        let padded = normalized.padding(toLength: ((normalized.count + 3) / 4) * 4, withPad: "=", startingAt: 0)
-        return Data(base64Encoded: padded)
-    }
 }
 
 private struct GmailSendBody: Encodable {

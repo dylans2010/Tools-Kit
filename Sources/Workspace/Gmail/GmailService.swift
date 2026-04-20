@@ -46,7 +46,7 @@ final class GmailService: @unchecked Sendable {
             queryItems.append(URLQueryItem(name: "pageToken", value: pageToken))
         }
         let url = baseURL.appendingPathComponent("messages").appending(queryItems: queryItems)
-        let response: GmailInboxListResponse = try await request(url: url)
+        let response: GmailInboxListResponse = try await request(url: url, body: Optional<Data>.none)
         return GmailInboxPage(messages: response.messages ?? [], nextPageToken: response.nextPageToken)
     }
 
@@ -54,7 +54,7 @@ final class GmailService: @unchecked Sendable {
         let url = baseURL
             .appendingPathComponent("messages/\(id)")
             .appending(queryItems: [URLQueryItem(name: "format", value: "full")])
-        let response: GmailMessageResponse = try await request(url: url)
+        let response: GmailMessageResponse = try await request(url: url, body: Optional<Data>.none)
 
         let headers = response.payload?.flattenedHeaders() ?? [:]
         let from = headers["from"] ?? "Unknown"
@@ -109,7 +109,7 @@ final class GmailService: @unchecked Sendable {
 
     func deleteMessage(id: String) async throws {
         let url = baseURL.appendingPathComponent("messages/\(id)")
-        try await requestVoid(url: url, method: "DELETE")
+        try await requestVoid(url: url, method: "DELETE", body: Optional<Data>.none)
     }
 
     @discardableResult
