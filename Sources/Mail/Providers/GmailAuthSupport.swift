@@ -1,12 +1,14 @@
 import Foundation
 
 enum GmailAuthSupport {
+    private static let bearerScheme = "Bearer"
+
     static func cleanedAccessToken(from rawToken: String?) -> String? {
         guard let rawToken else { return nil }
         let trimmed = rawToken.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleaned: String
-        if trimmed.lowercased().hasPrefix("bearer ") {
-            cleaned = String(trimmed.dropFirst("bearer ".count)).trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.lowercased().hasPrefix("\(bearerScheme.lowercased()) ") {
+            cleaned = String(trimmed.dropFirst("\(bearerScheme.lowercased()) ".count)).trimmingCharacters(in: .whitespacesAndNewlines)
         } else {
             cleaned = trimmed
         }
@@ -25,6 +27,6 @@ enum GmailAuthSupport {
             InternalLogger.shared.log("\(loggerContext): Google token_type missing; proceeding with access token", level: .warning)
             return true
         }
-        return tokenType.trimmingCharacters(in: .whitespacesAndNewlines).caseInsensitiveCompare("Bearer") == .orderedSame
+        return tokenType.trimmingCharacters(in: .whitespacesAndNewlines).caseInsensitiveCompare(bearerScheme) == .orderedSame
     }
 }
