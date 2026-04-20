@@ -1,5 +1,13 @@
 import Foundation
 
+struct EmailAccount: Identifiable, Codable, Hashable {
+    let id: String
+    let email: String
+    let provider: String
+    let accessToken: String
+    let refreshToken: String?
+}
+
 struct MailAccount: Identifiable, Codable, Hashable {
     let id: String
     var emailAddress: String
@@ -105,6 +113,16 @@ struct MailAccount: Identifiable, Codable, Hashable {
             smtpHost: nil,
             smtpPort: nil,
             isActive: isEnabled
+        )
+    }
+
+    func asEmailAccount() -> EmailAccount {
+        return EmailAccount(
+            id: id,
+            email: emailAddress,
+            provider: providerType.rawValue,
+            accessToken: accessToken ?? "",
+            refreshToken: refreshToken
         )
     }
 }

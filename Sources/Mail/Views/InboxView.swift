@@ -19,6 +19,14 @@ struct InboxView: View {
     @State private var showingManageAccounts = false
     @State private var showingFetchingLabel = false
     @State private var selectedMessage: MailMessage?
+    @State private var mailboxMode: MailboxMode = .account
+    @State private var unifiedThreads: [MailThread] = []
+
+    enum MailboxMode: String, CaseIterable, Identifiable {
+        case account = "Account"
+        case unified = "Unified"
+        var id: String { rawValue }
+    }
 
     var body: some View {
         ZStack {
@@ -39,7 +47,12 @@ struct InboxView: View {
         .searchable(text: $searchText)
         .refreshable {
             showingFetchingLabel = true
-            await viewModel.refresh(fetchFromServer: true)
+            if mailboxMode == .unified {
+                await MailSyncService.shared.syncAll(folder: folder)
+                loadUnifiedThreads()
+            } else {
+                await viewModel.refresh(fetchFromServer: true)
+            }
             showingFetchingLabel = false
         }
         .toolbar {
@@ -79,13 +92,18 @@ struct InboxView: View {
             guard let active = activeAccount else { return }
             viewModel.configure(account: active, folder: folder)
             await viewModel.loadCachedThenRefreshIfNeeded()
+            loadUnifiedThreads()
         }
         .onChange(of: mailStore.activeAccount?.id) { _ in
             Task {
                 guard let active = activeAccount else { return }
                 viewModel.configure(account: active, folder: folder)
                 await viewModel.loadCachedThenRefreshIfNeeded()
+                loadUnifiedThreads()
             }
+        }
+        .onChange(of: mailboxMode) { _ in
+            loadUnifiedThreads()
         }
     }
 
@@ -94,7 +112,7 @@ struct InboxView: View {
     }
 
     private var visibleThreads: [MailThread] {
-        var base = viewModel.localThreads
+        var base = mailboxMode == .unified ? unifiedThreads : viewModel.localThreads
         if filter == .unread {
             base = base.filter { !$0.isRead }
         }
@@ -110,6 +128,16 @@ struct InboxView: View {
 
     private var contentList: some View {
         List {
+            Section {
+                Picker("Mailbox", selection: $mailboxMode) {
+                    ForEach(MailboxMode.allCases) { mode in
+                        Text(mode.rawValue).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+            }
+            .listRowBackground(hexColor("#161622"))
+
             if showingFetchingLabel {
                 Section {
                     HStack(spacing: 10) {
@@ -232,6 +260,15 @@ struct InboxView: View {
 
     private func hexColor(_ value: String) -> Color {
         Color(hex: value) ?? .black
+    }
+
+    private func loadUnifiedThreads() {
+        let all = mailStore.accounts
+            .flatMap { account in
+                MailStorageService.shared.loadThreads(for: "\(account.id)_\(folder.id)")
+            }
+            .sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
+        unifiedThreads = all
     }
 }
 

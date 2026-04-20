@@ -10,11 +10,12 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
     private var authSession: ASWebAuthenticationSession?
     private var nextLinksByPage: [Int: String] = [:]
+    private static let scopes = "Mail.Read Mail.ReadWrite Mail.Send User.Read offline_access"
 
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
-        let remoteVariables = await fetchRemoteVariables()
-        let clientID = try oauthValue(primaryKey: "MICROSOFT_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
-        let redirectURI = try oauthValue(primaryKey: "MICROSOFT_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+        InternalLogger.shared.log("[microsoft][auth] oauth_start", level: .info)
+        let clientID = try AppConfig.requiredString("MICROSOFT_OAUTH_CLIENT_ID")
+        let redirectURI = try AppConfig.requiredString("MICROSOFT_OAUTH_REDIRECT_URI")
 
         let verifier = randomCodeVerifier()
         let challenge = codeChallenge(from: verifier)
@@ -26,7 +27,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             URLQueryItem(name: "response_type", value: "code"),
             URLQueryItem(name: "redirect_uri", value: redirectURI),
             URLQueryItem(name: "response_mode", value: "query"),
-            URLQueryItem(name: "scope", value: "Mail.ReadWrite Mail.Send offline_access"),
+            URLQueryItem(name: "scope", value: Self.scopes),
             URLQueryItem(name: "state", value: state),
             URLQueryItem(name: "code_challenge", value: challenge),
             URLQueryItem(name: "code_challenge_method", value: "S256")
@@ -37,6 +38,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         }
 
         let callback = try await startOAuth(url: url, callbackScheme: URL(string: redirectURI)?.scheme)
+        InternalLogger.shared.log("[microsoft][auth] oauth_callback_received", level: .info)
         let callbackComponents = URLComponents(url: callback, resolvingAgainstBaseURL: false)
         let returnedState = callbackComponents?.queryItems?.first(where: { $0.name == "state" })?.value
         guard returnedState == state else {
@@ -47,6 +49,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         }
 
         let token = try await exchangeCode(code: code, verifier: verifier, clientID: clientID, redirectURI: redirectURI)
+        InternalLogger.shared.log("[microsoft][auth] token_exchange_success", level: .info)
         let profile = try await fetchProfile(accessToken: token.accessToken)
 
         return MailSession(
@@ -264,7 +267,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "redirect_uri", value: redirectURI),
             URLQueryItem(name: "code_verifier", value: verifier),
-            URLQueryItem(name: "scope", value: "Mail.ReadWrite Mail.Send offline_access")
+            URLQueryItem(name: "scope", value: Self.scopes)
         ]
 
         request.httpBody = fields.map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")" }
@@ -285,6 +288,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     }
 
     private func request<T: Decodable, Body: Encodable>(url: URL, method: String = "GET", body: Body? = nil, token: String?) async throws -> T {
+        InternalLogger.shared.log("[microsoft][api] request method=\(method) path=\(url.path)", level: .debug)
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
@@ -297,14 +301,22 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         }
 
         let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
-            throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Graph request failed"])
+        guard let http = response as? HTTPURLResponse else {
+            throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Graph request failed"])
+        }
+        if http.statusCode == 401 {
+            InternalLogger.shared.log("[microsoft][api] unauthorized_401", level: .error)
+            throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Microsoft session expired. Please re-login."])
+        }
+        guard (200...299).contains(http.statusCode) else {
+            throw NSError(domain: "OutlookProvider", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Graph request failed"])
         }
 
         return try JSONDecoder().decode(T.self, from: data)
     }
 
     private func requestVoid<Body: Encodable>(url: URL, method: String = "GET", body: Body? = nil, token: String?) async throws {
+        InternalLogger.shared.log("[microsoft][api] request method=\(method) path=\(url.path)", level: .debug)
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
@@ -317,8 +329,15 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         }
 
         let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
-            throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Graph request failed"])
+        guard let http = response as? HTTPURLResponse else {
+            throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Graph request failed"])
+        }
+        if http.statusCode == 401 {
+            InternalLogger.shared.log("[microsoft][api] unauthorized_401", level: .error)
+            throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Microsoft session expired. Please re-login."])
+        }
+        guard (200...299).contains(http.statusCode) else {
+            throw NSError(domain: "OutlookProvider", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Graph request failed"])
         }
     }
 

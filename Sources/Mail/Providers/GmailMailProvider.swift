@@ -275,8 +275,7 @@ class GmailMailProvider: MailProviderProtocol {
             throw NSError(domain: "GmailMailProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing Gmail refresh token"])
         }
 
-        let remoteVariables = await fetchRemoteVariables()
-        let clientID = try oauthValue(primaryKey: "GMAIL_OAUTH_CLIENT_ID", fallbackKey: "GOOGLE_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
+        let clientID = try AppConfig.requiredString("GOOGLE_OAUTH_CLIENT_ID")
 
         var request = URLRequest(url: URL(string: "https://oauth2.googleapis.com/token")!)
         request.httpMethod = "POST"
