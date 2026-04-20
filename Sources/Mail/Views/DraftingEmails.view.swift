@@ -37,7 +37,6 @@ struct DraftingEmailsView: View {
     struct PromptPreset: Identifiable {
         let id = UUID()
         let title: String
-        let symbol: String
         let subjectHint: String
         let descriptionHint: String
     }
@@ -79,10 +78,10 @@ struct DraftingEmailsView: View {
 
     private var presets: [PromptPreset] {
         [
-            .init(title: "Executive Update", symbol: "briefcase.fill", subjectHint: "Weekly Platform Update", descriptionHint: "Summarize outcomes, blockers, and decisions needed this week."),
-            .init(title: "Polite Follow Up", symbol: "arrow.triangle.2.circlepath", subjectHint: "Following Up On Prior Request", descriptionHint: "Follow up respectfully and ask for a response by a clear deadline."),
-            .init(title: "Proposal", symbol: "chart.bar.doc.horizontal", subjectHint: "Proposal: Q3 Launch Strategy", descriptionHint: "Pitch a plan with timeline, expected impact, and next steps."),
-            .init(title: "Customer Support", symbol: "person.fill.questionmark", subjectHint: "Update On Your Support Case", descriptionHint: "Acknowledge issue, explain the fix, and set expectations for completion.")
+            .init(title: "Executive Update", subjectHint: "Weekly Platform Update", descriptionHint: "Summarize outcomes, blockers, and decisions needed this week."),
+            .init(title: "Polite Follow Up", subjectHint: "Following Up On Prior Request", descriptionHint: "Follow up respectfully and ask for a response by a clear deadline."),
+            .init(title: "Proposal", subjectHint: "Proposal: Q3 Launch Strategy", descriptionHint: "Pitch a plan with timeline, expected impact, and next steps."),
+            .init(title: "Customer Support", subjectHint: "Update On Your Support Case", descriptionHint: "Acknowledge issue, explain the fix, and set expectations for completion.")
         ]
     }
 
@@ -162,7 +161,7 @@ struct DraftingEmailsView: View {
                             subject = preset.subjectHint
                             context = preset.descriptionHint
                         } label: {
-                            Label(preset.title, systemImage: preset.symbol)
+                            Text(preset.title)
                                 .font(.caption.weight(.semibold))
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 8)

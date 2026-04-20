@@ -28,7 +28,7 @@ struct VideoGridView: View {
                    let sharer = participants.first(where: { $0.id == activeScreenShareParticipantID }),
                    let screenTrack = screenShareTracks[activeScreenShareParticipantID] {
                     VStack(alignment: .leading, spacing: 8) {
-                        Label("\(sharer.displayName) is sharing", systemImage: "rectangle.on.rectangle")
+                        Label("\(sharer.displayName) is sharing screen", systemImage: "rectangle.on.rectangle")
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(.secondary)
                         VideoTileView(participant: sharer, track: screenTrack)
