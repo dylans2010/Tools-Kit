@@ -47,7 +47,7 @@ class GmailMailProvider: MailProviderProtocol {
         let listURL = try buildListURL(limit: limit, pageToken: pageToken, query: nil)
         let listResponse: GmailInboxPage = try await requestJSON(url: listURL)
 
-        let ids = listResponse.messages.map { $0.id }
+        let ids = listResponse.messages?.map { $0.id } ?? []
         var threadsByID: [String: [MailMessage]] = [:]
         for id in ids {
             let message = try await fetchMessage(id: id)
@@ -119,7 +119,7 @@ class GmailMailProvider: MailProviderProtocol {
         let listURL = try buildListURL(limit: limit, pageToken: nil, query: query)
         let listResponse: GmailInboxPage = try await requestJSON(url: listURL)
 
-        let ids = listResponse.messages.map { $0.id }
+        let ids = listResponse.messages?.map { $0.id } ?? []
         var threadsByID: [String: [MailMessage]] = [:]
         for id in ids {
             let message = try await fetchMessage(id: id)

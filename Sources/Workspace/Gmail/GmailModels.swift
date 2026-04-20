@@ -34,7 +34,7 @@ struct GmailTokenBundle: Codable, Sendable {
 }
 
 struct GmailInboxPage: Decodable, Sendable {
-    let messages: [GmailMessageRef]
+    let messages: [GmailMessageRef]?
     let nextPageToken: String?
 }
 
