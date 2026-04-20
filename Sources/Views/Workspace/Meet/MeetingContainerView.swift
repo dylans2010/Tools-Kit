@@ -121,6 +121,8 @@ struct MeetingContainerView: View {
                     Label("More meeting tools", systemImage: "wand.and.stars")
                         .font(.subheadline.weight(.semibold))
                 }
+                .accessibilityLabel("More meeting tools")
+                .accessibilityHint("Expands or collapses additional meeting utilities")
                 .padding(12)
                 .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             }

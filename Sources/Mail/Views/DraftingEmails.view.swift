@@ -55,7 +55,6 @@ struct DraftingEmailsView: View {
 
     @State private var generatedBody = ""
     @State private var alternatives: [String] = []
-    @State private var subjectSuggestions: [String] = []
     @State private var isGenerating = false
     @State private var isGeneratingAlternatives = false
     @State private var isProcessingTool = false
@@ -69,11 +68,15 @@ struct DraftingEmailsView: View {
     }
 
     private var canApply: Bool {
-        !generatedBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !trimmedGeneratedBody.isEmpty
     }
 
     private var draftWordCount: Int {
         generatedBody.split { $0.isWhitespace || $0.isNewline }.count
+    }
+
+    private var trimmedGeneratedBody: String {
+        generatedBody.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private var presets: [PromptPreset] {
@@ -246,31 +249,7 @@ struct DraftingEmailsView: View {
                                 .background(Color.white.opacity(0.08), in: Capsule())
                         }
                         .buttonStyle(.plain)
-                        .disabled(generatedBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isProcessingTool)
-                    }
-                }
-            }
-
-            if !subjectSuggestions.isEmpty {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Subject Suggestions")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    ForEach(subjectSuggestions, id: \.self) { suggestion in
-                        Button {
-                            subject = suggestion
-                        } label: {
-                            HStack {
-                                Image(systemName: "text.badge.checkmark")
-                                Text(suggestion)
-                                    .lineLimit(2)
-                            }
-                            .font(.subheadline)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(10)
-                            .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
-                        }
-                        .buttonStyle(.plain)
+                        .disabled(trimmedGeneratedBody.isEmpty || isProcessingTool)
                     }
                 }
             }
@@ -316,7 +295,7 @@ struct DraftingEmailsView: View {
                 } label: {
                     Label("Generate 2", systemImage: "arrow.triangle.branch")
                 }
-                .disabled(generatedBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isGeneratingAlternatives)
+                .disabled(trimmedGeneratedBody.isEmpty || isGeneratingAlternatives)
             }
 
             if alternatives.isEmpty {
@@ -440,16 +419,11 @@ struct DraftingEmailsView: View {
             generatedBody = result.trimmingCharacters(in: .whitespacesAndNewlines)
 
             if subject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                let subjectPrompt = "Generate 3 concise subject line options for this draft, one per line:\n\(generatedBody)"
-                let generatedSubjects = try await AIService.shared.processText(prompt: subjectPrompt)
-                subjectSuggestions = generatedSubjects
-                    .components(separatedBy: .newlines)
-                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\"", with: "") }
-                    .filter { !$0.isEmpty }
-
-                if let first = subjectSuggestions.first {
-                    subject = first
-                }
+                let subjectPrompt = "Create one concise email subject line for this draft:\n\(generatedBody)"
+                let generatedSubject = try await AIService.shared.processText(prompt: subjectPrompt)
+                subject = generatedSubject
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                    .replacingOccurrences(of: "\"", with: "")
             }
         } catch {
             errorMessage = error.localizedDescription
