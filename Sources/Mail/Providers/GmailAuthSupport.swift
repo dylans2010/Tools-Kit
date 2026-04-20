@@ -1,6 +1,8 @@
 import Foundation
 
-enum GmailAuthSupport {
+struct GmailAuthSupport {
+    private init() {}
+
     private static let bearerScheme = "Bearer"
 
     static func cleanedAccessToken(from rawToken: String?) -> String? {

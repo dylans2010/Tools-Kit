@@ -258,7 +258,7 @@ class GmailMailProvider: MailProviderProtocol {
                 self.accessToken = normalized
                 return normalized
             }
-            InternalLogger.shared.log("GmailMailProvider: cached access token is invalid, falling back to keychain/refresh", level: .warning)
+            InternalLogger.shared.log("GmailMailProvider: cached access token is empty/invalid after normalization, falling back to keychain/refresh", level: .warning)
         }
 
         if let stored = MailKeychainManager.shared.getOAuthTokens(accountId: account.id) {
