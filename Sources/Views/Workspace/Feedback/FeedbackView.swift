@@ -36,7 +36,7 @@ struct FeedbackView: View {
 
                         Text("Minimum \(minLength) characters")
                             .font(.caption)
-                            .foregroundStyle(isMessageValid ? .secondary : .red)
+                            .foregroundStyle(isMessageValid ? Color.secondary : Color.red)
                     }
 
                     Section(header: Text("Category")) {
