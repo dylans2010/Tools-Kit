@@ -175,10 +175,8 @@ final class GmailService {
         }
 
         if T.self == GmailEmptyResponse.self {
-            guard let empty = GmailEmptyResponse() as? T else {
-                throw GmailServiceError.invalidResponse
-            }
-            return empty
+            // Safe because this branch is guarded by an exact runtime type check above.
+            return GmailEmptyResponse() as! T
         }
 
         return try JSONDecoder().decode(T.self, from: data)

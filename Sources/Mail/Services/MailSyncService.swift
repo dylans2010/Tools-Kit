@@ -58,18 +58,36 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
 
             switch account.provider {
             case .gmail:
+                let accountId = account.id
+                let fallbackAccessToken = account.accessToken
+                let fallbackRefreshToken = account.refreshToken
+                let fallbackEmail = account.emailAddress
                 let gmail = GmailService(
-                    accountId: account.id,
-                    fallbackAccessToken: account.accessToken,
-                    fallbackRefreshToken: account.refreshToken,
-                    fallbackEmail: account.emailAddress
+                    accountId: accountId,
+                    fallbackAccessToken: fallbackAccessToken,
+                    fallbackRefreshToken: fallbackRefreshToken,
+                    fallbackEmail: fallbackEmail
                 )
                 let pageToken = gmailPageTokensByAccount[account.id]?[currentOffset] ?? nil
                 let page = try await gmail.fetchInbox(maxResults: pageSize, pageToken: pageToken)
-                var messages: [MailMessage] = []
-                for messageRef in page.messages {
-                    let message = try await gmail.fetchMessage(id: messageRef.id)
-                    messages.append(message)
+                let messages = try await withThrowingTaskGroup(of: MailMessage.self, returning: [MailMessage].self) { group in
+                    for messageRef in page.messages {
+                        let messageId = messageRef.id
+                        group.addTask {
+                            try await GmailService(
+                                accountId: accountId,
+                                fallbackAccessToken: fallbackAccessToken,
+                                fallbackRefreshToken: fallbackRefreshToken,
+                                fallbackEmail: fallbackEmail
+                            ).fetchMessage(id: messageId)
+                        }
+                    }
+
+                    var collected: [MailMessage] = []
+                    for try await message in group {
+                        collected.append(message)
+                    }
+                    return collected
                 }
                 groupedThreads = groupMessages(messages)
                 if let nextPageToken = page.nextPageToken {
