@@ -140,7 +140,7 @@ extension MailProviderProtocol {
         return threads.compactMap { thread in
             guard let last = thread.messages.last else { return nil }
             return EmailMessage(
-                uid: Int(last.id) ?? Int.random(in: 1...Int.max),
+                uid: stableUID(from: last.id),
                 subject: last.subject,
                 sender: last.from,
                 date: last.date,
@@ -157,7 +157,7 @@ extension MailProviderProtocol {
         let threads = try await fetchThreads(in: .inbox, limit: 50, offset: 0)
         if let message = threads.flatMap(\.messages).first(where: { $0.id == id }) {
             return EmailMessage(
-                uid: Int(message.id) ?? Int.random(in: 1...Int.max),
+                uid: stableUID(from: message.id),
                 subject: message.subject,
                 sender: message.from,
                 date: message.date,
@@ -179,5 +179,14 @@ extension MailProviderProtocol {
 
     func listAccounts() -> [EmailAccount] {
         []
+    }
+
+    private func stableUID(from id: String) -> Int {
+        if let parsed = Int(id), parsed > 0 { return parsed }
+        let hashed = id.unicodeScalars.reduce(into: UInt64(5381)) { result, scalar in
+            result = ((result << 5) &+ result) &+ UInt64(scalar.value)
+        }
+        let safe = hashed % UInt64(Int.max)
+        return Int(max(safe, 1))
     }
 }

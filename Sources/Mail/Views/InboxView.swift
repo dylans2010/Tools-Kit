@@ -265,10 +265,14 @@ struct InboxView: View {
     private func loadUnifiedThreads() {
         let all = mailStore.accounts
             .flatMap { account in
-                MailStorageService.shared.loadThreads(for: "\(account.id)_\(folder.id)")
+                MailStorageService.shared.loadThreads(for: folderKey(account: account))
             }
             .sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
         unifiedThreads = all
+    }
+
+    private func folderKey(account: MailAccount) -> String {
+        "\(account.id)_\(folder.id)"
     }
 }
 
