@@ -46,7 +46,7 @@ struct InboxView: View {
                 Button {
                     showingUniversalInbox = true
                 } label: {
-                    Image(systemName: "chevron.left.circle")
+                    Image(systemName: "tray.full")
                 }
             }
 

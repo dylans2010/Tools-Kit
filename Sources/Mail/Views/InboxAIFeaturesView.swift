@@ -261,23 +261,44 @@ struct InboxAIFeaturesView: View {
         errorMessage = nil
 
         let unreadThreads = allUnreadThreads()
+        let latestMessages = unreadThreads.compactMap(\.messages.last)
+        let digestInput = latestMessages.prefix(25).map {
+            """
+            Subject: \($0.subject)
+            From: \($0.from)
+            Date: \($0.date.formatted(date: .abbreviated, time: .shortened))
+            Body: \($0.body.prefix(350))
+            """
+        }.joined(separator: "\n\n---\n\n")
 
         do {
-            async let catchUpTask = MailAIService.shared.catchUp(unreadThreads: unreadThreads)
-            async let priorityTask = MailAIService.shared.priorityDigest(unreadThreads: unreadThreads)
+            async let catchUpTask = AIService.shared.processText(
+                prompt: """
+                Summarize these unread emails into concise markdown with sections:
+                ## TL;DR
+                ## Important Updates
+                ## Action Items
+                
+                Emails:
+                \(digestInput)
+                """
+            )
+            async let priorityTask = AIService.shared.processText(
+                prompt: """
+                Review these unread emails and provide a markdown "Priority Digest" that identifies what should be handled first and why.
+                Include quick triage guidance.
+                
+                Emails:
+                \(digestInput)
+                """
+            )
 
-            let (summary, digest) = try await (catchUpTask, priorityTask)
+            let (summary, priorityDigest) = try await (catchUpTask, priorityTask)
 
             await MainActor.run {
                 self.catchUpSummary = summary
-                self.prioritySummary = digest.summaryMarkdown
-                // Map thread IDs back to actual threads
-                self.priorityEmails = unreadThreads.filter { digest.priorityThreadIDs.contains($0.id) }
-                // If priorityThreads is empty but digest has IDs, maybe they were not in the unread list we provided?
-                // Let's ensure we have some results.
-                if self.priorityEmails.isEmpty && !unreadThreads.isEmpty {
-                    self.priorityEmails = Array(unreadThreads.prefix(3))
-                }
+                self.prioritySummary = priorityDigest
+                self.priorityEmails = priorityThreads(from: unreadThreads, using: priorityDigest)
                 self.isAnalyzing = false
             }
         } catch {
@@ -286,6 +307,18 @@ struct InboxAIFeaturesView: View {
                 self.isAnalyzing = false
             }
         }
+    }
+
+    private func priorityThreads(from threads: [MailThread], using digest: String) -> [MailThread] {
+        let loweredDigest = digest.lowercased()
+        let matched = threads.filter { thread in
+            guard let message = thread.messages.last else { return false }
+            return loweredDigest.contains(message.subject.lowercased()) || loweredDigest.contains(senderName(from: message.from).lowercased())
+        }
+        if matched.isEmpty {
+            return Array(threads.prefix(5))
+        }
+        return Array(matched.prefix(5))
     }
 
     private func allUnreadThreads() -> [MailThread] {
