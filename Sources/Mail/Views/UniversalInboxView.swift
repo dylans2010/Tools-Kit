@@ -14,6 +14,7 @@ struct UniversalInboxView: View {
     @State private var showFolderEditorForAccount: MailAccount?
     @State private var selectedMessage: MailMessage?
     @State private var showCompose = false
+    @State private var navigationTarget: InboxNavigationTarget?
 
     var body: some View {
         List {
@@ -59,6 +60,11 @@ struct UniversalInboxView: View {
         .onChange(of: accountManager.accounts.map(\.id).joined(separator: ",")) { _ in
             loadFolderState()
         }
+        .navigationDestination(item: $navigationTarget) { destination in
+            if let account = accountManager.account(for: destination.accountId) {
+                InboxView(account: account, folder: destination.folder)
+            }
+        }
     }
 
     private var isUnifiedMode: Bool { groupingMode == "unified" }
@@ -99,24 +105,32 @@ struct UniversalInboxView: View {
         Section("All Accounts") {
             ForEach(unifiedMessages()) { mail in
                 messageRow(mail, account: accountManager.account(for: mail.accountId))
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        openInbox(accountId: mail.accountId, folderName: mappedFolder(for: mail.message.id, accountId: mail.accountId))
+                    }
             }
         }
     }
 
     private func accountHeader(_ account: MailAccount) -> some View {
-        Button {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                expandedAccountId = expandedAccountId == account.id ? "" : account.id
-                accountManager.setActiveAccount(account.id)
-            }
-        } label: {
-            HStack {
+        HStack(spacing: 12) {
+            Button {
+                openInbox(for: account, folderName: selectedFolder(for: account))
+            } label: {
                 Label(account.emailAddress, systemImage: providerIcon(account.providerType))
-                Spacer()
-                Image(systemName: expandedAccountId == account.id ? "chevron.up" : "chevron.down")
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .buttonStyle(.plain)
+
+            Button {
+                toggleAccountSection(account)
+            } label: {
+                Image(systemName: expandedAccountId == account.id ? "chevron.up" : "chevron.down")
+                    .padding(.horizontal, 4)
+            }
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
     }
 
     private func folderPicker(_ account: MailAccount) -> some View {
@@ -132,6 +146,7 @@ struct UniversalInboxView: View {
                             .background(selected ? Color.accentColor.opacity(0.24) : Color.secondary.opacity(0.15), in: Capsule())
                             .onTapGesture {
                                 selectedFolderByAccount[account.id] = folder
+                                openInbox(for: account, folderName: folder)
                             }
                     }
                 }
@@ -154,7 +169,12 @@ struct UniversalInboxView: View {
 
         return AnyView(
             ForEach(rows) { message in
-                messageRow(ScopedMailMessage(accountId: account.id, message: message), account: account)
+                let scoped = ScopedMailMessage(accountId: account.id, message: message)
+                messageRow(scoped, account: account)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        openInbox(for: account, folderName: mappedFolder(for: scoped.message.id, accountId: scoped.accountId))
+                    }
             }
         )
     }
@@ -301,6 +321,43 @@ struct UniversalInboxView: View {
         }
     }
 
+    private func toggleAccountSection(_ account: MailAccount) {
+        withAnimation(.easeInOut(duration: 0.2)) {
+            expandedAccountId = expandedAccountId == account.id ? "" : account.id
+            accountManager.setActiveAccount(account.id)
+        }
+    }
+
+    private func openInbox(for account: MailAccount, folderName: String = "Inbox") {
+        accountManager.setActiveAccount(account.id)
+        navigationTarget = InboxNavigationTarget(accountId: account.id, folder: mailFolder(for: folderName))
+    }
+
+    private func openInbox(accountId: String, folderName: String = "Inbox") {
+        guard let account = accountManager.account(for: accountId) else { return }
+        openInbox(for: account, folderName: folderName)
+    }
+
+    private func mailFolder(for name: String) -> MailFolder {
+        let normalized = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        switch normalized.lowercased() {
+        case "sent":
+            return .sent
+        case "drafts":
+            return .drafts
+        case "important", "starred":
+            return MailFolder(id: "STARRED", name: "Important", type: .starred)
+        case "deleted", "trash":
+            return .trash
+        case "archive":
+            return MailFolder(id: "ARCHIVE", name: "Archive", type: .custom)
+        case "inbox", "":
+            return .inbox
+        default:
+            return MailFolder(id: normalized.uppercased(), name: normalized, type: .custom)
+        }
+    }
+
     private func providerSession(for account: MailAccount) -> MailSession {
         MailSession(id: account.id, provider: account.providerType, email: account.emailAddress, displayName: account.displayName, accessTokenExpiration: account.accessTokenExpiration, imapHost: account.imapHost, imapPort: account.imapPort, smtpHost: account.smtpHost, smtpPort: account.smtpPort)
     }
@@ -324,6 +381,13 @@ struct UniversalInboxView: View {
         case .imap, .icloud: try await IMAPProvider().markRead(session: providerSession(for: account), id: messageId)
         }
     }
+}
+
+private struct InboxNavigationTarget: Identifiable, Hashable {
+    let accountId: String
+    let folder: MailFolder
+
+    var id: String { "\(accountId)_\(folder.id)" }
 }
 
 private struct ScopedMailMessage: Identifiable {
