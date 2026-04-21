@@ -637,7 +637,7 @@ private struct InboxMessageDetailView: View {
                     Include only what matters now and any clear next step.
 
                     Email:
-\(input)
+                    \(input)
                     """,
                     systemPrompt: "You are a concise executive email summarizer. Prefer short bullets and factual statements only."
                 )
