@@ -150,6 +150,8 @@ struct EmailComposingView: View {
                         messageBody = result.body
                     }
                 }
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showingAIWrite) {
                 AIWriteView { generated in
@@ -159,11 +161,15 @@ struct EmailComposingView: View {
                         messageBody += "\n\n" + generated
                     }
                 }
+                .presentationDetents([.height(320)])
+                .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showingTranslateSheet) {
                 TranslateEmailView(sourceText: messageBody) { translated in
                     messageBody = translated
                 }
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showingLinkSheet) {
                 linkComposerSheet
@@ -303,16 +309,16 @@ struct EmailComposingView: View {
             VStack(spacing: 12) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
-                        toolIconButton(icon: "sparkles", color: .purple) { showingAIWrite = true }
-                        toolIconButton(icon: "wand.and.stars", color: .indigo) { showingAIPanel = true }
-                        toolIconButton(icon: "globe", color: .blue) { showingTranslateSheet = true }
-                        toolIconButton(icon: "calendar.badge.clock", color: .green) { showingScheduleSheet = true }
-                        toolIconButton(icon: "paperclip", color: .orange) { showingAttachmentPicker = true }
-                        toolIconButton(icon: "doc.viewfinder", color: .teal) { showingDocumentScanner = true }
-                        toolIconButton(icon: "tablecells", color: .cyan) { showingTableBuilder = true }
-                        toolIconButton(icon: "link", color: .blue) { showingLinkSheet = true }
-                        toolIconButton(icon: "pencil.and.outline", color: .pink) { showingDrawingSheet = true }
-                        toolIconButton(icon: "waveform", color: .red) { showingAudioPicker = true }
+                        toolIconButton(icon: "sparkles") { showingAIWrite = true }
+                        toolIconButton(icon: "wand.and.stars") { showingAIPanel = true }
+                        toolIconButton(icon: "globe") { showingTranslateSheet = true }
+                        toolIconButton(icon: "calendar.badge.clock") { showingScheduleSheet = true }
+                        toolIconButton(icon: "paperclip") { showingAttachmentPicker = true }
+                        toolIconButton(icon: "doc.viewfinder") { showingDocumentScanner = true }
+                        toolIconButton(icon: "tablecells") { showingTableBuilder = true }
+                        toolIconButton(icon: "link") { showingLinkSheet = true }
+                        toolIconButton(icon: "pencil.and.outline") { showingDrawingSheet = true }
+                        toolIconButton(icon: "waveform") { showingAudioPicker = true }
                     }
                     .padding(.vertical, 4)
                 }
@@ -336,14 +342,13 @@ struct EmailComposingView: View {
         }
     }
 
-    private func toolIconButton(icon: String, color: Color, action: @escaping () -> Void) -> some View {
+    private func toolIconButton(icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: icon)
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundColor(.white)
-                .frame(width: 44, height: 44)
-                .background(color.gradient, in: RoundedRectangle(cornerRadius: 12))
-                .shadow(color: color.opacity(0.3), radius: 4, x: 0, y: 2)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(.primary)
+                .frame(width: 34, height: 34)
+                .background(Color(.tertiarySystemFill), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
         .buttonStyle(.plain)
     }
