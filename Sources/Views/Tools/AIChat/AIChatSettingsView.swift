@@ -105,6 +105,27 @@ struct AIChatSettingsView: View {
                 }
                 .padding(.vertical, 4)
             }
+            .scrollClipDisabled()
+
+            if let provider = selectedProvider {
+                HStack(spacing: 10) {
+                    Image(systemName: provider.icon)
+                        .font(.headline)
+                        .foregroundStyle(.blue)
+                        .frame(width: 34, height: 34)
+                        .background(.blue.opacity(0.12), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("\(provider.name) selected")
+                            .font(.subheadline.weight(.semibold))
+                        Text("Keys are stored per provider and preserved when switching.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                }
+                .padding(10)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            }
         } header: {
             Text("AI Provider")
         } footer: {
@@ -649,20 +670,23 @@ struct ProviderChip: View {
             VStack(spacing: 6) {
                 Image(systemName: provider.icon)
                     .font(.title3)
-                    .foregroundColor(isSelected ? .white : .blue)
+                    .foregroundStyle(isSelected ? .white : .blue)
                 Text(provider.name)
                     .font(.caption2)
                     .fontWeight(.medium)
-                    .foregroundColor(isSelected ? .white : .primary)
+                    .foregroundStyle(isSelected ? .white : .primary)
                     .lineLimit(1)
             }
             .frame(width: 80, height: 64)
-            .background(isSelected ? Color.blue : Color(.secondarySystemGroupedBackground))
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? Color.blue : Color.gray.opacity(0.2), lineWidth: 1.5)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(isSelected ? AnyShapeStyle(LinearGradient(colors: [.blue, .indigo], startPoint: .topLeading, endPoint: .bottomTrailing)) : AnyShapeStyle(.ultraThinMaterial))
             )
+            .overlay {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(isSelected ? .blue.opacity(0.85) : .gray.opacity(0.25), lineWidth: 1.2)
+            }
+            .shadow(color: isSelected ? .blue.opacity(0.25) : .clear, radius: 8, y: 4)
         }
     }
 }
@@ -680,6 +704,8 @@ struct APIKeyRowView: View {
     @State private var validationResult: Bool? = nil
     @State private var showKey: Bool = false
     @State private var showCopied = false
+
+    private var draftKeyStorage: String { "aichat.provider.draft.\(providerID)" }
 
     private let keyManager = APIKeyManager.shared
     private let registry = AIProviderRegistry.shared
@@ -751,10 +777,16 @@ struct APIKeyRowView: View {
         }
         .onAppear { loadSavedKey() }
         .onChange(of: providerID) { _ in loadSavedKey() }
+        .onChange(of: key) { newValue in
+            UserDefaults.standard.set(newValue, forKey: draftKeyStorage)
+        }
     }
 
     private func loadSavedKey() {
-        if let saved = keyManager.getKey(for: providerID) {
+        if let draft = UserDefaults.standard.string(forKey: draftKeyStorage), !draft.isEmpty {
+            key = draft
+            isSaved = keyManager.getKey(for: providerID) == draft
+        } else if let saved = keyManager.getKey(for: providerID) {
             key = saved
             isSaved = true
         } else {
@@ -766,6 +798,7 @@ struct APIKeyRowView: View {
 
     private func saveKey() {
         guard keyManager.saveKey(key, for: providerID) else { return }
+        UserDefaults.standard.set(key, forKey: draftKeyStorage)
         isSaved = true
         validationResult = nil
         Task { await modelCatalog.loadModels(for: providerID, force: true) }
@@ -773,6 +806,7 @@ struct APIKeyRowView: View {
 
     private func deleteKey() {
         keyManager.deleteKey(for: providerID)
+        UserDefaults.standard.removeObject(forKey: draftKeyStorage)
         key = ""
         isSaved = false
         validationResult = nil

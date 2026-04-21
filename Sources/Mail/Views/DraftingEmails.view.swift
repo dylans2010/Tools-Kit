@@ -50,6 +50,14 @@ struct DraftingEmailsView: View {
         var id: String { rawValue }
     }
 
+    enum Audience: String, CaseIterable, Identifiable, Hashable {
+        case client = "Client"
+        case internalTeam = "Internal Team"
+        case executive = "Executive"
+        case partner = "Partner"
+        var id: String { rawValue }
+    }
+
     @Environment(\.dismiss) private var dismiss
 
     @State private var recipient = ""
@@ -61,10 +69,25 @@ struct DraftingEmailsView: View {
     @State private var selectedUrgency: Urgency = .normal
     @State private var includeActionItems = true
     @State private var includeSubjectSuggestions = false
+    @State private var includeBulletSummary = true
+    @State private var includeCallToAction = true
+    @State private var includeMeetingSlots = false
+    @State private var selectedAudience: Audience = .client
+    @State private var keywords = ""
+    @State private var selectedFramework = "Standard"
 
     @State private var generatedBody = ""
     @State private var isGenerating = false
     @State private var errorMessage: String?
+    @State private var showTemplatesSheet = false
+
+    private let frameworks = ["Standard", "AIDA", "PAS", "SCQA", "STAR"]
+    private let quickTemplates = [
+        ("Status + Blockers", "Provide current status, key blockers, and requested support."),
+        ("Follow-up Reminder", "Friendly reminder with clear next steps and deadline."),
+        ("Meeting Confirmation", "Confirm meeting details and agenda in concise format."),
+        ("Customer Escalation", "Summarize issue impact, urgency, and ask for immediate action.")
+    ]
 
     let currentBody: String
     let onApply: (DraftingEmailResult) -> Void
@@ -94,6 +117,8 @@ struct DraftingEmailsView: View {
                                     .frame(minHeight: 120)
                                     .padding(8)
                                     .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+
+                                customTextField("Keywords:", text: $keywords, placeholder: "deadline, budget, next steps")
                             }
                         }
 
@@ -103,9 +128,17 @@ struct DraftingEmailsView: View {
                                 chipSelector(title: "Style", selection: $selectedStyle, options: MailStyle.allCases)
                                 chipSelector(title: "Length", selection: $selectedLength, options: OutputLength.allCases)
                                 chipSelector(title: "Urgency", selection: $selectedUrgency, options: Urgency.allCases)
+                                chipSelector(title: "Audience", selection: $selectedAudience, options: Audience.allCases)
+                                chipSelector(title: "Framework", selection: $selectedFramework, options: frameworks)
                                 Toggle("Include action items", isOn: $includeActionItems)
                                     .font(.caption.bold())
                                 Toggle("Include subject suggestions", isOn: $includeSubjectSuggestions)
+                                    .font(.caption.bold())
+                                Toggle("Include bullet summary", isOn: $includeBulletSummary)
+                                    .font(.caption.bold())
+                                Toggle("Include call to action", isOn: $includeCallToAction)
+                                    .font(.caption.bold())
+                                Toggle("Include meeting time suggestions", isOn: $includeMeetingSlots)
                                     .font(.caption.bold())
                             }
                         }
@@ -122,6 +155,9 @@ struct DraftingEmailsView: View {
             .toolbarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .bottom) {
                 actionBar
+            }
+            .sheet(isPresented: $showTemplatesSheet) {
+                templateSheet
             }
             .onAppear {
                 if generatedBody.isEmpty {
@@ -152,6 +188,15 @@ struct DraftingEmailsView: View {
                 .padding(.vertical, 12)
                 .background(Color.white.opacity(0.08), in: Capsule())
                 .foregroundStyle(.white)
+
+            Button {
+                showTemplatesSheet = true
+            } label: {
+                Image(systemName: "square.grid.2x2")
+                    .frame(width: 44, height: 44)
+                    .background(Color.white.opacity(0.1), in: Circle())
+            }
+            .buttonStyle(.plain)
 
             Button {
                 Task { await generateDraft() }
@@ -231,6 +276,32 @@ struct DraftingEmailsView: View {
         }
     }
 
+    private func chipSelector(title: String, selection: Binding<String>, options: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(options, id: \.self) { option in
+                        Button {
+                            selection.wrappedValue = option
+                        } label: {
+                            Text(option)
+                                .font(.caption.bold())
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(selection.wrappedValue == option ? Color.blue : Color.white.opacity(0.1), in: Capsule())
+                                .foregroundStyle(selection.wrappedValue == option ? .white : .secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+    }
+
     private var outputPreview: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
@@ -277,6 +348,33 @@ struct DraftingEmailsView: View {
         )
     }
 
+    private var templateSheet: some View {
+        NavigationStack {
+            List {
+                Section("Quick Templates") {
+                    ForEach(quickTemplates, id: \.0) { template in
+                        Button {
+                            context = template.1
+                            if subject.isEmpty { subject = template.0 }
+                            showTemplatesSheet = false
+                        } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(template.0).font(.subheadline.weight(.semibold))
+                                Text(template.1).font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Draft Tools")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showTemplatesSheet = false }
+                }
+            }
+        }
+    }
+
     @MainActor
     private func generateDraft() async {
         isGenerating = true
@@ -287,8 +385,14 @@ struct DraftingEmailsView: View {
             Write a \(selectedLength.rawValue.lowercased()) \(selectedStyle.rawValue.lowercased()) email.
             Goal: \(selectedGoal.rawValue).
             Urgency: \(selectedUrgency.rawValue).
+            Audience: \(selectedAudience.rawValue).
+            Copywriting framework: \(selectedFramework).
             Include action items: \(includeActionItems ? "yes" : "no").
             Include subject suggestions: \(includeSubjectSuggestions ? "yes" : "no").
+            Include bullet summary: \(includeBulletSummary ? "yes" : "no").
+            Include call to action: \(includeCallToAction ? "yes" : "no").
+            Include suggested meeting slots: \(includeMeetingSlots ? "yes" : "no").
+            Keywords to include when relevant: \(keywords).
             Context: \(context)
             Return only the email body.
             """
