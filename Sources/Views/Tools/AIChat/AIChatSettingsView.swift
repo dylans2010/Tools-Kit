@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct AIChatSettingsView: View {
     @Binding var settings: AIChatSettings
@@ -14,6 +15,7 @@ struct AIChatSettingsView: View {
     @State private var cloudStatusMessage: String?
     @State private var isSigningOut = false
     @State private var signOutStatusMessage: String?
+    @State private var showFreeOpenRouterSheet = false
 
     private let registry = AIProviderRegistry.shared
 
@@ -56,6 +58,30 @@ struct AIChatSettingsView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") { dismiss() }
+                }
+            }
+            .sheet(isPresented: $showFreeOpenRouterSheet) {
+                NavigationStack {
+                    List(freeOpenRouterModels) { model in
+                        Button {
+                            settings.modelID = model.id
+                            showFreeOpenRouterSheet = false
+                        } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(model.name)
+                                    .font(.subheadline.weight(.semibold))
+                                Text(model.id)
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+                    .navigationTitle("Free OpenRouter Models")
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Done") { showFreeOpenRouterSheet = false }
+                        }
+                    }
                 }
             }
         }
@@ -107,7 +133,7 @@ struct AIChatSettingsView: View {
 
     private var aiUsageSection: some View {
         Section {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 12) {
                 Picker("Model Source", selection: $settings.aiModelSource) {
                     ForEach(AIModelSource.allCases, id: \.self) { source in
                         Text(source.rawValue).tag(source)
@@ -115,9 +141,23 @@ struct AIChatSettingsView: View {
                 }
                 .pickerStyle(.segmented)
 
-                Text(featureCheck.usageMessage())
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundColor(settings.aiModelSource == .ownKey ? .green : .blue)
+                VStack(alignment: .leading, spacing: 8) {
+                    Label(featureCheck.usageMessage(), systemImage: settings.aiModelSource == .ownKey ? "checkmark.shield" : "bolt.badge.clock")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(settings.aiModelSource == .ownKey ? .green : .blue)
+
+                    HStack(spacing: 8) {
+                        Text(settings.aiModelSource == .ownKey ? "Unlimited requests with your API key." : "App key mode currently rate-limited.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
+                }
+                .padding(12)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill((settings.aiModelSource == .ownKey ? Color.green : Color.blue).opacity(0.12))
+                )
             }
             .padding(.vertical, 4)
         } header: {
@@ -161,6 +201,16 @@ struct AIChatSettingsView: View {
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
+                    }
+
+                    if settings.selectedProviderID == "openrouter", model.name.localizedCaseInsensitiveContains("free") || model.id.localizedCaseInsensitiveContains("free") {
+                        Button {
+                            showFreeOpenRouterSheet = true
+                        } label: {
+                            Label("Browse Free OpenRouter Models", systemImage: "list.bullet.rectangle")
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
                     }
                 }
             } else if modelCatalog.loadingProviders.contains(settings.selectedProviderID) {
@@ -540,6 +590,12 @@ private extension AIChatSettingsView {
         }
     }
 
+    var freeOpenRouterModels: [AIModel] {
+        modelCatalog.models(for: "openrouter")
+            .filter { $0.name.localizedCaseInsensitiveContains("free") || $0.id.localizedCaseInsensitiveContains("free") }
+            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+    }
+
     var currentMode: AppMode {
         if musicMode.isMusicModeEnabled { return .music }
         if workoutsMode.isWorkoutsModeEnabled { return .workouts }
@@ -623,6 +679,7 @@ struct APIKeyRowView: View {
     @State private var isValidating: Bool = false
     @State private var validationResult: Bool? = nil
     @State private var showKey: Bool = false
+    @State private var showCopied = false
 
     private let keyManager = APIKeyManager.shared
     private let registry = AIProviderRegistry.shared
@@ -657,6 +714,17 @@ struct APIKeyRowView: View {
                 .disabled(key.trimmingCharacters(in: .whitespaces).isEmpty)
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
+
+                Button(showCopied ? "Copied" : "Copy") {
+                    UIPasteboard.general.string = key
+                    withAnimation { showCopied = true }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                        showCopied = false
+                    }
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .disabled(key.trimmingCharacters(in: .whitespaces).isEmpty)
 
                 if isSaved {
                     Button("Delete") { deleteKey() }
