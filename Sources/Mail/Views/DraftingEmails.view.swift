@@ -7,6 +7,8 @@ struct DraftingEmailResult {
 }
 
 struct DraftingEmailsView: View {
+    private static let defaultCreativity = 0.55
+
     enum MailStyle: String, CaseIterable, Identifiable, Hashable {
         case professional = "Professional"
         case friendly = "Friendly"
@@ -86,7 +88,7 @@ struct DraftingEmailsView: View {
     @State private var includeCallToAction = true
     @State private var includeMeetingTimes = false
     @State private var includeBulletSummary = false
-    @State private var creativity: Double = 0.55
+    @State private var creativity: Double = defaultCreativity
     @State private var requiredPoints = ""
     @State private var avoidPhrases = ""
     @State private var additionalConstraints = ""

@@ -43,7 +43,7 @@ struct DrawingBoardView: View {
             case .arrow: return "arrow.up.right"
             case .doubleArrow: return "arrow.left.and.right"
             case .rectangle: return "rectangle"
-            case .roundedRectangle: return "capsule"
+            case .roundedRectangle: return "rectangle.roundedbottom"
             case .ellipse: return "oval"
             case .triangle: return "triangle"
             case .diamond: return "diamond"
@@ -110,9 +110,13 @@ struct DrawingBoardView: View {
         formatter.dateFormat = "yyyy-MM-dd_HHmmssSSS"
         return formatter
     }()
+    /// Number of paint dots emitted per recorded point for the spray brush.
     private let sprayDotCount = 8
+    /// Number of alternating peaks used to generate a zigzag between two drag points.
     private let zigzagSegmentCount = 10
+    /// Vertex count for star construction; keep this even so alternating outer/inner points render correctly.
     private let starVertexCount = 10
+    private let highlighterOpacity = 0.32
 
     var body: some View {
         NavigationStack {
@@ -629,7 +633,7 @@ struct DrawingBoardView: View {
     private func effectiveOpacity(for tool: Tool) -> Double {
         switch tool {
         case .highlighter:
-            return 0.32
+            return highlighterOpacity
         case .marker:
             return min(1, strokeOpacity * 0.85)
         case .neonPen:
