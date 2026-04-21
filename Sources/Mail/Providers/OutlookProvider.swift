@@ -14,7 +14,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
         let remoteVariables = await fetchRemoteVariables()
         let clientID = try oauthValue(primaryKey: "MICROSOFT_CLIENT_ID", fallbackKey: "MICROSOFT_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
-        let redirectURI = try oauthValue(primaryKey: "MICROSOFT_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+        let redirectURI = "msauth.com.dylans2010.ToolsKit://auth"
 
         let verifier = randomCodeVerifier()
         let challenge = codeChallenge(from: verifier)
@@ -36,8 +36,8 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid OAuth URL"])
         }
 
-        InternalLogger.shared.log("OAuth start provider=microsoft callbackScheme=\(URL(string: redirectURI)?.scheme ?? "unknown")", level: .info)
-        let callback = try await startOAuth(url: url, callbackScheme: URL(string: redirectURI)?.scheme)
+        InternalLogger.shared.log("OAuth start provider=microsoft callbackScheme=msauth.com.dylans2010.ToolsKit", level: .info)
+        let callback = try await startOAuth(url: url, callbackScheme: "msauth.com.dylans2010.ToolsKit")
         let callbackComponents = URLComponents(url: callback, resolvingAgainstBaseURL: false)
         let returnedState = callbackComponents?.queryItems?.first(where: { $0.name == "state" })?.value
         guard returnedState == state else {

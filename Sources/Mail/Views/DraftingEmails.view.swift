@@ -34,108 +34,83 @@ struct DraftingEmailsView: View {
         var id: String { rawValue }
     }
 
-    struct PromptPreset: Identifiable {
-        let id = UUID()
-        let title: String
-        let subjectHint: String
-        let descriptionHint: String
-    }
-
     @Environment(\.dismiss) private var dismiss
 
     @State private var recipient = ""
     @State private var subject = ""
     @State private var context = ""
-    @State private var mustInclude = ""
     @State private var selectedGoal: MailGoal = .statusUpdate
     @State private var selectedStyle: MailStyle = .professional
     @State private var selectedLength: OutputLength = .medium
-    @State private var includeCTA = true
-    @State private var includeBulletSummary = false
 
     @State private var generatedBody = ""
-    @State private var alternatives: [String] = []
     @State private var isGenerating = false
-    @State private var isGeneratingAlternatives = false
-    @State private var isProcessingTool = false
     @State private var errorMessage: String?
 
     let currentBody: String
     let onApply: (DraftingEmailResult) -> Void
 
-    private var canGenerate: Bool {
-        !context.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isGenerating
-    }
-
-    private var canApply: Bool {
-        !trimmedGeneratedBody.isEmpty
-    }
-
-    private var draftWordCount: Int {
-        generatedBody.split { $0.isWhitespace || $0.isNewline }.count
-    }
-
-    private var trimmedGeneratedBody: String {
-        generatedBody.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    private var presets: [PromptPreset] {
-        [
-            .init(title: "Executive Update", subjectHint: "Weekly Platform Update", descriptionHint: "Summarize outcomes, blockers, and decisions needed this week."),
-            .init(title: "Polite Follow Up", subjectHint: "Following Up On Prior Request", descriptionHint: "Follow up respectfully and ask for a response by a clear deadline."),
-            .init(title: "Proposal", subjectHint: "Proposal: Q3 Launch Strategy", descriptionHint: "Pitch a plan with timeline, expected impact, and next steps."),
-            .init(title: "Customer Support", subjectHint: "Update On Your Support Case", descriptionHint: "Acknowledge issue, explain the fix, and set expectations for completion.")
-        ]
-    }
-
-    private let rewriteTools: [(title: String, symbol: String, instruction: String)] = [
-        ("Shorten", "scissors", "Rewrite this email to be shorter while preserving all key intent and details."),
-        ("Expand", "arrow.up.left.and.arrow.down.right", "Expand this email with additional helpful context while staying clear."),
-        ("Polish", "sparkles", "Polish this email for grammar, flow, and clarity while preserving meaning."),
-        ("Softer", "face.smiling", "Rewrite this email with a warmer and more empathetic tone."),
-        ("Direct", "bolt.fill", "Rewrite this email to be more direct and action-oriented.")
-    ]
-
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 16) {
-                    headerCard
-                    setupCard
-                    optionsCard
-                    toolbeltCard
-                    outputCard
-                    alternativesCard
+            ZStack {
+                backgroundGradient.ignoresSafeArea()
+
+                ScrollView {
+                    VStack(spacing: 24) {
+                        headerSection
+
+                        inputCard(title: "Recipient & Subject", icon: "person.fill") {
+                            VStack(spacing: 12) {
+                                customTextField("To:", text: $recipient, placeholder: "email@example.com")
+                                customTextField("Subject:", text: $subject, placeholder: "Enter subject")
+                            }
+                        }
+
+                        inputCard(title: "Context", icon: "text.justify.left") {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("What is this email about?")
+                                    .font(.caption.bold())
+                                    .foregroundStyle(.secondary)
+                                TextEditor(text: $context)
+                                    .frame(minHeight: 120)
+                                    .padding(8)
+                                    .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+                            }
+                        }
+
+                        inputCard(title: "Style & Tone", icon: "slider.horizontal.3") {
+                            VStack(spacing: 16) {
+                                chipSelector(title: "Goal", selection: $selectedGoal, options: MailGoal.allCases)
+                                chipSelector(title: "Style", selection: $selectedStyle, options: MailStyle.allCases)
+                                chipSelector(title: "Length", selection: $selectedLength, options: OutputLength.allCases)
+                            }
+                        }
+
+                        if !generatedBody.isEmpty || isGenerating {
+                            outputPreview
+                        }
+                    }
+                    .padding(16)
                 }
-                .padding(16)
             }
-            .background(backgroundGradient.ignoresSafeArea())
-            .navigationTitle("Draft Email")
+            .navigationTitle("Drafting Studio")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "chevron.down")
-                            .font(.headline.weight(.semibold))
-                    }
+                    Button("Cancel") { dismiss() }
                 }
-                ToolbarItemGroup(placement: .topBarTrailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         Task { await generateDraft() }
                     } label: {
-                        Label("Generate", systemImage: "wand.and.stars")
+                        if isGenerating {
+                            ProgressView()
+                        } else {
+                            Text("Generate")
+                                .bold()
+                        }
                     }
-                    .disabled(!canGenerate)
-
-                    Button {
-                        onApply(.init(recipient: recipient, subject: subject, body: generatedBody))
-                        dismiss()
-                    } label: {
-                        Label("Apply", systemImage: "checkmark.circle.fill")
-                    }
-                    .disabled(!canApply)
+                    .disabled(context.isEmpty || isGenerating)
                 }
             }
             .onAppear {
@@ -143,366 +118,145 @@ struct DraftingEmailsView: View {
                     generatedBody = currentBody
                 }
             }
-            .animation(.easeInOut(duration: 0.22), value: isGenerating)
-            .animation(.easeInOut(duration: 0.22), value: isProcessingTool)
         }
     }
 
-    private var headerCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("AI Draft Studio")
-                .font(.system(size: 24, weight: .bold, design: .rounded))
-            Text("Set intent, tune tone, then generate polished drafts and quick rewrites.")
+    private var headerSection: some View {
+        VStack(spacing: 8) {
+            Text("AI Drafting Assistant")
+                .font(.title3.bold())
+                .foregroundStyle(.white)
+            Text("Craft the perfect message with tailored goals and styles.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(.top, 8)
+    }
+
+    private func inputCard<Content: View>(title: String, icon: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Label(title, systemImage: icon)
+                .font(.headline)
+                .foregroundStyle(.blue)
+
+            content()
+        }
+        .padding(18)
+        .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 20))
+        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.08), lineWidth: 1))
+    }
+
+    private func customTextField(_ label: String, text: Binding<String>, placeholder: String) -> some View {
+        HStack {
+            Text(label)
+                .font(.subheadline.bold())
+                .foregroundStyle(.secondary)
+                .frame(width: 70, alignment: .leading)
+
+            TextField(placeholder, text: text)
+                .font(.subheadline)
+                .foregroundStyle(.white)
+        }
+        .padding(12)
+        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
+    }
+
+    private func chipSelector<T: RawRepresentable & Hashable & Identifiable>(title: String, selection: Binding<T>, options: [T]) where T.RawValue == String {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    ForEach(presets) { preset in
+                    ForEach(options, id: \.id) { option in
                         Button {
-                            subject = preset.subjectHint
-                            context = preset.descriptionHint
+                            selection.wrappedValue = option
                         } label: {
-                            Text(preset.title)
-                                .font(.caption.weight(.semibold))
-                                .padding(.horizontal, 12)
+                            Text(option.rawValue)
+                                .font(.caption.bold())
+                                .padding(.horizontal, 14)
                                 .padding(.vertical, 8)
-                                .background(Color.white.opacity(0.08), in: Capsule())
+                                .background(selection.wrappedValue == option ? Color.blue : Color.white.opacity(0.1), in: Capsule())
+                                .foregroundStyle(selection.wrappedValue == option ? .white : .secondary)
                         }
                         .buttonStyle(.plain)
                     }
                 }
             }
         }
-        .padding(18)
-        .draftingCardSurface()
     }
 
-    private var setupCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Message Setup", systemImage: "slider.horizontal.3")
-                .font(.headline)
-
-            textField("Recipient", text: $recipient)
-            textField("Subject", text: $subject)
-
-            editorBlock(title: "What should this email achieve?", text: $context, minHeight: 120)
-            editorBlock(title: "Must Include (optional)", text: $mustInclude, minHeight: 80)
-        }
-        .padding(18)
-        .draftingCardSurface()
-    }
-
-    private var optionsCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Tone & Structure", systemImage: "text.bubble")
-                .font(.headline)
-
-            HStack(spacing: 10) {
-                pickerChip(title: "Goal", selection: $selectedGoal)
-                pickerChip(title: "Style", selection: $selectedStyle)
-                pickerChip(title: "Length", selection: $selectedLength)
-            }
-
-            Toggle(isOn: $includeCTA) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Label("Include clear call-to-action", systemImage: "checkmark.seal")
-                    Text("Ends with a direct ask or next step.")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .tint(.blue)
-
-            Toggle(isOn: $includeBulletSummary) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Label("Include short bullet summary", systemImage: "list.bullet.rectangle")
-                    Text("Adds concise bullets for quick readability.")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .tint(.teal)
-
-            HStack(spacing: 10) {
-                metricPill(title: "Words", value: "\(draftWordCount)")
-                metricPill(title: "Goal", value: selectedGoal.rawValue)
-                metricPill(title: "Tone", value: selectedStyle.rawValue)
-            }
-        }
-        .padding(18)
-        .draftingCardSurface()
-    }
-
-    private var toolbeltCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+    private var outputPreview: some View {
+        VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Label("Rewrite Tools", systemImage: "wand.and.rays")
+                Label("Generated Draft", systemImage: "sparkles")
                     .font(.headline)
+                    .foregroundStyle(.purple)
                 Spacer()
-                if isProcessingTool {
-                    ProgressView()
-                }
-            }
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(rewriteTools, id: \.title) { tool in
-                        Button {
-                            Task { await applyRewriteTool(tool.instruction) }
-                        } label: {
-                            Label(tool.title, systemImage: tool.symbol)
-                                .font(.caption.weight(.semibold))
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 8)
-                                .background(Color.white.opacity(0.08), in: Capsule())
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(trimmedGeneratedBody.isEmpty || isProcessingTool)
+                if !generatedBody.isEmpty {
+                    Button("Use This") {
+                        onApply(.init(recipient: recipient, subject: subject, body: generatedBody))
+                        dismiss()
                     }
-                }
-            }
-        }
-        .padding(18)
-        .draftingCardSurface()
-    }
-
-    private var outputCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Label("Draft", systemImage: "doc.text")
-                    .font(.headline)
-                Spacer()
-                if isGenerating {
-                    ProgressView()
+                    .font(.caption.bold())
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.blue, in: Capsule())
+                    .foregroundStyle(.white)
                 }
             }
 
-            TextEditor(text: $generatedBody)
-                .frame(minHeight: 230)
-                .padding(8)
-                .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
-
-            if let errorMessage {
-                Text(errorMessage)
-                    .font(.footnote)
-                    .foregroundStyle(.red)
-            }
-        }
-        .padding(18)
-        .draftingCardSurface()
-    }
-
-    private var alternativesCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Label("Alternatives", systemImage: "square.stack.3d.up")
-                    .font(.headline)
-                Spacer()
-                Button {
-                    Task { await generateAlternatives() }
-                } label: {
-                    Label("Generate 2", systemImage: "arrow.triangle.branch")
-                }
-                .disabled(trimmedGeneratedBody.isEmpty || isGeneratingAlternatives)
-            }
-
-            if alternatives.isEmpty {
-                Text("Generate variants to compare voice and directness.")
-                    .foregroundStyle(.secondary)
-                    .font(.subheadline)
+            if isGenerating {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 20)
             } else {
-                VStack(spacing: 10) {
-                    ForEach(Array(alternatives.enumerated()), id: \.offset) { item in
-                        Button {
-                            generatedBody = item.element
-                        } label: {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text("Variant \(item.offset + 1)")
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(.secondary)
-                                Text(item.element)
-                                    .font(.subheadline)
-                                    .lineLimit(4)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                            .padding(12)
-                            .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
+                Text(generatedBody)
+                    .font(.subheadline)
+                    .foregroundStyle(.white)
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
             }
         }
         .padding(18)
-        .draftingCardSurface()
-    }
-
-    private func editorBlock(title: String, text: Binding<String>, minHeight: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-            TextEditor(text: text)
-                .frame(minHeight: minHeight)
-                .padding(8)
-                .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
-        }
-    }
-
-    private func textField(_ title: String, text: Binding<String>) -> some View {
-        TextField(title, text: text)
-            .textInputAutocapitalization(.never)
-            .autocorrectionDisabled(true)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
-    }
-
-    private func pickerChip<T: CaseIterable & Identifiable & RawRepresentable & Hashable>(title: String, selection: Binding<T>) -> some View where T.RawValue == String {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(.secondary)
-            Picker(title, selection: selection) {
-                ForEach(Array(T.allCases), id: \.id) { value in
-                    Text(value.rawValue).tag(value)
-                }
-            }
-            .pickerStyle(.menu)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 6)
-            .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private func metricPill(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            Text(value)
-                .font(.caption.weight(.semibold))
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(Color.white.opacity(0.06), in: Capsule())
+        .background(Color.purple.opacity(0.05), in: RoundedRectangle(cornerRadius: 20))
+        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.purple.opacity(0.2), lineWidth: 1))
     }
 
     private var backgroundGradient: LinearGradient {
         LinearGradient(
-            colors: [Color(hex: "#0A0E16") ?? .black, Color(hex: "#11192A") ?? .black],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
+            colors: [Color(hex: "#09090B") ?? .black, Color(hex: "#12121A") ?? .black],
+            startPoint: .top,
+            endPoint: .bottom
         )
     }
 
     @MainActor
     private func generateDraft() async {
-        guard !isGenerating else { return }
         isGenerating = true
-        defer { isGenerating = false }
         errorMessage = nil
 
         do {
             let prompt = """
             Write a \(selectedLength.rawValue.lowercased()) \(selectedStyle.rawValue.lowercased()) email.
             Goal: \(selectedGoal.rawValue).
-            Recipient: \(recipient.isEmpty ? "Not specified" : recipient)
-            Subject hint: \(subject.isEmpty ? "Generate one" : subject)
-            Include CTA: \(includeCTA ? "yes" : "no")
-            Include summary bullets: \(includeBulletSummary ? "yes" : "no")
-
-            Context:
-            \(context)
-
-            Must include:
-            \(mustInclude.isEmpty ? "None" : mustInclude)
-
-            Return plain email body only.
+            Context: \(context)
+            Return only the email body.
             """
 
             let result = try await AIService.shared.processText(prompt: prompt)
-            generatedBody = result.trimmingCharacters(in: .whitespacesAndNewlines)
-
-            if subject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                let subjectPrompt = "Create one concise email subject line for this draft:\n\(generatedBody)"
-                let generatedSubject = try await AIService.shared.processText(prompt: subjectPrompt)
-                subject = generatedSubject
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-                    .replacingOccurrences(of: "\"", with: "")
+            await MainActor.run {
+                generatedBody = result.trimmingCharacters(in: .whitespacesAndNewlines)
+                isGenerating = false
             }
         } catch {
-            errorMessage = error.localizedDescription
+            await MainActor.run {
+                errorMessage = error.localizedDescription
+                isGenerating = false
+            }
         }
-    }
-
-    @MainActor
-    private func applyRewriteTool(_ instruction: String) async {
-        guard !isProcessingTool else { return }
-        let text = generatedBody.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !text.isEmpty else { return }
-
-        isProcessingTool = true
-        errorMessage = nil
-        defer { isProcessingTool = false }
-
-        do {
-            let prompt = """
-            \(instruction)
-
-            Email:
-            \(text)
-            """
-            let result = try await AIService.shared.processText(prompt: prompt)
-            generatedBody = result.trimmingCharacters(in: .whitespacesAndNewlines)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-
-    @MainActor
-    private func generateAlternatives() async {
-        guard !isGeneratingAlternatives else { return }
-        isGeneratingAlternatives = true
-        defer { isGeneratingAlternatives = false }
-
-        do {
-            let prompt = """
-            Rewrite this email into 2 alternatives:
-            - Version 1: more concise
-            - Version 2: warmer tone
-
-            Keep intent and key details.
-            Output with separator: ===
-
-            Email:
-            \(generatedBody)
-            """
-            let result = try await AIService.shared.processText(prompt: prompt)
-            let parts = result
-                .components(separatedBy: "===")
-                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                .filter { !$0.isEmpty }
-            alternatives = Array(parts.prefix(2))
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-}
-
-private extension View {
-    func draftingCardSurface() -> some View {
-        self
-            .background(
-                RoundedRectangle(cornerRadius: 18)
-                    .fill(Color.white.opacity(0.04))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 18)
-                    .stroke(Color.white.opacity(0.08), lineWidth: 1)
-            )
     }
 }

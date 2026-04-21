@@ -16,6 +16,7 @@ struct InboxView: View {
 
     @State private var searchText = ""
     @State private var showingCompose = false
+    @State private var showingAIFeatures = false
     @State private var showingUniversalInbox = false
     @State private var showingFetchingLabel = false
     @State private var selectedMessage: MailMessage?
@@ -41,11 +42,20 @@ struct InboxView: View {
             showingFetchingLabel = false
         }
         .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
+            ToolbarItem(placement: .navigationBarLeading) {
                 Button {
                     showingUniversalInbox = true
                 } label: {
-                    Image(systemName: "chevron.right.circle")
+                    Image(systemName: "chevron.left.circle")
+                }
+            }
+
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                Button {
+                    showingAIFeatures = true
+                } label: {
+                    Image(systemName: "sparkles.rectangle.stack")
+                        .foregroundStyle(LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing))
                 }
 
                 Button {
@@ -56,9 +66,12 @@ struct InboxView: View {
             }
         }
         .fullScreenCover(isPresented: $showingCompose) {
-            if let activeAccount {
-                EmailComposingView(account: activeAccount)
+            if let active = activeAccount {
+                EmailComposingView(account: active)
             }
+        }
+        .fullScreenCover(isPresented: $showingAIFeatures) {
+            InboxAIFeaturesView()
         }
         .navigationDestination(isPresented: $showingUniversalInbox) {
             UniversalInboxView()
@@ -353,17 +366,41 @@ private struct InboxMessageDetailView: View {
                     header
 
                     if isSummarizing {
-                        ProgressView("Summarizing…")
-                            .tint(.white)
+                        HStack {
+                            ProgressView()
+                                .tint(.purple)
+                            Text("Generating Intelligent Summary...")
+                                .font(.caption.bold())
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
                     }
 
                     if let summary, !summary.isEmpty {
-                        Text(summary)
-                            .font(.subheadline)
-                            .foregroundStyle(.white)
-                            .padding(12)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Label("AI Summary", systemImage: "sparkles")
+                                    .font(.caption.bold())
+                                    .foregroundStyle(.purple)
+                                Spacer()
+                            }
+
+                            Text(summary)
+                                .font(.subheadline)
+                                .foregroundStyle(.white)
+                                .lineSpacing(4)
+                        }
+                        .padding(16)
+                        .background(
+                            LinearGradient(colors: [Color.purple.opacity(0.1), Color.blue.opacity(0.05)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                            in: RoundedRectangle(cornerRadius: 16)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.purple.opacity(0.2), lineWidth: 1)
+                        )
                     }
 
                     if let htmlBody = message.htmlBody, !htmlBody.isEmpty {
