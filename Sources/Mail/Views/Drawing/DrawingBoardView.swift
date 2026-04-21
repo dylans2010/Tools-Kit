@@ -122,6 +122,10 @@ struct DrawingBoardView: View {
     private let highlighterOpacity = 0.32
     private let markerOpacityFactor = 0.85
     private let neonPenOpacityFactor = 0.95
+    /// Keep background/clip/overlay radii aligned to avoid corner peeking artifacts.
+    private let canvasCornerRadius: CGFloat = 18
+    private let sprayDotSize: CGFloat = 2.4
+    private let maxSprayPointsPerStroke = 420
 
     var body: some View {
         NavigationStack {
@@ -131,7 +135,7 @@ struct DrawingBoardView: View {
                 GeometryReader { geo in
                     ZStack {
                         canvasBackground
-                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                            .clipShape(RoundedRectangle(cornerRadius: canvasCornerRadius, style: .continuous))
 
                         Canvas { context, _ in
                             if showGrid {
@@ -144,11 +148,11 @@ struct DrawingBoardView: View {
                                 draw(inProgressStroke, in: &context)
                             }
                         }
-                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: canvasCornerRadius, style: .continuous))
                         .gesture(drawingGesture(in: geo.size))
                     }
                     .overlay(
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        RoundedRectangle(cornerRadius: canvasCornerRadius, style: .continuous)
                             .stroke(Color.white.opacity(0.25), lineWidth: 1)
                     )
                     .shadow(color: .black.opacity(0.12), radius: 16, y: 8)
@@ -359,7 +363,9 @@ struct DrawingBoardView: View {
                             isFilled: false
                         )
                     } else {
-                        inProgressStroke?.points.append(location)
+                        if shouldAppendPoint(location, to: inProgressStroke) {
+                            inProgressStroke?.points.append(location)
+                        }
                     }
                     return
                 }
@@ -444,14 +450,15 @@ struct DrawingBoardView: View {
     }
 
     private func drawSpray(_ stroke: Stroke, in context: inout GraphicsContext) {
+        let renderedPoints = spraySampledPoints(from: stroke.points)
         context.opacity = min(1, stroke.opacity + 0.15)
-        for (index, point) in stroke.points.enumerated() {
+        for (index, point) in renderedPoints.enumerated() {
             let radius = max(3, stroke.lineWidth * 1.2)
             for dot in 0..<sprayDotCount {
                 let phase = Double(index * sprayDotCount + dot)
                 let dx = CGFloat(cos(phase) * Double(radius) * 0.7)
                 let dy = CGFloat(sin(phase) * Double(radius) * 0.7)
-                let rect = CGRect(x: point.x + dx, y: point.y + dy, width: 2.4, height: 2.4)
+                let rect = CGRect(x: point.x + dx, y: point.y + dy, width: sprayDotSize, height: sprayDotSize)
                 context.fill(Path(ellipseIn: rect), with: .color(stroke.color))
             }
         }
@@ -692,7 +699,7 @@ struct DrawingBoardView: View {
     }
 
     private var canvasBackground: some View {
-        RoundedRectangle(cornerRadius: 16)
+        RoundedRectangle(cornerRadius: canvasCornerRadius)
             .fill(backgroundFill)
     }
 
@@ -740,6 +747,41 @@ struct DrawingBoardView: View {
                 hypot(candidate.x - point.x, candidate.y - point.y) <= threshold
             }
         }
+    }
+
+    private func shouldAppendPoint(_ point: CGPoint, to stroke: Stroke?) -> Bool {
+        guard let stroke else { return true }
+        guard stroke.tool == .spray else { return true }
+        guard let lastPoint = stroke.points.last else { return true }
+        let minDistance = max(2.0, lineWidth * 0.75)
+        return hypot(point.x - lastPoint.x, point.y - lastPoint.y) >= minDistance
+    }
+
+    private func spraySampledPoints(from points: [CGPoint]) -> [CGPoint] {
+        guard points.count > maxSprayPointsPerStroke else { return points }
+        guard let first = points.first else { return points }
+        let pathLength = zip(points, points.dropFirst()).reduce(CGFloat.zero) { partial, pair in
+            partial + hypot(pair.1.x - pair.0.x, pair.1.y - pair.0.y)
+        }
+        guard pathLength > 0 else { return [first] }
+
+        let targetSpacing = pathLength / CGFloat(maxSprayPointsPerStroke)
+        var sampled: [CGPoint] = [first]
+        var distanceSinceLastSample = CGFloat.zero
+
+        for (previous, current) in zip(points, points.dropFirst()) {
+            distanceSinceLastSample += hypot(current.x - previous.x, current.y - previous.y)
+            if distanceSinceLastSample >= targetSpacing {
+                sampled.append(current)
+                distanceSinceLastSample = 0
+            }
+        }
+
+        if let last = points.last, sampled.last != last {
+            sampled.append(last)
+        }
+
+        return sampled
     }
 
     private func clamp(_ point: CGPoint, in size: CGSize) -> CGPoint {
