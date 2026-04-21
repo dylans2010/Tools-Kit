@@ -17,16 +17,20 @@ struct UniversalInboxView: View {
     @State private var navigationTarget: InboxNavigationTarget?
 
     var body: some View {
-        List {
-            headerSection
-            if isUnifiedMode {
-                unifiedFeedSection
-            } else {
-                accountSections
+        ZStack {
+            Color(.systemGroupedBackground).ignoresSafeArea()
+
+            List {
+                headerSection
+                if isUnifiedMode {
+                    unifiedFeedSection
+                } else {
+                    accountSections
+                }
             }
+            .listStyle(.insetGrouped)
         }
-        .listStyle(.insetGrouped)
-        .navigationTitle("Accounts")
+        .navigationTitle("Mailboxes")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -78,17 +82,19 @@ struct UniversalInboxView: View {
                 Task { await syncAll() }
             } label: {
                 HStack {
-                    Text(sync.isSyncing ? "Syncing…" : "Sync All Accounts")
+                    Label(sync.isSyncing ? "Syncing…" : "Sync All Accounts", systemImage: "arrow.clockwise")
+                        .font(.subheadline.weight(.semibold))
                     Spacer()
                     if sync.isSyncing { ProgressView() }
                 }
             }
+            .buttonStyle(.plain)
         }
     }
 
     private var accountSections: some View {
         ForEach(accountManager.accounts) { account in
-            Section {
+            Section(account.emailAddress) {
                 accountHeader(account)
                 if expandedAccountId == account.id {
                     folderPicker(account)
@@ -99,7 +105,7 @@ struct UniversalInboxView: View {
     }
 
     private var unifiedFeedSection: some View {
-        Section("All Accounts") {
+        Section("All Inboxes") {
             ForEach(unifiedMessages()) { mail in
                 messageRow(mail, account: accountManager.account(for: mail.accountId))
                     .contentShape(Rectangle())
@@ -115,8 +121,24 @@ struct UniversalInboxView: View {
             Button {
                 openInbox(for: account, folderName: selectedFolder(for: account))
             } label: {
-                Label(account.emailAddress, systemImage: providerIcon(account.providerType))
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                HStack(spacing: 10) {
+                    Image(systemName: providerIcon(account.providerType))
+                        .foregroundStyle(.blue)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(account.emailAddress)
+                            .font(.subheadline.weight(.semibold))
+                        Text(account.providerType.displayName)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Text("\(unreadCount(for: account))")
+                        .font(.caption2.weight(.semibold))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.blue.opacity(0.14), in: Capsule())
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .buttonStyle(.plain)
 
@@ -180,17 +202,24 @@ struct UniversalInboxView: View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
+                    Circle()
+                        .fill(scoped.message.isRead ? Color.clear : Color.blue)
+                        .frame(width: 8, height: 8)
                     Text(scoped.message.subject)
                         .font(.subheadline.weight(.semibold))
                         .lineLimit(1)
                     Spacer()
-                    Text(scoped.message.date, style: .date)
+                    Text(scoped.message.date, style: .time)
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
                 Text(scoped.message.from)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                Text(previewText(for: scoped.message))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
                 if let account {
                     Text("\(account.providerType.displayName) • \(account.emailAddress)")
                         .font(.caption2)
@@ -201,6 +230,7 @@ struct UniversalInboxView: View {
                 .font(.caption2.weight(.bold))
                 .foregroundStyle(.secondary)
         }
+        .padding(.vertical, 6)
         .swipeActions(edge: .leading, allowsFullSwipe: false) {
             Button {
                 toggleImportant(scoped)
@@ -291,6 +321,18 @@ struct UniversalInboxView: View {
                     .map { ScopedMailMessage(accountId: account.id, message: $0) }
             }
             .sorted { $0.message.date > $1.message.date }
+    }
+
+    private func unreadCount(for account: MailAccount) -> Int {
+        let key = "\(account.id)_INBOX"
+        return storage.loadThreads(for: key).filter { !$0.isRead }.count
+    }
+
+    private func previewText(for message: MailMessage) -> String {
+        let source = message.body.trimmingCharacters(in: .whitespacesAndNewlines)
+        if source.isEmpty { return "No preview" }
+        let compact = source.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+        return compact
     }
 
     private func syncAll() async {

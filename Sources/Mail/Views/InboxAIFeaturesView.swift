@@ -13,11 +13,13 @@ struct InboxAIFeaturesView: View {
     @State private var selectedEmail: MailMessage?
     @State private var errorMessage: String?
     @State private var pulseHeader = false
+    @State private var glowAnimation = false
 
     var body: some View {
         NavigationStack {
             ZStack {
                 backgroundGradient.ignoresSafeArea()
+                animatedOrbs
 
                 ScrollView {
                     VStack(spacing: 20) {
@@ -70,7 +72,12 @@ struct InboxAIFeaturesView: View {
 
     private var backgroundGradient: LinearGradient {
         LinearGradient(
-            colors: [Color(hex: "#0F0C29") ?? .black, Color(hex: "#302B63") ?? .black, Color(hex: "#24243E") ?? .black],
+            colors: [
+                Color(hex: "#050510") ?? .black,
+                Color(hex: "#141B45") ?? .black,
+                Color(hex: "#2C1E5A") ?? .black,
+                Color(hex: "#152B5C") ?? .black
+            ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
@@ -78,10 +85,20 @@ struct InboxAIFeaturesView: View {
 
     private var headerSection: some View {
         VStack(spacing: 8) {
-            Image(systemName: "apple.intelligence")
-                .font(.system(size: 40))
-                .foregroundStyle(LinearGradient(colors: [.purple, .blue, .cyan], startPoint: .topLeading, endPoint: .bottomTrailing))
-                .modifier(ModernSymbolEffect(trigger: pulseHeader))
+            ZStack {
+                Circle()
+                    .fill(LinearGradient(colors: [.purple.opacity(0.45), .blue.opacity(0.35)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .frame(width: 102, height: 102)
+                    .blur(radius: glowAnimation ? 22 : 12)
+                    .scaleEffect(glowAnimation ? 1.06 : 0.94)
+                Circle()
+                    .stroke(LinearGradient(colors: [.cyan.opacity(0.9), .purple.opacity(0.9)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1.5)
+                    .frame(width: 92, height: 92)
+                Image(systemName: "apple.intelligence")
+                    .font(.system(size: 46, weight: .medium))
+                    .foregroundStyle(LinearGradient(colors: [.white, .cyan, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .modifier(ModernSymbolEffect(trigger: pulseHeader))
+            }
 
             Text("Email AI Tools")
                 .font(.title2.bold())
@@ -94,7 +111,28 @@ struct InboxAIFeaturesView: View {
                 .padding(.horizontal, 20)
         }
         .padding(.vertical, 10)
-        .onAppear { pulseHeader = true }
+        .onAppear {
+            pulseHeader = true
+            withAnimation(.easeInOut(duration: 1.7).repeatForever(autoreverses: true)) {
+                glowAnimation = true
+            }
+        }
+    }
+
+    private var animatedOrbs: some View {
+        ZStack {
+            Circle()
+                .fill(Color.cyan.opacity(0.14))
+                .frame(width: 260, height: 260)
+                .blur(radius: 40)
+                .offset(x: glowAnimation ? 120 : 70, y: glowAnimation ? -220 : -170)
+            Circle()
+                .fill(Color.purple.opacity(0.2))
+                .frame(width: 280, height: 280)
+                .blur(radius: 42)
+                .offset(x: glowAnimation ? -130 : -80, y: glowAnimation ? 250 : 200)
+        }
+        .allowsHitTesting(false)
     }
 
     private var loadingSection: some View {

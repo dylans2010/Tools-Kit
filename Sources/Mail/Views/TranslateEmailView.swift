@@ -34,11 +34,7 @@ struct TranslateEmailView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
 
-                        if isTranslating {
-                            ProgressView("Translating...")
-                                .tint(.blue)
-                                .padding()
-                        } else if !translatedText.isEmpty {
+                        if !translatedText.isEmpty {
                             displayCard(title: "Translation", icon: "character.bubble", isResult: true) {
                                 VStack(alignment: .leading, spacing: 10) {
                                     ScrollView {
@@ -71,6 +67,14 @@ struct TranslateEmailView: View {
                         }
                     }
                     .padding(16)
+                }
+
+                if isTranslating {
+                    ModernSheetLoadingView(
+                        title: "Translating Email",
+                        subtitle: "Using on-device intelligence to craft a natural translation."
+                    )
+                    .transition(.opacity)
                 }
             }
             .navigationTitle("Translate")

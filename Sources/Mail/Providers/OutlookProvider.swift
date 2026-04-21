@@ -15,7 +15,8 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
         let remoteVariables = await fetchRemoteVariables()
         let clientID = try oauthValue(primaryKey: "MICROSOFT_CLIENT_ID", fallbackKey: "MICROSOFT_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
-        let redirectURI = "msauth.com.dylans2010.ToolsKit://auth"
+        let redirectURI = (try? oauthValue(primaryKey: "MICROSOFT_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)) ?? "msauth.com.dylans2010.ToolsKit://auth"
+        let callbackScheme = URLComponents(string: redirectURI)?.scheme
 
         let verifier = randomCodeVerifier()
         let challenge = codeChallenge(from: verifier)
@@ -37,13 +38,13 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid OAuth URL"])
         }
 
-        InternalLogger.shared.log("OAuth start provider=microsoft callbackScheme=msauth.com.dylans2010.ToolsKit", level: .info)
-        let callback = try await startOAuth(url: url, callbackScheme: "msauth.com.dylans2010.ToolsKit")
+        InternalLogger.shared.log("OAuth start provider=microsoft callbackScheme=\(callbackScheme ?? "unknown")", level: .info)
+        let callback = try await startOAuth(url: url, callbackScheme: callbackScheme)
         let returnedState = callbackValue("state", from: callback)
         guard returnedState == state else {
             throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "OAuth state mismatch"])
         }
-        guard let code = callbackValue("code", from: callback), !code.isEmpty else {
+        guard let code = authorizationCode(from: callback), !code.isEmpty else {
             throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing authorization code"])
         }
 
@@ -322,6 +323,22 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         var parts = URLComponents()
         parts.query = fragment
         return parts.queryItems?.first(where: { $0.name == name })?.value
+    }
+
+    private func authorizationCode(from url: URL) -> String? {
+        if let value = callbackValue("code", from: url), !value.isEmpty {
+            return value
+        }
+
+        let decoded = url.absoluteString.removingPercentEncoding ?? url.absoluteString
+        if let range = decoded.range(of: "code=") {
+            let suffix = decoded[range.upperBound...]
+            let code = suffix.split(separator: "&").first.map(String.init)
+            if let code, !code.isEmpty {
+                return code
+            }
+        }
+        return nil
     }
 
     private func formURLEncoded(_ items: [URLQueryItem]) -> Data? {
