@@ -99,8 +99,11 @@ final class WiFiTransferServer: ObservableObject {
             case ("POST", "/upload-chunk"):
                 Task { @MainActor [weak self] in self?.handleUploadChunk(rawRequest: data, connection: connection) }
             case ("POST", "/finalize-upload"):
-                let body = self.extractHTTPBody(from: data)
-                Task { @MainActor [weak self] in self?.handleFinalizeUpload(body: body, connection: connection) }
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    let body = self.extractHTTPBody(from: data)
+                    self.handleFinalizeUpload(body: body, connection: connection)
+                }
             default:
                 Task { @MainActor [weak self] in self?.sendNotFound(connection) }
             }

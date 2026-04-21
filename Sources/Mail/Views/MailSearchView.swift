@@ -69,7 +69,7 @@ struct MailSearchView: View {
         .navigationTitle("Search")
         .listStyle(.insetGrouped)
         .searchable(text: $searchText)
-        .onChange(of: searchText) { newValue in
+        .onChange(of: searchText) { _, newValue in
             performSearch(newValue)
         }
     }
