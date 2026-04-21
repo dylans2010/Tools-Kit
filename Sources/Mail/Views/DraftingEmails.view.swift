@@ -7,6 +7,7 @@ struct DraftingEmailResult {
 }
 
 struct DraftingEmailsView: View {
+    /// Default creativity level balances conservative business tone with useful phrasing variety.
     private static let defaultCreativity = 0.55
 
     enum MailStyle: String, CaseIterable, Identifiable, Hashable {

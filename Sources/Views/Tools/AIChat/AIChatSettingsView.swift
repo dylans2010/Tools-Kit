@@ -843,6 +843,8 @@ struct APIKeyRowView: View {
         guard !trimmed.isEmpty else { return }
         if keyManager.saveKey(trimmed, for: id) {
             isSaved = true
+        } else {
+            isSaved = false
         }
     }
 

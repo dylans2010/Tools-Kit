@@ -116,6 +116,9 @@ struct DrawingBoardView: View {
     private let zigzagSegmentCount = 10
     /// Vertex count for star construction; keep this even so alternating outer/inner points render correctly.
     private let starVertexCount = 10
+    /// Ratio of star inner radius to outer radius; controls point depth and legibility.
+    private let starInnerRadiusRatio: CGFloat = 0.45
+    /// Opacity value applied to highlighter strokes for translucent marker effect.
     private let highlighterOpacity = 0.32
 
     var body: some View {
@@ -350,7 +353,7 @@ struct DrawingBoardView: View {
                             lineWidth: lineWidth,
                             opacity: effectiveOpacity(for: selectedTool),
                             tool: selectedTool,
-                            isDashed: useDashedStroke || selectedTool == .dashedLine,
+                            isDashed: useDashedStroke,
                             isFilled: false
                         )
                     } else {
@@ -617,7 +620,7 @@ struct DrawingBoardView: View {
         let rect = CGRect(from: stroke.points[0], to: stroke.points[1])
         let center = CGPoint(x: rect.midX, y: rect.midY)
         let outer = min(rect.width, rect.height) / 2
-        let inner = outer * 0.45
+        let inner = outer * starInnerRadiusRatio
         var points: [CGPoint] = []
         let angleStep = (.pi * 2) / CGFloat(starVertexCount)
         for i in 0..<starVertexCount {
