@@ -2,14 +2,15 @@ import Foundation
 
 actor InboxAIAnalysisCache {
     static let shared = InboxAIAnalysisCache()
-    private let cacheWarmupInterval: TimeInterval = 5 * 60
+    private let defaultCacheWarmupInterval: TimeInterval = 5 * 60
 
     private var lastWarmDate: Date?
     private var lastWarmProviderID: String?
 
+    /// Performs lightweight one-time AI subsystem warm-up and skips duplicate work for five minutes unless forced.
     func warmCacheIfNeeded(force: Bool) async {
         let now = Date()
-        if !force, let lastWarmDate, now.timeIntervalSince(lastWarmDate) < cacheWarmupInterval {
+        if !force, let lastWarmDate, now.timeIntervalSince(lastWarmDate) < defaultCacheWarmupInterval {
             return
         }
 

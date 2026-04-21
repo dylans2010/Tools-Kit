@@ -570,7 +570,7 @@ private struct InboxMessageDetailView: View {
                 .tint(.blue.opacity(0.8))
             }
 
-            MarkdownSummaryText(summary)
+            MarkdownSummaryText(text: summary)
         }
         .padding(16)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
@@ -736,10 +736,6 @@ private struct InboxMessageDetailView: View {
 
 private struct MarkdownSummaryText: View {
     let text: String
-
-    init(_ text: String) {
-        self.text = text
-    }
 
     var body: some View {
         if let attributed = try? AttributedString(markdown: text, options: .init(interpretedSyntax: .full, failurePolicy: .returnPartiallyParsedIfPossible)) {
