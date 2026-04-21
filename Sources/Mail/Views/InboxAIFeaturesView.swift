@@ -2,9 +2,8 @@ import SwiftUI
 
 struct InboxAIFeaturesView: View {
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var mailStore = MailStore.shared
-    @StateObject private var storage = MailStorageService.shared
-    @StateObject private var accountManager = AccountManager.shared
+
+    let inboxThreads: [MailThread]
 
     @State private var isAnalyzing = false
     @State private var catchUpSummary: String = ""
@@ -13,7 +12,6 @@ struct InboxAIFeaturesView: View {
     @State private var showingEmailsUsed = false
     @State private var selectedEmail: MailMessage?
     @State private var errorMessage: String?
-    @StateObject private var cache = InboxAIAnalysisCache.shared
 
     var body: some View {
         NavigationStack {
@@ -30,6 +28,13 @@ struct InboxAIFeaturesView: View {
                             catchUpSection
                             prioritySection
                         }
+
+                        if let errorMessage {
+                            Text(errorMessage)
+                                .font(.footnote)
+                                .foregroundStyle(.red)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
                     }
                     .padding(16)
                 }
@@ -38,9 +43,7 @@ struct InboxAIFeaturesView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Close") {
-                        dismiss()
-                    }
+                    Button("Close") { dismiss() }
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
@@ -53,19 +56,13 @@ struct InboxAIFeaturesView: View {
                 }
             }
             .task {
-                applyCachedResultIfAvailable()
-                await InboxAIAnalysisCache.shared.warmCacheIfNeeded(force: false)
-                applyCachedResultIfAvailable()
+                await runAnalysis()
             }
             .sheet(isPresented: $showingEmailsUsed) {
                 emailsUsedSheet
             }
             .navigationDestination(item: $selectedEmail) { message in
-                if let account = accountManager.activeAccount {
-                     // We reuse detail view from InboxView if possible, or define a local one.
-                     // For now, let's assume we navigate to a simplified detail view or the existing one.
-                     MessageDetailWrapper(message: message, account: account)
-                }
+                MessageDetailWrapper(message: message)
             }
         }
     }
@@ -88,7 +85,7 @@ struct InboxAIFeaturesView: View {
                 .font(.title2.bold())
                 .foregroundStyle(.white)
 
-            Text("Analyzing unread messages across all your accounts to prioritize what matters.")
+            Text("Analyzing only the emails currently loaded in this Inbox screen.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -133,10 +130,7 @@ struct InboxAIFeaturesView: View {
                     .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
             } else {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text(catchUpSummary)
-                        .font(.subheadline)
-                        .foregroundStyle(.white)
-                        .lineSpacing(4)
+                    MarkdownTextBlock(text: catchUpSummary)
 
                     Button {
                         showingEmailsUsed = true
@@ -176,11 +170,9 @@ struct InboxAIFeaturesView: View {
             } else {
                 VStack(spacing: 10) {
                     if !prioritySummary.isEmpty {
-                        Text(prioritySummary)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .padding(.bottom, 4)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        MarkdownTextBlock(text: prioritySummary)
+                            .padding(12)
+                            .background(Color.white.opacity(0.03), in: RoundedRectangle(cornerRadius: 10))
                     }
 
                     ForEach(priorityEmails) { thread in
@@ -233,8 +225,7 @@ struct InboxAIFeaturesView: View {
     private var emailsUsedSheet: some View {
         NavigationStack {
             List {
-                let unread = allUnreadThreads().flatMap(\.messages).sorted(by: { $0.date > $1.date })
-                ForEach(unread) { message in
+                ForEach(analyzableMessages()) { message in
                     Button {
                         selectedEmail = message
                         showingEmailsUsed = false
@@ -262,35 +253,93 @@ struct InboxAIFeaturesView: View {
     private func runAnalysis() async {
         isAnalyzing = true
         errorMessage = nil
-        await InboxAIAnalysisCache.shared.warmCacheIfNeeded(force: true)
-        applyCachedResultIfAvailable()
-        isAnalyzing = false
-    }
+        defer { isAnalyzing = false }
 
-    private func applyCachedResultIfAvailable() {
-        guard let result = cache.lastResult else { return }
-        catchUpSummary = result.catchUpSummary
-        prioritySummary = result.prioritySummary
-        priorityEmails = result.priorityEmails
-    }
-
-    private func priorityThreads(from threads: [MailThread], using digest: String) -> [MailThread] {
-        let loweredDigest = digest.lowercased()
-        let matched = threads.filter { thread in
-            guard let message = thread.messages.last else { return false }
-            return loweredDigest.contains(message.subject.lowercased()) || loweredDigest.contains(senderName(from: message.from).lowercased())
+        let messages = analyzableMessages()
+        guard !messages.isEmpty else {
+            catchUpSummary = "No unread emails to summarize."
+            prioritySummary = "No urgent emails detected."
+            priorityEmails = []
+            return
         }
-        if matched.isEmpty {
-            return Array(threads.prefix(5))
+
+        let analysisInput = messages.prefix(40).map { message in
+            """
+            Message ID: \(message.id)
+            Subject: \(message.subject)
+            From: \(message.from)
+            Date: \(message.date.formatted(date: .abbreviated, time: .shortened))
+            Content: \(message.body.trimmingCharacters(in: .whitespacesAndNewlines).prefix(1000))
+            """
+        }.joined(separator: "\n\n---\n\n")
+
+        let systemPrompt = """
+        You are InboxOps-FT-v3, a fine-tuned inbox triage model.
+        You must analyze ALL provided email content exactly as given.
+        Strict requirements:
+        1) Never invent facts; only use provided content.
+        2) Prioritize by urgency, deadline, risk, stakeholder importance, and blocked dependencies.
+        3) Detect hidden tasks and explicit asks.
+        4) Return concise markdown only.
+        5) Keep every sentence actionable and concrete.
+        6) If evidence is missing, explicitly write "Unknown from inbox content".
+        7) Prefer short bullet points over prose.
+        """
+
+        do {
+            async let catchUpTask = AIService.shared.processText(
+                prompt: """
+                Fully analyze the inbox content and return a SHORT markdown briefing with these sections:
+                ## TL;DR
+                ## Top Priorities (max 5 bullets)
+                ## Required Actions Today (max 5 checkboxes)
+
+                Inbox content:\n\(analysisInput)
+                """,
+                systemPrompt: systemPrompt
+            )
+
+            async let priorityTask = AIService.shared.processText(
+                prompt: """
+                Analyze inbox content and produce a SHORT markdown priority digest.
+                Include:
+                ## Priority Ranking
+                ## Why These Matter
+                ## What Can Wait
+
+                Mention message IDs when possible.
+
+                Inbox content:\n\(analysisInput)
+                """,
+                systemPrompt: systemPrompt
+            )
+
+            let (summary, priorityDigest) = try await (catchUpTask, priorityTask)
+            catchUpSummary = summary
+            prioritySummary = priorityDigest
+
+            let loweredDigest = priorityDigest.lowercased()
+            let unreadThreads = inboxThreads
+                .filter { !$0.isRead }
+                .sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
+            let matched = unreadThreads.filter { thread in
+                guard let message = thread.messages.last else { return false }
+                return loweredDigest.contains(message.id.lowercased()) ||
+                    loweredDigest.contains(message.subject.lowercased()) ||
+                    loweredDigest.contains(senderName(from: message.from).lowercased())
+            }
+
+            priorityEmails = Array((matched.isEmpty ? unreadThreads : matched).prefix(5))
+        } catch {
+            errorMessage = error.localizedDescription
         }
-        return Array(matched.prefix(5))
     }
 
-    private func allUnreadThreads() -> [MailThread] {
-        accountManager.accounts.flatMap { account in
-            let key = "\(account.id)_INBOX"
-            return storage.loadThreads(for: key).filter { !$0.isRead }
-        }.sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
+    private func analyzableMessages() -> [MailMessage] {
+        inboxThreads
+            .filter { !$0.isRead }
+            .flatMap(\.messages)
+            .sorted(by: { $0.date > $1.date })
     }
 
     private func senderName(from value: String) -> String {
@@ -307,110 +356,10 @@ struct InboxAIFeaturesView: View {
     }
 }
 
-@MainActor
-final class InboxAIAnalysisCache: ObservableObject {
-    static let shared = InboxAIAnalysisCache()
-
-    struct CachedResult {
-        let catchUpSummary: String
-        let prioritySummary: String
-        let priorityEmails: [MailThread]
-        let updatedAt: Date
-    }
-
-    @Published private(set) var lastResult: CachedResult?
-    private var isWarming = false
-    private let storage = MailStorageService.shared
-    private let accountManager = AccountManager.shared
-    private let cacheTTL: TimeInterval = 300
-
-    func warmCacheIfNeeded(force: Bool) async {
-        if isWarming { return }
-        if !force, let result = lastResult, Date().timeIntervalSince(result.updatedAt) < cacheTTL {
-            return
-        }
-
-        isWarming = true
-        defer { isWarming = false }
-
-        let unreadThreads = accountManager.accounts
-            .flatMap { account in
-                storage.loadThreads(for: "\(account.id)_INBOX").filter { !$0.isRead }
-            }
-            .sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
-
-        let latestMessages = unreadThreads.compactMap(\.messages.last)
-        let digestInput = latestMessages.prefix(25).map {
-            """
-            Subject: \($0.subject)
-            From: \($0.from)
-            Date: \($0.date.formatted(date: .abbreviated, time: .shortened))
-            Body: \($0.body.prefix(350))
-            """
-        }.joined(separator: "\n\n---\n\n")
-
-        guard !digestInput.isEmpty else {
-            lastResult = CachedResult(
-                catchUpSummary: "No unread emails to summarize.",
-                prioritySummary: "No urgent emails detected.",
-                priorityEmails: [],
-                updatedAt: Date()
-            )
-            return
-        }
-
-        do {
-            async let catchUpTask = AIService.shared.processText(
-                prompt: """
-                Summarize these unread emails into concise markdown with sections:
-                ## TL;DR
-                ## Important Updates
-                ## Action Items
-                
-                Emails:
-                \(digestInput)
-                """
-            )
-            async let priorityTask = AIService.shared.processText(
-                prompt: """
-                Review these unread emails and provide a markdown "Priority Digest" that identifies what should be handled first and why.
-                Include quick triage guidance.
-                
-                Emails:
-                \(digestInput)
-                """
-            )
-            let (summary, priorityDigest) = try await (catchUpTask, priorityTask)
-
-            let loweredDigest = priorityDigest.lowercased()
-            let matched = unreadThreads.filter { thread in
-                guard let message = thread.messages.last else { return false }
-                let sender = message.from.components(separatedBy: "<").first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? message.from
-                return loweredDigest.contains(message.subject.lowercased()) || loweredDigest.contains(sender.lowercased())
-            }
-
-            lastResult = CachedResult(
-                catchUpSummary: summary,
-                prioritySummary: priorityDigest,
-                priorityEmails: Array((matched.isEmpty ? unreadThreads : matched).prefix(5)),
-                updatedAt: Date()
-            )
-        } catch {
-            // Keep previously cached result on transient failures.
-        }
-    }
-}
-
-// Wrapper to avoid dependency issues with detail view
-struct MessageDetailWrapper: View {
+private struct MessageDetailWrapper: View {
     let message: MailMessage
-    let account: MailAccount
 
     var body: some View {
-        // Reuse InboxMessageDetailView if it was public or accessible,
-        // but it's private in InboxView.swift.
-        // For stabilization, let's make a clean detail view or move it to a shared component.
-        // For now, I'll provide a simple implementation.
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text(message.subject)
@@ -419,11 +368,31 @@ struct MessageDetailWrapper: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 Divider()
-                Text(message.body)
-                    .font(.body)
+                MarkdownTextBlock(text: message.body)
             }
             .padding()
         }
         .navigationTitle("Message")
+    }
+}
+
+private struct MarkdownTextBlock: View {
+    let text: String
+
+    var body: some View {
+        if let attributed = try? AttributedString(
+            markdown: text,
+            options: .init(interpretedSyntax: .full, failurePolicy: .returnPartiallyParsedIfPossible)
+        ) {
+            Text(attributed)
+                .font(.subheadline)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            Text(text)
+                .font(.subheadline)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 }

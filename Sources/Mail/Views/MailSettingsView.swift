@@ -15,6 +15,9 @@ struct MailSettingsView: View {
     @AppStorage("mail.settings.showAvatars") private var showAvatars = true
     @AppStorage("mail.settings.showAttachmentIndicators") private var showAttachmentIndicators = true
     @AppStorage("mail.settings.previewLines") private var previewLines = 2
+    @AppStorage("mail.settings.swipe.leading") private var leadingSwipeAction = "flag"
+    @AppStorage("mail.settings.swipe.trailing") private var trailingSwipeAction = "delete"
+    @AppStorage("mail.settings.contextMenu.enabled") private var contextMenuActionsEnabled = true
 
     @AppStorage("mail.settings.defaultArchiveFolder") private var defaultArchiveFolder = "Archive"
     @AppStorage("mail.settings.defaultDeleteBehavior") private var defaultDeleteBehavior = "Move to Trash"
@@ -48,6 +51,7 @@ struct MailSettingsView: View {
     private let archiveOptions = ["Archive", "All Mail", "Inbox"]
     private let deleteOptions = ["Move to Trash", "Archive Instead", "Delete Permanently"]
     private let syncOptions = ["Manual", "5 min", "15 min"]
+    private let inboxActionOptions: [(label: String, id: String)] = [("Delete", "delete"), ("Archive", "archive"), ("Flag Important", "flag"), ("Move to Folder", "move")]
 
     var body: some View {
         NavigationStack {
@@ -163,6 +167,28 @@ struct MailSettingsView: View {
                                 Text("\(lineCount)").tag(lineCount)
                             }
                         }
+                    }
+
+
+                    sectionCard(title: "Inbox Gestures", icon: "hand.draw") {
+                        Picker("Leading swipe", selection: $leadingSwipeAction) {
+                            ForEach(inboxActionOptions, id: \.id) { option in
+                                Text(option.label).tag(option.id)
+                            }
+                        }
+
+                        Picker("Trailing swipe", selection: $trailingSwipeAction) {
+                            ForEach(inboxActionOptions, id: \.id) { option in
+                                Text(option.label).tag(option.id)
+                            }
+                        }
+
+                        Toggle("Enable press and hold actions", isOn: $contextMenuActionsEnabled)
+                            .tint(.cyan)
+
+                        Text("Applies to InboxView rows: Delete, Archive, Flag Important, and Move to Folder.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
 
                     sectionCard(title: "Folder + Organization", icon: "folder") {
@@ -440,6 +466,9 @@ struct MailSettingsView: View {
         showAvatars = true
         showAttachmentIndicators = true
         previewLines = 2
+        leadingSwipeAction = "flag"
+        trailingSwipeAction = "delete"
+        contextMenuActionsEnabled = true
 
         defaultArchiveFolder = "Archive"
         defaultDeleteBehavior = "Move to Trash"
