@@ -95,7 +95,8 @@ struct DraftingEmailsView: View {
             }
             .navigationTitle("Drafting Studio")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
+            .toolbarTitleDisplayMode(.inline)
+            .toolbar(content: {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
                 }
@@ -112,7 +113,7 @@ struct DraftingEmailsView: View {
                     }
                     .disabled(context.isEmpty || isGenerating)
                 }
-            }
+            })
             .onAppear {
                 if generatedBody.isEmpty {
                     generatedBody = currentBody
