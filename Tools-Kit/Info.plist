@@ -27,6 +27,8 @@
 	<string>Your location is used to provide accurate local weather data and forecasts.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Your location is used to provide accurate local weather data and forecasts, even when the app is in the background.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Face ID is used to secure your mail settings and private messages.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
