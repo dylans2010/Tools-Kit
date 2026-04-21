@@ -11,10 +11,18 @@ struct TranslateEmailView: View {
     @State private var translatedText = ""
     @State private var isTranslating = false
     @State private var errorMessage: String?
+    @State private var translationTone = "Natural"
+    @State private var formality = "Professional"
+    @State private var preserveLineBreaks = true
+    @State private var keepNamesUntranslated = true
+    @State private var includeLocalizedDateStyle = false
+    @State private var showAdvancedOptions = false
 
     private let languages = [
-        "English", "Spanish", "French", "German", "Italian", "Portuguese", "Dutch", "Japanese", "Korean", "Chinese", "Arabic", "Hindi"
+        "English", "Spanish", "French", "German", "Italian", "Portuguese", "Dutch", "Japanese", "Korean", "Chinese", "Arabic", "Hindi", "Polish", "Turkish", "Swedish", "Vietnamese"
     ]
+    private let toneOptions = ["Natural", "Business", "Friendly", "Diplomatic", "Direct"]
+    private let formalityOptions = ["Professional", "Neutral", "Formal", "Informal"]
 
     var body: some View {
         NavigationStack {
@@ -22,7 +30,7 @@ struct TranslateEmailView: View {
                 backgroundGradient.ignoresSafeArea()
 
                 ScrollView {
-                    VStack(spacing: 20) {
+                    LazyVStack(spacing: 20) {
                         headerSection
 
                         languageSection
@@ -68,6 +76,7 @@ struct TranslateEmailView: View {
                     }
                     .padding(16)
                 }
+                .scrollBounceBehavior(.basedOnSize)
 
                 if isTranslating {
                     sheetLoadingOverlay(
@@ -135,9 +144,51 @@ struct TranslateEmailView: View {
                     }
                 }
             }
+
+            Divider().overlay(Color.white.opacity(0.15))
+
+            compactSelector(title: "Tone", selection: $translationTone, options: toneOptions)
+            compactSelector(title: "Formality", selection: $formality, options: formalityOptions)
+
+            DisclosureGroup("Advanced translation controls", isExpanded: $showAdvancedOptions) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Toggle("Preserve line breaks and paragraph layout", isOn: $preserveLineBreaks)
+                    Toggle("Keep names and proper nouns as-is", isOn: $keepNamesUntranslated)
+                    Toggle("Use localized date/number formatting", isOn: $includeLocalizedDateStyle)
+                }
+                .font(.caption.bold())
+                .padding(.top, 8)
+            }
+            .font(.caption.bold())
         }
         .padding(16)
         .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func compactSelector(title: String, selection: Binding<String>, options: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(options, id: \.self) { option in
+                        Button {
+                            selection.wrappedValue = option
+                        } label: {
+                            Text(option)
+                                .font(.caption.bold())
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 7)
+                                .background(selection.wrappedValue == option ? Color.blue : Color.white.opacity(0.1), in: Capsule())
+                                .foregroundStyle(selection.wrappedValue == option ? .white : .secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
     }
 
     private func displayCard<Content: View>(title: String, icon: String, isResult: Bool = false, @ViewBuilder content: () -> Content) -> some View {
@@ -206,6 +257,11 @@ struct TranslateEmailView: View {
             Rules:
             - Preserve meaning, names, dates, and intent.
             - Output MUST be in \(targetLanguage), not the source language.
+            - Tone: \(translationTone).
+            - Formality: \(formality).
+            - Preserve line breaks: \(preserveLineBreaks ? "yes" : "no").
+            - Keep names/proper nouns unchanged when possible: \(keepNamesUntranslated ? "yes" : "no").
+            - Localize dates and number formatting: \(includeLocalizedDateStyle ? "yes" : "no").
             - Do not explain the translation.
             - Return only the translated email text. DO NOT SAY ANYTHING ELSE
 

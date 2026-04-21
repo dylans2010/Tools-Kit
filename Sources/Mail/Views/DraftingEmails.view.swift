@@ -28,6 +28,10 @@ struct DraftingEmailsView: View {
         case apology = "Apology"
         case negotiation = "Negotiation"
         case meetingRequest = "Meeting Request"
+        case checkIn = "Check-In"
+        case renewal = "Renewal"
+        case escalation = "Escalation"
+        case thankYou = "Thank You"
 
         var id: String { rawValue }
     }
@@ -55,6 +59,17 @@ struct DraftingEmailsView: View {
         case internalTeam = "Internal Team"
         case executive = "Executive"
         case partner = "Partner"
+        case vendor = "Vendor"
+        case legal = "Legal"
+        case recruiter = "Recruiter"
+        var id: String { rawValue }
+    }
+
+    enum ReadingLevel: String, CaseIterable, Identifiable, Hashable {
+        case simple = "Simple"
+        case standard = "Standard"
+        case advanced = "Advanced"
+
         var id: String { rawValue }
     }
 
@@ -73,15 +88,25 @@ struct DraftingEmailsView: View {
     @State private var includeCallToAction = true
     @State private var includeMeetingSlots = false
     @State private var selectedAudience: Audience = .client
+    @State private var selectedReadingLevel: ReadingLevel = .standard
     @State private var keywords = ""
     @State private var selectedFramework = "Standard"
+    @State private var includeAlternativeVersion = false
+    @State private var includeRiskNotes = false
+    @State private var includeNextStepDeadline = false
+    @State private var includeToneReasoning = false
+    @State private var includeExecutiveSummary = false
+    @State private var includeFollowUpQuestion = false
+    @State private var avoidJargon = true
+    @State private var avoidOverpromising = true
+    @State private var showAdvancedOptions = false
 
     @State private var generatedBody = ""
     @State private var isGenerating = false
     @State private var errorMessage: String?
     @State private var showTemplatesSheet = false
 
-    private let frameworks = ["Standard", "AIDA", "PAS", "SCQA", "STAR"]
+    private let frameworks = ["Standard", "AIDA", "PAS", "SCQA", "STAR", "4Ps", "FAB", "Before-After-Bridge"]
     private let quickTemplates = [
         ("Status + Blockers", "Provide current status, key blockers, and requested support."),
         ("Follow-up Reminder", "Friendly reminder with clear next steps and deadline."),
@@ -98,7 +123,7 @@ struct DraftingEmailsView: View {
                 backgroundGradient.ignoresSafeArea()
 
                 ScrollView {
-                    VStack(spacing: 24) {
+                    LazyVStack(spacing: 24) {
                         headerSection
 
                         inputCard(title: "Recipient & Subject", icon: "person.fill") {
@@ -129,6 +154,7 @@ struct DraftingEmailsView: View {
                                 chipSelector(title: "Length", selection: $selectedLength, options: OutputLength.allCases)
                                 chipSelector(title: "Urgency", selection: $selectedUrgency, options: Urgency.allCases)
                                 chipSelector(title: "Audience", selection: $selectedAudience, options: Audience.allCases)
+                                chipSelector(title: "Reading Level", selection: $selectedReadingLevel, options: ReadingLevel.allCases)
                                 chipSelector(title: "Framework", selection: $selectedFramework, options: frameworks)
                                 Toggle("Include action items", isOn: $includeActionItems)
                                     .font(.caption.bold())
@@ -140,6 +166,22 @@ struct DraftingEmailsView: View {
                                     .font(.caption.bold())
                                 Toggle("Include meeting time suggestions", isOn: $includeMeetingSlots)
                                     .font(.caption.bold())
+
+                                DisclosureGroup("Advanced options", isExpanded: $showAdvancedOptions) {
+                                    VStack(alignment: .leading, spacing: 10) {
+                                        Toggle("Include alternate version", isOn: $includeAlternativeVersion)
+                                        Toggle("Include risk notes", isOn: $includeRiskNotes)
+                                        Toggle("Include next-step deadline", isOn: $includeNextStepDeadline)
+                                        Toggle("Include executive summary", isOn: $includeExecutiveSummary)
+                                        Toggle("Add follow-up question", isOn: $includeFollowUpQuestion)
+                                        Toggle("Explain tone choices", isOn: $includeToneReasoning)
+                                        Toggle("Avoid jargon", isOn: $avoidJargon)
+                                        Toggle("Avoid over-promising", isOn: $avoidOverpromising)
+                                    }
+                                    .font(.caption.bold())
+                                    .padding(.top, 8)
+                                }
+                                .font(.caption.bold())
                             }
                         }
 
@@ -157,6 +199,7 @@ struct DraftingEmailsView: View {
                     )
                 }
             }
+            .scrollBounceBehavior(.basedOnSize)
             .navigationTitle("AI Composing")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarTitleDisplayMode(.inline)
@@ -444,9 +487,23 @@ struct DraftingEmailsView: View {
             Include bullet summary: \(includeBulletSummary ? "yes" : "no").
             Include call to action: \(includeCallToAction ? "yes" : "no").
             Include suggested meeting slots: \(includeMeetingSlots ? "yes" : "no").
+            Include alternate version: \(includeAlternativeVersion ? "yes" : "no").
+            Include risk notes: \(includeRiskNotes ? "yes" : "no").
+            Include next-step deadline line: \(includeNextStepDeadline ? "yes" : "no").
+            Include executive summary: \(includeExecutiveSummary ? "yes" : "no").
+            Include follow-up question: \(includeFollowUpQuestion ? "yes" : "no").
+            Explain tone choices briefly: \(includeToneReasoning ? "yes" : "no").
+            Avoid jargon: \(avoidJargon ? "yes" : "no").
+            Avoid over-promising commitments: \(avoidOverpromising ? "yes" : "no").
+            Reading level: \(selectedReadingLevel.rawValue).
             Keywords to include when relevant: \(keywords).
             Context: \(context)
-            Return only the email body.
+            Training policy:
+            - Be accurate, concise, and business-safe.
+            - Never invent facts not in context.
+            - Keep commitments realistic and explicit.
+            - Use a polished structure with strong clarity and scannability.
+            Return only the email body text.
             """
 
             let result = try await AIService.shared.processText(prompt: prompt)
