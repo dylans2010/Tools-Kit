@@ -14,7 +14,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
         let remoteVariables = await fetchRemoteVariables()
         let clientID = try oauthValue(primaryKey: "MICROSOFT_CLIENT_ID", fallbackKey: "MICROSOFT_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
-        let redirectURI = try oauthValue(primaryKey: "MICROSOFT_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+        let redirectURI = resolveRedirectURI(remoteVariables: remoteVariables)
 
         let verifier = randomCodeVerifier()
         let challenge = codeChallenge(from: verifier)
@@ -43,7 +43,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         guard returnedState == state else {
             throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "OAuth state mismatch"])
         }
-        guard let code = callbackComponents?.queryItems?.first(where: { $0.name == "code" })?.value else {
+        guard let code = extractAuthorizationCode(from: callback) else {
             throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing authorization code"])
         }
 
@@ -198,6 +198,24 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         }
 
         throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing \(primaryKey)"])
+    }
+
+    private func resolveRedirectURI(remoteVariables: [String: String]) -> String {
+        let required = "msauth.com.dylans2010.ToolsKit://auth"
+        let configured = try? oauthValue(primaryKey: "MICROSOFT_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+        if let configured, configured == required {
+            return configured
+        }
+        return required
+    }
+
+    private func extractAuthorizationCode(from callback: URL) -> String? {
+        if let components = URLComponents(url: callback, resolvingAgainstBaseURL: false),
+           let value = components.queryItems?.first(where: { $0.name == "code" })?.value,
+           !value.isEmpty {
+            return value.removingPercentEncoding ?? value
+        }
+        return nil
     }
 
     private func localConfigValue(forKey key: String) -> String? {

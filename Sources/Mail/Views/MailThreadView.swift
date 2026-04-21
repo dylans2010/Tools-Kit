@@ -225,17 +225,25 @@ struct MailThreadView: View {
                         .foregroundColor(.secondary)
                 }
             }
-            Text(summary)
-                .font(.subheadline)
-                .lineSpacing(4)
+            if let attributed = try? AttributedString(markdown: summary) {
+                Text(attributed)
+                    .font(.subheadline)
+                    .lineSpacing(3)
+                    .lineLimit(8)
+            } else {
+                Text(summary)
+                    .font(.subheadline)
+                    .lineSpacing(3)
+                    .lineLimit(8)
+            }
         }
-        .padding()
+        .padding(14)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color.purple.opacity(0.08))
+                .fill(Color(.secondarySystemBackground))
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.purple.opacity(0.3), lineWidth: 1)
+                        .stroke(Color.purple.opacity(0.2), lineWidth: 1)
                 )
         )
     }

@@ -20,7 +20,7 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
         let remoteVariables = await fetchRemoteVariables()
         let clientID = try oauthValue(primaryKey: "YAHOO_CLIENT_ID", fallbackKey: "YAHOO_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
-        let redirectURI = try oauthValue(primaryKey: "YAHOO_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+        let redirectURI = resolveYahooRedirectURI(remoteVariables: remoteVariables)
 
         let verifier = randomCodeVerifier()
         let challenge = codeChallenge(from: verifier)
@@ -48,7 +48,7 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         guard returnedState == state else {
             throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "OAuth state mismatch"])
         }
-        guard let code = callbackComponents?.queryItems?.first(where: { $0.name == "code" })?.value else {
+        guard let code = extractAuthorizationCode(from: callback) else {
             throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing authorization code"])
         }
 
@@ -244,6 +244,34 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         }
 
         throw NSError(domain: "YahooProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing \(primaryKey)"])
+    }
+
+    private func resolveYahooRedirectURI(remoteVariables: [String: String]) -> String {
+        let required = "toolskit://oauth/yahoo"
+        let configured = try? oauthValue(primaryKey: "YAHOO_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+        if let configured, configured == required {
+            return configured
+        }
+        return required
+    }
+
+    private func extractAuthorizationCode(from callback: URL) -> String? {
+        if let components = URLComponents(url: callback, resolvingAgainstBaseURL: false),
+           let code = components.queryItems?.first(where: { $0.name == "code" })?.value,
+           !code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return code.removingPercentEncoding ?? code
+        }
+
+        let parts = callback.absoluteString.split(separator: \"?\", maxSplits: 1).map(String.init)
+        guard parts.count == 2 else { return nil }
+        let query = parts[1].split(separator: \"&\")
+        for segment in query {
+            let pair = segment.split(separator: \"=\", maxSplits: 1).map(String.init)
+            if pair.count == 2, pair[0] == \"code\", !pair[1].isEmpty {
+                return pair[1].removingPercentEncoding ?? pair[1]
+            }
+        }
+        return nil
     }
 
     private func localConfigValue(forKey key: String) -> String? {

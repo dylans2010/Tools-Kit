@@ -17,6 +17,7 @@ struct InboxView: View {
     @State private var searchText = ""
     @State private var showingCompose = false
     @State private var showingUniversalInbox = false
+    @State private var showingAIFeatures = false
     @State private var showingFetchingLabel = false
     @State private var selectedMessage: MailMessage?
 
@@ -49,6 +50,12 @@ struct InboxView: View {
                 }
 
                 Button {
+                    showingAIFeatures = true
+                } label: {
+                    Image(systemName: "sparkles")
+                }
+
+                Button {
                     showingCompose = true
                 } label: {
                     Image(systemName: "square.and.pencil")
@@ -62,6 +69,9 @@ struct InboxView: View {
         }
         .navigationDestination(isPresented: $showingUniversalInbox) {
             UniversalInboxView()
+        }
+        .fullScreenCover(isPresented: $showingAIFeatures) {
+            InboxAIFeaturesView()
         }
         .task {
             mailStore.reloadAccounts()
@@ -335,7 +345,7 @@ private struct SkeletonMailRow: View {
     }
 }
 
-private struct InboxMessageDetailView: View {
+struct InboxMessageDetailView: View {
     let account: MailAccount
     let message: MailMessage
 

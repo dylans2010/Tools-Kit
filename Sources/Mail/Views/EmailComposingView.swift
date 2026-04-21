@@ -18,6 +18,7 @@ struct EmailComposingView: View {
     @State private var isSending = false
     @State private var sendError: String?
     @State private var showingAIPanel = false
+    @State private var showingAIWrite = false
     @State private var showingAttachmentPicker = false
     @State private var showingAudioPicker = false
     @State private var showingTranslateSheet = false
@@ -27,7 +28,6 @@ struct EmailComposingView: View {
     @State private var showingPreviewSheet = false
     @State private var showingDocumentScanner = false
     @State private var showingTableBuilder = false
-    @State private var messageComposerMode: MessageComposerMode = .render
 
     @State private var scheduleDate: Date?
     @State private var selectedFromAccountID: String = ""
@@ -45,13 +45,6 @@ struct EmailComposingView: View {
 
     @FocusState private var bodyFocused: Bool
 
-    private enum MessageComposerMode: String, CaseIterable, Identifiable {
-        case render = "Rendered"
-        case markdown = "Markdown"
-
-        var id: String { rawValue }
-    }
-    
     private struct MarkdownFormatAction: Identifiable {
         let id = UUID()
         let title: String
@@ -156,6 +149,11 @@ struct EmailComposingView: View {
                     if !result.body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         messageBody = result.body
                     }
+                }
+            }
+            .sheet(isPresented: $showingAIWrite) {
+                AIWriteView { generated in
+                    messageBody = generated
                 }
             }
             .sheet(isPresented: $showingTranslateSheet) {
@@ -264,53 +262,35 @@ struct EmailComposingView: View {
 
     private var bodySection: some View {
         Section("Message") {
-            Picker("Composer Mode", selection: $messageComposerMode) {
-                ForEach(MessageComposerMode.allCases) { mode in
-                    Text(mode.rawValue).tag(mode)
+            ZStack(alignment: .topLeading) {
+                if messageBody.isEmpty && !bodyFocused {
+                    Text("Write your message…")
+                        .foregroundColor(Color(.placeholderText))
+                        .padding(.top, 8)
+                        .padding(.leading, 6)
                 }
+
+                TextEditor(text: $messageBody)
+                    .focused($bodyFocused)
+                    .frame(minHeight: 220)
             }
-            .pickerStyle(.segmented)
 
-            if messageComposerMode == .render {
-                ScrollView {
-                    Group {
-                        if let attributed = parsedMarkdownBody {
-                            Text(attributed)
-                        } else if !messageBody.isEmpty {
-                            Text(messageBody)
-                        } else {
-                            Text("Write your message…")
-                                .foregroundStyle(.secondary)
-                        }
+            ScrollView {
+                Group {
+                    if let attributed = parsedMarkdownBody {
+                        Text(attributed)
+                    } else if !messageBody.isEmpty {
+                        Text(messageBody)
+                    } else {
+                        Text("Rendered preview appears here.")
+                            .foregroundStyle(.secondary)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(10)
                 }
-                .frame(minHeight: 280)
-                .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10))
-
-                Button {
-                    messageComposerMode = .markdown
-                    bodyFocused = true
-                } label: {
-                    Label("Edit Markdown", systemImage: "square.and.pencil")
-                        .font(.caption.weight(.semibold))
-                }
-                .buttonStyle(.bordered)
-            } else {
-                ZStack(alignment: .topLeading) {
-                    if messageBody.isEmpty && !bodyFocused {
-                        Text("Write your message…")
-                            .foregroundColor(Color(.placeholderText))
-                            .padding(.top, 8)
-                            .padding(.leading, 6)
-                    }
-
-                    TextEditor(text: $messageBody)
-                        .focused($bodyFocused)
-                        .frame(minHeight: 280)
-                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(10)
             }
+            .frame(minHeight: 120)
+            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10))
         }
     }
 
@@ -320,21 +300,27 @@ struct EmailComposingView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    compactToolButton(icon: "sparkles", title: "AI Write") { showingAIWrite = true }
+                    compactToolButton(icon: "wand.and.stars", title: "Draft") { showingAIPanel = true }
+                    compactToolButton(icon: "globe", title: "Translate") { showingTranslateSheet = true }
+                    compactToolButton(icon: "calendar.badge.clock", title: "Schedule") { showingScheduleSheet = true }
+                    compactToolButton(icon: "doc.viewfinder", title: "Scan") { showingDocumentScanner = true }
+                    compactToolButton(icon: "paperclip", title: "Attach") { showingAttachmentPicker = true }
+                    compactToolButton(icon: "waveform", title: "Audio") { showingAudioPicker = true }
+                    compactToolButton(icon: "tablecells", title: "Table") { showingTableBuilder = true }
+                    compactToolButton(icon: "pencil.and.outline", title: "Draw") { showingDrawingSheet = true }
+                }
+            }
+            .frame(height: 54)
+            .padding(.vertical, 2)
+
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
-                modernToolButton(icon: "sparkles", title: "AI Draft", subtitle: "Generate content") { showingAIPanel = true }
-                    .disabled(!smartReplySuggestionsEnabled)
-                modernToolButton(icon: "globe", title: "Translate", subtitle: "Change language") { showingTranslateSheet = true }
-                    .disabled(!autoCategorizeEmailsEnabled)
-                modernToolButton(icon: "calendar.badge.clock", title: "Schedule", subtitle: "Send later") { showingScheduleSheet = true }
-                modernToolButton(icon: "doc.viewfinder", title: "Scan", subtitle: "Scan documents") { showingDocumentScanner = true }
-                modernToolButton(icon: "paperclip", title: "Attach", subtitle: "Add files") { showingAttachmentPicker = true }
-                modernToolButton(icon: "waveform", title: "Audio Notes", subtitle: "Attach audio") { showingAudioPicker = true }
-                modernToolButton(icon: "tablecells", title: "Table", subtitle: "Build table UI") { showingTableBuilder = true }
-                modernToolButton(icon: "doc.richtext", title: "Preview", subtitle: "Rendered output") { showingPreviewSheet = true }
                 modernToolButton(icon: "link", title: "Link", subtitle: "Insert hyperlink") { showingLinkSheet = true }
                 modernToolButton(icon: "text.quote", title: "Quote", subtitle: "Quote body") { insertQuote() }
                 modernToolButton(icon: "textformat.clear", title: "Clear", subtitle: "Remove markdown") { clearFormatting() }
-                modernToolButton(icon: "pencil.and.outline", title: "Drawing", subtitle: "Attach sketch") { showingDrawingSheet = true }
+                modernToolButton(icon: "doc.richtext", title: "Preview", subtitle: "Rendered output") { showingPreviewSheet = true }
             }
 
             ScrollView(.horizontal, showsIndicators: false) {
@@ -590,9 +576,21 @@ struct EmailComposingView: View {
     
     private func insertMarkdown(_ snippet: String) {
         insert(snippet)
-        if messageComposerMode == .markdown {
-            bodyFocused = true
+        bodyFocused = true
+    }
+
+    private func compactToolButton(icon: String, title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 3) {
+                Image(systemName: icon)
+                    .font(.subheadline.weight(.semibold))
+                Text(title)
+                    .font(.caption2)
+            }
+            .frame(width: 52, height: 46)
+            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10))
         }
+        .buttonStyle(.plain)
     }
 
     private func insertQuote() {

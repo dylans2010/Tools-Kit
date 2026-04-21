@@ -4,6 +4,7 @@ struct MailSettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     @StateObject private var accountManager = AccountManager.shared
+    @StateObject private var syncService = MailSyncService.shared
 
     @AppStorage("mail.settings.undoSendEnabled") private var undoSendEnabled = true
     @AppStorage("mail.settings.undoSendDelay") private var undoSendDelay = 10
@@ -314,9 +315,19 @@ struct MailSettingsView: View {
             }
             .onAppear {
                 accountManager.refreshAccounts()
+                MailNotificationManager.shared.requestAuthorizationIfNeeded()
                 loadSignatures()
                 loadNotifications()
                 ensureValidDefaultAccount()
+            }
+            .onChange(of: notificationByAccount) { _, map in
+                MailNotificationManager.shared.updateAccountNotifications(map)
+            }
+            .onChange(of: autoSyncEnabled) { _, _ in
+                syncService.configureFromSettings()
+            }
+            .onChange(of: syncInterval) { _, _ in
+                syncService.configureFromSettings()
             }
         }
     }

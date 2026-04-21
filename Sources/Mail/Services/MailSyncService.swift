@@ -15,6 +15,7 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
     private var activeAccount: MailAccount?
     private var activeFolder: MailFolder = .inbox
     private var gmailProviders: [String: GmailMailProvider] = [:]
+    private var nextEligibleSyncDate: Date = .distantPast
 
     func fetchThreads(account: MailAccount, folder: MailFolder) async {
         await performFetch(account: account, folder: folder, reset: true)
@@ -27,10 +28,18 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
     }
 
     func syncAll(folder: MailFolder = .inbox) async {
+        guard MailRuntimeSettings.autoSyncEnabled else { return }
+        guard Date() >= nextEligibleSyncDate else { return }
         let accounts = storage.loadAccounts()
         for account in accounts where account.isEnabled {
             await fetchThreads(account: account, folder: folder)
         }
+        configureFromSettings()
+    }
+
+    func configureFromSettings() {
+        let interval = MailRuntimeSettings.syncInterval
+        nextEligibleSyncDate = interval.isInfinite ? .distantFuture : Date().addingTimeInterval(interval)
     }
 
     // MARK: - Private
@@ -92,7 +101,8 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
 
             let folderKey = "\(account.id)_\(folder.id)"
             let merged = mergeThreads(existing: reset ? [] : storage.threads, new: groupedThreads)
-            storage.saveThreads(merged, for: folderKey)
+            let organized = applyFolderRules(to: merged)
+            storage.saveThreads(organized, for: folderKey)
             InternalLogger.shared.log("MailSync: storage updated for key \(folderKey)", level: .debug)
 
             currentOffset += groupedThreads.count
@@ -146,6 +156,14 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
             }
         }
         return combined.values.sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
+    }
+
+    private func applyFolderRules(to threads: [MailThread]) -> [MailThread] {
+        var updated = threads
+        if MailRuntimeSettings.autoSortEnabled {
+            updated.sort { $0.lastMessageDate > $1.lastMessageDate }
+        }
+        return updated
     }
 
     private func session(from account: MailAccount) -> MailSession {

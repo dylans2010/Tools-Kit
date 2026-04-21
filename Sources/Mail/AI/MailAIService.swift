@@ -10,6 +10,11 @@ class MailAIService {
         let priorityThreadIDs: [String]
     }
 
+    struct ScoredThread {
+        let thread: MailThread
+        let urgencyScore: Double
+    }
+
     private struct PriorityDigestResponse: Decodable {
         let summary_markdown: String
         let priority_thread_ids: [String]
@@ -49,6 +54,9 @@ class MailAIService {
     }
 
     func catchUp(unreadThreads: [MailThread]) async throws -> String {
+        guard MailRuntimeSettings.aiAutoSummarizeEnabled else {
+            return "AI summarization is disabled in Mail Settings."
+        }
         guard !unreadThreads.isEmpty else {
             return "You are all caught up. No unread emails were found."
         }
@@ -78,6 +86,9 @@ class MailAIService {
     }
 
     func priorityDigest(unreadThreads: [MailThread]) async throws -> PriorityDigest {
+        guard MailRuntimeSettings.aiAutoCategorizeEnabled else {
+            return PriorityDigest(summaryMarkdown: "### Priority Emails\nAI categorization is disabled in Mail Settings.", priorityThreadIDs: [])
+        }
         guard !unreadThreads.isEmpty else {
             return PriorityDigest(
                 summaryMarkdown: "### Priority Emails\nNo unread emails were found.",
@@ -85,12 +96,11 @@ class MailAIService {
             )
         }
 
-        let threads = unreadThreads
-            .sorted { $0.lastMessageDate > $1.lastMessageDate }
-            .prefix(40)
+        let scored = scoreUnreadThreads(unreadThreads)
+        let threads = scored.prefix(40).map(\.thread)
 
-        let context = threads.map { thread in
-            "ID: \(thread.id) | Subject: \(thread.subject) | From: \(thread.participants.joined(separator: ", ")) | Snippet: \(thread.snippet)"
+        let context = scored.prefix(40).map { item in
+            "ID: \(item.thread.id) | Score: \(String(format: "%.2f", item.urgencyScore)) | Subject: \(item.thread.subject) | From: \(item.thread.participants.joined(separator: ", ")) | Snippet: \(item.thread.snippet)"
         }.joined(separator: "\n")
 
         let prompt = """
@@ -121,7 +131,7 @@ class MailAIService {
             )
         }
 
-        let fallback = Array(threads.prefix(3))
+        let fallback = Array(scored.prefix(5).map(\.thread))
         let fallbackSummary = fallback.enumerated().map { index, thread in
             let sender = thread.participants.first ?? "Unknown"
             return "- **\(index + 1). \(thread.subject)** from \(sender)"
@@ -157,6 +167,9 @@ class MailAIService {
     }
 
     func generateReply(for message: MailMessage, context: String) async throws -> String {
+        guard MailRuntimeSettings.aiSmartReplyEnabled else {
+            return "AI smart reply is disabled in Mail Settings."
+        }
         let messageBody = message.body.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !messageBody.isEmpty else {
             return "Thanks for your email. Could you share a bit more detail so I can respond accurately?"
@@ -174,6 +187,9 @@ class MailAIService {
     }
 
     func improveDraft(_ draft: String, tone: String) async throws -> String {
+        guard MailRuntimeSettings.aiSmartReplyEnabled else {
+            return draft
+        }
         let prompt = """
         Improve the following email draft and make it sound \(tone).
         Preserve the intent, keep the wording natural, and avoid adding unsupported details.
@@ -185,6 +201,25 @@ class MailAIService {
     }
 
     func composeEmail(prompt: String, systemPrompt: String = MailAIToolsSystem.draftingSystemPrompt) async throws -> String {
+        guard MailRuntimeSettings.aiSmartReplyEnabled else {
+            return "AI smart reply is disabled in Mail Settings."
+        }
         try await processMailPrompt(prompt: prompt, systemPrompt: systemPrompt)
+    }
+
+    func scoreUnreadThreads(_ unreadThreads: [MailThread]) -> [ScoredThread] {
+        unreadThreads.map { thread in
+            let latest = thread.messages.last
+            let text = "\(thread.subject) \(thread.snippet)".lowercased()
+            let keywordScore = ["urgent": 0.55, "asap": 0.45, "deadline": 0.65, "immediately": 0.5]
+                .reduce(0.0) { partial, item in
+                    partial + (text.contains(item.key) ? item.value : 0)
+                }
+            let senderScore = (latest?.from.lowercased().contains("ceo") == true || latest?.from.lowercased().contains("manager") == true) ? 0.45 : 0.1
+            let hoursAgo = max(0, Date().timeIntervalSince(thread.lastMessageDate) / 3600)
+            let recencyScore = max(0.05, min(1.0, 1.0 / max(1, hoursAgo)))
+            return ScoredThread(thread: thread, urgencyScore: keywordScore + senderScore + recencyScore)
+        }
+        .sorted { $0.urgencyScore > $1.urgencyScore }
     }
 }
