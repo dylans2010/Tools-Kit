@@ -13,6 +13,7 @@ struct InboxAIFeaturesView: View {
     @State private var selectedEmail: MailMessage?
     @State private var errorMessage: String?
     @State private var animateSymbols = false
+    private let glassSectionOpacity = 0.65
 
     var body: some View {
         NavigationStack {
@@ -391,7 +392,7 @@ struct InboxAIFeaturesView: View {
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(LinearGradient(colors: tint, startPoint: .topLeading, endPoint: .bottomTrailing))
-                .opacity(0.65)
+                .opacity(glassSectionOpacity)
                 .overlay(.ultraThinMaterial.opacity(0.52))
                 .overlay(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)

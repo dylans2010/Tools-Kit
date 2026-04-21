@@ -103,7 +103,7 @@ struct AIChatSettingsView: View {
                         }
                     }
                 }
-                .padding(.vertical, 6)
+                .padding(.vertical, 8)
             }
             .padding(8)
             .background(

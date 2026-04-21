@@ -120,6 +120,8 @@ struct DrawingBoardView: View {
     private let starInnerRadiusRatio: CGFloat = 0.45
     /// Opacity value applied to highlighter strokes for translucent marker effect.
     private let highlighterOpacity = 0.32
+    private let markerOpacityFactor = 0.85
+    private let neonPenOpacityFactor = 0.95
 
     var body: some View {
         NavigationStack {
@@ -638,9 +640,9 @@ struct DrawingBoardView: View {
         case .highlighter:
             return highlighterOpacity
         case .marker:
-            return min(1, strokeOpacity * 0.85)
+            return min(1, strokeOpacity * markerOpacityFactor)
         case .neonPen:
-            return min(1, strokeOpacity * 0.95)
+            return min(1, strokeOpacity * neonPenOpacityFactor)
         default:
             return strokeOpacity
         }
