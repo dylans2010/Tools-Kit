@@ -511,56 +511,14 @@ private struct InboxMessageDetailView: View {
                     header
 
                     if isSummarizing {
-                        HStack {
-                            ProgressView()
-                                .tint(.purple)
-                            Text("Generating Intelligent Summary...")
-                                .font(.caption.bold())
-                                .foregroundStyle(.secondary)
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+                        summarizingIndicator
                     }
 
                     if let summary, !summary.isEmpty {
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack {
-                                Label("AI Summary", systemImage: "sparkles")
-                                    .font(.caption.bold())
-                                    .foregroundStyle(.blue)
-                                Spacer()
-                                Button {
-                                    UIPasteboard.general.string = summary
-                                } label: {
-                                    Label("Copy", systemImage: "doc.on.doc")
-                                        .font(.caption.bold())
-                                }
-                                .buttonStyle(.borderedProminent)
-                                .tint(.blue.opacity(0.8))
-                            }
-
-                            MarkdownSummaryText(summary)
-                        }
-                        .padding(16)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 18)
-                                .stroke(LinearGradient(colors: [Color.blue.opacity(0.45), Color.cyan.opacity(0.3)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
-                        )
+                        summarySection(summary: summary)
                     }
 
-                    if let htmlBody = message.htmlBody, !htmlBody.isEmpty {
-                        MessageWebView(html: htmlBody)
-                            .frame(minHeight: max(geo.size.height * 0.78, 420))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                    } else {
-                        Text(message.body)
-                            .font(.body)
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .frame(minHeight: max(geo.size.height * 0.72, 380), alignment: .topLeading)
-                    }
+                    messageContent(geo: geo)
 
                     if let actionError {
                         Text(actionError)
@@ -574,38 +532,97 @@ private struct InboxMessageDetailView: View {
             .navigationTitle("Message")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Button {
-                            summarize()
-                        } label: {
-                            Label("Summarize", systemImage: "text.justify.leading")
-                        }
-
-                        Button {
-                            showReply = true
-                        } label: {
-                            Label("Reply", systemImage: "arrowshape.turn.up.left")
-                        }
-
-                        Button {
-                            Task { await archiveMessage() }
-                        } label: {
-                            Label("Archive", systemImage: "archivebox")
-                        }
-
-                        Button(role: .destructive) {
-                            Task { await deleteMessage() }
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                    }
-                }
+                messageToolbar
             }
             .fullScreenCover(isPresented: $showReply) {
                 EmailComposingView(account: account, replyTo: message)
+            }
+        }
+    }
+
+    private var summarizingIndicator: some View {
+        HStack {
+            ProgressView()
+                .tint(.purple)
+            Text("Generating Intelligent Summary...")
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .frame(maxWidth: .infinity)
+        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func summarySection(summary: String) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label("AI Summary", systemImage: "sparkles")
+                    .font(.caption.bold())
+                    .foregroundStyle(.blue)
+                Spacer()
+                Button {
+                    UIPasteboard.general.string = summary
+                } label: {
+                    Label("Copy", systemImage: "doc.on.doc")
+                        .font(.caption.bold())
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.blue.opacity(0.8))
+            }
+
+            MarkdownSummaryText(text: summary)
+        }
+        .padding(16)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(LinearGradient(colors: [Color.blue.opacity(0.45), Color.cyan.opacity(0.3)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
+        )
+    }
+
+    @ViewBuilder
+    private func messageContent(geo: GeometryProxy) -> some View {
+        if let htmlBody = message.htmlBody, !htmlBody.isEmpty {
+            MessageWebView(html: htmlBody)
+                .frame(minHeight: max(geo.size.height * 0.78, 420))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+        } else {
+            Text(message.body)
+                .font(.body)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(minHeight: max(geo.size.height * 0.72, 380), alignment: .topLeading)
+        }
+    }
+
+    private var messageToolbar: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+                Button {
+                    summarize()
+                } label: {
+                    Label("Summarize", systemImage: "text.justify.leading")
+                }
+
+                Button {
+                    showReply = true
+                } label: {
+                    Label("Reply", systemImage: "arrowshape.turn.up.left")
+                }
+
+                Button {
+                    Task { await archiveMessage() }
+                } label: {
+                    Label("Archive", systemImage: "archivebox")
+                }
+
+                Button(role: .destructive) {
+                    Task { await deleteMessage() }
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
             }
         }
     }
