@@ -13,7 +13,6 @@ struct UniversalInboxView: View {
     @State private var assignmentByAccount: [String: [String: String]] = [:]
     @State private var showFolderEditorForAccount: MailAccount?
     @State private var selectedMessage: MailMessage?
-    @State private var showCompose = false
     @State private var showMailSettings = false
     @State private var navigationTarget: InboxNavigationTarget?
 
@@ -36,14 +35,6 @@ struct UniversalInboxView: View {
                     Image(systemName: "slider.horizontal.3")
                 }
             }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    showCompose = true
-                } label: {
-                    Image(systemName: "square.and.pencil")
-                }
-                .disabled(accountManager.activeAccount == nil)
-            }
         }
         .sheet(item: $showFolderEditorForAccount) { account in
             FolderEditorSheet(
@@ -54,11 +45,6 @@ struct UniversalInboxView: View {
                     persistFolderState()
                 }
             )
-        }
-        .sheet(isPresented: $showCompose) {
-            if let active = accountManager.activeAccount {
-                EmailComposingView(account: active)
-            }
         }
         .sheet(isPresented: $showMailSettings) {
             MailSettingsView()

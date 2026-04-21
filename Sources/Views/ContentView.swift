@@ -25,6 +25,9 @@ struct ContentView: View {
         }
         .task {
             await restoreSessionIfNeeded()
+            Task {
+                await InboxAIAnalysisCache.shared.warmCacheIfNeeded(force: false)
+            }
         }
     }
 
