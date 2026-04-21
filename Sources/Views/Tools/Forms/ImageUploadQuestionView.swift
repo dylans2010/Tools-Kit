@@ -55,7 +55,7 @@ struct ImageUploadQuestionView: View {
                 .background(Color(.secondarySystemBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
-        .onChange(of: pickerItem) { newItem in
+        .onChange(of: pickerItem) { _, newItem in
             Task {
                 guard let item = newItem else { return }
                 do {

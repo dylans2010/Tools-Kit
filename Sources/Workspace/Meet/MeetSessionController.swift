@@ -963,13 +963,13 @@ final class MeetingStateManager: NSObject, ObservableObject {
         }
     }
 
-    private nonisolated func participantDisplayName(_ participant: Participant) -> String {
+    private func participantDisplayName(_ participant: Participant) -> String {
         let trimmed = participant.info.username?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         if !trimmed.isEmpty { return trimmed }
         return Self.guestDisplayName
     }
 
-    private nonisolated func participantIDString(_ participant: Participant) -> String {
+    private func participantIDString(_ participant: Participant) -> String {
         "\(participant.id)"
     }
 

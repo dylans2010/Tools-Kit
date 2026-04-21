@@ -32,7 +32,7 @@ struct InboxView: View {
                     .transition(.opacity)
             }
         }
-        .navigationTitle(folder.displayName)
+        .navigationTitle(folder.name)
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText)
         .refreshable {
@@ -78,7 +78,7 @@ struct InboxView: View {
             viewModel.configure(account: active, folder: folder)
             await viewModel.loadCachedThenRefreshIfNeeded()
         }
-        .onChange(of: mailStore.activeAccount?.id) { _ in
+        .onChange(of: mailStore.activeAccount?.id) { _, _ in
             Task {
                 guard let active = activeAccount else { return }
                 viewModel.configure(account: active, folder: folder)
