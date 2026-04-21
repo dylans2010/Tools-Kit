@@ -753,7 +753,7 @@ struct DrawingBoardView: View {
         guard let stroke else { return true }
         guard stroke.tool == .spray else { return true }
         guard let lastPoint = stroke.points.last else { return true }
-        let minDistance = max(2.0, lineWidth * 0.75)
+        let minDistance = max(2.0, stroke.lineWidth * 0.75)
         return hypot(point.x - lastPoint.x, point.y - lastPoint.y) >= minDistance
     }
 
@@ -773,7 +773,7 @@ struct DrawingBoardView: View {
             distanceSinceLastSample += hypot(current.x - previous.x, current.y - previous.y)
             if distanceSinceLastSample >= targetSpacing {
                 sampled.append(current)
-                distanceSinceLastSample = 0
+                distanceSinceLastSample = .zero
             }
         }
 
