@@ -28,6 +28,8 @@ struct InboxView: View {
     @AppStorage("mail.settings.swipe.trailing") private var trailingSwipeAction = "delete"
     @AppStorage("mail.settings.contextMenu.enabled") private var contextMenuActionsEnabled = true
 
+    private let listCardBackground = Color(hex: "#161622") ?? .black
+
     var body: some View {
         ZStack {
             hexColor("#0D0D14").ignoresSafeArea()
@@ -114,16 +116,24 @@ struct InboxView: View {
     }
 
     private var visibleThreads: [MailThread] {
-        guard selectedCategory != .all else { return filteredThreadsBeforeCategory }
-        return filteredThreadsBeforeCategory.filter { MailCategoryClassifier.category(for: $0) == selectedCategory }
+        if selectedCategory == .all {
+            return categorizedThreads.map { $0.thread }
+        }
+        return categorizedThreads.filter { $0.category == selectedCategory }.map { $0.thread }
     }
 
     private var categoryCounts: [InboxCategory: Int] {
-        var counts: [InboxCategory: Int] = [.all: filteredThreadsBeforeCategory.count]
+        var counts: [InboxCategory: Int] = [.all: categorizedThreads.count]
         for category in InboxCategory.selectableCases where category != .all {
-            counts[category] = filteredThreadsBeforeCategory.filter { MailCategoryClassifier.category(for: $0) == category }.count
+            counts[category] = categorizedThreads.filter { $0.category == category }.count
         }
         return counts
+    }
+
+    private var categorizedThreads: [(thread: MailThread, category: InboxCategory)] {
+        filteredThreadsBeforeCategory.map { thread in
+            (thread: thread, category: MailCategoryClassifier.category(for: thread))
+        }
     }
 
     private var contentList: some View {
@@ -131,7 +141,7 @@ struct InboxView: View {
             Section {
                 categoryChips
             }
-            .listRowBackground(hexColor("#161622"))
+            .listRowBackground(listCardBackground)
 
             if showingFetchingLabel {
                 Section {
@@ -143,7 +153,7 @@ struct InboxView: View {
                     }
                     .padding(.vertical, 4)
                 }
-                .listRowBackground(hexColor("#161622"))
+                .listRowBackground(listCardBackground)
             }
 
             if visibleThreads.isEmpty {

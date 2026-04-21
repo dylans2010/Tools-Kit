@@ -4,14 +4,15 @@ struct ModernSheetLoadingView: View {
     let title: String
     let subtitle: String
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var animate = false
 
     var body: some View {
         ZStack {
             LinearGradient(
                 colors: [Color.black.opacity(0.9), Color.blue.opacity(0.35), Color.purple.opacity(0.45), Color.black.opacity(0.9)],
-                startPoint: animate ? .topLeading : .bottomTrailing,
-                endPoint: animate ? .bottomTrailing : .topLeading
+                startPoint: (animate && !reduceMotion) ? .topLeading : .bottomTrailing,
+                endPoint: (animate && !reduceMotion) ? .bottomTrailing : .topLeading
             )
             .ignoresSafeArea()
 
@@ -20,12 +21,12 @@ struct ModernSheetLoadingView: View {
                     .fill(.blue.opacity(0.3))
                     .frame(width: 280, height: 280)
                     .blur(radius: 18)
-                    .offset(x: animate ? -30 : 30, y: animate ? -36 : 36)
+                    .offset(x: (animate && !reduceMotion) ? -30 : 30, y: (animate && !reduceMotion) ? -36 : 36)
                 Circle()
                     .fill(.purple.opacity(0.32))
                     .frame(width: 240, height: 240)
                     .blur(radius: 18)
-                    .offset(x: animate ? 30 : -30, y: animate ? 34 : -34)
+                    .offset(x: (animate && !reduceMotion) ? 30 : -30, y: (animate && !reduceMotion) ? 34 : -34)
             }
 
             VStack(spacing: 18) {
@@ -40,7 +41,7 @@ struct ModernSheetLoadingView: View {
                             style: .init(lineWidth: 10, lineCap: .round)
                         )
                         .frame(width: 88, height: 88)
-                        .rotationEffect(.degrees(animate ? 360 : 0))
+                        .rotationEffect(.degrees((animate && !reduceMotion) ? 360 : 0))
                 }
 
                 VStack(spacing: 8) {
@@ -62,6 +63,7 @@ struct ModernSheetLoadingView: View {
             .padding(24)
         }
         .onAppear {
+            guard !reduceMotion else { return }
             withAnimation(.linear(duration: 1.3).repeatForever(autoreverses: false)) {
                 animate = true
             }

@@ -11,7 +11,7 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
     private var authSession: ASWebAuthenticationSession?
     private let imapFallback = IMAPProvider()
     private let boundSession: MailSession?
-    private let yahooScopes = "mail-r mail-w openid profile email offline_access"
+    private let oauthScopes = "mail-r mail-w openid profile email offline_access"
 
     init(session: MailSession? = nil) {
         self.boundSession = session
@@ -33,7 +33,7 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
             URLQueryItem(name: "client_id", value: clientID),
             URLQueryItem(name: "redirect_uri", value: redirectURI),
             URLQueryItem(name: "response_type", value: "code"),
-            URLQueryItem(name: "scope", value: yahooScopes),
+            URLQueryItem(name: "scope", value: oauthScopes),
             URLQueryItem(name: "state", value: state),
             URLQueryItem(name: "code_challenge", value: challenge),
             URLQueryItem(name: "code_challenge_method", value: "S256")
