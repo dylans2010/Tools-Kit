@@ -199,7 +199,15 @@ struct MailSettingsView: View {
                     }
 
                     sectionCard(title: "Performance + Sync", icon: "arrow.triangle.2.circlepath") {
-                        Toggle("Auto-sync", isOn: $autoSyncEnabled).tint(.cyan)
+                        Toggle("Auto-sync", isOn: $autoSyncEnabled)
+                            .tint(.cyan)
+                            .onChange(of: autoSyncEnabled) { _, enabled in
+                                if enabled {
+                                    MailSyncService.shared.startAutoSync()
+                                } else {
+                                    MailSyncService.shared.stopAutoSync()
+                                }
+                            }
 
                         Picker("Sync interval", selection: $syncInterval) {
                             ForEach(syncOptions, id: \.self) { option in
@@ -207,6 +215,11 @@ struct MailSettingsView: View {
                             }
                         }
                         .disabled(!autoSyncEnabled)
+                        .onChange(of: syncInterval) { _, _ in
+                            if autoSyncEnabled {
+                                MailSyncService.shared.startAutoSync()
+                            }
+                        }
 
                         Toggle("Download attachments automatically", isOn: $autoDownloadAttachments).tint(.cyan)
 

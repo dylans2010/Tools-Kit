@@ -60,7 +60,7 @@ struct UniversalInboxView: View {
                 EmailComposingView(account: active)
             }
         }
-        .fullScreenCover(isPresented: $showMailSettings) {
+        .sheet(isPresented: $showMailSettings) {
             MailSettingsView()
         }
         .task {
@@ -191,24 +191,29 @@ struct UniversalInboxView: View {
     }
 
     private func messageRow(_ scoped: ScopedMailMessage, account: MailAccount?) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(scoped.message.subject)
-                    .font(.subheadline.weight(.semibold))
-                    .lineLimit(1)
-                Spacer()
-                Text(scoped.message.date, style: .date)
-                    .font(.caption2)
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text(scoped.message.subject)
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(1)
+                    Spacer()
+                    Text(scoped.message.date, style: .date)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                Text(scoped.message.from)
+                    .font(.caption)
                     .foregroundStyle(.secondary)
+                if let account {
+                    Text("\(account.providerType.displayName) • \(account.emailAddress)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
             }
-            Text(scoped.message.from)
-                .font(.caption)
+            Image(systemName: "chevron.right")
+                .font(.caption2.weight(.bold))
                 .foregroundStyle(.secondary)
-            if let account {
-                Text("\(account.providerType.displayName) • \(account.emailAddress)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
         }
         .swipeActions(edge: .leading, allowsFullSwipe: false) {
             Button {

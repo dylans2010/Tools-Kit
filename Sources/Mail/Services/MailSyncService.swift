@@ -11,6 +11,7 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
     private let storage = MailStorageService.shared
     private let pageSize = 50
     private var currentOffset = 0
+    private var syncTimer: Timer?
     private var hasMorePages = true
     private var activeAccount: MailAccount?
     private var activeFolder: MailFolder = .inbox
@@ -28,9 +29,33 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
 
     func syncAll(folder: MailFolder = .inbox) async {
         let accounts = storage.loadAccounts()
-        for account in accounts where account.isEnabled {
+        for account in accounts {
             await fetchThreads(account: account, folder: folder)
         }
+    }
+
+    func startAutoSync() {
+        stopAutoSync()
+        guard UserDefaults.standard.bool(forKey: "mail.settings.autoSync") else { return }
+
+        let intervalString = UserDefaults.standard.string(forKey: "mail.settings.syncInterval") ?? "15 min"
+        let seconds: TimeInterval
+        switch intervalString {
+        case "5 min": seconds = 5 * 60
+        case "15 min": seconds = 15 * 60
+        default: return // Manual or unknown
+        }
+
+        syncTimer = Timer.scheduledTimer(withTimeInterval: seconds, repeats: true) { [weak self] _ in
+            Task { [weak self] in
+                await self?.syncAll()
+            }
+        }
+    }
+
+    func stopAutoSync() {
+        syncTimer?.invalidate()
+        syncTimer = nil
     }
 
     // MARK: - Private
@@ -91,7 +116,8 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
             InternalLogger.shared.log("MailSync: fetched \(groupedThreads.count) thread(s) for \(account.emailAddress)", level: .debug)
 
             let folderKey = "\(account.id)_\(folder.id)"
-            let merged = mergeThreads(existing: reset ? [] : storage.threads, new: groupedThreads)
+            let processedThreads = applyFolderRules(to: groupedThreads, account: account)
+            let merged = mergeThreads(existing: reset ? [] : storage.threads, new: processedThreads)
             storage.saveThreads(merged, for: folderKey)
             InternalLogger.shared.log("MailSync: storage updated for key \(folderKey)", level: .debug)
 
@@ -121,6 +147,37 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
             )
         }
         .sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
+    }
+
+    private func applyFolderRules(to threads: [MailThread], account: MailAccount) -> [MailThread] {
+        let autoSort = UserDefaults.standard.bool(forKey: "mail.settings.autoSortEmails")
+        let autoMarkImportant = UserDefaults.standard.bool(forKey: "mail.settings.autoMarkImportant")
+
+        if !autoSort && !autoMarkImportant { return threads }
+
+        return threads.map { thread in
+            var updatedThread = thread
+            let subject = thread.subject.lowercased()
+            let participants = thread.participants.joined(separator: " ").lowercased()
+
+            // Logic for auto-marking important
+            if autoMarkImportant {
+                let urgentKeywords = ["urgent", "asap", "deadline", "important", "action required"]
+                let isUrgent = urgentKeywords.contains { subject.contains($0) }
+                if isUrgent {
+                    // In a real system, we'd update the database/server.
+                    // Here we're just tagging the local model if possible.
+                    // MailThread doesn't have an isImportant field, but it has messages which have isStarred.
+                    updatedThread.messages = thread.messages.map { msg in
+                        var m = msg
+                        m.isStarred = true
+                        return m
+                    }
+                }
+            }
+
+            return updatedThread
+        }
     }
 
     private func mergeThreads(existing: [MailThread], new: [MailThread]) -> [MailThread] {

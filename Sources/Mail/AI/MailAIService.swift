@@ -49,6 +49,9 @@ class MailAIService {
     }
 
     func catchUp(unreadThreads: [MailThread]) async throws -> String {
+        guard UserDefaults.standard.bool(forKey: "mail.settings.ai.autoSummarize") else {
+            return "Summarization is disabled in settings."
+        }
         guard !unreadThreads.isEmpty else {
             return "You are all caught up. No unread emails were found."
         }
@@ -78,6 +81,9 @@ class MailAIService {
     }
 
     func priorityDigest(unreadThreads: [MailThread]) async throws -> PriorityDigest {
+        guard UserDefaults.standard.bool(forKey: "mail.settings.ai.autoSummarize") else {
+            return PriorityDigest(summaryMarkdown: "Summarization is disabled in settings.", priorityThreadIDs: [])
+        }
         guard !unreadThreads.isEmpty else {
             return PriorityDigest(
                 summaryMarkdown: "### Priority Emails\nNo unread emails were found.",
@@ -94,8 +100,13 @@ class MailAIService {
         }.joined(separator: "\n")
 
         let prompt = """
-        Analyze every email below and identify only the priority emails.
-        A priority email is urgent, deadline-driven, high business impact, or blocked waiting for a reply.
+        Analyze every email below and identify ONLY the high-priority emails.
+        Criteria for Priority:
+        1. Urgency: Keywords like 'urgent', 'ASAP', 'deadline', 'emergency', 'immediately'.
+        2. Importance: Communication from key stakeholders, bosses, or known high-importance senders.
+        3. Recency: Very recent unread messages that require immediate action.
+        4. Impact: High business or personal impact tasks.
+
         Return JSON only with this exact shape:
         {
           "summary_markdown": "short markdown summary of priority emails only",
@@ -138,6 +149,9 @@ class MailAIService {
     }
 
     func summarizeThread(_ thread: MailThread) async throws -> String {
+        guard UserDefaults.standard.bool(forKey: "mail.settings.ai.autoSummarize") else {
+            return "Summarization is disabled in settings."
+        }
         let content = thread.messages
             .map { "\($0.from): \($0.body.trimmingCharacters(in: .whitespacesAndNewlines))" }
             .joined(separator: "\n")

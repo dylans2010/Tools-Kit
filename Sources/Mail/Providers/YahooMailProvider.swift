@@ -43,7 +43,9 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
 
         InternalLogger.shared.log("OAuth start provider=yahoo callbackScheme=\(URL(string: redirectURI)?.scheme ?? "unknown")", level: .info)
         let callback = try await startOAuth(url: url, callbackScheme: URL(string: redirectURI)?.scheme)
-        let callbackComponents = URLComponents(url: callback, resolvingAgainstBaseURL: false)
+
+        let callbackString = callback.absoluteString.replacingOccurrences(of: "toolskit://oauth/yahoo?", with: "toolskit://oauth/yahoo/?")
+        let callbackComponents = URLComponents(string: callbackString)
         let returnedState = callbackComponents?.queryItems?.first(where: { $0.name == "state" })?.value
         guard returnedState == state else {
             throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "OAuth state mismatch"])
