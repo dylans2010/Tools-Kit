@@ -96,24 +96,9 @@ struct DraftingEmailsView: View {
             .navigationTitle("Drafting Studio")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarTitleDisplayMode(.inline)
-            .toolbar(content: {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        Task { await generateDraft() }
-                    } label: {
-                        if isGenerating {
-                            ProgressView()
-                        } else {
-                            Text("Generate")
-                                .bold()
-                        }
-                    }
-                    .disabled(context.isEmpty || isGenerating)
-                }
-            })
+            .safeAreaInset(edge: .bottom) {
+                actionBar
+            }
             .onAppear {
                 if generatedBody.isEmpty {
                     generatedBody = currentBody
@@ -133,6 +118,39 @@ struct DraftingEmailsView: View {
                 .multilineTextAlignment(.center)
         }
         .padding(.top, 8)
+    }
+
+    private var actionBar: some View {
+        HStack(spacing: 12) {
+            Button("Cancel") { dismiss() }
+                .font(.subheadline.bold())
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(Color.white.opacity(0.08), in: Capsule())
+                .foregroundStyle(.white)
+
+            Button {
+                Task { await generateDraft() }
+            } label: {
+                Group {
+                    if isGenerating {
+                        ProgressView()
+                    } else {
+                        Text("Generate")
+                            .bold()
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+            }
+            .disabled(context.isEmpty || isGenerating)
+            .background(context.isEmpty || isGenerating ? Color.gray.opacity(0.35) : Color.blue, in: Capsule())
+            .foregroundStyle(.white)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 10)
+        .padding(.bottom, 12)
+        .background(.ultraThinMaterial)
     }
 
     private func inputCard<Content: View>(title: String, icon: String, @ViewBuilder content: () -> Content) -> some View {
