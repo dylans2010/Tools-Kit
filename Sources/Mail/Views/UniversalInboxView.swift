@@ -7,6 +7,7 @@ struct UniversalInboxView: View {
 
     @AppStorage("mail.universal.expandedAccount") private var expandedAccountId: String = ""
     @AppStorage("mail.universal.grouping") private var groupingMode: String = "account"
+    @AppStorage("mail.settings.defaultSenderAccountId") private var defaultSenderAccountId: String = ""
 
     @State private var selectedFolderByAccount: [String: String] = [:]
     @State private var customFoldersByAccount: [String: [String]] = [:]
@@ -15,6 +16,7 @@ struct UniversalInboxView: View {
     @State private var selectedMessage: MailMessage?
     @State private var showMailSettings = false
     @State private var navigationTarget: InboxNavigationTarget?
+    @State private var didAutoOpenDefaultInbox = false
 
     var body: some View {
         List {
@@ -55,9 +57,11 @@ struct UniversalInboxView: View {
             accountManager.refreshAccounts()
             loadFolderState()
             await syncAll()
+            autoOpenDefaultInboxIfNeeded()
         }
         .onChange(of: accountManager.accounts.map(\.id).joined(separator: ",")) { _ in
             loadFolderState()
+            autoOpenDefaultInboxIfNeeded()
         }
         .navigationDestination(item: $navigationTarget) { destination in
             if let account = accountManager.account(for: destination.accountId) {
@@ -408,6 +412,27 @@ struct UniversalInboxView: View {
     private func openInbox(accountId: String, folderName: String = "Inbox") {
         guard let account = accountManager.account(for: accountId) else { return }
         openInbox(for: account, folderName: folderName)
+    }
+
+    private func autoOpenDefaultInboxIfNeeded() {
+        guard !didAutoOpenDefaultInbox, navigationTarget == nil else { return }
+        guard !isUnifiedMode else { return }
+
+        let preferredAccountId: String? = {
+            if !defaultSenderAccountId.isEmpty,
+               accountManager.account(for: defaultSenderAccountId) != nil {
+                return defaultSenderAccountId
+            }
+            if let activeId = accountManager.activeAccount?.id,
+               accountManager.account(for: activeId) != nil {
+                return activeId
+            }
+            return accountManager.accounts.first?.id
+        }()
+
+        guard let preferredAccountId else { return }
+        didAutoOpenDefaultInbox = true
+        openInbox(accountId: preferredAccountId, folderName: "Inbox")
     }
 
     private func mailFolder(for name: String) -> MailFolder {

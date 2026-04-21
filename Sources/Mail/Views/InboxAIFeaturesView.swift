@@ -20,7 +20,7 @@ struct InboxAIFeaturesView: View {
                 backgroundGradient.ignoresSafeArea()
 
                 ScrollView {
-                    VStack(spacing: 20) {
+                    LazyVStack(spacing: 20) {
                         headerSection
 
                         if isAnalyzing {
@@ -39,6 +39,7 @@ struct InboxAIFeaturesView: View {
                     }
                     .padding(16)
                 }
+                .scrollBounceBehavior(.basedOnSize)
             }
             .navigationTitle("AI Intelligence")
             .navigationBarTitleDisplayMode(.inline)
@@ -83,23 +84,16 @@ struct InboxAIFeaturesView: View {
 
     private var headerSection: some View {
         VStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [Color.purple.opacity(0.5), Color.blue.opacity(0.25), .clear],
-                            center: .center,
-                            startRadius: 10,
-                            endRadius: 80
-                        )
-                    )
-                    .frame(width: 148, height: 148)
-                    .blur(radius: 12)
-
+            TimelineView(.animation) { timeline in
+                let phase = timeline.date.timeIntervalSinceReferenceDate
                 Image(systemName: "apple.intelligence")
                     .font(.system(size: 46, weight: .semibold))
                     .foregroundStyle(
-                        LinearGradient(colors: [.white, .cyan, .blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        LinearGradient(
+                            colors: shiftingIconGradient(phase: phase),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
                     .shadow(color: .blue.opacity(0.45), radius: 12, y: 4)
                     .modifier(ModernSymbolEffect(trigger: pulseHeader))
@@ -118,6 +112,7 @@ struct InboxAIFeaturesView: View {
         .padding(.vertical, 14)
         .frame(maxWidth: .infinity)
         .background(Color.white.opacity(0.03), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .stroke(LinearGradient(colors: [.white.opacity(0.2), .clear], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
@@ -186,6 +181,7 @@ struct InboxAIFeaturesView: View {
         }
         .padding(16)
         .glassSectionBackground(gradient: [Color.purple.opacity(0.4), Color.indigo.opacity(0.35), Color.cyan.opacity(0.18)])
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
     private var prioritySection: some View {
@@ -225,6 +221,7 @@ struct InboxAIFeaturesView: View {
         }
         .padding(16)
         .glassSectionBackground(gradient: [Color.pink.opacity(0.35), Color.red.opacity(0.3), Color.orange.opacity(0.2)])
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
     private func priorityRow(thread: MailThread, message: MailMessage) -> some View {
@@ -261,6 +258,16 @@ struct InboxAIFeaturesView: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(LinearGradient(colors: [Color.white.opacity(0.2), Color.clear], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
         )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private func shiftingIconGradient(phase: TimeInterval) -> [Color] {
+        [
+            Color(hue: (phase * 0.08).truncatingRemainder(dividingBy: 1), saturation: 0.65, brightness: 1),
+            Color(hue: (phase * 0.08 + 0.15).truncatingRemainder(dividingBy: 1), saturation: 0.8, brightness: 1),
+            Color(hue: (phase * 0.08 + 0.32).truncatingRemainder(dividingBy: 1), saturation: 0.75, brightness: 0.98),
+            Color(hue: (phase * 0.08 + 0.52).truncatingRemainder(dividingBy: 1), saturation: 0.7, brightness: 1)
+        ]
     }
 
     private var emailsUsedSheet: some View {
