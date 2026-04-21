@@ -12,8 +12,7 @@ struct InboxAIFeaturesView: View {
     @State private var showingEmailsUsed = false
     @State private var selectedEmail: MailMessage?
     @State private var errorMessage: String?
-    @State private var animateSymbols = false
-    private let glassSectionOpacity = 0.65
+    @State private var pulseHeader = false
 
     var body: some View {
         NavigationStack {
@@ -50,17 +49,14 @@ struct InboxAIFeaturesView: View {
 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        animateSymbols.toggle()
                         Task { await runAnalysis() }
                     } label: {
                         Image(systemName: "arrow.clockwise")
-                            .modifier(RefreshSymbolEffect(trigger: animateSymbols))
                     }
                     .disabled(isAnalyzing)
                 }
             }
             .task {
-                animateSymbols.toggle()
                 await runAnalysis()
             }
             .sheet(isPresented: $showingEmailsUsed) {
@@ -85,7 +81,7 @@ struct InboxAIFeaturesView: View {
             Image(systemName: "sparkles")
                 .font(.system(size: 40))
                 .foregroundStyle(LinearGradient(colors: [.purple, .blue, .cyan], startPoint: .topLeading, endPoint: .bottomTrailing))
-                .modifier(HeaderSymbolEffect())
+                .modifier(ModernSymbolEffect(trigger: pulseHeader))
 
             Text("Workspace AI")
                 .font(.title2.bold())
@@ -98,14 +94,14 @@ struct InboxAIFeaturesView: View {
                 .padding(.horizontal, 20)
         }
         .padding(.vertical, 10)
+        .onAppear { pulseHeader = true }
     }
 
     private var loadingSection: some View {
         VStack(spacing: 20) {
-            Image(systemName: "brain.head.profile")
-                .font(.system(size: 36, weight: .semibold))
-                .foregroundStyle(LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing))
-                .modifier(LoadingSymbolEffect())
+            ProgressView()
+                .tint(.purple)
+                .scaleEffect(1.5)
 
             Text("Scanning your inbox...")
                 .font(.headline)
@@ -117,29 +113,15 @@ struct InboxAIFeaturesView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 60)
-        .background(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [Color.purple.opacity(0.22), Color.blue.opacity(0.15)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(.ultraThinMaterial.opacity(0.55))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .stroke(Color.white.opacity(0.18), lineWidth: 1)
-                )
-        )
     }
 
     private var catchUpSection: some View {
-        glassSectionCard {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Label("Catch Up", systemImage: "bolt.fill")
                     .font(.headline)
                     .foregroundStyle(.yellow)
+                    .modifier(ModernSymbolEffect(trigger: !catchUpSummary.isEmpty))
                 Spacer()
             }
 
@@ -173,14 +155,17 @@ struct InboxAIFeaturesView: View {
                         .stroke(LinearGradient(colors: [.purple.opacity(0.3), .blue.opacity(0.3)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
                 )
             }
-        } tint: [.purple.opacity(0.35), .blue.opacity(0.2)]
+        }
+        .padding(16)
+        .glassSectionBackground(gradient: [Color.purple.opacity(0.35), Color.blue.opacity(0.2)])
     }
 
     private var prioritySection: some View {
-        glassSectionCard {
+        VStack(alignment: .leading, spacing: 12) {
             Label("Priority Emails", systemImage: "exclamationmark.circle.fill")
                 .font(.headline)
                 .foregroundStyle(.red)
+                .modifier(ModernSymbolEffect(trigger: !priorityEmails.isEmpty))
 
             if priorityEmails.isEmpty {
                 Text("No urgent emails detected.")
@@ -209,7 +194,9 @@ struct InboxAIFeaturesView: View {
                     }
                 }
             }
-        } tint: [.pink.opacity(0.35), .orange.opacity(0.22)]
+        }
+        .padding(16)
+        .glassSectionBackground(gradient: [Color.red.opacity(0.28), Color.orange.opacity(0.18)])
     }
 
     private func priorityRow(thread: MailThread, message: MailMessage) -> some View {
@@ -241,10 +228,10 @@ struct InboxAIFeaturesView: View {
                 .foregroundStyle(.secondary)
         }
         .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color.white.opacity(0.06))
-                .overlay(.ultraThinMaterial.opacity(0.35))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(LinearGradient(colors: [Color.white.opacity(0.2), Color.clear], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
         )
     }
 
@@ -380,57 +367,32 @@ struct InboxAIFeaturesView: View {
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: date, relativeTo: Date())
     }
-
-    private func glassSectionCard<Content: View>(
-        @ViewBuilder content: () -> Content,
-        tint: [Color]
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            content()
-        }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(LinearGradient(colors: tint, startPoint: .topLeading, endPoint: .bottomTrailing))
-                .opacity(glassSectionOpacity)
-                .overlay(.ultraThinMaterial.opacity(0.52))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(Color.white.opacity(0.18), lineWidth: 1)
-                )
-        )
-    }
 }
 
-private struct HeaderSymbolEffect: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 17.0, *) {
-            content.symbolEffect(.bounce.byLayer, options: .repeating, isActive: true)
-        } else {
-            content
-        }
-    }
-}
-
-private struct LoadingSymbolEffect: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 17.0, *) {
-            content.symbolEffect(.pulse, options: .repeating, isActive: true)
-        } else {
-            content
-        }
-    }
-}
-
-private struct RefreshSymbolEffect: ViewModifier {
+private struct ModernSymbolEffect: ViewModifier {
     let trigger: Bool
 
     func body(content: Content) -> some View {
         if #available(iOS 17.0, *) {
-            content.symbolEffect(.bounce, value: trigger)
+            content.symbolEffect(.pulse.byLayer, value: trigger)
         } else {
             content
         }
+    }
+}
+
+private extension View {
+    func glassSectionBackground(gradient: [Color]) -> some View {
+        self
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(LinearGradient(colors: gradient, startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .overlay(.ultraThinMaterial.opacity(0.6))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(Color.white.opacity(0.18), lineWidth: 1)
+            )
     }
 }
 

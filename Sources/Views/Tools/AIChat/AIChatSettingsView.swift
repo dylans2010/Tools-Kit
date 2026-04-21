@@ -103,24 +103,29 @@ struct AIChatSettingsView: View {
                         }
                     }
                 }
-                .padding(.vertical, 8)
+                .padding(.vertical, 4)
             }
-            .padding(8)
-            .background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.blue.opacity(0.10), Color.purple.opacity(0.08)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .overlay(.ultraThinMaterial.opacity(0.35))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke(Color.white.opacity(0.12), lineWidth: 1)
-                    )
-            )
+            .scrollClipDisabled()
+
+            if let provider = selectedProvider {
+                HStack(spacing: 10) {
+                    Image(systemName: provider.icon)
+                        .font(.headline)
+                        .foregroundStyle(.blue)
+                        .frame(width: 34, height: 34)
+                        .background(.blue.opacity(0.12), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("\(provider.name) selected")
+                            .font(.subheadline.weight(.semibold))
+                        Text("Keys are stored per provider and preserved when switching.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                }
+                .padding(10)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            }
         } header: {
             Text("AI Provider")
         } footer: {
@@ -662,68 +667,26 @@ struct ProviderChip: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
                 Image(systemName: provider.icon)
-                    .font(.title3.weight(.semibold))
-                    .foregroundColor(isSelected ? .white : .blue)
-                    .symbolRenderingMode(.hierarchical)
-                    .modifier(ProviderIconEffect(isSelected: isSelected))
+                    .font(.title3)
+                    .foregroundStyle(isSelected ? .white : .blue)
                 Text(provider.name)
-                    .font(.caption2.weight(.semibold))
-                    .foregroundColor(isSelected ? .white : .primary)
+                    .font(.caption2)
+                    .fontWeight(.medium)
+                    .foregroundStyle(isSelected ? .white : .primary)
                     .lineLimit(1)
             }
-            .frame(width: 88, height: 70)
+            .frame(width: 80, height: 64)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(
-                        isSelected
-                        ? AnyShapeStyle(
-                            LinearGradient(
-                                colors: [Color.blue, Color.purple],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        : AnyShapeStyle(Color(.secondarySystemGroupedBackground))
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .fill(.ultraThinMaterial.opacity(isSelected ? 0.0 : 0.35))
-                    )
+                    .fill(isSelected ? AnyShapeStyle(LinearGradient(colors: [.blue, .indigo], startPoint: .topLeading, endPoint: .bottomTrailing)) : AnyShapeStyle(.ultraThinMaterial))
             )
-            .overlay(
+            .overlay {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(
-                        isSelected
-                        ? AnyShapeStyle(
-                            LinearGradient(
-                                colors: [Color.cyan.opacity(0.9), Color.white.opacity(0.7)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        : AnyShapeStyle(Color.gray.opacity(0.2)),
-                        lineWidth: 1.5
-                    )
-            )
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-private struct ProviderIconEffect: ViewModifier {
-    let isSelected: Bool
-
-    func body(content: Content) -> some View {
-        if #available(iOS 17.0, *) {
-            if isSelected {
-                content.symbolEffect(.pulse.byLayer, options: .repeating, isActive: true)
-            } else {
-                content
+                    .stroke(isSelected ? .blue.opacity(0.85) : .gray.opacity(0.25), lineWidth: 1.2)
             }
-        } else {
-            content
+            .shadow(color: isSelected ? .blue.opacity(0.25) : .clear, radius: 8, y: 4)
         }
     }
 }
@@ -741,7 +704,8 @@ struct APIKeyRowView: View {
     @State private var validationResult: Bool? = nil
     @State private var showKey: Bool = false
     @State private var showCopied = false
-    @State private var lastProviderID: String = ""
+
+    private var draftKeyStorage: String { "aichat.provider.draft.\(providerID)" }
 
     private let keyManager = APIKeyManager.shared
     private let registry = AIProviderRegistry.shared
@@ -811,24 +775,18 @@ struct APIKeyRowView: View {
                 }
             }
         }
-        .onAppear {
-            lastProviderID = providerID
-            loadSavedKey(for: providerID)
-        }
-        .onDisappear {
-            persistCurrentKeyIfNeeded(for: providerID)
-        }
-        .onChange(of: providerID) { newProviderID in
-            if !lastProviderID.isEmpty {
-                persistCurrentKeyIfNeeded(for: lastProviderID)
-            }
-            loadSavedKey(for: newProviderID)
-            lastProviderID = newProviderID
+        .onAppear { loadSavedKey() }
+        .onChange(of: providerID) { _ in loadSavedKey() }
+        .onChange(of: key) { newValue in
+            UserDefaults.standard.set(newValue, forKey: draftKeyStorage)
         }
     }
 
-    private func loadSavedKey(for id: String) {
-        if let saved = keyManager.getKey(for: id) {
+    private func loadSavedKey() {
+        if let draft = UserDefaults.standard.string(forKey: draftKeyStorage), !draft.isEmpty {
+            key = draft
+            isSaved = keyManager.getKey(for: providerID) == draft
+        } else if let saved = keyManager.getKey(for: providerID) {
             key = saved
             isSaved = true
         } else {
@@ -838,18 +796,9 @@ struct APIKeyRowView: View {
         }
     }
 
-    private func persistCurrentKeyIfNeeded(for id: String) {
-        let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-        if keyManager.saveKey(trimmed, for: id) {
-            isSaved = true
-        } else {
-            isSaved = false
-        }
-    }
-
     private func saveKey() {
         guard keyManager.saveKey(key, for: providerID) else { return }
+        UserDefaults.standard.set(key, forKey: draftKeyStorage)
         isSaved = true
         validationResult = nil
         Task { await modelCatalog.loadModels(for: providerID, force: true) }
@@ -857,6 +806,7 @@ struct APIKeyRowView: View {
 
     private func deleteKey() {
         keyManager.deleteKey(for: providerID)
+        UserDefaults.standard.removeObject(forKey: draftKeyStorage)
         key = ""
         isSaved = false
         validationResult = nil

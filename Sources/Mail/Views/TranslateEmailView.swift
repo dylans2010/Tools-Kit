@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct TranslateEmailView: View {
     let sourceText: String
@@ -39,14 +40,27 @@ struct TranslateEmailView: View {
                                 .padding()
                         } else if !translatedText.isEmpty {
                             displayCard(title: "Translation", icon: "character.bubble", isResult: true) {
-                                ScrollView {
-                                    Text(translatedText)
-                                        .font(.subheadline)
-                                        .foregroundStyle(.white)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .textSelection(.enabled)
+                                VStack(alignment: .leading, spacing: 10) {
+                                    ScrollView {
+                                        Text(translatedText)
+                                            .font(.subheadline)
+                                            .foregroundStyle(.white)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .textSelection(.enabled)
+                                    }
+                                    .frame(minHeight: 140)
+
+                                    HStack {
+                                        Spacer()
+                                        Button {
+                                            UIPasteboard.general.string = translatedText
+                                        } label: {
+                                            Label("Copy Translation", systemImage: "doc.on.doc")
+                                        }
+                                        .buttonStyle(.borderedProminent)
+                                        .controlSize(.small)
+                                    }
                                 }
-                                .frame(minHeight: 150)
                             }
                         }
 

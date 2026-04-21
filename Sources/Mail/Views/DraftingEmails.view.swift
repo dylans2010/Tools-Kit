@@ -7,9 +7,6 @@ struct DraftingEmailResult {
 }
 
 struct DraftingEmailsView: View {
-    /// Default creativity level balances conservative business tone with useful phrasing variety.
-    private static let defaultCreativity = 0.55
-
     enum MailStyle: String, CaseIterable, Identifiable, Hashable {
         case professional = "Professional"
         case friendly = "Friendly"
@@ -54,20 +51,10 @@ struct DraftingEmailsView: View {
     }
 
     enum Audience: String, CaseIterable, Identifiable, Hashable {
-        case executive = "Executive"
         case client = "Client"
-        case teammate = "Teammate"
-        case support = "Support Team"
-        case recruiter = "Recruiter"
-
-        var id: String { rawValue }
-    }
-
-    enum OutputFormat: String, CaseIterable, Identifiable, Hashable {
-        case paragraph = "Paragraph"
-        case bullets = "Bullets"
-        case checklist = "Checklist"
-
+        case internalTeam = "Internal Team"
+        case executive = "Executive"
+        case partner = "Partner"
         var id: String { rawValue }
     }
 
@@ -80,23 +67,27 @@ struct DraftingEmailsView: View {
     @State private var selectedStyle: MailStyle = .professional
     @State private var selectedLength: OutputLength = .medium
     @State private var selectedUrgency: Urgency = .normal
-    @State private var selectedAudience: Audience = .client
-    @State private var selectedFormat: OutputFormat = .paragraph
     @State private var includeActionItems = true
     @State private var includeSubjectSuggestions = false
-    @State private var includeGreeting = true
-    @State private var includeClosing = true
+    @State private var includeBulletSummary = true
     @State private var includeCallToAction = true
-    @State private var includeMeetingTimes = false
-    @State private var includeBulletSummary = false
-    @State private var creativity: Double = defaultCreativity
-    @State private var requiredPoints = ""
-    @State private var avoidPhrases = ""
-    @State private var additionalConstraints = ""
+    @State private var includeMeetingSlots = false
+    @State private var selectedAudience: Audience = .client
+    @State private var keywords = ""
+    @State private var selectedFramework = "Standard"
 
     @State private var generatedBody = ""
     @State private var isGenerating = false
     @State private var errorMessage: String?
+    @State private var showTemplatesSheet = false
+
+    private let frameworks = ["Standard", "AIDA", "PAS", "SCQA", "STAR"]
+    private let quickTemplates = [
+        ("Status + Blockers", "Provide current status, key blockers, and requested support."),
+        ("Follow-up Reminder", "Friendly reminder with clear next steps and deadline."),
+        ("Meeting Confirmation", "Confirm meeting details and agenda in concise format."),
+        ("Customer Escalation", "Summarize issue impact, urgency, and ask for immediate action.")
+    ]
 
     let currentBody: String
     let onApply: (DraftingEmailResult) -> Void
@@ -126,6 +117,8 @@ struct DraftingEmailsView: View {
                                     .frame(minHeight: 120)
                                     .padding(8)
                                     .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+
+                                customTextField("Keywords:", text: $keywords, placeholder: "deadline, budget, next steps")
                             }
                         }
 
@@ -135,77 +128,23 @@ struct DraftingEmailsView: View {
                                 chipSelector(title: "Style", selection: $selectedStyle, options: MailStyle.allCases)
                                 chipSelector(title: "Length", selection: $selectedLength, options: OutputLength.allCases)
                                 chipSelector(title: "Urgency", selection: $selectedUrgency, options: Urgency.allCases)
+                                chipSelector(title: "Audience", selection: $selectedAudience, options: Audience.allCases)
+                                chipSelector(title: "Framework", selection: $selectedFramework, options: frameworks)
                                 Toggle("Include action items", isOn: $includeActionItems)
                                     .font(.caption.bold())
                                 Toggle("Include subject suggestions", isOn: $includeSubjectSuggestions)
                                     .font(.caption.bold())
-                            }
-                        }
-
-                        inputCard(title: "Drafting Tools", icon: "wand.and.stars") {
-                            VStack(spacing: 16) {
-                                chipSelector(title: "Audience", selection: $selectedAudience, options: Audience.allCases)
-                                chipSelector(title: "Format", selection: $selectedFormat, options: OutputFormat.allCases)
-
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text("Creativity \(Int(creativity * 100))%")
-                                        .font(.caption.bold())
-                                        .foregroundStyle(.secondary)
-                                    Slider(value: $creativity, in: 0.1...1, step: 0.05)
-                                        .tint(.purple)
-                                }
-
-                                Toggle("Include greeting", isOn: $includeGreeting)
+                                Toggle("Include bullet summary", isOn: $includeBulletSummary)
                                     .font(.caption.bold())
-                                Toggle("Include closing", isOn: $includeClosing)
+                                Toggle("Include call to action", isOn: $includeCallToAction)
                                     .font(.caption.bold())
-                                Toggle("Include clear CTA", isOn: $includeCallToAction)
+                                Toggle("Include meeting time suggestions", isOn: $includeMeetingSlots)
                                     .font(.caption.bold())
-                                Toggle("Offer meeting-time options", isOn: $includeMeetingTimes)
-                                    .font(.caption.bold())
-                                Toggle("Add bullet summary at top", isOn: $includeBulletSummary)
-                                    .font(.caption.bold())
-
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("Must Include")
-                                        .font(.caption.bold())
-                                        .foregroundStyle(.secondary)
-                                    TextEditor(text: $requiredPoints)
-                                        .frame(minHeight: 72)
-                                        .padding(8)
-                                        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
-                                }
-
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("Avoid Phrases")
-                                        .font(.caption.bold())
-                                        .foregroundStyle(.secondary)
-                                    TextField("e.g. just checking in, per my last email", text: $avoidPhrases)
-                                        .padding(10)
-                                        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
-                                }
-
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("Additional Constraints")
-                                        .font(.caption.bold())
-                                        .foregroundStyle(.secondary)
-                                    TextEditor(text: $additionalConstraints)
-                                        .frame(minHeight: 72)
-                                        .padding(8)
-                                        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
-                                }
                             }
                         }
 
                         if !generatedBody.isEmpty || isGenerating {
                             outputPreview
-                        }
-
-                        if let errorMessage {
-                            Text(errorMessage)
-                                .font(.caption)
-                                .foregroundStyle(.red)
-                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                     .padding(16)
@@ -217,6 +156,9 @@ struct DraftingEmailsView: View {
             .safeAreaInset(edge: .bottom) {
                 actionBar
             }
+            .sheet(isPresented: $showTemplatesSheet) {
+                templateSheet
+            }
             .onAppear {
                 if generatedBody.isEmpty {
                     generatedBody = currentBody
@@ -227,11 +169,7 @@ struct DraftingEmailsView: View {
 
     private var headerSection: some View {
         VStack(spacing: 8) {
-            Image(systemName: "sparkles.rectangle.stack")
-                .font(.system(size: 30, weight: .semibold))
-                .foregroundStyle(LinearGradient(colors: [.purple, .blue, .cyan], startPoint: .topLeading, endPoint: .bottomTrailing))
-                .modifier(DraftingHeaderEffect())
-            Text("AI Drafting Studio")
+            Text("AI Drafting Assistant")
                 .font(.title3.bold())
                 .foregroundStyle(.white)
             Text("Craft the perfect message with tailored goals and styles.")
@@ -250,6 +188,15 @@ struct DraftingEmailsView: View {
                 .padding(.vertical, 12)
                 .background(Color.white.opacity(0.08), in: Capsule())
                 .foregroundStyle(.white)
+
+            Button {
+                showTemplatesSheet = true
+            } label: {
+                Image(systemName: "square.grid.2x2")
+                    .frame(width: 44, height: 44)
+                    .background(Color.white.opacity(0.1), in: Circle())
+            }
+            .buttonStyle(.plain)
 
             Button {
                 Task { await generateDraft() }
@@ -284,21 +231,8 @@ struct DraftingEmailsView: View {
             content()
         }
         .padding(18)
-        .background(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [Color.purple.opacity(0.14), Color.blue.opacity(0.08)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(.ultraThinMaterial.opacity(0.45))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.white.opacity(0.14), lineWidth: 1)
-        )
+        .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 20))
+        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.08), lineWidth: 1))
     }
 
     private func customTextField(_ label: String, text: Binding<String>, placeholder: String) -> some View {
@@ -329,6 +263,32 @@ struct DraftingEmailsView: View {
                             selection.wrappedValue = option
                         } label: {
                             Text(option.rawValue)
+                                .font(.caption.bold())
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(selection.wrappedValue == option ? Color.blue : Color.white.opacity(0.1), in: Capsule())
+                                .foregroundStyle(selection.wrappedValue == option ? .white : .secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+    }
+
+    private func chipSelector(title: String, selection: Binding<String>, options: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(options, id: \.self) { option in
+                        Button {
+                            selection.wrappedValue = option
+                        } label: {
+                            Text(option)
                                 .font(.caption.bold())
                                 .padding(.horizontal, 14)
                                 .padding(.vertical, 8)
@@ -388,6 +348,33 @@ struct DraftingEmailsView: View {
         )
     }
 
+    private var templateSheet: some View {
+        NavigationStack {
+            List {
+                Section("Quick Templates") {
+                    ForEach(quickTemplates, id: \.0) { template in
+                        Button {
+                            context = template.1
+                            if subject.isEmpty { subject = template.0 }
+                            showTemplatesSheet = false
+                        } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(template.0).font(.subheadline.weight(.semibold))
+                                Text(template.1).font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Draft Tools")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showTemplatesSheet = false }
+                }
+            }
+        }
+    }
+
     @MainActor
     private func generateDraft() async {
         isGenerating = true
@@ -399,18 +386,13 @@ struct DraftingEmailsView: View {
             Goal: \(selectedGoal.rawValue).
             Urgency: \(selectedUrgency.rawValue).
             Audience: \(selectedAudience.rawValue).
-            Format: \(selectedFormat.rawValue).
-            Creativity: \(Int(creativity * 100))%.
+            Copywriting framework: \(selectedFramework).
             Include action items: \(includeActionItems ? "yes" : "no").
             Include subject suggestions: \(includeSubjectSuggestions ? "yes" : "no").
-            Include greeting: \(includeGreeting ? "yes" : "no").
-            Include closing: \(includeClosing ? "yes" : "no").
-            Include clear call-to-action: \(includeCallToAction ? "yes" : "no").
             Include bullet summary: \(includeBulletSummary ? "yes" : "no").
-            Include meeting time options: \(includeMeetingTimes ? "yes" : "no").
-            Must include: \(requiredPoints.isEmpty ? "none provided" : requiredPoints).
-            Avoid phrases: \(avoidPhrases.isEmpty ? "none provided" : avoidPhrases).
-            Additional constraints: \(additionalConstraints.isEmpty ? "none provided" : additionalConstraints).
+            Include call to action: \(includeCallToAction ? "yes" : "no").
+            Include suggested meeting slots: \(includeMeetingSlots ? "yes" : "no").
+            Keywords to include when relevant: \(keywords).
             Context: \(context)
             Return only the email body.
             """
@@ -425,16 +407,6 @@ struct DraftingEmailsView: View {
                 errorMessage = error.localizedDescription
                 isGenerating = false
             }
-        }
-    }
-}
-
-private struct DraftingHeaderEffect: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 17.0, *) {
-            content.symbolEffect(.bounce.byLayer, options: .repeating, isActive: true)
-        } else {
-            content
         }
     }
 }
