@@ -16,7 +16,7 @@ struct InboxView: View {
 
     @State private var searchText = ""
     @State private var showingCompose = false
-    @State private var showingManageAccounts = false
+    @State private var showingUniversalInbox = false
     @State private var showingFetchingLabel = false
     @State private var selectedMessage: MailMessage?
 
@@ -43,9 +43,9 @@ struct InboxView: View {
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {
-                    showingManageAccounts = true
+                    showingUniversalInbox = true
                 } label: {
-                    Image(systemName: "person.2.crop.square.stack")
+                    Image(systemName: "chevron.right.circle")
                 }
 
                 Button {
@@ -60,13 +60,8 @@ struct InboxView: View {
                 EmailComposingView(account: activeAccount)
             }
         }
-        .sheet(isPresented: $showingManageAccounts) {
-            ManageAccountsView { selected in
-                mailStore.setActiveAccount(selected.id)
-                Task {
-                    await viewModel.loadCachedThenRefreshIfNeeded()
-                }
-            }
+        .navigationDestination(isPresented: $showingUniversalInbox) {
+            UniversalInboxView()
         }
         .task {
             mailStore.reloadAccounts()

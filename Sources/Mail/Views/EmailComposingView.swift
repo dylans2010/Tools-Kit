@@ -33,6 +33,15 @@ struct EmailComposingView: View {
     @State private var selectedFromAccountID: String = ""
     @State private var pendingLinkText = ""
     @State private var pendingLinkURL = "https://"
+    @State private var pendingUndoSendTask: Task<Void, Never>?
+    @State private var showUndoSendBanner = false
+    @State private var undoCountdown = 0
+
+    @AppStorage("mail.settings.defaultSenderAccountId") private var defaultSenderAccountId = ""
+    @AppStorage("mail.settings.undoSendEnabled") private var undoSendEnabled = true
+    @AppStorage("mail.settings.undoSendDelay") private var undoSendDelay = 10
+    @AppStorage("mail.settings.ai.smartReply") private var smartReplySuggestionsEnabled = true
+    @AppStorage("mail.settings.ai.autoCategorize") private var autoCategorizeEmailsEnabled = true
 
     @FocusState private var bodyFocused: Bool
 
@@ -108,7 +117,29 @@ struct EmailComposingView: View {
             }
             .onAppear(perform: prefillReply)
             .onAppear {
-                selectedFromAccountID = account.id
+                selectedFromAccountID = resolvedDefaultAccountID()
+            }
+            .onDisappear {
+                pendingUndoSendTask?.cancel()
+                pendingUndoSendTask = nil
+            }
+            .overlay(alignment: .bottom) {
+                if showUndoSendBanner {
+                    HStack(spacing: 12) {
+                        Label("Sending in \(undoCountdown)s", systemImage: "arrow.uturn.backward.circle")
+                            .font(.caption.weight(.semibold))
+                        Spacer()
+                        Button("Undo") {
+                            cancelPendingUndoSend()
+                        }
+                        .font(.caption.weight(.bold))
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(Color(.secondarySystemBackground), in: Capsule())
+                    .padding(.bottom, 14)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
             }
             .sheet(isPresented: $showingAIPanel) {
                 DraftingEmailsView(currentBody: messageBody) { result in
@@ -197,7 +228,7 @@ struct EmailComposingView: View {
     private var fromSection: some View {
         Section("From") {
             Picker("Sender", selection: $selectedFromAccountID) {
-                ForEach(MailStore.shared.accounts) { account in
+                ForEach(availableAccounts) { account in
                     Text("\(account.displayName) (\(account.emailAddress))").tag(account.id)
                 }
             }
@@ -291,7 +322,9 @@ struct EmailComposingView: View {
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
                 modernToolButton(icon: "sparkles", title: "AI Draft", subtitle: "Generate content") { showingAIPanel = true }
+                    .disabled(!smartReplySuggestionsEnabled)
                 modernToolButton(icon: "globe", title: "Translate", subtitle: "Change language") { showingTranslateSheet = true }
+                    .disabled(!autoCategorizeEmailsEnabled)
                 modernToolButton(icon: "calendar.badge.clock", title: "Schedule", subtitle: "Send later") { showingScheduleSheet = true }
                 modernToolButton(icon: "doc.viewfinder", title: "Scan", subtitle: "Scan documents") { showingDocumentScanner = true }
                 modernToolButton(icon: "paperclip", title: "Attach", subtitle: "Add files") { showingAttachmentPicker = true }
@@ -638,7 +671,7 @@ struct EmailComposingView: View {
                 cc: [],
                 bcc: [],
                 subject: subject,
-                bodyText: messageBody
+                bodyText: bodyWithSignature(for: selectedAccount)
             )
 
             switch selectedAccount.providerType {
@@ -670,6 +703,15 @@ struct EmailComposingView: View {
         let recipients = mergedRecipients()
         guard !recipients.isEmpty else { return }
 
+        if undoSendEnabled, undoSendDelay > 0 {
+            scheduleUndoSend(recipients: recipients)
+            return
+        }
+
+        sendNow(recipients: recipients)
+    }
+
+    private func sendNow(recipients: [String]) {
         isSending = true
         Task {
             do {
@@ -682,7 +724,7 @@ struct EmailComposingView: View {
                     cc: [],
                     bcc: [],
                     subject: subject,
-                    body: messageBody,
+                    body: bodyWithSignature(for: selectedAccount),
                     htmlBody: nil,
                     date: Date(),
                     isRead: true,
@@ -725,12 +767,81 @@ struct EmailComposingView: View {
             cc: [],
             bcc: [],
             subject: subject,
-            bodyText: messageBody
+            bodyText: bodyWithSignature(for: selectedAccount)
         )
     }
 
+    private func scheduleUndoSend(recipients: [String]) {
+        pendingUndoSendTask?.cancel()
+        isSending = true
+        undoCountdown = undoSendDelay
+        withAnimation(.easeInOut(duration: 0.2)) {
+            showUndoSendBanner = true
+        }
+
+        pendingUndoSendTask = Task {
+            for remaining in stride(from: undoSendDelay, to: 0, by: -1) {
+                if Task.isCancelled { return }
+                await MainActor.run {
+                    undoCountdown = remaining
+                }
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+            }
+            if Task.isCancelled { return }
+            await MainActor.run {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    showUndoSendBanner = false
+                }
+            }
+            sendNow(recipients: recipients)
+        }
+    }
+
+    private func cancelPendingUndoSend() {
+        pendingUndoSendTask?.cancel()
+        pendingUndoSendTask = nil
+        isSending = false
+        withAnimation(.easeInOut(duration: 0.2)) {
+            showUndoSendBanner = false
+        }
+    }
+
+    private func bodyWithSignature(for sender: MailAccount) -> String {
+        let signatures = MailSettingsPersistence.loadDictionary(forKey: "mail.settings.signatures")
+        let signature = signatures[sender.id]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard !signature.isEmpty else { return messageBody }
+
+        if messageBody.contains(signature) {
+            return messageBody
+        }
+
+        let trimmedBody = messageBody.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedBody.isEmpty {
+            return signature
+        }
+
+        return "\(messageBody)\n\n--\n\(signature)"
+    }
+
     private var selectedAccount: MailAccount {
-        MailStore.shared.accounts.first(where: { $0.id == selectedFromAccountID }) ?? account
+        availableAccounts.first(where: { $0.id == selectedFromAccountID }) ?? account
+    }
+
+    private var availableAccounts: [MailAccount] {
+        let accounts = MailStore.shared.accounts
+        return accounts.isEmpty ? [account] : accounts
+    }
+
+    private func resolvedDefaultAccountID() -> String {
+        let accounts = availableAccounts
+        let ids = Set(accounts.map(\.id))
+        if ids.contains(defaultSenderAccountId) {
+            return defaultSenderAccountId
+        }
+        if ids.contains(account.id) {
+            return account.id
+        }
+        return accounts.first?.id ?? account.id
     }
 
     private func providerSession(for account: MailAccount) -> MailSession {
