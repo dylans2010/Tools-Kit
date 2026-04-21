@@ -10,12 +10,12 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
     private var authSession: ASWebAuthenticationSession?
     private var nextLinksByPage: [Int: String] = [:]
-    private let microsoftScopes = "User.Read Mail.Read Mail.ReadWrite Mail.Send offline_access openid profile email"
+    private let microsoftScopes = "User.Read Mail.Read Mail.ReadWrite Mail.Send MailboxSettings.Read offline_access openid profile email"
 
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
         let remoteVariables = await fetchRemoteVariables()
         let clientID = try oauthValue(primaryKey: "MICROSOFT_CLIENT_ID", fallbackKey: "MICROSOFT_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
-        let redirectURI = "msauth.com.dylans2010.ToolsKit://auth"
+        let redirectURI = try oauthValue(primaryKey: "MICROSOFT_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
 
         let verifier = randomCodeVerifier()
         let challenge = codeChallenge(from: verifier)
@@ -37,8 +37,9 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid OAuth URL"])
         }
 
-        InternalLogger.shared.log("OAuth start provider=microsoft callbackScheme=msauth.com.dylans2010.ToolsKit", level: .info)
-        let callback = try await startOAuth(url: url, callbackScheme: "msauth.com.dylans2010.ToolsKit")
+        let callbackScheme = URL(string: redirectURI)?.scheme
+        InternalLogger.shared.log("OAuth start provider=microsoft callbackScheme=\(callbackScheme ?? "unknown")", level: .info)
+        let callback = try await startOAuth(url: url, callbackScheme: callbackScheme)
         let returnedState = callbackValue("state", from: callback)
         guard returnedState == state else {
             throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "OAuth state mismatch"])
@@ -49,7 +50,13 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
         InternalLogger.shared.log("OAuth callback provider=microsoft state=validated", level: .info)
         InternalLogger.shared.log("OAuth token exchange provider=microsoft", level: .info)
-        let token = try await exchangeCode(code: code, verifier: verifier, clientID: clientID, redirectURI: redirectURI)
+        let token = try await exchangeCode(
+            code: code,
+            verifier: verifier,
+            clientID: clientID,
+            clientSecret: oauthOptionalValue(primaryKey: "MICROSOFT_CLIENT_SECRET", remoteVariables: remoteVariables),
+            redirectURI: redirectURI
+        )
         let profile = try await fetchProfile(accessToken: token.accessToken)
 
         let sessionID = UUID().uuidString
@@ -224,6 +231,10 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         return trimmed.isEmpty ? nil : trimmed
     }
 
+    private func oauthOptionalValue(primaryKey: String, fallbackKey: String? = nil, remoteVariables: [String: String] = [:]) -> String? {
+        (try? oauthValue(primaryKey: primaryKey, fallbackKey: fallbackKey, remoteVariables: remoteVariables))
+    }
+
     private func fetchRemoteVariables() async -> [String: String] {
         guard
             let rawURL = localConfigValue(forKey: "APPWRITE_MAIL_CONFIG_URL"),
@@ -283,12 +294,12 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         }
     }
 
-    private func exchangeCode(code: String, verifier: String, clientID: String, redirectURI: String) async throws -> GraphToken {
+    private func exchangeCode(code: String, verifier: String, clientID: String, clientSecret: String?, redirectURI: String) async throws -> GraphToken {
         var request = URLRequest(url: URL(string: "https://login.microsoftonline.com/common/oauth2/v2.0/token")!)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
-        let fields = [
+        var fields = [
             URLQueryItem(name: "client_id", value: clientID),
             URLQueryItem(name: "grant_type", value: "authorization_code"),
             URLQueryItem(name: "code", value: code),
@@ -296,6 +307,9 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             URLQueryItem(name: "code_verifier", value: verifier),
             URLQueryItem(name: "scope", value: microsoftScopes)
         ]
+        if let clientSecret, !clientSecret.isEmpty {
+            fields.append(URLQueryItem(name: "client_secret", value: clientSecret))
+        }
 
         request.httpBody = formURLEncoded(fields)
 
@@ -405,17 +419,21 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         let remoteVariables = await fetchRemoteVariables()
         let clientID = try oauthValue(primaryKey: "MICROSOFT_CLIENT_ID", fallbackKey: "MICROSOFT_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
         let redirectURI = try oauthValue(primaryKey: "MICROSOFT_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+        let clientSecret = oauthOptionalValue(primaryKey: "MICROSOFT_CLIENT_SECRET", remoteVariables: remoteVariables)
 
         var request = URLRequest(url: URL(string: "https://login.microsoftonline.com/common/oauth2/v2.0/token")!)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        let fields = [
+        var fields = [
             URLQueryItem(name: "client_id", value: clientID),
             URLQueryItem(name: "grant_type", value: "refresh_token"),
             URLQueryItem(name: "refresh_token", value: refreshToken),
             URLQueryItem(name: "redirect_uri", value: redirectURI),
             URLQueryItem(name: "scope", value: microsoftScopes)
         ]
+        if let clientSecret, !clientSecret.isEmpty {
+            fields.append(URLQueryItem(name: "client_secret", value: clientSecret))
+        }
         request.httpBody = formURLEncoded(fields)
 
         let (data, response) = try await URLSession.shared.data(for: request)
