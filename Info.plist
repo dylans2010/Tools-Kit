@@ -100,6 +100,8 @@
 	</array>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Access is needed to import and play music files.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Face ID is used to secure your mail settings and private messages.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
