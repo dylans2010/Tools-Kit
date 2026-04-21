@@ -40,7 +40,7 @@ enum SMTPSender {
             try await expect(connection, command: "RCPT TO:<\(address)>", accepted: [250, 251])
         }
 
-        try await expect(connection, command: "DATA", accepted: [354])
+        _ = try await expect(connection, command: "DATA", accepted: [354])
         try await send(connection, data: mimeData(for: draft) + Data("\r\n.\r\n".utf8))
         let done = try await receiveLine(connection)
         guard responseCode(done) == 250 else {
