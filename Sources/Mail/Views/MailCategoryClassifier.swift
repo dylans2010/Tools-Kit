@@ -46,7 +46,7 @@ enum MailCategoryClassifier {
         let text = [
             latest?.subject ?? thread.subject,
             latest?.from ?? "",
-            latest?.body.prefix(maxAnalyzedCharacters / 2) ?? thread.snippet,
+            latest.map { String($0.body.prefix(maxAnalyzedCharacters / 2)) } ?? thread.snippet,
             thread.snippet
         ]
         .joined(separator: " ")
