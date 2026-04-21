@@ -110,6 +110,9 @@ struct DrawingBoardView: View {
         formatter.dateFormat = "yyyy-MM-dd_HHmmssSSS"
         return formatter
     }()
+    private let sprayDotCount = 8
+    private let zigzagSegmentCount = 10
+    private let starVertexCount = 10
 
     var body: some View {
         NavigationStack {
@@ -435,8 +438,8 @@ struct DrawingBoardView: View {
         context.opacity = min(1, stroke.opacity + 0.15)
         for (index, point) in stroke.points.enumerated() {
             let radius = max(3, stroke.lineWidth * 1.2)
-            for dot in 0..<8 {
-                let phase = Double(index * 8 + dot)
+            for dot in 0..<sprayDotCount {
+                let phase = Double(index * sprayDotCount + dot)
                 let dx = CGFloat(cos(phase) * Double(radius) * 0.7)
                 let dy = CGFloat(sin(phase) * Double(radius) * 0.7)
                 let rect = CGRect(x: point.x + dx, y: point.y + dy, width: 2.4, height: 2.4)
@@ -462,7 +465,7 @@ struct DrawingBoardView: View {
         guard stroke.points.count >= 2 else { return }
         let start = stroke.points[0]
         let end = stroke.points[1]
-        let segments = 10
+        let segments = zigzagSegmentCount
         let dx = (end.x - start.x) / CGFloat(segments)
         let dy = (end.y - start.y) / CGFloat(segments)
         let angle = atan2(end.y - start.y, end.x - start.x)
@@ -612,9 +615,10 @@ struct DrawingBoardView: View {
         let outer = min(rect.width, rect.height) / 2
         let inner = outer * 0.45
         var points: [CGPoint] = []
-        for i in 0..<10 {
+        let angleStep = (.pi * 2) / CGFloat(starVertexCount)
+        for i in 0..<starVertexCount {
             let radius = i.isMultiple(of: 2) ? outer : inner
-            let angle = CGFloat(i) * (.pi / 5) - .pi / 2
+            let angle = CGFloat(i) * angleStep - .pi / 2
             points.append(
                 CGPoint(x: center.x + cos(angle) * radius, y: center.y + sin(angle) * radius)
             )

@@ -841,7 +841,9 @@ struct APIKeyRowView: View {
     private func persistCurrentKeyIfNeeded(for id: String) {
         let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
-        _ = keyManager.saveKey(trimmed, for: id)
+        if keyManager.saveKey(trimmed, for: id), id == providerID {
+            isSaved = true
+        }
     }
 
     private func saveKey() {
