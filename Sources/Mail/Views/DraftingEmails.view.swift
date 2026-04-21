@@ -95,10 +95,13 @@ struct DraftingEmailsView: View {
             }
             .navigationTitle("Drafting Studio")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
                 }
+            }
+            .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         Task { await generateDraft() }
