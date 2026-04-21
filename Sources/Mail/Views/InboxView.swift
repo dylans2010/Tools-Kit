@@ -32,10 +32,8 @@ struct InboxView: View {
                     .transition(.opacity)
             }
         }
-        .navigationTitle(mailStore.activeAccount?.emailAddress ?? account.emailAddress)
-        .navigationBarTitleDisplayMode(.large)
-        .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
+        .navigationTitle(folder.displayName)
+        .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText)
         .refreshable {
             showingFetchingLabel = true
@@ -187,7 +185,7 @@ struct InboxView: View {
                 .foregroundStyle(.white)
                 .lineLimit(1)
 
-            Text(message.body.isEmpty ? "No preview" : message.body)
+            Text(previewText(for: message))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
@@ -217,6 +215,26 @@ struct InboxView: View {
             return String(value[..<range.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
         }
         return value
+    }
+
+    private func previewText(for message: MailMessage) -> String {
+        if let htmlBody = message.htmlBody,
+           let rendered = MailContentRenderer.render(htmlBody: htmlBody, plainBody: message.body).plainBody,
+           !rendered.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return rendered
+        }
+
+        let source = message.body.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !source.isEmpty else { return "No preview" }
+
+        if let attributed = try? AttributedString(
+            markdown: source,
+            options: .init(interpretedSyntax: .full, failurePolicy: .returnPartiallyParsedIfPossible)
+        ) {
+            let cleaned = String(attributed.characters).trimmingCharacters(in: .whitespacesAndNewlines)
+            return cleaned.isEmpty ? source : cleaned
+        }
+        return source
     }
 
     private func providerColor(_ provider: MailAccount.ProviderType) -> Color {

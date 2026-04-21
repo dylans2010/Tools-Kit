@@ -64,6 +64,65 @@ class AIService {
         return try await processText(prompt: prompt)
     }
 
+    func summarizeEmail(text: String) async throws -> String {
+        let prompt = """
+        You are a fine-tuned executive email analyst.
+        Summarize this email in markdown with sections:
+        ## TL;DR
+        ## Key Points
+        ## Action Items
+        Keep it concise and practical.
+
+        Email:
+        \(text)
+        """
+        return try await processText(prompt: prompt, systemPrompt: "You are an expert email copilot that writes clear markdown.")
+    }
+
+    func extractEmailActionItems(text: String) async throws -> String {
+        let prompt = """
+        Extract action items from this email.
+        Return markdown checklist bullets with owner and due date when available.
+        If none, say \"- [ ] No explicit action items found.\"
+
+        Email:
+        \(text)
+        """
+        return try await processText(prompt: prompt, systemPrompt: "You identify commitments, follow-ups, and deadlines in email.")
+    }
+
+    func assessEmailTone(text: String) async throws -> String {
+        let prompt = """
+        Analyze the tone of this email.
+        Return markdown with:
+        - Overall tone
+        - Urgency (Low/Medium/High)
+        - Suggested reply style
+        - Risk flags (if any)
+
+        Email:
+        \(text)
+        """
+        return try await processText(prompt: prompt, systemPrompt: "You are a communications analyst.")
+    }
+
+    func draftReply(to text: String, from sender: String, subject: String) async throws -> String {
+        let prompt = """
+        Draft a polished reply to this email.
+        Output markdown with:
+        - Suggested subject line
+        - Draft body
+        - Optional alternate shorter version
+
+        Context:
+        Sender: \(sender)
+        Subject: \(subject)
+        Email body:
+        \(text)
+        """
+        return try await processText(prompt: prompt, systemPrompt: "You are an expert executive assistant who writes concise, professional email replies.")
+    }
+
     func debugCode(code: String) async throws -> String {
         let prompt = "Analyze the following code for bugs, logic errors, and optimization opportunities. Return structured suggestions:\n\n\(code)"
         return try await processText(prompt: prompt, systemPrompt: "You are an expert software engineer.")

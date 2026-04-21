@@ -12,6 +12,10 @@ struct EmailDetailView: View {
     @State private var showReplyComposer = false
     @State private var summary = ""
     @State private var isSummarizing = false
+    @State private var actionItems = ""
+    @State private var toneAnalysis = ""
+    @State private var draftReply = ""
+    @State private var isRunningAIFeature = false
     @State private var actionError: String?
 
     init(viewModel: MailViewModel, email: EmailMessage, account: MailAccount? = nil) {
@@ -35,23 +39,23 @@ struct EmailDetailView: View {
                     }
 
                     if !summary.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Label("Summary", systemImage: "sparkles")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(.white.opacity(0.95))
-                            markdownText(summary, font: .subheadline)
-                                .foregroundStyle(.white)
-                        }
-                        .padding(14)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(
-                            LinearGradient(
-                                colors: [Color.blue.opacity(0.82), Color.red.opacity(0.78)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            in: RoundedRectangle(cornerRadius: 14)
-                        )
+                        aiResultCard(title: "AI Summary", icon: "sparkles", content: summary)
+                    }
+
+                    if isRunningAIFeature {
+                        ProgressView("Running AI analysis…")
+                    }
+
+                    if !actionItems.isEmpty {
+                        aiResultCard(title: "Action Items", icon: "checklist", content: actionItems)
+                    }
+
+                    if !toneAnalysis.isEmpty {
+                        aiResultCard(title: "Tone Insights", icon: "waveform.and.magnifyingglass", content: toneAnalysis)
+                    }
+
+                    if !draftReply.isEmpty {
+                        aiResultCard(title: "Reply Draft", icon: "arrowshape.turn.up.left.2", content: draftReply)
                     }
 
                     contentView(minHeight: max(geo.size.height * 0.4, 220))
@@ -75,9 +79,27 @@ struct EmailDetailView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button {
-                            summarize()
+                            runAIFeature(.summary)
                         } label: {
                             Label("Summarize", systemImage: "text.justify.leading")
+                        }
+
+                        Button {
+                            runAIFeature(.actionItems)
+                        } label: {
+                            Label("Extract action items", systemImage: "checklist")
+                        }
+
+                        Button {
+                            runAIFeature(.tone)
+                        } label: {
+                            Label("Analyze tone", systemImage: "waveform.and.magnifyingglass")
+                        }
+
+                        Button {
+                            runAIFeature(.replyDraft)
+                        } label: {
+                            Label("Generate reply draft", systemImage: "square.and.pencil")
                         }
 
                         Button {
@@ -179,27 +201,84 @@ struct EmailDetailView: View {
         viewModel.emails.first(where: { $0.uid == email.uid }) ?? email
     }
 
-    private func summarize() {
+    private enum EmailAIFeature {
+        case summary, actionItems, tone, replyDraft
+    }
+
+    private func runAIFeature(_ feature: EmailAIFeature) {
         guard !isSummarizing else { return }
         isSummarizing = true
+        isRunningAIFeature = feature != .summary
         actionError = nil
-        summary = ""
 
         Task {
             do {
-                let input = resolvedEmail.body ?? resolvedEmail.preview
-                let result = try await AIService.shared.summarize(text: input)
+                let input = normalizedEmailBody
+                let result: String
+                switch feature {
+                case .summary:
+                    result = try await AIService.shared.summarizeEmail(text: input)
+                case .actionItems:
+                    result = try await AIService.shared.extractEmailActionItems(text: input)
+                case .tone:
+                    result = try await AIService.shared.assessEmailTone(text: input)
+                case .replyDraft:
+                    result = try await AIService.shared.draftReply(
+                        to: input,
+                        from: resolvedEmail.sender,
+                        subject: resolvedEmail.subject
+                    )
+                }
                 await MainActor.run {
-                    summary = result
+                    switch feature {
+                    case .summary: summary = result
+                    case .actionItems: actionItems = result
+                    case .tone: toneAnalysis = result
+                    case .replyDraft: draftReply = result
+                    }
                     isSummarizing = false
+                    isRunningAIFeature = false
                 }
             } catch {
                 await MainActor.run {
                     actionError = error.localizedDescription
                     isSummarizing = false
+                    isRunningAIFeature = false
                 }
             }
         }
+    }
+
+    private var normalizedEmailBody: String {
+        if let content = renderContent(from: resolvedEmail), let plain = content.plainBody, !plain.isEmpty {
+            return plain
+        }
+        return resolvedEmail.body ?? resolvedEmail.preview
+    }
+
+    private func aiResultCard(title: String, icon: String, content: String) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label(title, systemImage: icon)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.92))
+
+            markdownText(content, font: .subheadline)
+                .foregroundStyle(.white.opacity(0.96))
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            LinearGradient(
+                colors: [Color.blue.opacity(0.6), Color.purple.opacity(0.55)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.2), lineWidth: 1)
+        )
     }
 
     private func deleteEmail() async {
