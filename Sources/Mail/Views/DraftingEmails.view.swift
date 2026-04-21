@@ -181,7 +181,7 @@ struct DraftingEmailsView: View {
         .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
     }
 
-    private func chipSelector<T: RawRepresentable & Hashable & Identifiable>(title: String, selection: Binding<T>, options: [T]) where T.RawValue == String {
+    private func chipSelector<T: RawRepresentable & Hashable & Identifiable>(title: String, selection: Binding<T>, options: [T]) -> some View where T.RawValue == String {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.caption.bold())
