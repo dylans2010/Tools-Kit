@@ -10,6 +10,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
     private var authSession: ASWebAuthenticationSession?
     private var nextLinksByPage: [Int: String] = [:]
+    private let microsoftScopes = "User.Read Mail.Read Mail.ReadWrite Mail.Send offline_access openid profile email"
 
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
         let remoteVariables = await fetchRemoteVariables()
@@ -26,7 +27,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             URLQueryItem(name: "response_type", value: "code"),
             URLQueryItem(name: "redirect_uri", value: redirectURI),
             URLQueryItem(name: "response_mode", value: "query"),
-            URLQueryItem(name: "scope", value: "Mail.ReadWrite Mail.Send offline_access"),
+            URLQueryItem(name: "scope", value: microsoftScopes),
             URLQueryItem(name: "state", value: state),
             URLQueryItem(name: "code_challenge", value: challenge),
             URLQueryItem(name: "code_challenge_method", value: "S256")
@@ -38,12 +39,11 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
         InternalLogger.shared.log("OAuth start provider=microsoft callbackScheme=msauth.com.dylans2010.ToolsKit", level: .info)
         let callback = try await startOAuth(url: url, callbackScheme: "msauth.com.dylans2010.ToolsKit")
-        let callbackComponents = URLComponents(url: callback, resolvingAgainstBaseURL: false)
-        let returnedState = callbackComponents?.queryItems?.first(where: { $0.name == "state" })?.value
+        let returnedState = callbackValue("state", from: callback)
         guard returnedState == state else {
             throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "OAuth state mismatch"])
         }
-        guard let code = callbackComponents?.queryItems?.first(where: { $0.name == "code" })?.value else {
+        guard let code = callbackValue("code", from: callback), !code.isEmpty else {
             throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing authorization code"])
         }
 
@@ -294,12 +294,10 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "redirect_uri", value: redirectURI),
             URLQueryItem(name: "code_verifier", value: verifier),
-            URLQueryItem(name: "scope", value: "Mail.ReadWrite Mail.Send offline_access")
+            URLQueryItem(name: "scope", value: microsoftScopes)
         ]
 
-        request.httpBody = fields.map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")" }
-            .joined(separator: "&")
-            .data(using: .utf8)
+        request.httpBody = formURLEncoded(fields)
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
@@ -312,6 +310,24 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     private func fetchProfile(accessToken: String) async throws -> GraphProfile {
         let url = URL(string: "https://graph.microsoft.com/v1.0/me")!
         return try await request(url: url, body: Optional<Data>.none, token: accessToken)
+    }
+
+    private func callbackValue(_ name: String, from url: URL) -> String? {
+        if let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
+           let value = queryItems.first(where: { $0.name == name })?.value {
+            return value
+        }
+
+        guard let fragment = URLComponents(url: url, resolvingAgainstBaseURL: false)?.fragment else { return nil }
+        var parts = URLComponents()
+        parts.query = fragment
+        return parts.queryItems?.first(where: { $0.name == name })?.value
+    }
+
+    private func formURLEncoded(_ items: [URLQueryItem]) -> Data? {
+        var components = URLComponents()
+        components.queryItems = items
+        return components.percentEncodedQuery?.data(using: .utf8)
     }
 
     private func request<T: Decodable, Body: Encodable>(url: URL, method: String = "GET", body: Body? = nil, token: String?) async throws -> T {
@@ -398,12 +414,9 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             URLQueryItem(name: "grant_type", value: "refresh_token"),
             URLQueryItem(name: "refresh_token", value: refreshToken),
             URLQueryItem(name: "redirect_uri", value: redirectURI),
-            URLQueryItem(name: "scope", value: "Mail.ReadWrite Mail.Send offline_access")
+            URLQueryItem(name: "scope", value: microsoftScopes)
         ]
-        request.httpBody = fields
-            .map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")" }
-            .joined(separator: "&")
-            .data(using: .utf8)
+        request.httpBody = formURLEncoded(fields)
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {

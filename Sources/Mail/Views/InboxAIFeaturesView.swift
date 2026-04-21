@@ -13,6 +13,7 @@ struct InboxAIFeaturesView: View {
     @State private var showingEmailsUsed = false
     @State private var selectedEmail: MailMessage?
     @State private var errorMessage: String?
+    @StateObject private var cache = InboxAIAnalysisCache.shared
 
     var body: some View {
         NavigationStack {
@@ -52,7 +53,9 @@ struct InboxAIFeaturesView: View {
                 }
             }
             .task {
-                await runAnalysis()
+                applyCachedResultIfAvailable()
+                await InboxAIAnalysisCache.shared.warmCacheIfNeeded(force: false)
+                applyCachedResultIfAvailable()
             }
             .sheet(isPresented: $showingEmailsUsed) {
                 emailsUsedSheet
@@ -259,54 +262,16 @@ struct InboxAIFeaturesView: View {
     private func runAnalysis() async {
         isAnalyzing = true
         errorMessage = nil
+        await InboxAIAnalysisCache.shared.warmCacheIfNeeded(force: true)
+        applyCachedResultIfAvailable()
+        isAnalyzing = false
+    }
 
-        let unreadThreads = allUnreadThreads()
-        let latestMessages = unreadThreads.compactMap(\.messages.last)
-        let digestInput = latestMessages.prefix(25).map {
-            """
-            Subject: \($0.subject)
-            From: \($0.from)
-            Date: \($0.date.formatted(date: .abbreviated, time: .shortened))
-            Body: \($0.body.prefix(350))
-            """
-        }.joined(separator: "\n\n---\n\n")
-
-        do {
-            async let catchUpTask = AIService.shared.processText(
-                prompt: """
-                Summarize these unread emails into concise markdown with sections:
-                ## TL;DR
-                ## Important Updates
-                ## Action Items
-                
-                Emails:
-                \(digestInput)
-                """
-            )
-            async let priorityTask = AIService.shared.processText(
-                prompt: """
-                Review these unread emails and provide a markdown "Priority Digest" that identifies what should be handled first and why.
-                Include quick triage guidance.
-                
-                Emails:
-                \(digestInput)
-                """
-            )
-
-            let (summary, priorityDigest) = try await (catchUpTask, priorityTask)
-
-            await MainActor.run {
-                self.catchUpSummary = summary
-                self.prioritySummary = priorityDigest
-                self.priorityEmails = priorityThreads(from: unreadThreads, using: priorityDigest)
-                self.isAnalyzing = false
-            }
-        } catch {
-            await MainActor.run {
-                self.errorMessage = error.localizedDescription
-                self.isAnalyzing = false
-            }
-        }
+    private func applyCachedResultIfAvailable() {
+        guard let result = cache.lastResult else { return }
+        catchUpSummary = result.catchUpSummary
+        prioritySummary = result.prioritySummary
+        priorityEmails = result.priorityEmails
     }
 
     private func priorityThreads(from threads: [MailThread], using digest: String) -> [MailThread] {
@@ -339,6 +304,100 @@ struct InboxAIFeaturesView: View {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: date, relativeTo: Date())
+    }
+}
+
+@MainActor
+final class InboxAIAnalysisCache: ObservableObject {
+    static let shared = InboxAIAnalysisCache()
+
+    struct CachedResult {
+        let catchUpSummary: String
+        let prioritySummary: String
+        let priorityEmails: [MailThread]
+        let updatedAt: Date
+    }
+
+    @Published private(set) var lastResult: CachedResult?
+    private var isWarming = false
+    private let storage = MailStorageService.shared
+    private let accountManager = AccountManager.shared
+    private let cacheTTL: TimeInterval = 300
+
+    func warmCacheIfNeeded(force: Bool) async {
+        if isWarming { return }
+        if !force, let result = lastResult, Date().timeIntervalSince(result.updatedAt) < cacheTTL {
+            return
+        }
+
+        isWarming = true
+        defer { isWarming = false }
+
+        let unreadThreads = accountManager.accounts
+            .flatMap { account in
+                storage.loadThreads(for: "\(account.id)_INBOX").filter { !$0.isRead }
+            }
+            .sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
+
+        let latestMessages = unreadThreads.compactMap(\.messages.last)
+        let digestInput = latestMessages.prefix(25).map {
+            """
+            Subject: \($0.subject)
+            From: \($0.from)
+            Date: \($0.date.formatted(date: .abbreviated, time: .shortened))
+            Body: \($0.body.prefix(350))
+            """
+        }.joined(separator: "\n\n---\n\n")
+
+        guard !digestInput.isEmpty else {
+            lastResult = CachedResult(
+                catchUpSummary: "No unread emails to summarize.",
+                prioritySummary: "No urgent emails detected.",
+                priorityEmails: [],
+                updatedAt: Date()
+            )
+            return
+        }
+
+        do {
+            async let catchUpTask = AIService.shared.processText(
+                prompt: """
+                Summarize these unread emails into concise markdown with sections:
+                ## TL;DR
+                ## Important Updates
+                ## Action Items
+                
+                Emails:
+                \(digestInput)
+                """
+            )
+            async let priorityTask = AIService.shared.processText(
+                prompt: """
+                Review these unread emails and provide a markdown "Priority Digest" that identifies what should be handled first and why.
+                Include quick triage guidance.
+                
+                Emails:
+                \(digestInput)
+                """
+            )
+            let (summary, priorityDigest) = try await (catchUpTask, priorityTask)
+
+            let loweredDigest = priorityDigest.lowercased()
+            let matched = unreadThreads.filter { thread in
+                guard let message = thread.messages.last else { return false }
+                let sender = message.from.components(separatedBy: "<").first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? message.from
+                return loweredDigest.contains(message.subject.lowercased()) || loweredDigest.contains(sender.lowercased())
+            }
+
+            lastResult = CachedResult(
+                catchUpSummary: summary,
+                prioritySummary: priorityDigest,
+                priorityEmails: Array((matched.isEmpty ? unreadThreads : matched).prefix(5)),
+                updatedAt: Date()
+            )
+        } catch {
+            // Keep previously cached result on transient failures.
+        }
     }
 }
 

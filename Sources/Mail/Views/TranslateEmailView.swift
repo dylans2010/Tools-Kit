@@ -149,8 +149,29 @@ struct TranslateEmailView: View {
         errorMessage = nil
 
         do {
-            let prompt = "Translate the following email to \(targetLanguage). Return only the translated body.\n\n\(sourceText)"
-            let result = try await AIService.shared.processText(prompt: prompt)
+            let prompt = """
+            Translate the email below into \(targetLanguage).
+            Rules:
+            - Preserve meaning, names, dates, and intent.
+            - Output MUST be in \(targetLanguage), not the source language.
+            - Do not explain the translation.
+            - Return only the translated email text.
+
+            Email:
+            \(sourceText)
+            """
+            var result = try await AIService.shared.processText(prompt: prompt)
+            let cleaned = result.trimmingCharacters(in: .whitespacesAndNewlines)
+            if cleaned.caseInsensitiveCompare(sourceText.trimmingCharacters(in: .whitespacesAndNewlines)) == .orderedSame {
+                let retryPrompt = """
+                The previous output copied the source text.
+                Translate this content to \(targetLanguage) now and ensure the output language is \(targetLanguage) only.
+                Return only the final translated text:
+                \(sourceText)
+                """
+                result = try await AIService.shared.processText(prompt: retryPrompt)
+            }
+
             await MainActor.run {
                 translatedText = result.trimmingCharacters(in: .whitespacesAndNewlines)
                 isTranslating = false

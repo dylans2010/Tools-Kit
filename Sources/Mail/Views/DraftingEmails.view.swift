@@ -12,6 +12,9 @@ struct DraftingEmailsView: View {
         case friendly = "Friendly"
         case executive = "Executive"
         case persuasive = "Persuasive"
+        case empathetic = "Empathetic"
+        case technical = "Technical"
+        case casual = "Casual"
 
         var id: String { rawValue }
     }
@@ -22,6 +25,9 @@ struct DraftingEmailsView: View {
         case proposal = "Proposal"
         case support = "Support"
         case introduction = "Introduction"
+        case apology = "Apology"
+        case negotiation = "Negotiation"
+        case meetingRequest = "Meeting Request"
 
         var id: String { rawValue }
     }
@@ -30,6 +36,16 @@ struct DraftingEmailsView: View {
         case short = "Short"
         case medium = "Medium"
         case long = "Long"
+        case veryLong = "Very Long"
+
+        var id: String { rawValue }
+    }
+
+    enum Urgency: String, CaseIterable, Identifiable, Hashable {
+        case low = "Low"
+        case normal = "Normal"
+        case high = "High"
+        case critical = "Critical"
 
         var id: String { rawValue }
     }
@@ -42,6 +58,9 @@ struct DraftingEmailsView: View {
     @State private var selectedGoal: MailGoal = .statusUpdate
     @State private var selectedStyle: MailStyle = .professional
     @State private var selectedLength: OutputLength = .medium
+    @State private var selectedUrgency: Urgency = .normal
+    @State private var includeActionItems = true
+    @State private var includeSubjectSuggestions = false
 
     @State private var generatedBody = ""
     @State private var isGenerating = false
@@ -83,6 +102,11 @@ struct DraftingEmailsView: View {
                                 chipSelector(title: "Goal", selection: $selectedGoal, options: MailGoal.allCases)
                                 chipSelector(title: "Style", selection: $selectedStyle, options: MailStyle.allCases)
                                 chipSelector(title: "Length", selection: $selectedLength, options: OutputLength.allCases)
+                                chipSelector(title: "Urgency", selection: $selectedUrgency, options: Urgency.allCases)
+                                Toggle("Include action items", isOn: $includeActionItems)
+                                    .font(.caption.bold())
+                                Toggle("Include subject suggestions", isOn: $includeSubjectSuggestions)
+                                    .font(.caption.bold())
                             }
                         }
 
@@ -262,6 +286,9 @@ struct DraftingEmailsView: View {
             let prompt = """
             Write a \(selectedLength.rawValue.lowercased()) \(selectedStyle.rawValue.lowercased()) email.
             Goal: \(selectedGoal.rawValue).
+            Urgency: \(selectedUrgency.rawValue).
+            Include action items: \(includeActionItems ? "yes" : "no").
+            Include subject suggestions: \(includeSubjectSuggestions ? "yes" : "no").
             Context: \(context)
             Return only the email body.
             """

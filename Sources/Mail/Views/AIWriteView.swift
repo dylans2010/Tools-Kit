@@ -9,6 +9,9 @@ struct AIWriteView: View {
         case request = "Request"
         case invitation = "Invitation"
         case response = "Response"
+        case apology = "Apology"
+        case sales = "Sales"
+        case thankYou = "Thank You"
 
         var id: String { rawValue }
     }
@@ -18,6 +21,17 @@ struct AIWriteView: View {
         case friendly = "Friendly"
         case concise = "Concise"
         case urgent = "Urgent"
+        case empathetic = "Empathetic"
+        case confident = "Confident"
+        case formal = "Formal"
+
+        var id: String { rawValue }
+    }
+
+    enum ReadingLevel: String, CaseIterable, Identifiable {
+        case plain = "Plain"
+        case standard = "Standard"
+        case elevated = "Elevated"
 
         var id: String { rawValue }
     }
@@ -25,6 +39,9 @@ struct AIWriteView: View {
     @State private var emailType: EmailType = .general
     @State private var tone: Tone = .professional
     @State private var prompt: String = ""
+    @State private var readingLevel: ReadingLevel = .standard
+    @State private var includeSubjectLine = true
+    @State private var includeCallToAction = true
     @State private var isGenerating = false
     @State private var generatedContent = ""
     @State private var errorMessage: String?
@@ -123,6 +140,26 @@ struct AIWriteView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
+
+            HStack {
+                Text("Reading level")
+                    .font(.caption.bold())
+                Spacer()
+                Picker("Reading level", selection: $readingLevel) {
+                    ForEach(ReadingLevel.allCases) { level in
+                        Text(level.rawValue).tag(level)
+                    }
+                }
+                .pickerStyle(.menu)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
+
+            Toggle("Include subject line", isOn: $includeSubjectLine)
+                .font(.caption.bold())
+            Toggle("Include call-to-action", isOn: $includeCallToAction)
+                .font(.caption.bold())
         }
     }
 
@@ -177,6 +214,9 @@ struct AIWriteView: View {
             let aiPrompt = """
             Write a \(tone.rawValue.lowercased()) \(emailType.rawValue.lowercased()) email about:
             \(prompt)
+            Reading level: \(readingLevel.rawValue.lowercased()).
+            Include subject line: \(includeSubjectLine ? "yes" : "no").
+            Include explicit call-to-action: \(includeCallToAction ? "yes" : "no").
 
             Return only the email body.
             """

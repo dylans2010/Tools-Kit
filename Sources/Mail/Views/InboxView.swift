@@ -42,14 +42,6 @@ struct InboxView: View {
             showingFetchingLabel = false
         }
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button {
-                    showingUniversalInbox = true
-                } label: {
-                    Image(systemName: "tray.full")
-                }
-            }
-
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {
                     showingAIFeatures = true
