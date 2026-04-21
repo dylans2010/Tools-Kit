@@ -34,11 +34,7 @@ struct TranslateEmailView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
 
-                        if isTranslating {
-                            ProgressView("Translating...")
-                                .tint(.blue)
-                                .padding()
-                        } else if !translatedText.isEmpty {
+                        if !translatedText.isEmpty && !isTranslating {
                             displayCard(title: "Translation", icon: "character.bubble", isResult: true) {
                                 VStack(alignment: .leading, spacing: 10) {
                                     ScrollView {
@@ -71,6 +67,13 @@ struct TranslateEmailView: View {
                         }
                     }
                     .padding(16)
+                }
+
+                if isTranslating {
+                    sheetLoadingOverlay(
+                        title: "Translating message",
+                        subtitle: "Preserving tone, meaning, and context"
+                    )
                 }
             }
             .navigationTitle("Translate")
@@ -154,10 +157,42 @@ struct TranslateEmailView: View {
 
     private var backgroundGradient: LinearGradient {
         LinearGradient(
-            colors: [Color(hex: "#050505") ?? .black, Color(hex: "#101018") ?? .black],
-            startPoint: .top,
-            endPoint: .bottom
+            colors: [Color(hex: "#05070F") ?? .black, Color(hex: "#101A31") ?? .black, Color(hex: "#1B1231") ?? .black],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
         )
+    }
+
+    private func sheetLoadingOverlay(title: String, subtitle: String) -> some View {
+        ZStack {
+            LinearGradient(colors: [Color.black.opacity(0.58), Color.blue.opacity(0.25), Color.indigo.opacity(0.25)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                .ignoresSafeArea()
+
+            VStack(spacing: 18) {
+                TimelineView(.animation) { timeline in
+                    let phase = timeline.date.timeIntervalSinceReferenceDate
+                    ZStack {
+                        Circle()
+                            .stroke(Color.white.opacity(0.2), lineWidth: 2)
+                            .frame(width: 118, height: 118)
+                        Circle()
+                            .trim(from: 0.1, to: 0.8)
+                            .stroke(AngularGradient(colors: [.cyan, .blue, .purple, .cyan], center: .center), style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                            .frame(width: 118, height: 118)
+                            .rotationEffect(.degrees(phase * 140))
+                        Image(systemName: "character.bubble.fill")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundStyle(.white)
+                    }
+                }
+                .frame(height: 118)
+
+                Text(title).font(.title3.weight(.semibold)).foregroundStyle(.white)
+                Text(subtitle).font(.subheadline).foregroundStyle(.white.opacity(0.8))
+            }
+            .padding(24)
+        }
+        .transition(.opacity)
     }
 
     @MainActor

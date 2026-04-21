@@ -11,6 +11,7 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
     private var authSession: ASWebAuthenticationSession?
     private let imapFallback = IMAPProvider()
     private let boundSession: MailSession?
+    private let yahooScopes = "mail-r mail-w openid profile email"
 
     init(session: MailSession? = nil) {
         self.boundSession = session
@@ -31,7 +32,7 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
             URLQueryItem(name: "client_id", value: clientID),
             URLQueryItem(name: "redirect_uri", value: redirectURI),
             URLQueryItem(name: "response_type", value: "code"),
-            URLQueryItem(name: "scope", value: "mail-r mail-w"),
+            URLQueryItem(name: "scope", value: yahooScopes),
             URLQueryItem(name: "state", value: state),
             URLQueryItem(name: "code_challenge", value: challenge),
             URLQueryItem(name: "code_challenge_method", value: "S256")
@@ -54,7 +55,13 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
 
         InternalLogger.shared.log("OAuth callback provider=yahoo state=validated", level: .info)
         InternalLogger.shared.log("OAuth token exchange provider=yahoo", level: .info)
-        let token = try await exchangeCode(code: code, verifier: verifier, clientID: clientID, redirectURI: redirectURI)
+        let token = try await exchangeCode(
+            code: code,
+            verifier: verifier,
+            clientID: clientID,
+            clientSecret: oauthOptionalValue(primaryKey: "YAHOO_CLIENT_SECRET", remoteVariables: remoteVariables),
+            redirectURI: redirectURI
+        )
         let email: String
         if !credentials.email.isEmpty {
             email = credentials.email
@@ -270,6 +277,10 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         return trimmed.isEmpty ? nil : trimmed
     }
 
+    private func oauthOptionalValue(primaryKey: String, fallbackKey: String? = nil, remoteVariables: [String: String] = [:]) -> String? {
+        (try? oauthValue(primaryKey: primaryKey, fallbackKey: fallbackKey, remoteVariables: remoteVariables))
+    }
+
     private func fetchRemoteVariables() async -> [String: String] {
         guard
             let rawURL = localConfigValue(forKey: "APPWRITE_MAIL_CONFIG_URL"),
@@ -329,18 +340,21 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         }
     }
 
-    private func exchangeCode(code: String, verifier: String, clientID: String, redirectURI: String) async throws -> YahooToken {
+    private func exchangeCode(code: String, verifier: String, clientID: String, clientSecret: String?, redirectURI: String) async throws -> YahooToken {
         var request = URLRequest(url: URL(string: "https://api.login.yahoo.com/oauth2/get_token")!)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
-        let fields = [
+        var fields = [
             URLQueryItem(name: "client_id", value: clientID),
             URLQueryItem(name: "grant_type", value: "authorization_code"),
             URLQueryItem(name: "redirect_uri", value: redirectURI),
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "code_verifier", value: verifier)
         ]
+        if let clientSecret, !clientSecret.isEmpty {
+            fields.append(URLQueryItem(name: "client_secret", value: clientSecret))
+        }
 
         request.httpBody = formURLEncoded(fields)
 
@@ -420,16 +434,20 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         let remoteVariables = await fetchRemoteVariables()
         let clientID = try oauthValue(primaryKey: "YAHOO_CLIENT_ID", fallbackKey: "YAHOO_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
         let redirectURI = try oauthValue(primaryKey: "YAHOO_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+        let clientSecret = oauthOptionalValue(primaryKey: "YAHOO_CLIENT_SECRET", remoteVariables: remoteVariables)
 
         var request = URLRequest(url: URL(string: "https://api.login.yahoo.com/oauth2/get_token")!)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        let fields = [
+        var fields = [
             URLQueryItem(name: "client_id", value: clientID),
             URLQueryItem(name: "grant_type", value: "refresh_token"),
             URLQueryItem(name: "refresh_token", value: refreshToken),
             URLQueryItem(name: "redirect_uri", value: redirectURI)
         ]
+        if let clientSecret, !clientSecret.isEmpty {
+            fields.append(URLQueryItem(name: "client_secret", value: clientSecret))
+        }
         request.httpBody = formURLEncoded(fields)
 
         let (data, response) = try await URLSession.shared.data(for: request)

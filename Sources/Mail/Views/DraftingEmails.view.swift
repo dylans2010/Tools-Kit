@@ -149,6 +149,13 @@ struct DraftingEmailsView: View {
                     }
                     .padding(16)
                 }
+
+                if isGenerating {
+                    sheetLoadingOverlay(
+                        title: "Crafting your message",
+                        subtitle: "Applying tone, intent, and structure with AI"
+                    )
+                }
             }
             .navigationTitle("AI Composing")
             .navigationBarTitleDisplayMode(.inline)
@@ -201,14 +208,8 @@ struct DraftingEmailsView: View {
             Button {
                 Task { await generateDraft() }
             } label: {
-                Group {
-                    if isGenerating {
-                        ProgressView()
-                    } else {
-                        Text("Generate")
-                            .bold()
-                    }
-                }
+                Text("Generate")
+                    .bold()
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
             }
@@ -323,9 +324,7 @@ struct DraftingEmailsView: View {
             }
 
             if isGenerating {
-                ProgressView()
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 20)
+                EmptyView()
             } else {
                 Text(generatedBody)
                     .font(.subheadline)
@@ -342,10 +341,63 @@ struct DraftingEmailsView: View {
 
     private var backgroundGradient: LinearGradient {
         LinearGradient(
-            colors: [Color(hex: "#09090B") ?? .black, Color(hex: "#12121A") ?? .black],
-            startPoint: .top,
-            endPoint: .bottom
+            colors: [
+                Color(hex: "#070B1C") ?? .black,
+                Color(hex: "#171A38") ?? .black,
+                Color(hex: "#10243E") ?? .black
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
         )
+    }
+
+    private func sheetLoadingOverlay(title: String, subtitle: String) -> some View {
+        ZStack {
+            LinearGradient(
+                colors: [Color.black.opacity(0.55), Color.blue.opacity(0.25), Color.purple.opacity(0.25)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                TimelineView(.animation) { timeline in
+                    let phase = timeline.date.timeIntervalSinceReferenceDate
+                    ZStack {
+                        Circle()
+                            .stroke(Color.white.opacity(0.22), lineWidth: 2)
+                            .frame(width: 124, height: 124)
+                        Circle()
+                            .trim(from: 0.08, to: 0.72)
+                            .stroke(
+                                AngularGradient(colors: [.cyan, .blue, .purple, .cyan], center: .center),
+                                style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                            )
+                            .frame(width: 124, height: 124)
+                            .rotationEffect(.degrees(phase * 140))
+                        Circle()
+                            .fill(.white.opacity(0.08))
+                            .frame(width: 68, height: 68)
+                            .overlay(
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 24, weight: .semibold))
+                                    .foregroundStyle(.white)
+                            )
+                    }
+                }
+                .frame(height: 130)
+
+                Text(title)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.white)
+                Text(subtitle)
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.8))
+            }
+            .padding(28)
+            .frame(maxWidth: .infinity)
+        }
+        .transition(.opacity)
     }
 
     private var templateSheet: some View {

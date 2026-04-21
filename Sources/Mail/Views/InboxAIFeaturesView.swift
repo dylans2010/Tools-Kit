@@ -70,18 +70,40 @@ struct InboxAIFeaturesView: View {
 
     private var backgroundGradient: LinearGradient {
         LinearGradient(
-            colors: [Color(hex: "#0F0C29") ?? .black, Color(hex: "#302B63") ?? .black, Color(hex: "#24243E") ?? .black],
+            colors: [
+                Color(hex: "#090E1F") ?? .black,
+                Color(hex: "#1F1B4B") ?? .black,
+                Color(hex: "#3A1F68") ?? .black,
+                Color(hex: "#11344A") ?? .black
+            ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
     }
 
     private var headerSection: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "apple.intelligence")
-                .font(.system(size: 40))
-                .foregroundStyle(LinearGradient(colors: [.purple, .blue, .cyan], startPoint: .topLeading, endPoint: .bottomTrailing))
-                .modifier(ModernSymbolEffect(trigger: pulseHeader))
+        VStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [Color.purple.opacity(0.5), Color.blue.opacity(0.25), .clear],
+                            center: .center,
+                            startRadius: 10,
+                            endRadius: 80
+                        )
+                    )
+                    .frame(width: 148, height: 148)
+                    .blur(radius: 12)
+
+                Image(systemName: "apple.intelligence")
+                    .font(.system(size: 46, weight: .semibold))
+                    .foregroundStyle(
+                        LinearGradient(colors: [.white, .cyan, .blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    )
+                    .shadow(color: .blue.opacity(0.45), radius: 12, y: 4)
+                    .modifier(ModernSymbolEffect(trigger: pulseHeader))
+            }
 
             Text("Email AI Tools")
                 .font(.title2.bold())
@@ -93,7 +115,13 @@ struct InboxAIFeaturesView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 20)
         }
-        .padding(.vertical, 10)
+        .padding(.vertical, 14)
+        .frame(maxWidth: .infinity)
+        .background(Color.white.opacity(0.03), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(LinearGradient(colors: [.white.opacity(0.2), .clear], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
+        )
         .onAppear { pulseHeader = true }
     }
 
@@ -157,7 +185,7 @@ struct InboxAIFeaturesView: View {
             }
         }
         .padding(16)
-        .glassSectionBackground(gradient: [Color.purple.opacity(0.35), Color.blue.opacity(0.2)])
+        .glassSectionBackground(gradient: [Color.purple.opacity(0.4), Color.indigo.opacity(0.35), Color.cyan.opacity(0.18)])
     }
 
     private var prioritySection: some View {
@@ -196,7 +224,7 @@ struct InboxAIFeaturesView: View {
             }
         }
         .padding(16)
-        .glassSectionBackground(gradient: [Color.red.opacity(0.28), Color.orange.opacity(0.18)])
+        .glassSectionBackground(gradient: [Color.pink.opacity(0.35), Color.red.opacity(0.3), Color.orange.opacity(0.2)])
     }
 
     private func priorityRow(thread: MailThread, message: MailMessage) -> some View {

@@ -26,6 +26,8 @@ struct UniversalInboxView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(Color(.systemGroupedBackground))
         .navigationTitle("Accounts")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -83,6 +85,7 @@ struct UniversalInboxView: View {
                     if sync.isSyncing { ProgressView() }
                 }
             }
+            .listRowBackground(Color(.secondarySystemGroupedBackground))
         }
     }
 
@@ -115,8 +118,26 @@ struct UniversalInboxView: View {
             Button {
                 openInbox(for: account, folderName: selectedFolder(for: account))
             } label: {
-                Label(account.emailAddress, systemImage: providerIcon(account.providerType))
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                HStack(spacing: 10) {
+                    Circle()
+                        .fill(providerColor(account.providerType).opacity(0.2))
+                        .frame(width: 28, height: 28)
+                        .overlay(
+                            Image(systemName: providerIcon(account.providerType))
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(providerColor(account.providerType))
+                        )
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(account.emailAddress)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                        Text(account.providerType.displayName)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .buttonStyle(.plain)
 
@@ -128,6 +149,7 @@ struct UniversalInboxView: View {
             }
             .buttonStyle(.plain)
         }
+        .padding(.vertical, 2)
     }
 
     private func folderPicker(_ account: MailAccount) -> some View {
@@ -177,10 +199,19 @@ struct UniversalInboxView: View {
     }
 
     private func messageRow(_ scoped: ScopedMailMessage, account: MailAccount?) -> some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
+            Circle()
+                .fill(Color(.tertiarySystemFill))
+                .frame(width: 34, height: 34)
+                .overlay(
+                    Text(senderInitials(scoped.message.from))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                )
+
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
-                    Text(scoped.message.subject)
+                    Text(senderName(scoped.message.from))
                         .font(.subheadline.weight(.semibold))
                         .lineLimit(1)
                     Spacer()
@@ -188,9 +219,14 @@ struct UniversalInboxView: View {
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
-                Text(scoped.message.from)
+                Text(scoped.message.subject)
+                    .font(.caption)
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                Text(previewText(scoped.message))
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .lineLimit(2)
                 if let account {
                     Text("\(account.providerType.displayName) • \(account.emailAddress)")
                         .font(.caption2)
@@ -201,6 +237,7 @@ struct UniversalInboxView: View {
                 .font(.caption2.weight(.bold))
                 .foregroundStyle(.secondary)
         }
+        .padding(.vertical, 4)
         .swipeActions(edge: .leading, allowsFullSwipe: false) {
             Button {
                 toggleImportant(scoped)
@@ -321,6 +358,39 @@ struct UniversalInboxView: View {
         case .proton: return "lock.shield"
         case .imap, .icloud: return "tray.full"
         }
+    }
+
+    private func providerColor(_ provider: MailAccount.ProviderType) -> Color {
+        switch provider {
+        case .gmail: return .red
+        case .outlook: return .blue
+        case .yahoo: return .purple
+        case .proton: return .green
+        case .imap, .icloud: return .gray
+        }
+    }
+
+    private func senderName(_ raw: String) -> String {
+        if let index = raw.firstIndex(of: "<") {
+            return String(raw[..<index]).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        return raw
+    }
+
+    private func senderInitials(_ sender: String) -> String {
+        let parts = senderName(sender).split(separator: " ")
+        let first = parts.first?.first.map(String.init) ?? "?"
+        let second = parts.dropFirst().first?.first.map(String.init) ?? ""
+        return (first + second).uppercased()
+    }
+
+    private func previewText(_ message: MailMessage) -> String {
+        let base = message.body.isEmpty ? (message.htmlBody ?? "") : message.body
+        return base
+            .replacingOccurrences(of: "<[^>]+>", with: " ", options: .regularExpression)
+            .replacingOccurrences(of: "&nbsp;", with: " ")
+            .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private func toggleAccountSection(_ account: MailAccount) {

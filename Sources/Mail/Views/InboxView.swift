@@ -254,10 +254,10 @@ struct InboxView: View {
         if let htmlBody = message.htmlBody,
            let rendered = MailContentRenderer.render(htmlBody: htmlBody, plainBody: message.body).plainBody,
            !rendered.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return rendered
+            return sanitizePreviewText(rendered)
         }
 
-        let source = message.body.trimmingCharacters(in: .whitespacesAndNewlines)
+        let source = sanitizePreviewText(message.body)
         guard !source.isEmpty else { return "No preview" }
 
         if let attributed = try? AttributedString(
@@ -268,6 +268,23 @@ struct InboxView: View {
             return cleaned.isEmpty ? source : cleaned
         }
         return source
+    }
+
+    private func sanitizePreviewText(_ input: String) -> String {
+        let noCodeBlocks = input.replacingOccurrences(of: "<style[\\s\\S]*?</style>", with: " ", options: .regularExpression)
+            .replacingOccurrences(of: "<script[\\s\\S]*?</script>", with: " ", options: .regularExpression)
+            .replacingOccurrences(of: "<[^>]+>", with: " ", options: .regularExpression)
+            .replacingOccurrences(of: "\\{[^\\}]*:[^\\}]*\\}", with: " ", options: .regularExpression)
+        let decoded = noCodeBlocks
+            .replacingOccurrences(of: "&nbsp;", with: " ")
+            .replacingOccurrences(of: "&amp;", with: "&")
+            .replacingOccurrences(of: "&lt;", with: "<")
+            .replacingOccurrences(of: "&gt;", with: ">")
+            .replacingOccurrences(of: "&quot;", with: "\"")
+            .replacingOccurrences(of: "&#39;", with: "'")
+            .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return decoded
     }
 
     @ViewBuilder
