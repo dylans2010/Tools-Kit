@@ -103,8 +103,24 @@ struct AIChatSettingsView: View {
                         }
                     }
                 }
-                .padding(.vertical, 4)
+                .padding(.vertical, 6)
             }
+            .padding(8)
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.blue.opacity(0.10), Color.purple.opacity(0.08)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .overlay(.ultraThinMaterial.opacity(0.35))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                    )
+            )
         } header: {
             Text("AI Provider")
         } footer: {
@@ -646,23 +662,68 @@ struct ProviderChip: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 6) {
+            VStack(spacing: 8) {
                 Image(systemName: provider.icon)
-                    .font(.title3)
+                    .font(.title3.weight(.semibold))
                     .foregroundColor(isSelected ? .white : .blue)
+                    .symbolRenderingMode(.hierarchical)
+                    .modifier(ProviderIconEffect(isSelected: isSelected))
                 Text(provider.name)
-                    .font(.caption2)
-                    .fontWeight(.medium)
+                    .font(.caption2.weight(.semibold))
                     .foregroundColor(isSelected ? .white : .primary)
                     .lineLimit(1)
             }
-            .frame(width: 80, height: 64)
-            .background(isSelected ? Color.blue : Color(.secondarySystemGroupedBackground))
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? Color.blue : Color.gray.opacity(0.2), lineWidth: 1.5)
+            .frame(width: 88, height: 70)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(
+                        isSelected
+                        ? AnyShapeStyle(
+                            LinearGradient(
+                                colors: [Color.blue, Color.purple],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        : AnyShapeStyle(Color(.secondarySystemGroupedBackground))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(.ultraThinMaterial.opacity(isSelected ? 0.0 : 0.35))
+                    )
             )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(
+                        isSelected
+                        ? AnyShapeStyle(
+                            LinearGradient(
+                                colors: [Color.cyan.opacity(0.9), Color.white.opacity(0.7)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        : AnyShapeStyle(Color.gray.opacity(0.2)),
+                        lineWidth: 1.5
+                    )
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct ProviderIconEffect: ViewModifier {
+    let isSelected: Bool
+
+    func body(content: Content) -> some View {
+        if #available(iOS 17.0, *) {
+            if isSelected {
+                content.symbolEffect(.pulse.byLayer, options: .repeating, isActive: true)
+            } else {
+                content
+            }
+        } else {
+            content
         }
     }
 }
@@ -680,6 +741,7 @@ struct APIKeyRowView: View {
     @State private var validationResult: Bool? = nil
     @State private var showKey: Bool = false
     @State private var showCopied = false
+    @State private var lastProviderID: String = ""
 
     private let keyManager = APIKeyManager.shared
     private let registry = AIProviderRegistry.shared
@@ -749,12 +811,24 @@ struct APIKeyRowView: View {
                 }
             }
         }
-        .onAppear { loadSavedKey() }
-        .onChange(of: providerID) { _ in loadSavedKey() }
+        .onAppear {
+            lastProviderID = providerID
+            loadSavedKey(for: providerID)
+        }
+        .onDisappear {
+            persistCurrentKeyIfNeeded(for: providerID)
+        }
+        .onChange(of: providerID) { newProviderID in
+            if !lastProviderID.isEmpty {
+                persistCurrentKeyIfNeeded(for: lastProviderID)
+            }
+            loadSavedKey(for: newProviderID)
+            lastProviderID = newProviderID
+        }
     }
 
-    private func loadSavedKey() {
-        if let saved = keyManager.getKey(for: providerID) {
+    private func loadSavedKey(for id: String) {
+        if let saved = keyManager.getKey(for: id) {
             key = saved
             isSaved = true
         } else {
@@ -762,6 +836,12 @@ struct APIKeyRowView: View {
             isSaved = false
             validationResult = nil
         }
+    }
+
+    private func persistCurrentKeyIfNeeded(for id: String) {
+        let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        _ = keyManager.saveKey(trimmed, for: id)
     }
 
     private func saveKey() {

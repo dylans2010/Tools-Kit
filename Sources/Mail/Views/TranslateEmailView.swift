@@ -39,11 +39,14 @@ struct TranslateEmailView: View {
                                 .padding()
                         } else if !translatedText.isEmpty {
                             displayCard(title: "Translation", icon: "character.bubble", isResult: true) {
-                                TextEditor(text: $translatedText)
-                                    .frame(minHeight: 150)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.white)
-                                    .scrollContentBackground(.hidden)
+                                ScrollView {
+                                    Text(translatedText)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.white)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .textSelection(.enabled)
+                                }
+                                .frame(minHeight: 150)
                             }
                         }
 
