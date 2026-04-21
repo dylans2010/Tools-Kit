@@ -14,6 +14,7 @@ struct UniversalInboxView: View {
     @State private var showFolderEditorForAccount: MailAccount?
     @State private var selectedMessage: MailMessage?
     @State private var showCompose = false
+    @State private var showMailSettings = false
     @State private var navigationTarget: InboxNavigationTarget?
 
     var body: some View {
@@ -28,6 +29,13 @@ struct UniversalInboxView: View {
         .listStyle(.insetGrouped)
         .navigationTitle("Universal Inbox")
         .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showMailSettings = true
+                } label: {
+                    Image(systemName: "slider.horizontal.3")
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     showCompose = true
@@ -51,6 +59,9 @@ struct UniversalInboxView: View {
             if let active = accountManager.activeAccount {
                 EmailComposingView(account: active)
             }
+        }
+        .fullScreenCover(isPresented: $showMailSettings) {
+            MailSettingsView()
         }
         .task {
             accountManager.refreshAccounts()
