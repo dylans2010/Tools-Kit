@@ -52,6 +52,7 @@
 		AI0200000000000000000001 /* InboxAIFeaturesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000001 /* InboxAIFeaturesView.swift */; };
 		AI0200000000000000000002 /* AIWriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000002 /* AIWriteView.swift */; };
 		MS0200000000000000000006 /* MailNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000006 /* MailNotificationManager.swift */; };
+		MS0200000000000000000007 /* InboxAIAnalysisCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000007 /* InboxAIAnalysisCache.swift */; };
 		50C031082B944F5782BAF41E /* MailContentRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB1750052D346DFBBD0A71D /* MailContentRenderer.swift */; };
 		AA11BB22CC33DD44EE55FF01 /* MailMIMEParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF00 /* MailMIMEParser.swift */; };
 		AA11BB22CC33DD44EE55FF03 /* MailContentDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF02 /* MailContentDecoder.swift */; };
@@ -687,6 +688,7 @@
 		E5803F11250B4895BDFCD61F /* MailIMAPService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Services/MailIMAPService.swift; sourceTree = "<group>"; };
 		DE11EA6244764DF7BD1850B1 /* MailKeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Services/MailKeychainManager.swift; sourceTree = "<group>"; };
 		MS0100000000000000000006 /* MailNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Services/MailNotificationManager.swift; sourceTree = "<group>"; };
+		MS0100000000000000000007 /* InboxAIAnalysisCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Services/InboxAIAnalysisCache.swift; sourceTree = "<group>"; };
 		E5AEBD1200A44657A5C545F3 /* FileModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Files/FileModels.swift"; sourceTree = "<group>"; };
 		CF9A900AAA944545B9AA0217 /* FileFolderBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Files/FileFolderBackend.swift"; sourceTree = "<group>"; };
 		10D892907BAC409D9E8D7684 /* FileFolderContentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Files/FileFolderContentsView.swift"; sourceTree = "<group>"; };
@@ -1420,6 +1422,7 @@
 				E5803F11250B4895BDFCD61F /* MailIMAPService.swift */,
 				DE11EA6244764DF7BD1850B1 /* MailKeychainManager.swift */,
 				MS0100000000000000000006 /* MailNotificationManager.swift */,
+				MS0100000000000000000007 /* InboxAIAnalysisCache.swift */,
 				B1ABEF1CC5614B57A749E486 /* NATOView.swift */,
 				711D3FB735414113B06478F1 /* MorseCodeView.swift */,
 				D8156480BE054D17A41ABFCF /* PrimeFactorView.swift */,
@@ -2087,6 +2090,7 @@
 				3DEFEFD38FC3482E8ACB0ABF /* MailIMAPService.swift in Sources */,
 				90A9E621D330450692FF9A62 /* MailKeychainManager.swift in Sources */,
 				MS0200000000000000000006 /* MailNotificationManager.swift in Sources */,
+				MS0200000000000000000007 /* InboxAIAnalysisCache.swift in Sources */,
 				04450CC11B3A4A3CA84BC3CA /* FileModels.swift in Sources */,
 				5E0CD5A16EF14B369FEA355E /* FileFolderBackend.swift in Sources */,
 				7F46638E50884AFF969EBA75 /* FileFolderContentsView.swift in Sources */,
