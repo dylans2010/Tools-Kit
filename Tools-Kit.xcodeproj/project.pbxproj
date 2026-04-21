@@ -51,6 +51,8 @@
 		9B92D995283049E1921A3007 /* InboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E1340D7B74447B9E795193 /* InboxView.swift */; };
 		AI0200000000000000000001 /* InboxAIFeaturesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000001 /* InboxAIFeaturesView.swift */; };
 		AI0200000000000000000002 /* AIWriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000002 /* AIWriteView.swift */; };
+		AI0200000000000000000003 /* MailAILoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000003 /* MailAILoadingView.swift */; };
+		AI0200000000000000000004 /* MailAITitleHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000004 /* MailAITitleHeader.swift */; };
 		MS0200000000000000000006 /* MailNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000006 /* MailNotificationManager.swift */; };
 		MS0200000000000000000007 /* InboxAIAnalysisCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000007 /* InboxAIAnalysisCache.swift */; };
 		50C031082B944F5782BAF41E /* MailContentRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB1750052D346DFBBD0A71D /* MailContentRenderer.swift */; };
@@ -679,6 +681,8 @@
 		93E1340D7B74447B9E795193 /* InboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/InboxView.swift; sourceTree = "<group>"; };
 		AI0100000000000000000001 /* InboxAIFeaturesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/InboxAIFeaturesView.swift; sourceTree = "<group>"; };
 		AI0100000000000000000002 /* AIWriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/AIWriteView.swift; sourceTree = "<group>"; };
+		AI0100000000000000000003 /* MailAILoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailAILoadingView.swift; sourceTree = "<group>"; };
+		AI0100000000000000000004 /* MailAITitleHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailAITitleHeader.swift; sourceTree = "<group>"; };
 		7FB1750052D346DFBBD0A71D /* MailContentRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Rendering/MailContentRenderer.swift; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF00 /* MailMIMEParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Rendering/MailMIMEParser.swift; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF02 /* MailContentDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Rendering/MailContentDecoder.swift; sourceTree = "<group>"; };
@@ -1410,6 +1414,8 @@
 				93E1340D7B74447B9E795193 /* InboxView.swift */,
 				AI0100000000000000000001 /* InboxAIFeaturesView.swift */,
 				AI0100000000000000000002 /* AIWriteView.swift */,
+				AI0100000000000000000003 /* MailAILoadingView.swift */,
+				AI0100000000000000000004 /* MailAITitleHeader.swift */,
 				7FB1750052D346DFBBD0A71D /* MailContentRenderer.swift */,
 				AA11BB22CC33DD44EE55FF00 /* MailMIMEParser.swift */,
 				AA11BB22CC33DD44EE55FF02 /* MailContentDecoder.swift */,
@@ -2078,6 +2084,8 @@
 				9B92D995283049E1921A3007 /* InboxView.swift in Sources */,
 				AI0200000000000000000001 /* InboxAIFeaturesView.swift in Sources */,
 				AI0200000000000000000002 /* AIWriteView.swift in Sources */,
+				AI0200000000000000000003 /* MailAILoadingView.swift in Sources */,
+				AI0200000000000000000004 /* MailAITitleHeader.swift in Sources */,
 				50C031082B944F5782BAF41E /* MailContentRenderer.swift in Sources */,
 				AA11BB22CC33DD44EE55FF01 /* MailMIMEParser.swift in Sources */,
 				AA11BB22CC33DD44EE55FF03 /* MailContentDecoder.swift in Sources */,
