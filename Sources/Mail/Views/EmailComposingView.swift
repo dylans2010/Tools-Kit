@@ -119,7 +119,7 @@ struct EmailComposingView: View {
             .overlay(alignment: .bottom) {
                 if showUndoSendBanner {
                     HStack(spacing: 12) {
-                        Label("Sending in \(undoCountdown)s", systemImage: "arrow.uturn.backward.circle")
+                        Label("Sending In \(undoCountdown)s", systemImage: "arrow.uturn.backward.circle")
                             .font(.caption.weight(.semibold))
                         Spacer()
                         Button("Undo") {
@@ -151,7 +151,6 @@ struct EmailComposingView: View {
                     }
                 }
                 .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showingAIWrite) {
                 AIWriteView { generated in
@@ -162,24 +161,20 @@ struct EmailComposingView: View {
                     }
                 }
                 .presentationDetents([.height(320)])
-                .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showingTranslateSheet) {
                 TranslateEmailView(sourceText: messageBody) { translated in
                     messageBody = translated
                 }
                 .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showingLinkSheet) {
                 linkComposerSheet
                     .presentationDetents([.medium])
-                    .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showingScheduleSheet) {
                 scheduleSheet
                     .presentationDetents([.height(250)])
-                    .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showingPreviewSheet) {
                 markdownPreviewSheet
@@ -250,7 +245,7 @@ struct EmailComposingView: View {
                     ForEach(toRecipients, id: \.self) { recipient in
                         recipientChip(recipient)
                     }
-                    TextField("Add recipient", text: $newRecipient)
+                    TextField("Add Recipient", text: $newRecipient)
                         .textInputAutocapitalization(.never)
                         .disableAutocorrection(true)
                         .keyboardType(.emailAddress)
@@ -264,7 +259,7 @@ struct EmailComposingView: View {
 
     private var subjectSection: some View {
         Section("Subject") {
-            TextField("Write a subject", text: $subject)
+            TextField("Email Subject", text: $subject)
                 .textInputAutocapitalization(.sentences)
                 .disableAutocorrection(true)
         }
@@ -279,7 +274,7 @@ struct EmailComposingView: View {
                         .frame(minHeight: 200)
 
                     if messageBody.isEmpty && !bodyFocused {
-                        Text("Write your message…")
+                        Text("Email Content")
                             .foregroundColor(Color(.placeholderText))
                             .padding(.top, 8)
                             .padding(.leading, 6)
@@ -356,7 +351,7 @@ struct EmailComposingView: View {
     private var attachmentsSection: some View {
         Section("Attachments") {
             if draftAttachments.isEmpty {
-                Text("No attachments yet")
+                Text("No Attachments")
                     .foregroundStyle(.secondary)
             } else {
                 ForEach(draftAttachments) { attachment in
@@ -400,7 +395,7 @@ struct EmailComposingView: View {
     private var linkComposerSheet: some View {
         NavigationStack {
             Form {
-                TextField("Link text", text: $pendingLinkText)
+                TextField("Link Text", text: $pendingLinkText)
                 TextField("URL", text: $pendingLinkURL)
                     .textInputAutocapitalization(.never)
                     .disableAutocorrection(true)
@@ -429,7 +424,7 @@ struct EmailComposingView: View {
     private var scheduleSheet: some View {
         NavigationStack {
             Form {
-                DatePicker("Send at", selection: Binding(
+                DatePicker("Send At", selection: Binding(
                     get: { scheduleDate ?? Date().addingTimeInterval(3600) },
                     set: { scheduleDate = $0 }
                 ), in: Date()..., displayedComponents: [.date, .hourAndMinute])

@@ -61,7 +61,7 @@ struct AIWriteView: View {
                         inputSection
 
                         if isGenerating {
-                            ProgressView("Creating your email...")
+                            ProgressView("Crafting Email...")
                                 .tint(.purple)
                                 .padding()
                         }
@@ -145,7 +145,7 @@ struct AIWriteView: View {
                 Text("Reading level")
                     .font(.caption.bold())
                 Spacer()
-                Picker("Reading level", selection: $readingLevel) {
+                Picker("Reading Level", selection: $readingLevel) {
                     ForEach(ReadingLevel.allCases) { level in
                         Text(level.rawValue).tag(level)
                     }

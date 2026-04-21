@@ -47,7 +47,7 @@ struct MailSettingsView: View {
     @State private var showResetConfirmation = false
 
     private let undoSendDurations = [5, 10, 20, 30]
-    private let sortOptions = ["Newest first", "Oldest first"]
+    private let sortOptions = ["Newest First", "Oldest First"]
     private let archiveOptions = ["Archive", "All Mail", "Inbox"]
     private let deleteOptions = ["Move to Trash", "Archive Instead", "Delete Permanently"]
     private let syncOptions = ["Manual", "5 min", "15 min"]

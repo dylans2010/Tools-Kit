@@ -43,7 +43,7 @@ struct EmailDetailView: View {
                     }
 
                     if isRunningAIFeature {
-                        ProgressView("Running AI analysis…")
+                        ProgressView("Running AI Analysis…")
                     }
 
                     if !actionItems.isEmpty {
@@ -87,19 +87,19 @@ struct EmailDetailView: View {
                         Button {
                             runAIFeature(.actionItems)
                         } label: {
-                            Label("Extract action items", systemImage: "checklist")
+                            Label("Extract Action Items", systemImage: "checklist")
                         }
 
                         Button {
                             runAIFeature(.tone)
                         } label: {
-                            Label("Analyze tone", systemImage: "waveform.and.magnifyingglass")
+                            Label("Analyze Tone", systemImage: "waveform.and.magnifyingglass")
                         }
 
                         Button {
                             runAIFeature(.replyDraft)
                         } label: {
-                            Label("Generate reply draft", systemImage: "square.and.pencil")
+                            Label("Generate Reply Draft", systemImage: "square.and.pencil")
                         }
 
                         Button {

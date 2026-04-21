@@ -9,7 +9,7 @@ struct NoiseControlView: View {
         VStack(alignment: .leading, spacing: 10) {
             Label("Noise Cancellation", systemImage: "waveform.and.mic")
                 .font(.subheadline.weight(.semibold))
-            Toggle("Enable filtering", isOn: Binding(get: { isEnabled }, set: onToggle))
+            Toggle("Enable Filtering", isOn: Binding(get: { isEnabled }, set: onToggle))
             Label(processingState, systemImage: isEnabled ? "checkmark.circle.fill" : "mic.slash")
                 .font(.caption)
                 .foregroundStyle(isEnabled ? .green : .secondary)

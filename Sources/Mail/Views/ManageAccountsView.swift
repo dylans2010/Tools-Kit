@@ -275,12 +275,12 @@ struct ManageAccountsView: View {
 
     private func buttonSubtitle(_ provider: MailAccount.ProviderType) -> String {
         switch provider {
-        case .gmail: return "OAuth sign in"
-        case .outlook: return "Microsoft OAuth"
-        case .yahoo: return "Yahoo OAuth"
-        case .proton: return "Bridge-assisted IMAP"
+        case .gmail: return "Sign in into Gmail"
+        case .outlook: return "Sign in into Outlook"
+        case .yahoo: return "Sign in into Yahoo"
+        case .proton: return "Bridge assisted IMAP"
         case .imap: return "Custom server"
-        case .icloud: return "Apple mail"
+        case .icloud: return "Sign in into iCloud"
         }
     }
 

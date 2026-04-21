@@ -49,10 +49,10 @@ struct MeetingControlsView: View {
                     controlIconButton(title: "Settings", subtitle: "Devices", icon: "slider.horizontal.3", tint: .gray, action: onOpenSettings)
                 }
                 if let onOpenAdmin {
-                    controlIconButton(title: "Admin", subtitle: "Host tools", icon: "person.badge.shield.checkmark.fill", tint: .purple, action: onOpenAdmin)
+                    controlIconButton(title: "Admin", subtitle: "Host Tools", icon: "person.badge.shield.checkmark.fill", tint: .purple, action: onOpenAdmin)
                 }
                 if let onOpenNotes {
-                    controlIconButton(title: "Notes", subtitle: "Shared notes", icon: "note.text", tint: .mint, action: onOpenNotes)
+                    controlIconButton(title: "Notes", subtitle: "Shared Notes", icon: "note.text", tint: .mint, action: onOpenNotes)
                 }
 
                 Button(role: .destructive, action: onLeaveMeeting) {

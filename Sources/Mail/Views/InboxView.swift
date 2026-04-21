@@ -652,6 +652,7 @@ private struct InboxMessageDetailView: View {
                     prompt: """
                     Write an ultra-short markdown summary for this email in at most 4 bullets.
                     Include only what matters now and any clear next step.
+                    DO NOT SAY NOTHING ELSE, ONLY THE SUMMARY
 
                     Email:
                     \(input)

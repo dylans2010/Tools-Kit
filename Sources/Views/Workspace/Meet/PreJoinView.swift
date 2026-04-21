@@ -19,7 +19,7 @@ struct PreJoinView: View {
             }
             .frame(height: 150)
 
-            TextField("Enter your name", text: $manager.displayNameInput)
+            TextField("Enter Your Name", text: $manager.displayNameInput)
                 .textFieldStyle(.roundedBorder)
 
             Toggle("Microphone", isOn: Binding(get: { !manager.isMicrophoneMuted }, set: { _ in manager.toggleMute() }))

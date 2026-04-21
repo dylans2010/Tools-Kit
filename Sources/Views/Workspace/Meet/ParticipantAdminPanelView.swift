@@ -38,6 +38,6 @@ struct ParticipantAdminPanelView: View {
                 }
             }
         }
-        .navigationTitle("Participant Admin")
+        .navigationTitle("Admin Controls")
     }
 }

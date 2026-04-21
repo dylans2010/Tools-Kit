@@ -18,10 +18,10 @@ struct CreateAccountView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 16) {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Create account")
+                        Text("Welcome To Tools Kit")
                             .font(.system(size: 32, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
-                        Text("Use email and password to create your Tools Kit account.")
+                        Text("Create an account to use Tools Kit, use email and password or choose a provider to create it.")
                             .font(.footnote)
                             .foregroundStyle(.white.opacity(0.78))
                     }
@@ -30,10 +30,10 @@ struct CreateAccountView: View {
                     .opacity(animateHeader ? 1 : 0.75)
 
                     VStack(spacing: 12) {
-                        inputField(title: "Full name", text: $name, secure: false, keyboard: .default)
+                        inputField(title: "Name", text: $name, secure: false, keyboard: .default)
                         inputField(title: "Email", text: $email, secure: false, keyboard: .emailAddress)
                         inputField(title: "Password", text: $password, secure: true, keyboard: .default)
-                        inputField(title: "Confirm password", text: $confirmPassword, secure: true, keyboard: .default)
+                        inputField(title: "Confirm Password", text: $confirmPassword, secure: true, keyboard: .default)
 
                         if let errorMessage {
                             Label(errorMessage, systemImage: "exclamationmark.triangle.fill")

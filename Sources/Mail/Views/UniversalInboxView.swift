@@ -26,7 +26,7 @@ struct UniversalInboxView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("Universal Inbox")
+        .navigationTitle("Accounts")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {

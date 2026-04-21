@@ -78,16 +78,16 @@ struct InboxAIFeaturesView: View {
 
     private var headerSection: some View {
         VStack(spacing: 8) {
-            Image(systemName: "sparkles")
+            Image(systemName: "apple.intelligence")
                 .font(.system(size: 40))
                 .foregroundStyle(LinearGradient(colors: [.purple, .blue, .cyan], startPoint: .topLeading, endPoint: .bottomTrailing))
                 .modifier(ModernSymbolEffect(trigger: pulseHeader))
 
-            Text("Workspace AI")
+            Text("Email AI Tools")
                 .font(.title2.bold())
                 .foregroundStyle(.white)
 
-            Text("Analyzing only the emails currently loaded in this Inbox screen.")
+            Text("Analyzing ONLY the emails currently loaded in this Inbox screen.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -103,7 +103,7 @@ struct InboxAIFeaturesView: View {
                 .tint(.purple)
                 .scaleEffect(1.5)
 
-            Text("Scanning your inbox...")
+            Text("Scanning Inbox...")
                 .font(.headline)
                 .foregroundStyle(.white)
 
@@ -287,7 +287,7 @@ struct InboxAIFeaturesView: View {
         }.joined(separator: "\n\n---\n\n")
 
         let systemPrompt = """
-        You are InboxOps-FT-v3, a fine-tuned inbox triage model.
+        You are InboxAI-Transformer-TK-v3, a fine-tuned inbox triage model.
         You must analyze ALL provided email content exactly as given.
         Strict requirements:
         1) Never invent facts; only use provided content.
@@ -297,6 +297,7 @@ struct InboxAIFeaturesView: View {
         5) Keep every sentence actionable and concrete.
         6) If evidence is missing, explicitly write "Unknown from inbox content".
         7) Prefer short bullet points over prose.
+        8) ALWAYS provide proper spacing and markdown
         """
 
         do {

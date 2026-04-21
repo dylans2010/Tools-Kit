@@ -27,7 +27,7 @@ struct LoginView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 22) {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Welcome back")
+                        Text("Welcome Back!")
                             .font(.system(size: 36, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                         Text("Sign in to continue to Tools Kit")
@@ -39,8 +39,8 @@ struct LoginView: View {
                     .opacity(animateHero ? 1 : 0.7)
 
                     VStack(spacing: 14) {
-                        inputField(label: "Email", placeholder: "you@example.com", text: $email, secure: false, keyboard: .emailAddress)
-                        inputField(label: "Password", placeholder: "Enter password", text: $password, secure: true, keyboard: .default)
+                        inputField(label: "Email", placeholder: "Enter Email", text: $email, secure: false, keyboard: .emailAddress)
+                        inputField(label: "Password", placeholder: "Enter Password", text: $password, secure: true, keyboard: .default)
 
                         if let errorMessage {
                             Label(errorMessage, systemImage: "exclamationmark.triangle.fill")
@@ -60,7 +60,7 @@ struct LoginView: View {
                                 if isLoading {
                                     ProgressView().tint(.white)
                                 }
-                                Text(isLoading ? "Signing in..." : "Sign In")
+                                Text(isLoading ? "Signing In..." : "Sign In")
                                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                             }
                             .frame(maxWidth: .infinity)
@@ -88,7 +88,7 @@ struct LoginView: View {
                     )
 
                     VStack(spacing: 12) {
-                        Text("or continue with")
+                        Text("Or Continue With")
                             .font(.system(size: 13, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.62))
 
@@ -98,7 +98,7 @@ struct LoginView: View {
                             SocialLoginButton(label: "Discord", iconText: "D") { signInWithOAuth(provider: "discord") }
                         }
 
-                        Button("Create account") {
+                        Button("Create Account") {
                             showingCreateAccount = true
                         }
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
@@ -151,7 +151,7 @@ struct LoginView: View {
 
     private func signInWithEmail() {
         guard !email.isEmpty, !password.isEmpty else {
-            errorMessage = "Enter both email and password."
+            errorMessage = "Enter both email and password to continue."
             return
         }
 

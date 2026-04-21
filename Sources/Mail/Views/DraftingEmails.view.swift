@@ -104,7 +104,7 @@ struct DraftingEmailsView: View {
                         inputCard(title: "Recipient & Subject", icon: "person.fill") {
                             VStack(spacing: 12) {
                                 customTextField("To:", text: $recipient, placeholder: "email@example.com")
-                                customTextField("Subject:", text: $subject, placeholder: "Enter subject")
+                                customTextField("Subject:", text: $subject, placeholder: "Enter Subject")
                             }
                         }
 
@@ -150,7 +150,7 @@ struct DraftingEmailsView: View {
                     .padding(16)
                 }
             }
-            .navigationTitle("Drafting Studio")
+            .navigationTitle("AI Composing")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .bottom) {
@@ -169,7 +169,7 @@ struct DraftingEmailsView: View {
 
     private var headerSection: some View {
         VStack(spacing: 8) {
-            Text("AI Drafting Assistant")
+            Text("Draft New Mail")
                 .font(.title3.bold())
                 .foregroundStyle(.white)
             Text("Craft the perfect message with tailored goals and styles.")

@@ -99,7 +99,7 @@ struct TranslateEmailView: View {
 
     private var headerSection: some View {
         VStack(spacing: 4) {
-            Text("Global Communication")
+            Text("Translate Emails")
                 .font(.headline)
                 .foregroundStyle(.blue)
             Text("Translate your message while maintaining its original intent.")
@@ -172,7 +172,7 @@ struct TranslateEmailView: View {
             - Preserve meaning, names, dates, and intent.
             - Output MUST be in \(targetLanguage), not the source language.
             - Do not explain the translation.
-            - Return only the translated email text.
+            - Return only the translated email text. DO NOT SAY ANYTHING ELSE
 
             Email:
             \(sourceText)

@@ -39,7 +39,7 @@ struct VideoGridView: View {
 
                 if liveVideoParticipants.isEmpty {
                     ContentUnavailableView(
-                        "No active video",
+                        "No Active Video",
                         systemImage: "video.slash",
                         description: Text("Turn on your camera or wait for participants to publish a video track.")
                     )
