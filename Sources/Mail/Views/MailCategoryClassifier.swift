@@ -1,4 +1,3 @@
-import CoreML
 import Foundation
 import SwiftUI
 
@@ -31,6 +30,7 @@ enum InboxCategory: String, CaseIterable, Identifiable {
 enum MailCategoryClassifier {
     private static let cacheLock = NSLock()
     private static var categoryCache: [String: InboxCategory] = [:]
+    private static let maxAnalyzedCharacters = 8_000
 
     static func category(for thread: MailThread) -> InboxCategory {
         let latest = thread.messages.last
@@ -46,39 +46,27 @@ enum MailCategoryClassifier {
         let text = [
             latest?.subject ?? thread.subject,
             latest?.from ?? "",
-            latest?.body ?? thread.snippet,
+            latest?.body.prefix(maxAnalyzedCharacters / 2) ?? thread.snippet,
             thread.snippet
         ]
         .joined(separator: " ")
         .lowercased()
-
         let features = buildFeatures(from: text)
-        let provider: MLFeatureProvider?
-        do {
-            provider = try MLDictionaryFeatureProvider(
-                dictionary: features.reduce(into: [String: MLFeatureValue]()) { partialResult, item in
-                    partialResult[item.key] = MLFeatureValue(double: item.value)
-                }
-            )
-        } catch {
-            InternalLogger.shared.log("MailCategoryClassifier: feature provider init failed \(error.localizedDescription)", level: .warning)
-            provider = nil
-        }
 
         let transactionScore = score(
-            provider: provider,
+            features: features,
             keys: ["invoice", "receipt", "payment", "order", "subscription", "billing", "statement", "transaction", "refund", "shipped"]
         )
         let offersScore = score(
-            provider: provider,
+            features: features,
             keys: ["discount", "sale", "offer", "promo", "coupon", "deal", "limited", "save", "off", "black friday"]
         )
         let updatesScore = score(
-            provider: provider,
+            features: features,
             keys: ["newsletter", "update", "digest", "announcement", "news", "release", "notification", "policy", "terms"]
         )
         let primaryScore = score(
-            provider: provider,
+            features: features,
             keys: ["meeting", "project", "follow up", "action required", "please review", "team", "request", "urgent"]
         )
 
@@ -103,7 +91,8 @@ enum MailCategoryClassifier {
     }
 
     private static func buildFeatures(from text: String) -> [String: Double] {
-        let normalized = text
+        let boundedText = text.count > maxAnalyzedCharacters ? String(text.prefix(maxAnalyzedCharacters)) : text
+        let normalized = boundedText
             .replacingOccurrences(of: "[^a-z0-9\\s]", with: " ", options: .regularExpression)
             .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
         let tokens = normalized.split(separator: " ").map(String.init)
@@ -111,13 +100,23 @@ enum MailCategoryClassifier {
         for token in tokens {
             counts[token, default: 0] += 1
         }
+
+        if normalized.contains("black friday") {
+            counts["black friday", default: 0] += 1
+        }
+        if normalized.contains("follow up") {
+            counts["follow up", default: 0] += 1
+        }
+        if normalized.contains("action required") {
+            counts["action required", default: 0] += 1
+        }
+
         return counts
     }
 
-    private static func score(provider: MLFeatureProvider?, keys: [String]) -> Double {
-        guard let provider else { return 0 }
+    private static func score(features: [String: Double], keys: [String]) -> Double {
         return keys.reduce(0) { partialResult, key in
-            partialResult + (provider.featureValue(for: key)?.doubleValue ?? 0)
+            partialResult + (features[key] ?? 0)
         }
     }
 }
