@@ -15,7 +15,8 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
         let remoteVariables = await fetchRemoteVariables()
         let clientID = try oauthValue(primaryKey: "MICROSOFT_CLIENT_ID", fallbackKey: "MICROSOFT_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
-        let redirectURI = "msauth.com.dylans2010.ToolsKit://auth"
+        let redirectURI = (try? oauthValue(primaryKey: "MICROSOFT_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)) ?? "msauth.com.dylans2010.ToolsKit://auth"
+        let callbackScheme = URLComponents(string: redirectURI)?.scheme
 
         let verifier = randomCodeVerifier()
         let challenge = codeChallenge(from: verifier)
@@ -37,13 +38,13 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid OAuth URL"])
         }
 
-        InternalLogger.shared.log("OAuth start provider=microsoft callbackScheme=msauth.com.dylans2010.ToolsKit", level: .info)
-        let callback = try await startOAuth(url: url, callbackScheme: "msauth.com.dylans2010.ToolsKit")
-        let returnedState = callbackValue("state", from: callback)
+        InternalLogger.shared.log("OAuth start provider=microsoft callbackScheme=\(callbackScheme ?? "unknown")", level: .info)
+        let callback = try await startOAuth(url: url, callbackScheme: callbackScheme)
+        let returnedState = OAuthCallbackParser.value("state", from: callback)
         guard returnedState == state else {
             throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "OAuth state mismatch"])
         }
-        guard let code = callbackValue("code", from: callback), !code.isEmpty else {
+        guard let code = OAuthCallbackParser.authorizationCode(from: callback), !code.isEmpty else {
             throw NSError(domain: "OutlookProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing authorization code"])
         }
 
@@ -310,18 +311,6 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     private func fetchProfile(accessToken: String) async throws -> GraphProfile {
         let url = URL(string: "https://graph.microsoft.com/v1.0/me")!
         return try await request(url: url, body: Optional<Data>.none, token: accessToken)
-    }
-
-    private func callbackValue(_ name: String, from url: URL) -> String? {
-        if let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
-           let value = queryItems.first(where: { $0.name == name })?.value {
-            return value
-        }
-
-        guard let fragment = URLComponents(url: url, resolvingAgainstBaseURL: false)?.fragment else { return nil }
-        var parts = URLComponents()
-        parts.query = fragment
-        return parts.queryItems?.first(where: { $0.name == name })?.value
     }
 
     private func formURLEncoded(_ items: [URLQueryItem]) -> Data? {

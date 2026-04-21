@@ -22,10 +22,15 @@ struct InboxView: View {
     @State private var showingFetchingLabel = false
     @State private var selectedMessage: MailMessage?
     @State private var actionError: String?
+    @State private var selectedCategory: InboxCategory = .all
 
     @AppStorage("mail.settings.swipe.leading") private var leadingSwipeAction = "flag"
     @AppStorage("mail.settings.swipe.trailing") private var trailingSwipeAction = "delete"
     @AppStorage("mail.settings.contextMenu.enabled") private var contextMenuActionsEnabled = true
+
+    private let listCardBackground = Color(hex: "#161622") ?? .black
+    private static let styleTagRegex = "(?is)<style[\\s\\S]*?</style>"
+    private static let scriptTagRegex = "(?is)<script[\\s\\S]*?</script>"
 
     var body: some View {
         ZStack {
@@ -97,7 +102,7 @@ struct InboxView: View {
         mailStore.activeAccount ?? account
     }
 
-    private var visibleThreads: [MailThread] {
+    private var filteredThreadsBeforeCategory: [MailThread] {
         var base = viewModel.localThreads
         if filter == .unread {
             base = base.filter { !$0.isRead }
@@ -112,8 +117,34 @@ struct InboxView: View {
         return base
     }
 
+    private var visibleThreads: [MailThread] {
+        if selectedCategory == .all {
+            return categorizedThreads.map { $0.thread }
+        }
+        return categorizedThreads.filter { $0.category == selectedCategory }.map { $0.thread }
+    }
+
+    private var categoryCounts: [InboxCategory: Int] {
+        var counts: [InboxCategory: Int] = [.all: categorizedThreads.count]
+        for category in InboxCategory.selectableCases where category != .all {
+            counts[category] = categorizedThreads.filter { $0.category == category }.count
+        }
+        return counts
+    }
+
+    private var categorizedThreads: [(thread: MailThread, category: InboxCategory)] {
+        filteredThreadsBeforeCategory.map { thread in
+            (thread: thread, category: MailCategoryClassifier.category(for: thread))
+        }
+    }
+
     private var contentList: some View {
         List {
+            Section {
+                categoryChips
+            }
+            .listRowBackground(listCardBackground)
+
             if showingFetchingLabel {
                 Section {
                     HStack(spacing: 10) {
@@ -124,7 +155,7 @@ struct InboxView: View {
                     }
                     .padding(.vertical, 4)
                 }
-                .listRowBackground(hexColor("#161622"))
+                .listRowBackground(listCardBackground)
             }
 
             if visibleThreads.isEmpty {
@@ -192,6 +223,34 @@ struct InboxView: View {
         }
     }
 
+    private var categoryChips: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(InboxCategory.selectableCases) { category in
+                    let selected = selectedCategory == category
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            selectedCategory = category
+                        }
+                    } label: {
+                        HStack(spacing: 6) {
+                            Text(category.title)
+                            Text("\(categoryCounts[category] ?? 0)")
+                                .foregroundStyle(selected ? .white.opacity(0.9) : .secondary)
+                        }
+                        .font(.caption.weight(.semibold))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 7)
+                        .background(selected ? category.tint.opacity(0.85) : Color.white.opacity(0.08), in: Capsule())
+                        .foregroundStyle(selected ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.vertical, 2)
+        }
+    }
+
     private func inboxRow(thread: MailThread, message: MailMessage) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
@@ -252,22 +311,54 @@ struct InboxView: View {
 
     private func previewText(for message: MailMessage) -> String {
         if let htmlBody = message.htmlBody,
-           let rendered = MailContentRenderer.render(htmlBody: htmlBody, plainBody: message.body).plainBody,
-           !rendered.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return rendered
+           let htmlPreview = htmlToPreviewText(htmlBody),
+           !htmlPreview.isEmpty {
+            return htmlPreview
         }
 
-        let source = message.body.trimmingCharacters(in: .whitespacesAndNewlines)
+        let source = normalizedPreviewText(message.body)
         guard !source.isEmpty else { return "No preview" }
+        return source
+    }
+
+    private func htmlToPreviewText(_ html: String) -> String? {
+        guard let data = html.data(using: .utf8) else { return nil }
+        if let attributed = try? NSAttributedString(
+            data: data,
+            options: [
+                .documentType: NSAttributedString.DocumentType.html,
+                .characterEncoding: String.Encoding.utf8.rawValue
+            ],
+            documentAttributes: nil
+        ) {
+            return normalizedPreviewText(attributed.string)
+        }
+        return normalizedPreviewText(html.replacingOccurrences(of: "<[^>]+>", with: " ", options: .regularExpression))
+    }
+
+    private func normalizedPreviewText(_ value: String) -> String {
+        var cleaned = value
+            .replacingOccurrences(of: Self.styleTagRegex, with: " ", options: .regularExpression)
+            .replacingOccurrences(of: Self.scriptTagRegex, with: " ", options: .regularExpression)
+            .replacingOccurrences(of: "<[^>]+>", with: " ", options: .regularExpression)
+            .replacingOccurrences(of: "&nbsp;", with: " ")
+            .replacingOccurrences(of: "&amp;", with: "&")
+            .replacingOccurrences(of: "&lt;", with: "<")
+            .replacingOccurrences(of: "&gt;", with: ">")
+            .replacingOccurrences(of: "&quot;", with: "\"")
+            .replacingOccurrences(of: "&#39;", with: "'")
+            .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
 
         if let attributed = try? AttributedString(
-            markdown: source,
+            markdown: cleaned,
             options: .init(interpretedSyntax: .full, failurePolicy: .returnPartiallyParsedIfPossible)
         ) {
-            let cleaned = String(attributed.characters).trimmingCharacters(in: .whitespacesAndNewlines)
-            return cleaned.isEmpty ? source : cleaned
+            let markdownStripped = String(attributed.characters).trimmingCharacters(in: .whitespacesAndNewlines)
+            cleaned = markdownStripped.isEmpty ? cleaned : markdownStripped
         }
-        return source
+
+        return cleaned
     }
 
     @ViewBuilder

@@ -149,6 +149,14 @@ struct DraftingEmailsView: View {
                     }
                     .padding(16)
                 }
+
+                if isGenerating {
+                    ModernSheetLoadingView(
+                        title: "Generating Draft",
+                        subtitle: "Building a polished email style, tone, and structure."
+                    )
+                    .transition(.opacity)
+                }
             }
             .navigationTitle("AI Composing")
             .navigationBarTitleDisplayMode(.inline)
@@ -203,7 +211,8 @@ struct DraftingEmailsView: View {
             } label: {
                 Group {
                     if isGenerating {
-                        ProgressView()
+                        Text("Generating…")
+                            .bold()
                     } else {
                         Text("Generate")
                             .bold()
@@ -323,7 +332,9 @@ struct DraftingEmailsView: View {
             }
 
             if isGenerating {
-                ProgressView()
+                Text("Creating your draft…")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.85))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 20)
             } else {
