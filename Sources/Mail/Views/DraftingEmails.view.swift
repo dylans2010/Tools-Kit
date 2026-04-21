@@ -192,12 +192,12 @@ struct DraftingEmailsView: View {
                     .padding(16)
                 }
 
-                if isGenerating {
-                    sheetLoadingOverlay(
-                        title: "Crafting your message",
-                        subtitle: "Applying tone, intent, and structure with AI"
-                    )
-                }
+                MailAILoadingView(
+                    isActive: isGenerating,
+                    title: "Crafting your message",
+                    subtitle: "Applying tone, intent, and structure with AI",
+                    symbol: "sparkles"
+                )
             }
             .scrollBounceBehavior(.basedOnSize)
             .navigationTitle("AI Composing")
@@ -218,15 +218,12 @@ struct DraftingEmailsView: View {
     }
 
     private var headerSection: some View {
-        VStack(spacing: 8) {
-            Text("Draft New Mail")
-                .font(.title3.bold())
-                .foregroundStyle(.white)
-            Text("Craft the perfect message with tailored goals and styles.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-        }
+        MailAITitleHeader(
+            title: "Draft New Mail",
+            subtitle: "Craft the perfect message with tailored goals and styles.",
+            symbol: "apple.intelligence",
+            symbolSize: 16
+        )
         .padding(.top, 8)
     }
 
@@ -392,55 +389,6 @@ struct DraftingEmailsView: View {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
-    }
-
-    private func sheetLoadingOverlay(title: String, subtitle: String) -> some View {
-        ZStack {
-            LinearGradient(
-                colors: [Color.black.opacity(0.55), Color.blue.opacity(0.25), Color.purple.opacity(0.25)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-
-            VStack(spacing: 20) {
-                TimelineView(.animation) { timeline in
-                    let phase = timeline.date.timeIntervalSinceReferenceDate
-                    ZStack {
-                        Circle()
-                            .stroke(Color.white.opacity(0.22), lineWidth: 2)
-                            .frame(width: 124, height: 124)
-                        Circle()
-                            .trim(from: 0.08, to: 0.72)
-                            .stroke(
-                                AngularGradient(colors: [.cyan, .blue, .purple, .cyan], center: .center),
-                                style: StrokeStyle(lineWidth: 8, lineCap: .round)
-                            )
-                            .frame(width: 124, height: 124)
-                            .rotationEffect(.degrees(phase * 140))
-                        Circle()
-                            .fill(.white.opacity(0.08))
-                            .frame(width: 68, height: 68)
-                            .overlay(
-                                Image(systemName: "sparkles")
-                                    .font(.system(size: 24, weight: .semibold))
-                                    .foregroundStyle(.white)
-                            )
-                    }
-                }
-                .frame(height: 130)
-
-                Text(title)
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(.white)
-                Text(subtitle)
-                    .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.8))
-            }
-            .padding(28)
-            .frame(maxWidth: .infinity)
-        }
-        .transition(.opacity)
     }
 
     private var templateSheet: some View {

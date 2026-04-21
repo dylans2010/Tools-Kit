@@ -60,12 +60,6 @@ struct AIWriteView: View {
                         optionsSection
                         inputSection
 
-                        if isGenerating {
-                            ProgressView("Crafting Email...")
-                                .tint(.purple)
-                                .padding()
-                        }
-
                         if !generatedContent.isEmpty {
                             outputSection
                         }
@@ -78,6 +72,13 @@ struct AIWriteView: View {
                     }
                     .padding(16)
                 }
+
+                MailAILoadingView(
+                    isActive: isGenerating,
+                    title: "Generating your email",
+                    subtitle: "Building a structured response with your selected tone",
+                    symbol: "square.and.pencil"
+                )
             }
             .navigationTitle("AI Writer")
             .navigationBarTitleDisplayMode(.inline)
@@ -98,15 +99,12 @@ struct AIWriteView: View {
     }
 
     private var headerSection: some View {
-        VStack(spacing: 4) {
-            Text("Spark Intelligence")
-                .font(.headline)
-                .foregroundStyle(.purple)
-            Text("Describe what you want to say, and I'll draft the perfect email.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-        }
+        MailAITitleHeader(
+            title: "Spark Intelligence",
+            subtitle: "Describe what you want to say, and I'll draft the perfect email.",
+            symbol: "apple.intelligence",
+            symbolSize: 16
+        )
     }
 
     private var optionsSection: some View {

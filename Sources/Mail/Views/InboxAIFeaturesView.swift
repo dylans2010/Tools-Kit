@@ -84,30 +84,14 @@ struct InboxAIFeaturesView: View {
 
     private var headerSection: some View {
         VStack(spacing: 12) {
-            TimelineView(.animation) { timeline in
-                let phase = timeline.date.timeIntervalSinceReferenceDate
-                Image(systemName: "apple.intelligence")
-                    .font(.system(size: 46, weight: .semibold))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: shiftingIconGradient(phase: phase),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .shadow(color: .blue.opacity(0.45), radius: 12, y: 4)
-                    .modifier(ModernSymbolEffect(trigger: pulseHeader))
-            }
-
-            Text("Email AI Tools")
-                .font(.title2.bold())
-                .foregroundStyle(.white)
-
-            Text("Analyzing ONLY the emails currently loaded in this Inbox screen.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 20)
+            MailAITitleHeader(
+                title: "Email AI Tools",
+                subtitle: "Analyzing ONLY the emails currently loaded in this Inbox screen.",
+                symbol: "apple.intelligence",
+                symbolSize: 20
+            )
+            .modifier(ModernSymbolEffect(trigger: pulseHeader))
+            .padding(.horizontal, 20)
         }
         .padding(.vertical, 14)
         .frame(maxWidth: .infinity)
@@ -259,15 +243,6 @@ struct InboxAIFeaturesView: View {
                 .stroke(LinearGradient(colors: [Color.white.opacity(0.2), Color.clear], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-    }
-
-    private func shiftingIconGradient(phase: TimeInterval) -> [Color] {
-        [
-            Color(hue: (phase * 0.08).truncatingRemainder(dividingBy: 1), saturation: 0.65, brightness: 1),
-            Color(hue: (phase * 0.08 + 0.15).truncatingRemainder(dividingBy: 1), saturation: 0.8, brightness: 1),
-            Color(hue: (phase * 0.08 + 0.32).truncatingRemainder(dividingBy: 1), saturation: 0.75, brightness: 0.98),
-            Color(hue: (phase * 0.08 + 0.52).truncatingRemainder(dividingBy: 1), saturation: 0.7, brightness: 1)
-        ]
     }
 
     private var emailsUsedSheet: some View {
