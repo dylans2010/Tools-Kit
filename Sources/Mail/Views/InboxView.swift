@@ -1,5 +1,6 @@
 import SwiftUI
 import WebKit
+import UIKit
 
 struct InboxView: View {
     let account: MailAccount
@@ -20,6 +21,11 @@ struct InboxView: View {
     @State private var showingUniversalInbox = false
     @State private var showingFetchingLabel = false
     @State private var selectedMessage: MailMessage?
+    @State private var actionError: String?
+
+    @AppStorage("mail.settings.swipe.leading") private var leadingSwipeAction = "flag"
+    @AppStorage("mail.settings.swipe.trailing") private var trailingSwipeAction = "delete"
+    @AppStorage("mail.settings.contextMenu.enabled") private var contextMenuActionsEnabled = true
 
     var body: some View {
         ZStack {
@@ -42,14 +48,6 @@ struct InboxView: View {
             showingFetchingLabel = false
         }
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button {
-                    showingUniversalInbox = true
-                } label: {
-                    Image(systemName: "chevron.left.circle")
-                }
-            }
-
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {
                     showingAIFeatures = true
@@ -71,7 +69,7 @@ struct InboxView: View {
             }
         }
         .fullScreenCover(isPresented: $showingAIFeatures) {
-            InboxAIFeaturesView()
+            InboxAIFeaturesView(inboxThreads: visibleThreads)
         }
         .navigationDestination(isPresented: $showingUniversalInbox) {
             UniversalInboxView()
@@ -155,6 +153,28 @@ struct InboxView: View {
                             inboxRow(thread: thread, message: message)
                         }
                         .buttonStyle(.plain)
+                        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                            swipeActionButton(for: leadingSwipeAction, thread: thread, message: message)
+                        }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            swipeActionButton(for: trailingSwipeAction, thread: thread, message: message)
+                        }
+                        .contextMenu {
+                            if contextMenuActionsEnabled {
+                                Button { Task { await performThreadAction("delete", thread: thread, message: message) } } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                                Button { Task { await performThreadAction("archive", thread: thread, message: message) } } label: {
+                                    Label("Archive", systemImage: "archivebox")
+                                }
+                                Button { Task { await performThreadAction("flag", thread: thread, message: message) } } label: {
+                                    Label("Flag Important", systemImage: "flag.fill")
+                                }
+                                Button { Task { await performThreadAction("move", thread: thread, message: message) } } label: {
+                                    Label("Move to Folder", systemImage: "folder")
+                                }
+                            }
+                        }
                         .listRowBackground(Color.clear)
                     }
                 }
@@ -164,6 +184,11 @@ struct InboxView: View {
         .scrollContentBackground(.hidden)
         .navigationDestination(item: $selectedMessage) { message in
             InboxMessageDetailView(account: activeAccount ?? account, message: message)
+        }
+        .alert("Mail Action", isPresented: Binding(get: { actionError != nil }, set: { if !$0 { actionError = nil } })) {
+            Button("OK", role: .cancel) { actionError = nil }
+        } message: {
+            Text(actionError ?? "")
         }
     }
 
@@ -245,6 +270,108 @@ struct InboxView: View {
         return source
     }
 
+    @ViewBuilder
+    private func swipeActionButton(for actionID: String, thread: MailThread, message: MailMessage) -> some View {
+        switch actionID {
+        case "archive":
+            Button {
+                Task { await performThreadAction("archive", thread: thread, message: message) }
+            } label: {
+                Label("Archive", systemImage: "archivebox")
+            }
+            .tint(.blue)
+        case "flag":
+            Button {
+                Task { await performThreadAction("flag", thread: thread, message: message) }
+            } label: {
+                Label("Flag", systemImage: "flag.fill")
+            }
+            .tint(.orange)
+        case "move":
+            Button {
+                Task { await performThreadAction("move", thread: thread, message: message) }
+            } label: {
+                Label("Move", systemImage: "folder")
+            }
+            .tint(.indigo)
+        default:
+            Button(role: .destructive) {
+                Task { await performThreadAction("delete", thread: thread, message: message) }
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
+    }
+
+    private func performThreadAction(_ actionID: String, thread: MailThread, message: MailMessage) async {
+        switch actionID {
+        case "delete":
+            do {
+                try await providerDelete(account: activeAccount ?? account, messageID: message.id)
+                await viewModel.refresh(fetchFromServer: true)
+            } catch {
+                actionError = error.localizedDescription
+            }
+        case "archive":
+            do {
+                try await providerMarkReadForArchive(account: activeAccount ?? account, messageID: message.id)
+                await viewModel.refresh(fetchFromServer: true)
+            } catch {
+                actionError = error.localizedDescription
+            }
+        case "flag":
+            viewModel.toggleStar(messageID: message.id)
+        case "move":
+            viewModel.moveMessageToFolderHint(messageID: message.id)
+        default:
+            break
+        }
+    }
+
+    private func providerDelete(account: MailAccount, messageID: String) async throws {
+        switch account.providerType {
+        case .gmail:
+            try await GmailProvider().deleteMessage(session: providerSession(for: account), id: messageID)
+        case .outlook:
+            try await OutlookProvider().deleteMessage(session: providerSession(for: account), id: messageID)
+        case .yahoo:
+            try await YahooMailProvider().deleteMessage(session: providerSession(for: account), id: messageID)
+        case .proton:
+            try await ProtonMailProvider().deleteMessage(session: providerSession(for: account), id: messageID)
+        case .imap, .icloud:
+            try await IMAPProvider().deleteMessage(session: providerSession(for: account), id: messageID)
+        }
+    }
+
+    private func providerMarkReadForArchive(account: MailAccount, messageID: String) async throws {
+        switch account.providerType {
+        case .gmail:
+            try await GmailProvider().markRead(session: providerSession(for: account), id: messageID)
+        case .outlook:
+            try await OutlookProvider().markRead(session: providerSession(for: account), id: messageID)
+        case .yahoo:
+            try await YahooMailProvider().markRead(session: providerSession(for: account), id: messageID)
+        case .proton:
+            try await ProtonMailProvider().markRead(session: providerSession(for: account), id: messageID)
+        case .imap, .icloud:
+            try await IMAPProvider().markRead(session: providerSession(for: account), id: messageID)
+        }
+    }
+
+    private func providerSession(for account: MailAccount) -> MailSession {
+        MailSession(
+            id: account.id,
+            provider: account.providerType,
+            email: account.emailAddress,
+            displayName: account.displayName,
+            accessTokenExpiration: account.accessTokenExpiration,
+            imapHost: account.imapHost ?? "imap.mail.me.com",
+            imapPort: account.imapPort ?? 993,
+            smtpHost: account.smtpHost ?? "smtp.mail.me.com",
+            smtpPort: account.smtpPort ?? 587
+        )
+    }
+
     private func providerColor(_ provider: MailAccount.ProviderType) -> Color {
         switch provider {
         case .gmail: return hexColor("#EA4335")
@@ -303,6 +430,24 @@ final class InboxScreenViewModel: ObservableObject {
         let key = "\(account.id)_\(folder.id)"
         localThreads = storage.loadThreads(for: key)
     }
+
+    func toggleStar(messageID: String) {
+        guard let account else { return }
+        for threadIndex in localThreads.indices {
+            for messageIndex in localThreads[threadIndex].messages.indices where localThreads[threadIndex].messages[messageIndex].id == messageID {
+                localThreads[threadIndex].messages[messageIndex].isStarred.toggle()
+            }
+        }
+        storage.saveThreads(localThreads, for: "\(account.id)_\(folder.id)")
+    }
+
+    func moveMessageToFolderHint(messageID: String) {
+        let key = "mail.move.map"
+        var map = UserDefaults.standard.dictionary(forKey: key) as? [String: String] ?? [:]
+        map[messageID] = "Later"
+        UserDefaults.standard.set(map, forKey: key)
+    }
+
 }
 
 private struct SkeletonMailRow: View {
@@ -366,54 +511,14 @@ private struct InboxMessageDetailView: View {
                     header
 
                     if isSummarizing {
-                        HStack {
-                            ProgressView()
-                                .tint(.purple)
-                            Text("Generating Intelligent Summary...")
-                                .font(.caption.bold())
-                                .foregroundStyle(.secondary)
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+                        summarizingIndicator
                     }
 
                     if let summary, !summary.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Label("AI Summary", systemImage: "sparkles")
-                                    .font(.caption.bold())
-                                    .foregroundStyle(.purple)
-                                Spacer()
-                            }
-
-                            Text(summary)
-                                .font(.subheadline)
-                                .foregroundStyle(.white)
-                                .lineSpacing(4)
-                        }
-                        .padding(16)
-                        .background(
-                            LinearGradient(colors: [Color.purple.opacity(0.1), Color.blue.opacity(0.05)], startPoint: .topLeading, endPoint: .bottomTrailing),
-                            in: RoundedRectangle(cornerRadius: 16)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.purple.opacity(0.2), lineWidth: 1)
-                        )
+                        summarySection(summary: summary)
                     }
 
-                    if let htmlBody = message.htmlBody, !htmlBody.isEmpty {
-                        MessageWebView(html: htmlBody)
-                            .frame(minHeight: max(geo.size.height * 0.78, 420))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                    } else {
-                        Text(message.body)
-                            .font(.body)
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .frame(minHeight: max(geo.size.height * 0.72, 380), alignment: .topLeading)
-                    }
+                    messageContent(geo: geo)
 
                     if let actionError {
                         Text(actionError)
@@ -427,38 +532,97 @@ private struct InboxMessageDetailView: View {
             .navigationTitle("Message")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Button {
-                            summarize()
-                        } label: {
-                            Label("Summarize", systemImage: "text.justify.leading")
-                        }
-
-                        Button {
-                            showReply = true
-                        } label: {
-                            Label("Reply", systemImage: "arrowshape.turn.up.left")
-                        }
-
-                        Button {
-                            Task { await archiveMessage() }
-                        } label: {
-                            Label("Archive", systemImage: "archivebox")
-                        }
-
-                        Button(role: .destructive) {
-                            Task { await deleteMessage() }
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                    }
-                }
+                messageToolbar
             }
             .fullScreenCover(isPresented: $showReply) {
                 EmailComposingView(account: account, replyTo: message)
+            }
+        }
+    }
+
+    private var summarizingIndicator: some View {
+        HStack {
+            ProgressView()
+                .tint(.purple)
+            Text("Generating Intelligent Summary...")
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .frame(maxWidth: .infinity)
+        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func summarySection(summary: String) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label("AI Summary", systemImage: "sparkles")
+                    .font(.caption.bold())
+                    .foregroundStyle(.blue)
+                Spacer()
+                Button {
+                    UIPasteboard.general.string = summary
+                } label: {
+                    Label("Copy", systemImage: "doc.on.doc")
+                        .font(.caption.bold())
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.blue.opacity(0.8))
+            }
+
+            MarkdownSummaryText(text: summary)
+        }
+        .padding(16)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(LinearGradient(colors: [Color.blue.opacity(0.45), Color.cyan.opacity(0.3)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
+        )
+    }
+
+    @ViewBuilder
+    private func messageContent(geo: GeometryProxy) -> some View {
+        if let htmlBody = message.htmlBody, !htmlBody.isEmpty {
+            MessageWebView(html: htmlBody)
+                .frame(minHeight: max(geo.size.height * 0.78, 420))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+        } else {
+            Text(message.body)
+                .font(.body)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(minHeight: max(geo.size.height * 0.72, 380), alignment: .topLeading)
+        }
+    }
+
+    private var messageToolbar: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+                Button {
+                    summarize()
+                } label: {
+                    Label("Summarize", systemImage: "text.justify.leading")
+                }
+
+                Button {
+                    showReply = true
+                } label: {
+                    Label("Reply", systemImage: "arrowshape.turn.up.left")
+                }
+
+                Button {
+                    Task { await archiveMessage() }
+                } label: {
+                    Label("Archive", systemImage: "archivebox")
+                }
+
+                Button(role: .destructive) {
+                    Task { await deleteMessage() }
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
             }
         }
     }
@@ -484,7 +648,16 @@ private struct InboxMessageDetailView: View {
         Task {
             do {
                 let input = message.body.isEmpty ? message.subject : message.body
-                let response = try await AIService.shared.summarize(text: input)
+                let response = try await AIService.shared.processText(
+                    prompt: """
+                    Write an ultra-short markdown summary for this email in at most 4 bullets.
+                    Include only what matters now and any clear next step.
+
+                    Email:
+                    \(input)
+                    """,
+                    systemPrompt: "You are a concise executive email summarizer. Prefer short bullets and factual statements only."
+                )
                 await MainActor.run {
                     summary = response
                     isSummarizing = false
@@ -558,6 +731,24 @@ private struct InboxMessageDetailView: View {
             smtpHost: account.smtpHost ?? "smtp.mail.me.com",
             smtpPort: account.smtpPort ?? 587
         )
+    }
+}
+
+private struct MarkdownSummaryText: View {
+    let text: String
+
+    var body: some View {
+        if let attributed = try? AttributedString(markdown: text, options: .init(interpretedSyntax: .full, failurePolicy: .returnPartiallyParsedIfPossible)) {
+            Text(attributed)
+                .font(.subheadline)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            Text(text)
+                .font(.subheadline)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 }
 

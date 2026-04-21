@@ -12,6 +12,9 @@ struct DraftingEmailsView: View {
         case friendly = "Friendly"
         case executive = "Executive"
         case persuasive = "Persuasive"
+        case empathetic = "Empathetic"
+        case technical = "Technical"
+        case casual = "Casual"
 
         var id: String { rawValue }
     }
@@ -22,6 +25,9 @@ struct DraftingEmailsView: View {
         case proposal = "Proposal"
         case support = "Support"
         case introduction = "Introduction"
+        case apology = "Apology"
+        case negotiation = "Negotiation"
+        case meetingRequest = "Meeting Request"
 
         var id: String { rawValue }
     }
@@ -30,6 +36,16 @@ struct DraftingEmailsView: View {
         case short = "Short"
         case medium = "Medium"
         case long = "Long"
+        case veryLong = "Very Long"
+
+        var id: String { rawValue }
+    }
+
+    enum Urgency: String, CaseIterable, Identifiable, Hashable {
+        case low = "Low"
+        case normal = "Normal"
+        case high = "High"
+        case critical = "Critical"
 
         var id: String { rawValue }
     }
@@ -42,6 +58,9 @@ struct DraftingEmailsView: View {
     @State private var selectedGoal: MailGoal = .statusUpdate
     @State private var selectedStyle: MailStyle = .professional
     @State private var selectedLength: OutputLength = .medium
+    @State private var selectedUrgency: Urgency = .normal
+    @State private var includeActionItems = true
+    @State private var includeSubjectSuggestions = false
 
     @State private var generatedBody = ""
     @State private var isGenerating = false
@@ -83,6 +102,11 @@ struct DraftingEmailsView: View {
                                 chipSelector(title: "Goal", selection: $selectedGoal, options: MailGoal.allCases)
                                 chipSelector(title: "Style", selection: $selectedStyle, options: MailStyle.allCases)
                                 chipSelector(title: "Length", selection: $selectedLength, options: OutputLength.allCases)
+                                chipSelector(title: "Urgency", selection: $selectedUrgency, options: Urgency.allCases)
+                                Toggle("Include action items", isOn: $includeActionItems)
+                                    .font(.caption.bold())
+                                Toggle("Include subject suggestions", isOn: $includeSubjectSuggestions)
+                                    .font(.caption.bold())
                             }
                         }
 
@@ -96,25 +120,8 @@ struct DraftingEmailsView: View {
             .navigationTitle("Drafting Studio")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") { dismiss() }
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        Task { await generateDraft() }
-                    } label: {
-                        if isGenerating {
-                            ProgressView()
-                        } else {
-                            Text("Generate")
-                                .bold()
-                        }
-                    }
-                    .disabled(context.isEmpty || isGenerating)
-                }
+            .safeAreaInset(edge: .bottom) {
+                actionBar
             }
             .onAppear {
                 if generatedBody.isEmpty {
@@ -135,6 +142,39 @@ struct DraftingEmailsView: View {
                 .multilineTextAlignment(.center)
         }
         .padding(.top, 8)
+    }
+
+    private var actionBar: some View {
+        HStack(spacing: 12) {
+            Button("Cancel") { dismiss() }
+                .font(.subheadline.bold())
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(Color.white.opacity(0.08), in: Capsule())
+                .foregroundStyle(.white)
+
+            Button {
+                Task { await generateDraft() }
+            } label: {
+                Group {
+                    if isGenerating {
+                        ProgressView()
+                    } else {
+                        Text("Generate")
+                            .bold()
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+            }
+            .disabled(context.isEmpty || isGenerating)
+            .background(context.isEmpty || isGenerating ? Color.gray.opacity(0.35) : Color.blue, in: Capsule())
+            .foregroundStyle(.white)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 10)
+        .padding(.bottom, 12)
+        .background(.ultraThinMaterial)
     }
 
     private func inputCard<Content: View>(title: String, icon: String, @ViewBuilder content: () -> Content) -> some View {
@@ -165,7 +205,7 @@ struct DraftingEmailsView: View {
         .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
     }
 
-    private func chipSelector<T: RawRepresentable & Hashable & Identifiable>(title: String, selection: Binding<T>, options: [T]) where T.RawValue == String {
+    private func chipSelector<T: RawRepresentable & Hashable & Identifiable>(title: String, selection: Binding<T>, options: [T]) -> some View where T.RawValue == String {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.caption.bold())
@@ -246,6 +286,9 @@ struct DraftingEmailsView: View {
             let prompt = """
             Write a \(selectedLength.rawValue.lowercased()) \(selectedStyle.rawValue.lowercased()) email.
             Goal: \(selectedGoal.rawValue).
+            Urgency: \(selectedUrgency.rawValue).
+            Include action items: \(includeActionItems ? "yes" : "no").
+            Include subject suggestions: \(includeSubjectSuggestions ? "yes" : "no").
             Context: \(context)
             Return only the email body.
             """

@@ -44,13 +44,11 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         InternalLogger.shared.log("OAuth start provider=yahoo callbackScheme=\(URL(string: redirectURI)?.scheme ?? "unknown")", level: .info)
         let callback = try await startOAuth(url: url, callbackScheme: URL(string: redirectURI)?.scheme)
 
-        let callbackString = callback.absoluteString.replacingOccurrences(of: "toolskit://oauth/yahoo?", with: "toolskit://oauth/yahoo/?")
-        let callbackComponents = URLComponents(string: callbackString)
-        let returnedState = callbackComponents?.queryItems?.first(where: { $0.name == "state" })?.value
+        let returnedState = callbackValue("state", from: callback)
         guard returnedState == state else {
             throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "OAuth state mismatch"])
         }
-        guard let code = callbackComponents?.queryItems?.first(where: { $0.name == "code" })?.value else {
+        guard let code = callbackValue("code", from: callback), !code.isEmpty else {
             throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing authorization code"])
         }
 
@@ -344,10 +342,7 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
             URLQueryItem(name: "code_verifier", value: verifier)
         ]
 
-        request.httpBody = fields
-            .map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")" }
-            .joined(separator: "&")
-            .data(using: .utf8)
+        request.httpBody = formURLEncoded(fields)
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
@@ -398,6 +393,24 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
             .replacingOccurrences(of: "=", with: "")
     }
 
+    private func callbackValue(_ name: String, from url: URL) -> String? {
+        if let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
+           let value = queryItems.first(where: { $0.name == name })?.value {
+            return value
+        }
+
+        guard let fragment = URLComponents(url: url, resolvingAgainstBaseURL: false)?.fragment else { return nil }
+        var components = URLComponents()
+        components.query = fragment
+        return components.queryItems?.first(where: { $0.name == name })?.value
+    }
+
+    private func formURLEncoded(_ items: [URLQueryItem]) -> Data? {
+        var components = URLComponents()
+        components.queryItems = items
+        return components.percentEncodedQuery?.data(using: .utf8)
+    }
+
     func refreshSessionToken(session: MailSession) async throws -> MailSession {
         try validateSessionProvider(session, expected: .yahoo)
         guard let tokens = MailKeychainManager.shared.getOAuthTokens(accountId: session.id),
@@ -417,10 +430,7 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
             URLQueryItem(name: "refresh_token", value: refreshToken),
             URLQueryItem(name: "redirect_uri", value: redirectURI)
         ]
-        request.httpBody = fields
-            .map { "\($0.name)=\(($0.value ?? "").addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")" }
-            .joined(separator: "&")
-            .data(using: .utf8)
+        request.httpBody = formURLEncoded(fields)
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
