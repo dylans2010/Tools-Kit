@@ -12,6 +12,7 @@ struct InboxAIFeaturesView: View {
     @State private var showingEmailsUsed = false
     @State private var selectedEmail: MailMessage?
     @State private var errorMessage: String?
+    @State private var pulseHeader = false
 
     var body: some View {
         NavigationStack {
@@ -80,6 +81,7 @@ struct InboxAIFeaturesView: View {
             Image(systemName: "sparkles")
                 .font(.system(size: 40))
                 .foregroundStyle(LinearGradient(colors: [.purple, .blue, .cyan], startPoint: .topLeading, endPoint: .bottomTrailing))
+                .modifier(ModernSymbolEffect(trigger: pulseHeader))
 
             Text("Workspace AI")
                 .font(.title2.bold())
@@ -92,6 +94,7 @@ struct InboxAIFeaturesView: View {
                 .padding(.horizontal, 20)
         }
         .padding(.vertical, 10)
+        .onAppear { pulseHeader = true }
     }
 
     private var loadingSection: some View {
@@ -118,6 +121,7 @@ struct InboxAIFeaturesView: View {
                 Label("Catch Up", systemImage: "bolt.fill")
                     .font(.headline)
                     .foregroundStyle(.yellow)
+                    .modifier(ModernSymbolEffect(trigger: !catchUpSummary.isEmpty))
                 Spacer()
             }
 
@@ -152,6 +156,8 @@ struct InboxAIFeaturesView: View {
                 )
             }
         }
+        .padding(16)
+        .glassSectionBackground(gradient: [Color.purple.opacity(0.35), Color.blue.opacity(0.2)])
     }
 
     private var prioritySection: some View {
@@ -159,6 +165,7 @@ struct InboxAIFeaturesView: View {
             Label("Priority Emails", systemImage: "exclamationmark.circle.fill")
                 .font(.headline)
                 .foregroundStyle(.red)
+                .modifier(ModernSymbolEffect(trigger: !priorityEmails.isEmpty))
 
             if priorityEmails.isEmpty {
                 Text("No urgent emails detected.")
@@ -188,6 +195,8 @@ struct InboxAIFeaturesView: View {
                 }
             }
         }
+        .padding(16)
+        .glassSectionBackground(gradient: [Color.red.opacity(0.28), Color.orange.opacity(0.18)])
     }
 
     private func priorityRow(thread: MailThread, message: MailMessage) -> some View {
@@ -219,7 +228,11 @@ struct InboxAIFeaturesView: View {
                 .foregroundStyle(.secondary)
         }
         .padding(12)
-        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(LinearGradient(colors: [Color.white.opacity(0.2), Color.clear], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
+        )
     }
 
     private var emailsUsedSheet: some View {
@@ -353,6 +366,33 @@ struct InboxAIFeaturesView: View {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: date, relativeTo: Date())
+    }
+}
+
+private struct ModernSymbolEffect: ViewModifier {
+    let trigger: Bool
+
+    func body(content: Content) -> some View {
+        if #available(iOS 17.0, *) {
+            content.symbolEffect(.pulse.byLayer, value: trigger)
+        } else {
+            content
+        }
+    }
+}
+
+private extension View {
+    func glassSectionBackground(gradient: [Color]) -> some View {
+        self
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(LinearGradient(colors: gradient, startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .overlay(.ultraThinMaterial.opacity(0.6))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(Color.white.opacity(0.18), lineWidth: 1)
+            )
     }
 }
 
