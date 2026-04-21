@@ -1,4 +1,5 @@
 import CoreML
+import Foundation
 import SwiftUI
 
 enum InboxCategory: String, CaseIterable, Identifiable {
@@ -28,8 +29,20 @@ enum InboxCategory: String, CaseIterable, Identifiable {
 }
 
 enum MailCategoryClassifier {
+    private static let cacheLock = NSLock()
+    private static var categoryCache: [String: InboxCategory] = [:]
+
     static func category(for thread: MailThread) -> InboxCategory {
         let latest = thread.messages.last
+        let cacheKey = "\(thread.id)|\(latest?.id ?? "")|\(latest?.date.timeIntervalSince1970 ?? 0)"
+
+        cacheLock.lock()
+        if let cached = categoryCache[cacheKey] {
+            cacheLock.unlock()
+            return cached
+        }
+        cacheLock.unlock()
+
         let text = [
             latest?.subject ?? thread.subject,
             latest?.from ?? "",
@@ -40,11 +53,17 @@ enum MailCategoryClassifier {
         .lowercased()
 
         let features = buildFeatures(from: text)
-        let provider = try? MLDictionaryFeatureProvider(
-            dictionary: features.reduce(into: [String: MLFeatureValue]()) { partialResult, item in
-                partialResult[item.key] = MLFeatureValue(double: item.value)
-            }
-        )
+        let provider: MLFeatureProvider?
+        do {
+            provider = try MLDictionaryFeatureProvider(
+                dictionary: features.reduce(into: [String: MLFeatureValue]()) { partialResult, item in
+                    partialResult[item.key] = MLFeatureValue(double: item.value)
+                }
+            )
+        } catch {
+            InternalLogger.shared.log("MailCategoryClassifier: feature provider init failed \(error.localizedDescription)", level: .warning)
+            provider = nil
+        }
 
         let transactionScore = score(
             provider: provider,
@@ -70,10 +89,17 @@ enum MailCategoryClassifier {
             (.primary, primaryScore)
         ]
 
+        let resolved: InboxCategory
         if let best = ranked.max(by: { $0.1 < $1.1 }), best.1 > 0 {
-            return best.0
+            resolved = best.0
+        } else {
+            resolved = .primary
         }
-        return .primary
+
+        cacheLock.lock()
+        categoryCache[cacheKey] = resolved
+        cacheLock.unlock()
+        return resolved
     }
 
     private static func buildFeatures(from text: String) -> [String: Double] {

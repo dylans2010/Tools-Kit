@@ -209,7 +209,7 @@ struct UniversalInboxView: View {
                         .font(.subheadline.weight(.semibold))
                         .lineLimit(1)
                     Spacer()
-                    Text(scoped.message.date, style: .time)
+                    Text(messageTimestamp(scoped.message.date))
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
@@ -333,6 +333,13 @@ struct UniversalInboxView: View {
         if source.isEmpty { return "No preview" }
         let compact = source.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
         return compact
+    }
+
+    private func messageTimestamp(_ date: Date) -> String {
+        if Calendar.current.isDateInToday(date) {
+            return date.formatted(date: .omitted, time: .shortened)
+        }
+        return RelativeDateTimeFormatter().localizedString(for: date, relativeTo: Date())
     }
 
     private func syncAll() async {

@@ -46,11 +46,11 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         InternalLogger.shared.log("OAuth start provider=yahoo callbackScheme=\(URL(string: redirectURI)?.scheme ?? "unknown")", level: .info)
         let callback = try await startOAuth(url: url, callbackScheme: URL(string: redirectURI)?.scheme)
 
-        let returnedState = callbackValue("state", from: callback)
+        let returnedState = OAuthCallbackParser.value("state", from: callback)
         guard returnedState == state else {
             throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "OAuth state mismatch"])
         }
-        guard let code = authorizationCode(from: callback), !code.isEmpty else {
+        guard let code = OAuthCallbackParser.authorizationCode(from: callback), !code.isEmpty else {
             throw NSError(domain: "YahooProvider", code: 401, userInfo: [NSLocalizedDescriptionKey: "Missing authorization code"])
         }
 
@@ -413,33 +413,6 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
             .replacingOccurrences(of: "+", with: "-")
             .replacingOccurrences(of: "/", with: "_")
             .replacingOccurrences(of: "=", with: "")
-    }
-
-    private func callbackValue(_ name: String, from url: URL) -> String? {
-        if let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
-           let value = queryItems.first(where: { $0.name == name })?.value {
-            return value
-        }
-
-        guard let fragment = URLComponents(url: url, resolvingAgainstBaseURL: false)?.fragment else { return nil }
-        var components = URLComponents()
-        components.query = fragment
-        return components.queryItems?.first(where: { $0.name == name })?.value
-    }
-
-    private func authorizationCode(from url: URL) -> String? {
-        if let value = callbackValue("code", from: url), !value.isEmpty {
-            return value
-        }
-        let decoded = url.absoluteString.removingPercentEncoding ?? url.absoluteString
-        if let range = decoded.range(of: "code=") {
-            let suffix = decoded[range.upperBound...]
-            let code = suffix.split(separator: "&").first.map(String.init)
-            if let code, !code.isEmpty {
-                return code
-            }
-        }
-        return nil
     }
 
     private func formURLEncoded(_ items: [URLQueryItem]) -> Data? {

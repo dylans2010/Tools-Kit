@@ -29,6 +29,8 @@ struct InboxView: View {
     @AppStorage("mail.settings.contextMenu.enabled") private var contextMenuActionsEnabled = true
 
     private let listCardBackground = Color(hex: "#161622") ?? .black
+    private static let styleTagRegex = "(?is)<style[\\s\\S]*?</style>"
+    private static let scriptTagRegex = "(?is)<script[\\s\\S]*?</script>"
 
     var body: some View {
         ZStack {
@@ -336,8 +338,8 @@ struct InboxView: View {
 
     private func normalizedPreviewText(_ value: String) -> String {
         var cleaned = value
-            .replacingOccurrences(of: "(?is)<style[\\s\\S]*?</style>", with: " ", options: .regularExpression)
-            .replacingOccurrences(of: "(?is)<script[\\s\\S]*?</script>", with: " ", options: .regularExpression)
+            .replacingOccurrences(of: Self.styleTagRegex, with: " ", options: .regularExpression)
+            .replacingOccurrences(of: Self.scriptTagRegex, with: " ", options: .regularExpression)
             .replacingOccurrences(of: "<[^>]+>", with: " ", options: .regularExpression)
             .replacingOccurrences(of: "&nbsp;", with: " ")
             .replacingOccurrences(of: "&amp;", with: "&")
