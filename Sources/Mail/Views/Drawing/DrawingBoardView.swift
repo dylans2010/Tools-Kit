@@ -9,13 +9,13 @@ struct DrawingExport {
 struct DrawingBoardView: View {
     enum Tool: String, CaseIterable, Identifiable {
         case pen = "Pen"
-        case highlighter = "Highlighter"
         case marker = "Marker"
-        case neonPen = "Neon Pen"
+        case highlighter = "Highlighter"
+        case pencil = "Pencil"
+        case brush = "Brush"
         case spray = "Spray"
         case line = "Line"
-        case dashedLine = "Dashed Line"
-        case zigzag = "Zigzag"
+        case doubleArrow = "Double Arrow"
         case arrow = "Arrow"
         case doubleArrow = "Double Arrow"
         case rectangle = "Rectangle"
@@ -24,8 +24,8 @@ struct DrawingBoardView: View {
         case triangle = "Triangle"
         case diamond = "Diamond"
         case star = "Star"
-        case heart = "Heart"
         case callout = "Callout"
+        case textBox = "Text Box"
         case eraser = "Eraser"
 
         var id: String { rawValue }
@@ -103,7 +103,7 @@ struct DrawingBoardView: View {
     @State private var showToolSheet = false
     @State private var showStyleSheet = false
     @State private var showCanvasSheet = false
-    @State private var toolAnimationTrigger = false
+    @State private var showActionsSheet = false
 
     private static let fileNameFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -180,165 +180,38 @@ struct DrawingBoardView: View {
                         Image(systemName: "chevron.down")
                     }
                 }
-            }
-            .sheet(isPresented: $showToolSheet) {
-                NavigationStack {
-                    toolSheetContent
-                        .navigationTitle("Tools")
-                        .toolbar {
-                            ToolbarItem(placement: .topBarTrailing) {
-                                Button("Done") { showToolSheet = false }
-                            }
-                        }
-                }
-                .presentationDetents([.medium, .large])
-            }
-            .sheet(isPresented: $showStyleSheet) {
-                NavigationStack {
-                    styleSheetContent
-                        .navigationTitle("Brush & Style")
-                        .toolbar {
-                            ToolbarItem(placement: .topBarTrailing) {
-                                Button("Done") { showStyleSheet = false }
-                            }
-                        }
-                }
-                .presentationDetents([.medium])
-            }
-            .sheet(isPresented: $showCanvasSheet) {
-                NavigationStack {
-                    canvasSheetContent
-                        .navigationTitle("Canvas")
-                        .toolbar {
-                            ToolbarItem(placement: .topBarTrailing) {
-                                Button("Done") { showCanvasSheet = false }
-                            }
-                        }
-                }
-                .presentationDetents([.medium])
-            }
-        }
-    }
-
-    private var topControlBar: some View {
-        HStack(spacing: 10) {
-            HStack(spacing: 8) {
-                Image(systemName: selectedTool.icon)
-                    .modifier(ToolIconAnimation(trigger: toolAnimationTrigger))
-                Text(selectedTool.rawValue)
-                    .font(.caption.bold())
-                    .lineLimit(1)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(.ultraThinMaterial, in: Capsule())
-
-            Spacer(minLength: 6)
-
-            Button {
-                showToolSheet = true
-            } label: {
-                Label("Tools", systemImage: "square.grid.2x2")
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-
-            Button {
-                showStyleSheet = true
-            } label: {
-                Label("Style", systemImage: "paintpalette")
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-
-            Button {
-                showCanvasSheet = true
-            } label: {
-                Label("Canvas", systemImage: "rectangle.inset.filled")
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.small)
-        }
-    }
-
-    private var toolSheetContent: some View {
-        ScrollView {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 10)], spacing: 10) {
-                ForEach(Tool.allCases) { tool in
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        selectedTool = tool
-                        if !tool.supportsFill {
-                            fillShapes = false
-                        }
-                        toolAnimationTrigger.toggle()
+                        showActionsSheet = true
                     } label: {
-                        VStack(spacing: 8) {
-                            Image(systemName: tool.icon)
-                                .font(.title3.weight(.semibold))
-                            Text(tool.rawValue)
-                                .font(.caption.weight(.semibold))
-                                .multilineTextAlignment(.center)
-                        }
-                        .frame(maxWidth: .infinity, minHeight: 72)
-                        .padding(8)
-                        .foregroundStyle(selectedTool == tool ? .white : .primary)
-                        .background(
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(selectedTool == tool ? Color.blue : Color.secondary.opacity(0.12))
-                        )
+                        Image(systemName: "ellipsis.circle")
                     }
-                    .buttonStyle(.plain)
                 }
             }
-            .padding()
+            .sheet(isPresented: $showToolSheet) { toolSheet }
+            .sheet(isPresented: $showStyleSheet) { styleSheet }
+            .sheet(isPresented: $showCanvasSheet) { canvasSheet }
+            .sheet(isPresented: $showActionsSheet) { actionsSheet }
         }
     }
 
-    private var styleSheetContent: some View {
-        Form {
-            Section("Brush") {
-                ColorPicker("Color", selection: $selectedColor)
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Size \(Int(lineWidth))")
-                    Slider(value: $lineWidth, in: 1...20)
+    private var controls: some View {
+        VStack(spacing: 10) {
+            HStack(spacing: 10) {
+                Button { showToolSheet = true } label: {
+                    Label(selectedTool.rawValue, systemImage: "paintbrush.pointed")
                 }
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Opacity \(Int(strokeOpacity * 100))%")
-                    Slider(value: $strokeOpacity, in: 0.1...1)
+                .buttonStyle(.borderedProminent)
+                Button { showStyleSheet = true } label: {
+                    Label("Style", systemImage: "slider.horizontal.3")
                 }
-            }
-
-            Section("Shape Options") {
-                Toggle("Dashed Stroke", isOn: $useDashedStroke)
-                Toggle("Fill Shapes", isOn: $fillShapes)
-                    .disabled(!selectedTool.supportsFill)
-            }
-
-            Section("Precision") {
-                Toggle("Show Grid", isOn: $showGrid)
-                Toggle("Snap To Grid", isOn: $snapToGrid)
-            }
-        }
-    }
-
-    private var canvasSheetContent: some View {
-        Form {
-            Section("Background") {
-                Picker("Canvas Background", selection: $backgroundStyle) {
-                    ForEach(CanvasBackground.allCases) { style in
-                        Text(style.rawValue).tag(style)
-                    }
+                .buttonStyle(.bordered)
+                Button { showCanvasSheet = true } label: {
+                    Label("Canvas", systemImage: "square.grid.3x3")
                 }
-                .pickerStyle(.segmented)
+                .buttonStyle(.bordered)
             }
-
-            Section("Quick Actions") {
-                Button(role: .destructive) {
-                    clearCanvas()
-                } label: {
-                    Label("Clear Canvas", systemImage: "trash")
-                }
-            }
+            .font(.subheadline.weight(.semibold))
         }
     }
 
@@ -350,14 +223,14 @@ struct DrawingBoardView: View {
                     eraseStroke(near: location)
                     return
                 }
-
-                if isFreehandTool(selectedTool) {
+                switch selectedTool {
+                case .pen, .highlighter, .pencil, .brush, .marker:
                     if inProgressStroke == nil {
                         inProgressStroke = Stroke(
                             points: [location],
                             color: selectedColor,
-                            lineWidth: lineWidth,
-                            opacity: effectiveOpacity(for: selectedTool),
+                            lineWidth: currentStrokeWidth,
+                            opacity: drawingOpacity(for: selectedTool),
                             tool: selectedTool,
                             isDashed: useDashedStroke,
                             isFilled: false
@@ -367,7 +240,35 @@ struct DrawingBoardView: View {
                             inProgressStroke?.points.append(location)
                         }
                     }
-                    return
+                case .line, .rectangle, .ellipse, .arrow, .doubleArrow, .triangle, .diamond, .star, .callout, .textBox:
+                    let start = inProgressStroke?.points.first ?? adjustedPoint(value.startLocation, in: size)
+                    inProgressStroke = Stroke(
+                        points: [start, location],
+                        color: selectedColor,
+                        lineWidth: lineWidth,
+                        opacity: strokeOpacity,
+                        tool: selectedTool,
+                        isDashed: useDashedStroke,
+                        isFilled: fillShapes
+                    )
+                case .spray:
+                    let dots = (0..<7).map { _ in
+                        CGPoint(x: location.x + .random(in: -8...8), y: location.y + .random(in: -8...8))
+                    }
+                    inProgressStroke = Stroke(
+                        points: dots,
+                        color: selectedColor,
+                        lineWidth: max(1, lineWidth / 2),
+                        opacity: 0.55,
+                        tool: selectedTool,
+                        isDashed: false,
+                        isFilled: true
+                    )
+                    if let sprayStroke = inProgressStroke {
+                        strokes.append(sprayStroke)
+                    }
+                case .eraser:
+                    break
                 }
 
                 let start = inProgressStroke?.points.first ?? adjustedPoint(value.startLocation, in: size)
@@ -394,18 +295,41 @@ struct DrawingBoardView: View {
         guard !stroke.points.isEmpty else { return }
 
         switch stroke.tool {
-        case .pen, .marker, .neonPen, .highlighter:
-            drawFreehand(stroke, in: &context)
-        case .spray:
-            drawSpray(stroke, in: &context)
-        case .line, .dashedLine:
-            drawLine(stroke, in: &context)
-        case .zigzag:
-            drawZigzag(stroke, in: &context)
+        case .pen, .highlighter, .pencil, .brush, .marker:
+            var path = Path()
+            path.move(to: stroke.points[0])
+            for point in stroke.points.dropFirst() {
+                path.addLine(to: point)
+            }
+            context.opacity = stroke.opacity
+            context.stroke(
+                path,
+                with: .color(stroke.color),
+                style: StrokeStyle(
+                    lineWidth: stroke.lineWidth,
+                    lineCap: .round,
+                    lineJoin: .round,
+                    dash: stroke.isDashed ? [10, 5] : []
+                )
+            )
+
+        case .line:
+            guard stroke.points.count >= 2 else { return }
+            var path = Path()
+            path.move(to: stroke.points[0])
+            path.addLine(to: stroke.points[1])
+            context.opacity = stroke.opacity
+            context.stroke(path, with: .color(stroke.color), style: StrokeStyle(lineWidth: stroke.lineWidth, lineCap: .round, dash: stroke.isDashed ? [10, 5] : []))
+
         case .arrow:
             guard stroke.points.count >= 2 else { return }
-            drawArrow(from: stroke.points[0], to: stroke.points[1], stroke: stroke, context: &context, bothSides: false)
+            drawArrow(from: stroke.points[0], to: stroke.points[1], stroke: stroke, context: &context)
         case .doubleArrow:
+            guard stroke.points.count >= 2 else { return }
+            drawArrow(from: stroke.points[0], to: stroke.points[1], stroke: stroke, context: &context)
+            drawArrow(from: stroke.points[1], to: stroke.points[0], stroke: stroke, context: &context)
+
+        case .rectangle:
             guard stroke.points.count >= 2 else { return }
             drawArrow(from: stroke.points[0], to: stroke.points[1], stroke: stroke, context: &context, bothSides: true)
         case .rectangle:
@@ -413,17 +337,50 @@ struct DrawingBoardView: View {
         case .roundedRectangle:
             drawRectLike(stroke, in: &context, rounded: true)
         case .ellipse:
-            drawEllipse(stroke, in: &context)
+            guard stroke.points.count >= 2 else { return }
+            let rect = CGRect(from: stroke.points[0], to: stroke.points[1])
+            let path = Path(ellipseIn: rect)
+            context.opacity = stroke.opacity
+            if stroke.isFilled {
+                context.fill(path, with: .color(stroke.color.opacity(0.18)))
+            }
+            context.stroke(path, with: .color(stroke.color), style: StrokeStyle(lineWidth: stroke.lineWidth, dash: stroke.isDashed ? [10, 5] : []))
         case .triangle:
-            drawPolygon(stroke, points: trianglePoints(stroke), in: &context)
+            guard stroke.points.count >= 2 else { return }
+            drawPolygon(sides: 3, from: stroke, in: &context)
         case .diamond:
-            drawPolygon(stroke, points: diamondPoints(stroke), in: &context)
+            guard stroke.points.count >= 2 else { return }
+            let rect = CGRect(from: stroke.points[0], to: stroke.points[1])
+            var path = Path()
+            path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+            path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+            path.addLine(to: CGPoint(x: rect.minX, y: rect.midY))
+            path.closeSubpath()
+            drawFillAndStroke(path: path, stroke: stroke, context: &context)
         case .star:
-            drawPolygon(stroke, points: starPoints(stroke), in: &context)
-        case .heart:
-            drawHeart(stroke, in: &context)
+            guard stroke.points.count >= 2 else { return }
+            drawStar(from: stroke, in: &context)
         case .callout:
-            drawCallout(stroke, in: &context)
+            guard stroke.points.count >= 2 else { return }
+            let rect = CGRect(from: stroke.points[0], to: stroke.points[1])
+            var bubble = Path(roundedRect: rect, cornerRadius: 14)
+            bubble.move(to: CGPoint(x: rect.midX - 10, y: rect.maxY))
+            bubble.addLine(to: CGPoint(x: rect.midX + 3, y: rect.maxY))
+            bubble.addLine(to: CGPoint(x: rect.midX - 8, y: rect.maxY + 16))
+            bubble.closeSubpath()
+            drawFillAndStroke(path: bubble, stroke: stroke, context: &context)
+        case .textBox:
+            guard stroke.points.count >= 2 else { return }
+            let rect = CGRect(from: stroke.points[0], to: stroke.points[1])
+            let path = Path(roundedRect: rect, cornerRadius: 8)
+            context.stroke(path, with: .color(stroke.color), style: StrokeStyle(lineWidth: stroke.lineWidth))
+            context.draw(Text("Text").font(.caption.bold()), at: CGPoint(x: rect.midX, y: rect.midY))
+        case .spray:
+            for point in stroke.points {
+                let dotRect = CGRect(x: point.x, y: point.y, width: stroke.lineWidth, height: stroke.lineWidth)
+                context.fill(Path(ellipseIn: dotRect), with: .color(stroke.color.opacity(stroke.opacity)))
+            }
         case .eraser:
             break
         }
@@ -729,7 +686,162 @@ struct DrawingBoardView: View {
         }
         context.stroke(path, with: .color(.gray.opacity(backgroundStyle == .dark ? 0.25 : 0.15)), style: StrokeStyle(lineWidth: 0.8))
     }
+    
+    private func drawArrow(from start: CGPoint, to end: CGPoint, stroke: Stroke, context: inout GraphicsContext) {
+        var path = Path()
+        path.move(to: start)
+        path.addLine(to: end)
+        context.opacity = stroke.opacity
+        context.stroke(path, with: .color(stroke.color), style: StrokeStyle(lineWidth: stroke.lineWidth, lineCap: .round, dash: stroke.isDashed ? [10, 5] : []))
+        
+        let angle = atan2(end.y - start.y, end.x - start.x)
+        let headLength = max(12, stroke.lineWidth * 2.2)
+        let arrow1 = CGPoint(x: end.x - headLength * cos(angle - .pi / 6), y: end.y - headLength * sin(angle - .pi / 6))
+        let arrow2 = CGPoint(x: end.x - headLength * cos(angle + .pi / 6), y: end.y - headLength * sin(angle + .pi / 6))
+        var head = Path()
+        head.move(to: end)
+        head.addLine(to: arrow1)
+        head.move(to: end)
+        head.addLine(to: arrow2)
+        context.stroke(head, with: .color(stroke.color), style: StrokeStyle(lineWidth: stroke.lineWidth, lineCap: .round))
+    }
 
+    private func drawPolygon(sides: Int, from stroke: Stroke, in context: inout GraphicsContext) {
+        let rect = CGRect(from: stroke.points[0], to: stroke.points[1])
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let radius = min(rect.width, rect.height) / 2
+        var path = Path()
+        for i in 0..<sides {
+            let angle = (Double(i) * (2 * .pi / Double(sides))) - (.pi / 2)
+            let pt = CGPoint(x: center.x + CGFloat(cos(angle)) * radius, y: center.y + CGFloat(sin(angle)) * radius)
+            if i == 0 { path.move(to: pt) } else { path.addLine(to: pt) }
+        }
+        path.closeSubpath()
+        drawFillAndStroke(path: path, stroke: stroke, context: &context)
+    }
+
+    private func drawStar(from stroke: Stroke, in context: inout GraphicsContext) {
+        let rect = CGRect(from: stroke.points[0], to: stroke.points[1])
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let outer = min(rect.width, rect.height) / 2
+        let inner = outer * 0.45
+        var path = Path()
+        for i in 0..<10 {
+            let radius = i.isMultiple(of: 2) ? outer : inner
+            let angle = (Double(i) * .pi / 5) - (.pi / 2)
+            let pt = CGPoint(x: center.x + CGFloat(cos(angle)) * radius, y: center.y + CGFloat(sin(angle)) * radius)
+            if i == 0 { path.move(to: pt) } else { path.addLine(to: pt) }
+        }
+        path.closeSubpath()
+        drawFillAndStroke(path: path, stroke: stroke, context: &context)
+    }
+
+    private func drawFillAndStroke(path: Path, stroke: Stroke, context: inout GraphicsContext) {
+        context.opacity = stroke.opacity
+        if stroke.isFilled { context.fill(path, with: .color(stroke.color.opacity(0.18))) }
+        context.stroke(path, with: .color(stroke.color), style: StrokeStyle(lineWidth: stroke.lineWidth, dash: stroke.isDashed ? [10, 5] : []))
+    }
+
+    private func drawingOpacity(for tool: Tool) -> Double {
+        switch tool {
+        case .highlighter: return 0.35
+        case .pencil: return 0.6
+        default: return strokeOpacity
+        }
+    }
+
+    private var currentStrokeWidth: CGFloat {
+        switch selectedTool {
+        case .marker: return lineWidth * 1.4
+        case .brush: return lineWidth * 1.8
+        case .pencil: return max(1, lineWidth * 0.6)
+        default: return lineWidth
+        }
+    }
+
+    private var toolSheet: some View {
+        NavigationStack {
+            List {
+                ForEach(Tool.allCases) { tool in
+                    Button {
+                        selectedTool = tool
+                        showToolSheet = false
+                    } label: {
+                        HStack {
+                            Text(tool.rawValue)
+                            Spacer()
+                            if selectedTool == tool { Image(systemName: "checkmark.circle.fill").foregroundStyle(.blue) }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Tools")
+        }
+    }
+
+    private var styleSheet: some View {
+        NavigationStack {
+            Form {
+                ColorPicker("Color", selection: $selectedColor)
+                HStack {
+                    Text("Size")
+                    Slider(value: $lineWidth, in: 1...20)
+                    Text(Int(lineWidth).description).font(.caption)
+                }
+                Toggle("Dashed", isOn: $useDashedStroke)
+                Toggle("Fill Shapes", isOn: $fillShapes)
+                HStack {
+                    Text("Opacity")
+                    Slider(value: $strokeOpacity, in: 0.2...1)
+                }
+            }
+            .navigationTitle("Style")
+        }
+    }
+
+    private var canvasSheet: some View {
+        NavigationStack {
+            Form {
+                Picker("Background", selection: $backgroundStyle) {
+                    ForEach(CanvasBackground.allCases) { style in
+                        Text(style.rawValue).tag(style)
+                    }
+                }
+                Toggle("Grid", isOn: $showGrid)
+                Toggle("Snap to Grid", isOn: $snapToGrid)
+            }
+            .navigationTitle("Canvas")
+        }
+    }
+
+    private var actionsSheet: some View {
+        NavigationStack {
+            List {
+                Button("Undo", action: undo).disabled(strokes.isEmpty)
+                Button("Redo", action: redo).disabled(redoStrokes.isEmpty)
+                Button("Clear", role: .destructive, action: clearCanvas)
+                Button("Export PNG", action: exportDrawing).disabled(strokes.isEmpty)
+            }
+            .navigationTitle("Actions")
+        }
+    }
+
+    private func undo() {
+        guard let last = strokes.popLast() else { return }
+        redoStrokes.append(last)
+    }
+
+    private func redo() {
+        guard let last = redoStrokes.popLast() else { return }
+        strokes.append(last)
+    }
+
+    private func clearCanvas() {
+        strokes.removeAll()
+        redoStrokes.removeAll()
+        inProgressStroke = nil
+    }
+    
     private func adjustedPoint(_ point: CGPoint, in size: CGSize) -> CGPoint {
         let clamped = clamp(point, in: size)
         guard snapToGrid else { return clamped }
