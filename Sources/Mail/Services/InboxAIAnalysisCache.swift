@@ -2,14 +2,14 @@ import Foundation
 
 actor InboxAIAnalysisCache {
     static let shared = InboxAIAnalysisCache()
-    private let warmInterval: TimeInterval = 300
+    private let cacheWarmupInterval: TimeInterval = 5 * 60
 
     private var lastWarmDate: Date?
     private var lastWarmProviderID: String?
 
     func warmCacheIfNeeded(force: Bool) async {
         let now = Date()
-        if !force, let lastWarmDate, now.timeIntervalSince(lastWarmDate) < warmInterval {
+        if !force, let lastWarmDate, now.timeIntervalSince(lastWarmDate) < cacheWarmupInterval {
             return
         }
 
@@ -20,6 +20,7 @@ actor InboxAIAnalysisCache {
         }
 
         await MainActor.run {
+            // Touch AI-related singletons once so the first user-triggered AI action has less setup latency.
             let featureCheck = AIFeatureCheck.shared
             featureCheck.refresh()
             _ = AIProviderRegistry.shared.provider(for: providerID) ?? AIProviderRegistry.shared.defaultProvider()
