@@ -264,7 +264,7 @@ struct CalendarHomeView: View {
             startTime: start,
             endTime: end,
             location: draft.location,
-            priority: .medium
+            priority: .normal
         )
 
         manager.addEvent(newEvent)
