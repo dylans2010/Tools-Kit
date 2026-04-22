@@ -133,8 +133,7 @@ struct AIWriteView: View {
         VStack(spacing: 12) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    ForEach(quickPrompts, id: \.
-0) { item in
+                    ForEach(quickPrompts, id: \.0) { item in
                         Button {
                             prompt = item.1
                         } label: {
