@@ -321,7 +321,7 @@ final class WiFiTransferServer: ObservableObject {
                 </html>
                 """
 
-                let data = Data()
+                var data = Data()
                 let header = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: \(html.utf8.count)\r\nAccess-Control-Allow-Origin: *\r\n\r\n"
                 data.append(header.data(using: .utf8) ?? Data())
                 data.append(html.data(using: .utf8) ?? Data())
