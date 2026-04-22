@@ -143,7 +143,7 @@ struct NowPlayingView: View {
 
     private var artworkHero: some View {
         let coverSize = min(UIScreen.main.bounds.width - 48, 360)
-        ZStack {
+        return ZStack {
             if let image = artworkImage {
                 Image(uiImage: image)
                     .resizable()
