@@ -195,8 +195,7 @@ struct DraftingEmailsView: View {
                 MailAILoadingView(
                     isActive: isGenerating,
                     title: "Crafting your message",
-                    subtitle: "Applying tone, intent, and structure with AI",
-                    symbol: "sparkles"
+                    subtitle: "Applying tone, intent, and structure with AI"
                 )
             }
             .scrollBounceBehavior(.basedOnSize)

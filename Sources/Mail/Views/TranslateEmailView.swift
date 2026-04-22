@@ -81,8 +81,7 @@ struct TranslateEmailView: View {
                 MailAILoadingView(
                     isActive: isTranslating,
                     title: "Translating message",
-                    subtitle: "Preserving tone, meaning, and context",
-                    symbol: "character.bubble.fill"
+                    subtitle: "Preserving tone, meaning, and context"
                 )
             }
             .navigationTitle("Translate")
