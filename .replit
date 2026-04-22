@@ -4,3 +4,26 @@ expertMode = true
 
 [nix]
 channel = "stable-25_05"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "echo '=== Tools Kit - Swift/SwiftUI iOS & macOS App ===' && echo '' && echo 'Platform: iOS 17+ / macOS 12+' && echo 'Language: Swift 5.9+' && echo 'UI Framework: SwiftUI' && echo '' && echo 'Tools registered: 140+' && echo 'Source files: 625 Swift files (~75,700 lines)' && echo '' && echo 'Dependencies:' && echo '  - Appwrite SDK (auth, database, cloud sync)' && echo '  - MailCore2 (IMAP/SMTP email)' && echo '  - Daily.co SDK (video/audio calls)' && echo '' && echo 'App Modes:' && echo '  1. Dashboard (140+ utility tools)' && echo '  2. Workspace (Email, Notes, Tasks, Calendar, Spreadsheets, Slides, Meet)' && echo '  3. Music Mode (player, library, radio)' && echo '  4. Workouts Mode (fitness, nutrition, HealthKit)' && echo '' && echo 'Note: This is a native iOS/macOS app.' && echo 'Build and run in Xcode on macOS.' && echo '' && echo 'Source files summary:' && find Sources -name '*.swift' | wc -l | xargs -I{} echo '  {} .swift files found'"
+
+[workflows.workflow.metadata]
+outputType = "console"
