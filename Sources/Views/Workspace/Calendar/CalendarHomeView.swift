@@ -14,32 +14,41 @@ struct CalendarHomeView: View {
     private let isoFormatter = ISO8601DateFormatter()
 
     var body: some View {
-        VStack(spacing: 0) {
-            compactHeader
-                .padding(.horizontal, 12)
-                .padding(.top, 10)
+        ZStack {
+            LinearGradient(
+                colors: [Color(red: 0.06, green: 0.08, blue: 0.14), Color(red: 0.09, green: 0.11, blue: 0.18), Color(red: 0.14, green: 0.08, blue: 0.22)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
 
-            CalendarModeSelector(selectedMode: $selectedView)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+            VStack(spacing: 0) {
+                dashboardHeader
+                    .padding(.horizontal, 12)
+                    .padding(.top, 10)
 
-            Divider()
+                CalendarModeSelector(selectedMode: $selectedView)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
 
-            Group {
-                switch selectedView {
-                case .month:
-                    CalendarMonthView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
-                case .week:
-                    CalendarWeekView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
-                case .year:
-                    CalendarYearView(selectedDate: $selectedDate, selectedView: $selectedView)
-                case .agenda:
-                    CalendarAgendaView(selectedEvent: $selectedEvent)
-                case .today:
-                    CalendarTodayView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
+                Divider().opacity(0.3)
+
+                Group {
+                    switch selectedView {
+                    case .month:
+                        CalendarMonthView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
+                    case .week:
+                        CalendarWeekView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
+                    case .year:
+                        CalendarYearView(selectedDate: $selectedDate, selectedView: $selectedView)
+                    case .agenda:
+                        CalendarAgendaView(selectedEvent: $selectedEvent)
+                    case .today:
+                        CalendarTodayView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .navigationTitle("Calendar")
         .sheet(item: $selectedEvent) { event in
@@ -108,9 +117,9 @@ struct CalendarHomeView: View {
                         Button("Add First Suggested Event") { addSuggestedEvent(first) }
                             .buttonStyle(.bordered)
                     }
-                    compactInsightRow(title: "Conflicts", items: aiInsights.conflicts)
+                            private var dashboardHeader: some View {
                     compactInsightRow(title: "Optimized", items: aiInsights.optimalScheduling)
-                }
+                                    VStack(spacing: 14) {
 
                 Spacer(minLength: 0)
             }
@@ -118,66 +127,115 @@ struct CalendarHomeView: View {
             .navigationTitle("AI Planner")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { showingAISheet = false }
-                }
-            }
-        }
-    }
+                                        HStack(spacing: 10) {
+                                            calendarMetric(title: "Today", value: "\(manager.events(on: Date()).count)", icon: "sun.max.fill", tint: .orange)
+                                            calendarMetric(title: "Upcoming", value: "\(manager.upcomingEvents(limit: 99).count)", icon: "clock.fill", tint: .blue)
+                                            calendarMetric(title: "Total", value: "\(manager.events.count)", icon: "calendar.badge.plus", tint: .indigo)
+                                        }
 
-    private func compactInsightRow(title: String, items: [String]) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text(title)
-                .font(.caption.weight(.semibold))
-            ForEach(items.prefix(2), id: \.self) { item in
-                Text("• \(item)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-            }
-        }
-    }
+                                        ScrollView(.horizontal, showsIndicators: false) {
+                                            HStack(spacing: 8) {
+                                                quickIconButton("calendar.badge.clock", label: "Focus Week") {
+                                                    runAIPlanner(using: "Plan my week with focus blocks and break time.")
+                                                }
+                                                quickIconButton("arrow.triangle.branch", label: "Conflict Solver") {
+                                                    runAIPlanner(using: "Find scheduling conflicts and suggest alternatives.")
+                                                }
+                                                quickIconButton("plus.circle.fill", label: "New Event") {
+                                                    showingCreate = true
+                                                }
+                                                quickIconButton("calendar.day.timeline.left", label: "Today") {
+                                                    selectedDate = Date()
+                                                    selectedView = .today
+                                                }
+                                                quickIconButton("sparkles", label: "AI Tools") {
+                                                    showingAISheet = true
+                                                }
+                                                quickIconButton("calendar.circle", label: "Month") {
+                                                    selectedView = .month
+                                                }
+                                                quickIconButton("calendar", label: "Agenda") {
+                                                    selectedView = .agenda
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
 
-    private func runAIPlanner() {
-        runAIPlanner(using: aiPrompt)
-    }
+                            private func calendarMetric(title: String, value: String, icon: String, tint: Color) -> some View {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Label(title, systemImage: icon)
+                                        .font(.caption2.weight(.semibold))
+                                        .foregroundStyle(.secondary)
+                                    Text(value)
+                                        .font(.headline.bold())
+                                        .foregroundStyle(tint)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(12)
+                                .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            }
 
-    private func runAIPlanner(using input: String) {
-        let prompt = input.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !prompt.isEmpty else { return }
-        aiLoading = true
-        aiError = nil
-        Task {
-            do {
-                let insights = try await manager.generateSchedulingInsights(from: prompt)
-                await MainActor.run {
-                    aiInsights = insights
-                    aiLoading = false
-                }
-            } catch {
-                await MainActor.run {
-                    aiError = "Couldn’t build a schedule yet. Natural language is supported, so rough requests are okay."
-                    aiLoading = false
-                }
-            }
-        }
-    }
+                            private var aiPlanningSheet: some View {
+                                NavigationStack {
+                                    VStack(alignment: .leading, spacing: 12) {
+                                        Text("AI Calendar Tools")
+                                            .font(.headline)
+                                        Text("Use natural language like \"schedule study time this week\" and AI will infer details.")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                        TextField("Ask naturally…", text: $aiPrompt, axis: .vertical)
+                                            .textFieldStyle(.roundedBorder)
 
-    private func addSuggestedEvent(_ draft: CalendarManager.AICalendarEventDraft) {
-        guard let start = isoFormatter.date(from: draft.startISO8601),
-              let end = isoFormatter.date(from: draft.endISO8601) else {
-            aiError = "Couldn’t parse event time this round. Please try again."
-            return
-        }
-        let event = CalendarEvent(
-            title: draft.title,
-            description: draft.details,
-            date: start,
-            startTime: start,
-            endTime: end,
-            location: draft.location
-        )
-        manager.addEvent(event)
+                                        ScrollView(.horizontal, showsIndicators: false) {
+                                            HStack(spacing: 8) {
+                                                quickIconButton("calendar.badge.clock", label: "Focus Week") {
+                                                    runAIPlanner(using: "Plan my week with focus blocks and break time.")
+                                                }
+                                                quickIconButton("arrow.triangle.branch", label: "Conflict Solver") {
+                                                    runAIPlanner(using: "Find scheduling conflicts and suggest alternatives.")
+                                                }
+                                                quickIconButton("list.bullet.rectangle", label: "Agenda Cleanup") {
+                                                    runAIPlanner(using: "Turn this schedule into a prioritized agenda.")
+                                                }
+                                                quickIconButton("repeat", label: "Recurring") {
+                                                    runAIPlanner(using: "Suggest recurring meeting patterns and cadence.")
+                                                }
+                                            }
+                                        }
+
+                                        Button("Generate Plan", action: runAIPlanner)
+                                            .buttonStyle(.borderedProminent)
+                                            .disabled(aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || aiLoading)
+
+                                        if aiLoading {
+                                            WorkspaceSkeletonLine()
+                                        } else if let aiError {
+                                            Text(aiError)
+                                                .font(.caption)
+                                                .foregroundStyle(.red)
+                                        } else if let aiInsights {
+                                            if let first = aiInsights.parsedEvents.first {
+                                                Button("Add First Suggested Event") { addSuggestedEvent(first) }
+                                                    .buttonStyle(.bordered)
+                                            }
+                                            compactInsightRow(title: "Conflicts", items: aiInsights.conflicts)
+                                            compactInsightRow(title: "Optimized", items: aiInsights.optimalScheduling)
+                                        }
+
+                                        Spacer(minLength: 0)
+                                    }
+                                    .padding(16)
+                                    .navigationTitle("AI Planner")
+                                    .navigationBarTitleDisplayMode(.inline)
+                                    .toolbar {
+                                        ToolbarItem(placement: .topBarTrailing) {
+                                            Button("Done") { showingAISheet = false }
+                                        }
+                                    }
+                                }
+                            }
         aiError = nil
     }
 

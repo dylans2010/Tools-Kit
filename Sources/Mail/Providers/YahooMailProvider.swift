@@ -21,7 +21,7 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
         let remoteVariables = await fetchRemoteVariables()
         let clientID = try oauthValue(primaryKey: "YAHOO_CLIENT_ID", fallbackKey: "YAHOO_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
-        let redirectURI = try oauthValue(primaryKey: "YAHOO_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+        let redirectURI = try normalizedRedirectURI(oauthValue(primaryKey: "YAHOO_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables))
 
         let verifier = randomCodeVerifier()
         let challenge = codeChallenge(from: verifier)
@@ -42,8 +42,9 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
             throw NSError(domain: "YahooProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid OAuth URL"])
         }
 
-        InternalLogger.shared.log("OAuth start provider=yahoo callbackScheme=\(URL(string: redirectURI)?.scheme ?? "unknown")", level: .info)
-        let callback = try await startOAuth(url: url, callbackScheme: URL(string: redirectURI)?.scheme)
+        let callbackScheme = callbackScheme(for: redirectURI)
+        InternalLogger.shared.log("OAuth start provider=yahoo callbackScheme=\(callbackScheme ?? "universal-link")", level: .info)
+        let callback = try await startOAuth(url: url, callbackScheme: callbackScheme)
 
         let returnedState = callbackValue("state", from: callback)
         guard returnedState == state else {
@@ -415,8 +416,21 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
 
         guard let fragment = URLComponents(url: url, resolvingAgainstBaseURL: false)?.fragment else { return nil }
         var components = URLComponents()
-        components.query = fragment
+        components.percentEncodedQuery = fragment
         return components.queryItems?.first(where: { $0.name == name })?.value
+    }
+
+    private func normalizedRedirectURI(_ redirectURI: String) throws -> String {
+        let trimmed = redirectURI.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let components = URLComponents(string: trimmed), components.scheme != nil else {
+            throw NSError(domain: "YahooProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid Yahoo redirect URI"])
+        }
+        return components.url?.absoluteString ?? trimmed
+    }
+
+    private func callbackScheme(for redirectURI: String) -> String? {
+        guard let scheme = URLComponents(string: redirectURI)?.scheme?.lowercased() else { return nil }
+        return (scheme == "http" || scheme == "https") ? nil : scheme
     }
 
     private func formURLEncoded(_ items: [URLQueryItem]) -> Data? {
@@ -433,7 +447,7 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
         }
         let remoteVariables = await fetchRemoteVariables()
         let clientID = try oauthValue(primaryKey: "YAHOO_CLIENT_ID", fallbackKey: "YAHOO_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
-        let redirectURI = try oauthValue(primaryKey: "YAHOO_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+        let redirectURI = try normalizedRedirectURI(oauthValue(primaryKey: "YAHOO_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables))
         let clientSecret = oauthOptionalValue(primaryKey: "YAHOO_CLIENT_SECRET", remoteVariables: remoteVariables)
 
         var request = URLRequest(url: URL(string: "https://api.login.yahoo.com/oauth2/get_token")!)

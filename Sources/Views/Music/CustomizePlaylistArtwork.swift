@@ -42,6 +42,35 @@ private enum FontDesignStyle: String, CaseIterable, Identifiable {
     }
 }
 
+private enum LabelLayoutPreset: String, CaseIterable, Identifiable {
+    case center = "Center"
+    case top = "Top"
+    case bottom = "Bottom"
+    case split = "Split"
+
+    var id: String { rawValue }
+}
+
+private enum SymbolOverlayPreset: String, CaseIterable, Identifiable {
+    case none = "None"
+    case headphone = "Headphones"
+    case waveform = "Waveform"
+    case stars = "Stars"
+    case vinyl = "Vinyl"
+
+    var id: String { rawValue }
+
+    var symbolName: String? {
+        switch self {
+        case .none: return nil
+        case .headphone: return "headphones"
+        case .waveform: return "waveform"
+        case .stars: return "sparkles"
+        case .vinyl: return "record.circle"
+        }
+    }
+}
+
 // MARK: - Gradient Color Stop
 
 private struct GradientStop: Identifiable {
@@ -87,6 +116,14 @@ struct CustomizePlaylistArtwork: View {
     @State private var textSize: CGFloat = 28
     @State private var textBold: Bool = true
     @State private var textDesign: FontDesignStyle = .rounded
+    @State private var labelLayout: LabelLayoutPreset = .center
+    @State private var textShadowOpacity: Double = 0.4
+    @State private var borderEnabled = false
+    @State private var borderWidth: CGFloat = 3
+    @State private var borderColor: Color = .white
+    @State private var symbolOverlay: SymbolOverlayPreset = .none
+    @State private var symbolColor: Color = .white
+    @State private var symbolSize: CGFloat = 54
 
     // Stickers
     @State private var stickers: [ArtworkSticker] = []
@@ -108,6 +145,7 @@ struct CustomizePlaylistArtwork: View {
             ScrollView {
                 VStack(spacing: 24) {
                     artworkPreview
+                    quickStylePresets
                     gradientSection
                     uploadSection
                     labelSection
@@ -206,13 +244,23 @@ struct CustomizePlaylistArtwork: View {
                 gradientBackground
             }
 
+            if let symbol = symbolOverlay.symbolName {
+                Image(systemName: symbol)
+                    .font(.system(size: symbolSize, weight: .semibold))
+                    .foregroundColor(symbolColor.opacity(0.88))
+                    .shadow(color: .black.opacity(0.28), radius: 6, x: 0, y: 3)
+                    .offset(y: symbolOverlay == .vinyl ? -58 : -64)
+            }
+
             if showLabel {
                 Text(displayLabelText)
                     .font(.system(size: textSize, weight: textBold ? .bold : .regular, design: textDesign.fontDesign))
                     .foregroundColor(textColor)
                     .multilineTextAlignment(.center)
                     .padding(8)
-                    .shadow(color: .black.opacity(0.4), radius: 4, x: 0, y: 2)
+                    .shadow(color: .black.opacity(textShadowOpacity), radius: 4, x: 0, y: 2)
+                    .frame(maxWidth: artworkSize - 30)
+                    .position(positionForLabelLayout())
             }
 
             ForEach(stickers) { sticker in
@@ -221,7 +269,79 @@ struct CustomizePlaylistArtwork: View {
                     .position(sticker.position)
             }
         }
+        .overlay {
+            if borderEnabled {
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(borderColor.opacity(0.85), lineWidth: borderWidth)
+            }
+        }
         .clipped()
+    }
+
+    private func positionForLabelLayout() -> CGPoint {
+        switch labelLayout {
+        case .center:
+            return CGPoint(x: artworkSize / 2, y: artworkSize / 2)
+        case .top:
+            return CGPoint(x: artworkSize / 2, y: 48)
+        case .bottom:
+            return CGPoint(x: artworkSize / 2, y: artworkSize - 48)
+        case .split:
+            return CGPoint(x: artworkSize / 2, y: artworkSize * 0.66)
+        }
+    }
+
+    private var quickStylePresets: some View {
+        cardSection("Style Presets") {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    stylePresetButton("Neon", colors: [.pink, .purple, .blue]) {
+                        stops = [GradientStop(color: .pink), GradientStop(color: .purple), GradientStop(color: .blue)]
+                        textColor = .white
+                        symbolOverlay = .waveform
+                        labelLayout = .center
+                    }
+                    stylePresetButton("Minimal", colors: [.black, .gray]) {
+                        stops = [GradientStop(color: .black), GradientStop(color: .gray)]
+                        textColor = .white
+                        symbolOverlay = .none
+                        labelLayout = .bottom
+                    }
+                    stylePresetButton("Sunrise", colors: [.orange, .pink, .yellow]) {
+                        stops = [GradientStop(color: .orange), GradientStop(color: .pink), GradientStop(color: .yellow)]
+                        textColor = .white
+                        symbolOverlay = .stars
+                        labelLayout = .top
+                    }
+                    stylePresetButton("Vinyl", colors: [.indigo, .black]) {
+                        stops = [GradientStop(color: .indigo), GradientStop(color: .black)]
+                        textColor = .white
+                        symbolOverlay = .vinyl
+                        labelLayout = .center
+                    }
+                }
+            }
+        }
+    }
+
+    private func stylePresetButton(_ title: String, colors: [Color], apply: @escaping () -> Void) -> some View {
+        Button {
+            apply()
+            generatedImage = nil
+            uploadedBackground = nil
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
+                LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .frame(width: 84, height: 52)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.primary)
+            }
+            .padding(8)
+            .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
     }
 
     @ViewBuilder
@@ -485,6 +605,13 @@ struct CustomizePlaylistArtwork: View {
                     }
                     .pickerStyle(.menu)
 
+                    Picker("Layout", selection: $labelLayout) {
+                        ForEach(LabelLayoutPreset.allCases) { preset in
+                            Text(preset.rawValue).tag(preset)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+
                     HStack {
                         ColorPicker("Color", selection: $textColor)
                         Spacer()
@@ -506,6 +633,50 @@ struct CustomizePlaylistArtwork: View {
                                 .foregroundColor(.secondary)
                         }
                         Slider(value: $textSize, in: 12...60)
+                    }
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text("Shadow")
+                            Spacer()
+                            Text("\(Int(textShadowOpacity * 100))%")
+                                .foregroundColor(.secondary)
+                        }
+                        Slider(value: $textShadowOpacity, in: 0...1)
+                    }
+
+                    Toggle("Border", isOn: $borderEnabled)
+                    if borderEnabled {
+                        ColorPicker("Border Color", selection: $borderColor)
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Border Width")
+                                Spacer()
+                                Text("\(Int(borderWidth))")
+                                    .foregroundColor(.secondary)
+                            }
+                            Slider(value: $borderWidth, in: 1...10, step: 1)
+                        }
+                    }
+
+                    Picker("Symbol", selection: $symbolOverlay) {
+                        ForEach(SymbolOverlayPreset.allCases) { preset in
+                            Text(preset.rawValue).tag(preset)
+                        }
+                    }
+                    .pickerStyle(.menu)
+
+                    if symbolOverlay != .none {
+                        ColorPicker("Symbol Color", selection: $symbolColor)
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Symbol Size")
+                                Spacer()
+                                Text("\(Int(symbolSize))")
+                                    .foregroundColor(.secondary)
+                            }
+                            Slider(value: $symbolSize, in: 24...96)
+                        }
                     }
                 }
             }

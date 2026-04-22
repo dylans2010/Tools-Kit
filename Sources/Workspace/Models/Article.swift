@@ -8,5 +8,6 @@ struct Article: Codable, Identifiable, Equatable {
     var imageURL: String? = nil
     var language: String = "en"
     var sourceURL: String = ""
+    var pageID: Int? = nil
     var savedAt: Date = Date()
 }

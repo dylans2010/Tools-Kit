@@ -16,13 +16,17 @@ struct TranslateEmailView: View {
     @State private var preserveLineBreaks = true
     @State private var keepNamesUntranslated = true
     @State private var includeLocalizedDateStyle = false
+    @State private var preserveMarkdownFormatting = true
+    @State private var translateSubjectLine = true
+    @State private var keepEmojiAndASCIIArt = true
+    @State private var localizeHonorifics = false
     @State private var showAdvancedOptions = false
 
     private let languages = [
         "English", "Spanish", "French", "German", "Italian", "Portuguese", "Dutch", "Japanese", "Korean", "Chinese", "Arabic", "Hindi", "Polish", "Turkish", "Swedish", "Vietnamese"
     ]
-    private let toneOptions = ["Natural", "Business", "Friendly", "Diplomatic", "Direct"]
-    private let formalityOptions = ["Professional", "Neutral", "Formal", "Informal"]
+    private let toneOptions = ["Natural", "Business", "Friendly", "Diplomatic", "Direct", "Warm", "Concise"]
+    private let formalityOptions = ["Professional", "Neutral", "Formal", "Informal", "Executive"]
 
     var body: some View {
         NavigationStack {
@@ -151,6 +155,10 @@ struct TranslateEmailView: View {
                     Toggle("Preserve line breaks and paragraph layout", isOn: $preserveLineBreaks)
                     Toggle("Keep names and proper nouns as-is", isOn: $keepNamesUntranslated)
                     Toggle("Use localized date/number formatting", isOn: $includeLocalizedDateStyle)
+                    Toggle("Preserve markdown formatting", isOn: $preserveMarkdownFormatting)
+                    Toggle("Translate subject line too", isOn: $translateSubjectLine)
+                    Toggle("Keep emoji / ASCII art", isOn: $keepEmojiAndASCIIArt)
+                    Toggle("Localize honorifics", isOn: $localizeHonorifics)
                 }
                 .font(.caption.bold())
                 .padding(.top, 8)
@@ -226,6 +234,10 @@ struct TranslateEmailView: View {
             - Preserve line breaks: \(preserveLineBreaks ? "yes" : "no").
             - Keep names/proper nouns unchanged when possible: \(keepNamesUntranslated ? "yes" : "no").
             - Localize dates and number formatting: \(includeLocalizedDateStyle ? "yes" : "no").
+            - Preserve markdown formatting: \(preserveMarkdownFormatting ? "yes" : "no").
+            - Translate the subject line too: \(translateSubjectLine ? "yes" : "no").
+            - Keep emoji / ASCII art: \(keepEmojiAndASCIIArt ? "yes" : "no").
+            - Localize honorifics and titles: \(localizeHonorifics ? "yes" : "no").
             - Do not explain the translation.
             - Return only the translated email text. DO NOT SAY ANYTHING ELSE
 

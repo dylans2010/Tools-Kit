@@ -13,6 +13,7 @@ struct NotebooksHomeView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 14) {
+                summaryCard
                 compactHeader
                 notebooksSection
             }
@@ -26,38 +27,89 @@ struct NotebooksHomeView: View {
 
     private var compactHeader: some View {
         WorkspaceSurfaceCard {
-            HStack(spacing: 10) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Notebooks")
-                        .font(.title3.bold())
-                    Text("Keep ideas organized with less clutter.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 10) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Notebooks")
+                            .font(.title3.bold())
+                        Text("Keep ideas organized with less clutter.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button {
+                        showingIntegrations = true
+                    } label: {
+                        Image(systemName: "puzzlepiece.extension")
+                            .frame(width: 36, height: 36)
+                    }
+                    .buttonStyle(.bordered)
+                    Button {
+                        showingAISheet = true
+                    } label: {
+                        Image(systemName: "sparkles")
+                            .frame(width: 36, height: 36)
+                    }
+                    .buttonStyle(.bordered)
+                    Button {
+                        showingCreate = true
+                    } label: {
+                        Image(systemName: "plus")
+                            .frame(width: 36, height: 36)
+                    }
+                    .buttonStyle(.borderedProminent)
                 }
-                Spacer()
-                Button {
-                    showingIntegrations = true
-                } label: {
-                    Image(systemName: "puzzlepiece.extension")
-                        .frame(width: 36, height: 36)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        quickAction("New Notebook", icon: "book.badge.plus") { showingCreate = true }
+                        quickAction("Add Folder", icon: "folder.badge.plus") { showingCreate = true }
+                        quickAction("Integrations", icon: "puzzlepiece.extension") { showingIntegrations = true }
+                        quickAction("AI Ideas", icon: "sparkles") { showingAISheet = true }
+                        quickAction("Templates", icon: "square.grid.2x2") { showingCreate = true }
+                    }
                 }
-                .buttonStyle(.bordered)
-                Button {
-                    showingAISheet = true
-                } label: {
-                    Image(systemName: "sparkles")
-                        .frame(width: 36, height: 36)
-                }
-                .buttonStyle(.bordered)
-                Button {
-                    showingCreate = true
-                } label: {
-                    Image(systemName: "plus")
-                        .frame(width: 36, height: 36)
-                }
-                .buttonStyle(.borderedProminent)
             }
         }
+    }
+
+    private var summaryCard: some View {
+        WorkspaceSurfaceCard {
+            HStack(spacing: 10) {
+                summaryStat("Notebooks", value: "\(manager.notebooks.count)", icon: "book.closed.fill", tint: .indigo)
+                summaryStat("Folders", value: "\(manager.notebooks.reduce(0) { $0 + $1.folders.count })", icon: "folder.fill", tint: .blue)
+                summaryStat("Pages", value: "\(manager.notebooks.reduce(0) { $0 + $1.folders.flatMap(\ .pages).count })", icon: "doc.richtext", tint: .teal)
+            }
+        }
+    }
+
+    private func summaryStat(_ title: String, value: String, icon: String, tint: Color) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label(title, systemImage: icon)
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.headline.bold())
+                .foregroundStyle(tint)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private func quickAction(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                Text(title)
+                    .font(.caption.weight(.semibold))
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.white.opacity(0.08), in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.primary)
     }
 
     @ViewBuilder
@@ -106,6 +158,9 @@ struct NotebooksHomeView: View {
                         }
                         aiAction("Study", icon: "brain.head.profile") {
                             runAI(using: "Turn this into a study guide with recall prompts.")
+                        }
+                        aiAction("Outline", icon: "list.bullet.rectangle") {
+                            runAI(using: "Turn this into a structured outline with sections.")
                         }
                     }
 

@@ -15,20 +15,99 @@ struct MailAILoadingView: View {
     var body: some View {
         Group {
             if showOverlay || isActive {
-                MailAIMetalLoadingContainer(
-                    title: title,
-                    subtitle: subtitle,
-                    symbol: "apple.intelligence"
-                )
-                .ignoresSafeArea()
-                .scaleEffect(revealAnimation ? 1.05 : 1.0)
-                .opacity(revealAnimation ? 0 : 1)
-                .blur(radius: revealAnimation ? 8 : 0)
-                .transition(.opacity)
+                loadingScene
+                    .ignoresSafeArea()
+                    .scaleEffect(revealAnimation ? 1.04 : 1.0)
+                    .opacity(revealAnimation ? 0 : 1)
+                    .blur(radius: revealAnimation ? 10 : 0)
+                    .transition(.opacity.combined(with: .scale))
             }
         }
         .onAppear { updateOverlayState(isActive) }
         .onChange(of: isActive) { updateOverlayState($0) }
+    }
+
+    private var loadingScene: some View {
+        ZStack {
+            LinearGradient(
+                colors: [Color(red: 0.03, green: 0.05, blue: 0.09), Color(red: 0.08, green: 0.10, blue: 0.18), Color(red: 0.13, green: 0.07, blue: 0.22)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+
+            TimelineView(.animation) { timeline in
+                let phase = timeline.date.timeIntervalSinceReferenceDate
+
+                ZStack {
+                    Circle()
+                        .fill(Color.cyan.opacity(0.18))
+                        .frame(width: 240, height: 240)
+                        .blur(radius: 30)
+                        .offset(x: CGFloat(sin(phase * 0.5)) * 110, y: CGFloat(cos(phase * 0.42)) * 80)
+
+                    Circle()
+                        .fill(Color.purple.opacity(0.16))
+                        .frame(width: 180, height: 180)
+                        .blur(radius: 25)
+                        .offset(x: CGFloat(cos(phase * 0.35)) * -95, y: CGFloat(sin(phase * 0.48)) * 70)
+
+                    Circle()
+                        .fill(Color.white.opacity(0.06))
+                        .frame(width: 360, height: 360)
+                        .blur(radius: 45)
+                        .scaleEffect(1 + CGFloat(sin(phase * 0.7)) * 0.06)
+                }
+            }
+
+            VStack(spacing: 18) {
+                ZStack {
+                    Circle()
+                        .fill(.ultraThinMaterial)
+                        .frame(width: 100, height: 100)
+                    Circle()
+                        .strokeBorder(
+                            AngularGradient(
+                                colors: [.cyan, .blue, .purple, .pink, .cyan],
+                                center: .center
+                            ),
+                            lineWidth: 2.5
+                        )
+                        .frame(width: 100, height: 100)
+                        .rotationEffect(.degrees(revealAnimation ? 360 : 0))
+                        .animation(.linear(duration: 2.8).repeatForever(autoreverses: false), value: revealAnimation)
+
+                    Image(systemName: "apple.intelligence")
+                        .font(.system(size: 28, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+
+                VStack(spacing: 6) {
+                    Text(title)
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(.white)
+                    Text(subtitle)
+                        .font(.callout)
+                        .foregroundStyle(.white.opacity(0.72))
+                        .multilineTextAlignment(.center)
+                        .lineLimit(3)
+                }
+
+                HStack(spacing: 6) {
+                    ForEach(0..<4, id: \.self) { index in
+                        Capsule()
+                            .fill(Color.white.opacity(0.75 - Double(index) * 0.12))
+                            .frame(width: 18, height: 6)
+                            .scaleEffect(revealAnimation ? 1.0 : 0.82)
+                            .animation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true).delay(Double(index) * 0.14), value: revealAnimation)
+                    }
+                }
+            }
+            .padding(28)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 32, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 32, style: .continuous).stroke(.white.opacity(0.14), lineWidth: 1))
+            .shadow(color: .black.opacity(0.3), radius: 30, y: 16)
+            .padding(.horizontal, 28)
+        }
     }
 
     private func updateOverlayState(_ active: Bool) {

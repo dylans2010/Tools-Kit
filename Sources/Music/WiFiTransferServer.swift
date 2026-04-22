@@ -14,6 +14,7 @@ final class WiFiTransferServer: ObservableObject {
 
     private var listener: NWListener?
     private var validatedSessions: Set<String> = []
+    private let preferredPorts: [UInt16] = [8765, 8766, 8767, 8775]
 
     private init() {}
 
@@ -24,15 +25,14 @@ final class WiFiTransferServer: ObservableObject {
         pairingCode = generateCode()
         ipAddress = getLocalIP() ?? "—"
 
-        do {
-            let params = NWParameters.tcp
-            params.allowLocalEndpointReuse = true
-            let nwPort = NWEndpoint.Port(rawValue: port) ?? 8765
-            listener = try NWListener(using: params, on: nwPort)
-        } catch {
-            InternalLogger.shared.log("WiFiTransferServer: failed to create listener — \(error)", level: .error)
+        guard let prepared = createListener() else {
+            appendLog("Failed to start server. Try another app-free port on the same network.")
+            InternalLogger.shared.log("WiFiTransferServer: failed to create listener on preferred ports", level: .error)
             return
         }
+
+        listener = prepared.listener
+        port = prepared.port
 
         listener?.newConnectionHandler = { [weak self] connection in
             connection.start(queue: .global(qos: .userInitiated))
@@ -68,17 +68,36 @@ final class WiFiTransferServer: ObservableObject {
     // MARK: - Connection Handler
 
     private func handleConnection(_ connection: NWConnection) {
-        receiveRequest(from: connection)
+        receiveCompleteRequest(from: connection, accumulated: Data())
     }
 
-    private func receiveRequest(from connection: NWConnection) {
+    private func receiveCompleteRequest(from connection: NWConnection, accumulated: Data) {
         connection.receive(minimumIncompleteLength: 1, maximumLength: 65536) { [weak self] data, _, _, error in
-            guard let self, let data, !data.isEmpty else {
+            guard let self else {
                 connection.cancel()
                 return
             }
 
-            let raw = String(data: data, encoding: .utf8) ?? ""
+            if let error {
+                self.appendLog("Connection error: \(error.localizedDescription)")
+                connection.cancel()
+                return
+            }
+
+            guard let data, !data.isEmpty else {
+                connection.cancel()
+                return
+            }
+
+            var buffer = accumulated
+            buffer.append(data)
+
+            if !self.requestIsComplete(buffer) {
+                self.receiveCompleteRequest(from: connection, accumulated: buffer)
+                return
+            }
+
+            let raw = String(data: buffer, encoding: .utf8) ?? ""
             let lines = raw.components(separatedBy: "\r\n")
             let requestLine = lines.first ?? ""
             let parts = requestLine.components(separatedBy: " ")
@@ -87,6 +106,10 @@ final class WiFiTransferServer: ObservableObject {
             let path = parts[1]
 
             switch (method, path) {
+            case ("GET", "/"):
+                Task { @MainActor [weak self] in self?.handleRootPage(connection: connection) }
+            case ("OPTIONS", _):
+                Task { @MainActor [weak self] in self?.sendOptionsOK(connection) }
             case ("POST", "/validate-code"):
                 var headerEnd = 0
                 for (i, line) in lines.enumerated() where line.isEmpty {
@@ -97,11 +120,11 @@ final class WiFiTransferServer: ObservableObject {
                 let body = bodyStr.data(using: .utf8) ?? Data()
                 Task { @MainActor [weak self] in self?.handleValidateCode(body: body, connection: connection) }
             case ("POST", "/upload-chunk"):
-                Task { @MainActor [weak self] in self?.handleUploadChunk(rawRequest: data, connection: connection) }
+                Task { @MainActor [weak self] in self?.handleUploadChunk(rawRequest: buffer, connection: connection) }
             case ("POST", "/finalize-upload"):
                 Task { @MainActor [weak self] in
                     guard let self else { return }
-                    let body = self.extractHTTPBody(from: data)
+                    let body = self.extractHTTPBody(from: buffer)
                     self.handleFinalizeUpload(body: body, connection: connection)
                 }
             default:
@@ -224,6 +247,89 @@ final class WiFiTransferServer: ObservableObject {
         }))
     }
 
+        private func sendOptionsOK(_ connection: NWConnection) {
+                let cors = "Access-Control-Allow-Origin: *\r\nAccess-Control-Allow-Headers: *\r\nAccess-Control-Allow-Methods: POST, GET, OPTIONS\r\n"
+                let response = "HTTP/1.1 204 No Content\r\n\(cors)Content-Length: 0\r\n\r\n"
+                connection.send(content: response.data(using: .utf8), completion: .contentProcessed({ _ in
+                        connection.cancel()
+                }))
+        }
+
+        private func handleRootPage(connection: NWConnection) {
+                let html = """
+                <!doctype html>
+                <html lang=\"en\">
+                <head>
+                    <meta charset=\"utf-8\" />
+                    <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\" />
+                    <title>Tools-Kit WiFi Transfer</title>
+                    <style>
+                        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f1220;color:#fff;margin:0;padding:24px}
+                        .card{max-width:760px;margin:0 auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:20px}
+                        input,button{font:inherit;border-radius:12px;border:1px solid rgba(255,255,255,.2);padding:12px}
+                        input{background:#1a1f36;color:#fff}
+                        button{background:#4f7cff;color:#fff;cursor:pointer}
+                        .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+                        .muted{opacity:.78;font-size:14px}
+                        .ok{color:#7df3a6}.bad{color:#ff8b8b}
+                        pre{background:#0b0e19;padding:12px;border-radius:12px;max-height:220px;overflow:auto}
+                    </style>
+                </head>
+                <body>
+                    <div class=\"card\">
+                        <h2>WiFi Music Transfer</h2>
+                        <p class=\"muted\">Enter the pairing code from your iPhone, then upload MP3/M4A/WAV/ZIP files.</p>
+                        <div class=\"row\">
+                            <input id=\"code\" placeholder=\"Pairing code\" />
+                            <button id=\"pair\">Pair</button>
+                            <span id=\"pairStatus\" class=\"muted\">Not paired</span>
+                        </div>
+                        <div class=\"row\" style=\"margin-top:12px\">
+                            <input id=\"files\" type=\"file\" multiple />
+                            <button id=\"upload\">Upload Files</button>
+                        </div>
+                        <pre id=\"log\"></pre>
+                    </div>
+                    <script>
+                        let session='';
+                        const log=(m)=>{const p=document.getElementById('log');p.textContent += m + '\\n';p.scrollTop=p.scrollHeight;};
+                        document.getElementById('pair').onclick=async()=>{
+                            const code=document.getElementById('code').value.trim();
+                            const res=await fetch('/validate-code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})});
+                            const json=await res.json().catch(()=>({}));
+                            if(res.ok&&json.session){session=json.session;document.getElementById('pairStatus').textContent='Paired';document.getElementById('pairStatus').className='ok';log('Paired successfully');}
+                            else {document.getElementById('pairStatus').textContent='Invalid code';document.getElementById('pairStatus').className='bad';log('Pair failed: '+(json.error||res.status));}
+                        };
+                        document.getElementById('upload').onclick=async()=>{
+                            const files=[...document.getElementById('files').files];
+                            if(!session){log('Pair first.');return;}
+                            if(!files.length){log('Choose files first.');return;}
+                            for(const file of files){
+                                const chunkSize=256*1024; const total=Math.ceil(file.size/chunkSize);
+                                for(let i=0;i<total;i++){
+                                    const chunk=file.slice(i*chunkSize,(i+1)*chunkSize);
+                                    const res=await fetch('/upload-chunk',{method:'POST',headers:{'X-Session':session,'X-Filename':file.name,'X-Chunk-Index':String(i)},body:chunk});
+                                    if(!res.ok){log('Chunk '+i+' failed for '+file.name);break;}
+                                }
+                                const done=await fetch('/finalize-upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session,filename:file.name,totalChunks:total})});
+                                const payload=await done.json().catch(()=>({}));
+                                if(done.ok){log('Uploaded: '+file.name);} else {log('Finalize failed: '+(payload.error||done.status));}
+                            }
+                        };
+                    </script>
+                </body>
+                </html>
+                """
+
+                let data = Data()
+                let header = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: \(html.utf8.count)\r\nAccess-Control-Allow-Origin: *\r\n\r\n"
+                data.append(header.data(using: .utf8) ?? Data())
+                data.append(html.data(using: .utf8) ?? Data())
+                connection.send(content: data, completion: .contentProcessed({ _ in
+                        connection.cancel()
+                }))
+        }
+
     private func sendNotFound(_ connection: NWConnection) {
         sendJSON("{\"error\":\"Not found\"}", connection: connection, status: 404)
     }
@@ -247,6 +353,23 @@ final class WiFiTransferServer: ObservableObject {
             }
         }
         return data
+    }
+
+    private func requestIsComplete(_ data: Data) -> Bool {
+        guard let raw = String(data: data, encoding: .utf8),
+              let delimiter = raw.range(of: "\r\n\r\n") else {
+            return false
+        }
+
+        let headerBytes = raw.distance(from: raw.startIndex, to: delimiter.upperBound)
+        let headerText = String(raw[..<delimiter.lowerBound])
+        let lengthLine = headerText
+            .components(separatedBy: "\r\n")
+            .first { $0.lowercased().hasPrefix("content-length:") }
+        let expectedBodyLength = lengthLine
+            .flatMap { Int($0.split(separator: ":", maxSplits: 1).last?.trimmingCharacters(in: .whitespaces) ?? "0") } ?? 0
+        let actualBodyLength = max(0, data.count - headerBytes)
+        return actualBodyLength >= expectedBodyLength
     }
 
     private func sanitize(_ name: String) -> String {
@@ -287,5 +410,21 @@ final class WiFiTransferServer: ObservableObject {
             self.transferLog.append("[\(Date().formatted(date: .omitted, time: .shortened))] \(message)")
             if self.transferLog.count > 100 { self.transferLog.removeFirst() }
         }
+    }
+
+    private func createListener() -> (listener: NWListener, port: UInt16)? {
+        let params = NWParameters.tcp
+        params.allowLocalEndpointReuse = true
+
+        for candidate in preferredPorts {
+            do {
+                let nwPort = NWEndpoint.Port(rawValue: candidate) ?? 8765
+                let made = try NWListener(using: params, on: nwPort)
+                return (made, candidate)
+            } catch {
+                InternalLogger.shared.log("WiFiTransferServer: port \(candidate) unavailable — \(error)", level: .warning)
+            }
+        }
+        return nil
     }
 }

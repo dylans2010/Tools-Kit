@@ -12,6 +12,11 @@ struct AIWriteView: View {
         case apology = "Apology"
         case sales = "Sales"
         case thankYou = "Thank You"
+        case announcement = "Announcement"
+        case reminder = "Reminder"
+        case update = "Update"
+        case outreach = "Outreach"
+        case onboarding = "Onboarding"
 
         var id: String { rawValue }
     }
@@ -24,6 +29,12 @@ struct AIWriteView: View {
         case empathetic = "Empathetic"
         case confident = "Confident"
         case formal = "Formal"
+        case warm = "Warm"
+        case direct = "Direct"
+        case appreciative = "Appreciative"
+        case diplomatic = "Diplomatic"
+        case visionary = "Visionary"
+        case reassuring = "Reassuring"
 
         var id: String { rawValue }
     }
@@ -32,6 +43,8 @@ struct AIWriteView: View {
         case plain = "Plain"
         case standard = "Standard"
         case elevated = "Elevated"
+        case conversational = "Conversational"
+        case executive = "Executive"
 
         var id: String { rawValue }
     }
@@ -42,9 +55,19 @@ struct AIWriteView: View {
     @State private var readingLevel: ReadingLevel = .standard
     @State private var includeSubjectLine = true
     @State private var includeCallToAction = true
+    @State private var includeBulletSummary = false
+    @State private var includeAlternativeSubject = true
+    @State private var includePolishedClosing = true
     @State private var isGenerating = false
     @State private var generatedContent = ""
     @State private var errorMessage: String?
+
+    private let quickPrompts = [
+        ("Project update", "Send a concise status update with blockers and next steps."),
+        ("Client follow-up", "Write a warm follow-up after a meeting with clear actions."),
+        ("Invitation", "Invite someone to a meeting with a clear agenda and timing."),
+        ("Apology", "Draft a thoughtful apology that takes ownership and offers a fix.")
+    ]
 
     let onCompletion: (String) -> Void
 
@@ -108,6 +131,24 @@ struct AIWriteView: View {
 
     private var optionsSection: some View {
         VStack(spacing: 12) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(quickPrompts, id: \.
+0) { item in
+                        Button {
+                            prompt = item.1
+                        } label: {
+                            Text(item.0)
+                                .font(.caption.weight(.semibold))
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(Color.white.opacity(0.08), in: Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+
             HStack {
                 Text("Type")
                     .font(.caption.bold())
@@ -156,6 +197,12 @@ struct AIWriteView: View {
             Toggle("Include subject line", isOn: $includeSubjectLine)
                 .font(.caption.bold())
             Toggle("Include call-to-action", isOn: $includeCallToAction)
+                .font(.caption.bold())
+            Toggle("Include bullet summary", isOn: $includeBulletSummary)
+                .font(.caption.bold())
+            Toggle("Include alternate subject", isOn: $includeAlternativeSubject)
+                .font(.caption.bold())
+            Toggle("Write polished closing", isOn: $includePolishedClosing)
                 .font(.caption.bold())
         }
     }
@@ -214,6 +261,9 @@ struct AIWriteView: View {
             Reading level: \(readingLevel.rawValue.lowercased()).
             Include subject line: \(includeSubjectLine ? "yes" : "no").
             Include explicit call-to-action: \(includeCallToAction ? "yes" : "no").
+            Include bullet summary: \(includeBulletSummary ? "yes" : "no").
+            Include alternate subject options: \(includeAlternativeSubject ? "yes" : "no").
+            Include polished closing: \(includePolishedClosing ? "yes" : "no").
 
             Return only the email body.
             """

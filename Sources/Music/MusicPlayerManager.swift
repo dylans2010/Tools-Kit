@@ -127,8 +127,10 @@ final class MusicPlayerManager: ObservableObject {
             } else {
                 pause()
                 seek(to: 0)
+                currentIndex = max(0, queue.count - 1)
             }
         }
+        savePlaybackState()
     }
 
     func previous() {
@@ -139,6 +141,7 @@ final class MusicPlayerManager: ObservableObject {
         guard !queue.isEmpty else { return }
         currentIndex = max(currentIndex - 1, 0)
         load(song: queue[currentIndex])
+        savePlaybackState()
     }
 
     func seek(to time: TimeInterval) {
@@ -157,13 +160,23 @@ final class MusicPlayerManager: ObservableObject {
     }
 
     func removeFromQueue(at offsets: IndexSet) {
+        let removedCurrent = offsets.contains(currentIndex)
         var adjusted = currentIndex
         for idx in offsets.sorted(by: >) {
             if idx < currentIndex { adjusted -= 1 }
         }
         queue.remove(atOffsets: offsets)
         originalQueue = queue
-        currentIndex = adjusted
+
+        if queue.isEmpty {
+            resetPlaybackState()
+            return
+        }
+
+        currentIndex = min(max(adjusted, 0), queue.count - 1)
+        if removedCurrent {
+            load(song: queue[currentIndex])
+        }
         savePlaybackState()
     }
 
@@ -289,6 +302,15 @@ final class MusicPlayerManager: ObservableObject {
     }
 
     private func handleSongEnd() {
+        guard !queue.isEmpty else {
+            isPlaying = false
+            currentTime = 0
+            duration = 0
+            currentSong = nil
+            savePlaybackState()
+            return
+        }
+
         switch repeatMode {
         case .one:
             if let song = queue[safe: currentIndex] ?? currentSong {

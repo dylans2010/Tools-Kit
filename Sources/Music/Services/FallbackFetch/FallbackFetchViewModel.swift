@@ -25,6 +25,7 @@ enum PipelineStage: String {
     case parsing  = "PARSING"
     case youtube  = "YOUTUBE"
     case zyla     = "ZYLA"
+    case provider = "PROVIDER"
     case polling  = "POLLING"
     case download = "DOWNLOAD"
     case zip      = "ZIP"
@@ -93,6 +94,7 @@ enum FetchError: LocalizedError {
     case pollingTimeout(jobId: String)
     case downloadFailed(String)
     case zipCreationFailed
+    case allAudioProvidersFailed(details: String)
 
     var errorDescription: String? {
         switch self {
@@ -108,6 +110,7 @@ enum FetchError: LocalizedError {
         case .pollingTimeout(let id): return "Polling timed out for: \(id)"
         case .downloadFailed(let name): return "Download failed for: \(name)"
         case .zipCreationFailed: return "Failed to create ZIP archive"
+        case .allAudioProvidersFailed(let details): return "All audio providers failed: \(details)"
         }
     }
 }
@@ -171,7 +174,7 @@ final class FallbackFetchViewModel: ObservableObject {
     private var activeZylaAPIKey: String = ""
 
     var canStartFetching: Bool {
-        !songs.isEmpty && !youtubeAPIKey.isEmpty && !zylaAPIKey.isEmpty && !isFetching
+        !songs.isEmpty && !youtubeAPIKey.isEmpty && !isFetching
     }
 
     init() {
@@ -353,15 +356,13 @@ final class FallbackFetchViewModel: ObservableObject {
             return
         }
 
-        guard !activeZylaAPIKey.isEmpty else {
+        if activeZylaAPIKey.isEmpty {
             await LogManager.shared.log(
-                level: .error,
+                level: .warning,
                 stage: .ui,
-                message: "ABORT: missing Zyla Labs API key",
+                message: "Zyla API key missing; pipeline will use no-key provider fallback only",
                 metadata: nil as [String: String]?
             )
-            await MainActor.run { self.errorMessage = "Please enter your Zyla Labs API Key" }
-            return
         }
 
         await resetState()
@@ -434,9 +435,7 @@ final class FallbackFetchViewModel: ObservableObject {
         await updateYoutubeURL(for: song.id, url: youTubeURL)
 
         await updateStatus(for: song.id, status: .fetchingAudio)
-        let jobId = try await convertToMP3(videoId: videoId)
-
-        let downloadURLString = try await pollJobStatus(jobId: jobId)
+        let downloadURLString = try await resolveDownloadURL(for: song, videoId: videoId)
 
         await updateStatus(for: song.id, status: .downloading)
         let fileURL = try await downloadMP3(from: downloadURLString, for: song)
@@ -602,6 +601,142 @@ final class FallbackFetchViewModel: ObservableObject {
     }
 
     // MARK: - Zyla
+
+    private func resolveDownloadURL(for song: SongFetchItem, videoId: String) async throws -> String {
+        var errors: [String] = []
+
+        if !activeZylaAPIKey.isEmpty {
+            do {
+                let jobId = try await convertToMP3(videoId: videoId)
+                let resolved = try await pollJobStatus(jobId: jobId)
+                await LogManager.shared.log(
+                    level: .info,
+                    stage: .provider,
+                    message: "Resolved by Zyla provider",
+                    metadata: ["song": song.title]
+                )
+                return resolved
+            } catch {
+                let reason = "Zyla failed: \(error.localizedDescription)"
+                errors.append(reason)
+                await LogManager.shared.log(
+                    level: .warning,
+                    stage: .provider,
+                    message: reason,
+                    metadata: ["song": song.title]
+                )
+            }
+        }
+
+        do {
+            let providerURL = try await extractWithYtDlpIo(videoId: videoId)
+            await LogManager.shared.log(
+                level: .info,
+                stage: .provider,
+                message: "Resolved by no-key provider ytdlp.online",
+                metadata: ["song": song.title]
+            )
+            return providerURL
+        } catch {
+            let reason = "ytdlp.online failed: \(error.localizedDescription)"
+            errors.append(reason)
+            await LogManager.shared.log(
+                level: .warning,
+                stage: .provider,
+                message: reason,
+                metadata: ["song": song.title]
+            )
+        }
+
+        do {
+            let providerURL = try await extractWithCobalt(videoId: videoId)
+            await LogManager.shared.log(
+                level: .info,
+                stage: .provider,
+                message: "Resolved by no-key provider Cobalt",
+                metadata: ["song": song.title]
+            )
+            return providerURL
+        } catch {
+            let reason = "Cobalt failed: \(error.localizedDescription)"
+            errors.append(reason)
+            await LogManager.shared.log(
+                level: .warning,
+                stage: .provider,
+                message: reason,
+                metadata: ["song": song.title]
+            )
+        }
+
+        throw FetchError.allAudioProvidersFailed(details: errors.joined(separator: " | "))
+    }
+
+    private func extractWithYtDlpIo(videoId: String) async throws -> String {
+        let target = "https://www.youtube.com/watch?v=\(videoId)"
+        guard let encoded = target.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: "https://p.oceansaver.in/ajax/download.php?format=mp3&url=\(encoded)") else {
+            throw FetchError.invalidURL("ytdlp.online request URL")
+        }
+
+        let (data, response) = try await URLSession.shared.data(from: url)
+        guard let http = response as? HTTPURLResponse else {
+            throw FetchError.invalidResponse
+        }
+        guard (200...299).contains(http.statusCode) else {
+            let body = String(data: data, encoding: .utf8) ?? "unreadable"
+            throw FetchError.zylaError("ytdlp.online http=\(http.statusCode) body=\(String(body.prefix(200)))")
+        }
+
+        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        let candidate = json?["download_url"] as? String
+            ?? json?["downloadUrl"] as? String
+            ?? json?["url"] as? String
+        guard let candidate, !candidate.isEmpty else {
+            throw FetchError.missingDownloadURL(String(data: data, encoding: .utf8) ?? "missing")
+        }
+        return candidate
+    }
+
+    private func extractWithCobalt(videoId: String) async throws -> String {
+        guard let url = URL(string: "https://api.cobalt.tools/api/json") else {
+            throw FetchError.invalidURL("cobalt endpoint")
+        }
+
+        let target = "https://www.youtube.com/watch?v=\(videoId)"
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        let payload: [String: Any] = [
+            "url": target,
+            "isAudioOnly": true,
+            "aFormat": "mp3"
+        ]
+        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw FetchError.invalidResponse
+        }
+        guard (200...299).contains(http.statusCode) else {
+            let body = String(data: data, encoding: .utf8) ?? "unreadable"
+            throw FetchError.zylaError("cobalt http=\(http.statusCode) body=\(String(body.prefix(200)))")
+        }
+
+        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        let status = (json?["status"] as? String)?.lowercased() ?? ""
+        if status == "error" {
+            let text = json?["text"] as? String ?? "cobalt provider returned error"
+            throw FetchError.zylaError(text)
+        }
+
+        let candidate = json?["url"] as? String
+            ?? (json?["picker"] as? [[String: Any]])?.first?["url"] as? String
+        guard let candidate, !candidate.isEmpty else {
+            throw FetchError.missingDownloadURL(String(data: data, encoding: .utf8) ?? "missing")
+        }
+        return candidate
+    }
 
     private func convertToMP3(videoId: String) async throws -> String {
         let fullURL = "https://www.youtube.com/watch?v=\(videoId)"

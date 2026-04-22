@@ -280,6 +280,11 @@ struct SlideEditorView: View {
                 Section("Smart Layout Helpers") {
                     Button("Add Title + Body Block") { addSlideWithLayout("Content") }
                     Button("Add Quote Layout") { addSlideWithLayout("Quote") }
+                    Button("Add Agenda Slide") { addSlideWithLayout("Agenda") }
+                    Button("Add Comparison Slide") { addSlideWithLayout("Comparison") }
+                    Button("Add Checklist Slide") { addSlideWithLayout("Checklist") }
+                    Button("Add Closing Slide") { addSlideWithLayout("Closing") }
+                    Button("Add Callout Slide") { addSlideWithLayout("Callout") }
                     Button("Center Selected Element") { centerSelectedElement() }
                     Button("Nudge Up") { nudgeSelectedElement(dx: 0, dy: -10) }
                     Button("Nudge Down") { nudgeSelectedElement(dx: 0, dy: 10) }
@@ -377,6 +382,10 @@ struct SlideEditorView: View {
                         aiQuick("Visual Ideas", icon: "photo", prompt: "Suggest visual concept and short caption options.")
                         aiQuick("Q&A", icon: "questionmark.bubble", prompt: "Create likely Q&A with concise answers.")
                         aiQuick("Timeline", icon: "calendar", prompt: "Convert this content into timeline format.")
+                        aiQuick("Agenda", icon: "list.number", prompt: "Turn this slide into an agenda with timing hints.")
+                        aiQuick("Comparison", icon: "rectangle.split.3x1", prompt: "Rewrite this slide as a comparison table or side-by-side structure.")
+                        aiQuick("Brand Voice", icon: "paintbrush", prompt: "Rewrite this slide to sound more on-brand and polished.")
+                        aiQuick("Story", icon: "sparkles", prompt: "Rewrite this slide as a short storytelling arc with a hook and payoff.")
                     }
 
                     if aiLoading {

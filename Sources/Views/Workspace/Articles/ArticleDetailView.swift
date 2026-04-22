@@ -16,70 +16,64 @@ struct ArticleDetailView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                if let imageURL = displayArticle.imageURL, let url = URL(string: imageURL) {
-                    AsyncImage(url: url) { image in
-                        image.resizable().scaledToFill()
-                    } placeholder: {
-                        Color(.systemGray5)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 220)
-                    .clipped()
-                    .cornerRadius(12)
-                    .padding(.horizontal)
-                }
+            VStack(alignment: .leading, spacing: 18) {
+                heroCard
 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(displayArticle.title)
-                        .font(.title2.bold())
-
-                    if isLoading {
+                if isLoading {
+                    articleCard(title: "Loading", icon: "clock") {
                         HStack {
                             Spacer()
-                            ProgressView("Loading Article…")
+                            ProgressView("Loading article…")
                             Spacer()
                         }
-                        .padding(.vertical, 40)
-                    } else if let err = errorMessage {
-                        Text(err).foregroundColor(.red)
-                    } else {
-                        Text(displayArticle.content.isEmpty ? displayArticle.summary : displayArticle.content)
-                            .font(.body)
-                            .lineSpacing(5)
+                        .padding(.vertical, 24)
                     }
-
-                    // AI result
-                    if !aiResult.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Divider()
-                            Text("AI: \(aiTask)")
-                                .font(.caption.bold())
-                                .foregroundColor(.purple)
-                            if aiLoading {
-                                ProgressView()
-                            } else {
-                                Text(aiResult)
-                                    .font(.callout)
-                                    .padding()
-                                    .background(Color.purple.opacity(0.08))
-                                    .cornerRadius(10)
-                            }
-                        }
+                } else if let err = errorMessage {
+                    articleCard(title: "Error", icon: "exclamationmark.triangle.fill", accent: .red) {
+                        Text(err)
+                            .foregroundStyle(.red)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
-
-                    // Source link
-                    if let url = URL(string: displayArticle.sourceURL) {
-                        Link("View On Wikipedia", destination: url)
-                            .font(.caption)
-                            .foregroundColor(.blue)
-                            .padding(.top, 8)
+                } else {
+                    articleCard(title: "Article", icon: "doc.richtext") {
+                        renderedArticleText(displayArticle.content.isEmpty ? displayArticle.summary : displayArticle.content)
                     }
                 }
-                .padding(.horizontal)
+
+                if !aiResult.isEmpty {
+                    articleCard(title: aiTask, icon: "sparkles", accent: .purple) {
+                        if aiLoading {
+                            ProgressView()
+                        } else {
+                            renderedArticleText(aiResult)
+                        }
+                    }
+                }
+
+                if let url = URL(string: displayArticle.sourceURL) {
+                    Link(destination: url) {
+                        HStack {
+                            Label("Open Source", systemImage: "safari")
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                        }
+                        .font(.subheadline.weight(.semibold))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 14)
+                        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    }
+                    .padding(.top, 2)
+                }
             }
-            .padding(.vertical, 8)
+            .padding(16)
         }
+        .background(
+            LinearGradient(
+                colors: [Color(red: 0.06, green: 0.08, blue: 0.14), Color(red: 0.10, green: 0.13, blue: 0.22), Color(red: 0.15, green: 0.08, blue: 0.20)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ).ignoresSafeArea()
+        )
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -108,6 +102,85 @@ struct ArticleDetailView: View {
             Button("Cancel", role: .cancel) {}
         }
         .onAppear { loadFullArticle() }
+    }
+
+    private var heroCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if let imageURL = displayArticle.imageURL, let url = URL(string: imageURL) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image.resizable().scaledToFill()
+                    default:
+                        LinearGradient(colors: [.white.opacity(0.12), .white.opacity(0.04)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    }
+                }
+                .frame(height: 220)
+                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                .overlay(alignment: .bottomLeading) {
+                    LinearGradient(colors: [.clear, .black.opacity(0.55)], startPoint: .top, endPoint: .bottom)
+                        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text(displayArticle.title)
+                    .font(.title.bold())
+                    .foregroundStyle(.white)
+                Text(displayArticle.summary.isEmpty ? "Full article view" : displayArticle.summary)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(3)
+
+                HStack(spacing: 8) {
+                    infoPill(icon: "globe", text: displayArticle.language.uppercased())
+                    if displayArticle.pageID != nil {
+                        infoPill(icon: "number", text: "Page ID")
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
+        }
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(.white.opacity(0.10), lineWidth: 1))
+    }
+
+    private func articleCard<Content: View>(title: String, icon: String, accent: Color = .blue, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label(title, systemImage: icon)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(accent)
+
+            content()
+                .font(.body)
+                .foregroundStyle(.primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .textSelection(.enabled)
+        }
+        .padding(16)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(accent.opacity(0.18), lineWidth: 1))
+    }
+
+    @ViewBuilder
+    private func renderedArticleText(_ text: String) -> some View {
+        if let attributed = try? AttributedString(markdown: text) {
+            Text(attributed)
+                .lineSpacing(6)
+        } else {
+            Text(text)
+                .lineSpacing(6)
+        }
+    }
+
+    private func infoPill(icon: String, text: String) -> some View {
+        Label(text, systemImage: icon)
+            .font(.caption.weight(.semibold))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(Color.white.opacity(0.10), in: Capsule())
+            .foregroundStyle(.white)
     }
 
     private var collectionPickerSheet: some View {
@@ -143,7 +216,7 @@ struct ArticleDetailView: View {
         isLoading = true
         Task {
             do {
-                let full = try await manager.fetchArticle(title: article.title, language: article.language)
+                let full = try await manager.fetchArticle(title: article.title, language: article.language, pageID: article.pageID)
                 await MainActor.run {
                     fullArticle = full
                     isLoading = false

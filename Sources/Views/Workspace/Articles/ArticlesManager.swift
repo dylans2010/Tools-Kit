@@ -86,13 +86,18 @@ final class ArticlesManager: ObservableObject {
             let snippet = (result["snippet"] as? String ?? "").replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
             let pageID = result["pageid"] as? Int ?? 0
             let sourceURL = "https://\(language).wikipedia.org/wiki/\(title.replacingOccurrences(of: " ", with: "_"))"
-            return Article(title: title, summary: snippet, content: "", language: language, sourceURL: sourceURL)
+            return Article(title: title, summary: snippet, content: "", language: language, sourceURL: sourceURL, pageID: pageID == 0 ? nil : pageID)
         }
     }
 
-    func fetchArticle(title: String, language: String = "en") async throws -> Article {
-        let encoded = title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? title
-        let urlString = "https://\(language).wikipedia.org/w/api.php?action=query&prop=extracts|pageimages&exintro=false&titles=\(encoded)&format=json&utf8=1&pithumbsize=400&redirects=1"
+    func fetchArticle(title: String, language: String = "en", pageID: Int? = nil) async throws -> Article {
+        let urlString: String
+        if let pageID {
+            urlString = "https://\(language).wikipedia.org/w/api.php?action=query&prop=extracts|pageimages&exintro=false&pageids=\(pageID)&format=json&utf8=1&pithumbsize=400&redirects=1"
+        } else {
+            let encoded = title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? title
+            urlString = "https://\(language).wikipedia.org/w/api.php?action=query&prop=extracts|pageimages&exintro=false&titles=\(encoded)&format=json&utf8=1&pithumbsize=400&redirects=1"
+        }
         guard let url = URL(string: urlString) else { throw URLError(.badURL) }
         let (data, _) = try await URLSession.shared.data(from: url)
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
@@ -104,7 +109,7 @@ final class ArticlesManager: ObservableObject {
         let sourceURL = "https://\(language).wikipedia.org/wiki/\(pageTitle.replacingOccurrences(of: " ", with: "_"))"
         let content = cleanHTML(extract)
         let summary = String(content.prefix(300))
-        return Article(title: pageTitle, summary: summary, content: content, imageURL: thumbnail, language: language, sourceURL: sourceURL)
+        return Article(title: pageTitle, summary: summary, content: content, imageURL: thumbnail, language: language, sourceURL: sourceURL, pageID: pageID)
     }
 
     private func cleanHTML(_ html: String) -> String {

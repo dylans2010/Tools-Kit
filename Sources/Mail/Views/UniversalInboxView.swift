@@ -29,7 +29,13 @@ struct UniversalInboxView: View {
         }
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
-        .background(Color(.systemGroupedBackground))
+        .background(
+            LinearGradient(
+                colors: [Color(red: 0.06, green: 0.08, blue: 0.14), Color(red: 0.09, green: 0.11, blue: 0.18), Color(red: 0.15, green: 0.08, blue: 0.22)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .navigationTitle("Accounts")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -74,23 +80,51 @@ struct UniversalInboxView: View {
 
     private var headerSection: some View {
         Section {
-            Picker("View", selection: $groupingMode) {
-                Text("By Account").tag("account")
-                Text("Unified").tag("unified")
-            }
-            .pickerStyle(.segmented)
-
-            Button {
-                Task { await syncAll() }
-            } label: {
-                HStack {
-                    Text(sync.isSyncing ? "Syncing…" : "Sync All Accounts")
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Universal Inbox")
+                            .font(.title2.bold())
+                        Text("See every mailbox in one place or drill into each account.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
-                    if sync.isSyncing { ProgressView() }
+                    Button {
+                        showMailSettings = true
+                    } label: {
+                        Image(systemName: "slider.horizontal.3")
+                            .frame(width: 36, height: 36)
+                    }
+                    .buttonStyle(.bordered)
+                }
+
+                Picker("View", selection: $groupingMode) {
+                    Text("By Account").tag("account")
+                    Text("Unified").tag("unified")
+                }
+                .pickerStyle(.segmented)
+
+                HStack(spacing: 10) {
+                    statusPill(title: "Accounts", value: "\(accountManager.accounts.count)", systemImage: "person.2")
+                    statusPill(title: "Mode", value: isUnifiedMode ? "Unified" : "Split", systemImage: isUnifiedMode ? "rectangle.3.group" : "person.crop.circle")
+                    Spacer(minLength: 0)
+                    Button {
+                        Task { await syncAll() }
+                    } label: {
+                        HStack(spacing: 8) {
+                            Text(sync.isSyncing ? "Syncing…" : "Sync All")
+                            if sync.isSyncing { ProgressView() }
+                        }
+                        .font(.subheadline.weight(.semibold))
+                    }
+                    .buttonStyle(.borderedProminent)
                 }
             }
-            .listRowBackground(Color(.secondarySystemGroupedBackground))
+            .padding(.vertical, 6)
         }
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
     }
 
     private var accountSections: some View {
@@ -122,13 +156,13 @@ struct UniversalInboxView: View {
             Button {
                 openInbox(for: account, folderName: selectedFolder(for: account))
             } label: {
-                HStack(spacing: 10) {
+                HStack(spacing: 12) {
                     Circle()
-                        .fill(providerColor(account.providerType).opacity(0.2))
-                        .frame(width: 28, height: 28)
+                        .fill(providerColor(account.providerType).opacity(0.18))
+                        .frame(width: 40, height: 40)
                         .overlay(
                             Image(systemName: providerIcon(account.providerType))
-                                .font(.caption.weight(.bold))
+                                .font(.body.weight(.bold))
                                 .foregroundStyle(providerColor(account.providerType))
                         )
                     VStack(alignment: .leading, spacing: 2) {
@@ -136,9 +170,10 @@ struct UniversalInboxView: View {
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.primary)
                             .lineLimit(1)
-                        Text(account.providerType.displayName)
+                        Text("\(account.providerType.displayName) • \(selectedFolder(for: account))")
                             .font(.caption)
                             .foregroundStyle(.secondary)
+                            .lineLimit(1)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -148,12 +183,13 @@ struct UniversalInboxView: View {
             Button {
                 toggleAccountSection(account)
             } label: {
-                Image(systemName: expandedAccountId == account.id ? "chevron.up" : "chevron.down")
-                    .padding(.horizontal, 4)
+                Image(systemName: expandedAccountId == account.id ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 4)
     }
 
     private func folderPicker(_ account: MailAccount) -> some View {
@@ -204,17 +240,26 @@ struct UniversalInboxView: View {
 
     private func messageRow(_ scoped: ScopedMailMessage, account: MailAccount?) -> some View {
         HStack(spacing: 10) {
-            Circle()
-                .fill(Color(.tertiarySystemFill))
-                .frame(width: 34, height: 34)
-                .overlay(
-                    Text(senderInitials(scoped.message.from))
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                )
+            ZStack(alignment: .topTrailing) {
+                Circle()
+                    .fill(Color.white.opacity(0.08))
+                    .frame(width: 42, height: 42)
+                    .overlay(
+                        Text(senderInitials(scoped.message.from))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    )
+
+                if !scoped.message.isRead {
+                    Circle()
+                        .fill(.blue)
+                        .frame(width: 8, height: 8)
+                        .offset(x: 4, y: -4)
+                }
+            }
 
             VStack(alignment: .leading, spacing: 6) {
-                HStack {
+                HStack(alignment: .firstTextBaseline) {
                     Text(senderName(scoped.message.from))
                         .font(.subheadline.weight(.semibold))
                         .lineLimit(1)
@@ -224,7 +269,7 @@ struct UniversalInboxView: View {
                         .foregroundStyle(.secondary)
                 }
                 Text(scoped.message.subject)
-                    .font(.caption)
+                    .font(.callout.weight(.semibold))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                 Text(previewText(scoped.message))
@@ -241,7 +286,9 @@ struct UniversalInboxView: View {
                 .font(.caption2.weight(.bold))
                 .foregroundStyle(.secondary)
         }
-        .padding(.vertical, 4)
+        .padding(14)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(Color.white.opacity(0.08), lineWidth: 1))
         .swipeActions(edge: .leading, allowsFullSwipe: false) {
             Button {
                 toggleImportant(scoped)
@@ -395,6 +442,20 @@ struct UniversalInboxView: View {
             .replacingOccurrences(of: "&nbsp;", with: " ")
             .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
             .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func statusPill(title: String, value: String, systemImage: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Label(title, systemImage: systemImage)
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.primary)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private func toggleAccountSection(_ account: MailAccount) {

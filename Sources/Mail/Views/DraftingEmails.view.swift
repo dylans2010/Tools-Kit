@@ -15,6 +15,9 @@ struct DraftingEmailsView: View {
         case empathetic = "Empathetic"
         case technical = "Technical"
         case casual = "Casual"
+        case confident = "Confident"
+        case diplomatic = "Diplomatic"
+        case concise = "Concise"
 
         var id: String { rawValue }
     }
@@ -32,6 +35,9 @@ struct DraftingEmailsView: View {
         case renewal = "Renewal"
         case escalation = "Escalation"
         case thankYou = "Thank You"
+        case roadmap = "Roadmap"
+        case decision = "Decision"
+        case recap = "Recap"
 
         var id: String { rawValue }
     }
@@ -99,6 +105,9 @@ struct DraftingEmailsView: View {
     @State private var includeFollowUpQuestion = false
     @State private var avoidJargon = true
     @State private var avoidOverpromising = true
+    @State private var includeOutcomeSummary = true
+    @State private var includeStakeholderUpdate = false
+    @State private var includeFallbackPlan = false
     @State private var showAdvancedOptions = false
 
     @State private var generatedBody = ""
@@ -111,7 +120,9 @@ struct DraftingEmailsView: View {
         ("Status + Blockers", "Provide current status, key blockers, and requested support."),
         ("Follow-up Reminder", "Friendly reminder with clear next steps and deadline."),
         ("Meeting Confirmation", "Confirm meeting details and agenda in concise format."),
-        ("Customer Escalation", "Summarize issue impact, urgency, and ask for immediate action.")
+        ("Customer Escalation", "Summarize issue impact, urgency, and ask for immediate action."),
+        ("Decision Request", "Ask for a decision with a brief recommendation and deadline."),
+        ("Executive Recap", "Summarize the situation for leadership with outcomes and risks.")
     ]
 
     let currentBody: String
@@ -177,6 +188,9 @@ struct DraftingEmailsView: View {
                                         Toggle("Explain tone choices", isOn: $includeToneReasoning)
                                         Toggle("Avoid jargon", isOn: $avoidJargon)
                                         Toggle("Avoid over-promising", isOn: $avoidOverpromising)
+                                        Toggle("Include outcome summary", isOn: $includeOutcomeSummary)
+                                        Toggle("Include stakeholder update", isOn: $includeStakeholderUpdate)
+                                        Toggle("Include fallback plan", isOn: $includeFallbackPlan)
                                     }
                                     .font(.caption.bold())
                                     .padding(.top, 8)
@@ -442,6 +456,9 @@ struct DraftingEmailsView: View {
             Explain tone choices briefly: \(includeToneReasoning ? "yes" : "no").
             Avoid jargon: \(avoidJargon ? "yes" : "no").
             Avoid over-promising commitments: \(avoidOverpromising ? "yes" : "no").
+            Include outcome summary: \(includeOutcomeSummary ? "yes" : "no").
+            Include stakeholder update: \(includeStakeholderUpdate ? "yes" : "no").
+            Include fallback plan: \(includeFallbackPlan ? "yes" : "no").
             Reading level: \(selectedReadingLevel.rawValue).
             Keywords to include when relevant: \(keywords).
             Context: \(context)

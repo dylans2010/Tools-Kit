@@ -16,6 +16,7 @@ struct ArticlesHomeView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 14) {
+                summaryCard
                 compactHeader
                 featuredSection
                 if !manager.recentArticles.isEmpty { recentSection }
@@ -32,35 +33,81 @@ struct ArticlesHomeView: View {
 
     private var compactHeader: some View {
         WorkspaceSurfaceCard {
-            HStack(spacing: 10) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Articles")
-                        .font(.title3.bold())
-                    Text("Read, summarize, and rewrite with quick AI help.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 10) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Articles")
+                            .font(.title3.bold())
+                        Text("Read, summarize, and rewrite with quick AI help.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    NavigationLink(destination: ArticleSearchView()) {
+                        Image(systemName: "magnifyingglass")
+                            .font(.headline)
+                            .frame(width: 36, height: 36)
+                    }
+                    .buttonStyle(.bordered)
+                    Button { showingCollections = true } label: {
+                        Image(systemName: "folder")
+                            .font(.headline)
+                            .frame(width: 36, height: 36)
+                    }
+                    .buttonStyle(.bordered)
+                    Button { showingAISheet = true } label: {
+                        Image(systemName: "sparkles")
+                            .font(.headline)
+                            .frame(width: 36, height: 36)
+                    }
+                    .buttonStyle(.borderedProminent)
                 }
-                Spacer()
-                NavigationLink(destination: ArticleSearchView()) {
-                    Image(systemName: "magnifyingglass")
-                        .font(.headline)
-                        .frame(width: 36, height: 36)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        aiQuickAction("Brief", icon: "doc.text.magnifyingglass") {
+                            runAI(using: "Give me a concise executive brief from this article.")
+                        }
+                        aiQuickAction("Debate", icon: "bubble.left.and.bubble.right") {
+                            runAI(using: "Explain both sides and key assumptions.")
+                        }
+                        aiQuickAction("Study Notes", icon: "lightbulb.max.fill") {
+                            runAI(using: "Turn this into study notes and action steps.")
+                        }
+                        aiQuickAction("Rewrite", icon: "pencil.and.outline") {
+                            runAI(using: "Rewrite this article for a general audience.")
+                        }
+                        aiQuickAction("Collections", icon: "folder.fill") {
+                            showingCollections = true
+                        }
+                    }
                 }
-                .buttonStyle(.bordered)
-                Button { showingCollections = true } label: {
-                    Image(systemName: "folder")
-                        .font(.headline)
-                        .frame(width: 36, height: 36)
-                }
-                .buttonStyle(.bordered)
-                Button { showingAISheet = true } label: {
-                    Image(systemName: "sparkles")
-                        .font(.headline)
-                        .frame(width: 36, height: 36)
-                }
-                .buttonStyle(.borderedProminent)
             }
         }
+    }
+
+    private var summaryCard: some View {
+        WorkspaceSurfaceCard {
+            HStack(spacing: 10) {
+                summaryStat("Featured", value: "\(featuredArticles.count)", icon: "star.fill", tint: .orange)
+                summaryStat("Recent", value: "\(manager.recentArticles.count)", icon: "clock.fill", tint: .blue)
+                summaryStat("Collections", value: "\(manager.collections.count)", icon: "folder.fill", tint: .indigo)
+            }
+        }
+    }
+
+    private func summaryStat(_ title: String, value: String, icon: String, tint: Color) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label(title, systemImage: icon)
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.headline.bold())
+                .foregroundStyle(tint)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private var aiAssistantSheet: some View {

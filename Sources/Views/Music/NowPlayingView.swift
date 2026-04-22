@@ -142,12 +142,14 @@ struct NowPlayingView: View {
     // MARK: - Artwork
 
     private var artworkHero: some View {
+        let coverSize = min(UIScreen.main.bounds.width - 48, 360)
         ZStack {
             if let image = artworkImage {
                 Image(uiImage: image)
                     .resizable()
-                    .scaledToFit()
-                    .frame(width: 300, height: 300)
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: coverSize, maxHeight: coverSize)
+                    .background(Color.white.opacity(0.02), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
                     .cornerRadius(20)
                     .shadow(color: .black.opacity(0.5), radius: 20, x: 0, y: 12)
                     .transition(.opacity)
@@ -160,7 +162,7 @@ struct NowPlayingView: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 300, height: 300)
+                    .frame(width: coverSize, height: coverSize)
                     .overlay(
                         Image(systemName: "music.note")
                             .font(.system(size: 80))

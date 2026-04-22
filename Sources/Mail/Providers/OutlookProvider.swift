@@ -15,7 +15,9 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     func authenticate(credentials: MailCredentials) async throws -> MailSession {
         let remoteVariables = await fetchRemoteVariables()
         let clientID = try oauthValue(primaryKey: "MICROSOFT_CLIENT_ID", fallbackKey: "MICROSOFT_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
-        let redirectURI = try oauthValue(primaryKey: "MICROSOFT_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+        let redirectURI = try normalizedRedirectURI(oauthValue(primaryKey: "MICROSOFT_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables))
+
+        let callbackScheme = callbackScheme(for: redirectURI)
 
         let verifier = randomCodeVerifier()
         let challenge = codeChallenge(from: verifier)
@@ -37,8 +39,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
             throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid OAuth URL"])
         }
 
-        let callbackScheme = URL(string: redirectURI)?.scheme
-        InternalLogger.shared.log("OAuth start provider=microsoft callbackScheme=\(callbackScheme ?? "unknown")", level: .info)
+        InternalLogger.shared.log("OAuth start provider=microsoft callbackScheme=\(callbackScheme ?? "universal-link")", level: .info)
         let callback = try await startOAuth(url: url, callbackScheme: callbackScheme)
         let returnedState = callbackValue("state", from: callback)
         guard returnedState == state else {
@@ -334,8 +335,21 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
 
         guard let fragment = URLComponents(url: url, resolvingAgainstBaseURL: false)?.fragment else { return nil }
         var parts = URLComponents()
-        parts.query = fragment
+        parts.percentEncodedQuery = fragment
         return parts.queryItems?.first(where: { $0.name == name })?.value
+    }
+
+    private func normalizedRedirectURI(_ redirectURI: String) throws -> String {
+        let trimmed = redirectURI.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let components = URLComponents(string: trimmed), components.scheme != nil else {
+            throw NSError(domain: "OutlookProvider", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid Microsoft redirect URI"])
+        }
+        return components.url?.absoluteString ?? trimmed
+    }
+
+    private func callbackScheme(for redirectURI: String) -> String? {
+        guard let scheme = URLComponents(string: redirectURI)?.scheme?.lowercased() else { return nil }
+        return (scheme == "http" || scheme == "https") ? nil : scheme
     }
 
     private func formURLEncoded(_ items: [URLQueryItem]) -> Data? {
@@ -418,7 +432,7 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
         }
         let remoteVariables = await fetchRemoteVariables()
         let clientID = try oauthValue(primaryKey: "MICROSOFT_CLIENT_ID", fallbackKey: "MICROSOFT_OAUTH_CLIENT_ID", remoteVariables: remoteVariables)
-        let redirectURI = try oauthValue(primaryKey: "MICROSOFT_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables)
+        let redirectURI = try normalizedRedirectURI(oauthValue(primaryKey: "MICROSOFT_OAUTH_REDIRECT_URI", remoteVariables: remoteVariables))
         let clientSecret = oauthOptionalValue(primaryKey: "MICROSOFT_CLIENT_SECRET", remoteVariables: remoteVariables)
 
         var request = URLRequest(url: URL(string: "https://login.microsoftonline.com/common/oauth2/v2.0/token")!)
