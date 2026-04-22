@@ -76,8 +76,7 @@ struct AIWriteView: View {
                 MailAILoadingView(
                     isActive: isGenerating,
                     title: "Generating your email",
-                    subtitle: "Building a structured response with your selected tone",
-                    symbol: "square.and.pencil"
+                    subtitle: "Building a structured response with your selected tone"
                 )
             }
             .navigationTitle("AI Writer")
