@@ -10,11 +10,10 @@ permissions:
   contents: write
 
 env:
-  CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-  SECRET_ID: ${{ secrets.SECRET_ID }}
+  RELEASE_REPOSITORY: ayon1xw/plist-files
 
 jobs:
-  build:
+  build_erdis_iphone:
     runs-on: macos-14
     steps:
       - name: Checkout
@@ -37,45 +36,120 @@ jobs:
           rm -rf ~/Library/Developer/Xcode/DerivedData
 
 
-      - name: Verify CI secret wiring
+      - name: Verify signing secret wiring
+        env:
+          P12_SECRET: ${{ secrets.IOS_P12_BASE64_A }}
+          P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD_A }}
+          PROFILE_SECRET: ${{ secrets.IOS_MOBILEPROVISION_BASE64_A }}
         run: |
-          if [ -n "$CLIENT_SECRET" ]; then
-            echo "CLIENT_SECRET is set (masked)"
+          if [ -n "$P12_SECRET" ]; then
+            echo "P12 secret is set (masked)"
           else
-            echo "CLIENT_SECRET is missing"
+            echo "P12 secret is missing"
+            exit 1
           fi
 
-          if [ -n "$SECRET_ID" ]; then
-            echo "SECRET_ID is set (masked)"
+          if [ -n "$P12_PASSWORD" ]; then
+            echo "P12 password is set (masked)"
           else
-            echo "SECRET_ID is missing"
+            echo "P12 password is missing"
+            exit 1
           fi
+
+          if [ -n "$PROFILE_SECRET" ]; then
+            echo "Provisioning profile secret is set (masked)"
+          else
+            echo "Provisioning profile secret is missing"
+            exit 1
+          fi
+
+      - name: Import signing assets
+        id: import
+        env:
+          P12_SECRET: ${{ secrets.IOS_P12_BASE64_A }}
+          P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD_A }}
+          PROFILE_SECRET: ${{ secrets.IOS_MOBILEPROVISION_BASE64_A }}
+        run: |
+          set -euo pipefail
+
+          KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain-db"
+          KEYCHAIN_PASSWORD="temp-keychain-password"
+          CERT_PATH="$RUNNER_TEMP/signing-cert.p12"
+          PROFILE_PATH="$RUNNER_TEMP/profile.mobileprovision"
+          PROFILE_PLIST="$RUNNER_TEMP/profile.plist"
+          PROFILE_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH"
+
+          printf '%s' "$P12_SECRET" | base64 -D > "$CERT_PATH"
+          printf '%s' "$PROFILE_SECRET" | base64 -D > "$PROFILE_PATH"
+
+          security import "$CERT_PATH" -k "$KEYCHAIN_PATH" -P "$P12_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/xcodebuild
+
+          mkdir -p "$PROFILE_DIR"
+          security cms -D -i "$PROFILE_PATH" > "$PROFILE_PLIST"
+
+          PROFILE_UUID="$(/usr/libexec/PlistBuddy -c 'Print UUID' "$PROFILE_PLIST")"
+          PROFILE_NAME="$(/usr/libexec/PlistBuddy -c 'Print Name' "$PROFILE_PLIST")"
+          TEAM_ID="$(/usr/libexec/PlistBuddy -c 'Print TeamIdentifier:0' "$PROFILE_PLIST")"
+
+          if [ -z "$PROFILE_UUID" ] || [ -z "$PROFILE_NAME" ] || [ -z "$TEAM_ID" ]; then
+            echo "Failed to read provisioning profile metadata"
+            exit 1
+          fi
+
+          cp "$PROFILE_PATH" "$PROFILE_DIR/$PROFILE_UUID.mobileprovision"
+
+          {
+            echo "profile_uuid=$PROFILE_UUID"
+            echo "profile_name=$PROFILE_NAME"
+            echo "team_id=$TEAM_ID"
+          } >> "$GITHUB_OUTPUT"
+
+          security find-identity -v -p codesigning "$KEYCHAIN_PATH"
 
       - name: Resolve Package Dependencies
         run: xcodebuild -project Tools-Kit.xcodeproj -scheme Tools-Kit -resolvePackageDependencies
 
       - name: Compile and Build .ipa
+        env:
+          PROFILE_UUID: ${{ steps.import.outputs.profile_uuid }}
+          TEAM_ID: ${{ steps.import.outputs.team_id }}
         run: |
+          set -euo pipefail
+
           mkdir -p upload
+          SIGNING_IDENTITY="$(security find-identity -v -p codesigning "$RUNNER_TEMP/build.keychain-db" | awk -F'"' '/Apple Development|iPhone Developer|Apple Distribution/ { print $2; exit }')"
+
+          if [ -z "$SIGNING_IDENTITY" ]; then
+            echo "Failed to detect a signing identity"
+            exit 1
+          fi
+
           xcodebuild -project Tools-Kit.xcodeproj \
             -scheme Tools-Kit \
             -configuration Release \
             -destination "generic/platform=iOS" \
             -sdk iphoneos \
-            -archivePath upload/Tools-Kit.xcarchive \
+            -archivePath "upload/Tools-Kit-erdis-iphone.xcarchive" \
             archive \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO
+            CODE_SIGN_STYLE=Manual \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID"
 
           mkdir -p upload/Payload
-          cp -R upload/Tools-Kit.xcarchive/Products/Applications/*.app upload/Payload/
+          cp -R upload/Tools-Kit-erdis-iphone.xcarchive/Products/Applications/*.app upload/Payload/
           cd upload
-          zip -r Tools-Kit.ipa Payload
+          zip -r "Tools-Kit-erdis-iphone.ipa" Payload
 
       - name: Verify IPA and Info.plist
         run: |
           ls -la upload/
-          test -f upload/Tools-Kit.ipa && echo "IPA created successfully"
+          test -f upload/Tools-Kit-erdis-iphone.ipa && echo "IPA created successfully"
 
           # Extract and validate Info.plist from the built app
           echo "Validating Info.plist in the .app bundle..."
@@ -92,10 +166,287 @@ jobs:
             exit 1
           fi
 
+      - name: Generate OTA plist and install link
+        id: ota
+        run: |
+          set -euo pipefail
+
+          APP_PATH="upload/Payload/Tools-Kit.app"
+          INFO_PLIST="$APP_PATH/Info.plist"
+
+          APP_NAME="$(/usr/libexec/PlistBuddy -c "Print CFBundleDisplayName" "$INFO_PLIST" 2>/dev/null || true)"
+          if [ -z "$APP_NAME" ]; then
+            APP_NAME="$(/usr/libexec/PlistBuddy -c "Print CFBundleName" "$INFO_PLIST" 2>/dev/null || true)"
+          fi
+          if [ -z "$APP_NAME" ]; then
+            APP_NAME="Tools-Kit"
+          fi
+
+          BUNDLE_ID="$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$INFO_PLIST")"
+          APP_VERSION="$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$INFO_PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$INFO_PLIST")"
+
+          RELEASE_TAG="v${APP_VERSION}-${GITHUB_RUN_NUMBER}"
+          ASSET_BASE_URL="https://github.com/${RELEASE_REPOSITORY}/releases/download/${RELEASE_TAG}"
+          SAFE_APP_NAME="$(echo "$APP_NAME" | tr ' ' '-' | tr -cd '[:alnum:]._-')"
+          if [ -z "$SAFE_APP_NAME" ]; then
+            SAFE_APP_NAME="Tools-Kit"
+          fi
+          IPA_NAME="${SAFE_APP_NAME}-erdis-iphone.ipa"
+          PLIST_NAME="${SAFE_APP_NAME}-erdis-iphone.plist"
+
+          cp "upload/Tools-Kit-erdis-iphone.ipa" "upload/${IPA_NAME}"
+          python3 Scripts/generate_ota_plist.py "upload/${PLIST_NAME}" "$BUNDLE_ID" "$APP_VERSION" "$APP_NAME" "${ASSET_BASE_URL}/${IPA_NAME}"
+
+          INSTALL_URL="itms-services://?action=download-manifest&url=${ASSET_BASE_URL}/${PLIST_NAME}"
+
+          {
+            echo "release_tag=${RELEASE_TAG}"
+            echo "ipa_name=${IPA_NAME}"
+            echo "plist_name=${PLIST_NAME}"
+            echo "install_url=${INSTALL_URL}"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## OTA Build Artifacts"
+            echo "- Device: Erdi's iPhone"
+            echo "- Release repository: ${RELEASE_REPOSITORY}"
+            echo "- Release tag: ${RELEASE_TAG}"
+            echo "- IPA URL: ${ASSET_BASE_URL}/${IPA_NAME}"
+            echo "- Plist URL: ${ASSET_BASE_URL}/${PLIST_NAME}"
+            echo "- Install link: ${INSTALL_URL}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          ls -la upload/
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: build-${{ github.run_number }}
-          name: SwiftCode Build ${{ github.run_number }}
-          files: upload/Tools-Kit.ipa
+          repository: ${{ env.RELEASE_REPOSITORY }}
+          tag_name: ${{ steps.ota.outputs.release_tag }}
+          name: Tools-Kit Build ${{ github.run_number }} (Erdi's iPhone)
+          append_body: true
+          files: |
+            upload/${{ steps.ota.outputs.ipa_name }}
+            upload/${{ steps.ota.outputs.plist_name }}
           generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+
+  build_dylans_iphone:
+    runs-on: macos-14
+    needs: build_erdis_iphone
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.2'
+
+      - name: Verify Xcode Version
+        run: |
+          xcodebuild -version
+          xcodebuild -showsdks
+
+      - name: Clean Build Environment
+        run: |
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+
+      - name: Verify signing secret wiring
+        env:
+          P12_SECRET: ${{ secrets.IOS_P12_BASE64_B }}
+          P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD_B }}
+          PROFILE_SECRET: ${{ secrets.IOS_MOBILEPROVISION_BASE64_B }}
+        run: |
+          if [ -n "$P12_SECRET" ]; then
+            echo "P12 secret is set (masked)"
+          else
+            echo "P12 secret is missing"
+            exit 1
+          fi
+
+          if [ -n "$P12_PASSWORD" ]; then
+            echo "P12 password is set (masked)"
+          else
+            echo "P12 password is missing"
+            exit 1
+          fi
+
+          if [ -n "$PROFILE_SECRET" ]; then
+            echo "Provisioning profile secret is set (masked)"
+          else
+            echo "Provisioning profile secret is missing"
+            exit 1
+          fi
+
+      - name: Import signing assets
+        id: import
+        env:
+          P12_SECRET: ${{ secrets.IOS_P12_BASE64_B }}
+          P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD_B }}
+          PROFILE_SECRET: ${{ secrets.IOS_MOBILEPROVISION_BASE64_B }}
+        run: |
+          set -euo pipefail
+
+          KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain-db"
+          KEYCHAIN_PASSWORD="temp-keychain-password"
+          CERT_PATH="$RUNNER_TEMP/signing-cert.p12"
+          PROFILE_PATH="$RUNNER_TEMP/profile.mobileprovision"
+          PROFILE_PLIST="$RUNNER_TEMP/profile.plist"
+          PROFILE_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH"
+
+          printf '%s' "$P12_SECRET" | base64 -D > "$CERT_PATH"
+          printf '%s' "$PROFILE_SECRET" | base64 -D > "$PROFILE_PATH"
+
+          security import "$CERT_PATH" -k "$KEYCHAIN_PATH" -P "$P12_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/xcodebuild
+
+          mkdir -p "$PROFILE_DIR"
+          security cms -D -i "$PROFILE_PATH" > "$PROFILE_PLIST"
+
+          PROFILE_UUID="$(/usr/libexec/PlistBuddy -c 'Print UUID' "$PROFILE_PLIST")"
+          PROFILE_NAME="$(/usr/libexec/PlistBuddy -c 'Print Name' "$PROFILE_PLIST")"
+          TEAM_ID="$(/usr/libexec/PlistBuddy -c 'Print TeamIdentifier:0' "$PROFILE_PLIST")"
+
+          if [ -z "$PROFILE_UUID" ] || [ -z "$PROFILE_NAME" ] || [ -z "$TEAM_ID" ]; then
+            echo "Failed to read provisioning profile metadata"
+            exit 1
+          fi
+
+          cp "$PROFILE_PATH" "$PROFILE_DIR/$PROFILE_UUID.mobileprovision"
+
+          {
+            echo "profile_uuid=$PROFILE_UUID"
+            echo "profile_name=$PROFILE_NAME"
+            echo "team_id=$TEAM_ID"
+          } >> "$GITHUB_OUTPUT"
+
+          security find-identity -v -p codesigning "$KEYCHAIN_PATH"
+
+      - name: Resolve Package Dependencies
+        run: xcodebuild -project Tools-Kit.xcodeproj -scheme Tools-Kit -resolvePackageDependencies
+
+      - name: Compile and Build .ipa
+        env:
+          PROFILE_UUID: ${{ steps.import.outputs.profile_uuid }}
+          TEAM_ID: ${{ steps.import.outputs.team_id }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p upload
+          SIGNING_IDENTITY="$(security find-identity -v -p codesigning "$RUNNER_TEMP/build.keychain-db" | awk -F'"' '/Apple Development|iPhone Developer|Apple Distribution/ { print $2; exit }')"
+
+          if [ -z "$SIGNING_IDENTITY" ]; then
+            echo "Failed to detect a signing identity"
+            exit 1
+          fi
+
+          xcodebuild -project Tools-Kit.xcodeproj \
+            -scheme Tools-Kit \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -sdk iphoneos \
+            -archivePath "upload/Tools-Kit-dylans-iphone.xcarchive" \
+            archive \
+            CODE_SIGN_STYLE=Manual \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID"
+
+          mkdir -p upload/Payload
+          cp -R upload/Tools-Kit-dylans-iphone.xcarchive/Products/Applications/*.app upload/Payload/
+          cd upload
+          zip -r "Tools-Kit-dylans-iphone.ipa" Payload
+
+      - name: Verify IPA and Info.plist
+        run: |
+          ls -la upload/
+          test -f upload/Tools-Kit-dylans-iphone.ipa && echo "IPA created successfully"
+
+          # Extract and validate Info.plist from the built app
+          echo "Validating Info.plist in the .app bundle..."
+          APP_PATH="upload/Payload/Tools-Kit.app"
+          if [ -f "$APP_PATH/Info.plist" ]; then
+            echo "Info.plist found in .app bundle"
+            /usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$APP_PATH/Info.plist" || echo "Warning: CFBundleIdentifier missing"
+            /usr/libexec/PlistBuddy -c "Print CFBundleExecutable" "$APP_PATH/Info.plist" || echo "Warning: CFBundleExecutable missing"
+            /usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$APP_PATH/Info.plist" || echo "Warning: CFBundleVersion missing"
+            /usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_PATH/Info.plist" || echo "Warning: CFBundleShortVersionString missing"
+            echo "Info.plist validation complete"
+          else
+            echo "ERROR: Info.plist not found in .app bundle!"
+            exit 1
+          fi
+
+      - name: Generate OTA plist and install link
+        id: ota
+        run: |
+          set -euo pipefail
+
+          APP_PATH="upload/Payload/Tools-Kit.app"
+          INFO_PLIST="$APP_PATH/Info.plist"
+
+          APP_NAME="$(/usr/libexec/PlistBuddy -c "Print CFBundleDisplayName" "$INFO_PLIST" 2>/dev/null || true)"
+          if [ -z "$APP_NAME" ]; then
+            APP_NAME="$(/usr/libexec/PlistBuddy -c "Print CFBundleName" "$INFO_PLIST" 2>/dev/null || true)"
+          fi
+          if [ -z "$APP_NAME" ]; then
+            APP_NAME="Tools-Kit"
+          fi
+
+          BUNDLE_ID="$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$INFO_PLIST")"
+          APP_VERSION="$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$INFO_PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$INFO_PLIST")"
+
+          RELEASE_TAG="v${APP_VERSION}-${GITHUB_RUN_NUMBER}"
+          ASSET_BASE_URL="https://github.com/${RELEASE_REPOSITORY}/releases/download/${RELEASE_TAG}"
+          SAFE_APP_NAME="$(echo "$APP_NAME" | tr ' ' '-' | tr -cd '[:alnum:]._-')"
+          if [ -z "$SAFE_APP_NAME" ]; then
+            SAFE_APP_NAME="Tools-Kit"
+          fi
+          IPA_NAME="${SAFE_APP_NAME}-dylans-iphone.ipa"
+          PLIST_NAME="${SAFE_APP_NAME}-dylans-iphone.plist"
+
+          cp "upload/Tools-Kit-dylans-iphone.ipa" "upload/${IPA_NAME}"
+          python3 Scripts/generate_ota_plist.py "upload/${PLIST_NAME}" "$BUNDLE_ID" "$APP_VERSION" "$APP_NAME" "${ASSET_BASE_URL}/${IPA_NAME}"
+
+          INSTALL_URL="itms-services://?action=download-manifest&url=${ASSET_BASE_URL}/${PLIST_NAME}"
+
+          {
+            echo "release_tag=${RELEASE_TAG}"
+            echo "ipa_name=${IPA_NAME}"
+            echo "plist_name=${PLIST_NAME}"
+            echo "install_url=${INSTALL_URL}"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## OTA Build Artifacts"
+            echo "- Device: Dylan's iPhone"
+            echo "- Release repository: ${RELEASE_REPOSITORY}"
+            echo "- Release tag: ${RELEASE_TAG}"
+            echo "- IPA URL: ${ASSET_BASE_URL}/${IPA_NAME}"
+            echo "- Plist URL: ${ASSET_BASE_URL}/${PLIST_NAME}"
+            echo "- Install link: ${INSTALL_URL}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          ls -la upload/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          repository: ${{ env.RELEASE_REPOSITORY }}
+          tag_name: ${{ steps.ota.outputs.release_tag }}
+          name: Tools-Kit Build ${{ github.run_number }} (Dylan's iPhone)
+          append_body: true
+          files: |
+            upload/${{ steps.ota.outputs.ipa_name }}
+            upload/${{ steps.ota.outputs.plist_name }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
