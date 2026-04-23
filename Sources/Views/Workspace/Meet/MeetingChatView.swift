@@ -26,7 +26,7 @@ struct MeetingChatView: View {
 
             if threads.isEmpty {
                 ContentUnavailableView(
-                    "No chat threads from Daily",
+                    "No Chat Threads",
                     systemImage: "message.badge",
                     description: Text("Threads appear only when received from live session events.")
                 )
@@ -63,7 +63,7 @@ struct MeetingChatView: View {
             }
 
             HStack {
-                TextField("New thread", text: $newThreadTitle)
+                TextField("New Thread", text: $newThreadTitle)
                     .textFieldStyle(.roundedBorder)
                 Button {
                     let title = newThreadTitle.trimmingCharacters(in: .whitespacesAndNewlines)

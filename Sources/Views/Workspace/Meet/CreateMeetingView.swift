@@ -16,18 +16,18 @@ struct CreateMeetingView: View {
                         .textInputAutocapitalization(.words)
                         .autocorrectionDisabled()
 
-                    Toggle("Schedule for later", isOn: $scheduleForLater)
+                    Toggle("Schedule For Later", isOn: $scheduleForLater)
 
                     if scheduleForLater {
                         DatePicker(
-                            "Scheduled time",
+                            "Scheduled Time",
                             selection: $scheduledAt,
                             in: Date()...,
                             displayedComponents: [.date, .hourAndMinute]
                         )
                     } else {
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("Generated Meeting ID")
+                            Text("Meeting ID")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                             if let meetingId = manager.currentSession?.meetingId {

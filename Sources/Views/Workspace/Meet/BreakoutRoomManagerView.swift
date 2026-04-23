@@ -7,7 +7,7 @@ struct BreakoutRoomManagerView: View {
     var body: some View {
         List {
             Section("Create Room") {
-                TextField("Room name", text: $newRoomName)
+                TextField("Room Name", text: $newRoomName)
                 Button("Create") {
                     let name = newRoomName.trimmingCharacters(in: .whitespacesAndNewlines)
                     guard !name.isEmpty else { return }
