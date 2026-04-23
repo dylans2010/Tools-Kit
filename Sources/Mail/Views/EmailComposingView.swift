@@ -170,7 +170,7 @@ struct EmailComposingView: View {
             }
             .sheet(isPresented: $showingLinkSheet) {
                 linkComposerSheet
-                    .presentationDetents([.medium])
+                    .presentationDetents([.small])
             }
             .sheet(isPresented: $showingScheduleSheet) {
                 scheduleSheet

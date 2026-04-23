@@ -5,7 +5,7 @@ struct AIWriteView: View {
 
     enum EmailType: String, CaseIterable, Identifiable {
         case general = "General"
-        case followup = "Follow-up"
+        case followup = "Follow Up"
         case request = "Request"
         case invitation = "Invitation"
         case response = "Response"
@@ -63,8 +63,8 @@ struct AIWriteView: View {
     @State private var errorMessage: String?
 
     private let quickPrompts = [
-        ("Project update", "Send a concise status update with blockers and next steps."),
-        ("Client follow-up", "Write a warm follow-up after a meeting with clear actions."),
+        ("Project Update", "Send a concise status update with blockers and next steps."),
+        ("Client Follow Up", "Write a warm follow-up after a meeting with clear actions."),
         ("Invitation", "Invite someone to a meeting with a clear agenda and timing."),
         ("Apology", "Draft a thoughtful apology that takes ownership and offers a fix.")
     ]
@@ -98,7 +98,7 @@ struct AIWriteView: View {
 
                 MailAILoadingView(
                     isActive: isGenerating,
-                    title: "Generating your email",
+                    title: "Generating Email",
                     subtitle: "Building a structured response with your selected tone"
                 )
             }
@@ -179,7 +179,7 @@ struct AIWriteView: View {
             .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
 
             HStack {
-                Text("Reading level")
+                Text("Reading Level")
                     .font(.caption.bold())
                 Spacer()
                 Picker("Reading Level", selection: $readingLevel) {
@@ -193,15 +193,15 @@ struct AIWriteView: View {
             .padding(.vertical, 8)
             .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
 
-            Toggle("Include subject line", isOn: $includeSubjectLine)
+            Toggle("Include Subject Line", isOn: $includeSubjectLine)
                 .font(.caption.bold())
-            Toggle("Include call-to-action", isOn: $includeCallToAction)
+            Toggle("Include Call To Action", isOn: $includeCallToAction)
                 .font(.caption.bold())
-            Toggle("Include bullet summary", isOn: $includeBulletSummary)
+            Toggle("Include Bullet Summary", isOn: $includeBulletSummary)
                 .font(.caption.bold())
-            Toggle("Include alternate subject", isOn: $includeAlternativeSubject)
+            Toggle("Include Alternate Subject", isOn: $includeAlternativeSubject)
                 .font(.caption.bold())
-            Toggle("Write polished closing", isOn: $includePolishedClosing)
+            Toggle("Write Polished Closing", isOn: $includePolishedClosing)
                 .font(.caption.bold())
         }
     }
