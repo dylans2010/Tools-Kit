@@ -7,7 +7,7 @@ struct BreakoutRoomsView: View {
     var body: some View {
         List {
             Section("Create Room") {
-                TextField("Room name", text: $newRoomName)
+                TextField("Room Name", text: $newRoomName)
                 Button("Create") {
                     let name = newRoomName.trimmingCharacters(in: .whitespacesAndNewlines)
                     guard !name.isEmpty else { return }
@@ -19,7 +19,7 @@ struct BreakoutRoomsView: View {
             Section("Rooms") {
                 if manager.breakoutRooms.isEmpty {
                     ContentUnavailableView(
-                        "No breakout rooms",
+                        "No Breakout Rooms",
                         systemImage: "square.3.layers.3d",
                         description: Text("No breakout rooms are available.")
                     )

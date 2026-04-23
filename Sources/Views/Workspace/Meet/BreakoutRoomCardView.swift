@@ -9,7 +9,7 @@ struct BreakoutRoomCardView: View {
             Text(room.name)
                 .font(.headline)
             if room.participantIds.isEmpty {
-                Text("No participants assigned")
+                Text("No Participants Assigned")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else {

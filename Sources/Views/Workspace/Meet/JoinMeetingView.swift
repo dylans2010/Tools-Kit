@@ -9,7 +9,7 @@ struct JoinMeetingView: View {
     var body: some View {
         List {
             Section {
-                TextField("Enter your name", text: $manager.displayNameInput)
+                TextField("Enter Your Name", text: $manager.displayNameInput)
                     .textInputAutocapitalization(.words)
                     .autocorrectionDisabled()
                     .onChange(of: manager.displayNameInput, initial: false) { _, newValue in
@@ -46,7 +46,7 @@ struct JoinMeetingView: View {
             Section {
                 if manager.scheduledMeetings.isEmpty {
                     ContentUnavailableView(
-                        "No scheduled meetings",
+                        "No Scheduled Meetings",
                         systemImage: "calendar.badge.exclamationmark",
                         description: Text("You have no meetings scheduled.")
                     )
@@ -60,7 +60,7 @@ struct JoinMeetingView: View {
                                     .font(.caption.monospaced())
                                     .foregroundStyle(.secondary)
                             } else {
-                                Text("ID: Pending activation")
+                                Text("ID: Pending Activation")
                                     .font(.caption.monospaced())
                                     .foregroundStyle(.secondary)
                             }

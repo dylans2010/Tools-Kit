@@ -25,7 +25,7 @@ struct AIAssistantPanelView: View {
             }
 
             if isLoading {
-                ProgressView("AI is processing…")
+                ProgressView("AI Is Processing…")
             }
 
             if !result.isEmpty {
