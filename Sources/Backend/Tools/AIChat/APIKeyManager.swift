@@ -67,6 +67,11 @@ class APIKeyManager {
 
     // MARK: - Private
 
+    private
+    func retrieveKey(service: APIKeyService) -> String? {
+        return getKey(for: service.rawValue)
+    }
+
     private func accountName(for providerID: String) -> String {
         "\(providerID)-api-key"
     }

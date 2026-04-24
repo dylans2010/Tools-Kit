@@ -7,6 +7,77 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		MS02000000000000000001F4 /* BinaryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01000000000000000001F4 /* BinaryManager.swift */; };
+		MS02000000000000000001F5 /* BuildLogDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01000000000000000001F5 /* BuildLogDecoder.swift */; };
+		MS02000000000000000001F6 /* CodingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01000000000000000001F6 /* CodingManager.swift */; };
+		MS02000000000000000001F7 /* CodeReaderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01000000000000000001F7 /* CodeReaderManager.swift */; };
+		MS02000000000000000001F8 /* GitHubImportManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01000000000000000001F8 /* GitHubImportManager.swift */; };
+		MS02000000000000000001F9 /* ToolbarActionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01000000000000000001F9 /* ToolbarActionManager.swift */; };
+		MS02000000000000000001FA /* AgentInterfaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01000000000000000001FA /* AgentInterfaceView.swift */; };
+		MS02000000000000000001FB /* ChatController.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01000000000000000001FB /* ChatController.swift */; };
+		MS02000000000000000001FC /* ChooseModelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01000000000000000001FC /* ChooseModelView.swift */; };
+		MS02000000000000000001FD /* LLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01000000000000000001FD /* LLMService.swift */; };
+		MS02000000000000000001FE /* AdvancedToolsSharedDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01000000000000000001FE /* AdvancedToolsSharedDesignSystem.swift */; };
+		MS02000000000000000001FF /* CodeIntelligenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01000000000000000001FF /* CodeIntelligenceEngine.swift */; };
+		MS0200000000000000000200 /* SymbolIndexingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000200 /* SymbolIndexingEngine.swift */; };
+		MS0200000000000000000201 /* WorkspaceProfilesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000201 /* WorkspaceProfilesManager.swift */; };
+		MS0200000000000000000202 /* AdvancedToolsDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000202 /* AdvancedToolsDesignSystem.swift */; };
+		MS0200000000000000000203 /* AssetManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000203 /* AssetManagerView.swift */; };
+		MS0200000000000000000204 /* CodeIntelligenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000204 /* CodeIntelligenceView.swift */; };
+		MS0200000000000000000205 /* CodeMetricsDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000205 /* CodeMetricsDashboardView.swift */; };
+		MS0200000000000000000206 /* CodeRefactoringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000206 /* CodeRefactoringView.swift */; };
+		MS0200000000000000000207 /* CrashLogAnalyzerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000207 /* CrashLogAnalyzerView.swift */; };
+		MS0200000000000000000208 /* DocumentationAIInsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000208 /* DocumentationAIInsightsView.swift */; };
+		MS0200000000000000000209 /* DocumentationBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000209 /* DocumentationBrowserView.swift */; };
+		MS020000000000000000020A /* ErrorDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000020A /* ErrorDiagnosticsView.swift */; };
+		MS020000000000000000020B /* ExtensionMarketplaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000020B /* ExtensionMarketplaceView.swift */; };
+		MS020000000000000000020C /* ProjectDependencyGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000020C /* ProjectDependencyGraphView.swift */; };
+		MS020000000000000000020D /* SearchDocumentationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000020D /* SearchDocumentationView.swift */; };
+		MS020000000000000000020E /* SnippetsLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000020E /* SnippetsLibraryView.swift */; };
+		MS020000000000000000020F /* SymbolIndexView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000020F /* SymbolIndexView.swift */; };
+		MS0200000000000000000210 /* WorkspaceProfilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000210 /* WorkspaceProfilesView.swift */; };
+		MS0200000000000000000211 /* PresetAgentSkills.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000211 /* PresetAgentSkills.swift */; };
+		MS0200000000000000000212 /* DebuggingToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000212 /* DebuggingToolsView.swift */; };
+		MS0200000000000000000213 /* TestToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000213 /* TestToolsView.swift */; };
+		MS0200000000000000000214 /* AgentMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000214 /* AgentMode.swift */; };
+		MS0200000000000000000215 /* AgentTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000215 /* AgentTool.swift */; };
+		MS0200000000000000000216 /* CodeIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000216 /* CodeIndex.swift */; };
+		MS0200000000000000000217 /* FileNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000217 /* FileNode.swift */; };
+		MS0200000000000000000218 /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000218 /* Project.swift */; };
+		MS0200000000000000000219 /* ProjectFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000219 /* ProjectFolder.swift */; };
+		MS020000000000000000021A /* ToolbarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000021A /* ToolbarItem.swift */; };
+		MS020000000000000000021B /* AgentMemory.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000021B /* AgentMemory.swift */; };
+		MS020000000000000000021C /* AgentMemoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000021C /* AgentMemoryManager.swift */; };
+		MS020000000000000000021D /* AgentSkillManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000021D /* AgentSkillManager.swift */; };
+		MS020000000000000000021E /* AgentTaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000021E /* AgentTaskManager.swift */; };
+		MS020000000000000000021F /* AgentTaskQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000021F /* AgentTaskQueue.swift */; };
+		MS0200000000000000000220 /* AgentToolService.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000220 /* AgentToolService.swift */; };
+		MS0200000000000000000221 /* CodeFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000221 /* CodeFormatter.swift */; };
+		MS0200000000000000000222 /* CodeIndexService.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000222 /* CodeIndexService.swift */; };
+		MS0200000000000000000223 /* CodeSuggestionsML.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000223 /* CodeSuggestionsML.swift */; };
+		MS0200000000000000000224 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000224 /* Color+Hex.swift */; };
+		MS0200000000000000000225 /* ExtensionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000225 /* ExtensionManager.swift */; };
+		MS0200000000000000000226 /* FolderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000226 /* FolderManager.swift */; };
+		MS0200000000000000000227 /* GitHubService.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000227 /* GitHubService.swift */; };
+		MS0200000000000000000228 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000228 /* KeychainService.swift */; };
+		MS0200000000000000000229 /* LocalModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000229 /* LocalModelManager.swift */; };
+		MS020000000000000000022A /* LogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000022A /* LogManager.swift */; };
+		MS020000000000000000022B /* PluginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000022B /* PluginManager.swift */; };
+		MS020000000000000000022C /* ProjectBuilderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000022C /* ProjectBuilderManager.swift */; };
+		MS020000000000000000022D /* ProjectFilesExtracter.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000022D /* ProjectFilesExtracter.swift */; };
+		MS020000000000000000022E /* ProjectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000022E /* ProjectManager.swift */; };
+		MS020000000000000000022F /* ProjectTemplateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000022F /* ProjectTemplateManager.swift */; };
+		MS0200000000000000000230 /* RepoPermManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000230 /* RepoPermManager.swift */; };
+		MS0200000000000000000231 /* SyntaxHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000231 /* SyntaxHighlighter.swift */; };
+		MS0200000000000000000232 /* ToolStubExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000232 /* ToolStubExtras.swift */; };
+		MS0200000000000000000233 /* ToolbarSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000233 /* ToolbarSettings.swift */; };
+		MS0200000000000000000234 /* ZipImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000234 /* ZipImporter.swift */; };
+		MS0200000000000000000235 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000235 /* AppSettings.swift */; };
+		MS0200000000000000000236 /* CodeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000236 /* CodeModels.swift */; };
+		MS0200000000000000000237 /* OfflineModelRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000237 /* OfflineModelRunner.swift */; };
+		MS0200000000000000000238 /* ToolStubExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000238 /* ToolStubExtras.swift */; };
+		MS0200000000000000000239 /* CodeMigrationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000239 /* CodeMigrationEngine.swift */; };
+		MS020000000000000000023A /* RepositoryCloneManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000023A /* RepositoryCloneManager.swift */; };
 		MS0200000000000000000013 /* ArchitectureMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000013 /* ArchitectureMapper.swift */; };
 		MS0200000000000000000014 /* MigrationPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000014 /* MigrationPlanner.swift */; };
 		MS0200000000000000000012 /* CodebaseAuditEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000012 /* CodebaseAuditEngine.swift */; };
@@ -667,6 +738,77 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		MS01000000000000000001F4 /* BinaryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Core/Binaries/BinaryManager.swift; sourceTree = "<group>"; };
+		MS01000000000000000001F5 /* BuildLogDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Core/BuildSystem/BuildLogDecoder.swift; sourceTree = "<group>"; };
+		MS01000000000000000001F6 /* CodingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Core/CodingManager.swift; sourceTree = "<group>"; };
+		MS01000000000000000001F7 /* CodeReaderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Core/FileSystem/CodeReaderManager.swift; sourceTree = "<group>"; };
+		MS01000000000000000001F8 /* GitHubImportManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Core/GitHub/GitHubImportManager.swift; sourceTree = "<group>"; };
+		MS01000000000000000001F9 /* ToolbarActionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Core/ToolbarActionManager.swift; sourceTree = "<group>"; };
+		MS01000000000000000001FA /* AgentInterfaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AI/AgentInterfaceView.swift; sourceTree = "<group>"; };
+		MS01000000000000000001FB /* ChatController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AI/ChatController.swift; sourceTree = "<group>"; };
+		MS01000000000000000001FC /* ChooseModelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AI/ChooseModelView.swift; sourceTree = "<group>"; };
+		MS01000000000000000001FD /* LLMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AI/LLMService.swift; sourceTree = "<group>"; };
+		MS01000000000000000001FE /* AdvancedToolsSharedDesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Engines/AdvancedToolsSharedDesignSystem.swift; sourceTree = "<group>"; };
+		MS01000000000000000001FF /* CodeIntelligenceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Engines/CodeIntelligenceEngine.swift; sourceTree = "<group>"; };
+		MS0100000000000000000200 /* SymbolIndexingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Engines/SymbolIndexingEngine.swift; sourceTree = "<group>"; };
+		MS0100000000000000000201 /* WorkspaceProfilesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Engines/WorkspaceProfilesManager.swift; sourceTree = "<group>"; };
+		MS0100000000000000000202 /* AdvancedToolsDesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Views/AdvancedToolsDesignSystem.swift; sourceTree = "<group>"; };
+		MS0100000000000000000203 /* AssetManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Views/AssetManagerView.swift; sourceTree = "<group>"; };
+		MS0100000000000000000204 /* CodeIntelligenceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Views/CodeIntelligenceView.swift; sourceTree = "<group>"; };
+		MS0100000000000000000205 /* CodeMetricsDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Views/CodeMetricsDashboardView.swift; sourceTree = "<group>"; };
+		MS0100000000000000000206 /* CodeRefactoringView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Views/CodeRefactoringView.swift; sourceTree = "<group>"; };
+		MS0100000000000000000207 /* CrashLogAnalyzerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Views/CrashLogAnalyzerView.swift; sourceTree = "<group>"; };
+		MS0100000000000000000208 /* DocumentationAIInsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Views/DocumentationAIInsightsView.swift; sourceTree = "<group>"; };
+		MS0100000000000000000209 /* DocumentationBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Views/DocumentationBrowserView.swift; sourceTree = "<group>"; };
+		MS010000000000000000020A /* ErrorDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Views/ErrorDiagnosticsView.swift; sourceTree = "<group>"; };
+		MS010000000000000000020B /* ExtensionMarketplaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Views/ExtensionMarketplaceView.swift; sourceTree = "<group>"; };
+		MS010000000000000000020C /* ProjectDependencyGraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Views/ProjectDependencyGraphView.swift; sourceTree = "<group>"; };
+		MS010000000000000000020D /* SearchDocumentationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Views/SearchDocumentationView.swift; sourceTree = "<group>"; };
+		MS010000000000000000020E /* SnippetsLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Views/SnippetsLibraryView.swift; sourceTree = "<group>"; };
+		MS010000000000000000020F /* SymbolIndexView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Views/SymbolIndexView.swift; sourceTree = "<group>"; };
+		MS0100000000000000000210 /* WorkspaceProfilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/AdvancedTools/Views/WorkspaceProfilesView.swift; sourceTree = "<group>"; };
+		MS0100000000000000000211 /* PresetAgentSkills.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/Agent Skills/PresetAgentSkills.swift; sourceTree = "<group>"; };
+		MS0100000000000000000212 /* DebuggingToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/Debug Tools/DebuggingToolsView.swift; sourceTree = "<group>"; };
+		MS0100000000000000000213 /* TestToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Features/Testing/Views/TestToolsView.swift; sourceTree = "<group>"; };
+		MS0100000000000000000214 /* AgentMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Models/AgentMode.swift; sourceTree = "<group>"; };
+		MS0100000000000000000215 /* AgentTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Models/AgentTool.swift; sourceTree = "<group>"; };
+		MS0100000000000000000216 /* CodeIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Models/CodeIndex.swift; sourceTree = "<group>"; };
+		MS0100000000000000000217 /* FileNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Models/FileNode.swift; sourceTree = "<group>"; };
+		MS0100000000000000000218 /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Models/Project.swift; sourceTree = "<group>"; };
+		MS0100000000000000000219 /* ProjectFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Models/ProjectFolder.swift; sourceTree = "<group>"; };
+		MS010000000000000000021A /* ToolbarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Models/ToolbarItem.swift; sourceTree = "<group>"; };
+		MS010000000000000000021B /* AgentMemory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/AgentMemory.swift; sourceTree = "<group>"; };
+		MS010000000000000000021C /* AgentMemoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/AgentMemoryManager.swift; sourceTree = "<group>"; };
+		MS010000000000000000021D /* AgentSkillManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/AgentSkillManager.swift; sourceTree = "<group>"; };
+		MS010000000000000000021E /* AgentTaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/AgentTaskManager.swift; sourceTree = "<group>"; };
+		MS010000000000000000021F /* AgentTaskQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/AgentTaskQueue.swift; sourceTree = "<group>"; };
+		MS0100000000000000000220 /* AgentToolService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/AgentToolService.swift; sourceTree = "<group>"; };
+		MS0100000000000000000221 /* CodeFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/CodeFormatter.swift; sourceTree = "<group>"; };
+		MS0100000000000000000222 /* CodeIndexService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/CodeIndexService.swift; sourceTree = "<group>"; };
+		MS0100000000000000000223 /* CodeSuggestionsML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/CodeSuggestionsML.swift; sourceTree = "<group>"; };
+		MS0100000000000000000224 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/Color+Hex.swift; sourceTree = "<group>"; };
+		MS0100000000000000000225 /* ExtensionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/ExtensionManager.swift; sourceTree = "<group>"; };
+		MS0100000000000000000226 /* FolderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/FolderManager.swift; sourceTree = "<group>"; };
+		MS0100000000000000000227 /* GitHubService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/GitHubService.swift; sourceTree = "<group>"; };
+		MS0100000000000000000228 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/KeychainService.swift; sourceTree = "<group>"; };
+		MS0100000000000000000229 /* LocalModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/LocalModelManager.swift; sourceTree = "<group>"; };
+		MS010000000000000000022A /* LogManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/LogManager.swift; sourceTree = "<group>"; };
+		MS010000000000000000022B /* PluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/PluginManager.swift; sourceTree = "<group>"; };
+		MS010000000000000000022C /* ProjectBuilderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/ProjectBuilderManager.swift; sourceTree = "<group>"; };
+		MS010000000000000000022D /* ProjectFilesExtracter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/ProjectFilesExtracter.swift; sourceTree = "<group>"; };
+		MS010000000000000000022E /* ProjectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/ProjectManager.swift; sourceTree = "<group>"; };
+		MS010000000000000000022F /* ProjectTemplateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/ProjectTemplateManager.swift; sourceTree = "<group>"; };
+		MS0100000000000000000230 /* RepoPermManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/RepoPermManager.swift; sourceTree = "<group>"; };
+		MS0100000000000000000231 /* SyntaxHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/SyntaxHighlighter.swift; sourceTree = "<group>"; };
+		MS0100000000000000000232 /* ToolStubExtras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/ToolStubExtras.swift; sourceTree = "<group>"; };
+		MS0100000000000000000233 /* ToolbarSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/ToolbarSettings.swift; sourceTree = "<group>"; };
+		MS0100000000000000000234 /* ZipImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/ZipImporter.swift; sourceTree = "<group>"; };
+		MS0100000000000000000235 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/AppSettings.swift; sourceTree = "<group>"; };
+		MS0100000000000000000236 /* CodeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/CodeModels.swift; sourceTree = "<group>"; };
+		MS0100000000000000000237 /* OfflineModelRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/OfflineModelRunner.swift; sourceTree = "<group>"; };
+		MS0100000000000000000238 /* ToolStubExtras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/Services/ToolStubExtras.swift; sourceTree = "<group>"; };
+		MS0100000000000000000239 /* CodeMigrationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Code/CodeMigrationEngine.swift; sourceTree = "<group>"; };
+		MS010000000000000000023A /* RepositoryCloneManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Code/RepositoryCloneManager.swift; sourceTree = "<group>"; };
 		MS0100000000000000000013 /* ArchitectureMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Code/ArchitectureMapper.swift; sourceTree = "<group>"; };
 		MS0100000000000000000014 /* MigrationPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Code/MigrationPlanner.swift; sourceTree = "<group>"; };
 		MS0100000000000000000012 /* CodebaseAuditEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Code/CodebaseAuditEngine.swift; sourceTree = "<group>"; };
@@ -1435,6 +1577,77 @@
 		8DF4BF69CF55A81CB6EBF3DE /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				MS01000000000000000001F4 /* BinaryManager.swift */,
+				MS01000000000000000001F5 /* BuildLogDecoder.swift */,
+				MS01000000000000000001F6 /* CodingManager.swift */,
+				MS01000000000000000001F7 /* CodeReaderManager.swift */,
+				MS01000000000000000001F8 /* GitHubImportManager.swift */,
+				MS01000000000000000001F9 /* ToolbarActionManager.swift */,
+				MS01000000000000000001FA /* AgentInterfaceView.swift */,
+				MS01000000000000000001FB /* ChatController.swift */,
+				MS01000000000000000001FC /* ChooseModelView.swift */,
+				MS01000000000000000001FD /* LLMService.swift */,
+				MS01000000000000000001FE /* AdvancedToolsSharedDesignSystem.swift */,
+				MS01000000000000000001FF /* CodeIntelligenceEngine.swift */,
+				MS0100000000000000000200 /* SymbolIndexingEngine.swift */,
+				MS0100000000000000000201 /* WorkspaceProfilesManager.swift */,
+				MS0100000000000000000202 /* AdvancedToolsDesignSystem.swift */,
+				MS0100000000000000000203 /* AssetManagerView.swift */,
+				MS0100000000000000000204 /* CodeIntelligenceView.swift */,
+				MS0100000000000000000205 /* CodeMetricsDashboardView.swift */,
+				MS0100000000000000000206 /* CodeRefactoringView.swift */,
+				MS0100000000000000000207 /* CrashLogAnalyzerView.swift */,
+				MS0100000000000000000208 /* DocumentationAIInsightsView.swift */,
+				MS0100000000000000000209 /* DocumentationBrowserView.swift */,
+				MS010000000000000000020A /* ErrorDiagnosticsView.swift */,
+				MS010000000000000000020B /* ExtensionMarketplaceView.swift */,
+				MS010000000000000000020C /* ProjectDependencyGraphView.swift */,
+				MS010000000000000000020D /* SearchDocumentationView.swift */,
+				MS010000000000000000020E /* SnippetsLibraryView.swift */,
+				MS010000000000000000020F /* SymbolIndexView.swift */,
+				MS0100000000000000000210 /* WorkspaceProfilesView.swift */,
+				MS0100000000000000000211 /* PresetAgentSkills.swift */,
+				MS0100000000000000000212 /* DebuggingToolsView.swift */,
+				MS0100000000000000000213 /* TestToolsView.swift */,
+				MS0100000000000000000214 /* AgentMode.swift */,
+				MS0100000000000000000215 /* AgentTool.swift */,
+				MS0100000000000000000216 /* CodeIndex.swift */,
+				MS0100000000000000000217 /* FileNode.swift */,
+				MS0100000000000000000218 /* Project.swift */,
+				MS0100000000000000000219 /* ProjectFolder.swift */,
+				MS010000000000000000021A /* ToolbarItem.swift */,
+				MS010000000000000000021B /* AgentMemory.swift */,
+				MS010000000000000000021C /* AgentMemoryManager.swift */,
+				MS010000000000000000021D /* AgentSkillManager.swift */,
+				MS010000000000000000021E /* AgentTaskManager.swift */,
+				MS010000000000000000021F /* AgentTaskQueue.swift */,
+				MS0100000000000000000220 /* AgentToolService.swift */,
+				MS0100000000000000000221 /* CodeFormatter.swift */,
+				MS0100000000000000000222 /* CodeIndexService.swift */,
+				MS0100000000000000000223 /* CodeSuggestionsML.swift */,
+				MS0100000000000000000224 /* Color+Hex.swift */,
+				MS0100000000000000000225 /* ExtensionManager.swift */,
+				MS0100000000000000000226 /* FolderManager.swift */,
+				MS0100000000000000000227 /* GitHubService.swift */,
+				MS0100000000000000000228 /* KeychainService.swift */,
+				MS0100000000000000000229 /* LocalModelManager.swift */,
+				MS010000000000000000022A /* LogManager.swift */,
+				MS010000000000000000022B /* PluginManager.swift */,
+				MS010000000000000000022C /* ProjectBuilderManager.swift */,
+				MS010000000000000000022D /* ProjectFilesExtracter.swift */,
+				MS010000000000000000022E /* ProjectManager.swift */,
+				MS010000000000000000022F /* ProjectTemplateManager.swift */,
+				MS0100000000000000000230 /* RepoPermManager.swift */,
+				MS0100000000000000000231 /* SyntaxHighlighter.swift */,
+				MS0100000000000000000232 /* ToolStubExtras.swift */,
+				MS0100000000000000000233 /* ToolbarSettings.swift */,
+				MS0100000000000000000234 /* ZipImporter.swift */,
+				MS0100000000000000000235 /* AppSettings.swift */,
+				MS0100000000000000000236 /* CodeModels.swift */,
+				MS0100000000000000000237 /* OfflineModelRunner.swift */,
+				MS0100000000000000000238 /* ToolStubExtras.swift */,
+				MS0100000000000000000239 /* CodeMigrationEngine.swift */,
+				MS010000000000000000023A /* RepositoryCloneManager.swift */,
 				MS0100000000000000000013 /* ArchitectureMapper.swift */,
 				MS0100000000000000000014 /* MigrationPlanner.swift */,
 				MS0100000000000000000012 /* CodebaseAuditEngine.swift */,
@@ -2135,6 +2348,77 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				MS02000000000000000001F4 /* BinaryManager.swift in Sources */,
+				MS02000000000000000001F5 /* BuildLogDecoder.swift in Sources */,
+				MS02000000000000000001F6 /* CodingManager.swift in Sources */,
+				MS02000000000000000001F7 /* CodeReaderManager.swift in Sources */,
+				MS02000000000000000001F8 /* GitHubImportManager.swift in Sources */,
+				MS02000000000000000001F9 /* ToolbarActionManager.swift in Sources */,
+				MS02000000000000000001FA /* AgentInterfaceView.swift in Sources */,
+				MS02000000000000000001FB /* ChatController.swift in Sources */,
+				MS02000000000000000001FC /* ChooseModelView.swift in Sources */,
+				MS02000000000000000001FD /* LLMService.swift in Sources */,
+				MS02000000000000000001FE /* AdvancedToolsSharedDesignSystem.swift in Sources */,
+				MS02000000000000000001FF /* CodeIntelligenceEngine.swift in Sources */,
+				MS0200000000000000000200 /* SymbolIndexingEngine.swift in Sources */,
+				MS0200000000000000000201 /* WorkspaceProfilesManager.swift in Sources */,
+				MS0200000000000000000202 /* AdvancedToolsDesignSystem.swift in Sources */,
+				MS0200000000000000000203 /* AssetManagerView.swift in Sources */,
+				MS0200000000000000000204 /* CodeIntelligenceView.swift in Sources */,
+				MS0200000000000000000205 /* CodeMetricsDashboardView.swift in Sources */,
+				MS0200000000000000000206 /* CodeRefactoringView.swift in Sources */,
+				MS0200000000000000000207 /* CrashLogAnalyzerView.swift in Sources */,
+				MS0200000000000000000208 /* DocumentationAIInsightsView.swift in Sources */,
+				MS0200000000000000000209 /* DocumentationBrowserView.swift in Sources */,
+				MS020000000000000000020A /* ErrorDiagnosticsView.swift in Sources */,
+				MS020000000000000000020B /* ExtensionMarketplaceView.swift in Sources */,
+				MS020000000000000000020C /* ProjectDependencyGraphView.swift in Sources */,
+				MS020000000000000000020D /* SearchDocumentationView.swift in Sources */,
+				MS020000000000000000020E /* SnippetsLibraryView.swift in Sources */,
+				MS020000000000000000020F /* SymbolIndexView.swift in Sources */,
+				MS0200000000000000000210 /* WorkspaceProfilesView.swift in Sources */,
+				MS0200000000000000000211 /* PresetAgentSkills.swift in Sources */,
+				MS0200000000000000000212 /* DebuggingToolsView.swift in Sources */,
+				MS0200000000000000000213 /* TestToolsView.swift in Sources */,
+				MS0200000000000000000214 /* AgentMode.swift in Sources */,
+				MS0200000000000000000215 /* AgentTool.swift in Sources */,
+				MS0200000000000000000216 /* CodeIndex.swift in Sources */,
+				MS0200000000000000000217 /* FileNode.swift in Sources */,
+				MS0200000000000000000218 /* Project.swift in Sources */,
+				MS0200000000000000000219 /* ProjectFolder.swift in Sources */,
+				MS020000000000000000021A /* ToolbarItem.swift in Sources */,
+				MS020000000000000000021B /* AgentMemory.swift in Sources */,
+				MS020000000000000000021C /* AgentMemoryManager.swift in Sources */,
+				MS020000000000000000021D /* AgentSkillManager.swift in Sources */,
+				MS020000000000000000021E /* AgentTaskManager.swift in Sources */,
+				MS020000000000000000021F /* AgentTaskQueue.swift in Sources */,
+				MS0200000000000000000220 /* AgentToolService.swift in Sources */,
+				MS0200000000000000000221 /* CodeFormatter.swift in Sources */,
+				MS0200000000000000000222 /* CodeIndexService.swift in Sources */,
+				MS0200000000000000000223 /* CodeSuggestionsML.swift in Sources */,
+				MS0200000000000000000224 /* Color+Hex.swift in Sources */,
+				MS0200000000000000000225 /* ExtensionManager.swift in Sources */,
+				MS0200000000000000000226 /* FolderManager.swift in Sources */,
+				MS0200000000000000000227 /* GitHubService.swift in Sources */,
+				MS0200000000000000000228 /* KeychainService.swift in Sources */,
+				MS0200000000000000000229 /* LocalModelManager.swift in Sources */,
+				MS020000000000000000022A /* LogManager.swift in Sources */,
+				MS020000000000000000022B /* PluginManager.swift in Sources */,
+				MS020000000000000000022C /* ProjectBuilderManager.swift in Sources */,
+				MS020000000000000000022D /* ProjectFilesExtracter.swift in Sources */,
+				MS020000000000000000022E /* ProjectManager.swift in Sources */,
+				MS020000000000000000022F /* ProjectTemplateManager.swift in Sources */,
+				MS0200000000000000000230 /* RepoPermManager.swift in Sources */,
+				MS0200000000000000000231 /* SyntaxHighlighter.swift in Sources */,
+				MS0200000000000000000232 /* ToolStubExtras.swift in Sources */,
+				MS0200000000000000000233 /* ToolbarSettings.swift in Sources */,
+				MS0200000000000000000234 /* ZipImporter.swift in Sources */,
+				MS0200000000000000000235 /* AppSettings.swift in Sources */,
+				MS0200000000000000000236 /* CodeModels.swift in Sources */,
+				MS0200000000000000000237 /* OfflineModelRunner.swift in Sources */,
+				MS0200000000000000000238 /* ToolStubExtras.swift in Sources */,
+				MS0200000000000000000239 /* CodeMigrationEngine.swift in Sources */,
+				MS020000000000000000023A /* RepositoryCloneManager.swift in Sources */,
 				MS0200000000000000000013 /* ArchitectureMapper.swift in Sources */,
 				MS0200000000000000000014 /* MigrationPlanner.swift in Sources */,
 				MS0200000000000000000012 /* CodebaseAuditEngine.swift in Sources */,
