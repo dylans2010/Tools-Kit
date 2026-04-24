@@ -1,0 +1,128 @@
+import SwiftUI
+
+/// Displays details of a specific pull request and allows merging.
+struct PRDetailView: View {
+    let owner: String
+    let repo: String
+    let pullRequest: GitHubPullRequest
+
+    @State private var comparison: GitHubComparison?
+    @State private var isMerging = false
+    @State private var errorMessage: String?
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                // Header
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(pullRequest.title)
+                        .font(.title2.bold())
+
+                    HStack {
+                        Capsule()
+                            .fill(pullRequest.state == "open" ? Color.green : Color.purple)
+                            .overlay(Text(pullRequest.state.capitalized).font(.caption.bold()).foregroundColor(.white))
+                            .frame(width: 60, height: 24)
+
+                        Text("\(pullRequest.user.login) wants to merge \(pullRequest.head.ref) into \(pullRequest.base.ref)")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding()
+                .background(Color(.secondarySystemGroupedBackground))
+                .cornerRadius(12)
+
+                if let body = pullRequest.body, !body.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Description").font(.headline)
+                        Text(body).font(.body)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .cornerRadius(12)
+                }
+
+                if let comparison = comparison {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Changes").font(.headline)
+                        HStack {
+                            StatBox(label: "Commits", value: "\(comparison.commits.count)", color: .blue)
+                            StatBox(label: "Files", value: "\(comparison.files.count)", color: .orange)
+                            StatBox(label: "Additions", value: "+\(comparison.files.reduce(0) { $0 + $1.additions })", color: .green)
+                        }
+                    }
+                    .padding()
+                }
+
+                if pullRequest.state == "open" {
+                    Button {
+                        mergePullRequest()
+                    } label: {
+                        if isMerging {
+                            ProgressView().tint(.white)
+                        } else {
+                            Text("Merge Pull Request")
+                                .font(.headline)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                    .disabled(isMerging)
+                    .padding(.horizontal)
+                }
+            }
+            .padding()
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("PR #\(pullRequest.number)")
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            fetchComparison()
+        }
+    }
+
+    private func fetchComparison() {
+        Task {
+            do {
+                self.comparison = try await GitHubAPIClient.shared.request(.compare(owner: owner, repo: repo, base: pullRequest.base.ref, head: pullRequest.head.sha))
+            } catch {}
+        }
+    }
+
+    private func mergePullRequest() {
+        isMerging = true
+        Task {
+            do {
+                try await GitHubAPIClient.shared.requestEmpty(.mergePR(owner: owner, repo: repo, number: pullRequest.number))
+                isMerging = false
+                dismiss()
+            } catch {
+                self.errorMessage = error.localizedDescription
+                isMerging = false
+            }
+        }
+    }
+}
+
+struct StatBox: View {
+    let label: String
+    let value: String
+    let color: Color
+
+    var body: some View {
+        VStack {
+            Text(value).font(.headline).foregroundColor(color)
+            Text(label).font(.caption).foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+        .background(Color(.secondarySystemGroupedBackground))
+        .cornerRadius(8)
+    }
+}

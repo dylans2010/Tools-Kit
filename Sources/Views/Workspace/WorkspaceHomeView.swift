@@ -11,6 +11,7 @@ struct WorkspaceHomeView: View {
         case tasks = "Tasks"
         case articles = "Articles"
         case files = "Files"
+        case github = "GitHub"
 
         var icon: String {
             switch self {
@@ -21,6 +22,7 @@ struct WorkspaceHomeView: View {
             case .tasks: return "checklist"
             case .articles: return "newspaper.fill"
             case .files: return "folder.fill"
+            case .github: return "terminal.fill"
             }
         }
     }
@@ -34,6 +36,7 @@ struct WorkspaceHomeView: View {
             tasksTab
             articlesTab
             filesTab
+            githubTab
         }
     }
 
@@ -106,6 +109,16 @@ struct WorkspaceHomeView: View {
         }
         .tag(WorkspaceTab.files)
     }
+
+    private var githubTab: some View {
+        NavigationStack {
+            GitHubRouterView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.github.rawValue, systemImage: WorkspaceTab.github.icon)
+        }
+        .tag(WorkspaceTab.github)
+    }
 }
 
 // MARK: - Dashboard View
@@ -124,6 +137,7 @@ struct WorkspaceDashboardView: View {
     @State private var showingSettings = false
 
     private let moreTools: [(title: String, icon: String, color: Color, destination: AnyView)] = [
+        ("GitHub", "terminal.fill", .black, AnyView(GitHubRouterView())),
         ("Calendar", "calendar", .green, AnyView(CalendarHomeView())),
         ("Habits", "flame.fill", .red, AnyView(WorkspaceHabitTrackerView())),
         ("Files", "folder.fill", .yellow, AnyView(FileManagementView())),
@@ -496,6 +510,89 @@ struct DashboardCard: View {
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
     }
+}
+
+struct GitHubRouterView: View {
+    @State private var isAuthenticated = false
+    @State private var isLoading = true
+    @State private var token: String = ""
+    @State private var showingAuth = false
+
+    var body: some View {
+        Group {
+            if isLoading {
+                ProgressView()
+            } else if isAuthenticated {
+                GitHubRepoListViewWrapper()
+            } else {
+                ContentUnavailableView(
+                    "GitHub Not Connected",
+                    systemImage: "terminal",
+                    description: Text("Connect your GitHub account using a Personal Access Token to manage your repositories.")
+                )
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button("Connect") {
+                            showingAuth = true
+                        }
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showingAuth) {
+            NavigationView {
+                Form {
+                    Section("Personal Access Token") {
+                        SecureField("Enter PAT", text: $token)
+                        Link("How to create a PAT?", destination: URL(string: "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token")!)
+                            .font(.caption)
+                    }
+                }
+                .navigationTitle("GitHub Auth")
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") { showingAuth = false }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Save") {
+                            saveToken()
+                        }
+                        .disabled(token.isEmpty)
+                    }
+                }
+            }
+        }
+        .task {
+            checkAuth()
+        }
+    }
+
+    private func checkAuth() {
+        Task {
+            let valid = await GitHubAuthManager.shared.validateToken()
+            await MainActor.run {
+                self.isAuthenticated = valid
+                self.isLoading = false
+            }
+        }
+    }
+
+    private func saveToken() {
+        GitHubAuthManager.shared.saveToken(token)
+        showingAuth = false
+        isLoading = true
+        checkAuth()
+    }
+}
+
+struct GitHubRepoListViewWrapper: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UINavigationController {
+        let repoListVC = RepoListViewController()
+        let nav = UINavigationController(rootViewController: repoListVC)
+        return nav
+    }
+
+    func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {}
 }
 
 struct WorkspaceMailRouterView: View {
