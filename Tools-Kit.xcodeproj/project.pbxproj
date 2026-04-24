@@ -7,6 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		GH0200000000000000000001 /* GitHubAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000001 /* GitHubAuthManager.swift */; };
+		GH0200000000000000000002 /* GitHubModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000002 /* GitHubModels.swift */; };
+		GH0200000000000000000003 /* GitHubEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000003 /* GitHubEndpoints.swift */; };
+		GH0200000000000000000004 /* GitHubAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000004 /* GitHubAPIClient.swift */; };
+		GH0200000000000000000005 /* RepoListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000005 /* RepoListViewController.swift */; };
+		GH0200000000000000000006 /* RepoDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000006 /* RepoDetailViewController.swift */; };
+		GH0200000000000000000007 /* BranchListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000007 /* BranchListView.swift */; };
+		GH0200000000000000000008 /* CommitHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000008 /* CommitHistoryView.swift */; };
+		GH0200000000000000000009 /* CommitComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000009 /* CommitComposerView.swift */; };
+		GH020000000000000000000A /* PullRequestsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH010000000000000000000A /* PullRequestsView.swift */; };
+		GH020000000000000000000B /* PRDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH010000000000000000000B /* PRDetailView.swift */; };
+		GH020000000000000000000C /* CreatePRView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH010000000000000000000C /* CreatePRView.swift */; };
+		GH020000000000000000000D /* RepoFileExplorerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH010000000000000000000D /* RepoFileExplorerView.swift */; };
+		GH020000000000000000000E /* FileEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH010000000000000000000E /* FileEditorView.swift */; };
+		GH020000000000000000000F /* DiffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH010000000000000000000F /* DiffView.swift */; };
 		ML0200000000000000000001 /* IMAPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000001 /* IMAPClient.swift */; };
 		ML0200000000000000000002 /* EmailMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000002 /* EmailMessage.swift */; };
 		ML0200000000000000000003 /* MailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000003 /* MailViewModel.swift */; };
@@ -637,6 +652,21 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		GH0100000000000000000001 /* GitHubAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubAuthManager.swift; sourceTree = "<group>"; };
+		GH0100000000000000000002 /* GitHubModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubModels.swift; sourceTree = "<group>"; };
+		GH0100000000000000000003 /* GitHubEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubEndpoints.swift; sourceTree = "<group>"; };
+		GH0100000000000000000004 /* GitHubAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubAPIClient.swift; sourceTree = "<group>"; };
+		GH0100000000000000000005 /* RepoListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/RepoListViewController.swift; sourceTree = "<group>"; };
+		GH0100000000000000000006 /* RepoDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/RepoDetailViewController.swift; sourceTree = "<group>"; };
+		GH0100000000000000000007 /* BranchListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/BranchListView.swift; sourceTree = "<group>"; };
+		GH0100000000000000000008 /* CommitHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/CommitHistoryView.swift; sourceTree = "<group>"; };
+		GH0100000000000000000009 /* CommitComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/CommitComposerView.swift; sourceTree = "<group>"; };
+		GH010000000000000000000A /* PullRequestsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/PullRequestsView.swift; sourceTree = "<group>"; };
+		GH010000000000000000000B /* PRDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/PRDetailView.swift; sourceTree = "<group>"; };
+		GH010000000000000000000C /* CreatePRView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/CreatePRView.swift; sourceTree = "<group>"; };
+		GH010000000000000000000D /* RepoFileExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/RepoFileExplorerView.swift; sourceTree = "<group>"; };
+		GH010000000000000000000E /* FileEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/FileEditorView.swift; sourceTree = "<group>"; };
+		GH010000000000000000000F /* DiffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/DiffView.swift; sourceTree = "<group>"; };
 		ML0100000000000000000001 /* IMAPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/IMAPClient.swift; sourceTree = "<group>"; };
 		ML0100000000000000000002 /* EmailMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/EmailMessage.swift; sourceTree = "<group>"; };
 		ML0100000000000000000003 /* MailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/MailViewModel.swift; sourceTree = "<group>"; };
@@ -1375,6 +1405,21 @@
 		8DF4BF69CF55A81CB6EBF3DE /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				GH0100000000000000000001 /* GitHubAuthManager.swift */,
+				GH0100000000000000000002 /* GitHubModels.swift */,
+				GH0100000000000000000003 /* GitHubEndpoints.swift */,
+				GH0100000000000000000004 /* GitHubAPIClient.swift */,
+				GH0100000000000000000005 /* RepoListViewController.swift */,
+				GH0100000000000000000006 /* RepoDetailViewController.swift */,
+				GH0100000000000000000007 /* BranchListView.swift */,
+				GH0100000000000000000008 /* CommitHistoryView.swift */,
+				GH0100000000000000000009 /* CommitComposerView.swift */,
+				GH010000000000000000000A /* PullRequestsView.swift */,
+				GH010000000000000000000B /* PRDetailView.swift */,
+				GH010000000000000000000C /* CreatePRView.swift */,
+				GH010000000000000000000D /* RepoFileExplorerView.swift */,
+				GH010000000000000000000E /* FileEditorView.swift */,
+				GH010000000000000000000F /* DiffView.swift */,
 				ML0100000000000000000001 /* IMAPClient.swift */,
 				ML0100000000000000000002 /* EmailMessage.swift */,
 				ML0100000000000000000003 /* MailViewModel.swift */,
@@ -2045,6 +2090,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				GH0200000000000000000001 /* GitHubAuthManager.swift in Sources */,
+				GH0200000000000000000002 /* GitHubModels.swift in Sources */,
+				GH0200000000000000000003 /* GitHubEndpoints.swift in Sources */,
+				GH0200000000000000000004 /* GitHubAPIClient.swift in Sources */,
+				GH0200000000000000000005 /* RepoListViewController.swift in Sources */,
+				GH0200000000000000000006 /* RepoDetailViewController.swift in Sources */,
+				GH0200000000000000000007 /* BranchListView.swift in Sources */,
+				GH0200000000000000000008 /* CommitHistoryView.swift in Sources */,
+				GH0200000000000000000009 /* CommitComposerView.swift in Sources */,
+				GH020000000000000000000A /* PullRequestsView.swift in Sources */,
+				GH020000000000000000000B /* PRDetailView.swift in Sources */,
+				GH020000000000000000000C /* CreatePRView.swift in Sources */,
+				GH020000000000000000000D /* RepoFileExplorerView.swift in Sources */,
+				GH020000000000000000000E /* FileEditorView.swift in Sources */,
+				GH020000000000000000000F /* DiffView.swift in Sources */,
 				ML0200000000000000000001 /* IMAPClient.swift in Sources */,
 				ML0200000000000000000002 /* EmailMessage.swift in Sources */,
 				ML0200000000000000000003 /* MailViewModel.swift in Sources */,
