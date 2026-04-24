@@ -16,78 +16,72 @@ env:
 jobs:
   build:
     runs-on: macos-14
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: 'true'
-      
+          submodules: true
+
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '16.2'
 
-      - name: Verify Xcode Version
+      - name: Verify Xcode
         run: |
           xcodebuild -version
           xcodebuild -showsdks
 
-      - name: Clean Build Environment
+      - name: Clean DerivedData
+        run: rm -rf ~/Library/Developer/Xcode/DerivedData
+
+      - name: Verify CI secrets
         run: |
-          rm -rf ~/Library/Developer/Xcode/DerivedData
+          [ -n "$CLIENT_SECRET" ] && echo "CLIENT_SECRET OK" || echo "CLIENT_SECRET missing"
+          [ -n "$SECRET_ID" ] && echo "SECRET_ID OK" || echo "SECRET_ID missing"
 
-      - name: Verify CI secret wiring
+      - name: Resolve Swift Packages
         run: |
-          if [ -n "$CLIENT_SECRET" ]; then
-            echo "CLIENT_SECRET is set (masked)"
-          else
-            echo "CLIENT_SECRET is missing"
-          fi
+          xcodebuild \
+            -project Tools-Kit.xcodeproj \
+            -scheme Tools-Kit \
+            -destination 'generic/platform=iOS' \
+            -resolvePackageDependencies
 
-          if [ -n "$SECRET_ID" ]; then
-            echo "SECRET_ID is set (masked)"
-          else
-            echo "SECRET_ID is missing"
-          fi
-
-      - name: Resolve Package Dependencies
-        run: xcodebuild -project Tools-Kit.xcodeproj -scheme Tools-Kit -resolvePackageDependencies
-
-      - name: Swift build (env check)
+      - name: Archive (iOS ONLY)
         run: |
-          if [ -f Package.swift ]; then
-            swift build
-          else
-            echo "No Package.swift found; skipping swift build for Xcode project workflow."
-          fi
+          mkdir -p build
 
-      - name: Compile and Build .ipa
-        run: |
-          mkdir -p upload
-          xcodebuild -project Tools-Kit.xcodeproj \
+          xcodebuild \
+            -project Tools-Kit.xcodeproj \
             -scheme Tools-Kit \
             -configuration Release \
-            -destination "generic/platform=iOS" \
+            -destination 'generic/platform=iOS' \
             -sdk iphoneos \
-            -archivePath upload/Tools-Kit.xcarchive \
+            -archivePath build/Tools-Kit.xcarchive \
             archive \
+            ONLY_ACTIVE_ARCH=NO \
             CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO
+            CODE_SIGNING_REQUIRED=NO \
+            SKIP_INSTALL=NO
 
-          mkdir -p upload/Payload
-          cp -R upload/Tools-Kit.xcarchive/Products/Applications/*.app upload/Payload/
-          cd upload
+      - name: Package IPA
+        run: |
+          mkdir -p build/Payload
+          cp -R build/Tools-Kit.xcarchive/Products/Applications/*.app build/Payload/
+          cd build
           zip -r Tools-Kit.ipa Payload
 
       - name: Verify IPA
         run: |
-          ls -la upload/
-          test -f upload/Tools-Kit.ipa && echo "IPA created successfully"
+          ls -la build/
+          test -f build/Tools-Kit.ipa && echo "IPA created"
 
-      - name: Create GitHub Release
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
           name: Tools-Kit Build ${{ github.run_number }}
-          files: upload/Tools-Kit.ipa
+          files: build/Tools-Kit.ipa
           generate_release_notes: true
