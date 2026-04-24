@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AI0200000000000000000005 /* JulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000005 /* JulesProvider.swift */; };
+		AI0200000000000000000006 /* JulesSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000006 /* JulesSessionManager.swift */; };
+		MS0200000000000000000008 /* CodeAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000008 /* CodeAnalyzer.swift */; };
+		MS0200000000000000000009 /* CodeAuditEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000009 /* CodeAuditEngine.swift */; };
+		MS020000000000000000000A /* CodeStructureMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000000A /* CodeStructureMapper.swift */; };
+		MS020000000000000000000B /* CodeImportPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000000B /* CodeImportPlanner.swift */; };
+		MS020000000000000000000C /* CodeTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000000C /* CodeTransformer.swift */; };
+		MS020000000000000000000D /* CodeHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000000D /* CodeHomeView.swift */; };
+		MS020000000000000000000E /* CodeAuditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000000E /* CodeAuditView.swift */; };
+		MS020000000000000000000F /* CodeImportPlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS010000000000000000000F /* CodeImportPlanView.swift */; };
+		MS0200000000000000000010 /* CodeGenerationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000010 /* CodeGenerationView.swift */; };
 		GH0200000000000000000001 /* GitHubAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000001 /* GitHubAuthManager.swift */; };
 		GH0200000000000000000002 /* GitHubModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000002 /* GitHubModels.swift */; };
 		GH0200000000000000000003 /* GitHubEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000003 /* GitHubEndpoints.swift */; };
@@ -713,6 +724,8 @@
 		AI0100000000000000000002 /* AIWriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/AIWriteView.swift; sourceTree = "<group>"; };
 		AI0100000000000000000003 /* MailAILoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailAILoadingView.swift; sourceTree = "<group>"; };
 		AI0100000000000000000004 /* MailAITitleHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailAITitleHeader.swift; sourceTree = "<group>"; };
+		AI0100000000000000000005 /* JulesProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Tools/AIChat/Providers/JulesProvider.swift; sourceTree = "<group>"; };
+		AI0100000000000000000006 /* JulesSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Services/JulesSessionManager.swift; sourceTree = "<group>"; };
 		7FB1750052D346DFBBD0A71D /* MailContentRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Rendering/MailContentRenderer.swift; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF00 /* MailMIMEParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Rendering/MailMIMEParser.swift; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF02 /* MailContentDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Rendering/MailContentDecoder.swift; sourceTree = "<group>"; };
@@ -723,6 +736,15 @@
 		DE11EA6244764DF7BD1850B1 /* MailKeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Services/MailKeychainManager.swift; sourceTree = "<group>"; };
 		MS0100000000000000000006 /* MailNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Services/MailNotificationManager.swift; sourceTree = "<group>"; };
 		MS0100000000000000000007 /* InboxAIAnalysisCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Services/InboxAIAnalysisCache.swift; sourceTree = "<group>"; };
+		MS0100000000000000000008 /* CodeAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/CodeAnalyzer.swift; sourceTree = "<group>"; };
+		MS0100000000000000000009 /* CodeAuditEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/CodeAuditEngine.swift; sourceTree = "<group>"; };
+		MS010000000000000000000A /* CodeStructureMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/CodeStructureMapper.swift; sourceTree = "<group>"; };
+		MS010000000000000000000B /* CodeImportPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/CodeImportPlanner.swift; sourceTree = "<group>"; };
+		MS010000000000000000000C /* CodeTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Code/CodeTransformer.swift; sourceTree = "<group>"; };
+		MS010000000000000000000D /* CodeHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Code/CodeHomeView.swift; sourceTree = "<group>"; };
+		MS010000000000000000000E /* CodeAuditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Code/CodeAuditView.swift; sourceTree = "<group>"; };
+		MS010000000000000000000F /* CodeImportPlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Code/CodeImportPlanView.swift; sourceTree = "<group>"; };
+		MS0100000000000000000010 /* CodeGenerationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Code/CodeGenerationView.swift; sourceTree = "<group>"; };
 		E5AEBD1200A44657A5C545F3 /* FileModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Files/FileModels.swift"; sourceTree = "<group>"; };
 		CF9A900AAA944545B9AA0217 /* FileFolderBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Files/FileFolderBackend.swift"; sourceTree = "<group>"; };
 		10D892907BAC409D9E8D7684 /* FileFolderContentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Files/FileFolderContentsView.swift"; sourceTree = "<group>"; };
@@ -1420,6 +1442,17 @@
 				GH010000000000000000000D /* RepoFileExplorerView.swift */,
 				GH010000000000000000000E /* FileEditorView.swift */,
 				GH010000000000000000000F /* DiffView.swift */,
+				AI0100000000000000000005 /* JulesProvider.swift */,
+				AI0100000000000000000006 /* JulesSessionManager.swift */,
+				MS0100000000000000000008 /* CodeAnalyzer.swift */,
+				MS0100000000000000000009 /* CodeAuditEngine.swift */,
+				MS010000000000000000000A /* CodeStructureMapper.swift */,
+				MS010000000000000000000B /* CodeImportPlanner.swift */,
+				MS010000000000000000000C /* CodeTransformer.swift */,
+				MS010000000000000000000D /* CodeHomeView.swift */,
+				MS010000000000000000000E /* CodeAuditView.swift */,
+				MS010000000000000000000F /* CodeImportPlanView.swift */,
+				MS0100000000000000000010 /* CodeGenerationView.swift */,
 				ML0100000000000000000001 /* IMAPClient.swift */,
 				ML0100000000000000000002 /* EmailMessage.swift */,
 				ML0100000000000000000003 /* MailViewModel.swift */,
@@ -2105,6 +2138,17 @@
 				GH020000000000000000000D /* RepoFileExplorerView.swift in Sources */,
 				GH020000000000000000000E /* FileEditorView.swift in Sources */,
 				GH020000000000000000000F /* DiffView.swift in Sources */,
+				AI0200000000000000000005 /* JulesProvider.swift in Sources */,
+				AI0200000000000000000006 /* JulesSessionManager.swift in Sources */,
+				MS0200000000000000000008 /* CodeAnalyzer.swift in Sources */,
+				MS0200000000000000000009 /* CodeAuditEngine.swift in Sources */,
+				MS020000000000000000000A /* CodeStructureMapper.swift in Sources */,
+				MS020000000000000000000B /* CodeImportPlanner.swift in Sources */,
+				MS020000000000000000000C /* CodeTransformer.swift in Sources */,
+				MS020000000000000000000D /* CodeHomeView.swift in Sources */,
+				MS020000000000000000000E /* CodeAuditView.swift in Sources */,
+				MS020000000000000000000F /* CodeImportPlanView.swift in Sources */,
+				MS0200000000000000000010 /* CodeGenerationView.swift in Sources */,
 				ML0200000000000000000001 /* IMAPClient.swift in Sources */,
 				ML0200000000000000000002 /* EmailMessage.swift in Sources */,
 				ML0200000000000000000003 /* MailViewModel.swift in Sources */,
