@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		MS0200000000000000000013 /* ArchitectureMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000013 /* ArchitectureMapper.swift */; };
+		MS0200000000000000000014 /* MigrationPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000014 /* MigrationPlanner.swift */; };
+		MS0200000000000000000012 /* CodebaseAuditEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000012 /* CodebaseAuditEngine.swift */; };
+		MS0200000000000000000016 /* CodeExecutionBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000016 /* CodeExecutionBridge.swift */; };
 		AI0200000000000000000005 /* JulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000005 /* JulesProvider.swift */; };
 		AI0200000000000000000006 /* JulesSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000006 /* JulesSessionManager.swift */; };
 		MS0200000000000000000008 /* CodeAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000008 /* CodeAnalyzer.swift */; };
@@ -663,6 +667,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		MS0100000000000000000013 /* ArchitectureMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Code/ArchitectureMapper.swift; sourceTree = "<group>"; };
+		MS0100000000000000000014 /* MigrationPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Code/MigrationPlanner.swift; sourceTree = "<group>"; };
+		MS0100000000000000000012 /* CodebaseAuditEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Code/CodebaseAuditEngine.swift; sourceTree = "<group>"; };
+		MS0100000000000000000016 /* CodeExecutionBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Code/CodeExecutionBridge.swift; sourceTree = "<group>"; };
 		GH0100000000000000000001 /* GitHubAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubAuthManager.swift; sourceTree = "<group>"; };
 		GH0100000000000000000002 /* GitHubModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubModels.swift; sourceTree = "<group>"; };
 		GH0100000000000000000003 /* GitHubEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubEndpoints.swift; sourceTree = "<group>"; };
@@ -1427,6 +1435,10 @@
 		8DF4BF69CF55A81CB6EBF3DE /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				MS0100000000000000000013 /* ArchitectureMapper.swift */,
+				MS0100000000000000000014 /* MigrationPlanner.swift */,
+				MS0100000000000000000012 /* CodebaseAuditEngine.swift */,
+				MS0100000000000000000016 /* CodeExecutionBridge.swift */,
 				GH0100000000000000000001 /* GitHubAuthManager.swift */,
 				GH0100000000000000000002 /* GitHubModels.swift */,
 				GH0100000000000000000003 /* GitHubEndpoints.swift */,
@@ -2123,6 +2135,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				MS0200000000000000000013 /* ArchitectureMapper.swift in Sources */,
+				MS0200000000000000000014 /* MigrationPlanner.swift in Sources */,
+				MS0200000000000000000012 /* CodebaseAuditEngine.swift in Sources */,
+				MS0200000000000000000016 /* CodeExecutionBridge.swift in Sources */,
 				GH0200000000000000000001 /* GitHubAuthManager.swift in Sources */,
 				GH0200000000000000000002 /* GitHubModels.swift in Sources */,
 				GH0200000000000000000003 /* GitHubEndpoints.swift in Sources */,
