@@ -83,11 +83,27 @@ jobs:
           security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security list-keychains -d user -s "$KEYCHAIN_PATH"
+          security default-keychain -s "$KEYCHAIN_PATH"
 
-          printf '%s' "$P12_SECRET" | base64 -D > "$CERT_PATH"
-          printf '%s' "$PROFILE_SECRET" | base64 -D > "$PROFILE_PATH"
+          printf '%s' "$P12_SECRET" | tr -d '\r\n ' | base64 --decode > "$CERT_PATH"
+          printf '%s' "$PROFILE_SECRET" | tr -d '\r\n ' | base64 --decode > "$PROFILE_PATH"
 
-          security import "$CERT_PATH" -k "$KEYCHAIN_PATH" -P "$P12_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/xcodebuild
+          ls -la "$CERT_PATH" "$PROFILE_PATH"
+
+          if ! test -s "$CERT_PATH"; then
+            echo "Decoded .p12 is empty. Fix the IOS_P12_BASE64_A secret."
+            exit 1
+          fi
+
+          if ! openssl pkcs12 -in "$CERT_PATH" -passin env:P12_PASSWORD -info -noout 2>/dev/null; then
+            echo "Decoded .p12 is not a valid PKCS#12 file or the password is wrong."
+            exit 1
+          fi
+
+          security import "$CERT_PATH" -k "$KEYCHAIN_PATH" -P "$P12_PASSWORD" -A
+
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s \
+            -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
 
           mkdir -p "$PROFILE_DIR"
           security cms -D -i "$PROFILE_PATH" > "$PROFILE_PLIST"
@@ -302,11 +318,27 @@ jobs:
           security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security list-keychains -d user -s "$KEYCHAIN_PATH"
+          security default-keychain -s "$KEYCHAIN_PATH"
 
-          printf '%s' "$P12_SECRET" | base64 -D > "$CERT_PATH"
-          printf '%s' "$PROFILE_SECRET" | base64 -D > "$PROFILE_PATH"
+          printf '%s' "$P12_SECRET" | tr -d '\r\n ' | base64 --decode > "$CERT_PATH"
+          printf '%s' "$PROFILE_SECRET" | tr -d '\r\n ' | base64 --decode > "$PROFILE_PATH"
 
-          security import "$CERT_PATH" -k "$KEYCHAIN_PATH" -P "$P12_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/xcodebuild
+          ls -la "$CERT_PATH" "$PROFILE_PATH"
+
+          if ! test -s "$CERT_PATH"; then
+            echo "Decoded .p12 is empty. Fix the IOS_P12_BASE64_B secret."
+            exit 1
+          fi
+
+          if ! openssl pkcs12 -in "$CERT_PATH" -passin env:P12_PASSWORD -info -noout 2>/dev/null; then
+            echo "Decoded .p12 is not a valid PKCS#12 file or the password is wrong."
+            exit 1
+          fi
+
+          security import "$CERT_PATH" -k "$KEYCHAIN_PATH" -P "$P12_PASSWORD" -A
+
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s \
+            -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
 
           mkdir -p "$PROFILE_DIR"
           security cms -D -i "$PROFILE_PATH" > "$PROFILE_PLIST"
