@@ -719,6 +719,7 @@
 		B113D9105FA74945ADCC97D4 /* abort_task.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCAB33AF454749D08BE4DB43 /* abort_task.swift */; };
 		8F01441574AC40D8BCF48A6A /* request_user_input.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D09A9CEEFEC47B4AB7BA4A8 /* request_user_input.swift */; };
 		A45AF0D374734800825C931C /* run_tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E12C05D9403C4CBAA3F00485 /* run_tests.swift */; };
+		B7C511D7D973477E8DCB0806 /* AuditToolsTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CEE13DE3FF453389279C80 /* AuditToolsTool.swift */; };
 		4BA9ABA9C6ED496C90C1ACED /* read_file.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF93B0EB90474097AFCD9094 /* read_file.swift */; };
 		BBD5D4F629A04A588229C26A /* run_command.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFF25B4375F4E95BC18F0FF /* run_command.swift */; };
 		7DB643A072514610BE571108 /* move_file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 083BC3A2ED564FCB9C9F3AEE /* move_file.swift */; };
@@ -1458,6 +1459,7 @@
 		FCAB33AF454749D08BE4DB43 /* abort_task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/abort_task.swift; sourceTree = "<group>"; };
 		2D09A9CEEFEC47B4AB7BA4A8 /* request_user_input.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/request_user_input.swift; sourceTree = "<group>"; };
 		E12C05D9403C4CBAA3F00485 /* run_tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/run_tests.swift; sourceTree = "<group>"; };
+		03CEE13DE3FF453389279C80 /* AuditToolsTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/AuditToolsTool.swift; sourceTree = "<group>"; };
 		DF93B0EB90474097AFCD9094 /* read_file.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/read_file.swift; sourceTree = "<group>"; };
 		8BFF25B4375F4E95BC18F0FF /* run_command.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/run_command.swift; sourceTree = "<group>"; };
 		083BC3A2ED564FCB9C9F3AEE /* move_file.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/move_file.swift; sourceTree = "<group>"; };
@@ -2250,6 +2252,7 @@
 				FCAB33AF454749D08BE4DB43 /* abort_task.swift */,
 				2D09A9CEEFEC47B4AB7BA4A8 /* request_user_input.swift */,
 				E12C05D9403C4CBAA3F00485 /* run_tests.swift */,
+				03CEE13DE3FF453389279C80 /* AuditToolsTool.swift */,
 				DF93B0EB90474097AFCD9094 /* read_file.swift */,
 				8BFF25B4375F4E95BC18F0FF /* run_command.swift */,
 				083BC3A2ED564FCB9C9F3AEE /* move_file.swift */,
@@ -3085,6 +3088,7 @@
 				B113D9105FA74945ADCC97D4 /* abort_task.swift in Sources */,
 				8F01441574AC40D8BCF48A6A /* request_user_input.swift in Sources */,
 				A45AF0D374734800825C931C /* run_tests.swift in Sources */,
+				B7C511D7D973477E8DCB0806 /* AuditToolsTool.swift in Sources */,
 				4BA9ABA9C6ED496C90C1ACED /* read_file.swift in Sources */,
 				BBD5D4F629A04A588229C26A /* run_command.swift in Sources */,
 				7DB643A072514610BE571108 /* move_file.swift in Sources */,

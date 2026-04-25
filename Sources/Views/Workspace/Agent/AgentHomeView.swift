@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AgentHomeView: View {
     @StateObject private var sessionManager = AgentSessionManager.shared
+    @StateObject private var settingsManager = AIChatSettingsManager.shared
     @State private var showingNewTask = false
     @State private var showingSettings = false
 
@@ -53,7 +54,7 @@ struct AgentHomeView: View {
             AgentPromptView(owner: owner, repo: repo)
         }
         .sheet(isPresented: $showingSettings) {
-            AIChatSettingsView()
+            AIChatSettingsView(settings: $settingsManager.settings)
         }
         .task {
             await sessionManager.fetchSessions()
