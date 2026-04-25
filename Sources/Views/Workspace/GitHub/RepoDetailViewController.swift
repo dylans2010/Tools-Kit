@@ -45,7 +45,7 @@ final class RepoDetailViewController: UIViewController {
 
     private func setupCollectionView() {
         let layout = UICollectionViewCompositionalLayout { sectionIndex, layoutEnvironment in
-            var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+            var config = UICollectionLayoutListConfiguration(appearance: .plain)
             config.headerMode = .supplementary
             return NSCollectionLayoutSection.list(using: config, layoutEnvironment: layoutEnvironment)
         }
@@ -72,7 +72,7 @@ extension RepoDetailViewController: UICollectionViewDataSource {
         switch section {
         case .header: return 1
         case .stats: return 3
-        case .actions: return 4
+        case .actions: return 5
         }
     }
 
@@ -105,11 +105,10 @@ extension RepoDetailViewController: UICollectionViewDataSource {
                 content.imageProperties.tintColor = .systemPurple
             }
         case .actions:
-            let actions = ["Branches", "Commits", "Pull Requests", "File Explorer"]
-            let icons = ["arrow.branch", "clock.fill", "tray.full.fill", "folder.fill"]
+            let actions = ["Branches", "Commits", "Pull Requests", "File Explorer", "Agent Mode"]
+            let icons = ["arrow.branch", "clock.fill", "tray.full.fill", "folder.fill", "sparkles"]
             content.text = actions[indexPath.item]
             content.image = UIImage(systemName: icons[indexPath.item])
-            cell.accessories = [.disclosureIndicator()]
         }
 
         cell.contentConfiguration = content
@@ -142,6 +141,9 @@ extension RepoDetailViewController: UICollectionViewDelegate {
             navigationController?.pushViewController(vc, animated: true)
         case 3: // File Explorer
             let vc = UIHostingController(rootView: RepoFileExplorerView(owner: repository.owner.login, repo: repository.name, path: ""))
+            navigationController?.pushViewController(vc, animated: true)
+        case 4: // Agent Mode
+            let vc = UIHostingController(rootView: AgentHomeView(owner: repository.owner.login, repo: repository.name))
             navigationController?.pushViewController(vc, animated: true)
         default:
             break

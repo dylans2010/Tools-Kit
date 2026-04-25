@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		30159A7915A848ED9CC2FA60 /* AgentResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C4B3171C5B7494C8A67B0CF /* AgentResultView.swift */; };
+		CDCEF3EE751D4CF698CB1915 /* AgentSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46732BA44554B63984B12FF /* AgentSessionView.swift */; };
+		475A364A9F594160AA2D4496 /* AgentPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61F2DDD1EE3A4A6884801378 /* AgentPromptView.swift */; };
+		33BCCBA5530A4FF58E5A39D6 /* AgentHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516C80132E684C1E8E5B7FDF /* AgentHomeView.swift */; };
+		D8C57A5ED8BE47A283B6F62E /* AgentSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF7CBB46C3D642FBAE58A45F /* AgentSettingsView.swift */; };
+		E0C553C06E6F4FB2BA59DCE0 /* AgentErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71BE421D6664511B9182A80 /* AgentErrorHandler.swift */; };
+		B0A9F10EC5E24DE1903C6E43 /* AgentSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A7A04CF98D4973B212B01D /* AgentSessionManager.swift */; };
+		2C73259A39A54D289143AD17 /* AgentClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5897A6ABD96449CBBBEC6BC6 /* AgentClient.swift */; };
+		8711D148CC2E469C86FE99F3 /* AgentKeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FFBFCD39785442C87D16E2B /* AgentKeychainManager.swift */; };
+		28D75A425E6C4DAA80A0DBC8 /* AgentModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C56AB0076964B928FF538B1 /* AgentModels.swift */; };
 		AI0200000000000000000005 /* JulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000005 /* JulesProvider.swift */; };
 		AI0200000000000000000006 /* JulesSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000006 /* JulesSessionManager.swift */; };
 		MS0200000000000000000008 /* CodeAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000008 /* CodeAnalyzer.swift */; };
@@ -663,6 +673,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3C4B3171C5B7494C8A67B0CF /* AgentResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentResultView.swift; sourceTree = "<group>"; };
+		D46732BA44554B63984B12FF /* AgentSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentSessionView.swift; sourceTree = "<group>"; };
+		61F2DDD1EE3A4A6884801378 /* AgentPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentPromptView.swift; sourceTree = "<group>"; };
+		516C80132E684C1E8E5B7FDF /* AgentHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentHomeView.swift; sourceTree = "<group>"; };
+		AF7CBB46C3D642FBAE58A45F /* AgentSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentSettingsView.swift; sourceTree = "<group>"; };
+		A71BE421D6664511B9182A80 /* AgentErrorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/AgentErrorHandler.swift; sourceTree = "<group>"; };
+		88A7A04CF98D4973B212B01D /* AgentSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/AgentSessionManager.swift; sourceTree = "<group>"; };
+		5897A6ABD96449CBBBEC6BC6 /* AgentClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/AgentClient.swift; sourceTree = "<group>"; };
+		6FFBFCD39785442C87D16E2B /* AgentKeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/AgentKeychainManager.swift; sourceTree = "<group>"; };
+		3C56AB0076964B928FF538B1 /* AgentModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/AgentModels.swift; sourceTree = "<group>"; };
 		GH0100000000000000000001 /* GitHubAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubAuthManager.swift; sourceTree = "<group>"; };
 		GH0100000000000000000002 /* GitHubModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubModels.swift; sourceTree = "<group>"; };
 		GH0100000000000000000003 /* GitHubEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubEndpoints.swift; sourceTree = "<group>"; };
@@ -1442,6 +1462,16 @@
 				GH010000000000000000000D /* RepoFileExplorerView.swift */,
 				GH010000000000000000000E /* FileEditorView.swift */,
 				GH010000000000000000000F /* DiffView.swift */,
+				3C56AB0076964B928FF538B1 /* AgentModels.swift */,
+				6FFBFCD39785442C87D16E2B /* AgentKeychainManager.swift */,
+				5897A6ABD96449CBBBEC6BC6 /* AgentClient.swift */,
+				88A7A04CF98D4973B212B01D /* AgentSessionManager.swift */,
+				A71BE421D6664511B9182A80 /* AgentErrorHandler.swift */,
+				AF7CBB46C3D642FBAE58A45F /* AgentSettingsView.swift */,
+				516C80132E684C1E8E5B7FDF /* AgentHomeView.swift */,
+				61F2DDD1EE3A4A6884801378 /* AgentPromptView.swift */,
+				D46732BA44554B63984B12FF /* AgentSessionView.swift */,
+				3C4B3171C5B7494C8A67B0CF /* AgentResultView.swift */,
 				AI0100000000000000000005 /* JulesProvider.swift */,
 				AI0100000000000000000006 /* JulesSessionManager.swift */,
 				MS0100000000000000000008 /* CodeAnalyzer.swift */,
@@ -2138,6 +2168,16 @@
 				GH020000000000000000000D /* RepoFileExplorerView.swift in Sources */,
 				GH020000000000000000000E /* FileEditorView.swift in Sources */,
 				GH020000000000000000000F /* DiffView.swift in Sources */,
+				28D75A425E6C4DAA80A0DBC8 /* AgentModels.swift in Sources */,
+				8711D148CC2E469C86FE99F3 /* AgentKeychainManager.swift in Sources */,
+				2C73259A39A54D289143AD17 /* AgentClient.swift in Sources */,
+				B0A9F10EC5E24DE1903C6E43 /* AgentSessionManager.swift in Sources */,
+				E0C553C06E6F4FB2BA59DCE0 /* AgentErrorHandler.swift in Sources */,
+				D8C57A5ED8BE47A283B6F62E /* AgentSettingsView.swift in Sources */,
+				33BCCBA5530A4FF58E5A39D6 /* AgentHomeView.swift in Sources */,
+				475A364A9F594160AA2D4496 /* AgentPromptView.swift in Sources */,
+				CDCEF3EE751D4CF698CB1915 /* AgentSessionView.swift in Sources */,
+				30159A7915A848ED9CC2FA60 /* AgentResultView.swift in Sources */,
 				AI0200000000000000000005 /* JulesProvider.swift in Sources */,
 				AI0200000000000000000006 /* JulesSessionManager.swift in Sources */,
 				MS0200000000000000000008 /* CodeAnalyzer.swift in Sources */,

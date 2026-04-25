@@ -30,6 +30,7 @@ struct BranchListView: View {
                 }
             }
         }
+        .listStyle(.plain)
         .navigationTitle("Branches")
         .overlay {
             if isLoading {

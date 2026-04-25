@@ -17,19 +17,30 @@ struct RepoFileExplorerView: View {
                     .foregroundColor(.secondary)
             } else {
                 ForEach(contents, id: \.sha) { item in
-                    if item.type == "dir" {
-                        NavigationLink(destination: RepoFileExplorerView(owner: owner, repo: repo, path: item.path, branch: branch)) {
+                    ZStack {
+                        if item.type == "dir" {
+                            NavigationLink(destination: RepoFileExplorerView(owner: owner, repo: repo, path: item.path, branch: branch)) {
+                                EmptyView()
+                            }
+                            .opacity(0)
+
                             Label(item.name, systemImage: "folder.fill")
                                 .foregroundColor(.blue)
-                        }
-                    } else {
-                        NavigationLink(destination: FileEditorView(owner: owner, repo: repo, path: item.path, branch: branch)) {
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        } else {
+                            NavigationLink(destination: FileEditorView(owner: owner, repo: repo, path: item.path, branch: branch)) {
+                                EmptyView()
+                            }
+                            .opacity(0)
+
                             Label(item.name, systemImage: "doc.text")
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                 }
             }
         }
+        .listStyle(.plain)
         .navigationTitle(path.isEmpty ? "Files" : (path as NSString).lastPathComponent)
         .overlay {
             if isLoading { ProgressView() }
