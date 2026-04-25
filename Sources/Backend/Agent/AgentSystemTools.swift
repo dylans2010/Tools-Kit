@@ -4,7 +4,7 @@ import Foundation
 final class AgentSystemTools {
     static let shared = AgentSystemTools()
 
-    private var tools: [String: SystemTool] = [:]
+    internal var tools: [String: SystemTool] = [:]
 
     private init() {
         registerTools()
