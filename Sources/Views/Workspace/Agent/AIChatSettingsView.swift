@@ -1,6 +1,7 @@
 import SwiftUI
 
-struct AgentSettingsView: View {
+struct AIChatSettingsView: View {
+    @AppStorage("use_system_tools") private var useSystemTools = true
     @State private var apiKey: String = ""
     @State private var isValidating = false
     @State private var validationError: String?
@@ -9,6 +10,10 @@ struct AgentSettingsView: View {
     var body: some View {
         NavigationView {
             Form {
+                Section(header: Text("System Tools")) {
+                    Toggle("Use System Tools", isOn: $useSystemTools)
+                }
+
                 Section(header: Text("Jules API Key")) {
                     SecureField("Enter API Key", text: $apiKey)
 

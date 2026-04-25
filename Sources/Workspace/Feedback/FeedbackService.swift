@@ -251,7 +251,7 @@ final class FeedbackService {
     private static let maxFeedbackLimit = 200
     private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "ToolsKit", category: "FeedbackService")
 
-    private static func resolvedUserName(from user: User<[String: AnyCodable]>?) -> String {
+    private static func resolvedUserName(from user: User<[String: JSONCodable.AnyCodable]>? = nil) -> String {
         [user?.name, user?.email]
             .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
             .first(where: { !$0.isEmpty }) ?? "Anonymous"
