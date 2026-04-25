@@ -5,6 +5,7 @@ import Combine
 final class AgentSessionManager: ObservableObject {
     @Published var activeSessions: [AgentSession] = []
     @Published var activities: [String: [AgentActivity]] = [:]
+    @Published var sessionStates: [String: AgentSessionState] = [:]
     @Published var isLoading = false
 
     private var pollingTasks: [String: Task<Void, Never>] = [:]
@@ -70,6 +71,11 @@ final class AgentSessionManager: ObservableObject {
                     self.activeSessions.insert(session, at: 0)
                 }
                 self.activities[sessionId] = sessionActivities
+
+                let workspaceId = session.sourceContext.source.components(separatedBy: "/").last ?? "unknown"
+                let state = self.sessionStates[sessionId] ?? AgentSessionState(sessionId: sessionId, workspaceId: workspaceId)
+                state.update(with: sessionActivities)
+                self.sessionStates[sessionId] = state
             }
         } catch {
             // Log error or handle

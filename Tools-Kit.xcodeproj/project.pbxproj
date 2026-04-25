@@ -18,6 +18,7 @@
 		2C73259A39A54D289143AD17 /* AgentClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5897A6ABD96449CBBBEC6BC6 /* AgentClient.swift */; };
 		8711D148CC2E469C86FE99F3 /* AgentKeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FFBFCD39785442C87D16E2B /* AgentKeychainManager.swift */; };
 		28D75A425E6C4DAA80A0DBC8 /* AgentModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C56AB0076964B928FF538B1 /* AgentModels.swift */; };
+		A80200000000000000000001 /* AgentSessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80100000000000000000001 /* AgentSessionState.swift */; };
 		AI0200000000000000000005 /* JulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000005 /* JulesProvider.swift */; };
 		AI0200000000000000000006 /* JulesSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000006 /* JulesSessionManager.swift */; };
 		MS0200000000000000000008 /* CodeAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000008 /* CodeAnalyzer.swift */; };
@@ -756,6 +757,7 @@
 		5897A6ABD96449CBBBEC6BC6 /* AgentClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/AgentClient.swift; sourceTree = "<group>"; };
 		6FFBFCD39785442C87D16E2B /* AgentKeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/AgentKeychainManager.swift; sourceTree = "<group>"; };
 		3C56AB0076964B928FF538B1 /* AgentModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/AgentModels.swift; sourceTree = "<group>"; };
+		A80100000000000000000001 /* AgentSessionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/AgentSessionState.swift; sourceTree = "<group>"; };
 		GH0100000000000000000001 /* GitHubAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubAuthManager.swift; sourceTree = "<group>"; };
 		GH0100000000000000000002 /* GitHubModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubModels.swift; sourceTree = "<group>"; };
 		GH0100000000000000000003 /* GitHubEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubEndpoints.swift; sourceTree = "<group>"; };
@@ -1607,6 +1609,7 @@
 				GH010000000000000000000E /* FileEditorView.swift */,
 				GH010000000000000000000F /* DiffView.swift */,
 				3C56AB0076964B928FF538B1 /* AgentModels.swift */,
+				A80100000000000000000001 /* AgentSessionState.swift */,
 				6FFBFCD39785442C87D16E2B /* AgentKeychainManager.swift */,
 				5897A6ABD96449CBBBEC6BC6 /* AgentClient.swift */,
 				88A7A04CF98D4973B212B01D /* AgentSessionManager.swift */,
@@ -2385,6 +2388,7 @@
 				GH020000000000000000000E /* FileEditorView.swift in Sources */,
 				GH020000000000000000000F /* DiffView.swift in Sources */,
 				28D75A425E6C4DAA80A0DBC8 /* AgentModels.swift in Sources */,
+				A80200000000000000000001 /* AgentSessionState.swift in Sources */,
 				8711D148CC2E469C86FE99F3 /* AgentKeychainManager.swift in Sources */,
 				2C73259A39A54D289143AD17 /* AgentClient.swift in Sources */,
 				B0A9F10EC5E24DE1903C6E43 /* AgentSessionManager.swift in Sources */,
