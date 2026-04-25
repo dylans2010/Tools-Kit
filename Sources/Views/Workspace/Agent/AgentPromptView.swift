@@ -7,13 +7,19 @@ struct AgentPromptView: View {
     @State private var prompt: String = ""
     @State private var isSubmitting = false
     @State private var errorMessage: String?
+    @State private var showingOptimizer = false
+    @State private var navigateToProgress = false
     @Environment(\.dismiss) var dismiss
 
     let templates = [
         ("Fix bugs", "Find and fix common bugs in this repository."),
         ("Add tests", "Write unit tests for the core logic of this app."),
         ("Refactor code", "Refactor the existing code for better readability and performance."),
-        ("Documentation", "Generate README or inline documentation for the source files.")
+        ("Documentation", "Generate README or inline documentation for the source files."),
+        ("Optimize Performance", "Analyze the codebase for performance bottlenecks and implement optimizations."),
+        ("Security Audit", "Perform a security audit and fix potential vulnerabilities."),
+        ("Add Feature", "Implement a new feature based on the existing architectural patterns."),
+        ("Modernize UI", "Update the SwiftUI views to use modern design principles and semantic styles.")
     ]
 
     var body: some View {
@@ -34,6 +40,12 @@ struct AgentPromptView: View {
                                 },
                                 alignment: .topLeading
                             )
+
+                        Button(action: { showingOptimizer = true }) {
+                            Label("Optimize with AI", systemImage: "sparkles")
+                                .font(.subheadline.bold())
+                        }
+                        .disabled(prompt.isEmpty)
                     }
 
                     Section("Templates") {
@@ -79,25 +91,18 @@ struct AgentPromptView: View {
                     Button("Cancel") { dismiss() }
                 }
             }
+            .sheet(isPresented: $showingOptimizer) {
+                AgentPromptOptimizerView(originalPrompt: prompt, optimizedPrompt: $prompt)
+            }
+            .background(
+                NavigationLink(destination: AgentProgressSessionView(prompt: prompt, owner: owner, repo: repo, branch: nil), isActive: $navigateToProgress) {
+                    EmptyView()
+                }
+            )
         }
     }
 
     private func startTask() {
-        isSubmitting = true
-        errorMessage = nil
-
-        Task {
-            do {
-                let _ = try await AgentSessionManager.shared.startSession(prompt: prompt, owner: owner, repo: repo)
-                await MainActor.run {
-                    dismiss()
-                }
-            } catch {
-                await MainActor.run {
-                    errorMessage = AgentErrorHandler.handle(error)
-                    isSubmitting = false
-                }
-            }
-        }
+        navigateToProgress = true
     }
 }
