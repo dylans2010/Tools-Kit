@@ -25,7 +25,7 @@ struct AgentToolExecutionView: View {
         .listStyle(.plain)
         .navigationTitle("Tool Executions")
         .sheet(item: $selectedTool) { execution in
-            ToolDetailView(execution: execution)
+            AgentToolExecutionDetailView(execution: execution)
         }
     }
 }
@@ -48,6 +48,7 @@ struct ToolExecutionRow: View {
             Spacer()
 
             if let error = execution.error {
+                let _ = error // Use error to avoid warning
                 Image(systemName: "exclamationmark.circle.fill")
                     .foregroundColor(.red)
                     .font(.caption)
@@ -72,7 +73,7 @@ struct ToolExecutionRow: View {
     }
 }
 
-struct ToolDetailView: View {
+struct AgentToolExecutionDetailView: View {
     let execution: AgentToolExecution
     @Environment(\.dismiss) var dismiss
 

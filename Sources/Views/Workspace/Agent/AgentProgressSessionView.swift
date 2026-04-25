@@ -46,7 +46,10 @@ struct AgentProgressSessionView: View {
             } else if let currentSession = sessionManager.activeSessions.first(where: { $0.id == session?.id }),
                       let state = sessionManager.sessionStates[currentSession.id] {
 
-                Picker("Session View", selection: state.$selectedTab) {
+                Picker("Session View", selection: Binding(
+                    get: { state.selectedTab },
+                    set: { state.selectedTab = $0 }
+                )) {
                     Text("Log").tag(0)
                     Text("Timeline").tag(1)
                     Text("Tools").tag(2)

@@ -10,7 +10,7 @@ final class AgentSessionState: ObservableObject, Identifiable {
     @Published var toolExecutions: [AgentToolExecution] = []
     @Published var memory: [String: AgentMemoryEntry] = [:]
     @Published var checkpoints: [AgentCheckpoint] = []
-    @Published var diffs: [String: AgentDiff] = []
+    @Published var diffs: [String: AgentDiff] = [:]
     @Published var timeline: [AgentTimelineStep] = []
     @Published var timelineTools: [String: [AgentToolExecution]] = [:] // Map step ID to tool executions
     @Published var workspaceFiles: [String] = [] // Simplified file list for the file tree
