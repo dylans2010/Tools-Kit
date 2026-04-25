@@ -5,47 +5,75 @@ struct AgentSessionView: View {
     @StateObject private var sessionManager = AgentSessionManager.shared
 
     var body: some View {
-        VStack {
-            if let session = sessionManager.activeSessions.first(where: { $0.id == sessionId }) {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        // Header
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(session.title ?? "Agent Task")
-                                .font(.title.bold())
-                            Text(session.prompt)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color(.secondarySystemBackground))
+        VStack(spacing: 0) {
+            if let session = sessionManager.activeSessions.first(where: { $0.id == sessionId }),
+               let state = sessionManager.sessionStates[sessionId] {
 
-                        // Activities
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("Activity Log")
-                                .font(.headline)
-                                .padding(.horizontal)
+                Picker("Session View", selection: state.$selectedTab) {
+                    Text("Log").tag(0)
+                    Text("Timeline").tag(1)
+                    Text("Tools").tag(2)
+                    Text("Memory").tag(3)
+                    Text("Diffs").tag(4)
+                    Text("Check").tag(5)
+                    Text("Work").tag(6)
+                }
+                .pickerStyle(.segmented)
+                .padding()
+                .background(Color(.systemBackground))
 
-                            if let activities = sessionManager.activities[sessionId] {
-                                ForEach(activities) { activity in
-                                    ActivityRow(activity: activity)
+                Divider()
+
+                switch state.selectedTab {
+                case 0:
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 20) {
+                            // Header
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(session.title ?? "Agent Task")
+                                    .font(.title3.bold())
+                                Text(session.prompt)
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color(.secondarySystemBackground))
+
+                            // Activities
+                            VStack(alignment: .leading, spacing: 16) {
+                                Text("Activity Log")
+                                    .font(.headline)
+                                    .padding(.horizontal)
+
+                                if let activities = sessionManager.activities[sessionId] {
+                                    ForEach(activities) { activity in
+                                        ActivityRow(activity: activity)
+                                    }
+                                } else {
+                                    ProgressView()
+                                        .padding()
                                 }
-                            } else {
-                                ProgressView()
+                            }
+
+                            // Result
+                            if let pr = session.outputs?.compactMap({ $0.pullRequest }).first {
+                                AgentResultView(pullRequest: pr)
                                     .padding()
                             }
                         }
-
-                        // Result
-                        if let pr = session.outputs?.compactMap({ $0.pullRequest }).first {
-                            AgentResultView(pullRequest: pr)
-                                .padding()
-                        }
                     }
+                case 1: AgentExecutionTimelineView(state: state)
+                case 2: AgentToolExecutionView(state: state)
+                case 3: AgentMemoryInspectorView(state: state)
+                case 4: AgentDiffViewerView(state: state)
+                case 5: AgentCheckpointManagerView(state: state)
+                case 6: AgentWorkspaceView(state: state)
+                default: EmptyView()
                 }
             } else {
                 ProgressView("Loading session...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .navigationTitle("Session Tracking")

@@ -43,11 +43,54 @@ struct AgentActivity: Codable, Identifiable {
     let planGenerated: AgentPlanGenerated?
     let progressUpdated: AgentProgressUpdated?
     let sessionCompleted: AgentSessionCompleted?
+    let toolExecuted: AgentToolExecution?
+    let memoryUpdated: AgentMemoryEntry?
+    let checkpointCreated: AgentCheckpoint?
+    let diffGenerated: AgentDiff?
+    let timelineUpdated: AgentTimelineStep?
 
     enum CodingKeys: String, CodingKey {
         case id, name, createTime, originator
         case planGenerated, progressUpdated, sessionCompleted
+        case toolExecuted, memoryUpdated, checkpointCreated, diffGenerated, timelineUpdated
     }
+}
+
+struct AgentToolExecution: Codable, Identifiable {
+    var id: String { requestId }
+    let tool: String
+    let status: String
+    let requestId: String
+    let input: [String: AnyCodable]
+    let output: [String: AnyCodable]
+    let error: SystemToolError?
+}
+
+struct AgentMemoryEntry: Codable, Identifiable {
+    var id: String { key }
+    let key: String
+    let value: AnyCodable
+    let category: String?
+}
+
+struct AgentCheckpoint: Codable, Identifiable {
+    let id: String
+    let timestamp: Date
+    let description: String
+    let branchName: String?
+}
+
+struct AgentDiff: Codable, Identifiable {
+    var id: String { filePath }
+    let filePath: String
+    let diff: String
+}
+
+struct AgentTimelineStep: Codable, Identifiable {
+    let id: String
+    let step: String // PLAN, AUDIT, EXECUTE, VERIFY
+    let status: String
+    let timestamp: Date
 }
 
 struct AgentPlanGenerated: Codable {
