@@ -70,12 +70,6 @@ struct CommitComposerView: View {
             let message: String
             let content: String
             let sha: String?
-        }
-
-        struct CommitPayload: Encodable {
-            let message: String
-            let content: String
-            let sha: String?
             let branch: String?
         }
 

@@ -25,11 +25,28 @@ final class AgentSystemTools {
         guard let tool = tools[name] else {
             throw AgentSystemToolsError.unknownTool(name)
         }
+
+        // Enforcement Rule: Audit validation
+        if name != "audit_tools" {
+            let auditResponse = try await execute(name: "audit_tools", input: [:], context: context)
+            if let status = auditResponse.output["audit_status"]?.value as? String, status == "failed" {
+                let fileName = name + ".swift"
+                let mockTools = auditResponse.output["mock_tools_detected"]?.value as? [String] ?? []
+                let registryMismatches = auditResponse.output["registry_mismatches"]?.value as? [String] ?? []
+                let nonFunctional = auditResponse.output["non_functional_tools"]?.value as? [String] ?? []
+
+                if mockTools.contains(fileName) || registryMismatches.contains(fileName) || nonFunctional.contains(fileName) {
+                    throw AgentSystemToolsError.toolFailedAudit(name)
+                }
+            }
+        }
+
         return try await tool.execute(input: input, context: context)
     }
 
         private func registerTools() {
         register(AbortTaskTool())
+        register(AuditToolsTool())
         register(AnalyzeErrorsTool())
         register(ApiContractScanTool())
         register(AppendFileTool())
@@ -97,11 +114,14 @@ final class AgentSystemTools {
 
 enum AgentSystemToolsError: Error, LocalizedError {
     case unknownTool(String)
+    case toolFailedAudit(String)
 
     var errorDescription: String? {
         switch self {
         case .unknownTool(let name):
             return "Unknown system tool: \(name)"
+        case .toolFailedAudit(let name):
+            return "Tool '\(name)' failed audit enforcement and is blocked from execution."
         }
     }
 }

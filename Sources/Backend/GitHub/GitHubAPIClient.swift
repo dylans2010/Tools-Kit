@@ -84,8 +84,8 @@ final class GitHubAPIClient {
     }
 
     /// Specialized request for endpoints that return no body (e.g., Star/Unstar).
-    func requestEmpty(_ endpoint: GitHubEndpoints) async throws {
-        let request = try buildRequest(for: endpoint)
+    func requestEmpty(_ endpoint: GitHubEndpoints, body: Encodable? = nil) async throws {
+        let request = try buildRequest(for: endpoint, body: body)
         let (_, response) = try await session.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
