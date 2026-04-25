@@ -79,7 +79,7 @@ struct ActivityRow: View {
                 }
                 Text(activity.createTime, style: .time)
                     .font(.caption2)
-                    .foregroundColor(.tertiaryLabel)
+                    .foregroundStyle(.tertiary)
             }
             Spacer()
         }

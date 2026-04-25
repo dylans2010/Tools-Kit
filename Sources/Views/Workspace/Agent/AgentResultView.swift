@@ -81,7 +81,7 @@ struct AgentResultView: View {
         isLoading = true
         Task {
             do {
-                let pr: GitHubPullRequest = try await GitHubAPIClient.shared.request(.pullRequest(owner: owner, repo: repo, number: number))
+                let pr: GitHubPullRequest = try await GitHubAPIClient.shared.request(.prDetails(owner: owner, repo: repo, number: number))
                 await MainActor.run {
                     self.prDetails = pr
                     self.isLoading = false
