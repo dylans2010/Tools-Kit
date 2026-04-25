@@ -53,7 +53,7 @@ struct AgentHomeView: View {
             AgentPromptView(owner: owner, repo: repo)
         }
         .sheet(isPresented: $showingSettings) {
-            AgentSettingsView()
+            AIChatSettingsView()
         }
         .task {
             await sessionManager.fetchSessions()
