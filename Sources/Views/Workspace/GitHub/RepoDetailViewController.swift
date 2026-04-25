@@ -6,6 +6,7 @@ final class RepoDetailViewController: UIViewController {
 
     private let repository: GitHubRepository
     private var collectionView: UICollectionView!
+    private var selectedBranch: String
 
     enum Section: Int, CaseIterable {
         case header
@@ -23,6 +24,7 @@ final class RepoDetailViewController: UIViewController {
 
     init(repository: GitHubRepository) {
         self.repository = repository
+        self.selectedBranch = repository.defaultBranch
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -85,7 +87,7 @@ extension RepoDetailViewController: UICollectionViewDataSource {
         switch section {
         case .header:
             content.text = repository.fullName
-            content.secondaryText = repository.description
+            content.secondaryText = "\(repository.description ?? "")\n\nActive Branch: \(selectedBranch)"
             content.secondaryTextProperties.numberOfLines = 0
         case .stats:
             if indexPath.item == 0 {
@@ -131,16 +133,21 @@ extension RepoDetailViewController: UICollectionViewDelegate {
 
         switch indexPath.item {
         case 0: // Branches
-            let vc = UIHostingController(rootView: BranchListView(owner: repository.owner.login, repo: repository.name))
+            let view = BranchListView(owner: repository.owner.login, repo: repository.name, selectedBranch: selectedBranch) { [weak self] branch in
+                self?.selectedBranch = branch
+                self?.collectionView.reloadData()
+                self?.navigationController?.popViewController(animated: true)
+            }
+            let vc = UIHostingController(rootView: view)
             navigationController?.pushViewController(vc, animated: true)
         case 1: // Commits
-            let vc = UIHostingController(rootView: CommitHistoryView(owner: repository.owner.login, repo: repository.name))
+            let vc = UIHostingController(rootView: CommitHistoryView(owner: repository.owner.login, repo: repository.name, branch: selectedBranch))
             navigationController?.pushViewController(vc, animated: true)
         case 2: // PRs
             let vc = UIHostingController(rootView: PullRequestsView(owner: repository.owner.login, repo: repository.name))
             navigationController?.pushViewController(vc, animated: true)
         case 3: // File Explorer
-            let vc = UIHostingController(rootView: RepoFileExplorerView(owner: repository.owner.login, repo: repository.name, path: ""))
+            let vc = UIHostingController(rootView: RepoFileExplorerView(owner: repository.owner.login, repo: repository.name, path: "", branch: selectedBranch))
             navigationController?.pushViewController(vc, animated: true)
         case 4: // Agent Mode
             let vc = UIHostingController(rootView: AgentHomeView(owner: repository.owner.login, repo: repository.name))

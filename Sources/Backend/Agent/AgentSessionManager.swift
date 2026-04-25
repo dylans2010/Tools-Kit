@@ -42,28 +42,37 @@ final class AgentSessionManager: ObservableObject {
 
         pollingTasks[sessionId] = Task {
             while !Task.isCancelled {
-                do {
-                    let session = try await AgentClient.shared.getSession(id: sessionId)
-                    let sessionActivities = try await AgentClient.shared.fetchActivities(sessionId: sessionId)
+                await refreshSession(sessionId: sessionId)
 
-                    await MainActor.run {
-                        if let index = self.activeSessions.firstIndex(where: { $0.id == sessionId }) {
-                            self.activeSessions[index] = session
-                        }
-                        self.activities[sessionId] = sessionActivities
-                    }
+                // Check if completed
+                let isDone = activities[sessionId]?.contains(where: { $0.sessionCompleted != nil }) == true ||
+                             activeSessions.first(where: { $0.id == sessionId })?.outputs?.contains(where: { $0.pullRequest != nil }) == true
 
-                    // Check if completed
-                    if sessionActivities.contains(where: { $0.sessionCompleted != nil }) || session.outputs?.contains(where: { $0.pullRequest != nil }) == true {
-                        break
-                    }
-                } catch {
-                    // Log error or handle
+                if isDone {
+                    break
                 }
 
                 try? await Task.sleep(nanoseconds: 5 * 1_000_000_000) // Poll every 5 seconds
             }
             pollingTasks[sessionId] = nil
+        }
+    }
+
+    func refreshSession(sessionId: String) async {
+        do {
+            let session = try await AgentClient.shared.getSession(id: sessionId)
+            let sessionActivities = try await AgentClient.shared.fetchActivities(sessionId: sessionId)
+
+            await MainActor.run {
+                if let index = self.activeSessions.firstIndex(where: { $0.id == sessionId }) {
+                    self.activeSessions[index] = session
+                } else {
+                    self.activeSessions.insert(session, at: 0)
+                }
+                self.activities[sessionId] = sessionActivities
+            }
+        } catch {
+            // Log error or handle
         }
     }
 

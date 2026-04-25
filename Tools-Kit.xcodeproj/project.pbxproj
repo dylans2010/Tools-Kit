@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		30159A7915A848ED9CC2FA60 /* AgentResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C4B3171C5B7494C8A67B0CF /* AgentResultView.swift */; };
+		A90000012B00000100000001 /* AgentPromptOptimizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90000012B00000100000002 /* AgentPromptOptimizerView.swift */; };
+		A90000012B00000100000003 /* AgentProgressSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90000012B00000100000004 /* AgentProgressSessionView.swift */; };
 		CDCEF3EE751D4CF698CB1915 /* AgentSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46732BA44554B63984B12FF /* AgentSessionView.swift */; };
 		475A364A9F594160AA2D4496 /* AgentPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61F2DDD1EE3A4A6884801378 /* AgentPromptView.swift */; };
 		33BCCBA5530A4FF58E5A39D6 /* AgentHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516C80132E684C1E8E5B7FDF /* AgentHomeView.swift */; };
@@ -674,6 +676,8 @@
 
 /* Begin PBXFileReference section */
 		3C4B3171C5B7494C8A67B0CF /* AgentResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentResultView.swift; sourceTree = "<group>"; };
+		A90000012B00000100000002 /* AgentPromptOptimizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentPromptOptimizerView.swift; sourceTree = "<group>"; };
+		A90000012B00000100000004 /* AgentProgressSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentProgressSessionView.swift; sourceTree = "<group>"; };
 		D46732BA44554B63984B12FF /* AgentSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentSessionView.swift; sourceTree = "<group>"; };
 		61F2DDD1EE3A4A6884801378 /* AgentPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentPromptView.swift; sourceTree = "<group>"; };
 		516C80132E684C1E8E5B7FDF /* AgentHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentHomeView.swift; sourceTree = "<group>"; };
@@ -1472,6 +1476,8 @@
 				61F2DDD1EE3A4A6884801378 /* AgentPromptView.swift */,
 				D46732BA44554B63984B12FF /* AgentSessionView.swift */,
 				3C4B3171C5B7494C8A67B0CF /* AgentResultView.swift */,
+				A90000012B00000100000002 /* AgentPromptOptimizerView.swift */,
+				A90000012B00000100000004 /* AgentProgressSessionView.swift */,
 				AI0100000000000000000005 /* JulesProvider.swift */,
 				AI0100000000000000000006 /* JulesSessionManager.swift */,
 				MS0100000000000000000008 /* CodeAnalyzer.swift */,
@@ -2178,6 +2184,8 @@
 				475A364A9F594160AA2D4496 /* AgentPromptView.swift in Sources */,
 				CDCEF3EE751D4CF698CB1915 /* AgentSessionView.swift in Sources */,
 				30159A7915A848ED9CC2FA60 /* AgentResultView.swift in Sources */,
+				A90000012B00000100000001 /* AgentPromptOptimizerView.swift in Sources */,
+				A90000012B00000100000003 /* AgentProgressSessionView.swift in Sources */,
 				AI0200000000000000000005 /* JulesProvider.swift in Sources */,
 				AI0200000000000000000006 /* JulesSessionManager.swift in Sources */,
 				MS0200000000000000000008 /* CodeAnalyzer.swift in Sources */,
