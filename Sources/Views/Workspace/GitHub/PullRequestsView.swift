@@ -15,7 +15,12 @@ struct PullRequestsView: View {
                 ContentUnavailableView("No Pull Requests", systemImage: "tray.fill", description: Text("There are no open pull requests in this repository."))
             } else {
                 ForEach(pullRequests) { pr in
-                    NavigationLink(destination: PRDetailView(owner: owner, repo: repo, pullRequest: pr)) {
+                    ZStack {
+                        NavigationLink(destination: PRDetailView(owner: owner, repo: repo, pullRequest: pr)) {
+                            EmptyView()
+                        }
+                        .opacity(0)
+
                         VStack(alignment: .leading, spacing: 4) {
                             Text(pr.title)
                                 .font(.headline)
@@ -36,6 +41,7 @@ struct PullRequestsView: View {
                 }
             }
         }
+        .listStyle(.plain)
         .navigationTitle("Pull Requests")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {

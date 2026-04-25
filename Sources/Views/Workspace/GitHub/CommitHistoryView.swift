@@ -48,6 +48,7 @@ struct CommitHistoryView: View {
                 .padding(.vertical, 4)
             }
         }
+        .listStyle(.plain)
         .navigationTitle("Commits")
         .overlay {
             if isLoading { ProgressView() }

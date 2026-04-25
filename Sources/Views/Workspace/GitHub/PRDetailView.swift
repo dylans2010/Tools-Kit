@@ -31,8 +31,6 @@ struct PRDetailView: View {
                     }
                 }
                 .padding()
-                .background(Color(.secondarySystemGroupedBackground))
-                .cornerRadius(12)
 
                 if let body = pullRequest.body, !body.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
@@ -41,8 +39,6 @@ struct PRDetailView: View {
                     }
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color(.secondarySystemGroupedBackground))
-                    .cornerRadius(12)
                 }
 
                 if let comparison = comparison {
@@ -54,7 +50,6 @@ struct PRDetailView: View {
                             StatBox(label: "Additions", value: "+\(comparison.files.reduce(0) { $0 + $1.additions })", color: .green)
                         }
                     }
-                    .padding()
                 }
 
                 if pullRequest.state == "open" {
@@ -122,7 +117,5 @@ struct StatBox: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
-        .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(8)
     }
 }
