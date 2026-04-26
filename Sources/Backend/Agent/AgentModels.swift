@@ -15,6 +15,9 @@ struct AgentSession: Codable, Identifiable {
         case id, name, title, prompt, status, outputs
         case sourceContext = "sourceContext"
         case sessionURL = "session_url"
+    }
+
+    private enum LegacySessionURLKeys: String, CodingKey {
         case webURL = "web_url"
         case htmlURL = "html_url"
         case url
@@ -27,10 +30,11 @@ struct AgentSession: Codable, Identifiable {
         title = try? container.decodeIfPresent(String.self, forKey: .title)
         prompt = try? container.decodeIfPresent(String.self, forKey: .prompt)
         status = try? container.decodeIfPresent(String.self, forKey: .status)
+        let legacyContainer = try decoder.container(keyedBy: LegacySessionURLKeys.self)
         sessionURL = (try? container.decodeIfPresent(String.self, forKey: .sessionURL))
-            ?? (try? container.decodeIfPresent(String.self, forKey: .webURL))
-            ?? (try? container.decodeIfPresent(String.self, forKey: .htmlURL))
-            ?? (try? container.decodeIfPresent(String.self, forKey: .url))
+            ?? (try? legacyContainer.decodeIfPresent(String.self, forKey: .webURL))
+            ?? (try? legacyContainer.decodeIfPresent(String.self, forKey: .htmlURL))
+            ?? (try? legacyContainer.decodeIfPresent(String.self, forKey: .url))
         sourceContext = (try? container.decode(AgentSourceContext.self, forKey: .sourceContext)) ?? AgentSourceContext(source: "unknown", githubRepoContext: nil)
         outputs = try? container.decodeIfPresent([AgentOutput].self, forKey: .outputs)
     }
@@ -52,14 +56,18 @@ struct AgentOutput: Codable {
     enum CodingKeys: String, CodingKey {
         case prURL = "pr_url"
         case pullRequest = "pull_request"
-        case legacyPullRequest = "pullRequest"
+    }
+
+    private enum LegacyCodingKeys: String, CodingKey {
+        case pullRequest = "pullRequest"
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let legacyContainer = try decoder.container(keyedBy: LegacyCodingKeys.self)
         prURL = try? container.decodeIfPresent(String.self, forKey: .prURL)
         pullRequest = (try? container.decodeIfPresent(AgentPullRequest.self, forKey: .pullRequest))
-            ?? (try? container.decodeIfPresent(AgentPullRequest.self, forKey: .legacyPullRequest))
+            ?? (try? legacyContainer.decodeIfPresent(AgentPullRequest.self, forKey: .pullRequest))
     }
 }
 
@@ -70,20 +78,24 @@ struct AgentPullRequest: Codable {
 
     enum CodingKeys: String, CodingKey {
         case url
-        case htmlURL = "html_url"
         case title
         case description
+    }
+
+    private enum LegacyCodingKeys: String, CodingKey {
+        case htmlURL = "html_url"
         case body
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let legacyContainer = try decoder.container(keyedBy: LegacyCodingKeys.self)
         url = (try? container.decode(String.self, forKey: .url))
-            ?? (try? container.decode(String.self, forKey: .htmlURL))
+            ?? (try? legacyContainer.decode(String.self, forKey: .htmlURL))
             ?? ""
         title = try? container.decodeIfPresent(String.self, forKey: .title)
         description = (try? container.decodeIfPresent(String.self, forKey: .description))
-            ?? (try? container.decodeIfPresent(String.self, forKey: .body))
+            ?? (try? legacyContainer.decodeIfPresent(String.self, forKey: .body))
     }
 }
 
