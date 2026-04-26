@@ -10,7 +10,7 @@ final class AgentClient {
     private init() {}
 
     private func makeRequest(_ path: String, method: String = "GET", body: Encodable? = nil) throws -> URLRequest {
-        guard let apiKey = AgentKeychainManager.shared.getKey() else {
+        guard let apiKey = APIKeyManager.shared.getKey(for: "jules") else {
             throw AgentError.missingApiKey
         }
 

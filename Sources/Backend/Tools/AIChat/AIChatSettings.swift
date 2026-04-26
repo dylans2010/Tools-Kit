@@ -24,6 +24,7 @@ struct AIChatSettings: Codable {
     var memorySensitivity: Double = 0.7
     var responseTone: ResponseTone = .balanced
     var preferredResponseLength: ResponseLength = .medium
+    var useSystemTools: Bool = true
 }
 
 enum AIModelSource: String, Codable, CaseIterable {

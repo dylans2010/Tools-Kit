@@ -23,82 +23,112 @@ struct AgentPromptView: View {
     ]
 
     var body: some View {
-        NavigationView {
-            VStack {
-                Form {
-                    Section("What should Jules do?") {
-                        TextEditor(text: $prompt)
-                            .frame(minHeight: 150)
-                            .overlay(
-                                Group {
-                                    if prompt.isEmpty {
-                                        Text("Describe the task...")
-                                            .foregroundColor(.secondary)
-                                            .padding(.horizontal, 4)
-                                            .padding(.vertical, 8)
-                                    }
-                                },
-                                alignment: .topLeading
-                            )
+        NavigationStack {
+            VStack(spacing: 0) {
+                List {
+                    Section {
+                        VStack(alignment: .leading, spacing: 12) {
+                            ZStack(alignment: .topLeading) {
+                                if prompt.isEmpty {
+                                    Text("Describe the task in detail...")
+                                        .foregroundColor(.secondary)
+                                        .padding(.horizontal, 4)
+                                        .padding(.vertical, 8)
+                                }
+                                TextEditor(text: $prompt)
+                                    .frame(minHeight: 180)
+                                    .font(.body)
+                            }
 
-                        Button(action: { showingOptimizer = true }) {
-                            Label("Optimize with AI", systemImage: "sparkles")
-                                .font(.subheadline.bold())
+                            HStack {
+                                Spacer()
+                                Button(action: { showingOptimizer = true }) {
+                                    Label("Optimize Prompt", systemImage: "sparkles")
+                                        .font(.subheadline.weight(.semibold))
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 6)
+                                        .background(Color.blue.opacity(0.1), in: Capsule())
+                                }
+                                .disabled(prompt.isEmpty)
+                            }
                         }
-                        .disabled(prompt.isEmpty)
+                        .padding(.vertical, 4)
+                    } header: {
+                        Text("Task Objectives")
+                    } footer: {
+                        Text("Provide a clear description of what you want Jules to accomplish in this repository.")
                     }
 
-                    Section("Templates") {
+                    Section("Quick Templates") {
                         ForEach(templates, id: \.0) { title, template in
-                            Button(action: { prompt = template }) {
+                            Button {
+                                withAnimation {
+                                    prompt = template
+                                }
+                            } label: {
                                 HStack {
-                                    Text(title)
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(title)
+                                            .font(.subheadline.weight(.medium))
+                                            .foregroundColor(.primary)
+                                    }
                                     Spacer()
-                                    Image(systemName: "arrow.right.circle")
-                                        .foregroundColor(.blue)
+                                    Image(systemName: "plus.circle.fill")
+                                        .foregroundColor(.blue.opacity(0.8))
                                 }
                             }
                         }
                     }
                 }
+                .listStyle(.insetGrouped)
 
-                if let error = errorMessage {
-                    Text(error)
-                        .foregroundColor(.red)
-                        .padding()
-                }
-
-                Button(action: startTask) {
-                    if isSubmitting {
-                        ProgressView().tint(.white)
-                    } else {
-                        Text("Start Agent Task")
-                            .font(.headline)
+                VStack(spacing: 12) {
+                    if let error = errorMessage {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
                     }
+
+                    Button(action: startTask) {
+                        HStack {
+                            if isSubmitting {
+                                ProgressView().tint(.white)
+                            } else {
+                                Image(systemName: "play.fill")
+                                Text("Launch Jules Agent")
+                            }
+                        }
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(prompt.isEmpty ? Color.secondary.opacity(0.3) : Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(14)
+                        .shadow(color: prompt.isEmpty ? .clear : .blue.opacity(0.3), radius: 8, y: 4)
+                    }
+                    .disabled(prompt.isEmpty || isSubmitting)
+                    .padding(.horizontal)
+                    .padding(.bottom, 20)
                 }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(prompt.isEmpty ? Color.gray : Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(12)
-                .padding()
-                .disabled(prompt.isEmpty || isSubmitting)
+                .background(Color(.systemGroupedBackground))
             }
-            .navigationTitle("New Task")
+            .navigationTitle("Agent Prompt")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Close") { dismiss() }
                 }
             }
             .sheet(isPresented: $showingOptimizer) {
                 AgentPromptOptimizerView(originalPrompt: prompt, optimizedPrompt: $prompt)
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
             }
-            .background(
-                NavigationLink(destination: AgentProgressSessionView(prompt: prompt, owner: owner, repo: repo, branch: nil), isActive: $navigateToProgress) {
-                    EmptyView()
-                }
-            )
+            .navigationDestination(isPresented: $navigateToProgress) {
+                AgentProgressSessionView(prompt: prompt, owner: owner, repo: repo, branch: nil)
+            }
         }
     }
 
