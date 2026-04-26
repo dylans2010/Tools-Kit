@@ -17,6 +17,7 @@ struct AIChatSettingsView: View {
     @State private var signOutStatusMessage: String?
     @State private var showFreeOpenRouterSheet = false
     @AppStorage("agentEnabled") private var agentEnabled = false
+    @AppStorage("agentDebugModeEnabled") private var debugModeEnabled = false
     @AppStorage("selectedAgentType") private var selectedAgentType = AgentType.jules.rawValue
 
     private let registry = AIProviderRegistry.shared
@@ -481,6 +482,13 @@ struct AIChatSettingsView: View {
             }
             NavigationLink("Feedback Admin") {
                 FeedbackAdminView(allowDeveloperToolsAccess: true)
+            }
+            if debugModeEnabled {
+                NavigationLink {
+                    AgentConfigView()
+                } label: {
+                    Label("Agent Config (Debug)", systemImage: "ant.fill")
+                }
             }
         }
     }
