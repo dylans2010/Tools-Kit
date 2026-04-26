@@ -1,7 +1,9 @@
 import Foundation
 
-struct AgentDebugReplay {
-    func replay(_ messages: [SystemAgentMessage], handler: (SystemAgentMessage) -> Void) {
-        messages.forEach(handler)
+public final class AgentDebugReplay {
+    public init() {}
+
+    public func replay(snapshot: AgentDebugSnapshot, onMessage: (SystemAgentMessage) -> Void) {
+        snapshot.history.forEach(onMessage)
     }
 }

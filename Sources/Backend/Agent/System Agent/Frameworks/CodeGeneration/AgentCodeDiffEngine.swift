@@ -1,16 +1,27 @@
 import Foundation
 
-struct AgentCodeDiffEngine {
-    func changedLines(old: String, new: String) -> [Int] {
-        let oldLines = old.split(separator: "
-", omittingEmptySubsequences: false).map(String.init)
-        let newLines = new.split(separator: "
-", omittingEmptySubsequences: false).map(String.init)
-        let maxCount = max(oldLines.count, newLines.count)
-        return (0..<maxCount).filter { idx in
-            let a = idx < oldLines.count ? oldLines[idx] : ""
-            let b = idx < newLines.count ? newLines[idx] : ""
-            return a != b
+public final class AgentCodeDiffEngine {
+    public init() {}
+
+    public func generateDiff(original: String, modified: String) -> String {
+        // Simple line-based diff generator
+        let originalLines = original.components(separatedBy: .newlines)
+        let modifiedLines = modified.components(separatedBy: .newlines)
+
+        var diff = ""
+        let maxLines = max(originalLines.count, modifiedLines.count)
+
+        for i in 0..<maxLines {
+            if i < originalLines.count && i < modifiedLines.count {
+                if originalLines[i] != modifiedLines[i] {
+                    diff += "- \(originalLines[i])\n+ \(modifiedLines[i])\n"
+                }
+            } else if i < originalLines.count {
+                diff += "- \(originalLines[i])\n"
+            } else if i < modifiedLines.count {
+                diff += "+ \(modifiedLines[i])\n"
+            }
         }
+        return diff
     }
 }

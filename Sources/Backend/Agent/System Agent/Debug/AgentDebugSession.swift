@@ -1,17 +1,18 @@
 import Foundation
 
-struct AgentDebugSession: Codable {
-    let id: UUID
-    var startedAt: Date
-    var notes: [String]
+public final class AgentDebugSession {
+    public let id: UUID
+    private var snapshots: [AgentDebugSnapshot] = []
 
-    init(id: UUID = UUID(), startedAt: Date = Date(), notes: [String] = []) {
-        self.id = id
-        self.startedAt = startedAt
-        self.notes = notes
+    public init() {
+        self.id = UUID()
     }
 
-    mutating func append(note: String) {
-        notes.append(note)
+    public func capture(state: SystemAgentState, history: [SystemAgentMessage]) {
+        snapshots.append(AgentDebugSnapshot(state: state, history: history))
+    }
+
+    public func getSnapshots() -> [AgentDebugSnapshot] {
+        snapshots
     }
 }

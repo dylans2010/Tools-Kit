@@ -1,16 +1,13 @@
 import Foundation
 
-struct AgentAutomationStep: Identifiable, Codable {
-    let id: UUID
-    let index: Int
-    let name: String
-    let prompt: String
-    let expectedTools: [String]
-    let dependsOn: [UUID]
-    let continueOnFailure: Bool
-    let timeoutOverride: TimeInterval?
-    var status: StepStatus
-    var result: AgentAutomationResult?
+public struct AgentAutomationStep: Codable, Identifiable {
+    public let id: UUID
+    public let action: String
+    public let parameters: [String: AnyCodable]
 
-    enum StepStatus: String, Codable { case pending, running, completed, failed, skipped }
+    public init(action: String, parameters: [String: AnyCodable] = [:]) {
+        self.id = UUID()
+        self.action = action
+        self.parameters = parameters
+    }
 }

@@ -1,7 +1,17 @@
 import Foundation
 
-struct AgentAutomationScheduler {
-    func nextRunDate(interval: TimeInterval, from date: Date = Date()) -> Date {
-        date.addingTimeInterval(max(interval, 0))
+public final class AgentAutomationScheduler {
+    public init() {}
+
+    public func schedule(script: AgentAutomationScript, at date: Date) {
+        let delay = date.timeIntervalSinceNow
+        guard delay > 0 else { return }
+
+        DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
+            Task {
+                let engine = AgentAutomationEngine()
+                _ = await engine.execute(script: script)
+            }
+        }
     }
 }

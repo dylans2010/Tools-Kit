@@ -1,7 +1,22 @@
 import Foundation
 
-struct AgentContextWindow: Codable {
-    var maxTokenEstimate: Int = 8_000
+public struct AgentContextWindow {
+    public let maxTokens: Int
+    public private(set) var currentTokens: Int = 0
 
-    static let `default` = AgentContextWindow()
+    public init(maxTokens: Int) {
+        self.maxTokens = maxTokens
+    }
+
+    public mutating func update(current: Int) {
+        self.currentTokens = current
+    }
+
+    public var remainingTokens: Int {
+        max(0, maxTokens - currentTokens)
+    }
+
+    public var isExceeded: Bool {
+        currentTokens > maxTokens
+    }
 }

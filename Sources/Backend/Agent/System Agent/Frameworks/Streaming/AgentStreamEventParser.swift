@@ -1,13 +1,23 @@
 import Foundation
 
-struct AgentStreamEventParser {
-    func parseLines(from text: String) -> [String: String] {
-        var event: [String: String] = [:]
-        text.split(separator: "
-").forEach { line in
-            let parts = line.split(separator: ":", maxSplits: 1).map(String.init)
-            if parts.count == 2 { event[parts[0].trimmingCharacters(in: .whitespaces)] = parts[1].trimmingCharacters(in: .whitespaces) }
+public enum AgentStreamEvent {
+    case token(String)
+    case toolCallStart(String)
+    case toolCallEnd(String, String)
+    case complete(String)
+}
+
+public struct AgentStreamEventParser {
+    public init() {}
+
+    public func parse(chunk: String) -> [AgentStreamEvent] {
+        // Basic parser that looks for tool call markers or just treats as tokens
+        if chunk.contains("\"tool\":") {
+            // Simplified detection for this implementation
+            return [.toolCallStart(chunk)]
+        } else if chunk.hasPrefix("data: [DONE]") {
+            return [.complete(chunk)]
         }
-        return event
+        return [.token(chunk)]
     }
 }

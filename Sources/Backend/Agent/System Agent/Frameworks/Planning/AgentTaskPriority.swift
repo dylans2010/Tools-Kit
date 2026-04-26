@@ -1,9 +1,12 @@
 import Foundation
 
-enum AgentTaskPriority: Int, Codable, Comparable {
-    case low = 0, normal = 1, high = 2, critical = 3
+public enum AgentTaskPriority: Int, Codable, Comparable {
+    case low = 0
+    case medium = 1
+    case high = 2
+    case critical = 3
 
-    static func < (lhs: AgentTaskPriority, rhs: AgentTaskPriority) -> Bool {
+    public static func < (lhs: AgentTaskPriority, rhs: AgentTaskPriority) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
 }

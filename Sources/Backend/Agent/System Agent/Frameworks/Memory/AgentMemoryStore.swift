@@ -1,22 +1,26 @@
 import Foundation
 
-actor AgentMemoryStore {
-    static let shared = AgentMemoryStore()
+public final class AgentMemoryStore {
+    private var entries: [AgentMemoryEntry] = []
+    private let lock = NSLock()
 
-    private var shortTerm: [AgentMemoryEntry] = []
-    private var longTerm: [AgentMemoryEntry] = []
-    private let index = AgentMemorySearchIndex()
+    public init() {}
 
-    func store(entry: AgentMemoryEntry) {
-        shortTerm.append(entry)
-        if shortTerm.count > 50 { shortTerm.removeFirst(shortTerm.count - 50) }
-        longTerm.append(entry)
-        index.index(entry: entry)
+    public func add(_ entry: AgentMemoryEntry) {
+        lock.lock()
+        defer { lock.unlock() }
+        entries.append(entry)
     }
 
-    func recall(query: String, limit: Int) async -> [AgentMemoryEntry] { index.search(query: query, limit: limit) }
-    func purgeShortTerm() { shortTerm.removeAll() }
-    func snapshot() -> AgentContextSnapshot { AgentContextSnapshot(memoryEntries: longTerm) }
-    func shortTermEntries() -> [AgentMemoryEntry] { shortTerm }
-    func longTermCount() -> Int { longTerm.count }
+    public func allEntries() -> [AgentMemoryEntry] {
+        lock.lock()
+        defer { lock.unlock() }
+        return entries
+    }
+
+    public func search(query: String) -> [AgentMemoryEntry] {
+        lock.lock()
+        defer { lock.unlock() }
+        return entries.filter { $0.content.localizedCaseInsensitiveContains(query) }
+    }
 }

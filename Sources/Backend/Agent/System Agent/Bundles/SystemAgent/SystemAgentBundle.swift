@@ -1,13 +1,11 @@
 import Foundation
 
-struct SystemAgentBundle: Codable {
-    var id: String
-    var profile: SystemAgentCapabilityProfile
-    var manifest: SystemAgentToolManifest
-
-    init(id: String = "system.agent", profile: SystemAgentCapabilityProfile = .init(), manifest: SystemAgentToolManifest = .init()) {
-        self.id = id
-        self.profile = profile
-        self.manifest = manifest
-    }
+public struct SystemAgentBundle {
+    public static let bundle = AgentBundle(
+        id: "com.system.agent",
+        name: "System Agent",
+        version: "1.0.0",
+        tools: SystemAgentToolManifest.tools,
+        capabilities: SystemAgentCapabilityProfile.capabilities
+    )
 }

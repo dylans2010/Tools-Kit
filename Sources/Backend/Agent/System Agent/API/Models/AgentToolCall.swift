@@ -1,11 +1,11 @@
 import Foundation
 
-struct AgentToolCall: Codable, Identifiable {
-    let id: UUID
-    let name: String
-    let input: [String: String]
+public struct AgentToolCall: Codable, Identifiable {
+    public let id: String
+    public let name: String
+    public let input: [String: AnyCodable]
 
-    init(id: UUID = UUID(), name: String, input: [String: String] = [:]) {
+    public init(id: String = UUID().uuidString, name: String, input: [String: AnyCodable]) {
         self.id = id
         self.name = name
         self.input = input

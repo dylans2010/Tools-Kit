@@ -1,21 +1,28 @@
 import Foundation
 
-struct AgentContextCompressor {
-    func compress(messages: [SystemAgentMessage], targetTokenCount: Int) -> [SystemAgentMessage] {
-        let before = estimate(messages)
-        guard before > targetTokenCount, messages.count > 10 else { return messages }
-        let tail = Array(messages.suffix(10))
-        let protected = messages.dropLast(10).filter {
-            if case .toolCall = $0.role { return true }
-            if case .toolResult = $0.role { return true }
-            return false
-        }
-        let summaryText = "[CONTEXT SUMMARY] Compressed \(messages.count - tail.count - protected.count) prior conversational messages."
-        let summary = SystemAgentMessage(role: .assistant, content: summaryText)
-        let output = [summary] + Array(protected) + tail
-        Task { await AgentAPILogger.shared.log(level: .info, component: "AgentContextCompressor", message: "Compressed context \(before)->\(estimate(output)) tokens") }
-        return output
-    }
+public struct AgentContextCompressor {
+    public init() {}
 
-    private func estimate(_ messages: [SystemAgentMessage]) -> Int { messages.map { max($0.content.count / 4, 1) }.reduce(0,+) }
+    public func compress(_ context: AgentContext, targetTokenCount: Int) -> AgentContext {
+        // Basic compression strategy: keep recent messages, remove oldest non-system messages.
+        var messages = context.messages
+
+        // We simulate token count by message length for this implementation
+        var currentApproxTokens = messages.reduce(0) { $0 + $1.content.count / 4 }
+
+        while currentApproxTokens > targetTokenCount && messages.count > 1 {
+            // Keep the system prompt (assume first message if role matches)
+            if messages[0].role == .user || messages[0].role == .assistant {
+                let removed = messages.removeFirst()
+                currentApproxTokens -= removed.content.count / 4
+            } else if messages.count > 1 {
+                let removed = messages.remove(at: 1)
+                currentApproxTokens -= removed.content.count / 4
+            } else {
+                break
+            }
+        }
+
+        return AgentContext(messages: messages, metadata: context.metadata)
+    }
 }

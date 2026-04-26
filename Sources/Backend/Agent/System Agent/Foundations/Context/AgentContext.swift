@@ -1,6 +1,11 @@
 import Foundation
 
-struct AgentContext: Codable {
-    var sessionID: UUID = UUID()
-    var metadata: [String: String] = [:]
+public struct AgentContext: Codable {
+    public var messages: [SystemAgentMessage]
+    public var metadata: [String: String]
+
+    public init(messages: [SystemAgentMessage] = [], metadata: [String: String] = [:]) {
+        self.messages = messages
+        self.metadata = metadata
+    }
 }
