@@ -3,15 +3,16 @@ import SwiftUI
 struct AgentPromptView: View {
     let owner: String
     let repo: String
+    @ObservedObject var systemAgentViewModel: SystemAgentViewModel
+    @ObservedObject var julesAgentViewModel: JulesAgentViewModel
 
     @State private var prompt: String = ""
     @State private var isSubmitting = false
-    @State private var errorMessage: String?
     @State private var showingOptimizer = false
     @State private var navigateToSession = false
+    @State private var navigateToAgentSession = false
     @State private var createdSessionID: String?
     @StateObject private var sessionManager = AgentSessionManager.shared
-    @StateObject private var systemAgentViewModel = SystemAgentViewModel()
     @AppStorage("selectedAgentType") private var selectedAgentType = AgentType.jules.rawValue
     @Environment(\.dismiss) var dismiss
 
@@ -87,14 +88,6 @@ struct AgentPromptView: View {
                 .listStyle(.insetGrouped)
 
                 VStack(spacing: 12) {
-                    if let error = errorMessage {
-                        Text(error)
-                            .font(.caption)
-                            .foregroundColor(.red)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
-                    }
-
                     Button(action: startTask) {
                         HStack {
                             if isSubmitting {
@@ -133,7 +126,14 @@ struct AgentPromptView: View {
             .navigationDestination(isPresented: $navigateToSession) {
                 if let sessionID = createdSessionID {
                     AgentSessionView(sessionId: sessionID)
+                        .environmentObject(systemAgentViewModel)
+                        .environmentObject(julesAgentViewModel)
                 }
+            }
+            .navigationDestination(isPresented: $navigateToAgentSession) {
+                AgentSessionView()
+                    .environmentObject(systemAgentViewModel)
+                    .environmentObject(julesAgentViewModel)
             }
         }
     }
@@ -141,27 +141,25 @@ struct AgentPromptView: View {
     private func startTask() {
         let trimmedPrompt = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedPrompt.isEmpty else {
-            errorMessage = "Prompt is required before launching Jules Agent."
             return
         }
 
-        errorMessage = nil
         prompt = trimmedPrompt
         isSubmitting = true
 
         Task {
             do {
                 if selectedAgentType == AgentType.system.rawValue {
-                    await MainActor.run {
-                        systemAgentViewModel.inputText = trimmedPrompt
-                    }
+                    await MainActor.run { systemAgentViewModel.inputText = trimmedPrompt }
                     await systemAgentViewModel.submit()
                     await MainActor.run {
-                        errorMessage = systemAgentViewModel.messages.last?.content
+                        navigateToAgentSession = true
                         isSubmitting = false
                     }
                     return
                 }
+                await MainActor.run { julesAgentViewModel.inputText = trimmedPrompt }
+                await julesAgentViewModel.submit()
                 let session = try await sessionManager.startSession(prompt: trimmedPrompt, owner: owner, repo: repo)
                 await MainActor.run {
                     createdSessionID = session.id
@@ -170,7 +168,6 @@ struct AgentPromptView: View {
                 }
             } catch {
                 await MainActor.run {
-                    errorMessage = error.localizedDescription
                     isSubmitting = false
                 }
             }

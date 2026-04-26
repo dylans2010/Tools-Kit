@@ -1,7 +1,7 @@
 import Foundation
 
 @MainActor
-final class SystemAgentViewModel: ObservableObject {
+final class SystemAgentViewModel: AgentViewModelProtocol {
     @Published var messages: [SystemAgentMessage] = []
     @Published var state: SystemAgentState = .idle
     @Published var inputText: String = ""
@@ -23,17 +23,22 @@ final class SystemAgentViewModel: ObservableObject {
         let trimmed = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
+        print("[SystemAgentViewModel] submit started")
         inputText = ""
         userFacingErrorMessage = nil
 
         do {
+            print("[SystemAgentViewModel] calling agent.sendMessage")
             _ = try await agent.sendMessage(trimmed)
             messages = await agent.history
             state = await agent.currentState
+            print("[SystemAgentViewModel] submit succeeded")
         } catch {
+            print("[SystemAgentViewModel] submit failed: \(error.localizedDescription)")
             state = .failed(error)
             userFacingErrorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
             messages = await agent.history
+            messages.append(SystemAgentMessage(role: .assistant, content: "Error: \(userFacingErrorMessage ?? "Unknown error")"))
         }
     }
 

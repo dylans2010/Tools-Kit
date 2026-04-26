@@ -760,6 +760,8 @@
 		C51A362904C749469C35ED8A /* AgentDiffViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835C5505B31744E4A0AD7B63 /* AgentDiffViewerView.swift */; };
 		A1B2C3D4E5F60718293A2001 /* SystemAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A1001 /* SystemAgent.swift */; };
 		A1B2C3D4E5F60718293A2002 /* SystemAgentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A1002 /* SystemAgentViewModel.swift */; };
+		A1B2C3D4E5F60718293A2008 /* AgentViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A1008 /* AgentViewModelProtocol.swift */; };
+		A90000012B00000100000005 /* JulesAgentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90000012B00000100000006 /* JulesAgentViewModel.swift */; };
 		A1B2C3D4E5F60718293A2003 /* SystemAgentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A1003 /* SystemAgentSession.swift */; };
 		A1B2C3D4E5F60718293A2004 /* SystemAgentMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A1004 /* SystemAgentMessage.swift */; };
 		A1B2C3D4E5F60718293A2005 /* SystemAgentToolRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A1005 /* SystemAgentToolRouter.swift */; };
@@ -1526,6 +1528,8 @@
 		A1B2C3D4E5F60718293A1005 /* SystemAgentToolRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAgentToolRouter.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A1006 /* SystemAgentState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAgentState.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A1007 /* SystemAgentError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAgentError.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A1008 /* AgentViewModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentViewModelProtocol.swift; sourceTree = "<group>"; };
+		A90000012B00000100000006 /* JulesAgentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/JulesAgentViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1678,6 +1682,7 @@
 				3C4B3171C5B7494C8A67B0CF /* AgentResultView.swift */,
 				A90000012B00000100000002 /* AgentPromptOptimizerView.swift */,
 				A90000012B00000100000004 /* AgentProgressSessionView.swift */,
+				A90000012B00000100000006 /* JulesAgentViewModel.swift */,
 				AI0100000000000000000005 /* JulesProvider.swift */,
 				AI0100000000000000000006 /* JulesSessionManager.swift */,
 				MS0100000000000000000008 /* CodeAnalyzer.swift */,
@@ -2364,6 +2369,7 @@
 				A1B2C3D4E5F60718293A1005 /* SystemAgentToolRouter.swift */,
 				A1B2C3D4E5F60718293A1006 /* SystemAgentState.swift */,
 				A1B2C3D4E5F60718293A1007 /* SystemAgentError.swift */,
+				A1B2C3D4E5F60718293A1008 /* AgentViewModelProtocol.swift */,
 			);
 			path = "System Agent";
 			sourceTree = "<group>";
@@ -2503,8 +2509,10 @@
 				30159A7915A848ED9CC2FA60 /* AgentResultView.swift in Sources */,
 				A90000012B00000100000001 /* AgentPromptOptimizerView.swift in Sources */,
 				A90000012B00000100000003 /* AgentProgressSessionView.swift in Sources */,
+				A90000012B00000100000005 /* JulesAgentViewModel.swift in Sources */,
 				A1B2C3D4E5F60718293A2001 /* SystemAgent.swift in Sources */,
 				A1B2C3D4E5F60718293A2002 /* SystemAgentViewModel.swift in Sources */,
+				A1B2C3D4E5F60718293A2008 /* AgentViewModelProtocol.swift in Sources */,
 				A1B2C3D4E5F60718293A2003 /* SystemAgentSession.swift in Sources */,
 				A1B2C3D4E5F60718293A2004 /* SystemAgentMessage.swift in Sources */,
 				A1B2C3D4E5F60718293A2005 /* SystemAgentToolRouter.swift in Sources */,
