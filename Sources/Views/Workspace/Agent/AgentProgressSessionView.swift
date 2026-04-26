@@ -6,168 +6,192 @@ struct AgentProgressSessionView: View {
     let repo: String
     let branch: String?
 
-    @State private var session: AgentSession?
+    @State private var sessionId: String?
     @State private var creationError: String?
     @State private var isCreating = true
+    @State private var selectedFilePath: String?
 
-    @StateObject private var sessionManager = AgentSessionManager.shared
-    @Environment(\.dismiss) var dismiss
-    @Environment(\.openURL) var openURL
+    @StateObject private var store = AgentSessionStore.shared
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         VStack(spacing: 0) {
             if isCreating {
-                VStack(spacing: 20) {
-                    ProgressView()
-                        .scaleEffect(1.5)
-                    Text("Initializing Jules Agent...")
-                        .font(.headline)
-                    Text("Creating a new task for \(owner)/\(repo)")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .frame(maxHeight: .infinity)
-            } else if let error = creationError {
-                VStack(spacing: 16) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.largeTitle)
-                        .foregroundColor(.red)
-                    Text("Failed to Create Task")
-                        .font(.title2.bold())
-                    Text(error)
-                        .multilineTextAlignment(.center)
-                        .padding()
-                    Button("Try Again") {
-                        createTask()
+                ProgressView("Initializing execution session…")
+                    .frame(maxHeight: .infinity)
+            } else if let creationError {
+                ContentUnavailableView("Failed to Create Task", systemImage: "exclamationmark.triangle", description: Text(creationError))
+            } else if let sessionId, let state = store.state(for: sessionId) {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        currentStepSection(state)
+                        timelineSection(state)
+                        logConsoleSection(state)
+                        diffViewerSection(state)
+                        finalOutputSection(state)
+                        debugSection(state)
                     }
-                    .buttonStyle(.borderedProminent)
-                }
-                .frame(maxHeight: .infinity)
-            } else if let currentSession = sessionManager.activeSessions.first(where: { $0.id == session?.id }),
-                      let state = sessionManager.sessionStates[currentSession.id] {
-
-                Picker("Session View", selection: Binding(
-                    get: { state.selectedTab },
-                    set: { state.selectedTab = $0 }
-                )) {
-                    Text("Log").tag(0)
-                    Text("Timeline").tag(1)
-                    Text("Tools").tag(2)
-                    Text("Memory").tag(3)
-                    Text("Diffs").tag(4)
-                    Text("Check").tag(5)
-                    Text("Work").tag(6)
-                }
-                .pickerStyle(.segmented)
-                .padding()
-                .background(Color(.systemBackground))
-
-                Divider()
-
-                switch state.selectedTab {
-                case 0:
-                    List {
-                        // Header Section
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(currentSession.title ?? "Agent Task")
-                                .font(.title3.bold())
-                            Text(currentSession.prompt ?? "")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(.vertical)
-                        .listRowSeparator(.hidden)
-
-                        // Completion Section
-                        if let pr = currentSession.outputs?.compactMap({ $0.pullRequest }).first {
-                            VStack(spacing: 16) {
-                                HStack {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
-                                        .font(.title3)
-                                    Text("Task Created Successfully!")
-                                        .font(.headline)
-                                }
-
-                                Button(action: {
-                                    if let url = URL(string: pr.url) {
-                                        openURL(url)
-                                    }
-                                }) {
-                                    HStack {
-                                        Image(systemName: "arrow.up.forward.circle.fill")
-                                        Text("Open Pull Request")
-                                    }
-                                    .font(.headline)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(Color.blue)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(12)
-                                }
-                            }
-                            .padding()
-                            .background(Color.green.opacity(0.1))
-                            .cornerRadius(16)
-                            .listRowSeparator(.hidden)
-                        }
-
-                        // Activity Log Section
-                        Section("Activity Log") {
-                            if let activities = sessionManager.activities[currentSession.id] {
-                                ForEach(activities) { activity in
-                                    ActivityRow(activity: activity)
-                                }
-                            } else {
-                                ProgressView("Fetching activities...")
-                                    .frame(maxWidth: .infinity, alignment: .center)
-                                    .padding()
-                            }
-                        }
-                    }
-                    .listStyle(.plain)
-                    .refreshable {
-                        await sessionManager.refreshSession(sessionId: currentSession.id)
-                    }
-                case 1: AgentExecutionTimelineView(state: state)
-                case 2: AgentToolExecutionView(state: state)
-                case 3: AgentMemoryInspectorView(state: state)
-                case 4: AgentDiffViewerView(state: state)
-                case 5: AgentCheckpointManagerView(state: state)
-                case 6: AgentWorkspaceView(state: state)
-                default: EmptyView()
+                    .padding()
                 }
             } else {
-                ProgressView("Loading session details...")
+                ProgressView("Loading session details…")
                     .frame(maxHeight: .infinity)
             }
         }
         .navigationTitle("Live Progress")
-        .navigationBarTitleDisplayMode(.inline)
         .task {
-            if session == nil {
-                createTask()
+            guard sessionId == nil else { return }
+            await createTask()
+        }
+    }
+
+    private func currentStepSection(_ state: AgentSessionState) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Current Step Indicator").font(.headline)
+            Text(state.currentStep ?? "Waiting for first execution step…")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func timelineSection(_ state: AgentSessionState) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Live Execution Timeline").font(.headline)
+            ForEach(state.executionEvents.sorted(by: { $0.timestamp < $1.timestamp })) { event in
+                HStack(alignment: .top, spacing: 8) {
+                    Circle().fill(color(for: event.type)).frame(width: 8, height: 8).padding(.top, 6)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(event.title).font(.subheadline.bold())
+                        Text(event.message).font(.caption).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Text(event.timestamp, style: .time).font(.caption2).foregroundStyle(.tertiary)
+                }
             }
         }
     }
 
-    private func createTask() {
-        isCreating = true
-        creationError = nil
-
-        Task {
-            do {
-                let newSession = try await AgentSessionManager.shared.startSession(prompt: prompt, owner: owner, repo: repo, branch: branch)
-                await MainActor.run {
-                    self.session = newSession
-                    self.isCreating = false
+    private func logConsoleSection(_ state: AgentSessionState) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Streaming Log Console").font(.headline)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(Array(state.logs.enumerated()), id: \.offset) { _, line in
+                        Text(line)
+                            .font(.system(.caption, design: .monospaced))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
-            } catch {
-                await MainActor.run {
-                    self.creationError = error.localizedDescription
-                    self.isCreating = false
+            }
+            .frame(maxHeight: 200)
+            .padding(8)
+            .background(Color(.secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+    }
+
+    private func diffViewerSection(_ state: AgentSessionState) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("File Change Diff Viewer").font(.headline)
+            if state.fileOperations.isEmpty {
+                Text("No generated file changes yet.").font(.caption).foregroundStyle(.secondary)
+            } else {
+                Picker("File", selection: Binding(
+                    get: { selectedFilePath ?? state.fileOperations.last?.path ?? "" },
+                    set: { selectedFilePath = $0 }
+                )) {
+                    ForEach(state.fileOperations.map(\.path).uniqued(), id: \.self) { path in
+                        Text(path).tag(path)
+                    }
+                }
+                .pickerStyle(.menu)
+
+                if let selected = selectedFilePath ?? state.fileOperations.last?.path,
+                   let op = state.fileOperations.last(where: { $0.path == selected }) {
+                    Text(op.patch ?? op.content ?? "No diff available")
+                        .font(.system(.caption, design: .monospaced))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(8)
+                        .background(Color(.secondarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
             }
         }
+    }
+
+    private func finalOutputSection(_ state: AgentSessionState) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Final Output Panel").font(.headline)
+            if let prURL = state.session?.outputs?.compactMap({ $0.pullRequest?.url }).first,
+               let url = URL(string: prURL) {
+                Button("Open Pull Request") { openURL(url) }
+                    .buttonStyle(.borderedProminent)
+            }
+            Text(state.finalOutput ?? "Execution in progress…")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            if let error = state.lastError {
+                Text(error).font(.caption).foregroundStyle(.red)
+            }
+        }
+    }
+
+    private func debugSection(_ state: AgentSessionState) -> some View {
+        Group {
+            if UserDefaults.standard.bool(forKey: "agent.framework.debug") {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Debug: Framework Processing").font(.headline)
+                    Text("Snapshots: \(state.debugSnapshots.count)")
+                        .font(.caption)
+                    if let latest = state.debugSnapshots.last {
+                        Text("Phase: \(latest.frameworkPhase)")
+                        Text("State: \(latest.stateTransition)")
+                        Text("UI Trigger: \(latest.uiTrigger)")
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func color(for type: AgentExecutionEventType) -> Color {
+        switch type {
+        case .sessionStarted: return .blue
+        case .stepStarted: return .indigo
+        case .stepProgress: return .teal
+        case .logOutput: return .gray
+        case .fileGenerated, .fileUpdated: return .orange
+        case .gitOperation: return .green
+        case .workflowTriggered: return .purple
+        case .sessionCompleted: return .mint
+        case .sessionFailed: return .red
+        }
+    }
+
+    private func createTask() async {
+        isCreating = true
+        creationError = nil
+
+        do {
+            let session = try await AgentSessionFramework.shared.startSession(prompt: prompt, owner: owner, repo: repo, branch: branch)
+            await MainActor.run {
+                self.sessionId = session.id
+                self.isCreating = false
+            }
+        } catch {
+            await MainActor.run {
+                self.creationError = error.localizedDescription
+                self.isCreating = false
+            }
+        }
+    }
+}
+
+private extension Array where Element: Hashable {
+    func uniqued() -> [Element] {
+        var seen = Set<Element>()
+        return filter { seen.insert($0).inserted }
     }
 }
