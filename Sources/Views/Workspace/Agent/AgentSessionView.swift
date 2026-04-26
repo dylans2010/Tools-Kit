@@ -35,7 +35,7 @@ struct AgentSessionView: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text(session.title ?? "Agent Task")
                                     .font(.title3.bold())
-                                Text(session.prompt)
+                                Text(session.prompt ?? "")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                             }

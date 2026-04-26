@@ -71,7 +71,7 @@ struct AgentProgressSessionView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text(currentSession.title ?? "Agent Task")
                                 .font(.title3.bold())
-                            Text(currentSession.prompt)
+                            Text(currentSession.prompt ?? "")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
