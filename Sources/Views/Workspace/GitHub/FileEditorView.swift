@@ -42,7 +42,7 @@ struct FileEditorView: View {
             }
         }
         .sheet(isPresented: $showingCommitComposer) {
-            CommitComposerView(owner: owner, repo: repo, path: path, currentSHA: fileContent?.sha, originalContent: text) { updated in
+            CommitComposerView(owner: owner, repo: repo, path: path, branch: branch, currentSHA: fileContent?.sha, originalContent: text) { updated in
                 self.fileContent = updated
                 self.isEditing = false
                 fetchFile()

@@ -586,13 +586,11 @@ struct GitHubRouterView: View {
 }
 
 struct GitHubRepoListViewWrapper: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> UINavigationController {
-        let repoListVC = RepoListViewController()
-        let nav = UINavigationController(rootViewController: repoListVC)
-        return nav
+    func makeUIViewController(context: Context) -> RepoListViewController {
+        return RepoListViewController()
     }
 
-    func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {}
+    func updateUIViewController(_ uiViewController: RepoListViewController, context: Context) {}
 }
 
 struct WorkspaceMailRouterView: View {

@@ -32,7 +32,7 @@ final class RepoListViewController: UIViewController {
     }
 
     private func setupCollectionView() {
-        var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+        var config = UICollectionLayoutListConfiguration(appearance: .plain)
         config.trailingSwipeActionsConfigurationProvider = { [weak self] indexPath in
             self?.makeSwipeActions(for: indexPath)
         }
@@ -61,7 +61,6 @@ final class RepoListViewController: UIViewController {
             content.imageProperties.tintColor = repo.private ? .systemOrange : .systemBlue
 
             cell.contentConfiguration = content
-            cell.accessories = [.disclosureIndicator()]
         }
 
         dataSource = UICollectionViewDiffableDataSource<Section, GitHubRepository>(collectionView: collectionView) { collectionView, indexPath, repo in

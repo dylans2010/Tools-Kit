@@ -5,6 +5,7 @@ struct CommitComposerView: View {
     let owner: String
     let repo: String
     let path: String
+    var branch: String? = nil
     let currentSHA: String?
     let originalContent: String
 
@@ -15,10 +16,11 @@ struct CommitComposerView: View {
 
     var onCommit: (GitHubContent) -> Void
 
-    init(owner: String, repo: String, path: String, currentSHA: String?, originalContent: String, onCommit: @escaping (GitHubContent) -> Void) {
+    init(owner: String, repo: String, path: String, branch: String? = nil, currentSHA: String?, originalContent: String, onCommit: @escaping (GitHubContent) -> Void) {
         self.owner = owner
         self.repo = repo
         self.path = path
+        self.branch = branch
         self.currentSHA = currentSHA
         self.originalContent = originalContent
         self.onCommit = onCommit
@@ -68,15 +70,18 @@ struct CommitComposerView: View {
             let message: String
             let content: String
             let sha: String?
+            let branch: String?
         }
 
-        let payload = CommitPayload(message: message, content: base64Content, sha: currentSHA)
+        let payload = CommitPayload(message: message, content: base64Content, sha: currentSHA, branch: branch)
 
         Task {
             do {
                 let updatedContent: GitHubContent = try await GitHubAPIClient.shared.request(.contents(owner: owner, repo: repo, path: path, ref: nil), body: payload)
-                onCommit(updatedContent)
-                dismiss()
+                await MainActor.run {
+                    onCommit(updatedContent)
+                    dismiss()
+                }
             } catch {
                 // In a real app, show alert
                 isSubmitting = false

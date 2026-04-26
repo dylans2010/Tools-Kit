@@ -39,6 +39,7 @@ struct AIChatSettingsView: View {
                 chatInterfaceSection
                 storageSection
                 memorySection
+                agentSettingsSection
                 appModeSection
                 toolVisibilitySection
                 supportSection
@@ -84,6 +85,12 @@ struct AIChatSettingsView: View {
                     }
                 }
             }
+        }
+    }
+
+    private var agentSettingsSection: some View {
+        Section("Agent Settings") {
+            Toggle("Use System Tools", isOn: $settings.useSystemTools)
         }
     }
 

@@ -31,8 +31,6 @@ struct PRDetailView: View {
                     }
                 }
                 .padding()
-                .background(Color(.secondarySystemGroupedBackground))
-                .cornerRadius(12)
 
                 if let body = pullRequest.body, !body.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
@@ -41,8 +39,6 @@ struct PRDetailView: View {
                     }
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color(.secondarySystemGroupedBackground))
-                    .cornerRadius(12)
                 }
 
                 if let comparison = comparison {
@@ -54,26 +50,40 @@ struct PRDetailView: View {
                             StatBox(label: "Additions", value: "+\(comparison.files.reduce(0) { $0 + $1.additions })", color: .green)
                         }
                     }
-                    .padding()
                 }
 
                 if pullRequest.state == "open" {
-                    Button {
-                        mergePullRequest()
-                    } label: {
-                        if isMerging {
-                            ProgressView().tint(.white)
-                        } else {
-                            Text("Merge Pull Request")
+                    VStack(spacing: 12) {
+                        Button {
+                            mergePullRequest()
+                        } label: {
+                            if isMerging {
+                                ProgressView().tint(.white)
+                            } else {
+                                Text("Merge Pull Request")
+                                    .font(.headline)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .disabled(isMerging)
+
+                        Button {
+                            closePullRequest()
+                        } label: {
+                            Text("Close Pull Request")
                                 .font(.headline)
                         }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.red)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .disabled(isMerging)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-                    .disabled(isMerging)
                     .padding(.horizontal)
                 }
             }
@@ -103,8 +113,31 @@ struct PRDetailView: View {
                 isMerging = false
                 dismiss()
             } catch {
-                self.errorMessage = error.localizedDescription
+                await MainActor.run {
+                    self.errorMessage = error.localizedDescription
+                    isMerging = false
+                }
+            }
+        }
+    }
+
+    private func closePullRequest() {
+        isMerging = true
+        struct UpdatePRPayload: Encodable {
+            let state: String
+        }
+        let payload = UpdatePRPayload(state: "closed")
+
+        Task {
+            do {
+                try await GitHubAPIClient.shared.requestEmpty(.updatePR(owner: owner, repo: repo, number: pullRequest.number), body: payload)
                 isMerging = false
+                dismiss()
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = error.localizedDescription
+                    isMerging = false
+                }
             }
         }
     }
@@ -122,7 +155,5 @@ struct StatBox: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
-        .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(8)
     }
 }

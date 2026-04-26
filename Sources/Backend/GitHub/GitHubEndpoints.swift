@@ -14,9 +14,12 @@ enum GitHubEndpoints {
     case prDetails(owner: String, repo: String, number: Int)
     case mergePR(owner: String, repo: String, number: Int)
     case createPR(owner: String, repo: String)
+    case updatePR(owner: String, repo: String, number: Int)
     case contents(owner: String, repo: String, path: String, ref: String?)
     case compare(owner: String, repo: String, base: String, head: String)
     case fork(owner: String, repo: String)
+    case createRef(owner: String, repo: String)
+    case deleteRef(owner: String, repo: String, ref: String)
 
     var url: URL {
         switch self {
@@ -43,6 +46,8 @@ enum GitHubEndpoints {
             return URL(string: "\(GitHubEndpoints.baseURL)/repos/\(owner)/\(repo)/pulls/\(number)")!
         case .mergePR(let owner, let repo, let number):
             return URL(string: "\(GitHubEndpoints.baseURL)/repos/\(owner)/\(repo)/pulls/\(number)/merge")!
+        case .updatePR(let owner, let repo, let number):
+            return URL(string: "\(GitHubEndpoints.baseURL)/repos/\(owner)/\(repo)/pulls/\(number)")!
         case .contents(let owner, let repo, let path, let ref):
             var urlString = "\(GitHubEndpoints.baseURL)/repos/\(owner)/\(repo)/contents/\(path)"
             if let ref = ref { urlString += "?ref=\(ref)" }
@@ -51,6 +56,11 @@ enum GitHubEndpoints {
             return URL(string: "\(GitHubEndpoints.baseURL)/repos/\(owner)/\(repo)/compare/\(base)...\(head)")!
         case .fork(let owner, let repo):
             return URL(string: "\(GitHubEndpoints.baseURL)/repos/\(owner)/\(repo)/forks")!
+        case .createRef(let owner, let repo):
+            return URL(string: "\(GitHubEndpoints.baseURL)/repos/\(owner)/\(repo)/git/refs")!
+        case .deleteRef(let owner, let repo, let ref):
+            let encodedRef = ref.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ref
+            return URL(string: "\(GitHubEndpoints.baseURL)/repos/\(owner)/\(repo)/git/refs/\(encodedRef)")!
         }
     }
 
@@ -62,8 +72,12 @@ enum GitHubEndpoints {
             return "PUT"
         case .mergePR:
             return "PUT"
-        case .fork, .createPR:
+        case .updatePR:
+            return "PATCH"
+        case .fork, .createPR, .createRef:
             return "POST"
+        case .deleteRef:
+            return "DELETE"
         }
     }
 }
