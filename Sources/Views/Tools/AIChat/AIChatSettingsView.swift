@@ -154,6 +154,23 @@ struct AIChatSettingsView: View {
                     placeholder: provider.apiKeyPlaceholder
                 )
             }
+
+            if settings.selectedProviderID != "jules", let jules = registry.provider(for: "jules") {
+                Divider()
+                VStack(alignment: .leading, spacing: 8) {
+                    Label("Jules Agent Mode Key", systemImage: "wand.and.stars")
+                        .font(.subheadline.weight(.semibold))
+                    Text("Optional: add a Jules key so Agent Mode can run with Jules regardless of your active chat provider.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    APIKeyRowView(
+                        providerID: jules.id,
+                        providerName: jules.name,
+                        placeholder: jules.apiKeyPlaceholder
+                    )
+                }
+                .padding(.top, 4)
+            }
         } header: {
             Text("API Key")
         }
