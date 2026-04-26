@@ -6,7 +6,7 @@ enum SystemAgentError: Error, LocalizedError {
     case toolExecutionFailure(tool: String, underlying: Error)
     case emptyResponse
     case sessionReset
-    case maxToolIterationsReached(limit: Int)
+    case maxToolIterationsReached(limit: Int, message: String)
 
     var errorDescription: String? {
         switch self {
@@ -20,8 +20,8 @@ enum SystemAgentError: Error, LocalizedError {
             return "The AI returned an empty response."
         case .sessionReset:
             return "The session was reset while processing your request."
-        case .maxToolIterationsReached(let limit):
-            return "Tool loop hit safety limit (\(limit) rounds)."
+        case .maxToolIterationsReached(_, let message):
+            return message
         }
     }
 }
