@@ -21,7 +21,7 @@ struct AgentHomeView: View {
                 ForEach(sessionManager.activeSessions) { session in
                     NavigationLink(destination: AgentSessionView(sessionId: session.id)) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(session.title ?? session.prompt)
+                            Text(session.title ?? session.prompt ?? "Untitled")
                                 .font(.headline)
                                 .lineLimit(1)
                             Text(session.id)
