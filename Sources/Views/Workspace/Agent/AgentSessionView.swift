@@ -1,13 +1,20 @@
 import SwiftUI
+import UIKit
 
 struct AgentSessionView: View {
     let sessionId: String
     @StateObject private var sessionManager = AgentSessionManager.shared
+    @StateObject private var viewModel: AgentSessionViewModel
+
+    init(sessionId: String) {
+        self.sessionId = sessionId
+        _viewModel = StateObject(wrappedValue: AgentSessionViewModel(sessionId: sessionId))
+    }
 
     var body: some View {
         VStack(spacing: 0) {
-            if let session = sessionManager.activeSessions.first(where: { $0.id == sessionId }),
-               let state = sessionManager.sessionStates[sessionId] {
+            if let state = sessionManager.sessionStates[sessionId] {
+                let session = viewModel.session ?? sessionManager.activeSessions.first(where: { $0.id == sessionId })
 
                 Picker("Session View", selection: Binding(
                     get: { state.selectedTab },
@@ -31,11 +38,13 @@ struct AgentSessionView: View {
                 case 0:
                     ScrollView {
                         VStack(alignment: .leading, spacing: 20) {
+                            sessionStatusSection
+
                             // Header
                             VStack(alignment: .leading, spacing: 8) {
-                                Text(session.title ?? "Agent Task")
+                                Text(viewModel.session?.title ?? session?.title ?? "Agent Task")
                                     .font(.title3.bold())
-                                Text(session.prompt ?? "")
+                                Text(viewModel.session?.prompt ?? session?.prompt ?? "")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                             }
@@ -49,7 +58,11 @@ struct AgentSessionView: View {
                                     .font(.headline)
                                     .padding(.horizontal)
 
-                                if let activities = sessionManager.activities[sessionId] {
+                                if !viewModel.activities.isEmpty {
+                                    ForEach(viewModel.activities) { activity in
+                                        ActivityRow(activity: activity)
+                                    }
+                                } else if let activities = sessionManager.activities[sessionId] {
                                     ForEach(activities) { activity in
                                         ActivityRow(activity: activity)
                                     }
@@ -60,9 +73,15 @@ struct AgentSessionView: View {
                             }
 
                             // Result
-                            if let pr = session.outputs?.compactMap({ $0.pullRequest }).first {
+                            if let session,
+                               let pr = viewModel.resolvedPullRequest(from: viewModel.session ?? session) {
                                 AgentResultView(pullRequest: pr)
                                     .padding()
+                            } else if viewModel.isTerminalCompleted {
+                                Text("PR not available")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                    .padding(.horizontal)
                             }
                         }
                     }
@@ -75,17 +94,192 @@ struct AgentSessionView: View {
                 default: EmptyView()
                 }
             } else {
-                ProgressView("Loading session...")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        sessionStatusSection
+                        ProgressView("Loading session…")
+                    }
+                    .padding()
+                }
             }
         }
         .navigationTitle("Session Tracking")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if let sessionURL = viewModel.validSessionURL {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Open in Jules") {
+                        viewModel.open(url: sessionURL)
+                    }
+                }
+            }
+        }
         .onAppear {
+            viewModel.startPolling()
             sessionManager.startPolling(sessionId: sessionId)
         }
         .onDisappear {
+            viewModel.stopPolling()
             sessionManager.stopPolling(sessionId: sessionId)
+        }
+    }
+
+    private var sessionStatusSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Session Status")
+                .font(.headline)
+
+            switch viewModel.uiStatus {
+            case .pending, .running:
+                HStack(spacing: 8) {
+                    ProgressView()
+                    Text(viewModel.uiStatus == .pending ? "Pending…" : "Running…")
+                        .font(.subheadline)
+                }
+            case .completed:
+                Label("Completed", systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+            case .failed:
+                Label("Failed", systemImage: "xmark.octagon.fill")
+                    .foregroundStyle(.red)
+            }
+
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+            }
+
+            if viewModel.isTerminalCompleted {
+                if let prURL = viewModel.validPRURL {
+                    Button("Open PR") {
+                        viewModel.open(url: prURL)
+                    }
+                    .buttonStyle(.borderedProminent)
+                } else {
+                    Text("PR not available")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemBackground))
+    }
+}
+
+@MainActor
+final class AgentSessionViewModel: ObservableObject {
+    enum UIStatus {
+        case pending
+        case running
+        case completed
+        case failed
+    }
+
+    @Published private(set) var session: AgentSession?
+    @Published private(set) var activities: [AgentActivity] = []
+    @Published private(set) var errorMessage: String?
+
+    let sessionId: String
+
+    private let client = AgentClient.shared
+    private var pollTask: Task<Void, Never>?
+    private let openURL: (URL) -> Void
+
+    init(sessionId: String, openURL: @escaping (URL) -> Void = { UIApplication.shared.open($0) }) {
+        self.sessionId = sessionId
+        self.openURL = openURL
+    }
+
+    var uiStatus: UIStatus {
+        guard let raw = session?.status?.lowercased() else {
+            return session == nil ? .pending : .running
+        }
+
+        if ["completed", "succeeded", "success", "done"].contains(raw) {
+            return .completed
+        }
+        if ["failed", "error", "cancelled"].contains(raw) {
+            return .failed
+        }
+        if ["pending", "queued", "created"].contains(raw) {
+            return .pending
+        }
+        return .running
+    }
+
+    var isTerminalCompleted: Bool {
+        uiStatus == .completed
+    }
+
+    var validSessionURL: URL? {
+        guard let source = session?.sessionURL?.trimmingCharacters(in: .whitespacesAndNewlines), !source.isEmpty,
+              let url = URL(string: source) else {
+            return nil
+        }
+        return url
+    }
+
+    var validPRURL: URL? {
+        guard let candidate = prURLString?.trimmingCharacters(in: .whitespacesAndNewlines),
+              let url = URL(string: candidate),
+              url.scheme == "https",
+              url.host == "github.com" else {
+            return nil
+        }
+        return url
+    }
+
+    func startPolling() {
+        guard pollTask == nil else { return }
+        pollTask = Task {
+            while !Task.isCancelled {
+                await refresh()
+                if isTerminalState { break }
+                try? await Task.sleep(for: .seconds(5))
+            }
+            pollTask = nil
+        }
+    }
+
+    func stopPolling() {
+        pollTask?.cancel()
+        pollTask = nil
+    }
+
+    func open(url: URL) {
+        openURL(url)
+    }
+
+    func resolvedPullRequest(from session: AgentSession) -> AgentPullRequest? {
+        session.outputs?.compactMap(\.pullRequest).first
+    }
+
+    private var prURLString: String? {
+        if let nested = session?.outputs?.compactMap({ $0.pullRequest?.url }).first(where: { !$0.isEmpty }) {
+            return nested
+        }
+        return session?.outputs?.compactMap({ $0.prURL }).first(where: { !$0.isEmpty })
+    }
+
+    private var isTerminalState: Bool {
+        uiStatus == .completed || uiStatus == .failed
+    }
+
+    private func refresh() async {
+        do {
+            async let sessionRequest = client.getSession(id: sessionId)
+            async let activityRequest = client.fetchActivities(sessionId: sessionId)
+
+            let (updatedSession, updatedActivities) = try await (sessionRequest, activityRequest)
+            session = updatedSession
+            activities = updatedActivities
+            errorMessage = nil
+            AgentSessionStore.shared.upsertSession(updatedSession, workspaceId: updatedSession.sourceContext.source)
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
 }

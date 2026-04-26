@@ -2,10 +2,7 @@ import SwiftUI
 
 struct AgentResultView: View {
     let pullRequest: AgentPullRequest
-    @State private var prDetails: GitHubPullRequest?
-    @State private var isLoading = false
-    @State private var showingPRDetail = false
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -34,8 +31,8 @@ struct AgentResultView: View {
 
             Button(action: openPR) {
                 HStack {
-                    Image(systemName: "tray.full.fill")
-                    Text("Open in PR View")
+                    Image(systemName: "safari")
+                    Text("Open PR")
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -43,6 +40,7 @@ struct AgentResultView: View {
                 .foregroundColor(.white)
                 .cornerRadius(10)
             }
+            .disabled(URL(string: pullRequest.url) == nil)
 
             Text("Note: You can also find this PR in the Pull Requests section of this repository.")
                 .font(.caption2)
@@ -53,43 +51,10 @@ struct AgentResultView: View {
         .background(Color(.systemBackground))
         .cornerRadius(12)
         .shadow(radius: 5)
-        .sheet(isPresented: $showingPRDetail) {
-            if let pr = prDetails {
-                let components = pullRequest.url.components(separatedBy: "/")
-                NavigationView {
-                    PRDetailView(owner: components[3], repo: components[4], pullRequest: pr)
-                        .toolbar {
-                            ToolbarItem(placement: .navigationBarLeading) {
-                                Button("Close") { showingPRDetail = false }
-                            }
-                        }
-                }
-            }
-        }
-        .overlay {
-            if isLoading { ProgressView() }
-        }
     }
 
     private func openPR() {
-        let components = pullRequest.url.components(separatedBy: "/")
-        guard components.count >= 7,
-              let number = Int(components[6]),
-              let owner = components.indices.contains(3) ? components[3] : nil,
-              let repo = components.indices.contains(4) ? components[4] : nil else { return }
-
-        isLoading = true
-        Task {
-            do {
-                let pr: GitHubPullRequest = try await GitHubAPIClient.shared.request(.prDetails(owner: owner, repo: repo, number: number))
-                await MainActor.run {
-                    self.prDetails = pr
-                    self.isLoading = false
-                    self.showingPRDetail = true
-                }
-            } catch {
-                await MainActor.run { self.isLoading = false }
-            }
-        }
+        guard let url = URL(string: pullRequest.url) else { return }
+        openURL(url)
     }
 }

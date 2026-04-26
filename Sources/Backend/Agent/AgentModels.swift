@@ -6,12 +6,18 @@ struct AgentSession: Codable, Identifiable {
     let name: String
     let title: String?
     let prompt: String?
+    let status: String?
+    let sessionURL: String?
     let sourceContext: AgentSourceContext
     let outputs: [AgentOutput]?
 
     enum CodingKeys: String, CodingKey {
-        case id, name, title, prompt, outputs
+        case id, name, title, prompt, status, outputs
         case sourceContext = "sourceContext"
+        case sessionURL = "session_url"
+        case webURL = "web_url"
+        case htmlURL = "html_url"
+        case url
     }
 
     init(from decoder: Decoder) throws {
@@ -20,6 +26,11 @@ struct AgentSession: Codable, Identifiable {
         name = (try? container.decode(String.self, forKey: .name)) ?? id
         title = try? container.decodeIfPresent(String.self, forKey: .title)
         prompt = try? container.decodeIfPresent(String.self, forKey: .prompt)
+        status = try? container.decodeIfPresent(String.self, forKey: .status)
+        sessionURL = (try? container.decodeIfPresent(String.self, forKey: .sessionURL))
+            ?? (try? container.decodeIfPresent(String.self, forKey: .webURL))
+            ?? (try? container.decodeIfPresent(String.self, forKey: .htmlURL))
+            ?? (try? container.decodeIfPresent(String.self, forKey: .url))
         sourceContext = (try? container.decode(AgentSourceContext.self, forKey: .sourceContext)) ?? AgentSourceContext(source: "unknown", githubRepoContext: nil)
         outputs = try? container.decodeIfPresent([AgentOutput].self, forKey: .outputs)
     }
@@ -35,13 +46,45 @@ struct AgentGitHubRepoContext: Codable {
 }
 
 struct AgentOutput: Codable {
+    let prURL: String?
     let pullRequest: AgentPullRequest?
+
+    enum CodingKeys: String, CodingKey {
+        case prURL = "pr_url"
+        case pullRequest = "pull_request"
+        case legacyPullRequest = "pullRequest"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        prURL = try? container.decodeIfPresent(String.self, forKey: .prURL)
+        pullRequest = (try? container.decodeIfPresent(AgentPullRequest.self, forKey: .pullRequest))
+            ?? (try? container.decodeIfPresent(AgentPullRequest.self, forKey: .legacyPullRequest))
+    }
 }
 
 struct AgentPullRequest: Codable {
     let url: String
     let title: String?
     let description: String?
+
+    enum CodingKeys: String, CodingKey {
+        case url
+        case htmlURL = "html_url"
+        case title
+        case description
+        case body
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        url = (try? container.decode(String.self, forKey: .url))
+            ?? (try? container.decode(String.self, forKey: .htmlURL))
+            ?? ""
+        title = try? container.decodeIfPresent(String.self, forKey: .title)
+        description = (try? container.decodeIfPresent(String.self, forKey: .description))
+            ?? (try? container.decodeIfPresent(String.self, forKey: .body))
+    }
 }
 
 /// Represents an activity within a Jules session.

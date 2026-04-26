@@ -8,7 +8,9 @@ struct AgentPromptView: View {
     @State private var isSubmitting = false
     @State private var errorMessage: String?
     @State private var showingOptimizer = false
-    @State private var navigateToProgress = false
+    @State private var navigateToSession = false
+    @State private var createdSessionID: String?
+    @StateObject private var sessionManager = AgentSessionManager.shared
     @Environment(\.dismiss) var dismiss
 
     let templates = [
@@ -126,8 +128,10 @@ struct AgentPromptView: View {
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
             }
-            .navigationDestination(isPresented: $navigateToProgress) {
-                AgentProgressSessionView(prompt: prompt, owner: owner, repo: repo, branch: nil)
+            .navigationDestination(isPresented: $navigateToSession) {
+                if let sessionID = createdSessionID {
+                    AgentSessionView(sessionId: sessionID)
+                }
             }
         }
     }
@@ -141,8 +145,22 @@ struct AgentPromptView: View {
 
         errorMessage = nil
         prompt = trimmedPrompt
-        print("[AgentPromptView] Captured prompt (length: \(trimmedPrompt.count))")
-        print("[AgentPromptView] Repository URL: https://github.com/\(owner)/\(repo)")
-        navigateToProgress = true
+        isSubmitting = true
+
+        Task {
+            do {
+                let session = try await sessionManager.startSession(prompt: trimmedPrompt, owner: owner, repo: repo)
+                await MainActor.run {
+                    createdSessionID = session.id
+                    navigateToSession = true
+                    isSubmitting = false
+                }
+            } catch {
+                await MainActor.run {
+                    errorMessage = error.localizedDescription
+                    isSubmitting = false
+                }
+            }
+        }
     }
 }
