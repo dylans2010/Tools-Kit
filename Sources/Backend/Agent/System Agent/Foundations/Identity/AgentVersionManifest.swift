@@ -1,11 +1,10 @@
 import Foundation
 
-struct AgentVersionManifest: Codable {
-    var version: String
-    var builtAt: Date
+public enum AgentVersionManifest {
+    public static let version = "1.0.0"
+    public static let buildNumber = "20240426.1"
 
-    init(version: String, builtAt: Date = Date()) {
-        self.version = version
-        self.builtAt = builtAt
+    public static var userAgent: String {
+        "SystemAgent/\(version) (\(buildNumber))"
     }
 }

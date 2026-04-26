@@ -1,7 +1,11 @@
 import Foundation
 
-struct AgentAPIValidator {
-    func validateStatus(_ response: HTTPURLResponse) -> Bool {
-        (200..<300).contains(response.statusCode)
+public struct AgentAPIValidator {
+    public init() {}
+
+    public func validateResponse(_ response: AgentAPIResponse) throws {
+        if response.text.isEmpty && response.finishReason != "stop" {
+            throw AgentValidationError.invalidFormat("text")
+        }
     }
 }

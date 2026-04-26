@@ -1,23 +1,21 @@
 import Foundation
 
-actor AgentDemoMode {
-    static let shared = AgentDemoMode()
+public final class AgentDemoMode {
+    public private(set) var isRunning: Bool = false
 
-    enum DemoStatus {
-        case idle, preparing
-        case running(script: AgentDemoScript, currentStep: Int, elapsed: TimeInterval)
-        case paused(at: Int)
-        case completed(result: AgentDemoResultRecorder.Recording)
-        case failed(step: Int, error: Error)
+    public init() {}
+
+    public func startDemo(script: AgentDemoScript, onStep: (AgentDemoStep) -> Void) async {
+        isRunning = true
+        for step in script.steps {
+            guard isRunning else { break }
+            onStep(step)
+            try? await Task.sleep(nanoseconds: UInt64(step.delay * 1_000_000_000))
+        }
+        isRunning = false
     }
 
-    private(set) var status: DemoStatus = .idle
-    private var currentScript: AgentDemoScript?
-    private var currentStepIndex = 0
-
-    func start(script: AgentDemoScript) async throws { status = .preparing; currentScript = script; currentStepIndex = 0; status = .running(script: script, currentStep: 0, elapsed: 0) }
-    func pause() { status = .paused(at: currentStepIndex) }
-    func resume() async throws { if let script = currentScript { status = .running(script: script, currentStep: currentStepIndex, elapsed: 0) } }
-    func stop() { status = .idle; currentScript = nil }
-    func exportRecording() -> AgentDemoResultRecorder.Recording? { nil }
+    public func stopDemo() {
+        isRunning = false
+    }
 }

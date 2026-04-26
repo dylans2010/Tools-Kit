@@ -1,13 +1,16 @@
 import Foundation
 
-struct AgentCapabilities: Codable, OptionSet {
-    let rawValue: Int
-    init(rawValue: Int) { self.rawValue = rawValue }
+public struct AgentCapabilities: Codable, Equatable {
+    public var canUseTools: Bool
+    public var canProcessVision: Bool
+    public var canGenerateCode: Bool
+    public var canAccessInternet: Bool
 
-    static let tools = AgentCapabilities(rawValue: 1 << 0)
-    static let planning = AgentCapabilities(rawValue: 1 << 1)
-    static let codeGeneration = AgentCapabilities(rawValue: 1 << 2)
-    static let memory = AgentCapabilities(rawValue: 1 << 3)
-    static let streaming = AgentCapabilities(rawValue: 1 << 4)
-    static let automation = AgentCapabilities(rawValue: 1 << 5)
+    public static var none: AgentCapabilities {
+        AgentCapabilities(canUseTools: false, canProcessVision: false, canGenerateCode: false, canAccessInternet: false)
+    }
+
+    public static var all: AgentCapabilities {
+        AgentCapabilities(canUseTools: true, canProcessVision: true, canGenerateCode: true, canAccessInternet: true)
+    }
 }

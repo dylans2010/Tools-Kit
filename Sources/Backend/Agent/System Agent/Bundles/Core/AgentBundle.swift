@@ -1,8 +1,17 @@
 import Foundation
 
-struct AgentBundle: Codable {
-    let identifier: String
-    let name: String
-    let modelIdentifier: String
-    let version: String
+public struct AgentBundle: Codable, Identifiable {
+    public let id: String
+    public let name: String
+    public let version: String
+    public let tools: [String]
+    public let capabilities: AgentCapabilities
+
+    public init(id: String, name: String, version: String, tools: [String], capabilities: AgentCapabilities) {
+        self.id = id
+        self.name = name
+        self.version = version
+        self.tools = tools
+        self.capabilities = capabilities
+    }
 }

@@ -1,15 +1,16 @@
 import Foundation
 
-struct AgentCodeValidator {
-    func validateBalancedDelimiters(_ code: String) -> Bool {
-        var stack: [Character] = []
-        let pairs: [Character: Character] = [")": "(", "]": "[", "}": "{"]
-        for ch in code {
-            if ["(", "[", "{"].contains(ch) { stack.append(ch) }
-            else if let expected = pairs[ch] {
-                guard stack.popLast() == expected else { return false }
-            }
+public final class AgentCodeValidator {
+    public init() {}
+
+    public func validate(code: String, language: String) -> Bool {
+        // Basic syntax check (braces balance)
+        var balance = 0
+        for char in code {
+            if char == "{" { balance += 1 }
+            else if char == "}" { balance -= 1 }
+            if balance < 0 { return false }
         }
-        return stack.isEmpty
+        return balance == 0
     }
 }

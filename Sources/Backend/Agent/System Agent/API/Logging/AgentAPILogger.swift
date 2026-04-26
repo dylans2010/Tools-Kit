@@ -1,13 +1,21 @@
 import Foundation
 
-actor AgentAPILogger {
-    static let shared = AgentAPILogger()
-    private var logs: [AgentLogEntry] = []
+public final class AgentAPILogger {
+    public static let shared = AgentAPILogger()
+    private var entries: [AgentLogEntry] = []
+    private let queue = DispatchQueue(label: "com.tools-kit.agent.logging")
 
-    func log(level: AgentLogLevel, component: String, message: String) {
-        logs.append(AgentLogEntry(id: UUID(), timestamp: Date(), level: level, component: component, message: message))
+    private init() {}
+
+    public func log(_ level: AgentLogLevel, _ message: String, metadata: [String: String] = [:]) {
+        let entry = AgentLogEntry(level: level, message: message, metadata: metadata)
+        queue.async {
+            self.entries.append(entry)
+            print("[\(level.rawValue.uppercased())] \(message)")
+        }
     }
 
-    func allLogs() -> [AgentLogEntry] { logs }
-    func clearLogs() { logs.removeAll() }
+    public func getLogs() -> [AgentLogEntry] {
+        queue.sync { entries }
+    }
 }

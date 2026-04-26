@@ -1,9 +1,17 @@
 import Foundation
 
-struct AgentLongTermMemory {
-    private var storage: [String: String] = [:]
+public final class AgentLongTermMemory {
+    private let store: AgentMemoryStore
 
-    mutating func remember(key: String, value: String) { storage[key] = value }
-    func recall(key: String) -> String? { storage[key] }
-    func all() -> [String: String] { storage }
+    public init(store: AgentMemoryStore = AgentMemoryStore()) {
+        self.store = store
+    }
+
+    public func persist(_ entry: AgentMemoryEntry) {
+        store.add(entry)
+    }
+
+    public func retrieve(query: String) -> [AgentMemoryEntry] {
+        store.search(query: query)
+    }
 }

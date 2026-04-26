@@ -1,15 +1,23 @@
 import Foundation
 
-struct AgentCodeBlockParser {
-    func parse(_ source: String) -> [AgentCodeBlock] {
-        let pattern = "```(\w+)?\n([\s\S]*?)```"
+public struct AgentCodeBlock {
+    public let language: String
+    public let code: String
+}
+
+public struct AgentCodeBlockParser {
+    public init() {}
+
+    public func parse(text: String) -> [AgentCodeBlock] {
+        let pattern = #"```(\w*)\n([\s\S]*?)```"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
-        let range = NSRange(source.startIndex..<source.endIndex, in: source)
-        return regex.matches(in: source, range: range).compactMap { match in
-            guard let codeRange = Range(match.range(at: 2), in: source) else { return nil }
-            let langRange = Range(match.range(at: 1), in: source)
-            let lang = langRange.map { String(source[$0]) } ?? "plaintext"
-            return AgentCodeBlock(language: lang.isEmpty ? "plaintext" : lang, code: String(source[codeRange]))
+        let range = NSRange(text.startIndex..<text.endIndex, in: text)
+        let matches = regex.matches(in: text, options: [], range: range)
+
+        return matches.compactMap { match in
+            guard let langRange = Range(match.range(at: 1), in: text),
+                  let codeRange = Range(match.range(at: 2), in: text) else { return nil }
+            return AgentCodeBlock(language: String(text[langRange]), code: String(text[codeRange]))
         }
     }
 }
