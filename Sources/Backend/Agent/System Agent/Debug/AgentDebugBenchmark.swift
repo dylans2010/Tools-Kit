@@ -1,9 +1,9 @@
 import Foundation
 
-public final class AgentDebugBenchmark {
-    public init() {}
+final class AgentDebugBenchmark {
+    init() {}
 
-    public func runBenchmark(task: () async -> Void) async -> TimeInterval {
+    func runBenchmark(task: () async -> Void) async -> TimeInterval {
         let start = Date()
         await task()
         return Date().timeIntervalSince(start)

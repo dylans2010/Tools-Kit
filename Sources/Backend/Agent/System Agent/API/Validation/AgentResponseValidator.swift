@@ -1,9 +1,9 @@
 import Foundation
 
-public struct AgentResponseValidator {
-    public init() {}
+struct AgentResponseValidator {
+    init() {}
 
-    public func validate(_ text: String) -> Bool {
+    func validate(_ text: String) -> Bool {
         !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }

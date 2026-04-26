@@ -1,9 +1,9 @@
 import Foundation
 
-public final class AgentCodeDiffEngine {
-    public init() {}
+final class AgentCodeDiffEngine {
+    init() {}
 
-    public func generateDiff(original: String, modified: String) -> String {
+    func generateDiff(original: String, modified: String) -> String {
         // Simple line-based diff generator
         let originalLines = original.components(separatedBy: .newlines)
         let modifiedLines = modified.components(separatedBy: .newlines)

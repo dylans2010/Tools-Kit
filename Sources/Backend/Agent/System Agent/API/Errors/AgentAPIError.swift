@@ -1,13 +1,13 @@
 import Foundation
 
-public enum AgentAPIError: Error, LocalizedError {
+enum AgentAPIError: Error, LocalizedError {
     case invalidURL
     case unexpectedResponse
     case decodingError(Error)
     case serverError(Int, String)
     case unauthorized
 
-    public var errorDescription: String? {
+    var errorDescription: String? {
         switch self {
         case .invalidURL: return "Invalid API URL."
         case .unexpectedResponse: return "Received an unexpected response from the API."

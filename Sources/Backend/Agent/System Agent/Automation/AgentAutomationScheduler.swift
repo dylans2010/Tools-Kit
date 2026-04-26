@@ -1,15 +1,19 @@
 import Foundation
 
-public final class AgentAutomationScheduler {
-    public init() {}
+final class AgentAutomationScheduler {
+    private let agent: SystemAgent
 
-    public func schedule(script: AgentAutomationScript, at date: Date) {
+    init(agent: SystemAgent) {
+        self.agent = agent
+    }
+
+    func schedule(script: AgentAutomationScript, at date: Date) {
         let delay = date.timeIntervalSinceNow
         guard delay > 0 else { return }
 
         DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
             Task {
-                let engine = AgentAutomationEngine()
+                let engine = AgentAutomationEngine(agent: self.agent)
                 _ = await engine.execute(script: script)
             }
         }

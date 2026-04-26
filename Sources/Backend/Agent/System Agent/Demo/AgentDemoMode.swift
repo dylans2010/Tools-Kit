@@ -1,11 +1,11 @@
 import Foundation
 
-public final class AgentDemoMode {
-    public private(set) var isRunning: Bool = false
+final class AgentDemoMode {
+    private(set) var isRunning: Bool = false
 
-    public init() {}
+    init() {}
 
-    public func startDemo(script: AgentDemoScript, onStep: (AgentDemoStep) -> Void) async {
+    func startDemo(script: AgentDemoScript, onStep: (AgentDemoStep) -> Void) async {
         isRunning = true
         for step in script.steps {
             guard isRunning else { break }
@@ -15,7 +15,7 @@ public final class AgentDemoMode {
         isRunning = false
     }
 
-    public func stopDemo() {
+    func stopDemo() {
         isRunning = false
     }
 }

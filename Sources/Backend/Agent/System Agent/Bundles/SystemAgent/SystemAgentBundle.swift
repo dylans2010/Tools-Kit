@@ -1,7 +1,7 @@
 import Foundation
 
-public struct SystemAgentBundle {
-    public static let bundle = AgentBundle(
+struct SystemAgentBundle {
+    static let bundle = AgentBundle(
         id: "com.system.agent",
         name: "System Agent",
         version: "1.0.0",

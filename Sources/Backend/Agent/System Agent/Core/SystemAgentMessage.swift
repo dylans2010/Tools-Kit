@@ -1,7 +1,7 @@
 import Foundation
 
 struct SystemAgentMessage: Codable, Identifiable {
-    enum Role: Codable {
+    enum Role: Equatable, Codable {
         case system
         case user
         case assistant
@@ -70,6 +70,22 @@ struct SystemAgentMessage: Codable, Identifiable {
             case .failed(let message):
                 try container.encode(Kind.failed, forKey: .type)
                 try container.encode(message, forKey: .message)
+            }
+        }
+
+
+        static func == (lhs: Role, rhs: Role) -> Bool {
+            switch (lhs, rhs) {
+            case (.system, .system), (.user, .user), (.assistant, .assistant):
+                return true
+            case (.toolCall(let lhsName, _), .toolCall(let rhsName, _)):
+                return lhsName == rhsName
+            case (.toolResult(let lhsTool, let lhsResult), .toolResult(let rhsTool, let rhsResult)):
+                return lhsTool == rhsTool && lhsResult == rhsResult
+            case (.failed(let lhsMessage), .failed(let rhsMessage)):
+                return lhsMessage == rhsMessage
+            default:
+                return false
             }
         }
     }

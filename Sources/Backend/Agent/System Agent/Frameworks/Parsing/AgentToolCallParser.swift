@@ -1,9 +1,9 @@
 import Foundation
 
-public struct AgentToolCallParser {
-    public init() {}
+struct AgentToolCallParser {
+    init() {}
 
-    public func parse(_ jsonString: String) throws -> AgentToolCall {
+    func parse(_ jsonString: String) throws -> AgentToolCall {
         guard let data = jsonString.data(using: .utf8) else {
             throw AgentValidationError.invalidFormat("tool_call")
         }

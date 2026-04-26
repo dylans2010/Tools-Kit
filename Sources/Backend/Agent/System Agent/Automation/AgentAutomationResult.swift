@@ -1,8 +1,8 @@
 import Foundation
 
-public struct AgentAutomationResult: Codable {
-    public let scriptId: UUID
-    public let success: Bool
-    public let output: String
-    public let error: String?
+struct AgentAutomationResult: Codable {
+    let scriptId: UUID
+    let success: Bool
+    let output: String
+    let error: String?
 }

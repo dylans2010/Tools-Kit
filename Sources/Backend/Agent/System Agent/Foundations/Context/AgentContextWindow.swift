@@ -1,22 +1,22 @@
 import Foundation
 
-public struct AgentContextWindow {
-    public let maxTokens: Int
-    public private(set) var currentTokens: Int = 0
+struct AgentContextWindow {
+    let maxTokens: Int
+    private(set) var currentTokens: Int = 0
 
-    public init(maxTokens: Int) {
+    init(maxTokens: Int) {
         self.maxTokens = maxTokens
     }
 
-    public mutating func update(current: Int) {
+    mutating func update(current: Int) {
         self.currentTokens = current
     }
 
-    public var remainingTokens: Int {
+    var remainingTokens: Int {
         max(0, maxTokens - currentTokens)
     }
 
-    public var isExceeded: Bool {
+    var isExceeded: Bool {
         currentTokens > maxTokens
     }
 }

@@ -31,6 +31,12 @@ final class JulesAgentViewModel: AgentViewModelProtocol {
         }
     }
 
+    func retryLastSubmission() async {
+        guard let lastUserMessage = messages.last(where: { $0.role == .user }) else { return }
+        inputText = lastUserMessage.content
+        await submit()
+    }
+
     func reset() {
         messages = []
         state = .idle

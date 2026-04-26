@@ -1,11 +1,11 @@
 import Foundation
 
-public struct AgentContextSnapshot: Codable {
-    public let id: UUID
-    public let timestamp: Date
-    public let context: AgentContext
+struct AgentContextSnapshot: Codable {
+    let id: UUID
+    let timestamp: Date
+    let context: AgentContext
 
-    public init(context: AgentContext) {
+    init(context: AgentContext) {
         self.id = UUID()
         self.timestamp = Date()
         self.context = context

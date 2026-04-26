@@ -1,12 +1,12 @@
 import Foundation
 
-public struct AgentTaskStep: Codable, Identifiable {
-    public let id: UUID
-    public let description: String
-    public var isCompleted: Bool
-    public let priority: AgentTaskPriority
+struct AgentTaskStep: Codable, Identifiable {
+    let id: UUID
+    let description: String
+    var isCompleted: Bool
+    let priority: AgentTaskPriority
 
-    public init(description: String, priority: AgentTaskPriority = .medium) {
+    init(description: String, priority: AgentTaskPriority = .medium) {
         self.id = UUID()
         self.description = description
         self.isCompleted = false

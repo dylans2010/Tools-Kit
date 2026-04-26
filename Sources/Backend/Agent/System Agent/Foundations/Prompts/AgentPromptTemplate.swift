@@ -1,13 +1,13 @@
 import Foundation
 
-public struct AgentPromptTemplate {
-    public let template: String
+struct AgentPromptTemplate {
+    let template: String
 
-    public init(_ template: String) {
+    init(_ template: String) {
         self.template = template
     }
 
-    public func render(variables: [String: String]) -> String {
+    func render(variables: [String: String]) -> String {
         var rendered = template
         for (key, value) in variables {
             rendered = rendered.replacingOccurrences(of: "{{\(key)}}", with: value)

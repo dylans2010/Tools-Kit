@@ -1,9 +1,9 @@
 import Foundation
 
-public struct AgentAPIResponseHandler {
-    public init() {}
+struct AgentAPIResponseHandler {
+    init() {}
 
-    public func handle<T: Decodable>(_ data: Data, response: HTTPURLResponse) throws -> T {
+    func handle<T: Decodable>(_ data: Data, response: HTTPURLResponse) throws -> T {
         guard (200...299).contains(response.statusCode) else {
             let message = String(data: data, encoding: .utf8) ?? "Unknown error"
             throw AgentAPIError.serverError(response.statusCode, message)

@@ -1,7 +1,7 @@
 import Foundation
 
-public struct JulesAgentCapabilityProfile {
-    public static let capabilities = AgentCapabilities(
+struct JulesAgentCapabilityProfile {
+    static let capabilities = AgentCapabilities(
         canUseTools: true,
         canProcessVision: true,
         canGenerateCode: true,

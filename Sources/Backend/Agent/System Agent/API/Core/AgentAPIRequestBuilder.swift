@@ -1,9 +1,9 @@
 import Foundation
 
-public struct AgentAPIRequestBuilder {
-    public init() {}
+struct AgentAPIRequestBuilder {
+    init() {}
 
-    public func build(endpoint: URL, method: String = "POST", body: Encodable? = nil, headers: [String: String] = [:]) throws -> URLRequest {
+    func build(endpoint: URL, method: String = "POST", body: Encodable? = nil, headers: [String: String] = [:]) throws -> URLRequest {
         var request = URLRequest(url: endpoint)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -16,7 +16,7 @@ public struct AgentAPIRequestBuilder {
         return request
     }
 
-    public func buildRequest(_ apiRequest: AgentAPIRequest, endpoint: URL, headers: [String: String] = [:]) throws -> URLRequest {
+    func buildRequest(_ apiRequest: AgentAPIRequest, endpoint: URL, headers: [String: String] = [:]) throws -> URLRequest {
         try build(endpoint: endpoint, method: "POST", body: apiRequest, headers: headers)
     }
 }

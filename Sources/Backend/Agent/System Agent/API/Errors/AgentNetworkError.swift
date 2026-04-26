@@ -1,12 +1,12 @@
 import Foundation
 
-public enum AgentNetworkError: Error, LocalizedError {
+enum AgentNetworkError: Error, LocalizedError {
     case noConnection
     case timeout
     case cancelled
     case underlying(Error)
 
-    public var errorDescription: String? {
+    var errorDescription: String? {
         switch self {
         case .noConnection: return "No internet connection."
         case .timeout: return "The request timed out."

@@ -1,9 +1,9 @@
 import Foundation
 
-public struct AgentBundleValidator {
-    public init() {}
+struct AgentBundleValidator {
+    init() {}
 
-    public func validate(bundle: AgentBundle) -> Bool {
+    func validate(bundle: AgentBundle) -> Bool {
         !bundle.id.isEmpty && !bundle.name.isEmpty && !bundle.version.isEmpty
     }
 }

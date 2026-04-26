@@ -1,9 +1,9 @@
 import Foundation
 
-public struct AgentConfigurationMigrator {
-    public init() {}
+struct AgentConfigurationMigrator {
+    init() {}
 
-    public func migrate(_ data: [String: Any]) -> AgentConfiguration {
+    func migrate(_ data: [String: Any]) -> AgentConfiguration {
         var config = AgentConfiguration.default
 
         if let modelId = data["modelId"] as? String {

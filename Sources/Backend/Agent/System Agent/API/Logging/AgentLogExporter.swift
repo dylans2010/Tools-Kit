@@ -1,9 +1,9 @@
 import Foundation
 
-public struct AgentLogExporter {
-    public init() {}
+struct AgentLogExporter {
+    init() {}
 
-    public func export(logs: [AgentLogEntry]) throws -> Data {
+    func export(logs: [AgentLogEntry]) throws -> Data {
         try JSONEncoder().encode(logs)
     }
 }

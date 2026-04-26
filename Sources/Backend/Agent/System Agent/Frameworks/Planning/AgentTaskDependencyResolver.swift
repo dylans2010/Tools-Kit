@@ -1,9 +1,9 @@
 import Foundation
 
-public final class AgentTaskDependencyResolver {
-    public init() {}
+final class AgentTaskDependencyResolver {
+    init() {}
 
-    public func resolve(graph: AgentTaskGraph) -> [String] {
+    func resolve(graph: AgentTaskGraph) -> [String] {
         var inDegree: [String: Int] = [:]
         let edges = graph.edges
 

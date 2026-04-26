@@ -132,13 +132,6 @@ struct AgentToolExecution: Codable, Identifiable {
     let error: SystemToolError?
 }
 
-struct AgentMemoryEntry: Codable, Identifiable {
-    var id: String { key }
-    let key: String
-    let value: AnyCodable
-    let category: String?
-}
-
 struct AgentCheckpoint: Codable, Identifiable {
     let id: String
     let timestamp: Date

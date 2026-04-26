@@ -1,9 +1,9 @@
 import Foundation
 
-public final class AgentCodeFormatter {
-    public init() {}
+final class AgentCodeFormatter {
+    init() {}
 
-    public func format(code: String, language: String) -> String {
+    func format(code: String, language: String) -> String {
         // Basic indentation formatter
         let lines = code.components(separatedBy: .newlines)
         var formatted = ""

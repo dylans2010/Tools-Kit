@@ -1,13 +1,13 @@
 import Foundation
 
-public final class AgentAutomationEngine {
+final class AgentAutomationEngine {
     private let agent: SystemAgent
 
-    public init(agent: SystemAgent) {
+    init(agent: SystemAgent) {
         self.agent = agent
     }
 
-    public func execute(script: AgentAutomationScript) async -> AgentAutomationResult {
+    func execute(script: AgentAutomationScript) async -> AgentAutomationResult {
         AgentAPILogger.shared.log(.info, "Executing automation script: \(script.name)")
 
         var output = "Execution started for script: \(script.name)\n"
