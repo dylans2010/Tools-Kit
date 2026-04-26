@@ -4,6 +4,7 @@ enum AgentExecutionEventType: String, Codable, CaseIterable {
     case sessionStarted = "session_started"
     case stepStarted = "step_started"
     case stepProgress = "step_progress"
+    case checklistUpdated = "checklist_updated"
     case logOutput = "log_output"
     case fileGenerated = "file_generated"
     case fileUpdated = "file_updated"

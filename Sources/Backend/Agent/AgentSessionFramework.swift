@@ -39,6 +39,26 @@ final class AgentExecutionEngine {
             .sorted { $0.createTime < $1.createTime }
 
         for activity in freshActivities {
+            if let plan = activity.planGenerated?.plan {
+                for step in plan.steps.sorted(by: { ($0.index ?? 0) < ($1.index ?? 0) }) {
+                    events.append(
+                        AgentExecutionEvent(
+                            sessionId: session.id,
+                            timestamp: activity.createTime,
+                            type: .checklistUpdated,
+                            stepId: step.id,
+                            title: step.title,
+                            message: "Checklist step added",
+                            payload: [
+                                "checklist_id": AnyCodable(step.id),
+                                "checklist_status": AnyCodable("pending"),
+                                "checklist_details": AnyCodable("Planned for execution")
+                            ]
+                        )
+                    )
+                }
+            }
+
             if let progress = activity.progressUpdated {
                 events.append(
                     AgentExecutionEvent(
@@ -68,6 +88,21 @@ final class AgentExecutionEngine {
                         ]
                     )
                 )
+                events.append(
+                    AgentExecutionEvent(
+                        sessionId: session.id,
+                        timestamp: timeline.timestamp,
+                        type: .checklistUpdated,
+                        stepId: timeline.id,
+                        title: timeline.step,
+                        message: "Checklist step \(timeline.status)",
+                        payload: [
+                            "checklist_id": AnyCodable(timeline.id),
+                            "checklist_status": AnyCodable(timeline.status),
+                            "checklist_details": AnyCodable("Updated from Jules timeline")
+                        ]
+                    )
+                )
             }
 
             if let tool = activity.toolExecuted {
@@ -85,6 +120,22 @@ final class AgentExecutionEngine {
                         ]
                     )
                 )
+                if tool.tool.hasPrefix("system_") || tool.tool.contains("_file") || tool.tool.contains("git") {
+                    events.append(
+                        AgentExecutionEvent(
+                            sessionId: session.id,
+                            timestamp: activity.createTime,
+                            type: .checklistUpdated,
+                            title: "Tool: \(tool.tool)",
+                            message: "Tool \(tool.status)",
+                            payload: [
+                                "checklist_id": AnyCodable("tool-\(tool.requestId)"),
+                                "checklist_status": AnyCodable(tool.status),
+                                "checklist_details": AnyCodable("Executed via SystemTools")
+                            ]
+                        )
+                    )
+                }
 
                 if tool.tool.contains("git") || ["branch_create", "branch_switch", "commit_changes", "merge_branch", "revert_commit"].contains(tool.tool) {
                     events.append(
@@ -139,6 +190,20 @@ final class AgentExecutionEngine {
                         title: "Session Completed",
                         message: "Execution completed successfully",
                         payload: [:]
+                    )
+                )
+                events.append(
+                    AgentExecutionEvent(
+                        sessionId: session.id,
+                        timestamp: activity.createTime,
+                        type: .checklistUpdated,
+                        title: "Session Finalization",
+                        message: "All checklist items completed",
+                        payload: [
+                            "checklist_id": AnyCodable("session-finalization"),
+                            "checklist_status": AnyCodable("completed"),
+                            "checklist_details": AnyCodable("Jules marked session complete")
+                        ]
                     )
                 )
             }

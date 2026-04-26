@@ -141,8 +141,34 @@ actor GitHubActionsClient {
         return try decoder.decode(WorkflowArtifactListResponse.self, from: data).artifacts
     }
 
+    func listJobs(owner: String, repo: String, runID: Int) async throws -> [WorkflowJob] {
+        let data = try await request(path: "/repos/\(owner)/\(repo)/actions/runs/\(runID)/jobs")
+        return try decoder.decode(WorkflowJobsResponse.self, from: data).jobs
+    }
+
     func downloadLogs(owner: String, repo: String, runID: Int) async throws -> Data {
         try await request(path: "/repos/\(owner)/\(repo)/actions/runs/\(runID)/logs", acceptedStatusCodes: 200...302)
+    }
+
+    func rerun(runID: Int, owner: String, repo: String) async throws {
+        _ = try await request(
+            path: "/repos/\(owner)/\(repo)/actions/runs/\(runID)/rerun",
+            method: "POST",
+            acceptedStatusCodes: 201...201
+        )
+    }
+
+    func cancel(runID: Int, owner: String, repo: String) async throws {
+        _ = try await request(
+            path: "/repos/\(owner)/\(repo)/actions/runs/\(runID)/cancel",
+            method: "POST",
+            acceptedStatusCodes: 202...202
+        )
+    }
+
+    func setWorkflowState(owner: String, repo: String, workflowID: Int, enabled: Bool) async throws {
+        let path = "/repos/\(owner)/\(repo)/actions/workflows/\(workflowID)/\(enabled ? "enable" : "disable")"
+        _ = try await request(path: path, method: "PUT", acceptedStatusCodes: 200...204)
     }
 
 

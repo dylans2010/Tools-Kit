@@ -70,6 +70,17 @@ final class WorkflowManager: ObservableObject {
         }
     }
 
+    func setWorkflowState(workflowID: Int, owner: String, repo: String, enabled: Bool) async -> Bool {
+        do {
+            try await client.setWorkflowState(owner: owner, repo: repo, workflowID: workflowID, enabled: enabled)
+            await refresh(owner: owner, repo: repo)
+            return true
+        } catch {
+            lastError = error.localizedDescription
+            return false
+        }
+    }
+
     func loadYAML(owner: String, repo: String, workflowPath: String, ref: String) async throws -> String {
         try await client.getWorkflowYAML(owner: owner, repo: repo, path: workflowPath, ref: ref)
     }

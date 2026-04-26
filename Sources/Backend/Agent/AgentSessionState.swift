@@ -14,6 +14,7 @@ final class AgentSessionState: ObservableObject, Identifiable {
     @Published var checkpoints: [AgentCheckpoint] = []
     @Published var diffs: [String: AgentDiff] = [:]
     @Published var timeline: [AgentTimelineStep] = []
+    @Published var checklist: [AgentChecklistItem] = []
     @Published var timelineTools: [String: [AgentToolExecution]] = [:]
     @Published var workspaceFiles: [String] = []
 
@@ -50,6 +51,15 @@ final class AgentSessionState: ObservableObject, Identifiable {
                 timeline[index] = AgentTimelineStep(id: stepId, step: timeline[index].step, status: status, timestamp: event.timestamp)
             }
             logs.append(event.message)
+        case .checklistUpdated:
+            let id = (event.payload["checklist_id"]?.value as? String) ?? event.stepId ?? UUID().uuidString
+            let status = (event.payload["checklist_status"]?.value as? String) ?? "in_progress"
+            let details = (event.payload["checklist_details"]?.value as? String) ?? event.message
+            if let index = checklist.firstIndex(where: { $0.id == id }) {
+                checklist[index] = AgentChecklistItem(id: id, title: event.title, status: status, details: details, timestamp: event.timestamp)
+            } else {
+                checklist.append(AgentChecklistItem(id: id, title: event.title, status: status, details: details, timestamp: event.timestamp))
+            }
         case .logOutput:
             logs.append("[\(event.title)] \(event.message)")
         case .fileGenerated, .fileUpdated:
@@ -89,6 +99,8 @@ final class AgentSessionState: ObservableObject, Identifiable {
         let workspaceId: String
         let selectedTab: Int
         let session: AgentSession?
+        let timeline: [AgentTimelineStep]
+        let checklist: [AgentChecklistItem]
         let executionEvents: [AgentExecutionEvent]
         let logs: [String]
         let fileOperations: [AgentFileOperation]
@@ -106,6 +118,8 @@ final class AgentSessionState: ObservableObject, Identifiable {
             workspaceId: workspaceId,
             selectedTab: selectedTab,
             session: session,
+            timeline: timeline,
+            checklist: checklist,
             executionEvents: executionEvents,
             logs: logs,
             fileOperations: fileOperations,
@@ -122,6 +136,8 @@ final class AgentSessionState: ObservableObject, Identifiable {
         self.init(sessionId: model.id, workspaceId: model.workspaceId)
         self.selectedTab = model.selectedTab
         self.session = model.session
+        self.timeline = model.timeline
+        self.checklist = model.checklist
         self.executionEvents = model.executionEvents
         self.logs = model.logs
         self.fileOperations = model.fileOperations
@@ -141,4 +157,12 @@ final class AgentSessionState: ObservableObject, Identifiable {
             }
         }
     }
+}
+
+struct AgentChecklistItem: Identifiable, Codable {
+    let id: String
+    let title: String
+    let status: String
+    let details: String
+    let timestamp: Date
 }

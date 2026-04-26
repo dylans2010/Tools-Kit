@@ -17,28 +17,39 @@ struct WorkflowListView: View {
     }
 
     var body: some View {
-        List(filtered) { summary in
-            NavigationLink(destination: WorkflowDetailView(owner: owner, repo: repo, workflow: summary.workflow, lastRun: summary.lastRun)) {
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        Text(summary.workflow.name).font(.headline)
-                        if summary.isFavorite { Image(systemName: "pin.fill").foregroundStyle(.orange) }
-                    }
-                    Text(summary.workflow.path).font(.caption).foregroundStyle(.secondary)
-                    Text("State: \(summary.workflow.state) • Trigger: \(summary.triggerDescription)").font(.caption2)
-                    if let lastRun = summary.lastRun {
-                        Text("Last run: #\(lastRun.runNumber) \(lastRun.status ?? "queued") / \(lastRun.conclusion ?? "-")")
-                            .font(.caption2)
-                    }
-                }
+        List {
+            Section("Dashboard") {
+                LabeledContent("Total Workflows", value: "\(manager.summaries.count)")
+                LabeledContent("Active", value: "\(manager.summaries.filter { $0.workflow.state == "active" }.count)")
+                LabeledContent("Pinned", value: "\(manager.summaries.filter(\.isFavorite).count)")
+                LabeledContent("Templates Available", value: "\(manager.templates.count)")
             }
-            .swipeActions {
-                Button {
-                    manager.toggleFavorite(workflowID: summary.workflow.id)
-                } label: {
-                    Label(summary.isFavorite ? "Unpin" : "Pin", systemImage: summary.isFavorite ? "pin.slash" : "pin")
+
+            Section("Workflows") {
+                ForEach(filtered) { summary in
+                    NavigationLink(destination: WorkflowDetailView(owner: owner, repo: repo, workflow: summary.workflow, lastRun: summary.lastRun)) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text(summary.workflow.name).font(.headline)
+                                if summary.isFavorite { Image(systemName: "pin.fill").foregroundStyle(.orange) }
+                            }
+                            Text(summary.workflow.path).font(.caption).foregroundStyle(.secondary)
+                            Text("State: \(summary.workflow.state) • Trigger: \(summary.triggerDescription)").font(.caption2)
+                            if let lastRun = summary.lastRun {
+                                Text("Last run: #\(lastRun.runNumber) \(lastRun.status ?? "queued") / \(lastRun.conclusion ?? "-")")
+                                    .font(.caption2)
+                            }
+                        }
+                    }
+                    .swipeActions {
+                        Button {
+                            manager.toggleFavorite(workflowID: summary.workflow.id)
+                        } label: {
+                            Label(summary.isFavorite ? "Unpin" : "Pin", systemImage: summary.isFavorite ? "pin.slash" : "pin")
+                        }
+                        .tint(.orange)
+                    }
                 }
-                .tint(.orange)
             }
         }
         .overlay {

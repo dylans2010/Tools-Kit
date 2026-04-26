@@ -142,8 +142,34 @@ final class AgentClient {
             automationMode: "AUTO_CREATE_PR"
         )
 
-        let session: AgentSession = try await performWithRetry(path: "sessions", method: "POST", body: payload)
-        return session
+        do {
+            let session: AgentSession = try await performWithRetry(path: "sessions", method: "POST", body: payload)
+            return session
+        } catch let requestError as JulesRequestManager.JulesRequestError {
+            if case .apiError(let statusCode, let message, _) = requestError,
+               statusCode == 404,
+               message.localizedCaseInsensitiveContains("NOT_FOUND"),
+               let recovered = try await recoverSessionAfterNotFound(prompt: payload.prompt, source: payload.sourceContext.source) {
+                return recovered
+            }
+            throw mapError(requestError) ?? requestError
+        } catch {
+            throw error
+        }
+    }
+
+    private func recoverSessionAfterNotFound(prompt: String, source: String) async throws -> AgentSession? {
+        for _ in 0..<4 {
+            let sessions = try await listSessions()
+            if let session = sessions.first(where: {
+                ($0.prompt?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "") == prompt &&
+                $0.sourceContext.source == source
+            }) {
+                return session
+            }
+            try await Task.sleep(for: .seconds(1.5))
+        }
+        return nil
     }
 
     func resolveGitHubSource(owner: String, repo: String) async throws -> String {
