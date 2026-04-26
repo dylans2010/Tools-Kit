@@ -25,6 +25,7 @@ struct AgentProgressSessionView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 18) {
                         currentStepSection(state)
+                        checklistSection(state)
                         timelineSection(state)
                         logConsoleSection(state)
                         diffViewerSection(state)
@@ -67,6 +68,31 @@ struct AgentProgressSessionView: View {
                     }
                     Spacer()
                     Text(event.timestamp, style: .time).font(.caption2).foregroundStyle(.tertiary)
+                }
+            }
+        }
+    }
+
+    private func checklistSection(_ state: AgentSessionState) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Jules Checklist").font(.headline)
+            if state.checklist.isEmpty {
+                Text("Waiting for Jules to publish checklist steps…")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(state.checklist.sorted(by: { $0.timestamp < $1.timestamp })) { item in
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: symbol(for: item.status))
+                            .foregroundStyle(color(forChecklist: item.status))
+                            .padding(.top, 2)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(item.title).font(.subheadline.weight(.semibold))
+                            Text(item.details).font(.caption).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Text(item.timestamp, style: .time).font(.caption2).foregroundStyle(.tertiary)
+                    }
                 }
             }
         }
@@ -161,12 +187,39 @@ struct AgentProgressSessionView: View {
         case .sessionStarted: return .blue
         case .stepStarted: return .indigo
         case .stepProgress: return .teal
+        case .checklistUpdated: return .cyan
         case .logOutput: return .gray
         case .fileGenerated, .fileUpdated: return .orange
         case .gitOperation: return .green
         case .workflowTriggered: return .purple
         case .sessionCompleted: return .mint
         case .sessionFailed: return .red
+        }
+    }
+
+    private func symbol(for status: String) -> String {
+        switch status.lowercased() {
+        case "completed", "success", "succeeded", "done":
+            return "checkmark.circle.fill"
+        case "failed", "error":
+            return "xmark.octagon.fill"
+        case "pending":
+            return "circle.dotted"
+        default:
+            return "clock.fill"
+        }
+    }
+
+    private func color(forChecklist status: String) -> Color {
+        switch status.lowercased() {
+        case "completed", "success", "succeeded", "done":
+            return .green
+        case "failed", "error":
+            return .red
+        case "pending":
+            return .gray
+        default:
+            return .blue
         }
     }
 

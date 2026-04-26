@@ -89,6 +89,31 @@ struct WorkflowArtifactListResponse: Codable, Sendable {
     }
 }
 
+struct WorkflowJob: Codable, Identifiable, Hashable, Sendable {
+    let id: Int
+    let name: String
+    let status: String?
+    let conclusion: String?
+    let startedAt: Date?
+    let completedAt: Date?
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, status, conclusion
+        case startedAt = "started_at"
+        case completedAt = "completed_at"
+    }
+}
+
+struct WorkflowJobsResponse: Codable, Sendable {
+    let totalCount: Int
+    let jobs: [WorkflowJob]
+
+    enum CodingKeys: String, CodingKey {
+        case totalCount = "total_count"
+        case jobs
+    }
+}
+
 struct WorkflowDispatchRequest: Encodable, Sendable {
     let ref: String
     let inputs: [String: String]?

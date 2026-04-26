@@ -5,6 +5,8 @@ final class WorkflowRunManager: ObservableObject {
     @Published private(set) var runs: [GitHubWorkflowRun] = []
     @Published private(set) var analytics = WorkflowAnalytics(totalRuns: 0, successfulRuns: 0, failedRuns: 0, successRate: 0, averageDurationSeconds: 0)
     @Published private(set) var polling = false
+    @Published private(set) var jobsByRunID: [Int: [WorkflowJob]] = [:]
+    @Published var lastError: String?
 
     private let client: GitHubActionsClient
     private var pollingTask: Task<Void, Never>?
@@ -18,8 +20,40 @@ final class WorkflowRunManager: ObservableObject {
             let fetched = try await client.listRuns(owner: owner, repo: repo, workflowID: workflowID)
             runs = fetched
             analytics = buildAnalytics(from: fetched)
+            lastError = nil
         } catch {
             runs = []
+            lastError = error.localizedDescription
+        }
+    }
+
+    func loadJobs(owner: String, repo: String, runID: Int) async {
+        do {
+            jobsByRunID[runID] = try await client.listJobs(owner: owner, repo: repo, runID: runID)
+            lastError = nil
+        } catch {
+            jobsByRunID[runID] = []
+            lastError = error.localizedDescription
+        }
+    }
+
+    func rerun(owner: String, repo: String, runID: Int, workflowID: Int?) async {
+        do {
+            try await client.rerun(runID: runID, owner: owner, repo: repo)
+            await fetchRuns(owner: owner, repo: repo, workflowID: workflowID)
+            lastError = nil
+        } catch {
+            lastError = error.localizedDescription
+        }
+    }
+
+    func cancel(owner: String, repo: String, runID: Int, workflowID: Int?) async {
+        do {
+            try await client.cancel(runID: runID, owner: owner, repo: repo)
+            await fetchRuns(owner: owner, repo: repo, workflowID: workflowID)
+            lastError = nil
+        } catch {
+            lastError = error.localizedDescription
         }
     }
 
