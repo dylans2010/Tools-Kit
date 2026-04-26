@@ -2261,7 +2261,7 @@
 				WK0100000000000000000033 /* AIResponseDecoder.swift */,
 				WK0100000000000000000034 /* NutritionInsightsView.swift */,
 				WK0100000000000000000035 /* MealDetailView.swift */,
-				A1B2C3D4E5F60718293A3000 /* System Agent */,
+				A1B2C3D4E5F60718293A3001 /* Backend */,
 							AE4D79B73FB1460294EBE1D1 /* AgentSystemTools.swift */,
 				0CC48E5BCC8C467CB4858035 /* emit_status.swift */,
 				193FC49D2D594E9994EB21EC /* get_git_diff.swift */,
@@ -2366,6 +2366,22 @@
 				A1B2C3D4E5F60718293A1007 /* SystemAgentError.swift */,
 			);
 			path = "System Agent";
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F60718293A3001 /* Backend */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F60718293A3002 /* Agent */,
+			);
+			path = Backend;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F60718293A3002 /* Agent */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F60718293A3000 /* System Agent */,
+			);
+			path = Agent;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
