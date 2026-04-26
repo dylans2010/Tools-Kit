@@ -35,7 +35,7 @@ struct AgentProgressSessionView: View {
                     .padding()
                 }
             } else {
-                ProgressView("Loading session details…")
+                ProgressView("Waiting for session initialization…")
                     .frame(maxHeight: .infinity)
             }
         }
@@ -49,7 +49,7 @@ struct AgentProgressSessionView: View {
     private func currentStepSection(_ state: AgentSessionState) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Current Step Indicator").font(.headline)
-            Text(state.currentStep ?? "Waiting for first execution step…")
+            Text(state.currentStep ?? "Waiting for confirmed status update…")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -58,7 +58,7 @@ struct AgentProgressSessionView: View {
 
     private func timelineSection(_ state: AgentSessionState) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Live Execution Timeline").font(.headline)
+            Text("Session Status Timeline").font(.headline)
             ForEach(state.executionEvents.sorted(by: { $0.timestamp < $1.timestamp })) { event in
                 HStack(alignment: .top, spacing: 8) {
                     Circle().fill(color(for: event.type)).frame(width: 8, height: 8).padding(.top, 6)
@@ -100,7 +100,7 @@ struct AgentProgressSessionView: View {
 
     private func logConsoleSection(_ state: AgentSessionState) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Streaming Log Console").font(.headline)
+            Text("Session Log Console").font(.headline)
             ScrollView {
                 VStack(alignment: .leading, spacing: 4) {
                     ForEach(Array(state.logs.enumerated()), id: \.offset) { _, line in
