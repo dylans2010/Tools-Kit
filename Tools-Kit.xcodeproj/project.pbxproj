@@ -1519,13 +1519,13 @@
 		9E0776041A4646C2B7E30578 /* AgentCheckpointManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentCheckpointManagerView.swift; sourceTree = "<group>"; };
 		9E81FA17E48D47C392F28F95 /* AgentExecutionTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentExecutionTimelineView.swift; sourceTree = "<group>"; };
 		835C5505B31744E4A0AD7B63 /* AgentDiffViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentDiffViewerView.swift; sourceTree = "<group>"; };
-		A1B2C3D4E5F60718293A1001 /* SystemAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Agent/System Agent/SystemAgent.swift"; sourceTree = "<group>"; };
-		A1B2C3D4E5F60718293A1002 /* SystemAgentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Agent/System Agent/SystemAgentViewModel.swift"; sourceTree = "<group>"; };
-		A1B2C3D4E5F60718293A1003 /* SystemAgentSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Agent/System Agent/SystemAgentSession.swift"; sourceTree = "<group>"; };
-		A1B2C3D4E5F60718293A1004 /* SystemAgentMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Agent/System Agent/SystemAgentMessage.swift"; sourceTree = "<group>"; };
-		A1B2C3D4E5F60718293A1005 /* SystemAgentToolRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Agent/System Agent/SystemAgentToolRouter.swift"; sourceTree = "<group>"; };
-		A1B2C3D4E5F60718293A1006 /* SystemAgentState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Agent/System Agent/SystemAgentState.swift"; sourceTree = "<group>"; };
-		A1B2C3D4E5F60718293A1007 /* SystemAgentError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Agent/System Agent/SystemAgentError.swift"; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A1001 /* SystemAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAgent.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A1002 /* SystemAgentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAgentViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A1003 /* SystemAgentSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAgentSession.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A1004 /* SystemAgentMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAgentMessage.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A1005 /* SystemAgentToolRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAgentToolRouter.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A1006 /* SystemAgentState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAgentState.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A1007 /* SystemAgentError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAgentError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -2365,7 +2365,7 @@
 				A1B2C3D4E5F60718293A1006 /* SystemAgentState.swift */,
 				A1B2C3D4E5F60718293A1007 /* SystemAgentError.swift */,
 			);
-			path = "Backend/Agent/System Agent";
+			path = "System Agent";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
