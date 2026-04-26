@@ -15,6 +15,10 @@ final class JulesProvider: AIProvider {
 
     private let baseURL = "https://jules.googleapis.com/v1alpha"
 
+    static var apiProviderInfo: (id: String, name: String, apiKeyPlaceholder: String) {
+        ("jules", "Jules", "X-Goog-Api-Key...")
+    }
+
     func supportsVision(model: String) -> Bool {
         return false
     }

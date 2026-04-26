@@ -9,7 +9,6 @@ final class AIProviderRegistry {
 
     private init() {
         providers = [
-            JulesProvider(),
             OpenRouterProvider(),
             OpenAIProvider(),
             AnthropicProvider(),

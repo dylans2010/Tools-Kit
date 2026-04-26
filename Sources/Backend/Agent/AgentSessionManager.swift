@@ -14,7 +14,7 @@ final class AgentSessionManager: ObservableObject {
     private init() {}
 
     func startSession(prompt: String, owner: String, repo: String, branch: String? = nil) async throws -> AgentSession {
-        let sourceName = "sources/github/\(owner)/\(repo)"
+        let sourceName = try await AgentClient.shared.resolveGitHubSource(owner: owner, repo: repo)
         let session = try await AgentClient.shared.createSession(prompt: prompt, source: sourceName, branch: branch)
 
         await MainActor.run {

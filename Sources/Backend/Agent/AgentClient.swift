@@ -10,7 +10,7 @@ final class AgentClient {
     private init() {}
 
     private func makeRequest(_ path: String, method: String = "GET", body: Encodable? = nil) throws -> URLRequest {
-        guard let apiKey = APIKeyManager.shared.getKey(for: "jules") else {
+        guard let apiKey = julesAPIKey() else {
             throw AgentError.missingApiKey
         }
 
@@ -25,6 +25,16 @@ final class AgentClient {
         }
 
         return request
+    }
+
+    private func julesAPIKey() -> String? {
+        if let key = APIKeyManager.shared.getKey(for: "jules"), !key.isEmpty {
+            return key
+        }
+        if let legacy = AgentKeychainManager.shared.getKey(), !legacy.isEmpty {
+            return legacy
+        }
+        return nil
     }
 
     func validateKey() async throws -> Bool {
@@ -60,8 +70,22 @@ final class AgentClient {
         )
 
         let request = try makeRequest("sessions", method: "POST", body: payload)
-        let (data, _) = try await session.data(for: request)
+        let (data, response) = try await session.data(for: request)
+        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+            throw AgentError.apiError(String(data: data, encoding: .utf8) ?? "Failed to create session")
+        }
         return try JSONDecoder().decode(AgentSession.self, from: data)
+    }
+
+    func resolveGitHubSource(owner: String, repo: String) async throws -> String {
+        let sources = try await fetchSources()
+        if let matched = sources.first(where: {
+            $0.githubRepo?.owner.caseInsensitiveCompare(owner) == .orderedSame &&
+            $0.githubRepo?.repo.caseInsensitiveCompare(repo) == .orderedSame
+        }) {
+            return matched.name
+        }
+        return "sources/github/\(owner)/\(repo)"
     }
 
     func getSession(id: String) async throws -> AgentSession {

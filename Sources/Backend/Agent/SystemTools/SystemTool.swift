@@ -99,6 +99,39 @@ extension SystemTool {
         URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
     }
 
+    func resolveFileURL(from input: [String: Any], key: String = "path") throws -> URL {
+        guard let value = input[key] as? String, !value.isEmpty else {
+            throw SystemToolError.missingParameter(key)
+        }
+        let candidate = URL(fileURLWithPath: value)
+        if candidate.path.hasPrefix("/") {
+            return candidate
+        }
+        return toolsWorkingDirectory(from: input).appendingPathComponent(value)
+    }
+
+    func enumerateFiles(root: URL, allowedExtensions: Set<String>? = nil) -> [URL] {
+        let fm = FileManager.default
+        guard let enumerator = fm.enumerator(
+            at: root,
+            includingPropertiesForKeys: [.isRegularFileKey],
+            options: [.skipsHiddenFiles]
+        ) else {
+            return []
+        }
+
+        var files: [URL] = []
+        for case let fileURL as URL in enumerator {
+            guard (try? fileURL.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true else { continue }
+            if let allowedExtensions {
+                let ext = fileURL.pathExtension.lowercased()
+                if !allowedExtensions.contains(ext) { continue }
+            }
+            files.append(fileURL)
+        }
+        return files
+    }
+
     func loadJSONArray(fileName: String) -> [[String: Any]] {
         let url = toolsStateURL(fileName: fileName)
         guard let data = try? Data(contentsOf: url),
