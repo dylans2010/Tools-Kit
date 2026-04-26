@@ -14,8 +14,10 @@ final class AgentSessionManager: ObservableObject {
     private init() {}
 
     func startSession(prompt: String, owner: String, repo: String, branch: String? = nil) async throws -> AgentSession {
-        let sourceName = try await AgentClient.shared.resolveGitHubSource(owner: owner, repo: repo)
-        let session = try await AgentClient.shared.createSession(prompt: prompt, source: sourceName, branch: branch)
+        let trimmedPrompt = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        print("[AgentSessionManager] Starting session for repo https://github.com/\(owner)/\(repo)")
+        print("[AgentSessionManager] Prompt length after trim: \(trimmedPrompt.count)")
+        let session = try await AgentClient.shared.createSession(prompt: trimmedPrompt, owner: owner, repo: repo, branch: branch)
 
         await MainActor.run {
             self.activeSessions.insert(session, at: 0)
