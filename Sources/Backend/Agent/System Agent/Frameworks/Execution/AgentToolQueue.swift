@@ -1,9 +1,21 @@
 import Foundation
 
-struct AgentToolQueue {
-    private var queue: [String] = []
+public final class AgentToolQueue {
+    private var queue: [AgentToolCall] = []
+    private let lock = NSLock()
 
-    mutating func enqueue(_ tool: String) { queue.append(tool) }
-    mutating func dequeue() -> String? { queue.isEmpty ? nil : queue.removeFirst() }
-    var isEmpty: Bool { queue.isEmpty }
+    public init() {}
+
+    public func enqueue(_ toolCall: AgentToolCall) {
+        lock.lock()
+        defer { lock.unlock() }
+        queue.append(toolCall)
+    }
+
+    public func dequeue() -> AgentToolCall? {
+        lock.lock()
+        defer { lock.unlock() }
+        guard !queue.isEmpty else { return nil }
+        return queue.removeFirst()
+    }
 }

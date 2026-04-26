@@ -1,9 +1,9 @@
 import Foundation
 
-struct AgentPromptInjector {
-    func inject(system: String, into userPrompt: String) -> String {
-        "\(system)
+public struct AgentPromptInjector {
+    public init() {}
 
-\(userPrompt)"
+    public func inject(prompt: String, into systemPrompt: String) -> String {
+        "\(systemPrompt)\n\nAdditional Instructions:\n\(prompt)"
     }
 }

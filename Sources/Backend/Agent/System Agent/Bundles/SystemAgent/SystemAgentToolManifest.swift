@@ -1,13 +1,10 @@
 import Foundation
 
-struct SystemAgentToolManifest: Codable {
-    var tools: [String]
-
-    init(tools: [String] = []) {
-        self.tools = Array(Set(tools)).sorted()
-    }
-
-    func contains(tool: String) -> Bool {
-        tools.contains(tool)
-    }
+public struct SystemAgentToolManifest {
+    public static let tools = [
+        "build_project",
+        "run_tests",
+        "commit_changes",
+        "branch_create"
+    ]
 }

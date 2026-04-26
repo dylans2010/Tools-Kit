@@ -1,2 +1,15 @@
 import Foundation
-// Core definitions are provided by legacy System Agent files at the folder root.
+
+enum AgentType: String, CaseIterable, Codable {
+    case system
+    case jules
+}
+
+enum SystemAgentState {
+    case idle
+    case thinking
+    case executingTool(name: String)
+    case responding
+    case completed
+    case failed(Error)
+}

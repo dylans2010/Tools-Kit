@@ -1,11 +1,21 @@
 import Foundation
 
-struct AgentShortTermMemory {
-    private(set) var entries: [String] = []
-    var capacity: Int = 10
+public final class AgentShortTermMemory {
+    private var entries: [AgentMemoryEntry] = []
+    public let capacity: Int
 
-    mutating func push(_ entry: String) {
-        entries.append(entry)
-        if entries.count > capacity { entries.removeFirst(entries.count - capacity) }
+    public init(capacity: Int = 100) {
+        self.capacity = capacity
+    }
+
+    public func add(_ content: String) {
+        if entries.count >= capacity {
+            entries.removeFirst()
+        }
+        entries.append(AgentMemoryEntry(content: content, tags: ["short-term"]))
+    }
+
+    public var recentEntries: [AgentMemoryEntry] {
+        entries
     }
 }

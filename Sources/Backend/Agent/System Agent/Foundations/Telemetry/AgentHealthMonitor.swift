@@ -1,30 +1,24 @@
 import Foundation
 
-actor AgentHealthMonitor {
-    enum HealthStatus: Codable { case healthy, degraded(reason: String), critical(reason: String) }
-
-    private var continuation: AsyncStream<HealthStatus>.Continuation?
-    private var monitorTask: Task<Void, Never>?
-    private var lastStatus: HealthStatus = .healthy
-
-    var healthStream: AsyncStream<HealthStatus> {
-        AsyncStream { continuation in
-            self.continuation = continuation
-            continuation.yield(self.lastStatus)
-        }
+public final class AgentHealthMonitor {
+    public enum Status {
+        case healthy, degraded, unhealthy
     }
 
-    func currentStatus() async -> HealthStatus { lastStatus }
+    private let aiService: AIService
 
-    func startMonitoring(interval: TimeInterval) {
-        monitorTask?.cancel()
-        monitorTask = Task {
-            while !Task.isCancelled {
-                continuation?.yield(lastStatus)
-                try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
-            }
-        }
+    public init(aiService: AIService = .shared) {
+        self.aiService = aiService
     }
 
-    func stopMonitoring() { monitorTask?.cancel(); monitorTask = nil }
+    public func checkStatus() async -> Status {
+        do {
+            // Check if AI Service is responsive
+            _ = try await aiService.processText(prompt: "health check", systemPrompt: "respond with ok")
+            return .healthy
+        } catch {
+            AgentAPILogger.shared.log(.error, "Health check failed: \(error.localizedDescription)")
+            return .unhealthy
+        }
+    }
 }

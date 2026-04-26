@@ -1,8 +1,21 @@
 import Foundation
 
-struct AgentPerformanceTracker {
-    private(set) var samples: [TimeInterval] = []
+public final class AgentPerformanceTracker {
+    private var startTimes: [String: Date] = [:]
+    private let queue = DispatchQueue(label: "com.tools-kit.agent.performance")
 
-    mutating func record(_ value: TimeInterval) { samples.append(value) }
-    var average: TimeInterval { samples.isEmpty ? 0 : samples.reduce(0, +) / Double(samples.count) }
+    public init() {}
+
+    public func start(task: String) {
+        queue.async {
+            self.startTimes[task] = Date()
+        }
+    }
+
+    public func stop(task: String) -> TimeInterval? {
+        queue.sync {
+            guard let start = self.startTimes.removeValue(forKey: task) else { return nil }
+            return Date().timeIntervalSince(start)
+        }
+    }
 }

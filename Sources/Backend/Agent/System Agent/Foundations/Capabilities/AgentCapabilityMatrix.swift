@@ -1,13 +1,14 @@
 import Foundation
 
-struct AgentCapabilityMatrix {
-    private(set) var rows: [String: AgentCapabilities] = [:]
+public struct AgentCapabilityMatrix {
+    private var modelCapabilities: [String: AgentCapabilities] = [:]
 
-    mutating func set(_ capabilities: AgentCapabilities, for profile: String) {
-        rows[profile] = capabilities
+    public init() {
+        modelCapabilities["gpt-4o"] = .all
+        modelCapabilities["claude-3-5-sonnet"] = .all
     }
 
-    func capabilities(for profile: String) -> AgentCapabilities {
-        rows[profile] ?? []
+    public func capabilities(for modelId: String) -> AgentCapabilities {
+        modelCapabilities[modelId] ?? .none
     }
 }

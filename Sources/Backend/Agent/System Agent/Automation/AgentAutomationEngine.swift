@@ -1,49 +1,30 @@
 import Foundation
 
-struct AgentAutomationProgress {
-    let stepIndex: Int
-    let totalSteps: Int
-    let activeToolName: String?
-    let elapsedTime: TimeInterval
-    let completionPercentage: Double
-}
-
-actor AgentAutomationEngine {
+public final class AgentAutomationEngine {
     private let agent: SystemAgent
-    private let configuration: AgentConfiguration
-    private let dependencyResolver = AgentTaskDependencyResolver()
-    private var progressContinuation: AsyncStream<AgentAutomationProgress>.Continuation?
 
-    init(agent: SystemAgent, configuration: AgentConfiguration = .default) {
+    public init(agent: SystemAgent) {
         self.agent = agent
-        self.configuration = configuration
     }
 
-    nonisolated func progressStream() -> AsyncStream<AgentAutomationProgress> {
-        AsyncStream { continuation in
-            Task { await self.setProgressContinuation(continuation) }
-        }
-    }
+    public func execute(script: AgentAutomationScript) async -> AgentAutomationResult {
+        AgentAPILogger.shared.log(.info, "Executing automation script: \(script.name)")
 
-    private func setProgressContinuation(_ continuation: AsyncStream<AgentAutomationProgress>.Continuation) {
-        self.progressContinuation = continuation
-    }
+        var output = "Execution started for script: \(script.name)\n"
 
-    func run(script: AgentAutomationScript, context: AgentContext) async throws -> AgentAutomationResult {
-        let startedAt = Date()
-        var results: [UUID: AgentAutomationResult.StepResult] = [:]
-        let ordered = dependencyResolver.resolve(steps: script.steps)
-        for (idx, step) in ordered.enumerated() {
-            let stepStart = Date()
+        for step in script.steps {
+            output += "Executing step: \(step.action)\n"
             do {
-                let output = try await agent.sendMessage(step.prompt).content
-                results[step.id] = .init(stepID: step.id, output: output, toolsUsed: step.expectedTools, duration: Date().timeIntervalSince(stepStart), status: .completed, error: nil)
+                // Map automation step to agent message
+                let response = try await agent.sendMessage("Execute automation step: \(step.action) with parameters: \(step.parameters)")
+                output += "Step output: \(response.content)\n"
             } catch {
-                results[step.id] = .init(stepID: step.id, output: "", toolsUsed: step.expectedTools, duration: Date().timeIntervalSince(stepStart), status: .failed, error: error.localizedDescription)
-                if !step.continueOnFailure { throw error }
+                return AgentAutomationResult(scriptId: script.id, success: false, output: output, error: "Step \(step.action) failed: \(error.localizedDescription)")
             }
-            progressContinuation?.yield(.init(stepIndex: idx + 1, totalSteps: ordered.count, activeToolName: step.expectedTools.first, elapsedTime: Date().timeIntervalSince(startedAt), completionPercentage: Double(idx + 1) / Double(max(ordered.count, 1))))
         }
-        return AgentAutomationResult(id: UUID(), scriptID: script.id, startedAt: startedAt, completedAt: Date(), duration: Date().timeIntervalSince(startedAt), stepResults: results, totalToolCallsExecuted: 0, totalCodeBlocksGenerated: 0, totalTokensUsed: 0, warnings: [], overallStatus: .success)
+
+        output += "Execution completed successfully."
+
+        return AgentAutomationResult(scriptId: script.id, success: true, output: output, error: nil)
     }
 }

@@ -1,10 +1,13 @@
 import Foundation
 
-struct AgentDemoScript: Identifiable, Codable {
-    let id: UUID
-    let name: String
-    let description: String
-    let estimatedDuration: TimeInterval
-    let steps: [AgentDemoStep]
-    let requiredCapabilities: [String]
+public struct AgentDemoScript: Codable, Identifiable {
+    public let id: UUID
+    public let name: String
+    public let steps: [AgentDemoStep]
+
+    public init(name: String, steps: [AgentDemoStep]) {
+        self.id = UUID()
+        self.name = name
+        self.steps = steps
+    }
 }

@@ -1,13 +1,10 @@
 import Foundation
 
-struct AgentBundleLoader {
-    func decodeBundle(from data: Data) throws -> AgentBundle {
-        try JSONDecoder().decode(AgentBundle.self, from: data)
-    }
+public final class AgentBundleLoader {
+    public init() {}
 
-    func encodeBundle(_ bundle: AgentBundle) throws -> Data {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        return try encoder.encode(bundle)
+    public func loadBundle(from url: URL) throws -> AgentBundle {
+        let data = try Data(contentsOf: url)
+        return try JSONDecoder().decode(AgentBundle.self, from: data)
     }
 }

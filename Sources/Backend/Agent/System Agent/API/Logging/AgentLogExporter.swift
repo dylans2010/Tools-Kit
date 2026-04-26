@@ -1,8 +1,9 @@
 import Foundation
 
-struct AgentLogExporter {
-    func export() async -> Data {
-        let logs = await AgentAPILogger.shared.allLogs()
-        return (try? JSONEncoder().encode(logs)) ?? Data()
+public struct AgentLogExporter {
+    public init() {}
+
+    public func export(logs: [AgentLogEntry]) throws -> Data {
+        try JSONEncoder().encode(logs)
     }
 }

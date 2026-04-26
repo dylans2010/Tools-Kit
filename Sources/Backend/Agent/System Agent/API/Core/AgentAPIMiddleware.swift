@@ -1,15 +1,18 @@
 import Foundation
 
-struct AgentAPIMiddleware {
-    typealias Middleware = (URLRequest) -> URLRequest
+public protocol AgentAPIMiddleware {
+    func process(request: URLRequest) async throws -> URLRequest
+    func process(data: Data, response: URLResponse) async throws -> (Data, URLResponse)
+}
 
-    private var middlewares: [Middleware] = []
-
-    mutating func use(_ middleware: @escaping Middleware) {
-        middlewares.append(middleware)
+public struct LoggingMiddleware: AgentAPIMiddleware {
+    public init() {}
+    public func process(request: URLRequest) async throws -> URLRequest {
+        AgentAPILogger.shared.log(.info, "Request: \(request.url?.absoluteString ?? "unknown")")
+        return request
     }
-
-    func apply(to request: URLRequest) -> URLRequest {
-        middlewares.reduce(request) { current, middleware in middleware(current) }
+    public func process(data: Data, response: URLResponse) async throws -> (Data, URLResponse) {
+        AgentAPILogger.shared.log(.info, "Response received")
+        return (data, response)
     }
 }

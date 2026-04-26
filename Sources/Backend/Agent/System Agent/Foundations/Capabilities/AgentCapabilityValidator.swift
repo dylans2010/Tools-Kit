@@ -1,11 +1,32 @@
 import Foundation
 
-struct AgentCapabilityValidator {
-    func missing(required: AgentCapabilities, available: AgentCapabilities) -> AgentCapabilities {
-        AgentCapabilities(rawValue: required.rawValue & ~available.rawValue)
+public struct AgentCapabilityValidator {
+    public enum CapabilityError: Error, LocalizedError {
+        case missingCapability(String)
+
+        public var errorDescription: String? {
+            switch self {
+            case .missingCapability(let cap): return "Missing required capability: \(cap)"
+            }
+        }
     }
 
-    func satisfies(required: AgentCapabilities, available: AgentCapabilities) -> Bool {
-        missing(required: required, available: available).isEmpty
+    public init() {}
+
+    public func validate(capabilities: AgentCapabilities, required: [String]) throws {
+        for req in required {
+            switch req {
+            case "tools":
+                if !capabilities.canUseTools { throw CapabilityError.missingCapability(req) }
+            case "vision":
+                if !capabilities.canProcessVision { throw CapabilityError.missingCapability(req) }
+            case "code":
+                if !capabilities.canGenerateCode { throw CapabilityError.missingCapability(req) }
+            case "internet":
+                if !capabilities.canAccessInternet { throw CapabilityError.missingCapability(req) }
+            default:
+                break
+            }
+        }
     }
 }
