@@ -103,12 +103,12 @@ struct AgentPromptView: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(prompt.isEmpty ? Color.secondary.opacity(0.3) : Color.blue)
+                        .background(prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? Color.secondary.opacity(0.3) : Color.blue)
                         .foregroundColor(.white)
                         .cornerRadius(14)
-                        .shadow(color: prompt.isEmpty ? .clear : .blue.opacity(0.3), radius: 8, y: 4)
+                        .shadow(color: prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .clear : .blue.opacity(0.3), radius: 8, y: 4)
                     }
-                    .disabled(prompt.isEmpty || isSubmitting)
+                    .disabled(prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSubmitting)
                     .padding(.horizontal)
                     .padding(.bottom, 20)
                 }
@@ -133,6 +133,16 @@ struct AgentPromptView: View {
     }
 
     private func startTask() {
+        let trimmedPrompt = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedPrompt.isEmpty else {
+            errorMessage = "Prompt is required before launching Jules Agent."
+            return
+        }
+
+        errorMessage = nil
+        prompt = trimmedPrompt
+        print("[AgentPromptView] Captured prompt (length: \(trimmedPrompt.count))")
+        print("[AgentPromptView] Repository URL: https://github.com/\(owner)/\(repo)")
         navigateToProgress = true
     }
 }

@@ -16,6 +16,7 @@
 		E0C553C06E6F4FB2BA59DCE0 /* AgentErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71BE421D6664511B9182A80 /* AgentErrorHandler.swift */; };
 		B0A9F10EC5E24DE1903C6E43 /* AgentSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A7A04CF98D4973B212B01D /* AgentSessionManager.swift */; };
 		2C73259A39A54D289143AD17 /* AgentClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5897A6ABD96449CBBBEC6BC6 /* AgentClient.swift */; };
+		JR0200000000000000000001 /* JulesRequestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = JR0100000000000000000001 /* JulesRequestManager.swift */; };
 		8711D148CC2E469C86FE99F3 /* AgentKeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FFBFCD39785442C87D16E2B /* AgentKeychainManager.swift */; };
 		28D75A425E6C4DAA80A0DBC8 /* AgentModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C56AB0076964B928FF538B1 /* AgentModels.swift */; };
 		A80200000000000000000001 /* AgentSessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80100000000000000000001 /* AgentSessionState.swift */; };
@@ -767,6 +768,7 @@
 		A71BE421D6664511B9182A80 /* AgentErrorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/AgentErrorHandler.swift; sourceTree = "<group>"; };
 		88A7A04CF98D4973B212B01D /* AgentSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/AgentSessionManager.swift; sourceTree = "<group>"; };
 		5897A6ABD96449CBBBEC6BC6 /* AgentClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/AgentClient.swift; sourceTree = "<group>"; };
+		JR0100000000000000000001 /* JulesRequestManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/JulesRequestManager.swift; sourceTree = "<group>"; };
 		6FFBFCD39785442C87D16E2B /* AgentKeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/AgentKeychainManager.swift; sourceTree = "<group>"; };
 		3C56AB0076964B928FF538B1 /* AgentModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/AgentModels.swift; sourceTree = "<group>"; };
 		A80100000000000000000001 /* AgentSessionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/AgentSessionState.swift; sourceTree = "<group>"; };
@@ -1647,6 +1649,7 @@
 				A80100000000000000000001 /* AgentSessionState.swift */,
 				6FFBFCD39785442C87D16E2B /* AgentKeychainManager.swift */,
 				5897A6ABD96449CBBBEC6BC6 /* AgentClient.swift */,
+				JR0100000000000000000001 /* JulesRequestManager.swift */,
 				88A7A04CF98D4973B212B01D /* AgentSessionManager.swift */,
 				A71BE421D6664511B9182A80 /* AgentErrorHandler.swift */,
 				516C80132E684C1E8E5B7FDF /* AgentHomeView.swift */,
@@ -2438,6 +2441,7 @@
 				A80200000000000000000001 /* AgentSessionState.swift in Sources */,
 				8711D148CC2E469C86FE99F3 /* AgentKeychainManager.swift in Sources */,
 				2C73259A39A54D289143AD17 /* AgentClient.swift in Sources */,
+				JR0200000000000000000001 /* JulesRequestManager.swift in Sources */,
 				B0A9F10EC5E24DE1903C6E43 /* AgentSessionManager.swift in Sources */,
 				E0C553C06E6F4FB2BA59DCE0 /* AgentErrorHandler.swift in Sources */,
 				33BCCBA5530A4FF58E5A39D6 /* AgentHomeView.swift in Sources */,
