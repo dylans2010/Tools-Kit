@@ -9,6 +9,8 @@ final class SystemAgentViewModel: AgentViewModelProtocol {
 
     private let agent: SystemAgent
     private var stateTask: Task<Void, Never>?
+    private var historyTask: Task<Void, Never>?
+    private var lastSubmittedInput: String?
 
     init(aiService: AIService = .shared) {
         self.agent = SystemAgent(aiService: aiService)
@@ -17,28 +19,25 @@ final class SystemAgentViewModel: AgentViewModelProtocol {
 
     deinit {
         stateTask?.cancel()
+        historyTask?.cancel()
     }
 
     func submit() async {
         let trimmed = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
-        print("[SystemAgentViewModel] submit started")
+        lastSubmittedInput = trimmed
         inputText = ""
         userFacingErrorMessage = nil
+        state = .thinking
 
         do {
-            print("[SystemAgentViewModel] calling agent.sendMessage")
             _ = try await agent.sendMessage(trimmed)
-            messages = await agent.history
-            state = await agent.currentState
-            print("[SystemAgentViewModel] submit succeeded")
+            state = .completed
         } catch {
-            print("[SystemAgentViewModel] submit failed: \(error.localizedDescription)")
             state = .failed(error)
             userFacingErrorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
-            messages = await agent.history
-            messages.append(SystemAgentMessage(role: .assistant, content: "Error: \(userFacingErrorMessage ?? "Unknown error")"))
+            messages.append(SystemAgentMessage(role: .failed(message: userFacingErrorMessage ?? "Unknown error"), content: "Error: \(userFacingErrorMessage ?? "Unknown error")"))
         }
     }
 
@@ -64,5 +63,21 @@ final class SystemAgentViewModel: AgentViewModelProtocol {
                 }
             }
         }
+
+        historyTask = Task { [weak self] in
+            guard let self else { return }
+            let stream = await agent.historyStream()
+            for await newHistory in stream {
+                await MainActor.run {
+                    self.messages = newHistory
+                }
+            }
+        }
+    }
+
+    func retryLastSubmission() async {
+        guard let lastSubmittedInput else { return }
+        inputText = lastSubmittedInput
+        await submit()
     }
 }

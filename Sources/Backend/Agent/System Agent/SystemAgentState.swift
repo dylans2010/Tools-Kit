@@ -8,7 +8,8 @@ enum AgentType: String, CaseIterable, Codable {
 enum SystemAgentState {
     case idle
     case thinking
-    case executingTool(String)
+    case executingTool(name: String)
     case responding
+    case completed
     case failed(Error)
 }

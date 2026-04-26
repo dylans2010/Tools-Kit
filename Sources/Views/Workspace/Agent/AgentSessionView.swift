@@ -142,15 +142,9 @@ struct AgentSessionView: View {
 
     private var systemChatBody: some View {
         VStack {
+            statusBanner
             List(activeAgentViewModel.messages) { message in
-                HStack {
-                    if message.role == .user { Spacer() }
-                    Text(message.content)
-                        .padding(10)
-                        .background(message.role == .user ? Color.blue.opacity(0.15) : Color.gray.opacity(0.12))
-                        .cornerRadius(8)
-                    if message.role != .user { Spacer() }
-                }
+                messageRow(message)
                 .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
@@ -171,6 +165,114 @@ struct AgentSessionView: View {
             }
             .padding()
         }
+    }
+
+    @ViewBuilder
+    private func messageRow(_ message: SystemAgentMessage) -> some View {
+        switch message.role {
+        case .user:
+            HStack {
+                Spacer()
+                Text(message.content)
+                    .padding(10)
+                    .background(Color.blue.opacity(0.15))
+                    .cornerRadius(8)
+            }
+        case .assistant, .system:
+            HStack {
+                Text(message.content)
+                    .padding(10)
+                    .background(Color.gray.opacity(0.12))
+                    .cornerRadius(8)
+                Spacer()
+            }
+        case .toolCall(let name, let input):
+            VStack(alignment: .leading, spacing: 8) {
+                Label("⚙ Running: \(name)", systemImage: "wrench.and.screwdriver")
+                    .font(.subheadline.weight(.semibold))
+                DisclosureGroup("Input Parameters") {
+                    Text(prettyJSON(from: input.mapValues(\.value)))
+                        .font(.system(.caption, design: .monospaced))
+                        .padding(.top, 4)
+                }
+            }
+            .padding(10)
+            .background(Color.orange.opacity(0.12))
+            .cornerRadius(10)
+        case .toolResult(let toolName, let result):
+            VStack(alignment: .leading, spacing: 8) {
+                Label("Tool Result: \(toolName)", systemImage: "terminal")
+                    .font(.subheadline.weight(.semibold))
+                DisclosureGroup("Output") {
+                    Text(prettyCodeBlock(result))
+                        .font(.system(.caption, design: .monospaced))
+                        .padding(.top, 4)
+                }
+            }
+            .padding(10)
+            .background(Color.green.opacity(0.12))
+            .cornerRadius(10)
+        case .failed(let message):
+            VStack(alignment: .leading, spacing: 10) {
+                Label("Execution Failed", systemImage: "xmark.octagon.fill")
+                    .foregroundStyle(.red)
+                Text(message)
+                    .font(.subheadline)
+                Button("Retry") {
+                    Task {
+                        if let vm = activeAgentViewModel as? SystemAgentViewModel {
+                            await vm.retryLastSubmission()
+                        }
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            .padding(10)
+            .background(Color.red.opacity(0.12))
+            .cornerRadius(10)
+        }
+    }
+
+    private var statusBanner: some View {
+        Group {
+            switch activeAgentViewModel.state {
+            case .thinking:
+                Label("Thinking…", systemImage: "brain")
+            case .executingTool(let name):
+                Label("Running \(name)…", systemImage: "gearshape.2")
+            case .responding:
+                Label("Writing response…", systemImage: "text.bubble")
+            case .completed:
+                Label("Completed", systemImage: "checkmark.circle")
+            case .failed(let error):
+                Label(error.localizedDescription, systemImage: "xmark.circle")
+                    .foregroundStyle(.red)
+            case .idle:
+                EmptyView()
+            }
+        }
+        .font(.caption)
+        .padding(.top, 8)
+    }
+
+    private func prettyJSON(from object: [String: Any]) -> String {
+        guard JSONSerialization.isValidJSONObject(object),
+              let data = try? JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted, .sortedKeys]),
+              let string = String(data: data, encoding: .utf8) else {
+            return String(describing: object)
+        }
+        return string
+    }
+
+    private func prettyCodeBlock(_ value: String) -> String {
+        guard let data = value.data(using: .utf8),
+              let object = try? JSONSerialization.jsonObject(with: data),
+              JSONSerialization.isValidJSONObject(object),
+              let prettyData = try? JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted, .sortedKeys]),
+              let pretty = String(data: prettyData, encoding: .utf8) else {
+            return value
+        }
+        return pretty
     }
 
     private var sessionStatusSection: some View {
