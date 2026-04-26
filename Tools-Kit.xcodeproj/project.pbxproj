@@ -45,6 +45,17 @@
 		GH020000000000000000000D /* RepoFileExplorerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH010000000000000000000D /* RepoFileExplorerView.swift */; };
 		GH020000000000000000000E /* FileEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH010000000000000000000E /* FileEditorView.swift */; };
 		GH020000000000000000000F /* DiffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH010000000000000000000F /* DiffView.swift */; };
+		GH0200000000000000000010 /* GitHubActionsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000010 /* GitHubActionsClient.swift */; };
+		GH0200000000000000000011 /* WorkflowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000011 /* WorkflowManager.swift */; };
+		GH0200000000000000000012 /* WorkflowRunManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000012 /* WorkflowRunManager.swift */; };
+		GH0200000000000000000013 /* WorkflowLogStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000013 /* WorkflowLogStreamer.swift */; };
+		GH0200000000000000000014 /* WorkflowModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000014 /* WorkflowModels.swift */; };
+		GH0200000000000000000015 /* WorkflowGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000015 /* WorkflowGenerator.swift */; };
+		GH0200000000000000000016 /* WorkflowListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000016 /* WorkflowListView.swift */; };
+		GH0200000000000000000017 /* WorkflowDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000017 /* WorkflowDetailView.swift */; };
+		GH0200000000000000000018 /* RunWorkflowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000018 /* RunWorkflowView.swift */; };
+		GH0200000000000000000019 /* WorkflowRunView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000019 /* WorkflowRunView.swift */; };
+		GH020000000000000000001A /* WorkflowLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH010000000000000000001A /* WorkflowLogsView.swift */; };
 		ML0200000000000000000001 /* IMAPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000001 /* IMAPClient.swift */; };
 		ML0200000000000000000002 /* EmailMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000002 /* EmailMessage.swift */; };
 		ML0200000000000000000003 /* MailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000003 /* MailViewModel.swift */; };
@@ -774,6 +785,17 @@
 		GH010000000000000000000D /* RepoFileExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/RepoFileExplorerView.swift; sourceTree = "<group>"; };
 		GH010000000000000000000E /* FileEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/FileEditorView.swift; sourceTree = "<group>"; };
 		GH010000000000000000000F /* DiffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/DiffView.swift; sourceTree = "<group>"; };
+		GH0100000000000000000010 /* GitHubActionsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/Actions/GitHubActionsClient.swift; sourceTree = "<group>"; };
+		GH0100000000000000000011 /* WorkflowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/Actions/WorkflowManager.swift; sourceTree = "<group>"; };
+		GH0100000000000000000012 /* WorkflowRunManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/Actions/WorkflowRunManager.swift; sourceTree = "<group>"; };
+		GH0100000000000000000013 /* WorkflowLogStreamer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/Actions/WorkflowLogStreamer.swift; sourceTree = "<group>"; };
+		GH0100000000000000000014 /* WorkflowModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/Actions/WorkflowModels.swift; sourceTree = "<group>"; };
+		GH0100000000000000000015 /* WorkflowGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/Actions/WorkflowGenerator.swift; sourceTree = "<group>"; };
+		GH0100000000000000000016 /* WorkflowListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/Actions/WorkflowListView.swift; sourceTree = "<group>"; };
+		GH0100000000000000000017 /* WorkflowDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/Actions/WorkflowDetailView.swift; sourceTree = "<group>"; };
+		GH0100000000000000000018 /* RunWorkflowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/Actions/RunWorkflowView.swift; sourceTree = "<group>"; };
+		GH0100000000000000000019 /* WorkflowRunView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/Actions/WorkflowRunView.swift; sourceTree = "<group>"; };
+		GH010000000000000000001A /* WorkflowLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/Actions/WorkflowLogsView.swift; sourceTree = "<group>"; };
 		ML0100000000000000000001 /* IMAPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/IMAPClient.swift; sourceTree = "<group>"; };
 		ML0100000000000000000002 /* EmailMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/EmailMessage.swift; sourceTree = "<group>"; };
 		ML0100000000000000000003 /* MailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/MailViewModel.swift; sourceTree = "<group>"; };
@@ -2390,6 +2412,17 @@
 				GH020000000000000000000D /* RepoFileExplorerView.swift in Sources */,
 				GH020000000000000000000E /* FileEditorView.swift in Sources */,
 				GH020000000000000000000F /* DiffView.swift in Sources */,
+				GH0200000000000000000010 /* GitHubActionsClient.swift in Sources */,
+				GH0200000000000000000011 /* WorkflowManager.swift in Sources */,
+				GH0200000000000000000012 /* WorkflowRunManager.swift in Sources */,
+				GH0200000000000000000013 /* WorkflowLogStreamer.swift in Sources */,
+				GH0200000000000000000014 /* WorkflowModels.swift in Sources */,
+				GH0200000000000000000015 /* WorkflowGenerator.swift in Sources */,
+				GH0200000000000000000016 /* WorkflowListView.swift in Sources */,
+				GH0200000000000000000017 /* WorkflowDetailView.swift in Sources */,
+				GH0200000000000000000018 /* RunWorkflowView.swift in Sources */,
+				GH0200000000000000000019 /* WorkflowRunView.swift in Sources */,
+				GH020000000000000000001A /* WorkflowLogsView.swift in Sources */,
 				28D75A425E6C4DAA80A0DBC8 /* AgentModels.swift in Sources */,
 				A80200000000000000000001 /* AgentSessionState.swift in Sources */,
 				8711D148CC2E469C86FE99F3 /* AgentKeychainManager.swift in Sources */,
