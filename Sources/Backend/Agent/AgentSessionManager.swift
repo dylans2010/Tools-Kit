@@ -41,6 +41,9 @@ final class AgentSessionManager: ObservableObject {
     }
 
     func startPolling(sessionId: String) {
+        guard sessionStates[sessionId] != nil || activeSessions.contains(where: { $0.id == sessionId }) else {
+            return
+        }
         framework.startPolling(sessionId: sessionId)
     }
 
