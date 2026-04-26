@@ -11,6 +11,8 @@ struct AgentPromptView: View {
     @State private var navigateToSession = false
     @State private var createdSessionID: String?
     @StateObject private var sessionManager = AgentSessionManager.shared
+    @StateObject private var systemAgentViewModel = SystemAgentViewModel()
+    @AppStorage("selectedAgentType") private var selectedAgentType = AgentType.jules.rawValue
     @Environment(\.dismiss) var dismiss
 
     let templates = [
@@ -149,6 +151,17 @@ struct AgentPromptView: View {
 
         Task {
             do {
+                if selectedAgentType == AgentType.system.rawValue {
+                    await MainActor.run {
+                        systemAgentViewModel.inputText = trimmedPrompt
+                    }
+                    await systemAgentViewModel.submit()
+                    await MainActor.run {
+                        errorMessage = systemAgentViewModel.messages.last?.content
+                        isSubmitting = false
+                    }
+                    return
+                }
                 let session = try await sessionManager.startSession(prompt: trimmedPrompt, owner: owner, repo: repo)
                 await MainActor.run {
                     createdSessionID = session.id
