@@ -105,7 +105,12 @@ actor GitHubActionsClient {
     }
 
     func dispatchWorkflow(owner: String, repo: String, workflowID: String, ref: String, inputs: [String: String]?) async throws {
-        let payload = WorkflowDispatchRequest(ref: ref, inputs: inputs)
+        let cleanedRef = ref.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanedRef.isEmpty else {
+            throw ActionsError.unexpectedStatusCode(400, "Invalid ref field. Ref must be non-empty.")
+        }
+        let cleanedInputs = inputs?.filter { !$0.key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        let payload = WorkflowDispatchRequest(ref: cleanedRef, inputs: cleanedInputs?.isEmpty == true ? nil : cleanedInputs)
         _ = try await request(
             path: "/repos/\(owner)/\(repo)/actions/workflows/\(workflowID)/dispatches",
             method: "POST",
@@ -140,6 +145,26 @@ actor GitHubActionsClient {
         try await request(path: "/repos/\(owner)/\(repo)/actions/runs/\(runID)/logs", acceptedStatusCodes: 200...302)
     }
 
+
+
+    func getWorkflowYAML(owner: String, repo: String, path: String, ref: String) async throws -> String {
+        let data = try await request(path: "/repos/\(owner)/\(repo)/contents/\(path)?ref=\(ref)")
+        guard
+            let object = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+            let content = object["content"] as? String
+        else {
+            throw ActionsError.invalidResponse
+        }
+        let compact = content.replacingOccurrences(of: "\n", with: "")
+        guard let decoded = Data(base64Encoded: compact), let text = String(data: decoded, encoding: .utf8) else {
+            throw ActionsError.invalidResponse
+        }
+        return text
+    }
+
+    func downloadArtifact(owner: String, repo: String, artifactID: Int) async throws -> Data {
+        try await request(path: "/repos/\(owner)/\(repo)/actions/artifacts/\(artifactID)/zip", acceptedStatusCodes: 200...302)
+    }
     func putFile(
         owner: String,
         repo: String,

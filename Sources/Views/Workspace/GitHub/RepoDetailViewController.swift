@@ -43,6 +43,18 @@ final class RepoDetailViewController: UIViewController {
         navigationItem.largeTitleDisplayMode = .never
 
         setupCollectionView()
+        setupNavigationActions()
+    }
+
+    private func setupNavigationActions() {
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Actions", style: .plain, target: self, action: #selector(openActions))
+    }
+
+    @objc
+    private func openActions() {
+        let actionsView = WorkflowListView(owner: repository.owner.login, repo: repository.name)
+        let vc = UIHostingController(rootView: actionsView)
+        navigationController?.pushViewController(vc, animated: true)
     }
 
     private func setupCollectionView() {
@@ -74,7 +86,7 @@ extension RepoDetailViewController: UICollectionViewDataSource {
         switch section {
         case .header: return 1
         case .stats: return 3
-        case .actions: return 5
+        case .actions: return 6
         }
     }
 
@@ -107,8 +119,8 @@ extension RepoDetailViewController: UICollectionViewDataSource {
                 content.imageProperties.tintColor = .systemPurple
             }
         case .actions:
-            let actions = ["Branches", "Commits", "Pull Requests", "File Explorer", "Agent Mode"]
-            let icons = ["arrow.branch", "clock.fill", "tray.full.fill", "folder.fill", "sparkles"]
+            let actions = ["Branches", "Commits", "Pull Requests", "File Explorer", "Agent Mode", "Actions"]
+            let icons = ["arrow.branch", "clock.fill", "tray.full.fill", "folder.fill", "sparkles", "play.rectangle.on.rectangle"]
             content.text = actions[indexPath.item]
             content.image = UIImage(systemName: icons[indexPath.item])
         }
@@ -152,6 +164,8 @@ extension RepoDetailViewController: UICollectionViewDelegate {
         case 4: // Agent Mode
             let vc = UIHostingController(rootView: AgentHomeView(owner: repository.owner.login, repo: repository.name))
             navigationController?.pushViewController(vc, animated: true)
+        case 5: // Actions
+            openActions()
         default:
             break
         }

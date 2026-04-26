@@ -109,6 +109,18 @@ struct WorkflowTemplate: Identifiable, Hashable, Sendable {
     let version: String
 }
 
+struct WorkflowSummary: Identifiable, Hashable, Sendable {
+    var id: Int { workflow.id }
+    let workflow: GitHubWorkflow
+    let lastRun: GitHubWorkflowRun?
+    let isFavorite: Bool
+
+    var triggerDescription: String {
+        if workflow.path.contains("workflow_dispatch") { return "manual" }
+        return "path-driven"
+    }
+}
+
 struct WorkflowAnalytics: Hashable, Sendable {
     let totalRuns: Int
     let successfulRuns: Int

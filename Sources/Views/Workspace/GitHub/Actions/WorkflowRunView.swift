@@ -10,10 +10,11 @@ struct WorkflowRunView: View {
     var body: some View {
         List(manager.runs) { run in
             NavigationLink(destination: WorkflowLogsView(owner: owner, repo: repo, runID: run.id)) {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(run.name ?? "Run #\(run.runNumber)").font(.headline)
                     Text("Branch: \(run.headBranch)").font(.caption)
                     Text("Status: \(run.status ?? "queued") / \(run.conclusion ?? "-")").font(.caption2)
+                    Text("Timeline: \(run.createdAt.formatted()) → \(run.updatedAt.formatted())").font(.caption2)
                 }
             }
         }
@@ -21,6 +22,7 @@ struct WorkflowRunView: View {
             VStack(spacing: 4) {
                 Text("Success rate: \(Int(manager.analytics.successRate * 100))%")
                 Text("Avg duration: \(Int(manager.analytics.averageDurationSeconds))s").font(.caption)
+                Text(manager.polling ? "Live updates enabled" : "Live updates paused").font(.caption2)
             }
             .padding(8)
             .frame(maxWidth: .infinity)
