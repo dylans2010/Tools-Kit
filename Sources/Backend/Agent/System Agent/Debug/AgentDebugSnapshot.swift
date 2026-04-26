@@ -1,12 +1,12 @@
 import Foundation
 
-public struct AgentDebugSnapshot: Codable {
-    public let id: UUID
-    public let timestamp: Date
-    public let state: SystemAgentState
-    public let history: [SystemAgentMessage]
+struct AgentDebugSnapshot: Codable {
+    let id: UUID
+    let timestamp: Date
+    let state: SystemAgentState
+    let history: [SystemAgentMessage]
 
-    public init(state: SystemAgentState, history: [SystemAgentMessage]) {
+    init(state: SystemAgentState, history: [SystemAgentMessage]) {
         self.id = UUID()
         self.timestamp = Date()
         self.state = state

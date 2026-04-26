@@ -1,5 +1,5 @@
 import Foundation
 
-public struct SystemAgentCapabilityProfile {
-    public static let capabilities = AgentCapabilities.all
+struct SystemAgentCapabilityProfile {
+    static let capabilities = AgentCapabilities.all
 }

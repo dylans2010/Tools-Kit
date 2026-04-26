@@ -1,9 +1,9 @@
 import Foundation
 
-public struct AgentDebugExporter {
-    public init() {}
+struct AgentDebugExporter {
+    init() {}
 
-    public func export(session: AgentDebugSession) throws -> Data {
+    func export(session: AgentDebugSession) throws -> Data {
         try JSONEncoder().encode(session.getSnapshots())
     }
 }

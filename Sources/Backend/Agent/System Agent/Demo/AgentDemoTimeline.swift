@@ -1,11 +1,11 @@
 import Foundation
 
-public final class AgentDemoTimeline {
-    public private(set) var events: [String] = []
+final class AgentDemoTimeline {
+    private(set) var events: [String] = []
 
-    public init() {}
+    init() {}
 
-    public func addEvent(_ event: String) {
+    func addEvent(_ event: String) {
         events.append("\(Date()): \(event)")
     }
 }

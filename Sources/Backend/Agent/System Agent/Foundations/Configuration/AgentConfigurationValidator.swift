@@ -1,12 +1,12 @@
 import Foundation
 
-public struct AgentConfigurationValidator {
-    public enum ValidationError: Error, LocalizedError {
+struct AgentConfigurationValidator {
+    enum ValidationError: Error, LocalizedError {
         case invalidTemperature(Double)
         case invalidMaxTokens(Int)
         case missingModelId
 
-        public var errorDescription: String? {
+        var errorDescription: String? {
             switch self {
             case .invalidTemperature(let t): return "Temperature \(t) must be between 0 and 2."
             case .invalidMaxTokens(let m): return "Max tokens \(m) must be greater than 0."
@@ -15,7 +15,7 @@ public struct AgentConfigurationValidator {
         }
     }
 
-    public func validate(_ configuration: AgentConfiguration) throws {
+    func validate(_ configuration: AgentConfiguration) throws {
         if configuration.modelId.isEmpty {
             throw ValidationError.missingModelId
         }

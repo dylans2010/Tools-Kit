@@ -1,16 +1,16 @@
 import Foundation
 
-public enum AgentStreamEvent {
+enum AgentStreamEvent {
     case token(String)
     case toolCallStart(String)
     case toolCallEnd(String, String)
     case complete(String)
 }
 
-public struct AgentStreamEventParser {
-    public init() {}
+struct AgentStreamEventParser {
+    init() {}
 
-    public func parse(chunk: String) -> [AgentStreamEvent] {
+    func parse(chunk: String) -> [AgentStreamEvent] {
         // Basic parser that looks for tool call markers or just treats as tokens
         if chunk.contains("\"tool\":") {
             // Simplified detection for this implementation

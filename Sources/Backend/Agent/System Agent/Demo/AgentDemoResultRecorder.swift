@@ -1,11 +1,11 @@
 import Foundation
 
-public final class AgentDemoResultRecorder {
-    public private(set) var results: [UUID: String] = [:]
+final class AgentDemoResultRecorder {
+    private(set) var results: [UUID: String] = [:]
 
-    public init() {}
+    init() {}
 
-    public func record(scriptId: UUID, result: String) {
+    func record(scriptId: UUID, result: String) {
         results[scriptId] = result
     }
 }

@@ -1,12 +1,12 @@
 import Foundation
 
-public final class AgentMemorySearchIndex {
+final class AgentMemorySearchIndex {
     private var index: [String: Set<UUID>] = [:]
     private let lock = NSLock()
 
-    public init() {}
+    init() {}
 
-    public func index(entry: AgentMemoryEntry) {
+    func index(entry: AgentMemoryEntry) {
         lock.lock()
         defer { lock.unlock() }
         let words = entry.content.lowercased().components(separatedBy: .punctuationCharacters).joined().components(separatedBy: .whitespaces)
@@ -15,7 +15,7 @@ public final class AgentMemorySearchIndex {
         }
     }
 
-    public func search(term: String) -> Set<UUID> {
+    func search(term: String) -> Set<UUID> {
         lock.lock()
         defer { lock.unlock() }
         return index[term.lowercased()] ?? []

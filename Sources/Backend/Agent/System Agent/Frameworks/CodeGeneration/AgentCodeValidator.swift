@@ -1,9 +1,9 @@
 import Foundation
 
-public final class AgentCodeValidator {
-    public init() {}
+final class AgentCodeValidator {
+    init() {}
 
-    public func validate(code: String, language: String) -> Bool {
+    func validate(code: String, language: String) -> Bool {
         // Basic syntax check (braces balance)
         var balance = 0
         for char in code {

@@ -1,9 +1,9 @@
 import Foundation
 
-public struct AgentContextCompressor {
-    public init() {}
+struct AgentContextCompressor {
+    init() {}
 
-    public func compress(_ context: AgentContext, targetTokenCount: Int) -> AgentContext {
+    func compress(_ context: AgentContext, targetTokenCount: Int) -> AgentContext {
         // Basic compression strategy: keep recent messages, remove oldest non-system messages.
         var messages = context.messages
 

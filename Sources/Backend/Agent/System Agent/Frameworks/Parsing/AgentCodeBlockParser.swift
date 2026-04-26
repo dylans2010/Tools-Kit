@@ -1,14 +1,9 @@
 import Foundation
 
-public struct AgentCodeBlock {
-    public let language: String
-    public let code: String
-}
+struct AgentCodeBlockParser {
+    init() {}
 
-public struct AgentCodeBlockParser {
-    public init() {}
-
-    public func parse(text: String) -> [AgentCodeBlock] {
+    func parse(text: String) -> [AgentCodeBlock] {
         let pattern = #"```(\w*)\n([\s\S]*?)```"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
         let range = NSRange(text.startIndex..<text.endIndex, in: text)

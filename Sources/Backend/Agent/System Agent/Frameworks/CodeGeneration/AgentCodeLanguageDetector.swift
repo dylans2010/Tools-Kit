@@ -1,9 +1,9 @@
 import Foundation
 
-public final class AgentCodeLanguageDetector {
-    public init() {}
+final class AgentCodeLanguageDetector {
+    init() {}
 
-    public func detect(from code: String) -> String {
+    func detect(from code: String) -> String {
         if code.contains("import SwiftUI") || code.contains("func ") { return "swift" }
         if code.contains("import React") || code.contains("const ") { return "javascript" }
         if code.contains("import os") || code.contains("def ") { return "python" }

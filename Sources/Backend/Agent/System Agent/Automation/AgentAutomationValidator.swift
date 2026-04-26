@@ -1,9 +1,9 @@
 import Foundation
 
-public struct AgentAutomationValidator {
-    public init() {}
+struct AgentAutomationValidator {
+    init() {}
 
-    public func validate(script: AgentAutomationScript) -> Bool {
+    func validate(script: AgentAutomationScript) -> Bool {
         !script.name.isEmpty && !script.steps.isEmpty
     }
 }

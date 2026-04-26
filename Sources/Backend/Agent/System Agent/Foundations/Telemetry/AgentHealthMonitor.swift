@@ -1,17 +1,17 @@
 import Foundation
 
-public final class AgentHealthMonitor {
-    public enum Status {
+final class AgentHealthMonitor {
+    enum Status {
         case healthy, degraded, unhealthy
     }
 
     private let aiService: AIService
 
-    public init(aiService: AIService = .shared) {
+    init(aiService: AIService = .shared) {
         self.aiService = aiService
     }
 
-    public func checkStatus() async -> Status {
+    func checkStatus() async -> Status {
         do {
             // Check if AI Service is responsive
             _ = try await aiService.processText(prompt: "health check", systemPrompt: "respond with ok")

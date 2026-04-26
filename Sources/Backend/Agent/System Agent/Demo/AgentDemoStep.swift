@@ -1,12 +1,12 @@
 import Foundation
 
-public struct AgentDemoStep: Codable, Identifiable {
-    public let id: UUID
-    public let title: String
-    public let content: String
-    public let delay: TimeInterval
+struct AgentDemoStep: Codable, Identifiable {
+    let id: UUID
+    let title: String
+    let content: String
+    let delay: TimeInterval
 
-    public init(title: String, content: String, delay: TimeInterval = 1.0) {
+    init(title: String, content: String, delay: TimeInterval = 1.0) {
         self.id = UUID()
         self.title = title
         self.content = content

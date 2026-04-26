@@ -74,12 +74,3 @@ struct AgentWorkflowTrigger: Identifiable, Codable {
     let details: String
     let timestamp: Date
 }
-
-struct AgentDebugSnapshot: Codable {
-    let rawSession: AgentSession?
-    let rawActivities: [AgentActivity]
-    let convertedEvents: [AgentExecutionEvent]
-    let stateTransition: String
-    let uiTrigger: String
-    let frameworkPhase: String
-}

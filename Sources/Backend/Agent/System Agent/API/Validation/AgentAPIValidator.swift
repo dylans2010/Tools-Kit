@@ -1,9 +1,9 @@
 import Foundation
 
-public struct AgentAPIValidator {
-    public init() {}
+struct AgentAPIValidator {
+    init() {}
 
-    public func validateResponse(_ response: AgentAPIResponse) throws {
+    func validateResponse(_ response: AgentAPIResponse) throws {
         if response.text.isEmpty && response.finishReason != "stop" {
             throw AgentValidationError.invalidFormat("text")
         }

@@ -1,12 +1,12 @@
 import Foundation
 
-public struct AgentMemoryEntry: Codable, Identifiable {
-    public let id: UUID
-    public let content: String
-    public let tags: Set<String>
-    public let timestamp: Date
+struct AgentMemoryEntry: Codable, Identifiable {
+    let id: UUID
+    let content: String
+    let tags: Set<String>
+    let timestamp: Date
 
-    public init(content: String, tags: Set<String> = []) {
+    init(content: String, tags: Set<String> = []) {
         self.id = UUID()
         self.content = content
         self.tags = tags

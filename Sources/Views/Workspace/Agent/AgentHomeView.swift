@@ -3,7 +3,7 @@ import SwiftUI
 struct AgentHomeView: View {
     @StateObject private var sessionManager = AgentSessionManager.shared
     @StateObject private var settingsManager = AIChatSettingsManager.shared
-    @StateObject private var systemAgentViewModel = SystemAgentViewModel()
+    @StateObject private var systemAgentViewModel = SystemAgentViewModel(agent: SystemAgent(aiService: AIService.shared))
     @StateObject private var julesAgentViewModel = JulesAgentViewModel()
     @State private var showingNewTask = false
     @State private var showingSettings = false

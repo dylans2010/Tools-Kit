@@ -9,6 +9,5 @@ struct AgentCodeBlock: Codable {
         self.code = code
     }
 
-    var lineCount: Int { max(code.split(separator: "
-", omittingEmptySubsequences: false).count, 1) }
+    var lineCount: Int { max(code.split(separator: "\n", omittingEmptySubsequences: false).count, 1) }
 }

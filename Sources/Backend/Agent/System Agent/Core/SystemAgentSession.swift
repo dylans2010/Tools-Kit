@@ -1,13 +1,13 @@
 import Foundation
 
-public final class SystemAgentSession: Codable, Identifiable {
-    public let id: String
-    public let createdAt: Date
-    public var updatedAt: Date
-    public var messages: [SystemAgentMessage]
-    public var metadata: [String: String]
+final class SystemAgentSession: Codable, Identifiable {
+    let id: String
+    let createdAt: Date
+    var updatedAt: Date
+    var messages: [SystemAgentMessage]
+    var metadata: [String: String]
 
-    public init(id: String = UUID().uuidString) {
+    init(id: String = UUID().uuidString) {
         self.id = id
         self.createdAt = Date()
         self.updatedAt = Date()
@@ -15,7 +15,7 @@ public final class SystemAgentSession: Codable, Identifiable {
         self.metadata = [:]
     }
 
-    public func addMessage(_ message: SystemAgentMessage) {
+    func addMessage(_ message: SystemAgentMessage) {
         messages.append(message)
         updatedAt = Date()
     }

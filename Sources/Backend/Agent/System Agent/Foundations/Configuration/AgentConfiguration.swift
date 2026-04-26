@@ -1,13 +1,13 @@
 import Foundation
 
-public struct AgentConfiguration: Codable, Equatable {
-    public var modelId: String
-    public var temperature: Double
-    public var maxTokens: Int?
-    public var systemPromptOverride: String?
-    public var enableStreaming: Bool
+struct AgentConfiguration: Codable, Equatable {
+    var modelId: String
+    var temperature: Double
+    var maxTokens: Int?
+    var systemPromptOverride: String?
+    var enableStreaming: Bool
 
-    public static var `default`: AgentConfiguration {
+    static var `default`: AgentConfiguration {
         AgentConfiguration(
             modelId: "gpt-4o",
             temperature: 0.7,

@@ -1,11 +1,13 @@
 import Foundation
 import Combine
 
-public protocol AgentViewModelProtocol: ObservableObject {
+protocol AgentViewModelProtocol: ObservableObject {
     var messages: [SystemAgentMessage] { get }
     var state: SystemAgentState { get }
     var isThinking: Bool { get }
+    var inputText: String { get set }
 
-    func sendMessage(_ content: String) async
+    func submit() async
+    func retryLastSubmission() async
     func reset()
 }

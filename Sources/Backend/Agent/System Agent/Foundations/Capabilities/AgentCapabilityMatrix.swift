@@ -1,14 +1,14 @@
 import Foundation
 
-public struct AgentCapabilityMatrix {
+struct AgentCapabilityMatrix {
     private var modelCapabilities: [String: AgentCapabilities] = [:]
 
-    public init() {
+    init() {
         modelCapabilities["gpt-4o"] = .all
         modelCapabilities["claude-3-5-sonnet"] = .all
     }
 
-    public func capabilities(for modelId: String) -> AgentCapabilities {
+    func capabilities(for modelId: String) -> AgentCapabilities {
         modelCapabilities[modelId] ?? .none
     }
 }

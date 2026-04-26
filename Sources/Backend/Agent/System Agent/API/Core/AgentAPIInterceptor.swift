@@ -1,17 +1,17 @@
 import Foundation
 
-public protocol AgentAPIInterceptor {
+protocol AgentAPIInterceptor {
     func intercept(_ request: URLRequest) -> URLRequest
 }
 
-public struct AgentAuthInterceptor: AgentAPIInterceptor {
+struct AgentAuthInterceptor: AgentAPIInterceptor {
     let apiKey: String
 
-    public init(apiKey: String) {
+    init(apiKey: String) {
         self.apiKey = apiKey
     }
 
-    public func intercept(_ request: URLRequest) -> URLRequest {
+    func intercept(_ request: URLRequest) -> URLRequest {
         var mutableRequest = request
         mutableRequest.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         return mutableRequest

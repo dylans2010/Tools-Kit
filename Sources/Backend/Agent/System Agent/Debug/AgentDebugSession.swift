@@ -1,18 +1,18 @@
 import Foundation
 
-public final class AgentDebugSession {
-    public let id: UUID
+final class AgentDebugSession {
+    let id: UUID
     private var snapshots: [AgentDebugSnapshot] = []
 
-    public init() {
+    init() {
         self.id = UUID()
     }
 
-    public func capture(state: SystemAgentState, history: [SystemAgentMessage]) {
+    func capture(state: SystemAgentState, history: [SystemAgentMessage]) {
         snapshots.append(AgentDebugSnapshot(state: state, history: history))
     }
 
-    public func getSnapshots() -> [AgentDebugSnapshot] {
+    func getSnapshots() -> [AgentDebugSnapshot] {
         snapshots
     }
 }

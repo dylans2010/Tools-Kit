@@ -1,10 +1,10 @@
 import Foundation
 
-public struct AgentContext: Codable {
-    public var messages: [SystemAgentMessage]
-    public var metadata: [String: String]
+struct AgentContext: Codable {
+    var messages: [SystemAgentMessage]
+    var metadata: [String: String]
 
-    public init(messages: [SystemAgentMessage] = [], metadata: [String: String] = [:]) {
+    init(messages: [SystemAgentMessage] = [], metadata: [String: String] = [:]) {
         self.messages = messages
         self.metadata = metadata
     }

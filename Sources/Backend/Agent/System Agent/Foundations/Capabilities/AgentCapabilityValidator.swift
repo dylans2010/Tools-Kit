@@ -1,19 +1,19 @@
 import Foundation
 
-public struct AgentCapabilityValidator {
-    public enum CapabilityError: Error, LocalizedError {
+struct AgentCapabilityValidator {
+    enum CapabilityError: Error, LocalizedError {
         case missingCapability(String)
 
-        public var errorDescription: String? {
+        var errorDescription: String? {
             switch self {
             case .missingCapability(let cap): return "Missing required capability: \(cap)"
             }
         }
     }
 
-    public init() {}
+    init() {}
 
-    public func validate(capabilities: AgentCapabilities, required: [String]) throws {
+    func validate(capabilities: AgentCapabilities, required: [String]) throws {
         for req in required {
             switch req {
             case "tools":

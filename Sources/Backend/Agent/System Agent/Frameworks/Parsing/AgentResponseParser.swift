@@ -1,9 +1,9 @@
 import Foundation
 
-public struct AgentResponseParser {
-    public init() {}
+struct AgentResponseParser {
+    init() {}
 
-    public func parseEnvelope(from content: String) -> (toolCall: (name: String, input: [String: Any])?, finalText: String?) {
+    func parseEnvelope(from content: String) -> (toolCall: (name: String, input: [String: Any])?, finalText: String?) {
         let cleaned = content
             .replacingOccurrences(of: "```json", with: "")
             .replacingOccurrences(of: "```", with: "")

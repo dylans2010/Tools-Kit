@@ -1,7 +1,7 @@
 import Foundation
 
-public struct SystemAgentToolManifest {
-    public static let tools = [
+struct SystemAgentToolManifest {
+    static let tools = [
         "build_project",
         "run_tests",
         "commit_changes",
