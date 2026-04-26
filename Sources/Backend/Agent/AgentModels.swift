@@ -31,7 +31,8 @@ struct AgentSession: Codable, Identifiable {
         prompt = try? container.decodeIfPresent(String.self, forKey: .prompt)
         status = try? container.decodeIfPresent(String.self, forKey: .status)
         let legacyContainer = try decoder.container(keyedBy: LegacySessionURLKeys.self)
-        sessionURL = (try? container.decodeIfPresent(String.self, forKey: .sessionURL))
+        let decodedSessionURL: String? = try? container.decodeIfPresent(String.self, forKey: .sessionURL)
+        sessionURL = decodedSessionURL
             ?? (try? legacyContainer.decodeIfPresent(String.self, forKey: .webURL))
             ?? (try? legacyContainer.decodeIfPresent(String.self, forKey: .htmlURL))
             ?? (try? legacyContainer.decodeIfPresent(String.self, forKey: .url))
