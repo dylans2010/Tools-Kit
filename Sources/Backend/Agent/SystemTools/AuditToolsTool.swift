@@ -66,7 +66,7 @@ final class AuditToolsTool: SystemTool {
 
                 // Mock Detection: Returns a success message without doing anything substantial
                 // Check if execute returns SystemToolResponse with "success" but no production-related keywords in the whole file
-                let productionKeywords = ["FileManager", "URLSession", "Process", "Data(contentsOf", "JSONDecoder", "JSONEncoder", "Bundle", "UserDefaults", "AppStorage", "NSTask", "Gzip"]
+                let productionKeywords = ["FileManager", "URLSession", "Data(contentsOf", "JSONDecoder", "JSONEncoder", "Bundle", "UserDefaults", "AppStorage", "Gzip"]
                 let hasProductionLogic = productionKeywords.contains { content.contains($0) }
 
                 if content.contains("\"success\"") && !hasProductionLogic {
