@@ -1,3 +1,7 @@
 import Foundation
 
-struct AgentSystemPrompt {}
+struct AgentSystemPrompt {
+    var text: String
+
+    init(_ text: String) { self.text = text }
+}
