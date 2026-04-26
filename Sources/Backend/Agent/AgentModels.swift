@@ -5,13 +5,23 @@ struct AgentSession: Codable, Identifiable {
     let id: String
     let name: String
     let title: String?
-    let prompt: String
+    let prompt: String?
     let sourceContext: AgentSourceContext
     let outputs: [AgentOutput]?
 
     enum CodingKeys: String, CodingKey {
         case id, name, title, prompt, outputs
         case sourceContext = "sourceContext"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        name = (try? container.decode(String.self, forKey: .name)) ?? id
+        title = try? container.decodeIfPresent(String.self, forKey: .title)
+        prompt = try? container.decodeIfPresent(String.self, forKey: .prompt)
+        sourceContext = (try? container.decode(AgentSourceContext.self, forKey: .sourceContext)) ?? AgentSourceContext(source: "unknown", githubRepoContext: nil)
+        outputs = try? container.decodeIfPresent([AgentOutput].self, forKey: .outputs)
     }
 }
 

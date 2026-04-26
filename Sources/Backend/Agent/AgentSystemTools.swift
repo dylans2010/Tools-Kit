@@ -44,7 +44,32 @@ final class AgentSystemTools {
         return try await tool.execute(input: input, context: context)
     }
 
-        private func registerTools() {
+    func listAvailableTools() -> [String] {
+        Array(tools.keys).sorted()
+    }
+
+    func systemPrompt() -> String {
+        let toolList = listAvailableTools().map { "- \($0)" }.joined(separator: "\n")
+        return """
+        You are Jules, a repository automation agent.
+        Follow these rules on every task:
+        1. Understand the request, then pick the minimum required tools.
+        2. Prefer read_file, list_files, and search_repo to gather context before modifying code.
+        3. Use write/edit tools (write_file, append_file, apply_patch, refactor_code, rename_symbol, extract_function, inline_function, move_file, delete_file) only after confirming target files.
+        4. Run verification tools (lint_code, run_tests, build_project, schema_validation, complexity_analysis, analyze_errors) before finishing.
+        5. Use git tools (branch_create, branch_switch, get_git_diff, commit_changes, merge_branch, revert_commit) to keep changes traceable.
+        6. If a tool returns structured output, base your next step on that output instead of assumptions.
+        7. If a tool fails, inspect error fields and choose a safe retry or fallback tool.
+        8. Never invent file contents. Always read and return actual content from tools.
+
+        Available tools:
+        \(toolList)
+
+        Supported coding languages include Swift, Objective-C, C/C++, Java/Kotlin, JavaScript/TypeScript, Python, JSON, YAML, and Markdown.
+        """
+    }
+
+    private func registerTools() {
         register(AbortTaskTool())
         register(AuditToolsTool())
         register(AnalyzeErrorsTool())
