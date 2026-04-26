@@ -16,6 +16,8 @@ struct AIChatSettingsView: View {
     @State private var isSigningOut = false
     @State private var signOutStatusMessage: String?
     @State private var showFreeOpenRouterSheet = false
+    @AppStorage("agentEnabled") private var agentEnabled = false
+    @AppStorage("selectedAgentType") private var selectedAgentType = AgentType.jules.rawValue
 
     private let registry = AIProviderRegistry.shared
 
@@ -91,6 +93,15 @@ struct AIChatSettingsView: View {
     private var agentSettingsSection: some View {
         Section("Agent Settings") {
             Toggle("Use System Tools", isOn: $settings.useSystemTools)
+            Toggle("Agent", isOn: $agentEnabled)
+                .help("Choose which agent handles your sessions")
+            if agentEnabled {
+                Picker("Agent Type", selection: $selectedAgentType) {
+                    Text("System").tag(AgentType.system.rawValue)
+                    Text("Jules").tag(AgentType.jules.rawValue)
+                }
+                .pickerStyle(.segmented)
+            }
             let jules = JulesProvider.apiProviderInfo
             APIKeyRowView(
                 providerID: jules.id,
