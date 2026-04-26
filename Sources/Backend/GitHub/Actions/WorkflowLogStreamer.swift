@@ -17,6 +17,22 @@ actor WorkflowLogStreamer {
 
     func readLogText(owner: String, repo: String, runID: Int) async throws -> String {
         let data = try await client.downloadLogs(owner: owner, repo: repo, runID: runID)
-        return "Downloaded \(data.count) bytes of logs for run #\(runID)."
+        let text = String(data: data, encoding: .utf8) ?? "Binary log archive downloaded (\(data.count) bytes)."
+        return parse(text: text)
+    }
+
+    private func parse(text: String) -> String {
+        text
+            .replacingOccurrences(of: "\u{001B}[0;31m", with: "")
+            .replacingOccurrences(of: "\u{001B}[0m", with: "")
+    }
+
+    func extractFailureReasons(from text: String) -> [String] {
+        text
+            .split(separator: "\n")
+            .map(String.init)
+            .filter { $0.localizedCaseInsensitiveContains("error") || $0.localizedCaseInsensitiveContains("failed") }
+            .prefix(20)
+            .map { $0 }
     }
 }
