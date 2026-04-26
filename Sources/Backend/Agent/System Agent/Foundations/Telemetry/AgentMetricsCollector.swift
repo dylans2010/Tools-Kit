@@ -1,3 +1,7 @@
 import Foundation
 
-struct AgentMetricsCollector {}
+struct AgentMetricsCollector {
+    func countTokens(in text: String) -> Int {
+        text.split(whereSeparator: \.isWhitespace).count
+    }
+}

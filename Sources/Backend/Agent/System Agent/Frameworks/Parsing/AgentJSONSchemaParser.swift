@@ -1,3 +1,7 @@
 import Foundation
 
-struct AgentJSONSchemaParser {}
+struct AgentJSONSchemaParser {
+    func requiredKeys(from schema: [String: Any]) -> [String] {
+        (schema["required"] as? [String] ?? []).sorted()
+    }
+}
