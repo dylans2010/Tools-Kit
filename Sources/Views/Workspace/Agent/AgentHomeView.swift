@@ -3,6 +3,8 @@ import SwiftUI
 struct AgentHomeView: View {
     @StateObject private var sessionManager = AgentSessionManager.shared
     @StateObject private var settingsManager = AIChatSettingsManager.shared
+    @StateObject private var systemAgentViewModel = SystemAgentViewModel()
+    @StateObject private var julesAgentViewModel = JulesAgentViewModel()
     @State private var showingNewTask = false
     @State private var showingSettings = false
 
@@ -19,7 +21,9 @@ struct AgentHomeView: View {
                 )
             } else {
                 ForEach(sessionManager.activeSessions) { session in
-                    NavigationLink(destination: AgentSessionView(sessionId: session.id)) {
+                    NavigationLink(destination: AgentSessionView(sessionId: session.id)
+                        .environmentObject(systemAgentViewModel)
+                        .environmentObject(julesAgentViewModel)) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(session.title ?? session.prompt ?? "Untitled")
                                 .font(.headline)
@@ -51,7 +55,14 @@ struct AgentHomeView: View {
             }
         }
         .sheet(isPresented: $showingNewTask) {
-            AgentPromptView(owner: owner, repo: repo)
+            AgentPromptView(
+                owner: owner,
+                repo: repo,
+                systemAgentViewModel: systemAgentViewModel,
+                julesAgentViewModel: julesAgentViewModel
+            )
+            .environmentObject(systemAgentViewModel)
+            .environmentObject(julesAgentViewModel)
         }
         .sheet(isPresented: $showingSettings) {
             AIChatSettingsView(settings: $settingsManager.settings)

@@ -2,7 +2,10 @@ import SwiftUI
 import UIKit
 
 struct AgentSessionView: View {
-    let sessionId: String
+    let sessionId: String?
+    @EnvironmentObject private var systemAgentViewModel: SystemAgentViewModel
+    @EnvironmentObject private var julesAgentViewModel: JulesAgentViewModel
+    @AppStorage("selectedAgentType") private var selectedAgentType = AgentType.jules.rawValue
     @StateObject private var sessionManager = AgentSessionManager.shared
     @StateObject private var viewModel: AgentSessionViewModel
 
@@ -11,9 +14,16 @@ struct AgentSessionView: View {
         _viewModel = StateObject(wrappedValue: AgentSessionViewModel(sessionId: sessionId))
     }
 
+    init() {
+        self.sessionId = nil
+        _viewModel = StateObject(wrappedValue: AgentSessionViewModel(sessionId: ""))
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            if let state = sessionManager.sessionStates[sessionId] {
+            if sessionId == nil {
+                systemChatBody
+            } else if let sessionId, let state = sessionManager.sessionStates[sessionId] {
                 let session = viewModel.session ?? sessionManager.activeSessions.first(where: { $0.id == sessionId })
 
                 Picker("Session View", selection: Binding(
@@ -115,12 +125,51 @@ struct AgentSessionView: View {
             }
         }
         .onAppear {
+            guard let sessionId else { return }
             viewModel.startPolling()
             sessionManager.startPolling(sessionId: sessionId)
         }
         .onDisappear {
+            guard let sessionId else { return }
             viewModel.stopPolling()
             sessionManager.stopPolling(sessionId: sessionId)
+        }
+    }
+
+    private var activeAgentViewModel: any AgentViewModelProtocol {
+        selectedAgentType == AgentType.system.rawValue ? systemAgentViewModel : julesAgentViewModel
+    }
+
+    private var systemChatBody: some View {
+        VStack {
+            List(activeAgentViewModel.messages) { message in
+                HStack {
+                    if message.role == .user { Spacer() }
+                    Text(message.content)
+                        .padding(10)
+                        .background(message.role == .user ? Color.blue.opacity(0.15) : Color.gray.opacity(0.12))
+                        .cornerRadius(8)
+                    if message.role != .user { Spacer() }
+                }
+                .listRowSeparator(.hidden)
+            }
+            .listStyle(.plain)
+
+            HStack(spacing: 8) {
+                TextField("Message", text: Binding(
+                    get: { activeAgentViewModel.inputText },
+                    set: { activeAgentViewModel.inputText = $0 }
+                ))
+                .textFieldStyle(.roundedBorder)
+
+                Button("Send") {
+                    Task {
+                        await activeAgentViewModel.submit()
+                    }
+                }
+                .disabled(activeAgentViewModel.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+            .padding()
         }
     }
 

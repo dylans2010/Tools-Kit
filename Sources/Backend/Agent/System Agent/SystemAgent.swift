@@ -31,6 +31,7 @@ actor SystemAgent {
 
     func sendMessage(_ content: String) async throws -> SystemAgentMessage {
         try Task.checkCancellation()
+        print("[SystemAgent] sendMessage started")
         let userMessage = SystemAgentMessage(role: .user, content: content)
         history.append(userMessage)
 
@@ -49,6 +50,7 @@ actor SystemAgent {
                     let toolResult = try await toolRouter.route(toolName: toolName, input: toolInput)
                     history.append(SystemAgentMessage(role: .tool, content: toolResult, toolCalls: [toolCall]))
                     loopCount += 1
+                    print("[SystemAgent] executed tool \(toolName)")
                     continue
                 }
 
@@ -60,6 +62,7 @@ actor SystemAgent {
                 let assistant = SystemAgentMessage(role: .assistant, content: final)
                 history.append(assistant)
                 try await transition(to: .idle)
+                print("[SystemAgent] sendMessage completed")
                 return assistant
             }
 
@@ -96,7 +99,6 @@ actor SystemAgent {
 
         let transcript = history.map { "[\($0.role.rawValue)] \($0.content)" }.joined(separator: "\n")
         let prompt = """
-        You are a local system agent.
         Available tools: \(toolsPayload)
 
         Conversation:
@@ -108,10 +110,16 @@ actor SystemAgent {
         {"final":"<assistant_text>"}
         """
 
-        let response = try await aiService.processText(prompt: prompt)
+        print("[SystemAgent] requesting AI response")
+        let response = try await aiService.processText(
+            prompt: prompt,
+            systemPrompt: "You are a helpful system agent. You have access to tools to help the user accomplish tasks on their device.",
+            model: nil
+        )
         guard !response.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw SystemAgentError.emptyResponse
         }
+        print("[SystemAgent] AI response received")
         return response
     }
 
