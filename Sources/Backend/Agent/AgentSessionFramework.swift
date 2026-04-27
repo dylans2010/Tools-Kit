@@ -450,11 +450,32 @@ final class AgentSessionFramework {
 
             await emitLifecycleEvent(sessionId: sessionId, status: normalizedStatus)
 
+            let debugState: SystemAgentState
+            switch normalizedStatus {
+            case .created, .queued:
+                debugState = .thinking
+            case .running:
+                debugState = .responding
+            case .completed:
+                debugState = .completed
+            case .failed:
+                debugState = .failed(AgentError.apiError("Session reported failure."))
+            case .unknown:
+                debugState = .idle
+            }
+
+            let debugHistory = events.map {
+                SystemAgentMessage(
+                    role: .assistant,
+                    content: "[\($0.type.rawValue)] \($0.title): \($0.message)",
+                    timestamp: $0.timestamp
+                )
+            }
+
             for event in events {
                 let debugSnapshot: AgentDebugSnapshot? = debugMode ? AgentDebugSnapshot(
-                    rawSession: session,
-                    rawActivities: activities,
-                    convertedEvents: events,
+                    state: debugState,
+                    history: debugHistory,
                     stateTransition: "state=\(normalizedStatus.rawValue) session=\(sessionId)",
                     uiTrigger: "AgentSessionStore published state change",
                     frameworkPhase: "AgentSessionFramework.refreshSession"

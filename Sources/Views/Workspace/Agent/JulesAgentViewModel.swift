@@ -6,6 +6,15 @@ final class JulesAgentViewModel: AgentViewModelProtocol {
     @Published var state: SystemAgentState = .idle
     @Published var inputText: String = ""
 
+    var isThinking: Bool {
+        switch state {
+        case .thinking, .executingTool:
+            return true
+        default:
+            return false
+        }
+    }
+
     private let sessionManager: AgentSessionManager
 
     init(sessionManager: AgentSessionManager = .shared) {
