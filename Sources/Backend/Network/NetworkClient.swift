@@ -72,7 +72,7 @@ enum NetworkClientError: LocalizedError {
     }
 }
 
-final class LoggingMiddleware: NetworkMiddleware {
+extension LoggingMiddleware: NetworkMiddleware {
     func process(request: inout URLRequest) -> NetworkMiddlewareDecision {
         #if DEBUG
         print("[NetworkClient] \(request.httpMethod ?? "GET") \(request.url?.absoluteString ?? "")")
