@@ -56,6 +56,16 @@ struct EmailDetailView: View {
                             aiResultCard(title: "Reply Draft", icon: "arrowshape.turn.up.left.2", content: draftReply)
                         }
 
+                        // Advanced Intelligence Panels
+                        let thread = MailThread(id: String(email.uid), subject: email.subject, messages: [viewModel.emails.first(where: { $0.uid == email.uid }) ?? email], lastMessageDate: email.date)
+                        EmailInsightPanel(thread: thread)
+
+                        if thread.subject.lowercased().contains("negotiation") || thread.subject.lowercased().contains("offer") {
+                            NegotiationAssistantPanel(thread: thread)
+                        }
+
+                        KnowledgeExtractionPanel(thread: thread)
+
                         contentView(minHeight: max(geo.size.height * 0.5, 300))
 
                         if let actionError {
@@ -84,6 +94,10 @@ struct EmailDetailView: View {
                                 Label("Reply", systemImage: "arrowshape.turn.up.left")
                             }
                             .disabled(account == nil)
+
+                            NavigationLink(destination: RelationshipInsightsPanel(email: email.sender)) {
+                                Label("Relationship Intel", systemImage: "person.text.rectangle")
+                            }
 
                             Button {
                                 Task { await archiveEmail() }

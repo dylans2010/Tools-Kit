@@ -71,6 +71,25 @@
 		53EC1AF8723044F3BFB42AB2 /* MailFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EEEF45551F542229BE32D06 /* MailFolder.swift */; };
 		169F73E894D6416298DC841C /* MailMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E0ABB5BDAD4793B4FE4B93 /* MailMessage.swift */; };
 		A08E51C322934D398CFF8C14 /* MailThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = F236C75C5ACB4018A839FB36 /* MailThread.swift */; };
+		ML0200000000000000000005 /* MailIntelligenceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000005 /* MailIntelligenceModels.swift */; };
+		AI0200000000000000000007 /* AdvancedAnalyticalEngines.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000007 /* AdvancedAnalyticalEngines.swift */; };
+		AI0200000000000000000008 /* AttachmentIntelligenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000008 /* AttachmentIntelligenceEngine.swift */; };
+		AI0200000000000000000009 /* CommunicationIntelligenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000009 /* CommunicationIntelligenceEngine.swift */; };
+		AI020000000000000000000A /* InboxOperatorEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI010000000000000000000A /* InboxOperatorEngine.swift */; };
+		AI020000000000000000000B /* MemoryGraphEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI010000000000000000000B /* MemoryGraphEngine.swift */; };
+		AI020000000000000000000C /* PriorityAttentionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI010000000000000000000C /* PriorityAttentionEngine.swift */; };
+		AI020000000000000000000D /* SafetySimulationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI010000000000000000000D /* SafetySimulationEngine.swift */; };
+		AI020000000000000000000E /* WorkflowAutomationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI010000000000000000000E /* WorkflowAutomationEngine.swift */; };
+		AI020000000000000000000F /* AIInboxDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI010000000000000000000F /* AIInboxDashboard.swift */; };
+		AI0200000000000000000010 /* AutomationBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000010 /* AutomationBuilderView.swift */; };
+		AI0200000000000000000011 /* ContextAndAttachmentViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000011 /* ContextAndAttachmentViews.swift */; };
+		AI0200000000000000000012 /* DecisionAndKnowledgeViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000012 /* DecisionAndKnowledgeViews.swift */; };
+		AI0200000000000000000013 /* EmailInsightPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000013 /* EmailInsightPanel.swift */; };
+		AI0200000000000000000014 /* NegotiationAndDeadlineViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000014 /* NegotiationAndDeadlineViews.swift */; };
+		AI0200000000000000000015 /* PriorityQueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000015 /* PriorityQueueView.swift */; };
+		AI0200000000000000000016 /* RelationshipInsightsPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000016 /* RelationshipInsightsPanel.swift */; };
+		AI0200000000000000000017 /* SimulationAndConsoleViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000017 /* SimulationAndConsoleViews.swift */; };
+		AI0200000000000000000018 /* WorkflowExecutionMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000018 /* WorkflowExecutionMonitor.swift */; };
 		FC0200000000000000000001 /* FilterChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0100000000000000000001 /* FilterChip.swift */; };
 		FI0200000000000000000001 /* FileImporterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FI0100000000000000000001 /* FileImporterView.swift */; };
 		SP0200000000000000000001 /* StatPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0100000000000000000001 /* StatPill.swift */; };
@@ -936,6 +955,25 @@
 		1EEEF45551F542229BE32D06 /* MailFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailFolder.swift; sourceTree = "<group>"; };
 		E1E0ABB5BDAD4793B4FE4B93 /* MailMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailMessage.swift; sourceTree = "<group>"; };
 		F236C75C5ACB4018A839FB36 /* MailThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailThread.swift; sourceTree = "<group>"; };
+		ML0100000000000000000005 /* MailIntelligenceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailIntelligenceModels.swift; sourceTree = "<group>"; };
+		AI0100000000000000000007 /* AdvancedAnalyticalEngines.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/AI/AdvancedAnalyticalEngines.swift; sourceTree = "<group>"; };
+		AI0100000000000000000008 /* AttachmentIntelligenceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/AI/AttachmentIntelligenceEngine.swift; sourceTree = "<group>"; };
+		AI0100000000000000000009 /* CommunicationIntelligenceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/AI/CommunicationIntelligenceEngine.swift; sourceTree = "<group>"; };
+		AI010000000000000000000A /* InboxOperatorEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/AI/InboxOperatorEngine.swift; sourceTree = "<group>"; };
+		AI010000000000000000000B /* MemoryGraphEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/AI/MemoryGraphEngine.swift; sourceTree = "<group>"; };
+		AI010000000000000000000C /* PriorityAttentionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/AI/PriorityAttentionEngine.swift; sourceTree = "<group>"; };
+		AI010000000000000000000D /* SafetySimulationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/AI/SafetySimulationEngine.swift; sourceTree = "<group>"; };
+		AI010000000000000000000E /* WorkflowAutomationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/AI/WorkflowAutomationEngine.swift; sourceTree = "<group>"; };
+		AI010000000000000000000F /* AIInboxDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/Advanced/AIInboxDashboard.swift; sourceTree = "<group>"; };
+		AI0100000000000000000010 /* AutomationBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/Advanced/AutomationBuilderView.swift; sourceTree = "<group>"; };
+		AI0100000000000000000011 /* ContextAndAttachmentViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/Advanced/ContextAndAttachmentViews.swift; sourceTree = "<group>"; };
+		AI0100000000000000000012 /* DecisionAndKnowledgeViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/Advanced/DecisionAndKnowledgeViews.swift; sourceTree = "<group>"; };
+		AI0100000000000000000013 /* EmailInsightPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/Advanced/EmailInsightPanel.swift; sourceTree = "<group>"; };
+		AI0100000000000000000014 /* NegotiationAndDeadlineViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/Advanced/NegotiationAndDeadlineViews.swift; sourceTree = "<group>"; };
+		AI0100000000000000000015 /* PriorityQueueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/Advanced/PriorityQueueView.swift; sourceTree = "<group>"; };
+		AI0100000000000000000016 /* RelationshipInsightsPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/Advanced/RelationshipInsightsPanel.swift; sourceTree = "<group>"; };
+		AI0100000000000000000017 /* SimulationAndConsoleViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/Advanced/SimulationAndConsoleViews.swift; sourceTree = "<group>"; };
+		AI0100000000000000000018 /* WorkflowExecutionMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/Advanced/WorkflowExecutionMonitor.swift; sourceTree = "<group>"; };
 		FC0100000000000000000001 /* FilterChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/FilterChip.swift; sourceTree = "<group>"; };
 		FI0100000000000000000001 /* FileImporterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/FileImporterView.swift; sourceTree = "<group>"; };
 		SP0100000000000000000001 /* StatPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/StatPill.swift; sourceTree = "<group>"; };
@@ -1941,8 +1979,27 @@
 				1EEEF45551F542229BE32D06 /* MailFolder.swift */,
 				E1E0ABB5BDAD4793B4FE4B93 /* MailMessage.swift */,
 				F236C75C5ACB4018A839FB36 /* MailThread.swift */,
+				ML0100000000000000000005 /* MailIntelligenceModels.swift */,
 				7BF38182EF444218AFF7D2D3 /* MailAIService.swift */,
 				A1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift */,
+				AI0100000000000000000007 /* AdvancedAnalyticalEngines.swift */,
+				AI0100000000000000000008 /* AttachmentIntelligenceEngine.swift */,
+				AI0100000000000000000009 /* CommunicationIntelligenceEngine.swift */,
+				AI010000000000000000000A /* InboxOperatorEngine.swift */,
+				AI010000000000000000000B /* MemoryGraphEngine.swift */,
+				AI010000000000000000000C /* PriorityAttentionEngine.swift */,
+				AI010000000000000000000D /* SafetySimulationEngine.swift */,
+				AI010000000000000000000E /* WorkflowAutomationEngine.swift */,
+				AI010000000000000000000F /* AIInboxDashboard.swift */,
+				AI0100000000000000000010 /* AutomationBuilderView.swift */,
+				AI0100000000000000000011 /* ContextAndAttachmentViews.swift */,
+				AI0100000000000000000012 /* DecisionAndKnowledgeViews.swift */,
+				AI0100000000000000000013 /* EmailInsightPanel.swift */,
+				AI0100000000000000000014 /* NegotiationAndDeadlineViews.swift */,
+				AI0100000000000000000015 /* PriorityQueueView.swift */,
+				AI0100000000000000000016 /* RelationshipInsightsPanel.swift */,
+				AI0100000000000000000017 /* SimulationAndConsoleViews.swift */,
+				AI0100000000000000000018 /* WorkflowExecutionMonitor.swift */,
 				E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */,
 				C1B5DD1027FA49B99C531EDE /* MailProviderProtocol.swift */,
 				AC0100000000000000000001 /* AppConfig.swift */,
@@ -3924,6 +3981,25 @@
 				EC7C33F7F0134FB199647133 /* AgentCheckpointManagerView.swift in Sources */,
 				35F07ABD517C4F1D8D1E8ACC /* AgentExecutionTimelineView.swift in Sources */,
 				C51A362904C749469C35ED8A /* AgentDiffViewerView.swift in Sources */,
+				ML0200000000000000000005 /* MailIntelligenceModels.swift in Sources */,
+				AI0200000000000000000007 /* AdvancedAnalyticalEngines.swift in Sources */,
+				AI0200000000000000000008 /* AttachmentIntelligenceEngine.swift in Sources */,
+				AI0200000000000000000009 /* CommunicationIntelligenceEngine.swift in Sources */,
+				AI020000000000000000000A /* InboxOperatorEngine.swift in Sources */,
+				AI020000000000000000000B /* MemoryGraphEngine.swift in Sources */,
+				AI020000000000000000000C /* PriorityAttentionEngine.swift in Sources */,
+				AI020000000000000000000D /* SafetySimulationEngine.swift in Sources */,
+				AI020000000000000000000E /* WorkflowAutomationEngine.swift in Sources */,
+				AI020000000000000000000F /* AIInboxDashboard.swift in Sources */,
+				AI0200000000000000000010 /* AutomationBuilderView.swift in Sources */,
+				AI0200000000000000000011 /* ContextAndAttachmentViews.swift in Sources */,
+				AI0200000000000000000012 /* DecisionAndKnowledgeViews.swift in Sources */,
+				AI0200000000000000000013 /* EmailInsightPanel.swift in Sources */,
+				AI0200000000000000000014 /* NegotiationAndDeadlineViews.swift in Sources */,
+				AI0200000000000000000015 /* PriorityQueueView.swift in Sources */,
+				AI0200000000000000000016 /* RelationshipInsightsPanel.swift in Sources */,
+				AI0200000000000000000017 /* SimulationAndConsoleViews.swift in Sources */,
+				AI0200000000000000000018 /* WorkflowExecutionMonitor.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
