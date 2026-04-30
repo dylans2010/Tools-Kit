@@ -196,28 +196,48 @@ struct PageEditorView: View {
     }
 
     private var notesEditor: some View {
-        Group {
-            if isPreview {
-                ScrollView {
+        ScrollView {
+            VStack(spacing: 12) {
+                if isPreview {
                     Text(renderPreview(content))
                         .padding(16)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            } else {
-                ZStack(alignment: .topLeading) {
-                    if content.isEmpty {
-                        Text("Start typing, paste content, or add files/images…")
+                } else {
+                    if page.blocks.isEmpty {
+                        Text("Start typing, or add blocks from the toolbar…")
                             .foregroundStyle(.secondary)
-                            .padding(.horizontal, 20)
                             .padding(.top, 12)
                     }
-                    TextEditor(text: $content)
-                        .font(.body)
-                        .scrollContentBackground(.hidden)
-                        .padding(.horizontal, 16)
-                        .onChange(of: content) { _ in scheduleAutosave() }
+
+                    ForEach(page.blocks.indices, id: \.self) { idx in
+                        BlockRenderer(
+                            block: Binding(
+                                get: { page.blocks[idx] },
+                                set: { newValue in
+                                    var updated = page
+                                    updated.blocks[idx] = newValue
+                                    manager.updatePage(updated, in: folderID, notebookID: notebookID)
+                                }
+                            ),
+                            onDelete: {
+                                manager.deleteBlock(page.blocks[idx].id, from: page.id, folderID: folderID, notebookID: notebookID)
+                            },
+                            onUpdate: {
+                                manager.updatePage(page, in: folderID, notebookID: notebookID)
+                            }
+                        )
+                    }
+
+                    Button {
+                        manager.addBlock(to: page.id, folderID: folderID, notebookID: notebookID, kind: .text)
+                    } label: {
+                        Label("Add Block", systemImage: "plus.circle")
+                    }
+                    .buttonStyle(.bordered)
+                    .padding(.top, 8)
                 }
             }
+            .padding(.horizontal, 16)
         }
     }
 
@@ -586,5 +606,63 @@ private struct CanvasStickyNote: View {
                         note.position = value.location
                     }
             )
+    }
+}
+
+struct BlockRenderer: View {
+    @Binding var block: NotebookBlock
+    var onDelete: () -> Void
+    var onUpdate: () -> Void
+
+    var body: some View {
+        WorkspaceSurfaceCard(padding: 12) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: icon(for: block.kind))
+                        .foregroundStyle(.secondary)
+                        .font(.caption)
+                    Text(block.kind.rawValue.capitalized)
+                        .font(.caption.bold())
+                        .foregroundStyle(.secondary)
+                    Spacer()
+
+                    Menu {
+                        Button(role: .destructive, action: onDelete) {
+                            Label("Delete Block", systemImage: "trash")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                switch block.kind {
+                case .text:
+                    TextBlockView(block: $block, onUpdate: onUpdate)
+                case .code:
+                    CodeBlockView(block: $block, onUpdate: onUpdate)
+                case .database:
+                    DatabaseBlockView(block: $block, onUpdate: onUpdate)
+                case .toggle:
+                    ToggleBlockView(block: $block, onUpdate: onUpdate)
+                case .embed:
+                    EmbedBlockView(block: $block, onUpdate: onUpdate)
+                case .widget:
+                    WidgetBlockView(block: $block, onUpdate: onUpdate)
+                }
+            }
+        }
+    }
+
+    private func icon(for kind: NotebookBlock.BlockKind) -> String {
+        switch kind {
+        case .text: return "text.alignleft"
+        case .code: return "chevron.left.forwardslash.chevron.right"
+        case .database: return "tablecells"
+        case .toggle: return "chevron.right.circle"
+        case .embed: return "link"
+        case .widget: return "square.grid.2x2"
+        }
     }
 }

@@ -79,9 +79,34 @@ final class NotebooksManager: ObservableObject {
               let pIdx = notebooks[nbIdx].folders[fIdx].pages.firstIndex(where: { $0.id == page.id }) else { return }
         var updated = page
         updated.updatedAt = Date()
+
+        // Versioning logic
+        if updated.blocks != notebooks[nbIdx].folders[fIdx].pages[pIdx].blocks {
+            let version = NotebookVersion(blocks: updated.blocks, author: "Local User")
+            updated.history.append(version)
+            if updated.history.count > 50 { updated.history.removeFirst() }
+        }
+
         notebooks[nbIdx].folders[fIdx].pages[pIdx] = updated
         notebooks[nbIdx].updatedAt = Date()
         saveNotebooks()
+    }
+
+    func addBlock(to pageID: UUID, folderID: UUID, notebookID: UUID, kind: NotebookBlock.BlockKind) {
+        guard let nbIdx = notebooks.firstIndex(where: { $0.id == notebookID }),
+              let fIdx = notebooks[nbIdx].folders.firstIndex(where: { $0.id == folderID }),
+              let pIdx = notebooks[nbIdx].folders[fIdx].pages.firstIndex(where: { $0.id == pageID }) else { return }
+        let block = NotebookBlock(kind: kind)
+        notebooks[nbIdx].folders[fIdx].pages[pIdx].blocks.append(block)
+        updatePage(notebooks[nbIdx].folders[fIdx].pages[pIdx], in: folderID, notebookID: notebookID)
+    }
+
+    func deleteBlock(_ blockID: UUID, from pageID: UUID, folderID: UUID, notebookID: UUID) {
+        guard let nbIdx = notebooks.firstIndex(where: { $0.id == notebookID }),
+              let fIdx = notebooks[nbIdx].folders.firstIndex(where: { $0.id == folderID }),
+              let pIdx = notebooks[nbIdx].folders[fIdx].pages.firstIndex(where: { $0.id == pageID }) else { return }
+        notebooks[nbIdx].folders[fIdx].pages[pIdx].blocks.removeAll { $0.id == blockID }
+        updatePage(notebooks[nbIdx].folders[fIdx].pages[pIdx], in: folderID, notebookID: notebookID)
     }
 
     func deletePage(_ page: NotebookPage, from folderID: UUID, notebookID: UUID) {
@@ -187,5 +212,19 @@ final class NotebooksManager: ObservableObject {
             systemPrompt: "You are a notebook knowledge assistant that understands informal natural language. Return strict JSON only."
         )
         return try aiDecoder.decode(AINotebookInsights.self, from: json, schema: aiSchema)
+    }
+
+    func updateKnowledgeGraph() {
+        // Simulated automatic clustering and backlink discovery
+        let pages = notebooks.flatMap { $0.folders.flatMap(\.pages) }
+        for page in pages {
+            // Find semantic links (simulated)
+            let otherPages = pages.filter { $0.id != page.id }
+            for other in otherPages {
+                if page.content.contains(other.title) {
+                    // Create backlink logic here
+                }
+            }
+        }
     }
 }

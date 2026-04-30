@@ -61,29 +61,40 @@ struct WorkspaceHabitTrackerView: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    if !manager.habits.isEmpty {
-                        Button {
-                            showingAnalytics = true
-                        } label: {
-                            Label("Analytics", systemImage: "chart.bar")
+
+                    Menu {
+                        if !manager.habits.isEmpty {
+                            Button { showingAnalytics = true } label: {
+                                Label("Analytics", systemImage: "chart.bar")
+                            }
                         }
-                        .buttonStyle(.bordered)
+                        Button { showingCreate = true } label: {
+                            Label("New Habit", systemImage: "plus")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .font(.headline)
+                            .frame(width: 36, height: 36)
                     }
+                    .buttonStyle(.bordered)
+
                     Button {
                         showingCreate = true
                     } label: {
-                        Label("New", systemImage: "plus")
+                        Image(systemName: "plus")
+                            .font(.headline)
+                            .frame(width: 36, height: 36)
                     }
                     .buttonStyle(.borderedProminent)
                 }
                 HStack(spacing: 8) {
-                    aiQuickAction("Morning Routine", icon: "sun.max.fill") {
+                    aiQuickAction("Morning", icon: "sun.max.fill") {
                         runAI(with: "Design a realistic morning routine for focus, fitness, and consistency.")
                     }
-                    aiQuickAction("Break Bad Habit", icon: "shield.lefthalf.filled") {
+                    aiQuickAction("Break Bad", icon: "shield.lefthalf.filled") {
                         runAI(with: "Give a replacement habit strategy to break a bad habit pattern.")
                     }
-                    aiQuickAction("Streak Recovery", icon: "flame.circle.fill") {
+                    aiQuickAction("Recovery", icon: "flame.circle.fill") {
                         runAI(with: "Create a 7-day streak recovery plan after missed days.")
                     }
                 }
