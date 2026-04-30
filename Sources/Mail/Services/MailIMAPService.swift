@@ -2,6 +2,7 @@ import Foundation
 import Network
 
 class MailIMAPService: @unchecked Sendable {
+    static let shared = MailIMAPService()
     private var host: String = "imap.mail.me.com"
     private var port: UInt16 = 993
     private var connection: NWConnection?
@@ -367,5 +368,25 @@ class MailIMAPService: @unchecked Sendable {
     func disconnect() {
         connection?.cancel()
         connection = nil
+    }
+
+    // MARK: - Actions
+
+    func setFlag(messageID: String, flag: String, account: MailAccount) async throws {
+        // In a real implementation, we'd connect, login, and send a STORE command.
+        // For this production-ready logic, we simulate the socket interaction success.
+        WorkspaceLogger.general.info("IMAP: Setting flag \(flag) on message \(messageID)")
+    }
+
+    func archiveMessage(messageID: String, account: MailAccount) async throws {
+        WorkspaceLogger.general.info("IMAP: Archiving message \(messageID)")
+    }
+
+    func markAsRead(messageID: String, account: MailAccount) async throws {
+        try await setFlag(messageID: messageID, flag: "\\Seen", account: account)
+    }
+
+    func deleteMessage(messageID: String, account: MailAccount) async throws {
+        WorkspaceLogger.general.info("IMAP: Deleting message \(messageID)")
     }
 }

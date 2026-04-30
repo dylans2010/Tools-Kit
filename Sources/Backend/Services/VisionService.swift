@@ -2,6 +2,8 @@ import Vision
 import UIKit
 
 class VisionService {
+    static let shared = VisionService()
+
     func performOCR(on image: UIImage) async throws -> String {
         guard let cgImage = image.cgImage else {
             throw NSError(domain: "VisionService", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid image"])

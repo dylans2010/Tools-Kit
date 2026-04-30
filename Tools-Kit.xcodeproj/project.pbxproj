@@ -90,6 +90,7 @@
 		AI0200000000000000000016 /* RelationshipInsightsPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000016 /* RelationshipInsightsPanel.swift */; };
 		AI0200000000000000000017 /* SimulationAndConsoleViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000017 /* SimulationAndConsoleViews.swift */; };
 		AI0200000000000000000018 /* WorkflowExecutionMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000018 /* WorkflowExecutionMonitor.swift */; };
+		AI0200000000000000000019 /* AdvancedMailViewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000019 /* AdvancedMailViewModels.swift */; };
 		FC0200000000000000000001 /* FilterChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0100000000000000000001 /* FilterChip.swift */; };
 		FI0200000000000000000001 /* FileImporterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FI0100000000000000000001 /* FileImporterView.swift */; };
 		SP0200000000000000000001 /* StatPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0100000000000000000001 /* StatPill.swift */; };
@@ -974,6 +975,7 @@
 		AI0100000000000000000016 /* RelationshipInsightsPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/Advanced/RelationshipInsightsPanel.swift; sourceTree = "<group>"; };
 		AI0100000000000000000017 /* SimulationAndConsoleViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/Advanced/SimulationAndConsoleViews.swift; sourceTree = "<group>"; };
 		AI0100000000000000000018 /* WorkflowExecutionMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/Advanced/WorkflowExecutionMonitor.swift; sourceTree = "<group>"; };
+		AI0100000000000000000019 /* AdvancedMailViewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/Advanced/AdvancedMailViewModels.swift; sourceTree = "<group>"; };
 		FC0100000000000000000001 /* FilterChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/FilterChip.swift; sourceTree = "<group>"; };
 		FI0100000000000000000001 /* FileImporterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/FileImporterView.swift; sourceTree = "<group>"; };
 		SP0100000000000000000001 /* StatPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/StatPill.swift; sourceTree = "<group>"; };
@@ -2000,6 +2002,7 @@
 				AI0100000000000000000016 /* RelationshipInsightsPanel.swift */,
 				AI0100000000000000000017 /* SimulationAndConsoleViews.swift */,
 				AI0100000000000000000018 /* WorkflowExecutionMonitor.swift */,
+				AI0100000000000000000019 /* AdvancedMailViewModels.swift */,
 				E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */,
 				C1B5DD1027FA49B99C531EDE /* MailProviderProtocol.swift */,
 				AC0100000000000000000001 /* AppConfig.swift */,
@@ -4000,6 +4003,7 @@
 				AI0200000000000000000016 /* RelationshipInsightsPanel.swift in Sources */,
 				AI0200000000000000000017 /* SimulationAndConsoleViews.swift in Sources */,
 				AI0200000000000000000018 /* WorkflowExecutionMonitor.swift in Sources */,
+				AI0200000000000000000019 /* AdvancedMailViewModels.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

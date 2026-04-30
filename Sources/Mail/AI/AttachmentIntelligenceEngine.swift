@@ -41,8 +41,7 @@ actor AttachmentIntelligenceEngine {
         // ensuring it never actually crosses actor boundaries during concurrent execution.
         return try await MainActor.run {
             guard let image = UIImage(data: data) else { return "" }
-            // Assuming VisionService.extractText is also compatible with MainActor or thread-safe.
-            return try await VisionService.shared.extractText(from: image)
+            return try await VisionService.shared.performOCR(on: image)
         }
     }
 
