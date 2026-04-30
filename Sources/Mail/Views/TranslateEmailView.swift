@@ -166,7 +166,7 @@ struct TranslateEmailView: View {
             .font(.caption.bold())
         }
         .padding(16)
-        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))
     }
 
     private func compactSelector(title: String, selection: Binding<String>, options: [String]) -> some View {
@@ -203,7 +203,7 @@ struct TranslateEmailView: View {
 
             content()
                 .padding(12)
-                .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+                .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))
         }
         .padding(16)
         .background(isResult ? Color.blue.opacity(0.05) : Color.white.opacity(0.02), in: RoundedRectangle(cornerRadius: 20))

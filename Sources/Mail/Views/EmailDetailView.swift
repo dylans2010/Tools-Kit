@@ -17,6 +17,7 @@ struct EmailDetailView: View {
     @State private var draftReply = ""
     @State private var isRunningAIFeature = false
     @State private var actionError: String?
+    @State private var showingInspector = false
 
     init(viewModel: MailViewModel, email: EmailMessage, account: MailAccount? = nil) {
         self.viewModel = viewModel
@@ -26,104 +27,84 @@ struct EmailDetailView: View {
 
     var body: some View {
         GeometryReader { geo in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    Text(resolvedEmail.subject)
-                        .font(.title3.bold())
-                    Text(resolvedEmail.sender)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+            ZStack {
+                Color.workspaceBackground.ignoresSafeArea()
 
-                    if isSummarizing {
-                        ProgressView("Summarizing…")
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        headerSection
+
+                        aiActionsBar
+
+                        if isSummarizing || isRunningAIFeature {
+                            loadingIndicator
+                        }
+
+                        if !summary.isEmpty {
+                            aiResultCard(title: "AI Summary", icon: "sparkles", content: summary)
+                        }
+
+                        if !actionItems.isEmpty {
+                            aiResultCard(title: "Action Items", icon: "checklist", content: actionItems)
+                        }
+
+                        if !toneAnalysis.isEmpty {
+                            aiResultCard(title: "Tone Insights", icon: "waveform.and.magnifyingglass", content: toneAnalysis)
+                        }
+
+                        if !draftReply.isEmpty {
+                            aiResultCard(title: "Reply Draft", icon: "arrowshape.turn.up.left.2", content: draftReply)
+                        }
+
+                        contentView(minHeight: max(geo.size.height * 0.5, 300))
+
+                        if let actionError {
+                            Text(actionError)
+                                .font(.footnote)
+                                .foregroundStyle(.red)
+                        }
                     }
-
-                    if !summary.isEmpty {
-                        aiResultCard(title: "AI Summary", icon: "sparkles", content: summary)
-                    }
-
-                    if isRunningAIFeature {
-                        ProgressView("Running AI Analysis…")
-                    }
-
-                    if !actionItems.isEmpty {
-                        aiResultCard(title: "Action Items", icon: "checklist", content: actionItems)
-                    }
-
-                    if !toneAnalysis.isEmpty {
-                        aiResultCard(title: "Tone Insights", icon: "waveform.and.magnifyingglass", content: toneAnalysis)
-                    }
-
-                    if !draftReply.isEmpty {
-                        aiResultCard(title: "Reply Draft", icon: "arrowshape.turn.up.left.2", content: draftReply)
-                    }
-
-                    contentView(minHeight: max(geo.size.height * 0.4, 220))
-
-                    if let actionError {
-                        Text(actionError)
-                            .font(.footnote)
-                            .foregroundStyle(.red)
-                    }
-
-                    if account == nil {
-                        Text("Connect a mail account to enable Reply, Delete, and Archive actions.")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                    }
+                    .padding(18)
                 }
-                .padding(16)
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
+                    HStack(spacing: 16) {
                         Button {
-                            runAIFeature(.summary)
+                            showingInspector = true
                         } label: {
-                            Label("Summarize", systemImage: "text.justify.leading")
+                            Image(systemName: "info.circle")
                         }
 
-                        Button {
-                            runAIFeature(.actionItems)
-                        } label: {
-                            Label("Extract Action Items", systemImage: "checklist")
-                        }
+                        Menu {
+                            Button {
+                                showReplyComposer = true
+                            } label: {
+                                Label("Reply", systemImage: "arrowshape.turn.up.left")
+                            }
+                            .disabled(account == nil)
 
-                        Button {
-                            runAIFeature(.tone)
-                        } label: {
-                            Label("Analyze Tone", systemImage: "waveform.and.magnifyingglass")
-                        }
+                            Button {
+                                Task { await archiveEmail() }
+                            } label: {
+                                Label("Archive", systemImage: "archivebox")
+                            }
 
-                        Button {
-                            runAIFeature(.replyDraft)
+                            Button(role: .destructive) {
+                                Task { await deleteEmail() }
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
                         } label: {
-                            Label("Generate Reply Draft", systemImage: "square.and.pencil")
+                            Image(systemName: "ellipsis.circle")
                         }
-
-                        Button {
-                            showReplyComposer = true
-                        } label: {
-                            Label("Reply", systemImage: "arrowshape.turn.up.left")
-                        }
-                        .disabled(account == nil)
-
-                        Button {
-                            Task { await archiveEmail() }
-                        } label: {
-                            Label("Archive", systemImage: "archivebox")
-                        }
-
-                        Button(role: .destructive) {
-                            Task { await deleteEmail() }
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
                     }
                 }
+            }
+            .sheet(isPresented: $showingInspector) {
+                MetadataInspectorView(email: email)
+                    .presentationDetents([.medium, .large])
             }
             .fullScreenCover(isPresented: $showReplyComposer) {
                 if let account {
@@ -155,6 +136,68 @@ struct EmailDetailView: View {
         }
     }
 
+    private var headerSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(resolvedEmail.subject)
+                .font(.title2.bold())
+                .foregroundStyle(.white)
+
+            HStack {
+                Circle()
+                    .fill(Color.blue.opacity(0.2))
+                    .frame(width: 32, height: 32)
+                    .overlay(Text(resolvedEmail.sender.prefix(1).uppercased()).font(.caption.bold()))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(resolvedEmail.sender)
+                        .font(.subheadline.bold())
+                        .foregroundStyle(.white)
+                    Text(resolvedEmail.date.formatted(date: .long, time: .shortened))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    private var aiActionsBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                aiActionButton(title: "Summarize", icon: "text.justify.leading", action: { runAIFeature(.summary) })
+                aiActionButton(title: "Action Items", icon: "checklist", action: { runAIFeature(.actionItems) })
+                aiActionButton(title: "Tone", icon: "waveform", action: { runAIFeature(.tone) })
+                aiActionButton(title: "Draft Reply", icon: "pencil.and.outline", action: { runAIFeature(.replyDraft) })
+            }
+        }
+    }
+
+    private func aiActionButton(title: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack {
+                Image(systemName: icon)
+                Text(title)
+            }
+            .font(.caption.bold())
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(Color.white.opacity(0.1), in: Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var loadingIndicator: some View {
+        HStack {
+            ProgressView()
+                .tint(.purple)
+            Text("AI is processing...")
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .frame(maxWidth: .infinity)
+        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))
+    }
+
     private func contentView(minHeight: CGFloat) -> some View {
         Group {
             if let content = renderContent(from: resolvedEmail) {
@@ -175,7 +218,7 @@ struct EmailDetailView: View {
             } else {
                 ProgressView("Loading Body...")
                     .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.top, 20)
+                    .padding(.top, 40)
             }
         }
     }
@@ -269,7 +312,7 @@ struct EmailDetailView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             LinearGradient(
-                colors: [Color.blue.opacity(0.6), Color.purple.opacity(0.55)],
+                colors: [Color.blue.opacity(0.4), Color.purple.opacity(0.35)],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             ),
@@ -277,7 +320,7 @@ struct EmailDetailView: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.2), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
         )
     }
 
@@ -369,5 +412,40 @@ struct EmailDetailView: View {
             smtpHost: account.smtpHost ?? "smtp.mail.me.com",
             smtpPort: account.smtpPort ?? 587
         )
+    }
+}
+
+struct MetadataInspectorView: View {
+    let email: EmailMessage
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section("Information") {
+                    LabeledContent("Subject", value: email.subject)
+                    LabeledContent("Sender", value: email.sender)
+                    LabeledContent("Date", value: email.date.formatted())
+                    LabeledContent("UID", value: "\(email.uid)")
+                }
+
+                Section("Attachments") {
+                    if email.attachments.isEmpty {
+                        Text("No attachments")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(email.attachments) { attachment in
+                            Label(attachment.filename, systemImage: "doc")
+                        }
+                    }
+                }
+
+                Section("Deep Data") {
+                    LabeledContent("MIME Type", value: "multipart/alternative")
+                    LabeledContent("Encoding", value: "quoted-printable")
+                }
+            }
+            .navigationTitle("Email Inspector")
+            .navigationBarTitleDisplayMode(.inline)
+        }
     }
 }

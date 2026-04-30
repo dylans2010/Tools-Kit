@@ -8,134 +8,69 @@ struct CalendarYearView: View {
     private let calendar = Calendar.current
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 16), count: 3)
 
-    private var year: Int {
-        calendar.component(.year, from: selectedDate)
-    }
-
     var body: some View {
-        VStack(spacing: 0) {
-            yearHeader
-
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(1...12, id: \.self) { month in
-                        if let monthDate = date(year: year, month: month) {
-                            MiniMonthView(date: monthDate, selectedDate: $selectedDate, manager: manager) {
-                                selectedDate = monthDate
-                                selectedView = .month
-                            }
+        ScrollView {
+            LazyVGrid(columns: columns, spacing: 24) {
+                ForEach(1...12, id: \.self) { month in
+                    if let monthDate = dateFor(month: month) {
+                        YearMiniMonthView(date: monthDate) {
+                            selectedDate = monthDate
+                            selectedView = .month
                         }
                     }
                 }
-                .padding()
             }
+            .padding()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
-    private var yearHeader: some View {
-        HStack {
-            Button {
-                selectedDate = calendar.date(byAdding: .year, value: -1, to: selectedDate) ?? selectedDate
-            } label: {
-                Image(systemName: "chevron.left")
-            }
-            Spacer()
-            Text("\(year)")
-                .font(.headline)
-            Spacer()
-            Button {
-                selectedDate = calendar.date(byAdding: .year, value: 1, to: selectedDate) ?? selectedDate
-            } label: {
-                Image(systemName: "chevron.right")
-            }
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 10)
-    }
-
-    private func date(year: Int, month: Int) -> Date? {
-        var components = DateComponents()
-        components.year = year
+    private func dateFor(month: Int) -> Date? {
+        var components = calendar.dateComponents([.year], from: selectedDate)
         components.month = month
         components.day = 1
         return calendar.date(from: components)
     }
 }
 
-struct MiniMonthView: View {
+struct YearMiniMonthView: View {
     let date: Date
-    @Binding var selectedDate: Date
-    @ObservedObject var manager: CalendarManager
     let onTap: () -> Void
-
     private let calendar = Calendar.current
-    private let miniColumns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
 
     var body: some View {
-        VStack(spacing: 4) {
-            Button(action: onTap) {
-                Text(monthName)
-                    .font(.caption.bold())
-                    .foregroundColor(isCurrentMonth ? .accentColor : .primary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .buttonStyle(.plain)
+        VStack(alignment: .leading, spacing: 8) {
+            Text(date.formatted(.dateTime.month(.abbreviated)))
+                .font(.caption.bold())
+                .foregroundStyle(.blue)
 
-            LazyVGrid(columns: miniColumns, spacing: 2) {
-                ForEach(daysInGrid(), id: \.self) { day in
+            LazyVGrid(columns: columns, spacing: 4) {
+                ForEach(daysInMonth(), id: \.self) { day in
                     if let day = day {
-                        let isToday = calendar.isDateInToday(day)
-                        let hasEvent = manager.hasEvents(on: day)
-                        ZStack {
-                            Circle()
-                                .fill(isToday ? Color.accentColor : Color.clear)
-                                .frame(width: 18, height: 18)
-                            Text(dayNum(day))
-                                .font(.system(size: 8, weight: isToday ? .bold : .regular))
-                                .foregroundColor(isToday ? .white : (hasEvent ? .accentColor : .secondary))
-                        }
-                        .frame(maxWidth: .infinity)
+                        Text("\(calendar.component(.day, from: day))")
+                            .font(.system(size: 6))
+                            .frame(maxWidth: .infinity)
                     } else {
-                        Color.clear.frame(height: 18)
+                        Color.clear.frame(height: 8)
                     }
                 }
             }
         }
-        .padding(8)
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(10)
+        .padding(10)
+        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))
+        .onTapGesture(perform: onTap)
     }
 
-    private var monthName: String {
-        let f = DateFormatter()
-        f.dateFormat = "MMM"
-        return f.string(from: date)
-    }
-
-    private var isCurrentMonth: Bool {
-        calendar.isDate(date, equalTo: Date(), toGranularity: .month)
-    }
-
-    private func daysInGrid() -> [Date?] {
-        guard let monthInterval = calendar.dateInterval(of: .month, for: date),
-              let firstWeek = calendar.dateInterval(of: .weekOfYear, for: monthInterval.start) else { return [] }
-
-        var days: [Date?] = []
-        let offset = calendar.dateComponents([.day], from: firstWeek.start, to: monthInterval.start).day ?? 0
-        for _ in 0..<offset { days.append(nil) }
+    private func daysInMonth() -> [Date?] {
+        guard let monthInterval = calendar.dateInterval(of: .month, for: date) else { return [] }
+        let startWeekday = calendar.component(.weekday, from: monthInterval.start)
+        var days: [Date?] = Array(repeating: nil, count: startWeekday - 1)
 
         var current = monthInterval.start
         while current < monthInterval.end {
             days.append(current)
-            current = calendar.date(byAdding: .day, value: 1, to: current) ?? current
+            current = calendar.date(byAdding: .day, value: 1, to: current)!
         }
         return days
-    }
-
-    private func dayNum(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateFormat = "d"
-        return f.string(from: date)
     }
 }

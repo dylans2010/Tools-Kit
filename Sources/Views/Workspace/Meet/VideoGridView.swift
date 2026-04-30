@@ -8,71 +8,54 @@ struct VideoGridView: View {
     let spotlightedParticipantID: String?
     let pinnedParticipantID: String?
 
-    private var liveVideoParticipants: [MeetingParticipant] {
-        participants.filter { participant in
-            participant.hasVideo && videoTracks[participant.id] != nil
+    var body: some View {
+        GeometryReader { geo in
+            let columns = participants.count > 4 ? 3 : (participants.count > 1 ? 2 : 1)
+            let layout = Array(repeating: GridItem(.flexible(), spacing: 12), count: columns)
+
+            LazyVGrid(columns: layout, spacing: 12) {
+                ForEach(participants) { participant in
+                    VideoTileView(participant: participant, track: videoTracks[participant.id])
+                        .frame(height: geo.size.height / CGFloat((participants.count + columns - 1) / columns) - 12)
+                }
+            }
         }
     }
+}
 
-    private var columns: [GridItem] {
-        let count = max(1, liveVideoParticipants.count)
-        if count <= 1 { return [GridItem(.flexible())] }
-        if count <= 4 { return [GridItem(.flexible()), GridItem(.flexible())] }
-        return [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
-    }
+struct VideoTileView: View {
+    let participant: MeetingParticipant
+    let track: MeetingVideoTrack?
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 10) {
-                if let activeScreenShareParticipantID,
-                   let sharer = participants.first(where: { $0.id == activeScreenShareParticipantID }),
-                   let screenTrack = screenShareTracks[activeScreenShareParticipantID] {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("\(sharer.displayName) is sharing screen", systemImage: "rectangle.on.rectangle")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                        VideoTileView(participant: sharer, track: screenTrack)
-                    }
-                    .padding(10)
-                    .background(Color(.tertiarySystemFill), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                }
+        ZStack(alignment: .bottomLeading) {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.workspaceSurface)
 
-                if liveVideoParticipants.isEmpty {
-                    ContentUnavailableView(
-                        "No Active Video",
-                        systemImage: "video.slash",
-                        description: Text("Turn on your camera or wait for participants to publish a video track.")
-                    )
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 26)
-                } else {
-                    LazyVGrid(columns: columns, spacing: 10) {
-                        ForEach(orderedParticipants) { participant in
-                            VideoTileView(participant: participant, track: videoTracks[participant.id])
-                        }
-                    }
+            if participant.hasVideo {
+                // Actual video implementation would go here
+                Image(systemName: "person.fill")
+                    .font(.largeTitle)
+                    .foregroundStyle(.secondary)
+            } else {
+                Circle()
+                    .fill(Color.blue.opacity(0.2))
+                    .frame(width: 60, height: 60)
+                    .overlay(Text(participant.displayName.prefix(1).uppercased()).font(.title.bold()))
+            }
+
+            HStack {
+                Text(participant.displayName)
+                    .font(.caption.bold())
+                if participant.isMuted {
+                    Image(systemName: "mic.slash.fill").font(.caption2).foregroundStyle(.red)
                 }
             }
-            .padding(12)
+            .padding(8)
+            .background(.ultraThinMaterial, in: Capsule())
+            .padding(8)
         }
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-    }
-
-    private var orderedParticipants: [MeetingParticipant] {
-        liveVideoParticipants.sorted { lhs, rhs in
-            let lhsPriority = sortPriority(for: lhs.id)
-            let rhsPriority = sortPriority(for: rhs.id)
-            if lhsPriority != rhsPriority {
-                return lhsPriority > rhsPriority
-            }
-            return lhs.displayName.localizedCaseInsensitiveCompare(rhs.displayName) == .orderedAscending
-        }
-    }
-
-    private func sortPriority(for participantID: String) -> Int {
-        if participantID == pinnedParticipantID { return 3 }
-        if participantID == spotlightedParticipantID { return 2 }
-        if participantID == activeScreenShareParticipantID { return 1 }
-        return 0
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(participant.isSpeaking ? Color.blue : Color.clear, lineWidth: 2))
     }
 }

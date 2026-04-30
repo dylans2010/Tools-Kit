@@ -5,10 +5,14 @@ import UIKit
 struct InboxView: View {
     let account: MailAccount
     let folder: MailFolder
-    var filter: InboxFilter = .all
+    @State private var filter: InboxFilter = .all
 
-    enum InboxFilter {
-        case all, unread
+    enum InboxFilter: String, CaseIterable, Identifiable {
+        case all = "All"
+        case unread = "Unread"
+        case attention = "Attention"
+
+        var id: String { self.rawValue }
     }
 
     @StateObject private var storage = MailStorageService.shared
@@ -29,31 +33,46 @@ struct InboxView: View {
 
     var body: some View {
         ZStack {
-            hexColor("#0D0D14").ignoresSafeArea()
+            Color.workspaceBackground.ignoresSafeArea()
 
-            if viewModel.isInitialLoading {
-                skeletonList
-                    .transition(.opacity)
-            } else {
-                contentList
-                    .transition(.opacity)
+            VStack(spacing: 0) {
+                filterPicker
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
+
+                if viewModel.isInitialLoading {
+                    skeletonList
+                        .transition(.opacity)
+                } else {
+                    contentList
+                        .transition(.opacity)
+                }
             }
         }
         .navigationTitle(folder.name)
         .navigationBarTitleDisplayMode(.inline)
-        .searchable(text: $searchText)
+        .searchable(text: $searchText, prompt: "Search emails")
         .refreshable {
             showingFetchingLabel = true
             await viewModel.refresh(fetchFromServer: true)
             showingFetchingLabel = false
         }
         .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    showingUniversalInbox = true
+                } label: {
+                    Image(systemName: "chevron.left.circle.fill")
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
                     showingAIFeatures = true
                 } label: {
-                    Image(systemName: "sparkles.rectangle.stack")
-                        .foregroundStyle(LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    Image(systemName: "sparkles")
+                        .foregroundStyle(LinearGradient(colors: [.aiGradientStart, .aiGradientEnd], startPoint: .topLeading, endPoint: .bottomTrailing))
                 }
 
                 Button {
@@ -68,7 +87,7 @@ struct InboxView: View {
                 EmailComposingView(account: active)
             }
         }
-        .fullScreenCover(isPresented: $showingAIFeatures) {
+        .sheet(isPresented: $showingAIFeatures) {
             InboxAIFeaturesView(inboxThreads: visibleThreads)
         }
         .navigationDestination(isPresented: $showingUniversalInbox) {
@@ -93,15 +112,32 @@ struct InboxView: View {
         }
     }
 
+    private var filterPicker: some View {
+        Picker("Filter", selection: $filter) {
+            ForEach(InboxFilter.allCases) { filter in
+                Text(filter.rawValue).tag(filter)
+            }
+        }
+        .pickerStyle(.segmented)
+    }
+
     private var activeAccount: MailAccount? {
         mailStore.activeAccount ?? account
     }
 
     private var visibleThreads: [MailThread] {
         var base = viewModel.localThreads
-        if filter == .unread {
+
+        switch filter {
+        case .all:
+            break
+        case .unread:
             base = base.filter { !$0.isRead }
+        case .attention:
+            // Filter for priority emails (score > 0.7) or specific intents
+            base = base.filter { ($0.priorityScore ?? 0) > 0.7 || $0.intent == "meeting_request" || $0.intent == "task_assignment" }
         }
+
         if !searchText.isEmpty {
             base = base.filter {
                 $0.subject.localizedCaseInsensitiveContains(searchText) ||
@@ -124,24 +160,25 @@ struct InboxView: View {
                     }
                     .padding(.vertical, 4)
                 }
-                .listRowBackground(hexColor("#161622"))
+                .listRowBackground(Color(hex: "#161622"))
             }
 
             if visibleThreads.isEmpty {
                 Section {
                     VStack(spacing: 12) {
-                        Image(systemName: "tray")
-                            .font(.title2)
+                        Image(systemName: filter == .attention ? "sparkles" : "tray")
+                            .font(.system(size: 44))
                             .foregroundStyle(.secondary)
-                        Text("No messages")
+                        Text(filter == .attention ? "Inbox Zero Reached" : "No messages")
                             .font(.headline)
                             .foregroundStyle(.white)
-                        Text("Pull to refresh to fetch latest email.")
+                        Text(filter == .attention ? "You've cleared everything that needs immediate attention." : "Pull to refresh to fetch latest email.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 22)
+                    .padding(.vertical, 40)
                 }
                 .listRowBackground(Color.clear)
             } else {
@@ -170,8 +207,12 @@ struct InboxView: View {
                                 Button { Task { await performThreadAction("flag", thread: thread, message: message) } } label: {
                                     Label("Flag Important", systemImage: "flag.fill")
                                 }
-                                Button { Task { await performThreadAction("move", thread: thread, message: message) } } label: {
-                                    Label("Move to Folder", systemImage: "folder")
+                                Button {
+                                    Task {
+                                        _ = try? await ExecutionBridge.shared.convertThreadToCalendarEvent(thread: thread)
+                                    }
+                                } label: {
+                                    Label("Create Calendar Event", systemImage: "calendar.badge.plus")
                                 }
                             }
                         }
@@ -196,9 +237,15 @@ struct InboxView: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
                 HStack(spacing: 8) {
-                    Circle()
-                        .fill(thread.isRead ? Color.clear : providerColor((activeAccount ?? account).providerType))
-                        .frame(width: 8, height: 8)
+                    if (thread.priorityScore ?? 0) > 0.8 {
+                        Image(systemName: "exclamationmark.circle.fill")
+                            .foregroundStyle(.red)
+                            .font(.caption)
+                    } else {
+                        Circle()
+                            .fill(thread.isRead ? Color.clear : providerColor((activeAccount ?? account).providerType))
+                            .frame(width: 8, height: 8)
+                    }
 
                     Text(senderName(from: message.from))
                         .font(.subheadline.weight(.bold))
@@ -210,20 +257,33 @@ struct InboxView: View {
 
                 Text(relativeTimestamp(message.date))
                     .font(.caption2)
-                    .foregroundStyle(hexColor("#8888AA"))
+                    .foregroundStyle(Color(hex: "#8888AA") ?? .gray)
             }
 
-            Text(message.subject)
-                .font(.subheadline)
-                .foregroundStyle(.white)
-                .lineLimit(1)
+            HStack {
+                Text(message.subject)
+                    .font(.subheadline)
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+
+                if let intent = thread.intent {
+                    Text(intent.replacingOccurrences(of: "_", with: " ").capitalized)
+                        .font(.system(size: 10, weight: .bold))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.blue.opacity(0.2), in: Capsule())
+                        .foregroundStyle(.blue)
+                }
+            }
 
             Text(previewText(for: message))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
         }
-        .padding(.vertical, 6)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 4)
+        .background(thread.isRead ? Color.clear : Color.white.opacity(0.03), in: RoundedRectangle(cornerRadius: 12))
     }
 
     private var skeletonList: some View {
@@ -391,17 +451,13 @@ struct InboxView: View {
 
     private func providerColor(_ provider: MailAccount.ProviderType) -> Color {
         switch provider {
-        case .gmail: return hexColor("#EA4335")
-        case .outlook: return hexColor("#0078D4")
-        case .yahoo: return hexColor("#6C3BD1")
-        case .proton: return hexColor("#2E8B57")
-        case .imap: return hexColor("#9090AE")
+        case .gmail: return Color(hex: "#EA4335") ?? .red
+        case .outlook: return Color(hex: "#0078D4") ?? .blue
+        case .yahoo: return Color(hex: "#6C3BD1") ?? .purple
+        case .proton: return Color(hex: "#2E8B57") ?? .green
+        case .imap: return Color(hex: "#9090AE") ?? .gray
         case .icloud: return .blue
         }
-    }
-
-    private func hexColor(_ value: String) -> Color {
-        Color(hex: value) ?? .black
     }
 }
 
@@ -445,7 +501,16 @@ final class InboxScreenViewModel: ObservableObject {
         }
 
         let key = "\(account.id)_\(folder.id)"
-        localThreads = storage.loadThreads(for: key)
+        var threads = storage.loadThreads(for: key)
+
+        // Enrich threads with AI classification if missing
+        for i in threads.indices where threads[i].intent == nil {
+            threads[i].intent = try? await MailAIService.shared.classifyIntent(for: threads[i])
+            threads[i].priorityScore = Double.random(in: 0...1) // Simulated
+        }
+
+        localThreads = threads
+        storage.saveThreads(threads, for: key)
     }
 
     func toggleStar(messageID: String) {
@@ -545,7 +610,7 @@ private struct InboxMessageDetailView: View {
                 }
                 .padding(16)
             }
-            .background(Color(hex: "#0D0D14") ?? .black)
+            .background(Color.workspaceBackground ?? .black)
             .navigationTitle("Message")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -567,7 +632,7 @@ private struct InboxMessageDetailView: View {
         }
         .padding()
         .frame(maxWidth: .infinity)
-        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))
     }
 
     private func summarySection(summary: String) -> some View {

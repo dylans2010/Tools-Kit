@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		VT0200000000000000000001 /* ValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = VT0100000000000000000001 /* ValidationTests.swift */; };
+		TH0200000000000000000001 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = TH0100000000000000000001 /* Theme.swift */; };
+		MA0200000000000000000001 /* MailAutomationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = MA0100000000000000000001 /* MailAutomationEngine.swift */; };
+		EX0200000000000000000001 /* ExecutionBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = EX0100000000000000000001 /* ExecutionBridge.swift */; };
 		30159A7915A848ED9CC2FA60 /* AgentResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C4B3171C5B7494C8A67B0CF /* AgentResultView.swift */; };
 		A90000012B00000100000001 /* AgentPromptOptimizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90000012B00000100000002 /* AgentPromptOptimizerView.swift */; };
 		A90000012B00000100000003 /* AgentProgressSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90000012B00000100000004 /* AgentProgressSessionView.swift */; };

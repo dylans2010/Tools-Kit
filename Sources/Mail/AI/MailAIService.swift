@@ -4,13 +4,14 @@ class MailAIService {
     static let shared = MailAIService()
     private let aiService = AIService.shared
     private let settingsManager = AIChatSettingsManager.shared
+    private let aiDecoder = AIResponseDecoder()
 
     struct PriorityDigest {
         let summaryMarkdown: String
         let priorityThreadIDs: [String]
     }
 
-    private struct PriorityDigestResponse: Decodable {
+    private struct PriorityDigestResponse: Codable {
         let summary_markdown: String
         let priority_thread_ids: [String]
     }
@@ -31,21 +32,6 @@ class MailAIService {
             systemPrompt: systemPrompt,
             model: await preferredModelID()
         )
-    }
-
-    private func decodePriorityDigest(from raw: String) -> PriorityDigestResponse? {
-        let stripped = raw
-            .replacingOccurrences(of: "```json", with: "")
-            .replacingOccurrences(of: "```", with: "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-
-        let start = stripped.firstIndex(of: "{")
-        let end = stripped.lastIndex(of: "}")
-        guard let start, let end, start <= end else { return nil }
-
-        let jsonString = String(stripped[start...end])
-        guard let data = jsonString.data(using: .utf8) else { return nil }
-        return try? JSONDecoder().decode(PriorityDigestResponse.self, from: data)
     }
 
     func catchUp(unreadThreads: [MailThread]) async throws -> String {
@@ -99,6 +85,17 @@ class MailAIService {
             "ID: \(thread.id) | Subject: \(thread.subject) | From: \(thread.participants.joined(separator: ", ")) | Snippet: \(thread.snippet)"
         }.joined(separator: "\n")
 
+        let schema = """
+        {
+          "type": "object",
+          "required": ["summary_markdown", "priority_thread_ids"],
+          "properties": {
+            "summary_markdown": { "type": "string" },
+            "priority_thread_ids": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+        """
+
         let prompt = """
         Analyze every email below and identify ONLY the high-priority emails.
         Criteria for Priority:
@@ -107,45 +104,19 @@ class MailAIService {
         3. Recency: Very recent unread messages that require immediate action.
         4. Impact: High business or personal impact tasks.
 
-        Return JSON only with this exact shape:
-        {
-          "summary_markdown": "short markdown summary of priority emails only",
-          "priority_thread_ids": ["thread-id-1", "thread-id-2"]
-        }
-        Rules:
-        - Include 1 to 7 IDs in priority_thread_ids.
-        - summary_markdown must include only priority content, no non-priority categories.
-        - Keep summary_markdown under 120 words.
+        Return JSON ONLY.
         Emails:
         \(context)
         """
 
-        let raw = try await processMailPrompt(
+        let json = try await aiService.generateStructuredJSON(
             prompt: prompt,
+            jsonSchema: schema,
             systemPrompt: MailAIToolsSystem.prioritySystemPrompt
         )
 
-        if let decoded = decodePriorityDigest(from: raw) {
-            return PriorityDigest(
-                summaryMarkdown: decoded.summary_markdown,
-                priorityThreadIDs: decoded.priority_thread_ids
-            )
-        }
-
-        let fallback = Array(threads.prefix(3))
-        let fallbackSummary = fallback.enumerated().map { index, thread in
-            let sender = thread.participants.first ?? "Unknown"
-            return "- **\(index + 1). \(thread.subject)** from \(sender)"
-        }.joined(separator: "\n")
-
-        return PriorityDigest(
-            summaryMarkdown: "### Priority Emails\n\(fallbackSummary)",
-            priorityThreadIDs: fallback.map(\.id)
-        )
-    }
-
-    func priorityBrief(unreadThreads: [MailThread]) async throws -> String {
-        try await priorityDigest(unreadThreads: unreadThreads).summaryMarkdown
+        let decoded = try JSONDecoder().decode(PriorityDigestResponse.self, from: json.data(using: .utf8)!)
+        return PriorityDigest(summaryMarkdown: decoded.summary_markdown, priorityThreadIDs: decoded.priority_thread_ids)
     }
 
     func summarizeThread(_ thread: MailThread) async throws -> String {
@@ -172,10 +143,6 @@ class MailAIService {
 
     func generateReply(for message: MailMessage, context: String) async throws -> String {
         let messageBody = message.body.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !messageBody.isEmpty else {
-            return "Thanks for your email. Could you share a bit more detail so I can respond accurately?"
-        }
-
         let prompt = """
         Write a clear, professional reply to this email.
         Original email:
@@ -187,18 +154,38 @@ class MailAIService {
         return try await processMailPrompt(prompt: prompt, systemPrompt: MailAIToolsSystem.draftingSystemPrompt)
     }
 
-    func improveDraft(_ draft: String, tone: String) async throws -> String {
-        let prompt = """
-        Improve the following email draft and make it sound \(tone).
-        Preserve the intent, keep the wording natural, and avoid adding unsupported details.
+    // MARK: - Advanced Intelligence
 
-        Draft:
-        \(draft)
-        """
-        return try await processMailPrompt(prompt: prompt, systemPrompt: MailAIToolsSystem.draftingSystemPrompt)
+    func classifyIntent(for thread: MailThread) async throws -> String {
+        let snippet = thread.snippet
+        let prompt = "Classify the intent of this email thread (e.g., meeting_request, inquiry, announcement, task_assignment). Return ONLY the category name: \(snippet)"
+        return try await aiService.processText(prompt: prompt, systemPrompt: "Return only the category name.")
     }
 
-    func composeEmail(prompt: String, systemPrompt: String = MailAIToolsSystem.draftingSystemPrompt) async throws -> String {
-        try await processMailPrompt(prompt: prompt, systemPrompt: systemPrompt)
+    struct EntityExtraction: Codable {
+        let entities: [String: String]
+    }
+
+    func extractEntities(for thread: MailThread) async throws -> [String: String] {
+        let content = thread.messages.last?.body ?? ""
+        let schema = """
+        {
+          "type": "object",
+          "required": ["entities"],
+          "properties": {
+            "entities": { "type": "object", "additionalProperties": { "type": "string" } }
+          }
+        }
+        """
+        let prompt = "Extract key entities (person, organization, date, event) from this email as JSON: \(content)"
+        let json = try await aiService.generateStructuredJSON(prompt: prompt, jsonSchema: schema)
+        let result = try JSONDecoder().decode(EntityExtraction.self, from: json.data(using: .utf8)!)
+        return result.entities
+    }
+
+    func detectToneRisk(for message: MailMessage) async throws -> String? {
+        let prompt = "Analyze the tone of this email for any potential risk or unprofessionalism: \(message.body)"
+        let analysis = try await aiService.processText(prompt: prompt, systemPrompt: "Return 'safe' or a brief description of the risk.")
+        return analysis.lowercased() == "safe" ? nil : analysis
     }
 }

@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 
+@MainActor
 final class SpreadsheetsManager: ObservableObject {
     static let shared = SpreadsheetsManager()
 
@@ -24,6 +25,72 @@ final class SpreadsheetsManager: ObservableObject {
     }
 
     private init() { load() }
+
+    // MARK: - Formula Engine (Dependency Graph)
+
+    private var dependencyGraph: [String: Set<String>] = [:]
+
+    func compute(cell: SpreadsheetCell, allCells: [[SpreadsheetCell]]) -> String {
+        guard let formula = cell.formula, formula.hasPrefix("=") else {
+            return cell.value
+        }
+
+        let expr = String(formula.dropFirst()).trimmingCharacters(in: .whitespaces).uppercased()
+
+        if expr.hasPrefix("SUM(") {
+            return computeRange(expr: expr, function: "SUM", cells: allCells)
+        } else if expr.hasPrefix("AVERAGE(") {
+            return computeRange(expr: expr, function: "AVERAGE", cells: allCells)
+        }
+
+        return "#ERR"
+    }
+
+    private func computeRange(expr: String, function fname: String, cells: [[SpreadsheetCell]]) -> String {
+        let inner = expr
+            .replacingOccurrences(of: "\(fname)(", with: "")
+            .replacingOccurrences(of: ")", with: "")
+        let parts = inner.split(separator: ":").map { String($0).trimmingCharacters(in: .whitespaces) }
+        guard parts.count == 2,
+              let (startCol, startRow) = parseCell(parts[0]),
+              let (endCol, endRow) = parseCell(parts[1]) else { return "#ERR" }
+
+        var values: [Double] = []
+        for row in startRow...min(endRow, cells.count - 1) {
+            for col in startCol...min(endCol, (cells[row].count) - 1) {
+                let val = cells[row][col].value
+                if let d = Double(val) { values.append(d) }
+            }
+        }
+        if values.isEmpty { return "0" }
+        switch fname {
+        case "SUM": return formatNumber(values.reduce(0, +))
+        case "AVERAGE": return formatNumber(values.reduce(0, +) / Double(values.count))
+        default: return "#ERR"
+        }
+    }
+
+    private func parseCell(_ ref: String) -> (Int, Int)? {
+        let letters = ref.prefix(while: { $0.isLetter })
+        let digits = ref.dropFirst(letters.count)
+        guard let col = columnIndex(String(letters)),
+              let row = Int(digits), row >= 1 else { return nil }
+        return (col, row - 1)
+    }
+
+    private func columnIndex(_ s: String) -> Int? {
+        let upper = s.uppercased()
+        var result = 0
+        for char in upper {
+            guard let ascii = char.asciiValue else { return nil }
+            result = result * 26 + Int(ascii - 64)
+        }
+        return result - 1
+    }
+
+    private func formatNumber(_ d: Double) -> String {
+        d == d.rounded() ? String(Int(d)) : String(format: "%.2f", d)
+    }
 
     // MARK: - CRUD
 
@@ -49,69 +116,6 @@ final class SpreadsheetsManager: ObservableObject {
         spreadsheets.removeAll { $0.id == sheet.id }
         try? FileManager.default.removeItem(at: fileURL(for: sheet.id))
         saveIndex()
-    }
-
-    // MARK: - Formula Engine
-
-    func compute(cell: SpreadsheetCell, allCells: [[SpreadsheetCell]]) -> String {
-        guard let formula = cell.formula, formula.hasPrefix("=") else {
-            return cell.value
-        }
-        let expr = String(formula.dropFirst()).trimmingCharacters(in: .whitespaces).uppercased()
-        if expr.hasPrefix("SUM(") {
-            return computeRange(expr: expr, function: "SUM", cells: allCells)
-        } else if expr.hasPrefix("AVERAGE(") {
-            return computeRange(expr: expr, function: "AVERAGE", cells: allCells)
-        }
-        return "#ERR"
-    }
-
-    private func computeRange(expr: String, function fname: String, cells: [[SpreadsheetCell]]) -> String {
-        // Parse range like A1:C3
-        let inner = expr
-            .replacingOccurrences(of: "\(fname)(", with: "")
-            .replacingOccurrences(of: ")", with: "")
-        let parts = inner.split(separator: ":").map { String($0).trimmingCharacters(in: .whitespaces) }
-        guard parts.count == 2,
-              let (startCol, startRow) = parseCell(parts[0]),
-              let (endCol, endRow) = parseCell(parts[1]) else { return "#ERR" }
-
-        var values: [Double] = []
-        for row in startRow...min(endRow, cells.count - 1) {
-            for col in startCol...min(endCol, (cells[row].count) - 1) {
-                let val = cells[row][col].value
-                if let d = Double(val) { values.append(d) }
-            }
-        }
-        if values.isEmpty { return "0" }
-        switch fname {
-        case "SUM": return formatNumber(values.reduce(0, +))
-        case "AVERAGE": return formatNumber(values.reduce(0, +) / Double(values.count))
-        default: return "#ERR"
-        }
-    }
-
-    private func parseCell(_ ref: String) -> (Int, Int)? {
-        // e.g. "A1" → (col: 0, row: 0)
-        let letters = ref.prefix(while: { $0.isLetter })
-        let digits = ref.dropFirst(letters.count)
-        guard let col = columnIndex(String(letters)),
-              let row = Int(digits), row >= 1 else { return nil }
-        return (col, row - 1)
-    }
-
-    private func columnIndex(_ s: String) -> Int? {
-        let upper = s.uppercased()
-        var result = 0
-        for char in upper {
-            guard let ascii = char.asciiValue else { return nil }
-            result = result * 26 + Int(ascii - 64)
-        }
-        return result - 1
-    }
-
-    private func formatNumber(_ d: Double) -> String {
-        d == d.rounded() ? String(Int(d)) : String(format: "%.2f", d)
     }
 
     // MARK: - Persistence
@@ -144,56 +148,8 @@ final class SpreadsheetsManager: ObservableObject {
 
     // MARK: - AI Analysis
 
-    struct SpreadsheetAIPayload: Codable {
-        let summary: String
-        let formulaSuggestions: [String]
-        let columnTypes: [String]
-        let rangeInsights: [String]
-        let chartSuggestions: [String]
-    }
-
-    private var aiSchemaString: String {
-        """
-        {
-          "type": "object",
-          "required": ["summary", "formulaSuggestions", "columnTypes", "rangeInsights", "chartSuggestions"],
-          "properties": {
-            "summary": { "type": "string" },
-            "formulaSuggestions": { "type": "array", "items": { "type": "string" } },
-            "columnTypes": { "type": "array", "items": { "type": "string" } },
-            "rangeInsights": { "type": "array", "items": { "type": "string" } },
-            "chartSuggestions": { "type": "array", "items": { "type": "string" } }
-          }
-        }
-        """
-    }
-
-    private var aiSchema: AIJSONType {
-        .object([
-            "summary": .string,
-            "formulaSuggestions": .array(.string),
-            "columnTypes": .array(.string),
-            "rangeInsights": .array(.string),
-            "chartSuggestions": .array(.string)
-        ])
-    }
-
-    @MainActor
-    func analyzeSpreadsheet(prompt: String, dataPreview: String) async throws -> SpreadsheetAIPayload {
-        // Drive spreadsheet insights and formula generation from validated JSON.
-        let request = """
-        User request:
-        \(prompt)
-
-        Spreadsheet data sample:
-        \(dataPreview)
-        """
-        let json = try await aiService.generateStructuredJSON(
-            prompt: request,
-            jsonSchema: aiSchemaString,
-            preferredModel: "openrouter/free",
-            systemPrompt: "You are a spreadsheet analyst. Return strict JSON only."
-        )
-        return try aiDecoder.decode(SpreadsheetAIPayload.self, from: json, schema: aiSchema)
+    func analyzeSpreadsheet(prompt: String, dataPreview: String) async throws -> String {
+        let request = "User request: \(prompt)\n\nData sample:\n\(dataPreview)"
+        return try await aiService.processText(prompt: request, systemPrompt: "You are a spreadsheet analyst. Provide insights and trends based ONLY on the provided data.")
     }
 }

@@ -1,54 +1,44 @@
 import SwiftUI
 
 struct MeetingSettingsView: View {
-    @Binding var settings: MeetingSettingsState
-
-    let availableAudioDevices: [String]
-    let availableVideoDevices: [String]
+    @ObservedObject var manager: MeetingStateManager
 
     var body: some View {
-        Form {
-            Section {
-                if availableAudioDevices.isEmpty {
-                    Text("No audio devices reported by runtime.")
-                        .foregroundStyle(.secondary)
-                } else {
-                    Picker("Audio Device", selection: $settings.selectedAudioDevice) {
-                        ForEach(availableAudioDevices, id: \.self) { Text($0) }
-                    }
-                }
-                if availableVideoDevices.isEmpty {
-                    Text("No video devices reported by runtime.")
-                        .foregroundStyle(.secondary)
-                } else {
-                    Picker("Video Device", selection: $settings.selectedVideoDevice) {
-                        ForEach(availableVideoDevices, id: \.self) { Text($0) }
-                    }
-                }
-            } header: {
-                Label("Devices", systemImage: "camera.metering.center.weighted")
-            } footer: {
-                Text("Pick active microphone and camera sources for this meeting.")
-            }
+        NavigationStack {
+            ZStack {
+                Color.workspaceBackground.ignoresSafeArea()
 
-            Section {
-                Picker("Layout", selection: $settings.layoutPreference) {
-                    ForEach(MeetingLayoutPreference.allCases) { preference in
-                        Text(preference.rawValue).tag(preference)
+                Form {
+                    Section("Devices") {
+                        Picker("Microphone", selection: $manager.settings.selectedAudioDevice) {
+                            Text("System Default").tag("default")
+                        }
+                        Picker("Camera", selection: $manager.settings.selectedVideoDevice) {
+                            Text("FaceTime HD Camera").tag("facetime")
+                        }
                     }
-                }
-                Picker("Quality", selection: $settings.qualitySetting) {
-                    ForEach(MeetingQualitySetting.allCases) { quality in
-                        Text(quality.rawValue).tag(quality)
+                    .listRowBackground(Color.workspaceSurface)
+
+                    Section("Preferences") {
+                        Picker("Layout", selection: $manager.settings.layoutPreference) {
+                            ForEach(MeetingLayoutPreference.allCases) { Text($0.rawValue).tag($0) }
+                        }
+                        Picker("Quality", selection: $manager.settings.qualitySetting) {
+                            ForEach(MeetingQualitySetting.allCases) { Text($0.rawValue).tag($0) }
+                        }
                     }
+                    .listRowBackground(Color.workspaceSurface)
+
+                    Section("Intelligence") {
+                        Toggle("Noise Cancellation", isOn: $manager.isNoiseCancellationEnabled)
+                        Toggle("Live Captions", isOn: $manager.isCaptionsEnabled)
+                    }
+                    .listRowBackground(Color.workspaceSurface)
                 }
-            } header: {
-                Label("Preferences", systemImage: "slider.horizontal.3")
-            } footer: {
-                Text("Adjust layout and quality to balance clarity and performance.")
+                .scrollContentBackground(.hidden)
             }
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
         }
-        .navigationTitle("Meeting Settings")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }

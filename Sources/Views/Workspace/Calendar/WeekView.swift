@@ -13,41 +13,39 @@ struct CalendarWeekView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            weekHeader
+        ZStack {
+            Color.workspaceBackground.ignoresSafeArea()
 
-            ScrollView {
-                VStack(spacing: 16) {
-                    ForEach(weekDays, id: \.self) { day in
-                        WeekDayRow(day: day, manager: manager, selectedDate: $selectedDate, selectedEvent: $selectedEvent)
+            VStack(spacing: 0) {
+                weekPicker
+                    .padding()
+
+                ScrollView {
+                    VStack(spacing: 12) {
+                        ForEach(weekDays, id: \.self) { day in
+                            WeekDayRow(day: day, manager: manager, selectedDate: $selectedDate, selectedEvent: $selectedEvent)
+                        }
                     }
+                    .padding()
                 }
-                .padding(.vertical, 8)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
-    private var weekHeader: some View {
+    private var weekPicker: some View {
         HStack {
-            Button {
-                selectedDate = calendar.date(byAdding: .weekOfYear, value: -1, to: selectedDate) ?? selectedDate
-            } label: {
+            Button { selectedDate = calendar.date(byAdding: .weekOfYear, value: -1, to: selectedDate) ?? selectedDate } label: {
                 Image(systemName: "chevron.left")
             }
             Spacer()
-            Text(weekRangeLabel)
-                .font(.subheadline.bold())
+            Text(weekRangeLabel).font(.headline)
             Spacer()
-            Button {
-                selectedDate = calendar.date(byAdding: .weekOfYear, value: 1, to: selectedDate) ?? selectedDate
-            } label: {
+            Button { selectedDate = calendar.date(byAdding: .weekOfYear, value: 1, to: selectedDate) ?? selectedDate } label: {
                 Image(systemName: "chevron.right")
             }
         }
-        .padding(.horizontal)
-        .padding(.vertical, 10)
-        .background(Color(.systemBackground))
+        .padding()
+        .background(Color.workspaceSurface, in: Capsule())
     }
 
     private var weekRangeLabel: String {
@@ -65,89 +63,44 @@ struct WeekDayRow: View {
     @Binding var selectedEvent: CalendarEvent?
 
     private let calendar = Calendar.current
-
-    var dayEvents: [CalendarEvent] { manager.events(on: day) }
-    var isToday: Bool { calendar.isDateInToday(day) }
-    var isSelected: Bool { calendar.isDate(day, inSameDayAs: selectedDate) }
+    private var dayEvents: [CalendarEvent] { manager.events(on: day) }
+    private var isToday: Bool { calendar.isDateInToday(day) }
+    private var isSelected: Bool { calendar.isDate(day, inSameDayAs: selectedDate) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Button {
-                selectedDate = day
-            } label: {
-                HStack(spacing: 10) {
-                    ZStack {
-                        Circle()
-                            .fill(isToday ? Color.accentColor : (isSelected ? Color.accentColor.opacity(0.15) : Color.clear))
-                            .frame(width: 34, height: 34)
-                        VStack(spacing: 1) {
-                            Text(dayName(day))
-                                .font(.caption2)
-                                .textCase(.uppercase)
-                                .foregroundColor(isToday ? .white : .secondary)
-                            Text(dayNumber(day))
-                                .font(.caption.bold())
-                                .foregroundColor(isToday ? .white : .primary)
-                        }
-                    }
-
-                    if dayEvents.isEmpty {
-                        Text("No events")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    } else {
-                        Text("\(dayEvents.count) event\(dayEvents.count == 1 ? "" : "s")")
-                            .font(.caption.bold())
-                            .foregroundColor(.accentColor)
-                    }
-                    Spacer()
+            HStack {
+                VStack(alignment: .center, spacing: 2) {
+                    Text(day.formatted(.dateTime.weekday(.abbreviated))).font(.caption2.bold()).foregroundStyle(.secondary)
+                    Text(day.formatted(.dateTime.day())).font(.title3.bold()).foregroundStyle(isToday ? .blue : .white)
                 }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .padding(.horizontal)
+                .frame(width: 45)
+                .padding(8)
+                .background(isToday ? Color.blue.opacity(0.1) : Color.clear, in: RoundedRectangle(cornerRadius: 12))
 
-            if isSelected && !dayEvents.isEmpty {
-                VStack(spacing: 4) {
-                    ForEach(dayEvents) { event in
-                        Button {
-                            selectedEvent = event
-                        } label: {
-                            HStack(spacing: 8) {
-                                RoundedRectangle(cornerRadius: 2)
-                                    .fill(Color(hex: event.priority.color) ?? .blue)
-                                    .frame(width: 3, height: 32)
-                                VStack(alignment: .leading, spacing: 2) {
+                if dayEvents.isEmpty {
+                    Text("No events").font(.caption).foregroundStyle(.secondary).padding(.leading, 8)
+                } else {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(dayEvents) { event in
+                                Button { selectedEvent = event } label: {
                                     Text(event.title)
                                         .font(.caption.bold())
-                                    Text(event.formattedTimeRange)
-                                        .font(.caption2)
-                                        .foregroundColor(.secondary)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(Color(hex: event.priority.color)?.opacity(0.2) ?? Color.blue.opacity(0.2), in: Capsule())
+                                        .foregroundStyle(Color(hex: event.priority.color) ?? .blue)
                                 }
-                                Spacer()
                             }
-                            .padding(.horizontal)
-                            .contentShape(Rectangle())
                         }
-                        .buttonStyle(.plain)
                     }
                 }
-                .padding(.leading, 44)
+                Spacer()
             }
         }
-        .padding(.vertical, 4)
-        .background(isSelected ? Color.accentColor.opacity(0.05) : Color.clear)
-    }
-
-    private func dayName(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateFormat = "EEE"
-        return f.string(from: date)
-    }
-
-    private func dayNumber(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateFormat = "d"
-        return f.string(from: date)
+        .padding(12)
+        .background(isSelected ? Color.white.opacity(0.08) : Color.white.opacity(0.03), in: RoundedRectangle(cornerRadius: 16))
+        .onTapGesture { selectedDate = day }
     }
 }
