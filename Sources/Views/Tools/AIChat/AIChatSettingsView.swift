@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import UniformTypeIdentifiers
 
 struct AIChatSettingsView: View {
     @Binding var settings: AIChatSettings
