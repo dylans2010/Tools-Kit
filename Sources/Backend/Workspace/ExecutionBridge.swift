@@ -58,7 +58,7 @@ final class ExecutionBridge {
         let task = WorkspaceTask(
             id: UUID(),
             title: title,
-            details: description,
+            description: description,
             createdAt: Date(),
             completed: false,
             priority: .medium

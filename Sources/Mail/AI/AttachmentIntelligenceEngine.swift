@@ -39,10 +39,11 @@ actor AttachmentIntelligenceEngine {
     private func performOCR(on data: Data) async throws -> String {
         // We use a @MainActor-isolated closure to safely handle the non-Sendable UIImage
         // ensuring it never actually crosses actor boundaries during concurrent execution.
-        return try await MainActor.run {
-            guard let image = UIImage(data: data) else { return "" }
-            return try await VisionService.shared.performOCR(on: image)
+        let image = await MainActor.run {
+            UIImage(data: data)
         }
+        guard let image = image else { return "" }
+        return try await VisionService.shared.performOCR(on: image)
     }
 
     private func extractStructuredData(from text: String, type: AttachmentIntelligence.AttachmentType) async throws -> [String: String] {
