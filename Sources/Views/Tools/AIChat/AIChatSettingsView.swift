@@ -16,6 +16,8 @@ struct AIChatSettingsView: View {
     @State private var isSigningOut = false
     @State private var signOutStatusMessage: String?
     @State private var showFreeOpenRouterSheet = false
+    @State private var showFileImporter = false
+    @State private var importedFileNames: [String] = []
     @AppStorage("agentEnabled") private var agentEnabled = false
     @AppStorage("agentDebugModeEnabled") private var debugModeEnabled = false
     @AppStorage("selectedAgentType") private var selectedAgentType = AgentType.jules.rawValue
@@ -47,6 +49,7 @@ struct AIChatSettingsView: View {
                 toolVisibilitySection
                 supportSection
                 developerToolsSection
+                internalSection
                 cloudDataSection
                 accountSection
             }
@@ -62,6 +65,11 @@ struct AIChatSettingsView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") { dismiss() }
+                }
+            }
+            .sheet(isPresented: $showFileImporter) {
+                FileImporterView(allowedContentTypes: [.data, .content, .item], allowsMultipleSelection: true) { urls in
+                    self.importedFileNames = urls.map { $0.lastPathComponent }
                 }
             }
             .sheet(isPresented: $showFreeOpenRouterSheet) {
@@ -87,6 +95,29 @@ struct AIChatSettingsView: View {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private var internalSection: some View {
+        Section("Internal") {
+            Button {
+                showFileImporter = true
+            } label: {
+                Label("Test File Importer", systemImage: "doc.badge.plus")
+            }
+
+            if !importedFileNames.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Imported Files:")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    ForEach(importedFileNames, id: \.self) { name in
+                        Text(name)
+                            .font(.subheadline)
+                    }
+                }
+                .padding(.vertical, 4)
             }
         }
     }
