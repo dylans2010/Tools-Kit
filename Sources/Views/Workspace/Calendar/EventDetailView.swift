@@ -7,135 +7,114 @@ struct EventDetailView: View {
     @State private var showingEdit = false
     @State private var showingDelete = false
 
-    private var eventColor: Color {
-        Color(hex: event.priority.color) ?? .blue
-    }
-
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                headerCard
-                detailsCard
-                if !event.description.isEmpty {
-                    descriptionCard
+        NavigationStack {
+            ZStack {
+                Color.workspaceBackground.ignoresSafeArea()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        headerSection
+
+                        detailsSection
+
+                        if !event.description.isEmpty {
+                            descriptionSection
+                        }
+
+                        Spacer(minLength: 40)
+                    }
+                    .padding()
                 }
             }
-            .padding()
-        }
-        .navigationTitle("Event")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Button { showingEdit = true } label: {
-                    Image(systemName: "pencil")
+            .navigationTitle("Event Details")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }
                 }
-                Button(role: .destructive) {
-                    showingDelete = true
-                } label: {
-                    Image(systemName: "trash")
+
+                ToolbarItemGroup(placement: .confirmationAction) {
+                    Button { showingEdit = true } label: { Image(systemName: "pencil") }
+                    Button(role: .destructive) { showingDelete = true } label: { Image(systemName: "trash") }
                 }
             }
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button("Close") { dismiss() }
-            }
-        }
-        .sheet(isPresented: $showingEdit) {
-            NavigationStack {
+            .sheet(isPresented: $showingEdit) {
                 CreateEventView(existingEvent: event) { updated in
                     manager.updateEvent(updated)
                     event = updated
                 }
             }
-        }
-        .confirmationDialog("Delete Event", isPresented: $showingDelete) {
-            Button("Delete Event", role: .destructive) {
-                manager.deleteEvent(event)
-                dismiss()
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("Are you sure you want to delete \"\(event.title)\"?")
-        }
-        .onReceive(manager.$events) { events in
-            if let updated = events.first(where: { $0.id == event.id }) {
-                event = updated
-            }
-        }
-    }
-
-    private var headerCard: some View {
-        CardView {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 14) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(eventColor.opacity(0.15))
-                            .frame(width: 52, height: 52)
-                        Image(systemName: "calendar")
-                            .font(.system(size: 22))
-                            .foregroundColor(eventColor)
-                    }
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(event.title)
-                            .font(.title3.bold())
-                        Label(event.priority.rawValue + " Priority", systemImage: "flag.fill")
-                            .font(.caption)
-                            .foregroundColor(eventColor)
-                    }
+            .confirmationDialog("Delete Event", isPresented: $showingDelete) {
+                Button("Delete", role: .destructive) {
+                    manager.deleteEvent(event)
+                    dismiss()
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
         }
     }
 
-    private var detailsCard: some View {
-        CardView {
-            VStack(alignment: .leading, spacing: 14) {
-                Text("Details")
-                    .font(.subheadline.bold())
-                    .foregroundColor(.secondary)
+    private var headerSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(event.title)
+                .font(.largeTitle.bold())
+                .foregroundStyle(.white)
 
-                DetailRow(icon: "calendar", label: "Date", value: formatDate(event.date))
-                DetailRow(icon: "clock", label: "Start", value: formatTime(event.startTime))
-                DetailRow(icon: "clock.badge.checkmark", label: "End", value: formatTime(event.endTime))
+            HStack {
+                Text(event.priority.rawValue)
+                    .font(.caption.bold())
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(Color(hex: event.priority.color)?.opacity(0.2) ?? .blue.opacity(0.2), in: Capsule())
+                    .foregroundStyle(Color(hex: event.priority.color) ?? .blue)
 
-                let duration = Int(event.duration / 60)
-                DetailRow(icon: "timer", label: "Duration", value: "\(duration) min")
+                Spacer()
 
-                if !event.location.isEmpty {
-                    DetailRow(icon: "location.fill", label: "Location", value: event.location)
-                }
-            }
-            .padding()
-        }
-    }
-
-    private var descriptionCard: some View {
-        CardView {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Description")
-                    .font(.subheadline.bold())
-                    .foregroundColor(.secondary)
-                Text(event.description)
+                Text(event.date.formatted(date: .long, time: .omitted))
                     .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
+        }
+        .padding()
+        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 20))
+    }
+
+    private var detailsSection: some View {
+        VStack(spacing: 1) {
+            detailRow(icon: "clock", label: "Starts", value: event.startTime.formatted(date: .omitted, time: .shortened))
+            Divider().background(Color.workspaceSurface)
+            detailRow(icon: "clock.fill", label: "Ends", value: event.endTime.formatted(date: .omitted, time: .shortened))
+
+            if !event.location.isEmpty {
+                Divider().background(Color.workspaceSurface)
+                detailRow(icon: "mappin.and.ellipse", label: "Location", value: event.location)
+            }
+        }
+        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var descriptionSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Agenda & Notes", systemImage: "text.alignleft")
+                .font(.subheadline.bold())
+                .foregroundStyle(.blue)
+
+            Text(event.description)
+                .font(.body)
+                .foregroundStyle(.white.opacity(0.8))
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.white.opacity(0.03), in: RoundedRectangle(cornerRadius: 12))
         }
     }
 
-    private func formatDate(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateStyle = .long
-        f.timeStyle = .none
-        return f.string(from: date)
-    }
-
-    private func formatTime(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateStyle = .none
-        f.timeStyle = .short
-        return f.string(from: date)
+    private func detailRow(icon: String, label: String, value: String) -> some View {
+        HStack {
+            Image(systemName: icon).frame(width: 24).foregroundStyle(.blue)
+            Text(label).foregroundStyle(.secondary)
+            Spacer()
+            Text(value).bold()
+        }
+        .padding()
     }
 }

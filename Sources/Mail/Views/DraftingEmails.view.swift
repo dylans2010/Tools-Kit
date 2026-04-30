@@ -7,123 +7,25 @@ struct DraftingEmailResult {
 }
 
 struct DraftingEmailsView: View {
-    enum MailStyle: String, CaseIterable, Identifiable, Hashable {
-        case professional = "Professional"
-        case friendly = "Friendly"
-        case executive = "Executive"
-        case persuasive = "Persuasive"
-        case empathetic = "Empathetic"
-        case technical = "Technical"
-        case casual = "Casual"
-        case confident = "Confident"
-        case diplomatic = "Diplomatic"
-        case concise = "Concise"
-
-        var id: String { rawValue }
-    }
-
-    enum MailGoal: String, CaseIterable, Identifiable, Hashable {
-        case statusUpdate = "Status Update"
-        case followUp = "Follow Up"
-        case proposal = "Proposal"
-        case support = "Support"
-        case introduction = "Introduction"
-        case apology = "Apology"
-        case negotiation = "Negotiation"
-        case meetingRequest = "Meeting Request"
-        case checkIn = "Check-In"
-        case renewal = "Renewal"
-        case escalation = "Escalation"
-        case thankYou = "Thank You"
-        case roadmap = "Roadmap"
-        case decision = "Decision"
-        case recap = "Recap"
-
-        var id: String { rawValue }
-    }
-
-    enum OutputLength: String, CaseIterable, Identifiable, Hashable {
-        case short = "Short"
-        case medium = "Medium"
-        case long = "Long"
-        case veryLong = "Very Long"
-
-        var id: String { rawValue }
-    }
-
-    enum Urgency: String, CaseIterable, Identifiable, Hashable {
-        case low = "Low"
-        case normal = "Normal"
-        case high = "High"
-        case critical = "Critical"
-
-        var id: String { rawValue }
-    }
-
-    enum Audience: String, CaseIterable, Identifiable, Hashable {
-        case client = "Client"
-        case internalTeam = "Internal Team"
-        case executive = "Executive"
-        case partner = "Partner"
-        case vendor = "Vendor"
-        case legal = "Legal"
-        case recruiter = "Recruiter"
-        var id: String { rawValue }
-    }
-
-    enum ReadingLevel: String, CaseIterable, Identifiable, Hashable {
-        case simple = "Simple"
-        case standard = "Standard"
-        case advanced = "Advanced"
-
-        var id: String { rawValue }
-    }
-
     @Environment(\.dismiss) private var dismiss
+
+    enum MailGoal: String, CaseIterable, Identifiable {
+        case statusUpdate = "Status Update", followUp = "Follow Up", request = "Request", apology = "Apology"
+        var id: String { rawValue }
+    }
+
+    enum MailStyle: String, CaseIterable, Identifiable {
+        case professional = "Professional", friendly = "Friendly", executive = "Executive", concise = "Concise"
+        var id: String { rawValue }
+    }
 
     @State private var recipient = ""
     @State private var subject = ""
     @State private var context = ""
     @State private var selectedGoal: MailGoal = .statusUpdate
     @State private var selectedStyle: MailStyle = .professional
-    @State private var selectedLength: OutputLength = .medium
-    @State private var selectedUrgency: Urgency = .normal
-    @State private var includeActionItems = true
-    @State private var includeSubjectSuggestions = false
-    @State private var includeBulletSummary = true
-    @State private var includeCallToAction = true
-    @State private var includeMeetingSlots = false
-    @State private var selectedAudience: Audience = .client
-    @State private var selectedReadingLevel: ReadingLevel = .standard
-    @State private var keywords = ""
-    @State private var selectedFramework = "Standard"
-    @State private var includeAlternativeVersion = false
-    @State private var includeRiskNotes = false
-    @State private var includeNextStepDeadline = false
-    @State private var includeToneReasoning = false
-    @State private var includeExecutiveSummary = false
-    @State private var includeFollowUpQuestion = false
-    @State private var avoidJargon = true
-    @State private var avoidOverpromising = true
-    @State private var includeOutcomeSummary = true
-    @State private var includeStakeholderUpdate = false
-    @State private var includeFallbackPlan = false
-    @State private var showAdvancedOptions = false
-
-    @State private var generatedBody = ""
     @State private var isGenerating = false
-    @State private var errorMessage: String?
-    @State private var showTemplatesSheet = false
-
-    private let frameworks = ["Standard", "AIDA", "PAS", "SCQA", "STAR", "4Ps", "FAB", "Before-After-Bridge"]
-    private let quickTemplates = [
-        ("Status + Blockers", "Provide current status, key blockers, and requested support."),
-        ("Follow-up Reminder", "Friendly reminder with clear next steps and deadline."),
-        ("Meeting Confirmation", "Confirm meeting details and agenda in concise format."),
-        ("Customer Escalation", "Summarize issue impact, urgency, and ask for immediate action."),
-        ("Decision Request", "Ask for a decision with a brief recommendation and deadline."),
-        ("Executive Recap", "Summarize the situation for leadership with outcomes and risks.")
-    ]
+    @State private var generatedBody = ""
 
     let currentBody: String
     let onApply: (DraftingEmailResult) -> Void
@@ -131,355 +33,159 @@ struct DraftingEmailsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                backgroundGradient.ignoresSafeArea()
+                Color.workspaceBackground.ignoresSafeArea()
 
                 ScrollView {
-                    LazyVStack(spacing: 24) {
+                    VStack(spacing: 24) {
                         headerSection
 
-                        inputCard(title: "Recipient & Subject", icon: "person.fill") {
-                            VStack(spacing: 12) {
-                                customTextField("To:", text: $recipient, placeholder: "email@example.com")
-                                customTextField("Subject:", text: $subject, placeholder: "Enter Subject")
-                            }
-                        }
+                        VStack(spacing: 16) {
+                            inputField(label: "Recipient", text: $recipient, placeholder: "email@example.com")
+                            inputField(label: "Subject", text: $subject, placeholder: "Enter subject")
 
-                        inputCard(title: "Context", icon: "text.justify.left") {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("What is this email about?")
+                                Text("Context")
                                     .font(.caption.bold())
                                     .foregroundStyle(.secondary)
                                 TextEditor(text: $context)
-                                    .frame(minHeight: 120)
+                                    .frame(height: 120)
                                     .padding(8)
-                                    .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
-
-                                customTextField("Keywords:", text: $keywords, placeholder: "deadline, budget, next steps")
+                                    .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))
                             }
                         }
 
-                        inputCard(title: "Style & Tone", icon: "slider.horizontal.3") {
-                            VStack(spacing: 16) {
-                                chipSelector(title: "Goal", selection: $selectedGoal, options: MailGoal.allCases)
-                                chipSelector(title: "Style", selection: $selectedStyle, options: MailStyle.allCases)
-                                chipSelector(title: "Length", selection: $selectedLength, options: OutputLength.allCases)
-                                chipSelector(title: "Urgency", selection: $selectedUrgency, options: Urgency.allCases)
-                                chipSelector(title: "Audience", selection: $selectedAudience, options: Audience.allCases)
-                                chipSelector(title: "Reading Level", selection: $selectedReadingLevel, options: ReadingLevel.allCases)
-                                chipSelector(title: "Framework", selection: $selectedFramework, options: frameworks)
-                                Toggle("Include action items", isOn: $includeActionItems)
+                        VStack(spacing: 12) {
+                            HStack {
+                                Text("Goal")
                                     .font(.caption.bold())
-                                Toggle("Include subject suggestions", isOn: $includeSubjectSuggestions)
-                                    .font(.caption.bold())
-                                Toggle("Include bullet summary", isOn: $includeBulletSummary)
-                                    .font(.caption.bold())
-                                Toggle("Include call to action", isOn: $includeCallToAction)
-                                    .font(.caption.bold())
-                                Toggle("Include meeting time suggestions", isOn: $includeMeetingSlots)
-                                    .font(.caption.bold())
-
-                                DisclosureGroup("Advanced options", isExpanded: $showAdvancedOptions) {
-                                    VStack(alignment: .leading, spacing: 10) {
-                                        Toggle("Include alternate version", isOn: $includeAlternativeVersion)
-                                        Toggle("Include risk notes", isOn: $includeRiskNotes)
-                                        Toggle("Include next-step deadline", isOn: $includeNextStepDeadline)
-                                        Toggle("Include executive summary", isOn: $includeExecutiveSummary)
-                                        Toggle("Add follow-up question", isOn: $includeFollowUpQuestion)
-                                        Toggle("Explain tone choices", isOn: $includeToneReasoning)
-                                        Toggle("Avoid jargon", isOn: $avoidJargon)
-                                        Toggle("Avoid over-promising", isOn: $avoidOverpromising)
-                                        Toggle("Include outcome summary", isOn: $includeOutcomeSummary)
-                                        Toggle("Include stakeholder update", isOn: $includeStakeholderUpdate)
-                                        Toggle("Include fallback plan", isOn: $includeFallbackPlan)
-                                    }
-                                    .font(.caption.bold())
-                                    .padding(.top, 8)
+                                    .foregroundStyle(.secondary)
+                                Spacer()
+                                Picker("", selection: $selectedGoal) {
+                                    ForEach(MailGoal.allCases) { Text($0.rawValue).tag($0) }
                                 }
-                                .font(.caption.bold())
+                                .pickerStyle(.menu)
+                            }
+
+                            HStack {
+                                Text("Style")
+                                    .font(.caption.bold())
+                                    .foregroundStyle(.secondary)
+                                Spacer()
+                                Picker("", selection: $selectedStyle) {
+                                    ForEach(MailStyle.allCases) { Text($0.rawValue).tag($0) }
+                                }
+                                .pickerStyle(.menu)
                             }
                         }
+                        .padding()
+                        .background(Color.white.opacity(0.03), in: RoundedRectangle(cornerRadius: 16))
 
-                        if !generatedBody.isEmpty || isGenerating {
+                        if !generatedBody.isEmpty {
                             outputPreview
                         }
+
+                        Spacer(minLength: 100)
                     }
-                    .padding(16)
+                    .padding(20)
+                }
+                .safeAreaInset(edge: .bottom) {
+                    generateButton
                 }
 
-                MailAILoadingView(
-                    isActive: isGenerating,
-                    title: "Crafting your message",
-                    subtitle: "Applying tone, intent, and structure with AI"
-                )
+                if isGenerating {
+                    loadingOverlay
+                }
             }
-            .scrollBounceBehavior(.basedOnSize)
-            .navigationTitle("AI Composing")
+            .navigationTitle("Drafting Assistant")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarTitleDisplayMode(.inline)
-            .safeAreaInset(edge: .bottom) {
-                actionBar
-            }
-            .sheet(isPresented: $showTemplatesSheet) {
-                templateSheet
-            }
-            .onAppear {
-                if generatedBody.isEmpty {
-                    generatedBody = currentBody
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") { dismiss() }
                 }
             }
         }
     }
 
     private var headerSection: some View {
-        MailAITitleHeader(
-            title: "Draft New Mail",
-            subtitle: "Craft the perfect message with tailored goals and styles.",
-            symbol: "apple.intelligence",
-            symbolSize: 16
-        )
-        .padding(.top, 8)
-    }
-
-    private var actionBar: some View {
-        HStack(spacing: 12) {
-            Button("Cancel") { dismiss() }
-                .font(.subheadline.bold())
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(Color.white.opacity(0.08), in: Capsule())
-                .foregroundStyle(.white)
-
-            Button {
-                showTemplatesSheet = true
-            } label: {
-                Image(systemName: "square.grid.2x2")
-                    .frame(width: 44, height: 44)
-                    .background(Color.white.opacity(0.1), in: Circle())
-            }
-            .buttonStyle(.plain)
-
-            Button {
-                Task { await generateDraft() }
-            } label: {
-                Text("Generate")
-                    .bold()
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-            }
-            .disabled(context.isEmpty || isGenerating)
-            .background(context.isEmpty || isGenerating ? Color.gray.opacity(0.35) : Color.blue, in: Capsule())
-            .foregroundStyle(.white)
-        }
-        .padding(.horizontal, 16)
-        .padding(.top, 10)
-        .padding(.bottom, 12)
-        .background(.ultraThinMaterial)
-    }
-
-    private func inputCard<Content: View>(title: String, icon: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Label(title, systemImage: icon)
-                .font(.headline)
+        VStack(spacing: 10) {
+            Image(systemName: "pencil.and.outline")
+                .font(.title)
                 .foregroundStyle(.blue)
-
-            content()
+            Text("Advanced Drafting")
+                .font(.headline)
+            Text("Tailor your message with precision.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
-        .padding(18)
-        .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 20))
-        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.08), lineWidth: 1))
     }
 
-    private func customTextField(_ label: String, text: Binding<String>, placeholder: String) -> some View {
-        HStack {
+    private func inputField(label: String, text: Binding<String>, placeholder: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
             Text(label)
-                .font(.subheadline.bold())
+                .font(.caption.bold())
                 .foregroundStyle(.secondary)
-                .frame(width: 70, alignment: .leading)
-
             TextField(placeholder, text: text)
-                .font(.subheadline)
-                .foregroundStyle(.white)
-        }
-        .padding(12)
-        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
-    }
-
-    private func chipSelector<T: RawRepresentable & Hashable & Identifiable>(title: String, selection: Binding<T>, options: [T]) -> some View where T.RawValue == String {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.caption.bold())
-                .foregroundStyle(.secondary)
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(options, id: \.id) { option in
-                        Button {
-                            selection.wrappedValue = option
-                        } label: {
-                            Text(option.rawValue)
-                                .font(.caption.bold())
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 8)
-                                .background(selection.wrappedValue == option ? Color.blue : Color.white.opacity(0.1), in: Capsule())
-                                .foregroundStyle(selection.wrappedValue == option ? .white : .secondary)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
-        }
-    }
-
-    private func chipSelector(title: String, selection: Binding<String>, options: [String]) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.caption.bold())
-                .foregroundStyle(.secondary)
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(options, id: \.self) { option in
-                        Button {
-                            selection.wrappedValue = option
-                        } label: {
-                            Text(option)
-                                .font(.caption.bold())
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 8)
-                                .background(selection.wrappedValue == option ? Color.blue : Color.white.opacity(0.1), in: Capsule())
-                                .foregroundStyle(selection.wrappedValue == option ? .white : .secondary)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
+                .padding(12)
+                .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 10))
         }
     }
 
     private var outputPreview: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Label("Generated Draft", systemImage: "sparkles")
-                    .font(.headline)
-                    .foregroundStyle(.purple)
+                Text("Draft Result")
+                    .font(.subheadline.bold())
                 Spacer()
-                if !generatedBody.isEmpty {
-                    Button("Use This") {
-                        onApply(.init(recipient: recipient, subject: subject, body: generatedBody))
-                        dismiss()
-                    }
-                    .font(.caption.bold())
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color.blue, in: Capsule())
-                    .foregroundStyle(.white)
+                Button("Use Draft") {
+                    onApply(.init(recipient: recipient, subject: subject, body: generatedBody))
+                    dismiss()
                 }
+                .font(.caption.bold())
+                .foregroundStyle(.blue)
             }
 
-            if isGenerating {
-                EmptyView()
-            } else {
-                Text(generatedBody)
-                    .font(.subheadline)
-                    .foregroundStyle(.white)
-                    .padding(16)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
-            }
+            Text(generatedBody)
+                .font(.subheadline)
+                .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
         }
-        .padding(18)
-        .background(Color.purple.opacity(0.05), in: RoundedRectangle(cornerRadius: 20))
-        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.purple.opacity(0.2), lineWidth: 1))
+        .padding()
+        .background(Color.blue.opacity(0.05), in: RoundedRectangle(cornerRadius: 20))
     }
 
-    private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            colors: [
-                Color(hex: "#070B1C") ?? .black,
-                Color(hex: "#171A38") ?? .black,
-                Color(hex: "#10243E") ?? .black
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
-    private var templateSheet: some View {
-        NavigationStack {
-            List {
-                Section("Quick Templates") {
-                    ForEach(quickTemplates, id: \.0) { template in
-                        Button {
-                            context = template.1
-                            if subject.isEmpty { subject = template.0 }
-                            showTemplatesSheet = false
-                        } label: {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(template.0).font(.subheadline.weight(.semibold))
-                                Text(template.1).font(.caption).foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Draft Tools")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { showTemplatesSheet = false }
-                }
-            }
+    private var generateButton: some View {
+        Button {
+            Task { await generate() }
+        } label: {
+            Text("Generate Draft")
+                .fontWeight(.bold)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(context.isEmpty ? Color.gray.opacity(0.3) : Color.blue, in: Capsule())
+                .foregroundStyle(.white)
         }
+        .disabled(context.isEmpty || isGenerating)
+        .padding()
+        .background(.ultraThinMaterial)
     }
 
-    @MainActor
-    private func generateDraft() async {
+    private var loadingOverlay: some View {
+        Color.black.opacity(0.6).ignoresSafeArea()
+            .overlay(ProgressView("Drafting...").tint(.white))
+    }
+
+    private func generate() async {
         isGenerating = true
-        errorMessage = nil
-
         do {
-            let prompt = """
-            Write a \(selectedLength.rawValue.lowercased()) \(selectedStyle.rawValue.lowercased()) email.
-            Goal: \(selectedGoal.rawValue).
-            Urgency: \(selectedUrgency.rawValue).
-            Audience: \(selectedAudience.rawValue).
-            Copywriting framework: \(selectedFramework).
-            Include action items: \(includeActionItems ? "yes" : "no").
-            Include subject suggestions: \(includeSubjectSuggestions ? "yes" : "no").
-            Include bullet summary: \(includeBulletSummary ? "yes" : "no").
-            Include call to action: \(includeCallToAction ? "yes" : "no").
-            Include suggested meeting slots: \(includeMeetingSlots ? "yes" : "no").
-            Include alternate version: \(includeAlternativeVersion ? "yes" : "no").
-            Include risk notes: \(includeRiskNotes ? "yes" : "no").
-            Include next-step deadline line: \(includeNextStepDeadline ? "yes" : "no").
-            Include executive summary: \(includeExecutiveSummary ? "yes" : "no").
-            Include follow-up question: \(includeFollowUpQuestion ? "yes" : "no").
-            Explain tone choices briefly: \(includeToneReasoning ? "yes" : "no").
-            Avoid jargon: \(avoidJargon ? "yes" : "no").
-            Avoid over-promising commitments: \(avoidOverpromising ? "yes" : "no").
-            Include outcome summary: \(includeOutcomeSummary ? "yes" : "no").
-            Include stakeholder update: \(includeStakeholderUpdate ? "yes" : "no").
-            Include fallback plan: \(includeFallbackPlan ? "yes" : "no").
-            Reading level: \(selectedReadingLevel.rawValue).
-            Keywords to include when relevant: \(keywords).
-            Context: \(context)
-            Training policy:
-            - Be accurate, concise, and business-safe.
-            - Never invent facts not in context.
-            - Keep commitments realistic and explicit.
-            - Use a polished structure with strong clarity and scannability.
-            Return only the email body text.
-            """
-
+            let prompt = "Write a \(selectedStyle.rawValue) email with the goal of \(selectedGoal.rawValue). Context: \(context)"
             let result = try await AIService.shared.processText(prompt: prompt)
             await MainActor.run {
-                generatedBody = result.trimmingCharacters(in: .whitespacesAndNewlines)
+                generatedBody = result
                 isGenerating = false
             }
         } catch {
-            await MainActor.run {
-                errorMessage = error.localizedDescription
-                isGenerating = false
-            }
+            await MainActor.run { isGenerating = false }
         }
     }
 }

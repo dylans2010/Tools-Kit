@@ -11,93 +11,137 @@ struct MailTableView: View {
     @State private var rows: [[String]] = Array(repeating: ["", "", ""], count: 2)
 
     private var gridColumns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: 8), count: max(columnCount, 1))
+        Array(repeating: GridItem(.flexible(), spacing: 12), count: max(columnCount, 1))
     }
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    Label("Table Builder", systemImage: "tablecells")
-                        .font(.headline)
+            ZStack {
+                Color.workspaceBackground.ignoresSafeArea()
 
-                    Text("Create a clean table without writing markdown manually.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        headerSection
 
-                    Stepper(value: $columnCount, in: 1...6) {
-                        Label("Columns: \(columnCount)", systemImage: "rectangle.split.3x1")
-                            .font(.subheadline)
+                        steppersSection
+
+                        headersGrid
+
+                        cellsGrid
                     }
-                    .onChange(of: columnCount, initial: false) { _, newValue in
-                        syncStructure(columns: newValue, rows: rowCount)
-                    }
-
-                    Stepper(value: $rowCount, in: 1...12) {
-                        Label("Rows: \(rowCount)", systemImage: "rectangle.split.1x2")
-                            .font(.subheadline)
-                    }
-                    .onChange(of: rowCount, initial: false) { _, newValue in
-                        syncStructure(columns: columnCount, rows: newValue)
-                    }
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("Headers", systemImage: "character.cursor.ibeam")
-                            .font(.subheadline.weight(.semibold))
-
-                        LazyVGrid(columns: gridColumns, spacing: 8) {
-                            ForEach(0..<columnCount, id: \.self) { column in
-                                TextField("Header \(column + 1)", text: Binding(
-                                    get: { headers[safe: column] ?? "" },
-                                    set: { value in
-                                        ensureCapacity()
-                                        headers[column] = value
-                                    }
-                                ))
-                                .textFieldStyle(.roundedBorder)
-                            }
-                        }
-                    }
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("Cells", systemImage: "square.grid.3x2")
-                            .font(.subheadline.weight(.semibold))
-
-                        ForEach(0..<rowCount, id: \.self) { row in
-                            LazyVGrid(columns: gridColumns, spacing: 8) {
-                                ForEach(0..<columnCount, id: \.self) { column in
-                                    TextField("R\(row + 1)C\(column + 1)", text: Binding(
-                                        get: { rows[safe: row]?[safe: column] ?? "" },
-                                        set: { value in
-                                            ensureCapacity()
-                                            rows[row][column] = value
-                                        }
-                                    ))
-                                    .textFieldStyle(.roundedBorder)
-                                }
-                            }
-                        }
-                    }
+                    .padding(20)
                 }
-                .padding(16)
             }
             .navigationTitle("Insert Table")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
+                        .foregroundStyle(.secondary)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         onInsert(buildMarkdownTable())
                         dismiss()
                     } label: {
-                        Label("Insert", systemImage: "checkmark.circle.fill")
+                        Text("Insert")
+                            .fontWeight(.bold)
                     }
                 }
             }
             .onAppear {
                 syncStructure(columns: columnCount, rows: rowCount)
+            }
+        }
+    }
+
+    private var headerSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Table Builder", systemImage: "tablecells.fill")
+                .font(.headline)
+                .foregroundStyle(.blue)
+
+            Text("Create a structured data table for your email.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var steppersSection: some View {
+        VStack(spacing: 16) {
+            Stepper(value: $columnCount, in: 1...6) {
+                HStack {
+                    Image(systemName: "rectangle.split.3x1")
+                    Text("Columns: \(columnCount)")
+                }
+                .font(.subheadline.bold())
+            }
+            .onChange(of: columnCount, initial: false) { _, newValue in
+                syncStructure(columns: newValue, rows: rowCount)
+            }
+
+            Stepper(value: $rowCount, in: 1...12) {
+                HStack {
+                    Image(systemName: "rectangle.split.1x2")
+                    Text("Rows: \(rowCount)")
+                }
+                .font(.subheadline.bold())
+            }
+            .onChange(of: rowCount, initial: false) { _, newValue in
+                syncStructure(columns: columnCount, rows: newValue)
+            }
+        }
+        .padding()
+        .background(Color.white.opacity(0.03), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var headersGrid: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Headers", systemImage: "textformat.size")
+                .font(.subheadline.bold())
+                .foregroundStyle(.secondary)
+
+            LazyVGrid(columns: gridColumns, spacing: 12) {
+                ForEach(0..<columnCount, id: \.self) { column in
+                    TextField("Header \(column + 1)", text: Binding(
+                        get: { headers[safe: column] ?? "" },
+                        set: { value in
+                            ensureCapacity()
+                            headers[column] = value
+                        }
+                    ))
+                    .textFieldStyle(PlainTextFieldStyle())
+                    .padding(10)
+                    .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+                }
+            }
+        }
+    }
+
+    private var cellsGrid: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Data Cells", systemImage: "square.grid.3x3.fill")
+                .font(.subheadline.bold())
+                .foregroundStyle(.secondary)
+
+            ForEach(0..<rowCount, id: \.self) { row in
+                LazyVGrid(columns: gridColumns, spacing: 12) {
+                    ForEach(0..<columnCount, id: \.self) { column in
+                        TextField("R\(row + 1)C\(column + 1)", text: Binding(
+                            get: { rows[safe: row]?[safe: column] ?? "" },
+                            set: { value in
+                                ensureCapacity()
+                                rows[row][column] = value
+                            }
+                        ))
+                        .textFieldStyle(PlainTextFieldStyle())
+                        .padding(10)
+                        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 8))
+                    }
+                }
             }
         }
     }

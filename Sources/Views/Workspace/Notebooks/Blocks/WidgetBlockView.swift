@@ -30,6 +30,6 @@ struct WidgetBlockView: View {
                 .font(.system(size: 10, weight: .bold))
         }
         .frame(width: 60, height: 60)
-        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
+        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 10))
     }
 }

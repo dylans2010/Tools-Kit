@@ -6,7 +6,6 @@ struct FormulaBarView: View {
     let onFormulaChanged: (String) -> Void
 
     @State private var editingFormula = ""
-    @State private var isEditing = false
 
     private var address: String {
         guard let sel = selectedCell else { return "" }
@@ -14,50 +13,36 @@ struct FormulaBarView: View {
     }
 
     private var currentFormula: String {
-        guard let sel = selectedCell,
-              sel.row < sheet.cells.count,
-              sel.col < sheet.cells[sel.row].count else { return "" }
+        guard let sel = selectedCell, sel.row < sheet.cells.count, sel.col < sheet.cells[sel.row].count else { return "" }
         let cell = sheet.cells[sel.row][sel.col]
         return cell.formula ?? cell.value
     }
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 12) {
             Text(address.isEmpty ? "—" : address)
-                .font(.system(.footnote, design: .monospaced))
-                .foregroundColor(.secondary)
-                .frame(width: 48, alignment: .center)
-                .padding(.horizontal, 4)
-                .background(Color(.systemGray6))
-                .cornerRadius(6)
+                .font(.system(.subheadline, design: .monospaced).bold())
+                .foregroundStyle(.blue)
+                .frame(width: 50)
+                .padding(.vertical, 8)
+                .background(Color.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
 
-            Divider().frame(height: 22)
+            Image(systemName: "function")
+                .foregroundStyle(.secondary)
 
-            TextField("Value or formula", text: $editingFormula, onCommit: {
-                onFormulaChanged(editingFormula)
-                isEditing = false
-            })
-            .font(.system(.body, design: .monospaced))
-            .autocorrectionDisabled()
-            .autocapitalization(.allCharacters)
-            .onAppear { editingFormula = currentFormula }
-            .onChange(of: selectedCell?.row) { _ in editingFormula = currentFormula }
-            .onChange(of: selectedCell?.col) { _ in editingFormula = currentFormula }
+            TextField("Enter value or formula", text: $editingFormula)
+                .font(.system(.body, design: .monospaced))
+                .onSubmit { onFormulaChanged(editingFormula) }
+                .onChange(of: selectedCell?.row) { editingFormula = currentFormula }
+                .onChange(of: selectedCell?.col) { editingFormula = currentFormula }
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(Color(.systemBackground))
-        .overlay(Divider(), alignment: .bottom)
+        .padding(10)
+        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))
+        .onAppear { editingFormula = currentFormula }
     }
 
     private func columnLabel(_ col: Int) -> String {
-        var result = ""
-        var n = col + 1
-        while n > 0 {
-            let r = (n - 1) % 26
-            result = String(UnicodeScalar(65 + r)!) + result
-            n = (n - 1) / 26
-        }
-        return result
+        let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        return String(letters[letters.index(letters.startIndex, offsetBy: col % 26)])
     }
 }

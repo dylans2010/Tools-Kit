@@ -6,72 +6,61 @@ struct MailSearchView: View {
     @State private var results: [EmailMessage] = []
 
     var body: some View {
-        List {
-            if searchText.isEmpty {
-                Section {
-                    VStack(spacing: 10) {
-                        Image(systemName: "magnifyingglass")
-                            .font(.title3)
-                            .foregroundColor(.secondary)
-                        Text("Search your mail")
-                            .font(.headline)
-                        Text("Find messages by sender or subject.")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 24)
-                    .listRowBackground(Color.clear)
-                }
-            } else if results.isEmpty {
-                Section {
-                    Text("No results for \"\(searchText)\"")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 16)
-                        .listRowBackground(Color.clear)
-                }
-            } else {
-                ForEach(results) { email in
-                    NavigationLink(destination: MailThreadView(viewModel: viewModel, email: email)) {
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack {
-                                Text(email.sender)
-                                    .font(.headline)
-                                    .lineLimit(1)
-                                Spacer()
-                                Text(email.date, style: .date)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+        NavigationStack {
+            ZStack {
+                Color.workspaceBackground.ignoresSafeArea()
+
+                List {
+                    if searchText.isEmpty {
+                        emptySearchState
+                    } else {
+                        ForEach(results) { email in
+                            NavigationLink(destination: MailThreadView(viewModel: viewModel, email: email)) {
+                                searchResultRow(email: email)
                             }
-                            Text(email.subject)
-                                .font(.subheadline.weight(.semibold))
-                                .lineLimit(1)
-                            if !email.preview.isEmpty {
-                                Text(email.preview)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(2)
-                            }
+                            .listRowBackground(Color.workspaceSurface)
                         }
-                        .padding(12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(.secondarySystemBackground))
-                        )
                     }
-                    .listRowInsets(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
-                    .listRowBackground(Color.clear)
                 }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+            }
+            .navigationTitle("Search")
+            .searchable(text: $searchText, prompt: "Search people, subjects, or keywords")
+            .onChange(of: searchText) { _, newValue in
+                performSearch(newValue)
             }
         }
-        .navigationTitle("Search")
-        .listStyle(.insetGrouped)
-        .searchable(text: $searchText)
-        .onChange(of: searchText) { _, newValue in
-            performSearch(newValue)
+    }
+
+    private var emptySearchState: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 60))
+                .foregroundStyle(.secondary.opacity(0.5))
+            Text("Deep Semantic Search")
+                .font(.headline)
+            Text("Find anything across your connected accounts instantly.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
         }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 100)
+        .listRowBackground(Color.clear)
+    }
+
+    private func searchResultRow(email: EmailMessage) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(email.sender).font(.subheadline.bold())
+                Spacer()
+                Text(email.date, style: .date).font(.caption2).foregroundStyle(.secondary)
+            }
+            Text(email.subject).font(.caption.bold())
+            Text(email.preview).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
+        }
+        .padding(.vertical, 4)
     }
 
     private func performSearch(_ query: String) {

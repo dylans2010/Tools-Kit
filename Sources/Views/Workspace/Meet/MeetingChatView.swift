@@ -3,133 +3,93 @@ import SwiftUI
 struct MeetingChatView: View {
     let threads: [MeetingChatThread]
     let messages: [MeetingMessage]
-    let isChatEnabled: Bool
-    let onAddThread: (String) -> Void
-    let onSendMessage: (String, String) -> Void
-    let onReactToMessage: (String, String) -> Void
 
-    @State private var selectedThreadID: String?
+    @State private var selectedThreadID: String = "general"
     @State private var composerText = ""
-    @State private var newThreadTitle = ""
 
     var body: some View {
-        VStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Label("Threaded Chat", systemImage: "message.badge.waveform")
-                    .font(.headline)
-                Text("Select a thread, then send focused updates and reactions.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal)
+        NavigationStack {
+            ZStack {
+                Color.workspaceBackground.ignoresSafeArea()
 
-            if threads.isEmpty {
-                ContentUnavailableView(
-                    "No Chat Threads",
-                    systemImage: "message.badge",
-                    description: Text("Threads appear only when received from live session events.")
-                )
-            } else {
-                Picker("Thread", selection: selectedThreadBinding(defaultID: threads[0].id)) {
-                    ForEach(threads) { thread in
-                        Text(thread.title).tag(thread.id)
+                VStack(spacing: 0) {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack {
+                            ForEach(threads) { thread in
+                                Button { selectedThreadID = thread.id } label: {
+                                    Text(thread.title)
+                                        .font(.caption.bold())
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 8)
+                                        .background(selectedThreadID == thread.id ? Color.blue : Color.white.opacity(0.1), in: Capsule())
+                                        .foregroundStyle(selectedThreadID == thread.id ? .white : .secondary)
+                                }
+                            }
+                        }
+                        .padding()
                     }
-                }
-                .pickerStyle(.segmented)
-            }
 
-            ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack(spacing: 8) {
-                        ForEach(filteredMessages) { message in
-                            ChatMessageBubbleView(
-                                message: message,
-                                onReact: { emoji in onReactToMessage(message.id, emoji) }
-                            )
-                                .id(message.id)
+                    Divider().opacity(0.1)
+
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            LazyVStack(spacing: 16) {
+                                ForEach(messages.filter { $0.threadId == selectedThreadID }) { message in
+                                    ChatMessageRow(message: message)
+                                }
+                            }
+                            .padding()
                         }
                     }
-                    .padding(.horizontal)
-                    .padding(.vertical, 6)
-                }
-                .onChange(of: filteredMessages.count, initial: false) { _, _ in
-                    if let last = filteredMessages.last {
-                        withAnimation(.easeOut(duration: 0.2)) {
-                            proxy.scrollTo(last.id, anchor: .bottom)
-                        }
-                    }
-                }
-            }
 
-            HStack {
-                TextField("New Thread", text: $newThreadTitle)
-                    .textFieldStyle(.roundedBorder)
-                Button {
-                    let title = newThreadTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-                    guard !title.isEmpty else { return }
-                    onAddThread(title)
-                    newThreadTitle = ""
-                } label: {
-                    Label("Add", systemImage: "plus.circle.fill")
-                }
-                .buttonStyle(.bordered)
-                .disabled(threads.isEmpty || !isChatEnabled)
-                .overlay(alignment: .bottom) {
-                    if !isChatEnabled {
-                        Text("Chat off")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                            .offset(y: 18)
-                    }
+                    chatInput
                 }
             }
-            .padding(.horizontal)
-            if !isChatEnabled {
-                Text("Chat is disabled by an admin.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal)
-            }
+            .navigationTitle("Chat")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
 
-            ChatInputView(text: $composerText, isEnabled: isChatEnabled) {
-                let text = composerText.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !text.isEmpty else { return }
-                guard let selectedThreadID else { return }
-                onSendMessage(text, selectedThreadID)
+    private var chatInput: some View {
+        HStack {
+            TextField("Message...", text: $composerText)
+                .padding(12)
+                .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))
+
+            Button {
+                // Send logic
                 composerText = ""
+            } label: {
+                Image(systemName: "paperplane.fill")
+                    .foregroundStyle(.blue)
             }
+            .disabled(composerText.isEmpty)
         }
-        .navigationTitle("Meeting Chat")
-        .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            ensureSelectedThreadIsValid(for: threadIDs)
+        .padding()
+        .background(.ultraThinMaterial)
+    }
+}
+
+struct ChatMessageRow: View {
+    let message: MeetingMessage
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Circle()
+                .fill(Color.blue.opacity(0.2))
+                .frame(width: 32, height: 32)
+                .overlay(Text(message.senderName.prefix(1).uppercased()).font(.caption.bold()))
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(message.senderName).font(.caption.bold())
+                    Text(message.sentAt.formatted(.dateTime.hour().minute())).font(.system(size: 10)).foregroundStyle(.secondary)
+                }
+                Text(message.text)
+                    .font(.subheadline)
+                    .padding(12)
+                    .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 16))
+            }
+            Spacer()
         }
-        .onChange(of: threadIDs, initial: false) { _, ids in
-            ensureSelectedThreadIsValid(for: ids)
-        }
-    }
-
-    private var filteredMessages: [MeetingMessage] {
-        guard let selectedThreadID else { return [] }
-        return messages.filter { $0.threadId == selectedThreadID }
-    }
-
-    private func selectedThreadBinding(defaultID: String) -> Binding<String> {
-        Binding<String>(
-            get: { selectedThreadID ?? defaultID },
-            set: { selectedThreadID = $0 }
-        )
-    }
-
-    private var threadIDs: [String] {
-        threads.map(\.id)
-    }
-
-    private func ensureSelectedThreadIsValid(for ids: [String]) {
-        if let selectedThreadID, ids.contains(selectedThreadID) {
-            return
-        }
-        selectedThreadID = ids.first
     }
 }

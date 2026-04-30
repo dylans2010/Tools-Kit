@@ -6,295 +6,100 @@ struct MeetingContainerView: View {
     @State private var showChat = false
     @State private var showParticipants = false
     @State private var showSettings = false
-    @State private var showAdmin = false
-    @State private var showNotes = false
-    @State private var selectedParticipant: MeetingParticipant?
-    @State private var showHostLeaveOptions = false
-    @State private var showAssistantTools = false
+    @State private var showSummary = false
+    @State private var showAssistant = false
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 12) {
-                headerSummary
+        NavigationStack {
+            ZStack {
+                Color.workspaceBackground.ignoresSafeArea()
 
-                sectionHeader(
-                    title: "Live Stage",
-                    subtitle: "Focus on active speakers and shared screens.",
-                    symbol: "rectangle.3.group.bubble.left.fill"
-                )
+                VStack(spacing: 0) {
+                    meetingHeader
 
-                VideoGridView(
-                    participants: manager.participants,
-                    videoTracks: manager.participantVideoTracks,
-                    screenShareTracks: manager.participantScreenShareTracks,
-                    activeScreenShareParticipantID: manager.activeScreenShareParticipantID,
-                    spotlightedParticipantID: manager.spotlightedParticipantID,
-                    pinnedParticipantID: manager.pinnedParticipantID
-                )
-                .frame(minHeight: 220, maxHeight: 390)
-
-                surfaceCard {
-                    VStack(alignment: .leading, spacing: 10) {
-                        sectionHeader(
-                            title: "Meeting Controls",
-                            subtitle: "Mic, camera, screen sharing, and quick actions.",
-                            symbol: "switch.2"
-                        )
-
-                    MeetingControlsView(
-                        isMuted: manager.isMicrophoneMuted,
-                        isCameraEnabled: manager.isCameraEnabled,
-                        isScreenSharing: manager.isScreenSharing,
-                        onToggleMute: { manager.toggleMute() },
-                        onToggleCamera: { manager.toggleCamera() },
-                        onToggleScreenShare: { manager.toggleScreenShare() },
-                        onLeaveMeeting: {
-                            if manager.isCurrentUserHost {
-                                showHostLeaveOptions = true
-                            } else {
-                                Task { await manager.leaveMeeting() }
-                            }
-                        },
-                        onOpenChat: { showChat = true },
-                        onOpenParticipants: { showParticipants = true },
-                        onOpenSettings: { showSettings = true },
-                        onOpenAdmin: manager.canAccessAdminControls ? { showAdmin = true } : nil,
-                        onOpenNotes: { showNotes = true }
+                    VideoGridView(
+                        participants: manager.participants,
+                        videoTracks: manager.participantVideoTracks,
+                        screenShareTracks: manager.participantScreenShareTracks,
+                        activeScreenShareParticipantID: manager.activeScreenShareParticipantID,
+                        spotlightedParticipantID: manager.spotlightedParticipantID,
+                        pinnedParticipantID: manager.pinnedParticipantID
                     )
-                    }
+                    .padding()
+
+                    meetingFooter
                 }
-
-                sectionHeader(
-                    title: "Quick Controls",
-                    subtitle: "Tune audio, network, picture-in-picture, and effects.",
-                    symbol: "slider.horizontal.3"
-                )
-
-                WorkspaceSurfaceCard(padding: 12) {
-                    VStack(spacing: 12) {
-                        HStack {
-                            Label("Device Controls", systemImage: "macpro.gen3.fill")
-                                .font(.subheadline.bold())
-                            Spacer()
-                        }
-
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                            NoiseControlView(
-                                isEnabled: manager.isNoiseCancellationEnabled,
-                                processingState: manager.activeAudioProcessingState,
-                                onToggle: { manager.setNoiseCancellationEnabled($0) }
-                            )
-                            .padding(8)
-                            .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
-
-                            NetworkStatusView(
-                                quality: manager.networkQuality,
-                                latencyMs: manager.diagnostics.latencyMs,
-                                packetLossPercent: manager.diagnostics.packetLossPercent
-                            )
-                            .padding(8)
-                            .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
-
-                            PiPOverlayView(
-                                isEnabled: manager.isPiPEnabled,
-                                isActive: manager.isPiPActive,
-                                onToggle: { manager.setPiPEnabled($0) }
-                            )
-                            .padding(8)
-                            .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
-
-                            BackgroundEffectsView(
-                                selectedEffect: manager.backgroundEffect,
-                                onSelectEffect: { manager.setBackgroundEffect($0) }
-                            )
-                            .padding(8)
-                            .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
-                        }
-                    }
+            }
+            .navigationTitle("Live Meeting")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { showAssistant.toggle() } label: { Image(systemName: "sparkles").foregroundStyle(.purple) }
                 }
-
-                DisclosureGroup(isExpanded: $showAssistantTools) {
-                    VStack(spacing: 10) {
-                        surfaceCard {
-                            ReactionsOverlayView(
-                                reactions: manager.reactions,
-                                onSendReaction: { manager.sendReaction($0) }
-                            )
-                        }
-                        surfaceCard {
-                            HandRaiseView(
-                                participants: manager.participants,
-                                localParticipantID: manager.localParticipantID,
-                                canManageOthers: manager.canAccessAdminControls,
-                                onToggleLocalHand: { manager.toggleRaiseHand() },
-                                onLowerHand: { manager.setHandRaised(participantID: $0, raised: false) }
-                            )
-                        }
-                        surfaceCard {
-                            LiveCaptionsView(
-                                isEnabled: manager.isCaptionsEnabled,
-                                captions: manager.captions,
-                                onToggleVisibility: { manager.setCaptionsEnabled($0) }
-                            )
-                        }
-                        if !manager.cpuWarnings.isEmpty {
-                            surfaceCard {
-                                PerformanceWarningView(warnings: manager.cpuWarnings, onDismiss: manager.dismissCPUWarning)
-                            }
-                        }
-                        surfaceCard {
-                            MeetingStateView(manager: manager)
-                        }
-                        surfaceCard {
-                            MeetingDiagnosticsView(diagnostics: manager.diagnostics)
-                        }
-                    }
-                    .padding(.top, 8)
-                } label: {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Label("More meeting tools", systemImage: "wand.and.stars")
-                            .font(.subheadline.weight(.semibold))
-                        Text("Reactions, raised hands, captions, and diagnostics.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .accessibilityLabel("More meeting tools")
-                .padding(12)
-                .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
-            .padding(.horizontal, 14)
-            .padding(.bottom, 20)
-            .padding(.top, 8)
-        }
-        .navigationTitle("Meeting")
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
-        .sheet(isPresented: $showChat) {
-            NavigationStack {
-                MeetingChatView(
-                    threads: manager.chatThreads,
-                    messages: manager.messages,
-                    isChatEnabled: manager.isChatEnabled || manager.canAccessAdminControls,
-                    onAddThread: { manager.addThread(named: $0) },
-                    onSendMessage: { text, threadID in manager.sendMessage(text, threadId: threadID) },
-                    onReactToMessage: { messageID, emoji in manager.reactToMessage(messageID: messageID, emoji: emoji) }
-                )
-            }
-            .presentationDetents([.medium, .large])
-        }
-        .sheet(isPresented: $showParticipants) {
-            NavigationStack {
-                ParticipantsView(
-                    participants: manager.participants,
-                    onSelectParticipant: { participant in
-                        guard manager.canAccessAdminControls, let localParticipantID = manager.localParticipantID, participant.id != localParticipantID else { return }
-                        selectedParticipant = participant
-                    },
-                    canManageParticipant: { participant in
-                        guard manager.canAccessAdminControls, let localParticipantID = manager.localParticipantID else { return false }
-                        return participant.id != localParticipantID
-                    },
-                    onToggleParticipantHand: { participantID in
-                        manager.setHandRaised(participantID: participantID, raised: false)
-                    }
-                )
-                .navigationTitle("Participants")
-            }
-            .presentationDetents([.medium, .large])
-        }
-        .sheet(isPresented: $showSettings) {
-            NavigationStack {
-                List {
-                    AudioSettingsView(manager: manager)
-                    VideoSettingsView(manager: manager)
-                }
-                .navigationTitle("Meeting Settings")
-            }
-            .presentationDetents([.medium, .large])
-        }
-        .sheet(isPresented: $showAdmin) {
-            NavigationStack {
-                AdminControlsView(manager: manager)
-            }
-            .presentationDetents([.medium, .large])
-        }
-        .sheet(isPresented: $showNotes) {
-            NavigationStack {
-                WorkspaceMeetingNotesView(manager: manager)
-            }
-            .presentationDetents([.medium, .large])
-        }
-        .sheet(item: $selectedParticipant) { participant in
-            NavigationStack {
-                ParticipantAdminPanelView(manager: manager, participant: participant)
-            }
-            .presentationDetents([.medium, .large])
-        }
-        .alert("Leave meeting", isPresented: $showHostLeaveOptions) {
-            Button("Leave meeting", role: .cancel) {
-                Task { await manager.leaveMeeting() }
-            }
-            Button("End meeting for everyone", role: .destructive) {
-                Task { await manager.endMeetingForEveryone() }
-            }
-        } message: {
-            Text("Leave meeting or end meeting for everyone.")
-        }
-        .animation(.easeInOut(duration: 0.2), value: showAssistantTools)
-    }
-
-    private var headerSummary: some View {
-        HStack(spacing: 10) {
-            summaryChip(title: "Participants", value: "\(manager.participants.count)", symbol: "person.3.fill")
-            summaryChip(title: "Network", value: manager.networkQuality.label, symbol: "antenna.radiowaves.left.and.right")
-            summaryChip(title: "Mic", value: manager.isMicrophoneMuted ? "Muted" : "Live", symbol: manager.isMicrophoneMuted ? "mic.slash.fill" : "mic.fill")
+            .sheet(isPresented: $showChat) { MeetingChatView(threads: manager.chatThreads, messages: manager.messages) }
+            .sheet(isPresented: $showParticipants) { ParticipantsView(participants: manager.participants) }
+            .sheet(isPresented: $showSettings) { MeetingSettingsView(manager: manager) }
+            .sheet(isPresented: $showAssistant) { MeetingSummaryView(manager: manager) }
         }
     }
 
-    private func summaryChip(title: String, value: String, symbol: String) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: symbol)
-                .font(.caption.weight(.semibold))
-            VStack(alignment: .leading, spacing: 1) {
-                Text(title)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                Text(value)
-                    .font(.caption.weight(.semibold))
-                    .lineLimit(1)
+    private var meetingHeader: some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text("Engineering Sync").font(.headline)
+                HStack {
+                    Circle().fill(.green).frame(width: 8, height: 8)
+                    Text("Recording & Live Transcribing").font(.caption).foregroundStyle(.secondary)
+                }
             }
-            Spacer(minLength: 0)
+            Spacer()
+
+            HStack(spacing: 12) {
+                sentimentIndicator
+                engagementPill
+            }
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .padding()
+        .background(Color.workspaceSurface)
     }
 
-    private func sectionHeader(title: String, subtitle: String, symbol: String) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: symbol)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.blue)
-                .frame(width: 24, height: 24)
-                .background(Color.blue.opacity(0.12), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer(minLength: 0)
+    private var sentimentIndicator: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "face.smiling.fill").foregroundStyle(.yellow)
+            Text("\(Int(manager.sentimentScore * 100))%").font(.caption.bold())
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(Color.yellow.opacity(0.1), in: Capsule())
     }
 
-    private func surfaceCard<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
-        content()
-            .padding(12)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    private var engagementPill: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "bolt.fill").foregroundStyle(.blue)
+            Text("High Engagement").font(.caption.bold())
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(Color.blue.opacity(0.1), in: Capsule())
+    }
+
+    private var meetingFooter: some View {
+        VStack {
+            MeetingControlsView(
+                isMuted: manager.isMicrophoneMuted,
+                isCameraEnabled: manager.isCameraEnabled,
+                isScreenSharing: manager.isScreenSharing,
+                onToggleMute: { manager.toggleMute() },
+                onToggleCamera: { manager.toggleCamera() },
+                onToggleScreenShare: { manager.toggleScreenShare() },
+                onLeaveMeeting: { Task { await manager.leaveMeeting() } },
+                onOpenChat: { showChat = true },
+                onOpenParticipants: { showParticipants = true },
+                onOpenSettings: { showSettings = true }
+            )
+        }
+        .padding()
+        .background(Color.workspaceSurface)
     }
 }

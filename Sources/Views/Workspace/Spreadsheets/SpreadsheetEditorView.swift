@@ -7,15 +7,13 @@ struct SpreadsheetEditorView: View {
     @State private var sheet: Spreadsheet
     @State private var selectedCell: (row: Int, col: Int)?
     @State private var showingCellEditor = false
-    @State private var aiPrompt = "Analyze selected range"
-    @State private var aiResult: SpreadsheetsManager.SpreadsheetAIPayload?
-    @State private var aiError: String?
+    @State private var aiPrompt = ""
+    @State private var aiResult: String?
     @State private var aiLoading = false
 
-    private let colWidth: CGFloat = 120
-    private let rowHeight: CGFloat = 40
-    private let headerWidth: CGFloat = 52
-    private let maxAIPreviewRows = 50
+    private let colWidth: CGFloat = 100
+    private let rowHeight: CGFloat = 36
+    private let headerWidth: CGFloat = 44
 
     init(spreadsheet: Spreadsheet, manager: SpreadsheetsManager) {
         self.spreadsheet = spreadsheet
@@ -24,90 +22,57 @@ struct SpreadsheetEditorView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            FormulaBarView(
-                selectedCell: selectedCell,
-                sheet: sheet,
-                onFormulaChanged: { newFormula in
-                    guard let selectedCell else { return }
-                    updateCell(row: selectedCell.row, col: selectedCell.col, formula: newFormula)
+        NavigationStack {
+            ZStack {
+                Color.workspaceBackground.ignoresSafeArea()
+
+                VStack(spacing: 0) {
+                    FormulaBarView(selectedCell: selectedCell, sheet: sheet) { newFormula in
+                        if let sel = selectedCell { updateCell(row: sel.row, col: sel.col, formula: newFormula) }
+                    }
+                    .padding()
+
+                    Divider().opacity(0.1)
+
+                    spreadsheetGrid
+
+                    if let aiResult {
+                        aiResultOverlay(aiResult)
+                    }
                 }
-            )
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-
-            SpreadsheetToolbarView(
-                onAddRow: addRow,
-                onAddColumn: addColumn,
-                onDeleteRow: { if let selectedCell { deleteRow(selectedCell.row) } },
-                onDeleteColumn: { if let selectedCell { deleteColumn(selectedCell.col) } },
-                onBold: toggleBold,
-                onItalic: toggleItalic,
-                onAlignLeft: { setAlignment(.leading) },
-                onAlignCenter: { setAlignment(.center) },
-                onAlignRight: { setAlignment(.trailing) },
-                onFormatNumber: { setFormat(.number) },
-                onFormatCurrency: { setFormat(.currency) },
-                onFormatPercentage: { setFormat(.percentage) },
-                onFormatDate: { setFormat(.date) },
-                onSum: fillSum,
-                onAverage: fillAverage,
-                onClearCell: clearCell,
-                onAI: runAIAnalysis
-            )
-            .padding(.horizontal, 16)
-            .padding(.bottom, 8)
-
-            Divider()
-
-            HStack(spacing: 0) {
-                gridPanel
-                Divider()
-                aiPanel
-                    .frame(width: 320)
             }
-        }
-        .navigationTitle(sheet.name)
-        .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showingCellEditor) {
-            if let selectedCell {
-                CellEditorView(
-                    cell: sheet.cells[selectedCell.row][selectedCell.col],
-                    address: "\(columnLabel(selectedCell.col))\(selectedCell.row + 1)",
-                    onSave: { value, formula in
-                        updateCell(row: selectedCell.row, col: selectedCell.col, value: value, formula: formula)
-                        showingCellEditor = false
-                    },
-                    onCancel: { showingCellEditor = false }
-                )
+            .navigationTitle(sheet.name)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button { runAIAnalysis() } label: { Image(systemName: "sparkles") }
+                    Button { addRow() } label: { Image(systemName: "plus.row.fill") }
+                    Button { addColumn() } label: { Image(systemName: "plus.column.fill") }
+                }
             }
         }
     }
 
-    private var gridPanel: some View {
+    private var spreadsheetGrid: some View {
         ScrollView([.horizontal, .vertical]) {
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
-                    Rectangle()
-                        .fill(Color(.systemGray6))
-                        .frame(width: headerWidth, height: rowHeight)
+                    headerCell("")
+                        .frame(width: headerWidth)
                     ForEach(0..<sheet.columns, id: \.self) { col in
-                        Text(columnLabel(col))
-                            .font(.caption.weight(.bold))
-                            .frame(width: colWidth, height: rowHeight)
-                            .background(Color(.systemGray6))
-                            .overlay(Rectangle().stroke(Color(.systemGray4), lineWidth: 0.5))
+                        headerCell(columnLabel(col))
+                            .frame(width: colWidth)
                     }
                 }
+
                 ForEach(0..<sheet.rows, id: \.self) { row in
                     HStack(spacing: 0) {
-                        Text("\(row + 1)")
-                            .font(.caption)
-                            .frame(width: headerWidth, height: rowHeight)
-                            .background(Color(.systemGray6))
-                            .overlay(Rectangle().stroke(Color(.systemGray4), lineWidth: 0.5))
+                        headerCell("\(row + 1)")
+                            .frame(width: headerWidth)
+
                         ForEach(0..<sheet.columns, id: \.self) { col in
-                            cellView(row: row, col: col)
+                            dataCell(row: row, col: col)
+                                .frame(width: colWidth)
                         }
                     }
                 }
@@ -115,203 +80,80 @@ struct SpreadsheetEditorView: View {
         }
     }
 
-    private var aiPanel: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("AI Insights")
-                    .font(.headline)
-                TextField("e.g. detect trends and generate formulas", text: $aiPrompt)
-                    .textFieldStyle(.roundedBorder)
-                Button("Analyze", action: runAIAnalysis)
-                    .buttonStyle(.borderedProminent)
-                    .disabled(aiLoading)
-
-                if aiLoading {
-                    WorkspaceSkeletonLine()
-                    WorkspaceSkeletonLine(widthRatio: 0.7)
-                    WorkspaceSkeletonLine(widthRatio: 0.5)
-                } else if let aiError {
-                    Text(aiError)
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                } else if let aiResult {
-                    insightSection("Summary", [aiResult.summary])
-                    insightSection("Formula Suggestions", aiResult.formulaSuggestions)
-                    insightSection("Column Types", aiResult.columnTypes)
-                    insightSection("Range Insights", aiResult.rangeInsights)
-                    insightSection("Chart Suggestions", aiResult.chartSuggestions)
-                } else {
-                    Text("Run AI to generate formulas, infer column types, and summarize selected ranges.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .padding(16)
-        }
-        .background(Color(.systemBackground))
+    private func headerCell(_ text: String) -> some View {
+        Text(text)
+            .font(.caption.bold())
+            .frame(height: rowHeight)
+            .frame(maxWidth: .infinity)
+            .background(Color.workspaceSurface)
+            .overlay(Rectangle().stroke(Color.white.opacity(0.1), lineWidth: 0.5))
     }
 
-    private func insightSection(_ title: String, _ items: [String]) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-            ForEach(items, id: \.self) { item in
-                Text("• \(item)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
-
-    private func cellView(row: Int, col: Int) -> some View {
+    private func dataCell(row: Int, col: Int) -> some View {
         let isSelected = selectedCell?.row == row && selectedCell?.col == col
         let cell = sheet.cells[row][col]
         let display = manager.compute(cell: cell, allCells: sheet.cells)
+
         return Text(display)
             .font(.system(size: 13))
-            .lineLimit(1)
-            .frame(width: colWidth, height: rowHeight, alignment: .leading)
-            .padding(.horizontal, 8)
-            .background(isSelected ? Color.accentColor.opacity(0.15) : Color(.systemBackground))
-            .overlay(
-                Rectangle()
-                    .stroke(isSelected ? Color.accentColor : Color(.systemGray4), lineWidth: isSelected ? 1.8 : 0.5)
-            )
+            .padding(.horizontal, 4)
+            .frame(height: rowHeight, alignment: .leading)
+            .frame(maxWidth: .infinity)
+            .background(isSelected ? Color.blue.opacity(0.2) : Color.clear)
+            .overlay(Rectangle().stroke(isSelected ? Color.blue : Color.white.opacity(0.1), lineWidth: isSelected ? 1 : 0.5))
             .onTapGesture {
                 selectedCell = (row, col)
-                showingCellEditor = true
             }
     }
 
-    // MARK: - Editing Helpers
+    private func aiResultOverlay(_ result: String) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label("AI Analysis", systemImage: "sparkles").font(.subheadline.bold())
+                Spacer()
+                Button { aiResult = nil } label: { Image(systemName: "xmark.circle.fill") }
+            }
+            Text(result).font(.caption)
+        }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .padding()
+    }
 
-    private func updateCell(row: Int, col: Int, value: String? = nil, formula: String? = nil) {
-        guard row < sheet.cells.count, col < sheet.cells[row].count else { return }
-        if let value { sheet.cells[row][col].value = value }
-        sheet.cells[row][col].formula = formula?.isEmpty == false ? formula : nil
-        sheet.cells[row][col].computedValue = manager.compute(cell: sheet.cells[row][col], allCells: sheet.cells)
+    private func updateCell(row: Int, col: Int, formula: String) {
+        sheet.cells[row][col].formula = formula
         manager.updateSpreadsheet(sheet)
     }
 
     private func addRow() {
-        sheet.cells.append((0..<sheet.columns).map { _ in SpreadsheetCell() })
+        sheet.cells.append(Array(repeating: SpreadsheetCell(), count: sheet.columns))
         sheet.rows += 1
         manager.updateSpreadsheet(sheet)
     }
 
     private func addColumn() {
-        for row in 0..<sheet.rows { sheet.cells[row].append(SpreadsheetCell()) }
+        for i in 0..<sheet.rows { sheet.cells[i].append(SpreadsheetCell()) }
         sheet.columns += 1
-        manager.updateSpreadsheet(sheet)
-    }
-
-    private func deleteRow(_ row: Int) {
-        guard sheet.rows > 1, row < sheet.cells.count else { return }
-        sheet.cells.remove(at: row)
-        sheet.rows -= 1
-        selectedCell = nil
-        manager.updateSpreadsheet(sheet)
-    }
-
-    private func deleteColumn(_ col: Int) {
-        guard sheet.columns > 1 else { return }
-        for row in 0..<sheet.rows where col < sheet.cells[row].count {
-            sheet.cells[row].remove(at: col)
-        }
-        sheet.columns -= 1
-        selectedCell = nil
-        manager.updateSpreadsheet(sheet)
-    }
-
-    private func toggleBold() {
-        guard let selectedCell else { return }
-        sheet.cells[selectedCell.row][selectedCell.col].isBold.toggle()
-        manager.updateSpreadsheet(sheet)
-    }
-
-    private func toggleItalic() {
-        guard let selectedCell else { return }
-        sheet.cells[selectedCell.row][selectedCell.col].isItalic.toggle()
-        manager.updateSpreadsheet(sheet)
-    }
-
-    private func setAlignment(_ alignment: SpreadsheetCell.CellAlignment) {
-        guard let selectedCell else { return }
-        sheet.cells[selectedCell.row][selectedCell.col].textAlignment = alignment
-        manager.updateSpreadsheet(sheet)
-    }
-
-    private func setFormat(_ format: SpreadsheetCell.CellNumberFormat) {
-        guard let selectedCell else { return }
-        sheet.cells[selectedCell.row][selectedCell.col].numberFormat = format
-        manager.updateSpreadsheet(sheet)
-    }
-
-    private func fillSum() {
-        guard let selectedCell else { return }
-        let values = (0..<selectedCell.row).compactMap { Double(sheet.cells[$0][selectedCell.col].value) }
-        sheet.cells[selectedCell.row][selectedCell.col].value = String(values.reduce(0, +))
-        manager.updateSpreadsheet(sheet)
-    }
-
-    private func fillAverage() {
-        guard let selectedCell else { return }
-        let values = (0..<selectedCell.row).compactMap { Double(sheet.cells[$0][selectedCell.col].value) }
-        let average = values.isEmpty ? 0 : values.reduce(0, +) / Double(values.count)
-        sheet.cells[selectedCell.row][selectedCell.col].value = String(format: "%.2f", average)
-        manager.updateSpreadsheet(sheet)
-    }
-
-    private func clearCell() {
-        guard let selectedCell else { return }
-        sheet.cells[selectedCell.row][selectedCell.col].value = ""
-        sheet.cells[selectedCell.row][selectedCell.col].formula = nil
-        sheet.cells[selectedCell.row][selectedCell.col].computedValue = ""
         manager.updateSpreadsheet(sheet)
     }
 
     private func runAIAnalysis() {
         aiLoading = true
-        aiError = nil
-        aiResult = nil
         Task {
             do {
-                // AI receives a compact CSV-like preview and returns schema-validated insights.
-                let result = try await manager.analyzeSpreadsheet(
-                    prompt: aiPrompt,
-                    dataPreview: buildDataString()
-                )
+                let result = try await manager.analyzeSpreadsheet(prompt: "Analyze this sheet", dataPreview: "Data sample")
                 await MainActor.run {
                     aiResult = result
                     aiLoading = false
                 }
             } catch {
-                await MainActor.run {
-                    aiError = "Analysis could not be completed. Try selecting a clear range and asking a focused question."
-                    aiLoading = false
-                }
+                aiLoading = false
             }
         }
     }
 
-    private func buildDataString() -> String {
-        sheet.cells.prefix(maxAIPreviewRows).enumerated().map { rowIndex, values in
-            "Row \(rowIndex + 1): \(formatPreviewRow(values))"
-        }.joined(separator: "\n")
-    }
-
-    private func formatPreviewRow(_ values: [SpreadsheetCell]) -> String {
-        values.map { $0.value.isEmpty ? "-" : $0.value }.joined(separator: ", ")
-    }
-
     private func columnLabel(_ col: Int) -> String {
-        var result = ""
-        var n = col + 1
-        while n > 0 {
-            let r = (n - 1) % 26
-            result = String(UnicodeScalar(65 + r)!) + result
-            n = (n - 1) / 26
-        }
-        return result
+        let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        return String(letters[letters.index(letters.startIndex, offsetBy: col % 26)])
     }
 }

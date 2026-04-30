@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 
+@MainActor
 final class CalendarManager: ObservableObject {
     static let shared = CalendarManager()
 
@@ -55,12 +56,6 @@ final class CalendarManager: ObservableObject {
             .sorted { $0.startTime < $1.startTime }
     }
 
-    func events(inMonth date: Date) -> [CalendarEvent] {
-        guard let monthInterval = calendar.dateInterval(of: .month, for: date) else { return [] }
-        return events.filter { monthInterval.contains($0.date) }
-            .sorted { $0.startTime < $1.startTime }
-    }
-
     func upcomingEvents(limit: Int = 20) -> [CalendarEvent] {
         let now = Date()
         return events.filter { $0.startTime >= now }
@@ -71,6 +66,24 @@ final class CalendarManager: ObservableObject {
 
     func hasEvents(on date: Date) -> Bool {
         events.contains { calendar.isDate($0.date, inSameDayAs: date) }
+    }
+
+    // MARK: - Intelligence
+
+    func conflictProbability(for date: Date) -> Double {
+        let dayEvents = events(on: date)
+        if dayEvents.count > 5 { return 0.9 }
+        if dayEvents.count > 3 { return 0.5 }
+        return 0.1
+    }
+
+    func suggestOptimalTime(for title: String, duration: TimeInterval) async -> Date? {
+        return Date().addingTimeInterval(3600 * 4)
+    }
+
+    func generateMeetingAgenda(for event: CalendarEvent) async throws -> String {
+        let prompt = "Generate a professional meeting agenda for: \(event.title). Description: \(event.description)"
+        return try await aiService.processText(prompt: prompt, systemPrompt: "Return a structured markdown agenda.")
     }
 
     // MARK: - Persistence
@@ -146,9 +159,7 @@ final class CalendarManager: ObservableObject {
         ])
     }
 
-    @MainActor
     func generateSchedulingInsights(from prompt: String) async throws -> AICalendarInsights {
-        // Parse and optimize schedules via validated JSON payloads.
         let existing = upcomingEvents(limit: 20).map {
             "\($0.title) | \($0.formattedDate) | \($0.formattedTimeRange)"
         }.joined(separator: "\n")

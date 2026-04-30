@@ -8,84 +8,51 @@ struct MeetingControlsView: View {
     let onToggleCamera: () -> Void
     let onToggleScreenShare: () -> Void
     let onLeaveMeeting: () -> Void
-    var onOpenChat: (() -> Void)? = nil
-    var onOpenParticipants: (() -> Void)? = nil
-    var onOpenSettings: (() -> Void)? = nil
-    var onOpenAdmin: (() -> Void)? = nil
-    var onOpenNotes: (() -> Void)? = nil
+    var onOpenChat: (() -> Void)?
+    var onOpenParticipants: (() -> Void)?
+    var onOpenSettings: (() -> Void)?
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 14) {
-                controlIconButton(
-                    title: isMuted ? "Unmute" : "Mute",
-                    subtitle: isMuted ? "Audio is off" : "Audio is live",
-                    icon: isMuted ? "mic.slash.fill" : "mic.fill",
-                    tint: isMuted ? .red : .blue,
-                    action: onToggleMute
-                )
-                controlIconButton(
-                    title: isCameraEnabled ? "Camera Off" : "Camera On",
-                    subtitle: isCameraEnabled ? "Video is live" : "Video is paused",
-                    icon: isCameraEnabled ? "video.slash.fill" : "video.fill",
-                    tint: isCameraEnabled ? .blue : .red,
-                    action: onToggleCamera
-                )
-                controlIconButton(
-                    title: isScreenSharing ? "Stop Share" : "Share",
-                    subtitle: isScreenSharing ? "Screen is shared" : "Share your screen",
-                    icon: isScreenSharing ? "rectangle.on.rectangle.slash" : "rectangle.on.rectangle",
-                    tint: .blue,
-                    action: onToggleScreenShare
-                )
+        HStack(spacing: 20) {
+            controlButton(icon: isMuted ? "mic.slash.fill" : "mic.fill", color: isMuted ? .red : .white.opacity(0.1), action: onToggleMute)
+            controlButton(icon: isCameraEnabled ? "video.fill" : "video.slash.fill", color: isCameraEnabled ? .white.opacity(0.1) : .red, action: onToggleCamera)
+            controlButton(icon: "screenview.fill", color: isScreenSharing ? .blue : .white.opacity(0.1), action: onToggleScreenShare)
 
-                if let onOpenChat {
-                    controlIconButton(title: "Chat", subtitle: "Messages", icon: "message.fill", tint: .indigo, action: onOpenChat)
-                }
-                if let onOpenParticipants {
-                    controlIconButton(title: "People", subtitle: "Attendees", icon: "person.3.fill", tint: .teal, action: onOpenParticipants)
-                }
-                if let onOpenSettings {
-                    controlIconButton(title: "Settings", subtitle: "Devices", icon: "slider.horizontal.3", tint: .gray, action: onOpenSettings)
-                }
-                if let onOpenAdmin {
-                    controlIconButton(title: "Admin", subtitle: "Host Tools", icon: "person.badge.shield.checkmark.fill", tint: .purple, action: onOpenAdmin)
-                }
-                if let onOpenNotes {
-                    controlIconButton(title: "Notes", subtitle: "Shared Notes", icon: "note.text", tint: .mint, action: onOpenNotes)
-                }
+            Spacer()
 
-                Button(role: .destructive, action: onLeaveMeeting) {
-                    Label("Leave", systemImage: "phone.down.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 10)
-                        .background(Color.red.opacity(0.15), in: Capsule())
-                }
-                .buttonStyle(.plain)
+            HStack(spacing: 16) {
+                actionButton(icon: "message.fill", action: onOpenChat)
+                actionButton(icon: "person.2.fill", action: onOpenParticipants)
+                actionButton(icon: "gearshape.fill", action: onOpenSettings)
             }
-            .padding(.horizontal, 2)
+
+            Spacer()
+
+            Button(action: onLeaveMeeting) {
+                Image(systemName: "phone.down.fill")
+                    .font(.title3)
+                    .foregroundStyle(.white)
+                    .frame(width: 54, height: 54)
+                    .background(Color.red, in: Circle())
+            }
+        }
+        .padding(.horizontal)
+    }
+
+    private func controlButton(icon: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.title3)
+                .frame(width: 48, height: 48)
+                .background(color, in: Circle())
         }
     }
 
-    private func controlIconButton(title: String, subtitle: String = "", icon: String, tint: Color, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            VStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .semibold))
-                    .frame(width: 38, height: 38)
-                    .background(tint.opacity(0.14), in: Circle())
-                Text(title)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
-                Text(subtitle)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
-            .frame(width: 84)
+    private func actionButton(icon: String, action: (() -> Void)?) -> some View {
+        Button { action?() } label: {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(.white)
         }
-        .buttonStyle(.plain)
     }
 }

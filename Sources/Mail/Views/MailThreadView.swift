@@ -12,6 +12,7 @@ struct MailThreadView: View {
     @State private var aiReplyDraft: String?
     @State private var isGeneratingReply = false
     @State private var aiErrorMessage: String?
+    @State private var showingInspector = false
 
     var body: some View {
         ScrollView {
@@ -19,9 +20,13 @@ struct MailThreadView: View {
                 // Header
                 headerSection
 
-                // Body — use MailContentRenderer for HTML or plain-text
+                // AI Tools Bar
+                aiToolsBar
+                    .padding(.top, 12)
+
+                // Body
                 bodySection
-                    .padding(.top, 8)
+                    .padding(.top, 12)
 
                 if let aiErrorMessage {
                     aiErrorCard(aiErrorMessage)
@@ -46,21 +51,30 @@ struct MailThreadView: View {
                 Spacer(minLength: 80)
             }
         }
+        .background(Color.workspaceBackground ?? .black)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Menu {
-                    Button { showingReply = true } label: {
-                        Label("Reply", systemImage: "arrowshape.turn.up.left")
+                HStack(spacing: 16) {
+                    Button {
+                        showingInspector = true
+                    } label: {
+                        Image(systemName: "info.circle")
                     }
-                    Button(action: summarizeWithAI) {
-                        Label("Summarize", systemImage: "sparkles")
+
+                    Menu {
+                        Button { showingReply = true } label: {
+                            Label("Reply", systemImage: "arrowshape.turn.up.left")
+                        }
+                        Button(action: summarizeWithAI) {
+                            Label("Summarize", systemImage: "sparkles")
+                        }
+                        Button(action: generateAIReply) {
+                            Label("Reply with AI", systemImage: "sparkle")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
                     }
-                    Button(action: generateAIReply) {
-                        Label("Reply with AI", systemImage: "sparkle")
-                    }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
                 }
             }
         }
@@ -70,31 +84,33 @@ struct MailThreadView: View {
         .fullScreenCover(isPresented: $showingReply) {
             replySheet
         }
+        .sheet(isPresented: $showingInspector) {
+            MetadataInspectorView(email: email)
+                .presentationDetents([.medium, .large])
+        }
     }
 
-    // MARK: - Header
-
     private var headerSection: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 10) {
             Text(email.subject)
-                .font(.title3)
-                .fontWeight(.semibold)
+                .font(.title3.bold())
+                .foregroundStyle(.white)
                 .padding(.top, 16)
 
-            HStack(spacing: 10) {
+            HStack(spacing: 12) {
                 Circle()
                     .fill(avatarColor(for: email.sender))
-                    .frame(width: 36, height: 36)
+                    .frame(width: 40, height: 40)
                     .overlay(
                         Text(email.sender.prefix(1).uppercased())
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(.system(size: 16, weight: .bold))
                             .foregroundColor(.white)
                     )
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(email.sender)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
+                        .font(.subheadline.bold())
+                        .foregroundStyle(.white)
                     Text(email.date, style: .date)
                         .font(.caption)
                         .foregroundColor(.secondary)
@@ -105,15 +121,40 @@ struct MailThreadView: View {
             .padding(.bottom, 12)
         }
         .padding(.horizontal)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.secondarySystemBackground))
-        )
+        .background(Color.workspaceSurface)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
         .padding(.horizontal)
         .padding(.top, 8)
     }
 
-    // MARK: - Body
+    private var aiToolsBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                aiToolButton(title: "Summarize", icon: "sparkles", action: summarizeWithAI, isLoading: isAISummarizing)
+                aiToolButton(title: "AI Reply", icon: "pencil.and.outline", action: generateAIReply, isLoading: isGeneratingReply)
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    private func aiToolButton(title: String, icon: String, action: @escaping () -> Void, isLoading: Bool) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                if isLoading {
+                    ProgressView().tint(.white)
+                } else {
+                    Image(systemName: icon)
+                }
+                Text(title)
+            }
+            .font(.caption.bold())
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(LinearGradient(colors: [.purple.opacity(0.6), .blue.opacity(0.6)], startPoint: .leading, endPoint: .trailing), in: Capsule())
+            .foregroundStyle(.white)
+        }
+        .disabled(isLoading)
+    }
 
     @ViewBuilder
     private var bodySection: some View {
@@ -126,18 +167,18 @@ struct MailThreadView: View {
                     .padding(.horizontal)
             } else if let plain = content.plainBody {
                 Text(plain)
+                    .font(.body)
+                    .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(.secondarySystemBackground))
-                    )
+                    .background(Color.white.opacity(0.03))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
                     .padding(.horizontal)
             }
         } else {
             VStack(spacing: 10) {
                 ProgressView()
-                Text("Loading…")
+                Text("Loading Content…")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -147,46 +188,41 @@ struct MailThreadView: View {
         }
     }
 
-    // MARK: - Reply Bar
-
     private var replyBar: some View {
         HStack(spacing: 12) {
             Button { showingReply = true } label: {
                 Label("Reply", systemImage: "arrowshape.turn.up.left.fill")
-                    .font(.subheadline.weight(.medium))
+                    .font(.subheadline.bold())
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(12)
+                    .padding(.vertical, 14)
+                    .background(Color.white.opacity(0.1))
+                    .cornerRadius(14)
             }
 
             Button(action: summarizeWithAI) {
                 if isAISummarizing {
                     ProgressView().tint(.white)
                 } else {
-                    Label("Summarize", systemImage: "sparkles")
-                        .font(.subheadline.weight(.medium))
+                    Label("AI Catch Up", systemImage: "sparkles")
+                        .font(.subheadline.bold())
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
+            .padding(.vertical, 14)
             .background(
-                LinearGradient(colors: [.purple, .blue], startPoint: .leading, endPoint: .trailing)
+                LinearGradient(colors: [.aiGradientStart, .aiGradientEnd], startPoint: .leading, endPoint: .trailing)
             )
             .foregroundColor(.white)
-            .cornerRadius(12)
+            .cornerRadius(14)
             .disabled(isAISummarizing)
         }
         .padding(.horizontal)
-        .padding(.vertical, 10)
-        .background(Material.bar)
+        .padding(.vertical, 12)
+        .background(BlurView(style: .systemThinMaterialDark))
     }
-
-    // MARK: - Reply Sheet
 
     @ViewBuilder
     private var replySheet: some View {
-        // Build a MailMessage from EmailMessage for the reply
         let rendered = renderedContent
         let msg = MailMessage(
             id: email.id.uuidString,
@@ -203,13 +239,10 @@ struct MailThreadView: View {
             isStarred: false,
             attachments: []
         )
-        // Use the first enabled saved account or a placeholder
         let account = MailStorageService.shared.loadAccounts().first
             ?? MailAccount(id: UUID(), email: "", provider: .iCloud, isEnabled: true)
         EmailComposingView(account: account, replyTo: msg)
     }
-
-    // MARK: - AI Cards
 
     private func aiSummaryCard(_ summary: String) -> some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -228,16 +261,11 @@ struct MailThreadView: View {
             Text(summary)
                 .font(.subheadline)
                 .lineSpacing(4)
+                .foregroundStyle(.white)
         }
         .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.purple.opacity(0.08))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.purple.opacity(0.3), lineWidth: 1)
-                )
-        )
+        .background(Color.purple.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.purple.opacity(0.3), lineWidth: 1))
     }
 
     private func aiReplyCard(_ draft: String) -> some View {
@@ -257,6 +285,7 @@ struct MailThreadView: View {
             Text(draft)
                 .font(.subheadline)
                 .lineSpacing(4)
+                .foregroundStyle(.white)
 
             HStack {
                 Button {
@@ -266,23 +295,19 @@ struct MailThreadView: View {
                         .font(.caption.bold())
                 }
                 .buttonStyle(.bordered)
+                .tint(.blue)
 
                 Button { showingReply = true } label: {
-                    Label("Use as Reply", systemImage: "arrowshape.turn.up.left")
+                    Label("Use Draft", systemImage: "arrowshape.turn.up.left")
                         .font(.caption.bold())
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(.blue)
             }
         }
         .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.blue.opacity(0.08))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.blue.opacity(0.3), lineWidth: 1)
-                )
-        )
+        .background(Color.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.blue.opacity(0.3), lineWidth: 1))
     }
 
     private func aiErrorCard(_ message: String) -> some View {
@@ -301,13 +326,8 @@ struct MailThreadView: View {
             }
         }
         .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.orange.opacity(0.1))
-        )
+        .background(Color.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
     }
-
-    // MARK: - AI Actions
 
     private func summarizeWithAI() {
         guard !isAISummarizing else { return }
@@ -315,29 +335,7 @@ struct MailThreadView: View {
         aiErrorMessage = nil
 
         let bodyText = renderedContent?.plainBody ?? email.body ?? email.preview
-
-        let thread = MailThread(
-            id: email.id.uuidString,
-            subject: email.subject,
-            messages: [
-                MailMessage(
-                    id: email.id.uuidString,
-                    threadId: UUID().uuidString,
-                    from: email.sender,
-                    to: [],
-                    cc: [],
-                    bcc: [],
-                    subject: email.subject,
-                    body: bodyText,
-                    htmlBody: email.htmlBody,
-                    date: email.date,
-                    isRead: email.isRead,
-                    isStarred: false,
-                    attachments: []
-                )
-            ],
-            lastMessageDate: email.date
-        )
+        let thread = MailThread(id: email.id.uuidString, subject: email.subject, messages: [], lastMessageDate: email.date)
 
         Task {
             do {
@@ -361,22 +359,7 @@ struct MailThreadView: View {
         aiErrorMessage = nil
 
         let bodyText = renderedContent?.plainBody ?? email.body ?? email.preview
-
-        let msg = MailMessage(
-            id: email.id.uuidString,
-            threadId: UUID().uuidString,
-            from: email.sender,
-            to: [],
-            cc: [],
-            bcc: [],
-            subject: email.subject,
-            body: bodyText,
-            htmlBody: email.htmlBody,
-            date: email.date,
-            isRead: true,
-            isStarred: false,
-            attachments: []
-        )
+        let msg = MailMessage(id: email.id.uuidString, threadId: "", from: email.sender, to: [], cc: [], bcc: [], subject: email.subject, body: bodyText, htmlBody: email.htmlBody, date: email.date, isRead: true, isStarred: false, attachments: [])
 
         Task {
             do {
@@ -394,8 +377,6 @@ struct MailThreadView: View {
         }
     }
 
-    // MARK: - Helpers
-
     private func avatarColor(for name: String) -> Color {
         let colors: [Color] = [.blue, .purple, .green, .orange, .pink, .teal, .indigo]
         let index = abs(name.hashValue) % colors.count
@@ -412,5 +393,15 @@ struct MailThreadView: View {
             return rendered.hasHTML || rendered.plainBody != nil ? rendered : MailContentRenderer.render(htmlBody: nil, plainBody: email.preview)
         }
         return MailContentRenderer.render(htmlBody: nil, plainBody: email.preview)
+    }
+}
+
+struct BlurView: UIViewRepresentable {
+    var style: UIBlurEffect.Style
+    func makeUIView(context: Context) -> UIVisualEffectView {
+        UIVisualEffectView(effect: UIBlurEffect(style: style))
+    }
+    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
+        uiView.effect = UIBlurEffect(style: style)
     }
 }
