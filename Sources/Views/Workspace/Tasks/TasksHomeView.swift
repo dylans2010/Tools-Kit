@@ -53,23 +53,27 @@ struct TasksHomeView: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Button { showingBoard = true } label: {
-                        Image(systemName: "square.grid.2x2")
+
+                    Menu {
+                        Button { showingBoard = true } label: {
+                            Label("Board View", systemImage: "square.grid.2x2")
+                        }
+                        Button { showingCategories = true } label: {
+                            Label("Categories", systemImage: "folder")
+                        }
+                        Button { showingAISheet = true } label: {
+                            Label("AI Assistant", systemImage: "sparkles")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .font(.headline)
                             .frame(width: 36, height: 36)
                     }
                     .buttonStyle(.bordered)
-                    Button { showingCategories = true } label: {
-                        Image(systemName: "folder")
-                            .frame(width: 36, height: 36)
-                    }
-                    .buttonStyle(.bordered)
-                    Button { showingAISheet = true } label: {
-                        Image(systemName: "sparkles")
-                            .frame(width: 36, height: 36)
-                    }
-                    .buttonStyle(.bordered)
+
                     Button { showingCreate = true } label: {
                         Image(systemName: "plus")
+                            .font(.headline)
                             .frame(width: 36, height: 36)
                     }
                     .buttonStyle(.borderedProminent)
@@ -320,21 +324,6 @@ struct TaskRowCard: View {
     }
 }
 
-struct WorkspaceSurfaceCard<Content: View>: View {
-    @ViewBuilder let content: Content
-    var body: some View {
-        content
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color(.secondarySystemBackground))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
-            )
-    }
-}
 
 struct WorkspaceSectionHeader: View {
     let title: String

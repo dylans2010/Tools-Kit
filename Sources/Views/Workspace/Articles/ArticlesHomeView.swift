@@ -49,12 +49,28 @@ struct ArticlesHomeView: View {
                             .frame(width: 36, height: 36)
                     }
                     .buttonStyle(.bordered)
-                    Button { showingCollections = true } label: {
-                        Image(systemName: "folder")
+
+                    Menu {
+                        Button { showingCollections = true } label: {
+                            Label("Collections", systemImage: "folder")
+                        }
+                        Button { showingAISheet = true } label: {
+                            Label("AI Assistant", systemImage: "sparkles")
+                        }
+                        Divider()
+                        Button { runAI(using: "Give me a concise executive brief from this article.") } label: {
+                            Label("Executive Brief", systemImage: "doc.text.magnifyingglass")
+                        }
+                        Button { runAI(using: "Explain both sides and key assumptions.") } label: {
+                            Label("Debate Lens", systemImage: "bubble.left.and.bubble.right")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
                             .font(.headline)
                             .frame(width: 36, height: 36)
                     }
                     .buttonStyle(.bordered)
+
                     Button { showingAISheet = true } label: {
                         Image(systemName: "sparkles")
                             .font(.headline)
@@ -107,7 +123,7 @@ struct ArticlesHomeView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
-        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private var aiAssistantSheet: some View {

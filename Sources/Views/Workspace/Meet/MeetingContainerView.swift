@@ -70,33 +70,46 @@ struct MeetingContainerView: View {
                     symbol: "slider.horizontal.3"
                 )
 
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                    surfaceCard {
-                        NoiseControlView(
-                            isEnabled: manager.isNoiseCancellationEnabled,
-                            processingState: manager.activeAudioProcessingState,
-                            onToggle: { manager.setNoiseCancellationEnabled($0) }
-                        )
-                    }
-                    surfaceCard {
-                        NetworkStatusView(
-                            quality: manager.networkQuality,
-                            latencyMs: manager.diagnostics.latencyMs,
-                            packetLossPercent: manager.diagnostics.packetLossPercent
-                        )
-                    }
-                    surfaceCard {
-                        PiPOverlayView(
-                            isEnabled: manager.isPiPEnabled,
-                            isActive: manager.isPiPActive,
-                            onToggle: { manager.setPiPEnabled($0) }
-                        )
-                    }
-                    surfaceCard {
-                        BackgroundEffectsView(
-                            selectedEffect: manager.backgroundEffect,
-                            onSelectEffect: { manager.setBackgroundEffect($0) }
-                        )
+                WorkspaceSurfaceCard(padding: 12) {
+                    VStack(spacing: 12) {
+                        HStack {
+                            Label("Device Controls", systemImage: "macpro.gen3.fill")
+                                .font(.subheadline.bold())
+                            Spacer()
+                        }
+
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                            NoiseControlView(
+                                isEnabled: manager.isNoiseCancellationEnabled,
+                                processingState: manager.activeAudioProcessingState,
+                                onToggle: { manager.setNoiseCancellationEnabled($0) }
+                            )
+                            .padding(8)
+                            .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
+
+                            NetworkStatusView(
+                                quality: manager.networkQuality,
+                                latencyMs: manager.diagnostics.latencyMs,
+                                packetLossPercent: manager.diagnostics.packetLossPercent
+                            )
+                            .padding(8)
+                            .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
+
+                            PiPOverlayView(
+                                isEnabled: manager.isPiPEnabled,
+                                isActive: manager.isPiPActive,
+                                onToggle: { manager.setPiPEnabled($0) }
+                            )
+                            .padding(8)
+                            .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
+
+                            BackgroundEffectsView(
+                                selectedEffect: manager.backgroundEffect,
+                                onSelectEffect: { manager.setBackgroundEffect($0) }
+                            )
+                            .padding(8)
+                            .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
+                        }
                     }
                 }
 

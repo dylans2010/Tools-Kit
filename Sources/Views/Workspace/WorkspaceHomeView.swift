@@ -523,7 +523,7 @@ struct GitHubRouterView: View {
             if isLoading {
                 ProgressView()
             } else if isAuthenticated {
-                GitHubRepoListViewWrapper()
+                RepoListView()
             } else {
                 ContentUnavailableView(
                     "GitHub Not Connected",
@@ -585,13 +585,6 @@ struct GitHubRouterView: View {
     }
 }
 
-struct GitHubRepoListViewWrapper: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> RepoListViewController {
-        return RepoListViewController()
-    }
-
-    func updateUIViewController(_ uiViewController: RepoListViewController, context: Context) {}
-}
 
 struct WorkspaceMailRouterView: View {
     @StateObject private var mailStore = MailStore.shared
