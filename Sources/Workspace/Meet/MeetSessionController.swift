@@ -68,6 +68,10 @@ final class MeetingStateManager: NSObject, ObservableObject {
         MeetPermissionService.availableVideoDevices()
     }
 
+    var availableAudioDevices: [String] {
+        MeetPermissionService.availableAudioDevices()
+    }
+
     func toggleCamera() { isCameraEnabled.toggle() }
     func toggleScreenShare() { isScreenSharing.toggle() }
 
