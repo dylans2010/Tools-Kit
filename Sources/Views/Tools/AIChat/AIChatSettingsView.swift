@@ -611,7 +611,7 @@ struct AIChatSettingsView: View {
         signOutStatusMessage = nil
         Task {
             do {
-                try await AuthService.shared.signOut()
+                try await AccountAuthService.shared.signOut()
                 await MainActor.run {
                     signOutStatusMessage = "Signed out."
                     isSigningOut = false
