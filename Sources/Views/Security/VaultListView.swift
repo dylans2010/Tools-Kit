@@ -98,19 +98,21 @@ struct VaultItemDetailView: View {
             }
         case .documents:
             if let data = decryptedData, let doc = try? JSONDecoder().decode(DocumentData.self, from: data) {
-                Section("Document Info") {
-                    LabeledContent("Type", value: doc.documentType)
-                    if let expiry = doc.expirationDate {
-                        LabeledContent("Expires", value: expiry, format: .date)
-                    }
-                    if let image = UIImage(data: data) {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                    } else {
-                        Text("No preview available for this document type")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                Group {
+                    Section("Document Info") {
+                        LabeledContent("Type", value: doc.documentType)
+                        if let expiry = doc.expirationDate {
+                            LabeledContent("Expires", value: expiry, format: .date)
+                        }
+                        if let image = UIImage(data: data) {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                        } else {
+                            Text("No preview available for this document type")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
             }

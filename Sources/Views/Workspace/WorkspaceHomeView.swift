@@ -101,7 +101,11 @@ struct WorkspaceHomeView: View {
 
     private var collaborationTab: some View {
         NavigationStack {
-            ContentUnavailableView("Collaboration", systemImage: "person.2.fill")
+            ContentUnavailableView(
+                "Collaboration",
+                systemImage: "person.2.fill",
+                description: Text("This workspace area is not available yet.")
+            )
         }
         .tabItem {
             Label(WorkspaceTab.collaboration.rawValue, systemImage: WorkspaceTab.collaboration.icon)
@@ -111,7 +115,11 @@ struct WorkspaceHomeView: View {
 
     private var editingTab: some View {
         NavigationStack {
-            ContentUnavailableView("Media Editing", systemImage: "photo.stack.fill")
+            ContentUnavailableView(
+                "Media Editing",
+                systemImage: "photo.stack.fill",
+                description: Text("This workspace area is not available yet.")
+            )
         }
         .tabItem {
             Label(WorkspaceTab.editing.rawValue, systemImage: WorkspaceTab.editing.icon)
@@ -186,8 +194,20 @@ struct WorkspaceDashboardView: View {
         ("Slides", "rectangle.on.rectangle.angled", .purple, AnyView(SlidesHomeView())),
         ("Sheets", "tablecells", .blue, AnyView(SpreadsheetsHomeView())),
         ("Workouts", "figure.strengthtraining.traditional", .mint, AnyView(WorkoutsHomeView())),
-        ("Collaboration", "person.2.fill", .orange, AnyView(ContentUnavailableView("Collaboration", systemImage: "person.2.fill"))),
-        ("Media Editing", "photo.stack.fill", .indigo, AnyView(ContentUnavailableView("Media Editing", systemImage: "photo.stack.fill"))),
+        ("Collaboration", "person.2.fill", .orange, AnyView(
+            ContentUnavailableView(
+                "Collaboration",
+                systemImage: "person.2.fill",
+                description: Text("This workspace area is not available yet.")
+            )
+        )),
+        ("Media Editing", "photo.stack.fill", .indigo, AnyView(
+            ContentUnavailableView(
+                "Media Editing",
+                systemImage: "photo.stack.fill",
+                description: Text("This workspace area is not available yet.")
+            )
+        )),
         ("AI Mentor", "sparkles", .pink, AnyView(AIMentorView())),
         ("Meet", "video.fill", .cyan, AnyView(JoinMeetingView()))
     ]

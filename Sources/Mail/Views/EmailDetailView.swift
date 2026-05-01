@@ -57,7 +57,28 @@ struct EmailDetailView: View {
                         }
 
                         // Advanced Intelligence Panels
-                        let thread = MailThread(id: String(email.uid), subject: email.subject, messages: [viewModel.emails.first(where: { $0.uid == email.uid }) ?? email], lastMessageDate: email.date)
+                        let resolved = resolvedEmail
+                        let mailMessage = MailMessage(
+                            id: String(resolved.uid),
+                            threadId: String(resolved.uid),
+                            from: resolved.sender,
+                            to: [],
+                            cc: [],
+                            bcc: [],
+                            subject: resolved.subject,
+                            body: resolved.body ?? resolved.preview,
+                            htmlBody: resolved.htmlBody,
+                            date: resolved.date,
+                            isRead: resolved.isRead,
+                            isStarred: false,
+                            attachments: []
+                        )
+                        let thread = MailThread(
+                            id: String(resolved.uid),
+                            subject: resolved.subject,
+                            messages: [mailMessage],
+                            lastMessageDate: resolved.date
+                        )
                         EmailInsightPanel(thread: thread)
 
                         if thread.subject.lowercased().contains("negotiation") || thread.subject.lowercased().contains("offer") {

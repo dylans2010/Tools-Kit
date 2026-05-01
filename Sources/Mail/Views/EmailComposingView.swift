@@ -207,7 +207,7 @@ struct EmailComposingView: View {
             }
 
             if !toRecipients.isEmpty {
-                FlowLayout(spacing: 8) {
+                WrappingFlowLayout(spacing: 8) {
                     ForEach(toRecipients, id: \.self) { recipient in
                         recipientChip(recipient)
                     }
@@ -523,7 +523,7 @@ struct EmailComposingView: View {
     }
 }
 
-struct FlowLayout: Layout {
+struct WrappingFlowLayout: Layout {
     var spacing: CGFloat = 8
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
         let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
