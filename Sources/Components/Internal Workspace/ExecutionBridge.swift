@@ -1,7 +1,6 @@
 import Foundation
 import os.log
 
-/// Coordinates actions across different modules, such as converting an email into a calendar event.
 final class ExecutionBridge {
     static let shared = ExecutionBridge()
 
@@ -16,7 +15,6 @@ final class ExecutionBridge {
 
     private init() {}
 
-    /// Converts a mail thread into a calendar event.
     func convertThreadToCalendarEvent(thread: MailThread) async throws -> CalendarEvent {
         let summary = try await mailAIService.summarizeThread(thread)
 
@@ -54,7 +52,6 @@ final class ExecutionBridge {
         return event
     }
 
-    /// Creates a workspace task.
     func createTask(title: String, description: String) async throws -> WorkspaceTask {
         let task = WorkspaceTask(
             id: UUID(),
@@ -73,7 +70,6 @@ final class ExecutionBridge {
     }
 }
 
-/// Workspace-wide logging system for modules that share this compile target.
 struct WorkspaceLogger {
     static let general = Logger(subsystem: "com.workspace", category: "General")
     static let db = Logger(subsystem: "com.workspace", category: "Database")
