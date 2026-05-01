@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CreateMeetingView: View {
-    @ObservedObject private var manager = MeetingStateManager.shared
+    @StateObject private var manager = MeetingStateManager.shared
     @State private var scheduleForLater = false
     @State private var scheduledAt = Date().addingTimeInterval(60 * 15)
 

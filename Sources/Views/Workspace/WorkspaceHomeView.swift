@@ -101,7 +101,7 @@ struct WorkspaceHomeView: View {
 
     private var collaborationTab: some View {
         NavigationStack {
-            CollaborationHomeView()
+            ContentUnavailableView("Collaboration", systemImage: "person.2.fill")
         }
         .tabItem {
             Label(WorkspaceTab.collaboration.rawValue, systemImage: WorkspaceTab.collaboration.icon)
@@ -111,7 +111,7 @@ struct WorkspaceHomeView: View {
 
     private var editingTab: some View {
         NavigationStack {
-            EditingHomeView()
+            ContentUnavailableView("Media Editing", systemImage: "photo.stack.fill")
         }
         .tabItem {
             Label(WorkspaceTab.editing.rawValue, systemImage: WorkspaceTab.editing.icon)
@@ -186,8 +186,8 @@ struct WorkspaceDashboardView: View {
         ("Slides", "rectangle.on.rectangle.angled", .purple, AnyView(SlidesHomeView())),
         ("Sheets", "tablecells", .blue, AnyView(SpreadsheetsHomeView())),
         ("Workouts", "figure.strengthtraining.traditional", .mint, AnyView(WorkoutsHomeView())),
-        ("Collaboration", "person.2.fill", .orange, AnyView(CollaborationHomeView())),
-        ("Media Editing", "photo.stack.fill", .indigo, AnyView(EditingHomeView())),
+        ("Collaboration", "person.2.fill", .orange, AnyView(ContentUnavailableView("Collaboration", systemImage: "person.2.fill"))),
+        ("Media Editing", "photo.stack.fill", .indigo, AnyView(ContentUnavailableView("Media Editing", systemImage: "photo.stack.fill"))),
         ("AI Mentor", "sparkles", .pink, AnyView(AIMentorView())),
         ("Meet", "video.fill", .cyan, AnyView(JoinMeetingView()))
     ]
