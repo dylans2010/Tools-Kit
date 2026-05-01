@@ -1,3 +1,4 @@
+#if os(iOS)
 import UIKit
 import CoreGraphics
 import CoreAnimation
@@ -104,3 +105,13 @@ final class EditingEngine: UIView {
         return UIGraphicsGetImageFromCurrentImageContext()
     }
 }
+#else
+import SwiftUI
+
+/// Fallback for non-iOS platforms.
+struct EditingEngine: View {
+    var body: some View {
+        Text("Media Editing Engine (iOS Only)")
+    }
+}
+#endif

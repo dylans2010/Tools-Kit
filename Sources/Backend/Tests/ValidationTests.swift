@@ -54,6 +54,21 @@ struct ValidationTests {
         let framework = CollaborationFramework.shared
         framework.indexObject(id: space.id, type: .notebook)
         assert(framework.indexedObjects[space.id] == .notebook)
+
+        // Test Pull Request creation
+        let pr = PullRequestManager.shared.createPullRequest(spaceID: space.id, title: "Fix UI", description: "Test", sourceBranchID: UUID(), targetBranchID: UUID())
+        assert(PullRequestManager.shared.pullRequests[space.id]?.count == 1)
+        assert(pr.title == "Fix UI")
+
+        // Test Forking
+        if let fork = ForkManager.shared.forkSpace(spaceID: space.id) {
+            assert(fork.name.contains("(Fork)"))
+        }
+
+        // Test Branch Protection
+        let rule = BranchProtectionRule(id: UUID(), branchName: "main", requireApprovals: true, requiredApprovalCount: 2, restrictMerges: false, allowedRoles: [.admin])
+        BranchProtectionService.shared.addRule(spaceID: space.id, rule: rule)
+        assert(!BranchProtectionService.shared.canMerge(spaceID: space.id, branchName: "main", userRole: .editor, approvalCount: 1))
     }
 
     private static func testEditingSystem() {
@@ -65,6 +80,19 @@ struct ValidationTests {
 
         // Check if project was automatically indexed in CollaborationFramework
         assert(CollaborationFramework.shared.indexedObjects[project.id] == .mediaProject)
+
+        // Test History Manager
+        let history = EditingHistoryManager(projectID: project.id)
+        history.pushState(project, description: "Initial State")
+        var projectV2 = project
+        projectV2.name = "Project V2"
+        history.pushState(projectV2, description: "Changed name")
+        assert(history.history.count == 2)
+        assert(history.undo()?.name == "Test Project")
+
+        // Test AI Engine Suggestion
+        let frame = AIEditingEngine.shared.suggestFraming(layer: EditingLayer(id: UUID(), name: "Layer", type: .image, position: .zero, scale: 1.0, rotation: 0), canvasSize: CGSize(width: 1920, height: 1080))
+        assert(frame.width == 1920)
     }
 
     private static func assert(_ condition: Bool, message: String = "Assertion failed") {

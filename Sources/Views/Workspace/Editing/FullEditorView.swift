@@ -110,6 +110,7 @@ struct FullEditorView: View {
     }
 }
 
+#if os(iOS)
 struct EditingEngineRepresentable: UIViewRepresentable {
     let project: EditingProject
 
@@ -129,3 +130,18 @@ struct BlurView: UIViewRepresentable {
     }
     func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
 }
+#else
+struct EditingEngineRepresentable: View {
+    let project: EditingProject
+    var body: some View {
+        EditingEngine()
+    }
+}
+struct BlurView: View {
+    enum Style { case systemThinMaterialDark }
+    let style: Style
+    var body: some View {
+        Color.black.opacity(0.5)
+    }
+}
+#endif
