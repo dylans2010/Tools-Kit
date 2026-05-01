@@ -150,15 +150,15 @@ final class MeetingStateManager: NSObject, ObservableObject {
     var meetingStateLabel: String {
         switch phase {
         case .idle: return "Idle"
-        case .joining: return "Joining"
-        case .joined: return "Live"
+        case .lobby: return "Lobby"
+        case .inMeeting: return "Live"
         case .ended: return "Ended"
-        case .error: return "Error"
+        case .failed: return "Error"
         }
     }
 
     func createBreakoutRoom(named name: String) async {
-        let room = MeetingBreakoutRoom(id: UUID().uuidString, name: name, participantIDs: [], isOpen: true)
+        let room = MeetingBreakoutRoom(id: UUID().uuidString, name: name, participantIds: [])
         breakoutRooms.append(room)
     }
 
