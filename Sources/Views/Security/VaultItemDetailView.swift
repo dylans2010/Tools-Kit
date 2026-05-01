@@ -29,6 +29,7 @@ struct AddItemView: View {
     @State private var selectedFileName: String?
 
     @State private var showingFilePicker = false
+    @State private var showingFileImporterBridge = false
     @State private var errorMessage: String?
 
     var body: some View {
@@ -98,6 +99,12 @@ struct AddItemView: View {
                 } label: {
                     Label(selectedFileName ?? "Choose File", systemImage: "doc.badge.plus")
                 }
+
+                Button {
+                    showingFileImporterBridge = true
+                } label: {
+                    Label("Import via Document Picker", systemImage: "square.and.arrow.down")
+                }
             }
             .fileImporter(isPresented: $showingFilePicker, allowedContentTypes: [.item], allowsMultipleSelection: false) { result in
                 switch result {
@@ -110,6 +117,18 @@ struct AddItemView: View {
                     }
                 case .failure(let error):
                     self.errorMessage = error.localizedDescription
+                }
+            }
+            .sheet(isPresented: $showingFileImporterBridge) {
+                FileImporterRepresentableView(allowedContentTypes: [.item], allowsMultipleSelection: false) { urls in
+                    guard let url = urls.first else { return }
+                    if url.startAccessingSecurityScopedResource() {
+                        defer { url.stopAccessingSecurityScopedResource() }
+                        self.selectedFileName = url.lastPathComponent
+                        self.selectedFileData = try? Data(contentsOf: url)
+                    } else {
+                        self.errorMessage = "Unable to access selected file."
+                    }
                 }
             }
         }
