@@ -1938,18 +1938,6 @@
 			sourceTree = "<group>";
 		};
 		8DF4BF69CF55A81CB6EBF3DE /* Sources */ = {
-				CL0100000000000000000000 /* CollaborationModels.swift */,
-				CL0100000000000000000001 /* CollaborationManager.swift */,
-				CL0100000000000000000002 /* CollaborationFramework.swift */,
-				ED0100000000000000000003 /* EditingModels.swift */,
-				ED0100000000000000000004 /* EditingManager.swift */,
-				ED0100000000000000000005 /* EditingEngine.swift */,
-				CL0100000000000000000006 /* CollaborationHomeView.swift */,
-				CL0100000000000000000007 /* SpaceDashboardView.swift */,
-				CL0100000000000000000008 /* VersionHistoryView.swift */,
-				CL0100000000000000000009 /* AddDataCollabView.swift */,
-				ED010000000000000000000A /* EditingHomeView.swift */,
-				ED010000000000000000000B /* FullEditorView.swift */,
 			isa = PBXGroup;
 			children = (
 				GH0100000000000000000001 /* GitHubAuthManager.swift */,
@@ -3138,18 +3126,6 @@
 
 /* Begin PBXSourcesBuildPhase section */
 		C9111E28A299A9C316B4C75C /* Sources */ = {
-				CL0200000000000000000000 /* CollaborationModels.swift in Sources */,
-				CL0200000000000000000001 /* CollaborationManager.swift in Sources */,
-				CL0200000000000000000002 /* CollaborationFramework.swift in Sources */,
-				ED0200000000000000000003 /* EditingModels.swift in Sources */,
-				ED0200000000000000000004 /* EditingManager.swift in Sources */,
-				ED0200000000000000000005 /* EditingEngine.swift in Sources */,
-				CL0200000000000000000006 /* CollaborationHomeView.swift in Sources */,
-				CL0200000000000000000007 /* SpaceDashboardView.swift in Sources */,
-				CL0200000000000000000008 /* VersionHistoryView.swift in Sources */,
-				CL0200000000000000000009 /* AddDataCollabView.swift in Sources */,
-				ED020000000000000000000A /* EditingHomeView.swift in Sources */,
-				ED020000000000000000000B /* FullEditorView.swift in Sources */,
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
