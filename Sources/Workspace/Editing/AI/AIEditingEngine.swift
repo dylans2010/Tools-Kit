@@ -1,3 +1,4 @@
+#if os(iOS)
 import UIKit
 import CoreImage
 
@@ -35,3 +36,14 @@ final class AIEditingEngine: ObservableObject {
         return ["brightness": 0.05, "contrast": 1.1, "saturation": 1.05]
     }
 }
+#else
+import Foundation
+
+final class AIEditingEngine: ObservableObject {
+    static let shared = AIEditingEngine()
+    private init() {}
+    func suggestFraming(layer: EditingLayer, canvasSize: CGSize) -> CGRect {
+        return .zero
+    }
+}
+#endif

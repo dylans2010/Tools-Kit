@@ -1,5 +1,7 @@
 import Foundation
+#if os(iOS)
 import UIKit
+#endif
 import AVFoundation
 
 /// Logic for professional media production tools.
@@ -21,9 +23,11 @@ final class ProfessionalEditingSuite: ObservableObject {
     }
 
     // MARK: - Color Grading
+    #if os(iOS)
     func applyLUT(_ lutImage: UIImage, to project: inout EditingProject) {
         print("Applying LUT to project")
     }
+    #endif
 
     // MARK: - Audio Enhancement
     func enhanceAudio(url: URL) async -> URL {

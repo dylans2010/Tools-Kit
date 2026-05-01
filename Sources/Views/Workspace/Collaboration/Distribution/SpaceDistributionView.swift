@@ -72,7 +72,12 @@ struct ExternalInviteView: View {
                     Text(link)
                         .font(.system(.caption, design: .monospaced))
                     Button("Copy to Clipboard") {
+                        #if os(iOS)
                         UIPasteboard.general.string = link
+                        #else
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(link, forType: .string)
+                        #endif
                     }
                 }
             }
