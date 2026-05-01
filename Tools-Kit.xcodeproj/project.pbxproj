@@ -359,6 +359,7 @@
 		WS0200000000000000000044 /* MonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000044 /* MonthView.swift */; };
 		WS0200000000000000000045 /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000045 /* WeekView.swift */; };
 		WS0200000000000000000046 /* YearView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000046 /* YearView.swift */; };
+		WS020000000000000000004F /* AISummarySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000004F /* AISummarySheet.swift */; };
 		WS0200000000000000000047 /* FeedbackModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000047 /* FeedbackModel.swift */; };
 		WS0200000000000000000048 /* FeedbackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000048 /* FeedbackService.swift */; };
 		WS0200000000000000000049 /* FeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000049 /* FeedbackView.swift */; };
@@ -1595,6 +1596,7 @@
 		WS0100000000000000000044 /* MonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/MonthView.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000045 /* WeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/WeekView.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000046 /* YearView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/YearView.swift"; sourceTree = "<group>"; };
+		WS010000000000000000004F /* AISummarySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Calendar/AISummarySheet.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000047 /* FeedbackModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Feedback/FeedbackModel.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000048 /* FeedbackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Feedback/FeedbackService.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000049 /* FeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Feedback/FeedbackView.swift"; sourceTree = "<group>"; };
@@ -2641,6 +2643,7 @@
 				WS0100000000000000000044 /* MonthView.swift */,
 				WS0100000000000000000045 /* WeekView.swift */,
 				WS0100000000000000000046 /* YearView.swift */,
+				WS010000000000000000004F /* AISummarySheet.swift */,
 				WS0100000000000000000047 /* FeedbackModel.swift */,
 				WS0100000000000000000048 /* FeedbackService.swift */,
 				WS0100000000000000000049 /* FeedbackView.swift */,
@@ -3993,6 +3996,7 @@
 				WS0200000000000000000044 /* MonthView.swift in Sources */,
 				WS0200000000000000000045 /* WeekView.swift in Sources */,
 				WS0200000000000000000046 /* YearView.swift in Sources */,
+				WS020000000000000000004F /* AISummarySheet.swift in Sources */,
 				WS0200000000000000000047 /* FeedbackModel.swift in Sources */,
 				WS0200000000000000000048 /* FeedbackService.swift in Sources */,
 				WS0200000000000000000049 /* FeedbackView.swift in Sources */,
