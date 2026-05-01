@@ -3256,6 +3256,9 @@
 			files = (
 				WS020000000000000000000001 /* WorkspacePersistence.swift in Sources */,
 				WS020000000000000000000002 /* SyncEngine.swift in Sources */,
+				IW0200000000000000000001 /* WorkspaceColorManager.swift in Sources */,
+				IW0200000000000000000002 /* WorkspaceSurfaceCard.swift in Sources */,
+				EX0200000000000000000001 /* ExecutionBridge.swift in Sources */,
 				CL020000000000000000000003 /* PullRequestManager.swift in Sources */,
 				CL020000000000000000000004 /* ForkManager.swift in Sources */,
 				CL020000000000000000000005 /* BranchProtectionService.swift in Sources */,
