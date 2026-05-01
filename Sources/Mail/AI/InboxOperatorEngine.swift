@@ -33,7 +33,7 @@ actor InboxOperatorEngine {
             case .delete:
                 try await MailIMAPService.shared.deleteMessage(messageID: action.threadID, account: account)
             default:
-                WorkspaceLogger.general.info("InboxOperator action \(action.type) not yet implemented for IMAP.")
+                WorkspaceLogger.general.info("InboxOperator action \(String(describing: action.type)) not yet implemented for IMAP.")
             }
         }
     }

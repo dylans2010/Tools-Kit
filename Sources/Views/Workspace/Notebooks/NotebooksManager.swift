@@ -77,12 +77,13 @@ final class NotebooksManager: ObservableObject {
         guard let nbIdx = notebooks.firstIndex(where: { $0.id == notebookID }),
               let fIdx = notebooks[nbIdx].folders.firstIndex(where: { $0.id == folderID }),
               let pIdx = notebooks[nbIdx].folders[fIdx].pages.firstIndex(where: { $0.id == page.id }) else { return }
+        let existing = notebooks[nbIdx].folders[fIdx].pages[pIdx]
         var updated = page
         updated.updatedAt = Date()
 
         // Versioning logic
-        if updated.blocks != notebooks[nbIdx].folders[fIdx].pages[pIdx].blocks {
-            let version = NotebookVersion(blocks: updated.blocks, author: "Local User")
+        if updated.blocks != existing.blocks {
+            let version = NotebookVersion(blocks: existing.blocks, author: "Local User")
             updated.history.append(version)
             if updated.history.count > 50 { updated.history.removeFirst() }
         }

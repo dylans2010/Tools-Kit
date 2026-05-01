@@ -12,7 +12,7 @@ struct CreateMeetingView: View {
 
             List {
                 Section {
-                    TextField("Meeting Name", text: $manager.meetingNameInput)
+                    TextField("Meeting Name", text: $manager.meetingIdInput)
                         .textInputAutocapitalization(.words)
                         .autocorrectionDisabled()
 
@@ -55,7 +55,7 @@ struct CreateMeetingView: View {
                     .buttonStyle(.borderedProminent)
                     .disabled(
                         manager.isBusy ||
-                        manager.meetingNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                        manager.meetingIdInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
                         (scheduleForLater && scheduledAt < Date())
                     )
                 } header: {
