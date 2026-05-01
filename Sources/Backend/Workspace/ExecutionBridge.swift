@@ -1,4 +1,5 @@
 import Foundation
+import os.log
 
 /// Coordinates actions across different modules, such as converting an email into a calendar event.
 final class ExecutionBridge {
@@ -70,4 +71,12 @@ final class ExecutionBridge {
 
         return task
     }
+}
+
+/// Workspace-wide logging system for modules that share this compile target.
+struct WorkspaceLogger {
+    static let general = Logger(subsystem: "com.workspace", category: "General")
+    static let db = Logger(subsystem: "com.workspace", category: "Database")
+    static let ai = Logger(subsystem: "com.workspace", category: "AI")
+    static let render = Logger(subsystem: "com.workspace", category: "Render")
 }
