@@ -14,10 +14,10 @@ struct ParticipantAdminPanelView: View {
 
     var body: some View {
         List {
-            Section("Participant") {
+            Section(header: Text("Participant")) {
                 Text(participant.displayName)
                 Picker("Role", selection: $selectedRole) {
-                    ForEach(MeetingParticipantRole.allCases.filter { $0 != .host }) { role in
+                    ForEach(MeetingParticipantRole.allCases.filter { $0 != .host }, id: \.self) { role in
                         Text(role.displayName).tag(role)
                     }
                 }
@@ -26,7 +26,7 @@ struct ParticipantAdminPanelView: View {
                 }
             }
 
-            Section("Controls") {
+            Section(header: Text("Controls")) {
                 Button("Mute Participant") {
                     Task { await manager.setParticipantMuted(participantID: participant.id, muted: true) }
                 }
