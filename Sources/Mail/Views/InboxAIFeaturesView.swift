@@ -4,6 +4,7 @@ struct InboxAIFeaturesView: View {
     @Environment(\.dismiss) private var dismiss
 
     let inboxThreads: [MailThread]
+    let account: MailAccount?
 
     @State private var isAnalyzing = false
     @State private var catchUpSummary: String = ""
@@ -61,7 +62,21 @@ struct InboxAIFeaturesView: View {
                 emailsUsedSheet
             }
             .navigationDestination(item: $selectedEmail) { message in
-                MessageDetailWrapper(message: message)
+                if let account {
+                    InboxMessageDetailView(account: account, message: message)
+                } else {
+                    VStack(spacing: 20) {
+                        Image(systemName: "envelope.fill")
+                            .font(.largeTitle)
+                        Text(message.subject)
+                            .font(.headline)
+                        Text(message.body)
+                            .font(.body)
+                        Spacer()
+                    }
+                    .padding()
+                    .background(Color.workspaceBackground)
+                }
             }
         }
     }
@@ -125,7 +140,7 @@ struct InboxAIFeaturesView: View {
                     .foregroundStyle(.secondary)
             } else {
                 VStack(alignment: .leading, spacing: 14) {
-                    MarkdownTextBlock(text: catchUpSummary)
+                    markdownText(catchUpSummary)
 
                     Button {
                         showingEmailsUsed = true
@@ -160,7 +175,7 @@ struct InboxAIFeaturesView: View {
             } else {
                 VStack(spacing: 12) {
                     if !prioritySummary.isEmpty {
-                        MarkdownTextBlock(text: prioritySummary)
+                        markdownText(prioritySummary)
                             .padding(14)
                             .background(Color.white.opacity(0.03), in: RoundedRectangle(cornerRadius: 14))
                     }
@@ -201,7 +216,7 @@ struct InboxAIFeaturesView: View {
                     .foregroundStyle(.white.opacity(0.9))
                     .lineLimit(1)
 
-                Text(message.snippet)
+                Text(message.body.prefix(100).description)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
@@ -300,5 +315,18 @@ struct InboxAIFeaturesView: View {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: date, relativeTo: Date())
+    }
+
+    @ViewBuilder
+    private func markdownText(_ source: String) -> some View {
+        if let attributed = try? AttributedString(markdown: source, options: .init(interpretedSyntax: .full, failurePolicy: .returnPartiallyParsedIfPossible)) {
+            Text(attributed)
+                .font(.body)
+                .foregroundStyle(.white)
+        } else {
+            Text(source)
+                .font(.body)
+                .foregroundStyle(.white)
+        }
     }
 }

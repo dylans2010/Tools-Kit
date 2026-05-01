@@ -60,7 +60,13 @@ struct SecurityPackageView: View {
                 }
             }
             .fileImporter(isPresented: $showingImportPicker, allowedContentTypes: [UTType(filenameExtension: "toolkitsec") ?? .data]) { result in
-                handleImport(result: result)
+                switch result {
+                case .success(let url):
+                    handleImport(urls: [url])
+                case .failure(let error):
+                    self.statusMessage = error.localizedDescription
+                    self.isError = true
+                }
             }
             .sheet(isPresented: $showingImportBridge) {
                 FileImporterRepresentableView(allowedContentTypes: [UTType(filenameExtension: "toolkitsec") ?? .data], allowsMultipleSelection: false) { urls in

@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 
+@MainActor
 protocol AgentViewModelProtocol: ObservableObject {
     var messages: [SystemAgentMessage] { get }
     var state: SystemAgentState { get }

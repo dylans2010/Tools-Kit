@@ -107,7 +107,7 @@ struct InboxView: View {
             }
         }
         .sheet(isPresented: $showingAIFeatures) {
-            InboxAIFeaturesView(inboxThreads: visibleThreads)
+            InboxAIFeaturesView(inboxThreads: visibleThreads, account: activeAccount)
         }
         .sheet(isPresented: $showingAIDashboard) {
             NavigationStack {
@@ -599,7 +599,7 @@ private struct SkeletonMailRow: View {
     }
 }
 
-private struct InboxMessageDetailView: View {
+struct InboxMessageDetailView: View {
     let account: MailAccount
     let message: MailMessage
 
