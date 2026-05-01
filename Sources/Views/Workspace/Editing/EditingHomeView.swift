@@ -12,7 +12,7 @@ struct EditingHomeView: View {
                         .foregroundColor(.secondary)
                 } else {
                     ForEach(manager.projects) { project in
-                        NavigationLink(destination: FullEditorView(projectID: project.id)) {
+                        NavigationLink(destination: ProductionEditingDashboardView(projectID: project.id)) {
                             HStack {
                                 Image(systemName: "photo")
                                     .frame(width: 40, height: 40)

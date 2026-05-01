@@ -19,11 +19,13 @@ struct CollaborationHomeView: View {
                 }
             }
 
-            Section("Recent Activity") {
-                // Global activity feed summary
-                Text("Coming soon: Unified activity feed across all spaces.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+            Section("Platform Modules") {
+                NavigationLink("Pull Request Hub") {
+                    PullRequestHubView(spaceID: manager.spaces.first?.id ?? UUID())
+                }
+                NavigationLink("Command Center") {
+                    WorkspaceCommandCenterView()
+                }
             }
         }
         .navigationTitle("Collaboration")
