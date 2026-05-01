@@ -11,7 +11,7 @@ struct HistoryReplayView: View {
                 // Visualization area
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(.secondarySystemBackground))
+                        .fill(Color.workspaceSurface)
 
                     if !commits.isEmpty {
                         VStack {

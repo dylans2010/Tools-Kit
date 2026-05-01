@@ -14,7 +14,7 @@ struct WorkspaceAnalyticsView: View {
                         .frame(height: 150)
                 }
                 .padding()
-                .background(Color(.secondarySystemBackground))
+                .background(Color.workspaceSurface)
                 .cornerRadius(12)
 
                 // Contribution Table
@@ -29,7 +29,7 @@ struct WorkspaceAnalyticsView: View {
                     }
                 }
                 .padding()
-                .background(Color(.secondarySystemBackground))
+                .background(Color.workspaceSurface)
                 .cornerRadius(12)
             }
             .padding()

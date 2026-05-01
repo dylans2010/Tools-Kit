@@ -13,7 +13,7 @@ struct LiveCollaborationStudioView: View {
                     .foregroundColor(.secondary)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(.secondarySystemBackground))
+            .background(Color.workspaceSurface)
 
             // Real-time Cursors
             ForEach(manager.activeParticipants) { participant in

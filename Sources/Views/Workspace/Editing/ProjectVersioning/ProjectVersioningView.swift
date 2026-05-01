@@ -39,7 +39,7 @@ struct ProjectVersioningView: View {
             .buttonStyle(.bordered)
         }
         .padding()
-        .background(Color(.secondarySystemBackground))
+        .background(Color.workspaceSurface)
         .cornerRadius(12)
     }
 

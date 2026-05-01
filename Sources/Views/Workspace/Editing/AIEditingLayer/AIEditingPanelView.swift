@@ -40,7 +40,7 @@ struct AIEditingPanelView: View {
             }
         }
         .padding()
-        .background(Color(.secondarySystemBackground))
+        .background(Color.workspaceSurface)
         .cornerRadius(16)
     }
 }

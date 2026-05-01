@@ -47,7 +47,7 @@ struct BoardColumnView: View {
         }
         .frame(width: 280)
         .padding()
-        .background(Color(.secondarySystemBackground))
+        .background(Color.workspaceSurface)
         .cornerRadius(12)
     }
 }

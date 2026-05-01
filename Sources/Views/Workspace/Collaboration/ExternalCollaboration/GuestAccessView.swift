@@ -1,4 +1,7 @@
 import SwiftUI
+#if os(iOS)
+import UIKit
+#endif
 
 struct GuestAccessView: View {
     @StateObject private var accessManager = ExternalAccessManager.shared
@@ -53,7 +56,7 @@ struct GuestAccessView: View {
         }
         .navigationTitle("Guest Access")
         .alert("Invite Generated", isPresented: $showInviteResult) {
-            Button("Copy Link") { UIPasteboard.general.string = generatedLink }
+            Button("Copy Link") { #if os(iOS)UIPasteboard.general.string#endif = generatedLink }
             Button("OK", role: .cancel) { }
         } message: {
             Text("Send this link to the guest: \(generatedLink)")

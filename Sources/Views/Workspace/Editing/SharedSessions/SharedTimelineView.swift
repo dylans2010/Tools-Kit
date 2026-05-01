@@ -21,7 +21,7 @@ struct SharedTimelineView: View {
                 }
             }
             .padding()
-            .background(Color(.secondarySystemBackground))
+            .background(Color.workspaceSurface)
 
             // Timeline Surface
             ScrollView {

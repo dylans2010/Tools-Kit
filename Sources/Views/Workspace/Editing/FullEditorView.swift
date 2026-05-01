@@ -13,7 +13,14 @@ struct FullEditorView: View {
         Group {
             if let project = project {
                 ZStack {
+
+#if os(iOS)
                     EditingEngineRepresentable(project: project)
+#else
+                    Text("Editor not available on macOS")
+                        .foregroundColor(.white)
+#endif
+
                         .edgesIgnoringSafeArea(.all)
 
                     VStack {
@@ -63,7 +70,13 @@ struct FullEditorView: View {
             toolButton(icon: "slider.horizontal.3", name: "Adjust")
         }
         .padding()
-        .background(BlurView(style: .systemThinMaterialDark))
+        .background(
+#if os(iOS)
+        BlurView(style: .systemThinMaterialDark)
+#else
+        Color.black.opacity(0.8)
+#endif
+)
         .cornerRadius(20)
         .padding(.bottom)
     }
@@ -110,6 +123,7 @@ struct FullEditorView: View {
     }
 }
 
+#if os(iOS)
 struct EditingEngineRepresentable: UIViewRepresentable {
     let project: EditingProject
 
@@ -121,7 +135,9 @@ struct EditingEngineRepresentable: UIViewRepresentable {
         uiView.updateProject(project)
     }
 }
+#endif
 
+#if os(iOS)
 struct BlurView: UIViewRepresentable {
     let style: UIBlurEffect.Style
     func makeUIView(context: Context) -> UIVisualEffectView {
@@ -129,3 +145,4 @@ struct BlurView: UIViewRepresentable {
     }
     func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
 }
+#endif

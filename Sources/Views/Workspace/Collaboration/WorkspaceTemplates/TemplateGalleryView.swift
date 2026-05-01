@@ -66,7 +66,7 @@ struct TemplateCard: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
-            .background(Color(.secondarySystemBackground))
+            .background(Color.workspaceSurface)
             .cornerRadius(12)
         }
         .buttonStyle(.plain)

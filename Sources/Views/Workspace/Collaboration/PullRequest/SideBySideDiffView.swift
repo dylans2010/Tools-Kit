@@ -13,7 +13,7 @@ struct SideBySideDiffView: View {
                             .font(.caption.monospaced())
                             .padding(8)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color(.secondarySystemBackground))
+                            .background(Color.workspaceSurface)
 
                         HStack(spacing: 0) {
                             // Left side (Old)

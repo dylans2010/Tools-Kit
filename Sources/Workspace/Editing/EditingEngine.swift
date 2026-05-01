@@ -1,3 +1,4 @@
+#if os(iOS)
 import UIKit
 import CoreGraphics
 import CoreAnimation
@@ -104,3 +105,4 @@ final class EditingEngine: UIView {
         return UIGraphicsGetImageFromCurrentImageContext()
     }
 }
+#endif

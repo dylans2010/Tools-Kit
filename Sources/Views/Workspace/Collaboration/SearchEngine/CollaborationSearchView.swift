@@ -72,3 +72,40 @@ struct CollaborationSearchView: View {
         }
     }
 }
+
+
+// Fallback for ContentUnavailableView if iOS < 17
+#if !compiler(>=5.9) || !canImport(SwiftUI, _version: "17.0")
+struct ContentUnavailableView<Label: View, Description: View>: View {
+    let label: Label
+    let description: Description
+    let systemImage: String
+
+    init(_ title: String, systemImage: String, description: Description) where Label == Text {
+        self.label = Text(title)
+        self.systemImage = systemImage
+        self.description = description
+    }
+
+    static func search(text: String) -> some View {
+        VStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 48))
+                .foregroundColor(.secondary)
+            Text("No results for '\(text)'")
+                .font(.headline)
+        }
+    }
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: systemImage)
+                .font(.system(size: 48))
+                .foregroundColor(.secondary)
+            label.font(.headline)
+            description.font(.subheadline).foregroundColor(.secondary)
+        }
+        .padding()
+    }
+}
+#endif

@@ -40,15 +40,15 @@ struct PRDetailView: View {
                 .padding(.horizontal)
 
                 // Description
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Description")
-                        .font(.headline)
-                    Text(pr.description)
-                        .font(.body)
+                WorkspaceSurfaceCard {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Description")
+                            .font(.headline)
+                        Text(pr.description)
+                            .font(.body)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding()
-                .background(Color(.secondarySystemBackground))
-                .cornerRadius(12)
                 .padding(.horizontal)
 
                 // Conversation
