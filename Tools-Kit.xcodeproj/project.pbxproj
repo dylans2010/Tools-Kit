@@ -41,8 +41,6 @@
 		GH0200000000000000000002 /* GitHubModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000002 /* GitHubModels.swift */; };
 		GH0200000000000000000003 /* GitHubEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000003 /* GitHubEndpoints.swift */; };
 		GH0200000000000000000004 /* GitHubAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000004 /* GitHubAPIClient.swift */; };
-		GH0200000000000000000005 /* RepoListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000005 /* RepoListViewController.swift */; };
-		GH0200000000000000000006 /* RepoDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000006 /* RepoDetailViewController.swift */; };
 		GH0200000000000000000007 /* BranchListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000007 /* BranchListView.swift */; };
 		GH0200000000000000000008 /* CommitHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000008 /* CommitHistoryView.swift */; };
 		GH0200000000000000000009 /* CommitComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000009 /* CommitComposerView.swift */; };
@@ -906,8 +904,6 @@
 		GH0100000000000000000002 /* GitHubModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubModels.swift; sourceTree = "<group>"; };
 		GH0100000000000000000003 /* GitHubEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubEndpoints.swift; sourceTree = "<group>"; };
 		GH0100000000000000000004 /* GitHubAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/GitHub/GitHubAPIClient.swift; sourceTree = "<group>"; };
-		GH0100000000000000000005 /* RepoListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/RepoListViewController.swift; sourceTree = "<group>"; };
-		GH0100000000000000000006 /* RepoDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/RepoDetailViewController.swift; sourceTree = "<group>"; };
 		GH0100000000000000000007 /* BranchListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/BranchListView.swift; sourceTree = "<group>"; };
 		GH0100000000000000000008 /* CommitHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/CommitHistoryView.swift; sourceTree = "<group>"; };
 		GH0100000000000000000009 /* CommitComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/CommitComposerView.swift; sourceTree = "<group>"; };
@@ -1884,8 +1880,6 @@
 				GH0100000000000000000002 /* GitHubModels.swift */,
 				GH0100000000000000000003 /* GitHubEndpoints.swift */,
 				GH0100000000000000000004 /* GitHubAPIClient.swift */,
-				GH0100000000000000000005 /* RepoListViewController.swift */,
-				GH0100000000000000000006 /* RepoDetailViewController.swift */,
 				GH0100000000000000000007 /* BranchListView.swift */,
 				GH0100000000000000000008 /* CommitHistoryView.swift */,
 				GH0100000000000000000009 /* CommitComposerView.swift */,
@@ -3055,8 +3049,6 @@
 				GH0200000000000000000002 /* GitHubModels.swift in Sources */,
 				GH0200000000000000000003 /* GitHubEndpoints.swift in Sources */,
 				GH0200000000000000000004 /* GitHubAPIClient.swift in Sources */,
-				GH0200000000000000000005 /* RepoListViewController.swift in Sources */,
-				GH0200000000000000000006 /* RepoDetailViewController.swift in Sources */,
 				GH0200000000000000000007 /* BranchListView.swift in Sources */,
 				GH0200000000000000000008 /* CommitHistoryView.swift in Sources */,
 				GH0200000000000000000009 /* CommitComposerView.swift in Sources */,
