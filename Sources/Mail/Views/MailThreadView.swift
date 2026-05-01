@@ -48,6 +48,27 @@ struct MailThreadView: View {
                         .padding(.top, 8)
                 }
 
+                // Advanced Context
+                let bodyText = renderedContent?.plainBody ?? email.body ?? email.preview
+                let currentMessage = MailMessage(id: email.id.uuidString, threadId: "", from: email.sender, to: [], cc: [], bcc: [], subject: email.subject, body: bodyText, htmlBody: email.htmlBody, date: email.date, isRead: true, isStarred: false, attachments: [])
+                let thread = MailThread(id: email.id.uuidString, subject: email.subject, messages: [currentMessage], lastMessageDate: email.date)
+                DecisionTimelineViewer(threadID: thread.id)
+
+                if !email.attachments.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Attachment Intelligence")
+                            .font(.headline)
+                            .padding(.horizontal)
+
+                        ForEach(email.attachments) { attachment in
+                            let mailAttachment = MailMessage.MailAttachment(id: attachment.id.uuidString, fileName: attachment.filename, contentType: "application/octet-stream", size: 0)
+                            AttachmentIntelligencePanel(attachment: mailAttachment)
+                                .padding(.horizontal)
+                        }
+                    }
+                    .padding(.top, 12)
+                }
+
                 Spacer(minLength: 80)
             }
         }
@@ -335,7 +356,8 @@ struct MailThreadView: View {
         aiErrorMessage = nil
 
         let bodyText = renderedContent?.plainBody ?? email.body ?? email.preview
-        let thread = MailThread(id: email.id.uuidString, subject: email.subject, messages: [], lastMessageDate: email.date)
+        let currentMessage = MailMessage(id: email.id.uuidString, threadId: "", from: email.sender, to: [], cc: [], bcc: [], subject: email.subject, body: bodyText, htmlBody: email.htmlBody, date: email.date, isRead: true, isStarred: false, attachments: [])
+        let thread = MailThread(id: email.id.uuidString, subject: email.subject, messages: [currentMessage], lastMessageDate: email.date)
 
         Task {
             do {

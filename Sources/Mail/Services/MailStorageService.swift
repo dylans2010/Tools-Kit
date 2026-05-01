@@ -72,6 +72,11 @@ class MailStorageService: ObservableObject {
             return []
         }
     }
+
+    func loadAttachmentData(attachmentID: String) -> Data? {
+        let fileURL = baseDirectory.appendingPathComponent("attachments/\(attachmentID)")
+        return try? Data(contentsOf: fileURL)
+    }
 }
 
 @MainActor

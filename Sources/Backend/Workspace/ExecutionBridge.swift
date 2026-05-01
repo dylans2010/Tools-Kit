@@ -5,6 +5,7 @@ final class ExecutionBridge {
     static let shared = ExecutionBridge()
 
     private let calendarManager = CalendarManager.shared
+    private let tasksManager = TasksManager.shared
     private let mailAIService = MailAIService.shared
 
     struct TimeExtraction: Codable {
@@ -50,5 +51,23 @@ final class ExecutionBridge {
         }
 
         return event
+    }
+
+    /// Creates a workspace task.
+    func createTask(title: String, description: String) async throws -> WorkspaceTask {
+        let task = WorkspaceTask(
+            id: UUID(),
+            title: title,
+            description: description,
+            createdAt: Date(),
+            completed: false,
+            priority: .medium
+        )
+
+        await MainActor.run {
+            tasksManager.addTask(task)
+        }
+
+        return task
     }
 }

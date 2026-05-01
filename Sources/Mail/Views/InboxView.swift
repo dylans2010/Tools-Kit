@@ -22,6 +22,7 @@ struct InboxView: View {
     @State private var searchText = ""
     @State private var showingCompose = false
     @State private var showingAIFeatures = false
+    @State private var showingAIDashboard = false
     @State private var showingUniversalInbox = false
     @State private var showingFetchingLabel = false
     @State private var selectedMessage: MailMessage?
@@ -68,8 +69,26 @@ struct InboxView: View {
             }
 
             ToolbarItemGroup(placement: .topBarTrailing) {
-                Button {
-                    showingAIFeatures = true
+                Menu {
+                    Button {
+                        showingAIFeatures = true
+                    } label: {
+                        Label("AI Features", systemImage: "sparkles")
+                    }
+
+                    Button {
+                        showingAIDashboard = true
+                    } label: {
+                        Label("AI Dashboard", systemImage: "gauge.with.dots.needle.bottom.100percent")
+                    }
+
+                    NavigationLink(destination: PriorityQueueView()) {
+                        Label("Priority Queue", systemImage: "line.3.horizontal.decrease.circle")
+                    }
+
+                    NavigationLink(destination: WorkflowExecutionMonitor()) {
+                        Label("Workflow Monitor", systemImage: "cpu")
+                    }
                 } label: {
                     Image(systemName: "sparkles")
                         .foregroundStyle(LinearGradient(colors: [.aiGradientStart, .aiGradientEnd], startPoint: .topLeading, endPoint: .bottomTrailing))
@@ -89,6 +108,11 @@ struct InboxView: View {
         }
         .sheet(isPresented: $showingAIFeatures) {
             InboxAIFeaturesView(inboxThreads: visibleThreads)
+        }
+        .sheet(isPresented: $showingAIDashboard) {
+            NavigationStack {
+                AIInboxDashboard()
+            }
         }
         .navigationDestination(isPresented: $showingUniversalInbox) {
             UniversalInboxView()
