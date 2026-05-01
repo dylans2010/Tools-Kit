@@ -88,7 +88,7 @@ struct JoinMeetingView: View {
         }
     }
 
-    private func scheduledMeetingRow(_ scheduled: MeetingSession) -> some View {
+    private func scheduledMeetingRow(_ scheduled: ScheduledMeeting) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(scheduled.name)
                 .font(.headline)
