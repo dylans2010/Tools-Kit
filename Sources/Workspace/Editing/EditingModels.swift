@@ -48,17 +48,31 @@ struct EditingLayer: Codable, Identifiable {
 
     // Filters applied to this layer
     var filters: [MediaFilter] = []
+
+    var metadata: [String: String] = [:]
+}
+
+/// Represents a track in the editing timeline.
+struct TimelineTrack: Codable, Identifiable {
+    let id: UUID
+    var name: String
+    var layerIDs: [UUID]
+    var isMuted: Bool = false
+    var isLocked: Bool = false
 }
 
 /// Represents a media editing project.
 struct EditingProject: Codable, Identifiable {
-    let id: UUID
+    var id: UUID
     var name: String
+    var ownerID: UUID
     var layers: [EditingLayer]
+    var timelineTracks: [TimelineTrack]
     var canvasSize: CGSize
 
     var createdAt: Date
     var updatedAt: Date
 
     var previewImageID: String?
+    var metadata: [String: String] = [:]
 }

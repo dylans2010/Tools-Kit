@@ -43,7 +43,14 @@ struct FullEditorView: View {
                 .shadow(radius: 2)
             Spacer()
             Button("Export") {
-                // Trigger export
+                Task {
+                    do {
+                        let url = try await EditingFramework.shared.exportProject(projectID: projectID)
+                        print("Exported to: \(url)")
+                    } catch {
+                        print("Export failed: \(error)")
+                    }
+                }
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
@@ -56,11 +63,15 @@ struct FullEditorView: View {
 
     private var toolPalette: some View {
         HStack(spacing: 20) {
-            toolButton(icon: "cursorarrow", name: "Select")
-            toolButton(icon: "paintbrush", name: "Brush")
-            toolButton(icon: "textformat", name: "Text")
-            toolButton(icon: "square.dashed", name: "Crop")
-            toolButton(icon: "slider.horizontal.3", name: "Adjust")
+            toolButton(icon: "arrow.uturn.backward", name: "Undo") {
+                manager.undo(projectID: projectID)
+            }
+            toolButton(icon: "arrow.uturn.forward", name: "Redo") {
+                manager.redo(projectID: projectID)
+            }
+            toolButton(icon: "paintbrush", name: "Brush") {}
+            toolButton(icon: "textformat", name: "Text") {}
+            toolButton(icon: "slider.horizontal.3", name: "Adjust") {}
         }
         .padding()
         .background(BlurView(style: .systemThinMaterialDark))
@@ -89,14 +100,16 @@ struct FullEditorView: View {
         .background(Color.black.opacity(0.5))
     }
 
-    private func toolButton(icon: String, name: String) -> some View {
-        VStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.title2)
-            Text(name)
-                .font(.caption2)
+    private func toolButton(icon: String, name: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.title2)
+                Text(name)
+                    .font(.caption2)
+            }
+            .foregroundColor(.white)
         }
-        .foregroundColor(.white)
     }
 
     private func iconFor(_ type: LayerType) -> String {

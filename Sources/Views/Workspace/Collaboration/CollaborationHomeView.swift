@@ -20,10 +20,22 @@ struct CollaborationHomeView: View {
             }
 
             Section("Recent Activity") {
-                // Global activity feed summary
-                Text("Coming soon: Unified activity feed across all spaces.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                let recentActivity = manager.spaces.flatMap { $0.activityFeed }.sorted { $0.timestamp > $1.timestamp }.prefix(10)
+                if recentActivity.isEmpty {
+                    Text("No recent activity.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else {
+                    ForEach(recentActivity) { log in
+                        VStack(alignment: .leading) {
+                            Text(log.action)
+                                .font(.caption)
+                            Text("\(log.userName) • \(log.timestamp, style: .relative)")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
             }
         }
         .navigationTitle("Collaboration")

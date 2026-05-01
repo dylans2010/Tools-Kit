@@ -56,11 +56,12 @@ struct ActivityLog: Codable, Identifiable {
 
 /// The core container for a Collaboration Space.
 struct CollaborationSpace: Codable, Identifiable {
-    let id: UUID
+    var id: UUID
     var name: String
     var description: String
     var icon: String
     var visibility: SpaceVisibility
+    var ownerID: UUID
     var members: [SpaceMember]
     var branches: [CollaborationBranch]
     var currentBranchID: UUID
@@ -74,6 +75,11 @@ struct CollaborationSpace: Codable, Identifiable {
     var spreadsheetIDs: [UUID]
     var mediaProjectIDs: [UUID]
 
+    // Tool states
+    var taskIDs: [UUID]
+    var decisionIDs: [UUID]
+
     var createdAt: Date
     var updatedAt: Date
+    var metadata: [String: String] = [:]
 }
