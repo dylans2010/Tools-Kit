@@ -7,7 +7,7 @@ struct PreJoinView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.workspaceBackground.ignoresSafeArea()
+                Color(.systemGroupedBackground).ignoresSafeArea()
 
                 VStack(spacing: 24) {
                     cameraPreview
@@ -15,7 +15,7 @@ struct PreJoinView: View {
                     VStack(spacing: 16) {
                         TextField("Display Name", text: $manager.localParticipantDisplayName)
                             .padding()
-                            .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))
+                            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
 
                         HStack(spacing: 12) {
                             toggleButton(icon: manager.isMicrophoneMuted ? "mic.slash.fill" : "mic.fill", isOn: !manager.isMicrophoneMuted) { manager.toggleMute() }
@@ -37,7 +37,7 @@ struct PreJoinView: View {
     private var cameraPreview: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 24)
-                .fill(Color.workspaceSurface)
+                .fill(Color(.secondarySystemGroupedBackground))
                 .frame(height: 240)
 
             if manager.isCameraEnabled {
