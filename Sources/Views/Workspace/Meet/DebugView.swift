@@ -5,7 +5,7 @@ struct DebugView: View {
     @StateObject private var logger = DebugLogger.shared
     @AppStorage("daily_api_key") private var persistedAPIKey = ""
 
-    init(manager: MeetingStateManager = .shared) {
+    init(manager: MeetingStateManager) {
         self.manager = manager
     }
 

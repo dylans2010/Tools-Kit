@@ -509,7 +509,7 @@ struct AIChatSettingsView: View {
     private var developerToolsSection: some View {
         Section("Developer") {
             NavigationLink("Developer Tools") {
-                MeetDeveloperToolsView()
+                MeetDeveloperToolsView(manager: .shared)
             }
             NavigationLink("Feedback Admin") {
                 FeedbackAdminView(allowDeveloperToolsAccess: true)
