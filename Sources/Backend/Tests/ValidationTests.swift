@@ -12,6 +12,7 @@ struct ValidationTests {
         testCollaborationSystem()
         testEditingSystem()
         testSecuritySystem()
+        testMessagesExtension()
 
         print("All Validation Tests Passed!")
     }
@@ -93,6 +94,10 @@ struct ValidationTests {
         } catch {
             fatalError("Security System Test Failed: \(error.localizedDescription)")
         }
+    }
+
+    private static func testMessagesExtension() {
+        MessagesValidationTests.run()
     }
 
     private static func testEditingSystem() {
