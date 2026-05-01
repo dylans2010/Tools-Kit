@@ -78,7 +78,7 @@ struct DeadlineTrackerDashboard: View {
                 if isLoading {
                     ProgressView()
                 } else if obligations.isEmpty {
-                    Text("No deadlines detected.")
+                    Text("No Deadlines Detected")
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(obligations) { entry in

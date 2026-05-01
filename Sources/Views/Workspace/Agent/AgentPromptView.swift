@@ -48,7 +48,7 @@ struct AgentPromptView: View {
                             HStack {
                                 Spacer()
                                 Button(action: { showingOptimizer = true }) {
-                                    Label("Optimize Prompt", systemImage: "sparkles")
+                                    Label("Optimize Prompt", systemImage: "apple.intelligence")
                                         .font(.subheadline.weight(.semibold))
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 6)
@@ -61,7 +61,7 @@ struct AgentPromptView: View {
                     } header: {
                         Text("Task Objectives")
                     } footer: {
-                        Text("Provide a clear description of what you want Jules to accomplish in this repository.")
+                        Text("Provide a clear description of what you want Agent to accomplish in this repository.")
                     }
 
                     Section("Quick Templates") {
@@ -93,8 +93,8 @@ struct AgentPromptView: View {
                             if isSubmitting {
                                 ProgressView().tint(.white)
                             } else {
-                                Image(systemName: "play.fill")
-                                Text("Launch Jules Agent")
+                                Image(systemName: "sparkle")
+                                Text("Start Agent")
                             }
                         }
                         .font(.headline)

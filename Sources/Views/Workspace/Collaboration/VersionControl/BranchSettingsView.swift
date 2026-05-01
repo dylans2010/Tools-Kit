@@ -14,7 +14,7 @@ struct BranchSettingsView: View {
                             Text(rule.branchName)
                                 .font(.headline)
                             if rule.requireApprovals {
-                                Text("Requires \(rule.requiredApprovalCount) approvals")
+                                Text("Requires \(rule.requiredApprovalCount) Approvals")
                                     .font(.caption)
                                     .foregroundColor(.orange)
                             }

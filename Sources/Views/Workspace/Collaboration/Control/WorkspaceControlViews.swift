@@ -20,7 +20,7 @@ struct WorkspaceCommandCenterView: View {
 
             Section("Audit Logs") {
                 if auditLogs.isEmpty {
-                    Text("No issues found.")
+                    Text("No Issues Found")
                         .foregroundColor(.secondary)
                 } else {
                     ForEach(auditLogs, id: \.self) { log in

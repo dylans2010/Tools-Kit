@@ -10,7 +10,7 @@ struct WorkflowExecutionMonitor: View {
             if isLoading {
                 ProgressView()
             } else if activeWorkflows.isEmpty {
-                Text("No active workflows.")
+                Text("No Active Workflows")
                     .foregroundStyle(.secondary)
             } else {
                 ForEach(activeWorkflows) { workflow in
@@ -26,7 +26,7 @@ struct WorkflowExecutionMonitor: View {
                             .tint(.blue)
 
                         HStack {
-                            Text("Step \(workflow.currentStepIndex + 1) of \(workflow.steps.count)")
+                            Text("Step \(workflow.currentStepIndex + 1) Of \(workflow.steps.count)")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                             Spacer()

@@ -54,7 +54,7 @@ struct ExportQueueView: View {
             }
 
             if manager.activeJobs.isEmpty {
-                Text("No active exports.")
+                Text("No Active Exports")
                     .foregroundColor(.secondary)
             }
         }

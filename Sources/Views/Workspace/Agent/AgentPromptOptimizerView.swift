@@ -17,7 +17,7 @@ struct AgentPromptOptimizerView: View {
                         ProgressView()
                             .scaleEffect(1.5)
                             .tint(.blue)
-                        Text("Enhancing your prompt with AI...")
+                        Text("Please Wait...")
                             .font(.subheadline.weight(.medium))
                             .foregroundColor(.secondary)
                     }
@@ -50,9 +50,9 @@ struct AgentPromptOptimizerView: View {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 20) {
                             HStack {
-                                Image(systemName: "sparkles")
+                                Image(systemName: "apple.intelligence")
                                     .foregroundColor(.blue)
-                                Text("Refined Agent Instructions")
+                                Text("Agent Instructions")
                                     .font(.headline)
                             }
                             .padding(.top)
@@ -69,10 +69,10 @@ struct AgentPromptOptimizerView: View {
                                 )
 
                             VStack(alignment: .leading, spacing: 8) {
-                                Label("What changed?", systemImage: "info.circle")
+                                Label("What Changed?", systemImage: "info.circle")
                                     .font(.caption.bold())
                                     .foregroundColor(.blue)
-                                Text("The original prompt was expanded to include specific goals, technical constraints, and a more structured format optimized for the Jules agent's capabilities.")
+                                Text("The original prompt was expanded to include specific goals, technical constraints, and a more structured format optimized for Agent's capabilities.")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                                     .lineSpacing(4)
@@ -108,7 +108,7 @@ struct AgentPromptOptimizerView: View {
                     .background(.ultraThinMaterial)
                 }
             }
-            .navigationTitle("AI Prompt Lab")
+            .navigationTitle("Intelligence")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

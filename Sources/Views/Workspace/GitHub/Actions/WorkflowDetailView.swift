@@ -27,8 +27,8 @@ struct WorkflowDetailView: View {
                 Text("Repository: \(owner)/\(repo)")
                 TextField("Ref", text: $ref)
                 if let lastRun {
-                    Text("Last run branch: \(lastRun.headBranch)")
-                    Text("Last commit: \(lastRun.headSHA)").font(.caption)
+                    Text("Last Run Branch: \(lastRun.headBranch)")
+                    Text("Last Commit: \(lastRun.headSHA)").font(.caption)
                 }
             }
 

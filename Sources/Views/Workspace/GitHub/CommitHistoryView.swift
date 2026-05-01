@@ -67,7 +67,7 @@ struct CommitHistoryView: View {
         .alert("Error", isPresented: Binding(get: { errorMessage != nil }, set: { _ in errorMessage = nil })) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text(errorMessage ?? "Unknown error")
+            Text(errorMessage ?? "Unknown Error")
         }
     }
 
@@ -90,11 +90,6 @@ struct CommitHistoryView: View {
     }
 
     private func revertCommit(_ commit: GitHubCommit) {
-        // Logic to revert a commit via API:
-        // 1. Create a new branch 'revert-<sha>'
-        // 2. This is non-trivial via pure GitHub API without Git client logic
-        // For now, we will simulate the start of this process or provide a placeholder
-        // In a real app, we might use Jules API to perform the revert as it has git access.
 
         let revertPrompt = "Revert the changes made in commit \(commit.sha) (\(commit.commit.message))"
 

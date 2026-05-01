@@ -113,7 +113,7 @@ struct InboxAIFeaturesView: View {
     private var catchUpSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Label("The Catch Up", systemImage: "bolt.fill")
+                Label("Catch Up", systemImage: "bolt.fill")
                     .font(.headline.bold())
                     .foregroundStyle(.yellow)
                 Spacer()

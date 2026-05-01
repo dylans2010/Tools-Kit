@@ -13,7 +13,7 @@ struct RepoFileExplorerView: View {
     var body: some View {
         List {
             if contents.isEmpty && !isLoading {
-                Text("Empty directory.")
+                Text("Empty Directory")
                     .foregroundColor(.secondary)
             } else {
                 ForEach(contents, id: \.sha) { item in

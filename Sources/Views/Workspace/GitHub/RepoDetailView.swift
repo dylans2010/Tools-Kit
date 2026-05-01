@@ -110,7 +110,7 @@ struct RepoDetailView: View {
                 }
 
                 NavigationLink(destination: AgentHomeView(owner: repository.owner.login, repo: repository.name)) {
-                    ActionCardContent(title: "Agent Mode", icon: "sparkles", color: .pink)
+                    ActionCardContent(title: "Agent", icon: "sparkles", color: .pink)
                 }
 
                 NavigationLink(destination: WorkflowListView(owner: repository.owner.login, repo: repository.name)) {

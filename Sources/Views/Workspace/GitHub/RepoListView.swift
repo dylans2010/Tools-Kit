@@ -11,7 +11,7 @@ struct RepoListView: View {
     var body: some View {
         Group {
             if isLoading && repositories.isEmpty {
-                ProgressView("Fetching repositories...")
+                ProgressView("Fetching Repositories...")
             } else if repositories.isEmpty && !isLoading {
                 ContentUnavailableView(
                     "No Repositories",
@@ -44,11 +44,11 @@ struct RepoListView: View {
             }
         }
         .navigationTitle("Repositories")
-        .searchable(text: $searchText, prompt: "Search repositories...")
+        .searchable(text: $searchText, prompt: "Search Repositories")
         .alert("Error", isPresented: Binding(get: { errorMessage != nil }, set: { _ in errorMessage = nil })) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text(errorMessage ?? "Unknown error")
+            Text(errorMessage ?? "Unknown Error")
         }
         .task {
             await fetchRepositories()

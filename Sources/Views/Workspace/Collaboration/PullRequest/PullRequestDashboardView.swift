@@ -14,7 +14,7 @@ struct PullRequestDashboardView: View {
                                 .font(.headline)
                             HStack {
                                 Text("#\(pr.id.uuidString.prefix(6))")
-                                Text("by \(pr.creatorName)")
+                                Text("By \(pr.creatorName)")
                                 Spacer()
                                 Text(pr.status.rawValue.capitalized)
                                     .padding(.horizontal, 8)

@@ -129,7 +129,7 @@ struct BoardColumn: View {
                     Text(task.title)
                         .bold()
                     if !task.dependencyIDs.isEmpty {
-                        Text("Has dependencies")
+                        Text("Has Dependencies")
                             .font(.caption2)
                             .foregroundColor(.orange)
                     }

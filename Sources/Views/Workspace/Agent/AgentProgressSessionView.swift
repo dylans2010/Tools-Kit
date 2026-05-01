@@ -17,7 +17,7 @@ struct AgentProgressSessionView: View {
     var body: some View {
         VStack(spacing: 0) {
             if isCreating {
-                ProgressView("Initializing execution session…")
+                ProgressView("Initializing Execution Session…")
                     .frame(maxHeight: .infinity)
             } else if let creationError {
                 ContentUnavailableView("Failed to Create Task", systemImage: "exclamationmark.triangle", description: Text(creationError))

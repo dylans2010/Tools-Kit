@@ -16,7 +16,7 @@ struct SimulationPanel: View {
             if isSimulating {
                 HStack {
                     Spacer()
-                    ProgressView("Simulating outcomes...")
+                    ProgressView("Simulating Outcomes...")
                     Spacer()
                 }
             } else if !simulationResult.isEmpty {
@@ -69,7 +69,7 @@ struct SimulationPanel: View {
     private func runSimulation() {
         isSimulating = true
         Task {
-            simulationResult = (try? await SafetySimulationEngine.shared.simulateReplyOutcome(original: original, reply: draft)) ?? "Simulation failed."
+            simulationResult = (try? await SafetySimulationEngine.shared.simulateReplyOutcome(original: original, reply: draft)) ?? "Simulation Failed"
             isSimulating = false
         }
     }

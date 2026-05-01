@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct SpacePublishingView: View {
     let spaceID: UUID
