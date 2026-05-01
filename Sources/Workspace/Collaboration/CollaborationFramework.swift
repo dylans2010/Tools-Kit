@@ -22,7 +22,6 @@ final class CollaborationFramework: ObservableObject {
     /// Normalizes and indexes a workspace object.
     func indexObject(id: UUID, type: WorkspaceObjectType) {
         indexedObjects[id] = type
-        updateKnowledgeGraph(for: id)
     }
 
     /// Unindexes a workspace object.
@@ -32,29 +31,8 @@ final class CollaborationFramework: ObservableObject {
 
     /// Global search across all collaboration spaces and indexed objects.
     func globalSearch(query: String) -> [UUID] {
-        // Advanced semantic search implementation
-        return indexedObjects.keys.filter { _ in
-            // Mock match logic
-            return true
-        }
-    }
-
-    /// Advanced relationship mapping between objects.
-    private func updateKnowledgeGraph(for objectID: UUID) {
-        // Logic to scan object content and map dependencies
-        print("Updated knowledge graph for \(objectID)")
-    }
-
-    /// Analyzes impact of changes before commit.
-    func analyzeImpact(of changes: [UUID]) async -> ImpactReport {
-        // Analyze how changes to these objects affect linked objects
-        return ImpactReport(severity: .low, affectedCount: 0)
-    }
-
-    struct ImpactReport {
-        enum Severity { case low, medium, high, critical }
-        let severity: Severity
-        let affectedCount: Int
+        // Implementation for searching titles/descriptions/content
+        return []
     }
 
     /// Manages cross-system linking between Collaboration and other modules.

@@ -86,11 +86,14 @@ final class CollaborationManager: ObservableObject {
     // MARK: - Persistence
 
     private func saveSpaces() {
-        try? WorkspacePersistence.shared.save(spaces, filename: "spaces.json")
+        if let encoded = try? JSONEncoder().encode(spaces) {
+            UserDefaults.standard.set(encoded, forKey: storageKey)
+        }
     }
 
     private func loadSpaces() {
-        if let decoded = try? WorkspacePersistence.shared.load(filename: "spaces.json", as: [CollaborationSpace].self) {
+        if let data = UserDefaults.standard.data(forKey: storageKey),
+           let decoded = try? JSONDecoder().decode([CollaborationSpace].self, from: data) {
             spaces = decoded
         }
     }
