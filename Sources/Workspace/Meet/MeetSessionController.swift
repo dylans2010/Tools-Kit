@@ -31,6 +31,8 @@ final class MeetingStateManager: NSObject, ObservableObject {
     @Published var transcript: String = ""
     @Published var meetingSummary: String = ""
 
+    @Published var meetingIdInput = ""
+    @Published var currentSession: MeetingSession?
     @Published var settings = MeetingSettingsState()
     @Published var diagnostics = MeetingDiagnosticsState()
     @Published var lobbyState = MeetingLobbyState()

@@ -43,7 +43,7 @@ struct NegotiationAssistantPanel: View {
                             .foregroundStyle(.secondary)
                         ForEach(state.commitments, id: \.self) { commitment in
                             HStack {
-                                Image(systemImage: "circle.fill")
+                                Image(systemName: "circle.fill")
                                     .font(.system(size: 6))
                                 Text(commitment)
                                     .font(.caption)

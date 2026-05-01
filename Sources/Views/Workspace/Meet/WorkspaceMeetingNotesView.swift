@@ -37,7 +37,7 @@ struct WorkspaceMeetingNotesView: View {
     }
 
     private var sessionStorageKey: String {
-        manager.currentSession?.sessionId ?? manager.meetingIdInput
+        manager.currentSession?.sessionId ?? ""
     }
 
     private enum AIAction {
