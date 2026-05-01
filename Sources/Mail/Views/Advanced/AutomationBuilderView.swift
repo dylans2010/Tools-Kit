@@ -23,7 +23,7 @@ struct AutomationBuilderView: View {
                 .onDelete(perform: viewModel.deleteStep)
 
                 Button(action: viewModel.addStep) {
-                    Label("Add Execution Step", systemName: "plus.circle")
+                    Label("Add Execution Step", systemImage: "plus.circle")
                 }
             }
 

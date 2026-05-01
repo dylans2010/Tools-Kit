@@ -10,7 +10,7 @@ struct NegotiationAssistantPanel: View {
         WorkspaceSurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
-                    Label("Negotiation Intel", systemName: "hand.raised.fill")
+                    Label("Negotiation Intel", systemImage: "hand.raised.fill")
                         .font(.headline)
                     Spacer()
                     if isLoading {
@@ -43,7 +43,7 @@ struct NegotiationAssistantPanel: View {
                             .foregroundStyle(.secondary)
                         ForEach(state.commitments, id: \.self) { commitment in
                             HStack {
-                                Image(systemName: "circle.fill")
+                                Image(systemImage: "circle.fill")
                                     .font(.system(size: 6))
                                 Text(commitment)
                                     .font(.caption)

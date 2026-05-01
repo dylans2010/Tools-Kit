@@ -15,7 +15,7 @@ struct MemoryGraphViewer: View {
                         ForEach(nodes) { node in
                             WorkspaceSurfaceCard {
                                 HStack {
-                                    Image(systemName: icon(for: node.type))
+                                    Image(systemImage: icon(for: node.type))
                                         .foregroundStyle(.purple)
                                     VStack(alignment: .leading) {
                                         Text(node.value)
@@ -66,7 +66,7 @@ struct AttachmentIntelligencePanel: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Attachment Intel", systemName: "doc.text.magnifyingglass")
+            Label("Attachment Intel", systemImage: "doc.text.magnifyingglass")
                 .font(.headline)
 
             if isLoading {

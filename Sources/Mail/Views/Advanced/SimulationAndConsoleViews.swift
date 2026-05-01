@@ -10,7 +10,7 @@ struct SimulationPanel: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Label("Response Simulation", systemName: "chart.bar.doc.horizontal.fill")
+            Label("Response Simulation", systemImage: "chart.bar.doc.horizontal.fill")
                 .font(.headline)
 
             if isSimulating {
@@ -69,14 +69,14 @@ struct SimulationPanel: View {
     private func runSimulation() {
         isSimulating = true
         Task {
-            simulationResult = try? await SafetySimulationEngine.shared.simulateReplyOutcome(original: original, reply: draft) ?? "Simulation failed."
+            simulationResult = (try? await SafetySimulationEngine.shared.simulateReplyOutcome(original: original, reply: draft)) ?? "Simulation failed."
             isSimulating = false
         }
     }
 
     private func loadStrategies() {
         Task {
-            suggestions = try? await SafetySimulationEngine.shared.suggestStrategies(original: original) ?? []
+            suggestions = (try? await SafetySimulationEngine.shared.suggestStrategies(original: original)) ?? []
         }
     }
 }
@@ -110,7 +110,7 @@ struct CommandConsole: View {
                     if isExecuting {
                         ProgressView()
                     } else {
-                        Image(systemName: "terminal.fill")
+                        Image(systemImage: "terminal.fill")
                     }
                 }
                 .disabled(command.isEmpty || isExecuting)

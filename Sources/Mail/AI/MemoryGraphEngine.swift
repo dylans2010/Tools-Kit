@@ -7,7 +7,7 @@ actor MemoryGraphEngine {
     private var edges: [MemoryGraphEdge] = []
 
     private init() {
-        loadGraph()
+        Task { await loadGraph() }
     }
 
     /// Adds or updates a node in the graph.
