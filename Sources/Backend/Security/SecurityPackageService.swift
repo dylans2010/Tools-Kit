@@ -11,7 +11,7 @@ public final class SecurityPackageService {
     @MainActor
     public func exportPackage() async throws -> URL {
         let vaultManager = VaultManager.shared
-        let authService = AuthService.shared
+        let authService = VaultAuthService.shared
         let key = try authService.getMasterKey()
 
         let items = vaultManager.items

@@ -206,7 +206,7 @@
 		NP0200000000000000000013 /* TemporaryIdentityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000013 /* TemporaryIdentityView.swift */; };
 		NP0200000000000000000014 /* SecureFileSenderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000014 /* SecureFileSenderView.swift */; };
 		NP0200000000000000000015 /* SecurityModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000015 /* SecurityModels.swift */; };
-		NP0200000000000000000016 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000016 /* AuthService.swift */; };
+		NP0200000000000000000016 /* VaultAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000016 /* VaultAuthService.swift */; };
 		NP0200000000000000000017 /* EncryptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000017 /* EncryptionService.swift */; };
 		NP0200000000000000000018 /* SecureFileStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000018 /* SecureFileStorageService.swift */; };
 		NP0200000000000000000019 /* SecurityPackageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000019 /* SecurityPackageService.swift */; };
@@ -1438,7 +1438,7 @@
 		NP0100000000000000000013 /* TemporaryIdentityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/TemporaryIdentity/TemporaryIdentityView.swift"; sourceTree = "<group>"; };
 		NP0100000000000000000014 /* SecureFileSenderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/SecureFileSender/SecureFileSenderView.swift"; sourceTree = "<group>"; };
 		NP0100000000000000000015 /* SecurityModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Models/SecurityModels.swift; sourceTree = "<group>"; };
-		NP0100000000000000000016 /* AuthService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend/Security/AuthService.swift; sourceTree = "<group>"; };
+		NP0100000000000000000016 /* VaultAuthService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend/Security/VaultAuthService.swift; sourceTree = "<group>"; };
 		NP0100000000000000000017 /* EncryptionService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend/Security/EncryptionService.swift; sourceTree = "<group>"; };
 		NP0100000000000000000018 /* SecureFileStorageService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend/Security/SecureFileStorageService.swift; sourceTree = "<group>"; };
 		NP0100000000000000000019 /* SecurityPackageService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend/Security/SecurityPackageService.swift; sourceTree = "<group>"; };
@@ -2481,7 +2481,7 @@
 				NP0100000000000000000013 /* TemporaryIdentityView.swift */,
 				NP0100000000000000000014 /* SecureFileSenderView.swift */,
 				NP0100000000000000000015 /* SecurityModels.swift */,
-				NP0100000000000000000016 /* AuthService.swift */,
+				NP0100000000000000000016 /* VaultAuthService.swift */,
 				NP0100000000000000000017 /* EncryptionService.swift */,
 				NP0100000000000000000018 /* SecureFileStorageService.swift */,
 				NP0100000000000000000019 /* SecurityPackageService.swift */,
@@ -3820,7 +3820,7 @@
 				NP0200000000000000000013 /* TemporaryIdentityView.swift in Sources */,
 				NP0200000000000000000014 /* SecureFileSenderView.swift in Sources */,
 				NP0200000000000000000015 /* SecurityModels.swift in Sources */,
-				NP0200000000000000000016 /* AuthService.swift in Sources */,
+				NP0200000000000000000016 /* VaultAuthService.swift in Sources */,
 				NP0200000000000000000017 /* EncryptionService.swift in Sources */,
 				NP0200000000000000000018 /* SecureFileStorageService.swift in Sources */,
 				NP0200000000000000000019 /* SecurityPackageService.swift in Sources */,

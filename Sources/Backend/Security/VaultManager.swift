@@ -32,9 +32,9 @@ public final class VaultManager: ObservableObject {
             keyDerivationRounds: rounds
         )
 
-        try AuthService.shared.setMasterPassword(password, config: newConfig)
+        try VaultAuthService.shared.setMasterPassword(password, config: newConfig)
         if useBiometrics {
-            try? AuthService.shared.enableBiometricAccess(password: password, config: newConfig)
+            try? VaultAuthService.shared.enableBiometricAccess(password: password, config: newConfig)
         }
 
         self.config = newConfig
@@ -48,7 +48,7 @@ public final class VaultManager: ObservableObject {
 
         // Items are stored in an encrypted index file.
         // We need the master key to decrypt it.
-        let key = try AuthService.shared.getMasterKey()
+        let key = try VaultAuthService.shared.getMasterKey()
 
         if persistence.exists(filename: indexFilename) {
             let encryptedData = try persistence.load(Data.self, from: indexFilename)
@@ -61,7 +61,7 @@ public final class VaultManager: ObservableObject {
 
     public func addItem(_ item: VaultItem, data: Data? = nil) async throws {
         var newItem = item
-        let key = try AuthService.shared.getMasterKey()
+        let key = try VaultAuthService.shared.getMasterKey()
 
         if let data = data {
             if data.count < 1024 * 64 { // If less than 64KB, store in payload
@@ -85,7 +85,7 @@ public final class VaultManager: ObservableObject {
     }
 
     public func getItemData(_ item: VaultItem) throws -> Data? {
-        let key = try AuthService.shared.getMasterKey()
+        let key = try VaultAuthService.shared.getMasterKey()
 
         if let payload = item.encryptedPayload {
             return try EncryptionService.shared.decrypt(payload, using: key)
@@ -108,7 +108,7 @@ public final class VaultManager: ObservableObject {
     }
 
     private func saveItems() throws {
-        let key = try AuthService.shared.getMasterKey()
+        let key = try VaultAuthService.shared.getMasterKey()
         let data = try JSONEncoder().encode(items)
         let encryptedData = try EncryptionService.shared.encrypt(data, using: key)
         try persistence.save(encryptedData, to: indexFilename)

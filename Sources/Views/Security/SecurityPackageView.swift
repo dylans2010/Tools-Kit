@@ -50,7 +50,16 @@ struct SecurityPackageView: View {
         .navigationTitle("Backup & Recovery")
         .sheet(isPresented: $showShareSheet) {
             if let url = exportURL {
+                #if os(iOS)
                 ShareSheet(items: [url])
+                #else
+                VStack {
+                    Text("Backup exported to:")
+                    Text(url.path).font(.caption).foregroundColor(.secondary)
+                    Button("Done") { showShareSheet = false }
+                }
+                .padding()
+                #endif
             }
         }
         .fileImporter(isPresented: $isImporting, allowedContentTypes: [.data]) { result in
@@ -100,6 +109,7 @@ struct SecurityPackageView: View {
     }
 }
 
+#if os(iOS)
 struct ShareSheet: UIViewControllerRepresentable {
     let items: [Any]
     func makeUIViewController(context: Context) -> UIActivityViewController {
@@ -107,3 +117,4 @@ struct ShareSheet: UIViewControllerRepresentable {
     }
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
+#endif

@@ -4,8 +4,8 @@ import LocalAuthentication
 import CryptoKit
 
 /// Manages vault authentication, biometric state, and the master encryption key.
-public final class AuthService: ObservableObject {
-    public static let shared = AuthService()
+public final class VaultAuthService: ObservableObject {
+    public static let shared = VaultAuthService()
 
     @Published public var isAuthenticated = false
     @Published public var isBiometricsAvailable = false

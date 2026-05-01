@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SecurityGateView: View {
-    @StateObject private var authService = AuthService.shared
+    @StateObject private var authService = VaultAuthService.shared
     @StateObject private var vaultManager = VaultManager.shared
     @State private var password = ""
     @State private var error: String?

@@ -28,9 +28,9 @@ struct SecurityOnboardingView: View {
 
                 Section {
                     Toggle("Enable Face ID / Touch ID", isOn: $useBiometrics)
-                        .disabled(!AuthService.shared.isBiometricsAvailable)
+                        .disabled(!VaultAuthService.shared.isBiometricsAvailable)
 
-                    if !AuthService.shared.isBiometricsAvailable {
+                    if !VaultAuthService.shared.isBiometricsAvailable {
                         Text("Biometrics are not available on this device.")
                             .font(.caption)
                             .foregroundColor(.secondary)

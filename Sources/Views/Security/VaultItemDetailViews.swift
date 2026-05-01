@@ -1,6 +1,11 @@
 import SwiftUI
 import PhotosUI
 import UniformTypeIdentifiers
+#if os(iOS)
+import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
 struct AddVaultItemView: View {
     let type: VaultItemType
@@ -111,7 +116,7 @@ struct AddVaultItemView: View {
 
     private func saveItem() {
         isSaving = true
-        Task {
+        Task { @MainActor in
             var item = VaultItem(type: type, title: title)
             var data: Data?
 
@@ -138,11 +143,11 @@ struct AddVaultItemView: View {
 
             do {
                 try await vaultManager.addItem(item, data: data)
-                await MainActor.run { dismiss() }
+                dismiss()
             } catch {
                 // Handle error
             }
-            await MainActor.run { isSaving = false }
+            isSaving = false
         }
     }
 }
@@ -158,6 +163,29 @@ struct VaultItemDetailView: View {
     @State private var showShareSheet = false
 
     var body: some View {
+        mainList
+            .navigationTitle(item.title)
+            .sheet(isPresented: $showShareSheet) {
+                #if os(iOS)
+                if let data = decryptedData {
+                    let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(item.fileMetadata?.fileName ?? "exported_file")
+                    try? data.write(to: tempURL)
+                    ShareSheet(items: [tempURL])
+                }
+                #else
+                VStack {
+                    Text("File decrypted and exported.")
+                    Button("Close") { showShareSheet = false }
+                }
+                .padding()
+                #endif
+            }
+            .onAppear {
+                if item.type == .totp { decrypt() }
+            }
+    }
+
+    private var mainList: some View {
         List {
             Section("Details") {
                 detailRow(label: "Title", value: item.title)
@@ -230,18 +258,6 @@ struct VaultItemDetailView: View {
                 }
             }
         }
-        .navigationTitle(item.title)
-        .sheet(isPresented: $showShareSheet) {
-            if let data = decryptedData {
-                let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(item.fileMetadata?.fileName ?? "exported_file")
-                try? data.write(to: tempURL)
-                ShareSheet(items: [tempURL])
-            }
-        }
-        .onAppear {
-            if item.type == .totp { decrypt() }
-        }
-    }
 
     private func detailRow(label: String, value: String) -> some View {
         HStack {

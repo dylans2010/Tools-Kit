@@ -2,7 +2,7 @@ import SwiftUI
 
 struct SecurityDashboardView: View {
     @StateObject private var vaultManager = VaultManager.shared
-    @StateObject private var authService = AuthService.shared
+    @StateObject private var authService = VaultAuthService.shared
     @State private var showAddMenu = false
     @State private var selectedType: VaultItemType?
     @State private var showOnboarding = false
