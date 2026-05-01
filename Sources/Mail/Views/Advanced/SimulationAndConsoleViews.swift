@@ -110,7 +110,7 @@ struct CommandConsole: View {
                     if isExecuting {
                         ProgressView()
                     } else {
-                        Image(systemImage: "terminal.fill")
+                        Image(systemName: "terminal.fill")
                     }
                 }
                 .disabled(command.isEmpty || isExecuting)

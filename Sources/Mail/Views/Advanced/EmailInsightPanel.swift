@@ -73,7 +73,7 @@ struct EntityPill: View {
     let color: Color
     var body: some View {
         HStack(spacing: 4) {
-            Image(systemImage: icon)
+            Image(systemName: icon)
             Text(text)
         }
         .font(.caption2.bold())

@@ -15,7 +15,7 @@ struct MemoryGraphViewer: View {
                         ForEach(nodes) { node in
                             WorkspaceSurfaceCard {
                                 HStack {
-                                    Image(systemImage: icon(for: node.type))
+                                    Image(systemName: icon(for: node.type))
                                         .foregroundStyle(.purple)
                                     VStack(alignment: .leading) {
                                         Text(node.value)
