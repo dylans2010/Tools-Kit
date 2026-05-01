@@ -14,7 +14,7 @@ struct ParticipantAdminPanelView: View {
 
     var body: some View {
         List {
-            Section(header: Text("Participant")) {
+            Section {
                 Text(participant.displayName)
                 Picker("Role", selection: $selectedRole) {
                     ForEach(MeetingParticipantRole.allCases.filter { $0 != .host }, id: \.self) { role in
@@ -24,9 +24,11 @@ struct ParticipantAdminPanelView: View {
                 .onChange(of: selectedRole, initial: false) { _, newRole in
                     Task { await manager.assignRole(participantID: participant.id, role: newRole) }
                 }
+            } header: {
+                Text("Participant")
             }
 
-            Section(header: Text("Controls")) {
+            Section {
                 Button("Mute Participant") {
                     Task { await manager.setParticipantMuted(participantID: participant.id, muted: true) }
                 }
@@ -36,6 +38,8 @@ struct ParticipantAdminPanelView: View {
                 Button("Kick Participant", role: .destructive) {
                     Task { await manager.removeParticipant(participantID: participant.id) }
                 }
+            } header: {
+                Text("Controls")
             }
         }
         .navigationTitle("Admin Controls")
