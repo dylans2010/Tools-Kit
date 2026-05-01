@@ -1,2 +1,2 @@
 import Foundation
-final class ColorGradingManager: ObservableObject { static let shared = ColorGradingManager() }
+final class ColorGradingManager: ObservableObject { static let shared = ColorGradingManager(); private init() {} }

@@ -1,2 +1,2 @@
 import Foundation
-final class LiveStudioManager: ObservableObject { static let shared = LiveStudioManager() }
+final class LiveStudioManager: ObservableObject { static let shared = LiveStudioManager(); private init() {} }

@@ -3,9 +3,8 @@ import SwiftUI
 import UIKit
 #endif
 struct GuestAccessView: View {
-    let spaceID: UUID
     var body: some View {
-        Button("Copy Invite Link") {
+        Button("Copy Link") {
             #if os(iOS)
             UIPasteboard.general.string = "link"
             #endif

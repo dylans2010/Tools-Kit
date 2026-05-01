@@ -1,2 +1,2 @@
 import Foundation
-final class HistoryManager: ObservableObject { static let shared = HistoryManager() }
+final class HistoryManager: ObservableObject { static let shared = HistoryManager(); private init() {} }

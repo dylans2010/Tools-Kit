@@ -1,2 +1,2 @@
 import Foundation
-final class DecisionEngineManager: ObservableObject { static let shared = DecisionEngineManager() }
+final class DecisionEngineManager: ObservableObject { static let shared = DecisionEngineManager(); private init() {} }

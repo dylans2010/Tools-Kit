@@ -1,2 +1,2 @@
 import Foundation
-final class ExternalAccessManager: ObservableObject { static let shared = ExternalAccessManager() }
+final class ExternalAccessManager: ObservableObject { static let shared = ExternalAccessManager(); private init() {} }

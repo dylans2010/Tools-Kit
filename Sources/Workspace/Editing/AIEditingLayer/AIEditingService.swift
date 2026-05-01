@@ -1,2 +1,2 @@
 import Foundation
-final class AIEditingService { static let shared = AIEditingService() }
+final class AIEditingService { static let shared = AIEditingService(); private init() {} }

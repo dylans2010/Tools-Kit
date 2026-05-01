@@ -1,2 +1,2 @@
 import Foundation
-final class TimelineIntelligenceService: ObservableObject { static let shared = TimelineIntelligenceService() }
+final class TimelineIntelligenceService: ObservableObject { static let shared = TimelineIntelligenceService(); private init() {} }

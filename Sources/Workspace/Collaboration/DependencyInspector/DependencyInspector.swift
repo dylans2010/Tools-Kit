@@ -1,2 +1,2 @@
 import Foundation
-final class DependencyInspector: ObservableObject { static let shared = DependencyInspector() }
+final class DependencyInspector: ObservableObject { static let shared = DependencyInspector(); private init() {} }

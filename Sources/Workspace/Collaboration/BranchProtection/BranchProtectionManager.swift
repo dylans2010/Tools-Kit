@@ -1,2 +1,2 @@
 import Foundation
-final class BranchProtectionManager: ObservableObject { static let shared = BranchProtectionManager() }
+final class BranchProtectionManager: ObservableObject { static let shared = BranchProtectionManager(); private init() {} }

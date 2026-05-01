@@ -1,2 +1,2 @@
 import Foundation
-final class ExportPipelineManager: ObservableObject { static let shared = ExportPipelineManager() }
+final class ExportPipelineManager: ObservableObject { static let shared = ExportPipelineManager(); private init() {} }

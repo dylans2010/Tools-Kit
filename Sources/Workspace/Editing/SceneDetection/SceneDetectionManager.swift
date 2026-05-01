@@ -1,2 +1,2 @@
 import Foundation
-final class SceneDetectionManager: ObservableObject { static let shared = SceneDetectionManager() }
+final class SceneDetectionManager: ObservableObject { static let shared = SceneDetectionManager(); private init() {} }

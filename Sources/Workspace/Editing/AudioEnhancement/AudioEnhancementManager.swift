@@ -1,2 +1,2 @@
 import Foundation
-final class AudioEnhancementManager: ObservableObject { static let shared = AudioEnhancementManager() }
+final class AudioEnhancementManager: ObservableObject { static let shared = AudioEnhancementManager(); private init() {} }

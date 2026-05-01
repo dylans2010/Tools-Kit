@@ -1,2 +1,2 @@
 import Foundation
-final class SharedEditingManager: ObservableObject { static let shared = SharedEditingManager() }
+final class SharedEditingManager: ObservableObject { static let shared = SharedEditingManager(); private init() {} }

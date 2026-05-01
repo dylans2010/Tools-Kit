@@ -7,140 +7,46 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		ED02B64E8E39309649CE1F4E /* AssetManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01B64E8E39309649CE1F4E /* AssetManagerView.swift */; };
-		ED02B8AF10BAD091416359B5 /* TemplateStudioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01B8AF10BAD091416359B5 /* TemplateStudioView.swift */; };
-		ED02F94FA50A1AAEA41B83F0 /* AutoEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01F94FA50A1AAEA41B83F0 /* AutoEditView.swift */; };
-		ED02664A79B234AC50F31A6E /* ProjectVersioningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01664A79B234AC50F31A6E /* ProjectVersioningView.swift */; };
-		ED02D786A61593BC0BE35DFE /* ColorGradingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01D786A61593BC0BE35DFE /* ColorGradingView.swift */; };
-		ED02EC669ADE7D1A5CB6BF55 /* MotionTrackingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01EC669ADE7D1A5CB6BF55 /* MotionTrackingView.swift */; };
-		ED02039FBEE7D6546AA8DDAA /* ExportPipelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01039FBEE7D6546AA8DDAA /* ExportPipelineView.swift */; };
-		ED02BE5317FE564B61EC31E7 /* SceneDetectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01BE5317FE564B61EC31E7 /* SceneDetectionView.swift */; };
-		ED027BF145F9DC22B767AE23 /* AudioEnhancementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED017BF145F9DC22B767AE23 /* AudioEnhancementView.swift */; };
-		ED024C5D73CFDA9D395578C9 /* BatchProcessingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED014C5D73CFDA9D395578C9 /* BatchProcessingView.swift */; };
-		ED029D8B75DC9DC11F6A3928 /* HistoryTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED019D8B75DC9DC11F6A3928 /* HistoryTimelineView.swift */; };
-		ED028942E3D0A627325688CB /* TimelineIntelligenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED018942E3D0A627325688CB /* TimelineIntelligenceView.swift */; };
-		ED022B333F6E9E3F3E8E7172 /* SharedTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED012B333F6E9E3F3E8E7172 /* SharedTimelineView.swift */; };
-		CL028346B2FD9E82B198E201 /* DependencyInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL018346B2FD9E82B198E201 /* DependencyInspectorView.swift */; };
-		CL02A55C2AECA681D9937F69 /* SmartOrganizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01A55C2AECA681D9937F69 /* SmartOrganizerView.swift */; };
-		CL022E99CF1349BE22481731 /* HistoryReplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL012E99CF1349BE22481731 /* HistoryReplayView.swift */; };
-		CL02FAB5B8BE29F3826AA057 /* ActivityTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01FAB5B8BE29F3826AA057 /* ActivityTimelineView.swift */; };
-		CL02C9D288DF19F22EC06C36 /* SpacePublishingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01C9D288DF19F22EC06C36 /* SpacePublishingView.swift */; };
-		CL0267BF2DFB4F24E5D4B842 /* LiveCollaborationStudioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0167BF2DFB4F24E5D4B842 /* LiveCollaborationStudioView.swift */; };
-		CL020424390AD525E494A1D1 /* WorkspaceAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010424390AD525E494A1D1 /* WorkspaceAnalyticsView.swift */; };
-		CL02C76DA47F1357630D6130 /* ForkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01C76DA47F1357630D6130 /* ForkView.swift */; };
-		CL022E9CECBF7292F2977B54 /* CommitIntelligenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL012E9CECBF7292F2977B54 /* CommitIntelligenceView.swift */; };
-		CL02B803AA7D3A965F360BB1 /* DecisionEngineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01B803AA7D3A965F360BB1 /* DecisionEngineView.swift */; };
-		CL029C40A27CBD5BC2B4C096 /* WorkspaceCommandCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL019C40A27CBD5BC2B4C096 /* WorkspaceCommandCenterView.swift */; };
-		CL02773F724A37E3CD2396DF /* KnowledgeGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01773F724A37E3CD2396DF /* KnowledgeGraphView.swift */; };
-		CL02CF7B7A0C36F86CCB1469 /* SideBySideDiffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01CF7B7A0C36F86CCB1469 /* SideBySideDiffView.swift */; };
-		CL027745376556E12A15C4A3 /* PRDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL017745376556E12A15C4A3 /* PRDetailView.swift */; };
-		CL029BC7426CE415DBA90DE8 /* ConflictResolutionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL019BC7426CE415DBA90DE8 /* ConflictResolutionView.swift */; };
 		CL020EEE766C741562D7373B /* CollaborationSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010EEE766C741562D7373B /* CollaborationSearchView.swift */; };
-		CL0266FD34F77FB6AE0210E7 /* ProjectExecutionBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0166FD34F77FB6AE0210E7 /* ProjectExecutionBoardView.swift */; };
-		CL0228244D97E84954A1E268 /* BranchProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0128244D97E84954A1E268 /* BranchProtectionView.swift */; };
-		CL0250C20E3BC3F2643D3CF6 /* TemplateGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0150C20E3BC3F2643D3CF6 /* TemplateGalleryView.swift */; };
-		ED0232BF3F263926D7093C5D /* AIEditingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0132BF3F263926D7093C5D /* AIEditingService.swift */; };
-		CL027D47C3959B9B46ADD8EF /* LiveStudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL017D47C3959B9B46ADD8EF /* LiveStudioManager.swift */; };
-		CL027EFDFFDDA6F29C19D242 /* WorkspaceAnalyticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL017EFDFFDDA6F29C19D242 /* WorkspaceAnalyticsManager.swift */; };
-		CL0231A410BFA1567B66E958 /* KnowledgeGraphManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0131A410BFA1567B66E958 /* KnowledgeGraphManager.swift */; };
-		CL0217011FA47290ABC62564 /* ExecutionBoardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0117011FA47290ABC62564 /* ExecutionBoardManager.swift */; };
-		ED02F68F5154B35821FD92C5 /* AIEditingPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01F68F5154B35821FD92C5 /* AIEditingPanelView.swift */; };
-		CL023BFC5B0183AC2FECD645 /* GuestAccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL013BFC5B0183AC2FECD645 /* GuestAccessView.swift */; };
-		ED02B0CB18B2E81F9A985237 /* TemplateStudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01B0CB18B2E81F9A985237 /* TemplateStudioManager.swift */; };
-		ED02AFE5CE5B821D4812C403 /* AutoEditManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01AFE5CE5B821D4812C403 /* AutoEditManager.swift */; };
-		ED0245002380F404A71BB571 /* ProjectVersioningManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0145002380F404A71BB571 /* ProjectVersioningManager.swift */; };
-		ED02D996D2D49050FCD1F440 /* ColorGradingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01D996D2D49050FCD1F440 /* ColorGradingManager.swift */; };
-		ED0229D507DB65309B40CCA7 /* MotionTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0129D507DB65309B40CCA7 /* MotionTrackingManager.swift */; };
+		CL02FAB5B8BE29F3826AA057 /* ActivityTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01FAB5B8BE29F3826AA057 /* ActivityTimelineView.swift */; };
+		ED0272FD09958FF23E06D924 /* FullEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0172FD09958FF23E06D924 /* FullEditorView.swift */; };
 		ED02AA3640C7CCD74550F61B /* ExportPipelineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01AA3640C7CCD74550F61B /* ExportPipelineManager.swift */; };
-		ED02CAD31035F2F8AE1DF3F7 /* SceneDetectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01CAD31035F2F8AE1DF3F7 /* SceneDetectionManager.swift */; };
-		ED02BBE9498F2257CF925312 /* AudioEnhancementManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01BBE9498F2257CF925312 /* AudioEnhancementManager.swift */; };
-		ED0280FAD94022F7DE242E0B /* BatchProcessingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0180FAD94022F7DE242E0B /* BatchProcessingManager.swift */; };
+		ED02281F17CFB314F0597C1A /* AssetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01281F17CFB314F0597C1A /* AssetManager.swift */; };
 		ED02838E54324D10EACDFCA3 /* TimelineIntelligenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01838E54324D10EACDFCA3 /* TimelineIntelligenceService.swift */; };
 		ED02FB1EE79D5C765D0EF215 /* SharedEditingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01FB1EE79D5C765D0EF215 /* SharedEditingManager.swift */; };
-		CL0224B957930EFA62641C8A /* DependencyInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0124B957930EFA62641C8A /* DependencyInspector.swift */; };
+		ED0245002380F404A71BB571 /* ProjectVersioningManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0145002380F404A71BB571 /* ProjectVersioningManager.swift */; };
+		ED0280FAD94022F7DE242E0B /* BatchProcessingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0180FAD94022F7DE242E0B /* BatchProcessingManager.swift */; };
+		ED02B0CB18B2E81F9A985237 /* TemplateStudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01B0CB18B2E81F9A985237 /* TemplateStudioManager.swift */; };
+		ED02BBE9498F2257CF925312 /* AudioEnhancementManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01BBE9498F2257CF925312 /* AudioEnhancementManager.swift */; };
+		ED02D996D2D49050FCD1F440 /* ColorGradingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01D996D2D49050FCD1F440 /* ColorGradingManager.swift */; };
+		ED0229D507DB65309B40CCA7 /* MotionTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0129D507DB65309B40CCA7 /* MotionTrackingManager.swift */; };
+		ED02AFE5CE5B821D4812C403 /* AutoEditManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01AFE5CE5B821D4812C403 /* AutoEditManager.swift */; };
+		ED02CAD31035F2F8AE1DF3F7 /* SceneDetectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01CAD31035F2F8AE1DF3F7 /* SceneDetectionManager.swift */; };
+		ED0232BF3F263926D7093C5D /* AIEditingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0132BF3F263926D7093C5D /* AIEditingService.swift */; };
+		CL027EFDFFDDA6F29C19D242 /* WorkspaceAnalyticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL017EFDFFDDA6F29C19D242 /* WorkspaceAnalyticsManager.swift */; };
+		CL027D47C3959B9B46ADD8EF /* LiveStudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL017D47C3959B9B46ADD8EF /* LiveStudioManager.swift */; };
+		CL0231A410BFA1567B66E958 /* KnowledgeGraphManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0131A410BFA1567B66E958 /* KnowledgeGraphManager.swift */; };
+		CL0217011FA47290ABC62564 /* ExecutionBoardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0117011FA47290ABC62564 /* ExecutionBoardManager.swift */; };
+		CL02A0291FC15EE77FB74EF1 /* DecisionEngineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01A0291FC15EE77FB74EF1 /* DecisionEngineManager.swift */; };
+		CL02031EEFB99032C3EE4B47 /* CollaborationSearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01031EEFB99032C3EE4B47 /* CollaborationSearchEngine.swift */; };
 		CL0232B447C8434C59EF9D22 /* SmartOrganizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0132B447C8434C59EF9D22 /* SmartOrganizer.swift */; };
-		CL02C3AFDC3CF52E64F81C26 /* ActivityTimelineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01C3AFDC3CF52E64F81C26 /* ActivityTimelineManager.swift */; };
-		CL026AA7C0AF2ACE4A1D6AAB /* SpacePublishingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL016AA7C0AF2ACE4A1D6AAB /* SpacePublishingManager.swift */; };
-		CL0267D53D1AD377DC13D828 /* ExternalAccessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0167D53D1AD377DC13D828 /* ExternalAccessManager.swift */; };
-		CL025A49D432ABAD978F2754 /* CommitIntelligenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL015A49D432ABAD978F2754 /* CommitIntelligenceService.swift */; };
+		CL0224B957930EFA62641C8A /* DependencyInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0124B957930EFA62641C8A /* DependencyInspector.swift */; };
 		CL028C5787DACB78FC90CA26 /* CommandCenterController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL018C5787DACB78FC90CA26 /* CommandCenterController.swift */; };
+		CL0267D53D1AD377DC13D828 /* ExternalAccessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0167D53D1AD377DC13D828 /* ExternalAccessManager.swift */; };
 		CL02E52B5ABF880487C60D4A /* TemplateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01E52B5ABF880487C60D4A /* TemplateManager.swift */; };
-		ED0272FD09958FF23E06D924 /* FullEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0172FD09958FF23E06D924 /* FullEditorView.swift */; };
-		ED02D411C2F5479E0B7CC39D /* EditingHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01D411C2F5479E0B7CC39D /* EditingHomeView.swift */; };
+		CL026AA7C0AF2ACE4A1D6AAB /* SpacePublishingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL016AA7C0AF2ACE4A1D6AAB /* SpacePublishingManager.swift */; };
+		CL02C3AFDC3CF52E64F81C26 /* ActivityTimelineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01C3AFDC3CF52E64F81C26 /* ActivityTimelineManager.swift */; };
+		CL025A49D432ABAD978F2754 /* CommitIntelligenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL015A49D432ABAD978F2754 /* CommitIntelligenceService.swift */; };
+		CL02F2FEE87142C26FDF58A8 /* ForkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01F2FEE87142C26FDF58A8 /* ForkManager.swift */; };
+		CL023BFC5B0183AC2FECD645 /* GuestAccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL013BFC5B0183AC2FECD645 /* GuestAccessView.swift */; };
 		CL0201914289947246594FAF /* PRListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0101914289947246594FAF /* PRListView.swift */; };
-		CL02EC1C5BD402E0A1A0EE90 /* VersionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01EC1C5BD402E0A1A0EE90 /* VersionHistoryView.swift */; };
-		CL027E48D5E8FFBC05FE8EE2 /* SpaceDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL017E48D5E8FFBC05FE8EE2 /* SpaceDashboardView.swift */; };
-		CL022A041040343F46F86D5E /* CollaborationHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL012A041040343F46F86D5E /* CollaborationHomeView.swift */; };
-		CL02F470EDF037D1B6507319 /* AddDataCollabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01F470EDF037D1B6507319 /* AddDataCollabView.swift */; };
-		WS021475DCE9954699818366 /* CallKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS011475DCE9954699818366 /* CallKitManager.swift */; };
-		WS021A80C1258BD7A498BC68 /* PiPController.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS011A80C1258BD7A498BC68 /* PiPController.swift */; };
-		WS02E11772B333E64F5AC2D5 /* MeetingResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01E11772B333E64F5AC2D5 /* MeetingResolver.swift */; };
-		WS02EE8C6278AA701670E7CE /* MeetSessionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01EE8C6278AA701670E7CE /* MeetSessionController.swift */; };
-		WS02073AAB2B49E6A3039D76 /* CallKitProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01073AAB2B49E6A3039D76 /* CallKitProvider.swift */; };
-		WS0250569A735E125B6363CA /* MeetingDomainModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0150569A735E125B6363CA /* MeetingDomainModels.swift */; };
-		WS020AB9EA3F4D81377FA5B8 /* DailyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010AB9EA3F4D81377FA5B8 /* DailyService.swift */; };
-		WS0296E7AE02C0847BA7C335 /* MeetingNotesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0196E7AE02C0847BA7C335 /* MeetingNotesManager.swift */; };
-		WS02C4F183F3581BA799E71A /* MeetingSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01C4F183F3581BA799E71A /* MeetingSession.swift */; };
-		WS0281BB51BB411945E6394B /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0181BB51BB411945E6394B /* DebugLogger.swift */; };
-		WS02A26D0D7F707B9C08F55A /* MeetPermissionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01A26D0D7F707B9C08F55A /* MeetPermissionService.swift */; };
-		ED02281F17CFB314F0597C1A /* AssetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01281F17CFB314F0597C1A /* AssetManager.swift */; };
 		ED02C3C4130B4C8C6EA21681 /* HistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01C3C4130B4C8C6EA21681 /* HistoryManager.swift */; };
 		ED0265ED68F76474BD609BE9 /* EditingFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0165ED68F76474BD609BE9 /* EditingFramework.swift */; };
-		ED0267E64A0D77F39997C421 /* EditingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0167E64A0D77F39997C421 /* EditingManager.swift */; };
-		ED027AF32EAE5CDE84E17854 /* EditingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED017AF32EAE5CDE84E17854 /* EditingEngine.swift */; };
-		ED0207BE27EED97F075CDB07 /* EditingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0107BE27EED97F075CDB07 /* EditingModels.swift */; };
-		WS025CD9F7B2527A10843551 /* FeedbackModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS015CD9F7B2527A10843551 /* FeedbackModel.swift */; };
-		WS02C5B83ACB0F10533EE584 /* FeedbackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01C5B83ACB0F10533EE584 /* FeedbackService.swift */; };
-		CL02F2FEE87142C26FDF58A8 /* ForkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01F2FEE87142C26FDF58A8 /* ForkManager.swift */; };
-		CL02A0291FC15EE77FB74EF1 /* DecisionEngineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01A0291FC15EE77FB74EF1 /* DecisionEngineManager.swift */; };
-		CL023C954A5E1AEBA57DBE92 /* PRModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL013C954A5E1AEBA57DBE92 /* PRModels.swift */; };
-		CL02A461A1FF368A2C7A5B03 /* PRManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01A461A1FF368A2C7A5B03 /* PRManager.swift */; };
-		CL02031EEFB99032C3EE4B47 /* CollaborationSearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01031EEFB99032C3EE4B47 /* CollaborationSearchEngine.swift */; };
 		CL029BC32BCC14D68B592B18 /* BranchProtectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL019BC32BCC14D68B592B18 /* BranchProtectionManager.swift */; };
-		CL02A9149AFEA14984FB827A /* CollaborationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01A9149AFEA14984FB827A /* CollaborationManager.swift */; };
-		CL02EA46B7C453D2926D5165 /* CollaborationFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01EA46B7C453D2926D5165 /* CollaborationFramework.swift */; };
-		CL02B73C35F5C3FFA0A20AF1 /* CollaborationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01B73C35F5C3FFA0A20AF1 /* CollaborationModels.swift */; };
-		WS029CC9F558D3D5EB55F54C /* CodeAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS019CC9F558D3D5EB55F54C /* CodeAnalyzer.swift */; };
-		WS02C62057035832C8B0F500 /* CodeAuditEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01C62057035832C8B0F500 /* CodeAuditEngine.swift */; };
-		WS02B6F213A171BB05821A9B /* CodeImportPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01B6F213A171BB05821A9B /* CodeImportPlanner.swift */; };
-		WS021A85A5613A03B03EEABF /* CodeStructureMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS011A85A5613A03B03EEABF /* CodeStructureMapper.swift */; };
-		WS024A954F08244C7B79B5D6 /* CodeTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS014A954F08244C7B79B5D6 /* CodeTransformer.swift */; };
-		WS02F9DA36F3527867C629E2 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01F9DA36F3527867C629E2 /* AppConfig.swift */; };
-		WS02FE9B82267F56BEDB3463 /* IntegrationTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01FE9B82267F56BEDB3463 /* IntegrationTool.swift */; };
-		WS0234106FCFE8A242AC5721 /* ArticleCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0134106FCFE8A242AC5721 /* ArticleCollection.swift */; };
-		WS02C7ED91243FC73FA4CDC5 /* NotebookBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01C7ED91243FC73FA4CDC5 /* NotebookBlock.swift */; };
-		WS024B1B97F2B14399972340 /* SpreadsheetCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS014B1B97F2B14399972340 /* SpreadsheetCell.swift */; };
-		WS02B9C908A27D71AF96FDD2 /* HabitLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01B9C908A27D71AF96FDD2 /* HabitLog.swift */; };
-		WS02637B31C677342DB65844 /* Spreadsheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01637B31C677342DB65844 /* Spreadsheet.swift */; };
-		WS0249B517285C64EBE466CC /* Habit.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0149B517285C64EBE466CC /* Habit.swift */; };
-		WS027A75D54B299657AC781E /* TaskCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS017A75D54B299657AC781E /* TaskCategory.swift */; };
-		WS02A14517EC6BB272448FAD /* SlideElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01A14517EC6BB272448FAD /* SlideElement.swift */; };
-		WS023CAA7879D69D2E1DF1FC /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS013CAA7879D69D2E1DF1FC /* CalendarEvent.swift */; };
-		WS02576CAE03B5C957532182 /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01576CAE03B5C957532182 /* Article.swift */; };
-		WS02AB870369FA28E436ABDD /* NotebookFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01AB870369FA28E436ABDD /* NotebookFolder.swift */; };
-		WS024AB47EB3D97D7F43750A /* SlideAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS014AB47EB3D97D7F43750A /* SlideAnimation.swift */; };
-		WS02F63A07253A27B2A4E16D /* Notebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01F63A07253A27B2A4E16D /* Notebook.swift */; };
-		WS02E2DBE362F0C85A3186E6 /* Slide.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01E2DBE362F0C85A3186E6 /* Slide.swift */; };
-		WS024F1F74B3BF5E454453A4 /* WorkspaceTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS014F1F74B3BF5E454453A4 /* WorkspaceTask.swift */; };
-		WS02B9E7D3E3960DF07BC99D /* SlideDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01B9E7D3E3960DF07BC99D /* SlideDeck.swift */; };
-		WS02B6CDF5D6482762CEAC0E /* NotebookPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01B6CDF5D6482762CEAC0E /* NotebookPage.swift */; };
-		WS029500627D8C0D189EEFB2 /* SlideNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS019500627D8C0D189EEFB2 /* SlideNode.swift */; };
+		CL02A461A1FF368A2C7A5B03 /* PRManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01A461A1FF368A2C7A5B03 /* PRManager.swift */; };
+		CL023C954A5E1AEBA57DBE92 /* PRModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL013C954A5E1AEBA57DBE92 /* PRModels.swift */; };
 		WS02C642EB7BC90635C49082 /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01C642EB7BC90635C49082 /* SyncEngine.swift */; };
-		WS02442A30C52193468293A9 /* WorkoutsModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01442A30C52193468293A9 /* WorkoutsModeManager.swift */; };
 		WS02B9B79423E80FD8FABEBD /* WorkspaceCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01B9B79423E80FD8FABEBD /* WorkspaceCore.swift */; };
-		WS026558DCB7439C528F452A /* WorkspaceModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS016558DCB7439C528F452A /* WorkspaceModeManager.swift */; };
-		CL02FFFFFFF70F3AFBC9F80C /* PRListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01FFFFFFF70F3AFBC9F80C /* PRListView.swift */; };
-		ED02FFFFFF89B1258F7DE137 /* AssetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01FFFFFF89B1258F7DE137 /* AssetManager.swift */; };
-		ED02FFFFFFEEBB5AB13AF7AC /* HistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01FFFFFFEEBB5AB13AF7AC /* HistoryManager.swift */; };
-		CL02FFFFFFFCE9C55783B21D /* CollaborationSearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01FFFFFFFCE9C55783B21D /* CollaborationSearchEngine.swift */; };
-		CL02FFFFFFC3E42A245B2788 /* DecisionEngineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01FFFFFFC3E42A245B2788 /* DecisionEngineManager.swift */; };
-		CL02FFFFFF8A5885DDAFB7ED /* BranchProtectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01FFFFFF8A5885DDAFB7ED /* BranchProtectionManager.swift */; };
-		CL02FFFFFFA0457E3EE139F8 /* ForkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01FFFFFFA0457E3EE139F8 /* ForkManager.swift */; };
-		CL02FFFFFFA0635533913053 /* PRManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01FFFFFFA0635533913053 /* PRManager.swift */; };
-		CL02FFFFFFC65A1AFD85B5E4 /* PRModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01FFFFFFC65A1AFD85B5E4 /* PRModels.swift */; };
-		ED020000007EA2EAD51B02EB /* EditingFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000007EA2EAD51B02EB /* EditingFramework.swift */; };
-		WS02FFFFFFE0D2C474485E59 /* WorkspaceCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01FFFFFFE0D2C474485E59 /* WorkspaceCore.swift */; };
-		WS0200000005DD026BD93171 /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000005DD026BD93171 /* SyncEngine.swift */; };
 		CL0200000000000000000000 /* CollaborationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000000 /* CollaborationModels.swift */; };
 		CL0200000000000000000001 /* CollaborationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000001 /* CollaborationManager.swift */; };
 		CL0200000000000000000002 /* CollaborationFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000002 /* CollaborationFramework.swift */; };
@@ -1051,140 +957,46 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		ED01B64E8E39309649CE1F4E /* AssetManagerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/AssetManager/AssetManagerView.swift; sourceTree = "<group>"; };
-		ED01B8AF10BAD091416359B5 /* TemplateStudioView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/TemplateStudio/TemplateStudioView.swift; sourceTree = "<group>"; };
-		ED01F94FA50A1AAEA41B83F0 /* AutoEditView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/AutoEdit/AutoEditView.swift; sourceTree = "<group>"; };
-		ED01664A79B234AC50F31A6E /* ProjectVersioningView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/ProjectVersioning/ProjectVersioningView.swift; sourceTree = "<group>"; };
-		ED01D786A61593BC0BE35DFE /* ColorGradingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/ColorGrading/ColorGradingView.swift; sourceTree = "<group>"; };
-		ED01EC669ADE7D1A5CB6BF55 /* MotionTrackingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/MotionTracking/MotionTrackingView.swift; sourceTree = "<group>"; };
-		ED01039FBEE7D6546AA8DDAA /* ExportPipelineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/ExportPipeline/ExportPipelineView.swift; sourceTree = "<group>"; };
-		ED01BE5317FE564B61EC31E7 /* SceneDetectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/SceneDetection/SceneDetectionView.swift; sourceTree = "<group>"; };
-		ED017BF145F9DC22B767AE23 /* AudioEnhancementView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/AudioEnhancement/AudioEnhancementView.swift; sourceTree = "<group>"; };
-		ED014C5D73CFDA9D395578C9 /* BatchProcessingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/BatchProcessing/BatchProcessingView.swift; sourceTree = "<group>"; };
-		ED019D8B75DC9DC11F6A3928 /* HistoryTimelineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/NonDestructivePipeline/HistoryTimelineView.swift; sourceTree = "<group>"; };
-		ED018942E3D0A627325688CB /* TimelineIntelligenceView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/TimelineIntelligence/TimelineIntelligenceView.swift; sourceTree = "<group>"; };
-		ED012B333F6E9E3F3E8E7172 /* SharedTimelineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/SharedSessions/SharedTimelineView.swift; sourceTree = "<group>"; };
-		CL018346B2FD9E82B198E201 /* DependencyInspectorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/DependencyInspector/DependencyInspectorView.swift; sourceTree = "<group>"; };
-		CL01A55C2AECA681D9937F69 /* SmartOrganizerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/SmartOrganizer/SmartOrganizerView.swift; sourceTree = "<group>"; };
-		CL012E99CF1349BE22481731 /* HistoryReplayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/ActivityTimeline/HistoryReplayView.swift; sourceTree = "<group>"; };
-		CL01FAB5B8BE29F3826AA057 /* ActivityTimelineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/ActivityTimeline/ActivityTimelineView.swift; sourceTree = "<group>"; };
-		CL01C9D288DF19F22EC06C36 /* SpacePublishingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/SpacePublishing/SpacePublishingView.swift; sourceTree = "<group>"; };
-		CL0167BF2DFB4F24E5D4B842 /* LiveCollaborationStudioView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/LiveStudio/LiveCollaborationStudioView.swift; sourceTree = "<group>"; };
-		CL010424390AD525E494A1D1 /* WorkspaceAnalyticsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/WorkspaceAnalytics/WorkspaceAnalyticsView.swift; sourceTree = "<group>"; };
-		CL01C76DA47F1357630D6130 /* ForkView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/Forking/ForkView.swift; sourceTree = "<group>"; };
-		CL012E9CECBF7292F2977B54 /* CommitIntelligenceView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/CommitIntelligence/CommitIntelligenceView.swift; sourceTree = "<group>"; };
-		CL01B803AA7D3A965F360BB1 /* DecisionEngineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/DecisionEngine/DecisionEngineView.swift; sourceTree = "<group>"; };
-		CL019C40A27CBD5BC2B4C096 /* WorkspaceCommandCenterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/CommandCenter/WorkspaceCommandCenterView.swift; sourceTree = "<group>"; };
-		CL01773F724A37E3CD2396DF /* KnowledgeGraphView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/KnowledgeGraph/KnowledgeGraphView.swift; sourceTree = "<group>"; };
-		CL01CF7B7A0C36F86CCB1469 /* SideBySideDiffView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/PullRequest/SideBySideDiffView.swift; sourceTree = "<group>"; };
-		CL017745376556E12A15C4A3 /* PRDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/PullRequest/PRDetailView.swift; sourceTree = "<group>"; };
-		CL019BC7426CE415DBA90DE8 /* ConflictResolutionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/PullRequest/ConflictResolutionView.swift; sourceTree = "<group>"; };
 		CL010EEE766C741562D7373B /* CollaborationSearchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/SearchEngine/CollaborationSearchView.swift; sourceTree = "<group>"; };
-		CL0166FD34F77FB6AE0210E7 /* ProjectExecutionBoardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/ExecutionBoard/ProjectExecutionBoardView.swift; sourceTree = "<group>"; };
-		CL0128244D97E84954A1E268 /* BranchProtectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/BranchProtection/BranchProtectionView.swift; sourceTree = "<group>"; };
-		CL0150C20E3BC3F2643D3CF6 /* TemplateGalleryView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/WorkspaceTemplates/TemplateGalleryView.swift; sourceTree = "<group>"; };
-		ED0132BF3F263926D7093C5D /* AIEditingService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/AIEditingLayer/AIEditingService.swift; sourceTree = "<group>"; };
-		CL017D47C3959B9B46ADD8EF /* LiveStudioManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/LiveStudio/LiveStudioManager.swift; sourceTree = "<group>"; };
-		CL017EFDFFDDA6F29C19D242 /* WorkspaceAnalyticsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/WorkspaceAnalytics/WorkspaceAnalyticsManager.swift; sourceTree = "<group>"; };
-		CL0131A410BFA1567B66E958 /* KnowledgeGraphManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/KnowledgeGraph/KnowledgeGraphManager.swift; sourceTree = "<group>"; };
-		CL0117011FA47290ABC62564 /* ExecutionBoardManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/ExecutionBoard/ExecutionBoardManager.swift; sourceTree = "<group>"; };
-		ED01F68F5154B35821FD92C5 /* AIEditingPanelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/AIEditingLayer/AIEditingPanelView.swift; sourceTree = "<group>"; };
-		CL013BFC5B0183AC2FECD645 /* GuestAccessView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/ExternalCollaboration/GuestAccessView.swift; sourceTree = "<group>"; };
-		ED01B0CB18B2E81F9A985237 /* TemplateStudioManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/TemplateStudio/TemplateStudioManager.swift; sourceTree = "<group>"; };
-		ED01AFE5CE5B821D4812C403 /* AutoEditManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/AutoEdit/AutoEditManager.swift; sourceTree = "<group>"; };
-		ED0145002380F404A71BB571 /* ProjectVersioningManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/ProjectVersioning/ProjectVersioningManager.swift; sourceTree = "<group>"; };
-		ED01D996D2D49050FCD1F440 /* ColorGradingManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/ColorGrading/ColorGradingManager.swift; sourceTree = "<group>"; };
-		ED0129D507DB65309B40CCA7 /* MotionTrackingManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/MotionTracking/MotionTrackingManager.swift; sourceTree = "<group>"; };
+		CL01FAB5B8BE29F3826AA057 /* ActivityTimelineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/ActivityTimeline/ActivityTimelineView.swift; sourceTree = "<group>"; };
+		ED0172FD09958FF23E06D924 /* FullEditorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/FullEditorView.swift; sourceTree = "<group>"; };
 		ED01AA3640C7CCD74550F61B /* ExportPipelineManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/ExportPipeline/ExportPipelineManager.swift; sourceTree = "<group>"; };
-		ED01CAD31035F2F8AE1DF3F7 /* SceneDetectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/SceneDetection/SceneDetectionManager.swift; sourceTree = "<group>"; };
-		ED01BBE9498F2257CF925312 /* AudioEnhancementManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/AudioEnhancement/AudioEnhancementManager.swift; sourceTree = "<group>"; };
-		ED0180FAD94022F7DE242E0B /* BatchProcessingManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/BatchProcessing/BatchProcessingManager.swift; sourceTree = "<group>"; };
+		ED01281F17CFB314F0597C1A /* AssetManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/AssetManager/AssetManager.swift; sourceTree = "<group>"; };
 		ED01838E54324D10EACDFCA3 /* TimelineIntelligenceService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/TimelineIntelligence/TimelineIntelligenceService.swift; sourceTree = "<group>"; };
 		ED01FB1EE79D5C765D0EF215 /* SharedEditingManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/SharedSessions/SharedEditingManager.swift; sourceTree = "<group>"; };
-		CL0124B957930EFA62641C8A /* DependencyInspector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/DependencyInspector/DependencyInspector.swift; sourceTree = "<group>"; };
+		ED0145002380F404A71BB571 /* ProjectVersioningManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/ProjectVersioning/ProjectVersioningManager.swift; sourceTree = "<group>"; };
+		ED0180FAD94022F7DE242E0B /* BatchProcessingManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/BatchProcessing/BatchProcessingManager.swift; sourceTree = "<group>"; };
+		ED01B0CB18B2E81F9A985237 /* TemplateStudioManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/TemplateStudio/TemplateStudioManager.swift; sourceTree = "<group>"; };
+		ED01BBE9498F2257CF925312 /* AudioEnhancementManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/AudioEnhancement/AudioEnhancementManager.swift; sourceTree = "<group>"; };
+		ED01D996D2D49050FCD1F440 /* ColorGradingManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/ColorGrading/ColorGradingManager.swift; sourceTree = "<group>"; };
+		ED0129D507DB65309B40CCA7 /* MotionTrackingManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/MotionTracking/MotionTrackingManager.swift; sourceTree = "<group>"; };
+		ED01AFE5CE5B821D4812C403 /* AutoEditManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/AutoEdit/AutoEditManager.swift; sourceTree = "<group>"; };
+		ED01CAD31035F2F8AE1DF3F7 /* SceneDetectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/SceneDetection/SceneDetectionManager.swift; sourceTree = "<group>"; };
+		ED0132BF3F263926D7093C5D /* AIEditingService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/AIEditingLayer/AIEditingService.swift; sourceTree = "<group>"; };
+		CL017EFDFFDDA6F29C19D242 /* WorkspaceAnalyticsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/WorkspaceAnalytics/WorkspaceAnalyticsManager.swift; sourceTree = "<group>"; };
+		CL017D47C3959B9B46ADD8EF /* LiveStudioManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/LiveStudio/LiveStudioManager.swift; sourceTree = "<group>"; };
+		CL0131A410BFA1567B66E958 /* KnowledgeGraphManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/KnowledgeGraph/KnowledgeGraphManager.swift; sourceTree = "<group>"; };
+		CL0117011FA47290ABC62564 /* ExecutionBoardManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/ExecutionBoard/ExecutionBoardManager.swift; sourceTree = "<group>"; };
+		CL01A0291FC15EE77FB74EF1 /* DecisionEngineManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/DecisionEngine/DecisionEngineManager.swift; sourceTree = "<group>"; };
+		CL01031EEFB99032C3EE4B47 /* CollaborationSearchEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/SearchEngine/CollaborationSearchEngine.swift; sourceTree = "<group>"; };
 		CL0132B447C8434C59EF9D22 /* SmartOrganizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/SmartOrganizer/SmartOrganizer.swift; sourceTree = "<group>"; };
-		CL01C3AFDC3CF52E64F81C26 /* ActivityTimelineManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/ActivityTimeline/ActivityTimelineManager.swift; sourceTree = "<group>"; };
-		CL016AA7C0AF2ACE4A1D6AAB /* SpacePublishingManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/SpacePublishing/SpacePublishingManager.swift; sourceTree = "<group>"; };
-		CL0167D53D1AD377DC13D828 /* ExternalAccessManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/ExternalCollaboration/ExternalAccessManager.swift; sourceTree = "<group>"; };
-		CL015A49D432ABAD978F2754 /* CommitIntelligenceService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/CommitIntelligence/CommitIntelligenceService.swift; sourceTree = "<group>"; };
+		CL0124B957930EFA62641C8A /* DependencyInspector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/DependencyInspector/DependencyInspector.swift; sourceTree = "<group>"; };
 		CL018C5787DACB78FC90CA26 /* CommandCenterController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/CommandCenter/CommandCenterController.swift; sourceTree = "<group>"; };
+		CL0167D53D1AD377DC13D828 /* ExternalAccessManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/ExternalCollaboration/ExternalAccessManager.swift; sourceTree = "<group>"; };
 		CL01E52B5ABF880487C60D4A /* TemplateManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/WorkspaceTemplates/TemplateManager.swift; sourceTree = "<group>"; };
-		ED0172FD09958FF23E06D924 /* FullEditorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/FullEditorView.swift; sourceTree = "<group>"; };
-		ED01D411C2F5479E0B7CC39D /* EditingHomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/EditingHomeView.swift; sourceTree = "<group>"; };
+		CL016AA7C0AF2ACE4A1D6AAB /* SpacePublishingManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/SpacePublishing/SpacePublishingManager.swift; sourceTree = "<group>"; };
+		CL01C3AFDC3CF52E64F81C26 /* ActivityTimelineManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/ActivityTimeline/ActivityTimelineManager.swift; sourceTree = "<group>"; };
+		CL015A49D432ABAD978F2754 /* CommitIntelligenceService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/CommitIntelligence/CommitIntelligenceService.swift; sourceTree = "<group>"; };
+		CL01F2FEE87142C26FDF58A8 /* ForkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/Forking/ForkManager.swift; sourceTree = "<group>"; };
+		CL013BFC5B0183AC2FECD645 /* GuestAccessView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/ExternalCollaboration/GuestAccessView.swift; sourceTree = "<group>"; };
 		CL0101914289947246594FAF /* PRListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/PullRequest/PRListView.swift; sourceTree = "<group>"; };
-		CL01EC1C5BD402E0A1A0EE90 /* VersionHistoryView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/VersionHistoryView.swift; sourceTree = "<group>"; };
-		CL017E48D5E8FFBC05FE8EE2 /* SpaceDashboardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/SpaceDashboardView.swift; sourceTree = "<group>"; };
-		CL012A041040343F46F86D5E /* CollaborationHomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/CollaborationHomeView.swift; sourceTree = "<group>"; };
-		CL01F470EDF037D1B6507319 /* AddDataCollabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/AddDataCollabView.swift; sourceTree = "<group>"; };
-		WS011475DCE9954699818366 /* CallKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Meet/CallKitManager.swift; sourceTree = "<group>"; };
-		WS011A80C1258BD7A498BC68 /* PiPController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Meet/PiPController.swift; sourceTree = "<group>"; };
-		WS01E11772B333E64F5AC2D5 /* MeetingResolver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Meet/MeetingResolver.swift; sourceTree = "<group>"; };
-		WS01EE8C6278AA701670E7CE /* MeetSessionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Meet/MeetSessionController.swift; sourceTree = "<group>"; };
-		WS01073AAB2B49E6A3039D76 /* CallKitProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Meet/CallKitProvider.swift; sourceTree = "<group>"; };
-		WS0150569A735E125B6363CA /* MeetingDomainModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Meet/MeetingDomainModels.swift; sourceTree = "<group>"; };
-		WS010AB9EA3F4D81377FA5B8 /* DailyService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Meet/DailyService.swift; sourceTree = "<group>"; };
-		WS0196E7AE02C0847BA7C335 /* MeetingNotesManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Meet/MeetingNotesManager.swift; sourceTree = "<group>"; };
-		WS01C4F183F3581BA799E71A /* MeetingSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Meet/MeetingSession.swift; sourceTree = "<group>"; };
-		WS0181BB51BB411945E6394B /* DebugLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Meet/DebugLogger.swift; sourceTree = "<group>"; };
-		WS01A26D0D7F707B9C08F55A /* MeetPermissionService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Meet/MeetPermissionService.swift; sourceTree = "<group>"; };
-		ED01281F17CFB314F0597C1A /* AssetManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/AssetManager/AssetManager.swift; sourceTree = "<group>"; };
 		ED01C3C4130B4C8C6EA21681 /* HistoryManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/NonDestructivePipeline/HistoryManager.swift; sourceTree = "<group>"; };
 		ED0165ED68F76474BD609BE9 /* EditingFramework.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/EditingFramework.swift; sourceTree = "<group>"; };
-		ED0167E64A0D77F39997C421 /* EditingManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/EditingManager.swift; sourceTree = "<group>"; };
-		ED017AF32EAE5CDE84E17854 /* EditingEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/EditingEngine.swift; sourceTree = "<group>"; };
-		ED0107BE27EED97F075CDB07 /* EditingModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/EditingModels.swift; sourceTree = "<group>"; };
-		WS015CD9F7B2527A10843551 /* FeedbackModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Feedback/FeedbackModel.swift; sourceTree = "<group>"; };
-		WS01C5B83ACB0F10533EE584 /* FeedbackService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Feedback/FeedbackService.swift; sourceTree = "<group>"; };
-		CL01F2FEE87142C26FDF58A8 /* ForkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/Forking/ForkManager.swift; sourceTree = "<group>"; };
-		CL01A0291FC15EE77FB74EF1 /* DecisionEngineManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/DecisionEngine/DecisionEngineManager.swift; sourceTree = "<group>"; };
-		CL013C954A5E1AEBA57DBE92 /* PRModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/PullRequest/PRModels.swift; sourceTree = "<group>"; };
-		CL01A461A1FF368A2C7A5B03 /* PRManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/PullRequest/PRManager.swift; sourceTree = "<group>"; };
-		CL01031EEFB99032C3EE4B47 /* CollaborationSearchEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/SearchEngine/CollaborationSearchEngine.swift; sourceTree = "<group>"; };
 		CL019BC32BCC14D68B592B18 /* BranchProtectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/BranchProtection/BranchProtectionManager.swift; sourceTree = "<group>"; };
-		CL01A9149AFEA14984FB827A /* CollaborationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/CollaborationManager.swift; sourceTree = "<group>"; };
-		CL01EA46B7C453D2926D5165 /* CollaborationFramework.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/CollaborationFramework.swift; sourceTree = "<group>"; };
-		CL01B73C35F5C3FFA0A20AF1 /* CollaborationModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/CollaborationModels.swift; sourceTree = "<group>"; };
-		WS019CC9F558D3D5EB55F54C /* CodeAnalyzer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Code/CodeAnalyzer.swift; sourceTree = "<group>"; };
-		WS01C62057035832C8B0F500 /* CodeAuditEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Code/CodeAuditEngine.swift; sourceTree = "<group>"; };
-		WS01B6F213A171BB05821A9B /* CodeImportPlanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Code/CodeImportPlanner.swift; sourceTree = "<group>"; };
-		WS011A85A5613A03B03EEABF /* CodeStructureMapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Code/CodeStructureMapper.swift; sourceTree = "<group>"; };
-		WS014A954F08244C7B79B5D6 /* CodeTransformer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Code/CodeTransformer.swift; sourceTree = "<group>"; };
-		WS01F9DA36F3527867C629E2 /* AppConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Core/AppConfig.swift; sourceTree = "<group>"; };
-		WS01FE9B82267F56BEDB3463 /* IntegrationTool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/IntegrationTool.swift; sourceTree = "<group>"; };
-		WS0134106FCFE8A242AC5721 /* ArticleCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/ArticleCollection.swift; sourceTree = "<group>"; };
-		WS01C7ED91243FC73FA4CDC5 /* NotebookBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/NotebookBlock.swift; sourceTree = "<group>"; };
-		WS014B1B97F2B14399972340 /* SpreadsheetCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/SpreadsheetCell.swift; sourceTree = "<group>"; };
-		WS01B9C908A27D71AF96FDD2 /* HabitLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/HabitLog.swift; sourceTree = "<group>"; };
-		WS01637B31C677342DB65844 /* Spreadsheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/Spreadsheet.swift; sourceTree = "<group>"; };
-		WS0149B517285C64EBE466CC /* Habit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/Habit.swift; sourceTree = "<group>"; };
-		WS017A75D54B299657AC781E /* TaskCategory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/TaskCategory.swift; sourceTree = "<group>"; };
-		WS01A14517EC6BB272448FAD /* SlideElement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/SlideElement.swift; sourceTree = "<group>"; };
-		WS013CAA7879D69D2E1DF1FC /* CalendarEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/CalendarEvent.swift; sourceTree = "<group>"; };
-		WS01576CAE03B5C957532182 /* Article.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/Article.swift; sourceTree = "<group>"; };
-		WS01AB870369FA28E436ABDD /* NotebookFolder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/NotebookFolder.swift; sourceTree = "<group>"; };
-		WS014AB47EB3D97D7F43750A /* SlideAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/SlideAnimation.swift; sourceTree = "<group>"; };
-		WS01F63A07253A27B2A4E16D /* Notebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/Notebook.swift; sourceTree = "<group>"; };
-		WS01E2DBE362F0C85A3186E6 /* Slide.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/Slide.swift; sourceTree = "<group>"; };
-		WS014F1F74B3BF5E454453A4 /* WorkspaceTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/WorkspaceTask.swift; sourceTree = "<group>"; };
-		WS01B9E7D3E3960DF07BC99D /* SlideDeck.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/SlideDeck.swift; sourceTree = "<group>"; };
-		WS01B6CDF5D6482762CEAC0E /* NotebookPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/NotebookPage.swift; sourceTree = "<group>"; };
-		WS019500627D8C0D189EEFB2 /* SlideNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Models/SlideNode.swift; sourceTree = "<group>"; };
+		CL01A461A1FF368A2C7A5B03 /* PRManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/PullRequest/PRManager.swift; sourceTree = "<group>"; };
+		CL013C954A5E1AEBA57DBE92 /* PRModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/PullRequest/PRModels.swift; sourceTree = "<group>"; };
 		WS01C642EB7BC90635C49082 /* SyncEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/SyncEngine.swift; sourceTree = "<group>"; };
-		WS01442A30C52193468293A9 /* WorkoutsModeManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/WorkoutsModeManager.swift; sourceTree = "<group>"; };
 		WS01B9B79423E80FD8FABEBD /* WorkspaceCore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/WorkspaceCore.swift; sourceTree = "<group>"; };
-		WS016558DCB7439C528F452A /* WorkspaceModeManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/WorkspaceModeManager.swift; sourceTree = "<group>"; };
-		CL01FFFFFFF70F3AFBC9F80C /* PRListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/PullRequest/PRListView.swift; sourceTree = "<group>"; };
-		ED01FFFFFF89B1258F7DE137 /* AssetManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/AssetManager/AssetManager.swift; sourceTree = "<group>"; };
-		ED01FFFFFFEEBB5AB13AF7AC /* HistoryManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/NonDestructivePipeline/HistoryManager.swift; sourceTree = "<group>"; };
-		CL01FFFFFFFCE9C55783B21D /* CollaborationSearchEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/SearchEngine/CollaborationSearchEngine.swift; sourceTree = "<group>"; };
-		CL01FFFFFFC3E42A245B2788 /* DecisionEngineManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/DecisionEngine/DecisionEngineManager.swift; sourceTree = "<group>"; };
-		CL01FFFFFF8A5885DDAFB7ED /* BranchProtectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/BranchProtection/BranchProtectionManager.swift; sourceTree = "<group>"; };
-		CL01FFFFFFA0457E3EE139F8 /* ForkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/Forking/ForkManager.swift; sourceTree = "<group>"; };
-		CL01FFFFFFA0635533913053 /* PRManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/PullRequest/PRManager.swift; sourceTree = "<group>"; };
-		CL01FFFFFFC65A1AFD85B5E4 /* PRModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/PullRequest/PRModels.swift; sourceTree = "<group>"; };
-		ED010000007EA2EAD51B02EB /* EditingFramework.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/EditingFramework.swift; sourceTree = "<group>"; };
-		WS01FFFFFFE0D2C474485E59 /* WorkspaceCore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/WorkspaceCore.swift; sourceTree = "<group>"; };
-		WS0100000005DD026BD93171 /* SyncEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/SyncEngine.swift; sourceTree = "<group>"; };
 		CL0100000000000000000000 /* CollaborationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/CollaborationModels.swift; sourceTree = "<group>"; };
 		CL0100000000000000000001 /* CollaborationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/CollaborationManager.swift; sourceTree = "<group>"; };
 		CL0100000000000000000002 /* CollaborationFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/CollaborationFramework.swift; sourceTree = "<group>"; };
@@ -2208,140 +2020,46 @@
 		8DF4BF69CF55A81CB6EBF3DE /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				ED01B64E8E39309649CE1F4E /* AssetManagerView.swift */,
-				ED01B8AF10BAD091416359B5 /* TemplateStudioView.swift */,
-				ED01F94FA50A1AAEA41B83F0 /* AutoEditView.swift */,
-				ED01664A79B234AC50F31A6E /* ProjectVersioningView.swift */,
-				ED01D786A61593BC0BE35DFE /* ColorGradingView.swift */,
-				ED01EC669ADE7D1A5CB6BF55 /* MotionTrackingView.swift */,
-				ED01039FBEE7D6546AA8DDAA /* ExportPipelineView.swift */,
-				ED01BE5317FE564B61EC31E7 /* SceneDetectionView.swift */,
-				ED017BF145F9DC22B767AE23 /* AudioEnhancementView.swift */,
-				ED014C5D73CFDA9D395578C9 /* BatchProcessingView.swift */,
-				ED019D8B75DC9DC11F6A3928 /* HistoryTimelineView.swift */,
-				ED018942E3D0A627325688CB /* TimelineIntelligenceView.swift */,
-				ED012B333F6E9E3F3E8E7172 /* SharedTimelineView.swift */,
-				CL018346B2FD9E82B198E201 /* DependencyInspectorView.swift */,
-				CL01A55C2AECA681D9937F69 /* SmartOrganizerView.swift */,
-				CL012E99CF1349BE22481731 /* HistoryReplayView.swift */,
-				CL01FAB5B8BE29F3826AA057 /* ActivityTimelineView.swift */,
-				CL01C9D288DF19F22EC06C36 /* SpacePublishingView.swift */,
-				CL0167BF2DFB4F24E5D4B842 /* LiveCollaborationStudioView.swift */,
-				CL010424390AD525E494A1D1 /* WorkspaceAnalyticsView.swift */,
-				CL01C76DA47F1357630D6130 /* ForkView.swift */,
-				CL012E9CECBF7292F2977B54 /* CommitIntelligenceView.swift */,
-				CL01B803AA7D3A965F360BB1 /* DecisionEngineView.swift */,
-				CL019C40A27CBD5BC2B4C096 /* WorkspaceCommandCenterView.swift */,
-				CL01773F724A37E3CD2396DF /* KnowledgeGraphView.swift */,
-				CL01CF7B7A0C36F86CCB1469 /* SideBySideDiffView.swift */,
-				CL017745376556E12A15C4A3 /* PRDetailView.swift */,
-				CL019BC7426CE415DBA90DE8 /* ConflictResolutionView.swift */,
 				CL010EEE766C741562D7373B /* CollaborationSearchView.swift */,
-				CL0166FD34F77FB6AE0210E7 /* ProjectExecutionBoardView.swift */,
-				CL0128244D97E84954A1E268 /* BranchProtectionView.swift */,
-				CL0150C20E3BC3F2643D3CF6 /* TemplateGalleryView.swift */,
-				ED0132BF3F263926D7093C5D /* AIEditingService.swift */,
-				CL017D47C3959B9B46ADD8EF /* LiveStudioManager.swift */,
-				CL017EFDFFDDA6F29C19D242 /* WorkspaceAnalyticsManager.swift */,
-				CL0131A410BFA1567B66E958 /* KnowledgeGraphManager.swift */,
-				CL0117011FA47290ABC62564 /* ExecutionBoardManager.swift */,
-				ED01F68F5154B35821FD92C5 /* AIEditingPanelView.swift */,
-				CL013BFC5B0183AC2FECD645 /* GuestAccessView.swift */,
-				ED01B0CB18B2E81F9A985237 /* TemplateStudioManager.swift */,
-				ED01AFE5CE5B821D4812C403 /* AutoEditManager.swift */,
-				ED0145002380F404A71BB571 /* ProjectVersioningManager.swift */,
-				ED01D996D2D49050FCD1F440 /* ColorGradingManager.swift */,
-				ED0129D507DB65309B40CCA7 /* MotionTrackingManager.swift */,
+				CL01FAB5B8BE29F3826AA057 /* ActivityTimelineView.swift */,
+				ED0172FD09958FF23E06D924 /* FullEditorView.swift */,
 				ED01AA3640C7CCD74550F61B /* ExportPipelineManager.swift */,
-				ED01CAD31035F2F8AE1DF3F7 /* SceneDetectionManager.swift */,
-				ED01BBE9498F2257CF925312 /* AudioEnhancementManager.swift */,
-				ED0180FAD94022F7DE242E0B /* BatchProcessingManager.swift */,
+				ED01281F17CFB314F0597C1A /* AssetManager.swift */,
 				ED01838E54324D10EACDFCA3 /* TimelineIntelligenceService.swift */,
 				ED01FB1EE79D5C765D0EF215 /* SharedEditingManager.swift */,
-				CL0124B957930EFA62641C8A /* DependencyInspector.swift */,
+				ED0145002380F404A71BB571 /* ProjectVersioningManager.swift */,
+				ED0180FAD94022F7DE242E0B /* BatchProcessingManager.swift */,
+				ED01B0CB18B2E81F9A985237 /* TemplateStudioManager.swift */,
+				ED01BBE9498F2257CF925312 /* AudioEnhancementManager.swift */,
+				ED01D996D2D49050FCD1F440 /* ColorGradingManager.swift */,
+				ED0129D507DB65309B40CCA7 /* MotionTrackingManager.swift */,
+				ED01AFE5CE5B821D4812C403 /* AutoEditManager.swift */,
+				ED01CAD31035F2F8AE1DF3F7 /* SceneDetectionManager.swift */,
+				ED0132BF3F263926D7093C5D /* AIEditingService.swift */,
+				CL017EFDFFDDA6F29C19D242 /* WorkspaceAnalyticsManager.swift */,
+				CL017D47C3959B9B46ADD8EF /* LiveStudioManager.swift */,
+				CL0131A410BFA1567B66E958 /* KnowledgeGraphManager.swift */,
+				CL0117011FA47290ABC62564 /* ExecutionBoardManager.swift */,
+				CL01A0291FC15EE77FB74EF1 /* DecisionEngineManager.swift */,
+				CL01031EEFB99032C3EE4B47 /* CollaborationSearchEngine.swift */,
 				CL0132B447C8434C59EF9D22 /* SmartOrganizer.swift */,
-				CL01C3AFDC3CF52E64F81C26 /* ActivityTimelineManager.swift */,
-				CL016AA7C0AF2ACE4A1D6AAB /* SpacePublishingManager.swift */,
-				CL0167D53D1AD377DC13D828 /* ExternalAccessManager.swift */,
-				CL015A49D432ABAD978F2754 /* CommitIntelligenceService.swift */,
+				CL0124B957930EFA62641C8A /* DependencyInspector.swift */,
 				CL018C5787DACB78FC90CA26 /* CommandCenterController.swift */,
+				CL0167D53D1AD377DC13D828 /* ExternalAccessManager.swift */,
 				CL01E52B5ABF880487C60D4A /* TemplateManager.swift */,
-				ED0172FD09958FF23E06D924 /* FullEditorView.swift */,
-				ED01D411C2F5479E0B7CC39D /* EditingHomeView.swift */,
+				CL016AA7C0AF2ACE4A1D6AAB /* SpacePublishingManager.swift */,
+				CL01C3AFDC3CF52E64F81C26 /* ActivityTimelineManager.swift */,
+				CL015A49D432ABAD978F2754 /* CommitIntelligenceService.swift */,
+				CL01F2FEE87142C26FDF58A8 /* ForkManager.swift */,
+				CL013BFC5B0183AC2FECD645 /* GuestAccessView.swift */,
 				CL0101914289947246594FAF /* PRListView.swift */,
-				CL01EC1C5BD402E0A1A0EE90 /* VersionHistoryView.swift */,
-				CL017E48D5E8FFBC05FE8EE2 /* SpaceDashboardView.swift */,
-				CL012A041040343F46F86D5E /* CollaborationHomeView.swift */,
-				CL01F470EDF037D1B6507319 /* AddDataCollabView.swift */,
-				WS011475DCE9954699818366 /* CallKitManager.swift */,
-				WS011A80C1258BD7A498BC68 /* PiPController.swift */,
-				WS01E11772B333E64F5AC2D5 /* MeetingResolver.swift */,
-				WS01EE8C6278AA701670E7CE /* MeetSessionController.swift */,
-				WS01073AAB2B49E6A3039D76 /* CallKitProvider.swift */,
-				WS0150569A735E125B6363CA /* MeetingDomainModels.swift */,
-				WS010AB9EA3F4D81377FA5B8 /* DailyService.swift */,
-				WS0196E7AE02C0847BA7C335 /* MeetingNotesManager.swift */,
-				WS01C4F183F3581BA799E71A /* MeetingSession.swift */,
-				WS0181BB51BB411945E6394B /* DebugLogger.swift */,
-				WS01A26D0D7F707B9C08F55A /* MeetPermissionService.swift */,
-				ED01281F17CFB314F0597C1A /* AssetManager.swift */,
 				ED01C3C4130B4C8C6EA21681 /* HistoryManager.swift */,
 				ED0165ED68F76474BD609BE9 /* EditingFramework.swift */,
-				ED0167E64A0D77F39997C421 /* EditingManager.swift */,
-				ED017AF32EAE5CDE84E17854 /* EditingEngine.swift */,
-				ED0107BE27EED97F075CDB07 /* EditingModels.swift */,
-				WS015CD9F7B2527A10843551 /* FeedbackModel.swift */,
-				WS01C5B83ACB0F10533EE584 /* FeedbackService.swift */,
-				CL01F2FEE87142C26FDF58A8 /* ForkManager.swift */,
-				CL01A0291FC15EE77FB74EF1 /* DecisionEngineManager.swift */,
-				CL013C954A5E1AEBA57DBE92 /* PRModels.swift */,
-				CL01A461A1FF368A2C7A5B03 /* PRManager.swift */,
-				CL01031EEFB99032C3EE4B47 /* CollaborationSearchEngine.swift */,
 				CL019BC32BCC14D68B592B18 /* BranchProtectionManager.swift */,
-				CL01A9149AFEA14984FB827A /* CollaborationManager.swift */,
-				CL01EA46B7C453D2926D5165 /* CollaborationFramework.swift */,
-				CL01B73C35F5C3FFA0A20AF1 /* CollaborationModels.swift */,
-				WS019CC9F558D3D5EB55F54C /* CodeAnalyzer.swift */,
-				WS01C62057035832C8B0F500 /* CodeAuditEngine.swift */,
-				WS01B6F213A171BB05821A9B /* CodeImportPlanner.swift */,
-				WS011A85A5613A03B03EEABF /* CodeStructureMapper.swift */,
-				WS014A954F08244C7B79B5D6 /* CodeTransformer.swift */,
-				WS01F9DA36F3527867C629E2 /* AppConfig.swift */,
-				WS01FE9B82267F56BEDB3463 /* IntegrationTool.swift */,
-				WS0134106FCFE8A242AC5721 /* ArticleCollection.swift */,
-				WS01C7ED91243FC73FA4CDC5 /* NotebookBlock.swift */,
-				WS014B1B97F2B14399972340 /* SpreadsheetCell.swift */,
-				WS01B9C908A27D71AF96FDD2 /* HabitLog.swift */,
-				WS01637B31C677342DB65844 /* Spreadsheet.swift */,
-				WS0149B517285C64EBE466CC /* Habit.swift */,
-				WS017A75D54B299657AC781E /* TaskCategory.swift */,
-				WS01A14517EC6BB272448FAD /* SlideElement.swift */,
-				WS013CAA7879D69D2E1DF1FC /* CalendarEvent.swift */,
-				WS01576CAE03B5C957532182 /* Article.swift */,
-				WS01AB870369FA28E436ABDD /* NotebookFolder.swift */,
-				WS014AB47EB3D97D7F43750A /* SlideAnimation.swift */,
-				WS01F63A07253A27B2A4E16D /* Notebook.swift */,
-				WS01E2DBE362F0C85A3186E6 /* Slide.swift */,
-				WS014F1F74B3BF5E454453A4 /* WorkspaceTask.swift */,
-				WS01B9E7D3E3960DF07BC99D /* SlideDeck.swift */,
-				WS01B6CDF5D6482762CEAC0E /* NotebookPage.swift */,
-				WS019500627D8C0D189EEFB2 /* SlideNode.swift */,
+				CL01A461A1FF368A2C7A5B03 /* PRManager.swift */,
+				CL013C954A5E1AEBA57DBE92 /* PRModels.swift */,
 				WS01C642EB7BC90635C49082 /* SyncEngine.swift */,
-				WS01442A30C52193468293A9 /* WorkoutsModeManager.swift */,
 				WS01B9B79423E80FD8FABEBD /* WorkspaceCore.swift */,
-				WS016558DCB7439C528F452A /* WorkspaceModeManager.swift */,
-				CL01FFFFFFF70F3AFBC9F80C /* PRListView.swift */,
-				ED01FFFFFF89B1258F7DE137 /* AssetManager.swift */,
-				ED01FFFFFFEEBB5AB13AF7AC /* HistoryManager.swift */,
-				CL01FFFFFFFCE9C55783B21D /* CollaborationSearchEngine.swift */,
-				CL01FFFFFFC3E42A245B2788 /* DecisionEngineManager.swift */,
-				CL01FFFFFF8A5885DDAFB7ED /* BranchProtectionManager.swift */,
-				CL01FFFFFFA0457E3EE139F8 /* ForkManager.swift */,
-				CL01FFFFFFA0635533913053 /* PRManager.swift */,
-				CL01FFFFFFC65A1AFD85B5E4 /* PRModels.swift */,
-				ED010000007EA2EAD51B02EB /* EditingFramework.swift */,
-				WS01FFFFFFE0D2C474485E59 /* WorkspaceCore.swift */,
-				WS0100000005DD026BD93171 /* SyncEngine.swift */,
 				GH0100000000000000000001 /* GitHubAuthManager.swift */,
 				GH0100000000000000000002 /* GitHubModels.swift */,
 				GH0100000000000000000003 /* GitHubEndpoints.swift */,
@@ -3531,140 +3249,46 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED02B64E8E39309649CE1F4E /* AssetManagerView.swift in Sources */,
-				ED02B8AF10BAD091416359B5 /* TemplateStudioView.swift in Sources */,
-				ED02F94FA50A1AAEA41B83F0 /* AutoEditView.swift in Sources */,
-				ED02664A79B234AC50F31A6E /* ProjectVersioningView.swift in Sources */,
-				ED02D786A61593BC0BE35DFE /* ColorGradingView.swift in Sources */,
-				ED02EC669ADE7D1A5CB6BF55 /* MotionTrackingView.swift in Sources */,
-				ED02039FBEE7D6546AA8DDAA /* ExportPipelineView.swift in Sources */,
-				ED02BE5317FE564B61EC31E7 /* SceneDetectionView.swift in Sources */,
-				ED027BF145F9DC22B767AE23 /* AudioEnhancementView.swift in Sources */,
-				ED024C5D73CFDA9D395578C9 /* BatchProcessingView.swift in Sources */,
-				ED029D8B75DC9DC11F6A3928 /* HistoryTimelineView.swift in Sources */,
-				ED028942E3D0A627325688CB /* TimelineIntelligenceView.swift in Sources */,
-				ED022B333F6E9E3F3E8E7172 /* SharedTimelineView.swift in Sources */,
-				CL028346B2FD9E82B198E201 /* DependencyInspectorView.swift in Sources */,
-				CL02A55C2AECA681D9937F69 /* SmartOrganizerView.swift in Sources */,
-				CL022E99CF1349BE22481731 /* HistoryReplayView.swift in Sources */,
-				CL02FAB5B8BE29F3826AA057 /* ActivityTimelineView.swift in Sources */,
-				CL02C9D288DF19F22EC06C36 /* SpacePublishingView.swift in Sources */,
-				CL0267BF2DFB4F24E5D4B842 /* LiveCollaborationStudioView.swift in Sources */,
-				CL020424390AD525E494A1D1 /* WorkspaceAnalyticsView.swift in Sources */,
-				CL02C76DA47F1357630D6130 /* ForkView.swift in Sources */,
-				CL022E9CECBF7292F2977B54 /* CommitIntelligenceView.swift in Sources */,
-				CL02B803AA7D3A965F360BB1 /* DecisionEngineView.swift in Sources */,
-				CL029C40A27CBD5BC2B4C096 /* WorkspaceCommandCenterView.swift in Sources */,
-				CL02773F724A37E3CD2396DF /* KnowledgeGraphView.swift in Sources */,
-				CL02CF7B7A0C36F86CCB1469 /* SideBySideDiffView.swift in Sources */,
-				CL027745376556E12A15C4A3 /* PRDetailView.swift in Sources */,
-				CL029BC7426CE415DBA90DE8 /* ConflictResolutionView.swift in Sources */,
 				CL020EEE766C741562D7373B /* CollaborationSearchView.swift in Sources */,
-				CL0266FD34F77FB6AE0210E7 /* ProjectExecutionBoardView.swift in Sources */,
-				CL0228244D97E84954A1E268 /* BranchProtectionView.swift in Sources */,
-				CL0250C20E3BC3F2643D3CF6 /* TemplateGalleryView.swift in Sources */,
-				ED0232BF3F263926D7093C5D /* AIEditingService.swift in Sources */,
-				CL027D47C3959B9B46ADD8EF /* LiveStudioManager.swift in Sources */,
-				CL027EFDFFDDA6F29C19D242 /* WorkspaceAnalyticsManager.swift in Sources */,
-				CL0231A410BFA1567B66E958 /* KnowledgeGraphManager.swift in Sources */,
-				CL0217011FA47290ABC62564 /* ExecutionBoardManager.swift in Sources */,
-				ED02F68F5154B35821FD92C5 /* AIEditingPanelView.swift in Sources */,
-				CL023BFC5B0183AC2FECD645 /* GuestAccessView.swift in Sources */,
-				ED02B0CB18B2E81F9A985237 /* TemplateStudioManager.swift in Sources */,
-				ED02AFE5CE5B821D4812C403 /* AutoEditManager.swift in Sources */,
-				ED0245002380F404A71BB571 /* ProjectVersioningManager.swift in Sources */,
-				ED02D996D2D49050FCD1F440 /* ColorGradingManager.swift in Sources */,
-				ED0229D507DB65309B40CCA7 /* MotionTrackingManager.swift in Sources */,
+				CL02FAB5B8BE29F3826AA057 /* ActivityTimelineView.swift in Sources */,
+				ED0272FD09958FF23E06D924 /* FullEditorView.swift in Sources */,
 				ED02AA3640C7CCD74550F61B /* ExportPipelineManager.swift in Sources */,
-				ED02CAD31035F2F8AE1DF3F7 /* SceneDetectionManager.swift in Sources */,
-				ED02BBE9498F2257CF925312 /* AudioEnhancementManager.swift in Sources */,
-				ED0280FAD94022F7DE242E0B /* BatchProcessingManager.swift in Sources */,
+				ED02281F17CFB314F0597C1A /* AssetManager.swift in Sources */,
 				ED02838E54324D10EACDFCA3 /* TimelineIntelligenceService.swift in Sources */,
 				ED02FB1EE79D5C765D0EF215 /* SharedEditingManager.swift in Sources */,
-				CL0224B957930EFA62641C8A /* DependencyInspector.swift in Sources */,
+				ED0245002380F404A71BB571 /* ProjectVersioningManager.swift in Sources */,
+				ED0280FAD94022F7DE242E0B /* BatchProcessingManager.swift in Sources */,
+				ED02B0CB18B2E81F9A985237 /* TemplateStudioManager.swift in Sources */,
+				ED02BBE9498F2257CF925312 /* AudioEnhancementManager.swift in Sources */,
+				ED02D996D2D49050FCD1F440 /* ColorGradingManager.swift in Sources */,
+				ED0229D507DB65309B40CCA7 /* MotionTrackingManager.swift in Sources */,
+				ED02AFE5CE5B821D4812C403 /* AutoEditManager.swift in Sources */,
+				ED02CAD31035F2F8AE1DF3F7 /* SceneDetectionManager.swift in Sources */,
+				ED0232BF3F263926D7093C5D /* AIEditingService.swift in Sources */,
+				CL027EFDFFDDA6F29C19D242 /* WorkspaceAnalyticsManager.swift in Sources */,
+				CL027D47C3959B9B46ADD8EF /* LiveStudioManager.swift in Sources */,
+				CL0231A410BFA1567B66E958 /* KnowledgeGraphManager.swift in Sources */,
+				CL0217011FA47290ABC62564 /* ExecutionBoardManager.swift in Sources */,
+				CL02A0291FC15EE77FB74EF1 /* DecisionEngineManager.swift in Sources */,
+				CL02031EEFB99032C3EE4B47 /* CollaborationSearchEngine.swift in Sources */,
 				CL0232B447C8434C59EF9D22 /* SmartOrganizer.swift in Sources */,
-				CL02C3AFDC3CF52E64F81C26 /* ActivityTimelineManager.swift in Sources */,
-				CL026AA7C0AF2ACE4A1D6AAB /* SpacePublishingManager.swift in Sources */,
-				CL0267D53D1AD377DC13D828 /* ExternalAccessManager.swift in Sources */,
-				CL025A49D432ABAD978F2754 /* CommitIntelligenceService.swift in Sources */,
+				CL0224B957930EFA62641C8A /* DependencyInspector.swift in Sources */,
 				CL028C5787DACB78FC90CA26 /* CommandCenterController.swift in Sources */,
+				CL0267D53D1AD377DC13D828 /* ExternalAccessManager.swift in Sources */,
 				CL02E52B5ABF880487C60D4A /* TemplateManager.swift in Sources */,
-				ED0272FD09958FF23E06D924 /* FullEditorView.swift in Sources */,
-				ED02D411C2F5479E0B7CC39D /* EditingHomeView.swift in Sources */,
+				CL026AA7C0AF2ACE4A1D6AAB /* SpacePublishingManager.swift in Sources */,
+				CL02C3AFDC3CF52E64F81C26 /* ActivityTimelineManager.swift in Sources */,
+				CL025A49D432ABAD978F2754 /* CommitIntelligenceService.swift in Sources */,
+				CL02F2FEE87142C26FDF58A8 /* ForkManager.swift in Sources */,
+				CL023BFC5B0183AC2FECD645 /* GuestAccessView.swift in Sources */,
 				CL0201914289947246594FAF /* PRListView.swift in Sources */,
-				CL02EC1C5BD402E0A1A0EE90 /* VersionHistoryView.swift in Sources */,
-				CL027E48D5E8FFBC05FE8EE2 /* SpaceDashboardView.swift in Sources */,
-				CL022A041040343F46F86D5E /* CollaborationHomeView.swift in Sources */,
-				CL02F470EDF037D1B6507319 /* AddDataCollabView.swift in Sources */,
-				WS021475DCE9954699818366 /* CallKitManager.swift in Sources */,
-				WS021A80C1258BD7A498BC68 /* PiPController.swift in Sources */,
-				WS02E11772B333E64F5AC2D5 /* MeetingResolver.swift in Sources */,
-				WS02EE8C6278AA701670E7CE /* MeetSessionController.swift in Sources */,
-				WS02073AAB2B49E6A3039D76 /* CallKitProvider.swift in Sources */,
-				WS0250569A735E125B6363CA /* MeetingDomainModels.swift in Sources */,
-				WS020AB9EA3F4D81377FA5B8 /* DailyService.swift in Sources */,
-				WS0296E7AE02C0847BA7C335 /* MeetingNotesManager.swift in Sources */,
-				WS02C4F183F3581BA799E71A /* MeetingSession.swift in Sources */,
-				WS0281BB51BB411945E6394B /* DebugLogger.swift in Sources */,
-				WS02A26D0D7F707B9C08F55A /* MeetPermissionService.swift in Sources */,
-				ED02281F17CFB314F0597C1A /* AssetManager.swift in Sources */,
 				ED02C3C4130B4C8C6EA21681 /* HistoryManager.swift in Sources */,
 				ED0265ED68F76474BD609BE9 /* EditingFramework.swift in Sources */,
-				ED0267E64A0D77F39997C421 /* EditingManager.swift in Sources */,
-				ED027AF32EAE5CDE84E17854 /* EditingEngine.swift in Sources */,
-				ED0207BE27EED97F075CDB07 /* EditingModels.swift in Sources */,
-				WS025CD9F7B2527A10843551 /* FeedbackModel.swift in Sources */,
-				WS02C5B83ACB0F10533EE584 /* FeedbackService.swift in Sources */,
-				CL02F2FEE87142C26FDF58A8 /* ForkManager.swift in Sources */,
-				CL02A0291FC15EE77FB74EF1 /* DecisionEngineManager.swift in Sources */,
-				CL023C954A5E1AEBA57DBE92 /* PRModels.swift in Sources */,
-				CL02A461A1FF368A2C7A5B03 /* PRManager.swift in Sources */,
-				CL02031EEFB99032C3EE4B47 /* CollaborationSearchEngine.swift in Sources */,
 				CL029BC32BCC14D68B592B18 /* BranchProtectionManager.swift in Sources */,
-				CL02A9149AFEA14984FB827A /* CollaborationManager.swift in Sources */,
-				CL02EA46B7C453D2926D5165 /* CollaborationFramework.swift in Sources */,
-				CL02B73C35F5C3FFA0A20AF1 /* CollaborationModels.swift in Sources */,
-				WS029CC9F558D3D5EB55F54C /* CodeAnalyzer.swift in Sources */,
-				WS02C62057035832C8B0F500 /* CodeAuditEngine.swift in Sources */,
-				WS02B6F213A171BB05821A9B /* CodeImportPlanner.swift in Sources */,
-				WS021A85A5613A03B03EEABF /* CodeStructureMapper.swift in Sources */,
-				WS024A954F08244C7B79B5D6 /* CodeTransformer.swift in Sources */,
-				WS02F9DA36F3527867C629E2 /* AppConfig.swift in Sources */,
-				WS02FE9B82267F56BEDB3463 /* IntegrationTool.swift in Sources */,
-				WS0234106FCFE8A242AC5721 /* ArticleCollection.swift in Sources */,
-				WS02C7ED91243FC73FA4CDC5 /* NotebookBlock.swift in Sources */,
-				WS024B1B97F2B14399972340 /* SpreadsheetCell.swift in Sources */,
-				WS02B9C908A27D71AF96FDD2 /* HabitLog.swift in Sources */,
-				WS02637B31C677342DB65844 /* Spreadsheet.swift in Sources */,
-				WS0249B517285C64EBE466CC /* Habit.swift in Sources */,
-				WS027A75D54B299657AC781E /* TaskCategory.swift in Sources */,
-				WS02A14517EC6BB272448FAD /* SlideElement.swift in Sources */,
-				WS023CAA7879D69D2E1DF1FC /* CalendarEvent.swift in Sources */,
-				WS02576CAE03B5C957532182 /* Article.swift in Sources */,
-				WS02AB870369FA28E436ABDD /* NotebookFolder.swift in Sources */,
-				WS024AB47EB3D97D7F43750A /* SlideAnimation.swift in Sources */,
-				WS02F63A07253A27B2A4E16D /* Notebook.swift in Sources */,
-				WS02E2DBE362F0C85A3186E6 /* Slide.swift in Sources */,
-				WS024F1F74B3BF5E454453A4 /* WorkspaceTask.swift in Sources */,
-				WS02B9E7D3E3960DF07BC99D /* SlideDeck.swift in Sources */,
-				WS02B6CDF5D6482762CEAC0E /* NotebookPage.swift in Sources */,
-				WS029500627D8C0D189EEFB2 /* SlideNode.swift in Sources */,
+				CL02A461A1FF368A2C7A5B03 /* PRManager.swift in Sources */,
+				CL023C954A5E1AEBA57DBE92 /* PRModels.swift in Sources */,
 				WS02C642EB7BC90635C49082 /* SyncEngine.swift in Sources */,
-				WS02442A30C52193468293A9 /* WorkoutsModeManager.swift in Sources */,
 				WS02B9B79423E80FD8FABEBD /* WorkspaceCore.swift in Sources */,
-				WS026558DCB7439C528F452A /* WorkspaceModeManager.swift in Sources */,
-				CL02FFFFFFF70F3AFBC9F80C /* PRListView.swift in Sources */,
-				ED02FFFFFF89B1258F7DE137 /* AssetManager.swift in Sources */,
-				ED02FFFFFFEEBB5AB13AF7AC /* HistoryManager.swift in Sources */,
-				CL02FFFFFFFCE9C55783B21D /* CollaborationSearchEngine.swift in Sources */,
-				CL02FFFFFFC3E42A245B2788 /* DecisionEngineManager.swift in Sources */,
-				CL02FFFFFF8A5885DDAFB7ED /* BranchProtectionManager.swift in Sources */,
-				CL02FFFFFFA0457E3EE139F8 /* ForkManager.swift in Sources */,
-				CL02FFFFFFA0635533913053 /* PRManager.swift in Sources */,
-				CL02FFFFFFC65A1AFD85B5E4 /* PRModels.swift in Sources */,
-				ED020000007EA2EAD51B02EB /* EditingFramework.swift in Sources */,
-				WS02FFFFFFE0D2C474485E59 /* WorkspaceCore.swift in Sources */,
-				WS0200000005DD026BD93171 /* SyncEngine.swift in Sources */,
 				GH0200000000000000000001 /* GitHubAuthManager.swift in Sources */,
 				GH0200000000000000000002 /* GitHubModels.swift in Sources */,
 				GH0200000000000000000003 /* GitHubEndpoints.swift in Sources */,

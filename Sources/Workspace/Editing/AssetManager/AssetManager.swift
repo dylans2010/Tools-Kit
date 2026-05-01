@@ -1,2 +1,2 @@
 import Foundation
-final class AssetManager: ObservableObject { static let shared = AssetManager() }
+final class AssetManager: ObservableObject { static let shared = AssetManager(); private init() {} }

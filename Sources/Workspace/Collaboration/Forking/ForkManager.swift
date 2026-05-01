@@ -1,2 +1,2 @@
 import Foundation
-final class ForkManager: ObservableObject { static let shared = ForkManager(); func fork(id: UUID) {} }
+final class ForkManager: ObservableObject { static let shared = ForkManager(); private init() {} }

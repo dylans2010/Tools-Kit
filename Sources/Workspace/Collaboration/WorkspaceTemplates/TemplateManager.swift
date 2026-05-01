@@ -1,2 +1,2 @@
 import Foundation
-final class TemplateManager: ObservableObject { static let shared = TemplateManager() }
+final class TemplateManager: ObservableObject { static let shared = TemplateManager(); private init() {} }
