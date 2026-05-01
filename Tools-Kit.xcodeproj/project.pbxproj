@@ -7,6 +7,33 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		MS028A4E8FF9A0449D039277 /* JSONCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS018A4E8FF9A0449D039277 /* JSONCoder.swift */; };
+		MS026A2894802C56D5AB5FC3 /* SegmentSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */; };
+		MS028F0C9AC0045039A23CD0 /* MessageBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS018F0C9AC0045039A23CD0 /* MessageBubbleView.swift */; };
+		MS02D442AA3AC95EC642CC1E /* BasketballState.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01D442AA3AC95EC642CC1E /* BasketballState.swift */; };
+		MS02816F60DBD614264AF88E /* BattleshipState.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01816F60DBD614264AF88E /* BattleshipState.swift */; };
+		MS02E0F9192FA0E8B3445E54 /* TapRaceState.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01E0F9192FA0E8B3445E54 /* TapRaceState.swift */; };
+		MS022CD4AFE40BD50BF82789 /* BattleshipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS012CD4AFE40BD50BF82789 /* BattleshipView.swift */; };
+		MS02BDF8308A95D614AA1C20 /* BasketballView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01BDF8308A95D614AA1C20 /* BasketballView.swift */; };
+		MS02A84A87714E4FE5FD5FFF /* TapRaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01A84A87714E4FE5FD5FFF /* TapRaceView.swift */; };
+		MS02B920A763BB0B6AF77AD6 /* GamesHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01B920A763BB0B6AF77AD6 /* GamesHomeView.swift */; };
+		MS02DA7A5FE39E9469EDEE68 /* BattleshipEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01DA7A5FE39E9469EDEE68 /* BattleshipEngine.swift */; };
+		MS0223F34F806EDC45551CD3 /* BasketballEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0123F34F806EDC45551CD3 /* BasketballEngine.swift */; };
+		MS02059C3F057ABB5008787C /* TapRaceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01059C3F057ABB5008787C /* TapRaceEngine.swift */; };
+		MS026D7AD6C281D9321FF63C /* GameProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS016D7AD6C281D9321FF63C /* GameProtocol.swift */; };
+		MS02C58D1037F0CAD3040522 /* GameEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01C58D1037F0CAD3040522 /* GameEngine.swift */; };
+		MS02FC7937606485556A0399 /* AIResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01FC7937606485556A0399 /* AIResult.swift */; };
+		MS0241E90E57AB2C232DF282 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0141E90E57AB2C232DF282 /* GameState.swift */; };
+		MS0286DB33EDB286E8AD29C6 /* MessagePayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0186DB33EDB286E8AD29C6 /* MessagePayload.swift */; };
+		MS0277ACD2D4A36D101ABCBF /* MessageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0177ACD2D4A36D101ABCBF /* MessageManager.swift */; };
+		MS02EEED74BCAAEF7F52CEF5 /* MessagesAIRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01EEED74BCAAEF7F52CEF5 /* MessagesAIRequest.swift */; };
+		MS0298D4E695260224D8850A /* MessagesSummarizeTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0198D4E695260224D8850A /* MessagesSummarizeTool.swift */; };
+		MS027E7FE63D8D555B572718 /* MessagesReplyGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS017E7FE63D8D555B572718 /* MessagesReplyGenerator.swift */; };
+		MS022EFADBBDF308609DF63E /* MessagesRewriteTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS012EFADBBDF308609DF63E /* MessagesRewriteTool.swift */; };
+		MS02B0FF40CAEAEC26586CD6 /* MessagesAIHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01B0FF40CAEAEC26586CD6 /* MessagesAIHomeView.swift */; };
+		MS0277F553B9F980351B8A6B /* MessagesAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0177F553B9F980351B8A6B /* MessagesAIService.swift */; };
+		MS02F387A7A65E6019196A12 /* MessagesRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01F387A7A65E6019196A12 /* MessagesRootView.swift */; };
+		MS0207C4CA60A1926E94DEC9 /* MessagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0107C4CA60A1926E94DEC9 /* MessagesViewController.swift */; };
 		WS020000000000000000000001 /* WorkspacePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000001 /* WorkspacePersistence.swift */; };
 		WS020000000000000000000002 /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000002 /* SyncEngine.swift */; };
 		CL020000000000000000000003 /* PullRequestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000003 /* PullRequestManager.swift */; };
@@ -968,6 +995,33 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		MS018A4E8FF9A0449D039277 /* JSONCoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONCoder.swift; sourceTree = "<group>"; };
+		MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentSwitcher.swift; sourceTree = "<group>"; };
+		MS018F0C9AC0045039A23CD0 /* MessageBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubbleView.swift; sourceTree = "<group>"; };
+		MS01D442AA3AC95EC642CC1E /* BasketballState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballState.swift; sourceTree = "<group>"; };
+		MS01816F60DBD614264AF88E /* BattleshipState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattleshipState.swift; sourceTree = "<group>"; };
+		MS01E0F9192FA0E8B3445E54 /* TapRaceState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapRaceState.swift; sourceTree = "<group>"; };
+		MS012CD4AFE40BD50BF82789 /* BattleshipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattleshipView.swift; sourceTree = "<group>"; };
+		MS01BDF8308A95D614AA1C20 /* BasketballView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballView.swift; sourceTree = "<group>"; };
+		MS01A84A87714E4FE5FD5FFF /* TapRaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapRaceView.swift; sourceTree = "<group>"; };
+		MS01B920A763BB0B6AF77AD6 /* GamesHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesHomeView.swift; sourceTree = "<group>"; };
+		MS01DA7A5FE39E9469EDEE68 /* BattleshipEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattleshipEngine.swift; sourceTree = "<group>"; };
+		MS0123F34F806EDC45551CD3 /* BasketballEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballEngine.swift; sourceTree = "<group>"; };
+		MS01059C3F057ABB5008787C /* TapRaceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapRaceEngine.swift; sourceTree = "<group>"; };
+		MS016D7AD6C281D9321FF63C /* GameProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameProtocol.swift; sourceTree = "<group>"; };
+		MS01C58D1037F0CAD3040522 /* GameEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameEngine.swift; sourceTree = "<group>"; };
+		MS01FC7937606485556A0399 /* AIResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIResult.swift; sourceTree = "<group>"; };
+		MS0141E90E57AB2C232DF282 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
+		MS0186DB33EDB286E8AD29C6 /* MessagePayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagePayload.swift; sourceTree = "<group>"; };
+		MS0177ACD2D4A36D101ABCBF /* MessageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageManager.swift; sourceTree = "<group>"; };
+		MS01EEED74BCAAEF7F52CEF5 /* MessagesAIRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesAIRequest.swift; sourceTree = "<group>"; };
+		MS0198D4E695260224D8850A /* MessagesSummarizeTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesSummarizeTool.swift; sourceTree = "<group>"; };
+		MS017E7FE63D8D555B572718 /* MessagesReplyGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesReplyGenerator.swift; sourceTree = "<group>"; };
+		MS012EFADBBDF308609DF63E /* MessagesRewriteTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesRewriteTool.swift; sourceTree = "<group>"; };
+		MS01B0FF40CAEAEC26586CD6 /* MessagesAIHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesAIHomeView.swift; sourceTree = "<group>"; };
+		MS0177F553B9F980351B8A6B /* MessagesAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesAIService.swift; sourceTree = "<group>"; };
+		MS01F387A7A65E6019196A12 /* MessagesRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesRootView.swift; sourceTree = "<group>"; };
+		MS0107C4CA60A1926E94DEC9 /* MessagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewController.swift; sourceTree = "<group>"; };
 		WS010000000000000000000001 /* WorkspacePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Core/WorkspacePersistence.swift"; sourceTree = "<group>"; };
 		WS010000000000000000000002 /* SyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Core/SyncEngine.swift"; sourceTree = "<group>"; };
 		CL010000000000000000000003 /* PullRequestManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Collaboration/PullRequest/PullRequestManager.swift"; sourceTree = "<group>"; };
@@ -1928,6 +1982,219 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		MS01A6BB6CA6F42ED04EDA16 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				MS0107C4CA60A1926E94DEC9 /* MessagesViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		MS01CFE7EC8358E49287504A /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				MS01F387A7A65E6019196A12 /* MessagesRootView.swift */,
+			);
+			path = Root;
+			sourceTree = "<group>";
+		};
+		MS019DF30CA19BD6230F8C3F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				MS01CFE7EC8358E49287504A /* Root */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		MS019A665425135215447E81 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				MS0177F553B9F980351B8A6B /* MessagesAIService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		MS01CE56D5B0FFDCBAE186F7 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				MS01B0FF40CAEAEC26586CD6 /* MessagesAIHomeView.swift */,
+				MS012EFADBBDF308609DF63E /* MessagesRewriteTool.swift */,
+				MS017E7FE63D8D555B572718 /* MessagesReplyGenerator.swift */,
+				MS0198D4E695260224D8850A /* MessagesSummarizeTool.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		MS019EBACE0548994ADE76AD /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				MS01EEED74BCAAEF7F52CEF5 /* MessagesAIRequest.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		MS0144F3B6F6CCF2FD962F1A /* AI */ = {
+			isa = PBXGroup;
+			children = (
+				MS019A665425135215447E81 /* Services */,
+				MS01CE56D5B0FFDCBAE186F7 /* Views */,
+				MS01CE56D5B0FFDCBAE186F7 /* Views */,
+				MS01CE56D5B0FFDCBAE186F7 /* Views */,
+				MS01CE56D5B0FFDCBAE186F7 /* Views */,
+				MS019EBACE0548994ADE76AD /* Models */,
+			);
+			path = AI;
+			sourceTree = "<group>";
+		};
+		MS01E8ABD4E371A2E9D249A1 /* Messaging */ = {
+			isa = PBXGroup;
+			children = (
+				MS0177ACD2D4A36D101ABCBF /* MessageManager.swift */,
+				MS0186DB33EDB286E8AD29C6 /* MessagePayload.swift */,
+			);
+			path = Messaging;
+			sourceTree = "<group>";
+		};
+		MS01499B5E0948C02B5EC3AA /* State */ = {
+			isa = PBXGroup;
+			children = (
+				MS0141E90E57AB2C232DF282 /* GameState.swift */,
+				MS01FC7937606485556A0399 /* AIResult.swift */,
+			);
+			path = State;
+			sourceTree = "<group>";
+		};
+		MS0130A7C81FADEBC7543B76 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				MS01E8ABD4E371A2E9D249A1 /* Messaging */,
+				MS01E8ABD4E371A2E9D249A1 /* Messaging */,
+				MS01499B5E0948C02B5EC3AA /* State */,
+				MS01499B5E0948C02B5EC3AA /* State */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		MS0164DF0792B2CA4257190E /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				MS01C58D1037F0CAD3040522 /* GameEngine.swift */,
+				MS016D7AD6C281D9321FF63C /* GameProtocol.swift */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
+		MS014678665BAD644EBA1728 /* Logic */ = {
+			isa = PBXGroup;
+			children = (
+				MS01059C3F057ABB5008787C /* TapRaceEngine.swift */,
+				MS0123F34F806EDC45551CD3 /* BasketballEngine.swift */,
+				MS01DA7A5FE39E9469EDEE68 /* BattleshipEngine.swift */,
+			);
+			path = Logic;
+			sourceTree = "<group>";
+		};
+		MS013A164AE474C087F6D824 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				MS01B920A763BB0B6AF77AD6 /* GamesHomeView.swift */,
+				MS01A84A87714E4FE5FD5FFF /* TapRaceView.swift */,
+				MS01BDF8308A95D614AA1C20 /* BasketballView.swift */,
+				MS012CD4AFE40BD50BF82789 /* BattleshipView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		MS01A88B918360575AAFD4D1 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				MS01E0F9192FA0E8B3445E54 /* TapRaceState.swift */,
+				MS01816F60DBD614264AF88E /* BattleshipState.swift */,
+				MS01D442AA3AC95EC642CC1E /* BasketballState.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		MS0164B3FFCFB0AF5D647AB9 /* Games */ = {
+			isa = PBXGroup;
+			children = (
+				MS0164DF0792B2CA4257190E /* Engine */,
+				MS0164DF0792B2CA4257190E /* Engine */,
+				MS014678665BAD644EBA1728 /* Logic */,
+				MS014678665BAD644EBA1728 /* Logic */,
+				MS014678665BAD644EBA1728 /* Logic */,
+				MS013A164AE474C087F6D824 /* Views */,
+				MS013A164AE474C087F6D824 /* Views */,
+				MS013A164AE474C087F6D824 /* Views */,
+				MS013A164AE474C087F6D824 /* Views */,
+				MS01A88B918360575AAFD4D1 /* Models */,
+				MS01A88B918360575AAFD4D1 /* Models */,
+				MS01A88B918360575AAFD4D1 /* Models */,
+			);
+			path = Games;
+			sourceTree = "<group>";
+		};
+		MS01F966B11ABA79C7BDF62D /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				MS018F0C9AC0045039A23CD0 /* MessageBubbleView.swift */,
+				MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		MS0188AA1F3B54B83550EFF9 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				MS018A4E8FF9A0449D039277 /* JSONCoder.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		MS013C8E64C5B046ED9E34E3 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				MS01F966B11ABA79C7BDF62D /* Components */,
+				MS01F966B11ABA79C7BDF62D /* Components */,
+				MS0188AA1F3B54B83550EFF9 /* Utils */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		MS01D8F6E8B59DA1CCE7ABA8 /* Messages */ = {
+			isa = PBXGroup;
+			children = (
+				MS01A6BB6CA6F42ED04EDA16 /* Controllers */,
+				MS019DF30CA19BD6230F8C3F /* Views */,
+				MS0144F3B6F6CCF2FD962F1A /* AI */,
+				MS0144F3B6F6CCF2FD962F1A /* AI */,
+				MS0144F3B6F6CCF2FD962F1A /* AI */,
+				MS0144F3B6F6CCF2FD962F1A /* AI */,
+				MS0144F3B6F6CCF2FD962F1A /* AI */,
+				MS0144F3B6F6CCF2FD962F1A /* AI */,
+				MS0130A7C81FADEBC7543B76 /* Core */,
+				MS0130A7C81FADEBC7543B76 /* Core */,
+				MS0130A7C81FADEBC7543B76 /* Core */,
+				MS0130A7C81FADEBC7543B76 /* Core */,
+				MS0164B3FFCFB0AF5D647AB9 /* Games */,
+				MS0164B3FFCFB0AF5D647AB9 /* Games */,
+				MS0164B3FFCFB0AF5D647AB9 /* Games */,
+				MS0164B3FFCFB0AF5D647AB9 /* Games */,
+				MS0164B3FFCFB0AF5D647AB9 /* Games */,
+				MS0164B3FFCFB0AF5D647AB9 /* Games */,
+				MS0164B3FFCFB0AF5D647AB9 /* Games */,
+				MS0164B3FFCFB0AF5D647AB9 /* Games */,
+				MS0164B3FFCFB0AF5D647AB9 /* Games */,
+				MS0164B3FFCFB0AF5D647AB9 /* Games */,
+				MS0164B3FFCFB0AF5D647AB9 /* Games */,
+				MS0164B3FFCFB0AF5D647AB9 /* Games */,
+				MS013C8E64C5B046ED9E34E3 /* Shared */,
+				MS013C8E64C5B046ED9E34E3 /* Shared */,
+				MS013C8E64C5B046ED9E34E3 /* Shared */,
+			);
+			path = Messages;
+			sourceTree = "<group>";
+		};
 		4A2CB0E156D82F6EAA22B391 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -2045,6 +2312,7 @@
 		8DF4BF69CF55A81CB6EBF3DE /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				MS01D8F6E8B59DA1CCE7ABA8 /* Messages */,
 				WS010000000000000000000001 /* WorkspacePersistence.swift */,
 				WS010000000000000000000002 /* SyncEngine.swift */,
 				CL010000000000000000000003 /* PullRequestManager.swift */,
@@ -3283,6 +3551,33 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				MS0207C4CA60A1926E94DEC9 /* MessagesViewController.swift in Sources */,
+				MS02F387A7A65E6019196A12 /* MessagesRootView.swift in Sources */,
+				MS0277F553B9F980351B8A6B /* MessagesAIService.swift in Sources */,
+				MS02B0FF40CAEAEC26586CD6 /* MessagesAIHomeView.swift in Sources */,
+				MS022EFADBBDF308609DF63E /* MessagesRewriteTool.swift in Sources */,
+				MS027E7FE63D8D555B572718 /* MessagesReplyGenerator.swift in Sources */,
+				MS0298D4E695260224D8850A /* MessagesSummarizeTool.swift in Sources */,
+				MS02EEED74BCAAEF7F52CEF5 /* MessagesAIRequest.swift in Sources */,
+				MS0277ACD2D4A36D101ABCBF /* MessageManager.swift in Sources */,
+				MS0286DB33EDB286E8AD29C6 /* MessagePayload.swift in Sources */,
+				MS0241E90E57AB2C232DF282 /* GameState.swift in Sources */,
+				MS02FC7937606485556A0399 /* AIResult.swift in Sources */,
+				MS02C58D1037F0CAD3040522 /* GameEngine.swift in Sources */,
+				MS026D7AD6C281D9321FF63C /* GameProtocol.swift in Sources */,
+				MS02059C3F057ABB5008787C /* TapRaceEngine.swift in Sources */,
+				MS0223F34F806EDC45551CD3 /* BasketballEngine.swift in Sources */,
+				MS02DA7A5FE39E9469EDEE68 /* BattleshipEngine.swift in Sources */,
+				MS02B920A763BB0B6AF77AD6 /* GamesHomeView.swift in Sources */,
+				MS02A84A87714E4FE5FD5FFF /* TapRaceView.swift in Sources */,
+				MS02BDF8308A95D614AA1C20 /* BasketballView.swift in Sources */,
+				MS022CD4AFE40BD50BF82789 /* BattleshipView.swift in Sources */,
+				MS02E0F9192FA0E8B3445E54 /* TapRaceState.swift in Sources */,
+				MS02816F60DBD614264AF88E /* BattleshipState.swift in Sources */,
+				MS02D442AA3AC95EC642CC1E /* BasketballState.swift in Sources */,
+				MS028F0C9AC0045039A23CD0 /* MessageBubbleView.swift in Sources */,
+				MS026A2894802C56D5AB5FC3 /* SegmentSwitcher.swift in Sources */,
+				MS028A4E8FF9A0449D039277 /* JSONCoder.swift in Sources */,
 				WS020000000000000000000001 /* WorkspacePersistence.swift in Sources */,
 				WS020000000000000000000002 /* SyncEngine.swift in Sources */,
 				IW0200000000000000000001 /* WorkspaceColorManager.swift in Sources */,
