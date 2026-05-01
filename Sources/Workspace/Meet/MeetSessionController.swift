@@ -52,11 +52,13 @@ final class MeetingStateManager: NSObject, ObservableObject {
     @Published var activeAudioProcessingState = "Disabled"
     @Published var isNoiseCancellationEnabled = false
     @Published var isCaptionsEnabled = false
+    @Published var debugSnapshot: DailyDebugSnapshot = .empty
 
     @Published var participantVideoTracks: [String: MeetingVideoTrack] = [:]
     @Published var participantScreenShareTracks: [String: MeetingVideoTrack] = [:]
 
     private let aiService = AIService.shared
+    private let resolver = MeetingResolver.shared
 
     override init() {
         super.init()
@@ -177,6 +179,61 @@ final class MeetingStateManager: NSObject, ObservableObject {
             }
             return updated
         }
+    }
+
+    func refreshDebugSnapshot() async {
+        debugSnapshot = await resolver.fetchDebugSnapshot()
+    }
+
+    func assignRole(participantID: String, role: MeetingParticipantRole) async {
+        participants = participants.map { participant in
+            var updated = participant
+            if updated.id == participantID {
+                updated.role = role
+            }
+            return updated
+        }
+
+        guard let session = currentSession else { return }
+        await resolver.applyAdminAction(.assignRole(participantId: participantID, role: role), in: session)
+    }
+
+    func setParticipantMuted(participantID: String, muted: Bool) async {
+        participants = participants.map { participant in
+            var updated = participant
+            if updated.id == participantID {
+                updated.isMuted = muted
+            }
+            return updated
+        }
+
+        guard let session = currentSession else { return }
+        await resolver.applyAdminAction(.setParticipantMuted(participantId: participantID, muted: muted), in: session)
+    }
+
+    func setParticipantVideoEnabled(participantID: String, enabled: Bool) async {
+        participants = participants.map { participant in
+            var updated = participant
+            if updated.id == participantID {
+                updated.hasVideo = enabled
+            }
+            return updated
+        }
+
+        guard let session = currentSession else { return }
+        await resolver.applyAdminAction(.setParticipantVideoEnabled(participantId: participantID, enabled: enabled), in: session)
+    }
+
+    func removeParticipant(participantID: String) async {
+        participants.removeAll { $0.id == participantID }
+        breakoutRooms = breakoutRooms.map { room in
+            var updated = room
+            updated.participantIds.removeAll { $0 == participantID }
+            return updated
+        }
+
+        guard let session = currentSession else { return }
+        await resolver.applyAdminAction(.removeParticipant(participantId: participantID), in: session)
     }
 }
 
