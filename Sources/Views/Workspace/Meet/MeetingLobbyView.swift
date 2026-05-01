@@ -13,15 +13,7 @@ struct MeetingLobbyView: View {
                 }
             }
 
-            Section("Participants") {
-                HStack(spacing: 10) {
-                    if manager.lobbyState.isLoadingParticipants {
-                        ProgressView()
-                    }
-                    Text(manager.lobbyState.isLoadingParticipants ? "Loading participants..." : "\(manager.participants.count) participant(s) ready")
-                        .foregroundStyle(.secondary)
-                }
-            }
+            Section("Participants") { participantsRow }
 
             Section("Device Checks") {
                 permissionRow(title: "Microphone", state: manager.lobbyState.microphonePermission, icon: "mic")
@@ -56,6 +48,16 @@ struct MeetingLobbyView: View {
             Spacer()
             Text(state.rawValue.capitalized)
                 .foregroundStyle(state == .granted ? .green : (state == .denied ? .red : .secondary))
+        }
+    }
+
+    private var participantsRow: some View {
+        HStack(spacing: 10) {
+            if manager.lobbyState.isLoadingParticipants {
+                ProgressView()
+            }
+            Text(manager.lobbyState.isLoadingParticipants ? "Loading participants..." : "\(manager.participants.count) participant(s) ready")
+                .foregroundStyle(.secondary)
         }
     }
 }
