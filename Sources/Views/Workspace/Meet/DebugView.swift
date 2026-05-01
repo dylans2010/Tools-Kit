@@ -1,9 +1,13 @@
 import SwiftUI
 
 struct DebugView: View {
-    @StateObject private var manager = MeetingStateManager.shared
+    @ObservedObject var manager: MeetingStateManager
     @StateObject private var logger = DebugLogger.shared
     @AppStorage("daily_api_key") private var persistedAPIKey = ""
+
+    init(manager: MeetingStateManager = .shared) {
+        self.manager = manager
+    }
 
     var body: some View {
         Form {

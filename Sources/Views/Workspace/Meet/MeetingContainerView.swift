@@ -12,7 +12,7 @@ struct MeetingContainerView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.workspaceBackground.ignoresSafeArea()
+                Color(.systemBackground).ignoresSafeArea()
 
                 VStack(spacing: 0) {
                     meetingHeader
@@ -61,7 +61,7 @@ struct MeetingContainerView: View {
             }
         }
         .padding()
-        .background(Color.workspaceSurface)
+        .background(Color(.secondarySystemGroupedBackground))
     }
 
     private var sentimentIndicator: some View {
@@ -100,6 +100,6 @@ struct MeetingContainerView: View {
             )
         }
         .padding()
-        .background(Color.workspaceSurface)
+        .background(Color(.secondarySystemGroupedBackground))
     }
 }
