@@ -54,6 +54,15 @@ struct ValidationTests {
         let framework = CollaborationFramework.shared
         framework.indexObject(id: space.id, type: .notebook)
         assert(framework.indexedObjects[space.id] == .notebook)
+
+        // Test PR logic
+        let pr = PRManager.shared.createPullRequest(spaceID: space.id, title: "Test PR", description: "Desc", sourceBranchID: UUID(), targetBranchID: UUID())
+        assert(PRManager.shared.pullRequests.contains(where: { $0.id == pr.id }))
+
+        // Test Branch Protection
+        let rules = BranchProtectionRules(requireApprovals: true, requiredApprovalCount: 2)
+        BranchProtectionManager.shared.setRules(for: space.branches[0].id, rules: rules)
+        assert(BranchProtectionManager.shared.protectionMap[space.branches[0].id]?.requiredApprovalCount == 2)
     }
 
     private static func testEditingSystem() {
@@ -65,6 +74,14 @@ struct ValidationTests {
 
         // Check if project was automatically indexed in CollaborationFramework
         assert(CollaborationFramework.shared.indexedObjects[project.id] == .mediaProject)
+
+        // Test History Manager
+        HistoryManager.shared.saveSnapshot(projectID: project.id, layers: [], message: "Initial")
+        assert(HistoryManager.shared.history[project.id]?.count == 1)
+
+        // Test Asset Manager
+        AssetManager.shared.addAsset(name: "Test Asset", type: .video, size: 100, duration: 10)
+        assert(!AssetManager.shared.library.isEmpty)
     }
 
     private static func assert(_ condition: Bool, message: String = "Assertion failed") {

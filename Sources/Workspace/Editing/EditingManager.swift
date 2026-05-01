@@ -50,14 +50,11 @@ final class EditingManager: ObservableObject {
     // MARK: - Persistence
 
     private func saveProjects() {
-        if let encoded = try? JSONEncoder().encode(projects) {
-            UserDefaults.standard.set(encoded, forKey: storageKey)
-        }
+        try? WorkspacePersistence.shared.save(projects, filename: "editing_projects.json")
     }
 
     private func loadProjects() {
-        if let data = UserDefaults.standard.data(forKey: storageKey),
-           let decoded = try? JSONDecoder().decode([EditingProject].self, from: data) {
+        if let decoded = try? WorkspacePersistence.shared.load(filename: "editing_projects.json", as: [EditingProject].self) {
             projects = decoded
 
             // Re-index all projects
