@@ -49,7 +49,7 @@ struct WeatherView: View {
                 .padding()
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
         .onAppear {
             viewModel.refresh()
         }
