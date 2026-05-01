@@ -91,14 +91,6 @@ final class MeetingStateManager: NSObject, ObservableObject {
         return isMeetingIDFormatValid
     }
 
-    func leaveMeeting() async {
-        phase = .ended
-    }
-
-    func endMeetingForEveryone() async {
-        phase = .ended
-    }
-
     func runLobbyChecks() async {
         lobbyState.isLoadingParticipants = true
         let permissionService = MeetPermissionService()
@@ -173,6 +165,14 @@ final class MeetingStateManager: NSObject, ObservableObject {
             errorMessage = error.localizedDescription
         }
         isBusy = false
+    }
+
+    func leaveMeeting() async {
+        phase = .ended
+    }
+
+    func endMeetingForEveryone() async {
+        phase = .ended
     }
 
 
