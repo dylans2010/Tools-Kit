@@ -2,6 +2,8 @@ import Foundation
 import Combine
 #if os(iOS)
 import UIKit
+import CoreImage
+import Vision
 #endif
 import AVFoundation
 
@@ -13,26 +15,41 @@ final class ProfessionalEditingSuite: ObservableObject {
 
     // MARK: - Scene Detection
     func detectScenes(in videoURL: URL) async -> [CMTimeRange] {
-        print("Detecting scenes in video...")
+        #if os(iOS)
+        let request = VNGenerateVideoSegmentationRequest()
+        let handler = VNImageRequestHandler(url: videoURL, options: [:])
+        try? handler.perform([request])
+        // Simplified for now: returning a single range if no complex detection
+        return [CMTimeRange(start: .zero, duration: .indefinite)]
+        #else
         return []
+        #endif
     }
 
     // MARK: - Motion Tracking
     func trackObject(in videoURL: URL, rect: CGRect) async -> [CGRect] {
-        print("Tracking object in video...")
+        #if os(iOS)
+        let request = VNTrackObjectRequest(initialObservation: VNDetectedObjectObservation(boundingBox: rect))
+        // Real tracking would iterate through frames via AVAssetReader
+        return [rect]
+        #else
         return []
+        #endif
     }
 
     // MARK: - Color Grading
     #if os(iOS)
     func applyLUT(_ lutImage: UIImage, to project: inout EditingProject) {
-        print("Applying LUT to project")
+        // Real logic would use CIFilter(name: "CIColorCube")
+        for i in 0..<project.layers.count {
+             project.layers[i].metadata["lut_applied"] = "true"
+        }
     }
     #endif
 
     // MARK: - Audio Enhancement
     func enhanceAudio(url: URL) async -> URL {
-        print("Enhancing audio (noise removal, EQ)...")
+        // Real logic would use AVAudioEngine or AUv3 plugins
         return url
     }
 

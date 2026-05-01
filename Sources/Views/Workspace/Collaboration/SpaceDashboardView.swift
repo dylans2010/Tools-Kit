@@ -51,8 +51,8 @@ struct SpaceDashboardView: View {
         case 0: SpaceOverviewTab(space: space)
         case 1: SpaceObjectsList(title: "Notebooks", ids: space.notebookIDs, icon: "book")
         case 2: SpaceObjectsList(title: "Slides", ids: space.slideDeckIDs, icon: "rectangle.on.rectangle.angled")
-        case 3: SpaceObjectsList(title: "Meetings", ids: space.meetingIDs, icon: "video")
-        case 4: SpaceObjectsList(title: "Forms", ids: space.formIDs, icon: "list.bullet.rectangle")
+        case 3: ProjectBoardView(spaceID: space.id)
+        case 4: DecisionEngineView(spaceID: space.id)
         case 5: SpaceObjectsList(title: "Sheets", ids: space.spreadsheetIDs, icon: "tablecells")
         case 6: SpaceObjectsList(title: "Media Projects", ids: space.mediaProjectIDs, icon: "photo.on.rectangle")
         case 7: VersionHistoryView(spaceID: space.id)
@@ -68,8 +68,15 @@ struct SpaceOverviewTab: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text(space.description)
-                    .padding(.horizontal)
+                if space.description.isEmpty {
+                    Text("No description provided.")
+                        .italic()
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal)
+                } else {
+                    Text(space.description)
+                        .padding(.horizontal)
+                }
 
                 Divider()
 
@@ -77,19 +84,25 @@ struct SpaceOverviewTab: View {
                     .font(.headline)
                     .padding(.horizontal)
 
-                ForEach(space.activityFeed) { log in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(log.action)
-                                .font(.subheadline)
-                            Text("\(log.userName) • \(log.timestamp, style: .relative)")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                if space.activityFeed.isEmpty {
+                    Text("No activity yet.")
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal)
+                } else {
+                    ForEach(space.activityFeed) { log in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(log.action)
+                                    .font(.subheadline)
+                                Text("\(log.userName) • \(log.timestamp, style: .relative)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
                         }
-                        Spacer()
+                        .padding(.horizontal)
+                        .padding(.vertical, 4)
                     }
-                    .padding(.horizontal)
-                    .padding(.vertical, 4)
                 }
             }
         }

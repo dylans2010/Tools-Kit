@@ -1,13 +1,54 @@
 import SwiftUI
 
 struct DecisionEngineView: View {
-    @StateObject private var tool = DecisionEngineTool()
+    let spaceID: UUID
+    @ObservedObject private var tool = DecisionEngineTool.shared
+    @State private var newDecisionTitle = ""
+
+    private var filteredDecisions: [DecisionEngineTool.Decision] {
+        guard let space = CollaborationManager.shared.spaces.first(where: { $0.id == spaceID }) else { return [] }
+        return tool.decisions.filter { space.decisionIDs.contains($0.id) }
+    }
+
+    var body: some View {
+        List {
+            Section("Decisions") {
+                if filteredDecisions.isEmpty {
+                    Text("No decisions in this space.")
+                        .foregroundColor(.secondary)
+                } else {
+                    ForEach(filteredDecisions) { decision in
+                        NavigationLink(destination: DecisionDetailView(decision: decision)) {
+                            Text(decision.title)
+                        }
+                    }
+                }
+            }
+
+            Section("New Decision") {
+                HStack {
+                    TextField("Title", text: $newDecisionTitle)
+                    Button("Create") {
+                        let _ = tool.createDecision(spaceID: spaceID, title: newDecisionTitle)
+                        newDecisionTitle = ""
+                    }
+                    .disabled(newDecisionTitle.isEmpty)
+                }
+            }
+        }
+        .navigationTitle("Decision Engine")
+    }
+}
+
+struct DecisionDetailView: View {
+    let decision: DecisionEngineTool.Decision
+    @ObservedObject private var tool = DecisionEngineTool.shared
     @State private var newOption = ""
 
     var body: some View {
         VStack {
             List {
-                ForEach(tool.options) { option in
+                ForEach(decision.options) { option in
                     HStack {
                         VStack(alignment: .leading) {
                             Text(option.title)
@@ -17,7 +58,7 @@ struct DecisionEngineView: View {
                         }
                         Spacer()
                         Button("Vote") {
-                            tool.vote(optionID: option.id)
+                            tool.vote(decisionID: decision.id, optionID: option.id)
                         }
                         .buttonStyle(.bordered)
                     }
@@ -27,27 +68,47 @@ struct DecisionEngineView: View {
             HStack {
                 TextField("New Option", text: $newOption)
                 Button("Add") {
-                    tool.addOption(title: newOption)
+                    tool.addOption(to: decision.id, title: newOption)
                     newOption = ""
                 }
             }
             .padding()
         }
-        .navigationTitle("Decision Engine")
+        .navigationTitle(decision.title)
     }
 }
 
 struct ProjectBoardView: View {
-    @StateObject private var tool = ProjectExecutionBoardTool()
+    let spaceID: UUID
+    @ObservedObject private var tool = ProjectExecutionBoardTool.shared
+    @State private var newTaskTitle = ""
+
+    private var filteredTasks: [ProjectExecutionBoardTool.BoardTask] {
+        guard let space = CollaborationManager.shared.spaces.first(where: { $0.id == spaceID }) else { return [] }
+        return tool.tasks.filter { space.taskIDs.contains($0.id) }
+    }
 
     var body: some View {
-        ScrollView(.horizontal) {
-            HStack(alignment: .top, spacing: 20) {
-                BoardColumn(title: "To Do", tasks: tool.tasks.filter { $0.status == .todo })
-                BoardColumn(title: "In Progress", tasks: tool.tasks.filter { $0.status == .inProgress })
-                BoardColumn(title: "Done", tasks: tool.tasks.filter { $0.status == .done })
+        VStack {
+            HStack {
+                TextField("New Task", text: $newTaskTitle)
+                    .textFieldStyle(.roundedBorder)
+                Button("Add") {
+                    tool.addTask(spaceID: spaceID, title: newTaskTitle)
+                    newTaskTitle = ""
+                }
+                .disabled(newTaskTitle.isEmpty)
             }
             .padding()
+
+            ScrollView(.horizontal) {
+                HStack(alignment: .top, spacing: 20) {
+                    BoardColumn(title: "To Do", tasks: filteredTasks.filter { $0.status == .todo })
+                    BoardColumn(title: "In Progress", tasks: filteredTasks.filter { $0.status == .inProgress })
+                    BoardColumn(title: "Done", tasks: filteredTasks.filter { $0.status == .done })
+                }
+                .padding()
+            }
         }
         .navigationTitle("Project Board")
     }

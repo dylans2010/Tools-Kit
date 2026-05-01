@@ -8,22 +8,38 @@ final class CollaborationManager: ObservableObject {
     @Published var spaces: [CollaborationSpace] = []
     @Published var commits: [UUID: CollaborationCommit] = [:]
 
-    private let storageKey = "com.tools-kit.collaboration.spaces"
+    private let spacesFile = "collaboration_spaces.json"
+    private let commitsFile = "collaboration_commits.json"
 
     private init() {
-        loadSpaces()
+        loadData()
     }
 
     // MARK: - Space Management
 
     func createSpace(name: String, description: String, icon: String, visibility: SpaceVisibility) -> CollaborationSpace {
-        let initialBranch = CollaborationBranch(id: UUID(), name: "main", headCommitID: UUID()) // Dummy head for now
+        let spaceID = UUID()
+        let initialCommitID = UUID()
+
+        let initialCommit = CollaborationCommit(
+            id: initialCommitID,
+            parentID: nil,
+            message: "Initial commit",
+            timestamp: Date(),
+            author: "System",
+            authorID: UUID(),
+            dataSnapshot: Data()
+        )
+        commits[initialCommitID] = initialCommit
+
+        let initialBranch = CollaborationBranch(id: UUID(), name: "main", headCommitID: initialCommitID)
         let space = CollaborationSpace(
-            id: UUID(),
+            id: spaceID,
             name: name,
             description: description,
             icon: icon,
             visibility: visibility,
+            ownerID: UUID(), // Should be real user ID
             members: [],
             branches: [initialBranch],
             currentBranchID: initialBranch.id,
@@ -34,18 +50,21 @@ final class CollaborationManager: ObservableObject {
             formIDs: [],
             spreadsheetIDs: [],
             mediaProjectIDs: [],
+            taskIDs: [],
+            decisionIDs: [],
             createdAt: Date(),
-            updatedAt: Date()
+            updatedAt: Date(),
+            metadata: [:]
         )
         spaces.append(space)
-        saveSpaces()
+        saveData()
         logActivity(spaceID: space.id, action: "Created space '\(name)'")
         return space
     }
 
     func deleteSpace(id: UUID) {
         spaces.removeAll { $0.id == id }
-        saveSpaces()
+        saveData()
     }
 
     // MARK: - Version Control
@@ -70,7 +89,7 @@ final class CollaborationManager: ObservableObject {
         spaces[spaceIndex].updatedAt = Date()
 
         logActivity(spaceID: spaceID, action: "Committed: \(message)")
-        saveSpaces()
+        saveData()
     }
 
     func createBranch(spaceID: UUID, sourceBranchID: UUID, name: String) {
@@ -79,22 +98,77 @@ final class CollaborationManager: ObservableObject {
 
         let newBranch = CollaborationBranch(id: UUID(), name: name, headCommitID: sourceBranch.headCommitID)
         spaces[spaceIndex].branches.append(newBranch)
-        saveSpaces()
+        saveData()
         logActivity(spaceID: spaceID, action: "Created branch '\(name)' from '\(sourceBranch.name)'")
+    }
+
+    func mergeBranch(spaceID: UUID, sourceBranchID: UUID, targetBranchID: UUID) {
+        guard let spaceIndex = spaces.firstIndex(where: { $0.id == spaceID }),
+              let sourceBranch = spaces[spaceIndex].branches.first(where: { $0.id == sourceBranchID }),
+              let targetBranchIndex = spaces[spaceIndex].branches.firstIndex(where: { $0.id == targetBranchID }) else { return }
+
+        // Basic conflict detection: check if target has moved ahead since source branched off
+        // For now, we'll just fast-forward or merge the head.
+        let sourceHead = sourceBranch.headCommitID
+        spaces[spaceIndex].branches[targetBranchIndex].headCommitID = sourceHead
+        spaces[spaceIndex].updatedAt = Date()
+
+        saveData()
+        logActivity(spaceID: spaceID, action: "Merged branch '\(sourceBranch.name)' into '\(spaces[spaceIndex].branches[targetBranchIndex].name)'")
+    }
+
+    func getCommitHistory(branchID: UUID) -> [CollaborationCommit] {
+        var history: [CollaborationCommit] = []
+        // Find any branch with this ID to get the head
+        var currentCommitID: UUID? = nil
+        for space in spaces {
+            if let branch = space.branches.first(where: { $0.id == branchID }) {
+                currentCommitID = branch.headCommitID
+                break
+            }
+        }
+
+        while let id = currentCommitID, let commit = commits[id] {
+            history.append(commit)
+            currentCommitID = commit.parentID
+        }
+
+        return history
+    }
+
+    func revertToCommit(spaceID: UUID, branchID: UUID, commitID: UUID) {
+        guard let spaceIndex = spaces.firstIndex(where: { $0.id == spaceID }),
+              let branchIndex = spaces[spaceIndex].branches.firstIndex(where: { $0.id == branchID }),
+              let _ = commits[commitID] else { return }
+
+        spaces[spaceIndex].branches[branchIndex].headCommitID = commitID
+        spaces[spaceIndex].updatedAt = Date()
+
+        saveData()
+        logActivity(spaceID: spaceID, action: "Reverted branch '\(spaces[spaceIndex].branches[branchIndex].name)' to commit \(commitID.uuidString.prefix(8))")
     }
 
     // MARK: - Persistence
 
-    private func saveSpaces() {
-        if let encoded = try? JSONEncoder().encode(spaces) {
-            UserDefaults.standard.set(encoded, forKey: storageKey)
+    private func saveData() {
+        do {
+            try WorkspacePersistence.shared.save(spaces, to: spacesFile)
+            try WorkspacePersistence.shared.save(commits, to: commitsFile)
+        } catch {
+            print("Error saving collaboration data: \(error)")
         }
     }
 
-    private func loadSpaces() {
-        if let data = UserDefaults.standard.data(forKey: storageKey),
-           let decoded = try? JSONDecoder().decode([CollaborationSpace].self, from: data) {
-            spaces = decoded
+    private func loadData() {
+        do {
+            if WorkspacePersistence.shared.exists(filename: spacesFile) {
+                spaces = try WorkspacePersistence.shared.load([CollaborationSpace].self, from: spacesFile)
+            }
+            if WorkspacePersistence.shared.exists(filename: commitsFile) {
+                commits = try WorkspacePersistence.shared.load([UUID: CollaborationCommit].self, from: commitsFile)
+            }
+        } catch {
+            print("Error loading collaboration data: \(error)")
         }
     }
 

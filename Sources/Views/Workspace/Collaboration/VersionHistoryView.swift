@@ -21,10 +21,42 @@ struct VersionHistoryView: View {
             }
             .padding()
 
-            List {
-                // Placeholder for commit list
-                Text("No commits yet.")
-                    .foregroundColor(.secondary)
+            let history = manager.getCommitHistory(branchID: space?.currentBranchID ?? UUID())
+            if history.isEmpty {
+                VStack(spacing: 20) {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.largeTitle)
+                        .foregroundColor(.secondary)
+                    Text("No version history yet.")
+                        .font(.headline)
+                    Text("Every change you make will appear here as a commit.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List {
+                    ForEach(history) { commit in
+                        VStack(alignment: .leading) {
+                            Text(commit.message)
+                                .font(.headline)
+                            Text("\(commit.author) • \(commit.timestamp, style: .date) at \(commit.timestamp, style: .time)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text(commit.id.uuidString.prefix(8))
+                                .font(.system(.caption, design: .monospaced))
+                                .foregroundColor(.blue)
+                        }
+                        .swipeActions {
+                            Button("Revert") {
+                                manager.revertToCommit(spaceID: spaceID, branchID: space?.currentBranchID ?? UUID(), commitID: commit.id)
+                            }
+                            .tint(.orange)
+                        }
+                    }
+                }
             }
         }
     }
