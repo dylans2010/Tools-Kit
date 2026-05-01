@@ -76,6 +76,7 @@
 		ED020000000000000000000A /* EditingHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000A /* EditingHomeView.swift */; };
 		ED020000000000000000000B /* FullEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000B /* FullEditorView.swift */; };
 		VT0200000000000000000001 /* ValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = VT0100000000000000000001 /* ValidationTests.swift */; };
+		KB0200000000000000000050 /* KeyboardValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000050 /* KeyboardValidationTests.swift */; };
 		TH0200000000000000000001 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = TH0100000000000000000001 /* Theme.swift */; };
 		IW0200000000000000000001 /* WorkspaceColorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = IW0100000000000000000001 /* WorkspaceColorManager.swift */; };
 		IW0200000000000000000002 /* WorkspaceSurfaceCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = IW0100000000000000000002 /* WorkspaceSurfaceCard.swift */; };
@@ -827,6 +828,29 @@
 		E8E69E7E31124543960E6E5F /* workspace_snapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD5F94EC0F04247BCF4B43C /* workspace_snapshot.swift */; };
 		E335A377270E42E390CF69C4 /* save_memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6913648A93B54B718A248998 /* save_memory.swift */; };
 		E97014D7C15F41FE83CA7797 /* event_replay.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EE4711716F40128E0770BE /* event_replay.swift */; };
+		KB0200000000000000000001 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000001 /* KeyboardViewController.swift */; };
+		KB0200000000000000000002 /* KeyboardRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000002 /* KeyboardRootView.swift */; };
+		KB0200000000000000000003 /* SuggestionBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000003 /* SuggestionBarView.swift */; };
+		KB0200000000000000000004 /* ActionToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000004 /* ActionToolbarView.swift */; };
+		KB0200000000000000000005 /* ToneSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000005 /* ToneSelectorView.swift */; };
+		KB0200000000000000000006 /* RewriteBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000006 /* RewriteBarView.swift */; };
+		KB0200000000000000000007 /* TextProxyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000007 /* TextProxyManager.swift */; };
+		KB0200000000000000000008 /* KeyboardState.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000008 /* KeyboardState.swift */; };
+		KB0200000000000000000009 /* AccessMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000009 /* AccessMode.swift */; };
+		KB0200000000000000000010 /* KeyboardAIFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000010 /* KeyboardAIFramework.swift */; };
+		KB0200000000000000000011 /* KeyboardAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000011 /* KeyboardAIService.swift */; };
+		KB0200000000000000000012 /* AIRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000012 /* AIRequest.swift */; };
+		KB0200000000000000000013 /* AIResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000013 /* AIResponse.swift */; };
+		KB0200000000000000000014 /* Suggestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000014 /* Suggestion.swift */; };
+		KB0200000000000000000015 /* TextAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000015 /* TextAnalysis.swift */; };
+		KB0200000000000000000016 /* SuggestionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000016 /* SuggestionEngine.swift */; };
+		KB0200000000000000000017 /* RewriteEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000017 /* RewriteEngine.swift */; };
+		KB0200000000000000000018 /* ToneEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000018 /* ToneEngine.swift */; };
+		KB0200000000000000000019 /* LocalEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000019 /* LocalEngine.swift */; };
+		KB0200000000000000000020 /* ContextAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000020 /* ContextAnalyzer.swift */; };
+		KB0200000000000000000021 /* TextAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000021 /* TextAnalyzer.swift */; };
+		KB0200000000000000000022 /* JSONCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000022 /* JSONCoder.swift */; };
+		KB0200000000000000000023 /* Debouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000023 /* Debouncer.swift */; };
 		38C32C8092D740FEABBB82CA /* complexity_analysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60692A4B70AF4F33B1B95FEC /* complexity_analysis.swift */; };
 		90EC979C8BAA4B75B43395CC /* append_file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90393BD11F224ACE8DCE96E3 /* append_file.swift */; };
 		5698586A0DF640A0A32A29D6 /* tool_health_check.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7072876D7E764C9B98DC8AF4 /* tool_health_check.swift */; };
@@ -1817,6 +1841,31 @@
 		8DD5F94EC0F04247BCF4B43C /* workspace_snapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/workspace_snapshot.swift; sourceTree = "<group>"; };
 		6913648A93B54B718A248998 /* save_memory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/save_memory.swift; sourceTree = "<group>"; };
 		E9EE4711716F40128E0770BE /* event_replay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/event_replay.swift; sourceTree = "<group>"; };
+		KB0100000000000000000050 /* KeyboardValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Tests/KeyboardValidationTests.swift; sourceTree = "<group>"; };
+		KB0100000000000000000001 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Controllers/KeyboardViewController.swift; sourceTree = "<group>"; };
+		KB0100000000000000000002 /* KeyboardRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Views/Root/KeyboardRootView.swift; sourceTree = "<group>"; };
+		KB0100000000000000000003 /* SuggestionBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Views/Components/SuggestionBarView.swift; sourceTree = "<group>"; };
+		KB0100000000000000000004 /* ActionToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Views/Components/ActionToolbarView.swift; sourceTree = "<group>"; };
+		KB0100000000000000000005 /* ToneSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Views/Components/ToneSelectorView.swift; sourceTree = "<group>"; };
+		KB0100000000000000000006 /* RewriteBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Views/Components/RewriteBarView.swift; sourceTree = "<group>"; };
+		KB0100000000000000000007 /* TextProxyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Core/Input/TextProxyManager.swift; sourceTree = "<group>"; };
+		KB0100000000000000000008 /* KeyboardState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Core/State/KeyboardState.swift; sourceTree = "<group>"; };
+		KB0100000000000000000009 /* AccessMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Core/State/AccessMode.swift; sourceTree = "<group>"; };
+		KB0100000000000000000010 /* KeyboardAIFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/AI/Framework/KeyboardAIFramework.swift; sourceTree = "<group>"; };
+		KB0100000000000000000011 /* KeyboardAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/AI/Services/KeyboardAIService.swift; sourceTree = "<group>"; };
+		KB0100000000000000000012 /* AIRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/AI/Models/AIRequest.swift; sourceTree = "<group>"; };
+		KB0100000000000000000013 /* AIResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/AI/Models/AIResponse.swift; sourceTree = "<group>"; };
+		KB0100000000000000000014 /* Suggestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/AI/Models/Suggestion.swift; sourceTree = "<group>"; };
+		KB0100000000000000000015 /* TextAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/AI/Models/TextAnalysis.swift; sourceTree = "<group>"; };
+		KB0100000000000000000016 /* SuggestionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Engine/SuggestionEngine.swift; sourceTree = "<group>"; };
+		KB0100000000000000000017 /* RewriteEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Engine/RewriteEngine.swift; sourceTree = "<group>"; };
+		KB0100000000000000000018 /* ToneEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Engine/ToneEngine.swift; sourceTree = "<group>"; };
+		KB0100000000000000000019 /* LocalEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Engine/LocalEngine.swift; sourceTree = "<group>"; };
+		KB0100000000000000000020 /* ContextAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Engine/ContextAnalyzer.swift; sourceTree = "<group>"; };
+		KB0100000000000000000021 /* TextAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Utils/TextAnalyzer.swift; sourceTree = "<group>"; };
+		KB0100000000000000000022 /* JSONCoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Utils/JSONCoder.swift; sourceTree = "<group>"; };
+		KB0100000000000000000023 /* Debouncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Utils/Debouncer.swift; sourceTree = "<group>"; };
+		KB0100000000000000000024 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Keyboard/Info.plist; sourceTree = "<group>"; };
 		60692A4B70AF4F33B1B95FEC /* complexity_analysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/complexity_analysis.swift; sourceTree = "<group>"; };
 		90393BD11F224ACE8DCE96E3 /* append_file.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/append_file.swift; sourceTree = "<group>"; };
 		7072876D7E764C9B98DC8AF4 /* tool_health_check.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/tool_health_check.swift; sourceTree = "<group>"; };
@@ -2315,9 +2364,145 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		KB0300000000000000000000 /* Keyboard */ = {
+			isa = PBXGroup;
+			children = (
+				KB0300000000000000000001 /* AI */,
+				KB0300000000000000000002 /* Controllers */,
+				KB0300000000000000000003 /* Core */,
+				KB0300000000000000000004 /* Engine */,
+				KB0300000000000000000005 /* Utils */,
+				KB0300000000000000000006 /* Views */,
+				KB0100000000000000000024 /* Info.plist */,
+			);
+			path = Keyboard;
+			sourceTree = "<group>";
+		};
+		KB0300000000000000000001 /* AI */ = {
+			isa = PBXGroup;
+			children = (
+				KB0300000000000000000101 /* Framework */,
+				KB0300000000000000000102 /* Models */,
+				KB0300000000000000000103 /* Services */,
+			);
+			path = AI;
+			sourceTree = "<group>";
+		};
+		KB0300000000000000000101 /* Framework */ = {
+			isa = PBXGroup;
+			children = (
+				KB0100000000000000000010 /* KeyboardAIFramework.swift */,
+			);
+			path = Framework;
+			sourceTree = "<group>";
+		};
+		KB0300000000000000000102 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				KB0100000000000000000012 /* AIRequest.swift */,
+				KB0100000000000000000013 /* AIResponse.swift */,
+				KB0100000000000000000014 /* Suggestion.swift */,
+				KB0100000000000000000015 /* TextAnalysis.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		KB0300000000000000000103 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				KB0100000000000000000011 /* KeyboardAIService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		KB0300000000000000000002 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				KB0100000000000000000001 /* KeyboardViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		KB0300000000000000000003 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				KB0300000000000000000301 /* Input */,
+				KB0300000000000000000302 /* State */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		KB0300000000000000000301 /* Input */ = {
+			isa = PBXGroup;
+			children = (
+				KB0100000000000000000007 /* TextProxyManager.swift */,
+			);
+			path = Input;
+			sourceTree = "<group>";
+		};
+		KB0300000000000000000302 /* State */ = {
+			isa = PBXGroup;
+			children = (
+				KB0100000000000000000009 /* AccessMode.swift */,
+				KB0100000000000000000008 /* KeyboardState.swift */,
+			);
+			path = State;
+			sourceTree = "<group>";
+		};
+		KB0300000000000000000004 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				KB0100000000000000000020 /* ContextAnalyzer.swift */,
+				KB0100000000000000000019 /* LocalEngine.swift */,
+				KB0100000000000000000017 /* RewriteEngine.swift */,
+				KB0100000000000000000016 /* SuggestionEngine.swift */,
+				KB0100000000000000000018 /* ToneEngine.swift */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
+		KB0300000000000000000005 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				KB0100000000000000000023 /* Debouncer.swift */,
+				KB0100000000000000000022 /* JSONCoder.swift */,
+				KB0100000000000000000021 /* TextAnalyzer.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		KB0300000000000000000006 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				KB0300000000000000000601 /* Components */,
+				KB0300000000000000000602 /* Root */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		KB0300000000000000000601 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				KB0100000000000000000004 /* ActionToolbarView.swift */,
+				KB0100000000000000000006 /* RewriteBarView.swift */,
+				KB0100000000000000000003 /* SuggestionBarView.swift */,
+				KB0100000000000000000005 /* ToneSelectorView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		KB0300000000000000000602 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				KB0100000000000000000002 /* KeyboardRootView.swift */,
+			);
+			path = Root;
+			sourceTree = "<group>";
+		};
 		8DF4BF69CF55A81CB6EBF3DE /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				KB0300000000000000000000 /* Keyboard */,
 				MS01D8F6E8B59DA1CCE7ABA8 /* Messages */,
 				WS010000000000000000000001 /* WorkspacePersistence.swift */,
 				WS010000000000000000000002 /* SyncEngine.swift */,
@@ -3104,6 +3289,7 @@
 			isa = PBXGroup;
 			children = (
 				8DF4BF69CF55A81CB6EBF3DE /* Sources */,
+				KB0300000000000000000000 /* Keyboard */,
 				B81AA4FC2BB81266E881DF5B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -3508,6 +3694,23 @@
 			productReference = 732E3165BFBB323BD8081B3F /* Tools-Kit.app */;
 			productType = "com.apple.product-type.application";
 		};
+		KB0400000000000000000001 /* KeyboardExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = KB0400000000000000000101 /* Build configuration list for PBXNativeTarget "KeyboardExtension" */;
+			buildPhases = (
+				KB0400000000000000000201 /* Sources */,
+				KB0400000000000000000202 /* Frameworks */,
+				KB0400000000000000000203 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KeyboardExtension;
+			productName = KeyboardExtension;
+			productReference = KB0100000000000000000024 /* Info.plist */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -3540,9 +3743,64 @@
 			);
 			targets = (
 				F3353FBEDEEBF7704E1E6451 /* Tools-Kit */,
+				KB0400000000000000000001 /* KeyboardExtension */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		KB0400000000000000000203 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		KB0400000000000000000201 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				KB0200000000000000000001 /* KeyboardViewController.swift in Sources */,
+				KB0200000000000000000002 /* KeyboardRootView.swift in Sources */,
+				KB0200000000000000000003 /* SuggestionBarView.swift in Sources */,
+				KB0200000000000000000004 /* ActionToolbarView.swift in Sources */,
+				KB0200000000000000000005 /* ToneSelectorView.swift in Sources */,
+				KB0200000000000000000006 /* RewriteBarView.swift in Sources */,
+				KB0200000000000000000007 /* TextProxyManager.swift in Sources */,
+				KB0200000000000000000008 /* KeyboardState.swift in Sources */,
+				KB0200000000000000000009 /* AccessMode.swift in Sources */,
+				KB0200000000000000000010 /* KeyboardAIFramework.swift in Sources */,
+				KB0200000000000000000011 /* KeyboardAIService.swift in Sources */,
+				KB0200000000000000000012 /* AIRequest.swift in Sources */,
+				KB0200000000000000000013 /* AIResponse.swift in Sources */,
+				KB0200000000000000000014 /* Suggestion.swift in Sources */,
+				KB0200000000000000000015 /* TextAnalysis.swift in Sources */,
+				KB0200000000000000000016 /* SuggestionEngine.swift in Sources */,
+				KB0200000000000000000017 /* RewriteEngine.swift in Sources */,
+				KB0200000000000000000018 /* ToneEngine.swift in Sources */,
+				KB0200000000000000000019 /* LocalEngine.swift in Sources */,
+				KB0200000000000000000020 /* ContextAnalyzer.swift in Sources */,
+				KB0200000000000000000021 /* TextAnalyzer.swift in Sources */,
+				KB0200000000000000000022 /* JSONCoder.swift in Sources */,
+				KB0200000000000000000023 /* Debouncer.swift in Sources */,
+				B1C2D3E4F5A60708090A0D01 /* AIService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		KB0400000000000000000202 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXResourcesBuildPhase section */
 		B1C2D3E4F5A60708090A0E01 /* Resources */ = {
@@ -4654,6 +4912,46 @@
 			};
 			name = Debug;
 		};
+		KB0400000000000000000111 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Keyboard/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.keyboard;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		KB0400000000000000000112 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Keyboard/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.keyboard;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		B71B3BFB03C4B7C7DD032762 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4714,6 +5012,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		KB0400000000000000000101 /* Build configuration list for PBXNativeTarget "KeyboardExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				KB0400000000000000000111 /* Debug */,
+				KB0400000000000000000112 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		7A6D9F4389A5C85EEE4A6E47 /* Build configuration list for PBXNativeTarget "Tools-Kit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
