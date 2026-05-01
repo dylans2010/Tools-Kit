@@ -14,6 +14,7 @@ struct WorkspaceHomeView: View {
         case articles = "Articles"
         case files = "Files"
         case github = "GitHub"
+        case security = "Security"
 
         var icon: String {
             switch self {
@@ -27,6 +28,7 @@ struct WorkspaceHomeView: View {
             case .articles: return "newspaper.fill"
             case .files: return "folder.fill"
             case .github: return "terminal.fill"
+            case .security: return "lock.shield.fill"
             }
         }
     }
@@ -43,6 +45,7 @@ struct WorkspaceHomeView: View {
             articlesTab
             filesTab
             githubTab
+            securityTab
         }
     }
 
@@ -145,6 +148,16 @@ struct WorkspaceHomeView: View {
         }
         .tag(WorkspaceTab.github)
     }
+
+    private var securityTab: some View {
+        NavigationStack {
+            SecurityHomeView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.security.rawValue, systemImage: WorkspaceTab.security.icon)
+        }
+        .tag(WorkspaceTab.security)
+    }
 }
 
 // MARK: - Dashboard View
@@ -163,6 +176,7 @@ struct WorkspaceDashboardView: View {
     @State private var showingSettings = false
 
     private let moreTools: [(title: String, icon: String, color: Color, destination: AnyView)] = [
+        ("Security", "lock.shield.fill", .blue, AnyView(SecurityHomeView())),
         ("GitHub", "terminal.fill", .black, AnyView(GitHubRouterView())),
         ("Calendar", "calendar", .green, AnyView(CalendarHomeView())),
         ("Habits", "flame.fill", .red, AnyView(WorkspaceHabitTrackerView())),
