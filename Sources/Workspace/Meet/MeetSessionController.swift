@@ -63,6 +63,11 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
 
     func toggleMute() { isMicrophoneMuted.toggle() }
+
+    var videoDeviceOptions: [String] {
+        MeetPermissionService.availableVideoDevices()
+    }
+
     func toggleCamera() { isCameraEnabled.toggle() }
     func toggleScreenShare() { isScreenSharing.toggle() }
 
@@ -73,6 +78,23 @@ final class MeetingStateManager: NSObject, ObservableObject {
     func endMeetingForEveryone() async {
         phase = .ended
     }
+
+
+    func muteAllParticipants() async {
+        participants = participants.map { participant in
+            var updated = participant
+            if updated.role != .host {
+                updated.isMuted = true
+            }
+            return updated
+        }
+    }
+
+    func setMeetingLocked(_ locked: Bool) async { isMeetingLocked = locked }
+    func setChatEnabled(_ enabled: Bool) async { isChatEnabled = enabled }
+    func setScreenShareAllowed(_ allowed: Bool) async { isScreenShareAllowed = allowed }
+    func spotlightParticipant(_ participantID: String?) async { spotlightedParticipantID = participantID }
+    func pinParticipant(_ participantID: String?) async { pinnedParticipantID = participantID }
 
     // MARK: - Real-Time Analytics
 
@@ -145,9 +167,9 @@ final class MeetingStateManager: NSObject, ObservableObject {
 
         breakoutRooms = breakoutRooms.map { room in
             var updated = room
-            updated.participantIDs.removeAll { $0 == participantID }
+            updated.participantIds.removeAll { $0 == participantID }
             if roomID == updated.id {
-                updated.participantIDs.append(participantID)
+                updated.participantIds.append(participantID)
             }
             return updated
         }
