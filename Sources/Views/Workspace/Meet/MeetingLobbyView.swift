@@ -6,26 +6,10 @@ struct MeetingLobbyView: View {
 
     var body: some View {
         List {
-            Section("Session") {
-                if let session = manager.currentSession {
-                    LabeledContent("Meeting ID", value: session.meetingId)
-                        .font(.headline.monospaced())
-                }
-            }
-
-            Section("Participants") { participantsRow }
-
-            Section("Device Checks") {
-                permissionRow(title: "Microphone", state: manager.lobbyState.microphonePermission, icon: "mic")
-                permissionRow(title: "Camera", state: manager.lobbyState.cameraPermission, icon: "video")
-            }
-
-            Section("Prejoin") {
-                PreJoinView(manager: manager) {
-                    DebugLogger.shared.log("Join button tapped from prejoin.", level: .info, category: "Meet")
-                    Task { await manager.startMeeting() }
-                }
-            }
+            sessionSection
+            participantsSection
+            deviceChecksSection
+            prejoinSection
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Lobby")
@@ -37,6 +21,35 @@ struct MeetingLobbyView: View {
         }
         .onChange(of: manager.phase, initial: false) { _, newValue in
             navigateToMeeting = (newValue == .inMeeting)
+        }
+    }
+
+    private var sessionSection: some View {
+        Section("Session") {
+            if let session = manager.currentSession {
+                LabeledContent("Meeting ID", value: session.meetingId)
+                    .font(.headline.monospaced())
+            }
+        }
+    }
+
+    private var participantsSection: some View {
+        Section("Participants") { participantsRow }
+    }
+
+    private var deviceChecksSection: some View {
+        Section("Device Checks") {
+            permissionRow(title: "Microphone", state: manager.lobbyState.microphonePermission, icon: "mic")
+            permissionRow(title: "Camera", state: manager.lobbyState.cameraPermission, icon: "video")
+        }
+    }
+
+    private var prejoinSection: some View {
+        Section("Prejoin") {
+            PreJoinView(manager: manager) {
+                DebugLogger.shared.log("Join button tapped from prejoin.", level: .info, category: "Meet")
+                Task { await manager.startMeeting() }
+            }
         }
     }
 

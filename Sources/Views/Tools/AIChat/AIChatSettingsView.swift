@@ -966,7 +966,7 @@ struct TagEditorView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            FlowLayout(tags: tags) { tag in
+            TagFlowLayout(tags: tags) { tag in
                 HStack(spacing: 4) {
                     Text(tag)
                         .font(.caption)
@@ -1000,7 +1000,7 @@ struct TagEditorView: View {
     }
 }
 
-struct FlowLayout<Content: View>: View {
+struct TagFlowLayout<Content: View>: View {
     let tags: [String]
     let content: (String) -> Content
 

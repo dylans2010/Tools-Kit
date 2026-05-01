@@ -41,7 +41,7 @@ final class WiFiTransferServer: ObservableObject {
             }
         }
         listener?.stateUpdateHandler = { [weak self] state in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 switch state {
                 case .ready:
                     self?.isRunning = true
@@ -73,31 +73,32 @@ final class WiFiTransferServer: ObservableObject {
 
     private func receiveCompleteRequest(from connection: NWConnection, accumulated: Data) {
         connection.receive(minimumIncompleteLength: 1, maximumLength: 65536) { [weak self] data, _, _, error in
-            guard let self else {
-                connection.cancel()
-                return
-            }
+            Task { @MainActor in
+                guard let self else {
+                    connection.cancel()
+                    return
+                }
 
-            if let error {
-                self.appendLog("Connection error: \(error.localizedDescription)")
-                connection.cancel()
-                return
-            }
+                if let error {
+                    self.appendLog("Connection error: \(error.localizedDescription)")
+                    connection.cancel()
+                    return
+                }
 
-            guard let data, !data.isEmpty else {
-                connection.cancel()
-                return
-            }
+                guard let data, !data.isEmpty else {
+                    connection.cancel()
+                    return
+                }
 
-            var buffer = accumulated
-            buffer.append(data)
+                var buffer = accumulated
+                buffer.append(data)
 
-            if !self.requestIsComplete(buffer) {
-                self.receiveCompleteRequest(from: connection, accumulated: buffer)
-                return
-            }
+                if !self.requestIsComplete(buffer) {
+                    self.receiveCompleteRequest(from: connection, accumulated: buffer)
+                    return
+                }
 
-            let raw = String(data: buffer, encoding: .utf8) ?? ""
+                let raw = String(data: buffer, encoding: .utf8) ?? ""
             let lines = raw.components(separatedBy: "\r\n")
             let requestLine = lines.first ?? ""
             let parts = requestLine.components(separatedBy: " ")
@@ -127,8 +128,9 @@ final class WiFiTransferServer: ObservableObject {
                     let body = self.extractHTTPBody(from: buffer)
                     self.handleFinalizeUpload(body: body, connection: connection)
                 }
-            default:
-                Task { @MainActor [weak self] in self?.sendNotFound(connection) }
+                default:
+                    self.sendNotFound(connection)
+                }
             }
         }
     }
@@ -140,7 +142,7 @@ final class WiFiTransferServer: ObservableObject {
         if let req = try? JSONDecoder().decode(CodeRequest.self, from: body),
            req.code == pairingCode {
             let sessionID = UUID().uuidString
-            DispatchQueue.main.async { self.validatedSessions.insert(sessionID) }
+            self.validatedSessions.insert(sessionID)
             sendJSON("{\"success\":true,\"session\":\"\(sessionID)\"}", connection: connection, status: 200)
             appendLog("Device paired successfully.")
         } else {
@@ -406,10 +408,8 @@ final class WiFiTransferServer: ObservableObject {
     }
 
     private func appendLog(_ message: String) {
-        DispatchQueue.main.async {
-            self.transferLog.append("[\(Date().formatted(date: .omitted, time: .shortened))] \(message)")
-            if self.transferLog.count > 100 { self.transferLog.removeFirst() }
-        }
+        self.transferLog.append("[\(Date().formatted(date: .omitted, time: .shortened))] \(message)")
+        if self.transferLog.count > 100 { self.transferLog.removeFirst() }
     }
 
     private func createListener() -> (listener: NWListener, port: UInt16)? {
