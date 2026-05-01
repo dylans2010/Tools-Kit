@@ -48,6 +48,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
     @Published var hostParticipantID: String?
     @Published var adminParticipantIDs: Set<String> = []
     @Published var isMeetingLocked = false
+    @Published var breakoutRooms: [MeetingBreakoutRoom] = []
     @Published var activeAudioProcessingState = "Disabled"
     @Published var isNoiseCancellationEnabled = false
     @Published var isCaptionsEnabled = false
@@ -117,6 +118,40 @@ final class MeetingStateManager: NSObject, ObservableObject {
     }
     func addThread(named name: String) { chatThreads.append(MeetingChatThread(id: UUID().uuidString, title: name)) }
     func reactToMessage(messageID: String, emoji: String) { /* Logic */ }
+
+    var meetingStateLabel: String {
+        switch phase {
+        case .idle: return "Idle"
+        case .joining: return "Joining"
+        case .joined: return "Live"
+        case .ended: return "Ended"
+        case .error: return "Error"
+        }
+    }
+
+    func createBreakoutRoom(named name: String) async {
+        let room = MeetingBreakoutRoom(id: UUID().uuidString, name: name, participantIDs: [], isOpen: true)
+        breakoutRooms.append(room)
+    }
+
+    func assignParticipant(_ participantID: String, to roomID: String?) async {
+        participants = participants.map { participant in
+            var updated = participant
+            if updated.id == participantID {
+                updated.breakoutRoomID = roomID
+            }
+            return updated
+        }
+
+        breakoutRooms = breakoutRooms.map { room in
+            var updated = room
+            updated.participantIDs.removeAll { $0 == participantID }
+            if roomID == updated.id {
+                updated.participantIDs.append(participantID)
+            }
+            return updated
+        }
+    }
 }
 
 typealias MeetSessionController = MeetingStateManager

@@ -67,11 +67,3 @@ final class BackgroundPipeline {
         }
     }
 }
-
-/// Robust workspace-wide logging system.
-struct WorkspaceLogger {
-    static let general = Logger(subsystem: "com.workspace", category: "General")
-    static let db = Logger(subsystem: "com.workspace", category: "Database")
-    static let ai = Logger(subsystem: "com.workspace", category: "AI")
-    static let render = Logger(subsystem: "com.workspace", category: "Render")
-}
