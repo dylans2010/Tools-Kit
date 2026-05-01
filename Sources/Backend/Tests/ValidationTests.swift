@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 /// Internal validation tests to ensure core logic is functional across refactored modules.
 struct ValidationTests {

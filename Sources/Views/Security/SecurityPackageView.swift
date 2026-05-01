@@ -1,5 +1,8 @@
 import SwiftUI
 import UniformTypeIdentifiers
+#if os(iOS)
+import UIKit
+#endif
 
 struct SecurityPackageView: View {
     @StateObject private var packageService = SecurityPackageService.shared
