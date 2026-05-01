@@ -9,6 +9,8 @@ struct ValidationTests {
         testCalendarPredictiveLogic()
         testSpreadsheetCalculation()
         testMeetAnalytics()
+        testCollaborationSystem()
+        testEditingSystem()
 
         print("All Validation Tests Passed!")
     }
@@ -40,6 +42,29 @@ struct ValidationTests {
         let manager = MeetingStateManager.shared
         manager.updateEngagement()
         assert(manager.engagementLevel >= 0)
+    }
+
+    private static func testCollaborationSystem() {
+        print("Testing Collaboration System...")
+        let manager = CollaborationManager.shared
+        let space = manager.createSpace(name: "Test Space", description: "Test", icon: "test", visibility: .privateSpace)
+        assert(space.name == "Test Space")
+        assert(!manager.spaces.isEmpty)
+
+        let framework = CollaborationFramework.shared
+        framework.indexObject(id: space.id, type: .notebook)
+        assert(framework.indexedObjects[space.id] == .notebook)
+    }
+
+    private static func testEditingSystem() {
+        print("Testing Editing System...")
+        let manager = EditingManager.shared
+        let project = manager.createProject(name: "Test Project", canvasSize: CGSize(width: 100, height: 100))
+        assert(project.name == "Test Project")
+        assert(!manager.projects.isEmpty)
+
+        // Check if project was automatically indexed in CollaborationFramework
+        assert(CollaborationFramework.shared.indexedObjects[project.id] == .mediaProject)
     }
 
     private static func assert(_ condition: Bool, message: String = "Assertion failed") {
