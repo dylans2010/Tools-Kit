@@ -150,7 +150,7 @@ struct CreateAccountView: View {
 
         Task {
             do {
-                try await AuthService.shared.createAccount(name: name.trimmingCharacters(in: .whitespacesAndNewlines), email: normalizedEmail, password: password)
+                try await AccountAuthService.shared.createAccount(name: name.trimmingCharacters(in: .whitespacesAndNewlines), email: normalizedEmail, password: password)
                 await MainActor.run {
                     isWorking = false
                     dismiss()

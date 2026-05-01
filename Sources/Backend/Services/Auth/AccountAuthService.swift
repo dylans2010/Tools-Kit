@@ -13,8 +13,8 @@ enum AuthServiceError: LocalizedError {
 }
 
 @MainActor
-final class AuthService: ObservableObject {
-    static let shared = AuthService()
+final class AccountAuthService: ObservableObject {
+    static let shared = AccountAuthService()
 
     @Published var isBusy = false
     @Published var lastErrorMessage: String?

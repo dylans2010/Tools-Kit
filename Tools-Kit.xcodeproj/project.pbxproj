@@ -525,7 +525,7 @@
 		BD781D5600F4E98B9B514667 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54244EAC19ED294008A5A839 /* ContentView.swift */; };
 		C4F2A9817D6E4B30A5C1D9E2 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D9E2F14C3B4A8192D0E6F1 /* LoginView.swift */; };
 		BFA001000000000000000001 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000001 /* CreateAccountView.swift */; };
-		BFA001000000000000000002 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000002 /* AuthService.swift */; };
+		BFA001000000000000000002 /* AccountAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000002 /* AccountAuthService.swift */; };
 		BFA001000000000000000003 /* AuthDatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000003 /* AuthDatabaseService.swift */; };
 		BFA001000000000000000005 /* GmailServerConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000005 /* GmailServerConfiguration.swift */; };
 		BFA001000000000000000006 /* GmailMailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA101000000000000000006 /* GmailMailProvider.swift */; };
@@ -1190,7 +1190,7 @@
 		54244EAC19ED294008A5A839 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A7D9E2F14C3B4A8192D0E6F1 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Auth/LoginView.swift"; sourceTree = "<group>"; };
 		BFA101000000000000000001 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Auth/CreateAccountView.swift"; sourceTree = "<group>"; };
-		BFA101000000000000000002 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Backend/Services/Auth/AuthService.swift"; sourceTree = "<group>"; };
+		BFA101000000000000000002 /* AccountAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Backend/Services/Auth/AccountAuthService.swift"; sourceTree = "<group>"; };
 		BFA101000000000000000003 /* AuthDatabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Backend/Services/Auth/AuthDatabaseService.swift"; sourceTree = "<group>"; };
 		BFA101000000000000000005 /* GmailServerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Mail/Models/Gmail/GmailServerConfiguration.swift"; sourceTree = "<group>"; };
 		BFA101000000000000000006 /* GmailMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "../Mail/Providers/GmailMailProvider.swift"; sourceTree = "<group>"; };
@@ -1911,7 +1911,7 @@
 				54244EAC19ED294008A5A839 /* ContentView.swift */,
 				A7D9E2F14C3B4A8192D0E6F1 /* LoginView.swift */,
 				BFA101000000000000000001 /* CreateAccountView.swift */,
-				BFA101000000000000000002 /* AuthService.swift */,
+				BFA101000000000000000002 /* AccountAuthService.swift */,
 				BFA101000000000000000003 /* AuthDatabaseService.swift */,
 				BFA101000000000000000005 /* GmailServerConfiguration.swift */,
 				BFA101000000000000000006 /* GmailMailProvider.swift */,
@@ -3582,7 +3582,7 @@
 				BD781D5600F4E98B9B514667 /* ContentView.swift in Sources */,
 				C4F2A9817D6E4B30A5C1D9E2 /* LoginView.swift in Sources */,
 				BFA001000000000000000001 /* CreateAccountView.swift in Sources */,
-				BFA001000000000000000002 /* AuthService.swift in Sources */,
+				BFA001000000000000000002 /* AccountAuthService.swift in Sources */,
 				BFA001000000000000000003 /* AuthDatabaseService.swift in Sources */,
 				BFA001000000000000000005 /* GmailServerConfiguration.swift in Sources */,
 				BFA001000000000000000006 /* GmailMailProvider.swift in Sources */,

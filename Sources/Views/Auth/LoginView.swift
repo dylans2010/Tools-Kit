@@ -160,7 +160,7 @@ struct LoginView: View {
 
         Task {
             do {
-                try await AuthService.shared.signIn(email: email, password: password)
+                try await AccountAuthService.shared.signIn(email: email, password: password)
                 await MainActor.run {
                     isLoading = false
                     onAuthenticated()
@@ -180,7 +180,7 @@ struct LoginView: View {
 
         Task {
             do {
-                try await AuthService.shared.signInWithOAuth(provider: provider)
+                try await AccountAuthService.shared.signInWithOAuth(provider: provider)
                 await MainActor.run {
                     isLoading = false
                     onAuthenticated()
