@@ -42,6 +42,11 @@ final class MeetingStateManager: NSObject, ObservableObject {
     @Published var reactions: [MeetingReactionEvent] = []
     @Published var cpuWarnings: [MeetingCPUWarning] = []
     @Published var isPiPEnabled = false
+
+    @Published var displayNameInput = ""
+    @Published var isBusy = false
+    @Published var errorMessage: String?
+    @Published var scheduledMeetings: [ScheduledMeeting] = []
     @Published var isPiPActive = false
     @Published var isChatEnabled = true
     @Published var isScreenShareAllowed = true
@@ -77,12 +82,97 @@ final class MeetingStateManager: NSObject, ObservableObject {
     func toggleCamera() { isCameraEnabled.toggle() }
     func toggleScreenShare() { isScreenSharing.toggle() }
 
+    var isMeetingIDFormatValid: Bool {
+        let trimmed = meetingIdInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        return !trimmed.isEmpty && trimmed.count >= 3
+    }
+
+    func validateMeetingID() -> Bool {
+        return isMeetingIDFormatValid
+    }
+
     func leaveMeeting() async {
         phase = .ended
     }
 
     func endMeetingForEveryone() async {
         phase = .ended
+    }
+
+    func runLobbyChecks() async {
+        lobbyState.isLoadingParticipants = true
+        let permissionService = MeetPermissionService()
+        lobbyState.microphonePermission = await permissionService.checkMicrophonePermission()
+        lobbyState.cameraPermission = await permissionService.checkCameraPermission()
+        lobbyState.isLoadingParticipants = false
+    }
+
+    func startMeeting() async {
+        guard let session = currentSession else { return }
+        await resolver.beginSession(session)
+        phase = .inMeeting
+    }
+
+    func joinMeeting() async {
+        guard isMeetingIDFormatValid else {
+            errorMessage = "Invalid Meeting ID"
+            return
+        }
+        isBusy = true
+        errorMessage = nil
+        do {
+            let session = try await resolver.joinSession(with: meetingIdInput)
+            currentSession = session
+            localParticipantDisplayName = displayNameInput
+            phase = .lobby
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isBusy = false
+    }
+
+    func joinScheduledMeeting(_ scheduled: ScheduledMeeting) async {
+        guard let meetingId = scheduled.meetingId else {
+            errorMessage = "Meeting ID not available yet"
+            return
+        }
+        isBusy = true
+        errorMessage = nil
+        do {
+            let session = try await resolver.joinSession(with: meetingId)
+            currentSession = session
+            localParticipantDisplayName = displayNameInput
+            phase = .lobby
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isBusy = false
+    }
+
+    func createMeeting(scheduleForLater: Bool, scheduledAt: Date) async {
+        isBusy = true
+        errorMessage = nil
+        do {
+            if scheduleForLater {
+                let newScheduled = ScheduledMeeting(
+                    id: UUID().uuidString,
+                    name: meetingIdInput,
+                    meetingId: nil,
+                    scheduledAt: scheduledAt,
+                    activationState: .pending
+                )
+                scheduledMeetings.append(newScheduled)
+                meetingIdInput = ""
+            } else {
+                let session = try await resolver.createSession(with: meetingIdInput)
+                currentSession = session
+                localParticipantDisplayName = displayNameInput
+                phase = .lobby
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isBusy = false
     }
 
 
