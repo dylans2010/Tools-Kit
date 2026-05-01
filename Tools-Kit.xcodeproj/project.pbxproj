@@ -205,6 +205,19 @@
 		NP0200000000000000000012 /* TrackerBlockerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000012 /* TrackerBlockerView.swift */; };
 		NP0200000000000000000013 /* TemporaryIdentityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000013 /* TemporaryIdentityView.swift */; };
 		NP0200000000000000000014 /* SecureFileSenderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000014 /* SecureFileSenderView.swift */; };
+		NP0200000000000000000015 /* SecurityModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000015 /* SecurityModels.swift */; };
+		NP0200000000000000000016 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000016 /* AuthService.swift */; };
+		NP0200000000000000000017 /* EncryptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000017 /* EncryptionService.swift */; };
+		NP0200000000000000000018 /* SecureFileStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000018 /* SecureFileStorageService.swift */; };
+		NP0200000000000000000019 /* SecurityPackageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000019 /* SecurityPackageService.swift */; };
+		NP020000000000000000001A /* TOTPService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP010000000000000000001A /* TOTPService.swift */; };
+		NP020000000000000000001B /* VaultManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP010000000000000000001B /* VaultManager.swift */; };
+		NP020000000000000000001C /* SecurityDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP010000000000000000001C /* SecurityDashboardView.swift */; };
+		NP020000000000000000001D /* SecurityGateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP010000000000000000001D /* SecurityGateView.swift */; };
+		NP020000000000000000001E /* SecurityOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP010000000000000000001E /* SecurityOnboardingView.swift */; };
+		NP020000000000000000001F /* SecurityPackageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP010000000000000000001F /* SecurityPackageView.swift */; };
+		NP0200000000000000000020 /* SecurityTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000020 /* SecurityTool.swift */; };
+		NP0200000000000000000021 /* VaultItemDetailViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = NP0100000000000000000021 /* VaultItemDetailViews.swift */; };
 		NT0200000000000000000001 /* NetworkProfilerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000001 /* NetworkProfilerBackend.swift */; };
 		NT0200000000000000000002 /* WebSocketInspectorBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000002 /* WebSocketInspectorBackend.swift */; };
 		NT0200000000000000000003 /* TLSInspectorBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = NT0100000000000000000003 /* TLSInspectorBackend.swift */; };
@@ -1424,6 +1437,19 @@
 		NP0100000000000000000012 /* TrackerBlockerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/TrackerBlocker/TrackerBlockerView.swift"; sourceTree = "<group>"; };
 		NP0100000000000000000013 /* TemporaryIdentityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/TemporaryIdentity/TemporaryIdentityView.swift"; sourceTree = "<group>"; };
 		NP0100000000000000000014 /* SecureFileSenderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/SecureFileSender/SecureFileSenderView.swift"; sourceTree = "<group>"; };
+		NP0100000000000000000015 /* SecurityModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Models/SecurityModels.swift; sourceTree = "<group>"; };
+		NP0100000000000000000016 /* AuthService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend/Security/AuthService.swift; sourceTree = "<group>"; };
+		NP0100000000000000000017 /* EncryptionService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend/Security/EncryptionService.swift; sourceTree = "<group>"; };
+		NP0100000000000000000018 /* SecureFileStorageService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend/Security/SecureFileStorageService.swift; sourceTree = "<group>"; };
+		NP0100000000000000000019 /* SecurityPackageService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend/Security/SecurityPackageService.swift; sourceTree = "<group>"; };
+		NP010000000000000000001A /* TOTPService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend/Security/TOTPService.swift; sourceTree = "<group>"; };
+		NP010000000000000000001B /* VaultManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend/Security/VaultManager.swift; sourceTree = "<group>"; };
+		NP010000000000000000001C /* SecurityDashboardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Views/Security/SecurityDashboardView.swift; sourceTree = "<group>"; };
+		NP010000000000000000001D /* SecurityGateView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Views/Security/SecurityGateView.swift; sourceTree = "<group>"; };
+		NP010000000000000000001E /* SecurityOnboardingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Views/Security/SecurityOnboardingView.swift; sourceTree = "<group>"; };
+		NP010000000000000000001F /* SecurityPackageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Views/Security/SecurityPackageView.swift; sourceTree = "<group>"; };
+		NP0100000000000000000020 /* SecurityTool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Views/Security/SecurityTool.swift; sourceTree = "<group>"; };
+		NP0100000000000000000021 /* VaultItemDetailViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Views/Security/VaultItemDetailViews.swift; sourceTree = "<group>"; };
 		NT0100000000000000000001 /* NetworkProfilerBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/NetworkProfiler/NetworkProfilerBackend.swift"; sourceTree = "<group>"; };
 		NT0100000000000000000002 /* WebSocketInspectorBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/WebSocketInspector/WebSocketInspectorBackend.swift"; sourceTree = "<group>"; };
 		NT0100000000000000000003 /* TLSInspectorBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/TLSInspector/TLSInspectorBackend.swift"; sourceTree = "<group>"; };
@@ -2454,6 +2480,19 @@
 				NP0100000000000000000012 /* TrackerBlockerView.swift */,
 				NP0100000000000000000013 /* TemporaryIdentityView.swift */,
 				NP0100000000000000000014 /* SecureFileSenderView.swift */,
+				NP0100000000000000000015 /* SecurityModels.swift */,
+				NP0100000000000000000016 /* AuthService.swift */,
+				NP0100000000000000000017 /* EncryptionService.swift */,
+				NP0100000000000000000018 /* SecureFileStorageService.swift */,
+				NP0100000000000000000019 /* SecurityPackageService.swift */,
+				NP010000000000000000001A /* TOTPService.swift */,
+				NP010000000000000000001B /* VaultManager.swift */,
+				NP010000000000000000001C /* SecurityDashboardView.swift */,
+				NP010000000000000000001D /* SecurityGateView.swift */,
+				NP010000000000000000001E /* SecurityOnboardingView.swift */,
+				NP010000000000000000001F /* SecurityPackageView.swift */,
+				NP0100000000000000000020 /* SecurityTool.swift */,
+				NP0100000000000000000021 /* VaultItemDetailViews.swift */,
 				NT0100000000000000000001 /* NetworkProfilerBackend.swift */,
 				NT0100000000000000000002 /* WebSocketInspectorBackend.swift */,
 				NT0100000000000000000003 /* TLSInspectorBackend.swift */,
@@ -3780,6 +3819,19 @@
 				NP0200000000000000000012 /* TrackerBlockerView.swift in Sources */,
 				NP0200000000000000000013 /* TemporaryIdentityView.swift in Sources */,
 				NP0200000000000000000014 /* SecureFileSenderView.swift in Sources */,
+				NP0200000000000000000015 /* SecurityModels.swift in Sources */,
+				NP0200000000000000000016 /* AuthService.swift in Sources */,
+				NP0200000000000000000017 /* EncryptionService.swift in Sources */,
+				NP0200000000000000000018 /* SecureFileStorageService.swift in Sources */,
+				NP0200000000000000000019 /* SecurityPackageService.swift in Sources */,
+				NP020000000000000000001A /* TOTPService.swift in Sources */,
+				NP020000000000000000001B /* VaultManager.swift in Sources */,
+				NP020000000000000000001C /* SecurityDashboardView.swift in Sources */,
+				NP020000000000000000001D /* SecurityGateView.swift in Sources */,
+				NP020000000000000000001E /* SecurityOnboardingView.swift in Sources */,
+				NP020000000000000000001F /* SecurityPackageView.swift in Sources */,
+				NP0200000000000000000020 /* SecurityTool.swift in Sources */,
+				NP0200000000000000000021 /* VaultItemDetailViews.swift in Sources */,
 				NT0200000000000000000001 /* NetworkProfilerBackend.swift in Sources */,
 				NT0200000000000000000002 /* WebSocketInspectorBackend.swift in Sources */,
 				NT0200000000000000000003 /* TLSInspectorBackend.swift in Sources */,

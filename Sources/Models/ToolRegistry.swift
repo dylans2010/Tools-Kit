@@ -134,6 +134,7 @@ class ToolRegistry: ObservableObject {
             SafeBrowsingTool(),
 
             // Privacy Tools
+            SecurityTool(),
             EncryptedVaultTool(),
             TrackerBlockerTool(),
             TemporaryIdentityTool(),
