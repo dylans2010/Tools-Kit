@@ -8,6 +8,7 @@ struct SecurityPackageView: View {
     @State private var showingImportPicker = false
     @State private var statusMessage: String?
     @State private var isError = false
+    @State private var showingImportBridge = false
 
     var body: some View {
         NavigationStack {
@@ -37,6 +38,12 @@ struct SecurityPackageView: View {
                     } label: {
                         Label("Import Vault", systemImage: "square.and.arrow.down")
                     }
+
+                    Button {
+                        showingImportBridge = true
+                    } label: {
+                        Label("Import via Document Picker", systemImage: "doc.badge.plus")
+                    }
                 }
 
                 if let status = statusMessage {
@@ -54,6 +61,11 @@ struct SecurityPackageView: View {
             }
             .fileImporter(isPresented: $showingImportPicker, allowedContentTypes: [UTType(filenameExtension: "toolkitsec") ?? .data]) { result in
                 handleImport(result: result)
+            }
+            .sheet(isPresented: $showingImportBridge) {
+                FileImporterRepresentableView(allowedContentTypes: [UTType(filenameExtension: "toolkitsec") ?? .data], allowsMultipleSelection: false) { urls in
+                    handleImport(urls: urls)
+                }
             }
         }
     }
@@ -73,22 +85,27 @@ struct SecurityPackageView: View {
         }
     }
 
-    private func handleImport(result: Result<URL, Error>) {
+    private func handleImport(result: Result<[URL], Error>) {
         switch result {
-        case .success(let url):
-            Task {
-                do {
-                    try await SecurityPackageService.shared.importPackage(at: url, password: password)
-                    self.statusMessage = "Vault imported successfully."
-                    self.isError = false
-                } catch {
-                    self.statusMessage = "Import failed: \(error.localizedDescription)"
-                    self.isError = true
-                }
-            }
+        case .success(let urls):
+            handleImport(urls: urls)
         case .failure(let error):
             self.statusMessage = error.localizedDescription
             self.isError = true
+        }
+    }
+
+    private func handleImport(urls: [URL]) {
+        guard let url = urls.first else { return }
+        Task {
+            do {
+                try await SecurityPackageService.shared.importPackage(at: url, password: password)
+                self.statusMessage = "Vault imported successfully."
+                self.isError = false
+            } catch {
+                self.statusMessage = "Import failed: \(error.localizedDescription)"
+                self.isError = true
+            }
         }
     }
 }
