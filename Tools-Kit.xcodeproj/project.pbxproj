@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CL0200000000000000000000 /* CollaborationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000000 /* CollaborationModels.swift */; };
+		CL0200000000000000000001 /* CollaborationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000001 /* CollaborationManager.swift */; };
+		CL0200000000000000000002 /* CollaborationFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000002 /* CollaborationFramework.swift */; };
+		ED0200000000000000000003 /* EditingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0100000000000000000003 /* EditingModels.swift */; };
+		ED0200000000000000000004 /* EditingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0100000000000000000004 /* EditingManager.swift */; };
+		ED0200000000000000000005 /* EditingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0100000000000000000005 /* EditingEngine.swift */; };
+		CL0200000000000000000006 /* CollaborationHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000006 /* CollaborationHomeView.swift */; };
+		CL0200000000000000000007 /* SpaceDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000007 /* SpaceDashboardView.swift */; };
+		CL0200000000000000000008 /* VersionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000008 /* VersionHistoryView.swift */; };
+		CL0200000000000000000009 /* AddDataCollabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000009 /* AddDataCollabView.swift */; };
+		ED020000000000000000000A /* EditingHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000A /* EditingHomeView.swift */; };
+		ED020000000000000000000B /* FullEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000B /* FullEditorView.swift */; };
 		VT0200000000000000000001 /* ValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = VT0100000000000000000001 /* ValidationTests.swift */; };
 		TH0200000000000000000001 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = TH0100000000000000000001 /* Theme.swift */; };
 		MA0200000000000000000001 /* MailAutomationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = MA0100000000000000000001 /* MailAutomationEngine.swift */; };
@@ -905,6 +917,18 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CL0100000000000000000000 /* CollaborationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/CollaborationModels.swift; sourceTree = "<group>"; };
+		CL0100000000000000000001 /* CollaborationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/CollaborationManager.swift; sourceTree = "<group>"; };
+		CL0100000000000000000002 /* CollaborationFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Collaboration/CollaborationFramework.swift; sourceTree = "<group>"; };
+		ED0100000000000000000003 /* EditingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/EditingModels.swift; sourceTree = "<group>"; };
+		ED0100000000000000000004 /* EditingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/EditingManager.swift; sourceTree = "<group>"; };
+		ED0100000000000000000005 /* EditingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Workspace/Editing/EditingEngine.swift; sourceTree = "<group>"; };
+		CL0100000000000000000006 /* CollaborationHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/CollaborationHomeView.swift; sourceTree = "<group>"; };
+		CL0100000000000000000007 /* SpaceDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/SpaceDashboardView.swift; sourceTree = "<group>"; };
+		CL0100000000000000000008 /* VersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/VersionHistoryView.swift; sourceTree = "<group>"; };
+		CL0100000000000000000009 /* AddDataCollabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Collaboration/AddDataCollabView.swift; sourceTree = "<group>"; };
+		ED010000000000000000000A /* EditingHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/EditingHomeView.swift; sourceTree = "<group>"; };
+		ED010000000000000000000B /* FullEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Editing/FullEditorView.swift; sourceTree = "<group>"; };
 		3C4B3171C5B7494C8A67B0CF /* AgentResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentResultView.swift; sourceTree = "<group>"; };
 		A90000012B00000100000002 /* AgentPromptOptimizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentPromptOptimizerView.swift; sourceTree = "<group>"; };
 		A90000012B00000100000004 /* AgentProgressSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentProgressSessionView.swift; sourceTree = "<group>"; };
@@ -1914,6 +1938,18 @@
 			sourceTree = "<group>";
 		};
 		8DF4BF69CF55A81CB6EBF3DE /* Sources */ = {
+				CL0100000000000000000000 /* CollaborationModels.swift */,
+				CL0100000000000000000001 /* CollaborationManager.swift */,
+				CL0100000000000000000002 /* CollaborationFramework.swift */,
+				ED0100000000000000000003 /* EditingModels.swift */,
+				ED0100000000000000000004 /* EditingManager.swift */,
+				ED0100000000000000000005 /* EditingEngine.swift */,
+				CL0100000000000000000006 /* CollaborationHomeView.swift */,
+				CL0100000000000000000007 /* SpaceDashboardView.swift */,
+				CL0100000000000000000008 /* VersionHistoryView.swift */,
+				CL0100000000000000000009 /* AddDataCollabView.swift */,
+				ED010000000000000000000A /* EditingHomeView.swift */,
+				ED010000000000000000000B /* FullEditorView.swift */,
 			isa = PBXGroup;
 			children = (
 				GH0100000000000000000001 /* GitHubAuthManager.swift */,
@@ -3102,6 +3138,18 @@
 
 /* Begin PBXSourcesBuildPhase section */
 		C9111E28A299A9C316B4C75C /* Sources */ = {
+				CL0200000000000000000000 /* CollaborationModels.swift in Sources */,
+				CL0200000000000000000001 /* CollaborationManager.swift in Sources */,
+				CL0200000000000000000002 /* CollaborationFramework.swift in Sources */,
+				ED0200000000000000000003 /* EditingModels.swift in Sources */,
+				ED0200000000000000000004 /* EditingManager.swift in Sources */,
+				ED0200000000000000000005 /* EditingEngine.swift in Sources */,
+				CL0200000000000000000006 /* CollaborationHomeView.swift in Sources */,
+				CL0200000000000000000007 /* SpaceDashboardView.swift in Sources */,
+				CL0200000000000000000008 /* VersionHistoryView.swift in Sources */,
+				CL0200000000000000000009 /* AddDataCollabView.swift in Sources */,
+				ED020000000000000000000A /* EditingHomeView.swift in Sources */,
+				ED020000000000000000000B /* FullEditorView.swift in Sources */,
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (

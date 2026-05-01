@@ -9,6 +9,8 @@ struct WorkspaceHomeView: View {
         case mail = "Mail"
         case notebooks = "Notebooks"
         case tasks = "Tasks"
+        case collaboration = "Collaboration"
+        case editing = "Editing"
         case articles = "Articles"
         case files = "Files"
         case github = "GitHub"
@@ -20,6 +22,8 @@ struct WorkspaceHomeView: View {
             case .mail: return "envelope.fill"
             case .notebooks: return "book.closed.fill"
             case .tasks: return "checklist"
+            case .collaboration: return "person.2.fill"
+            case .editing: return "photo.stack.fill"
             case .articles: return "newspaper.fill"
             case .files: return "folder.fill"
             case .github: return "terminal.fill"
@@ -34,6 +38,8 @@ struct WorkspaceHomeView: View {
             mailTab
             notebooksTab
             tasksTab
+            collaborationTab
+            editingTab
             articlesTab
             filesTab
             githubTab
@@ -88,6 +94,26 @@ struct WorkspaceHomeView: View {
             Label(WorkspaceTab.tasks.rawValue, systemImage: WorkspaceTab.tasks.icon)
         }
         .tag(WorkspaceTab.tasks)
+    }
+
+    private var collaborationTab: some View {
+        NavigationStack {
+            CollaborationHomeView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.collaboration.rawValue, systemImage: WorkspaceTab.collaboration.icon)
+        }
+        .tag(WorkspaceTab.collaboration)
+    }
+
+    private var editingTab: some View {
+        NavigationStack {
+            EditingHomeView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.editing.rawValue, systemImage: WorkspaceTab.editing.icon)
+        }
+        .tag(WorkspaceTab.editing)
     }
 
     private var articlesTab: some View {
@@ -146,6 +172,8 @@ struct WorkspaceDashboardView: View {
         ("Slides", "rectangle.on.rectangle.angled", .purple, AnyView(SlidesHomeView())),
         ("Sheets", "tablecells", .blue, AnyView(SpreadsheetsHomeView())),
         ("Workouts", "figure.strengthtraining.traditional", .mint, AnyView(WorkoutsHomeView())),
+        ("Collaboration", "person.2.fill", .orange, AnyView(CollaborationHomeView())),
+        ("Media Editing", "photo.stack.fill", .indigo, AnyView(EditingHomeView())),
         ("AI Mentor", "sparkles", .pink, AnyView(AIMentorView())),
         ("Meet", "video.fill", .cyan, AnyView(JoinMeetingView()))
     ]
