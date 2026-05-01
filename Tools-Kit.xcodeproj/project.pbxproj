@@ -825,6 +825,18 @@
 		A1B2C3D4E5F60718293A2008 /* AgentViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A1008 /* AgentViewModelProtocol.swift */; };
 		A90000012B00000100000005 /* JulesAgentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90000012B00000100000006 /* JulesAgentViewModel.swift */; };
 		A1B2C3D4E5F60718293A2005 /* SystemAgentToolRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A1005 /* SystemAgentToolRouter.swift */; };
+		SC0200000000000000000001 /* SecurityModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000001 /* SecurityModels.swift */; };
+		SC0200000000000000000002 /* EncryptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000002 /* EncryptionService.swift */; };
+		SC0200000000000000000003 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000003 /* AuthService.swift */; };
+		SC0200000000000000000004 /* SecureFileStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000004 /* SecureFileStorageService.swift */; };
+		SC0200000000000000000005 /* TOTPService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000005 /* TOTPService.swift */; };
+		SC0200000000000000000006 /* VaultManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000006 /* VaultManager.swift */; };
+		SC0200000000000000000007 /* SecurityPackageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000007 /* SecurityPackageService.swift */; };
+		SV0200000000000000000001 /* SecurityOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV0100000000000000000001 /* SecurityOnboardingView.swift */; };
+		SV0200000000000000000002 /* SecurityHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV0100000000000000000002 /* SecurityHomeView.swift */; };
+		SV0200000000000000000003 /* VaultListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV0100000000000000000003 /* VaultListView.swift */; };
+		SV0200000000000000000004 /* VaultItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV0100000000000000000004 /* VaultItemDetailView.swift */; };
+		SV0200000000000000000005 /* SecurityPackageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV0100000000000000000005 /* SecurityPackageView.swift */; };
 
 		23B93FB537ABB9BD41662CC6 /* AgentAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D2CCB0DD033075384AEC33 /* AgentAIService.swift */; };
 		B5AC93E41E5345D68C89A2D0 /* AgentAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D728CE519C5B80D75E8244 /* AgentAPIClient.swift */; };
@@ -1758,6 +1770,18 @@
 		9E81FA17E48D47C392F28F95 /* AgentExecutionTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentExecutionTimelineView.swift; sourceTree = "<group>"; };
 		835C5505B31744E4A0AD7B63 /* AgentDiffViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentDiffViewerView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A1005 /* SystemAgentToolRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAgentToolRouter.swift; sourceTree = "<group>"; };
+		SC0100000000000000000001 /* SecurityModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Security/SecurityModels.swift; sourceTree = "<group>"; };
+		SC0100000000000000000002 /* EncryptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Security/EncryptionService.swift; sourceTree = "<group>"; };
+		SC0100000000000000000003 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Security/AuthService.swift; sourceTree = "<group>"; };
+		SC0100000000000000000004 /* SecureFileStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Security/SecureFileStorageService.swift; sourceTree = "<group>"; };
+		SC0100000000000000000005 /* TOTPService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Security/TOTPService.swift; sourceTree = "<group>"; };
+		SC0100000000000000000006 /* VaultManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Security/VaultManager.swift; sourceTree = "<group>"; };
+		SC0100000000000000000007 /* SecurityPackageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Security/SecurityPackageService.swift; sourceTree = "<group>"; };
+		SV0100000000000000000001 /* SecurityOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Security/SecurityOnboardingView.swift; sourceTree = "<group>"; };
+		SV0100000000000000000002 /* SecurityHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Security/SecurityHomeView.swift; sourceTree = "<group>"; };
+		SV0100000000000000000003 /* VaultListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Security/VaultListView.swift; sourceTree = "<group>"; };
+		SV0100000000000000000004 /* VaultItemDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Security/VaultItemDetailView.swift; sourceTree = "<group>"; };
+		SV0100000000000000000005 /* SecurityPackageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Security/SecurityPackageView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A1008 /* AgentViewModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentViewModelProtocol.swift; sourceTree = "<group>"; };
 		A90000012B00000100000006 /* JulesAgentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/JulesAgentViewModel.swift; sourceTree = "<group>"; };
 
@@ -2738,6 +2762,18 @@
 				C1943B3721CB42D5BECA2810 /* publish_workspace_state.swift */,
 				A310FC531464448FB8647AEB /* search_repo.swift */,
 				63935A4E10C64913964D9DC4 /* update_memory.swift */,
+				SC0100000000000000000001 /* SecurityModels.swift */,
+				SC0100000000000000000002 /* EncryptionService.swift */,
+				SC0100000000000000000003 /* AuthService.swift */,
+				SC0100000000000000000004 /* SecureFileStorageService.swift */,
+				SC0100000000000000000005 /* TOTPService.swift */,
+				SC0100000000000000000006 /* VaultManager.swift */,
+				SC0100000000000000000007 /* SecurityPackageService.swift */,
+				SV0100000000000000000001 /* SecurityOnboardingView.swift */,
+				SV0100000000000000000002 /* SecurityHomeView.swift */,
+				SV0100000000000000000003 /* VaultListView.swift */,
+				SV0100000000000000000004 /* VaultItemDetailView.swift */,
+				SV0100000000000000000005 /* SecurityPackageView.swift */,
 				24B298CC1AD34BFF97151075 /* AgentToolExecutionView.swift */,
 				3DAC1CAC51ED4B519B87E1EB /* AgentMemoryInspectorView.swift */,
 				3B0CC277E7E24E07B881500D /* AgentWorkspaceView.swift */,
@@ -3285,6 +3321,18 @@
 				A90000012B00000100000001 /* AgentPromptOptimizerView.swift in Sources */,
 				A90000012B00000100000003 /* AgentProgressSessionView.swift in Sources */,
 				A90000012B00000100000005 /* JulesAgentViewModel.swift in Sources */,
+				SC0200000000000000000001 /* SecurityModels.swift in Sources */,
+				SC0200000000000000000002 /* EncryptionService.swift in Sources */,
+				SC0200000000000000000003 /* AuthService.swift in Sources */,
+				SC0200000000000000000004 /* SecureFileStorageService.swift in Sources */,
+				SC0200000000000000000005 /* TOTPService.swift in Sources */,
+				SC0200000000000000000006 /* VaultManager.swift in Sources */,
+				SC0200000000000000000007 /* SecurityPackageService.swift in Sources */,
+				SV0200000000000000000001 /* SecurityOnboardingView.swift in Sources */,
+				SV0200000000000000000002 /* SecurityHomeView.swift in Sources */,
+				SV0200000000000000000003 /* VaultListView.swift in Sources */,
+				SV0200000000000000000004 /* VaultItemDetailView.swift in Sources */,
+				SV0200000000000000000005 /* SecurityPackageView.swift in Sources */,
 				A1B2C3D4E5F60718293A2008 /* AgentViewModelProtocol.swift in Sources */,
 				A1B2C3D4E5F60718293A2005 /* SystemAgentToolRouter.swift in Sources */,
 				23B93FB537ABB9BD41662CC6 /* AgentAIService.swift in Sources */,

@@ -11,6 +11,7 @@ struct ValidationTests {
         testMeetAnalytics()
         testCollaborationSystem()
         testEditingSystem()
+        testSecuritySystem()
 
         print("All Validation Tests Passed!")
     }
@@ -69,6 +70,29 @@ struct ValidationTests {
         let rule = BranchProtectionRule(id: UUID(), branchName: "main", requireApprovals: true, requiredApprovalCount: 2, restrictMerges: false, allowedRoles: [.admin])
         BranchProtectionService.shared.addRule(spaceID: space.id, rule: rule)
         assert(!BranchProtectionService.shared.canMerge(spaceID: space.id, branchName: "main", userRole: .editor, approvalCount: 1))
+    }
+
+    private static func testSecuritySystem() {
+        print("Testing Security System...")
+        let encryption = EncryptionService.shared
+        let salt = encryption.generateSalt()
+        let password = "test-password"
+
+        do {
+            let key = try encryption.deriveKey(password: password, salt: salt)
+            let secret = "Sensitive Data"
+            let encrypted = try encryption.encryptString(secret, using: key)
+            let decrypted = try encryption.decryptString(encrypted, using: key)
+            assert(decrypted == secret, "Encryption/Decryption failed")
+
+            // Test TOTP
+            let totp = TOTPService.shared.generateTOTP(secret: "JBSWY3DPEHPK3PXP") // 'helloworld' in base32
+            assert(totp?.count == 6, "TOTP generation failed")
+
+            print("Security System Logic Verified.")
+        } catch {
+            fatalError("Security System Test Failed: \(error.localizedDescription)")
+        }
     }
 
     private static func testEditingSystem() {
