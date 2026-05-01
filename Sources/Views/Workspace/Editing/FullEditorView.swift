@@ -13,8 +13,14 @@ struct FullEditorView: View {
         Group {
             if let project = project {
                 ZStack {
+                    #if os(iOS)
                     EditingEngineRepresentable(project: project)
                         .edgesIgnoringSafeArea(.all)
+                    #else
+                    Color.black
+                        .overlay(Text("Media Editor is currently only available on iOS").foregroundColor(.white))
+                        .edgesIgnoringSafeArea(.all)
+                    #endif
 
                     VStack {
                         headerView(project: project)
@@ -27,7 +33,9 @@ struct FullEditorView: View {
                 Text("Project not found")
             }
         }
+        #if os(iOS)
         .navigationBarHidden(true)
+        #endif
     }
 
     private func headerView(project: EditingProject) -> some View {
@@ -63,7 +71,11 @@ struct FullEditorView: View {
             toolButton(icon: "slider.horizontal.3", name: "Adjust")
         }
         .padding()
+        #if os(iOS)
         .background(BlurView(style: .systemThinMaterialDark))
+        #else
+        .background(Color.gray.opacity(0.8))
+        #endif
         .cornerRadius(20)
         .padding(.bottom)
     }
@@ -110,6 +122,7 @@ struct FullEditorView: View {
     }
 }
 
+#if os(iOS)
 struct EditingEngineRepresentable: UIViewRepresentable {
     let project: EditingProject
 
@@ -129,3 +142,4 @@ struct BlurView: UIViewRepresentable {
     }
     func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
 }
+#endif
