@@ -309,6 +309,7 @@
 		WS0200000000000000000012 /* Notebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000012 /* Notebook.swift */; };
 		WS0200000000000000000013 /* NotebookFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000013 /* NotebookFolder.swift */; };
 		WS0200000000000000000014 /* NotebookPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000014 /* NotebookPage.swift */; };
+		NB02000000000000000000A1 /* NotebookBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = NB01000000000000000000A1 /* NotebookBlock.swift */; };
 		WS0200000000000000000015 /* IntegrationTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000015 /* IntegrationTool.swift */; };
 		WS0200000000000000000016 /* ArticlesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000016 /* ArticlesManager.swift */; };
 		WS0200000000000000000017 /* ArticlesHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000017 /* ArticlesHomeView.swift */; };
@@ -328,6 +329,12 @@
 		WS0200000000000000000025 /* NotebookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000025 /* NotebookDetailView.swift */; };
 		WS0200000000000000000026 /* FolderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000026 /* FolderDetailView.swift */; };
 		WS0200000000000000000027 /* PageEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000027 /* PageEditorView.swift */; };
+		NB02000000000000000000A2 /* TextBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NB01000000000000000000A2 /* TextBlockView.swift */; };
+		NB02000000000000000000A3 /* CodeBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NB01000000000000000000A3 /* CodeBlockView.swift */; };
+		NB02000000000000000000A4 /* DatabaseBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NB01000000000000000000A4 /* DatabaseBlockView.swift */; };
+		NB02000000000000000000A5 /* ToggleBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NB01000000000000000000A5 /* ToggleBlockView.swift */; };
+		NB02000000000000000000A6 /* EmbedBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NB01000000000000000000A6 /* EmbedBlockView.swift */; };
+		NB02000000000000000000A7 /* WidgetBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NB01000000000000000000A7 /* WidgetBlockView.swift */; };
 		WS0200000000000000000028 /* NotebookSidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000028 /* NotebookSidebarView.swift */; };
 		WS0200000000000000000029 /* CreateNotebookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000029 /* CreateNotebookView.swift */; };
 		WS020000000000000000002A /* CreateFolderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000002A /* CreateFolderView.swift */; };
@@ -1546,6 +1553,7 @@
 		WS0100000000000000000012 /* Notebook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/Notebook.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000013 /* NotebookFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/NotebookFolder.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000014 /* NotebookPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/NotebookPage.swift"; sourceTree = "<group>"; };
+		NB01000000000000000000A1 /* NotebookBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/NotebookBlock.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000015 /* IntegrationTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Models/IntegrationTool.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000016 /* ArticlesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Articles/ArticlesManager.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000017 /* ArticlesHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Articles/ArticlesHomeView.swift"; sourceTree = "<group>"; };
@@ -1565,6 +1573,12 @@
 		WS0100000000000000000025 /* NotebookDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/NotebookDetailView.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000026 /* FolderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/FolderDetailView.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000027 /* PageEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/PageEditorView.swift"; sourceTree = "<group>"; };
+		NB01000000000000000000A2 /* TextBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/Blocks/TextBlockView.swift"; sourceTree = "<group>"; };
+		NB01000000000000000000A3 /* CodeBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/Blocks/CodeBlockView.swift"; sourceTree = "<group>"; };
+		NB01000000000000000000A4 /* DatabaseBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/Blocks/DatabaseBlockView.swift"; sourceTree = "<group>"; };
+		NB01000000000000000000A5 /* ToggleBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/Blocks/ToggleBlockView.swift"; sourceTree = "<group>"; };
+		NB01000000000000000000A6 /* EmbedBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/Blocks/EmbedBlockView.swift"; sourceTree = "<group>"; };
+		NB01000000000000000000A7 /* WidgetBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/Blocks/WidgetBlockView.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000028 /* NotebookSidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/NotebookSidebarView.swift"; sourceTree = "<group>"; };
 		WS0100000000000000000029 /* CreateNotebookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/CreateNotebookView.swift"; sourceTree = "<group>"; };
 		WS010000000000000000002A /* CreateFolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Notebooks/CreateFolderView.swift"; sourceTree = "<group>"; };
@@ -2593,6 +2607,7 @@
 				WS0100000000000000000012 /* Notebook.swift */,
 				WS0100000000000000000013 /* NotebookFolder.swift */,
 				WS0100000000000000000014 /* NotebookPage.swift */,
+				NB01000000000000000000A1 /* NotebookBlock.swift */,
 				WS0100000000000000000015 /* IntegrationTool.swift */,
 				WS0100000000000000000016 /* ArticlesManager.swift */,
 				WS0100000000000000000017 /* ArticlesHomeView.swift */,
@@ -2612,6 +2627,12 @@
 				WS0100000000000000000025 /* NotebookDetailView.swift */,
 				WS0100000000000000000026 /* FolderDetailView.swift */,
 				WS0100000000000000000027 /* PageEditorView.swift */,
+				NB01000000000000000000A2 /* TextBlockView.swift */,
+				NB01000000000000000000A3 /* CodeBlockView.swift */,
+				NB01000000000000000000A4 /* DatabaseBlockView.swift */,
+				NB01000000000000000000A5 /* ToggleBlockView.swift */,
+				NB01000000000000000000A6 /* EmbedBlockView.swift */,
+				NB01000000000000000000A7 /* WidgetBlockView.swift */,
 				WS0100000000000000000028 /* NotebookSidebarView.swift */,
 				WS0100000000000000000029 /* CreateNotebookView.swift */,
 				WS010000000000000000002A /* CreateFolderView.swift */,
@@ -3946,6 +3967,7 @@
 				WS0200000000000000000012 /* Notebook.swift in Sources */,
 				WS0200000000000000000013 /* NotebookFolder.swift in Sources */,
 				WS0200000000000000000014 /* NotebookPage.swift in Sources */,
+				NB02000000000000000000A1 /* NotebookBlock.swift in Sources */,
 				WS0200000000000000000015 /* IntegrationTool.swift in Sources */,
 				WS0200000000000000000016 /* ArticlesManager.swift in Sources */,
 				WS0200000000000000000017 /* ArticlesHomeView.swift in Sources */,
@@ -3965,6 +3987,12 @@
 				WS0200000000000000000025 /* NotebookDetailView.swift in Sources */,
 				WS0200000000000000000026 /* FolderDetailView.swift in Sources */,
 				WS0200000000000000000027 /* PageEditorView.swift in Sources */,
+				NB02000000000000000000A2 /* TextBlockView.swift in Sources */,
+				NB02000000000000000000A3 /* CodeBlockView.swift in Sources */,
+				NB02000000000000000000A4 /* DatabaseBlockView.swift in Sources */,
+				NB02000000000000000000A5 /* ToggleBlockView.swift in Sources */,
+				NB02000000000000000000A6 /* EmbedBlockView.swift in Sources */,
+				NB02000000000000000000A7 /* WidgetBlockView.swift in Sources */,
 				WS0200000000000000000028 /* NotebookSidebarView.swift in Sources */,
 				WS0200000000000000000029 /* CreateNotebookView.swift in Sources */,
 				WS020000000000000000002A /* CreateFolderView.swift in Sources */,

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct JoinMeetingView: View {
-    @StateObject private var manager = MeetingStateManager.shared
+    @ObservedObject private var manager = MeetingStateManager.shared
     @State private var navigateToLobby = false
     @State private var showCreateMeetingSheet = false
     @AppStorage("meet_display_name") private var storedDisplayName = ""
