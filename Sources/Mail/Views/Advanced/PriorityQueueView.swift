@@ -33,7 +33,7 @@ struct PriorityQueueView: View {
                                 .lineLimit(2)
 
                             HStack {
-                                Label("Urgent", systemName: "exclamationmark.circle")
+                                Label("Urgent", systemImage: "exclamationmark.circle")
                                     .font(.caption)
                                     .foregroundStyle(.red)
                                 Spacer()

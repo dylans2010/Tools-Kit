@@ -27,7 +27,7 @@ struct EmailInsightPanel: View {
 
     private var intentSection: some View {
         HStack {
-            Label("Intent", systemName: "target")
+            Label("Intent", systemImage: "target")
                 .font(.headline)
             Spacer()
             Text(viewModel.intent?.rawValue.capitalized ?? "Analyzing...")
@@ -53,13 +53,13 @@ struct EmailInsightPanel: View {
     private var actionsSection: some View {
         HStack {
             Button(action: { viewModel.addToTasks(thread: thread) }) {
-                Label("Add to Tasks", systemName: "checklist")
+                Label("Add to Tasks", systemImage: "checklist")
             }
             .buttonStyle(.bordered)
             .controlSize(.small)
 
             Button(action: { viewModel.addToCalendar(thread: thread) }) {
-                Label("Calendar", systemName: "calendar")
+                Label("Calendar", systemImage: "calendar")
             }
             .buttonStyle(.bordered)
             .controlSize(.small)
@@ -73,7 +73,7 @@ struct EntityPill: View {
     let color: Color
     var body: some View {
         HStack(spacing: 4) {
-            Image(systemName: icon)
+            Image(systemImage: icon)
             Text(text)
         }
         .font(.caption2.bold())

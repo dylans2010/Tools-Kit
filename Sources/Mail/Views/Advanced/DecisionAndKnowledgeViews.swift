@@ -51,7 +51,7 @@ struct DecisionTimelineViewer: View {
         Task {
             let allThreads = MailStorageService.shared.loadThreads(for: "all")
             if let thread = allThreads.first(where: { $0.id == threadID }) {
-                decisions = try? await DecisionIntelligenceEngine.shared.trackDecisions(for: thread) ?? []
+                decisions = (try? await DecisionIntelligenceEngine.shared.trackDecisions(for: thread)) ?? []
             }
             isLoading = false
         }
@@ -66,7 +66,7 @@ struct KnowledgeExtractionPanel: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Extracted Knowledge", systemName: "books.vertical.fill")
+            Label("Extracted Knowledge", systemImage: "books.vertical.fill")
                 .font(.headline)
 
             if isLoading {
