@@ -104,6 +104,9 @@
 		GH0200000000000000000018 /* RunWorkflowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000018 /* RunWorkflowView.swift */; };
 		GH0200000000000000000019 /* WorkflowRunView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000019 /* WorkflowRunView.swift */; };
 		GH020000000000000000001A /* WorkflowLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH010000000000000000001A /* WorkflowLogsView.swift */; };
+		RP0200000000000000000001 /* RepoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RP0100000000000000000001 /* RepoListView.swift */; };
+		NBDB02000000000000000001 /* NotebookDatabaseEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = NBDB01000000000000000001 /* NotebookDatabaseEngine.swift */; };
+		NBTB02000000000000000001 /* NotebookTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NBTB01000000000000000001 /* NotebookTableView.swift */; };
 		ML0200000000000000000001 /* IMAPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000001 /* IMAPClient.swift */; };
 		ML0200000000000000000002 /* EmailMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000002 /* EmailMessage.swift */; };
 		ML0200000000000000000003 /* MailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000003 /* MailViewModel.swift */; };
@@ -1048,6 +1051,9 @@
 		GH0100000000000000000018 /* RunWorkflowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/Actions/RunWorkflowView.swift; sourceTree = "<group>"; };
 		GH0100000000000000000019 /* WorkflowRunView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/Actions/WorkflowRunView.swift; sourceTree = "<group>"; };
 		GH010000000000000000001A /* WorkflowLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/Actions/WorkflowLogsView.swift; sourceTree = "<group>"; };
+		RP0100000000000000000001 /* RepoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/RepoListView.swift; sourceTree = "<group>"; };
+		NBDB01000000000000000001 /* NotebookDatabaseEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Workspace/Notebooks/NotebookDatabaseEngine.swift; sourceTree = "<group>"; };
+		NBTB01000000000000000001 /* NotebookTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Notebooks/DatabaseViews/NotebookTableView.swift; sourceTree = "<group>"; };
 		ML0100000000000000000001 /* IMAPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/IMAPClient.swift; sourceTree = "<group>"; };
 		ML0100000000000000000002 /* EmailMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/EmailMessage.swift; sourceTree = "<group>"; };
 		ML0100000000000000000003 /* MailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/MailViewModel.swift; sourceTree = "<group>"; };
@@ -2098,6 +2104,7 @@
 				GH0100000000000000000018 /* RunWorkflowView.swift */,
 				GH0100000000000000000019 /* WorkflowRunView.swift */,
 				GH010000000000000000001A /* WorkflowLogsView.swift */,
+				RP0100000000000000000001 /* RepoListView.swift */,
 				3C56AB0076964B928FF538B1 /* AgentModels.swift */,
 				A80100000000000000000001 /* AgentSessionState.swift */,
 				AF0100000000000000000002 /* AgentExecutionEvents.swift */,
@@ -2639,6 +2646,8 @@
 				WS010000000000000000002B /* CreatePageView.swift */,
 				WS010000000000000000002C /* IntegrationsView.swift */,
 				WS010000000000000000002D /* IntegrationEditorView.swift */,
+				NBTB01000000000000000001 /* NotebookTableView.swift */,
+				NBDB01000000000000000001 /* NotebookDatabaseEngine.swift */,
 				WS010000000000000000002E /* WorkspaceTask.swift */,
 				WS010000000000000000002F /* TaskCategory.swift */,
 				WS0100000000000000000030 /* Habit.swift */,
@@ -3339,6 +3348,7 @@
 				GH0200000000000000000018 /* RunWorkflowView.swift in Sources */,
 				GH0200000000000000000019 /* WorkflowRunView.swift in Sources */,
 				GH020000000000000000001A /* WorkflowLogsView.swift in Sources */,
+				RP0200000000000000000001 /* RepoListView.swift in Sources */,
 				28D75A425E6C4DAA80A0DBC8 /* AgentModels.swift in Sources */,
 				A80200000000000000000001 /* AgentSessionState.swift in Sources */,
 				AF0200000000000000000002 /* AgentExecutionEvents.swift in Sources */,
@@ -3999,6 +4009,8 @@
 				WS020000000000000000002B /* CreatePageView.swift in Sources */,
 				WS020000000000000000002C /* IntegrationsView.swift in Sources */,
 				WS020000000000000000002D /* IntegrationEditorView.swift in Sources */,
+				NBTB02000000000000000001 /* NotebookTableView.swift in Sources */,
+				NBDB02000000000000000001 /* NotebookDatabaseEngine.swift in Sources */,
 				WS020000000000000000002E /* WorkspaceTask.swift in Sources */,
 				WS020000000000000000002F /* TaskCategory.swift in Sources */,
 				WS0200000000000000000030 /* Habit.swift in Sources */,
