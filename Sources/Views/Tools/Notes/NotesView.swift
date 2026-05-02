@@ -300,10 +300,10 @@ struct NoteEditorView: View {
                     VStack(spacing: 12) {
                         TextField("Title", text: $note.title)
                             .font(.title3.bold())
-                            .onChange(of: note.title) { _ in backend.updateNote(note) }
+                            .onChange(of: note.title) { _, _ in backend.updateNote(note) }
                         TextField("Folder", text: $note.folder)
                             .textFieldStyle(.roundedBorder)
-                            .onChange(of: note.folder) { _ in backend.updateNote(note) }
+                            .onChange(of: note.folder) { _, _ in backend.updateNote(note) }
                     }
                     .padding()
                 }
@@ -336,7 +336,7 @@ struct NoteEditorView: View {
                     TextEditor(text: $note.content)
                         .frame(minHeight: 260)
                         .padding(8)
-                        .onChange(of: note.content) { _ in backend.updateNote(note) }
+                        .onChange(of: note.content) { _, _ in backend.updateNote(note) }
                 }
 
                 markdownToolbar
