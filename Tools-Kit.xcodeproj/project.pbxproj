@@ -1167,9 +1167,9 @@
 		FI0100000000000000000001 /* FileImporterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/FileImporterView.swift; sourceTree = "<group>"; };
 		SP0100000000000000000001 /* StatPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/StatPill.swift; sourceTree = "<group>"; };
 		TH0100000000000000000001 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/Theme.swift; sourceTree = "<group>"; };
-		IW0100000000000000000001 /* WorkspaceColorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Internal Workspace/WorkspaceColorManager.swift"; sourceTree = "<group>"; };
-		IW0100000000000000000002 /* WorkspaceSurfaceCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Internal Workspace/WorkspaceSurfaceCard.swift"; sourceTree = "<group>"; };
-		EX0100000000000000000001 /* ExecutionBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Internal Workspace/ExecutionBridge.swift"; sourceTree = "<group>"; };
+		IW0100000000000000000001 /* WorkspaceColorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/Internal Workspace/WorkspaceColorManager.swift"; sourceTree = "<group>"; };
+		IW0100000000000000000002 /* WorkspaceSurfaceCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/Internal Workspace/WorkspaceSurfaceCard.swift"; sourceTree = "<group>"; };
+		EX0100000000000000000001 /* ExecutionBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/Internal Workspace/ExecutionBridge.swift"; sourceTree = "<group>"; };
 		7BF38182EF444218AFF7D2D3 /* MailAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/AI/MailAIService.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/AI/MailAIToolsSystem.swift; sourceTree = "<group>"; };
 		E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/iCloudMailProvider.swift; sourceTree = "<group>"; };
