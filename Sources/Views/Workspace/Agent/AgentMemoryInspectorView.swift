@@ -16,7 +16,7 @@ struct AgentMemoryInspectorView: View {
                 let categories = Array(Set(state.memory.values.compactMap { $0.category ?? "General" })).sorted()
 
                 ForEach(categories, id: \.self) { category in
-                    Section(header: Text(category)) {
+                    Section {
                         let filteredEntries = state.memory.values
                             .filter { ($0.category ?? "General") == category }
                             .filter { searchText.isEmpty || $0.key.localizedCaseInsensitiveContains(searchText) }
@@ -25,6 +25,8 @@ struct AgentMemoryInspectorView: View {
                         ForEach(filteredEntries) { entry in
                             MemoryEntryRow(entry: entry)
                         }
+                    } header: {
+                        Text(category)
                     }
                 }
             }

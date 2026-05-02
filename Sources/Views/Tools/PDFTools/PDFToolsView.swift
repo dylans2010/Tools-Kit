@@ -11,7 +11,7 @@ struct PDFToolsView: View {
     var body: some View {
         VStack(spacing: 20) {
             List {
-                Section(header: Text("Selected PDF Files")) {
+                Section {
                     if selectedURLs.isEmpty {
                         Text("No files selected").foregroundColor(.secondary)
                     } else {
@@ -22,6 +22,8 @@ struct PDFToolsView: View {
                             selectedURLs.remove(atOffsets: indices)
                         }
                     }
+                } header: {
+                    Text("Selected PDF Files")
                 }
             }
             .listStyle(InsetGroupedListStyle())
