@@ -103,15 +103,9 @@ struct VaultItemDetailView: View {
                     if let expiry = doc.expirationDate {
                         LabeledContent("Expires", value: expiry, format: .date)
                     }
-                    if let image = UIImage(data: data) {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                    } else {
-                        Text("No preview available for this document type")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                    Text("No preview available for this document type")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 } header: {
                     Text("Document Info")
                 }
