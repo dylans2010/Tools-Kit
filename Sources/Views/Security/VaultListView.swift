@@ -55,6 +55,13 @@ struct VaultItemDetailView: View {
 
     var body: some View {
         List {
+            if let errorMessage {
+                Section {
+                    Text(errorMessage)
+                        .foregroundStyle(.red)
+                }
+            }
+
             Section("Details") {
                 LabeledContent("Title", value: item.title)
                 if !item.note.isEmpty {
@@ -97,8 +104,9 @@ struct VaultItemDetailView: View {
                 }
             }
         case .documents:
-            if let data = decryptedData, let doc = try? JSONDecoder().decode(DocumentData.self, from: data) {
-                Section {
+            if let data = decryptedData,
+               let doc = try? JSONDecoder().decode(DocumentData.self, from: data) {
+                Section(header: Text("Document Info")) {
                     LabeledContent("Type", value: doc.documentType)
                     if let expiry = doc.expirationDate {
                         LabeledContent("Expires", value: expiry, format: .date)
@@ -106,8 +114,6 @@ struct VaultItemDetailView: View {
                     Text("No preview available for this document type")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                } header: {
-                    Text("Document Info")
                 }
             }
         case .photos:
