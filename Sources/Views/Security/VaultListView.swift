@@ -62,7 +62,7 @@ struct VaultItemDetailView: View {
                 }
             }
 
-            Section(header: Text("Details")) {
+            Section {
                 LabeledContent("Title", value: item.title)
                 if !item.note.isEmpty {
                     VStack(alignment: .leading, spacing: 4) {
@@ -74,6 +74,8 @@ struct VaultItemDetailView: View {
                 }
                 LabeledContent("Created", value: item.createdAt, format: .dateTime)
                 LabeledContent("Updated", value: item.updatedAt, format: .dateTime)
+            } header: {
+                Text("Details")
             }
 
             contentSection
@@ -103,7 +105,7 @@ struct VaultItemDetailView: View {
                 DocumentInfoSection(doc: doc)
             }
         case .photos:
-            Section(header: Text("Photo")) {
+            Section {
                 if let data = decryptedData, let image = UIImage(data: data) {
                     Image(uiImage: image)
                         .resizable()
@@ -113,15 +115,19 @@ struct VaultItemDetailView: View {
                 } else {
                     ProgressView()
                 }
+            } header: {
+                Text("Photo")
             }
         case .files:
-            Section(header: Text("File")) {
+            Section {
                 LabeledContent("Filename", value: item.payloadIdentifier)
                 if let data = decryptedData {
                     ShareLink(item: data, preview: SharePreview(item.title, image: Image(systemName: "doc.fill"))) {
                         Label("Share Decrypted File", systemImage: "square.and.arrow.up")
                     }
                 }
+            } header: {
+                Text("File")
             }
         case .totp:
             if let data = decryptedData, let totp = try? JSONDecoder().decode(TOTPData.self, from: data) {
@@ -171,7 +177,7 @@ struct TOTPDetailSection: View {
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        Section(header: Text("One-Time Code")) {
+        Section {
             VStack(alignment: .center, spacing: 12) {
                 Text(currentCode)
                     .font(.system(size: 40, weight: .bold, design: .monospaced))
@@ -186,6 +192,8 @@ struct TOTPDetailSection: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical)
+        } header: {
+            Text("One-Time Code")
         }
         .onAppear(perform: updateCode)
         .onReceive(timer) { _ in updateCode() }
@@ -201,12 +209,14 @@ struct CredentialInfoSection: View {
     let creds: CredentialData
 
     var body: some View {
-        Section(header: Text("Credential")) {
+        Section {
             LabeledContent("Username", value: creds.username)
             SecureLabeledContent(label: "Password", value: creds.password)
             if !creds.website.isEmpty {
                 LabeledContent("Website", value: creds.website)
             }
+        } header: {
+            Text("Credential")
         }
     }
 }
@@ -215,7 +225,7 @@ struct DocumentInfoSection: View {
     let doc: DocumentData
 
     var body: some View {
-        Section(header: Text("Document Info")) {
+        Section {
             LabeledContent("Type", value: doc.documentType)
             if let expiry = doc.expirationDate {
                 LabeledContent("Expires", value: expiry, format: .date)
@@ -223,6 +233,8 @@ struct DocumentInfoSection: View {
             Text("No preview available for this document type")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+        } header: {
+            Text("Document Info")
         }
     }
 }
