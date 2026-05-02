@@ -17,7 +17,12 @@ final class ProfessionalEditingSuite: ObservableObject {
     func detectScenes(in videoURL: URL) async -> [CMTimeRange] {
         #if os(iOS)
         // VNGenerateVideoSegmentationRequest not found/unavailable in current SDK
-        return [CMTimeRange(start: .zero, duration: .indefinite)]
+        let asset = AVAsset(url: videoURL)
+        let duration = asset.duration
+        guard duration.isNumeric && duration > .zero else {
+            return []
+        }
+        return [CMTimeRange(start: .zero, duration: duration)]
         #else
         return []
         #endif
