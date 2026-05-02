@@ -31,6 +31,30 @@ struct EditingHomeView: View {
                     }
                 }
             }
+
+            Section("Professional Suite") {
+                NavigationLink(destination: ProfessionalToolsDashboard()) {
+                    Label("Pro Tools", systemImage: "slider.horizontal.3")
+                }
+                NavigationLink(destination: AIEditControlsView()) {
+                    Label("AI Assistant", systemImage: "sparkles")
+                }
+                NavigationLink(destination: HistoryInspectorView()) {
+                    Label("History Inspector", systemImage: "clock.arrow.circlepath")
+                }
+            }
+
+            Section("Workflow") {
+                NavigationLink(destination: AssetManagerView()) {
+                    Label("Asset Manager", systemImage: "folder.fill")
+                }
+                NavigationLink(destination: ExportQueueView()) {
+                    Label("Export Queue", systemImage: "square.and.arrow.up.fill")
+                }
+                NavigationLink(destination: BatchProcessingView()) {
+                    Label("Batch Processing", systemImage: "square.stack.3d.down.right.fill")
+                }
+            }
         }
         .navigationTitle("Media Editing")
         .toolbar {

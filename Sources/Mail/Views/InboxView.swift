@@ -59,15 +59,6 @@ struct InboxView: View {
             showingFetchingLabel = false
         }
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    showingUniversalInbox = true
-                } label: {
-                    Image(systemName: "chevron.left.circle.fill")
-                        .foregroundStyle(.secondary)
-                }
-            }
-
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Menu {
                     Button {

@@ -903,6 +903,7 @@
 		SV0200000000000000000003 /* VaultListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV0100000000000000000003 /* VaultListView.swift */; };
 		SV0200000000000000000004 /* VaultItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV0100000000000000000004 /* VaultItemDetailView.swift */; };
 		SV0200000000000000000005 /* SecurityPackageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV0100000000000000000005 /* SecurityPackageView.swift */; };
+		SV0200000000000000000006 /* AddInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV0100000000000000000006 /* AddInfoView.swift */; };
 
 		23B93FB537ABB9BD41662CC6 /* AgentAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D2CCB0DD033075384AEC33 /* AgentAIService.swift */; };
 		B5AC93E41E5345D68C89A2D0 /* AgentAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D728CE519C5B80D75E8244 /* AgentAPIClient.swift */; };
@@ -1918,6 +1919,7 @@
 		SV0100000000000000000003 /* VaultListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Security/VaultListView.swift; sourceTree = "<group>"; };
 		SV0100000000000000000004 /* VaultItemDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Security/VaultItemDetailView.swift; sourceTree = "<group>"; };
 		SV0100000000000000000005 /* SecurityPackageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Security/SecurityPackageView.swift; sourceTree = "<group>"; };
+		SV0100000000000000000006 /* AddInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Security/AddInfoView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A1008 /* AgentViewModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentViewModelProtocol.swift; sourceTree = "<group>"; };
 		A90000012B00000100000006 /* JulesAgentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/JulesAgentViewModel.swift; sourceTree = "<group>"; };
 
@@ -3270,6 +3272,7 @@
 				SV0100000000000000000003 /* VaultListView.swift */,
 				SV0100000000000000000004 /* VaultItemDetailView.swift */,
 				SV0100000000000000000005 /* SecurityPackageView.swift */,
+				SV0100000000000000000006 /* AddInfoView.swift */,
 				24B298CC1AD34BFF97151075 /* AgentToolExecutionView.swift */,
 				3DAC1CAC51ED4B519B87E1EB /* AgentMemoryInspectorView.swift */,
 				3B0CC277E7E24E07B881500D /* AgentWorkspaceView.swift */,
@@ -3958,6 +3961,7 @@
 				SV0200000000000000000003 /* VaultListView.swift in Sources */,
 				SV0200000000000000000004 /* VaultItemDetailView.swift in Sources */,
 				SV0200000000000000000005 /* SecurityPackageView.swift in Sources */,
+				SV0200000000000000000006 /* AddInfoView.swift in Sources */,
 				A1B2C3D4E5F60718293A2008 /* AgentViewModelProtocol.swift in Sources */,
 				A1B2C3D4E5F60718293A2005 /* SystemAgentToolRouter.swift in Sources */,
 				23B93FB537ABB9BD41662CC6 /* AgentAIService.swift in Sources */,
