@@ -95,26 +95,12 @@ struct VaultItemDetailView: View {
         switch item.category {
         case .credentials:
             if let data = decryptedData, let creds = try? JSONDecoder().decode(CredentialData.self, from: data) {
-                Section("Credential") {
-                    LabeledContent("Username", value: creds.username)
-                    SecureLabeledContent(label: "Password", value: creds.password)
-                    if !creds.website.isEmpty {
-                        LabeledContent("Website", value: creds.website)
-                    }
-                }
+                CredentialInfoSection(creds: creds)
             }
         case .documents:
             if let data = decryptedData,
                let doc = try? JSONDecoder().decode(DocumentData.self, from: data) {
-                Section("Document Info") {
-                    LabeledContent("Type", value: doc.documentType)
-                    if let expiry = doc.expirationDate {
-                        LabeledContent("Expires", value: expiry, format: .date)
-                    }
-                    Text("No preview available for this document type")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+                DocumentInfoSection(doc: doc)
             }
         case .photos:
             Section("Photo") {
@@ -208,5 +194,35 @@ struct TOTPDetailSection: View {
     private func updateCode() {
         currentCode = TOTPService.shared.generateTOTP(secret: data.secret, digits: data.digits, period: data.period) ?? "ERROR"
         timeRemaining = TOTPService.shared.timeRemaining(period: data.period)
+    }
+}
+
+struct CredentialInfoSection: View {
+    let creds: CredentialData
+
+    var body: some View {
+        Section("Credential") {
+            LabeledContent("Username", value: creds.username)
+            SecureLabeledContent(label: "Password", value: creds.password)
+            if !creds.website.isEmpty {
+                LabeledContent("Website", value: creds.website)
+            }
+        }
+    }
+}
+
+struct DocumentInfoSection: View {
+    let doc: DocumentData
+
+    var body: some View {
+        Section("Document Info") {
+            LabeledContent("Type", value: doc.documentType)
+            if let expiry = doc.expirationDate {
+                LabeledContent("Expires", value: expiry, format: .date)
+            }
+            Text("No preview available for this document type")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
     }
 }
