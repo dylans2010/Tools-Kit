@@ -62,7 +62,7 @@ struct VaultItemDetailView: View {
                 }
             }
 
-            Section("Details") {
+            Section(header: Text("Details")) {
                 LabeledContent("Title", value: item.title)
                 if !item.note.isEmpty {
                     VStack(alignment: .leading, spacing: 4) {
@@ -103,7 +103,7 @@ struct VaultItemDetailView: View {
                 DocumentInfoSection(doc: doc)
             }
         case .photos:
-            Section("Photo") {
+            Section(header: Text("Photo")) {
                 if let data = decryptedData, let image = UIImage(data: data) {
                     Image(uiImage: image)
                         .resizable()
@@ -115,7 +115,7 @@ struct VaultItemDetailView: View {
                 }
             }
         case .files:
-            Section("File") {
+            Section(header: Text("File")) {
                 LabeledContent("Filename", value: item.payloadIdentifier)
                 if let data = decryptedData {
                     ShareLink(item: data, preview: SharePreview(item.title, image: Image(systemName: "doc.fill"))) {
@@ -171,7 +171,7 @@ struct TOTPDetailSection: View {
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        Section("One-Time Code") {
+        Section(header: Text("One-Time Code")) {
             VStack(alignment: .center, spacing: 12) {
                 Text(currentCode)
                     .font(.system(size: 40, weight: .bold, design: .monospaced))
@@ -201,7 +201,7 @@ struct CredentialInfoSection: View {
     let creds: CredentialData
 
     var body: some View {
-        Section("Credential") {
+        Section(header: Text("Credential")) {
             LabeledContent("Username", value: creds.username)
             SecureLabeledContent(label: "Password", value: creds.password)
             if !creds.website.isEmpty {
@@ -215,7 +215,7 @@ struct DocumentInfoSection: View {
     let doc: DocumentData
 
     var body: some View {
-        Section("Document Info") {
+        Section(header: Text("Document Info")) {
             LabeledContent("Type", value: doc.documentType)
             if let expiry = doc.expirationDate {
                 LabeledContent("Expires", value: expiry, format: .date)

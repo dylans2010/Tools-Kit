@@ -35,7 +35,7 @@ struct AddItemView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("General") {
+                Section(header: Text("General")) {
                     Picker("Category", selection: $category) {
                         ForEach(VaultCategory.allCases) { cat in
                             Label(cat.rawValue, systemImage: cat.icon).tag(cat)
@@ -70,30 +70,30 @@ struct AddItemView: View {
     private var categorySpecificSection: some View {
         switch category {
         case .credentials:
-            Section("Credential Details") {
+            Section(header: Text("Credential Details")) {
                 TextField("Username", text: $username)
                 SecureField("Password", text: $password)
                 TextField("Website", text: $website)
             }
         case .documents:
-            Section("Document Details") {
+            Section(header: Text("Document Details")) {
                 TextField("Document Type", text: $docType)
                 DatePicker("Expiration Date", selection: $expirationDate, displayedComponents: .date)
             }
         case .totp:
-            Section("TOTP Details") {
+            Section(header: Text("TOTP Details")) {
                 TextField("Issuer", text: $totpIssuer)
                 TextField("Secret (Base32)", text: $totpSecret)
                     .textInputAutocapitalization(.characters)
             }
         case .photos:
-            Section("Import Photo") {
+            Section(header: Text("Import Photo")) {
                 PhotosPicker(selection: $selectedPhoto, matching: .images) {
                     Label("Choose from Library", systemImage: "photo.on.rectangle")
                 }
             }
         case .files:
-            Section("Import File") {
+            Section(header: Text("Import File")) {
                 Button {
                     showingFilePicker = true
                 } label: {
@@ -194,7 +194,7 @@ struct EditItemView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Edit Info") {
+                Section(header: Text("Edit Info")) {
                     TextField("Title", text: $title)
                     TextField("Notes", text: $note, axis: .vertical)
                 }
