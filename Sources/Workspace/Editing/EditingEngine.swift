@@ -1,7 +1,7 @@
 #if os(iOS)
 import UIKit
 import CoreGraphics
-import CoreAnimation
+import QuartzCore
 
 /// High-performance renderer for the media editing suite.
 /// Uses UIKit, Core Animation, and Core Graphics for real-time composition.
