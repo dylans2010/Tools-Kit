@@ -57,7 +57,7 @@ struct AIChatSettingsView: View {
                 await loadProviderModels(force: false)
                 await MainActor.run { featureCheck.refresh() }
             }
-            .onChange(of: settings.selectedProviderID) { _ in
+            .onChange(of: settings.selectedProviderID) { _, _ in
                 Task { await loadProviderModels(force: false) }
             }
             .navigationTitle("App Settings")
@@ -839,8 +839,8 @@ struct APIKeyRowView: View {
             }
         }
         .onAppear { loadSavedKey() }
-        .onChange(of: providerID) { _ in loadSavedKey() }
-        .onChange(of: key) { newValue in
+        .onChange(of: providerID) { _, _ in loadSavedKey() }
+        .onChange(of: key) { _, newValue in
             UserDefaults.standard.set(newValue, forKey: draftKeyStorage)
         }
     }

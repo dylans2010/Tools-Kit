@@ -52,7 +52,7 @@ struct RealTimeTranslationView: View {
                     TextEditor(text: $backend.inputText)
                         .frame(minHeight: 120)
                         .cornerRadius(8)
-                        .onChange(of: backend.inputText) { _ in
+                        .onChange(of: backend.inputText) { _, _ in
                             backend.translate()
                         }
 

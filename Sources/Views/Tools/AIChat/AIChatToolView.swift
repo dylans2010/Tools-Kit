@@ -59,7 +59,7 @@ struct AIChatToolView: View {
                 showFileImporter = false
             }
         }
-        .onChange(of: selectedPhotoItem) { item in
+        .onChange(of: selectedPhotoItem) { _, item in
             guard let item = item else { return }
             loadPhoto(from: item)
         }
@@ -142,7 +142,7 @@ struct AIChatToolView: View {
                     }
                     .padding()
                 }
-                .onChange(of: viewModel.messages.count) { _ in
+                .onChange(of: viewModel.messages.count) { _, _ in
                     if let lastId = viewModel.messages.last?.id {
                         withAnimation {
                             proxy.scrollTo(lastId, anchor: .bottom)
