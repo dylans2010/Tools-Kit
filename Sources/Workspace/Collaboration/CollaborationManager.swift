@@ -151,6 +151,20 @@ final class CollaborationManager: ObservableObject {
     // MARK: - Persistence
 
     func saveData() {
+        let spacesSnapshot = spaces
+        let commitsSnapshot = commits
+
+        DispatchQueue.global(qos: .utility).async { [spacesFile, commitsFile] in
+            self.saveDataSynchronously(spaces: spacesSnapshot, commits: commitsSnapshot, spacesFile: spacesFile, commitsFile: commitsFile)
+        }
+    }
+
+    private func saveDataSynchronously(
+        spaces: [CollaborationSpace],
+        commits: [UUID: CollaborationCommit],
+        spacesFile: String,
+        commitsFile: String
+    ) {
         do {
             try WorkspacePersistence.shared.save(spaces, to: spacesFile)
             try WorkspacePersistence.shared.save(commits, to: commitsFile)
