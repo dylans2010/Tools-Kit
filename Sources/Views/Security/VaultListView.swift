@@ -1,4 +1,7 @@
 import SwiftUI
+#if os(iOS)
+import UIKit
+#endif
 
 struct VaultListView: View {
     let category: VaultCategory
@@ -63,17 +66,19 @@ struct VaultItemDetailView: View {
             }
 
             Section(header: Text("Details")) {
-                LabeledContent("Title", value: item.title)
-                if !item.note.isEmpty {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Note")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text(item.note)
+                Group {
+                    LabeledContent("Title", value: item.title)
+                    if !item.note.isEmpty {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Note")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Text(item.note)
+                        }
                     }
+                    LabeledContent("Created", value: item.createdAt, format: .dateTime)
+                    LabeledContent("Updated", value: item.updatedAt, format: .dateTime)
                 }
-                LabeledContent("Created", value: item.createdAt, format: .dateTime)
-                LabeledContent("Updated", value: item.updatedAt, format: .dateTime)
             }
 
             contentSection
@@ -103,26 +108,9 @@ struct VaultItemDetailView: View {
                 DocumentInfoSection(doc: doc)
             }
         case .photos:
-            Section(header: Text("Photo")) {
-                if let data = decryptedData, let image = UIImage(data: data) {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxHeight: 300)
-                        .cornerRadius(8)
-                } else {
-                    ProgressView()
-                }
-            }
+            PhotoInfoSection(decryptedData: decryptedData)
         case .files:
-            Section(header: Text("File")) {
-                LabeledContent("Filename", value: item.payloadIdentifier)
-                if let data = decryptedData {
-                    ShareLink(item: data, preview: SharePreview(item.title, image: Image(systemName: "doc.fill"))) {
-                        Label("Share Decrypted File", systemImage: "square.and.arrow.up")
-                    }
-                }
-            }
+            FileInfoSection(item: item, decryptedData: decryptedData)
         case .totp:
             if let data = decryptedData, let totp = try? JSONDecoder().decode(TOTPData.self, from: data) {
                 TOTPDetailSection(data: totp)
@@ -172,7 +160,8 @@ struct TOTPDetailSection: View {
 
     var body: some View {
         Section(header: Text("One-Time Code")) {
-            VStack(alignment: .center, spacing: 12) {
+            Group {
+                VStack(alignment: .center, spacing: 12) {
                 Text(currentCode)
                     .font(.system(size: 40, weight: .bold, design: .monospaced))
                     .foregroundStyle(.blue)
@@ -184,8 +173,9 @@ struct TOTPDetailSection: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical)
+            }
         }
         .onAppear(perform: updateCode)
         .onReceive(timer) { _ in updateCode() }
@@ -202,10 +192,12 @@ struct CredentialInfoSection: View {
 
     var body: some View {
         Section(header: Text("Credential")) {
-            LabeledContent("Username", value: creds.username)
+            Group {
+                LabeledContent("Username", value: creds.username)
             SecureLabeledContent(label: "Password", value: creds.password)
-            if !creds.website.isEmpty {
-                LabeledContent("Website", value: creds.website)
+                if !creds.website.isEmpty {
+                    LabeledContent("Website", value: creds.website)
+                }
             }
         }
     }
@@ -216,13 +208,53 @@ struct DocumentInfoSection: View {
 
     var body: some View {
         Section(header: Text("Document Info")) {
-            LabeledContent("Type", value: doc.documentType)
-            if let expiry = doc.expirationDate {
-                LabeledContent("Expires", value: expiry, format: .date)
+            Group {
+                LabeledContent("Type", value: doc.documentType)
+                if let expiry = doc.expirationDate {
+                    LabeledContent("Expires", value: expiry, format: .date)
+                }
+                Text("No preview available for this document type")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
-            Text("No preview available for this document type")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+        }
+    }
+}
+
+struct PhotoInfoSection: View {
+    let decryptedData: Data?
+
+    var body: some View {
+        Section(header: Text("Photo")) {
+            Group {
+                if let data = decryptedData, let image = UIImage(data: data) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxHeight: 300)
+                        .cornerRadius(8)
+                } else {
+                    ProgressView()
+                }
+            }
+        }
+    }
+}
+
+struct FileInfoSection: View {
+    let item: VaultItem
+    let decryptedData: Data?
+
+    var body: some View {
+        Section(header: Text("File")) {
+            Group {
+                LabeledContent("Filename", value: item.payloadIdentifier)
+                if let data = decryptedData {
+                    ShareLink(item: data, preview: SharePreview(item.title, image: Image(systemName: "doc.fill"))) {
+                        Label("Share Decrypted File", systemImage: "square.and.arrow.up")
+                    }
+                }
+            }
         }
     }
 }

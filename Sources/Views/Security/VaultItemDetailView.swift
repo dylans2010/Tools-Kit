@@ -70,67 +70,21 @@ struct AddItemView: View {
     private var categorySpecificSection: some View {
         switch category {
         case .credentials:
-            Section(header: Text("Credential Details")) {
-                TextField("Username", text: $username)
-                SecureField("Password", text: $password)
-                TextField("Website", text: $website)
-            }
+            CredentialInputSection(username: $username, password: $password, website: $website)
         case .documents:
-            Section(header: Text("Document Details")) {
-                TextField("Document Type", text: $docType)
-                DatePicker("Expiration Date", selection: $expirationDate, displayedComponents: .date)
-            }
+            DocumentInputSection(docType: $docType, expirationDate: $expirationDate)
         case .totp:
-            Section(header: Text("TOTP Details")) {
-                TextField("Issuer", text: $totpIssuer)
-                TextField("Secret (Base32)", text: $totpSecret)
-                    .textInputAutocapitalization(.characters)
-            }
+            TOTPInputSection(totpIssuer: $totpIssuer, totpSecret: $totpSecret)
         case .photos:
-            Section(header: Text("Import Photo")) {
-                PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                    Label("Choose from Library", systemImage: "photo.on.rectangle")
-                }
-            }
+            PhotoInputSection(selectedPhoto: $selectedPhoto)
         case .files:
-            Section(header: Text("Import File")) {
-                Button {
-                    showingFilePicker = true
-                } label: {
-                    Label(selectedFileName ?? "Choose File", systemImage: "doc.badge.plus")
-                }
-
-                Button {
-                    showingFileImporterBridge = true
-                } label: {
-                    Label("Import via Document Picker", systemImage: "square.and.arrow.down")
-                }
-            }
-            .fileImporter(isPresented: $showingFilePicker, allowedContentTypes: [.item], allowsMultipleSelection: false) { result in
-                switch result {
-                case .success(let urls):
-                    guard let url = urls.first else { return }
-                    if url.startAccessingSecurityScopedResource() {
-                        defer { url.stopAccessingSecurityScopedResource() }
-                        self.selectedFileName = url.lastPathComponent
-                        self.selectedFileData = try? Data(contentsOf: url)
-                    }
-                case .failure(let error):
-                    self.errorMessage = error.localizedDescription
-                }
-            }
-            .sheet(isPresented: $showingFileImporterBridge) {
-                FileImporterRepresentableView(allowedContentTypes: [.item], allowsMultipleSelection: false) { urls in
-                    guard let url = urls.first else { return }
-                    if url.startAccessingSecurityScopedResource() {
-                        defer { url.stopAccessingSecurityScopedResource() }
-                        self.selectedFileName = url.lastPathComponent
-                        self.selectedFileData = try? Data(contentsOf: url)
-                    } else {
-                        self.errorMessage = "Unable to access selected file."
-                    }
-                }
-            }
+            FileInputSection(
+                showingFilePicker: $showingFilePicker,
+                showingFileImporterBridge: $showingFileImporterBridge,
+                selectedFileName: $selectedFileName,
+                errorMessage: $errorMessage,
+                selectedFileData: $selectedFileData
+            )
         }
     }
 
@@ -172,6 +126,116 @@ struct AddItemView: View {
                 dismiss()
             } catch {
                 errorMessage = error.localizedDescription
+            }
+        }
+    }
+}
+
+struct CredentialInputSection: View {
+    @Binding var username: String
+    @Binding var password: String
+    @Binding var website: String
+
+    var body: some View {
+        Section(header: Text("Credential Details")) {
+            Group {
+                TextField("Username", text: $username)
+                SecureField("Password", text: $password)
+                TextField("Website", text: $website)
+            }
+        }
+    }
+}
+
+struct DocumentInputSection: View {
+    @Binding var docType: String
+    @Binding var expirationDate: Date
+
+    var body: some View {
+        Section(header: Text("Document Details")) {
+            Group {
+                TextField("Document Type", text: $docType)
+                DatePicker("Expiration Date", selection: $expirationDate, displayedComponents: .date)
+            }
+        }
+    }
+}
+
+struct TOTPInputSection: View {
+    @Binding var totpIssuer: String
+    @Binding var totpSecret: String
+
+    var body: some View {
+        Section(header: Text("TOTP Details")) {
+            Group {
+                TextField("Issuer", text: $totpIssuer)
+                TextField("Secret (Base32)", text: $totpSecret)
+                    .textInputAutocapitalization(.characters)
+            }
+        }
+    }
+}
+
+struct PhotoInputSection: View {
+    @Binding var selectedPhoto: PhotosPickerItem?
+
+    var body: some View {
+        Section(header: Text("Import Photo")) {
+            Group {
+                PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                    Label("Choose from Library", systemImage: "photo.on.rectangle")
+                }
+            }
+        }
+    }
+}
+
+struct FileInputSection: View {
+    @Binding var showingFilePicker: Bool
+    @Binding var showingFileImporterBridge: Bool
+    @Binding var selectedFileName: String?
+    @Binding var errorMessage: String?
+    @Binding var selectedFileData: Data?
+
+    var body: some View {
+        Section(header: Text("Import File")) {
+            Group {
+                Button {
+                    showingFilePicker = true
+                } label: {
+                    Label(selectedFileName ?? "Choose File", systemImage: "doc.badge.plus")
+                }
+
+                Button {
+                    showingFileImporterBridge = true
+                } label: {
+                    Label("Import via Document Picker", systemImage: "square.and.arrow.down")
+                }
+            }
+        }
+        .fileImporter(isPresented: $showingFilePicker, allowedContentTypes: [.item], allowsMultipleSelection: false) { result in
+            switch result {
+            case .success(let urls):
+                guard let url = urls.first else { return }
+                if url.startAccessingSecurityScopedResource() {
+                    defer { url.stopAccessingSecurityScopedResource() }
+                    self.selectedFileName = url.lastPathComponent
+                    self.selectedFileData = try? Data(contentsOf: url)
+                }
+            case .failure(let error):
+                self.errorMessage = error.localizedDescription
+            }
+        }
+        .sheet(isPresented: $showingFileImporterBridge) {
+            FileImporterRepresentableView(allowedContentTypes: [.item], allowsMultipleSelection: false) { urls in
+                guard let url = urls.first else { return }
+                if url.startAccessingSecurityScopedResource() {
+                    defer { url.stopAccessingSecurityScopedResource() }
+                    self.selectedFileName = url.lastPathComponent
+                    self.selectedFileData = try? Data(contentsOf: url)
+                } else {
+                    self.errorMessage = "Unable to access selected file."
+                }
             }
         }
     }
