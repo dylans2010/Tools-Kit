@@ -5,7 +5,7 @@ struct MeetingNotesView: View {
 
     var body: some View {
         Form {
-            Section(header: Text("Meeting Info")) {
+            Section {
                 TextField("Topic", text: $backend.topic)
                 TextField("Participants (comma separated)", text: $backend.participants)
 
@@ -14,6 +14,8 @@ struct MeetingNotesView: View {
                         Text(type.rawValue).tag(type)
                     }
                 }
+            } header: {
+                Text("Meeting Info")
             }
 
             Section {
@@ -32,7 +34,7 @@ struct MeetingNotesView: View {
             }
 
             if !backend.generatedNotes.isEmpty {
-                Section(header: Text("Generated Notes")) {
+                Section {
                     TextEditor(text: .constant(backend.generatedNotes))
                         .frame(height: 300)
                         .font(.system(.body, design: .monospaced))
@@ -40,6 +42,8 @@ struct MeetingNotesView: View {
                     Button(action: { UIPasteboard.general.string = backend.generatedNotes }) {
                         Label("Copy to Clipboard", systemImage: "doc.on.doc")
                     }
+                } header: {
+                    Text("Generated Notes")
                 }
             }
         }

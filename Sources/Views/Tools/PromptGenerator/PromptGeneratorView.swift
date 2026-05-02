@@ -5,7 +5,7 @@ struct PromptGeneratorView: View {
 
     var body: some View {
         Form {
-            Section(header: Text("Configuration")) {
+            Section {
                 TextField("Topic / Subject", text: $backend.topic)
 
                 Picker("Target Model", selection: $backend.selectedModel) {
@@ -21,6 +21,8 @@ struct PromptGeneratorView: View {
                 }
 
                 Toggle("Include Constraints", isOn: $backend.includeConstraints)
+            } header: {
+                Text("Configuration")
             }
 
             Section {
@@ -39,7 +41,7 @@ struct PromptGeneratorView: View {
             }
 
             if !backend.generatedPrompt.isEmpty {
-                Section(header: Text("Generated Prompt")) {
+                Section {
                     TextEditor(text: .constant(backend.generatedPrompt))
                         .frame(height: 150)
                         .font(.subheadline)
@@ -47,6 +49,8 @@ struct PromptGeneratorView: View {
                     Button(action: { UIPasteboard.general.string = backend.generatedPrompt }) {
                         Label("Copy to Clipboard", systemImage: "doc.on.doc")
                     }
+                } header: {
+                    Text("Generated Prompt")
                 }
             }
         }

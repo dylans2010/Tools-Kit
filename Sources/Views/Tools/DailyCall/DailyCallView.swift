@@ -9,16 +9,18 @@ struct DailyCallView: View {
 
     var body: some View {
         Form {
-            Section(header: Text("Room")) {
+            Section {
                 TextField("https://your-team.daily.co/room-name", text: $backend.roomURL)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.URL)
                     .autocorrectionDisabled()
                 SecureField("Meeting token (optional)", text: $backend.meetingToken)
                 TextField("Display name", text: $backend.username)
+            } header: {
+                Text("Room")
             }
 
-            Section(header: Text("Session")) {
+            Section {
                 HStack {
                     Label(backend.callStateDescription, systemImage: backend.isJoined ? "dot.radiowaves.left.and.right" : "phone.down")
                         .foregroundColor(backend.isJoined ? .green : .secondary)
@@ -55,10 +57,12 @@ struct DailyCallView: View {
                     .buttonStyle(.bordered)
                     .disabled(!backend.isJoined)
                 }
+            } header: {
+                Text("Session")
             }
 
             #if canImport(Daily)
-            Section(header: Text("Video")) {
+            Section {
                 if let track = backend.activeSpeakerVideoTrack ?? backend.localVideoTrack {
                     DailySDKVideoView(track: track)
                         .frame(height: 220)
@@ -66,10 +70,12 @@ struct DailyCallView: View {
                 } else {
                     ContentUnavailableView("No Video Track", systemImage: "video.slash", description: Text("Join a room and enable camera to render video."))
                 }
+            } header: {
+                Text("Video")
             }
             #endif
 
-            Section(header: Text("Participants")) {
+            Section {
                 if backend.participants.isEmpty {
                     Text("No participants")
                         .foregroundColor(.secondary)
@@ -93,9 +99,11 @@ struct DailyCallView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Participants")
             }
 
-            Section(header: Text("Debug")) {
+            Section {
                 LabeledContent("Network", value: backend.networkQualityDescription)
                 LabeledContent("Recording", value: backend.recordingStateDescription)
                 if let errorMessage = backend.errorMessage, !errorMessage.isEmpty {
@@ -108,6 +116,8 @@ struct DailyCallView: View {
                         .foregroundColor(.secondary)
                         .textSelection(.enabled)
                 }
+            } header: {
+                Text("Debug")
             }
         }
         .navigationTitle("Daily Call")

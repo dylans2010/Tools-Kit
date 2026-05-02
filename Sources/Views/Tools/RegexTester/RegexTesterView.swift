@@ -5,25 +5,31 @@ struct RegexTesterView: View {
 
     var body: some View {
         Form {
-            Section(header: Text("Regex Pattern")) {
+            Section {
                 TextField("Pattern", text: $backend.pattern)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled(true)
                     .onChange(of: backend.pattern) { _ in backend.findMatches() }
+            } header: {
+                Text("Regex Pattern")
             }
 
-            Section(header: Text("Test Text")) {
+            Section {
                 TextEditor(text: $backend.testText)
                     .frame(height: 150)
                     .onChange(of: backend.testText) { _ in backend.findMatches() }
+            } header: {
+                Text("Test Text")
             }
 
-            Section(header: Text("Matches (\(backend.matches.count))")) {
+            Section {
                 List(backend.matches, id: \.self) { match in
                     Text(match)
                         .font(.system(.body, design: .monospaced))
                 }
                 .frame(minHeight: 100)
+            } header: {
+                Text("Matches (\(backend.matches.count))")
             }
         }
         .navigationTitle("Regex Tester")

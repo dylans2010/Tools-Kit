@@ -6,7 +6,7 @@ struct CodeImportPlanView: View {
 
     var body: some View {
         List {
-            Section(header: Text("Proposed Actions"), footer: Text("Modules marked for refactor will be transformed using Agent Mode.")) {
+            Section {
                 ForEach(analyzer.importPlan) { action in
                     HStack {
                         VStack(alignment: .leading) {
@@ -23,6 +23,10 @@ struct CodeImportPlanView: View {
                         ActionBadge(type: action.action)
                     }
                 }
+            } header: {
+                Text("Proposed Actions")
+            } footer: {
+                Text("Modules marked for refactor will be transformed using Agent Mode.")
             }
 
             Section {

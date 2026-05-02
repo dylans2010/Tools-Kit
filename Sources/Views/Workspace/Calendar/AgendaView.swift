@@ -28,11 +28,13 @@ struct CalendarAgendaView: View {
                 } else {
                     LazyVStack(alignment: .leading, spacing: 24, pinnedViews: [.sectionHeaders]) {
                         ForEach(groupedEvents, id: \.0) { date, events in
-                            Section(header: dateHeader(date)) {
+                            Section {
                                 ForEach(events) { event in
                                     EventAgendaRow(event: event)
                                         .onTapGesture { selectedEvent = event }
                                 }
+                            } header: {
+                                dateHeader(date)
                             }
                         }
                     }

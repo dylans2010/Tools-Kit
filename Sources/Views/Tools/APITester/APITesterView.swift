@@ -7,7 +7,7 @@ struct APITesterView: View {
     var body: some View {
         VStack(spacing: 0) {
             Form {
-                Section(header: Text("Request")) {
+                Section {
                     TextField("URL", text: $backend.url)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
@@ -19,9 +19,11 @@ struct APITesterView: View {
                         }
                     }
                     .pickerStyle(.menu)
+                } header: {
+                    Text("Request")
                 }
 
-                Section(header: headerSectionHeader) {
+                Section {
                     ForEach($backend.headers) { $header in
                         HStack {
                             TextField("Key", text: $header.key)
@@ -36,14 +38,18 @@ struct APITesterView: View {
                     Button(action: backend.addHeader) {
                         Label("Add Header", systemImage: "plus.circle")
                     }
+                } header: {
+                    headerSectionHeader
                 }
 
                 if backend.method != "GET" && backend.method != "HEAD" {
-                    Section(header: Text("Body")) {
+                    Section {
                         TextEditor(text: $backend.requestBody)
                             .frame(height: 100)
                             .font(.system(.caption, design: .monospaced))
                             .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.gray.opacity(0.2)))
+                    } header: {
+                        Text("Body")
                     }
                 }
 
@@ -59,7 +65,7 @@ struct APITesterView: View {
                     .disabled(backend.isLoading)
                 }
 
-                Section(header: Text("Response Status")) {
+                Section {
                     HStack {
                         Circle()
                             .fill(statusColor)
@@ -67,9 +73,11 @@ struct APITesterView: View {
                         Text("Status Code: \(backend.responseStatus)")
                             .bold()
                     }
+                } header: {
+                    Text("Response Status")
                 }
 
-                Section(header: responseTabPicker) {
+                Section {
                     if selectedTab == 0 {
                         TextEditor(text: .constant(backend.responseBody))
                             .frame(height: 250)
@@ -86,6 +94,8 @@ struct APITesterView: View {
                         }
                         .padding(.vertical, 4)
                     }
+                } header: {
+                    responseTabPicker
                 }
             }
         }
