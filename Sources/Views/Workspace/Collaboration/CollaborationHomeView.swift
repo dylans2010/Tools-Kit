@@ -28,10 +28,10 @@ struct CollaborationHomeView: View {
                     Label("Pull Requests", systemImage: "arrow.triangle.pull")
                         .foregroundColor(.secondary)
                 }
-                NavigationLink(destination: ActivityTimelineView()) {
+                NavigationLink(destination: ActivityTimelineView(spaceID: manager.spaces.first?.id ?? UUID())) {
                     Label("Activity Timeline", systemImage: "clock.arrow.2.circlepath")
                 }
-                NavigationLink(destination: SpacePublishingView()) {
+                NavigationLink(destination: SpacePublishingView(spaceID: manager.spaces.first?.id ?? UUID())) {
                     Label("Distribution & Publishing", systemImage: "paperplane.fill")
                 }
                 NavigationLink(destination: WorkspaceCommandCenterView()) {
