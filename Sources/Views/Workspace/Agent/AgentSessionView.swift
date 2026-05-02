@@ -469,7 +469,7 @@ struct ActivityRow: View {
     }
 
     private func title(for activity: AgentActivity) -> String {
-        if let plan = activity.planGenerated {
+        if activity.planGenerated != nil {
             return "Plan Generated"
         } else if let progress = activity.progressUpdated {
             return progress.title ?? "Updating Progress"
