@@ -228,7 +228,7 @@ struct DocumentInfoSection: View {
         Section {
             LabeledContent("Type", value: doc.documentType)
             if let expiry = doc.expirationDate {
-                LabeledContent("Expires", value: expiry, format: .date)
+                LabeledContent("Expires", value: expiry.formatted(date: .abbreviated, time: .omitted))
             }
             Text("No preview available for this document type")
                 .font(.caption)
