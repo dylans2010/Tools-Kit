@@ -5,11 +5,6 @@ struct ManageAccountsView: View {
     @StateObject private var mailStore = MailStore.shared
     @State private var loadingProvider: MailAccount.ProviderType?
 
-    var onSelectAccount: ((MailAccount) -> Void)?
-
-    init(onSelectAccount: ((MailAccount) -> Void)? = nil) {
-        self.onSelectAccount = onSelectAccount
-    }
 
     var body: some View {
         NavigationStack {
@@ -72,7 +67,8 @@ struct ManageAccountsView: View {
                         }
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            onSelectAccount?(account)
+                            mailStore.setActiveAccount(account.id)
+                            mailStore.reloadAccounts()
                             dismiss()
                         }
 

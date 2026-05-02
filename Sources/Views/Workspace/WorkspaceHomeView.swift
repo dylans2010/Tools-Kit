@@ -682,10 +682,7 @@ struct WorkspaceMailRouterView: View {
                 }
             )
             .sheet(isPresented: $showingManageAccounts) {
-                ManageAccountsView { selectedAccount in
-                    mailStore.setActiveAccount(selectedAccount.id)
-                    mailStore.reloadAccounts()
-                }
+                ManageAccountsView()
             }
             .onAppear {
                 mailStore.reloadAccounts()

@@ -146,7 +146,7 @@ struct AIChatSettingsView: View {
     // MARK: - Provider Section
 
     private var providerSection: some View {
-        Section {
+        Section(header: Text("AI Provider"), footer: providerFooter) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(registry.providers, id: \.id) { provider in
@@ -182,20 +182,21 @@ struct AIChatSettingsView: View {
                 .padding(10)
                 .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
-        } header: {
-            Text("AI Provider")
-        } footer: {
-            if let provider = selectedProvider, let url = provider.apiKeyURL {
-                Link("Get an API key from \(provider.name)", destination: url)
-                    .font(.footnote)
-            }
+        }
+    }
+
+    @ViewBuilder
+    private var providerFooter: some View {
+        if let provider = selectedProvider, let url = provider.apiKeyURL {
+            Link("Get an API key from \(provider.name)", destination: url)
+                .font(.footnote)
         }
     }
 
     // MARK: - API Key Section
 
     private var apiKeySection: some View {
-        Section {
+        Section(header: Text("API Key")) {
             if let provider = selectedProvider {
                 APIKeyRowView(
                     providerID: provider.id,
@@ -203,13 +204,11 @@ struct AIChatSettingsView: View {
                     placeholder: provider.apiKeyPlaceholder
                 )
             }
-        } header: {
-            Text("API Key")
         }
     }
 
     private var aiUsageSection: some View {
-        Section {
+        Section(header: Text("AI Usage"), footer: Text("App Model uses PRODUCTION_API_KEY with a 10 requests/day limit. My API Key mode is unlimited.")) {
             VStack(alignment: .leading, spacing: 12) {
                 Picker("Model Source", selection: $settings.aiModelSource) {
                     ForEach(AIModelSource.allCases, id: \.self) { source in
@@ -237,10 +236,6 @@ struct AIChatSettingsView: View {
                 )
             }
             .padding(.vertical, 4)
-        } header: {
-            Text("AI Usage")
-        } footer: {
-            Text("App Model uses PRODUCTION_API_KEY with a 10 requests/day limit. My API Key mode is unlimited.")
         }
     }
 
@@ -442,7 +437,7 @@ struct AIChatSettingsView: View {
     // MARK: - App Mode Section
 
     private var appModeSection: some View {
-        Section {
+        Section(header: Text("Turn ToolsKit Into"), footer: Text("Choose the launch experience for ToolsKit. Only one mode can be active at a time.").font(.caption)) {
             Picker("Mode", selection: selectedAppMode) {
                 ForEach(AppMode.allCases) { mode in
                     Label(mode.title, systemImage: mode.icon)
@@ -471,11 +466,6 @@ struct AIChatSettingsView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
-        } header: {
-            Text("Turn ToolsKit Into")
-        } footer: {
-            Text("Choose the launch experience for ToolsKit. Only one mode can be active at a time.")
-                .font(.caption)
         }
     }
 
