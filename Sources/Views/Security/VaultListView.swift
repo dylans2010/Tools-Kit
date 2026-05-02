@@ -137,10 +137,12 @@ struct VaultItemDetailView: View {
     }
 
     private func loadData() {
-        do {
-            decryptedData = try vaultManager.loadItemData(item)
-        } catch {
-            errorMessage = error.localizedDescription
+        Task {
+            do {
+                decryptedData = try await vaultManager.loadItemData(item)
+            } catch {
+                errorMessage = error.localizedDescription
+            }
         }
     }
 }
@@ -174,29 +176,61 @@ struct TOTPDetailSection: View {
     let data: TOTPData
     @State private var currentCode = ""
     @State private var timeRemaining = 0
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @State private var showCopyConfirmation = false
 
     var body: some View {
         Section {
-            VStack(alignment: .center, spacing: 12) {
-                Text(currentCode)
-                    .font(.system(size: 40, weight: .bold, design: .monospaced))
-                    .foregroundStyle(.blue)
+            TimelineView(.periodic(from: .now, by: 1)) { timeline in
+                VStack(alignment: .center, spacing: 12) {
+                    Text(currentCode)
+                        .font(.system(size: 48, weight: .bold, design: .monospaced))
+                        .foregroundStyle(.blue)
+                        .contentTransition(.numericText())
 
-                ProgressView(value: Double(timeRemaining), total: Double(data.period))
-                    .tint(timeRemaining < 5 ? .red : .blue)
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .fill(Color.secondary.opacity(0.2))
+                            .frame(height: 8)
 
-                Text("\(timeRemaining) seconds remaining")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                        Capsule()
+                            .fill(timeRemaining < 5 ? Color.red : Color.blue)
+                            .frame(width: max(0, CGFloat(timeRemaining) / CGFloat(data.period) * 300), height: 8)
+                            .animation(.linear(duration: 1), value: timeRemaining)
+                    }
+                    .frame(width: 300)
+
+                    HStack {
+                        Text("\(timeRemaining)s")
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(.secondary)
+
+                        Spacer()
+
+                        Button {
+                            UIPasteboard.general.string = currentCode
+                            withAnimation { showCopyConfirmation = true }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation { showCopyConfirmation = false }
+                            }
+                        } label: {
+                            Label(showCopyConfirmation ? "Copied" : "Copy", systemImage: showCopyConfirmation ? "checkmark" : "doc.on.doc")
+                                .font(.caption.bold())
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(showCopyConfirmation ? .green : .blue)
+                    }
+                    .frame(width: 300)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical)
+                .onChange(of: timeline.date) { _, _ in
+                    updateCode()
+                }
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical)
         } header: {
             Text("One-Time Code")
         }
         .onAppear(perform: updateCode)
-        .onReceive(timer) { _ in updateCode() }
     }
 
     private func updateCode() {

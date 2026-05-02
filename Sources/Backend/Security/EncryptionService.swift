@@ -49,6 +49,38 @@ class EncryptionService {
         guard let text = String(data: decrypted, encoding: .utf8) else { throw SecurityError.decodingFailed }
         return text
     }
+
+    // MARK: - Secure Enclave & Key Wrapping
+
+    func generateRandomKey() -> SymmetricKey {
+        return SymmetricKey(size: .bits256)
+    }
+
+    func wrapKey(_ keyToWrap: SymmetricKey, using wrappingKey: SymmetricKey) throws -> Data {
+        let keyData = keyToWrap.withUnsafeBytes { Data($0) }
+        return try encrypt(keyData, using: wrappingKey)
+    }
+
+    func unwrapKey(_ wrappedKeyData: Data, using wrappingKey: SymmetricKey) throws -> SymmetricKey {
+        let decryptedData = try decrypt(wrappedKeyData, using: wrappingKey)
+        return SymmetricKey(data: decryptedData)
+    }
+
+    func encryptWithSecureEnclave(_ data: Data, publicKey: SecKey) throws -> Data {
+        var error: Unmanaged<CFError>?
+        guard let encrypted = SecKeyCreateEncryptedData(publicKey, .eciesEncryptionStandardX963SHA256AESGCM, data as CFData, &error) else {
+            throw SecurityError.encryptionFailed
+        }
+        return encrypted as Data
+    }
+
+    func decryptWithSecureEnclave(_ data: Data, privateKey: SecKey) throws -> Data {
+        var error: Unmanaged<CFError>?
+        guard let decrypted = SecKeyCreateDecryptedData(privateKey, .eciesEncryptionStandardX963SHA256AESGCM, data as CFData, &error) else {
+            throw SecurityError.hardwareAuthFailed
+        }
+        return decrypted as Data
+    }
 }
 
 enum SecurityError: Error, LocalizedError {
@@ -60,6 +92,8 @@ enum SecurityError: Error, LocalizedError {
     case authenticationFailed
     case keyDerivationFailed
     case itemNotFound
+    case secureEnclaveNotAvailable
+    case hardwareAuthFailed
 
     var errorDescription: String? {
         switch self {
@@ -71,6 +105,8 @@ enum SecurityError: Error, LocalizedError {
         case .authenticationFailed: return "Authentication failed."
         case .keyDerivationFailed: return "Failed to derive security key."
         case .itemNotFound: return "Item not found in vault."
+        case .secureEnclaveNotAvailable: return "Secure Enclave is not available on this device."
+        case .hardwareAuthFailed: return "Hardware authentication failed."
         }
     }
 }

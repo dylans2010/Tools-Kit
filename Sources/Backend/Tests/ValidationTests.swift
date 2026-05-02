@@ -81,14 +81,27 @@ struct ValidationTests {
 
         do {
             let key = try encryption.deriveKey(password: password, salt: salt)
-            let secret = "Sensitive Data"
-            let encrypted = try encryption.encryptString(secret, using: key)
-            let decrypted = try encryption.decryptString(encrypted, using: key)
-            assert(decrypted == secret, "Encryption/Decryption failed")
+            let secret = "Sensitive Data".data(using: .utf8)!
+
+            // Test Sharded Encryption
+            let storage = SecureFileStorageService.shared
+            let filename = "test_file.vault"
+            let indexName = try storage.saveEncryptedFile(data: secret, filename: filename, key: key)
+            let decrypted = try storage.loadDecryptedFile(filename: indexName, key: key)
+            assert(decrypted == secret, "Sharded Encryption/Decryption failed")
+            storage.deleteFile(indexName)
 
             // Test TOTP
-            let totp = TOTPService.shared.generateTOTP(secret: "JBSWY3DPEHPK3PXP") // 'helloworld' in base32
-            assert(totp?.count == 6, "TOTP generation failed")
+            let totp = TOTPService.shared.generateTOTP(secret: "JBSWY3DPEHPK3PXP", algorithm: .sha1)
+            assert(totp?.count == 6, "TOTP (SHA1) failed")
+
+            let totp256 = TOTPService.shared.generateTOTP(secret: "JBSWY3DPEHPK3PXP", algorithm: .sha256)
+            assert(totp256?.count == 6, "TOTP (SHA256) failed")
+
+            // Test Package Export/Import (Binary format)
+            let packageURL = try await SecurityPackageService.shared.exportPackage(password: password)
+            assert(FileManager.default.fileExists(atPath: packageURL.path), "Package export failed")
+            // In a real test we'd import it back, but requireAuth needs LAContext interaction.
 
             print("Security System Logic Verified.")
         } catch {
