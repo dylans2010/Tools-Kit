@@ -1,6 +1,7 @@
 import Foundation
 import os.log
 
+@MainActor
 final class ExecutionBridge {
     static let shared = ExecutionBridge()
 
@@ -45,9 +46,7 @@ final class ExecutionBridge {
             location: "Virtual Room"
         )
 
-        await MainActor.run {
-            calendarManager.addEvent(event)
-        }
+        calendarManager.addEvent(event)
 
         return event
     }
@@ -62,9 +61,7 @@ final class ExecutionBridge {
             createdAt: Date()
         )
 
-        await MainActor.run {
-            tasksManager.addTask(task)
-        }
+        tasksManager.addTask(task)
 
         return task
     }

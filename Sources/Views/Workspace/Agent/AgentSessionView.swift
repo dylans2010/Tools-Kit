@@ -337,9 +337,9 @@ final class AgentSessionViewModel: ObservableObject {
 
     private let client = AgentClient.shared
     private var pollTask: Task<Void, Never>?
-    private let openURL: (URL) -> Void
+    private let openURL: @MainActor (URL) -> Void
 
-    init(sessionId: String, openURL: @escaping (URL) -> Void = { UIApplication.shared.open($0) }) {
+    init(sessionId: String, openURL: @MainActor @escaping (URL) -> Void = { UIApplication.shared.open($0, options: [:], completionHandler: nil) }) {
         self.sessionId = sessionId
         self.openURL = openURL
     }
