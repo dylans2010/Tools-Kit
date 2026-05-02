@@ -13,9 +13,12 @@ class AuthService: ObservableObject {
     private let masterPasswordKey = "com.toolskit.security.master"
     private let saltKey = "com.toolskit.security.salt"
     private let useBiometricsKey = "com.toolskit.security.useBiometrics"
+    private let wrappedVMKKey = "com.toolskit.security.wrapped_vmk"
+    private let wrappedDEKKey = "com.toolskit.security.wrapped_dek"
+    private let vmkSecureEnclaveTag = "com.toolskit.security.vmk"
     private let autoLockInterval: TimeInterval = 300 // 5 minutes
 
-    var sessionKey: SymmetricKey?
+    var sessionKey: SymmetricKey? // This acts as the DEK (Data Encryption Key)
     private var cancellables = Set<AnyCancellable>()
 
     private init() {
@@ -29,21 +32,32 @@ class AuthService: ObservableObject {
 
     func setup(password: String, useBiometrics: Bool) throws {
         let salt = EncryptionService.shared.generateSalt()
-        let key = try EncryptionService.shared.deriveKey(password: password, salt: salt)
+        let vmk = try EncryptionService.shared.deriveKey(password: password, salt: salt)
+
+        // Generate DEK
+        let dek = EncryptionService.shared.generateRandomKey()
+        let wrappedDEK = try EncryptionService.shared.wrapKey(dek, using: vmk)
 
         UserDefaults.standard.set(salt, forKey: saltKey)
         UserDefaults.standard.set(useBiometrics, forKey: useBiometricsKey)
+        UserDefaults.standard.set(wrappedDEK, forKey: wrappedDEKKey)
 
         let verification = "verified".data(using: .utf8)!
-        let encrypted = try EncryptionService.shared.encrypt(verification, using: key)
+        let encrypted = try EncryptionService.shared.encrypt(verification, using: vmk)
 
         saveToKeychain(data: encrypted, service: masterPasswordKey)
 
         if useBiometrics {
-            savePasswordToKeychain(password)
+            let seKey = try createSecureEnclaveKey()
+            guard let publicKey = SecKeyCopyPublicKey(seKey) else { throw SecurityError.encryptionFailed }
+
+            // Wrap VMK with SE Key
+            let vmkData = vmk.withUnsafeBytes { Data($0) }
+            let wrappedVMK = try EncryptionService.shared.encryptWithSecureEnclave(vmkData, publicKey: publicKey)
+            UserDefaults.standard.set(wrappedVMK, forKey: wrappedVMKKey)
         }
 
-        self.sessionKey = key
+        self.sessionKey = dek
         self.isAuthenticated = true
         self.isSetup = true
         self.lastActivity = Date()
@@ -51,18 +65,21 @@ class AuthService: ObservableObject {
 
     func authenticate(password: String) throws {
         guard let salt = UserDefaults.standard.data(forKey: saltKey),
+              let wrappedDEK = UserDefaults.standard.data(forKey: wrappedDEKKey),
               let encryptedVerification = loadFromKeychain(service: masterPasswordKey) else {
             throw SecurityError.authenticationFailed
         }
 
-        let key = try EncryptionService.shared.deriveKey(password: password, salt: salt)
+        let vmk = try EncryptionService.shared.deriveKey(password: password, salt: salt)
 
-        let decrypted = try EncryptionService.shared.decrypt(encryptedVerification, using: key)
+        let decrypted = try EncryptionService.shared.decrypt(encryptedVerification, using: vmk)
         guard String(data: decrypted, encoding: .utf8) == "verified" else {
             throw SecurityError.authenticationFailed
         }
 
-        self.sessionKey = key
+        let dek = try EncryptionService.shared.unwrapKey(wrappedDEK, using: vmk)
+
+        self.sessionKey = dek
         self.isAuthenticated = true
         self.lastActivity = Date()
     }
@@ -77,17 +94,80 @@ class AuthService: ObservableObject {
             context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Unlock your Security Vault") { success, authenticationError in
                 DispatchQueue.main.async {
                     if success {
-                        if let storedPassword = self.getPasswordFromKeychain() {
-                            do {
-                                try self.authenticate(password: storedPassword)
-                            } catch {
-                                self.isAuthenticated = false
-                            }
+                        do {
+                            try self.unlockWithSecureEnclave()
+                        } catch {
+                            self.isAuthenticated = false
                         }
                     }
                 }
             }
         }
+    }
+
+    // MARK: - Secure Enclave Integration
+
+    private func createSecureEnclaveKey() throws -> SecKey {
+        guard SecureEnclave.isAvailable else { throw SecurityError.secureEnclaveNotAvailable }
+
+        let accessControl = SecAccessControlCreateWithFlags(
+            nil,
+            kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+            [.biometryCurrentSet, .userPresence],
+            nil
+        )!
+
+        let tag = vmkSecureEnclaveTag.data(using: .utf8)!
+        let query: [CFString: Any] = [
+            kSecClass: kSecClassKey,
+            kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandomGF2P256,
+            kSecAttrKeySizeInBits: 256,
+            kSecAttrTokenID: kSecAttrTokenIDSecureEnclave,
+            kSecPrivateKeyAttrs: [
+                kSecAttrIsPermanent: true,
+                kSecAttrApplicationTag: tag,
+                kSecAttrAccessControl: accessControl
+            ]
+        ]
+
+        SecItemDelete(query as CFDictionary)
+        var error: Unmanaged<CFError>?
+        guard let key = SecKeyCreateRandomKey(query as CFDictionary, &error) else {
+            throw SecurityError.encryptionFailed
+        }
+        return key
+    }
+
+    private func unlockWithSecureEnclave() throws {
+        guard let wrappedVMK = UserDefaults.standard.data(forKey: wrappedVMKKey),
+              let wrappedDEK = UserDefaults.standard.data(forKey: wrappedDEKKey) else {
+            throw SecurityError.authenticationFailed
+        }
+
+        let tag = vmkSecureEnclaveTag.data(using: .utf8)!
+        let query: [CFString: Any] = [
+            kSecClass: kSecClassKey,
+            kSecAttrApplicationTag: tag,
+            kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandomGF2P256,
+            kSecReturnRef: true
+        ]
+
+        var item: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &item)
+        guard status == errSecSuccess, let seKey = item as! SecKey? else {
+            throw SecurityError.hardwareAuthFailed
+        }
+
+        // Unwrap VMK using Secure Enclave Key
+        let vmkData = try EncryptionService.shared.decryptWithSecureEnclave(wrappedVMK, privateKey: seKey)
+        let vmk = SymmetricKey(data: vmkData)
+
+        // Unwrap DEK using VMK
+        let dek = try EncryptionService.shared.unwrapKey(wrappedDEK, using: vmk)
+
+        self.sessionKey = dek
+        self.isAuthenticated = true
+        self.lastActivity = Date()
     }
 
     func updateActivity() {
@@ -101,6 +181,18 @@ class AuthService: ObservableObject {
                 self?.checkAutoLock()
             }
             .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)
+            .sink { [weak self] _ in
+                self?.logout()
+            }
+            .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)
+            .sink { [weak self] _ in
+                self?.updateActivity()
+            }
+            .store(in: &cancellables)
     }
 
     private func checkAutoLock() {
@@ -110,7 +202,37 @@ class AuthService: ObservableObject {
         }
     }
 
+    @MainActor
+    func requireAuth() async throws {
+        if !isAuthenticated {
+            // This would normally trigger a UI prompt if not authenticated,
+            // but here we ensure that whatever operation is being performed
+            // is gated by the current auth state.
+            throw SecurityError.authenticationFailed
+        }
+
+        let context = LAContext()
+        var error: NSError?
+
+        if context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) {
+            let success = try await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: "Confirm your identity to access sensitive data")
+            if !success {
+                throw SecurityError.hardwareAuthFailed
+            }
+            updateActivity()
+        } else {
+            throw SecurityError.secureEnclaveNotAvailable
+        }
+    }
+
     func logout() {
+        // Zero out session key memory
+        if let key = sessionKey {
+            key.withUnsafeBytes { ptr in
+                let mutablePtr = UnsafeMutableRawBufferPointer(mutating: ptr)
+                mutablePtr.initializeMemory(as: UInt8.self, repeating: 0)
+            }
+        }
         sessionKey = nil
         isAuthenticated = false
     }

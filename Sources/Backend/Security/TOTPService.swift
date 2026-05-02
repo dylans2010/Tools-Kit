@@ -6,15 +6,26 @@ class TOTPService {
 
     private init() {}
 
-    func generateTOTP(secret: String, digits: Int = 6, period: Int = 30) -> String? {
+    enum HashAlgorithm: String {
+        case sha1, sha256, sha512
+    }
+
+    func generateTOTP(secret: String, digits: Int = 6, period: Int = 30, algorithm: HashAlgorithm = .sha1) -> String? {
         guard let secretData = decodeBase32(secret) else { return nil }
 
         let counter = UInt64(Date().timeIntervalSince1970) / UInt64(period)
         var counterNetworkOrder = counter.bigEndian
         let counterData = Data(bytes: &counterNetworkOrder, count: MemoryLayout.size(ofValue: counterNetworkOrder))
 
-        let hmac = HMAC<Insecure.SHA1>.authenticationCode(for: counterData, using: SymmetricKey(data: secretData))
-        let hmacData = Data(hmac)
+        let hmacData: Data
+        switch algorithm {
+        case .sha1:
+            hmacData = Data(HMAC<Insecure.SHA1>.authenticationCode(for: counterData, using: SymmetricKey(data: secretData)))
+        case .sha256:
+            hmacData = Data(HMAC<SHA256>.authenticationCode(for: counterData, using: SymmetricKey(data: secretData)))
+        case .sha512:
+            hmacData = Data(HMAC<SHA512>.authenticationCode(for: counterData, using: SymmetricKey(data: secretData)))
+        }
 
         let offset = Int(hmacData.last! & 0x0f)
         let truncatedHash = hmacData.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) -> UInt32 in
@@ -24,6 +35,29 @@ class TOTPService {
 
         let pin = (truncatedHash & 0x7fffffff) % UInt32(pow(10, Double(digits)))
         return String(format: "%0\(digits)d", pin)
+    }
+
+    func parseOTPAuthURL(_ urlString: String) -> TOTPData? {
+        guard let url = URL(string: urlString),
+              url.scheme == "otpauth",
+              url.host == "totp" else { return nil }
+
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        let queryItems = components?.queryItems
+
+        let issuer = queryItems?.first(where: { $0.name == "issuer" })?.value ?? "Unknown"
+        let secret = queryItems?.first(where: { $0.name == "secret" })?.value ?? ""
+        let digits = Int(queryItems?.first(where: { $0.name == "digits" })?.value ?? "6") ?? 6
+        let period = Int(queryItems?.first(where: { $0.name == "period" })?.value ?? "30") ?? 30
+
+        // Account name is usually in the path
+        var account = url.path
+        if account.hasPrefix("/") { account.removeFirst() }
+        if let colonRange = account.range(of: ":") {
+            account = String(account[colonRange.upperBound...])
+        }
+
+        return TOTPData(secret: secret, issuer: issuer, account: account, digits: digits, period: period)
     }
 
     func timeRemaining(period: Int = 30) -> Int {

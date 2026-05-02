@@ -77,7 +77,8 @@ class VaultManager: ObservableObject {
         saveIndex()
     }
 
-    func loadItemData(_ item: VaultItem) throws -> Data {
+    func loadItemData(_ item: VaultItem) async throws -> Data {
+        try await AuthService.shared.requireAuth()
         guard let key = AuthService.shared.sessionKey else { throw SecurityError.authenticationFailed }
         return try SecureFileStorageService.shared.loadDecryptedFile(filename: item.payloadIdentifier, key: key)
     }
