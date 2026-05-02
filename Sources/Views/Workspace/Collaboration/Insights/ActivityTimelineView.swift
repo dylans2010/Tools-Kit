@@ -34,7 +34,7 @@ struct ActivityTimelineView: View {
 
             List {
                 ForEach(filteredActivities) { log in
-                    ActivityRow(log: log)
+                    TimelineActivityRow(log: log)
                 }
             }
         }
@@ -42,7 +42,7 @@ struct ActivityTimelineView: View {
     }
 }
 
-struct ActivityRow: View {
+struct TimelineActivityRow: View {
     let log: ActivityLog
 
     var body: some View {

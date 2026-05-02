@@ -55,17 +55,19 @@ struct AddProtectionRuleView: View {
             }
             .navigationTitle("New Rule")
             .toolbar {
-                Button("Save") {
-                    let rule = BranchProtectionRule(
-                        id: UUID(),
-                        branchName: branchName,
-                        requireApprovals: requireApprovals,
-                        requiredApprovalCount: requiredApprovalCount,
-                        restrictMerges: false,
-                        allowedRoles: [.admin, .owner]
-                    )
-                    BranchProtectionService.shared.addRule(spaceID: spaceID, rule: rule)
-                    dismiss()
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        let rule = BranchProtectionRule(
+                            id: UUID(),
+                            branchName: branchName,
+                            requireApprovals: requireApprovals,
+                            requiredApprovalCount: requiredApprovalCount,
+                            restrictMerges: false,
+                            allowedRoles: [.admin, .owner]
+                        )
+                        BranchProtectionService.shared.addRule(spaceID: spaceID, rule: rule)
+                        dismiss()
+                    }
                 }
             }
         }
