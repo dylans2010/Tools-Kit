@@ -20,8 +20,13 @@ struct CollaborationHomeView: View {
             }
 
             Section("Tools & Management") {
-                NavigationLink(destination: PullRequestDashboardView()) {
+                if let firstSpace = manager.spaces.first {
+                    NavigationLink(destination: PullRequestDashboardView(spaceID: firstSpace.id)) {
+                        Label("Pull Requests", systemImage: "arrow.triangle.pull")
+                    }
+                } else {
                     Label("Pull Requests", systemImage: "arrow.triangle.pull")
+                        .foregroundColor(.secondary)
                 }
                 NavigationLink(destination: ActivityTimelineView()) {
                     Label("Activity Timeline", systemImage: "clock.arrow.2.circlepath")
