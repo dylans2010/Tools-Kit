@@ -5,7 +5,7 @@ struct EmailGeneratorView: View {
 
     var body: some View {
         Form {
-            Section(header: Text("Configuration")) {
+            Section {
                 Picker("Email Type", selection: $backend.selectedType) {
                     ForEach(EmailType.allCases, id: \.self) { type in
                         Text(type.rawValue).tag(type)
@@ -21,6 +21,8 @@ struct EmailGeneratorView: View {
                 TextField("Recipient Name", text: $backend.recipientName)
                 TextField("Your Name", text: $backend.senderName)
                 TextField("Context / Topic", text: $backend.contextInfo)
+            } header: {
+                Text("Configuration")
             }
 
             Section {
@@ -39,7 +41,7 @@ struct EmailGeneratorView: View {
             }
 
             if !backend.generatedEmail.isEmpty {
-                Section(header: Text("Generated Email")) {
+                Section {
                     TextEditor(text: .constant(backend.generatedEmail))
                         .frame(height: 200)
                         .font(.body)
@@ -47,6 +49,8 @@ struct EmailGeneratorView: View {
                     Button(action: { UIPasteboard.general.string = backend.generatedEmail }) {
                         Label("Copy to Clipboard", systemImage: "doc.on.doc")
                     }
+                } header: {
+                    Text("Generated Email")
                 }
             }
         }

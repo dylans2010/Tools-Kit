@@ -14,7 +14,7 @@ struct NotebookSidebarView: View {
     var body: some View {
         List {
             ForEach(liveNotebook.folders) { folder in
-                Section(header: Text(folder.name).font(.caption.bold())) {
+                Section {
                     ForEach(folder.pages) { page in
                         Button {
                             selectedFolder = folder
@@ -31,6 +31,8 @@ struct NotebookSidebarView: View {
                         }
                         .buttonStyle(.plain)
                     }
+                } header: {
+                    Text(folder.name).font(.caption.bold())
                 }
             }
         }

@@ -15,7 +15,7 @@ struct ExtendedTranslationView: View {
 
     var body: some View {
         Form {
-            Section(header: Text("Languages")) {
+            Section {
                 Picker("Source", selection: $backend.sourceLanguage) {
                     ForEach(languages.keys.sorted(), id: \.self) { key in
                         Text(languages[key] ?? key).tag(key)
@@ -30,9 +30,11 @@ struct ExtendedTranslationView: View {
                         Text(languages[key] ?? key).tag(key)
                     }
                 }
+            } header: {
+                Text("Languages")
             }
 
-            Section(header: Text("Input Text or Voice")) {
+            Section {
                 VStack(spacing: 12) {
                     HStack {
                         TextEditor(text: $backend.inputText)
@@ -63,10 +65,12 @@ struct ExtendedTranslationView: View {
                     .disabled(backend.inputText.isEmpty || backend.isProcessing)
                 }
                 .padding(.vertical, 8)
+            } header: {
+                Text("Input Text or Voice")
             }
 
             if !backend.translatedText.isEmpty {
-                Section(header: Text("Translation")) {
+                Section {
                     VStack(alignment: .leading, spacing: 12) {
                         Text(backend.translatedText)
                             .font(.headline)
@@ -86,6 +90,8 @@ struct ExtendedTranslationView: View {
                         }
                     }
                     .padding(.vertical, 8)
+                } header: {
+                    Text("Translation")
                 }
             }
         }

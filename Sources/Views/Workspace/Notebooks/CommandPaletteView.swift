@@ -33,7 +33,7 @@ struct CommandPaletteView: View {
 
                 List {
                     ForEach(groupedActions.keys.sorted(), id: \.self) { category in
-                        Section(header: Text(category)) {
+                        Section {
                             ForEach(groupedActions[category] ?? []) { action in
                                 Button {
                                     // Execute action
@@ -55,6 +55,8 @@ struct CommandPaletteView: View {
                                     }
                                 }
                             }
+                        } header: {
+                            Text(category)
                         }
                     }
                 }

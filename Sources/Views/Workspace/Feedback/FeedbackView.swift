@@ -22,7 +22,7 @@ struct FeedbackView: View {
                 }
             } else {
                 Form {
-                    Section(header: Text("Feedback")) {
+                    Section {
                         TextEditor(text: $message)
                             .frame(minHeight: 140)
                             .overlay(alignment: .topLeading) {
@@ -37,19 +37,25 @@ struct FeedbackView: View {
                         Text("Minimum \(minLength) characters")
                             .font(.caption)
                             .foregroundStyle(isMessageValid ? Color.secondary : Color.red)
+                    } header: {
+                        Text("Feedback")
                     }
 
-                    Section(header: Text("Category")) {
+                    Section {
                         Picker("Category", selection: $selectedCategory) {
                             ForEach(FeedbackCategory.allCases) { category in
                                 Text(category.displayName).tag(category)
                             }
                         }
                         .pickerStyle(.segmented)
+                    } header: {
+                        Text("Category")
                     }
 
-                    Section(header: Text("Visibility")) {
+                    Section {
                         Toggle("Let me view submission status", isOn: $showStatusToUser)
+                    } header: {
+                        Text("Visibility")
                     }
 
                     if let errorMessage {
