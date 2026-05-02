@@ -216,7 +216,7 @@ struct InboxAIFeaturesView: View {
                     .foregroundStyle(.white.opacity(0.9))
                     .lineLimit(1)
 
-                Text(message.body.prefix(100).description)
+                Text(String(message.body.prefix(100)))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)

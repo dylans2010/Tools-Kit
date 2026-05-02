@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 import Combine
 
+@MainActor
 final class SystemAgentViewModel: AgentViewModelProtocol {
     @Published private(set) var messages: [SystemAgentMessage] = []
     @Published private(set) var state: SystemAgentState = .idle
