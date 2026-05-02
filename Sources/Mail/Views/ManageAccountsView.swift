@@ -5,6 +5,12 @@ struct ManageAccountsView: View {
     @StateObject private var mailStore = MailStore.shared
     @State private var loadingProvider: MailAccount.ProviderType?
 
+    var onSelectAccount: ((MailAccount) -> Void)?
+
+    init(onSelectAccount: ((MailAccount) -> Void)? = nil) {
+        self.onSelectAccount = onSelectAccount
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -50,17 +56,24 @@ struct ManageAccountsView: View {
             } else {
                 ForEach(mailStore.accounts) { account in
                     HStack {
-                        providerIconView(for: account.providerType)
+                        HStack {
+                            providerIconView(for: account.providerType)
 
-                        VStack(alignment: .leading) {
-                            Text(account.emailAddress).font(.subheadline.bold())
-                            Text(account.providerType.displayName).font(.caption).foregroundStyle(.secondary)
+                            VStack(alignment: .leading) {
+                                Text(account.emailAddress).font(.subheadline.bold())
+                                Text(account.providerType.displayName).font(.caption).foregroundStyle(.secondary)
+                            }
+
+                            Spacer()
+
+                            if account.isActive {
+                                Text("Active").font(.caption2.bold()).padding(.horizontal, 8).padding(.vertical, 4).background(Color.green.opacity(0.2), in: Capsule()).foregroundStyle(.green)
+                            }
                         }
-
-                        Spacer()
-
-                        if account.isActive {
-                            Text("Active").font(.caption2.bold()).padding(.horizontal, 8).padding(.vertical, 4).background(Color.green.opacity(0.2), in: Capsule()).foregroundStyle(.green)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            onSelectAccount?(account)
+                            dismiss()
                         }
 
                         Button(role: .destructive) {
