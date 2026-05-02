@@ -46,6 +46,7 @@ struct AIChatSettingsView: View {
                 memorySection
                 agentSettingsSection
                 appModeSection
+                keyboardExtensionSection
                 toolVisibilitySection
                 supportSection
                 developerToolsSection
@@ -440,6 +441,61 @@ struct AIChatSettingsView: View {
     }
 
     // MARK: - App Mode Section
+
+    private var keyboardExtensionSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 8) {
+                Label("AI Keyboard Extension", systemImage: "keyboard")
+                    .font(.headline)
+
+                Text("Enable the ToolsKit keyboard to get AI writing assistance in any app.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                Button {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                } label: {
+                    Text("Open System Settings")
+                        .font(.subheadline.bold())
+                }
+                .buttonStyle(.borderedProminent)
+                .padding(.top, 4)
+            }
+            .padding(.vertical, 4)
+
+            NavigationLink {
+                VStack(spacing: 20) {
+                    Image(systemName: "keyboard")
+                        .font(.system(size: 60))
+                        .foregroundColor(.blue)
+
+                    Text("How to Enable")
+                        .font(.title2.bold())
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        StepView(number: 1, text: "Open iOS Settings")
+                        StepView(number: 2, text: "Go to General > Keyboard > Keyboards")
+                        StepView(number: 3, text: "Tap 'Add New Keyboard...'")
+                        StepView(number: 4, text: "Select 'ToolsKit'")
+                        StepView(number: 5, text: "Tap 'ToolsKit' and enable 'Allow Full Access'")
+                    }
+                    .padding()
+
+                    Spacer()
+                }
+                .padding()
+                .navigationTitle("Keyboard Setup")
+            } label: {
+                Label("Setup Instructions", systemImage: "info.circle")
+            }
+        } header: {
+            Text("Keyboard")
+        } footer: {
+            Text("Full access is required for AI features like rewriting and smart suggestions.")
+        }
+    }
 
     private var appModeSection: some View {
         Section {
@@ -1018,6 +1074,26 @@ struct TagFlowLayout<Content: View>: View {
                     content(tag)
                 }
             }
+        }
+    }
+}
+
+struct StepView: View {
+    let number: Int
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Text("\(number)")
+                .font(.caption.bold())
+                .foregroundColor(.white)
+                .frame(width: 24, height: 24)
+                .background(Circle().fill(Color.blue))
+
+            Text(text)
+                .font(.subheadline)
+
+            Spacer()
         }
     }
 }

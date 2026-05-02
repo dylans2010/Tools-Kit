@@ -86,7 +86,7 @@ struct SecurityHomeView: View {
             }
         }
         .sheet(isPresented: $showingAddSheet) {
-            AddItemView()
+            AddInfoView()
         }
         .sheet(isPresented: $showingPackageView) {
             SecurityPackageView()

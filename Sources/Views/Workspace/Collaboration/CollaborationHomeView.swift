@@ -19,6 +19,24 @@ struct CollaborationHomeView: View {
                 }
             }
 
+            Section("Tools & Management") {
+                NavigationLink(destination: PullRequestDashboardView()) {
+                    Label("Pull Requests", systemImage: "arrow.triangle.pull")
+                }
+                NavigationLink(destination: ActivityTimelineView()) {
+                    Label("Activity Timeline", systemImage: "clock.arrow.2.circlepath")
+                }
+                NavigationLink(destination: SpacePublishingView()) {
+                    Label("Distribution & Publishing", systemImage: "paperplane.fill")
+                }
+                NavigationLink(destination: WorkspaceCommandCenterView()) {
+                    Label("Command Center", systemImage: "terminal.fill")
+                }
+                NavigationLink(destination: VersionHistoryView()) {
+                    Label("Version History", systemImage: "clock.fill")
+                }
+            }
+
             Section("Recent Activity") {
                 let recentActivity = manager.spaces.flatMap { $0.activityFeed }.sorted { $0.timestamp > $1.timestamp }.prefix(10)
                 if recentActivity.isEmpty {

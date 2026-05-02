@@ -178,8 +178,16 @@ struct DraftingEmailsView: View {
     private func generate() async {
         isGenerating = true
         do {
-            let prompt = "Write a \(selectedStyle.rawValue) email with the goal of \(selectedGoal.rawValue). Context: \(context)"
-            let result = try await AIService.shared.processText(prompt: prompt)
+            let prompt = """
+            Write a highly effective, \(selectedStyle.rawValue) email.
+            Goal: \(selectedGoal.rawValue)
+            Context: \(context)
+
+            Ensure the tone is perfectly aligned with \(selectedStyle.rawValue) expectations.
+            Include a clear subject line and a strong call to action.
+            Use professional formatting and structure.
+            """
+            let result = try await AIService.shared.processText(prompt: prompt, systemPrompt: "You are an expert executive communications assistant. Your emails are clear, impactful, and follow industry best practices for professional correspondence.")
             await MainActor.run {
                 generatedBody = result
                 isGenerating = false

@@ -124,9 +124,34 @@ struct ManageAccountsView: View {
     }
 
     private func handleProviderTap(_ provider: MailAccount.ProviderType) async {
-        // OAuth simulation
         loadingProvider = provider
-        try? await Task.sleep(nanoseconds: 1_000_000_000)
-        loadingProvider = nil
+
+        do {
+            let account: MailAccount
+            switch provider {
+            case .gmail:
+                account = try await GmailProvider().authenticate()
+            case .outlook:
+                account = try await OutlookProvider().authenticate()
+            case .yahoo:
+                account = try await YahooMailProvider().authenticate()
+            case .proton:
+                account = try await ProtonMailProvider().authenticate()
+            case .icloud:
+                account = try await iCloudMailProvider().authenticate()
+            case .imap:
+                account = try await IMAPProvider().authenticate()
+            }
+
+            await MainActor.run {
+                mailStore.addOrUpdateAccount(account, makeActive: true)
+                loadingProvider = nil
+            }
+        } catch {
+            print("Authentication failed: \(error)")
+            await MainActor.run {
+                loadingProvider = nil
+            }
+        }
     }
 }

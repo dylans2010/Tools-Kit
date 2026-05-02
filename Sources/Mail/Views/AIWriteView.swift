@@ -147,7 +147,17 @@ struct AIWriteView: View {
         isGenerating = true
         errorMessage = nil
         do {
-            let result = try await AIService.shared.processText(prompt: "Write a \(tone.rawValue) \(emailType.rawValue) email about: \(prompt)")
+            let fullPrompt = """
+            Write a \(tone.rawValue) \(emailType.rawValue) email based on this description:
+            \(prompt)
+
+            Guidelines:
+            - Tone: \(tone.rawValue)
+            - Type: \(emailType.rawValue)
+            - Ensure clarity and professionalism.
+            - Use appropriate greetings and sign-offs.
+            """
+            let result = try await AIService.shared.processText(prompt: fullPrompt, systemPrompt: "You are an AI writing assistant specializing in email communications. You help users draft clear, effective, and well-structured emails tailored to their specific needs.")
             await MainActor.run {
                 generatedContent = result
                 isGenerating = false

@@ -140,35 +140,43 @@ struct EmailComposingView: View {
                 DraftingEmailsView(currentBody: messageBody) { result in
                     applyAIDraft(result)
                 }
+                .presentationDetents([.medium, .large])
             }
             .sheet(isPresented: $showingAIWrite) {
                 AIWriteView { generated in
                     insertMarkdown(generated)
                 }
+                .presentationDetents([.medium, .large])
             }
             .sheet(isPresented: $showingTranslateSheet) {
                 TranslateEmailView(sourceText: messageBody) { translated in
                     messageBody = translated
                 }
+                .presentationDetents([.medium, .large])
             }
             .sheet(isPresented: $showingLinkSheet) {
                 linkComposerSheet
+                .presentationDetents([.medium])
             }
             .sheet(isPresented: $showingScheduleSheet) {
                 scheduleSheet
+                .presentationDetents([.medium, .large])
             }
             .sheet(isPresented: $showingTableBuilder) {
                 MailTableView { generatedTable in
                     insertMarkdown(generatedTable)
                 }
+                .presentationDetents([.medium, .large])
             }
             .sheet(isPresented: $showingDocumentScanner) {
                 mailDocumentScannerSheet
+                .presentationDetents([.medium])
             }
             .sheet(isPresented: $showingDrawingSheet) {
                 DrawingBoardView { export in
                     addAttachment(from: export)
                 }
+                .presentationDetents([.large])
             }
             .sheet(isPresented: $showingAttachmentPicker) {
                 FileImporterView(allowedContentTypes: [.data, .image, .pdf, .text], allowsMultipleSelection: true) { urls in
