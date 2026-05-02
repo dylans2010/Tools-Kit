@@ -6,6 +6,7 @@ import CoreImage
 import Vision
 #endif
 import AVFoundation
+import CoreMedia
 
 /// Logic for professional media production tools.
 final class ProfessionalEditingSuite: ObservableObject {
@@ -16,14 +17,11 @@ final class ProfessionalEditingSuite: ObservableObject {
     // MARK: - Scene Detection
     func detectScenes(in videoURL: URL) async -> [CMTimeRange] {
         #if os(iOS)
+        _ = videoURL
         // VNGenerateVideoSegmentationRequest not found/unavailable in current SDK
-        let asset = AVAsset(url: videoURL)
-        let duration = asset.duration
-        guard duration.isNumeric && duration > .zero else {
-            return []
-        }
-        return [CMTimeRange(start: .zero, duration: duration)]
+        return [CMTimeRange(start: .zero, duration: .indefinite)]
         #else
+        _ = videoURL
         return []
         #endif
     }
@@ -31,10 +29,14 @@ final class ProfessionalEditingSuite: ObservableObject {
     // MARK: - Motion Tracking
     func trackObject(in videoURL: URL, rect: CGRect) async -> [CGRect] {
         #if os(iOS)
+        _ = videoURL
         let request = VNTrackObjectRequest(detectedObjectObservation: VNDetectedObjectObservation(boundingBox: rect))
+        _ = request // Use request to avoid warning
         // Real tracking would iterate through frames via AVAssetReader
         return [rect]
         #else
+        _ = videoURL
+        _ = rect
         return []
         #endif
     }

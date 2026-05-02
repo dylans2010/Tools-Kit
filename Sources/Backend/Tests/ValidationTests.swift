@@ -1,6 +1,7 @@
 import Foundation
 
 /// Internal validation tests to ensure core logic is functional across refactored modules.
+@MainActor
 struct ValidationTests {
     static func runAll() {
         print("Starting System Validation Tests...")

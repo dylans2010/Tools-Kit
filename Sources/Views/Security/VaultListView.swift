@@ -1,4 +1,7 @@
 import SwiftUI
+#if os(iOS)
+import UIKit
+#endif
 
 struct VaultListView: View {
     let category: VaultCategory
@@ -103,9 +106,15 @@ struct VaultItemDetailView: View {
                     if let expiry = doc.expirationDate {
                         LabeledContent("Expires", value: expiry, format: .date)
                     }
-                    Text("No preview available for this document type")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    if let image = UIImage(data: data) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                    } else {
+                        Text("No preview available for this document type")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 } header: {
                     Text("Document Info")
                 }

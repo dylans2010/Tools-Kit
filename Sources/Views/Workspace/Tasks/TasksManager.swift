@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 
+@MainActor
 final class TasksManager: ObservableObject {
     static let shared = TasksManager()
 
