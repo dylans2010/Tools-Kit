@@ -48,7 +48,7 @@ struct EditingHomeView: View {
                 NavigationLink(destination: ExportQueueView()) {
                     Label("Export Queue", systemImage: "square.and.arrow.up.fill")
                 }
-                NavigationLink(destination: BatchProcessingView()) {
+                NavigationLink(destination: BatchProcessingView(projects: manager.projects)) {
                     Label("Batch Processing", systemImage: "square.stack.3d.down.right.fill")
                 }
             }
