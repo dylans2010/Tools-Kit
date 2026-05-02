@@ -55,7 +55,7 @@ struct SpaceDashboardView: View {
         case 4: DecisionEngineView(spaceID: space.id)
         case 5: SpaceObjectsList(title: "Sheets", ids: space.spreadsheetIDs, icon: "tablecells")
         case 6: SpaceObjectsList(title: "Media Projects", ids: space.mediaProjectIDs, icon: "photo.on.rectangle")
-        case 7: VersionHistoryView(spaceID: space.id)
+        case 7: SpaceVersionHistoryView(spaceID: space.id)
         case 8: Text("Settings Content")
         default: EmptyView()
         }
