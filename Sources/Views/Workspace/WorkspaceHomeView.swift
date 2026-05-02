@@ -653,42 +653,43 @@ struct WorkspaceMailRouterView: View {
     @State private var showingManageAccounts = false
 
     var body: some View {
-        Group {
-            if mailStore.activeAccount != nil {
-                UniversalInboxView()
-            } else {
-                ContentUnavailableView(
-                    "No Mail Account Connected",
-                    systemImage: "envelope.badge",
-                    description: Text("Add an account to open Inbox as your default mail workspace.")
-                )
-                .navigationTitle("Mail")
-                .navigationBarItems(
-                    trailing: HStack(spacing: 16) {
-                        Button {
-                        } label: {
-                            Image(systemName: "square.and.pencil")
-                        }
-                        .disabled(true)
-                        .accessibilityLabel("Compose unavailable without mail account")
-
-                        Button {
-                            showingManageAccounts = true
-                        } label: {
-                            Image(systemName: "person.crop.circle.badge.gearshape")
-                        }
+        if mailStore.activeAccount != nil {
+            UniversalInboxView()
+                .onAppear {
+                    mailStore.reloadAccounts()
+                }
+        } else {
+            ContentUnavailableView(
+                "No Mail Account Connected",
+                systemImage: "envelope.badge",
+                description: Text("Add an account to open Inbox as your default mail workspace.")
+            )
+            .navigationTitle("Mail")
+            .navigationBarItems(
+                trailing: HStack(spacing: 16) {
+                    Button {
+                    } label: {
+                        Image(systemName: "square.and.pencil")
                     }
-                )
-                .sheet(isPresented: $showingManageAccounts) {
-                    ManageAccountsView { selectedAccount in
-                        mailStore.setActiveAccount(selectedAccount.id)
-                        mailStore.reloadAccounts()
+                    .disabled(true)
+                    .accessibilityLabel("Compose unavailable without mail account")
+
+                    Button {
+                        showingManageAccounts = true
+                    } label: {
+                        Image(systemName: "person.crop.circle.badge.gearshape")
                     }
                 }
+            )
+            .sheet(isPresented: $showingManageAccounts) {
+                ManageAccountsView { selectedAccount in
+                    mailStore.setActiveAccount(selectedAccount.id)
+                    mailStore.reloadAccounts()
+                }
             }
-        }
-        .onAppear {
-            mailStore.reloadAccounts()
+            .onAppear {
+                mailStore.reloadAccounts()
+            }
         }
     }
 }

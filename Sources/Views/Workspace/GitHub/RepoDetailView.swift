@@ -77,9 +77,9 @@ struct RepoDetailView: View {
                 .padding(.leading, 4)
 
             HStack(spacing: 12) {
-                StatCard(title: "Stars", value: "\(repository.stargazersCount)", icon: "star.fill", color: .yellow)
-                StatCard(title: "Forks", value: "\(repository.forksCount)", icon: "arrow.triangle.branch", color: .green)
-                StatCard(title: "Watchers", value: "\(repository.watchersCount)", icon: "eye.fill", color: .purple)
+                RepoStatCard(title: "Stars", value: "\(repository.stargazersCount)", icon: "star.fill", color: .yellow)
+                RepoStatCard(title: "Forks", value: "\(repository.forksCount)", icon: "arrow.triangle.branch", color: .green)
+                RepoStatCard(title: "Watchers", value: "\(repository.watchersCount)", icon: "eye.fill", color: .purple)
             }
         }
     }
@@ -122,7 +122,7 @@ struct RepoDetailView: View {
     }
 }
 
-private struct StatCard: View {
+private struct RepoStatCard: View {
     let title: String
     let value: String
     let icon: String

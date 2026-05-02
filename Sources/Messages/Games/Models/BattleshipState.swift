@@ -16,4 +16,13 @@ struct BattleshipState: Codable {
         self.player2ShipsPlaced = false
         self.isPlayer1Turn = true
     }
+
+    init(base: GameState, player1Board: [Int], player2Board: [Int], player1ShipsPlaced: Bool, player2ShipsPlaced: Bool, isPlayer1Turn: Bool) {
+        self.base = base
+        self.player1Board = player1Board
+        self.player2Board = player2Board
+        self.player1ShipsPlaced = player1ShipsPlaced
+        self.player2ShipsPlaced = player2ShipsPlaced
+        self.isPlayer1Turn = isPlayer1Turn
+    }
 }
