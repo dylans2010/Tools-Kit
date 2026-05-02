@@ -32,7 +32,7 @@ struct CollaborationHomeView: View {
                 NavigationLink(destination: WorkspaceCommandCenterView()) {
                     Label("Command Center", systemImage: "terminal.fill")
                 }
-                NavigationLink(destination: VersionHistoryView()) {
+                NavigationLink(destination: SpaceVersionHistoryView()) {
                     Label("Version History", systemImage: "clock.fill")
                 }
             }

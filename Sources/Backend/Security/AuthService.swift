@@ -2,6 +2,9 @@ import Foundation
 import LocalAuthentication
 import CryptoKit
 import Combine
+#if canImport(UIKit)
+import UIKit
+#endif
 
 class AuthService: ObservableObject {
     static let shared = AuthService()
@@ -120,7 +123,7 @@ class AuthService: ObservableObject {
         let tag = vmkSecureEnclaveTag.data(using: .utf8)!
         let query: [CFString: Any] = [
             kSecClass: kSecClassKey,
-            kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandomGF2P256,
+            kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandom,
             kSecAttrKeySizeInBits: 256,
             kSecAttrTokenID: kSecAttrTokenIDSecureEnclave,
             kSecPrivateKeyAttrs: [
@@ -148,7 +151,7 @@ class AuthService: ObservableObject {
         let query: [CFString: Any] = [
             kSecClass: kSecClassKey,
             kSecAttrApplicationTag: tag,
-            kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandomGF2P256,
+            kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandom,
             kSecReturnRef: true
         ]
 
@@ -182,6 +185,7 @@ class AuthService: ObservableObject {
             }
             .store(in: &cancellables)
 
+        #if canImport(UIKit)
         NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)
             .sink { [weak self] _ in
                 self?.logout()
@@ -193,6 +197,7 @@ class AuthService: ObservableObject {
                 self?.updateActivity()
             }
             .store(in: &cancellables)
+        #endif
     }
 
     private func checkAutoLock() {

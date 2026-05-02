@@ -74,7 +74,7 @@ struct FullEditorView: View {
             toolButton(icon: "slider.horizontal.3", name: "Adjust") {}
         }
         .padding()
-        .background(BlurView(style: .systemThinMaterialDark))
+        .background(EditorBlurView(style: .systemThinMaterialDark))
         .cornerRadius(20)
         .padding(.bottom)
     }
@@ -136,7 +136,7 @@ struct EditingEngineRepresentable: UIViewRepresentable {
     }
 }
 
-struct BlurView: UIViewRepresentable {
+struct EditorBlurView: UIViewRepresentable {
     let style: UIBlurEffect.Style
     func makeUIView(context: Context) -> UIVisualEffectView {
         UIVisualEffectView(effect: UIBlurEffect(style: style))
@@ -150,7 +150,7 @@ struct EditingEngineRepresentable: View {
         EditingEngine()
     }
 }
-struct BlurView: View {
+struct EditorBlurView: View {
     enum Style { case systemThinMaterialDark }
     let style: Style
     var body: some View {

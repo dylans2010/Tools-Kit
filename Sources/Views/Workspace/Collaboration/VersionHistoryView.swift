@@ -1,11 +1,12 @@
 import SwiftUI
 
-struct VersionHistoryView: View {
-    let spaceID: UUID
+struct SpaceVersionHistoryView: View {
+    var spaceID: UUID?
     @StateObject private var manager = CollaborationManager.shared
 
     private var space: CollaborationSpace? {
-        manager.spaces.first { $0.id == spaceID }
+        guard let spaceID else { return nil }
+        return manager.spaces.first { $0.id == spaceID }
     }
 
     var body: some View {
@@ -14,10 +15,12 @@ struct VersionHistoryView: View {
                 Text("History")
                     .font(.headline)
                 Spacer()
-                NavigationLink("Manage Branches") {
-                    BranchManagementUI(spaceID: spaceID)
+                if let spaceID {
+                    NavigationLink("Manage Branches") {
+                        BranchManagementUI(spaceID: spaceID)
+                    }
+                    .font(.subheadline)
                 }
-                .font(.subheadline)
             }
             .padding()
 
@@ -50,10 +53,12 @@ struct VersionHistoryView: View {
                                 .foregroundColor(.blue)
                         }
                         .swipeActions {
-                            Button("Revert") {
-                                manager.revertToCommit(spaceID: spaceID, branchID: space?.currentBranchID ?? UUID(), commitID: commit.id)
+                            if let spaceID {
+                                Button("Revert") {
+                                    manager.revertToCommit(spaceID: spaceID, branchID: space?.currentBranchID ?? UUID(), commitID: commit.id)
+                                }
+                                .tint(.orange)
                             }
-                            .tint(.orange)
                         }
                     }
                 }
