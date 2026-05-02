@@ -16,10 +16,7 @@ final class ProfessionalEditingSuite: ObservableObject {
     // MARK: - Scene Detection
     func detectScenes(in videoURL: URL) async -> [CMTimeRange] {
         #if os(iOS)
-        let request = VNGenerateVideoSegmentationRequest()
-        let handler = VNImageRequestHandler(url: videoURL, options: [:])
-        try? handler.perform([request])
-        // Simplified for now: returning a single range if no complex detection
+        // VNGenerateVideoSegmentationRequest not found/unavailable in current SDK
         return [CMTimeRange(start: .zero, duration: .indefinite)]
         #else
         return []
@@ -29,7 +26,7 @@ final class ProfessionalEditingSuite: ObservableObject {
     // MARK: - Motion Tracking
     func trackObject(in videoURL: URL, rect: CGRect) async -> [CGRect] {
         #if os(iOS)
-        let request = VNTrackObjectRequest(initialObservation: VNDetectedObjectObservation(boundingBox: rect))
+        let request = VNTrackObjectRequest(detectedObjectObservation: VNDetectedObjectObservation(boundingBox: rect))
         // Real tracking would iterate through frames via AVAssetReader
         return [rect]
         #else

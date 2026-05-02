@@ -57,9 +57,9 @@ final class ExecutionBridge {
             id: UUID(),
             title: title,
             description: description,
-            createdAt: Date(),
+            priority: .medium,
             completed: false,
-            priority: .medium
+            createdAt: Date()
         )
 
         await MainActor.run {

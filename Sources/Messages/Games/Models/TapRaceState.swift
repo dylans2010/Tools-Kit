@@ -14,4 +14,12 @@ struct TapRaceState: Codable {
         self.isPlayer1Turn = true
         self.isFinished = false
     }
+
+    init(base: GameState, player1Taps: Int, player2Taps: Int, isPlayer1Turn: Bool, isFinished: Bool) {
+        self.base = base
+        self.player1Taps = player1Taps
+        self.player2Taps = player2Taps
+        self.isPlayer1Turn = isPlayer1Turn
+        self.isFinished = isFinished
+    }
 }

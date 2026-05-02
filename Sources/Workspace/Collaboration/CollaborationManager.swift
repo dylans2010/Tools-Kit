@@ -150,7 +150,7 @@ final class CollaborationManager: ObservableObject {
 
     // MARK: - Persistence
 
-    private func saveData() {
+    func saveData() {
         do {
             try WorkspacePersistence.shared.save(spaces, to: spacesFile)
             try WorkspacePersistence.shared.save(commits, to: commitsFile)
