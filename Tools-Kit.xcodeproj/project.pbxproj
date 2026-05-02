@@ -133,6 +133,7 @@
 		GH0200000000000000000019 /* WorkflowRunView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0100000000000000000019 /* WorkflowRunView.swift */; };
 		GH020000000000000000001A /* WorkflowLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH010000000000000000001A /* WorkflowLogsView.swift */; };
 		RP0200000000000000000001 /* RepoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RP0100000000000000000001 /* RepoListView.swift */; };
+		RP0200000000000000000002 /* RepoDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RP0100000000000000000002 /* RepoDetailView.swift */; };
 		NBDB02000000000000000001 /* NotebookDatabaseEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = NBDB01000000000000000001 /* NotebookDatabaseEngine.swift */; };
 		NBTB02000000000000000001 /* NotebookTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NBTB01000000000000000001 /* NotebookTableView.swift */; };
 		ML0200000000000000000001 /* IMAPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000001 /* IMAPClient.swift */; };
@@ -1131,6 +1132,7 @@
 		GH0100000000000000000019 /* WorkflowRunView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/Actions/WorkflowRunView.swift; sourceTree = "<group>"; };
 		GH010000000000000000001A /* WorkflowLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/Actions/WorkflowLogsView.swift; sourceTree = "<group>"; };
 		RP0100000000000000000001 /* RepoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/RepoListView.swift; sourceTree = "<group>"; };
+		RP0100000000000000000002 /* RepoDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/GitHub/RepoDetailView.swift; sourceTree = "<group>"; };
 		NBDB01000000000000000001 /* NotebookDatabaseEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Workspace/Notebooks/NotebookDatabaseEngine.swift; sourceTree = "<group>"; };
 		NBTB01000000000000000001 /* NotebookTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Notebooks/DatabaseViews/NotebookTableView.swift; sourceTree = "<group>"; };
 		ML0100000000000000000001 /* IMAPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/IMAPClient.swift; sourceTree = "<group>"; };
@@ -2560,6 +2562,7 @@
 				GH0100000000000000000019 /* WorkflowRunView.swift */,
 				GH010000000000000000001A /* WorkflowLogsView.swift */,
 				RP0100000000000000000001 /* RepoListView.swift */,
+				RP0100000000000000000002 /* RepoDetailView.swift */,
 				3C56AB0076964B928FF538B1 /* AgentModels.swift */,
 				A80100000000000000000001 /* AgentSessionState.swift */,
 				AF0100000000000000000002 /* AgentExecutionEvents.swift */,
@@ -3853,6 +3856,12 @@
 				IW0200000000000000000001 /* WorkspaceColorManager.swift in Sources */,
 				IW0200000000000000000002 /* WorkspaceSurfaceCard.swift in Sources */,
 				EX0200000000000000000001 /* ExecutionBridge.swift in Sources */,
+				CL0200000000000000000000 /* CollaborationModels.swift in Sources */,
+				CL0200000000000000000001 /* CollaborationManager.swift in Sources */,
+				CL0200000000000000000002 /* CollaborationFramework.swift in Sources */,
+				ED0200000000000000000003 /* EditingModels.swift in Sources */,
+				ED0200000000000000000004 /* EditingManager.swift in Sources */,
+				ED0200000000000000000005 /* EditingEngine.swift in Sources */,
 				CL020000000000000000000003 /* PullRequestManager.swift in Sources */,
 				CL020000000000000000000004 /* ForkManager.swift in Sources */,
 				CL020000000000000000000005 /* BranchProtectionService.swift in Sources */,
@@ -3905,6 +3914,7 @@
 				GH0200000000000000000019 /* WorkflowRunView.swift in Sources */,
 				GH020000000000000000001A /* WorkflowLogsView.swift in Sources */,
 				RP0200000000000000000001 /* RepoListView.swift in Sources */,
+				RP0200000000000000000002 /* RepoDetailView.swift in Sources */,
 				28D75A425E6C4DAA80A0DBC8 /* AgentModels.swift in Sources */,
 				A80200000000000000000001 /* AgentSessionState.swift in Sources */,
 				AF0200000000000000000002 /* AgentExecutionEvents.swift in Sources */,

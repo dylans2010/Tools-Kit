@@ -99,7 +99,7 @@ struct VaultItemDetailView: View {
         case .documents:
             if let data = decryptedData, let doc = try? JSONDecoder().decode(DocumentData.self, from: data) {
                 Group {
-                    Section("Document Info") {
+                    Section {
                         LabeledContent("Type", value: doc.documentType)
                         if let expiry = doc.expirationDate {
                             LabeledContent("Expires", value: expiry, format: .date)
@@ -113,6 +113,8 @@ struct VaultItemDetailView: View {
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
+                    } header: {
+                        Text("Document Info")
                     }
                 }
             }

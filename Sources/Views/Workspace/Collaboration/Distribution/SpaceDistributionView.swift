@@ -59,17 +59,19 @@ struct ExternalInviteView: View {
 
     var body: some View {
         Form {
-            Section("Invite Guests") {
+            Section {
                 Text("Generate a temporary access link for external collaborators.")
                     .font(.caption)
 
                 Button("Generate 24h Editor Link") {
                     inviteLink = manager.generateInviteLink(spaceID: spaceID, role: .editor, duration: 86400)
                 }
+            } header: {
+                Text("Invite Guests")
             }
 
             if let link = inviteLink {
-                Section("Your Link") {
+                Section {
                     Text(link)
                         .font(.system(.caption, design: .monospaced))
                     Button("Copy to Clipboard") {
@@ -80,6 +82,8 @@ struct ExternalInviteView: View {
                         NSPasteboard.general.setString(link, forType: .string)
                         #endif
                     }
+                } header: {
+                    Text("Your Link")
                 }
             }
         }

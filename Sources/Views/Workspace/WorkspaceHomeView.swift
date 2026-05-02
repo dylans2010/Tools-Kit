@@ -654,7 +654,7 @@ struct WorkspaceMailRouterView: View {
 
     var body: some View {
         Group {
-            if let active = mailStore.activeAccount {
+            if mailStore.activeAccount != nil {
                 UniversalInboxView()
             } else {
                 ContentUnavailableView(

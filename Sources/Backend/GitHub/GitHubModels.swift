@@ -12,6 +12,7 @@ struct GitHubRepository: Codable, Identifiable, Hashable {
     let forksCount: Int
     let watchersCount: Int
     let defaultBranch: String
+    let language: String?
     let `private`: Bool
     let updatedAt: Date
 
@@ -23,6 +24,7 @@ struct GitHubRepository: Codable, Identifiable, Hashable {
         case forksCount = "forks_count"
         case watchersCount = "watchers_count"
         case defaultBranch = "default_branch"
+        case language
         case `private`
         case updatedAt = "updated_at"
     }
