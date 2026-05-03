@@ -26,9 +26,9 @@ struct PluginMarketplaceView: View {
             // Header stats
             Section {
                 HStack(spacing: 20) {
-                    StatPill(value: "\(manager.availablePlugins.count)", label: "Available", color: .blue)
-                    StatPill(value: "\(manager.installedPlugins.count)", label: "Installed", color: .green)
-                    StatPill(value: "\(manager.installedPlugins.filter { $0.isEnabled }.count)", label: "Active", color: .orange)
+                    StatPill(label: "Available", value: "\(manager.availablePlugins.count)", color: .blue)
+                    StatPill(label: "Installed", value: "\(manager.installedPlugins.count)", color: .green)
+                    StatPill(label: "Active", value: "\(manager.installedPlugins.filter { $0.isEnabled }.count)", color: .orange)
                 }
             }
 

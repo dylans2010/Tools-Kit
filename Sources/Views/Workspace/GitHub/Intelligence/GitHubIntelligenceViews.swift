@@ -145,7 +145,7 @@ struct WorkflowBuilderView: View {
         .sheet(isPresented: $showingCreate) {
             CreateWorkflowView()
         }
-        .sheet(item: $selectedWorkflow) { wf in
+        .sheet(item: $selectedWorkflow) { (wf: WorkflowBuilderService.WorkflowDefinition) in
             WorkflowEditorView(workflowID: wf.id)
         }
         .sheet(isPresented: $showingSimLog) {
