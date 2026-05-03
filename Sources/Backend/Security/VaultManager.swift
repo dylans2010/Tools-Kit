@@ -72,7 +72,9 @@ class VaultManager: ObservableObject {
     }
 
     func deleteItem(_ item: VaultItem) {
-        SecureFileStorageService.shared.deleteFile(filename: item.payloadIdentifier)
+        Task {
+            await SecureFileStorageService.shared.deleteFile(filename: item.payloadIdentifier)
+        }
         items.removeAll { $0.id == item.id }
         saveIndex()
     }

@@ -73,6 +73,12 @@
 		CL0200000000000000000007 /* SpaceDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000007 /* SpaceDashboardView.swift */; };
 		CL0200000000000000000008 /* VersionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000008 /* VersionHistoryView.swift */; };
 		CL0200000000000000000009 /* AddDataCollabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000009 /* AddDataCollabView.swift */; };
+		CL020000000000000000000A /* WorkspaceAutomationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000A /* WorkspaceAutomationEngine.swift */; };
+		CL020000000000000000000B /* ContentGraphService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000B /* ContentGraphService.swift */; };
+		CL020000000000000000000C /* WorkspaceSnapshotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000C /* WorkspaceSnapshotService.swift */; };
+		CL020000000000000000000D /* WorkspaceServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000D /* WorkspaceServices.swift */; };
+		CL020000000000000000000E /* CommandEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000E /* CommandEngine.swift */; };
+		CL020000000000000000000F /* PluginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000F /* PluginManager.swift */; };
 		ED020000000000000000000A /* EditingHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000A /* EditingHomeView.swift */; };
 		ED020000000000000000000B /* FullEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000B /* FullEditorView.swift */; };
 		VT0200000000000000000001 /* ValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = VT0100000000000000000001 /* ValidationTests.swift */; };
@@ -1105,6 +1111,12 @@
 		CL0100000000000000000007 /* SpaceDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Collaboration/SpaceDashboardView.swift; sourceTree = "<group>"; };
 		CL0100000000000000000008 /* VersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Collaboration/VersionHistoryView.swift; sourceTree = "<group>"; };
 		CL0100000000000000000009 /* AddDataCollabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Collaboration/AddDataCollabView.swift; sourceTree = "<group>"; };
+		CL010000000000000000000A /* WorkspaceAutomationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Collaboration/WorkspaceAutomationEngine.swift; sourceTree = "<group>"; };
+		CL010000000000000000000B /* ContentGraphService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Collaboration/ContentGraphService.swift; sourceTree = "<group>"; };
+		CL010000000000000000000C /* WorkspaceSnapshotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Collaboration/WorkspaceSnapshotService.swift; sourceTree = "<group>"; };
+		CL010000000000000000000D /* WorkspaceServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Collaboration/WorkspaceServices.swift; sourceTree = "<group>"; };
+		CL010000000000000000000E /* CommandEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/CommandPalette/CommandEngine.swift; sourceTree = "<group>"; };
+		CL010000000000000000000F /* PluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Plugins/PluginManager.swift; sourceTree = "<group>"; };
 		ED010000000000000000000A /* EditingHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Editing/EditingHomeView.swift; sourceTree = "<group>"; };
 		ED010000000000000000000B /* FullEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Editing/FullEditorView.swift; sourceTree = "<group>"; };
 		3C4B3171C5B7494C8A67B0CF /* AgentResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentResultView.swift; sourceTree = "<group>"; };
@@ -3282,6 +3294,12 @@
 				CL0100000000000000000007 /* SpaceDashboardView.swift */,
 				CL0100000000000000000008 /* VersionHistoryView.swift */,
 				CL0100000000000000000009 /* AddDataCollabView.swift */,
+				CL010000000000000000000A /* WorkspaceAutomationEngine.swift */,
+				CL010000000000000000000B /* ContentGraphService.swift */,
+				CL010000000000000000000C /* WorkspaceSnapshotService.swift */,
+				CL010000000000000000000D /* WorkspaceServices.swift */,
+				CL010000000000000000000E /* CommandEngine.swift */,
+				CL010000000000000000000F /* PluginManager.swift */,
 				ED010000000000000000000A /* EditingHomeView.swift */,
 				ED010000000000000000000B /* FullEditorView.swift */,
 				TH0100000000000000000001 /* Theme.swift */,
@@ -5053,7 +5071,13 @@
 				AA1000000000000000000014 /* PluginMarketplaceView.swift in Sources */,
 				AA1000000000000000000016 /* LocalGitEngineView.swift in Sources */,
 				AA1000000000000000000018 /* GitHubIntelligenceViews.swift in Sources */,
-				AA100000000000000000001A /* GitHubToolPanelViews.swift in Sources */,);
+				AA100000000000000000001A /* GitHubToolPanelViews.swift in Sources */,
+				CL020000000000000000000A /* WorkspaceAutomationEngine.swift in Sources */,
+				CL020000000000000000000B /* ContentGraphService.swift in Sources */,
+				CL020000000000000000000C /* WorkspaceSnapshotService.swift in Sources */,
+				CL020000000000000000000D /* WorkspaceServices.swift in Sources */,
+				CL020000000000000000000E /* CommandEngine.swift in Sources */,
+				CL020000000000000000000F /* PluginManager.swift in Sources */,);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
