@@ -1,5 +1,4 @@
 import SwiftUI
-import Workspace
 
 struct TasksHomeView: View {
     @StateObject private var manager = TasksManager.shared
