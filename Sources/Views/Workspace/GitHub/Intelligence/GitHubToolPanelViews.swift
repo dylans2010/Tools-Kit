@@ -150,8 +150,8 @@ struct ReleaseManagerView: View {
                 Button {
                     // In production this would call GitHubAPIClient to create the release.
                     // For now, stage it as a commit and notify.
-                    engine.stageChange(filePath: "CHANGELOG.md", original: "", modified: releaseBody, changeType: .added)
-                    WorkspaceNotificationService.shared.post(title: "Release Staged", body: "\(tagName) staged locally. Push to create on GitHub.", category: .update)
+                    engine.stageChange(filePath: "CHANGELOG.md", original: "", modified: releaseBody, changeType: GitEngineService.ChangeType.added)
+                    WorkspaceNotificationService.shared.post(title: "Release Staged", body: "\(tagName) staged locally. Push to create on GitHub.", category: WorkspaceNotificationService.NotificationCategory.update)
                     tagName = ""; releaseName = ""; releaseBody = ""
                 } label: {
                     Label("Stage Release", systemImage: "tray.and.arrow.up.fill")
@@ -165,12 +165,12 @@ struct ReleaseManagerView: View {
     }
 
     private func generateNotes() -> String {
-        let commits = engine.localCommits.filter { $0.status != .pushed }.prefix(20)
+        let commits = engine.localCommits.filter { $0.status != GitEngineService.CommitStatus.pushed }.prefix(20)
         if commits.isEmpty { return "No new commits since last release." }
         var notes = "## What's Changed\n\n"
-        let features = commits.filter { $0.category == .feature }
-        let bugfixes = commits.filter { $0.category == .bugfix }
-        let others = commits.filter { ![.feature, .bugfix].contains($0.category) }
+        let features = commits.filter { $0.category == GitEngineService.CommitCategory.feature }
+        let bugfixes = commits.filter { $0.category == GitEngineService.CommitCategory.bugfix }
+        let others = commits.filter { ![GitEngineService.CommitCategory.feature, GitEngineService.CommitCategory.bugfix].contains($0.category) }
         if !features.isEmpty {
             notes += "### Features\n"
             for c in features { notes += "- \(c.message)\n" }
@@ -293,12 +293,14 @@ struct BranchIntelligenceView: View {
 
     var body: some View {
         List {
-            Section("Branch Overview") {
+            Section {
                 Text("Connected to \(owner)/\(repo)")
                     .font(.caption).foregroundStyle(.secondary)
+            } header: {
+                Text("Branch Overview")
             }
 
-            Section("Merge Simulation") {
+            Section {
                 Text("Select two local commits to simulate a merge conflict preview.")
                     .font(.caption).foregroundStyle(.secondary)
 
@@ -325,9 +327,11 @@ struct BranchIntelligenceView: View {
                 } else {
                     Text("Need at least 2 local commits to simulate.").font(.caption).foregroundStyle(.secondary)
                 }
+            } header: {
+                Text("Merge Simulation")
             }
 
-            Section("Divergence Visualization") {
+            Section {
                 let grouped = Dictionary(grouping: gitEngine.localCommits, by: { $0.branch })
                 ForEach(Array(grouped.keys.sorted()), id: \.self) { branch in
                     HStack {
@@ -337,6 +341,8 @@ struct BranchIntelligenceView: View {
                         Text("\(grouped[branch]?.count ?? 0) commits").font(.caption2).foregroundStyle(.secondary)
                     }
                 }
+            } header: {
+                Text("Divergence Visualization")
             }
         }
         .navigationTitle("Branch Intelligence")
