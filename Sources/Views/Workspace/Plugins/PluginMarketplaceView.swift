@@ -1,4 +1,5 @@
 import SwiftUI
+import Workspace
 
 // MARK: - Plugin Marketplace
 
@@ -254,21 +255,5 @@ struct InstalledPluginsView: View {
                 }
             }
         }
-    }
-}
-
-// MARK: - Helper
-
-struct StatPill: View {
-    let value: String
-    let label: String
-    let color: Color
-
-    var body: some View {
-        VStack(spacing: 2) {
-            Text(value).font(.title2.bold()).foregroundStyle(color)
-            Text(label).font(.caption2).foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
     }
 }

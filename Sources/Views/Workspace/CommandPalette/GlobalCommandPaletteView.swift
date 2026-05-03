@@ -1,4 +1,5 @@
 import SwiftUI
+import Workspace
 
 // MARK: - Global Command Palette Overlay
 
@@ -151,7 +152,7 @@ struct GlobalCommandPaletteView: View {
 
     private func dismiss() {
         query = ""
-        lastResult = nil
+        lastResult = (nil as CommandResult?)
         showingResult = false
         isPresented = false
     }

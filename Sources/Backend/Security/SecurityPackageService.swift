@@ -26,7 +26,7 @@ class SecurityPackageService {
 
         let exportKey = try EncryptionService.shared.deriveKey(password: password, salt: salt)
         let items = await VaultManager.shared.items
-        let sessionKey = AuthService.shared.sessionKey!
+        let sessionKey = await MainActor.run { AuthService.shared.sessionKey }!
 
         // 1. Build shard table and collect encrypted shards
         var shardIndices: [String: SecureFileStorageService.ShardIndex] = [:]

@@ -1,4 +1,5 @@
 import SwiftUI
+import Workspace
 
 struct TasksHomeView: View {
     @StateObject private var manager = TasksManager.shared
@@ -42,7 +43,9 @@ struct TasksHomeView: View {
     }
 
     private var compactHeader: some View {
-        WorkspaceSurfaceCard {
+        let categories: [TaskCategory] = manager.categories
+        let selectedCategoryID: UUID? = filterCategory?.id
+        return WorkspaceSurfaceCard {
             VStack(spacing: 10) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
@@ -82,9 +85,9 @@ struct TasksHomeView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         FilterChip(title: "All", isSelected: filterCategory == nil) { filterCategory = nil }
-                        ForEach(manager.categories) { cat in
-                            FilterChip(title: cat.name, color: Color(hex: cat.colorHex) ?? .blue, isSelected: filterCategory?.id == cat.id) {
-                                filterCategory = (filterCategory?.id == cat.id) ? nil : cat
+                        ForEach(categories) { cat in
+                            FilterChip(title: cat.name, color: Color(hex: cat.colorHex) ?? .blue, isSelected: selectedCategoryID == cat.id) {
+                                filterCategory = (selectedCategoryID == cat.id) ? nil : cat
                             }
                         }
                     }
@@ -160,9 +163,9 @@ struct TasksHomeView: View {
 
     private var summaryCards: some View {
         HStack(spacing: 8) {
-            StatPill(label: "Today", value: "\(manager.todayTasks.count)", color: .blue)
-            StatPill(label: "Upcoming", value: "\(manager.upcomingTasks.count)", color: .orange)
-            StatPill(label: "Completed", value: "\(manager.completedTasks.count)", color: .green)
+            StatPill(value: "\(manager.todayTasks.count)", label: "Today", color: .blue)
+            StatPill(value: "\(manager.upcomingTasks.count)", label: "Upcoming", color: .orange)
+            StatPill(value: "\(manager.completedTasks.count)", label: "Completed", color: .green)
         }
     }
 
