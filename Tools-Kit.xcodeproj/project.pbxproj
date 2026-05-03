@@ -3933,6 +3933,12 @@
 				ED0200000000000000000003 /* EditingModels.swift in Sources */,
 				ED0200000000000000000004 /* EditingManager.swift in Sources */,
 				ED0200000000000000000005 /* EditingEngine.swift in Sources */,
+				CL0200000000000000000006 /* CollaborationHomeView.swift in Sources */,
+				CL0200000000000000000007 /* SpaceDashboardView.swift in Sources */,
+				CL0200000000000000000008 /* VersionHistoryView.swift in Sources */,
+				CL0200000000000000000009 /* AddDataCollabView.swift in Sources */,
+				ED020000000000000000000A /* EditingHomeView.swift in Sources */,
+				ED020000000000000000000B /* FullEditorView.swift in Sources */,
 				CL020000000000000000000003 /* PullRequestManager.swift in Sources */,
 				CL020000000000000000000004 /* ForkManager.swift in Sources */,
 				CL020000000000000000000005 /* BranchProtectionService.swift in Sources */,
@@ -4983,7 +4989,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				INFOPLIST_FILE = Messages/Info.plist;
+				INFOPLIST_FILE = Sources/Messages/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5003,7 +5009,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				INFOPLIST_FILE = Messages/Info.plist;
+				INFOPLIST_FILE = Sources/Messages/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5043,7 +5049,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				INFOPLIST_FILE = Keyboard/Info.plist;
+				INFOPLIST_FILE = Sources/Keyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5063,7 +5069,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				INFOPLIST_FILE = Keyboard/Info.plist;
+				INFOPLIST_FILE = Sources/Keyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

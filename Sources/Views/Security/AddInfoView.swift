@@ -158,7 +158,7 @@ struct AddInfoView: View {
     }
 
     private func updateTOTPCode() {
-        if let code = TOTPService.shared.generateCode(secret: totpSecret) {
+        if let code = TOTPService.shared.generateTOTP(secret: totpSecret) {
             totpCode = code
         }
     }

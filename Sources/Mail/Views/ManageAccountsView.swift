@@ -127,21 +127,42 @@ struct ManageAccountsView: View {
         loadingProvider = provider
 
         do {
-            let account: MailAccount
+            let credentials = MailCredentials.oauth()
+            let session: MailSession
             switch provider {
             case .gmail:
-                account = try await GmailProvider().authenticate()
+                session = try await GmailProvider().authenticate(credentials: credentials)
             case .outlook:
-                account = try await OutlookProvider().authenticate()
+                session = try await OutlookProvider().authenticate(credentials: credentials)
             case .yahoo:
-                account = try await YahooMailProvider().authenticate()
+                session = try await YahooMailProvider().authenticate(credentials: credentials)
             case .proton:
-                account = try await ProtonMailProvider().authenticate()
+                session = try await ProtonMailProvider().authenticate(credentials: credentials)
             case .icloud:
-                account = try await iCloudMailProvider().authenticate()
+                session = try await IMAPProvider().authenticate(credentials: MailCredentials(
+                    email: "",
+                    password: nil,
+                    host: "imap.mail.me.com",
+                    port: 993,
+                    smtpHost: "smtp.mail.me.com",
+                    smtpPort: 587
+                ))
             case .imap:
-                account = try await IMAPProvider().authenticate()
+                session = try await IMAPProvider().authenticate(credentials: credentials)
             }
+
+            let account = MailAccount(
+                id: session.id,
+                emailAddress: session.email,
+                providerType: session.provider,
+                displayName: session.displayName,
+                accessTokenExpiration: session.accessTokenExpiration,
+                imapHost: session.imapHost,
+                imapPort: session.imapPort,
+                smtpHost: session.smtpHost,
+                smtpPort: session.smtpPort,
+                isActive: false
+            )
 
             await MainActor.run {
                 mailStore.addOrUpdateAccount(account, makeActive: true)
