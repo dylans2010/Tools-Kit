@@ -6,6 +6,7 @@ import Combine
 import UIKit
 #endif
 
+@MainActor
 class AuthService: ObservableObject {
     static let shared = AuthService()
 

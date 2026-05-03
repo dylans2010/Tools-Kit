@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SecurityHomeView: View {
-    @StateObject private var authService = AuthService.shared
+    @ObservedObject private var authService = AuthService.shared
     @StateObject private var vaultManager = VaultManager.shared
 
     @State private var showingAddSheet = false

@@ -16,19 +16,13 @@ class MessagesViewController: MSMessagesAppViewController {
 
     override func willBecomeActive(with conversation: MSConversation) {
         super.willBecomeActive(with: conversation)
+        // Setup/re-setup UI whenever we become active to ensure we have the latest conversation state
         presentRootView(with: conversation)
-    }
-
-    override func didBecomeActive(with conversation: MSConversation) {
-        super.didBecomeActive(with: conversation)
-    }
-
-    override func willResignActive(with conversation: MSConversation) {
-        super.willResignActive(with: conversation)
     }
 
     override func didResignActive(with conversation: MSConversation) {
         super.didResignActive(with: conversation)
+        // Cleanup or save state if needed when resigning active
     }
 
     override func didReceive(_ message: MSMessage, conversation: MSConversation) {

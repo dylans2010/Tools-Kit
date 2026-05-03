@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SecurityOnboardingView: View {
-    @StateObject private var authService = AuthService.shared
+    @ObservedObject private var authService = AuthService.shared
     @State private var password = ""
     @State private var confirmPassword = ""
     @State private var useBiometrics = true
@@ -71,7 +71,7 @@ struct SecurityOnboardingView: View {
 }
 
 struct SecurityLoginView: View {
-    @StateObject private var authService = AuthService.shared
+    @ObservedObject private var authService = AuthService.shared
     @State private var password = ""
     @State private var error: String?
 
