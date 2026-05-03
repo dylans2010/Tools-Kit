@@ -1027,6 +1027,15 @@
 		263990BC7630F22EA508C3AC /* AgentConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF63B3A68BCFCFECED7994F2 /* AgentConfigView.swift */; };
 		KB0200000000000000000099 /* KeyboardExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000099 /* KeyboardExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		MS0200000000000000000099 /* MessagesExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000099 /* MessagesExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AA100000000000000000000A /* WorkspaceAutomationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000009 /* WorkspaceAutomationView.swift */; };
+		AA100000000000000000000C /* ContentGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100000000000000000000B /* ContentGraphView.swift */; };
+		AA100000000000000000000E /* WorkspaceSnapshotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100000000000000000000D /* WorkspaceSnapshotView.swift */; };
+		AA1000000000000000000010 /* WorkspaceAdvancedViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100000000000000000000F /* WorkspaceAdvancedViews.swift */; };
+		AA1000000000000000000012 /* GlobalCommandPaletteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000011 /* GlobalCommandPaletteView.swift */; };
+		AA1000000000000000000014 /* PluginMarketplaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000013 /* PluginMarketplaceView.swift */; };
+		AA1000000000000000000016 /* LocalGitEngineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000015 /* LocalGitEngineView.swift */; };
+		AA1000000000000000000018 /* GitHubIntelligenceViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000017 /* GitHubIntelligenceViews.swift */; };
+		AA100000000000000000001A /* GitHubToolPanelViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000019 /* GitHubToolPanelViews.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2047,6 +2056,15 @@
 		CF63B3A68BCFCFECED7994F2 /* AgentConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConfigView.swift; sourceTree = "<group>"; };
 		KB0100000000000000000099 /* KeyboardExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = KeyboardExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		MS0100000000000000000099 /* MessagesExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = MessagesExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA1000000000000000000009 /* WorkspaceAutomationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAutomationView.swift; sourceTree = "<group>"; };
+		AA100000000000000000000B /* ContentGraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentGraphView.swift; sourceTree = "<group>"; };
+		AA100000000000000000000D /* WorkspaceSnapshotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSnapshotView.swift; sourceTree = "<group>"; };
+		AA100000000000000000000F /* WorkspaceAdvancedViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAdvancedViews.swift; sourceTree = "<group>"; };
+		AA1000000000000000000011 /* GlobalCommandPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalCommandPaletteView.swift; sourceTree = "<group>"; };
+		AA1000000000000000000013 /* PluginMarketplaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginMarketplaceView.swift; sourceTree = "<group>"; };
+		AA1000000000000000000015 /* LocalGitEngineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalGitEngineView.swift; sourceTree = "<group>"; };
+		AA1000000000000000000017 /* GitHubIntelligenceViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubIntelligenceViews.swift; sourceTree = "<group>"; };
+		AA1000000000000000000019 /* GitHubToolPanelViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubToolPanelViews.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -3725,6 +3743,10 @@
 			isa = PBXGroup;
 			children = (
 				E10000000000000000000007 /* Core */,
+				AA1000000000000000000001 /* Collaboration */,
+				AA1000000000000000000005 /* CommandPalette */,
+				AA1000000000000000000006 /* Plugins */,
+				AA1000000000000000000007 /* GitHub */,
 			);
 			path = Workspace;
 			sourceTree = "<group>";
@@ -3738,6 +3760,75 @@
 			sourceTree = "<group>";
 		};
 
+		AA1000000000000000000001 /* Collaboration */ = {
+			isa = PBXGroup;
+			children = (
+				AA1000000000000000000002 /* Automation */,
+				AA1000000000000000000003 /* Graph */,
+				AA1000000000000000000004 /* Snapshots */,
+				AA100000000000000000000F /* WorkspaceAdvancedViews.swift */,
+			);
+			path = Collaboration;
+			sourceTree = "<group>";
+		};
+		AA1000000000000000000002 /* Automation */ = {
+			isa = PBXGroup;
+			children = (
+				AA1000000000000000000009 /* WorkspaceAutomationView.swift */,
+			);
+			path = Automation;
+			sourceTree = "<group>";
+		};
+		AA1000000000000000000003 /* Graph */ = {
+			isa = PBXGroup;
+			children = (
+				AA100000000000000000000B /* ContentGraphView.swift */,
+			);
+			path = Graph;
+			sourceTree = "<group>";
+		};
+		AA1000000000000000000004 /* Snapshots */ = {
+			isa = PBXGroup;
+			children = (
+				AA100000000000000000000D /* WorkspaceSnapshotView.swift */,
+			);
+			path = Snapshots;
+			sourceTree = "<group>";
+		};
+		AA1000000000000000000005 /* CommandPalette */ = {
+			isa = PBXGroup;
+			children = (
+				AA1000000000000000000011 /* GlobalCommandPaletteView.swift */,
+			);
+			path = CommandPalette;
+			sourceTree = "<group>";
+		};
+		AA1000000000000000000006 /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+				AA1000000000000000000013 /* PluginMarketplaceView.swift */,
+			);
+			path = Plugins;
+			sourceTree = "<group>";
+		};
+		AA1000000000000000000007 /* GitHub */ = {
+			isa = PBXGroup;
+			children = (
+				AA1000000000000000000008 /* Intelligence */,
+			);
+			path = GitHub;
+			sourceTree = "<group>";
+		};
+		AA1000000000000000000008 /* Intelligence */ = {
+			isa = PBXGroup;
+			children = (
+				AA1000000000000000000015 /* LocalGitEngineView.swift */,
+				AA1000000000000000000017 /* GitHubIntelligenceViews.swift */,
+				AA1000000000000000000019 /* GitHubToolPanelViews.swift */,
+			);
+			path = Intelligence;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -4945,7 +5036,16 @@
 				AI0200000000000000000017 /* SimulationAndConsoleViews.swift in Sources */,
 				AI0200000000000000000018 /* WorkflowExecutionMonitor.swift in Sources */,
 				AI0200000000000000000019 /* AdvancedMailViewModels.swift in Sources */,
-);
+
+				AA100000000000000000000A /* WorkspaceAutomationView.swift in Sources */,
+				AA100000000000000000000C /* ContentGraphView.swift in Sources */,
+				AA100000000000000000000E /* WorkspaceSnapshotView.swift in Sources */,
+				AA1000000000000000000010 /* WorkspaceAdvancedViews.swift in Sources */,
+				AA1000000000000000000012 /* GlobalCommandPaletteView.swift in Sources */,
+				AA1000000000000000000014 /* PluginMarketplaceView.swift in Sources */,
+				AA1000000000000000000016 /* LocalGitEngineView.swift in Sources */,
+				AA1000000000000000000018 /* GitHubIntelligenceViews.swift in Sources */,
+				AA100000000000000000001A /* GitHubToolPanelViews.swift in Sources */,);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
