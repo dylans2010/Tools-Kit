@@ -1,5 +1,4 @@
 import SwiftUI
-import Workspace
 
 // MARK: - Global Command Palette Overlay
 
