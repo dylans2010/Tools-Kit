@@ -45,7 +45,7 @@ class KeyboardViewController: UIInputViewController {
         }
     }
 
-    var hasFullAccess: Bool {
-        return self.hasFullAccessPrivileges
+    override var hasFullAccess: Bool {
+        return super.hasFullAccess
     }
 }
