@@ -67,7 +67,7 @@ struct WorkspaceGlobalSearchView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding()
             } else if searchService.results.isEmpty {
-                ContentUnavailableView.search(text: query)
+                ContentUnavailableView("No Results", systemImage: "magnifyingglass", description: Text("No results found for '\(query)'. Check your spelling or try another search."))
             } else {
                 List(searchService.results) { result in
                     SearchResultRow(result: result)
