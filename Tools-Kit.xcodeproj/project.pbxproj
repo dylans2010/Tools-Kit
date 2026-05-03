@@ -36,6 +36,7 @@
 		MS0207C4CA60A1926E94DEC9 /* MessagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS0107C4CA60A1926E94DEC9 /* MessagesViewController.swift */; };
 		WS020000000000000000000001 /* WorkspacePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000001 /* WorkspacePersistence.swift */; };
 		WS020000000000000000000002 /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000002 /* SyncEngine.swift */; };
+		PN020000000000000000000001 /* PermissionDeniedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PN010000000000000000000001 /* PermissionDeniedView.swift */; };
 		CL020000000000000000000003 /* PullRequestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000003 /* PullRequestManager.swift */; };
 		CL020000000000000000000004 /* ForkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000004 /* ForkManager.swift */; };
 		CL020000000000000000000005 /* BranchProtectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000005 /* BranchProtectionService.swift */; };
@@ -75,6 +76,7 @@
 		CL0200000000000000000009 /* AddDataCollabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000009 /* AddDataCollabView.swift */; };
 		ED020000000000000000000A /* EditingHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000A /* EditingHomeView.swift */; };
 		ED020000000000000000000B /* FullEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000B /* FullEditorView.swift */; };
+		ED02000000000000000000FF /* RichTextEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01000000000000000000FF /* RichTextEditorView.swift */; };
 		VT0200000000000000000001 /* ValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = VT0100000000000000000001 /* ValidationTests.swift */; };
 		KB0200000000000000000050 /* KeyboardValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000050 /* KeyboardValidationTests.swift */; };
 		TH0200000000000000000001 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = TH0100000000000000000001 /* Theme.swift */; };
@@ -1054,23 +1056,23 @@
 		MS0107C4CA60A1926E94DEC9 /* MessagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewController.swift; sourceTree = "<group>"; };
 		WS010000000000000000000001 /* WorkspacePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Core/WorkspacePersistence.swift"; sourceTree = "<group>"; };
 		WS010000000000000000000002 /* SyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Core/SyncEngine.swift"; sourceTree = "<group>"; };
-		CL010000000000000000000003 /* PullRequestManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Collaboration/PullRequest/PullRequestManager.swift"; sourceTree = "<group>"; };
-		CL010000000000000000000004 /* ForkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Collaboration/VersionControl/ForkManager.swift"; sourceTree = "<group>"; };
-		CL010000000000000000000005 /* BranchProtectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Collaboration/VersionControl/BranchProtectionService.swift"; sourceTree = "<group>"; };
-		CL010000000000000000000006 /* CommitIntelligence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Collaboration/Intelligence/CommitIntelligence.swift"; sourceTree = "<group>"; };
-		CL010000000000000000000007 /* SpaceDistributionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Collaboration/Distribution/SpaceDistributionManager.swift"; sourceTree = "<group>"; };
-		CL010000000000000000000008 /* WorkspaceControlSystems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Collaboration/Control/WorkspaceControlSystems.swift"; sourceTree = "<group>"; };
-		CL010000000000000000000009 /* ReviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Collaboration/Review/ReviewManager.swift"; sourceTree = "<group>"; };
-		CL01000000000000000000000A /* CollaborationTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Collaboration/Tools/CollaborationTools.swift"; sourceTree = "<group>"; };
-		ED01000000000000000000000B /* EditingFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/EditingFramework.swift"; sourceTree = "<group>"; };
-		ED01000000000000000000000C /* EditingHistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/History/EditingHistoryManager.swift"; sourceTree = "<group>"; };
-		ED01000000000000000000000D /* AIEditingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/AI/AIEditingEngine.swift"; sourceTree = "<group>"; };
-		ED01000000000000000000000E /* ProfessionalEditingSuite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/Tools/ProfessionalEditingSuite.swift"; sourceTree = "<group>"; };
-		ED01000000000000000000000F /* EditingCollaboration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/Collaboration/EditingCollaboration.swift"; sourceTree = "<group>"; };
-		ED010000000000000000000010 /* EditingWorkflow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/Workflow/EditingWorkflow.swift"; sourceTree = "<group>"; };
+		CL010000000000000000000003 /* PullRequestManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Collaboration/PullRequestManager.swift; sourceTree = "<group>"; };
+		CL010000000000000000000004 /* ForkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Collaboration/ForkManager.swift; sourceTree = "<group>"; };
+		CL010000000000000000000005 /* BranchProtectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Collaboration/BranchProtectionService.swift; sourceTree = "<group>"; };
+		CL010000000000000000000006 /* CommitIntelligence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Collaboration/CommitIntelligence.swift; sourceTree = "<group>"; };
+		CL010000000000000000000007 /* SpaceDistributionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Collaboration/SpaceDistributionManager.swift; sourceTree = "<group>"; };
+		CL010000000000000000000008 /* WorkspaceControlSystems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Collaboration/WorkspaceControlSystems.swift; sourceTree = "<group>"; };
+		CL010000000000000000000009 /* ReviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Collaboration/ReviewManager.swift; sourceTree = "<group>"; };
+		CL01000000000000000000000A /* CollaborationTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Collaboration/CollaborationTools.swift; sourceTree = "<group>"; };
+		ED01000000000000000000000B /* EditingFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Editing/EditingFramework.swift; sourceTree = "<group>"; };
+		ED01000000000000000000000C /* EditingHistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Editing/EditingHistoryManager.swift; sourceTree = "<group>"; };
+		ED01000000000000000000000D /* AIEditingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Editing/AIEditingEngine.swift; sourceTree = "<group>"; };
+		ED01000000000000000000000E /* ProfessionalEditingSuite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Editing/ProfessionalEditingSuite.swift; sourceTree = "<group>"; };
+		ED01000000000000000000000F /* EditingCollaboration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Editing/EditingCollaboration.swift; sourceTree = "<group>"; };
+		ED010000000000000000000010 /* EditingWorkflow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Editing/EditingWorkflow.swift; sourceTree = "<group>"; };
 		CL010000000000000000000011 /* PullRequestDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Collaboration/PullRequest/PullRequestDashboardView.swift"; sourceTree = "<group>"; };
 		CL010000000000000000000012 /* PRDiffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Collaboration/PullRequest/PRDiffView.swift"; sourceTree = "<group>"; };
-		CL010000000000000000000013 /* ActivityTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Collaboration/Insights/ActivityTimelineView.swift"; sourceTree = "<group>"; };
+		CL010000000000000000000013 /* ActivityTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Collaboration/Insights/ActivityTimelineView.swift; sourceTree = "<group>"; };
 		CL010000000000000000000014 /* SpaceDistributionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Collaboration/Distribution/SpaceDistributionView.swift"; sourceTree = "<group>"; };
 		CL010000000000000000000015 /* BranchSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Collaboration/VersionControl/BranchSettingsView.swift"; sourceTree = "<group>"; };
 		CL010000000000000000000016 /* WorkspaceControlViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Collaboration/Control/WorkspaceControlViews.swift"; sourceTree = "<group>"; };
@@ -1081,18 +1083,20 @@
 		ED01000000000000000000001B /* ProfessionalToolViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Editing/Tools/ProfessionalToolViews.swift"; sourceTree = "<group>"; };
 		ED01000000000000000000001C /* EditingCollaborationViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Editing/Collaboration/EditingCollaborationViews.swift"; sourceTree = "<group>"; };
 		ED01000000000000000000001D /* EditingWorkflowViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Editing/Workflow/EditingWorkflowViews.swift"; sourceTree = "<group>"; };
-		CL0100000000000000000000 /* CollaborationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Collaboration/CollaborationModels.swift; sourceTree = "<group>"; };
-		CL0100000000000000000001 /* CollaborationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Collaboration/CollaborationManager.swift; sourceTree = "<group>"; };
-		CL0100000000000000000002 /* CollaborationFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Collaboration/CollaborationFramework.swift; sourceTree = "<group>"; };
-		ED0100000000000000000003 /* EditingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Editing/EditingModels.swift; sourceTree = "<group>"; };
-		ED0100000000000000000004 /* EditingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Editing/EditingManager.swift; sourceTree = "<group>"; };
-		ED0100000000000000000005 /* EditingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Editing/EditingEngine.swift; sourceTree = "<group>"; };
+		CL0100000000000000000000 /* CollaborationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Collaboration/CollaborationModels.swift; sourceTree = "<group>"; };
+		CL0100000000000000000001 /* CollaborationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Collaboration/CollaborationManager.swift; sourceTree = "<group>"; };
+		CL0100000000000000000002 /* CollaborationFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Collaboration/CollaborationFramework.swift; sourceTree = "<group>"; };
+		ED0100000000000000000003 /* EditingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Editing/EditingModels.swift; sourceTree = "<group>"; };
+		ED0100000000000000000004 /* EditingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Editing/EditingManager.swift; sourceTree = "<group>"; };
+		ED0100000000000000000005 /* EditingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Editing/EditingEngine.swift; sourceTree = "<group>"; };
 		CL0100000000000000000006 /* CollaborationHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Collaboration/CollaborationHomeView.swift; sourceTree = "<group>"; };
 		CL0100000000000000000007 /* SpaceDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Collaboration/SpaceDashboardView.swift; sourceTree = "<group>"; };
 		CL0100000000000000000008 /* VersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Collaboration/VersionHistoryView.swift; sourceTree = "<group>"; };
 		CL0100000000000000000009 /* AddDataCollabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Collaboration/AddDataCollabView.swift; sourceTree = "<group>"; };
 		ED010000000000000000000A /* EditingHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Editing/EditingHomeView.swift; sourceTree = "<group>"; };
 		ED010000000000000000000B /* FullEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Editing/FullEditorView.swift; sourceTree = "<group>"; };
+		PN010000000000000000000001 /* PermissionDeniedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/PermissionDeniedView.swift; sourceTree = "<group>"; };
+		ED01000000000000000000FF /* RichTextEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Editing/Text/RichTextEditorView.swift; sourceTree = "<group>"; };
 		3C4B3171C5B7494C8A67B0CF /* AgentResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentResultView.swift; sourceTree = "<group>"; };
 		A90000012B00000100000002 /* AgentPromptOptimizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentPromptOptimizerView.swift; sourceTree = "<group>"; };
 		A90000012B00000100000004 /* AgentProgressSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentProgressSessionView.swift; sourceTree = "<group>"; };
@@ -3290,7 +3294,9 @@
 				CL0100000000000000000008 /* VersionHistoryView.swift */,
 				CL0100000000000000000009 /* AddDataCollabView.swift */,
 				ED010000000000000000000A /* EditingHomeView.swift */,
+				PN010000000000000000000001 /* PermissionDeniedView.swift */,
 				ED010000000000000000000B /* FullEditorView.swift */,
+				ED01000000000000000000FF /* RichTextEditorView.swift */,
 				TH0100000000000000000001 /* Theme.swift */,
 				IW0100000000000000000001 /* WorkspaceColorManager.swift */,
 				IW0100000000000000000002 /* WorkspaceSurfaceCard.swift */,
@@ -3843,6 +3849,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				MS0207C4CA60A1926E94DEC9 /* MessagesViewController.swift in Sources */,
+				PN020000000000000000000001 /* PermissionDeniedView.swift in Sources */,
+				ED02000000000000000000FF /* RichTextEditorView.swift in Sources */,
 				MS02F387A7A65E6019196A12 /* MessagesRootView.swift in Sources */,
 				MS0277F553B9F980351B8A6B /* MessagesAIService.swift in Sources */,
 				MS02B0FF40CAEAEC26586CD6 /* MessagesAIHomeView.swift in Sources */,
@@ -3902,6 +3910,12 @@
 				CL020000000000000000000016 /* WorkspaceControlViews.swift in Sources */,
 				CL020000000000000000000017 /* ReviewViews.swift in Sources */,
 				CL020000000000000000000018 /* CollaborationToolViews.swift in Sources */,
+				ED02000000000000000000000B /* EditingFramework.swift in Sources */,
+				ED02000000000000000000000C /* EditingHistoryManager.swift in Sources */,
+				ED02000000000000000000000D /* AIEditingEngine.swift in Sources */,
+				ED02000000000000000000000E /* ProfessionalEditingSuite.swift in Sources */,
+				ED02000000000000000000000F /* EditingCollaboration.swift in Sources */,
+				ED020000000000000000000010 /* EditingWorkflow.swift in Sources */,
 				ED020000000000000000000019 /* HistoryInspectorView.swift in Sources */,
 				ED02000000000000000000001A /* AIEditControlsView.swift in Sources */,
 				ED02000000000000000000001B /* ProfessionalToolViews.swift in Sources */,
@@ -4957,7 +4971,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.keyboard;
+				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.app.keyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -4977,7 +4991,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.keyboard;
+				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.app.keyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;

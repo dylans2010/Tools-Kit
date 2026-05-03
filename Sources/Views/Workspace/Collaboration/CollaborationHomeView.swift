@@ -23,7 +23,7 @@ struct CollaborationHomeView: View {
                 NavigationLink(destination: PullRequestDashboardView()) {
                     Label("Pull Requests", systemImage: "arrow.triangle.pull")
                 }
-                NavigationLink(destination: ActivityTimelineView()) {
+                NavigationLink(destination: GlobalActivityTimelineView()) {
                     Label("Activity Timeline", systemImage: "clock.arrow.2.circlepath")
                 }
                 NavigationLink(destination: SpacePublishingView()) {
@@ -64,6 +64,11 @@ struct CollaborationHomeView: View {
         }
         .sheet(isPresented: $showingCreateSpace) {
             CreateSpaceView()
+        }
+        .onOpenURL { url in
+            if url.pathExtension == "tkcollab" {
+                manager.importSpace(from: url)
+            }
         }
     }
 }

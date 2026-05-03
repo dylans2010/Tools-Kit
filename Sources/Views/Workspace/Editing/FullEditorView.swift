@@ -9,6 +9,9 @@ struct FullEditorView: View {
         manager.projects.first { $0.id == projectID }
     }
 
+    @State private var showingTextEditor = false
+    @State private var projectText = ""
+
     var body: some View {
         Group {
             if let project = project {
@@ -21,6 +24,17 @@ struct FullEditorView: View {
                         Spacer()
                         toolPalette
                         layerPanel
+                    }
+                }
+                .sheet(isPresented: $showingTextEditor) {
+                    NavigationStack {
+                        RichTextEditorView(text: $projectText)
+                            .navigationTitle("Document Editor")
+                            .toolbar {
+                                ToolbarItem(placement: .confirmationAction) {
+                                    Button("Done") { showingTextEditor = false }
+                                }
+                            }
                     }
                 }
             } else {
@@ -70,7 +84,9 @@ struct FullEditorView: View {
                 manager.redo(projectID: projectID)
             }
             toolButton(icon: "paintbrush", name: "Brush") {}
-            toolButton(icon: "textformat", name: "Text") {}
+            toolButton(icon: "textformat", name: "Text") {
+                showingTextEditor = true
+            }
             toolButton(icon: "slider.horizontal.3", name: "Adjust") {}
         }
         .padding()

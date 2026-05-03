@@ -93,6 +93,30 @@ final class EditingEngine: UIView {
         // view.layer.compositingFilter = ... (Advanced Core Image integration)
     }
 
+    // MARK: - Tool Operations
+
+    func cropLayer(id: UUID, rect: CGRect) {
+        guard let view = layerViews[id] else { return }
+        view.layer.masksToBounds = true
+        view.layer.contentsRect = CGRect(
+            x: rect.origin.x / view.bounds.width,
+            y: rect.origin.y / view.bounds.height,
+            width: rect.width / view.bounds.width,
+            height: rect.height / view.bounds.height
+        )
+    }
+
+    func resizeLayer(id: UUID, size: CGSize) {
+        guard let view = layerViews[id] else { return }
+        view.bounds.size = size
+    }
+
+    func applyAdjustment(id: UUID, brightness: Float, contrast: Float) {
+        guard let view = layerViews[id] else { return }
+        // Simulate adjustment via view opacity/background for visual feedback
+        view.alpha = CGFloat(0.5 + brightness / 2)
+    }
+
     // MARK: - Export
 
     func renderToImage() -> UIImage? {

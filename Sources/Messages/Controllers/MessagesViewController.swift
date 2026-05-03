@@ -25,6 +25,7 @@ class MessagesViewController: MSMessagesAppViewController {
 
     override func willResignActive(with conversation: MSConversation) {
         super.willResignActive(with: conversation)
+        // Cleanup or save state if needed
     }
 
     override func didResignActive(with conversation: MSConversation) {

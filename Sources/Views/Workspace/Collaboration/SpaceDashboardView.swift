@@ -47,18 +47,31 @@ struct SpaceDashboardView: View {
 
     @ViewBuilder
     private func contentView(for space: CollaborationSpace) -> some View {
-        switch selectedTab {
-        case 0: SpaceOverviewTab(space: space)
-        case 1: SpaceObjectsList(title: "Notebooks", ids: space.notebookIDs, icon: "book")
-        case 2: SpaceObjectsList(title: "Slides", ids: space.slideDeckIDs, icon: "rectangle.on.rectangle.angled")
-        case 3: ProjectBoardView(spaceID: space.id)
-        case 4: DecisionEngineView(spaceID: space.id)
-        case 5: SpaceObjectsList(title: "Sheets", ids: space.spreadsheetIDs, icon: "tablecells")
-        case 6: SpaceObjectsList(title: "Media Projects", ids: space.mediaProjectIDs, icon: "photo.on.rectangle")
-        case 7: VersionHistoryView(spaceID: space.id)
-        case 8: Text("Settings Content")
-        default: EmptyView()
+        if currentUserRole(for: space) == .viewer && [1, 2, 3, 4, 5, 6].contains(selectedTab) {
+            PermissionDeniedView(title: "Permission Denied", icon: "lock.fill", message: "You only have viewer access to this space.")
+        } else {
+            switch selectedTab {
+            case 0: SpaceOverviewTab(space: space)
+            case 1: SpaceObjectsList(title: "Notebooks", ids: space.notebookIDs, icon: "book")
+            case 2: SpaceObjectsList(title: "Slides", ids: space.slideDeckIDs, icon: "rectangle.on.rectangle.angled")
+            case 3: ProjectBoardView(spaceID: space.id)
+            case 4: DecisionEngineView(spaceID: space.id)
+            case 5: SpaceObjectsList(title: "Sheets", ids: space.spreadsheetIDs, icon: "tablecells")
+            case 6: SpaceObjectsList(title: "Media Projects", ids: space.mediaProjectIDs, icon: "photo.on.rectangle")
+            case 7: VersionHistoryView(spaceID: space.id)
+            case 8: SpaceSettingsTab(space: space)
+            default: EmptyView()
+            }
         }
+    }
+
+    private func currentUserRole(for space: CollaborationSpace) -> SpaceRole {
+        // In local production mode, if you are not the owner and not in members, you are a viewer.
+        // For simulation purposes, we check if the space name contains "(View Only)"
+        if space.name.contains("(View Only)") {
+            return .viewer
+        }
+        return .owner
     }
 }
 
@@ -121,7 +134,60 @@ struct SpaceObjectsList: View {
                     .foregroundColor(.secondary)
             } else {
                 ForEach(ids, id: \.self) { id in
-                    Label("Object \(id.uuidString.prefix(8))", systemImage: icon)
+                    HStack {
+                        Label("Object \(id.uuidString.prefix(8))", systemImage: icon)
+                        Spacer()
+                        Button {
+                            // Open object
+                        } label: {
+                            Image(systemName: "arrow.up.right.square")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct SpaceSettingsTab: View {
+    let space: CollaborationSpace
+    @StateObject private var manager = CollaborationManager.shared
+
+    var body: some View {
+        List {
+            Section("Space Info") {
+                HStack {
+                    Text("Name")
+                    Spacer()
+                    Text(space.name).foregroundColor(.secondary)
+                }
+                HStack {
+                    Text("Visibility")
+                    Spacer()
+                    Text(space.visibility.rawValue).foregroundColor(.secondary)
+                }
+            }
+
+            Section("Data Management") {
+                Button {
+                    if let url = manager.exportSpace(id: space.id) {
+                        let av = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                           let rootVC = windowScene.windows.first?.rootViewController {
+                            rootVC.present(av, animated: true)
+                        }
+                    }
+                } label: {
+                    Label("Export Space Session", systemImage: "square.and.arrow.up")
+                }
+            }
+
+            Section("Danger Zone") {
+                Button(role: .destructive) {
+                    manager.deleteSpace(id: space.id)
+                } label: {
+                    Label("Delete Space", systemImage: "trash")
                 }
             }
         }

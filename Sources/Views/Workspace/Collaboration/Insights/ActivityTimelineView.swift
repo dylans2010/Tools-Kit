@@ -1,5 +1,42 @@
 import SwiftUI
 
+struct GlobalActivityTimelineView: View {
+    @StateObject private var manager = CollaborationManager.shared
+    @State private var filter: ActivityTimelineView.ActivityFilter = .all
+
+    private var allActivities: [ActivityLog] {
+        manager.spaces.flatMap { $0.activityFeed }.sorted { $0.timestamp > $1.timestamp }
+    }
+
+    private var filteredActivities: [ActivityLog] {
+        switch filter {
+        case .all: return allActivities
+        case .commits: return allActivities.filter { $0.action.contains("Committed") }
+        case .merges: return allActivities.filter { $0.action.contains("Merged") }
+        case .comments: return allActivities.filter { $0.action.contains("Commented") }
+        }
+    }
+
+    var body: some View {
+        VStack {
+            Picker("Filter", selection: $filter) {
+                ForEach(ActivityTimelineView.ActivityFilter.allCases, id: \.self) { filter in
+                    Text(filter.rawValue).tag(filter)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding()
+
+            List {
+                ForEach(filteredActivities) { log in
+                    TimelineActivityRow(log: log)
+                }
+            }
+        }
+        .navigationTitle("Global Activity")
+    }
+}
+
 struct ActivityTimelineView: View {
     let spaceID: UUID
     @StateObject private var manager = CollaborationManager.shared

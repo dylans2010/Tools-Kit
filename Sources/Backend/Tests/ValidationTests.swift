@@ -67,6 +67,14 @@ struct ValidationTests {
             assert(fork.name.contains("(Fork)"))
         }
 
+        // Test Export
+        if let exportURL = manager.exportSpace(id: space.id) {
+            assert(FileManager.default.fileExists(atPath: exportURL.path))
+            // Test Import
+            manager.importSpace(from: exportURL)
+            try? FileManager.default.removeItem(at: exportURL)
+        }
+
         // Test Branch Protection
         let rule = BranchProtectionRule(id: UUID(), branchName: "main", requireApprovals: true, requiredApprovalCount: 2, restrictMerges: false, allowedRoles: [.admin])
         BranchProtectionService.shared.addRule(spaceID: space.id, rule: rule)

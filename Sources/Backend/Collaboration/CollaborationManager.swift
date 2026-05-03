@@ -199,4 +199,33 @@ final class CollaborationManager: ObservableObject {
         )
         spaces[index].activityFeed.insert(log, at: 0)
     }
+
+    // MARK: - Import/Export
+
+    func exportSpace(id: UUID) -> URL? {
+        guard let space = spaces.first(where: { $0.id == id }) else { return nil }
+        do {
+            let data = try JSONEncoder().encode(space)
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("\(space.name).tkcollab")
+            try data.write(to: tempURL)
+            return tempURL
+        } catch {
+            print("Failed to export space: \(error)")
+            return nil
+        }
+    }
+
+    func importSpace(from url: URL) {
+        do {
+            let data = try Data(contentsOf: url)
+            let space = try JSONDecoder().decode(CollaborationSpace.self, from: data)
+            if !spaces.contains(where: { $0.id == space.id }) {
+                spaces.append(space)
+                saveData()
+                logActivity(spaceID: space.id, action: "Imported space '\(space.name)'")
+            }
+        } catch {
+            print("Failed to import space: \(error)")
+        }
+    }
 }
