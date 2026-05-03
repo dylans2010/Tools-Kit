@@ -2237,7 +2237,7 @@
 				MS013C8E64C5B046ED9E34E3 /* Shared */,
 				Sources/Messages/Info.plist,
 			);
-			path = Messages;
+			path = Sources/Messages;
 			sourceTree = "<group>";
 		};
 		4A2CB0E156D82F6EAA22B391 /* Views */ = {
@@ -2365,7 +2365,7 @@
 				KB0300000000000000000006 /* Views */,
 				KB0100000000000000000024 /* Info.plist */,
 			);
-			path = Keyboard;
+			path = Sources/Keyboard;
 			sourceTree = "<group>";
 		};
 		KB0300000000000000000001 /* AI */ = {
