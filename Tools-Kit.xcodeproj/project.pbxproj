@@ -1022,6 +1022,8 @@
 		EFEA0E0A3C174F3AF08CA63C /* AgentConfigOverviewTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0878D677AD59E14BECEBD8 /* AgentConfigOverviewTab.swift */; };
 		11269BA3A04E207DC8F31B61 /* AgentConfigToolsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E5357B98021BEB4BF6313B1 /* AgentConfigToolsTab.swift */; };
 		263990BC7630F22EA508C3AC /* AgentConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF63B3A68BCFCFECED7994F2 /* AgentConfigView.swift */; };
+		KB0200000000000000000099 /* KeyboardExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000099 /* KeyboardExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		MS0200000000000000000099 /* MessagesExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = MS0100000000000000000099 /* MessagesExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2040,6 +2042,8 @@
 		6D0878D677AD59E14BECEBD8 /* AgentConfigOverviewTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConfigOverviewTab.swift; sourceTree = "<group>"; };
 		3E5357B98021BEB4BF6313B1 /* AgentConfigToolsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConfigToolsTab.swift; sourceTree = "<group>"; };
 		CF63B3A68BCFCFECED7994F2 /* AgentConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConfigView.swift; sourceTree = "<group>"; };
+		KB0100000000000000000099 /* KeyboardExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = KeyboardExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		MS0100000000000000000099 /* MessagesExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = MessagesExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -2228,30 +2232,10 @@
 				MS01A6BB6CA6F42ED04EDA16 /* Controllers */,
 				MS019DF30CA19BD6230F8C3F /* Views */,
 				MS0144F3B6F6CCF2FD962F1A /* AI */,
-				MS0144F3B6F6CCF2FD962F1A /* AI */,
-				MS0144F3B6F6CCF2FD962F1A /* AI */,
-				MS0144F3B6F6CCF2FD962F1A /* AI */,
-				MS0144F3B6F6CCF2FD962F1A /* AI */,
-				MS0144F3B6F6CCF2FD962F1A /* AI */,
 				MS0130A7C81FADEBC7543B76 /* Core */,
-				MS0130A7C81FADEBC7543B76 /* Core */,
-				MS0130A7C81FADEBC7543B76 /* Core */,
-				MS0130A7C81FADEBC7543B76 /* Core */,
-				MS0164B3FFCFB0AF5D647AB9 /* Games */,
-				MS0164B3FFCFB0AF5D647AB9 /* Games */,
-				MS0164B3FFCFB0AF5D647AB9 /* Games */,
-				MS0164B3FFCFB0AF5D647AB9 /* Games */,
-				MS0164B3FFCFB0AF5D647AB9 /* Games */,
-				MS0164B3FFCFB0AF5D647AB9 /* Games */,
-				MS0164B3FFCFB0AF5D647AB9 /* Games */,
-				MS0164B3FFCFB0AF5D647AB9 /* Games */,
-				MS0164B3FFCFB0AF5D647AB9 /* Games */,
-				MS0164B3FFCFB0AF5D647AB9 /* Games */,
-				MS0164B3FFCFB0AF5D647AB9 /* Games */,
 				MS0164B3FFCFB0AF5D647AB9 /* Games */,
 				MS013C8E64C5B046ED9E34E3 /* Shared */,
-				MS013C8E64C5B046ED9E34E3 /* Shared */,
-				MS013C8E64C5B046ED9E34E3 /* Shared */,
+				Sources/Messages/Info.plist,
 			);
 			path = Messages;
 			sourceTree = "<group>";
@@ -2509,7 +2493,6 @@
 			isa = PBXGroup;
 			children = (
 				KB0300000000000000000000 /* Keyboard */,
-				MS01D8F6E8B59DA1CCE7ABA8 /* Messages */,
 				WS010000000000000000000001 /* WorkspacePersistence.swift */,
 				WS010000000000000000000002 /* SyncEngine.swift */,
 				CL010000000000000000000003 /* PullRequestManager.swift */,
@@ -3305,6 +3288,8 @@
 			isa = PBXGroup;
 			children = (
 				732E3165BFBB323BD8081B3F /* Tools-Kit.app */,
+				KB0100000000000000000099 /* KeyboardExtension.appex */,
+				MS0100000000000000000099 /* MessagesExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3314,6 +3299,7 @@
 			children = (
 				8DF4BF69CF55A81CB6EBF3DE /* Sources */,
 				KB0300000000000000000000 /* Keyboard */,
+				MS01D8F6E8B59DA1CCE7ABA8 /* Messages */,
 				B81AA4FC2BB81266E881DF5B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -3702,6 +3688,7 @@
 				C9111E28A299A9C316B4C75C /* Sources */,
 				ZF0000000000000000000004 /* Frameworks */,
 				B1C2D3E4F5A60708090A0E01 /* Resources */,
+				EE0400000000000000000001 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
@@ -3732,7 +3719,24 @@
 			);
 			name = KeyboardExtension;
 			productName = KeyboardExtension;
-			productReference = KB0100000000000000000024 /* Info.plist */;
+			productReference = KB0100000000000000000099 /* KeyboardExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		MS0400000000000000000001 /* MessagesExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = MS0400000000000000000101 /* Build configuration list for PBXNativeTarget "MessagesExtension" */;
+			buildPhases = (
+				MS0400000000000000000201 /* Sources */,
+				MS0400000000000000000202 /* Frameworks */,
+				MS0400000000000000000203 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MessagesExtension;
+			productName = MessagesExtension;
+			productReference = MS0100000000000000000099 /* MessagesExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -3744,6 +3748,18 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					F3353FBEDEEBF7704E1E6451 = {
+						CreatedOnToolsVersion = 14.3;
+						ProvisioningStyle = Automatic;
+					};
+					KB0400000000000000000001 = {
+						CreatedOnToolsVersion = 14.3;
+						ProvisioningStyle = Automatic;
+					};
+					MS0400000000000000000001 = {
+						CreatedOnToolsVersion = 14.3;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 7E5F95D2373D6BB31D0BE224 /* Build configuration list for PBXProject "Tools-Kit" */;
@@ -3768,11 +3784,19 @@
 			targets = (
 				F3353FBEDEEBF7704E1E6451 /* Tools-Kit */,
 				KB0400000000000000000001 /* KeyboardExtension */,
+				MS0400000000000000000001 /* MessagesExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		MS0400000000000000000203 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		KB0400000000000000000203 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3781,6 +3805,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		EE0400000000000000000001 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				KB0200000000000000000099 /* KeyboardExtension.appex in Embed App Extensions */,
+				MS0200000000000000000099 /* MessagesExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		KB0400000000000000000201 /* Sources */ = {
@@ -3817,6 +3856,13 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		MS0400000000000000000202 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		KB0400000000000000000202 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -3838,7 +3884,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		C9111E28A299A9C316B4C75C /* Sources */ = {
+		MS0400000000000000000201 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -3869,6 +3915,13 @@
 				MS028F0C9AC0045039A23CD0 /* MessageBubbleView.swift in Sources */,
 				MS026A2894802C56D5AB5FC3 /* SegmentSwitcher.swift in Sources */,
 				MS028A4E8FF9A0449D039277 /* JSONCoder.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C9111E28A299A9C316B4C75C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 				WS020000000000000000000001 /* WorkspacePersistence.swift in Sources */,
 				WS020000000000000000000002 /* SyncEngine.swift in Sources */,
 				IW0200000000000000000001 /* WorkspaceColorManager.swift in Sources */,
@@ -4925,6 +4978,46 @@
 			};
 			name = Release;
 		};
+		MS0400000000000000000111 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Messages/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.app.messages;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		MS0400000000000000000112 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Messages/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.app.messages;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		8EF2AC13861B30D4D246AC91 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4957,7 +5050,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.keyboard;
+				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.app.keyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -4977,7 +5070,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.keyboard;
+				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.app.keyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -5050,6 +5143,15 @@
 			buildConfigurations = (
 				KB0400000000000000000111 /* Debug */,
 				KB0400000000000000000112 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		MS0400000000000000000101 /* Build configuration list for PBXNativeTarget "MessagesExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				MS0400000000000000000111 /* Debug */,
+				MS0400000000000000000112 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

@@ -3,6 +3,7 @@ import LocalAuthentication
 import CryptoKit
 import Combine
 
+@MainActor
 class AuthService: ObservableObject {
     static let shared = AuthService()
 
