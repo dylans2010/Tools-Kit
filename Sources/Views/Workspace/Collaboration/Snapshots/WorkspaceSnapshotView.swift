@@ -198,8 +198,8 @@ struct SnapshotPicker: View {
 
     var body: some View {
         Menu {
-            ForEach(snapshots) { s in
-                Button(s.label ?? "Untitled") { selection = s }
+            ForEach(snapshots) { (s: WorkspaceSnapshotService.Snapshot) in
+                Button(s.label) { selection = s }
             }
         } label: {
             VStack(alignment: .leading, spacing: 2) {

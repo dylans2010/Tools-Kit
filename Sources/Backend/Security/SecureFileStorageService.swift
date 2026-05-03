@@ -114,8 +114,9 @@ class SecureFileStorageService {
 
     func deleteFile(filename: String) async {
         let indexURL = vaultURL.appendingPathComponent(filename)
+        let sessionKey = await MainActor.run { AuthService.shared.sessionKey }
         if let encryptedIndex = try? Data(contentsOf: indexURL),
-           let key = await MainActor.run({ AuthService.shared.sessionKey }),
+           let key = sessionKey,
            let indexData = try? EncryptionService.shared.decrypt(encryptedIndex, using: key),
            let index = try? JSONDecoder().decode(ShardIndex.self, from: indexData) {
             for shardName in index.shardFilenames {
