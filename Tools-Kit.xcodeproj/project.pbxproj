@@ -1873,6 +1873,7 @@
 		KB0100000000000000000022 /* JSONCoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Utils/JSONCoder.swift; sourceTree = "<group>"; };
 		KB0100000000000000000023 /* Debouncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard/Utils/Debouncer.swift; sourceTree = "<group>"; };
 		KB0100000000000000000024 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Keyboard/Info.plist; sourceTree = "<group>"; };
+		MS0100000000000000000024 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Messages/Info.plist; sourceTree = "<group>"; };
 		60692A4B70AF4F33B1B95FEC /* complexity_analysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/complexity_analysis.swift; sourceTree = "<group>"; };
 		90393BD11F224ACE8DCE96E3 /* append_file.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/append_file.swift; sourceTree = "<group>"; };
 		7072876D7E764C9B98DC8AF4 /* tool_health_check.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Agent/SystemTools/tool_health_check.swift; sourceTree = "<group>"; };
@@ -2235,7 +2236,7 @@
 				MS0130A7C81FADEBC7543B76 /* Core */,
 				MS0164B3FFCFB0AF5D647AB9 /* Games */,
 				MS013C8E64C5B046ED9E34E3 /* Shared */,
-				Sources/Messages/Info.plist,
+				MS0100000000000000000024 /* Info.plist */,
 			);
 			path = Messages;
 			sourceTree = "<group>";
