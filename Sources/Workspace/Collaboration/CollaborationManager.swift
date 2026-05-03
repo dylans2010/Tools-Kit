@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import UIKit
 
 /// Manages collaboration spaces, members, and version control operations.
 final class CollaborationManager: ObservableObject {
@@ -184,6 +185,29 @@ final class CollaborationManager: ObservableObject {
         } catch {
             print("Error loading collaboration data: \(error)")
         }
+    }
+
+    func updateReceivedSpace(_ space: CollaborationSpace) {
+        if let index = spaces.firstIndex(where: { $0.id == space.id }) {
+            if space.updatedAt > spaces[index].updatedAt {
+                spaces[index] = space
+                saveData()
+            }
+        } else {
+            spaces.append(space)
+            saveData()
+        }
+    }
+
+    func updateMemberRole(spaceID: UUID, memberID: UUID, role: SpaceRole) {
+        guard let spaceIndex = spaces.firstIndex(where: { $0.id == spaceID }),
+              let memberIndex = spaces[spaceIndex].members.firstIndex(where: { $0.id == memberID }) else { return }
+
+        spaces[spaceIndex].members[memberIndex].role = role
+        spaces[spaceIndex].updatedAt = Date()
+        logActivity(spaceID: spaceID, action: "Changed role of \(spaces[spaceIndex].members[memberIndex].name) to \(role.rawValue)")
+        saveData()
+        CollaborationSyncService.shared.syncSpace(spaces[spaceIndex])
     }
 
     private var localUserID: UUID {
