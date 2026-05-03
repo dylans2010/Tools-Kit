@@ -75,7 +75,7 @@
 		CL0200000000000000000009 /* AddDataCollabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000009 /* AddDataCollabView.swift */; };
 		ED020000000000000000000A /* EditingHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000A /* EditingHomeView.swift */; };
 		ED020000000000000000000B /* FullEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000B /* FullEditorView.swift */; };
-		VT0200000000000000000001 /* ValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = VT0100000000000000000001 /* ValidationTests.swift */; };
+		
 		KB0200000000000000000050 /* KeyboardValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000050 /* KeyboardValidationTests.swift */; };
 		TH0200000000000000000001 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = TH0100000000000000000001 /* Theme.swift */; };
 		IW0200000000000000000001 /* WorkspaceColorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = IW0100000000000000000001 /* WorkspaceColorManager.swift */; };
@@ -2501,7 +2501,7 @@
 				BFA101000000000000000003 /* AuthDatabaseService.swift */,
 				BFA101000000000000000005 /* GmailServerConfiguration.swift */,
 				BFA101000000000000000006 /* GmailMailProvider.swift */,
-				MEG0000000000000000000002 /* Workspace */,
+
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -2744,35 +2744,6 @@
 			isa = PBXGroup;
 			children = (
 				KB0300000000000000000000 /* Keyboard */,
-				WS010000000000000000000001 /* WorkspacePersistence.swift */,
-				WS010000000000000000000002 /* SyncEngine.swift */,
-				CL010000000000000000000003 /* PullRequestManager.swift */,
-				CL010000000000000000000004 /* ForkManager.swift */,
-				CL010000000000000000000005 /* BranchProtectionService.swift */,
-				CL010000000000000000000006 /* CommitIntelligence.swift */,
-				CL010000000000000000000007 /* SpaceDistributionManager.swift */,
-				CL010000000000000000000008 /* WorkspaceControlSystems.swift */,
-				CL010000000000000000000009 /* ReviewManager.swift */,
-				CL01000000000000000000000A /* CollaborationTools.swift */,
-				ED01000000000000000000000B /* EditingFramework.swift */,
-				ED01000000000000000000000C /* EditingHistoryManager.swift */,
-				ED01000000000000000000000D /* AIEditingEngine.swift */,
-				ED01000000000000000000000E /* ProfessionalEditingSuite.swift */,
-				ED01000000000000000000000F /* EditingCollaboration.swift */,
-				ED010000000000000000000010 /* EditingWorkflow.swift */,
-				CL010000000000000000000011 /* PullRequestDashboardView.swift */,
-				CL010000000000000000000012 /* PRDiffView.swift */,
-				CL010000000000000000000013 /* ActivityTimelineView.swift */,
-				CL010000000000000000000014 /* SpaceDistributionView.swift */,
-				CL010000000000000000000015 /* BranchSettingsView.swift */,
-				CL010000000000000000000016 /* WorkspaceControlViews.swift */,
-				CL010000000000000000000017 /* ReviewViews.swift */,
-				CL010000000000000000000018 /* CollaborationToolViews.swift */,
-				ED010000000000000000000019 /* HistoryInspectorView.swift */,
-				ED01000000000000000000001A /* AIEditControlsView.swift */,
-				ED01000000000000000000001B /* ProfessionalToolViews.swift */,
-				ED01000000000000000000001C /* EditingCollaborationViews.swift */,
-				ED01000000000000000000001D /* EditingWorkflowViews.swift */,
 				GH0100000000000000000001 /* GitHubAuthManager.swift */,
 				GH0100000000000000000002 /* GitHubModels.swift */,
 				GH0100000000000000000003 /* GitHubEndpoints.swift */,
@@ -3283,7 +3254,6 @@
 				RD0100000000000000000009 /* MusicHomeView.swift */,
 				RD010000000000000000000A /* MusicSearchView.swift */,
 				WS0100000000000000000001 /* WorkspaceModeManager.swift */,
-				MEG0000000000000000000004 /* Workspace */,
 				WS0100000000000000000002 /* WorkspaceHomeView.swift */,
 				WS0100000000000000000003 /* SlideDeck.swift */,
 				WS0100000000000000000004 /* Slide.swift */,
@@ -4423,8 +4393,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				WS020000000000000000000001 /* WorkspacePersistence.swift in Sources */,
-				WS020000000000000000000002 /* SyncEngine.swift in Sources */,
 				IW0200000000000000000001 /* WorkspaceColorManager.swift in Sources */,
 				IW0200000000000000000002 /* WorkspaceSurfaceCard.swift in Sources */,
 				EX0200000000000000000001 /* ExecutionBridge.swift in Sources */,
@@ -4440,33 +4408,6 @@
 				CL0200000000000000000009 /* AddDataCollabView.swift in Sources */,
 				ED020000000000000000000A /* EditingHomeView.swift in Sources */,
 				ED020000000000000000000B /* FullEditorView.swift in Sources */,
-				CL020000000000000000000003 /* PullRequestManager.swift in Sources */,
-				CL020000000000000000000004 /* ForkManager.swift in Sources */,
-				CL020000000000000000000005 /* BranchProtectionService.swift in Sources */,
-				CL020000000000000000000006 /* CommitIntelligence.swift in Sources */,
-				CL020000000000000000000007 /* SpaceDistributionManager.swift in Sources */,
-				CL020000000000000000000008 /* WorkspaceControlSystems.swift in Sources */,
-				CL020000000000000000000009 /* ReviewManager.swift in Sources */,
-				CL02000000000000000000000A /* CollaborationTools.swift in Sources */,
-				ED02000000000000000000000B /* EditingFramework.swift in Sources */,
-				ED02000000000000000000000C /* EditingHistoryManager.swift in Sources */,
-				ED02000000000000000000000D /* AIEditingEngine.swift in Sources */,
-				ED02000000000000000000000E /* ProfessionalEditingSuite.swift in Sources */,
-				ED02000000000000000000000F /* EditingCollaboration.swift in Sources */,
-				ED020000000000000000000010 /* EditingWorkflow.swift in Sources */,
-				CL020000000000000000000011 /* PullRequestDashboardView.swift in Sources */,
-				CL020000000000000000000012 /* PRDiffView.swift in Sources */,
-				CL020000000000000000000013 /* ActivityTimelineView.swift in Sources */,
-				CL020000000000000000000014 /* SpaceDistributionView.swift in Sources */,
-				CL020000000000000000000015 /* BranchSettingsView.swift in Sources */,
-				CL020000000000000000000016 /* WorkspaceControlViews.swift in Sources */,
-				CL020000000000000000000017 /* ReviewViews.swift in Sources */,
-				CL020000000000000000000018 /* CollaborationToolViews.swift in Sources */,
-				ED020000000000000000000019 /* HistoryInspectorView.swift in Sources */,
-				ED02000000000000000000001A /* AIEditControlsView.swift in Sources */,
-				ED02000000000000000000001B /* ProfessionalToolViews.swift in Sources */,
-				ED02000000000000000000001C /* EditingCollaborationViews.swift in Sources */,
-				ED02000000000000000000001D /* EditingWorkflowViews.swift in Sources */,
 				GH0200000000000000000001 /* GitHubAuthManager.swift in Sources */,
 				GH0200000000000000000002 /* GitHubModels.swift in Sources */,
 				GH0200000000000000000003 /* GitHubEndpoints.swift in Sources */,
