@@ -1305,7 +1305,7 @@
 		A1B2C3D4E5F60718293A0003 /* MailAIToolsSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/AI/MailAIToolsSystem.swift; sourceTree = "<group>"; };
 		E7CF3A650D21475D81EB7CAE /* iCloudMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/iCloudMailProvider.swift; sourceTree = "<group>"; };
 		C1B5DD1027FA49B99C531EDE /* MailProviderProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/MailProviderProtocol.swift; sourceTree = "<group>"; };
-		AC0100000000000000000001 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Core/AppConfig.swift; sourceTree = "<group>"; };
+		AC0100000000000000000001 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		MP0100000000000000000001 /* GmailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/GmailProvider.swift; sourceTree = "<group>"; };
 		MP0100000000000000000002 /* OutlookProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/OutlookProvider.swift; sourceTree = "<group>"; };
 		MP0100000000000000000003 /* YahooMailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Providers/YahooMailProvider.swift; sourceTree = "<group>"; };
@@ -1555,7 +1555,7 @@
 		E7F486EF5ED54F9B9D7B0875 /* FocusTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/FocusTracker/FocusTrackerView.swift"; sourceTree = "<group>"; };
 		E7F486EF5ED54F9B9D7B0876 /* FocusSessionBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/FocusTracker/FocusSessionBackend.swift"; sourceTree = "<group>"; };
 		6662160AA2024E9FBEA29A4C /* AIChatToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/AIChat/AIChatToolView.swift"; sourceTree = "<group>"; };
-		AB11BC22CD33DE44EF55FA01 /* APIKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/APIKeyManager.swift"; sourceTree = "<group>"; };
+		AB11BC22CD33DE44EF55FA01 /* APIKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKeyManager.swift; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/OpenRouterService.swift"; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA03 /* MapsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/Maps/MapsService.swift"; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Shared/FileImporterRepresentableView.swift"; sourceTree = "<group>"; };
@@ -1563,11 +1563,11 @@
 		AB11BC22CD33DE44EF55FA06 /* AIChatMemoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/AIChatMemoryStore.swift"; sourceTree = "<group>"; };
 		DD11EE22FF33AA44BB55CC01 /* AIProviderProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/AIProviderProtocol.swift"; sourceTree = "<group>"; };
 		DD11EE22FF33AA44BB55CC02 /* AIProviderRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/AIProviderRegistry.swift"; sourceTree = "<group>"; };
-		DD11EE22FF33AA44BB55CC03 /* AnthropicProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/Providers/AnthropicProvider.swift"; sourceTree = "<group>"; };
-		DD11EE22FF33AA44BB55CC04 /* GeminiProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/Providers/GeminiProvider.swift"; sourceTree = "<group>"; };
-		DD11EE22FF33AA44BB55CC05 /* MistralProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/Providers/MistralProvider.swift"; sourceTree = "<group>"; };
-		DD11EE22FF33AA44BB55CC06 /* OpenAIProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/Providers/OpenAIProvider.swift"; sourceTree = "<group>"; };
-		DD11EE22FF33AA44BB55CC07 /* OpenRouterProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backend/Tools/AIChat/Providers/OpenRouterProvider.swift"; sourceTree = "<group>"; };
+		DD11EE22FF33AA44BB55CC03 /* AnthropicProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnthropicProvider.swift; sourceTree = "<group>"; };
+		DD11EE22FF33AA44BB55CC04 /* GeminiProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiProvider.swift; sourceTree = "<group>"; };
+		DD11EE22FF33AA44BB55CC05 /* MistralProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistralProvider.swift; sourceTree = "<group>"; };
+		DD11EE22FF33AA44BB55CC06 /* OpenAIProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIProvider.swift; sourceTree = "<group>"; };
+		DD11EE22FF33AA44BB55CC07 /* OpenRouterProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterProvider.swift; sourceTree = "<group>"; };
 		064CB13BC205411B91EAA752 /* MapsToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Maps/MapsToolView.swift"; sourceTree = "<group>"; };
 		09E6435EECFF4FD6B31B4C0B /* MapsToolViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/Maps/MapsToolViewModel.swift"; sourceTree = "<group>"; };
 		CCFF0BDC48A74ACABA6CE6DD /* ObjectDetectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Tools/ObjectDetection/ObjectDetectionView.swift"; sourceTree = "<group>"; };
