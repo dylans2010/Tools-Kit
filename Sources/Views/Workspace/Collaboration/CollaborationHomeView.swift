@@ -3,6 +3,7 @@ import SwiftUI
 struct CollaborationHomeView: View {
     @StateObject private var manager = CollaborationManager.shared
     @State private var showingCreateSpace = false
+    @State private var showingCommandPalette = false
 
     var body: some View {
         List {
@@ -42,6 +43,33 @@ struct CollaborationHomeView: View {
                 }
             }
 
+            Section("Automation & Intelligence") {
+                NavigationLink(destination: WorkspaceAutomationView()) {
+                    Label("Automations", systemImage: "bolt.fill")
+                }
+                NavigationLink(destination: ContentGraphView()) {
+                    Label("Content Graph", systemImage: "circle.hexagongrid.fill")
+                }
+                NavigationLink(destination: WorkspaceSnapshotView()) {
+                    Label("Snapshots", systemImage: "camera.fill")
+                }
+                NavigationLink(destination: WorkspaceGlobalSearchView()) {
+                    Label("Global Search", systemImage: "magnifyingglass")
+                }
+            }
+
+            Section("Analytics & Tools") {
+                NavigationLink(destination: WorkspaceToolsPanelView(spaceID: manager.spaces.first?.id)) {
+                    Label("Workspace Tools", systemImage: "wrench.and.screwdriver.fill")
+                }
+                NavigationLink(destination: CommandHistoryView()) {
+                    Label("Command History", systemImage: "clock.arrow.circlepath")
+                }
+                NavigationLink(destination: PluginMarketplaceView()) {
+                    Label("Plugin Marketplace", systemImage: "puzzlepiece.extension.fill")
+                }
+            }
+
             Section("Recent Activity") {
                 let recentActivity = manager.spaces.flatMap { $0.activityFeed }.sorted { $0.timestamp > $1.timestamp }.prefix(10)
                 if recentActivity.isEmpty {
@@ -63,12 +91,21 @@ struct CollaborationHomeView: View {
         }
         .navigationTitle("Collaboration")
         .toolbar {
-            Button(action: { showingCreateSpace = true }) {
-                Image(systemName: "plus")
+            ToolbarItemGroup(placement: .primaryAction) {
+                CommandPaletteButton(isShowingPalette: $showingCommandPalette)
+                Button(action: { showingCreateSpace = true }) {
+                    Image(systemName: "plus")
+                }
             }
         }
         .sheet(isPresented: $showingCreateSpace) {
             CreateSpaceView()
+        }
+        .overlay {
+            if showingCommandPalette {
+                GlobalCommandPaletteView(isPresented: $showingCommandPalette, currentView: "collaboration")
+                    .ignoresSafeArea()
+            }
         }
     }
 }
