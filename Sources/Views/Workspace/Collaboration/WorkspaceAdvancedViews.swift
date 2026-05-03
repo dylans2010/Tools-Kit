@@ -1,4 +1,5 @@
 import SwiftUI
+import Workspace
 
 // MARK: - Global Search View
 

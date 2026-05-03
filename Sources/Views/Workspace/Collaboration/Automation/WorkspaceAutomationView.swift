@@ -1,4 +1,5 @@
 import SwiftUI
+import Workspace
 
 // MARK: - Automation List View
 
@@ -30,7 +31,7 @@ struct WorkspaceAutomationView: View {
                         .foregroundStyle(.secondary)
                         .font(.caption)
                 } else {
-                    ForEach(engine.automations) { automation in
+                    ForEach(engine.automations) { (automation: WorkspaceAutomationEngine.Automation) in
                         AutomationRow(automation: automation, onTap: { selectedAutomation = automation })
                     }
                     .onDelete { offsets in

@@ -1,4 +1,5 @@
 import SwiftUI
+import Workspace
 
 // MARK: - Snapshot List
 
@@ -199,7 +200,7 @@ struct SnapshotPicker: View {
     var body: some View {
         Menu {
             ForEach(snapshots) { s in
-                Button(s.label) { selection = s }
+                Button(s.label ?? "Untitled") { selection = s }
             }
         } label: {
             VStack(alignment: .leading, spacing: 2) {
