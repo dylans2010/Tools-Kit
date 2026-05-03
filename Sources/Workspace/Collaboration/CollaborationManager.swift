@@ -186,13 +186,23 @@ final class CollaborationManager: ObservableObject {
         }
     }
 
+    private var localUserID: UUID {
+        if let idString = UserDefaults.standard.string(forKey: "com.toolskit.collab.local_user_id"),
+           let id = UUID(uuidString: idString) {
+            return id
+        }
+        let id = UUID()
+        UserDefaults.standard.set(id.uuidString, forKey: "com.toolskit.collab.local_user_id")
+        return id
+    }
+
     private func logActivity(spaceID: UUID, action: String) {
         guard let index = spaces.firstIndex(where: { $0.id == spaceID }) else { return }
         let log = ActivityLog(
             id: UUID(),
             timestamp: Date(),
-            userID: UUID(), // Real user ID
-            userName: "Local User",
+            userID: localUserID,
+            userName: UIDevice.current.name,
             action: action,
             objectID: nil,
             objectType: nil

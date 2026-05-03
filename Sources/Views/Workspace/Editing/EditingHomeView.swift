@@ -39,8 +39,10 @@ struct EditingHomeView: View {
                 NavigationLink(destination: AIEditControlsView()) {
                     Label("AI Assistant", systemImage: "sparkles")
                 }
-                NavigationLink(destination: HistoryInspectorView()) {
-                    Label("History Inspector", systemImage: "clock.arrow.circlepath")
+                if let firstProject = manager.projects.first {
+                    NavigationLink(destination: HistoryInspectorView(historyManager: EditingHistoryManager(projectID: firstProject.id), onJump: { _ in })) {
+                        Label("History Inspector", systemImage: "clock.arrow.circlepath")
+                    }
                 }
             }
 
@@ -51,7 +53,7 @@ struct EditingHomeView: View {
                 NavigationLink(destination: ExportQueueView()) {
                     Label("Export Queue", systemImage: "square.and.arrow.up.fill")
                 }
-                NavigationLink(destination: BatchProcessingView()) {
+                NavigationLink(destination: BatchProcessingView(projects: manager.projects)) {
                     Label("Batch Processing", systemImage: "square.stack.3d.down.right.fill")
                 }
             }

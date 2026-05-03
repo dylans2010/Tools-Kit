@@ -104,6 +104,51 @@ final class EditingEngine: UIView {
 
         return UIGraphicsGetImageFromCurrentImageContext()
     }
+
+    // MARK: - Image Operations
+
+    func applyFilter(name: String, intensity: Double, to layerID: UUID) {
+        guard var project = project,
+              let index = project.layers.firstIndex(where: { $0.id == layerID }) else { return }
+
+        let filter = MediaFilter(id: UUID(), name: name, intensity: intensity)
+        project.layers[index].filters.append(filter)
+        EditingManager.shared.saveProject(project)
+    }
+
+    func resizeCanvas(to size: CGSize) {
+        guard var project = project else { return }
+        project.canvasSize = size
+        EditingManager.shared.saveProject(project)
+        setupCanvas()
+    }
+
+    func cropLayer(id: UUID, rect: CGRect) {
+        guard var project = project,
+              let index = project.layers.firstIndex(where: { $0.id == id }),
+              let view = layerViews[id] as? UIImageView,
+              let image = view.image else { return }
+
+        // Core Image Cropping
+        guard let ciImage = CIImage(image: image) else { return }
+
+        // Convert UIKit rect to CIImage coordinates (origin bottom-left)
+        let ciRect = CGRect(x: rect.origin.x,
+                           y: image.size.height - rect.origin.y - rect.size.height,
+                           width: rect.size.width,
+                           height: rect.size.height)
+
+        let croppedCI = ciImage.cropped(to: ciRect)
+        let context = CIContext(options: nil)
+        if let cgImage = context.createCGImage(croppedCI, from: croppedCI.extent) {
+            let croppedUI = UIImage(cgImage: cgImage)
+            view.image = croppedUI
+
+            // Update metadata to track the crop
+            project.layers[index].metadata["crop_rect"] = NSCoder.string(for: rect)
+            EditingManager.shared.saveProject(project)
+        }
+    }
 }
 #else
 import SwiftUI

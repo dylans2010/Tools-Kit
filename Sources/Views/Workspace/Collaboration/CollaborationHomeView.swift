@@ -23,8 +23,10 @@ struct CollaborationHomeView: View {
                 NavigationLink(destination: PullRequestDashboardView()) {
                     Label("Pull Requests", systemImage: "arrow.triangle.pull")
                 }
-                NavigationLink(destination: ActivityTimelineView()) {
-                    Label("Activity Timeline", systemImage: "clock.arrow.2.circlepath")
+                if let firstSpace = manager.spaces.first {
+                    NavigationLink(destination: ActivityTimelineView(spaceID: firstSpace.id)) {
+                        Label("Activity Timeline", systemImage: "clock.arrow.2.circlepath")
+                    }
                 }
                 NavigationLink(destination: SpacePublishingView()) {
                     Label("Distribution & Publishing", systemImage: "paperplane.fill")

@@ -4,6 +4,16 @@ struct FullEditorView: View {
     let projectID: UUID
     @StateObject private var manager = EditingManager.shared
     @Environment(\.dismiss) var dismiss
+    @State private var showingTextEditor = false
+    @State private var showingHistory = false
+    @State private var editingText = ""
+    @State private var activeLayerID: UUID?
+    @StateObject private var historyManager: EditingHistoryManager
+
+    init(projectID: UUID) {
+        self.projectID = projectID
+        _historyManager = StateObject(wrappedValue: EditingHistoryManager(projectID: projectID))
+    }
 
     private var project: EditingProject? {
         manager.projects.first { $0.id == projectID }
@@ -69,9 +79,34 @@ struct FullEditorView: View {
             toolButton(icon: "arrow.uturn.forward", name: "Redo") {
                 manager.redo(projectID: projectID)
             }
+            toolButton(icon: "clock.arrow.circlepath", name: "History") {
+                showingHistory = true
+            }
             toolButton(icon: "paintbrush", name: "Brush") {}
-            toolButton(icon: "textformat", name: "Text") {}
+            toolButton(icon: "textformat", name: "Text") {
+                if let textLayer = project?.layers.first(where: { $0.type == .text }) {
+                    editingText = textLayer.textContent ?? ""
+                    activeLayerID = textLayer.id
+                    showingTextEditor = true
+                } else {
+                    addNewTextLayer()
+                }
+            }
             toolButton(icon: "slider.horizontal.3", name: "Adjust") {}
+        }
+        .sheet(isPresented: $showingTextEditor) {
+            richTextEditorSheet
+        }
+        .sheet(isPresented: $showingHistory) {
+            NavigationStack {
+                HistoryInspectorView(historyManager: historyManager) { newProject in
+                    manager.saveProject(newProject)
+                    showingHistory = false
+                }
+                .toolbar {
+                    Button("Close") { showingHistory = false }
+                }
+            }
         }
         .padding()
         .background(BlurView(style: .systemThinMaterialDark))
@@ -120,6 +155,49 @@ struct FullEditorView: View {
         case .shape: return "square"
         case .brush: return "paintbrush"
         }
+    }
+
+    private func addNewTextLayer() {
+        guard var project = project else { return }
+        let newLayer = EditingLayer(
+            id: UUID(),
+            name: "New Text",
+            type: .text,
+            position: CGPoint(x: project.canvasSize.width / 2, y: project.canvasSize.height / 2),
+            scale: 1.0,
+            rotation: 0,
+            textContent: "Enter text..."
+        )
+        project.layers.append(newLayer)
+        manager.saveProject(project)
+        historyManager.pushState(project, description: "Added text layer")
+
+        editingText = newLayer.textContent ?? ""
+        activeLayerID = newLayer.id
+        showingTextEditor = true
+    }
+
+    private var richTextEditorSheet: some View {
+        NavigationStack {
+            RichTextEditor(text: $editingText) {
+                saveTextChanges()
+            }
+            .padding()
+            .navigationTitle("Edit Text")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                Button("Done") { showingTextEditor = false }
+            }
+        }
+    }
+
+    private func saveTextChanges() {
+        guard var project = project, let layerID = activeLayerID,
+              let index = project.layers.firstIndex(where: { $0.id == layerID }) else { return }
+
+        project.layers[index].textContent = editingText
+        manager.saveProject(project)
+        historyManager.pushState(project, description: "Updated text layer")
     }
 }
 

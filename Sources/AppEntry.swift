@@ -7,6 +7,11 @@ struct ToolsKitApp: App {
         WindowGroup {
             ContentView()
                 .registerOAuthHandler()
+                .onAppear {
+                    #if DEBUG
+                    ValidationTests.runAll()
+                    #endif
+                }
         }
     }
 }

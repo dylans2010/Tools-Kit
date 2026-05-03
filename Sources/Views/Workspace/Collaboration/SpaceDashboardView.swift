@@ -121,9 +121,53 @@ struct SpaceObjectsList: View {
                     .foregroundColor(.secondary)
             } else {
                 ForEach(ids, id: \.self) { id in
-                    Label("Object \(id.uuidString.prefix(8))", systemImage: icon)
+                    objectRow(id: id)
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func objectRow(id: UUID) -> some View {
+        if let type = CollaborationFramework.shared.indexedObjects[id] {
+            switch type {
+            case .notebook:
+                if let notebook = NotebooksManager.shared.notebooks.first(where: { $0.id == id }) {
+                    NavigationLink(destination: NotebookDetailView(notebook: notebook)) {
+                        Label(notebook.name, systemImage: "book")
+                    }
+                } else {
+                    Label("Notebook \(id.uuidString.prefix(4))", systemImage: "book")
+                }
+            case .slideDeck:
+                if let deck = SlideDecksManager.shared.slideDecks.first(where: { $0.id == id }) {
+                    NavigationLink(destination: SlideEditorView(deckID: deck.id)) {
+                        Label(deck.title, systemImage: "rectangle.on.rectangle.angled")
+                    }
+                } else {
+                    Label("Slide Deck \(id.uuidString.prefix(4))", systemImage: "rectangle.on.rectangle.angled")
+                }
+            case .spreadsheet:
+                if let sheet = SpreadsheetsManager.shared.spreadsheets.first(where: { $0.id == id }) {
+                    NavigationLink(destination: SpreadsheetEditorView(spreadsheetID: sheet.id)) {
+                        Label(sheet.name, systemImage: "tablecells")
+                    }
+                } else {
+                    Label("Spreadsheet \(id.uuidString.prefix(4))", systemImage: "tablecells")
+                }
+            case .mediaProject:
+                if let project = EditingManager.shared.projects.first(where: { $0.id == id }) {
+                    NavigationLink(destination: FullEditorView(projectID: project.id)) {
+                        Label(project.name, systemImage: "photo.on.rectangle")
+                    }
+                } else {
+                    Label("Media Project \(id.uuidString.prefix(4))", systemImage: "photo.on.rectangle")
+                }
+            default:
+                Label("\(type.rawValue.capitalized) \(id.uuidString.prefix(4))", systemImage: icon)
+            }
+        } else {
+            Label("Object \(id.uuidString.prefix(8))", systemImage: icon)
         }
     }
 }
