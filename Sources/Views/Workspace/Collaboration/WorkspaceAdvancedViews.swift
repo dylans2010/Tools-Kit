@@ -168,10 +168,10 @@ struct WorkspaceToolsPanelView: View {
                 }
 
                 Button {
-                    let ids = ProjectExecutionBoardTool.shared.tasks.filter { $0.title.isEmpty }.map { $0.id }
-                    ProjectExecutionBoardTool.shared.removeTasks(ids: ids)
+                    let emptyTaskIDs = ProjectExecutionBoardTool.shared.tasks.filter { $0.title.isEmpty }.map { $0.id }
+                    ProjectExecutionBoardTool.shared.removeTasks(ids: emptyTaskIDs)
                     CollaborationManager.shared.cleanOrphanedTaskRefs()
-                    notif.post(title: "Workspace Cleaned", body: "Removed \(ids.count) empty task(s) and cleaned orphaned references.", category: .update)
+                    notif.post(title: "Workspace Cleaned", body: "Removed \(emptyTaskIDs.count) empty task(s) and cleaned orphaned references.", category: .update)
                 } label: {
                     Label("Clean Unused Data", systemImage: "trash")
                         .foregroundStyle(.orange)

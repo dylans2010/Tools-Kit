@@ -260,9 +260,10 @@ final class AICommandInterpreter {
                 return ["label": label]
             }),
             (["search ", "find ", "look for ", "locate "], .globalSearch, { raw in
-                let keywords = ["search ", "find ", "look for ", "locate "]
-                for kw in keywords {
-                    if let r = raw.range(of: kw, options: .caseInsensitive) {
+                // Extract the query by stripping any matched keyword prefix
+                let prefixes = ["look for ", "locate ", "search ", "find "]
+                for prefix in prefixes {
+                    if let r = raw.range(of: prefix, options: .caseInsensitive) {
                         return ["query": String(raw[r.upperBound...])]
                     }
                 }

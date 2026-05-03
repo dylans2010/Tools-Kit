@@ -150,8 +150,9 @@ final class PluginManager: ObservableObject {
         saveInstalled()
     }
 
-    // MARK: - Validation (sandbox gate)
-
+    /// Validates a plugin definition before installation.
+    /// Version must follow strict major.minor.patch semver format (e.g. "1.2.0"). Pre-release
+    /// suffixes (e.g. "1.0.0-beta") and "v" prefixes are not supported.
     func validate(plugin: PluginDefinition) -> Bool {
         guard !plugin.name.isEmpty, !plugin.version.isEmpty else { return false }
         let parts = plugin.version.split(separator: ".")

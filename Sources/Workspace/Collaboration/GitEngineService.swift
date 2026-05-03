@@ -288,7 +288,8 @@ final class RepoIntelligenceService: ObservableObject {
 
             // Hardcoded values
             for (lineIndex, line) in lines.enumerated() {
-                if line.contains("http://") && !line.contains("//") {
+                // Flag http:// URLs that aren't inside a comment (comment lines start with //)
+                if line.contains("http://") && !line.trimmingCharacters(in: .whitespaces).hasPrefix("//") {
                     foundSmells.append(CodeSmell(type: .hardcodedValue, filePath: file.path, description: "Line \(lineIndex + 1): Hardcoded HTTP URL"))
                 }
             }
