@@ -4,6 +4,7 @@ import SwiftUI
 struct RepoDetailView: View {
     let repository: GitHubRepository
     @State private var selectedBranch: String
+    @State private var showingCommandPalette = false
 
     init(repository: GitHubRepository) {
         self.repository = repository
@@ -16,16 +17,24 @@ struct RepoDetailView: View {
                 headerSection
                 statsSection
                 actionsSection
+                developerToolsSection
             }
             .padding(16)
         }
         .navigationTitle(repository.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItemGroup(placement: .primaryAction) {
+                CommandPaletteButton(isShowingPalette: $showingCommandPalette)
                 NavigationLink(destination: WorkflowListView(owner: repository.owner.login, repo: repository.name)) {
                     Text("Actions")
                 }
+            }
+        }
+        .overlay {
+            if showingCommandPalette {
+                GlobalCommandPaletteView(isPresented: $showingCommandPalette, currentView: "github")
+                    .ignoresSafeArea()
             }
         }
     }
@@ -115,6 +124,42 @@ struct RepoDetailView: View {
 
                 NavigationLink(destination: WorkflowListView(owner: repository.owner.login, repo: repository.name)) {
                     ActionCardContent(title: "Workflows", icon: "play.rectangle.on.rectangle", color: .cyan)
+                }
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var developerToolsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Developer Tools")
+                .font(.headline)
+                .padding(.leading, 4)
+
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                NavigationLink(destination: LocalGitEngineView()) {
+                    ActionCardContent(title: "Local Git", icon: "externaldrive.connected.to.line.below", color: .teal)
+                }
+                NavigationLink(destination: WorkflowBuilderView()) {
+                    ActionCardContent(title: "Workflow Builder", icon: "play.rectangle.on.rectangle", color: .purple)
+                }
+                NavigationLink(destination: CodeIntelligenceView()) {
+                    ActionCardContent(title: "Code Intel", icon: "magnifyingglass.circle.fill", color: .orange)
+                }
+                NavigationLink(destination: RepoToolsPanelView(owner: repository.owner.login, repo: repository.name)) {
+                    ActionCardContent(title: "Repo Tools", icon: "wrench.and.screwdriver.fill", color: .indigo)
+                }
+                NavigationLink(destination: ReleaseManagerView(owner: repository.owner.login, repo: repository.name)) {
+                    ActionCardContent(title: "Releases", icon: "tag.fill", color: .green)
+                }
+                NavigationLink(destination: SecurityToolsView(owner: repository.owner.login, repo: repository.name)) {
+                    ActionCardContent(title: "Security", icon: "lock.shield.fill", color: .red)
+                }
+                NavigationLink(destination: BranchIntelligenceView(owner: repository.owner.login, repo: repository.name)) {
+                    ActionCardContent(title: "Branch Intel", icon: "arrow.branch", color: .blue)
+                }
+                NavigationLink(destination: LogsIntelligenceView()) {
+                    ActionCardContent(title: "Logs", icon: "doc.text.magnifyingglass", color: .gray)
                 }
             }
             .buttonStyle(.plain)
