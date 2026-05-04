@@ -1,5 +1,38 @@
 import SwiftUI
 
+// MARK: - Workspace Advanced Home
+
+/// Top-level hub for advanced workspace features.
+/// Provides NavigationStack-compatible NavigationLink routing to
+/// WorkspaceSnapshotView, ContentGraphView, and WorkspaceAutomationView.
+struct WorkspaceAdvancedHomeView: View {
+    var body: some View {
+        List {
+            Section("Advanced Features") {
+                NavigationLink(destination: WorkspaceSnapshotView()) {
+                    Label("Snapshots", systemImage: "camera.fill")
+                }
+                NavigationLink(destination: ContentGraphView()) {
+                    Label("Content Graph", systemImage: "circle.hexagongrid.fill")
+                }
+                NavigationLink(destination: WorkspaceAutomationView()) {
+                    Label("Automations", systemImage: "bolt.fill")
+                }
+            }
+
+            Section("Workspace Utilities") {
+                NavigationLink(destination: WorkspaceGlobalSearchView()) {
+                    Label("Global Search", systemImage: "magnifyingglass")
+                }
+                NavigationLink(destination: WorkspaceToolsPanelView()) {
+                    Label("Workspace Tools", systemImage: "wrench.and.screwdriver.fill")
+                }
+            }
+        }
+        .navigationTitle("Advanced Workspace")
+    }
+}
+
 // MARK: - Global Search View
 
 struct WorkspaceGlobalSearchView: View {

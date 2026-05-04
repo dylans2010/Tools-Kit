@@ -1,6 +1,9 @@
 import UIKit
 import Messages
 import SwiftUI
+import os.log
+
+private let extensionLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "com.dylans2010.ToolsKit.messages", category: "MessagesExtension")
 
 class MessagesViewController: MSMessagesAppViewController {
 
@@ -9,6 +12,8 @@ class MessagesViewController: MSMessagesAppViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        let bundleID = Bundle.main.bundleIdentifier ?? "(nil)"
+        os_log("MessagesViewController viewDidLoad – bundle identifier: %{public}@", log: extensionLog, type: .info, bundleID)
         setupSwiftUI()
     }
 
@@ -16,12 +21,14 @@ class MessagesViewController: MSMessagesAppViewController {
 
     override func willBecomeActive(with conversation: MSConversation) {
         super.willBecomeActive(with: conversation)
+        os_log("MessagesViewController willBecomeActive", log: extensionLog, type: .info)
         // Setup/re-setup UI whenever we become active to ensure we have the latest conversation state
         presentRootView(with: conversation)
     }
 
     override func didResignActive(with conversation: MSConversation) {
         super.didResignActive(with: conversation)
+        os_log("MessagesViewController didResignActive", log: extensionLog, type: .info)
         // Cleanup or save state if needed when resigning active
     }
 
@@ -50,6 +57,7 @@ class MessagesViewController: MSMessagesAppViewController {
 
     private func setupSwiftUI() {
         // Initial setup, actual view will be updated in presentRootView
+        os_log("MessagesViewController SwiftUI bridge initialized", log: extensionLog, type: .info)
     }
 
     private func presentRootView(with conversation: MSConversation) {
