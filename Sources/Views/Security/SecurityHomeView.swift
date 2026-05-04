@@ -129,10 +129,11 @@ struct SecurityHomeView: View {
                 NavigationLink(destination: SecurityActivityLogView()) { Label("Activity", systemImage: "list.bullet.rectangle") }
                 NavigationLink(destination: SecurityDeviceTrustView()) { Label("Trusted Devices", systemImage: "checkmark.seal") }
                 NavigationLink(destination: SecurityAutoLockSettingsView()) { Label("Auto-Lock", systemImage: "timer") }
+                NavigationLink(destination: SecureFoldersView()) { Label("Secure Folders", systemImage: "folder.badge.lock") }
                 NavigationLink(destination: SecurityRecoveryOptionsView()) { Label("Recovery", systemImage: "key.viewfinder") }
                 NavigationLink(destination: SecurityThreatDetectionView()) { Label("Threats", systemImage: "shield.exclamationmark") }
                 NavigationLink(destination: SecurityBiometricControlView()) { Label("Biometrics", systemImage: "faceid") }
-                NavigationLink(destination: SecurityAppLockRulesView()) { Label("App Lock", systemImage: "app.badge.key") }
+                NavigationLink(destination: AppLockView()) { Label("App Lock System", systemImage: "app.badge.key") }
                 NavigationLink(destination: SecurityEncryptionSettingsView()) { Label("Encryption", systemImage: "lock.square.stack") }
                 NavigationLink(destination: SecurityAuditDashboardView()) { Label("Audit", systemImage: "chart.bar.doc.horizontal") }
                 NavigationLink(destination: SecurityPermissionCenterView()) { Label("Permissions", systemImage: "hand.raised.slash") }

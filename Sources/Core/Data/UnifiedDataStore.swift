@@ -8,6 +8,7 @@ final class UnifiedDataStore: ObservableObject {
 
     @Published private(set) var workflows: [WorkspaceWorkflow] = []
     @Published private(set) var canvases: [SpatialCanvas] = []
+    @Published private(set) var secureFolders: [SecureFolder] = []
 
     private let persistence = WorkspacePersistence.shared
     private let eventBus = PluginEventBus.shared
@@ -15,6 +16,7 @@ final class UnifiedDataStore: ObservableObject {
     private init() {
         self.workflows = loadWorkflowsFromDisk()
         self.canvases = loadCanvasesFromDisk()
+        self.secureFolders = loadSecureFoldersFromDisk()
     }
 
     // MARK: - Specialized Storage
@@ -47,6 +49,21 @@ final class UnifiedDataStore: ObservableObject {
 
     private func loadCanvasesFromDisk() -> [SpatialCanvas] {
         return (try? load([SpatialCanvas].self, key: "spatial_canvases")) ?? []
+    }
+
+    // MARK: - Secure Folders
+
+    func saveSecureFolders(_ folders: [SecureFolder]) throws {
+        self.secureFolders = folders
+        try save(folders, key: "secure_folders")
+    }
+
+    func loadSecureFolders() -> [SecureFolder] {
+        return secureFolders
+    }
+
+    private func loadSecureFoldersFromDisk() -> [SecureFolder] {
+        return (try? load([SecureFolder].self, key: "secure_folders")) ?? []
     }
 
     // MARK: - Generic Persistence

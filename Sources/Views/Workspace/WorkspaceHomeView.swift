@@ -229,6 +229,7 @@ struct WorkspaceDashboardView: View {
 
     private let moreTools: [(title: String, icon: String, color: Color, destination: AnyView)] = [
         ("Security", "lock.shield.fill", .blue, AnyView(SecurityHomeView())),
+        ("App Lock", "app.badge.key", .red, AnyView(AppLockView())),
         ("GitHub", "terminal.fill", .black, AnyView(GitHubRouterView())),
         ("Calendar", "calendar", .green, AnyView(CalendarHomeView())),
         ("Habits", "flame.fill", .red, AnyView(WorkspaceHabitTrackerView())),
