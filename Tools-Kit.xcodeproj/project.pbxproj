@@ -5101,10 +5101,6 @@
 				AA1000000000000000000018 /* GitHubIntelligenceViews.swift in Sources */,
 				AA100000000000000000001A /* GitHubToolPanelViews.swift in Sources */,
 				CL020000000000000000000A /* WorkspaceAutomationEngine.swift in Sources */,
-				CL020000000000000000000B /* ContentGraphService.swift in Sources */,
-				CL020000000000000000000C /* WorkspaceSnapshotService.swift in Sources */,
-				CL020000000000000000000D /* WorkspaceServices.swift in Sources */,
-				CL020000000000000000000E /* CommandEngine.swift in Sources */,
 				CL020000000000000000000F /* PluginManager.swift in Sources */,);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5218,7 +5214,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.app.messages;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dylans2010.ToolsKit.messages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -5238,7 +5234,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.app.messages;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dylans2010.ToolsKit.messages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -5278,7 +5274,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.app.keyboard;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dylans2010.ToolsKit.keyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -5298,7 +5294,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.toolskit.app.keyboard;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dylans2010.ToolsKit.keyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
