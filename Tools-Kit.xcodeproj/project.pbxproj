@@ -912,6 +912,7 @@
 		SC0200000000000000000005 /* TOTPService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000005 /* TOTPService.swift */; };
 		SC0200000000000000000006 /* VaultManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000006 /* VaultManager.swift */; };
 		SC0200000000000000000007 /* SecurityPackageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000007 /* SecurityPackageService.swift */; };
+		SC0200000000000000000008 /* SecurityDeviceSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC0100000000000000000008 /* SecurityDeviceSessionStore.swift */; };
 		SV0200000000000000000001 /* SecurityOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV0100000000000000000001 /* SecurityOnboardingView.swift */; };
 		SV0200000000000000000002 /* SecurityHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV0100000000000000000002 /* SecurityHomeView.swift */; };
 		SV0200000000000000000003 /* VaultListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV0100000000000000000003 /* VaultListView.swift */; };
@@ -2141,6 +2142,7 @@
 		SV016A6A8C64AFF84AADB98F /* SecurityAuditDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityAuditDashboardView.swift; sourceTree = "<group>"; };
 		SV017C6FA6D76B1B4F51B5C4 /* SecurityAppLockRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityAppLockRulesView.swift; sourceTree = "<group>"; };
 		SV01753ABE02878346C2A212 /* SecurityActivityLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityActivityLogView.swift; sourceTree = "<group>"; };
+		SC0100000000000000000008 /* SecurityDeviceSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Security/SecurityDeviceSessionStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -3358,6 +3360,7 @@
 				SC0100000000000000000005 /* TOTPService.swift */,
 				SC0100000000000000000006 /* VaultManager.swift */,
 				SC0100000000000000000007 /* SecurityPackageService.swift */,
+				SC0100000000000000000008 /* SecurityDeviceSessionStore.swift */,
 				SV0100000000000000000001 /* SecurityOnboardingView.swift */,
 				SV0100000000000000000002 /* SecurityHomeView.swift */,
 				SV0100000000000000000003 /* VaultListView.swift */,
@@ -4312,6 +4315,7 @@
 				SC0200000000000000000005 /* TOTPService.swift in Sources */,
 				SC0200000000000000000006 /* VaultManager.swift in Sources */,
 				SC0200000000000000000007 /* SecurityPackageService.swift in Sources */,
+				SC0200000000000000000008 /* SecurityDeviceSessionStore.swift in Sources */,
 				SV020F7D28526D764BED88E3 /* SecurityActivityLogView.swift in Sources */,
 				SV02E63D7931CCF04F3DA79B /* SecurityAppLockRulesView.swift in Sources */,
 				SV0248C2284F045048B58A92 /* SecurityAuditDashboardView.swift in Sources */,

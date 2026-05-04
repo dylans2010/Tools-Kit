@@ -8,7 +8,6 @@ struct SecurityPackageView: View {
     @State private var showingImportPicker = false
     @State private var statusMessage: String?
     @State private var isError = false
-    @State private var showingImportBridge = false
 
     var body: some View {
         NavigationStack {
@@ -71,11 +70,6 @@ struct SecurityPackageView: View {
                     self.isError = true
                 }
             }
-            .sheet(isPresented: $showingImportBridge) {
-                FileImporterRepresentableView(allowedContentTypes: [UTType(filenameExtension: "toolkitsec") ?? .data], allowsMultipleSelection: false) { urls in
-                    handleImport(urls: urls)
-                }
-            }
         }
     }
 
@@ -91,16 +85,6 @@ struct SecurityPackageView: View {
                 self.statusMessage = "Export failed: \(error.localizedDescription)"
                 self.isError = true
             }
-        }
-    }
-
-    private func handleImport(result: Result<[URL], Error>) {
-        switch result {
-        case .success(let urls):
-            handleImport(urls: urls)
-        case .failure(let error):
-            self.statusMessage = error.localizedDescription
-            self.isError = true
         }
     }
 

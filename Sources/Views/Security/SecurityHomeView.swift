@@ -5,7 +5,7 @@ struct SecurityHomeView: View {
     @StateObject private var vaultManager = VaultManager.shared
 
     @State private var showingAddSheet = false
-        @State private var showingPackageView = false
+    @State private var showingPackageView = false
     @State private var showingEmergencyLock = false
 
 
@@ -75,7 +75,7 @@ struct SecurityHomeView: View {
                 }
             }
         }
-                .sheet(isPresented: $showingAddSheet) {
+        .sheet(isPresented: $showingAddSheet) {
             AddInfoView()
         }
         .sheet(isPresented: $showingPackageView) {
