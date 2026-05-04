@@ -1,11 +1,12 @@
 import SwiftUI
 
 struct SecurityOnboardingView: View {
-    @ObservedObject private var authService = AuthService.shared
+    @ObservedObject var authService: AuthService
     @State private var password = ""
     @State private var confirmPassword = ""
     @State private var useBiometrics = true
     @State private var error: String?
+    @State private var isAuthenticating = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -46,7 +47,7 @@ struct SecurityOnboardingView: View {
             Spacer()
 
             Button {
-                setupVault()
+                Task { await setupVault() }
             } label: {
                 Text("Initialize Vault")
                     .frame(maxWidth: .infinity)
@@ -55,15 +56,19 @@ struct SecurityOnboardingView: View {
                     .foregroundColor(.white)
                     .cornerRadius(12)
             }
-            .disabled(password.isEmpty || password != confirmPassword)
+            .disabled(isAuthenticating || password.isEmpty || password != confirmPassword)
             .padding()
         }
         .background(Color(.systemGroupedBackground))
     }
 
-    private func setupVault() {
+    @MainActor
+    private func setupVault() async {
+        isAuthenticating = true
+        defer { isAuthenticating = false }
         do {
             try authService.setup(password: password, useBiometrics: useBiometrics)
+            error = nil
         } catch {
             self.error = error.localizedDescription
         }
@@ -71,9 +76,10 @@ struct SecurityOnboardingView: View {
 }
 
 struct SecurityLoginView: View {
-    @ObservedObject private var authService = AuthService.shared
+    @ObservedObject var authService: AuthService
     @State private var password = ""
     @State private var error: String?
+    @State private var isAuthenticating = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -96,7 +102,7 @@ struct SecurityLoginView: View {
             }
 
             Button {
-                login()
+                Task { await login() }
             } label: {
                 Text("Unlock")
                     .frame(maxWidth: .infinity)
@@ -105,10 +111,11 @@ struct SecurityLoginView: View {
                     .foregroundColor(.white)
                     .cornerRadius(12)
             }
-            .disabled(password.isEmpty)
+            .disabled(isAuthenticating || password.isEmpty)
             .padding(.horizontal)
 
             Button {
+                isAuthenticating = true
                 authService.authenticateWithBiometrics()
             } label: {
                 Label("Unlock with Biometrics", systemImage: "faceid")
@@ -118,13 +125,24 @@ struct SecurityLoginView: View {
             Spacer()
         }
         .onAppear {
+            isAuthenticating = true
             authService.authenticateWithBiometrics()
+        }
+        .onChange(of: authService.isAuthenticated) { _, value in
+            if value {
+                isAuthenticating = false
+                error = nil
+            }
         }
     }
 
-    private func login() {
+    @MainActor
+    private func login() async {
+        isAuthenticating = true
+        defer { isAuthenticating = false }
         do {
             try authService.authenticate(password: password)
+            error = nil
         } catch {
             self.error = "Incorrect password"
         }

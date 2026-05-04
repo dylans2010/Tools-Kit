@@ -17,9 +17,9 @@ struct SecurityHomeView: View {
     var body: some View {
         Group {
             if !authService.isSetup {
-                SecurityOnboardingView()
+                SecurityOnboardingView(authService: authService)
             } else if !authService.isAuthenticated {
-                SecurityLoginView()
+                SecurityLoginView(authService: authService)
             } else {
                 dashboardContent
             }
