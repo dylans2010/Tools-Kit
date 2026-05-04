@@ -112,7 +112,7 @@ struct AIInboxDashboard: View {
 
     private var priorityThreadList: some View {
         ForEach(viewModel.priorityThreads.prefix(3)) { thread in
-            NavigationLink(destination: MailThreadView(thread: thread)) {
+            NavigationLink(destination: MailThreadView(viewModel: MailViewModel(), email: EmailMessage(uid: Int(thread.messages.last?.id ?? "0") ?? 0, subject: thread.subject, sender: thread.messages.last?.from ?? "Unknown Sender", date: thread.lastMessageDate, preview: thread.messages.last?.body ?? "", isRead: thread.isRead, body: thread.messages.last?.body, htmlBody: thread.messages.last?.htmlBody, attachments: []))) {
                 priorityThreadRow(thread)
             }
             .buttonStyle(.plain)
