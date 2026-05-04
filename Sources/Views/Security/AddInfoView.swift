@@ -31,10 +31,22 @@ struct AddInfoView: View {
     @State private var totpAccount = ""
     @State private var totpCode = "------"
     @State private var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @State private var errorMessage: String?
 
     var body: some View {
         NavigationStack {
             Form {
+                Section {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Add Secure Item")
+                            .font(.headline)
+                        Text("Everything is encrypted and stored locally in your vault.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 4)
+                }
+
                 Section {
                     Picker("Type", selection: $category) {
                         ForEach(VaultCategory.allCases) { cat in
@@ -51,6 +63,13 @@ struct AddInfoView: View {
                 Section("Notes") {
                     TextEditor(text: $note)
                         .frame(minHeight: 100)
+                }
+
+                if let errorMessage {
+                    Section {
+                        Text(errorMessage)
+                            .foregroundStyle(.red)
+                    }
                 }
             }
             .navigationTitle("New Entry")
@@ -164,12 +183,17 @@ struct AddInfoView: View {
     }
 
     private func saveItem() {
+        errorMessage = nil
         let itemData: Data
         var metadata: [String: String] = [:]
 
         do {
             switch category {
             case .credentials:
+                guard !username.isEmpty, !password.isEmpty else {
+                    errorMessage = "Username and password are required."
+                    return
+                }
                 let data = CredentialData(username: username, password: password, website: domain)
                 itemData = try JSONEncoder().encode(data)
                 metadata["username"] = username
@@ -186,6 +210,10 @@ struct AddInfoView: View {
                 itemData = selectedFile != nil ? try Data(contentsOf: selectedFile!) : Data()
                 metadata["filename"] = selectedFile?.lastPathComponent ?? "unknown"
             case .totp:
+                guard !totpSecret.isEmpty else {
+                    errorMessage = "TOTP secret is required."
+                    return
+                }
                 let data = TOTPData(secret: totpSecret, issuer: totpIssuer, account: totpAccount)
                 itemData = try JSONEncoder().encode(data)
                 metadata["issuer"] = totpIssuer
@@ -203,7 +231,7 @@ struct AddInfoView: View {
             try vaultManager.addItem(newItem, data: itemData)
             dismiss()
         } catch {
-            print("Failed to save vault item: \(error)")
+            errorMessage = "Failed to save vault item: \(error.localizedDescription)"
         }
     }
 }
