@@ -188,13 +188,13 @@ final class PluginManager: ObservableObject {
     private func saveInstalled() {
         let s = installedPlugins
         DispatchQueue.global(qos: .utility).async {
-            try? WorkspacePersistence.shared.save(s, to: self.storageFile)
+            try? UnifiedDataStore.shared.save(s, key: "installed_plugins")
         }
     }
 
     private func loadInstalled() {
-        if WorkspacePersistence.shared.exists(filename: storageFile) {
-            installedPlugins = (try? WorkspacePersistence.shared.load([PluginDefinition].self, from: storageFile)) ?? []
+        if UnifiedDataStore.shared.exists(key: "installed_plugins") {
+            installedPlugins = (try? UnifiedDataStore.shared.load([PluginDefinition].self, key: "installed_plugins")) ?? []
         }
     }
 }

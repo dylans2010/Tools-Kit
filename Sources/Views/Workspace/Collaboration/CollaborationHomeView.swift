@@ -47,7 +47,10 @@ struct CollaborationHomeView: View {
                 NavigationLink(destination: WorkspaceAdvancedHomeView()) {
                     Label("Advanced Workspace", systemImage: "square.3.layers.3d")
                 }
-                NavigationLink(destination: WorkspaceAutomationView()) {
+                NavigationLink(destination: AdvancedCollaborationView()) {
+                    Label("Advanced Collaboration", systemImage: "person.2.wave.2.fill")
+                }
+                NavigationLink(destination: AutomationHomeView()) {
                     Label("Automations", systemImage: "bolt.fill")
                 }
                 NavigationLink(destination: ContentGraphView()) {
@@ -68,8 +71,8 @@ struct CollaborationHomeView: View {
                 NavigationLink(destination: CommandHistoryView()) {
                     Label("Command History", systemImage: "clock.arrow.circlepath")
                 }
-                NavigationLink(destination: PluginMarketplaceView()) {
-                    Label("Plugin Marketplace", systemImage: "puzzlepiece.extension.fill")
+                NavigationLink(destination: PluginsMainView()) {
+                    Label("Workspace Extensions", systemImage: "puzzlepiece.extension.fill")
                 }
             }
 

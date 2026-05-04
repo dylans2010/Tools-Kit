@@ -18,6 +18,7 @@ struct RepoDetailView: View {
                 statsSection
                 actionsSection
                 developerToolsSection
+                pluginToolsSection
             }
             .padding(16)
         }
@@ -124,6 +125,21 @@ struct RepoDetailView: View {
 
                 NavigationLink(destination: WorkflowListView(owner: repository.owner.login, repo: repository.name)) {
                     ActionCardContent(title: "Workflows", icon: "play.rectangle.on.rectangle", color: .cyan)
+                }
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var pluginToolsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Plugin Tools")
+                .font(.headline)
+                .padding(.leading, 4)
+
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                NavigationLink(destination: PluginsMainView()) {
+                    ActionCardContent(title: "Extensions", icon: "puzzlepiece.extension.fill", color: .green)
                 }
             }
             .buttonStyle(.plain)
