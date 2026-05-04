@@ -139,14 +139,14 @@ struct RepoDetailView: View {
                     .padding(.leading, 4)
 
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    NavigationLink(destination: GitHubToolDashboardView(owner: repository.owner.login, repo: repository.name)) {
+                        ActionCardContent(title: "Intelligence Module", icon: "sparkles.tv.fill", color: .indigo)
+                    }
                     NavigationLink(destination: CodeIntelligenceView()) {
                         ActionCardContent(title: "Code Intel", icon: "magnifyingglass.circle.fill", color: .orange)
                     }
                     NavigationLink(destination: BranchIntelligenceView(owner: repository.owner.login, repo: repository.name)) {
                         ActionCardContent(title: "Branch Intel", icon: "arrow.branch", color: .blue)
-                    }
-                    NavigationLink(destination: LogsIntelligenceView()) {
-                        ActionCardContent(title: "Logs", icon: "doc.text.magnifyingglass", color: .gray)
                     }
                     NavigationLink(destination: WorkflowBuilderView()) {
                         ActionCardContent(title: "Workflow Builder", icon: "play.rectangle.on.rectangle", color: .purple)

@@ -64,3 +64,14 @@ struct TOTPData: Codable {
     var digits: Int = 6
     var period: Int = 30
 }
+
+struct SecurityLogEvent: Codable, Identifiable {
+    let id: UUID
+    let type: LogType
+    let message: String
+    let timestamp: Date
+
+    enum LogType: String, Codable {
+        case login, failedLogin, settingsChange, vaultAccess, threat
+    }
+}

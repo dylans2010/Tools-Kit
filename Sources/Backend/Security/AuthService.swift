@@ -13,6 +13,7 @@ class AuthService: ObservableObject {
     @Published var isAuthenticated = false
     @Published var isSetup = false
     @Published var lastActivity: Date = Date()
+    @Published var logs: [SecurityLogEvent] = []
 
     private let masterPasswordKey = "com.toolskit.security.master"
     private let saltKey = "com.toolskit.security.salt"
@@ -28,10 +29,25 @@ class AuthService: ObservableObject {
     private init() {
         checkSetup()
         setupAutoLockTimer()
+        loadLogs()
     }
 
     func checkSetup() {
         isSetup = UserDefaults.standard.data(forKey: saltKey) != nil
+    }
+
+    func logEvent(type: SecurityLogEvent.LogType, message: String) {
+        let event = SecurityLogEvent(id: UUID(), type: type, message: message, timestamp: Date())
+        logs.insert(event, at: 0)
+        saveLogs()
+    }
+
+    private func saveLogs() {
+        try? WorkspacePersistence.shared.save(logs, to: "security_logs.json")
+    }
+
+    private func loadLogs() {
+        logs = (try? WorkspacePersistence.shared.load([SecurityLogEvent].self, from: "security_logs.json")) ?? []
     }
 
     func setup(password: String, useBiometrics: Bool) throws {
@@ -65,6 +81,7 @@ class AuthService: ObservableObject {
         self.isAuthenticated = true
         self.isSetup = true
         self.lastActivity = Date()
+        logEvent(type: .settingsChange, message: "Vault initialized and first login")
     }
 
     func authenticate(password: String) throws {
@@ -86,6 +103,7 @@ class AuthService: ObservableObject {
         self.sessionKey = dek
         self.isAuthenticated = true
         self.lastActivity = Date()
+        logEvent(type: .login, message: "Successful password login")
     }
 
     func authenticateWithBiometrics() {
@@ -96,13 +114,17 @@ class AuthService: ObservableObject {
 
         if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
             context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Unlock your Security Vault") { success, authenticationError in
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     if success {
                         do {
                             try self.unlockWithSecureEnclave()
+                            self.logEvent(type: .login, message: "Successful biometric login")
                         } catch {
                             self.isAuthenticated = false
+                            self.logEvent(type: .failedLogin, message: "Biometric login failed during decryption")
                         }
+                    } else {
+                        self.logEvent(type: .failedLogin, message: "Biometric authentication failed")
                     }
                 }
             }

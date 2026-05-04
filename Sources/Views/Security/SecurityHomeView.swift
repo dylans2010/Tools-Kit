@@ -7,6 +7,7 @@ struct SecurityHomeView: View {
     @State private var showingAddSheet = false
     @State private var selectedCategory: VaultCategory?
     @State private var showingPackageView = false
+    @State private var showingEmergencyLock = false
 
     private let columns = [
         GridItem(.flexible()),
@@ -24,7 +25,6 @@ struct SecurityHomeView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIScene.willDeactivateNotification)) { _ in
-            // Optional: lock on background if desired, or just update activity
             authService.updateActivity()
         }
         .onTapGesture {
@@ -36,6 +36,11 @@ struct SecurityHomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 headerSection
+                securityToolsSection
+
+                Text("Vault Categories")
+                    .font(.headline)
+                    .padding(.horizontal)
 
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(VaultCategory.allCases) { category in
@@ -51,10 +56,16 @@ struct SecurityHomeView: View {
             .padding(.vertical)
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Security Vault")
+        .navigationTitle("Security Hub")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
+                    Button(role: .destructive) {
+                        showingEmergencyLock = true
+                    } label: {
+                        Label("Emergency Lock", systemImage: "exclamationmark.lock.fill")
+                    }
+
                     Button {
                         showingPackageView = true
                     } label: {
@@ -91,6 +102,9 @@ struct SecurityHomeView: View {
         .sheet(isPresented: $showingPackageView) {
             SecurityPackageView()
         }
+        .fullScreenCover(isPresented: $showingEmergencyLock) {
+            SecurityEmergencyLockView()
+        }
     }
 
     private var headerSection: some View {
@@ -98,10 +112,34 @@ struct SecurityHomeView: View {
             Text("Your Secure Space")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
-            Text("Encrypted Vault")
+            Text("Security Dashboard")
                 .font(.title2.bold())
         }
         .padding(.horizontal)
+    }
+
+    private var securityToolsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Security Suite")
+                .font(.headline)
+                .padding(.horizontal)
+
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                SecurityToolButton(title: "Sessions", icon: "iphone.badge.play", color: .blue, destination: AnyView(SecuritySessionManagerView()))
+                SecurityToolButton(title: "Activity", icon: "list.bullet.rectangle", color: .green, destination: AnyView(SecurityActivityLogView()))
+                SecurityToolButton(title: "Trusted", icon: "checkmark.seal", color: .orange, destination: AnyView(SecurityDeviceTrustView()))
+                SecurityToolButton(title: "Auto-Lock", icon: "timer", color: .purple, destination: AnyView(SecurityAutoLockSettingsView()))
+                SecurityToolButton(title: "Recovery", icon: "key.viewfinder", color: .red, destination: AnyView(SecurityRecoveryOptionsView()))
+                SecurityToolButton(title: "Threats", icon: "shield.exclamationmark", color: .indigo, destination: AnyView(SecurityThreatDetectionView()))
+                SecurityToolButton(title: "Biometrics", icon: "faceid", color: .teal, destination: AnyView(SecurityBiometricControlView()))
+                SecurityToolButton(title: "App Lock", icon: "app.badge.key", color: .pink, destination: AnyView(SecurityAppLockRulesView()))
+                SecurityToolButton(title: "Encryption", icon: "lock.square.stack", color: .cyan, destination: AnyView(SecurityEncryptionSettingsView()))
+                SecurityToolButton(title: "Audit", icon: "chart.bar.doc.horizontal", color: .brown, destination: AnyView(SecurityAuditDashboardView()))
+                SecurityToolButton(title: "Permissions", icon: "hand.raised.slash", color: .yellow, destination: AnyView(SecurityPermissionCenterView()))
+                SecurityToolButton(title: "Emergency", icon: "exclamationmark.triangle", color: .red, destination: AnyView(SecurityEmergencyLockView()))
+            }
+            .padding(.horizontal)
+        }
     }
 
     private var recentItemsSection: some View {
@@ -116,7 +154,7 @@ struct SecurityHomeView: View {
                     .foregroundStyle(.secondary)
                     .padding(.horizontal)
             } else {
-                ForEach(vaultManager.items.sorted(by: { $0.updatedAt > $1.updatedAt }).prefix(5)) { item in
+                ForEach(vaultManager.items.sorted(by: { $0.updatedAt > $1.updatedAt }).prefix(3)) { item in
                     NavigationLink {
                         VaultItemDetailView(item: item)
                     } label: {
@@ -151,33 +189,29 @@ struct SecurityHomeView: View {
     }
 }
 
-struct CategoryCard: View {
-    let category: VaultCategory
-    let count: Int
-    let action: () -> Void
+struct SecurityToolButton: View {
+    let title: String
+    let icon: String
+    let color: Color
+    let destination: AnyView
 
     var body: some View {
-        Button(action: action) {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Image(systemName: category.icon)
-                        .font(.title2)
-                        .foregroundStyle(.blue)
-                    Spacer()
-                    Text("\(count)")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                }
-
-                Text(category.rawValue)
-                    .font(.subheadline.bold())
+        NavigationLink(destination: destination) {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundColor(color)
+                    .frame(width: 44, height: 44)
+                    .background(color.opacity(0.1))
+                    .clipShape(Circle())
+                Text(title)
+                    .font(.caption2.bold())
                     .foregroundColor(.primary)
             }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
             .background(Color(.secondarySystemGroupedBackground))
-            .cornerRadius(16)
-            .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
+            .cornerRadius(12)
         }
         .buttonStyle(.plain)
     }
