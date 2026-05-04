@@ -2344,8 +2344,28 @@
 				BFA101000000000000000005 /* GmailServerConfiguration.swift */,
 				BFA101000000000000000006 /* GmailMailProvider.swift */,
 				MEG0000000000000000000002 /* Workspace */,
-			);
+							0303CEB3629B1574C8C70B31 /* Security */,
+);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		0303CEB3629B1574C8C70B31 /* Security */ = {
+			isa = PBXGroup;
+			children = (
+						SV01753ABE02878346C2A212 /* SecurityActivityLogView.swift */,
+						SV017C6FA6D76B1B4F51B5C4 /* SecurityAppLockRulesView.swift */,
+						SV016A6A8C64AFF84AADB98F /* SecurityAuditDashboardView.swift */,
+						SV01A12D37157D974BB2B816 /* SecurityAutoLockSettingsView.swift */,
+						SV015345021718F34F31B96A /* SecurityBiometricControlView.swift */,
+						SV01AE5D63E2D3A746308755 /* SecurityDeviceTrustView.swift */,
+						SV01827D4408A72B42F49B48 /* SecurityEmergencyLockView.swift */,
+						SV0164C62E3BB446438C9239 /* SecurityEncryptionSettingsView.swift */,
+						SV018F383F25FEDE4423B849 /* SecurityPermissionCenterView.swift */,
+						SV0166A64203E84844FF8623 /* SecurityRecoveryOptionsView.swift */,
+						SV01649B1C7F0A714E8085F8 /* SecuritySessionManagerView.swift */,
+						SV013668155C187E4EE3B5C9 /* SecurityThreatDetectionView.swift */,
+);
+			path = Security;
 			sourceTree = "<group>";
 		};
 		MEG0000000000000000000002 /* Workspace */ = {
@@ -3332,18 +3352,6 @@
 				SC0100000000000000000005 /* TOTPService.swift */,
 				SC0100000000000000000006 /* VaultManager.swift */,
 				SC0100000000000000000007 /* SecurityPackageService.swift */,
-				SV01753ABE02878346C2A212 /* SecurityActivityLogView.swift */,
-				SV017C6FA6D76B1B4F51B5C4 /* SecurityAppLockRulesView.swift */,
-				SV016A6A8C64AFF84AADB98F /* SecurityAuditDashboardView.swift */,
-				SV01A12D37157D974BB2B816 /* SecurityAutoLockSettingsView.swift */,
-				SV015345021718F34F31B96A /* SecurityBiometricControlView.swift */,
-				SV01AE5D63E2D3A746308755 /* SecurityDeviceTrustView.swift */,
-				SV01827D4408A72B42F49B48 /* SecurityEmergencyLockView.swift */,
-				SV0164C62E3BB446438C9239 /* SecurityEncryptionSettingsView.swift */,
-				SV018F383F25FEDE4423B849 /* SecurityPermissionCenterView.swift */,
-				SV0166A64203E84844FF8623 /* SecurityRecoveryOptionsView.swift */,
-				SV01649B1C7F0A714E8085F8 /* SecuritySessionManagerView.swift */,
-				SV013668155C187E4EE3B5C9 /* SecurityThreatDetectionView.swift */,
 				SV0100000000000000000001 /* SecurityOnboardingView.swift */,
 				SV0100000000000000000002 /* SecurityHomeView.swift */,
 				SV0100000000000000000003 /* VaultListView.swift */,
