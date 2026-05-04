@@ -149,6 +149,8 @@
 		ML0200000000000000000002 /* EmailMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000002 /* EmailMessage.swift */; };
 		ML0200000000000000000003 /* MailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000003 /* MailViewModel.swift */; };
 		ML0200000000000000000004 /* EmailDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000004 /* EmailDetailView.swift */; };
+		ML0200000000000000000006 /* MetadataInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000006 /* MetadataInspectorView.swift */; };
+		ML0200000000000000000007 /* DocumentScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000007 /* DocumentScannerView.swift */; };
 		F9864379942F4D0AAD6AB5F2 /* MailAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6554994AF5D14C2ABD0C2FD8 /* MailAccount.swift */; };
 		53EC1AF8723044F3BFB42AB2 /* MailFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EEEF45551F542229BE32D06 /* MailFolder.swift */; };
 		169F73E894D6416298DC841C /* MailMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E0ABB5BDAD4793B4FE4B93 /* MailMessage.swift */; };
@@ -1200,6 +1202,8 @@
 		ML0100000000000000000002 /* EmailMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/EmailMessage.swift; sourceTree = "<group>"; };
 		ML0100000000000000000003 /* MailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/MailViewModel.swift; sourceTree = "<group>"; };
 		ML0100000000000000000004 /* EmailDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/EmailDetailView.swift; sourceTree = "<group>"; };
+		ML0100000000000000000006 /* MetadataInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MetadataInspectorView.swift; sourceTree = "<group>"; };
+		ML0100000000000000000007 /* DocumentScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/DocumentScannerView.swift; sourceTree = "<group>"; };
 		6554994AF5D14C2ABD0C2FD8 /* MailAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailAccount.swift; sourceTree = "<group>"; };
 		1EEEF45551F542229BE32D06 /* MailFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailFolder.swift; sourceTree = "<group>"; };
 		E1E0ABB5BDAD4793B4FE4B93 /* MailMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailMessage.swift; sourceTree = "<group>"; };
@@ -2344,8 +2348,28 @@
 				BFA101000000000000000005 /* GmailServerConfiguration.swift */,
 				BFA101000000000000000006 /* GmailMailProvider.swift */,
 				MEG0000000000000000000002 /* Workspace */,
-			);
+							0303CEB3629B1574C8C70B31 /* Security */,
+);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		0303CEB3629B1574C8C70B31 /* Security */ = {
+			isa = PBXGroup;
+			children = (
+						SV01753ABE02878346C2A212 /* SecurityActivityLogView.swift */,
+						SV017C6FA6D76B1B4F51B5C4 /* SecurityAppLockRulesView.swift */,
+						SV016A6A8C64AFF84AADB98F /* SecurityAuditDashboardView.swift */,
+						SV01A12D37157D974BB2B816 /* SecurityAutoLockSettingsView.swift */,
+						SV015345021718F34F31B96A /* SecurityBiometricControlView.swift */,
+						SV01AE5D63E2D3A746308755 /* SecurityDeviceTrustView.swift */,
+						SV01827D4408A72B42F49B48 /* SecurityEmergencyLockView.swift */,
+						SV0164C62E3BB446438C9239 /* SecurityEncryptionSettingsView.swift */,
+						SV018F383F25FEDE4423B849 /* SecurityPermissionCenterView.swift */,
+						SV0166A64203E84844FF8623 /* SecurityRecoveryOptionsView.swift */,
+						SV01649B1C7F0A714E8085F8 /* SecuritySessionManagerView.swift */,
+						SV013668155C187E4EE3B5C9 /* SecurityThreatDetectionView.swift */,
+);
+			path = Security;
 			sourceTree = "<group>";
 		};
 		MEG0000000000000000000002 /* Workspace */ = {
@@ -2675,6 +2699,8 @@
 				ML0100000000000000000002 /* EmailMessage.swift */,
 				ML0100000000000000000003 /* MailViewModel.swift */,
 				ML0100000000000000000004 /* EmailDetailView.swift */,
+				ML0100000000000000000006 /* MetadataInspectorView.swift */,
+				ML0100000000000000000007 /* DocumentScannerView.swift */,
 				6554994AF5D14C2ABD0C2FD8 /* MailAccount.swift */,
 				1EEEF45551F542229BE32D06 /* MailFolder.swift */,
 				E1E0ABB5BDAD4793B4FE4B93 /* MailMessage.swift */,
@@ -3332,18 +3358,6 @@
 				SC0100000000000000000005 /* TOTPService.swift */,
 				SC0100000000000000000006 /* VaultManager.swift */,
 				SC0100000000000000000007 /* SecurityPackageService.swift */,
-				SV01753ABE02878346C2A212 /* SecurityActivityLogView.swift */,
-				SV017C6FA6D76B1B4F51B5C4 /* SecurityAppLockRulesView.swift */,
-				SV016A6A8C64AFF84AADB98F /* SecurityAuditDashboardView.swift */,
-				SV01A12D37157D974BB2B816 /* SecurityAutoLockSettingsView.swift */,
-				SV015345021718F34F31B96A /* SecurityBiometricControlView.swift */,
-				SV01AE5D63E2D3A746308755 /* SecurityDeviceTrustView.swift */,
-				SV01827D4408A72B42F49B48 /* SecurityEmergencyLockView.swift */,
-				SV0164C62E3BB446438C9239 /* SecurityEncryptionSettingsView.swift */,
-				SV018F383F25FEDE4423B849 /* SecurityPermissionCenterView.swift */,
-				SV0166A64203E84844FF8623 /* SecurityRecoveryOptionsView.swift */,
-				SV01649B1C7F0A714E8085F8 /* SecuritySessionManagerView.swift */,
-				SV013668155C187E4EE3B5C9 /* SecurityThreatDetectionView.swift */,
 				SV0100000000000000000001 /* SecurityOnboardingView.swift */,
 				SV0100000000000000000002 /* SecurityHomeView.swift */,
 				SV0100000000000000000003 /* VaultListView.swift */,
@@ -4464,6 +4478,8 @@
 				ML0200000000000000000002 /* EmailMessage.swift in Sources */,
 				ML0200000000000000000003 /* MailViewModel.swift in Sources */,
 				ML0200000000000000000004 /* EmailDetailView.swift in Sources */,
+				ML0200000000000000000006 /* MetadataInspectorView.swift in Sources */,
+				ML0200000000000000000007 /* DocumentScannerView.swift in Sources */,
 				F9864379942F4D0AAD6AB5F2 /* MailAccount.swift in Sources */,
 				53EC1AF8723044F3BFB42AB2 /* MailFolder.swift in Sources */,
 				169F73E894D6416298DC841C /* MailMessage.swift in Sources */,

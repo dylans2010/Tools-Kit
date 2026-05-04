@@ -424,6 +424,16 @@ final class WorkflowBuilderService: ObservableObject {
         workflows[i] = wf
         saveData()
     }
+
+    private func saveData() {
+        try? WorkspacePersistence.shared.save(workflows, to: storageFile)
+    }
+
+    private func loadData() {
+        if WorkspacePersistence.shared.exists(filename: storageFile) {
+            workflows = (try? WorkspacePersistence.shared.load([WorkflowDefinition].self, from: storageFile)) ?? []
+        }
+    }
 }
 
 // MARK: - Repo Analyzer
@@ -491,16 +501,4 @@ final class RepoAnalyzerService: ObservableObject {
         self.circularDependencies = Array(Set(cycles))
     }
 
-    private func saveData() {
-        let s = workflows
-        DispatchQueue.global(qos: .utility).async {
-            try? WorkspacePersistence.shared.save(s, to: self.storageFile)
-        }
-    }
-
-    private func loadData() {
-        if WorkspacePersistence.shared.exists(filename: storageFile) {
-            workflows = (try? WorkspacePersistence.shared.load([WorkflowDefinition].self, from: storageFile)) ?? []
-        }
-    }
 }

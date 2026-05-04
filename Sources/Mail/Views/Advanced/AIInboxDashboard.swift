@@ -80,49 +80,65 @@ struct AIInboxDashboard: View {
 
     private var prioritySection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Label("Priority Attention", systemImage: "bolt.fill")
-                    .font(.headline)
-                    .foregroundStyle(.orange)
-                Spacer()
-                NavigationLink("Full Queue", destination: PriorityQueueView())
-                    .font(.caption.bold())
-                    .foregroundStyle(.blue)
-            }
+            priorityHeader
 
             if viewModel.priorityThreads.isEmpty {
-                Text("All quiet for now. No urgent items detected.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 30)
+                emptyPriorityState
             } else {
-                ForEach(viewModel.priorityThreads.prefix(3)) { thread in
-                    NavigationLink(destination: MailThreadView(thread: thread)) {
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack {
-                                Text(thread.subject)
-                                    .font(.subheadline.bold())
-                                    .lineLimit(1)
-                                Spacer()
-                                Text("\(Int((thread.priorityScore ?? 0.8) * 100))")
-                                    .font(.system(size: 10, weight: .bold))
-                                    .padding(4)
-                                    .background(Color.orange.opacity(0.2), in: Circle())
-                                    .foregroundStyle(.orange)
-                            }
-                            Text(thread.messages.last?.body.prefix(100) ?? "")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(2)
-                        }
-                        .padding()
-                        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 16))
-                    }
-                    .buttonStyle(.plain)
-                }
+                priorityThreadList
             }
         }
+    }
+
+    private var priorityHeader: some View {
+        HStack {
+            Label("Priority Attention", systemImage: "bolt.fill")
+                .font(.headline)
+                .foregroundStyle(.orange)
+            Spacer()
+            NavigationLink("Full Queue", destination: PriorityQueueView())
+                .font(.caption.bold())
+                .foregroundStyle(.blue)
+        }
+    }
+
+    private var emptyPriorityState: some View {
+        Text("All quiet for now. No urgent items detected.")
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.vertical, 30)
+    }
+
+    private var priorityThreadList: some View {
+        ForEach(viewModel.priorityThreads.prefix(3)) { thread in
+            NavigationLink(destination: MailThreadView(thread: thread)) {
+                priorityThreadRow(thread)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private func priorityThreadRow(_ thread: MailThread) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(thread.subject)
+                    .font(.subheadline.bold())
+                    .lineLimit(1)
+                Spacer()
+                Text("\(Int((thread.priorityScore ?? 0.8) * 100))")
+                    .font(.system(size: 10, weight: .bold))
+                    .padding(4)
+                    .background(Color.orange.opacity(0.2), in: Circle())
+                    .foregroundStyle(.orange)
+            }
+            Text(thread.messages.last?.body.prefix(100) ?? "")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+        }
+        .padding()
+        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 16))
     }
 
     private var insightsSection: some View {
@@ -182,5 +198,27 @@ struct AIInboxDashboard: View {
         .navigationDestination(isPresented: $showingMemoryGraph) {
             MemoryGraphViewer()
         }
+    }
+}
+
+struct ActionCard: View {
+    let title: String
+    let icon: String
+    let color: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.title3)
+                Text(title)
+                    .font(.caption.bold())
+            }
+            .frame(maxWidth: .infinity, minHeight: 96)
+            .padding()
+            .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
+        }
+        .buttonStyle(.plain)
     }
 }
