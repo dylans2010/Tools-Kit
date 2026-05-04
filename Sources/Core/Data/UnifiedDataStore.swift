@@ -6,8 +6,8 @@ import Combine
 final class UnifiedDataStore: ObservableObject {
     static let shared = UnifiedDataStore()
 
-    @Published private(set) var workflows: [WorkspaceWorkflow] = []
-    @Published private(set) var canvases: [SpatialCanvas] = []
+    @Published private(set) var workflows: [String] = []
+    @Published private(set) var canvases: [String] = []
     @Published private(set) var secureFolders: [SecureFolder] = []
 
     private let persistence = WorkspacePersistence.shared
@@ -21,34 +21,32 @@ final class UnifiedDataStore: ObservableObject {
 
     // MARK: - Specialized Storage
 
-    func saveWorkflows(_ workflows: [WorkspaceWorkflow]) throws {
+    func saveWorkflows(_ workflows: [String]) throws {
         self.workflows = workflows
         try save(workflows, key: "workspace_workflows")
     }
 
-    func loadWorkflows() -> [WorkspaceWorkflow] {
+    func loadWorkflows() -> [String] {
         return workflows
     }
 
-    private func loadWorkflowsFromDisk() -> [WorkspaceWorkflow] {
-        return (try? load([WorkspaceWorkflow].self, key: "workspace_workflows")) ?? []
+    private func loadWorkflowsFromDisk() -> [String] {
+        return (try? load([String].self, key: "workspace_workflows")) ?? []
     }
 
-    func saveCanvas(_ canvas: SpatialCanvas) throws {
-        if let index = canvases.firstIndex(where: { $0.id == canvas.id }) {
-            canvases[index] = canvas
-        } else {
+    func saveCanvas(_ canvas: String) throws {
+        if !canvases.contains(canvas) {
             canvases.append(canvas)
         }
         try save(canvases, key: "spatial_canvases")
     }
 
-    func loadCanvases() -> [SpatialCanvas] {
+    func loadCanvases() -> [String] {
         return canvases
     }
 
-    private func loadCanvasesFromDisk() -> [SpatialCanvas] {
-        return (try? load([SpatialCanvas].self, key: "spatial_canvases")) ?? []
+    private func loadCanvasesFromDisk() -> [String] {
+        return (try? load([String].self, key: "spatial_canvases")) ?? []
     }
 
     // MARK: - Secure Folders

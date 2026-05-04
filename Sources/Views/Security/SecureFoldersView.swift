@@ -72,7 +72,7 @@ struct SecureFolderDetailView: View {
                 Text("No items in this folder")
                     .foregroundColor(.secondary)
             } else {
-                ForEach(folder.items, id: \.self.hashValue) { item in
+                ForEach(Array(folder.items.enumerated()), id: \.offset) { _, item in
                     FolderItemRow(item: item)
                 }
                 .onDelete { indexSet in
