@@ -68,8 +68,8 @@ struct CollaborationHomeView: View {
                 NavigationLink(destination: CommandHistoryView()) {
                     Label("Command History", systemImage: "clock.arrow.circlepath")
                 }
-                NavigationLink(destination: PluginMarketplaceView()) {
-                    Label("Plugin Marketplace", systemImage: "puzzlepiece.extension.fill")
+                NavigationLink(destination: PluginsMainView()) {
+                    Label("Workspace Extensions", systemImage: "puzzlepiece.extension.fill")
                 }
             }
 

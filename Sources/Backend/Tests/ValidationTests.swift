@@ -13,6 +13,7 @@ struct ValidationTests {
         testEditingSystem()
         await testSecuritySystem()
         testMessagesExtension()
+        testPluginSystem()
 
         print("All Validation Tests Passed!")
     }
@@ -111,6 +112,10 @@ struct ValidationTests {
 
     private static func testMessagesExtension() {
         MessagesValidationTests.run()
+    }
+
+    private static func testPluginSystem() {
+        PluginValidationTests.run()
     }
 
     private static func testEditingSystem() {

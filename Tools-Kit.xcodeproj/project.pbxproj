@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		PL0200000000000000000009 /* PluginValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000009 /* PluginValidationTests.swift */; };
+		PL0200000000000000000001 /* PluginModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000001 /* PluginModels.swift */; };
+		PL0200000000000000000002 /* PluginEventBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000002 /* PluginEventBus.swift */; };
+		PL0200000000000000000003 /* PluginSandbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000003 /* PluginSandbox.swift */; };
+		PL0200000000000000000004 /* PluginLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000004 /* PluginLoader.swift */; };
+		PL0200000000000000000005 /* PluginRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000005 /* PluginRuntime.swift */; };
+		PL0200000000000000000006 /* PluginsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000006 /* PluginsMainView.swift */; };
+		PL0200000000000000000007 /* PluginBuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000007 /* PluginBuildView.swift */; };
+		PL0200000000000000000008 /* PluginDevConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000008 /* PluginDevConsoleView.swift */; };
 		MS028A4E8FF9A0449D039277 /* JSONCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS018A4E8FF9A0449D039277 /* JSONCoder.swift */; };
 		MS026A2894802C56D5AB5FC3 /* SegmentSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */; };
 		MS028F0C9AC0045039A23CD0 /* MessageBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS018F0C9AC0045039A23CD0 /* MessageBubbleView.swift */; };
@@ -1076,6 +1085,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		PL0100000000000000000009 /* PluginValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Tests/PluginValidationTests.swift; sourceTree = "<group>"; };
+		PL0100000000000000000001 /* PluginModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Extensions/Core/PluginModels.swift; sourceTree = "<group>"; };
+		PL0100000000000000000002 /* PluginEventBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Extensions/Core/PluginEventBus.swift; sourceTree = "<group>"; };
+		PL0100000000000000000003 /* PluginSandbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Extensions/Core/PluginSandbox.swift; sourceTree = "<group>"; };
+		PL0100000000000000000004 /* PluginLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Extensions/Core/PluginLoader.swift; sourceTree = "<group>"; };
+		PL0100000000000000000005 /* PluginRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Extensions/Core/PluginRuntime.swift; sourceTree = "<group>"; };
+		PL0100000000000000000006 /* PluginsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginsMainView.swift; sourceTree = "<group>"; };
+		PL0100000000000000000007 /* PluginBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginBuildView.swift; sourceTree = "<group>"; };
+		PL0100000000000000000008 /* PluginDevConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginDevConsoleView.swift; sourceTree = "<group>"; };
 		MS018A4E8FF9A0449D039277 /* JSONCoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONCoder.swift; sourceTree = "<group>"; };
 		MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentSwitcher.swift; sourceTree = "<group>"; };
 		MS018F0C9AC0045039A23CD0 /* MessageBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubbleView.swift; sourceTree = "<group>"; };
@@ -1152,7 +1170,7 @@
 		CL010000000000000000000C /* WorkspaceSnapshotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Collaboration/WorkspaceSnapshotService.swift; sourceTree = "<group>"; };
 		CL010000000000000000000D /* WorkspaceServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Collaboration/WorkspaceServices.swift; sourceTree = "<group>"; };
 		CL010000000000000000000E /* CommandEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/CommandPalette/CommandEngine.swift; sourceTree = "<group>"; };
-		CL010000000000000000000F /* PluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Plugins/PluginManager.swift; sourceTree = "<group>"; };
+		CL010000000000000000000F /* PluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Extensions/Core/PluginManager.swift; sourceTree = "<group>"; };
 		ED010000000000000000000A /* EditingHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Editing/EditingHomeView.swift; sourceTree = "<group>"; };
 		ED010000000000000000000B /* FullEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Editing/FullEditorView.swift; sourceTree = "<group>"; };
 		3C4B3171C5B7494C8A67B0CF /* AgentResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentResultView.swift; sourceTree = "<group>"; };
@@ -3382,6 +3400,11 @@
 				CL010000000000000000000C /* WorkspaceSnapshotService.swift */,
 				CL010000000000000000000D /* WorkspaceServices.swift */,
 				CL010000000000000000000E /* CommandEngine.swift */,
+				PL0100000000000000000001 /* PluginModels.swift */,
+				PL0100000000000000000002 /* PluginEventBus.swift */,
+				PL0100000000000000000003 /* PluginSandbox.swift */,
+				PL0100000000000000000004 /* PluginLoader.swift */,
+				PL0100000000000000000005 /* PluginRuntime.swift */,
 				CL010000000000000000000F /* PluginManager.swift */,
 				ED010000000000000000000A /* EditingHomeView.swift */,
 				ED010000000000000000000B /* FullEditorView.swift */,
@@ -3920,7 +3943,10 @@
 		AA1000000000000000000006 /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
+				PL0100000000000000000006 /* PluginsMainView.swift */,
+				PL0100000000000000000007 /* PluginBuildView.swift */,
 				AA1000000000000000000013 /* PluginMarketplaceView.swift */,
+				PL0100000000000000000008 /* PluginDevConsoleView.swift */,
 			);
 			path = Plugins;
 			sourceTree = "<group>";
@@ -5220,6 +5246,14 @@
 				AA100000000000000000001A /* GitHubToolPanelViews.swift in Sources */,
 				CL020000000000000000000A /* WorkspaceAutomationEngine.swift in Sources */,
 				CL020000000000000000000F /* PluginManager.swift in Sources */,);
+				PL0200000000000000000001 /* PluginModels.swift in Sources */,
+				PL0200000000000000000002 /* PluginEventBus.swift in Sources */,
+				PL0200000000000000000003 /* PluginSandbox.swift in Sources */,
+				PL0200000000000000000004 /* PluginLoader.swift in Sources */,
+				PL0200000000000000000005 /* PluginRuntime.swift in Sources */,
+				PL0200000000000000000006 /* PluginsMainView.swift in Sources */,
+				PL0200000000000000000007 /* PluginBuildView.swift in Sources */,
+				PL0200000000000000000008 /* PluginDevConsoleView.swift in Sources */,
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
