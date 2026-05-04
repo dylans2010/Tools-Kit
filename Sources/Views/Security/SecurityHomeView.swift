@@ -189,6 +189,36 @@ struct SecurityHomeView: View {
     }
 }
 
+struct CategoryCard: View {
+    let category: VaultCategory
+    let count: Int
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 10) {
+                Image(systemName: category.icon)
+                    .font(.title2)
+                    .foregroundColor(.blue)
+                    .frame(width: 48, height: 48)
+                    .background(Color.blue.opacity(0.1))
+                    .clipShape(Circle())
+                Text(category.rawValue)
+                    .font(.caption.bold())
+                    .foregroundColor(.primary)
+                Text("\(count) item\(count == 1 ? "" : "s")")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(Color(.secondarySystemGroupedBackground))
+            .cornerRadius(12)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 struct SecurityToolButton: View {
     let title: String
     let icon: String
