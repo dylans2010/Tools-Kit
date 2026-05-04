@@ -165,7 +165,7 @@ struct ReleaseManagerView: View {
     }
 
     private func generateNotes() -> String {
-        let commits = Array(engine.localCommits.filter(where: { $0.status != GitEngineService.CommitStatus.pushed }).prefix(20))
+        let commits = Array(engine.localCommits.filter(where: { (commit: GitEngineService.LocalCommit) in commit.status != GitEngineService.CommitStatus.pushed }).prefix(20))
         if commits.isEmpty { return "No new commits since last release." }
         var notes = "## What's Changed\n\n"
         let features = commits.filter(where: { $0.category == GitEngineService.CommitCategory.feature })
@@ -300,7 +300,7 @@ struct BranchIntelligenceView: View {
                 Text("Branch Overview")
             }
 
-            Section<AnyView, Text, EmptyView>(content: {
+            Section<Text, AnyView, EmptyView>(content: {
                 AnyView(VStack(alignment: .leading) {
                     Text("Select two local commits to simulate a merge conflict preview.")
                         .font(.caption).foregroundStyle(.secondary)
