@@ -424,6 +424,16 @@ final class WorkflowBuilderService: ObservableObject {
         workflows[i] = wf
         saveData()
     }
+
+    private func saveData() {
+        try? WorkspacePersistence.shared.save(workflows, to: storageFile)
+    }
+
+    private func loadData() {
+        if WorkspacePersistence.shared.exists(filename: storageFile) {
+            workflows = (try? WorkspacePersistence.shared.load([WorkflowDefinition].self, from: storageFile)) ?? []
+        }
+    }
 }
 
 // MARK: - Repo Analyzer
