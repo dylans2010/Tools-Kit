@@ -162,9 +162,9 @@ struct TasksHomeView: View {
 
     private var summaryCards: some View {
         HStack(spacing: 8) {
-            StatPill(value: "\(manager.todayTasks.count)", label: "Today", color: .blue)
-            StatPill(value: "\(manager.upcomingTasks.count)", label: "Upcoming", color: .orange)
-            StatPill(value: "\(manager.completedTasks.count)", label: "Completed", color: .green)
+            StatPill(label: "Today", value: "\(manager.todayTasks.count)", color: .blue)
+            StatPill(label: "Upcoming", value: "\(manager.upcomingTasks.count)", color: .orange)
+            StatPill(label: "Completed", value: "\(manager.completedTasks.count)", color: .green)
         }
     }
 

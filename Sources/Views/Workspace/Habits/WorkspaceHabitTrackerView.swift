@@ -107,9 +107,9 @@ struct WorkspaceHabitTrackerView: View {
             let completed = manager.habits.filter { $0.isCompletedToday() }.count
             let habitCount = manager.habits.count
             let safeTotal = max(habitCount, 1)
-            StatPill(value: "\(completed)/\(habitCount)", label: "Done", color: .green)
-            StatPill(value: "\(Int((Double(completed) / Double(safeTotal)) * 100))%", label: "Rate", color: .blue)
-            StatPill(value: "\(manager.habits.filter { $0.currentStreak > 0 }.count)", label: "Streaking", color: .orange)
+            StatPill(label: "Done", value: "\(completed)/\(habitCount)", color: .green)
+            StatPill(label: "Rate", value: "\(Int((Double(completed) / Double(safeTotal)) * 100))%", color: .blue)
+            StatPill(label: "Streaking", value: "\(manager.habits.filter { $0.currentStreak > 0 }.count)", color: .orange)
         }
     }
 
@@ -209,7 +209,7 @@ struct HabitRowCard: View {
                         .font(.body.weight(.semibold))
                         .onTapGesture(perform: onTap)
                     HStack(spacing: 6) {
-                        WorkspaceStatusBadge(title: "\(habit.currentStreak) day streak", label: "Upcoming", label: "Streaking", color: .orange)
+                        WorkspaceStatusBadge(title: "\(habit.currentStreak) day streak", color: .orange)
                         WorkspaceStatusBadge(title: "\(todayCount)/\(habit.targetCount)", color: habitColor)
                     }
                     ProgressView(value: Double(min(todayCount, habit.targetCount)), total: Double(habit.targetCount))
