@@ -1,10 +1,9 @@
 import SwiftUI
+import UIKit
 
 struct SecurityDeviceTrustView: View {
-    @State private var trustedDevices: [TrustedDevice] = [
-        TrustedDevice(id: UUID(), name: "Jules's iPhone 15", fingerprint: "SHA256:a1b2c3d4...", isCurrent: true),
-        TrustedDevice(id: UUID(), name: "MacBook Pro M2", fingerprint: "SHA256:e5f6g7h8...", isCurrent: false)
-    ]
+    @AppStorage("com.toolskit.security.trustedDevices") private var trustedDevicesData: Data = Data()
+    @State private var trustedDevices: [TrustedDevice] = []
 
     var body: some View {
         List {
@@ -31,6 +30,7 @@ struct SecurityDeviceTrustView: View {
                         if !device.isCurrent {
                             Button(role: .destructive) {
                                 trustedDevices.removeAll { $0.id == device.id }
+                                persist()
                             } label: {
                                 Label("Remove", systemImage: "trash")
                             }
@@ -41,16 +41,34 @@ struct SecurityDeviceTrustView: View {
 
             Section(footer: Text("Trusted devices can access your vault without additional email verification.")) {
                 Button("Add Current Device") {
-                    // Logic to trust current device
+                    addCurrentDevice()
                 }
                 .disabled(trustedDevices.contains { $0.isCurrent })
             }
         }
         .navigationTitle("Trusted Devices")
+        .onAppear(perform: loadTrustedDevices)
+    }
+
+    private func loadTrustedDevices() {
+        trustedDevices = (try? JSONDecoder().decode([TrustedDevice].self, from: trustedDevicesData)) ?? []
+    }
+
+    private func persist() {
+        trustedDevicesData = (try? JSONEncoder().encode(trustedDevices)) ?? Data()
+    }
+
+    private func addCurrentDevice() {
+        trustedDevices = trustedDevices.map {
+            TrustedDevice(id: $0.id, name: $0.name, fingerprint: $0.fingerprint, isCurrent: false)
+        }
+        let fingerprint = "SHA256:\(UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(16))…"
+        trustedDevices.insert(TrustedDevice(id: UUID(), name: UIDevice.current.name, fingerprint: fingerprint, isCurrent: true), at: 0)
+        persist()
     }
 }
 
-struct TrustedDevice: Identifiable {
+struct TrustedDevice: Identifiable, Codable {
     let id: UUID
     let name: String
     let fingerprint: String

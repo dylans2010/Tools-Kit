@@ -9,6 +9,7 @@ struct SecurityPackageView: View {
     @State private var statusMessage: String?
     @State private var isError = false
     @State private var showingImportBridge = false
+    @State private var isWorking = false
 
     var body: some View {
         NavigationStack {
@@ -25,7 +26,7 @@ struct SecurityPackageView: View {
                     } label: {
                         Label("Export Vault", systemImage: "square.and.arrow.up")
                     }
-                    .disabled(password.isEmpty)
+                    .disabled(password.isEmpty || isWorking)
                 }
 
                 Section("Restore") {
@@ -38,22 +39,32 @@ struct SecurityPackageView: View {
                     } label: {
                         Label("Import Vault", systemImage: "square.and.arrow.down")
                     }
+                    .disabled(isWorking)
 
                     Button {
                         showingImportBridge = true
                     } label: {
                         Label("Import via Document Picker", systemImage: "doc.badge.plus")
                     }
+                    .disabled(isWorking)
                 }
 
                 if let status = statusMessage {
                     Section {
-                        Text(status)
+                        Label(status, systemImage: isError ? "xmark.circle.fill" : "checkmark.circle.fill")
                             .foregroundColor(isError ? .red : .green)
                     }
                 }
             }
             .navigationTitle("Security Package")
+            .overlay {
+                if isWorking {
+                    ProgressView("Processing…")
+                        .padding()
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                }
+            }
             .sheet(isPresented: $showingExportShare) {
                 if let url = exportURL {
                     ShareSheet(activityItems: [url])
@@ -78,6 +89,8 @@ struct SecurityPackageView: View {
 
     private func exportVault() {
         Task {
+            isWorking = true
+            defer { isWorking = false }
             do {
                 let url = try await SecurityPackageService.shared.exportPackage(password: password)
                 self.exportURL = url
@@ -104,6 +117,8 @@ struct SecurityPackageView: View {
     private func handleImport(urls: [URL]) {
         guard let url = urls.first else { return }
         Task {
+            isWorking = true
+            defer { isWorking = false }
             do {
                 try await SecurityPackageService.shared.importPackage(at: url, password: password)
                 self.statusMessage = "Vault imported successfully."

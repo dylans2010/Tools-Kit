@@ -1,10 +1,9 @@
 import SwiftUI
+import UIKit
 
 struct SecuritySessionManagerView: View {
-    @State private var activeSessions: [SecuritySession] = [
-        SecuritySession(id: UUID(), deviceName: "iPhone 15 Pro", location: "San Francisco, CA", lastActive: Date(), isCurrent: true),
-        SecuritySession(id: UUID(), deviceName: "iPad Pro", location: "Oakland, CA", lastActive: Date().addingTimeInterval(-3600), isCurrent: false)
-    ]
+    @ObservedObject private var authService = AuthService.shared
+    @State private var activeSessions: [SecuritySession] = []
 
     var body: some View {
         List {
@@ -37,6 +36,20 @@ struct SecuritySessionManagerView: View {
             }
         }
         .navigationTitle("Session Manager")
+        .onAppear {
+            loadSessions()
+        }
+    }
+
+    private func loadSessions() {
+        let grouped = Dictionary(grouping: authService.logs.filter { $0.type == .login }) { Calendar.current.startOfDay(for: $0.timestamp) }
+        var sessions = grouped.keys.sorted(by: >).map { day in
+            SecuritySession(id: UUID(), deviceName: UIDevice.current.name, location: "Current Device", lastActive: day, isCurrent: day == grouped.keys.max())
+        }
+        if sessions.isEmpty {
+            sessions = [SecuritySession(id: UUID(), deviceName: UIDevice.current.name, location: "Current Device", lastActive: Date(), isCurrent: true)]
+        }
+        activeSessions = sessions
     }
 }
 
