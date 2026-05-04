@@ -6,7 +6,7 @@ import Foundation
 // Since we are writing the main app code, we provide the monitoring trigger logic in AppLockManager.
 // Here we define the extension logic placeholder/structure as requested.
 
-class DeviceActivityMonitor: DeviceActivityMonitorExtension {
+class AppDeviceActivityMonitor: DeviceActivityMonitor {
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)
 
