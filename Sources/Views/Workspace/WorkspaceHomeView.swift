@@ -15,6 +15,10 @@ struct WorkspaceHomeView: View {
         case files = "Files"
         case github = "GitHub"
         case security = "Security"
+        case intelligence = "Intelligence"
+        case automation = "Automation"
+        case spatial = "Spatial"
+        case extensions = "Extensions"
 
         var icon: String {
             switch self {
@@ -29,6 +33,10 @@ struct WorkspaceHomeView: View {
             case .files: return "folder.fill"
             case .github: return "terminal.fill"
             case .security: return "lock.shield.fill"
+            case .intelligence: return "sparkles"
+            case .automation: return "bolt.fill"
+            case .spatial: return "square.3.layers.3d"
+            case .extensions: return "puzzlepiece.extension.fill"
             }
         }
     }
@@ -46,6 +54,10 @@ struct WorkspaceHomeView: View {
             filesTab
             githubTab
             securityTab
+            intelligenceTab
+            automationTab
+            spatialTab
+            extensionsTab
         }
     }
 
@@ -158,6 +170,46 @@ struct WorkspaceHomeView: View {
         }
         .tag(WorkspaceTab.security)
     }
+
+    private var intelligenceTab: some View {
+        NavigationStack {
+            CrossIntelligenceHomeView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.intelligence.rawValue, systemImage: WorkspaceTab.intelligence.icon)
+        }
+        .tag(WorkspaceTab.intelligence)
+    }
+
+    private var automationTab: some View {
+        NavigationStack {
+            AutomationHomeView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.automation.rawValue, systemImage: WorkspaceTab.automation.icon)
+        }
+        .tag(WorkspaceTab.automation)
+    }
+
+    private var spatialTab: some View {
+        NavigationStack {
+            SpatialWorkspaceHomeView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.spatial.rawValue, systemImage: WorkspaceTab.spatial.icon)
+        }
+        .tag(WorkspaceTab.spatial)
+    }
+
+    private var extensionsTab: some View {
+        NavigationStack {
+            PluginsMainView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.extensions.rawValue, systemImage: WorkspaceTab.extensions.icon)
+        }
+        .tag(WorkspaceTab.extensions)
+    }
 }
 
 // MARK: - Dashboard View
@@ -189,7 +241,11 @@ struct WorkspaceDashboardView: View {
         ("Collaboration", "person.2.fill", .orange, AnyView(CollaborationHomeView())),
         ("Media Editing", "photo.stack.fill", .indigo, AnyView(EditingHomeView())),
         ("AI Mentor", "sparkles", .pink, AnyView(AIMentorView())),
-        ("Meet", "video.fill", .cyan, AnyView(JoinMeetingView()))
+        ("Meet", "video.fill", .cyan, AnyView(JoinMeetingView())),
+        ("Intelligence", "sparkles", .purple, AnyView(CrossIntelligenceHomeView())),
+        ("Automation", "bolt.fill", .orange, AnyView(AutomationHomeView())),
+        ("Spatial Workspace", "square.3.layers.3d", .blue, AnyView(SpatialWorkspaceHomeView())),
+        ("Extensions", "puzzlepiece.extension.fill", .green, AnyView(PluginsMainView()))
     ]
 
     var body: some View {

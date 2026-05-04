@@ -1073,6 +1073,25 @@
 		SV0248C2284F045048B58A92 /* SecurityAuditDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV016A6A8C64AFF84AADB98F /* SecurityAuditDashboardView.swift */; };
 		SV02E63D7931CCF04F3DA79B /* SecurityAppLockRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV017C6FA6D76B1B4F51B5C4 /* SecurityAppLockRulesView.swift */; };
 		SV020F7D28526D764BED88E3 /* SecurityActivityLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV01753ABE02878346C2A212 /* SecurityActivityLogView.swift */; };
+		TKBF0000000000000000000000 /* UnifiedDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000000 /* UnifiedDataStore.swift */; };
+		TKBF0000000000000000000001 /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000001 /* SyncManager.swift */; };
+		TKBF0000000000000000000002 /* AIOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000002 /* AIOrchestrator.swift */; };
+		TKBF0000000000000000000003 /* EmbeddingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000003 /* EmbeddingService.swift */; };
+		TKBF0000000000000000000004 /* WebSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000004 /* WebSocketManager.swift */; };
+		TKBF0000000000000000000005 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000005 /* APIClient.swift */; };
+		TKBF0000000000000000000006 /* PluginEventBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000006 /* PluginEventBus.swift */; };
+		TKBF0000000000000000000007 /* PluginRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000007 /* PluginRuntime.swift */; };
+		TKBF0000000000000000000008 /* PluginSandbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000008 /* PluginSandbox.swift */; };
+		TKBF0000000000000000000009 /* PluginLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000009 /* PluginLoader.swift */; };
+		TKBF000000000000000000000A /* CrossIntelligenceHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF000000000000000000000A /* CrossIntelligenceHomeView.swift */; };
+		TKBF000000000000000000000B /* AutomationHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF000000000000000000000B /* AutomationHomeView.swift */; };
+		TKBF000000000000000000000C /* AdvancedCollaborationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF000000000000000000000C /* AdvancedCollaborationView.swift */; };
+		TKBF000000000000000000000D /* SpatialWorkspaceHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF000000000000000000000D /* SpatialWorkspaceHomeView.swift */; };
+		TKBF000000000000000000000E /* PluginsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF000000000000000000000E /* PluginsMainView.swift */; };
+		TKBF000000000000000000000F /* PluginBuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF000000000000000000000F /* PluginBuildView.swift */; };
+		TKBF0000000000000000000010 /* PluginsInstalledView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000010 /* PluginsInstalledView.swift */; };
+		TKBF0000000000000000000011 /* MarketplaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000011 /* MarketplaceView.swift */; };
+		TKBF0000000000000000000012 /* PluginDevConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000012 /* PluginDevConsoleView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2141,6 +2160,25 @@
 		SV016A6A8C64AFF84AADB98F /* SecurityAuditDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityAuditDashboardView.swift; sourceTree = "<group>"; };
 		SV017C6FA6D76B1B4F51B5C4 /* SecurityAppLockRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityAppLockRulesView.swift; sourceTree = "<group>"; };
 		SV01753ABE02878346C2A212 /* SecurityActivityLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityActivityLogView.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000000 /* UnifiedDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/Data/UnifiedDataStore.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000001 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/Data/SyncManager.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000002 /* AIOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/AI/AIOrchestrator.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000003 /* EmbeddingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/AI/EmbeddingService.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000004 /* WebSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/Networking/WebSocketManager.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000005 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/Networking/APIClient.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000006 /* PluginEventBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Extensions/Core/PluginEventBus.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000007 /* PluginRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Extensions/Core/PluginRuntime.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000008 /* PluginSandbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Extensions/Core/PluginSandbox.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000009 /* PluginLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Extensions/Core/PluginLoader.swift; sourceTree = "<group>"; };
+		TKRF000000000000000000000A /* CrossIntelligenceHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Intelligence/CrossIntelligenceHomeView.swift; sourceTree = "<group>"; };
+		TKRF000000000000000000000B /* AutomationHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Automation/AutomationHomeView.swift; sourceTree = "<group>"; };
+		TKRF000000000000000000000C /* AdvancedCollaborationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Collaboration/AdvancedCollaborationView.swift; sourceTree = "<group>"; };
+		TKRF000000000000000000000D /* SpatialWorkspaceHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Spatial/SpatialWorkspaceHomeView.swift; sourceTree = "<group>"; };
+		TKRF000000000000000000000E /* PluginsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginsMainView.swift; sourceTree = "<group>"; };
+		TKRF000000000000000000000F /* PluginBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginBuildView.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000010 /* PluginsInstalledView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginsInstalledView.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000011 /* MarketplaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/MarketplaceView.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000012 /* PluginDevConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginDevConsoleView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -2609,6 +2647,25 @@
 		8DF4BF69CF55A81CB6EBF3DE /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				TKRF0000000000000000000000 /* UnifiedDataStore.swift */,
+				TKRF0000000000000000000001 /* SyncManager.swift */,
+				TKRF0000000000000000000002 /* AIOrchestrator.swift */,
+				TKRF0000000000000000000003 /* EmbeddingService.swift */,
+				TKRF0000000000000000000004 /* WebSocketManager.swift */,
+				TKRF0000000000000000000005 /* APIClient.swift */,
+				TKRF0000000000000000000006 /* PluginEventBus.swift */,
+				TKRF0000000000000000000007 /* PluginRuntime.swift */,
+				TKRF0000000000000000000008 /* PluginSandbox.swift */,
+				TKRF0000000000000000000009 /* PluginLoader.swift */,
+				TKRF000000000000000000000A /* CrossIntelligenceHomeView.swift */,
+				TKRF000000000000000000000B /* AutomationHomeView.swift */,
+				TKRF000000000000000000000C /* AdvancedCollaborationView.swift */,
+				TKRF000000000000000000000D /* SpatialWorkspaceHomeView.swift */,
+				TKRF000000000000000000000E /* PluginsMainView.swift */,
+				TKRF000000000000000000000F /* PluginBuildView.swift */,
+				TKRF0000000000000000000010 /* PluginsInstalledView.swift */,
+				TKRF0000000000000000000011 /* MarketplaceView.swift */,
+				TKRF0000000000000000000012 /* PluginDevConsoleView.swift */,
 				E10000000000000000000001 /* Backend */,
 				E10000000000000000000006 /* Workspace */,
 				AA10000000000000000000A1 /* Workspace */,
@@ -4214,6 +4271,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				TKBF0000000000000000000000 /* UnifiedDataStore.swift in Sources */,
+				TKBF0000000000000000000001 /* SyncManager.swift in Sources */,
+				TKBF0000000000000000000002 /* AIOrchestrator.swift in Sources */,
+				TKBF0000000000000000000003 /* EmbeddingService.swift in Sources */,
+				TKBF0000000000000000000004 /* WebSocketManager.swift in Sources */,
+				TKBF0000000000000000000005 /* APIClient.swift in Sources */,
+				TKBF0000000000000000000006 /* PluginEventBus.swift in Sources */,
+				TKBF0000000000000000000007 /* PluginRuntime.swift in Sources */,
+				TKBF0000000000000000000008 /* PluginSandbox.swift in Sources */,
+				TKBF0000000000000000000009 /* PluginLoader.swift in Sources */,
+				TKBF000000000000000000000A /* CrossIntelligenceHomeView.swift in Sources */,
+				TKBF000000000000000000000B /* AutomationHomeView.swift in Sources */,
+				TKBF000000000000000000000C /* AdvancedCollaborationView.swift in Sources */,
+				TKBF000000000000000000000D /* SpatialWorkspaceHomeView.swift in Sources */,
+				TKBF000000000000000000000E /* PluginsMainView.swift in Sources */,
+				TKBF000000000000000000000F /* PluginBuildView.swift in Sources */,
+				TKBF0000000000000000000010 /* PluginsInstalledView.swift in Sources */,
+				TKBF0000000000000000000011 /* MarketplaceView.swift in Sources */,
+				TKBF0000000000000000000012 /* PluginDevConsoleView.swift in Sources */,
 				WS020000000000000000000001 /* WorkspacePersistence.swift in Sources */,
 				WS020000000000000000000002 /* SyncEngine.swift in Sources */,
 				IW0200000000000000000001 /* WorkspaceColorManager.swift in Sources */,
