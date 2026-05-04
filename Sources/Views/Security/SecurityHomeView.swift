@@ -5,14 +5,8 @@ struct SecurityHomeView: View {
     @StateObject private var vaultManager = VaultManager.shared
 
     @State private var showingAddSheet = false
-    @State private var selectedCategory: VaultCategory?
     @State private var showingPackageView = false
     @State private var showingEmergencyLock = false
-
-    private let columns = [
-        GridItem(.flexible()),
-        GridItem(.flexible())
-    ]
 
     var body: some View {
         Group {
@@ -38,20 +32,7 @@ struct SecurityHomeView: View {
                 headerSection
                 securityToolsSection
 
-                Text("Vault Categories")
-                    .font(.headline)
-                    .padding(.horizontal)
-
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(VaultCategory.allCases) { category in
-                        CategoryCard(category: category, count: vaultManager.items(for: category).count) {
-                            selectedCategory = category
-                        }
-                    }
-                }
-                .padding(.horizontal)
-
-                recentItemsSection
+                allItemsSection
             }
             .padding(.vertical)
         }
@@ -89,11 +70,6 @@ struct SecurityHomeView: View {
                     Label("Add Item", systemImage: "plus.circle.fill")
                         .font(.headline)
                 }
-            }
-        }
-        .sheet(item: $selectedCategory) { category in
-            NavigationStack {
-                VaultListView(category: category)
             }
         }
         .sheet(isPresented: $showingAddSheet) {
@@ -149,6 +125,7 @@ struct SecurityHomeView: View {
                 .cornerRadius(12)
                 .padding(.horizontal)
             }
+            .padding(.horizontal)
 
             Button {
                 showingAddSheet = true
@@ -167,9 +144,9 @@ struct SecurityHomeView: View {
         }
     }
 
-    private var recentItemsSection: some View {
+    private var allItemsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Recently Updated")
+            Text("All Vault Items")
                 .font(.headline)
                 .padding(.horizontal)
 
@@ -179,7 +156,7 @@ struct SecurityHomeView: View {
                     .foregroundStyle(.secondary)
                     .padding(.horizontal)
             } else {
-                ForEach(vaultManager.items.sorted(by: { $0.updatedAt > $1.updatedAt }).prefix(3)) { item in
+                ForEach(vaultManager.items.sorted(by: { $0.updatedAt > $1.updatedAt })) { item in
                     NavigationLink {
                         VaultItemDetailView(item: item)
                     } label: {
@@ -212,35 +189,16 @@ struct SecurityHomeView: View {
             }
         }
     }
-}
 
-struct CategoryCard: View {
-    let category: VaultCategory
-    let count: Int
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 10) {
-                Image(systemName: category.icon)
-                    .font(.title2)
-                    .foregroundColor(.blue)
-                    .frame(width: 48, height: 48)
-                    .background(Color.blue.opacity(0.1))
-                    .clipShape(Circle())
-                Text(category.rawValue)
-                    .font(.caption.bold())
-                    .foregroundColor(.primary)
-                Text("\(count) item\(count == 1 ? "" : "s")")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .background(Color(.secondarySystemGroupedBackground))
-            .cornerRadius(12)
+    private func toolLink<Destination: View>(_ title: String, _ icon: String, _ destination: Destination) -> some View {
+        NavigationLink(destination: destination) {
+            Label(title, systemImage: icon)
+                .font(.subheadline.bold())
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+                .background(Color(.secondarySystemGroupedBackground))
+                .cornerRadius(12)
         }
         .buttonStyle(.plain)
     }
 }
-
