@@ -127,6 +127,22 @@ struct SecurityLoginView: View {
             }
             .padding(.top)
 
+            Button(role: .destructive) {
+                authService.resetVaultAndPassword()
+                password = ""
+                error = nil
+            } label: {
+                Text("Reset Password")
+                    .font(.subheadline)
+            }
+            .padding(.top, 6)
+
+            Text("Resetting your password permanently erases all encrypted vault data on this device.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
             Spacer()
         }
         .onAppear {

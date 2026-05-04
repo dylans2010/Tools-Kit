@@ -300,6 +300,36 @@ class AuthService: ObservableObject {
         return result as? Data
     }
 
+
+    func resetVaultAndPassword() {
+        logout()
+
+        UserDefaults.standard.removeObject(forKey: saltKey)
+        UserDefaults.standard.removeObject(forKey: useBiometricsKey)
+        UserDefaults.standard.removeObject(forKey: wrappedVMKKey)
+        UserDefaults.standard.removeObject(forKey: wrappedDEKKey)
+        UserDefaults.standard.removeObject(forKey: "com.toolskit.security.vault.index")
+
+        let tag = vmkSecureEnclaveTag.data(using: .utf8)!
+        let keyQuery: [CFString: Any] = [
+            kSecClass: kSecClassKey,
+            kSecAttrApplicationTag: tag,
+            kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandom
+        ]
+        SecItemDelete(keyQuery as CFDictionary)
+
+        let passwordQuery: [CFString: Any] = [
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrService: masterPasswordKey,
+            kSecAttrAccount: "user"
+        ]
+        SecItemDelete(passwordQuery as CFDictionary)
+
+        SecureFileStorageService.shared.clearAll()
+        VaultManager.shared.items = []
+        isSetup = false
+        logEvent(type: .settingsChange, message: "Vault reset and password removed")
+    }
     private func savePasswordToKeychain(_ password: String) {
         if let data = password.data(using: .utf8) {
             saveToKeychain(data: data, service: "com.toolskit.security.password_fallback")

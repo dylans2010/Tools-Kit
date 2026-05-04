@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SecurityHomeView: View {
-    @ObservedObject private var authService = AuthService.shared
+    @StateObject private var authService = AuthService.shared
     @StateObject private var vaultManager = VaultManager.shared
 
     @State private var showingAddSheet = false
@@ -124,21 +124,45 @@ struct SecurityHomeView: View {
                 .font(.headline)
                 .padding(.horizontal)
 
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                SecurityToolButton(title: "Sessions", icon: "iphone.badge.play", color: .blue, destination: AnyView(SecuritySessionManagerView()))
-                SecurityToolButton(title: "Activity", icon: "list.bullet.rectangle", color: .green, destination: AnyView(SecurityActivityLogView()))
-                SecurityToolButton(title: "Trusted", icon: "checkmark.seal", color: .orange, destination: AnyView(SecurityDeviceTrustView()))
-                SecurityToolButton(title: "Auto-Lock", icon: "timer", color: .purple, destination: AnyView(SecurityAutoLockSettingsView()))
-                SecurityToolButton(title: "Recovery", icon: "key.viewfinder", color: .red, destination: AnyView(SecurityRecoveryOptionsView()))
-                SecurityToolButton(title: "Threats", icon: "shield.exclamationmark", color: .indigo, destination: AnyView(SecurityThreatDetectionView()))
-                SecurityToolButton(title: "Biometrics", icon: "faceid", color: .teal, destination: AnyView(SecurityBiometricControlView()))
-                SecurityToolButton(title: "App Lock", icon: "app.badge.key", color: .pink, destination: AnyView(SecurityAppLockRulesView()))
-                SecurityToolButton(title: "Encryption", icon: "lock.square.stack", color: .cyan, destination: AnyView(SecurityEncryptionSettingsView()))
-                SecurityToolButton(title: "Audit", icon: "chart.bar.doc.horizontal", color: .brown, destination: AnyView(SecurityAuditDashboardView()))
-                SecurityToolButton(title: "Permissions", icon: "hand.raised.slash", color: .yellow, destination: AnyView(SecurityPermissionCenterView()))
-                SecurityToolButton(title: "Emergency", icon: "exclamationmark.triangle", color: .red, destination: AnyView(SecurityEmergencyLockView()))
+            Menu {
+                NavigationLink(destination: SecuritySessionManagerView()) { Label("Sessions", systemImage: "iphone.badge.play") }
+                NavigationLink(destination: SecurityActivityLogView()) { Label("Activity", systemImage: "list.bullet.rectangle") }
+                NavigationLink(destination: SecurityDeviceTrustView()) { Label("Trusted Devices", systemImage: "checkmark.seal") }
+                NavigationLink(destination: SecurityAutoLockSettingsView()) { Label("Auto-Lock", systemImage: "timer") }
+                NavigationLink(destination: SecurityRecoveryOptionsView()) { Label("Recovery", systemImage: "key.viewfinder") }
+                NavigationLink(destination: SecurityThreatDetectionView()) { Label("Threats", systemImage: "shield.exclamationmark") }
+                NavigationLink(destination: SecurityBiometricControlView()) { Label("Biometrics", systemImage: "faceid") }
+                NavigationLink(destination: SecurityAppLockRulesView()) { Label("App Lock", systemImage: "app.badge.key") }
+                NavigationLink(destination: SecurityEncryptionSettingsView()) { Label("Encryption", systemImage: "lock.square.stack") }
+                NavigationLink(destination: SecurityAuditDashboardView()) { Label("Audit", systemImage: "chart.bar.doc.horizontal") }
+                NavigationLink(destination: SecurityPermissionCenterView()) { Label("Permissions", systemImage: "hand.raised.slash") }
+                NavigationLink(destination: SecurityEmergencyLockView()) { Label("Emergency", systemImage: "exclamationmark.triangle") }
+            } label: {
+                HStack {
+                    Label("Open Security Tools", systemImage: "chevron.down.circle")
+                        .font(.subheadline.bold())
+                    Spacer()
+                }
+                .padding()
+                .background(Color(.secondarySystemGroupedBackground))
+                .cornerRadius(12)
+                .padding(.horizontal)
             }
-            .padding(.horizontal)
+
+            Button {
+                showingAddSheet = true
+            } label: {
+                HStack {
+                    Label("Add Entry", systemImage: "plus.circle.fill")
+                        .font(.subheadline.bold())
+                    Spacer()
+                }
+                .padding()
+                .background(Color.blue.opacity(0.12))
+                .cornerRadius(12)
+                .padding(.horizontal)
+            }
+            .buttonStyle(.plain)
         }
     }
 
@@ -219,30 +243,3 @@ struct CategoryCard: View {
     }
 }
 
-struct SecurityToolButton: View {
-    let title: String
-    let icon: String
-    let color: Color
-    let destination: AnyView
-
-    var body: some View {
-        NavigationLink(destination: destination) {
-            VStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.title3)
-                    .foregroundColor(color)
-                    .frame(width: 44, height: 44)
-                    .background(color.opacity(0.1))
-                    .clipShape(Circle())
-                Text(title)
-                    .font(.caption2.bold())
-                    .foregroundColor(.primary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(Color(.secondarySystemGroupedBackground))
-            .cornerRadius(12)
-        }
-        .buttonStyle(.plain)
-    }
-}
