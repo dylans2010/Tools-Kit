@@ -100,19 +100,30 @@ struct SecurityHomeView: View {
                 .font(.headline)
                 .padding(.horizontal)
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
-                toolLink("Sessions", "iphone.badge.play", SecuritySessionManagerView())
-                toolLink("Activity", "list.bullet.rectangle", SecurityActivityLogView())
-                toolLink("Trusted Devices", "checkmark.seal", SecurityDeviceTrustView())
-                toolLink("Auto-Lock", "timer", SecurityAutoLockSettingsView())
-                toolLink("Recovery", "key.viewfinder", SecurityRecoveryOptionsView())
-                toolLink("Threats", "shield.exclamationmark", SecurityThreatDetectionView())
-                toolLink("Biometrics", "faceid", SecurityBiometricControlView())
-                toolLink("App Lock", "app.badge.key", SecurityAppLockRulesView())
-                toolLink("Encryption", "lock.square.stack", SecurityEncryptionSettingsView())
-                toolLink("Audit", "chart.bar.doc.horizontal", SecurityAuditDashboardView())
-                toolLink("Permissions", "hand.raised.slash", SecurityPermissionCenterView())
-                toolLink("Emergency", "exclamationmark.triangle", SecurityEmergencyLockView())
+            Menu {
+                NavigationLink(destination: SecuritySessionManagerView()) { Label("Sessions", systemImage: "iphone.badge.play") }
+                NavigationLink(destination: SecurityActivityLogView()) { Label("Activity", systemImage: "list.bullet.rectangle") }
+                NavigationLink(destination: SecurityDeviceTrustView()) { Label("Trusted Devices", systemImage: "checkmark.seal") }
+                NavigationLink(destination: SecurityAutoLockSettingsView()) { Label("Auto-Lock", systemImage: "timer") }
+                NavigationLink(destination: SecureFoldersView()) { Label("Secure Folders", systemImage: "folder.badge.lock") }
+                NavigationLink(destination: SecurityRecoveryOptionsView()) { Label("Recovery", systemImage: "key.viewfinder") }
+                NavigationLink(destination: SecurityThreatDetectionView()) { Label("Threats", systemImage: "shield.exclamationmark") }
+                NavigationLink(destination: SecurityBiometricControlView()) { Label("Biometrics", systemImage: "faceid") }
+                NavigationLink(destination: AppLockView()) { Label("App Lock System", systemImage: "app.badge.key") }
+                NavigationLink(destination: SecurityEncryptionSettingsView()) { Label("Encryption", systemImage: "lock.square.stack") }
+                NavigationLink(destination: SecurityAuditDashboardView()) { Label("Audit", systemImage: "chart.bar.doc.horizontal") }
+                NavigationLink(destination: SecurityPermissionCenterView()) { Label("Permissions", systemImage: "hand.raised.slash") }
+                NavigationLink(destination: SecurityEmergencyLockView()) { Label("Emergency", systemImage: "exclamationmark.triangle") }
+            } label: {
+                HStack {
+                    Label("Open Security Tools", systemImage: "chevron.down.circle")
+                        .font(.subheadline.bold())
+                    Spacer()
+                }
+                .padding()
+                .background(Color(.secondarySystemGroupedBackground))
+                .cornerRadius(12)
+                .padding(.horizontal)
             }
             .padding(.horizontal)
 
