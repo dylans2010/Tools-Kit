@@ -538,7 +538,7 @@ struct EmailComposingView: View {
 
     private var mailDocumentScannerSheet: some View {
         #if os(iOS)
-        DocumentScannerView { scan in
+        MailDocumentScannerView { scan in
             handleDocumentScan(scan)
             showingDocumentScanner = false
         } onCancel: {

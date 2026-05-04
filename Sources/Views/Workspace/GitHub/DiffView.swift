@@ -29,6 +29,30 @@ struct DiffView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
+    /// Convenience initializer that generates a unified patch from raw original/modified strings.
+    init(original: String, modified: String, filename: String = "Untitled") {
+        let patch = Self.generatePatch(original: original, modified: modified)
+        self.fileDiff = GitHubFileDiff(
+            sha: "",
+            filename: filename,
+            status: "modified",
+            additions: 0,
+            deletions: 0,
+            changes: 0,
+            patch: patch.isEmpty ? nil : patch
+        )
+    }
+
+    private static func generatePatch(original: String, modified: String) -> String {
+        guard original != modified else { return "" }
+        let oldLines = original.components(separatedBy: "\n")
+        let newLines = modified.components(separatedBy: "\n")
+        var result = "@@ -1,\(oldLines.count) +1,\(newLines.count) @@\n"
+        for line in oldLines { result += "-\(line)\n" }
+        for line in newLines { result += "+\(line)\n" }
+        return result
+    }
+
     @ViewBuilder
     private func lineView(for line: String) -> some View {
         let color: Color = {

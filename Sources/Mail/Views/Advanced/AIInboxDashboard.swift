@@ -184,3 +184,25 @@ struct AIInboxDashboard: View {
         }
     }
 }
+
+struct ActionCard: View {
+    let title: String
+    let icon: String
+    let color: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.title3)
+                Text(title)
+                    .font(.caption.bold())
+            }
+            .frame(maxWidth: .infinity, minHeight: 96)
+            .padding()
+            .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
+        }
+        .buttonStyle(.plain)
+    }
+}
