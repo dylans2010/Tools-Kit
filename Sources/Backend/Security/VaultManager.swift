@@ -90,4 +90,9 @@ class VaultManager: ObservableObject {
     func items(for category: VaultCategory) -> [VaultItem] {
         items.filter { $0.category == category }
     }
+
+    func clearAllData() {
+        items.removeAll()
+        UserDefaults.standard.removeObject(forKey: indexKey)
+    }
 }

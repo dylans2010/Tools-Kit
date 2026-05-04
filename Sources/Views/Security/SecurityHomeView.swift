@@ -6,6 +6,7 @@ struct SecurityHomeView: View {
 
     @State private var showingAddSheet = false
     @State private var selectedCategory: VaultCategory?
+    @State private var selectedSecurityTool: SecurityToolOption?
     @State private var showingPackageView = false
     @State private var showingEmergencyLock = false
 
@@ -99,6 +100,11 @@ struct SecurityHomeView: View {
         .sheet(isPresented: $showingAddSheet) {
             AddInfoView()
         }
+        .sheet(item: $selectedSecurityTool) { tool in
+            NavigationStack {
+                tool.destination
+            }
+        }
         .sheet(isPresented: $showingPackageView) {
             SecurityPackageView()
         }
@@ -124,19 +130,35 @@ struct SecurityHomeView: View {
                 .font(.headline)
                 .padding(.horizontal)
 
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                SecurityToolButton(title: "Sessions", icon: "iphone.badge.play", color: .blue, destination: AnyView(SecuritySessionManagerView()))
-                SecurityToolButton(title: "Activity", icon: "list.bullet.rectangle", color: .green, destination: AnyView(SecurityActivityLogView()))
-                SecurityToolButton(title: "Trusted", icon: "checkmark.seal", color: .orange, destination: AnyView(SecurityDeviceTrustView()))
-                SecurityToolButton(title: "Auto-Lock", icon: "timer", color: .purple, destination: AnyView(SecurityAutoLockSettingsView()))
-                SecurityToolButton(title: "Recovery", icon: "key.viewfinder", color: .red, destination: AnyView(SecurityRecoveryOptionsView()))
-                SecurityToolButton(title: "Threats", icon: "shield.exclamationmark", color: .indigo, destination: AnyView(SecurityThreatDetectionView()))
-                SecurityToolButton(title: "Biometrics", icon: "faceid", color: .teal, destination: AnyView(SecurityBiometricControlView()))
-                SecurityToolButton(title: "App Lock", icon: "app.badge.key", color: .pink, destination: AnyView(SecurityAppLockRulesView()))
-                SecurityToolButton(title: "Encryption", icon: "lock.square.stack", color: .cyan, destination: AnyView(SecurityEncryptionSettingsView()))
-                SecurityToolButton(title: "Audit", icon: "chart.bar.doc.horizontal", color: .brown, destination: AnyView(SecurityAuditDashboardView()))
-                SecurityToolButton(title: "Permissions", icon: "hand.raised.slash", color: .yellow, destination: AnyView(SecurityPermissionCenterView()))
-                SecurityToolButton(title: "Emergency", icon: "exclamationmark.triangle", color: .red, destination: AnyView(SecurityEmergencyLockView()))
+            HStack(spacing: 12) {
+                Menu {
+                    ForEach(SecurityToolOption.allCases) { tool in
+                        Button {
+                            selectedSecurityTool = tool
+                        } label: {
+                            Label(tool.title, systemImage: tool.icon)
+                        }
+                    }
+                } label: {
+                    Label("Open Security Tool", systemImage: "chevron.down.circle")
+                        .font(.subheadline.bold())
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(Color(.secondarySystemGroupedBackground))
+                        .cornerRadius(12)
+                }
+
+                Button {
+                    showingAddSheet = true
+                } label: {
+                    Label("Add Entry", systemImage: "plus.circle.fill")
+                        .font(.subheadline.bold())
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                }
             }
             .padding(.horizontal)
         }
@@ -219,30 +241,58 @@ struct CategoryCard: View {
     }
 }
 
-struct SecurityToolButton: View {
-    let title: String
-    let icon: String
-    let color: Color
-    let destination: AnyView
+enum SecurityToolOption: String, CaseIterable, Identifiable {
+    case sessions, activity, trusted, autoLock, recovery, threats, biometrics, appLock, encryption, audit, permissions, emergency
+    var id: String { rawValue }
 
-    var body: some View {
-        NavigationLink(destination: destination) {
-            VStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.title3)
-                    .foregroundColor(color)
-                    .frame(width: 44, height: 44)
-                    .background(color.opacity(0.1))
-                    .clipShape(Circle())
-                Text(title)
-                    .font(.caption2.bold())
-                    .foregroundColor(.primary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(Color(.secondarySystemGroupedBackground))
-            .cornerRadius(12)
+    var title: String {
+        switch self {
+        case .sessions: return "Sessions"
+        case .activity: return "Activity"
+        case .trusted: return "Trusted"
+        case .autoLock: return "Auto-Lock"
+        case .recovery: return "Recovery"
+        case .threats: return "Threats"
+        case .biometrics: return "Biometrics"
+        case .appLock: return "App Lock"
+        case .encryption: return "Encryption"
+        case .audit: return "Audit"
+        case .permissions: return "Permissions"
+        case .emergency: return "Emergency"
         }
-        .buttonStyle(.plain)
+    }
+
+    var icon: String {
+        switch self {
+        case .sessions: return "iphone.badge.play"
+        case .activity: return "list.bullet.rectangle"
+        case .trusted: return "checkmark.seal"
+        case .autoLock: return "timer"
+        case .recovery: return "key.viewfinder"
+        case .threats: return "shield.exclamationmark"
+        case .biometrics: return "faceid"
+        case .appLock: return "app.badge.key"
+        case .encryption: return "lock.square.stack"
+        case .audit: return "chart.bar.doc.horizontal"
+        case .permissions: return "hand.raised.slash"
+        case .emergency: return "exclamationmark.triangle"
+        }
+    }
+
+    var destination: AnyView {
+        switch self {
+        case .sessions: return AnyView(SecuritySessionManagerView())
+        case .activity: return AnyView(SecurityActivityLogView())
+        case .trusted: return AnyView(SecurityDeviceTrustView())
+        case .autoLock: return AnyView(SecurityAutoLockSettingsView())
+        case .recovery: return AnyView(SecurityRecoveryOptionsView())
+        case .threats: return AnyView(SecurityThreatDetectionView())
+        case .biometrics: return AnyView(SecurityBiometricControlView())
+        case .appLock: return AnyView(SecurityAppLockRulesView())
+        case .encryption: return AnyView(SecurityEncryptionSettingsView())
+        case .audit: return AnyView(SecurityAuditDashboardView())
+        case .permissions: return AnyView(SecurityPermissionCenterView())
+        case .emergency: return AnyView(SecurityEmergencyLockView())
+        }
     }
 }
