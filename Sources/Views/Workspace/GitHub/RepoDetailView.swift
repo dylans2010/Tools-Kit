@@ -132,37 +132,62 @@ struct RepoDetailView: View {
 
     private var developerToolsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Developer Tools")
-                .font(.headline)
-                .padding(.leading, 4)
+            // Intelligence
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Intelligence")
+                    .font(.headline)
+                    .padding(.leading, 4)
 
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                NavigationLink(destination: LocalGitEngineView()) {
-                    ActionCardContent(title: "Local Git", icon: "externaldrive.connected.to.line.below", color: .teal)
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    NavigationLink(destination: CodeIntelligenceView()) {
+                        ActionCardContent(title: "Code Intel", icon: "magnifyingglass.circle.fill", color: .orange)
+                    }
+                    NavigationLink(destination: BranchIntelligenceView(owner: repository.owner.login, repo: repository.name)) {
+                        ActionCardContent(title: "Branch Intel", icon: "arrow.branch", color: .blue)
+                    }
+                    NavigationLink(destination: LogsIntelligenceView()) {
+                        ActionCardContent(title: "Logs", icon: "doc.text.magnifyingglass", color: .gray)
+                    }
+                    NavigationLink(destination: WorkflowBuilderView()) {
+                        ActionCardContent(title: "Workflow Builder", icon: "play.rectangle.on.rectangle", color: .purple)
+                    }
                 }
-                NavigationLink(destination: WorkflowBuilderView()) {
-                    ActionCardContent(title: "Workflow Builder", icon: "play.rectangle.on.rectangle", color: .purple)
-                }
-                NavigationLink(destination: CodeIntelligenceView()) {
-                    ActionCardContent(title: "Code Intel", icon: "magnifyingglass.circle.fill", color: .orange)
-                }
-                NavigationLink(destination: RepoToolsPanelView(owner: repository.owner.login, repo: repository.name)) {
-                    ActionCardContent(title: "Repo Tools", icon: "wrench.and.screwdriver.fill", color: .indigo)
-                }
-                NavigationLink(destination: ReleaseManagerView(owner: repository.owner.login, repo: repository.name)) {
-                    ActionCardContent(title: "Releases", icon: "tag.fill", color: .green)
-                }
-                NavigationLink(destination: SecurityToolsView(owner: repository.owner.login, repo: repository.name)) {
-                    ActionCardContent(title: "Security", icon: "lock.shield.fill", color: .red)
-                }
-                NavigationLink(destination: BranchIntelligenceView(owner: repository.owner.login, repo: repository.name)) {
-                    ActionCardContent(title: "Branch Intel", icon: "arrow.branch", color: .blue)
-                }
-                NavigationLink(destination: LogsIntelligenceView()) {
-                    ActionCardContent(title: "Logs", icon: "doc.text.magnifyingglass", color: .gray)
-                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
+
+            // Tools
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Tools")
+                    .font(.headline)
+                    .padding(.leading, 4)
+
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    NavigationLink(destination: RepoToolsPanelView(owner: repository.owner.login, repo: repository.name)) {
+                        ActionCardContent(title: "Repo Tools", icon: "wrench.and.screwdriver.fill", color: .indigo)
+                    }
+                    NavigationLink(destination: SecurityToolsView(owner: repository.owner.login, repo: repository.name)) {
+                        ActionCardContent(title: "Security", icon: "lock.shield.fill", color: .red)
+                    }
+                    NavigationLink(destination: ReleaseManagerView(owner: repository.owner.login, repo: repository.name)) {
+                        ActionCardContent(title: "Releases", icon: "tag.fill", color: .green)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+
+            // Local Engine
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Local Engine")
+                    .font(.headline)
+                    .padding(.leading, 4)
+
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    NavigationLink(destination: LocalGitEngineView()) {
+                        ActionCardContent(title: "Local Git", icon: "externaldrive.connected.to.line.below", color: .teal)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
         }
     }
 }
