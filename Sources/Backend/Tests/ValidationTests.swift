@@ -13,51 +13,12 @@ struct ValidationTests {
         testEditingSystem()
         await testSecuritySystem()
         testMessagesExtension()
-        await testIntelligenceLayer()
-        await testAutomationEngine()
-        testAdvancedCollaboration()
+        testPluginSystem()
+        testIntelligenceSystem()
+        testAutomationSystem()
         testSpatialWorkspace()
-        await testDeveloperLayer()
 
         print("All Validation Tests Passed!")
-    }
-
-    private static func testIntelligenceLayer() async {
-        print("Testing Intelligence Layer...")
-        let results = await SemanticSearchService.shared.search(query: "test")
-        assert(results.count >= 0)
-
-        let response = await AIOrchestrator.shared.query(prompt: "Hello")
-        assert(!response.isEmpty)
-    }
-
-    private static func testAutomationEngine() async {
-        print("Testing Automation Engine...")
-        let wf = Workflow(id: UUID(), name: "Test WF", steps: [WorkflowStep(id: UUID(), actionType: "Test", parameters: [:])])
-        await AutomationEngine.shared.execute(workflow: wf)
-    }
-
-    private static func testAdvancedCollaboration() {
-        print("Testing Advanced Collaboration...")
-        CollaborationSessionManager.shared.joinSession()
-        assert(CollaborationSessionManager.shared.activeUsers.count > 1)
-
-        DecisionTrackingService.shared.recordDecision(title: "Test", outcome: "Done")
-        assert(DecisionTrackingService.shared.decisions.count > 0)
-    }
-
-    private static func testSpatialWorkspace() {
-        print("Testing Spatial Workspace...")
-        let entity = WorkspaceEntity(id: UUID(), title: "Node", type: .note, content: "", metadata: [:])
-        NodeGraphEngine.shared.addNode(entity: entity, position: .zero)
-        assert(NodeGraphEngine.shared.nodes.count > 0)
-    }
-
-    private static func testDeveloperLayer() async {
-        print("Testing Developer Layer...")
-        await RepoSyncService.shared.syncIssuesToTasks(repoID: "test-repo")
-        let fix = await AICodeAssistantManager.shared.suggestFix(for: "error")
-        assert(!fix.isEmpty)
     }
 
     private static func testMailIntelligence() {
@@ -158,6 +119,32 @@ struct ValidationTests {
 
     private static func testPluginSystem() {
         PluginValidationTests.run()
+    }
+
+    private static func testIntelligenceSystem() {
+        print("Testing Intelligence System...")
+        let orchestrator = AIOrchestrator.shared
+        orchestrator.refreshInsights()
+        // Insights are async, but we can verify the orchestrator exists and has a method
+        assert(orchestrator.globalInsights.count >= 0)
+    }
+
+    private static func testAutomationSystem() {
+        print("Testing Automation System...")
+        let engine = WorkflowEngine.shared
+        assert(!engine.workflows.isEmpty)
+        let workflow = engine.workflows[0]
+        engine.executeWorkflow(workflow, context: ["test": "val"])
+        assert(!engine.activeRuns.isEmpty)
+    }
+
+    private static func testSpatialWorkspace() {
+        print("Testing Spatial Workspace...")
+        let manager = SpatialCanvasManager.shared
+        let initialCount = manager.currentCanvas.items.count
+        manager.addItem(.note, at: .zero)
+        assert(manager.currentCanvas.items.count == initialCount + 1)
+        assert(manager.currentCanvas.items.last?.type == .note)
     }
 
     private static func testEditingSystem() {

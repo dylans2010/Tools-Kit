@@ -43,16 +43,18 @@ struct CollaborationHomeView: View {
                 }
             }
 
-            Section("Advanced") {
-                AdvancedCollaborationView()
-            }
-
             Section("Automation & Intelligence") {
+                NavigationLink(destination: CrossIntelligenceHomeView()) {
+                    Label("System Intelligence", systemImage: "sparkles.rectangle.stack.fill")
+                }
+                NavigationLink(destination: AutomationHomeView()) {
+                    Label("Workflow Engine", systemImage: "bolt.fill")
+                }
+                NavigationLink(destination: SpatialWorkspaceHomeView()) {
+                    Label("Spatial Canvas", systemImage: "view.2d")
+                }
                 NavigationLink(destination: WorkspaceAdvancedHomeView()) {
                     Label("Advanced Workspace", systemImage: "square.3.layers.3d")
-                }
-                NavigationLink(destination: WorkspaceAutomationView()) {
-                    Label("Automations", systemImage: "bolt.fill")
                 }
                 NavigationLink(destination: ContentGraphView()) {
                     Label("Content Graph", systemImage: "circle.hexagongrid.fill")

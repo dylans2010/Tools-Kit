@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AI0200000000000000000021 /* IntelligenceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000021 /* IntelligenceModels.swift */; };
+		AI0200000000000000000022 /* AIOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000022 /* AIOrchestrator.swift */; };
+		AI0200000000000000000023 /* CrossIntelligenceHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000023 /* CrossIntelligenceHomeView.swift */; };
+		AU0200000000000000000001 /* WorkflowModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU0100000000000000000001 /* WorkflowModels.swift */; };
+		AU0200000000000000000002 /* WorkflowEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU0100000000000000000002 /* WorkflowEngine.swift */; };
+		AU0200000000000000000003 /* AutomationHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU0100000000000000000003 /* AutomationHomeView.swift */; };
+		SP0200000000000000000002 /* SpatialModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0100000000000000000002 /* SpatialModels.swift */; };
+		SP0200000000000000000003 /* SpatialCanvasManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0100000000000000000003 /* SpatialCanvasManager.swift */; };
+		SP0200000000000000000004 /* SpatialWorkspaceHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0100000000000000000004 /* SpatialWorkspaceHomeView.swift */; };
 		PL0200000000000000000009 /* PluginValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000009 /* PluginValidationTests.swift */; };
 		PL0200000000000000000001 /* PluginModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000001 /* PluginModels.swift */; };
 		PL0200000000000000000002 /* PluginEventBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000002 /* PluginEventBus.swift */; };
@@ -16,50 +25,6 @@
 		PL0200000000000000000006 /* PluginsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000006 /* PluginsMainView.swift */; };
 		PL0200000000000000000007 /* PluginBuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000007 /* PluginBuildView.swift */; };
 		PL0200000000000000000008 /* PluginDevConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000008 /* PluginDevConsoleView.swift */; };
-AI0200000000000000000001 /* AIOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000001 /* AIOrchestrator.swift */; };
-AI0200000000000000000002 /* EmbeddingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000002 /* EmbeddingService.swift */; };
-WS0200000000000000000101 /* UnifiedDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000001 /* UnifiedDataStore.swift */; };
-WS0200000000000000000102 /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000002 /* SyncManager.swift */; };
-NW0200000000000000000001 /* WebSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = NW0100000000000000000001 /* WebSocketManager.swift */; };
-NW0200000000000000000002 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = NW0100000000000000000002 /* APIClient.swift */; };
-AI0200000000000000000101 /* SemanticSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000101 /* SemanticSearchService.swift */; };
-AI0200000000000000000102 /* AutoLinkingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000102 /* AutoLinkingService.swift */; };
-AI0200000000000000000103 /* ContextGraphManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000103 /* ContextGraphManager.swift */; };
-AI0200000000000000000104 /* CrossIntelligenceHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000104 /* CrossIntelligenceHomeView.swift */; };
-AI0200000000000000000105 /* GlobalSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000105 /* GlobalSearchView.swift */; };
-AI0200000000000000000106 /* AskWorkspaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000106 /* AskWorkspaceView.swift */; };
-AI0200000000000000000107 /* GraphExplorerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI0100000000000000000107 /* GraphExplorerView.swift */; };
-AU0200000000000000000001 /* AutomationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU0100000000000000000001 /* AutomationEngine.swift */; };
-AU0200000000000000000002 /* TriggerActionRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU0100000000000000000002 /* TriggerActionRegistry.swift */; };
-AU0200000000000000000003 /* WorkflowBuilderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU0100000000000000000003 /* WorkflowBuilderService.swift */; };
-AU0200000000000000000004 /* BackgroundRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU0100000000000000000004 /* BackgroundRunner.swift */; };
-AU0200000000000000000005 /* AutomationHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU0100000000000000000005 /* AutomationHomeView.swift */; };
-AU0200000000000000000006 /* WorkflowBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU0100000000000000000006 /* WorkflowBuilderView.swift */; };
-AU0200000000000000000007 /* TriggerPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU0100000000000000000007 /* TriggerPickerView.swift */; };
-AU0200000000000000000008 /* ActionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU0100000000000000000008 /* ActionPickerView.swift */; };
-AU0200000000000000000009 /* WorkflowExecutionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU0100000000000000000009 /* WorkflowExecutionView.swift */; };
-CL0200000000000000000101 /* CollaborationSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000101 /* CollaborationSessionManager.swift */; };
-CL0200000000000000000102 /* ThreadedDiscussionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000102 /* ThreadedDiscussionService.swift */; };
-CL0200000000000000000103 /* DecisionTrackingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000103 /* DecisionTrackingService.swift */; };
-CL0200000000000000000104 /* AdvancedCollaborationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000104 /* AdvancedCollaborationView.swift */; };
-CL0200000000000000000105 /* LiveSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000105 /* LiveSessionView.swift */; };
-CL0200000000000000000106 /* ThreadedDiscussionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000106 /* ThreadedDiscussionView.swift */; };
-CL0200000000000000000107 /* DecisionTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000107 /* DecisionTrackerView.swift */; };
-CL0200000000000000000108 /* PresenceOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000108 /* PresenceOverlayView.swift */; };
-SP0200000000000000000001 /* SpatialEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0100000000000000000001 /* SpatialEngine.swift */; };
-SP0200000000000000000002 /* NodeGraphEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0100000000000000000002 /* NodeGraphEngine.swift */; };
-SP0200000000000000000003 /* EntityMappingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0100000000000000000003 /* EntityMappingService.swift */; };
-SP0200000000000000000004 /* SpatialWorkspaceHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0100000000000000000004 /* SpatialWorkspaceHomeView.swift */; };
-SP0200000000000000000005 /* InfiniteCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0100000000000000000005 /* InfiniteCanvasView.swift */; };
-SP0200000000000000000006 /* MindMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0100000000000000000006 /* MindMapView.swift */; };
-SP0200000000000000000007 /* NodeInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0100000000000000000007 /* NodeInspectorView.swift */; };
-DV0200000000000000000001 /* RepoSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000001 /* RepoSyncService.swift */; };
-DV0200000000000000000002 /* CodeAnalysisService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000002 /* CodeAnalysisService.swift */; };
-DV0200000000000000000003 /* AICodeAssistantManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000003 /* AICodeAssistantManager.swift */; };
-DV0200000000000000000101 /* RepoDetailView+Developer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000101 /* RepoDetailView+Developer.swift */; };
-DV0200000000000000000102 /* CodeAssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000102 /* CodeAssistantView.swift */; };
-DV0200000000000000000103 /* RepoTasksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000103 /* RepoTasksView.swift */; };
-DV0200000000000000000104 /* DevWorkflowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000104 /* DevWorkflowView.swift */; };
 		MS028A4E8FF9A0449D039277 /* JSONCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS018A4E8FF9A0449D039277 /* JSONCoder.swift */; };
 		MS026A2894802C56D5AB5FC3 /* SegmentSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */; };
 		MS028F0C9AC0045039A23CD0 /* MessageBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS018F0C9AC0045039A23CD0 /* MessageBubbleView.swift */; };
@@ -1129,6 +1094,15 @@ DV0200000000000000000104 /* DevWorkflowView.swift in Sources */ = {isa = PBXBuil
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AI0100000000000000000021 /* IntelligenceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Intelligence/Core/IntelligenceModels.swift; sourceTree = "<group>"; };
+		AI0100000000000000000022 /* AIOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Intelligence/Core/AIOrchestrator.swift; sourceTree = "<group>"; };
+		AI0100000000000000000023 /* CrossIntelligenceHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Intelligence/CrossIntelligenceHomeView.swift; sourceTree = "<group>"; };
+		AU0100000000000000000001 /* WorkflowModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Automation/Core/WorkflowModels.swift; sourceTree = "<group>"; };
+		AU0100000000000000000002 /* WorkflowEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Automation/Core/WorkflowEngine.swift; sourceTree = "<group>"; };
+		AU0100000000000000000003 /* AutomationHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Automation/AutomationHomeView.swift; sourceTree = "<group>"; };
+		SP0100000000000000000002 /* SpatialModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Spatial/Core/SpatialModels.swift; sourceTree = "<group>"; };
+		SP0100000000000000000003 /* SpatialCanvasManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Spatial/Core/SpatialCanvasManager.swift; sourceTree = "<group>"; };
+		SP0100000000000000000004 /* SpatialWorkspaceHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Spatial/SpatialWorkspaceHomeView.swift; sourceTree = "<group>"; };
 		PL0100000000000000000009 /* PluginValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Tests/PluginValidationTests.swift; sourceTree = "<group>"; };
 		PL0100000000000000000001 /* PluginModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Extensions/Core/PluginModels.swift; sourceTree = "<group>"; };
 		PL0100000000000000000002 /* PluginEventBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Extensions/Core/PluginEventBus.swift; sourceTree = "<group>"; };
@@ -1138,58 +1112,6 @@ DV0200000000000000000104 /* DevWorkflowView.swift in Sources */ = {isa = PBXBuil
 		PL0100000000000000000006 /* PluginsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginsMainView.swift; sourceTree = "<group>"; };
 		PL0100000000000000000007 /* PluginBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginBuildView.swift; sourceTree = "<group>"; };
 		PL0100000000000000000008 /* PluginDevConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginDevConsoleView.swift; sourceTree = "<group>"; };
-/* Core AI */
-AI0100000000000000000001 /* AIOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIOrchestrator.swift; sourceTree = "<group>"; };
-AI0100000000000000000002 /* EmbeddingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddingService.swift; sourceTree = "<group>"; };
-/* Core Data */
-WS0100000000000000000001 /* UnifiedDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnifiedDataStore.swift; sourceTree = "<group>"; };
-WS0100000000000000000002 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
-/* Core Networking */
-NW0100000000000000000001 /* WebSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketManager.swift; sourceTree = "<group>"; };
-NW0100000000000000000002 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
-/* Intelligence */
-AI0100000000000000000101 /* SemanticSearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticSearchService.swift; sourceTree = "<group>"; };
-AI0100000000000000000102 /* AutoLinkingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoLinkingService.swift; sourceTree = "<group>"; };
-AI0100000000000000000103 /* ContextGraphManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextGraphManager.swift; sourceTree = "<group>"; };
-AI0100000000000000000104 /* CrossIntelligenceHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossIntelligenceHomeView.swift; sourceTree = "<group>"; };
-AI0100000000000000000105 /* GlobalSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalSearchView.swift; sourceTree = "<group>"; };
-AI0100000000000000000106 /* AskWorkspaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AskWorkspaceView.swift; sourceTree = "<group>"; };
-AI0100000000000000000107 /* GraphExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphExplorerView.swift; sourceTree = "<group>"; };
-/* Automation */
-AU0100000000000000000001 /* AutomationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationEngine.swift; sourceTree = "<group>"; };
-AU0100000000000000000002 /* TriggerActionRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriggerActionRegistry.swift; sourceTree = "<group>"; };
-AU0100000000000000000003 /* WorkflowBuilderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowBuilderService.swift; sourceTree = "<group>"; };
-AU0100000000000000000004 /* BackgroundRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRunner.swift; sourceTree = "<group>"; };
-AU0100000000000000000005 /* AutomationHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationHomeView.swift; sourceTree = "<group>"; };
-AU0100000000000000000006 /* WorkflowBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowBuilderView.swift; sourceTree = "<group>"; };
-AU0100000000000000000007 /* TriggerPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriggerPickerView.swift; sourceTree = "<group>"; };
-AU0100000000000000000008 /* ActionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionPickerView.swift; sourceTree = "<group>"; };
-AU0100000000000000000009 /* WorkflowExecutionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowExecutionView.swift; sourceTree = "<group>"; };
-/* Collaboration */
-CL0100000000000000000101 /* CollaborationSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaborationSessionManager.swift; sourceTree = "<group>"; };
-CL0100000000000000000102 /* ThreadedDiscussionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadedDiscussionService.swift; sourceTree = "<group>"; };
-CL0100000000000000000103 /* DecisionTrackingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionTrackingService.swift; sourceTree = "<group>"; };
-CL0100000000000000000104 /* AdvancedCollaborationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedCollaborationView.swift; sourceTree = "<group>"; };
-CL0100000000000000000105 /* LiveSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveSessionView.swift; sourceTree = "<group>"; };
-CL0100000000000000000106 /* ThreadedDiscussionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadedDiscussionView.swift; sourceTree = "<group>"; };
-CL0100000000000000000107 /* DecisionTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionTrackerView.swift; sourceTree = "<group>"; };
-CL0100000000000000000108 /* PresenceOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresenceOverlayView.swift; sourceTree = "<group>"; };
-/* Spatial */
-SP0100000000000000000001 /* SpatialEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpatialEngine.swift; sourceTree = "<group>"; };
-SP0100000000000000000002 /* NodeGraphEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeGraphEngine.swift; sourceTree = "<group>"; };
-SP0100000000000000000003 /* EntityMappingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityMappingService.swift; sourceTree = "<group>"; };
-SP0100000000000000000004 /* SpatialWorkspaceHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpatialWorkspaceHomeView.swift; sourceTree = "<group>"; };
-SP0100000000000000000005 /* InfiniteCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfiniteCanvasView.swift; sourceTree = "<group>"; };
-SP0100000000000000000006 /* MindMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindMapView.swift; sourceTree = "<group>"; };
-SP0100000000000000000007 /* NodeInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeInspectorView.swift; sourceTree = "<group>"; };
-/* Developer */
-DV0100000000000000000001 /* RepoSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoSyncService.swift; sourceTree = "<group>"; };
-DV0100000000000000000002 /* CodeAnalysisService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeAnalysisService.swift; sourceTree = "<group>"; };
-DV0100000000000000000003 /* AICodeAssistantManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AICodeAssistantManager.swift; sourceTree = "<group>"; };
-DV0100000000000000000101 /* RepoDetailView+Developer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RepoDetailView+Developer.swift"; sourceTree = "<group>"; };
-DV0100000000000000000102 /* CodeAssistantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeAssistantView.swift; sourceTree = "<group>"; };
-DV0100000000000000000103 /* RepoTasksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoTasksView.swift; sourceTree = "<group>"; };
-DV0100000000000000000104 /* DevWorkflowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevWorkflowView.swift; sourceTree = "<group>"; };
 		MS018A4E8FF9A0449D039277 /* JSONCoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONCoder.swift; sourceTree = "<group>"; };
 		MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentSwitcher.swift; sourceTree = "<group>"; };
 		MS018F0C9AC0045039A23CD0 /* MessageBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubbleView.swift; sourceTree = "<group>"; };
@@ -3496,6 +3418,12 @@ DV0100000000000000000104 /* DevWorkflowView.swift */ = {isa = PBXFileReference; 
 				CL010000000000000000000C /* WorkspaceSnapshotService.swift */,
 				CL010000000000000000000D /* WorkspaceServices.swift */,
 				CL010000000000000000000E /* CommandEngine.swift */,
+				AI0100000000000000000021 /* IntelligenceModels.swift */,
+				AI0100000000000000000022 /* AIOrchestrator.swift */,
+				AU0100000000000000000001 /* WorkflowModels.swift */,
+				AU0100000000000000000002 /* WorkflowEngine.swift */,
+				SP0100000000000000000002 /* SpatialModels.swift */,
+				SP0100000000000000000003 /* SpatialCanvasManager.swift */,
 				PL0100000000000000000001 /* PluginModels.swift */,
 				PL0100000000000000000002 /* PluginEventBus.swift */,
 				PL0100000000000000000003 /* PluginSandbox.swift */,
@@ -4039,6 +3967,9 @@ DV0100000000000000000104 /* DevWorkflowView.swift */ = {isa = PBXFileReference; 
 		AA1000000000000000000006 /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
+				AI0100000000000000000023 /* CrossIntelligenceHomeView.swift */,
+				AU0100000000000000000003 /* AutomationHomeView.swift */,
+				SP0100000000000000000004 /* SpatialWorkspaceHomeView.swift */,
 				PL0100000000000000000006 /* PluginsMainView.swift */,
 				PL0100000000000000000007 /* PluginBuildView.swift */,
 				AA1000000000000000000013 /* PluginMarketplaceView.swift */,
@@ -5342,6 +5273,15 @@ DV0100000000000000000104 /* DevWorkflowView.swift */ = {isa = PBXFileReference; 
 				AA100000000000000000001A /* GitHubToolPanelViews.swift in Sources */,
 				CL020000000000000000000A /* WorkspaceAutomationEngine.swift in Sources */,
 				CL020000000000000000000F /* PluginManager.swift in Sources */,);
+				AI0200000000000000000021 /* IntelligenceModels.swift in Sources */,
+				AI0200000000000000000022 /* AIOrchestrator.swift in Sources */,
+				AI0200000000000000000023 /* CrossIntelligenceHomeView.swift in Sources */,
+				AU0200000000000000000001 /* WorkflowModels.swift in Sources */,
+				AU0200000000000000000002 /* WorkflowEngine.swift in Sources */,
+				AU0200000000000000000003 /* AutomationHomeView.swift in Sources */,
+				SP0200000000000000000002 /* SpatialModels.swift in Sources */,
+				SP0200000000000000000003 /* SpatialCanvasManager.swift in Sources */,
+				SP0200000000000000000004 /* SpatialWorkspaceHomeView.swift in Sources */,
 				PL0200000000000000000001 /* PluginModels.swift in Sources */,
 				PL0200000000000000000002 /* PluginEventBus.swift in Sources */,
 				PL0200000000000000000003 /* PluginSandbox.swift in Sources */,
@@ -5350,50 +5290,6 @@ DV0100000000000000000104 /* DevWorkflowView.swift */ = {isa = PBXFileReference; 
 				PL0200000000000000000006 /* PluginsMainView.swift in Sources */,
 				PL0200000000000000000007 /* PluginBuildView.swift in Sources */,
 				PL0200000000000000000008 /* PluginDevConsoleView.swift in Sources */,
-				AI0200000000000000000001 /* AIOrchestrator.swift in Sources */,
-				AI0200000000000000000002 /* EmbeddingService.swift in Sources */,
-				WS0200000000000000000101 /* UnifiedDataStore.swift in Sources */,
-				WS0200000000000000000102 /* SyncManager.swift in Sources */,
-				NW0200000000000000000001 /* WebSocketManager.swift in Sources */,
-				NW0200000000000000000002 /* APIClient.swift in Sources */,
-				AI0200000000000000000101 /* SemanticSearchService.swift in Sources */,
-				AI0200000000000000000102 /* AutoLinkingService.swift in Sources */,
-				AI0200000000000000000103 /* ContextGraphManager.swift in Sources */,
-				AI0200000000000000000104 /* CrossIntelligenceHomeView.swift in Sources */,
-				AI0200000000000000000105 /* GlobalSearchView.swift in Sources */,
-				AI0200000000000000000106 /* AskWorkspaceView.swift in Sources */,
-				AI0200000000000000000107 /* GraphExplorerView.swift in Sources */,
-				AU0200000000000000000001 /* AutomationEngine.swift in Sources */,
-				AU0200000000000000000002 /* TriggerActionRegistry.swift in Sources */,
-				AU0200000000000000000003 /* WorkflowBuilderService.swift in Sources */,
-				AU0200000000000000000004 /* BackgroundRunner.swift in Sources */,
-				AU0200000000000000000005 /* AutomationHomeView.swift in Sources */,
-				AU0200000000000000000006 /* WorkflowBuilderView.swift in Sources */,
-				AU0200000000000000000007 /* TriggerPickerView.swift in Sources */,
-				AU0200000000000000000008 /* ActionPickerView.swift in Sources */,
-				AU0200000000000000000009 /* WorkflowExecutionView.swift in Sources */,
-				CL0200000000000000000101 /* CollaborationSessionManager.swift in Sources */,
-				CL0200000000000000000102 /* ThreadedDiscussionService.swift in Sources */,
-				CL0200000000000000000103 /* DecisionTrackingService.swift in Sources */,
-				CL0200000000000000000104 /* AdvancedCollaborationView.swift in Sources */,
-				CL0200000000000000000105 /* LiveSessionView.swift in Sources */,
-				CL0200000000000000000106 /* ThreadedDiscussionView.swift in Sources */,
-				CL0200000000000000000107 /* DecisionTrackerView.swift in Sources */,
-				CL0200000000000000000108 /* PresenceOverlayView.swift in Sources */,
-				SP0200000000000000000001 /* SpatialEngine.swift in Sources */,
-				SP0200000000000000000002 /* NodeGraphEngine.swift in Sources */,
-				SP0200000000000000000003 /* EntityMappingService.swift in Sources */,
-				SP0200000000000000000004 /* SpatialWorkspaceHomeView.swift in Sources */,
-				SP0200000000000000000005 /* InfiniteCanvasView.swift in Sources */,
-				SP0200000000000000000006 /* MindMapView.swift in Sources */,
-				SP0200000000000000000007 /* NodeInspectorView.swift in Sources */,
-				DV0200000000000000000001 /* RepoSyncService.swift in Sources */,
-				DV0200000000000000000002 /* CodeAnalysisService.swift in Sources */,
-				DV0200000000000000000003 /* AICodeAssistantManager.swift in Sources */,
-				DV0200000000000000000101 /* RepoDetailView+Developer.swift in Sources */,
-				DV0200000000000000000102 /* CodeAssistantView.swift in Sources */,
-				DV0200000000000000000103 /* RepoTasksView.swift in Sources */,
-				DV0200000000000000000104 /* DevWorkflowView.swift in Sources */,
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */

@@ -132,8 +132,6 @@ struct RepoDetailView: View {
 
     private var developerToolsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            RepoDetailView_Developer(repo: repository.name)
-
             // Intelligence
             VStack(alignment: .leading, spacing: 10) {
                 Text("Intelligence")
