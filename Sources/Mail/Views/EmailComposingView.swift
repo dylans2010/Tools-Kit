@@ -537,6 +537,7 @@ struct EmailComposingView: View {
     }
 
     private var mailDocumentScannerSheet: some View {
+        #if os(iOS)
         DocumentScannerView { scan in
             handleDocumentScan(scan)
             showingDocumentScanner = false
@@ -546,8 +547,12 @@ struct EmailComposingView: View {
             sendError = error.localizedDescription
             showingDocumentScanner = false
         }
+        #else
+        Text("Document Scanning is not supported on this platform.")
+        #endif
     }
 
+    #if os(iOS)
     private func handleDocumentScan(_ scan: VNDocumentCameraScan) {
         for pageIndex in 0..<scan.pageCount {
             let image = scan.imageOfPage(at: pageIndex)
@@ -562,6 +567,7 @@ struct EmailComposingView: View {
             }
         }
     }
+    #endif
 }
 
 struct WrappingFlowLayout: Layout {

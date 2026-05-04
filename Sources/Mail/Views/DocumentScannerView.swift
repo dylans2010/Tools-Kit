@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 import VisionKit
 import UIKit
@@ -39,3 +40,4 @@ struct DocumentScannerView: UIViewControllerRepresentable {
         }
     }
 }
+#endif
