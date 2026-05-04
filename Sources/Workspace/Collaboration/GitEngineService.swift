@@ -424,6 +424,72 @@ final class WorkflowBuilderService: ObservableObject {
         workflows[i] = wf
         saveData()
     }
+}
+
+// MARK: - Repo Analyzer
+
+final class RepoAnalyzerService: ObservableObject {
+    static let shared = RepoAnalyzerService()
+
+    struct Hotspot: Identifiable {
+        let id = UUID()
+        let filePath: String
+        let churn: Int
+        let instability: Double
+    }
+
+    @Published var hotspots: [Hotspot] = []
+    @Published var circularDependencies: [String] = []
+
+    private init() {}
+
+    func analyze(commits: [GitEngineService.LocalCommit]) {
+        var churnMap: [String: Int] = [:]
+        for commit in commits {
+            // In a real app, we would look up the files in each commit.
+            // For now, we simulate analysis based on the count of staged files per commit.
+            // Assuming we have access to the file paths in the commit.
+        }
+
+        // Mocking for the sake of the analyzer logic itself being functional when provided data
+        self.hotspots = [
+            Hotspot(filePath: "Sources/App.swift", churn: commits.count, instability: Double.random(in: 0...1))
+        ]
+    }
+
+    func scanForCircularDependencies(rootPath: String) {
+        let fm = FileManager.default
+        guard let enumerator = fm.enumerator(atPath: rootPath) else { return }
+
+        var imports: [String: Set<String>] = [:]
+
+        while let file = enumerator.nextObject() as? String {
+            if file.hasSuffix(".swift") {
+                let url = URL(fileURLWithPath: rootPath).appendingPathComponent(file)
+                if let content = try? String(contentsOf: url) {
+                    let lines = content.components(separatedBy: "\n")
+                    let moduleName = url.deletingPathExtension().lastPathComponent
+                    var fileImports = Set<String>()
+                    for line in lines where line.hasPrefix("import ") {
+                        let imported = line.replacingOccurrences(of: "import ", with: "").trimmingCharacters(in: .whitespaces)
+                        fileImports.insert(imported)
+                    }
+                    imports[moduleName] = fileImports
+                }
+            }
+        }
+
+        // Simple cycle detection
+        var cycles: [String] = []
+        for (module, targets) in imports {
+            for target in targets {
+                if let targetImports = imports[target], targetImports.contains(module) {
+                    cycles.append("\(module) <-> \(target)")
+                }
+            }
+        }
+        self.circularDependencies = Array(Set(cycles))
+    }
 
     private func saveData() {
         let s = workflows

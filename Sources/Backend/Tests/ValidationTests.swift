@@ -2,7 +2,7 @@ import Foundation
 
 /// Internal validation tests to ensure core logic is functional across refactored modules.
 struct ValidationTests {
-    static func runAll() {
+    static func runAll() async {
         print("Starting System Validation Tests...")
 
         testMailIntelligence()
@@ -11,7 +11,7 @@ struct ValidationTests {
         testMeetAnalytics()
         testCollaborationSystem()
         testEditingSystem()
-        testSecuritySystem()
+        await testSecuritySystem()
         testMessagesExtension()
 
         print("All Validation Tests Passed!")
@@ -73,7 +73,7 @@ struct ValidationTests {
         assert(!BranchProtectionService.shared.canMerge(spaceID: space.id, branchName: "main", userRole: .editor, approvalCount: 1))
     }
 
-    private static func testSecuritySystem() {
+    private static func testSecuritySystem() async {
         print("Testing Security System...")
         let encryption = EncryptionService.shared
         let salt = encryption.generateSalt()

@@ -79,9 +79,7 @@
 		CL0200000000000000000008 /* VersionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000008 /* VersionHistoryView.swift */; };
 		CL0200000000000000000009 /* AddDataCollabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000009 /* AddDataCollabView.swift */; };
 		CL020000000000000000000A /* WorkspaceAutomationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000A /* WorkspaceAutomationEngine.swift */; };
-		CL020000000000000000000B /* ContentGraphService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000B /* ContentGraphService.swift */; };
 		CL020000000000000000000C /* WorkspaceSnapshotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000C /* WorkspaceSnapshotService.swift */; };
-		CL020000000000000000000D /* WorkspaceServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000D /* WorkspaceServices.swift */; };
 		CL020000000000000000000E /* CommandEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000E /* CommandEngine.swift */; };
 		CL020000000000000000000F /* PluginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000F /* PluginManager.swift */; };
 		ED020000000000000000000A /* EditingHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000A /* EditingHomeView.swift */; };
@@ -1047,6 +1045,32 @@
 		AA1000000000000000000016 /* LocalGitEngineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000015 /* LocalGitEngineView.swift */; };
 		AA1000000000000000000018 /* GitHubIntelligenceViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000017 /* GitHubIntelligenceViews.swift */; };
 		AA100000000000000000001A /* GitHubToolPanelViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000019 /* GitHubToolPanelViews.swift */; };
+		GH02D6A009D86B3F41F2B926 /* GitHubWorkspaceSnapshotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH01105EAFF8AB834C00B382 /* GitHubWorkspaceSnapshotView.swift */; };
+		GH025535BE3C29864A279256 /* GitHubToolDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH01FCDC58142454445A8FA4 /* GitHubToolDashboardView.swift */; };
+		GH028AB61F627BFB4C1B9771 /* GitHubSyncStatusDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH012A0E8086452C4882A32B /* GitHubSyncStatusDashboardView.swift */; };
+		GH02C1B2F96215BD4A12BB0E /* GitHubStagingAreaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0168FC1BB603404E5D8E09 /* GitHubStagingAreaView.swift */; };
+		GH02A0F643B3C33A468397B8 /* GitHubReleaseBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH01EF345100B83C43E3B5AF /* GitHubReleaseBuilderView.swift */; };
+		GH028D17B14C898A4743AEAF /* GitHubRefactorPlannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH01C9A780CB1F4C4FB1A4F3 /* GitHubRefactorPlannerView.swift */; };
+		GH022DFC0E9E140B4CEBBCAC /* GitHubQuickFixPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH013994CB8B227D475CA449 /* GitHubQuickFixPanelView.swift */; };
+		GH027AAD49A11B7944C1B7F2 /* GitHubHotspotDetectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0199AC9C1E130F43DEB800 /* GitHubHotspotDetectorView.swift */; };
+		GH020627CEE8B08B44A79D10 /* GitHubFileRecoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH012BFC962BECF84B6C9FAB /* GitHubFileRecoveryView.swift */; };
+		GH0233F26EC1106A46C2A904 /* GitHubDependencyDebuggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH015D0EF165D5FA404F9930 /* GitHubDependencyDebuggerView.swift */; };
+		GH0260E92C5C7E48402AA190 /* GitHubConflictResolutionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH01F5A13E0ACE6546A2AF2E /* GitHubConflictResolutionView.swift */; };
+		GH02969D9C5D3D4D40D1975B /* GitHubCommandCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH0192443AA7C29D4830B271 /* GitHubCommandCenterView.swift */; };
+		GH02FBEF657F18C545B1915C /* GitHubCodeEditorWorkspaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH018ADA42AD7D2647DEAF5C /* GitHubCodeEditorWorkspaceView.swift */; };
+		GH02F277F629CC834393A8DA /* GitHubChangeReviewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH015D0EB27F176A41B4BB5E /* GitHubChangeReviewerView.swift */; };
+		SV02977F84A8F87E4C7A84E3 /* SecurityThreatDetectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV013668155C187E4EE3B5C9 /* SecurityThreatDetectionView.swift */; };
+		SV02664E4F9B852F455E9E7E /* SecuritySessionManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV01649B1C7F0A714E8085F8 /* SecuritySessionManagerView.swift */; };
+		SV022372722B94AD4C4F917E /* SecurityRecoveryOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV0166A64203E84844FF8623 /* SecurityRecoveryOptionsView.swift */; };
+		SV02C3C04B78F71C477A8150 /* SecurityPermissionCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV018F383F25FEDE4423B849 /* SecurityPermissionCenterView.swift */; };
+		SV023BC7F2E3FB934824A7D5 /* SecurityEncryptionSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV0164C62E3BB446438C9239 /* SecurityEncryptionSettingsView.swift */; };
+		SV02D8BBB6BDD80B4A418E02 /* SecurityEmergencyLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV01827D4408A72B42F49B48 /* SecurityEmergencyLockView.swift */; };
+		SV020406628ADCCE4496982E /* SecurityDeviceTrustView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV01AE5D63E2D3A746308755 /* SecurityDeviceTrustView.swift */; };
+		SV0269EC7B2AD592484BBD08 /* SecurityBiometricControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV015345021718F34F31B96A /* SecurityBiometricControlView.swift */; };
+		SV02EE95F43338A84774BDF6 /* SecurityAutoLockSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV01A12D37157D974BB2B816 /* SecurityAutoLockSettingsView.swift */; };
+		SV0248C2284F045048B58A92 /* SecurityAuditDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV016A6A8C64AFF84AADB98F /* SecurityAuditDashboardView.swift */; };
+		SV02E63D7931CCF04F3DA79B /* SecurityAppLockRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV017C6FA6D76B1B4F51B5C4 /* SecurityAppLockRulesView.swift */; };
+		SV020F7D28526D764BED88E3 /* SecurityActivityLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SV01753ABE02878346C2A212 /* SecurityActivityLogView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2087,6 +2111,32 @@
 		AA1000000000000000000015 /* LocalGitEngineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalGitEngineView.swift; sourceTree = "<group>"; };
 		AA1000000000000000000017 /* GitHubIntelligenceViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubIntelligenceViews.swift; sourceTree = "<group>"; };
 		AA1000000000000000000019 /* GitHubToolPanelViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubToolPanelViews.swift; sourceTree = "<group>"; };
+		GH01105EAFF8AB834C00B382 /* GitHubWorkspaceSnapshotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubWorkspaceSnapshotView.swift; sourceTree = "<group>"; };
+		GH01FCDC58142454445A8FA4 /* GitHubToolDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubToolDashboardView.swift; sourceTree = "<group>"; };
+		GH012A0E8086452C4882A32B /* GitHubSyncStatusDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubSyncStatusDashboardView.swift; sourceTree = "<group>"; };
+		GH0168FC1BB603404E5D8E09 /* GitHubStagingAreaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubStagingAreaView.swift; sourceTree = "<group>"; };
+		GH01EF345100B83C43E3B5AF /* GitHubReleaseBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubReleaseBuilderView.swift; sourceTree = "<group>"; };
+		GH01C9A780CB1F4C4FB1A4F3 /* GitHubRefactorPlannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubRefactorPlannerView.swift; sourceTree = "<group>"; };
+		GH013994CB8B227D475CA449 /* GitHubQuickFixPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubQuickFixPanelView.swift; sourceTree = "<group>"; };
+		GH0199AC9C1E130F43DEB800 /* GitHubHotspotDetectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubHotspotDetectorView.swift; sourceTree = "<group>"; };
+		GH012BFC962BECF84B6C9FAB /* GitHubFileRecoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubFileRecoveryView.swift; sourceTree = "<group>"; };
+		GH015D0EF165D5FA404F9930 /* GitHubDependencyDebuggerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubDependencyDebuggerView.swift; sourceTree = "<group>"; };
+		GH01F5A13E0ACE6546A2AF2E /* GitHubConflictResolutionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubConflictResolutionView.swift; sourceTree = "<group>"; };
+		GH0192443AA7C29D4830B271 /* GitHubCommandCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubCommandCenterView.swift; sourceTree = "<group>"; };
+		GH018ADA42AD7D2647DEAF5C /* GitHubCodeEditorWorkspaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubCodeEditorWorkspaceView.swift; sourceTree = "<group>"; };
+		GH015D0EB27F176A41B4BB5E /* GitHubChangeReviewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubChangeReviewerView.swift; sourceTree = "<group>"; };
+		SV013668155C187E4EE3B5C9 /* SecurityThreatDetectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityThreatDetectionView.swift; sourceTree = "<group>"; };
+		SV01649B1C7F0A714E8085F8 /* SecuritySessionManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuritySessionManagerView.swift; sourceTree = "<group>"; };
+		SV0166A64203E84844FF8623 /* SecurityRecoveryOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityRecoveryOptionsView.swift; sourceTree = "<group>"; };
+		SV018F383F25FEDE4423B849 /* SecurityPermissionCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityPermissionCenterView.swift; sourceTree = "<group>"; };
+		SV0164C62E3BB446438C9239 /* SecurityEncryptionSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityEncryptionSettingsView.swift; sourceTree = "<group>"; };
+		SV01827D4408A72B42F49B48 /* SecurityEmergencyLockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityEmergencyLockView.swift; sourceTree = "<group>"; };
+		SV01AE5D63E2D3A746308755 /* SecurityDeviceTrustView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityDeviceTrustView.swift; sourceTree = "<group>"; };
+		SV015345021718F34F31B96A /* SecurityBiometricControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityBiometricControlView.swift; sourceTree = "<group>"; };
+		SV01A12D37157D974BB2B816 /* SecurityAutoLockSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityAutoLockSettingsView.swift; sourceTree = "<group>"; };
+		SV016A6A8C64AFF84AADB98F /* SecurityAuditDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityAuditDashboardView.swift; sourceTree = "<group>"; };
+		SV017C6FA6D76B1B4F51B5C4 /* SecurityAppLockRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityAppLockRulesView.swift; sourceTree = "<group>"; };
+		SV01753ABE02878346C2A212 /* SecurityActivityLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityActivityLogView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -3282,6 +3332,18 @@
 				SC0100000000000000000005 /* TOTPService.swift */,
 				SC0100000000000000000006 /* VaultManager.swift */,
 				SC0100000000000000000007 /* SecurityPackageService.swift */,
+				SV01753ABE02878346C2A212 /* SecurityActivityLogView.swift */,
+				SV017C6FA6D76B1B4F51B5C4 /* SecurityAppLockRulesView.swift */,
+				SV016A6A8C64AFF84AADB98F /* SecurityAuditDashboardView.swift */,
+				SV01A12D37157D974BB2B816 /* SecurityAutoLockSettingsView.swift */,
+				SV015345021718F34F31B96A /* SecurityBiometricControlView.swift */,
+				SV01AE5D63E2D3A746308755 /* SecurityDeviceTrustView.swift */,
+				SV01827D4408A72B42F49B48 /* SecurityEmergencyLockView.swift */,
+				SV0164C62E3BB446438C9239 /* SecurityEncryptionSettingsView.swift */,
+				SV018F383F25FEDE4423B849 /* SecurityPermissionCenterView.swift */,
+				SV0166A64203E84844FF8623 /* SecurityRecoveryOptionsView.swift */,
+				SV01649B1C7F0A714E8085F8 /* SecuritySessionManagerView.swift */,
+				SV013668155C187E4EE3B5C9 /* SecurityThreatDetectionView.swift */,
 				SV0100000000000000000001 /* SecurityOnboardingView.swift */,
 				SV0100000000000000000002 /* SecurityHomeView.swift */,
 				SV0100000000000000000003 /* VaultListView.swift */,
@@ -3860,6 +3922,20 @@
 		AA1000000000000000000008 /* Intelligence */ = {
 			isa = PBXGroup;
 			children = (
+				GH01105EAFF8AB834C00B382 /* GitHubWorkspaceSnapshotView.swift */,
+				GH01FCDC58142454445A8FA4 /* GitHubToolDashboardView.swift */,
+				GH012A0E8086452C4882A32B /* GitHubSyncStatusDashboardView.swift */,
+				GH0168FC1BB603404E5D8E09 /* GitHubStagingAreaView.swift */,
+				GH01EF345100B83C43E3B5AF /* GitHubReleaseBuilderView.swift */,
+				GH01C9A780CB1F4C4FB1A4F3 /* GitHubRefactorPlannerView.swift */,
+				GH013994CB8B227D475CA449 /* GitHubQuickFixPanelView.swift */,
+				GH0199AC9C1E130F43DEB800 /* GitHubHotspotDetectorView.swift */,
+				GH012BFC962BECF84B6C9FAB /* GitHubFileRecoveryView.swift */,
+				GH015D0EF165D5FA404F9930 /* GitHubDependencyDebuggerView.swift */,
+				GH01F5A13E0ACE6546A2AF2E /* GitHubConflictResolutionView.swift */,
+				GH0192443AA7C29D4830B271 /* GitHubCommandCenterView.swift */,
+				GH018ADA42AD7D2647DEAF5C /* GitHubCodeEditorWorkspaceView.swift */,
+				GH015D0EB27F176A41B4BB5E /* GitHubChangeReviewerView.swift */,
 				AA1000000000000000000015 /* LocalGitEngineView.swift */,
 				AA1000000000000000000017 /* GitHubIntelligenceViews.swift */,
 				AA1000000000000000000019 /* GitHubToolPanelViews.swift */,
@@ -4222,6 +4298,32 @@
 				SC0200000000000000000005 /* TOTPService.swift in Sources */,
 				SC0200000000000000000006 /* VaultManager.swift in Sources */,
 				SC0200000000000000000007 /* SecurityPackageService.swift in Sources */,
+				SV020F7D28526D764BED88E3 /* SecurityActivityLogView.swift in Sources */,
+				SV02E63D7931CCF04F3DA79B /* SecurityAppLockRulesView.swift in Sources */,
+				SV0248C2284F045048B58A92 /* SecurityAuditDashboardView.swift in Sources */,
+				SV02EE95F43338A84774BDF6 /* SecurityAutoLockSettingsView.swift in Sources */,
+				SV0269EC7B2AD592484BBD08 /* SecurityBiometricControlView.swift in Sources */,
+				SV020406628ADCCE4496982E /* SecurityDeviceTrustView.swift in Sources */,
+				SV02D8BBB6BDD80B4A418E02 /* SecurityEmergencyLockView.swift in Sources */,
+				SV023BC7F2E3FB934824A7D5 /* SecurityEncryptionSettingsView.swift in Sources */,
+				SV02C3C04B78F71C477A8150 /* SecurityPermissionCenterView.swift in Sources */,
+				SV022372722B94AD4C4F917E /* SecurityRecoveryOptionsView.swift in Sources */,
+				SV02664E4F9B852F455E9E7E /* SecuritySessionManagerView.swift in Sources */,
+				SV02977F84A8F87E4C7A84E3 /* SecurityThreatDetectionView.swift in Sources */,
+				GH02F277F629CC834393A8DA /* GitHubChangeReviewerView.swift in Sources */,
+				GH02FBEF657F18C545B1915C /* GitHubCodeEditorWorkspaceView.swift in Sources */,
+				GH02969D9C5D3D4D40D1975B /* GitHubCommandCenterView.swift in Sources */,
+				GH0260E92C5C7E48402AA190 /* GitHubConflictResolutionView.swift in Sources */,
+				GH0233F26EC1106A46C2A904 /* GitHubDependencyDebuggerView.swift in Sources */,
+				GH020627CEE8B08B44A79D10 /* GitHubFileRecoveryView.swift in Sources */,
+				GH027AAD49A11B7944C1B7F2 /* GitHubHotspotDetectorView.swift in Sources */,
+				GH022DFC0E9E140B4CEBBCAC /* GitHubQuickFixPanelView.swift in Sources */,
+				GH028D17B14C898A4743AEAF /* GitHubRefactorPlannerView.swift in Sources */,
+				GH02A0F643B3C33A468397B8 /* GitHubReleaseBuilderView.swift in Sources */,
+				GH02C1B2F96215BD4A12BB0E /* GitHubStagingAreaView.swift in Sources */,
+				GH028AB61F627BFB4C1B9771 /* GitHubSyncStatusDashboardView.swift in Sources */,
+				GH025535BE3C29864A279256 /* GitHubToolDashboardView.swift in Sources */,
+				GH02D6A009D86B3F41F2B926 /* GitHubWorkspaceSnapshotView.swift in Sources */,
 				SV0200000000000000000001 /* SecurityOnboardingView.swift in Sources */,
 				SV0200000000000000000002 /* SecurityHomeView.swift in Sources */,
 				SV0200000000000000000003 /* VaultListView.swift in Sources */,
