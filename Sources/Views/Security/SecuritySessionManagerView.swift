@@ -1,51 +1,58 @@
 import SwiftUI
 
 struct SecuritySessionManagerView: View {
-    @State private var activeSessions: [SecuritySession] = [
-        SecuritySession(id: UUID(), deviceName: "iPhone 15 Pro", location: "San Francisco, CA", lastActive: Date(), isCurrent: true),
-        SecuritySession(id: UUID(), deviceName: "iPad Pro", location: "Oakland, CA", lastActive: Date().addingTimeInterval(-3600), isCurrent: false)
-    ]
+    @StateObject private var store = SecurityDeviceSessionStore.shared
+
+    private var currentSession: SecuritySession? {
+        store.sessions.first(where: { $0.isCurrent })
+    }
+
+    private var otherSessions: [SecuritySession] {
+        store.sessions.filter { !$0.isCurrent }.sorted(by: { $0.lastActive > $1.lastActive })
+    }
 
     var body: some View {
         List {
             Section("Current Session") {
-                if let current = activeSessions.first(where: { $0.isCurrent }) {
-                    SessionRow(session: current)
+                if let currentSession {
+                    SessionRow(session: currentSession)
                 }
             }
 
             Section("Other Active Sessions") {
-                ForEach(activeSessions.filter { !$0.isCurrent }) { session in
-                    SessionRow(session: session)
-                        .swipeActions {
-                            Button(role: .destructive) {
-                                activeSessions.removeAll { $0.id == session.id }
-                            } label: {
-                                Label("Revoke", systemImage: "xmark.circle")
+                if otherSessions.isEmpty {
+                    Text("No other active sessions")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(otherSessions) { session in
+                        SessionRow(session: session)
+                            .swipeActions {
+                                Button(role: .destructive) {
+                                    store.revokeSession(session)
+                                } label: {
+                                    Label("Revoke", systemImage: "xmark.circle")
+                                }
                             }
-                        }
+                    }
                 }
             }
 
             Section {
                 Button(role: .destructive) {
-                    activeSessions.removeAll { !$0.isCurrent }
+                    store.revokeAllOtherSessions()
                 } label: {
                     Text("Logout All Other Sessions")
                         .frame(maxWidth: .infinity)
                 }
+                .disabled(otherSessions.isEmpty)
             }
         }
         .navigationTitle("Session Manager")
+        .onAppear {
+            store.refreshCurrentSessionActivity()
+        }
     }
-}
-
-struct SecuritySession: Identifiable {
-    let id: UUID
-    let deviceName: String
-    let location: String
-    let lastActive: Date
-    let isCurrent: Bool
 }
 
 struct SessionRow: View {

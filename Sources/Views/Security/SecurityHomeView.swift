@@ -5,14 +5,9 @@ struct SecurityHomeView: View {
     @StateObject private var vaultManager = VaultManager.shared
 
     @State private var showingAddSheet = false
-    @State private var selectedCategory: VaultCategory?
-    @State private var showingPackageView = false
+        @State private var showingPackageView = false
     @State private var showingEmergencyLock = false
 
-    private let columns = [
-        GridItem(.flexible()),
-        GridItem(.flexible())
-    ]
 
     var body: some View {
         Group {
@@ -38,18 +33,7 @@ struct SecurityHomeView: View {
                 headerSection
                 securityToolsSection
 
-                Text("Vault Categories")
-                    .font(.headline)
-                    .padding(.horizontal)
-
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(VaultCategory.allCases) { category in
-                        CategoryCard(category: category, count: vaultManager.items(for: category).count) {
-                            selectedCategory = category
-                        }
-                    }
-                }
-                .padding(.horizontal)
+                allItemsSection
 
                 recentItemsSection
             }
@@ -91,12 +75,7 @@ struct SecurityHomeView: View {
                 }
             }
         }
-        .sheet(item: $selectedCategory) { category in
-            NavigationStack {
-                VaultListView(category: category)
-            }
-        }
-        .sheet(isPresented: $showingAddSheet) {
+                .sheet(isPresented: $showingAddSheet) {
             AddInfoView()
         }
         .sheet(isPresented: $showingPackageView) {
@@ -124,45 +103,76 @@ struct SecurityHomeView: View {
                 .font(.headline)
                 .padding(.horizontal)
 
-            Menu {
-                NavigationLink(destination: SecuritySessionManagerView()) { Label("Sessions", systemImage: "iphone.badge.play") }
-                NavigationLink(destination: SecurityActivityLogView()) { Label("Activity", systemImage: "list.bullet.rectangle") }
-                NavigationLink(destination: SecurityDeviceTrustView()) { Label("Trusted Devices", systemImage: "checkmark.seal") }
-                NavigationLink(destination: SecurityAutoLockSettingsView()) { Label("Auto-Lock", systemImage: "timer") }
-                NavigationLink(destination: SecurityRecoveryOptionsView()) { Label("Recovery", systemImage: "key.viewfinder") }
-                NavigationLink(destination: SecurityThreatDetectionView()) { Label("Threats", systemImage: "shield.exclamationmark") }
-                NavigationLink(destination: SecurityBiometricControlView()) { Label("Biometrics", systemImage: "faceid") }
-                NavigationLink(destination: SecurityAppLockRulesView()) { Label("App Lock", systemImage: "app.badge.key") }
-                NavigationLink(destination: SecurityEncryptionSettingsView()) { Label("Encryption", systemImage: "lock.square.stack") }
-                NavigationLink(destination: SecurityAuditDashboardView()) { Label("Audit", systemImage: "chart.bar.doc.horizontal") }
-                NavigationLink(destination: SecurityPermissionCenterView()) { Label("Permissions", systemImage: "hand.raised.slash") }
-                NavigationLink(destination: SecurityEmergencyLockView()) { Label("Emergency", systemImage: "exclamationmark.triangle") }
-            } label: {
-                HStack {
-                    Label("Open Security Tools", systemImage: "chevron.down.circle")
-                        .font(.subheadline.bold())
-                    Spacer()
-                }
-                .padding()
-                .background(Color(.secondarySystemGroupedBackground))
-                .cornerRadius(12)
-                .padding(.horizontal)
-            }
+            let tools: [(String, String, AnyView)] = [
+                ("Sessions", "iphone.badge.play", AnyView(SecuritySessionManagerView())),
+                ("Activity", "list.bullet.rectangle", AnyView(SecurityActivityLogView())),
+                ("Trusted Devices", "checkmark.seal", AnyView(SecurityDeviceTrustView())),
+                ("Auto-Lock", "timer", AnyView(SecurityAutoLockSettingsView())),
+                ("Recovery", "key.viewfinder", AnyView(SecurityRecoveryOptionsView())),
+                ("Threats", "shield.exclamationmark", AnyView(SecurityThreatDetectionView())),
+                ("Biometrics", "faceid", AnyView(SecurityBiometricControlView())),
+                ("App Lock", "app.badge.key", AnyView(SecurityAppLockRulesView())),
+                ("Encryption", "lock.square.stack", AnyView(SecurityEncryptionSettingsView())),
+                ("Audit", "chart.bar.doc.horizontal", AnyView(SecurityAuditDashboardView())),
+                ("Permissions", "hand.raised.slash", AnyView(SecurityPermissionCenterView()))
+            ]
 
-            Button {
-                showingAddSheet = true
-            } label: {
-                HStack {
-                    Label("Add Entry", systemImage: "plus.circle.fill")
-                        .font(.subheadline.bold())
-                    Spacer()
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                ForEach(0..<tools.count, id: \.self) { idx in
+                    NavigationLink(destination: tools[idx].2) {
+                        Label(tools[idx].0, systemImage: tools[idx].1)
+                            .font(.subheadline.weight(.medium))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(12)
+                            .background(Color(.secondarySystemGroupedBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .buttonStyle(.plain)
                 }
-                .padding()
-                .background(Color.blue.opacity(0.12))
-                .cornerRadius(12)
-                .padding(.horizontal)
             }
-            .buttonStyle(.plain)
+            .padding(.horizontal)
+        }
+    }
+
+    private var allItemsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("All Vault Items")
+                .font(.headline)
+                .padding(.horizontal)
+
+            if vaultManager.items.isEmpty {
+                Text("No items yet")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal)
+            } else {
+                ForEach(vaultManager.items.sorted(by: { $0.updatedAt > $1.updatedAt })) { item in
+                    NavigationLink(destination: VaultItemDetailView(item: item)) {
+                        HStack(spacing: 12) {
+                            Image(systemName: item.category.icon)
+                                .foregroundStyle(.white)
+                                .frame(width: 36, height: 36)
+                                .background(Circle().fill(Color.accentColor))
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(item.title)
+                                    .font(.subheadline.bold())
+                                Text(item.category.rawValue)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding()
+                        .background(Color(.secondarySystemGroupedBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .padding(.horizontal)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
         }
     }
 
@@ -210,36 +220,6 @@ struct SecurityHomeView: View {
                 }
             }
         }
-    }
-}
-
-struct CategoryCard: View {
-    let category: VaultCategory
-    let count: Int
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 10) {
-                Image(systemName: category.icon)
-                    .font(.title2)
-                    .foregroundColor(.blue)
-                    .frame(width: 48, height: 48)
-                    .background(Color.blue.opacity(0.1))
-                    .clipShape(Circle())
-                Text(category.rawValue)
-                    .font(.caption.bold())
-                    .foregroundColor(.primary)
-                Text("\(count) item\(count == 1 ? "" : "s")")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .background(Color(.secondarySystemGroupedBackground))
-            .cornerRadius(12)
-        }
-        .buttonStyle(.plain)
     }
 }
 

@@ -34,8 +34,9 @@ struct AddInfoView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
+            ScrollView {
+                VStack(spacing: 16) {
+                GroupBox {
                     Picker("Type", selection: $category) {
                         ForEach(VaultCategory.allCases) { cat in
                             Label(cat.rawValue, systemImage: cat.icon).tag(cat)
@@ -48,11 +49,14 @@ struct AddInfoView: View {
 
                 dynamicSection
 
-                Section("Notes") {
+                GroupBox("Notes") {
                     TextEditor(text: $note)
                         .frame(minHeight: 100)
                 }
+                }
+                .padding()
             }
+            .background(Color(.systemGroupedBackground))
             .navigationTitle("New Entry")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -83,7 +87,7 @@ struct AddInfoView: View {
     private var dynamicSection: some View {
         switch category {
         case .credentials:
-            Section("Credentials") {
+            GroupBox("Credentials") {
                 TextField("Username", text: $username)
                     .textContentType(.username)
                 SecureField("Password", text: $password)
@@ -93,7 +97,7 @@ struct AddInfoView: View {
                     .autocapitalization(.none)
             }
         case .documents:
-            Section("Document Details") {
+            GroupBox("Document Details") {
                 Picker("Document Type", selection: $documentType) {
                     Text("ID").tag("ID")
                     Text("Passport").tag("Passport")
@@ -109,7 +113,7 @@ struct AddInfoView: View {
                 }
             }
         case .photos:
-            Section("Photo") {
+            GroupBox("Photo") {
                 PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
                     if let selectedPhotoData, let uiImage = UIImage(data: selectedPhotoData) {
                         Image(uiImage: uiImage)
@@ -130,7 +134,7 @@ struct AddInfoView: View {
                 }
             }
         case .files:
-            Section("File") {
+            GroupBox("File") {
                 Button {
                     showingFilePicker = true
                 } label: {
@@ -138,7 +142,7 @@ struct AddInfoView: View {
                 }
             }
         case .totp:
-            Section("TOTP Settings") {
+            GroupBox("TOTP Settings") {
                 TextField("Issuer (e.g. Google)", text: $totpIssuer)
                 TextField("Account (e.g. email@me.com)", text: $totpAccount)
                 TextField("Secret Key", text: $totpSecret)

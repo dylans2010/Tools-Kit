@@ -12,13 +12,15 @@ struct SecurityPackageView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                Section("Backup") {
+            ScrollView {
+                VStack(spacing: 16) {
+                GroupBox("Backup") {
                     Text("Export your entire vault into a single encrypted .toolkitsec file.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
                     SecureField("Master Password", text: $password)
+                        .textContentType(.password)
 
                     Button {
                         exportVault()
@@ -28,7 +30,7 @@ struct SecurityPackageView: View {
                     .disabled(password.isEmpty)
                 }
 
-                Section("Restore") {
+                GroupBox("Restore") {
                     Text("Import a previously exported .toolkitsec file. This will add items to your current vault.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -39,20 +41,21 @@ struct SecurityPackageView: View {
                         Label("Import Vault", systemImage: "square.and.arrow.down")
                     }
 
-                    Button {
-                        showingImportBridge = true
-                    } label: {
-                        Label("Import via Document Picker", systemImage: "doc.badge.plus")
-                    }
                 }
 
                 if let status = statusMessage {
-                    Section {
-                        Text(status)
-                            .foregroundColor(isError ? .red : .green)
-                    }
+                    Text(status)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(isError ? .red : .green)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background((isError ? Color.red : Color.green).opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
+                }
+                .padding()
             }
+            .background(Color(.systemGroupedBackground))
             .navigationTitle("Security Package")
             .sheet(isPresented: $showingExportShare) {
                 if let url = exportURL {
