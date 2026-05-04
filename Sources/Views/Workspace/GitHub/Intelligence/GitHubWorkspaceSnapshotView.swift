@@ -1,45 +1,69 @@
 import SwiftUI
 
 struct GitHubWorkspaceSnapshotView: View {
-    @State private var snapshots: [WorkspaceSnapshot] = [
-        WorkspaceSnapshot(id: UUID(), name: "Pre-Refactor Snapshot", branch: "main", timestamp: Date()),
-        WorkspaceSnapshot(id: UUID(), name: "Stable Release 1.1.0", branch: "main", timestamp: Date().addingTimeInterval(-604800))
-    ]
+    @ObservedObject private var gitEngine = GitEngineService.shared
+    @State private var snapshots: [WorkspaceSnapshot] = []
 
     var body: some View {
         List {
             Section("Repository Snapshots") {
-                ForEach(snapshots) { snapshot in
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text(snapshot.name).font(.subheadline.bold())
-                            Spacer()
-                            Text(snapshot.branch).font(.caption2).foregroundStyle(.secondary)
-                        }
-                        Text(snapshot.timestamp.formatted())
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                if snapshots.isEmpty {
+                    Text("No snapshots found in local storage.")
+                        .font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(snapshots) { snapshot in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(snapshot.name).font(.subheadline.bold())
+                                Spacer()
+                                Text(snapshot.branch).font(.caption2).foregroundStyle(.secondary)
+                            }
+                            Text(snapshot.timestamp.formatted())
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
 
-                        HStack {
-                            Button("Diff") { /* Diff logic */ }
-                            Button("Restore") { /* Restore logic */ }
+                            HStack {
+                                Button("Diff") { /* Diff logic */ }
+                                Button("Restore") { /* Restore logic */ }
+                            }
+                            .font(.caption.bold())
+                            .buttonStyle(.bordered)
+                            .padding(.top, 4)
                         }
-                        .font(.caption.bold())
-                        .buttonStyle(.bordered)
-                        .padding(.top, 4)
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
                 }
             }
 
             Section {
                 Button("Capture Full State Snapshot") {
-                    snapshots.insert(WorkspaceSnapshot(id: UUID(), name: "Manual Snapshot", branch: "main", timestamp: Date()), at: 0)
+                    captureSnapshot()
                 }
                 .frame(maxWidth: .infinity)
             }
         }
         .navigationTitle("Workspace Snapshots")
+        .onAppear {
+            loadSnapshots()
+        }
+    }
+
+    private func loadSnapshots() {
+        let fm = FileManager.default
+        let docs = fm.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        if let items = try? fm.contentsOfDirectory(at: docs, includingPropertiesForKeys: nil) {
+            let snapshotFiles = items.filter { $0.lastPathComponent.contains("repo_snapshot_") }
+            self.snapshots = snapshotFiles.compactMap { url in
+                WorkspaceSnapshot(id: UUID(), name: "Automatic Backup", branch: "main", timestamp: (try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? Date())
+            }
+        }
+    }
+
+    private func captureSnapshot() {
+        let filename = "repo_snapshot_\(Int(Date().timeIntervalSince1970)).json"
+        let data = (try? JSONEncoder().encode(gitEngine.stagedChanges)) ?? Data()
+        try? WorkspacePersistence.shared.save(data, to: filename)
+        loadSnapshots()
     }
 }
 
