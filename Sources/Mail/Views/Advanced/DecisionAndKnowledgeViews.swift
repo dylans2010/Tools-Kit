@@ -95,7 +95,7 @@ struct KnowledgeExtractionPanel: View {
             }
         }
         .padding()
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .background(Color.workspaceSurface)
         .cornerRadius(12)
         .onAppear(perform: extract)
     }
