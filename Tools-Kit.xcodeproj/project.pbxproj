@@ -150,7 +150,7 @@
 		ML0200000000000000000003 /* MailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000003 /* MailViewModel.swift */; };
 		ML0200000000000000000004 /* EmailDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000004 /* EmailDetailView.swift */; };
 		ML0200000000000000000006 /* MetadataInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000006 /* MetadataInspectorView.swift */; };
-		ML0200000000000000000007 /* DocumentScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000007 /* DocumentScannerView.swift */; };
+		ML0200000000000000000007 /* MailDocScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100000000000000000007 /* MailDocScanView.swift */; };
 		F9864379942F4D0AAD6AB5F2 /* MailAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6554994AF5D14C2ABD0C2FD8 /* MailAccount.swift */; };
 		53EC1AF8723044F3BFB42AB2 /* MailFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EEEF45551F542229BE32D06 /* MailFolder.swift */; };
 		169F73E894D6416298DC841C /* MailMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E0ABB5BDAD4793B4FE4B93 /* MailMessage.swift */; };
@@ -1203,7 +1203,7 @@
 		ML0100000000000000000003 /* MailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/MailViewModel.swift; sourceTree = "<group>"; };
 		ML0100000000000000000004 /* EmailDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/EmailDetailView.swift; sourceTree = "<group>"; };
 		ML0100000000000000000006 /* MetadataInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MetadataInspectorView.swift; sourceTree = "<group>"; };
-		ML0100000000000000000007 /* DocumentScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/DocumentScannerView.swift; sourceTree = "<group>"; };
+		ML0100000000000000000007 /* MailDocScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Views/MailDocScanView.swift; sourceTree = "<group>"; };
 		6554994AF5D14C2ABD0C2FD8 /* MailAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailAccount.swift; sourceTree = "<group>"; };
 		1EEEF45551F542229BE32D06 /* MailFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailFolder.swift; sourceTree = "<group>"; };
 		E1E0ABB5BDAD4793B4FE4B93 /* MailMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail/Models/MailMessage.swift; sourceTree = "<group>"; };
@@ -2700,7 +2700,7 @@
 				ML0100000000000000000003 /* MailViewModel.swift */,
 				ML0100000000000000000004 /* EmailDetailView.swift */,
 				ML0100000000000000000006 /* MetadataInspectorView.swift */,
-				ML0100000000000000000007 /* DocumentScannerView.swift */,
+				ML0100000000000000000007 /* MailDocScanView.swift */,
 				6554994AF5D14C2ABD0C2FD8 /* MailAccount.swift */,
 				1EEEF45551F542229BE32D06 /* MailFolder.swift */,
 				E1E0ABB5BDAD4793B4FE4B93 /* MailMessage.swift */,
@@ -4479,7 +4479,7 @@
 				ML0200000000000000000003 /* MailViewModel.swift in Sources */,
 				ML0200000000000000000004 /* EmailDetailView.swift in Sources */,
 				ML0200000000000000000006 /* MetadataInspectorView.swift in Sources */,
-				ML0200000000000000000007 /* DocumentScannerView.swift in Sources */,
+				ML0200000000000000000007 /* MailDocScanView.swift in Sources */,
 				F9864379942F4D0AAD6AB5F2 /* MailAccount.swift in Sources */,
 				53EC1AF8723044F3BFB42AB2 /* MailFolder.swift in Sources */,
 				169F73E894D6416298DC841C /* MailMessage.swift in Sources */,

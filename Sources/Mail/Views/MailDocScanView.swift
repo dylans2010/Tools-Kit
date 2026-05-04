@@ -3,7 +3,7 @@ import SwiftUI
 import VisionKit
 import UIKit
 
-struct MailDocumentScannerView: UIViewControllerRepresentable {
+struct MailDocScanView: UIViewControllerRepresentable {
     var onFinish: (VNDocumentCameraScan) -> Void
     var onCancel: () -> Void
     var onError: (Error) -> Void
@@ -21,9 +21,9 @@ struct MailDocumentScannerView: UIViewControllerRepresentable {
     }
 
     class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
-        var parent: MailDocumentScannerView
+        var parent: MailDocScanView
 
-        init(parent: MailDocumentScannerView) {
+        init(parent: MailDocScanView) {
             self.parent = parent
         }
 
