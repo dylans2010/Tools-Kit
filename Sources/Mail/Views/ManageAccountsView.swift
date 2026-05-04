@@ -4,6 +4,9 @@ struct ManageAccountsView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var mailStore = MailStore.shared
     @State private var loadingProvider: MailAccount.ProviderType?
+    @State private var statusMessage: String?
+    @State private var isSuccess = false
+    @State private var showError = false
 
     var onSelectAccount: ((MailAccount) -> Void)?
 
@@ -16,101 +19,171 @@ struct ManageAccountsView: View {
             ZStack {
                 Color.workspaceBackground.ignoresSafeArea()
 
+                // Ambient Background
+                Circle()
+                    .fill(Color.blue.opacity(0.1))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 60)
+                    .offset(x: -150, y: -200)
+
                 ScrollView {
-                    VStack(spacing: 24) {
+                    VStack(spacing: 32) {
                         connectedAccountsList
 
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("Add Provider")
-                                .font(.headline)
+                        VStack(alignment: .leading, spacing: 20) {
+                            Text("Connect New Provider")
+                                .font(.title3.bold())
                                 .padding(.horizontal)
 
-                            ForEach(MailAccount.ProviderType.allCases, id: \.self) { provider in
-                                providerButton(for: provider)
+                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                                ForEach(MailAccount.ProviderType.allCases, id: \.self) { provider in
+                                    modernProviderCard(for: provider)
+                                }
                             }
+                            .padding(.horizontal)
                         }
                     }
                     .padding(.vertical)
                 }
+
+                if loadingProvider != nil {
+                    loadingOverlay
+                }
+
+                if showError {
+                    feedbackOverlay(message: statusMessage ?? "Unknown Error", isError: true)
+                }
+
+                if isSuccess {
+                    feedbackOverlay(message: statusMessage ?? "Success", isError: false)
+                }
             }
-            .navigationTitle("Accounts")
+            .navigationTitle("Mail Accounts")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Close") { dismiss() }
+                    Button("Done") { dismiss() }
+                        .font(.subheadline.bold())
                 }
             }
         }
     }
 
     private var connectedAccountsList: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Active Accounts")
-                .font(.headline)
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Your Accounts")
+                .font(.title3.bold())
                 .padding(.horizontal)
 
             if mailStore.accounts.isEmpty {
-                Text("No accounts connected.")
-                    .foregroundStyle(.secondary)
-                    .padding()
+                VStack(spacing: 12) {
+                    Image(systemName: "envelope.badge.shield.half.filled")
+                        .font(.system(size: 40))
+                        .foregroundStyle(.secondary)
+                    Text("No accounts connected yet.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 40)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24))
+                .padding(.horizontal)
             } else {
                 ForEach(mailStore.accounts) { account in
-                    HStack {
-                        HStack {
-                            providerIconView(for: account.providerType)
+                    HStack(spacing: 16) {
+                        providerIconView(for: account.providerType)
+                            .scaleEffect(1.2)
 
-                            VStack(alignment: .leading) {
-                                Text(account.emailAddress).font(.subheadline.bold())
-                                Text(account.providerType.displayName).font(.caption).foregroundStyle(.secondary)
-                            }
-
-                            Spacer()
-
-                            if account.isActive {
-                                Text("Active").font(.caption2.bold()).padding(.horizontal, 8).padding(.vertical, 4).background(Color.green.opacity(0.2), in: Capsule()).foregroundStyle(.green)
-                            }
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            onSelectAccount?(account)
-                            dismiss()
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(account.emailAddress)
+                                .font(.subheadline.bold())
+                            Text(account.providerType.displayName)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
 
-                        Button(role: .destructive) {
-                            mailStore.removeAccount(account)
+                        Spacer()
+
+                        if account.isActive {
+                            Text("Active")
+                                .font(.system(size: 10, weight: .bold))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.green.opacity(0.15), in: Capsule())
+                                .foregroundStyle(.green)
+                        }
+
+                        Menu {
+                            Button {
+                                onSelectAccount?(account)
+                                dismiss()
+                            } label: {
+                                Label("Select", systemImage: "checkmark.circle")
+                            }
+
+                            Button(role: .destructive) {
+                                withAnimation {
+                                    mailStore.removeAccount(account)
+                                }
+                            } label: {
+                                Label("Remove", systemImage: "trash")
+                            }
                         } label: {
-                            Image(systemName: "trash")
+                            Image(systemName: "ellipsis")
+                                .font(.system(size: 14, weight: .bold))
+                                .padding(8)
+                                .background(Color.white.opacity(0.1), in: Circle())
+                                .foregroundStyle(.secondary)
                         }
                     }
                     .padding()
-                    .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 16))
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.1), lineWidth: 1))
                     .padding(.horizontal)
                 }
             }
         }
     }
 
-    private func providerButton(for provider: MailAccount.ProviderType) -> some View {
+    private func modernProviderCard(for provider: MailAccount.ProviderType) -> some View {
         Button {
             Task { await handleProviderTap(provider) }
         } label: {
-            HStack {
+            VStack(spacing: 12) {
                 providerIconView(for: provider)
-                Text(provider.displayName).font(.subheadline.bold())
-                Spacer()
-                Image(systemName: "plus.circle.fill").foregroundStyle(.blue)
+                Text(provider.displayName)
+                    .font(.caption.bold())
             }
-            .padding()
-            .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 16))
-            .padding(.horizontal)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.1), lineWidth: 1))
         }
+        .buttonStyle(.plain)
     }
 
     private func providerIconView(for provider: MailAccount.ProviderType) -> some View {
-        Image(systemName: "envelope.fill")
-            .foregroundStyle(providerColor(provider))
-            .frame(width: 32, height: 32)
-            .background(providerColor(provider).opacity(0.1), in: Circle())
+        ZStack {
+            Circle()
+                .fill(providerColor(provider).opacity(0.15))
+                .frame(width: 44, height: 44)
+
+            Image(systemName: providerIcon(for: provider))
+                .foregroundStyle(providerColor(provider))
+                .font(.system(size: 20, weight: .semibold))
+        }
+    }
+
+    private func providerIcon(for provider: MailAccount.ProviderType) -> String {
+        switch provider {
+        case .gmail: return "g.circle.fill"
+        case .outlook: return "envelope.fill"
+        case .yahoo: return "y.circle.fill"
+        case .icloud: return "icloud.fill"
+        default: return "envelope.badge.shield.half.filled"
+        }
     }
 
     private func providerColor(_ provider: MailAccount.ProviderType) -> Color {
@@ -119,8 +192,47 @@ struct ManageAccountsView: View {
         case .outlook: return .blue
         case .yahoo: return .purple
         case .proton: return .green
-        case .imap, .icloud: return .gray
+        case .icloud: return .cyan
+        case .imap: return .gray
         }
+    }
+
+    private var loadingOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.4).ignoresSafeArea()
+            VStack(spacing: 16) {
+                ProgressView()
+                    .scaleEffect(1.2)
+                    .tint(.white)
+                Text("Authenticating...")
+                    .font(.headline)
+                    .foregroundStyle(.white)
+            }
+            .padding(32)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24))
+        }
+    }
+
+    private func feedbackOverlay(message: String, isError: Bool) -> some View {
+        VStack {
+            Spacer()
+            HStack(spacing: 12) {
+                Image(systemName: isError ? "xmark.octagon.fill" : "checkmark.seal.fill")
+                    .foregroundStyle(isError ? .red : .green)
+                    .font(.headline)
+
+                Text(message)
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.primary)
+            }
+            .padding()
+            .background(.ultraThinMaterial)
+            .clipShape(Capsule())
+            .overlay(Capsule().stroke(isError ? Color.red.opacity(0.3) : Color.green.opacity(0.3), lineWidth: 1.5))
+            .padding(.bottom, 40)
+            .transition(.move(edge: .bottom).combined(with: .opacity))
+        }
+        .ignoresSafeArea()
     }
 
     private func handleProviderTap(_ provider: MailAccount.ProviderType) async {
@@ -167,11 +279,27 @@ struct ManageAccountsView: View {
             await MainActor.run {
                 mailStore.addOrUpdateAccount(account, makeActive: true)
                 loadingProvider = nil
+                triggerFeedback(message: "Account Connected Successfully!", error: false)
             }
         } catch {
-            print("Authentication failed: \(error)")
             await MainActor.run {
                 loadingProvider = nil
+                triggerFeedback(message: "Failed to connect: \(error.localizedDescription)", error: true)
+            }
+        }
+    }
+
+    private func triggerFeedback(message: String, error: Bool) {
+        statusMessage = message
+        if error {
+            withAnimation(.spring()) { showError = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                withAnimation { showError = false }
+            }
+        } else {
+            withAnimation(.spring()) { isSuccess = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                withAnimation { isSuccess = false }
             }
         }
     }

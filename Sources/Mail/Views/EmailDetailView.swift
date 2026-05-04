@@ -27,75 +27,45 @@ struct EmailDetailView: View {
 
     var body: some View {
         GeometryReader { geo in
-            ZStack {
+            ZStack(alignment: .top) {
                 Color.workspaceBackground.ignoresSafeArea()
 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
+                    VStack(alignment: .leading, spacing: 0) {
                         headerSection
+                            .padding(18)
 
-                        aiActionsBar
+                        VStack(alignment: .leading, spacing: 18) {
+                            aiActionsBar
 
-                        if isSummarizing || isRunningAIFeature {
-                            loadingIndicator
+                            if isSummarizing || isRunningAIFeature {
+                                loadingIndicator
+                            }
+
+                            if !summary.isEmpty {
+                                aiResultCard(title: "AI Summary", icon: "sparkles", content: summary)
+                            }
+
+                            if !actionItems.isEmpty {
+                                aiResultCard(title: "Action Items", icon: "checklist", content: actionItems)
+                            }
+
+                            if !toneAnalysis.isEmpty {
+                                aiResultCard(title: "Tone Insights", icon: "waveform.and.magnifyingglass", content: toneAnalysis)
+                            }
+
+                            if !draftReply.isEmpty {
+                                aiResultCard(title: "Reply Draft", icon: "arrowshape.turn.up.left.2", content: draftReply)
+                            }
+
+                            // Advanced Intelligence Panels
+                            intelligencePanels
                         }
+                        .padding(.horizontal, 18)
+                        .padding(.bottom, 18)
 
-                        if !summary.isEmpty {
-                            aiResultCard(title: "AI Summary", icon: "sparkles", content: summary)
-                        }
-
-                        if !actionItems.isEmpty {
-                            aiResultCard(title: "Action Items", icon: "checklist", content: actionItems)
-                        }
-
-                        if !toneAnalysis.isEmpty {
-                            aiResultCard(title: "Tone Insights", icon: "waveform.and.magnifyingglass", content: toneAnalysis)
-                        }
-
-                        if !draftReply.isEmpty {
-                            aiResultCard(title: "Reply Draft", icon: "arrowshape.turn.up.left.2", content: draftReply)
-                        }
-
-                        // Advanced Intelligence Panels
-                        let resolved = resolvedEmail
-                        let mailMessage = MailMessage(
-                            id: String(resolved.uid),
-                            threadId: String(resolved.uid),
-                            from: resolved.sender,
-                            to: [],
-                            cc: [],
-                            bcc: [],
-                            subject: resolved.subject,
-                            body: resolved.body ?? resolved.preview,
-                            htmlBody: resolved.htmlBody,
-                            date: resolved.date,
-                            isRead: resolved.isRead,
-                            isStarred: false,
-                            attachments: []
-                        )
-                        let thread = MailThread(
-                            id: String(resolved.uid),
-                            subject: resolved.subject,
-                            messages: [mailMessage],
-                            lastMessageDate: resolved.date
-                        )
-                        EmailInsightPanel(thread: thread)
-
-                        if thread.subject.lowercased().contains("negotiation") || thread.subject.lowercased().contains("offer") {
-                            NegotiationAssistantPanel(thread: thread)
-                        }
-
-                        KnowledgeExtractionPanel(thread: thread)
-
-                        contentView(minHeight: max(geo.size.height * 0.5, 300))
-
-                        if let actionError {
-                            Text(actionError)
-                                .font(.footnote)
-                                .foregroundStyle(.red)
-                        }
+                        contentView(minHeight: max(geo.size.height - 200, 400))
                     }
-                    .padding(18)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -233,19 +203,54 @@ struct EmailDetailView: View {
         .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))
     }
 
+    @ViewBuilder
+    private var intelligencePanels: some View {
+        let resolved = resolvedEmail
+        let mailMessage = MailMessage(
+            id: String(resolved.uid),
+            threadId: String(resolved.uid),
+            from: resolved.sender,
+            to: [],
+            cc: [],
+            bcc: [],
+            subject: resolved.subject,
+            body: resolved.body ?? resolved.preview,
+            htmlBody: resolved.htmlBody,
+            date: resolved.date,
+            isRead: resolved.isRead,
+            isStarred: false,
+            attachments: []
+        )
+        let thread = MailThread(
+            id: String(resolved.uid),
+            subject: resolved.subject,
+            messages: [mailMessage],
+            lastMessageDate: resolved.date
+        )
+        EmailInsightPanel(thread: thread)
+
+        if thread.subject.lowercased().contains("negotiation") || thread.subject.lowercased().contains("offer") {
+            NegotiationAssistantPanel(thread: thread)
+        }
+
+        KnowledgeExtractionPanel(thread: thread)
+    }
+
     private func contentView(minHeight: CGFloat) -> some View {
         Group {
             if let content = renderContent(from: resolvedEmail) {
                 if content.hasHTML, let html = content.htmlBody {
                     MailWebView(htmlString: html, dynamicHeight: $bodyWebViewHeight)
-                        .frame(height: max(bodyWebViewHeight, minHeight))
                         .frame(maxWidth: .infinity)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .frame(minHeight: minHeight)
+                        .background(Color.white) // Typical email background
                 } else if let plain = content.plainBody {
-                    ScrollView(.vertical, showsIndicators: false) {
-                        markdownText(plain)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .fixedSize(horizontal: false, vertical: true)
+                    VStack(alignment: .leading, spacing: 0) {
+                        Divider().background(Color.white.opacity(0.1))
+                        Text(plain)
+                            .font(.body)
+                            .padding(20)
+                            .frame(maxWidth: .infinity, alignment: .topLeading)
                             .textSelection(.enabled)
                     }
                     .frame(minHeight: minHeight, alignment: .topLeading)
@@ -447,40 +452,5 @@ struct EmailDetailView: View {
             smtpHost: account.smtpHost ?? "smtp.mail.me.com",
             smtpPort: account.smtpPort ?? 587
         )
-    }
-}
-
-struct MetadataInspectorView: View {
-    let email: EmailMessage
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Section("Information") {
-                    LabeledContent("Subject", value: email.subject)
-                    LabeledContent("Sender", value: email.sender)
-                    LabeledContent("Date", value: email.date.formatted())
-                    LabeledContent("UID", value: "\(email.uid)")
-                }
-
-                Section("Attachments") {
-                    if email.attachments.isEmpty {
-                        Text("No attachments")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        ForEach(email.attachments) { attachment in
-                            Label(attachment.filename, systemImage: "doc")
-                        }
-                    }
-                }
-
-                Section("Deep Data") {
-                    LabeledContent("MIME Type", value: "multipart/alternative")
-                    LabeledContent("Encoding", value: "quoted-printable")
-                }
-            }
-            .navigationTitle("Email Inspector")
-            .navigationBarTitleDisplayMode(.inline)
-        }
     }
 }

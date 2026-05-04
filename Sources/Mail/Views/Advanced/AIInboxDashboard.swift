@@ -5,85 +5,151 @@ struct AIInboxDashboard: View {
     @StateObject private var viewModel = AIInboxDashboardViewModel()
     @State private var showingAutomationBuilder = false
     @State private var showingMemoryGraph = false
+    @State private var showingWorkflowMonitor = false
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                headerSection
-                prioritySection
-                insightsSection
-                quickActionsSection
+        ZStack {
+            Color.workspaceBackground.ignoresSafeArea()
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    headerSection
+
+                    if viewModel.isTriageActive {
+                        triageLoadingView
+                    } else {
+                        prioritySection
+                        insightsSection
+                    }
+
+                    quickActionsSection
+                }
+                .padding()
             }
-            .padding()
         }
-        .navigationTitle("AI Dashboard")
-        .background(Color(uiColor: .systemGroupedBackground))
+        .navigationTitle("Inbox Intelligence")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showingWorkflowMonitor = true
+                } label: {
+                    Image(systemName: "gauge.with.needle")
+                }
+            }
+        }
+        .sheet(isPresented: $showingWorkflowMonitor) {
+            NavigationStack {
+                WorkflowExecutionMonitor()
+            }
+        }
+        .onAppear { viewModel.performTriage() }
         .onDisappear { viewModel.cancelTasks() }
     }
 
     private var headerSection: some View {
-        WorkspaceSurfaceCard {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Inbox Intelligence")
-                    .font(.headline)
-                Text("AI is monitoring your communication to surface the most critical items.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Intelligence Overview")
+                    .font(.title2.bold())
+                Spacer()
+                Image(systemName: "sparkles")
+                    .foregroundStyle(LinearGradient(colors: [.aiGradientStart, .aiGradientEnd], startPoint: .topLeading, endPoint: .bottomTrailing))
             }
+            Text("AI is monitoring your communication to surface critical items and automate workflows.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
+        .padding()
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+
+    private var triageLoadingView: some View {
+        VStack(spacing: 20) {
+            ProgressView()
+                .scaleEffect(1.5)
+            Text("AI is performing deep triage...")
+                .font(.headline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 60)
+        .background(Color.workspaceSurface.opacity(0.4), in: RoundedRectangle(cornerRadius: 20))
     }
 
     private var prioritySection: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Priority Attention")
-                    .font(.title3.bold())
+                Label("Priority Attention", systemImage: "bolt.fill")
+                    .font(.headline)
+                    .foregroundStyle(.orange)
                 Spacer()
-                NavigationLink("View Queue", destination: PriorityQueueView())
-                    .font(.caption)
+                NavigationLink("Full Queue", destination: PriorityQueueView())
+                    .font(.caption.bold())
+                    .foregroundStyle(.blue)
             }
 
             if viewModel.priorityThreads.isEmpty {
-                Text("No urgent items detected.")
-                    .font(.callout)
+                Text("All quiet for now. No urgent items detected.")
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
-                    .padding(.vertical)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 30)
             } else {
                 ForEach(viewModel.priorityThreads.prefix(3)) { thread in
-                    WorkspaceSurfaceCard {
-                        HStack {
-                            VStack(alignment: .leading) {
+                    NavigationLink(destination: MailThreadView(thread: thread)) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
                                 Text(thread.subject)
                                     .font(.subheadline.bold())
-                                Text(thread.snippet)
-                                    .font(.caption)
                                     .lineLimit(1)
+                                Spacer()
+                                Text("\(Int((thread.priorityScore ?? 0.8) * 100))")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .padding(4)
+                                    .background(Color.orange.opacity(0.2), in: Circle())
+                                    .foregroundStyle(.orange)
                             }
-                            Spacer()
-                            Image(systemName: "sparkles")
-                                .foregroundStyle(.purple)
+                            Text(thread.messages.last?.body.prefix(100) ?? "")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(2)
                         }
+                        .padding()
+                        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 16))
                     }
+                    .buttonStyle(.plain)
                 }
             }
         }
     }
 
     private var insightsSection: some View {
-        VStack(alignment: .leading) {
-            Text("Automated Insights")
-                .font(.title3.bold())
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Automated Insights", systemImage: "brain.head.profile")
+                .font(.headline)
+                .foregroundStyle(.purple)
 
-            WorkspaceSurfaceCard {
-                VStack(alignment: .leading, spacing: 12) {
-                    if viewModel.insights.isEmpty {
-                        Text("No active insights. Perform triage to generate.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    } else {
-                        ForEach(viewModel.insights, id: \.self) { insight in
-                            InsightRow(icon: "sparkles", text: insight)
+            VStack(alignment: .leading, spacing: 12) {
+                if viewModel.insights.isEmpty {
+                    Text("Triage your inbox to generate intelligence.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(viewModel.insights, id: \.self) { insight in
+                        HStack(alignment: .top, spacing: 12) {
+                            Image(systemName: "sparkles")
+                                .font(.caption)
+                                .foregroundStyle(.purple)
+                                .padding(.top, 2)
+                            Text(insight)
+                                .font(.subheadline)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.purple.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
                     }
                 }
             }
@@ -91,11 +157,11 @@ struct AIInboxDashboard: View {
     }
 
     private var quickActionsSection: some View {
-        VStack(alignment: .leading) {
-            Text("AI Actions")
-                .font(.title3.bold())
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Advanced Actions")
+                .font(.headline)
 
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                 ActionCard(title: "Perform Triage", icon: "tray.full.fill", color: .blue) {
                     viewModel.performTriage()
                 }
@@ -115,42 +181,6 @@ struct AIInboxDashboard: View {
         }
         .navigationDestination(isPresented: $showingMemoryGraph) {
             MemoryGraphViewer()
-        }
-    }
-}
-
-struct InsightRow: View {
-    let icon: String
-    let text: String
-    var body: some View {
-        HStack {
-            Image(systemName: icon)
-                .foregroundStyle(.blue)
-            Text(text)
-                .font(.subheadline)
-        }
-    }
-}
-
-struct ActionCard: View {
-    let title: String
-    let icon: String
-    let color: Color
-    let action: () -> Void
-    var body: some View {
-        Button(action: action) {
-            VStack {
-                Image(systemName: icon)
-                    .font(.title2)
-                    .foregroundStyle(color)
-                Text(title)
-                    .font(.caption.bold())
-                    .foregroundStyle(.primary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .cornerRadius(12)
         }
     }
 }
