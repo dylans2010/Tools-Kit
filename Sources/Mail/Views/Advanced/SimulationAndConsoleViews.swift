@@ -7,133 +7,137 @@ struct SimulationPanel: View {
     @State private var simulationResult: String = ""
     @State private var suggestions: [String] = []
     @State private var isSimulating = false
+    @State private var currentSentiment: String = "Analyzing..."
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Label("Response Simulation", systemImage: "chart.bar.doc.horizontal.fill")
-                .font(.headline)
+        VStack(alignment: .leading, spacing: 20) {
+            HStack {
+                Label("Response Simulation", systemImage: "chart.bar.doc.horizontal.fill")
+                    .font(.headline)
+                Spacer()
+                Text(currentSentiment)
+                    .font(.caption.bold())
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.blue.opacity(0.1))
+                    .foregroundStyle(.blue)
+                    .clipShape(Capsule())
+            }
 
             if isSimulating {
                 HStack {
                     Spacer()
-                    ProgressView("Simulating Outcomes...")
+                    VStack(spacing: 12) {
+                        ProgressView()
+                        Text("Simulating Outcomes...")
+                            .font(.caption.bold())
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
                 }
+                .padding(.vertical, 20)
             } else if !simulationResult.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Likely Outcome")
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Projected Outcome")
                         .font(.caption.bold())
                         .foregroundStyle(.secondary)
+
                     Text(simulationResult)
-                        .font(.callout)
-                        .padding(8)
-                        .background(Color.blue.opacity(0.1))
-                        .cornerRadius(8)
+                        .font(.subheadline)
+                        .padding(14)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.blue.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.blue.opacity(0.1), lineWidth: 1))
                 }
             }
 
             if !suggestions.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 10) {
                     Text("Alternative Strategies")
                         .font(.caption.bold())
                         .foregroundStyle(.secondary)
+
                     ForEach(suggestions, id: \.self) { strategy in
-                        Button(action: { /* Apply strategy */ }) {
-                            Text(strategy)
-                                .font(.caption)
-                                .padding(8)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Color.purple.opacity(0.05))
-                                .cornerRadius(8)
+                        Button {
+                            withAnimation {
+                                draft = "AI Suggestion: " + strategy + "\n\n" + draft
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: "lightbulb.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(.orange)
+                                Text(strategy)
+                                    .font(.caption)
+                                    .multilineTextAlignment(.leading)
+                                Spacer()
+                                Image(systemName: "plus.circle")
+                                    .font(.caption)
+                            }
+                            .padding(12)
+                            .background(Color.workspaceSurface)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
+                        .buttonStyle(.plain)
                     }
                 }
             }
 
-            Button(action: runSimulation) {
+            Button {
+                runSimulation()
+            } label: {
                 HStack {
                     Spacer()
+                    Image(systemName: "sparkles")
                     Text("Run AI Simulation")
                     Spacer()
                 }
+                .padding(.vertical, 12)
             }
             .buttonStyle(.borderedProminent)
-            .disabled(draft.isEmpty)
+            .disabled(draft.isEmpty || isSimulating)
         }
         .padding()
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .cornerRadius(12)
-        .onAppear(perform: loadStrategies)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .onAppear(perform: initialAnalysis)
+    }
+
+    private func initialAnalysis() {
+        Task {
+            let tone = try? await AIService.shared.assessEmailTone(text: original)
+            await MainActor.run {
+                currentSentiment = tone ?? "Neutral"
+                loadStrategies()
+            }
+        }
     }
 
     private func runSimulation() {
         isSimulating = true
         Task {
-            simulationResult = (try? await SafetySimulationEngine.shared.simulateReplyOutcome(original: original, reply: draft)) ?? "Simulation Failed"
-            isSimulating = false
+            do {
+                let result = try await SafetySimulationEngine.shared.simulateReplyOutcome(original: original, reply: draft)
+                await MainActor.run {
+                    simulationResult = result
+                    isSimulating = false
+                }
+            } catch {
+                await MainActor.run {
+                    simulationResult = "Failed to simulate: \(error.localizedDescription)"
+                    isSimulating = false
+                }
+            }
         }
     }
 
     private func loadStrategies() {
         Task {
-            suggestions = (try? await SafetySimulationEngine.shared.suggestStrategies(original: original)) ?? []
-        }
-    }
-}
-
-/// Console for manual execution of advanced AI actions.
-struct CommandConsole: View {
-    @State private var command: String = ""
-    @State private var history: [String] = []
-    @State private var isExecuting = false
-
-    var body: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(history, id: \.self) { entry in
-                        Text("> \(entry)")
-                            .font(.system(.caption, design: .monospaced))
-                    }
-                }
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
+            let res = try? await SafetySimulationEngine.shared.suggestStrategies(original: original)
+            await MainActor.run {
+                suggestions = res ?? []
             }
-            .background(Color.black.opacity(0.05))
-
-            HStack {
-                TextField("Type command (e.g., 'summarize thread', 'schedule meeting')", text: $command)
-                    .textFieldStyle(.roundedBorder)
-                    .font(.system(.subheadline, design: .monospaced))
-
-                Button(action: execute) {
-                    if isExecuting {
-                        ProgressView()
-                    } else {
-                        Image(systemName: "terminal.fill")
-                    }
-                }
-                .disabled(command.isEmpty || isExecuting)
-            }
-            .padding()
-            .background(Color(uiColor: .systemBackground))
-        }
-        .navigationTitle("Command Console")
-    }
-
-    private func execute() {
-        isExecuting = true
-        let cmd = command
-        command = ""
-        Task {
-            let results = try? await EmailCommandEngine.shared.processCommands(in: cmd)
-            history.append(cmd)
-            if let results, !results.isEmpty {
-                history.append(contentsOf: results.map { "  Executed: \($0)" })
-            } else {
-                history.append("  No command recognized.")
-            }
-            isExecuting = false
         }
     }
 }

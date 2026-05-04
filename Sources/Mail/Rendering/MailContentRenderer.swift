@@ -128,11 +128,39 @@ enum MailContentRenderer {
     }
 }
 
-struct MailWebView: UIViewRepresentable {
+#if os(iOS)
+typealias NativeView = UIView
+typealias NativeViewRepresentable = UIViewRepresentable
+#elseif os(macOS)
+typealias NativeView = NSView
+typealias NativeViewRepresentable = NSViewRepresentable
+#endif
+
+struct MailWebView: NativeViewRepresentable {
     let htmlString: String
     @Binding var dynamicHeight: CGFloat
 
+    #if os(iOS)
     func makeUIView(context: Context) -> WKWebView {
+        let webView = createWebView(context: context)
+        webView.scrollView.isScrollEnabled = false
+        return webView
+    }
+
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+        updateWebView(uiView, context: context)
+    }
+    #elseif os(macOS)
+    func makeNSView(context: Context) -> WKWebView {
+        return createWebView(context: context)
+    }
+
+    func updateNSView(_ nsView: WKWebView, context: Context) {
+        updateWebView(nsView, context: context)
+    }
+    #endif
+
+    private func createWebView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
         let preferences = WKWebpagePreferences()
         preferences.allowsContentJavaScript = false
@@ -140,14 +168,15 @@ struct MailWebView: UIViewRepresentable {
 
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = context.coordinator
+        #if os(iOS)
         webView.isOpaque = false
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
-        webView.scrollView.isScrollEnabled = false
+        #endif
         return webView
     }
 
-    func updateUIView(_ uiView: WKWebView, context: Context) {
+    private func updateWebView(_ webView: WKWebView, context: Context) {
         context.coordinator.onHeightChange = { height in
             DispatchQueue.main.async {
                 dynamicHeight = max(320, height)
@@ -156,7 +185,7 @@ struct MailWebView: UIViewRepresentable {
 
         guard context.coordinator.loadedHTML != htmlString else { return }
         context.coordinator.loadedHTML = htmlString
-        uiView.loadHTMLString(htmlString, baseURL: nil)
+        webView.loadHTMLString(htmlString, baseURL: nil)
     }
 
     func makeCoordinator() -> Coordinator {
@@ -174,7 +203,11 @@ struct MailWebView: UIViewRepresentable {
         ) {
             if navigationAction.navigationType == .linkActivated,
                let url = navigationAction.request.url {
+                #if os(iOS)
                 UIApplication.shared.open(url)
+                #elseif os(macOS)
+                NSWorkspace.shared.open(url)
+                #endif
                 decisionHandler(.cancel)
             } else {
                 decisionHandler(.allow)

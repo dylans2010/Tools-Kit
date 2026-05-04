@@ -170,7 +170,7 @@ struct EmailComposingView: View {
             }
             .sheet(isPresented: $showingDocumentScanner) {
                 mailDocumentScannerSheet
-                .presentationDetents([.medium])
+                .presentationDetents([.large])
             }
             .sheet(isPresented: $showingDrawingSheet) {
                 DrawingBoardView { export in
@@ -270,16 +270,17 @@ struct EmailComposingView: View {
     private var compactToolsGrid: some View {
         VStack(alignment: .leading, spacing: 16) {
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
-                    toolButton(icon: "sparkles", action: { showingAIWrite = true })
-                    toolButton(icon: "globe", action: { showingTranslateSheet = true })
-                    toolButton(icon: "calendar.badge.clock", action: { showingScheduleSheet = true })
-                    toolButton(icon: "paperclip", action: { showingAttachmentPicker = true })
-                    toolButton(icon: "doc.viewfinder", action: { showingDocumentScanner = true })
-                    toolButton(icon: "tablecells", action: { showingTableBuilder = true })
-                    toolButton(icon: "link", action: { showingLinkSheet = true })
-                    toolButton(icon: "pencil.and.outline", action: { showingDrawingSheet = true })
+                HStack(spacing: 14) {
+                    toolButton(icon: "sparkles", color: .purple, action: { showingAIWrite = true })
+                    toolButton(icon: "paperclip", color: .blue, action: { showingAttachmentPicker = true })
+                    toolButton(icon: "doc.viewfinder", color: .orange, action: { showingDocumentScanner = true })
+                    toolButton(icon: "calendar.badge.clock", color: .green, action: { showingScheduleSheet = true })
+                    toolButton(icon: "globe", color: .cyan, action: { showingTranslateSheet = true })
+                    toolButton(icon: "tablecells", color: .indigo, action: { showingTableBuilder = true })
+                    toolButton(icon: "link", color: .blue, action: { showingLinkSheet = true })
+                    toolButton(icon: "pencil.and.outline", color: .pink, action: { showingDrawingSheet = true })
                 }
+                .padding(.horizontal, 2)
             }
 
             ScrollView(.horizontal, showsIndicators: false) {
@@ -289,23 +290,32 @@ struct EmailComposingView: View {
                             insertMarkdown(action.insertion)
                         } label: {
                             Image(systemName: action.icon)
-                                .font(.subheadline.bold())
-                                .frame(width: 36, height: 36)
-                                .background(Color.white.opacity(0.08), in: Circle())
+                                .font(.system(size: 14, weight: .bold))
+                                .frame(width: 40, height: 40)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                                .overlay(Circle().stroke(Color.white.opacity(0.1), lineWidth: 1))
                         }
                     }
                 }
+                .padding(.horizontal, 2)
             }
         }
-        .padding(.vertical, 10)
+        .padding(.vertical, 14)
     }
 
-    private func toolButton(icon: String, action: @escaping () -> Void) -> some View {
+    private func toolButton(icon: String, color: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Image(systemName: icon)
-                .font(.headline)
-                .frame(width: 44, height: 44)
-                .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+            VStack {
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(color)
+            }
+            .frame(width: 48, height: 48)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.1), lineWidth: 1))
+            .shadow(color: color.opacity(0.1), radius: 4)
         }
         .buttonStyle(.plain)
     }
@@ -527,8 +537,37 @@ struct EmailComposingView: View {
     }
 
     private var mailDocumentScannerSheet: some View {
-        Text("Document Scanner Placeholder")
+        #if os(iOS)
+        DocumentScannerView { scan in
+            handleDocumentScan(scan)
+            showingDocumentScanner = false
+        } onCancel: {
+            showingDocumentScanner = false
+        } onError: { error in
+            sendError = error.localizedDescription
+            showingDocumentScanner = false
+        }
+        #else
+        Text("Document Scanning is not supported on this platform.")
+        #endif
     }
+
+    #if os(iOS)
+    private func handleDocumentScan(_ scan: VNDocumentCameraScan) {
+        for pageIndex in 0..<scan.pageCount {
+            let image = scan.imageOfPage(at: pageIndex)
+            if let data = image.jpegData(compressionQuality: 0.8) {
+                let attachment = MailMessage.MailAttachment(
+                    id: UUID().uuidString,
+                    fileName: "Scanned Document \(pageIndex + 1).jpg",
+                    contentType: "image/jpeg",
+                    size: Int64(data.count)
+                )
+                draftAttachments.append(attachment)
+            }
+        }
+    }
+    #endif
 }
 
 struct WrappingFlowLayout: Layout {

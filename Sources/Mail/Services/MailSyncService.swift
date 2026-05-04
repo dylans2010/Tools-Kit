@@ -29,8 +29,19 @@ class MailSyncService: ObservableObject, @unchecked Sendable {
 
     func syncAll(folder: MailFolder = .inbox) async {
         let accounts = storage.loadAccounts()
-        for account in accounts {
-            await fetchThreads(account: account, folder: folder)
+        await withTaskGroup(of: Void.self) { group in
+            for account in accounts {
+                group.addTask {
+                    await self.fetchThreads(account: account, folder: folder)
+                }
+            }
+        }
+    }
+
+    /// Triggers an initial sync for all accounts, typically called at app startup.
+    func performInitialSync() {
+        Task {
+            await syncAll()
         }
     }
 
