@@ -300,36 +300,38 @@ struct BranchIntelligenceView: View {
                 Text("Branch Overview")
             }
 
-            Section(content: {
-                Text("Select two local commits to simulate a merge conflict preview.")
-                    .font(.caption).foregroundStyle(.secondary)
+            Section<AnyView, Text, EmptyView>(content: {
+                AnyView(VStack(alignment: .leading) {
+                    Text("Select two local commits to simulate a merge conflict preview.")
+                        .font(.caption).foregroundStyle(.secondary)
 
-                if gitEngine.localCommits.count >= 2 {
-                    let a = gitEngine.localCommits[0]
-                    let b = gitEngine.localCommits[1]
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Branch A: \(a.branch)").font(.caption.bold())
-                        Text("Head: \(a.message)").font(.caption).foregroundStyle(.secondary)
-                        Text("Branch B: \(b.branch)").font(.caption.bold())
-                        Text("Head: \(b.message)").font(.caption).foregroundStyle(.secondary)
-                        Button("Preview Merge") {
-                            conflictPreviewText = simulateMerge(a: a, b: b)
+                    if gitEngine.localCommits.count >= 2 {
+                        let a = gitEngine.localCommits[0]
+                        let b = gitEngine.localCommits[1]
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Branch A: \(a.branch)").font(.caption.bold())
+                            Text("Head: \(a.message)").font(.caption).foregroundStyle(.secondary)
+                            Text("Branch B: \(b.branch)").font(.caption.bold())
+                            Text("Head: \(b.message)").font(.caption).foregroundStyle(.secondary)
+                            Button("Preview Merge") {
+                                conflictPreviewText = simulateMerge(a: a, b: b)
+                            }
+                            .foregroundStyle(.blue)
                         }
-                        .foregroundStyle(.blue)
+                        if !conflictPreviewText.isEmpty {
+                            Text(conflictPreviewText)
+                                .font(.system(.caption, design: .monospaced))
+                                .padding(8)
+                                .background(Color(uiColor: .secondarySystemBackground))
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                    } else {
+                        Text("Need at least 2 local commits to simulate.").font(.caption).foregroundStyle(.secondary)
                     }
-                    if !conflictPreviewText.isEmpty {
-                        Text(conflictPreviewText)
-                            .font(.system(.caption, design: .monospaced))
-                            .padding(8)
-                            .background(Color(uiColor: .secondarySystemBackground))
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                } else {
-                    Text("Need at least 2 local commits to simulate.").font(.caption).foregroundStyle(.secondary)
-                }
-            } header: {
+                })
+            }, header: {
                 Text("Merge Simulation")
-            }
+            })
 
             Section {
                 let grouped = Dictionary(grouping: gitEngine.localCommits, by: { $0.branch })

@@ -44,12 +44,12 @@
 		CL020000000000000000000008 /* WorkspaceControlSystems.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000008 /* WorkspaceControlSystems.swift */; };
 		CL020000000000000000000009 /* ReviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000009 /* ReviewManager.swift */; };
 		CL02000000000000000000000A /* CollaborationTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01000000000000000000000A /* CollaborationTools.swift */; };
-		ED02000000000000000000000B /* EditingFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01000000000000000000000B /* EditingFramework.swift */; };
-		ED02000000000000000000000C /* EditingHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01000000000000000000000C /* EditingHistoryManager.swift */; };
-		ED02000000000000000000000D /* AIEditingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01000000000000000000000D /* AIEditingEngine.swift */; };
-		ED02000000000000000000000E /* ProfessionalEditingSuite.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01000000000000000000000E /* ProfessionalEditingSuite.swift */; };
-		ED02000000000000000000000F /* EditingCollaboration.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01000000000000000000000F /* EditingCollaboration.swift */; };
-		ED020000000000000000000010 /* EditingWorkflow.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000010 /* EditingWorkflow.swift */; };
+		5397745A2D02C0A7F9F9276A /* EditingFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4279371F37A11E68D21F0DB0 /* EditingFramework.swift */; };
+		41E58AD7343E2A2492A1C3CA /* EditingHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CBA21622F31EF8FD1A4205B /* EditingHistoryManager.swift */; };
+		74CE99E96BFD131D9E7A7A63 /* AIEditingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1230BE816EF0AC627E1F83EE /* AIEditingEngine.swift */; };
+		B1714C0480D5B39A5A1F6004 /* ProfessionalEditingSuite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F530BFF8DE562022C02C25 /* ProfessionalEditingSuite.swift */; };
+		E6F771CDF6FB6EE1B59DC3B7 /* EditingCollaboration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B77D866877663BBBFD1255 /* EditingCollaboration.swift */; };
+		A6EB0359B411A36DB0E7F8D6 /* EditingWorkflow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7FCD686F59E5C4A88418926 /* EditingWorkflow.swift */; };
 		CL020000000000000000000011 /* PullRequestDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000011 /* PullRequestDashboardView.swift */; };
 		CL020000000000000000000012 /* PRDiffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000012 /* PRDiffView.swift */; };
 		CL020000000000000000000013 /* ActivityTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000013 /* ActivityTimelineView.swift */; };
@@ -58,11 +58,11 @@
 		CL020000000000000000000016 /* WorkspaceControlViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000016 /* WorkspaceControlViews.swift */; };
 		CL020000000000000000000017 /* ReviewViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000017 /* ReviewViews.swift */; };
 		CL020000000000000000000018 /* CollaborationToolViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000018 /* CollaborationToolViews.swift */; };
-		ED020000000000000000000019 /* HistoryInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000019 /* HistoryInspectorView.swift */; };
-		ED02000000000000000000001A /* AIEditControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01000000000000000000001A /* AIEditControlsView.swift */; };
-		ED02000000000000000000001B /* ProfessionalToolViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01000000000000000000001B /* ProfessionalToolViews.swift */; };
-		ED02000000000000000000001C /* EditingCollaborationViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01000000000000000000001C /* EditingCollaborationViews.swift */; };
-		ED02000000000000000000001D /* EditingWorkflowViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED01000000000000000000001D /* EditingWorkflowViews.swift */; };
+		CDB93E05C5973585CC3B4457 /* HistoryInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A467EE22AA44C60F7633C2C1 /* HistoryInspectorView.swift */; };
+		B7F5A33B3D9C44B069B3CB56 /* AIEditControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023B6EAF3B05FA2E1B194460 /* AIEditControlsView.swift */; };
+		255994A117DABA42CF2C4FE9 /* ProfessionalToolViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E34FBFB3593F01B45E73252C /* ProfessionalToolViews.swift */; };
+		CF7C5DF73C21950069C94080 /* EditingCollaborationViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13FDB940ADAE0855D6C08CA8 /* EditingCollaborationViews.swift */; };
+		FABD4919AD64B111C9936C50 /* EditingWorkflowViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67C2C40A4BF21CFC16309CB /* EditingWorkflowViews.swift */; };
 		CL0200000000000000000000 /* CollaborationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000000 /* CollaborationModels.swift */; };
 		CL0200000000000000000001 /* CollaborationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000001 /* CollaborationManager.swift */; };
 		CL0200000000000000000002 /* CollaborationFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL0100000000000000000002 /* CollaborationFramework.swift */; };
@@ -1081,12 +1081,12 @@
 		CL010000000000000000000008 /* WorkspaceControlSystems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Collaboration/Control/WorkspaceControlSystems.swift"; sourceTree = "<group>"; };
 		CL010000000000000000000009 /* ReviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Collaboration/Review/ReviewManager.swift"; sourceTree = "<group>"; };
 		CL01000000000000000000000A /* CollaborationTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Collaboration/Tools/CollaborationTools.swift"; sourceTree = "<group>"; };
-		ED01000000000000000000000B /* EditingFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/EditingFramework.swift"; sourceTree = "<group>"; };
-		ED01000000000000000000000C /* EditingHistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/History/EditingHistoryManager.swift"; sourceTree = "<group>"; };
-		ED01000000000000000000000D /* AIEditingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/AI/AIEditingEngine.swift"; sourceTree = "<group>"; };
-		ED01000000000000000000000E /* ProfessionalEditingSuite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/Tools/ProfessionalEditingSuite.swift"; sourceTree = "<group>"; };
-		ED01000000000000000000000F /* EditingCollaboration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/Collaboration/EditingCollaboration.swift"; sourceTree = "<group>"; };
-		ED010000000000000000000010 /* EditingWorkflow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/Workflow/EditingWorkflow.swift"; sourceTree = "<group>"; };
+		4279371F37A11E68D21F0DB0 /* EditingFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/EditingFramework.swift"; sourceTree = "<group>"; };
+		1CBA21622F31EF8FD1A4205B /* EditingHistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/History/EditingHistoryManager.swift"; sourceTree = "<group>"; };
+		1230BE816EF0AC627E1F83EE /* AIEditingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/AI/AIEditingEngine.swift"; sourceTree = "<group>"; };
+		69F530BFF8DE562022C02C25 /* ProfessionalEditingSuite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/Tools/ProfessionalEditingSuite.swift"; sourceTree = "<group>"; };
+		B8B77D866877663BBBFD1255 /* EditingCollaboration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/Collaboration/EditingCollaboration.swift"; sourceTree = "<group>"; };
+		E7FCD686F59E5C4A88418926 /* EditingWorkflow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Editing/Workflow/EditingWorkflow.swift"; sourceTree = "<group>"; };
 		CL010000000000000000000011 /* PullRequestDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Collaboration/PullRequest/PullRequestDashboardView.swift"; sourceTree = "<group>"; };
 		CL010000000000000000000012 /* PRDiffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Collaboration/PullRequest/PRDiffView.swift"; sourceTree = "<group>"; };
 		CL010000000000000000000013 /* ActivityTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Collaboration/Insights/ActivityTimelineView.swift"; sourceTree = "<group>"; };
@@ -1095,11 +1095,11 @@
 		CL010000000000000000000016 /* WorkspaceControlViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Collaboration/Control/WorkspaceControlViews.swift"; sourceTree = "<group>"; };
 		CL010000000000000000000017 /* ReviewViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Collaboration/Review/ReviewViews.swift"; sourceTree = "<group>"; };
 		CL010000000000000000000018 /* CollaborationToolViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Collaboration/Tools/CollaborationToolViews.swift"; sourceTree = "<group>"; };
-		ED010000000000000000000019 /* HistoryInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Editing/History/HistoryInspectorView.swift"; sourceTree = "<group>"; };
-		ED01000000000000000000001A /* AIEditControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Editing/AI/AIEditControlsView.swift"; sourceTree = "<group>"; };
-		ED01000000000000000000001B /* ProfessionalToolViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Editing/Tools/ProfessionalToolViews.swift"; sourceTree = "<group>"; };
-		ED01000000000000000000001C /* EditingCollaborationViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Editing/Collaboration/EditingCollaborationViews.swift"; sourceTree = "<group>"; };
-		ED01000000000000000000001D /* EditingWorkflowViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Editing/Workflow/EditingWorkflowViews.swift"; sourceTree = "<group>"; };
+		A467EE22AA44C60F7633C2C1 /* HistoryInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Editing/History/HistoryInspectorView.swift"; sourceTree = "<group>"; };
+		023B6EAF3B05FA2E1B194460 /* AIEditControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Editing/AI/AIEditControlsView.swift"; sourceTree = "<group>"; };
+		E34FBFB3593F01B45E73252C /* ProfessionalToolViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Editing/Tools/ProfessionalToolViews.swift"; sourceTree = "<group>"; };
+		13FDB940ADAE0855D6C08CA8 /* EditingCollaborationViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Editing/Collaboration/EditingCollaborationViews.swift"; sourceTree = "<group>"; };
+		F67C2C40A4BF21CFC16309CB /* EditingWorkflowViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Editing/Workflow/EditingWorkflowViews.swift"; sourceTree = "<group>"; };
 		CL0100000000000000000000 /* CollaborationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaborationModels.swift; sourceTree = "<group>"; };
 		CL0100000000000000000001 /* CollaborationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaborationManager.swift; sourceTree = "<group>"; };
 		CL0100000000000000000002 /* CollaborationFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaborationFramework.swift; sourceTree = "<group>"; };
@@ -2537,12 +2537,12 @@
 				CL010000000000000000000008 /* WorkspaceControlSystems.swift */,
 				CL010000000000000000000009 /* ReviewManager.swift */,
 				CL01000000000000000000000A /* CollaborationTools.swift */,
-				ED01000000000000000000000B /* EditingFramework.swift */,
-				ED01000000000000000000000C /* EditingHistoryManager.swift */,
-				ED01000000000000000000000D /* AIEditingEngine.swift */,
-				ED01000000000000000000000E /* ProfessionalEditingSuite.swift */,
-				ED01000000000000000000000F /* EditingCollaboration.swift */,
-				ED010000000000000000000010 /* EditingWorkflow.swift */,
+				4279371F37A11E68D21F0DB0 /* EditingFramework.swift */,
+				1CBA21622F31EF8FD1A4205B /* EditingHistoryManager.swift */,
+				1230BE816EF0AC627E1F83EE /* AIEditingEngine.swift */,
+				69F530BFF8DE562022C02C25 /* ProfessionalEditingSuite.swift */,
+				B8B77D866877663BBBFD1255 /* EditingCollaboration.swift */,
+				E7FCD686F59E5C4A88418926 /* EditingWorkflow.swift */,
 				CL010000000000000000000011 /* PullRequestDashboardView.swift */,
 				CL010000000000000000000012 /* PRDiffView.swift */,
 				CL010000000000000000000013 /* ActivityTimelineView.swift */,
@@ -2551,11 +2551,11 @@
 				CL010000000000000000000016 /* WorkspaceControlViews.swift */,
 				CL010000000000000000000017 /* ReviewViews.swift */,
 				CL010000000000000000000018 /* CollaborationToolViews.swift */,
-				ED010000000000000000000019 /* HistoryInspectorView.swift */,
-				ED01000000000000000000001A /* AIEditControlsView.swift */,
-				ED01000000000000000000001B /* ProfessionalToolViews.swift */,
-				ED01000000000000000000001C /* EditingCollaborationViews.swift */,
-				ED01000000000000000000001D /* EditingWorkflowViews.swift */,
+				A467EE22AA44C60F7633C2C1 /* HistoryInspectorView.swift */,
+				023B6EAF3B05FA2E1B194460 /* AIEditControlsView.swift */,
+				E34FBFB3593F01B45E73252C /* ProfessionalToolViews.swift */,
+				13FDB940ADAE0855D6C08CA8 /* EditingCollaborationViews.swift */,
+				F67C2C40A4BF21CFC16309CB /* EditingWorkflowViews.swift */,
 				GH0100000000000000000001 /* GitHubAuthManager.swift */,
 				GH0100000000000000000002 /* GitHubModels.swift */,
 				GH0100000000000000000003 /* GitHubEndpoints.swift */,
@@ -4136,12 +4136,12 @@
 				CL020000000000000000000008 /* WorkspaceControlSystems.swift in Sources */,
 				CL020000000000000000000009 /* ReviewManager.swift in Sources */,
 				CL02000000000000000000000A /* CollaborationTools.swift in Sources */,
-				ED02000000000000000000000B /* EditingFramework.swift in Sources */,
-				ED02000000000000000000000C /* EditingHistoryManager.swift in Sources */,
-				ED02000000000000000000000D /* AIEditingEngine.swift in Sources */,
-				ED02000000000000000000000E /* ProfessionalEditingSuite.swift in Sources */,
-				ED02000000000000000000000F /* EditingCollaboration.swift in Sources */,
-				ED020000000000000000000010 /* EditingWorkflow.swift in Sources */,
+				5397745A2D02C0A7F9F9276A /* EditingFramework.swift in Sources */,
+				41E58AD7343E2A2492A1C3CA /* EditingHistoryManager.swift in Sources */,
+				74CE99E96BFD131D9E7A7A63 /* AIEditingEngine.swift in Sources */,
+				B1714C0480D5B39A5A1F6004 /* ProfessionalEditingSuite.swift in Sources */,
+				E6F771CDF6FB6EE1B59DC3B7 /* EditingCollaboration.swift in Sources */,
+				A6EB0359B411A36DB0E7F8D6 /* EditingWorkflow.swift in Sources */,
 				CL020000000000000000000011 /* PullRequestDashboardView.swift in Sources */,
 				CL020000000000000000000012 /* PRDiffView.swift in Sources */,
 				CL020000000000000000000013 /* ActivityTimelineView.swift in Sources */,
@@ -4150,11 +4150,11 @@
 				CL020000000000000000000016 /* WorkspaceControlViews.swift in Sources */,
 				CL020000000000000000000017 /* ReviewViews.swift in Sources */,
 				CL020000000000000000000018 /* CollaborationToolViews.swift in Sources */,
-				ED020000000000000000000019 /* HistoryInspectorView.swift in Sources */,
-				ED02000000000000000000001A /* AIEditControlsView.swift in Sources */,
-				ED02000000000000000000001B /* ProfessionalToolViews.swift in Sources */,
-				ED02000000000000000000001C /* EditingCollaborationViews.swift in Sources */,
-				ED02000000000000000000001D /* EditingWorkflowViews.swift in Sources */,
+				CDB93E05C5973585CC3B4457 /* HistoryInspectorView.swift in Sources */,
+				B7F5A33B3D9C44B069B3CB56 /* AIEditControlsView.swift in Sources */,
+				255994A117DABA42CF2C4FE9 /* ProfessionalToolViews.swift in Sources */,
+				CF7C5DF73C21950069C94080 /* EditingCollaborationViews.swift in Sources */,
+				FABD4919AD64B111C9936C50 /* EditingWorkflowViews.swift in Sources */,
 				GH0200000000000000000001 /* GitHubAuthManager.swift in Sources */,
 				GH0200000000000000000002 /* GitHubModels.swift in Sources */,
 				GH0200000000000000000003 /* GitHubEndpoints.swift in Sources */,
