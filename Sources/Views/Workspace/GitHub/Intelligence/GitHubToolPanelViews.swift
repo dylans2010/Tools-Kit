@@ -165,12 +165,12 @@ struct ReleaseManagerView: View {
     }
 
     private func generateNotes() -> String {
-        let commits = Array(engine.localCommits.filter(where: { (commit: GitEngineService.LocalCommit) in commit.status != GitEngineService.CommitStatus.pushed }).prefix(20))
+        let commits = Array(engine.localCommits.filter { (commit: GitEngineService.LocalCommit) in commit.status != GitEngineService.CommitStatus.pushed }.prefix(20))
         if commits.isEmpty { return "No new commits since last release." }
         var notes = "## What's Changed\n\n"
-        let features = commits.filter(where: { $0.category == GitEngineService.CommitCategory.feature })
-        let bugfixes = commits.filter(where: { $0.category == GitEngineService.CommitCategory.bugfix })
-        let others = commits.filter(where: { ![GitEngineService.CommitCategory.feature, GitEngineService.CommitCategory.bugfix].contains($0.category) })
+        let features = commits.filter { $0.category == GitEngineService.CommitCategory.feature }
+        let bugfixes = commits.filter { $0.category == GitEngineService.CommitCategory.bugfix }
+        let others = commits.filter { ![GitEngineService.CommitCategory.feature, GitEngineService.CommitCategory.bugfix].contains($0.category) }
         if !features.isEmpty {
             notes += "### Features\n"
             for c in features { notes += "- \(c.message)\n" }
