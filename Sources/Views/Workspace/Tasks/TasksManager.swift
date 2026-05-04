@@ -37,6 +37,7 @@ final class TasksManager: ObservableObject {
     func addTask(_ task: WorkspaceTask) {
         tasks.insert(task, at: 0)
         saveTasks()
+        PluginEventBus.shared.emit(type: .taskCreated, payload: ["id": task.id.uuidString, "title": task.title])
     }
 
     func updateTask(_ task: WorkspaceTask) {
@@ -55,6 +56,9 @@ final class TasksManager: ObservableObject {
         if let idx = tasks.firstIndex(where: { $0.id == task.id }) {
             tasks[idx].completed.toggle()
             saveTasks()
+            if tasks[idx].completed {
+                PluginEventBus.shared.emit(type: .taskCompleted, payload: ["id": task.id.uuidString, "title": task.title])
+            }
         }
     }
 

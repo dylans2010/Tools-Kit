@@ -213,8 +213,10 @@ struct WorkspaceDashboardView: View {
     @State private var showingCreateTask = false
     @State private var showingCreateNotebook = false
     @State private var showingSettings = false
+    @State private var showingInstalledPlugins = false
 
     private let moreTools: [(title: String, icon: String, color: Color, destination: AnyView)] = [
+        ("Plugins", "puzzlepiece.extension.fill", .blue, AnyView(PluginsMainView())),
         ("Intelligence", "sparkles", .pink, AnyView(CrossIntelligenceHomeView())),
         ("Automation", "bolt.fill", .orange, AnyView(AutomationHomeView())),
         ("Spatial", "square.grid.3x3.fill", .purple, AnyView(SpatialWorkspaceHomeView())),
@@ -266,6 +268,29 @@ struct WorkspaceDashboardView: View {
         .sheet(isPresented: $showingCreateNotebook) {
             CreateNotebookView()
         }
+        .sheet(isPresented: $showingInstalledPlugins) {
+            NavigationStack {
+                PluginsInstalledView()
+            }
+        }
+        .overlay(alignment: .bottomTrailing) {
+            globalPluginButton
+        }
+    }
+
+    private var globalPluginButton: some View {
+        Button {
+            showingInstalledPlugins = true
+        } label: {
+            Image(systemName: "puzzlepiece.extension.fill")
+                .font(.title2)
+                .foregroundColor(.white)
+                .frame(width: 56, height: 56)
+                .background(Color.blue)
+                .clipShape(Circle())
+                .shadow(radius: 4)
+        }
+        .padding(24)
     }
 
     private var quickActionsSection: some View {

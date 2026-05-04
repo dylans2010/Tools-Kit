@@ -111,6 +111,7 @@ final class MeetingStateManager: NSObject, ObservableObject {
         guard let session = currentSession else { return }
         await resolver.beginSession(session)
         phase = .inMeeting
+        PluginEventBus.shared.emit(type: .meetStarted, payload: ["id": session.id, "name": session.name])
     }
 
     func joinMeeting() async {

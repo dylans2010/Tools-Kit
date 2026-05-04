@@ -156,6 +156,10 @@ struct ValidationTests {
         MessagesValidationTests.run()
     }
 
+    private static func testPluginSystem() {
+        PluginValidationTests.run()
+    }
+
     private static func testEditingSystem() {
         print("Testing Editing System...")
         let manager = EditingManager.shared

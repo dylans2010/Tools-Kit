@@ -15,6 +15,7 @@ class NotesBackend: ObservableObject {
         let newNote = Note()
         notes.append(newNote)
         saveNotes()
+        PluginEventBus.shared.emit(type: .noteCreated, payload: ["id": newNote.id.uuidString, "title": newNote.title, "content": newNote.content])
         return newNote
     }
 

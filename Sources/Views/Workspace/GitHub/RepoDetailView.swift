@@ -173,6 +173,9 @@ struct RepoDetailView: View {
                     NavigationLink(destination: ReleaseManagerView(owner: repository.owner.login, repo: repository.name)) {
                         ActionCardContent(title: "Releases", icon: "tag.fill", color: .green)
                     }
+                    NavigationLink(destination: PluginsMainView()) {
+                        ActionCardContent(title: "Plugin Tools", icon: "puzzlepiece.extension.fill", color: .blue)
+                    }
                 }
                 .buttonStyle(.plain)
             }
