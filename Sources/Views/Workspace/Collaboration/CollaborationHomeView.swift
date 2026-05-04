@@ -44,6 +44,9 @@ struct CollaborationHomeView: View {
             }
 
             Section("Automation & Intelligence") {
+                NavigationLink(destination: WorkspaceAdvancedHomeView()) {
+                    Label("Advanced Workspace", systemImage: "square.3.layers.3d")
+                }
                 NavigationLink(destination: WorkspaceAutomationView()) {
                     Label("Automations", systemImage: "bolt.fill")
                 }

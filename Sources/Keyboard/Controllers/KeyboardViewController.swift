@@ -1,5 +1,8 @@
 import UIKit
 import SwiftUI
+import os.log
+
+private let extensionLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "com.dylans2010.ToolsKit.keyboard", category: "KeyboardExtension")
 
 class KeyboardViewController: UIInputViewController {
     private var proxyManager: TextProxyManager?
@@ -7,6 +10,9 @@ class KeyboardViewController: UIInputViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        let bundleID = Bundle.main.bundleIdentifier ?? "(nil)"
+        os_log("KeyboardViewController viewDidLoad – bundle identifier: %{public}@", log: extensionLog, type: .info, bundleID)
 
         self.proxyManager = TextProxyManager(proxy: self.textDocumentProxy)
         setupSwiftUI()
@@ -32,6 +38,7 @@ class KeyboardViewController: UIInputViewController {
         ])
 
         controller.didMove(toParent: self)
+        os_log("KeyboardViewController SwiftUI bridge initialized", log: extensionLog, type: .info)
     }
 
     override func textWillChange(_ textInput: UITextInput?) {
