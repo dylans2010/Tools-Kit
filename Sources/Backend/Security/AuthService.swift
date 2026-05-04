@@ -106,8 +106,11 @@ class AuthService: ObservableObject {
         logEvent(type: .login, message: "Successful password login")
     }
 
-    func authenticateWithBiometrics() {
-        guard UserDefaults.standard.bool(forKey: useBiometricsKey) else { return }
+    func authenticateWithBiometrics(completion: ((Bool) -> Void)? = nil) {
+        guard UserDefaults.standard.bool(forKey: useBiometricsKey) else {
+            completion?(false)
+            return
+        }
 
         let context = LAContext()
         var error: NSError?
@@ -119,15 +122,20 @@ class AuthService: ObservableObject {
                         do {
                             try self.unlockWithSecureEnclave()
                             self.logEvent(type: .login, message: "Successful biometric login")
+                            completion?(true)
                         } catch {
                             self.isAuthenticated = false
                             self.logEvent(type: .failedLogin, message: "Biometric login failed during decryption")
+                            completion?(false)
                         }
                     } else {
                         self.logEvent(type: .failedLogin, message: "Biometric authentication failed")
+                        completion?(false)
                     }
                 }
             }
+        } else {
+            completion?(false)
         }
     }
 

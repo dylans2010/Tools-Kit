@@ -116,7 +116,12 @@ struct SecurityLoginView: View {
 
             Button {
                 isAuthenticating = true
-                authService.authenticateWithBiometrics()
+                authService.authenticateWithBiometrics { success in
+                    isAuthenticating = false
+                    if !success {
+                        error = "Biometric authentication failed"
+                    }
+                }
             } label: {
                 Label("Unlock with Biometrics", systemImage: "faceid")
             }
@@ -125,8 +130,11 @@ struct SecurityLoginView: View {
             Spacer()
         }
         .onAppear {
-            isAuthenticating = true
-            authService.authenticateWithBiometrics()
+            authService.authenticateWithBiometrics { success in
+                if !success {
+                    isAuthenticating = false
+                }
+            }
         }
         .onChange(of: authService.isAuthenticated) { _, value in
             if value {
