@@ -15,6 +15,9 @@ struct WorkspaceHomeView: View {
         case files = "Files"
         case github = "GitHub"
         case security = "Security"
+        case intelligence = "Intelligence"
+        case automation = "Automation"
+        case spatial = "Spatial"
 
         var icon: String {
             switch self {
@@ -29,6 +32,9 @@ struct WorkspaceHomeView: View {
             case .files: return "folder.fill"
             case .github: return "terminal.fill"
             case .security: return "lock.shield.fill"
+            case .intelligence: return "sparkles"
+            case .automation: return "bolt.fill"
+            case .spatial: return "square.grid.3x3.fill"
             }
         }
     }
@@ -46,6 +52,9 @@ struct WorkspaceHomeView: View {
             filesTab
             githubTab
             securityTab
+            intelligenceTab
+            automationTab
+            spatialTab
         }
     }
 
@@ -158,6 +167,36 @@ struct WorkspaceHomeView: View {
         }
         .tag(WorkspaceTab.security)
     }
+
+    private var intelligenceTab: some View {
+        NavigationStack {
+            CrossIntelligenceHomeView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.intelligence.rawValue, systemImage: WorkspaceTab.intelligence.icon)
+        }
+        .tag(WorkspaceTab.intelligence)
+    }
+
+    private var automationTab: some View {
+        NavigationStack {
+            AutomationHomeView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.automation.rawValue, systemImage: WorkspaceTab.automation.icon)
+        }
+        .tag(WorkspaceTab.automation)
+    }
+
+    private var spatialTab: some View {
+        NavigationStack {
+            SpatialWorkspaceHomeView()
+        }
+        .tabItem {
+            Label(WorkspaceTab.spatial.rawValue, systemImage: WorkspaceTab.spatial.icon)
+        }
+        .tag(WorkspaceTab.spatial)
+    }
 }
 
 // MARK: - Dashboard View
@@ -176,6 +215,9 @@ struct WorkspaceDashboardView: View {
     @State private var showingSettings = false
 
     private let moreTools: [(title: String, icon: String, color: Color, destination: AnyView)] = [
+        ("Intelligence", "sparkles", .pink, AnyView(CrossIntelligenceHomeView())),
+        ("Automation", "bolt.fill", .orange, AnyView(AutomationHomeView())),
+        ("Spatial", "square.grid.3x3.fill", .purple, AnyView(SpatialWorkspaceHomeView())),
         ("Security", "lock.shield.fill", .blue, AnyView(SecurityHomeView())),
         ("GitHub", "terminal.fill", .black, AnyView(GitHubRouterView())),
         ("Calendar", "calendar", .green, AnyView(CalendarHomeView())),
