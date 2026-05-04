@@ -47,10 +47,12 @@ struct DiffView: View {
         guard original != modified else { return "" }
         let oldLines = original.components(separatedBy: "\n")
         let newLines = modified.components(separatedBy: "\n")
-        var result = "@@ -1,\(oldLines.count) +1,\(newLines.count) @@\n"
-        for line in oldLines { result += "-\(line)\n" }
-        for line in newLines { result += "+\(line)\n" }
-        return result
+        var lines: [String] = []
+        lines.reserveCapacity(oldLines.count + newLines.count + 1)
+        lines.append("@@ -1,\(oldLines.count) +1,\(newLines.count) @@")
+        for line in oldLines { lines.append("-\(line)") }
+        for line in newLines { lines.append("+\(line)") }
+        return lines.joined(separator: "\n")
     }
 
     @ViewBuilder
