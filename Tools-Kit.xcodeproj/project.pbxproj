@@ -1092,6 +1092,9 @@
 		TKBF0000000000000000000010 /* PluginsInstalledView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000010 /* PluginsInstalledView.swift */; };
 		TKBF0000000000000000000011 /* MarketplaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000011 /* MarketplaceView.swift */; };
 		TKBF0000000000000000000012 /* PluginDevConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000012 /* PluginDevConsoleView.swift */; };
+		TZBF0000000000000000000000 /* WorkspaceWorkflow.swift in Sources */ = {isa = PBXBuildFile; fileRef = TZRF0000000000000000000000 /* WorkspaceWorkflow.swift */; };
+		TZBF0000000000000000000001 /* SpatialModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = TZRF0000000000000000000001 /* SpatialModels.swift */; };
+		TZBF0000000000000000000002 /* WorkflowRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = TZRF0000000000000000000002 /* WorkflowRunner.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */

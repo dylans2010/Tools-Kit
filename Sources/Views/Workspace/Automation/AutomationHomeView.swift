@@ -1,19 +1,27 @@
 import SwiftUI
 
 struct AutomationHomeView: View {
+    @State private var workflows: [WorkspaceWorkflow] = []
     @State private var showingWorkflowBuilder = false
 
     var body: some View {
         List {
-            Section("Active Workflows") {
-                Text("No active workflows.")
-                    .foregroundColor(.secondary)
+            Section("Your Workflows") {
+                if workflows.isEmpty {
+                    Text("No active workflows.")
+                        .foregroundColor(.secondary)
+                } else {
+                    ForEach(workflows) { workflow in
+                        WorkflowRow(workflow: workflow)
+                    }
+                    .onDelete(perform: deleteWorkflows)
+                }
             }
 
-            Section("Templates") {
-                WorkflowTemplateRow(title: "Auto-task from Email", description: "Create a task when an email is marked as priority.", icon: "envelope.badge.shield.half.filled")
-                WorkflowTemplateRow(title: "Commit to Note", description: "Summarize daily commits into a notebook page.", icon: "terminal.fill")
-                WorkflowTemplateRow(title: "Meeting Summary", description: "Generate action items after a call ends.", icon: "video.fill")
+            Section("Available Triggers") {
+                Label("Note Created", systemImage: "note.text")
+                Label("Task Completed", systemImage: "checkmark.circle.fill")
+                Label("GitHub Push", systemImage: "terminal.fill")
             }
         }
         .navigationTitle("Automation")
@@ -23,45 +31,83 @@ struct AutomationHomeView: View {
             }
         }
         .sheet(isPresented: $showingWorkflowBuilder) {
-            WorkflowBuilderView()
+            WorkflowBuilderView { newWorkflow in
+                workflows.append(newWorkflow)
+                saveWorkflows()
+            }
         }
+        .onAppear(perform: loadWorkflows)
+    }
+
+    private func loadWorkflows() {
+        workflows = UnifiedDataStore.shared.loadWorkflows()
+    }
+
+    private func saveWorkflows() {
+        try? UnifiedDataStore.shared.saveWorkflows(workflows)
+    }
+
+    private func deleteWorkflows(at offsets: IndexSet) {
+        workflows.remove(atOffsets: offsets)
+        saveWorkflows()
     }
 }
 
-struct WorkflowTemplateRow: View {
-    let title: String
-    let description: String
-    let icon: String
+struct WorkflowRow: View {
+    let workflow: WorkspaceWorkflow
 
     var body: some View {
-        HStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(.title2)
+        HStack {
+            Image(systemName: workflow.icon)
                 .foregroundColor(.blue)
-                .frame(width: 44, height: 44)
-                .background(Color.blue.opacity(0.1))
-                .clipShape(Circle())
+                .frame(width: 32)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+            VStack(alignment: .leading) {
+                Text(workflow.title)
                     .font(.headline)
-                Text(description)
+                Text("Trigger: \(workflow.trigger.capability).\(workflow.trigger.action)")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+
+            Spacer()
+
+            if workflow.isEnabled {
+                Image(systemName: "bolt.fill")
+                    .foregroundColor(.yellow)
+            }
         }
-        .padding(.vertical, 8)
     }
 }
 
 struct WorkflowBuilderView: View {
     @Environment(\.dismiss) var dismiss
+    var onSave: (WorkspaceWorkflow) -> Void
+
+    @State private var title = ""
+    @State private var triggerCapability = "notes"
+    @State private var triggerAction = "created"
 
     var body: some View {
         NavigationStack {
-            VStack {
-                Text("Workflow Builder Implementation")
-                    .foregroundColor(.secondary)
+            Form {
+                Section("Information") {
+                    TextField("Workflow Title", text: $title)
+                }
+
+                Section("Trigger") {
+                    Picker("Capability", selection: $triggerCapability) {
+                        Text("Notes").tag("notes")
+                        Text("Tasks").tag("tasks")
+                        Text("GitHub").tag("github")
+                    }
+                    TextField("Action (e.g. created, completed)", text: $triggerAction)
+                }
+
+                Section("Action") {
+                    Text("Auto-create task on trigger")
+                        .foregroundColor(.secondary)
+                }
             }
             .navigationTitle("New Workflow")
             .toolbar {
@@ -69,7 +115,21 @@ struct WorkflowBuilderView: View {
                     Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { dismiss() }
+                    Button("Save") {
+                        let new = WorkspaceWorkflow(
+                            id: UUID(),
+                            title: title,
+                            description: "Custom automation",
+                            icon: "bolt.fill",
+                            trigger: .init(capability: triggerCapability, action: triggerAction),
+                            actions: [.init(id: UUID(), type: "create_task", parameters: ["title": "Follow up on \(title)"])],
+                            isEnabled: true,
+                            createdAt: Date()
+                        )
+                        onSave(new)
+                        dismiss()
+                    }
+                    .disabled(title.isEmpty)
                 }
             }
         }

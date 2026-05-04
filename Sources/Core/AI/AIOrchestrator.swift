@@ -14,23 +14,40 @@ final class AIOrchestrator {
     func queryWorkspace(_ prompt: String) async throws -> String {
         print("[AIOrchestrator] Querying workspace with prompt: \(prompt)")
 
-        // 1. Generate embedding for the query
-        let _ = try await embeddingService.generateEmbedding(for: prompt)
+        // 1. Fetch real workspace data for context
+        let workflows = dataStore.loadWorkflows()
+        let canvases = dataStore.loadCanvases()
+        let notebooks = NotebooksManager.shared.notebooks
+        let tasks = TasksManager.shared.tasks
 
-        // 2. Perform semantic search across indexed data
-        // (This would involve vector database lookup in a full implementation)
+        // 2. Perform simple keyword search across all entities
+        let query = prompt.lowercased()
+        var contextResults: [String] = []
 
-        // 3. Construct context and call LLM
-        // return try await llmService.complete(prompt: prompt, context: context)
+        for task in tasks where task.title.lowercased().contains(query) || task.description.lowercased().contains(query) {
+            contextResults.append("Task: \(task.title) (Priority: \(task.priority.rawValue))")
+        }
 
-        return "Based on your workspace data, I found that you have 3 upcoming tasks related to this query."
+        for workflow in workflows where workflow.title.lowercased().contains(query) {
+            contextResults.append("Workflow: \(workflow.title)")
+        }
+
+        for notebook in notebooks where notebook.name.lowercased().contains(query) {
+            contextResults.append("Notebook: \(notebook.name)")
+        }
+
+        if contextResults.isEmpty {
+            return "I couldn't find any specific items in your workspace matching '\(prompt)'. However, I'm here to help you manage your tasks, notes, and automations."
+        }
+
+        return "I found the following relevant items in your workspace: " + contextResults.joined(separator: "; ") + ". How would you like to proceed with them?"
     }
 
     /// Indexes a piece of data for semantic search.
     func indexData(key: String, content: String) async {
         do {
             let embedding = try await embeddingService.generateEmbedding(for: content)
-            // Save embedding associated with the key for later retrieval
+            // Save embedding associated with the key for later retrieval in vector DB
             print("[AIOrchestrator] Indexed data for key: \(key)")
         } catch {
             print("[AIOrchestrator] Indexing failed: \(error.localizedDescription)")

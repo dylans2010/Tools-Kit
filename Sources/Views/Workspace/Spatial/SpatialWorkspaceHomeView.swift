@@ -1,11 +1,7 @@
 import SwiftUI
 
 struct SpatialWorkspaceHomeView: View {
-    @State private var nodes: [SpatialNode] = [
-        SpatialNode(id: UUID(), title: "Project Strategy", type: .note, position: CGPoint(x: 100, y: 100)),
-        SpatialNode(id: UUID(), title: "Backend API", type: .task, position: CGPoint(x: 300, y: 200)),
-        SpatialNode(id: UUID(), title: "Logo Assets", type: .file, position: CGPoint(x: 150, y: 350))
-    ]
+    @State private var canvas: SpatialCanvas = SpatialCanvas(id: UUID(), name: "Default Canvas", nodes: [], lastModified: Date())
 
     var body: some View {
         ZStack {
@@ -22,45 +18,55 @@ struct SpatialWorkspaceHomeView: View {
                 }
             }
 
-            ForEach(nodes) { node in
+            ForEach(canvas.nodes) { node in
                 SpatialNodeView(node: node)
                     .position(node.position)
+                    .gesture(
+                        DragGesture()
+                            .onChanged { value in
+                                updateNodePosition(node.id, to: value.location)
+                            }
+                            .onEnded { _ in
+                                saveCanvas()
+                            }
+                    )
             }
         }
-        .navigationTitle("Spatial Workspace")
+        .navigationTitle(canvas.name)
         .toolbar {
-            Button(action: { /* Add node */ }) {
+            Button(action: addNode) {
                 Image(systemName: "plus.square.on.square")
             }
         }
+        .onAppear(perform: loadCanvas)
     }
-}
 
-struct SpatialNode: Identifiable {
-    let id: UUID
-    var title: String
-    var type: NodeType
-    var position: CGPoint
-
-    enum NodeType {
-        case note, task, file, meeting
-
-        var icon: String {
-            switch self {
-            case .note: return "note.text"
-            case .task: return "checklist"
-            case .file: return "doc.fill"
-            case .meeting: return "video.fill"
-            }
+    private func loadCanvas() {
+        if let existing = UnifiedDataStore.shared.loadCanvases().first {
+            self.canvas = existing
+        } else {
+            canvas.nodes = [
+                SpatialNode(id: UUID(), title: "Project Strategy", type: .note, position: CGPoint(x: 100, y: 100)),
+                SpatialNode(id: UUID(), title: "Backend API", type: .task, position: CGPoint(x: 300, y: 200))
+            ]
+            saveCanvas()
         }
+    }
 
-        var color: Color {
-            switch self {
-            case .note: return .yellow
-            case .task: return .blue
-            case .file: return .orange
-            case .meeting: return .purple
-            }
+    private func saveCanvas() {
+        canvas.lastModified = Date()
+        try? UnifiedDataStore.shared.saveCanvas(canvas)
+    }
+
+    private func addNode() {
+        let newNode = SpatialNode(id: UUID(), title: "New Item", type: .note, position: CGPoint(x: 200, y: 200))
+        canvas.nodes.append(newNode)
+        saveCanvas()
+    }
+
+    private func updateNodePosition(_ id: UUID, to position: CGPoint) {
+        if let index = canvas.nodes.firstIndex(where: { $0.id == id }) {
+            canvas.nodes[index].position = position
         }
     }
 }
@@ -70,14 +76,32 @@ struct SpatialNodeView: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            Image(systemName: node.type.icon)
+            Image(systemName: nodeIcon)
                 .font(.title2)
-                .foregroundColor(node.type.color)
+                .foregroundColor(nodeColor)
             Text(node.title)
                 .font(.caption.bold())
         }
         .frame(width: 100, height: 100)
         .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
         .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
+    }
+
+    private var nodeIcon: String {
+        switch node.type {
+        case .note: return "note.text"
+        case .task: return "checklist"
+        case .file: return "doc.fill"
+        case .meeting: return "video.fill"
+        }
+    }
+
+    private var nodeColor: Color {
+        switch node.type {
+        case .note: return .yellow
+        case .task: return .blue
+        case .file: return .orange
+        case .meeting: return .purple
+        }
     }
 }
