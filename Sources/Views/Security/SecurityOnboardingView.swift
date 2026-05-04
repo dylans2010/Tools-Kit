@@ -80,6 +80,7 @@ struct SecurityLoginView: View {
     @State private var password = ""
     @State private var error: String?
     @State private var isAuthenticating = false
+    @State private var showingResetConfirmation = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -127,6 +128,13 @@ struct SecurityLoginView: View {
             }
             .padding(.top)
 
+            Button(role: .destructive) {
+                showingResetConfirmation = true
+            } label: {
+                Label("Reset Password", systemImage: "arrow.counterclockwise.circle")
+            }
+            .padding(.top, 4)
+
             Spacer()
         }
         .onAppear {
@@ -141,6 +149,16 @@ struct SecurityLoginView: View {
                 isAuthenticating = false
                 error = nil
             }
+        }
+        .alert("Reset Password?", isPresented: $showingResetConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Reset & Erase Data", role: .destructive) {
+                authService.resetVaultAndPassword()
+                password = ""
+                error = nil
+            }
+        } message: {
+            Text("This will permanently erase your vault data to protect your privacy.")
         }
     }
 

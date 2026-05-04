@@ -273,6 +273,21 @@ class AuthService: ObservableObject {
         isAuthenticated = false
     }
 
+    func resetVaultAndPassword() {
+        logout()
+        VaultManager.shared.clearAllData()
+        SecureFileStorageService.shared.clearAll()
+        clearFromKeychain(service: masterPasswordKey)
+        clearFromKeychain(service: "com.toolskit.security.password_fallback")
+        clearSecureEnclaveKey()
+        UserDefaults.standard.removeObject(forKey: saltKey)
+        UserDefaults.standard.removeObject(forKey: useBiometricsKey)
+        UserDefaults.standard.removeObject(forKey: wrappedVMKKey)
+        UserDefaults.standard.removeObject(forKey: wrappedDEKKey)
+        isSetup = false
+        logEvent(type: .settingsChange, message: "Vault reset requested; all stored data erased")
+    }
+
     // MARK: - Keychain Helpers
 
     private func saveToKeychain(data: Data, service: String) {
@@ -298,6 +313,25 @@ class AuthService: ObservableObject {
         var result: AnyObject?
         SecItemCopyMatching(query as CFDictionary, &result)
         return result as? Data
+    }
+
+    private func clearFromKeychain(service: String) {
+        let query: [CFString: Any] = [
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrService: service,
+            kSecAttrAccount: "user"
+        ]
+        SecItemDelete(query as CFDictionary)
+    }
+
+    private func clearSecureEnclaveKey() {
+        let tag = vmkSecureEnclaveTag.data(using: .utf8)!
+        let query: [CFString: Any] = [
+            kSecClass: kSecClassKey,
+            kSecAttrApplicationTag: tag,
+            kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandom
+        ]
+        SecItemDelete(query as CFDictionary)
     }
 
     private func savePasswordToKeychain(_ password: String) {
