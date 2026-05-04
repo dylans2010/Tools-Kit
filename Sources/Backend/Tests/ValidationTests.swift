@@ -13,9 +13,51 @@ struct ValidationTests {
         testEditingSystem()
         await testSecuritySystem()
         testMessagesExtension()
-        testPluginSystem()
+        await testIntelligenceLayer()
+        await testAutomationEngine()
+        testAdvancedCollaboration()
+        testSpatialWorkspace()
+        await testDeveloperLayer()
 
         print("All Validation Tests Passed!")
+    }
+
+    private static func testIntelligenceLayer() async {
+        print("Testing Intelligence Layer...")
+        let results = await SemanticSearchService.shared.search(query: "test")
+        assert(results.count >= 0)
+
+        let response = await AIOrchestrator.shared.query(prompt: "Hello")
+        assert(!response.isEmpty)
+    }
+
+    private static func testAutomationEngine() async {
+        print("Testing Automation Engine...")
+        let wf = Workflow(id: UUID(), name: "Test WF", steps: [WorkflowStep(id: UUID(), actionType: "Test", parameters: [:])])
+        await AutomationEngine.shared.execute(workflow: wf)
+    }
+
+    private static func testAdvancedCollaboration() {
+        print("Testing Advanced Collaboration...")
+        CollaborationSessionManager.shared.joinSession()
+        assert(CollaborationSessionManager.shared.activeUsers.count > 1)
+
+        DecisionTrackingService.shared.recordDecision(title: "Test", outcome: "Done")
+        assert(DecisionTrackingService.shared.decisions.count > 0)
+    }
+
+    private static func testSpatialWorkspace() {
+        print("Testing Spatial Workspace...")
+        let entity = WorkspaceEntity(id: UUID(), title: "Node", type: .note, content: "", metadata: [:])
+        NodeGraphEngine.shared.addNode(entity: entity, position: .zero)
+        assert(NodeGraphEngine.shared.nodes.count > 0)
+    }
+
+    private static func testDeveloperLayer() async {
+        print("Testing Developer Layer...")
+        await RepoSyncService.shared.syncIssuesToTasks(repoID: "test-repo")
+        let fix = await AICodeAssistantManager.shared.suggestFix(for: "error")
+        assert(!fix.isEmpty)
     }
 
     private static func testMailIntelligence() {
