@@ -25,10 +25,14 @@ struct SDKBuildView: View {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button { showingSystemExplorer = true } label: { Label("Explorer", systemImage: "network") }
                     Button { showingConsole = true } label: { Label("Console", systemImage: "terminal") }
+                }
 
-                    Toggle("Try with SDK", isOn: $runtime.isNoSandboxModeEnabled)
-                        .toggleStyle(.button)
-                        .tint(.red)
+                ToolbarItem(placement: .bottomBar) {
+                    Toggle(isOn: $runtime.isNoSandboxModeEnabled) {
+                        Label("Try with SDK", systemImage: "shield.slash")
+                    }
+                    .toggleStyle(.button)
+                    .tint(.red)
                 }
 
                 ToolbarItem(placement: .navigationBarLeading) {

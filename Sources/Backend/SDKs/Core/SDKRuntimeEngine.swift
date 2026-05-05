@@ -34,15 +34,13 @@ public final class SDKRuntimeEngine: ObservableObject {
     }
 
     private func performExecution(project: SDKProject, context: SDKExecutionContext) async throws {
-        // Validate permissions unless noSandbox is enabled
-        if !context.noSandbox {
-            try permissionManager.validateProjectScopes(project)
-        } else {
+        // Use SDKExecutionKernel for coordinated execution
+        if context.noSandbox {
             SDKConsoleView.LogBus.shared.log("WARNING: Running in noSandbox mode. Restrictions bypassed.", type: .warning)
+            try await SDKNoSandboxOverrideController.shared.executeUnrestricted(project.sourceCode)
+        } else {
+            try await SDKSandboxController.shared.execute(project.sourceCode, context: context)
         }
-
-        // Use SDKExecutionBridge to bridge to real systems
-        try await SDKExecutionBridge.shared.execute(sourceCode: project.sourceCode, context: context)
     }
 
     public func stopProject(id: UUID) {

@@ -16,6 +16,7 @@ struct ValidationTests {
         testMessagesExtension()
         testConnectorsSystem()
         await testWorkspaceOS()
+        await testSDKPlatform()
 
         print("All Validation Tests Passed!")
     }
@@ -224,6 +225,42 @@ struct ValidationTests {
         assert(UnifiedDataStore.shared.spatialCanvases.contains(where: { $0.id == canvas.id }))
 
         print("Workspace OS Logic Verified.")
+    }
+
+    private static func testSDKPlatform() async {
+        print("Testing SDK Platform Expansion...")
+
+        let project = SDKProject(id: UUID(), name: "Test Project", sourceCode: "print('hello')", requiredScopes: ["workspace.notes.write"], status: .idle)
+        let context = SDKExecutionContext(projectID: project.id, noSandbox: false)
+
+        // 1. Test Kernel routing
+        let action = SDKAction.createNote(title: "SDK Test", content: "Content")
+        do {
+            try await SDKExecutionKernel.shared.execute(action: action, context: context)
+        } catch {
+            fatalError("SDK Execution Kernel failed: \(error.localizedDescription)")
+        }
+
+        // 2. Test System Router
+        let systemAction = try? SDKSystemRouter.shared.route(action: action)
+        assert(systemAction != nil)
+
+        // 3. Test Mutation Engine with Permission Gate
+        do {
+            try await SDKMutationEngine.shared.performMutation(action, context: context)
+        } catch {
+            fatalError("SDK Mutation Engine failed: \(error.localizedDescription)")
+        }
+
+        // 4. Test Event Injection
+        SDKEventInjectionEngine.shared.broadcast(action: action)
+
+        // 5. Test Telemetry
+        let traceID = UUID()
+        SDKTelemetryEngine.shared.startTrace(id: traceID, action: action)
+        SDKTelemetryEngine.shared.endTrace(id: traceID, status: .success)
+
+        print("SDK Platform Logic Verified.")
     }
 
     private static func testEditingSystem() {

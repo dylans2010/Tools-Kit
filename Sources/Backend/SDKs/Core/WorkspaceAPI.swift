@@ -110,6 +110,11 @@ public final class WorkspaceAPI {
         public func restoreState(snapshotID: UUID) throws {
             try TimeTravelFramework.shared.restoreFromSnapshot(snapshotID: snapshotID)
         }
+
+        public func createSnapshot(message: String) {
+            // Simplified snapshot creation for SDK
+            print("Creating Time Travel snapshot: \(message)")
+        }
     }
     public let timeTravel = TimeTravelAPI()
 
@@ -122,6 +127,10 @@ public final class WorkspaceAPI {
         public func getInsights() -> [PersonaInsight] {
             return PersonaManager.shared.proactiveInsights
         }
+
+        public func injectMemory(content: String) {
+            print("Injecting Persona memory: \(content)")
+        }
     }
     public let persona = PersonaAPI()
 
@@ -132,6 +141,22 @@ public final class WorkspaceAPI {
                 try await IntegrationEngine.shared.execute(workflow: workflow)
             }
         }
+
+        public func triggerWorkflow(event: String) {
+            print("Triggering workflow for event: \(event)")
+        }
     }
     public let integrations = IntegrationsAPI()
+
+    // MARK: - Intelligence
+    public struct IntelligenceAPI {
+        public func getGraph() -> [String: Any] {
+            return [:] // Placeholder for real graph data
+        }
+
+        public func updateLink(source: UUID, target: UUID, relation: String) {
+            SDKWorkspaceGraphEngine.shared.updateLink(source: source, target: target, relation: relation)
+        }
+    }
+    public let intelligence = IntelligenceAPI()
 }
