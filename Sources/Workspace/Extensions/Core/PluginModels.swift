@@ -9,7 +9,7 @@ struct PluginDefinition: Codable, Identifiable {
     var author: String
     var version: String
     var icon: String
-    var identifier: String // com.ToolsKit.<userInput>
+    var identifier: String // com.toolskit.<pluginName> (Immutable after creation)
     var isEnabled: Bool = false
     var isInstalled: Bool = false
     var installedAt: Date? = nil
@@ -20,16 +20,132 @@ struct PluginDefinition: Codable, Identifiable {
     var actions: [PluginAction]
     var sourceCode: String
 
+    // Enhanced Metadata
+    var releaseNotes: String?
+    var changelog: [PluginChangeLogEntry] = []
+    var apiKey: String? // Required for high-risk scopes
+    var privacyNote: String? // Developer justification
+    var dataUsageExplanation: String?
+    var retentionPolicy: String?
+
     var permissions: [PluginPermission] {
         capabilities.map { PluginPermission(capability: $0) }
     }
 }
 
+struct PluginChangeLogEntry: Codable, Identifiable {
+    var id: UUID = UUID()
+    let version: String
+    let date: Date
+    let notes: String
+}
+
 struct PluginPermission: Codable, Identifiable {
-    var id: String { capability.rawValue }
+    var id: String { capability.technicalKey }
     let capability: PluginCapability
+
+    var technicalKey: String { capability.technicalKey }
+    var description: String { capability.description }
+    var riskLevel: RiskLevel { capability.riskLevel }
+    var accessLevel: AccessLevel { capability.accessLevel }
+}
+
+enum RiskLevel: String, Codable {
+    case low, medium, high, critical
+}
+
+enum AccessLevel: String, Codable {
+    case read, write, full, selective
+}
+
+// MARK: - Capabilities & Actions
+
+enum PluginCapability: String, Codable, CaseIterable, Identifiable {
+    // Legacy / Core
+    case notes, tasks, mail, calendar, files, whiteboard, slides, media, meet, github, automation, intelligence, collaboration, ai
+
+    // AI Persona
+    case aiPersonaQuery = "ai.persona.query"
+    case aiPersonaMemoryAccess = "ai.persona.memory.access"
+    case aiPersonaWorkspaceAnalysis = "ai.persona.workspace.analysis"
+    case aiPersonaBehaviorModel = "ai.persona.behavior.model"
+
+    // Time Travel
+    case timeReadHistory = "time.read.history"
+    case timeRestoreState = "time.restore.state"
+    case timeDiffGenerate = "time.diff.generate"
+    case timeTimelineBranch = "time.timeline.branch"
+
+    // Automation (Enhanced)
+    case automationCreateWorkflow = "automation.create.workflow"
+    case automationModifyWorkflow = "automation.modify.workflow"
+    case automationExecuteTrigger = "automation.execute.trigger"
+    case automationSimulateRun = "automation.simulate.run"
+
+    // Integrations
+    case integrationsConnectService = "integrations.connect.service"
+    case integrationsSendEvent = "integrations.send.event"
+    case integrationsReceiveWebhook = "integrations.receive.webhook"
+    case integrationsPipelineBuild = "integrations.pipeline.build"
+
+    // Intelligence (Enhanced)
+    case intelligenceGraphRead = "intelligence.graph.read"
+    case intelligenceGraphLink = "intelligence.graph.link"
+    case intelligenceSemanticQuery = "intelligence.semantic.query"
+    case intelligencePredictNext = "intelligence.predict.next"
+
+    // Slides (Enhanced)
+    case slidesGenerateAI = "slides.generate.ai"
+    case slidesSyncData = "slides.sync.data"
+    case slidesPresentLive = "slides.present.live"
+
+    // Specialized
+    case workspaceModifySelective = "workspace.modify.selective"
+    case mailFetchData = "mail.fetchData"
+    case securityFetchData = "security.fetchData"
+    case workspaceFetchFullData = "workspace.fetchFullData"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .aiPersonaQuery: return "AI Persona Query"
+        case .aiPersonaMemoryAccess: return "AI Persona Memory"
+        case .aiPersonaWorkspaceAnalysis: return "AI Workspace Analysis"
+        case .aiPersonaBehaviorModel: return "AI Behavior Modeling"
+        case .timeReadHistory: return "Time Travel History"
+        case .timeRestoreState: return "Time Travel Restore"
+        case .timeDiffGenerate: return "Time Travel Diff"
+        case .timeTimelineBranch: return "Time Travel Branching"
+        case .automationCreateWorkflow: return "Create Automation"
+        case .automationModifyWorkflow: return "Modify Automation"
+        case .automationExecuteTrigger: return "Execute Trigger"
+        case .automationSimulateRun: return "Simulate Automation"
+        case .integrationsConnectService: return "Connect Services"
+        case .integrationsSendEvent: return "Send Events"
+        case .integrationsReceiveWebhook: return "Receive Webhooks"
+        case .integrationsPipelineBuild: return "Build Pipelines"
+        case .intelligenceGraphRead: return "Read Knowledge Graph"
+        case .intelligenceGraphLink: return "Link Entities"
+        case .intelligenceSemanticQuery: return "Semantic Query"
+        case .intelligencePredictNext: return "Predict Actions"
+        case .slidesGenerateAI: return "AI Slide Generation"
+        case .slidesSyncData: return "Live Data Sync"
+        case .slidesPresentLive: return "Live Presentation"
+        case .workspaceModifySelective: return "Selective Workspace Modification"
+        case .mailFetchData: return "Fetch Mail Data"
+        case .securityFetchData: return "Fetch Security Data"
+        case .workspaceFetchFullData: return "Fetch Full Workspace Data"
+        default: return rawValue.capitalized
+        }
+    }
+
+    var technicalKey: String {
+        return rawValue
+    }
+
     var description: String {
-        switch capability {
+        switch self {
         case .notes: return "Read, write, and delete notes."
         case .tasks: return "Manage tasks and completion status."
         case .mail: return "Access and send emails."
@@ -44,37 +160,81 @@ struct PluginPermission: Codable, Identifiable {
         case .intelligence: return "Access graph and semantic search."
         case .collaboration: return "Manage sessions and comments."
         case .ai: return "Generate, summarize, and classify with AI."
+
+        case .aiPersonaQuery: return "Queries workspace-trained AI Persona using local data only."
+        case .aiPersonaMemoryAccess: return "Reads persistent persona memory derived from workspace activity."
+        case .aiPersonaWorkspaceAnalysis: return "Performs deep cross-system analysis across all workspace modules."
+        case .aiPersonaBehaviorModel: return "Generates predictive behavioral modeling based on user activity."
+
+        case .timeReadHistory: return "Reads full historical changes across workspace entities."
+        case .timeRestoreState: return "Restores system or object state from snapshot."
+        case .timeDiffGenerate: return "Generates structured diffs between versions."
+        case .timeTimelineBranch: return "Creates alternate workspace timelines for experimentation."
+
+        case .automationCreateWorkflow: return "Creates structured automation pipelines."
+        case .automationModifyWorkflow: return "Edits existing workflows."
+        case .automationExecuteTrigger: return "Triggers workflows manually or event-based."
+        case .automationSimulateRun: return "Simulates execution safely without side effects."
+
+        case .integrationsConnectService: return "Connects external services securely."
+        case .integrationsSendEvent: return "Sends workspace events externally."
+        case .integrationsReceiveWebhook: return "Receives external system triggers."
+        case .integrationsPipelineBuild: return "Builds chained automation pipelines."
+
+        case .intelligenceGraphRead: return "Reads workspace knowledge graph."
+        case .intelligenceGraphLink: return "Creates relationships between entities."
+        case .intelligenceSemanticQuery: return "Enables natural language querying."
+        case .intelligencePredictNext: return "Predicts next user actions or required data."
+
+        case .slidesGenerateAI: return "Generates presentations from workspace data."
+        case .slidesSyncData: return "Binds live workspace data to slides."
+        case .slidesPresentLive: return "Enables real-time control of presentation flow including navigation, transitions, and live data updates during active presentation sessions."
+
+        case .workspaceModifySelective: return "Allows controlled modification of specific workspace entities such as notes, tasks, or files without granting full system-wide write access."
+        case .mailFetchData: return "Allows retrieval of email data for processing inside sandboxed plugin environment."
+        case .securityFetchData: return "Allows access to security logs, authentication events, and audit trails."
+        case .workspaceFetchFullData: return "Allows full workspace dataset access excluding Vault and encrypted Mail content."
         }
     }
-}
 
-// MARK: - Capabilities & Actions
+    var riskLevel: RiskLevel {
+        switch self {
+        case .mailFetchData, .securityFetchData, .workspaceFetchFullData, .workspaceModifySelective: return .high
+        case .aiPersonaMemoryAccess, .timeRestoreState, .automationExecuteTrigger, .integrationsConnectService: return .medium
+        default: return .low
+        }
+    }
 
-enum PluginCapability: String, Codable, CaseIterable, Identifiable {
-    case notes, tasks, mail, calendar, files, whiteboard, slides, media, meet, github, automation, intelligence, collaboration, ai
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        rawValue.capitalized
+    var accessLevel: AccessLevel {
+        switch self {
+        case .mailFetchData, .securityFetchData, .workspaceFetchFullData: return .full
+        case .workspaceModifySelective: return .selective
+        case .notes, .tasks, .files, .whiteboard, .slides, .media: return .write
+        default: return .read
+        }
     }
 
     var icon: String {
         switch self {
         case .notes: return "note.text"
         case .tasks: return "checkmark.circle"
-        case .mail: return "envelope"
+        case .mail, .mailFetchData: return "envelope"
         case .calendar: return "calendar"
         case .files: return "doc"
         case .whiteboard: return "pencil.and.outline"
-        case .slides: return "play.rectangle"
+        case .slides, .slidesGenerateAI, .slidesSyncData, .slidesPresentLive: return "play.rectangle"
         case .media: return "photo.on.rectangle"
         case .meet: return "video"
         case .github: return "terminal"
-        case .automation: return "gearshape.2"
-        case .intelligence: return "brain"
+        case .automation, .automationCreateWorkflow, .automationModifyWorkflow, .automationExecuteTrigger, .automationSimulateRun: return "gearshape.2"
+        case .intelligence, .intelligenceGraphRead, .intelligenceGraphLink, .intelligenceSemanticQuery, .intelligencePredictNext: return "brain"
         case .collaboration: return "person.2"
         case .ai: return "sparkles"
+        case .aiPersonaQuery, .aiPersonaMemoryAccess, .aiPersonaWorkspaceAnalysis, .aiPersonaBehaviorModel: return "person.and.sparkles"
+        case .timeReadHistory, .timeRestoreState, .timeDiffGenerate, .timeTimelineBranch: return "clock.arrow.circlepath"
+        case .integrationsConnectService, .integrationsSendEvent, .integrationsReceiveWebhook, .integrationsPipelineBuild: return "puzzlepiece"
+        case .workspaceModifySelective, .workspaceFetchFullData: return "tray.full"
+        case .securityFetchData: return "shield.lefthalf.filled"
         }
     }
 }
@@ -116,6 +276,9 @@ enum PluginAction: String, Codable, CaseIterable, Identifiable {
     case fileUploaded = "file.uploaded"
     case fileDeleted = "file.deleted"
 
+    // Generic
+    case workspaceEvent = "workspace.event"
+
     var id: String { rawValue }
 
     var parentCapability: PluginCapability {
@@ -128,6 +291,7 @@ enum PluginAction: String, Codable, CaseIterable, Identifiable {
         case .mediaImported, .mediaExported: return .media
         case .calendarEventCreated, .calendarEventUpdated: return .calendar
         case .fileUploaded, .fileDeleted: return .files
+        case .workspaceEvent: return .intelligence
         }
     }
 }
@@ -140,4 +304,16 @@ struct PluginEvent: Codable, Identifiable {
     let action: String
     let payload: [String: String]
     let timestamp: Date
+}
+
+// MARK: - New Models
+
+struct PluginScope: Codable, Equatable {
+    let capability: PluginCapability
+    let action: String
+    var isValidated: Bool = false
+}
+
+enum PluginPrerequisite: String, Codable, CaseIterable {
+    case notes, repo, mail, ai, automation, calendar
 }

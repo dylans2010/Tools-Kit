@@ -1129,6 +1129,8 @@
 		ML020000000000000000000013 /* NotebookAddCommentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML010000000000000000000013 /* NotebookAddCommentsView.swift */; };
 		ML020000000000000000000014 /* NotebookAuditLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML010000000000000000000014 /* NotebookAuditLogsView.swift */; };
 		PL020000000000000000000004 /* PluginSecurityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000004 /* PluginSecurityView.swift */; };
+		PL020000000000000000000005 /* PluginLimitedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000005 /* PluginLimitedView.swift */; };
+		PL020000000000000000000006 /* SecurityScopeApplicationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000006 /* SecurityScopeApplicationView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2253,6 +2255,8 @@
 		ML010000000000000000000013 /* NotebookAddCommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Notebooks/Features/NotebookAddCommentsView.swift; sourceTree = "<group>"; };
 		ML010000000000000000000014 /* NotebookAuditLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Notebooks/Features/NotebookAuditLogsView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000004 /* PluginSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginSecurityView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000005 /* PluginLimitedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginLimitedView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000006 /* SecurityScopeApplicationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SecurityScopeApplicationView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -2747,6 +2751,8 @@
 				ML010000000000000000000013 /* NotebookAddCommentsView.swift */,
 				ML010000000000000000000014 /* NotebookAuditLogsView.swift */,
 				PL010000000000000000000004 /* PluginSecurityView.swift */,
+				PL010000000000000000000005 /* PluginLimitedView.swift */,
+				PL010000000000000000000006 /* SecurityScopeApplicationView.swift */,
 				MS01A1B2C3D4E5F600000001 /* SecureFolderModels.swift */,
 				MS01A1B2C3D4E5F600000002 /* SecureFolderManager.swift */,
 				MS01A1B2C3D4E5F600000003 /* AppLockManager.swift */,
@@ -4408,6 +4414,8 @@
 				ML020000000000000000000013 /* NotebookAddCommentsView.swift in Sources */,
 				ML020000000000000000000014 /* NotebookAuditLogsView.swift in Sources */,
 				PL020000000000000000000004 /* PluginSecurityView.swift in Sources */,
+				PL020000000000000000000005 /* PluginLimitedView.swift in Sources */,
+				PL020000000000000000000006 /* SecurityScopeApplicationView.swift in Sources */,
 				TKBF0000000000000000000000 /* UnifiedDataStore.swift in Sources */,
 				TKBF0000000000000000000001 /* SyncManager.swift in Sources */,
 				TKBF0000000000000000000002 /* AIOrchestrator.swift in Sources */,

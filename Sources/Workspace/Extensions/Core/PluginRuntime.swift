@@ -1,6 +1,7 @@
 import Foundation
 
 /// Handles the execution of plugin logic within the system.
+/// Orchestrates the execution pipeline: capture, evaluate, and execute or block.
 final class PluginRuntime {
     static let shared = PluginRuntime()
 
@@ -25,6 +26,7 @@ final class PluginRuntime {
             let isSubscribed = plugin.actions.contains { $0.rawValue == event.action }
 
             if isSubscribed {
+                // The sandbox now handles validation and execution/blocking logic
                 sandbox.execute(plugin: plugin, event: event)
             }
         }
