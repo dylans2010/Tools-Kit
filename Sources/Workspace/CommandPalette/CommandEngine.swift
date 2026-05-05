@@ -37,6 +37,13 @@ enum CommandIntent: String, CaseIterable {
     case unknown = "unknown"
 }
 
+
+struct PluginCommand: Identifiable {
+    let id: UUID
+    let keyword: String
+    let description: String
+}
+
 struct CommandSuggestion: Identifiable {
     let id = UUID()
     let text: String

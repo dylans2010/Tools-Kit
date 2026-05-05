@@ -24,12 +24,10 @@ final class TimeTravelFramework {
 
     func createSnapshot(message: String, entityType: String, entityID: UUID, data: Data) throws {
         let snapshot = WorkspaceSnapshot(
-            timestamp: Date(),
-            message: message,
-            entityType: entityType,
-            entityID: entityID,
-            data: data,
-            author: "Local User"
+            id: UUID(),
+            name: message,
+            branch: entityType,
+            timestamp: Date()
         )
         try dataStore.saveSnapshot(snapshot)
     }

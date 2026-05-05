@@ -18,7 +18,8 @@ struct NotebookSearchPageView: View {
         NavigationStack {
             List {
                 ForEach(searchResults) { result in
-                    NavigationLink(destination: PageEditorView(page: result.page, folderID: result.folderID, notebookID: result.notebookID)) {
+                    let destination = PageEditorView(page: result.page, folderID: result.folderID, notebookID: result.notebookID)
+                    NavigationLink(destination: destination) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(result.page.title)
                                 .font(.headline)

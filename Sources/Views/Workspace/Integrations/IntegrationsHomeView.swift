@@ -61,7 +61,7 @@ struct IntegrationsHomeView: View {
         }
         .navigationTitle("Integrations")
         .sheet(isPresented: $showingWorkflowBuilder) {
-            WorkflowBuilderView()
+WorkflowBuilderView()
         }
     }
 }

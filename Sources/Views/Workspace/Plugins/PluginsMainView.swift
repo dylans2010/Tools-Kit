@@ -44,27 +44,27 @@ struct PluginsMainView: View {
         Section {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 NavigationLink(destination: PluginBuildView()) {
-                    ActionCard(title: "Create Plugin", icon: "plus.circle.fill", color: .blue)
+                    ActionCard(title: "Create Plugin", icon: "plus.circle.fill", color: .blue) { }
                 }
 
                 NavigationLink(destination: PluginsInstalledView()) {
-                    ActionCard(title: "Installed", icon: "puzzlepiece.extension.fill", color: .green)
+                    ActionCard(title: "Installed", icon: "puzzlepiece.extension.fill", color: .green) { }
                 }
 
                 NavigationLink(destination: MarketplaceView()) {
-                    ActionCard(title: "Marketplace", icon: "cart.fill", color: .orange)
+                    ActionCard(title: "Marketplace", icon: "cart.fill", color: .orange) { }
                 }
 
                 NavigationLink(destination: PluginDevConsoleView()) {
-                    ActionCard(title: "Dev Console", icon: "terminal.fill", color: .purple)
+                    ActionCard(title: "Dev Console", icon: "terminal.fill", color: .purple) { }
                 }
 
                 NavigationLink(destination: PluginSecurityView()) {
-                    ActionCard(title: "Security", icon: "shield.fill", color: .red)
+                    ActionCard(title: "Security", icon: "shield.fill", color: .red) { }
                 }
 
                 Button(action: { /* Action */ }) {
-                    ActionCard(title: "Sandbox", icon: "box.truck.fill", color: .gray)
+                    ActionCard(title: "Sandbox", icon: "box.truck.fill", color: .gray) { }
                 }
             }
             .padding(.vertical, 8)
@@ -100,7 +100,7 @@ struct PluginsMainView: View {
                             VStack(alignment: .trailing, spacing: 2) {
                                 if let lastExec = plugin.lastExecutedAt {
                                     Text(lastExec.formatted(.relative(presentation: .named)))
-                                        .font(.caption2).foregroundColor(.tertiary)
+                                        .font(.caption2).foregroundColor(Color.tertiary)
                                 }
                                 PluginStatusPill(status: .running)
                             }
@@ -139,6 +139,7 @@ struct PluginsMainView: View {
     }
 
     private var quickInsightsSection: some View {
+        return Group {
         Section("Quick Insights") {
             LabeledContent("Most Used", value: "Task Scheduler")
             LabeledContent("Top Action", value: "note.created")
@@ -152,6 +153,7 @@ struct PluginsMainView: View {
                 ResourceRow(label: "Network (IO)", value: "12 KB/s", icon: "arrow.up.arrow.down")
             }
             .padding(.vertical, 4)
+        }
         }
     }
 
@@ -182,31 +184,6 @@ struct StatusIndicator: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
         }
-    }
-}
-
-struct ActionCard: View {
-    let title: String
-    let icon: String
-    let color: Color
-
-    var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundColor(.white)
-                .frame(width: 44, height: 44)
-                .background(color.gradient)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-
-            Text(title)
-                .font(.caption.bold())
-                .foregroundColor(.primary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
 
