@@ -26,7 +26,7 @@ struct ConnectorBuilderView: View {
 
     var body: some View {
         Form {
-            Section("Connector Identity") {
+            Section {
                 TextField("Name", text: $name)
 
                 HStack {
@@ -52,6 +52,8 @@ struct ConnectorBuilderView: View {
                     TextEditor(text: $description)
                         .frame(minHeight: 80)
                 }
+            } header: {
+                Text("Connector Identity")
             } footer: {
                 if !isIdentifierLocked {
                     Text("The identifier 'com.toolskit.\(identifier)' will be locked after creation.")

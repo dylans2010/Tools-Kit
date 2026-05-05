@@ -220,12 +220,12 @@ final class ConnectorExecutionService {
     private func applyAuth(to request: inout URLRequest, config: ConnectorAuthConfig, connectorID: UUID) {
         switch config.type {
         case .apiKey:
-            let key = SyncEngine.shared.getSecureValue(key: "apiKey", connectorID: connectorID) ?? config.credentials["apiKey"]
+            let key = ConnectorAuthManager.shared.getSecureValue(key: "apiKey", connectorID: connectorID) ?? config.credentials["apiKey"]
             if let key = key, let header = config.credentials["headerName"] {
                 request.setValue(key, forHTTPHeaderField: header)
             }
         case .bearer:
-            let token = SyncEngine.shared.getSecureValue(key: "token", connectorID: connectorID) ?? config.credentials["token"]
+            let token = ConnectorAuthManager.shared.getSecureValue(key: "token", connectorID: connectorID) ?? config.credentials["token"]
             if let token = token {
                 request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
             }
@@ -250,14 +250,14 @@ final class PluginToolkitEngine {
         case "AI Prompt Builder":
             // Deep integration with AIService
             let prompt = "Act as an expert prompt engineer. Transform the following input into a high-quality system prompt: \(input)"
-            let response = try await AIService.shared.generateContent(prompt: prompt)
+            let response = try await AIService.shared.generateResponse(prompt: prompt)
             return response
         case "AI Behavior Tuner":
             let prompt = "Tuning behavior profile based on parameters: \(input). Finalizing Persona behavior model."
-            let response = try await AIService.shared.generateContent(prompt: prompt)
+            let response = try await AIService.shared.generateResponse(prompt: prompt)
             return response
         default:
-            return try await AIService.shared.generateContent(prompt: "Process \(tool) with input: \(input)")
+            return try await AIService.shared.generateResponse(prompt: "Process \(tool) with input: \(input)")
         }
     }
 
