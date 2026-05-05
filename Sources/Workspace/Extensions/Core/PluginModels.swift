@@ -28,6 +28,13 @@ struct PluginDefinition: Codable, Identifiable {
     var dataUsageExplanation: String?
     var retentionPolicy: String?
 
+    // Advanced Builder Features
+    var endpoints: [ExternalAPIEndpoint] = []
+    var dataMappings: [DataMapping] = []
+    var executionRules: [ExecutionRule] = []
+    var uiExtensions: [UIExtension] = []
+    var toolkitTools: [PluginToolkitTool] = []
+
     var permissions: [PluginPermission] {
         capabilities.map { PluginPermission(capability: $0) }
     }
@@ -99,6 +106,18 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
     case slidesSyncData = "slides.sync.data"
     case slidesPresentLive = "slides.present.live"
 
+    // External API (New)
+    case externalApiConnect = "external.api.connect"
+    case externalApiSendRequest = "external.api.send.request"
+    case externalApiReceiveResponse = "external.api.receive.response"
+    case externalApiSecureHeaders = "external.api.secureHeaders"
+
+    // UI Extensions (New)
+    case uiOverlayPresent = "ui.overlay.present"
+    case uiPanelInject = "ui.panel.inject"
+    case uiCommandbarExtend = "ui.commandbar.extend"
+    case uiContextmenuModify = "ui.contextmenu.modify"
+
     // Specialized
     case workspaceModifySelective = "workspace.modify.selective"
     case mailFetchData = "mail.fetchData"
@@ -132,6 +151,14 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
         case .slidesGenerateAI: return "AI Slide Generation"
         case .slidesSyncData: return "Live Data Sync"
         case .slidesPresentLive: return "Live Presentation"
+        case .externalApiConnect: return "Connect External API"
+        case .externalApiSendRequest: return "Send API Requests"
+        case .externalApiReceiveResponse: return "Receive API Data"
+        case .externalApiSecureHeaders: return "Secure Header Injection"
+        case .uiOverlayPresent: return "Show Overlays"
+        case .uiPanelInject: return "Inject UI Panels"
+        case .uiCommandbarExtend: return "Extend Command Bar"
+        case .uiContextmenuModify: return "Modify Context Menus"
         case .workspaceModifySelective: return "Selective Workspace Modification"
         case .mailFetchData: return "Fetch Mail Data"
         case .securityFetchData: return "Fetch Security Data"
@@ -190,6 +217,16 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
         case .slidesSyncData: return "Binds live workspace data to slides."
         case .slidesPresentLive: return "Enables real-time control of presentation flow including navigation, transitions, and live data updates during active presentation sessions."
 
+        case .externalApiConnect: return "Allows plugin to establish a connection with defined endpoint."
+        case .externalApiSendRequest: return "Allows sending structured requests."
+        case .externalApiReceiveResponse: return "Allows consuming response data inside plugin logic."
+        case .externalApiSecureHeaders: return "Allows injecting secure headers dynamically at runtime."
+
+        case .uiOverlayPresent: return "Display floating overlays."
+        case .uiPanelInject: return "Inject panels into views."
+        case .uiCommandbarExtend: return "Add commands to command bar."
+        case .uiContextmenuModify: return "Add options to right-click menus."
+
         case .workspaceModifySelective: return "Allows controlled modification of specific workspace entities such as notes, tasks, or files without granting full system-wide write access."
         case .mailFetchData: return "Allows retrieval of email data for processing inside sandboxed plugin environment."
         case .securityFetchData: return "Allows access to security logs, authentication events, and audit trails."
@@ -200,7 +237,7 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
     var riskLevel: RiskLevel {
         switch self {
         case .mailFetchData, .securityFetchData, .workspaceFetchFullData, .workspaceModifySelective: return .high
-        case .aiPersonaMemoryAccess, .timeRestoreState, .automationExecuteTrigger, .integrationsConnectService: return .medium
+        case .aiPersonaMemoryAccess, .timeRestoreState, .automationExecuteTrigger, .integrationsConnectService, .externalApiConnect, .externalApiSendRequest, .externalApiSecureHeaders: return .medium
         default: return .low
         }
     }
@@ -208,8 +245,8 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
     var accessLevel: AccessLevel {
         switch self {
         case .mailFetchData, .securityFetchData, .workspaceFetchFullData: return .full
-        case .workspaceModifySelective: return .selective
-        case .notes, .tasks, .files, .whiteboard, .slides, .media: return .write
+        case .workspaceModifySelective, .uiOverlayPresent, .uiPanelInject, .uiCommandbarExtend, .uiContextmenuModify: return .selective
+        case .notes, .tasks, .files, .whiteboard, .slides, .media, .externalApiSendRequest: return .write
         default: return .read
         }
     }
@@ -233,6 +270,8 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
         case .aiPersonaQuery, .aiPersonaMemoryAccess, .aiPersonaWorkspaceAnalysis, .aiPersonaBehaviorModel: return "person.and.sparkles"
         case .timeReadHistory, .timeRestoreState, .timeDiffGenerate, .timeTimelineBranch: return "clock.arrow.circlepath"
         case .integrationsConnectService, .integrationsSendEvent, .integrationsReceiveWebhook, .integrationsPipelineBuild: return "puzzlepiece"
+        case .externalApiConnect, .externalApiSendRequest, .externalApiReceiveResponse, .externalApiSecureHeaders: return "network"
+        case .uiOverlayPresent, .uiPanelInject, .uiCommandbarExtend, .uiContextmenuModify: return "macwindow"
         case .workspaceModifySelective, .workspaceFetchFullData: return "tray.full"
         case .securityFetchData: return "shield.lefthalf.filled"
         }
@@ -306,7 +345,85 @@ struct PluginEvent: Codable, Identifiable {
     let timestamp: Date
 }
 
-// MARK: - New Models
+// MARK: - Advanced Models
+
+struct ExternalAPIEndpoint: Codable, Identifiable {
+    var id: UUID = UUID()
+    var name: String
+    var baseURL: String
+    var path: String
+    var method: HTTPMethod
+    var headers: [String: String]
+    var queryParams: [String: String]
+    var bodySchema: String? // JSON Schema
+    var authType: AuthType
+    var rateLimit: Int? // requests per minute
+    var timeout: Int = 30 // seconds
+    var retryPolicy: RetryPolicy
+
+    // Security
+    var encryptedHeaders: [String] = [] // List of header keys that are encrypted
+}
+
+enum HTTPMethod: String, Codable, CaseIterable {
+    case get = "GET", post = "POST", put = "PUT", delete = "DELETE"
+}
+
+enum AuthType: String, Codable, CaseIterable {
+    case none, apiKey, bearer, oauth
+}
+
+struct RetryPolicy: Codable {
+    var maxRetries: Int = 3
+    var backoff: Double = 1.5
+}
+
+struct DataMapping: Codable, Identifiable {
+    var id: UUID = UUID()
+    var sourceField: String // e.g. "event.note.content"
+    var targetField: String // e.g. "payload.body.text"
+    var transformer: String? // JS transformation logic
+}
+
+struct ExecutionRule: Codable, Identifiable {
+    var id: UUID = UUID()
+    var type: RuleType
+    var condition: String // JS condition
+    var limit: Int?
+}
+
+enum RuleType: String, Codable, CaseIterable {
+    case eventFilter, timeConstraint, frequencyLimit, conditionalLogic
+}
+
+struct UIExtension: Codable, Identifiable {
+    var id: UUID = UUID()
+    var type: UIExtensionType
+    var component: UIComponentType
+    var targetView: String
+    var actionBinding: String // JS function name
+}
+
+enum UIExtensionType: String, Codable, CaseIterable {
+    case overlay, panel, commandBar, contextMenu
+}
+
+enum UIComponentType: String, Codable, CaseIterable {
+    case button, panel, modal, textInput, statusIndicator
+}
+
+struct PluginToolkitTool: Codable, Identifiable {
+    var id: UUID = UUID()
+    var name: String
+    var category: ToolCategory
+    var config: [String: String]
+}
+
+enum ToolCategory: String, Codable, CaseIterable {
+    case ai, data, automation, integrations, workspace, developer, security, event
+}
+
+// MARK: - Legacy Models
 
 struct PluginScope: Codable, Equatable {
     let capability: PluginCapability
@@ -316,4 +433,22 @@ struct PluginScope: Codable, Equatable {
 
 enum PluginPrerequisite: String, Codable, CaseIterable {
     case notes, repo, mail, ai, automation, calendar
+}
+
+// MARK: - Security Helpers
+
+struct PluginSecurityService {
+    static func encryptHeader(_ value: String) -> String {
+        // Simulated encryption: base64 + prefix
+        return "SECURE:" + Data(value.utf8).base64EncodedString()
+    }
+
+    static func decryptHeader(_ encryptedValue: String) -> String {
+        guard encryptedValue.hasPrefix("SECURE:") else { return encryptedValue }
+        let base64 = String(encryptedValue.dropFirst(7))
+        if let data = Data(base64Encoded: base64), let decrypted = String(data: data, encoding: .utf8) {
+            return decrypted
+        }
+        return encryptedValue
+    }
 }
