@@ -168,12 +168,21 @@ struct PluginsMainView: View {
             case .marketplace: MarketplaceView()
             case .devConsole: PluginDevConsoleView()
             case .security: PluginSecurityView()
-            case .sandbox: PluginGlobalOverlay()
+            case .sandbox: PluginSandboxView()
             }
         }
     }
 }
 
+
+
+private struct PluginSandboxView: View {
+    var body: some View {
+        PluginsInstalledView()
+            .withPluginOverlay()
+            .navigationTitle("Sandbox")
+    }
+}
 private enum PluginDestination: Hashable, Identifiable {
     case build, installed, marketplace, devConsole, security, sandbox
     var id: Self { self }
