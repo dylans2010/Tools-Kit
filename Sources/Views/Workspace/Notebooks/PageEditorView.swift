@@ -31,6 +31,11 @@ struct PageEditorView: View {
     @State private var canvasNotes: [CanvasNote] = []
     @State private var canvasZoom: CGFloat = 1.0
 
+    @State private var showingSearch = false
+    @State private var showingCompare = false
+    @State private var showingComments = false
+    @State private var showingLogs = false
+
     // 1.5 seconds in nanoseconds for autosave debounce.
     private let autosaveDelayNanoseconds: UInt64 = 1_500_000_000
     private let defaultNoteSpawn = CGPoint(x: 320, y: 320)
@@ -126,7 +131,36 @@ struct PageEditorView: View {
                 } label: {
                     Image(systemName: "sparkles")
                 }
+
+                Menu {
+                    Button { showingSearch = true } label: {
+                        Label("Search Pages", systemImage: "magnifyingglass")
+                    }
+                    Button { showingCompare = true } label: {
+                        Label("Compare Pages", systemImage: "arrow.left.and.right")
+                    }
+                    Button { showingComments = true } label: {
+                        Label("Comments", systemImage: "bubble.left.and.right")
+                    }
+                    Button { showingLogs = true } label: {
+                        Label("Audit Logs", systemImage: "clock.arrow.circlepath")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
             }
+        }
+        .sheet(isPresented: $showingSearch) {
+            NotebookSearchPageView()
+        }
+        .sheet(isPresented: $showingCompare) {
+            NotebookComparePagesView()
+        }
+        .sheet(isPresented: $showingComments) {
+            NotebookAddCommentsView(pageID: page.id)
+        }
+        .sheet(isPresented: $showingLogs) {
+            NotebookAuditLogsView(pageID: page.id)
         }
         .confirmationDialog("Notebook AI Tools", isPresented: $showingAI, titleVisibility: .visible) {
             Button("Summarize Page") { runAI("Summarize", "Summarize these notes with concise key takeaways and decisions:\n\n\(content)") }

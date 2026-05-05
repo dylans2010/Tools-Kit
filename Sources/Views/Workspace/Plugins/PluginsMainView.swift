@@ -58,6 +58,14 @@ struct PluginsMainView: View {
                 NavigationLink(destination: PluginDevConsoleView()) {
                     ActionCard(title: "Dev Console", icon: "terminal.fill", color: .purple)
                 }
+
+                NavigationLink(destination: PluginSecurityView()) {
+                    ActionCard(title: "Security", icon: "shield.fill", color: .red)
+                }
+
+                Button(action: { /* Action */ }) {
+                    ActionCard(title: "Sandbox", icon: "box.truck.fill", color: .gray)
+                }
             }
             .padding(.vertical, 8)
             .buttonStyle(.plain)
@@ -136,6 +144,15 @@ struct PluginsMainView: View {
             LabeledContent("Top Action", value: "note.created")
             LabeledContent("System Health", value: "98% Stable")
         }
+
+        Section("Resource Usage") {
+            VStack(spacing: 12) {
+                ResourceRow(label: "CPU Usage", value: "1.2%", icon: "cpu")
+                ResourceRow(label: "Memory", value: "48 MB", icon: "memorychip")
+                ResourceRow(label: "Network (IO)", value: "12 KB/s", icon: "arrow.up.arrow.down")
+            }
+            .padding(.vertical, 4)
+        }
     }
 
     // MARK: - Helpers
@@ -195,6 +212,23 @@ struct ActionCard: View {
 
 enum PluginStatus {
     case running, idle, error
+}
+
+struct ResourceRow: View {
+    let label: String
+    let value: String
+    let icon: String
+
+    var body: some View {
+        HStack {
+            Label(label, systemImage: icon)
+                .font(.caption)
+            Spacer()
+            Text(value)
+                .font(.caption.bold())
+                .foregroundColor(.blue)
+        }
+    }
 }
 
 struct PluginStatusPill: View {
