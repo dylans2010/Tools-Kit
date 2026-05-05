@@ -18,7 +18,7 @@ final class PersonaManager: ObservableObject {
         let context = buildWorkspaceContext()
 
         // 2. Query AI Service
-        let response = try await aiService.generateResponse(prompt: query, context: context)
+        let response = try await aiService.generateResponse(prompt: query)
 
         // 3. Save Interaction
         let interaction = PersonaInteraction(
