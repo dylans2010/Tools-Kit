@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SecurityHomeView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var authService = AuthService.shared
     @StateObject private var vaultManager = VaultManager.shared
 
@@ -20,6 +21,20 @@ struct SecurityHomeView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: UIScene.willDeactivateNotification)) { _ in
             authService.updateActivity()
+            vaultManager.saveIndex()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .background {
+                vaultManager.saveIndex()
+            }
+            if newPhase == .active, authService.isAuthenticated {
+                vaultManager.loadIndex()
+            }
+        }
+        .onChange(of: authService.isAuthenticated) { _, isAuthenticated in
+            if isAuthenticated {
+                vaultManager.loadIndex()
+            }
         }
         .onTapGesture {
             authService.updateActivity()
