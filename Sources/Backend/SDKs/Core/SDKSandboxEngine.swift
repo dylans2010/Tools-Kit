@@ -77,7 +77,9 @@ public final class SDKSandboxEngine {
         // Files Module
         let files = JSValue(object: [:], in: context)
         let listFiles: @convention(block) () -> [[String: Any]] = {
-            WorkspaceAPI.shared.files.listFiles().map { ["id": $0.id.uuidString, "name": $0.name] }
+            DispatchQueue.main.sync {
+                return WorkspaceAPI.shared.files.listFiles().map { ["id": $0.id, "name": $0.url.lastPathComponent] }
+            }
         }
         files?.setObject(listFiles, forKeyedSubscript: "list" as NSString)
         workspace?.setObject(files, forKeyedSubscript: "files" as NSString)
@@ -92,9 +94,8 @@ public final class SDKSandboxEngine {
 
         // Meet Module
         let meet = JSValue(object: [:], in: context)
-        let startMeeting: @convention(block) (String) -> JSValue = { title in
-            // Handle async bridge if possible, or return a handle
-            return JSValue(object: "meeting-started", in: context)
+        let startMeeting: @convention(block) (String) -> Void = { title in
+            Task { try? await WorkspaceAPI.shared.meet.startMeeting(title: title) }
         }
         meet?.setObject(startMeeting, forKeyedSubscript: "start" as NSString)
         workspace?.setObject(meet, forKeyedSubscript: "meet" as NSString)
@@ -102,7 +103,7 @@ public final class SDKSandboxEngine {
         // Time Travel Module
         let timeTravel = JSValue(object: [:], in: context)
         let listSnapshots: @convention(block) () -> [[String: Any]] = {
-            WorkspaceAPI.shared.timeTravel.listSnapshots().map { ["id": $0.id.uuidString, "message": $0.message] }
+            WorkspaceAPI.shared.timeTravel.listSnapshots().map { ["id": $0.id.uuidString, "name": $0.name] }
         }
         timeTravel?.setObject(listSnapshots, forKeyedSubscript: "list" as NSString)
         workspace?.setObject(timeTravel, forKeyedSubscript: "timeTravel" as NSString)
