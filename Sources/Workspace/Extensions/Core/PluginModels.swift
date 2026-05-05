@@ -415,11 +415,11 @@ enum UIComponentType: String, Codable, CaseIterable {
 struct PluginToolkitTool: Codable, Identifiable {
     var id: UUID = UUID()
     var name: String
-    var category: ToolCategory
+    var category: PluginToolCategory
     var config: [String: String]
 }
 
-enum ToolCategory: String, Codable, CaseIterable {
+enum PluginToolCategory: String, Codable, CaseIterable {
     case ai, data, automation, integrations, workspace, developer, security, event
 }
 
