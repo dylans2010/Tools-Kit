@@ -349,7 +349,7 @@ export async function onEvent(event, ctx) {
             ForEach($toolkitTools) { $tool in
                 VStack {
                     Picker("Category", selection: $tool.category) {
-                        ForEach(ToolCategory.allCases, id: \.self) { c in Text(c.rawValue.capitalized).tag(c) }
+                        ForEach(PluginToolCategory.allCases, id: \.self) { c in Text(c.rawValue.capitalized).tag(c) }
                     }
 
                     Picker("Tool", selection: $tool.name) {
@@ -368,7 +368,7 @@ export async function onEvent(event, ctx) {
         }
     }
 
-    private func availableToolkitTools(for category: ToolCategory) -> [String] {
+    private func availableToolkitTools(for category: PluginToolCategory) -> [String] {
         switch category {
         case .ai: return ["AI Text Summarizer", "AI Code Generator", "AI Context Analyzer", "AI Classification Engine"]
         case .data: return ["Data Filter Engine", "Data Transformer", "JSON Builder", "CSV Exporter"]
