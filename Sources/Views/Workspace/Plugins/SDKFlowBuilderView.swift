@@ -2,7 +2,7 @@ import SwiftUI
 
 struct SDKFlowBuilderView: View {
     @Binding var project: SDKProject
-    @State private var nodes: [SDKNode] = []
+    @State private var nodes: [SDKFlowNode] = []
 
     var body: some View {
         ScrollView([.horizontal, .vertical]) {
@@ -35,25 +35,25 @@ struct SDKFlowBuilderView: View {
     }
 
     private func analyzeProject() {
-        var newNodes: [SDKNode] = []
+        var newNodes: [SDKFlowNode] = []
         if project.sourceCode.contains("workspace.notes") {
-            newNodes.append(SDKNode(name: "Module: Notes", type: .trigger, position: CGPoint(x: 200, y: 200)))
+            newNodes.append(SDKFlowNode(name: "Module: Notes", type: .trigger, position: CGPoint(x: 200, y: 200)))
         }
         if project.sourceCode.contains("workspace.tasks") {
-            newNodes.append(SDKNode(name: "Module: Tasks", type: .action, position: CGPoint(x: 400, y: 300)))
+            newNodes.append(SDKFlowNode(name: "Module: Tasks", type: .action, position: CGPoint(x: 400, y: 300)))
         }
         if newNodes.isEmpty {
-            newNodes.append(SDKNode(name: "Entry: Main", type: .trigger, position: CGPoint(x: 100, y: 100)))
+            newNodes.append(SDKFlowNode(name: "Entry: Main", type: .trigger, position: CGPoint(x: 100, y: 100)))
         }
         self.nodes = newNodes
     }
 
     private func addNode() {
-        nodes.append(SDKNode(name: "Custom Action", type: .action, position: CGPoint(x: 300, y: 300)))
+        nodes.append(SDKFlowNode(name: "Custom Action", type: .action, position: CGPoint(x: 300, y: 300)))
     }
 }
 
-struct SDKNode: Identifiable {
+struct SDKFlowNode: Identifiable {
     let id = UUID()
     var name: String
     var type: NodeType
@@ -65,7 +65,7 @@ struct SDKNode: Identifiable {
 }
 
 struct NodeView: View {
-    let node: SDKNode
+    let node: SDKFlowNode
     var body: some View {
         VStack {
             Text(node.name).font(.caption).bold()

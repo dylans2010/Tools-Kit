@@ -118,6 +118,9 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
     case uiCommandbarExtend = "ui.commandbar.extend"
     case uiContextmenuModify = "ui.contextmenu.modify"
 
+    // Generic
+    case workspaceEvent = "workspace.event"
+
     // Specialized
     case workspaceModifySelective = "workspace.modify.selective"
     case mailFetchData = "mail.fetchData"
@@ -230,6 +233,7 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
         case .uiPanelInject: return "Inject panels into views."
         case .uiCommandbarExtend: return "Add commands to command bar."
         case .uiContextmenuModify: return "Add options to right-click menus."
+        case .workspaceEvent: return "Allows plugins to receive generic workspace event notifications."
 
         case .workspaceModifySelective: return "Allows controlled modification of specific workspace entities such as notes, tasks, or files without granting full system-wide write access."
         case .mailFetchData: return "Allows retrieval of email data for processing inside sandboxed plugin environment."
@@ -278,7 +282,7 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
         case .integrationsConnectService, .integrationsSendEvent, .integrationsReceiveWebhook, .integrationsPipelineBuild: return "puzzlepiece"
         case .externalApiConnect, .externalApiSendRequest, .externalApiReceiveResponse, .externalApiSecureHeaders: return "network"
         case .uiOverlayPresent, .uiPanelInject, .uiCommandbarExtend, .uiContextmenuModify: return "macwindow"
-        case .workspaceModifySelective, .workspaceFetchFullData: return "tray.full"
+        case .workspaceEvent, .workspaceModifySelective, .workspaceFetchFullData: return "tray.full"
         case .securityFetchData: return "shield.lefthalf.filled"
         }
     }

@@ -47,7 +47,7 @@ public final class SDKSandboxEngine {
         // Tasks Module
         let tasks = JSValue(object: [:], in: context)
         let listTasks: @convention(block) () -> [[String: Any]] = {
-            WorkspaceAPI.shared.tasks.listTasks().map { ["id": $0.id.uuidString, "title": $0.title, "completed": $0.isCompleted] }
+            WorkspaceAPI.shared.tasks.listTasks().map { ["id": $0.id.uuidString, "title": $0.title, "completed": $0.completed] }
         }
         let createTask: @convention(block) (String) -> [String: Any] = { title in
             let task = WorkspaceAPI.shared.tasks.createTask(title: title, dueDate: nil)

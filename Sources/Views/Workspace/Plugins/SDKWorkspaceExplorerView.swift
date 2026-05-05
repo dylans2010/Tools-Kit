@@ -8,7 +8,7 @@ struct SDKWorkspaceExplorerView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Search & Filter
-            SearchBar(text: $searchText, placeholder: "Search Workspace Entities...")
+            SearchBar(text: $searchText)
                 .padding()
 
             Divider()
@@ -78,7 +78,7 @@ struct SDKWorkspaceExplorerView: View {
 
     // Real data for explorer from WorkspaceAPI
     private var mockNodes: [SDKNode] {
-        let notes = WorkspaceAPI.shared.notes.listNotes().map { SDKNode(id: UUID(uuidString: $0.id) ?? UUID(), label: $0.title, type: "Note") }
+        let notes = WorkspaceAPI.shared.notes.listNotes().map { SDKNode(id: $0.id, label: $0.title, type: "Note") }
         let tasks = WorkspaceAPI.shared.tasks.listTasks().map { SDKNode(id: $0.id, label: $0.title, type: "Task") }
         let events = WorkspaceAPI.shared.calendar.listEvents().map { SDKNode(id: $0.id, label: $0.title, type: "Event") }
         return notes + tasks + events
