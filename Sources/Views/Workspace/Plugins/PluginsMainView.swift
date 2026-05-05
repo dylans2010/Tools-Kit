@@ -165,3 +165,40 @@ struct StatusIndicator: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
+
+
+enum PluginStatus {
+    case running
+    case stopped
+    case error
+}
+
+struct PluginStatusPill: View {
+    let status: PluginStatus
+
+    var body: some View {
+        Text(label)
+            .font(.caption.weight(.semibold))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.15))
+            .foregroundStyle(color)
+            .clipShape(Capsule())
+    }
+
+    private var label: String {
+        switch status {
+        case .running: "Running"
+        case .stopped: "Stopped"
+        case .error: "Error"
+        }
+    }
+
+    private var color: Color {
+        switch status {
+        case .running: .green
+        case .stopped: .secondary
+        case .error: .red
+        }
+    }
+}
