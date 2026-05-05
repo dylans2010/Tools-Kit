@@ -1103,6 +1103,27 @@
 		MS02A1B2C3D4E5F600000007 /* AppLockSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01A1B2C3D4E5F600000007 /* AppLockSessionView.swift */; };
 		MS02A1B2C3D4E5F600000008 /* AppLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01A1B2C3D4E5F600000008 /* AppLockView.swift */; };
 		MS02A1B2C3D4E5F600000009 /* SecureFolderItemPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01A1B2C3D4E5F600000009 /* SecureFolderItemPicker.swift */; };
+		WS02634D13801CC4452CAC00 /* IntegrationWorkflow.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0146AAEAC6C99F44618AFC /* IntegrationWorkflow.swift */; };
+		WS02F29CA192362B45BA9F72 /* TimeTravelModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01461357B998A54AEBA31C /* TimeTravelModels.swift */; };
+		WS02A2803D2D6C14415D892F /* SpatialModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01566D85144B6340BC8D72 /* SpatialModels.swift */; };
+		WS02E7CDB790CE0249BDA7FE /* PersonaModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS017888C80E63784FD093F4 /* PersonaModels.swift */; };
+		WS02EA09203DAF5F4BB88804 /* SpaceCollabManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS012C5C255D0CF443E6AB0C /* SpaceCollabManager.swift */; };
+		ML028D3F5881AB1746F1A95E /* CreatePRCollabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0100ED96698B244749A088 /* CreatePRCollabView.swift */; };
+		ML02C964BF54AB6A4C35A16D /* ScreenTimeAuthorizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0135411A63E277490B9799 /* ScreenTimeAuthorizationManager.swift */; };
+		WS020716FB71BCFF40C09E6F /* IntelligenceFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01A8D8DD2FB24642CDA114 /* IntelligenceFramework.swift */; };
+		WS0296A3160BD9744C05A2B4 /* PersonaManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS01CEDE12EC1A3C4B62BE89 /* PersonaManager.swift */; };
+		WS02CE9042A7F661496AB0DF /* PersonaWorkspace.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS013BBA0D8E9D6444C5890B /* PersonaWorkspace.swift */; };
+		ML02136B5884C6FB4E3D8084 /* PersonaHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0180133150940C4A3C83DA /* PersonaHomeView.swift */; };
+		WS0262710A8E258D45669067 /* IntegrationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010221CB88A3A14E1D9D6E /* IntegrationEngine.swift */; };
+		ML0226A7184B2AFC42F9BEC0 /* IntegrationsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0157AFE2F8373C4F1BA902 /* IntegrationsHomeView.swift */; };
+		ML02D567C111D67846ED8F0F /* WorkflowBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML01FC3317E40F374F26AA98 /* WorkflowBuilderView.swift */; };
+		WS02D40B22F4139B409888E5 /* TimeTravelFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0161A7E91002E24E99B7C7 /* TimeTravelFramework.swift */; };
+		ML029184825062ED4B74ADF9 /* TimeTravelHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0115541435D32B402F925F /* TimeTravelHomeView.swift */; };
+		WS026DD1EFCF1CD045FCB81D /* CanvasEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010B325BD96A9C411CA501 /* CanvasEngine.swift */; };
+		ML02B06DC3006D57495DB2DC /* WhiteboardsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML01742CECDC03174132BEBE /* WhiteboardsHomeView.swift */; };
+		ML028FFC6949369149FA8496 /* WhiteboardCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML01A8B623046E0549E89D14 /* WhiteboardCanvasView.swift */; };
+		ML022F1EBBD1C64D48F4A5F8 /* CitationFormatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML012C87341CFA2C46D9A708 /* CitationFormatsView.swift */; };
+		ML02B9C001F45A2E4FCA868D /* VersionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0130D0F9E841DE468381A7 /* VersionHistoryView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2201,6 +2222,27 @@
 		MS01A1B2C3D4E5F600000007 /* AppLockSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/App Lock/AppLockSessionView.swift"; sourceTree = "<group>"; };
 		MS01A1B2C3D4E5F600000008 /* AppLockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/App Lock/AppLockView.swift"; sourceTree = "<group>"; };
 		MS01A1B2C3D4E5F600000009 /* SecureFolderItemPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Security/SecureFolderItemPicker.swift; sourceTree = "<group>"; };
+		WS0146AAEAC6C99F44618AFC /* IntegrationWorkflow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Models/IntegrationWorkflow.swift; sourceTree = "<group>"; };
+		WS01461357B998A54AEBA31C /* TimeTravelModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Models/TimeTravelModels.swift; sourceTree = "<group>"; };
+		WS01566D85144B6340BC8D72 /* SpatialModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Models/SpatialModels.swift; sourceTree = "<group>"; };
+		WS017888C80E63784FD093F4 /* PersonaModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Models/PersonaModels.swift; sourceTree = "<group>"; };
+		WS012C5C255D0CF443E6AB0C /* SpaceCollabManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Collaboration/SpaceCollabManager.swift; sourceTree = "<group>"; };
+		ML0100ED96698B244749A088 /* CreatePRCollabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Collaboration/PullRequest/CreatePRCollabView.swift; sourceTree = "<group>"; };
+		ML0135411A63E277490B9799 /* ScreenTimeAuthorizationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/App Lock/ScreenTimeAuthorizationManager.swift"; sourceTree = "<group>"; };
+		WS01A8D8DD2FB24642CDA114 /* IntelligenceFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Intelligence/IntelligenceFramework.swift; sourceTree = "<group>"; };
+		WS01CEDE12EC1A3C4B62BE89 /* PersonaManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Persona/PersonaManager.swift; sourceTree = "<group>"; };
+		WS013BBA0D8E9D6444C5890B /* PersonaWorkspace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Persona/PersonaWorkspace.swift; sourceTree = "<group>"; };
+		ML0180133150940C4A3C83DA /* PersonaHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Persona/PersonaHomeView.swift; sourceTree = "<group>"; };
+		WS010221CB88A3A14E1D9D6E /* IntegrationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Integrations/IntegrationEngine.swift; sourceTree = "<group>"; };
+		ML0157AFE2F8373C4F1BA902 /* IntegrationsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Integrations/IntegrationsHomeView.swift; sourceTree = "<group>"; };
+		ML01FC3317E40F374F26AA98 /* WorkflowBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Integrations/WorkflowBuilderView.swift; sourceTree = "<group>"; };
+		WS0161A7E91002E24E99B7C7 /* TimeTravelFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workspace/Time Travel/TimeTravelFramework.swift"; sourceTree = "<group>"; };
+		ML0115541435D32B402F925F /* TimeTravelHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/Time Travel/TimeTravelHomeView.swift"; sourceTree = "<group>"; };
+		WS010B325BD96A9C411CA501 /* CanvasEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Spatial/CanvasEngine.swift; sourceTree = "<group>"; };
+		ML01742CECDC03174132BEBE /* WhiteboardsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Spatial/WhiteboardsHomeView.swift; sourceTree = "<group>"; };
+		ML01A8B623046E0549E89D14 /* WhiteboardCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Spatial/WhiteboardCanvasView.swift; sourceTree = "<group>"; };
+		ML012C87341CFA2C46D9A708 /* CitationFormatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Notebooks/Features/CitationFormatsView.swift; sourceTree = "<group>"; };
+		ML0130D0F9E841DE468381A7 /* VersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Notebooks/Features/VersionHistoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -2669,6 +2711,27 @@
 		8DF4BF69CF55A81CB6EBF3DE /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				WS0146AAEAC6C99F44618AFC /* IntegrationWorkflow.swift */,
+				WS01461357B998A54AEBA31C /* TimeTravelModels.swift */,
+				WS01566D85144B6340BC8D72 /* SpatialModels.swift */,
+				WS017888C80E63784FD093F4 /* PersonaModels.swift */,
+				WS012C5C255D0CF443E6AB0C /* SpaceCollabManager.swift */,
+				ML0100ED96698B244749A088 /* CreatePRCollabView.swift */,
+				ML0135411A63E277490B9799 /* ScreenTimeAuthorizationManager.swift */,
+				WS01A8D8DD2FB24642CDA114 /* IntelligenceFramework.swift */,
+				WS01CEDE12EC1A3C4B62BE89 /* PersonaManager.swift */,
+				WS013BBA0D8E9D6444C5890B /* PersonaWorkspace.swift */,
+				ML0180133150940C4A3C83DA /* PersonaHomeView.swift */,
+				WS010221CB88A3A14E1D9D6E /* IntegrationEngine.swift */,
+				ML0157AFE2F8373C4F1BA902 /* IntegrationsHomeView.swift */,
+				ML01FC3317E40F374F26AA98 /* WorkflowBuilderView.swift */,
+				WS0161A7E91002E24E99B7C7 /* TimeTravelFramework.swift */,
+				ML0115541435D32B402F925F /* TimeTravelHomeView.swift */,
+				WS010B325BD96A9C411CA501 /* CanvasEngine.swift */,
+				ML01742CECDC03174132BEBE /* WhiteboardsHomeView.swift */,
+				ML01A8B623046E0549E89D14 /* WhiteboardCanvasView.swift */,
+				ML012C87341CFA2C46D9A708 /* CitationFormatsView.swift */,
+				ML0130D0F9E841DE468381A7 /* VersionHistoryView.swift */,
 				MS01A1B2C3D4E5F600000001 /* SecureFolderModels.swift */,
 				MS01A1B2C3D4E5F600000002 /* SecureFolderManager.swift */,
 				MS01A1B2C3D4E5F600000003 /* AppLockManager.swift */,
@@ -4304,6 +4367,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				WS02634D13801CC4452CAC00 /* IntegrationWorkflow.swift in Sources */,
+				WS02F29CA192362B45BA9F72 /* TimeTravelModels.swift in Sources */,
+				WS02A2803D2D6C14415D892F /* SpatialModels.swift in Sources */,
+				WS02E7CDB790CE0249BDA7FE /* PersonaModels.swift in Sources */,
+				WS02EA09203DAF5F4BB88804 /* SpaceCollabManager.swift in Sources */,
+				ML028D3F5881AB1746F1A95E /* CreatePRCollabView.swift in Sources */,
+				ML02C964BF54AB6A4C35A16D /* ScreenTimeAuthorizationManager.swift in Sources */,
+				WS020716FB71BCFF40C09E6F /* IntelligenceFramework.swift in Sources */,
+				WS0296A3160BD9744C05A2B4 /* PersonaManager.swift in Sources */,
+				WS02CE9042A7F661496AB0DF /* PersonaWorkspace.swift in Sources */,
+				ML02136B5884C6FB4E3D8084 /* PersonaHomeView.swift in Sources */,
+				WS0262710A8E258D45669067 /* IntegrationEngine.swift in Sources */,
+				ML0226A7184B2AFC42F9BEC0 /* IntegrationsHomeView.swift in Sources */,
+				ML02D567C111D67846ED8F0F /* WorkflowBuilderView.swift in Sources */,
+				WS02D40B22F4139B409888E5 /* TimeTravelFramework.swift in Sources */,
+				ML029184825062ED4B74ADF9 /* TimeTravelHomeView.swift in Sources */,
+				WS026DD1EFCF1CD045FCB81D /* CanvasEngine.swift in Sources */,
+				ML02B06DC3006D57495DB2DC /* WhiteboardsHomeView.swift in Sources */,
+				ML028FFC6949369149FA8496 /* WhiteboardCanvasView.swift in Sources */,
+				ML022F1EBBD1C64D48F4A5F8 /* CitationFormatsView.swift in Sources */,
+				ML02B9C001F45A2E4FCA868D /* VersionHistoryView.swift in Sources */,
 				TKBF0000000000000000000000 /* UnifiedDataStore.swift in Sources */,
 				TKBF0000000000000000000001 /* SyncManager.swift in Sources */,
 				TKBF0000000000000000000002 /* AIOrchestrator.swift in Sources */,

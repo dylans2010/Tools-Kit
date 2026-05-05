@@ -4,6 +4,7 @@ struct CrossIntelligenceHomeView: View {
     @State private var query = ""
     @State private var isSearching = false
     @State private var results: [String] = []
+    @State private var insights: [WorkspaceInsight] = []
 
     var body: some View {
         ScrollView {
@@ -59,21 +60,43 @@ struct CrossIntelligenceHomeView: View {
             Text("Recent Insights")
                 .font(.headline)
 
-            ForEach(0..<3) { _ in
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Image(systemName: "lightbulb.fill")
-                            .foregroundColor(.yellow)
-                        Text("Suggested Action")
-                            .font(.subheadline.bold())
+            if insights.isEmpty {
+                Text("Scanning workspace for insights...")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            } else {
+                ForEach(insights) { insight in
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: insight.type == .recommendation ? "lightbulb.fill" : "chart.bar.fill")
+                                .foregroundColor(insight.type == .recommendation ? .yellow : .blue)
+                            Text(insight.title)
+                                .font(.subheadline.bold())
+                        }
+                        Text(insight.description)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
-                    Text("I noticed you have several tasks related to 'Project X' due this week. Would you like me to schedule a focus session?")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    .padding()
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .cornerRadius(12)
                 }
-                .padding()
-                .background(Color(.secondarySystemGroupedBackground))
-                .cornerRadius(12)
+            }
+        }
+        .task {
+            loadInsights()
+        }
+    }
+
+    private func loadInsights() {
+        Task {
+            do {
+                let realInsights = try await IntelligenceFramework.shared.scanWorkspace()
+                await MainActor.run {
+                    self.insights = realInsights
+                }
+            } catch {
+                print("Failed to scan workspace: \(error)")
             }
         }
     }

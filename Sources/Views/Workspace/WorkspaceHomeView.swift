@@ -246,7 +246,10 @@ struct WorkspaceDashboardView: View {
         ("Meet", "video.fill", .cyan, AnyView(JoinMeetingView())),
         ("Intelligence", "sparkles", .purple, AnyView(CrossIntelligenceHomeView())),
         ("Automation", "bolt.fill", .orange, AnyView(AutomationHomeView())),
-        ("Spatial Workspace", "square.3.layers.3d", .blue, AnyView(SpatialWorkspaceHomeView())),
+        ("Spatial Workspace", "square.3.layers.3d", .blue, AnyView(WhiteboardsHomeView())),
+        ("Integrations", "puzzlepiece.extension", .green, AnyView(IntegrationsHomeView())),
+        ("Time Travel", "clock.arrow.circlepath", .indigo, AnyView(TimeTravelHomeView())),
+        ("AI Persona", "person.and.sparkles", .purple, AnyView(PersonaHomeView())),
         ("Extensions", "puzzlepiece.extension.fill", .green, AnyView(PluginsMainView()))
     ]
 
