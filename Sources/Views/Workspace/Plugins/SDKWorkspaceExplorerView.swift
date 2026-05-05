@@ -8,7 +8,7 @@ struct SDKWorkspaceExplorerView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Search & Filter
-            SearchBar(text: $searchText, placeholder: "Search Workspace Entities...")
+            SearchBar(text: $searchText)
                 .padding()
 
             Divider()
