@@ -27,6 +27,9 @@ export async function onEvent(event, ctx) {
 }
 """
 
+    @State private var testEventPayload = """{"type":"note.created","payload":{"id":"sample-id","content":"Draft note text"}}"""
+    @State private var simulatedBuildOutput: [String] = []
+
     @State private var showingIdentifierLockAlert = false
     @State private var errorMessage: String?
 
@@ -37,6 +40,7 @@ export async function onEvent(event, ctx) {
             actionsSection
             permissionsSummarySection
             logicEditorSection
+            validationSection
             buildSection
         }
         .navigationTitle("Create Plugin")
@@ -148,6 +152,35 @@ export async function onEvent(event, ctx) {
         }
     }
 
+    private var validationSection: some View {
+        Section("Quick Validation") {
+            LabeledContent("Identifier", value: "com.ToolsKit.\(identifier.isEmpty ? "<missing>" : identifier)")
+            LabeledContent("Capabilities", value: "\(selectedCapabilities.count)")
+            LabeledContent("Actions", value: "\(selectedActions.count)")
+
+            TextEditor(text: $testEventPayload)
+                .font(.system(.caption, design: .monospaced))
+                .frame(minHeight: 96)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                )
+
+            Button("Run Build Checks") {
+                runLocalValidation()
+            }
+            .buttonStyle(.bordered)
+
+            if !simulatedBuildOutput.isEmpty {
+                ForEach(simulatedBuildOutput, id: \.self) { line in
+                    Text(line)
+                        .font(.caption.monospaced())
+                        .foregroundStyle(line.contains("ERROR") ? .red : .secondary)
+                }
+            }
+        }
+    }
+
     private var buildSection: some View {
         Section {
             if let error = errorMessage {
@@ -195,5 +228,34 @@ export async function onEvent(event, ctx) {
 
         manager.savePlugin(newPlugin)
         dismiss()
+    }
+
+    private func runLocalValidation() {
+        var output: [String] = []
+        output.append("• Checking plugin manifest...")
+
+        if identifier.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            output.append("ERROR: identifier is required")
+        }
+
+        if selectedCapabilities.isEmpty {
+            output.append("ERROR: at least one capability is required")
+        }
+
+        if selectedActions.isEmpty {
+            output.append("ERROR: at least one action is required")
+        }
+
+        if (try? JSONSerialization.jsonObject(with: Data(testEventPayload.utf8))) == nil {
+            output.append("ERROR: test event payload is not valid JSON")
+        } else {
+            output.append("✓ test event payload JSON is valid")
+        }
+
+        if output.count == 2 {
+            output.append("✓ ready to build")
+        }
+
+        simulatedBuildOutput = output
     }
 }
