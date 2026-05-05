@@ -124,6 +124,9 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
     case securityFetchData = "security.fetchData"
     case workspaceFetchFullData = "workspace.fetchFullData"
 
+    // SDK Developer
+    case sdkDeveloperNoSandbox = "sdk.developer.noSandbox"
+
     var id: String { rawValue }
 
     var displayName: String {
@@ -163,6 +166,7 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
         case .mailFetchData: return "Fetch Mail Data"
         case .securityFetchData: return "Fetch Security Data"
         case .workspaceFetchFullData: return "Fetch Full Workspace Data"
+        case .sdkDeveloperNoSandbox: return "SDK Unrestricted Access"
         default: return rawValue.capitalized
         }
     }
@@ -231,11 +235,13 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
         case .mailFetchData: return "Allows retrieval of email data for processing inside sandboxed plugin environment."
         case .securityFetchData: return "Allows access to security logs, authentication events, and audit trails."
         case .workspaceFetchFullData: return "Allows full workspace dataset access excluding Vault and encrypted Mail content."
+        case .sdkDeveloperNoSandbox: return "Allows execution without sandbox restrictions for testing purposes only. WARNING: Use with caution."
         }
     }
 
     var riskLevel: RiskLevel {
         switch self {
+        case .sdkDeveloperNoSandbox: return .critical
         case .mailFetchData, .securityFetchData, .workspaceFetchFullData, .workspaceModifySelective: return .high
         case .aiPersonaMemoryAccess, .timeRestoreState, .automationExecuteTrigger, .integrationsConnectService, .externalApiConnect, .externalApiSendRequest, .externalApiSecureHeaders: return .medium
         default: return .low
