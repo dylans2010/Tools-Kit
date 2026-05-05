@@ -128,19 +128,24 @@ final class PluginSandbox {
 
     // MARK: - Execution
 
-    func execute(plugin: PluginDefinition, event: PluginEvent) {
+    func execute(plugin: PluginDefinition, event: PluginEvent, useSDK: Bool = false) {
         // Core Execution Pipeline (Final)
         // 1. Capability Match
         // 2. Action Match
         // 3. Scope Validation
         // 4. Prerequisite Verification
 
-        let result = validateExecution(plugin: plugin, event: event)
+        var result = validateExecution(plugin: plugin, event: event)
+
+        if useSDK && plugin.capabilities.contains(.sdkDeveloperNoSandbox) {
+            print("[SDK Sandbox] Bypassing restrictions for \(plugin.name)")
+            result = .success
+        }
 
         switch result {
         case .success:
             // 5. Inject Context & Toolkit
-            performExecution(plugin: plugin, event: event)
+            performExecution(plugin: plugin, event: event, unrestricted: useSDK)
         case .failure(let reason, let detail):
             // 6. Block & Persist Logs
             print("Blocking plugin \(plugin.name) execution: \(reason.rawValue) - \(detail)")
@@ -152,8 +157,16 @@ final class PluginSandbox {
         }
     }
 
-    private func performExecution(plugin: PluginDefinition, event: PluginEvent) {
+    private func performExecution(plugin: PluginDefinition, event: PluginEvent, unrestricted: Bool = false) {
         guard let context = context else { return }
+
+        if unrestricted {
+            // Inject Master Workspace API in unrestricted mode
+            let masterAPI: @convention(block) () -> [String: Any] = {
+                return ["mode": "unrestricted", "access": "full"]
+            }
+            context.setObject(masterAPI, forKeyedSubscript: "sdk_master" as NSString)
+        }
 
         // Data Mapping (NEW)
         let mappedPayload = applyDataMappings(plugin.dataMappings, payload: event.payload)

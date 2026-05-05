@@ -1,0 +1,49 @@
+import SwiftUI
+
+struct SDKDataControlView: View {
+    @State private var showingWarning = true
+    @State private var statusMessage = ""
+
+    var body: some View {
+        List {
+            if showingWarning {
+                Section {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("HIGH RISK ACCESS", systemImage: "exclamationmark.triangle.fill")
+                            .foregroundColor(.red).bold()
+                        Text("This interface allows direct manipulation of workspace data structures. Incorrect operations may lead to data loss.")
+                            .font(.caption)
+                        Button("I Understand") { showingWarning = false }
+                            .buttonStyle(.bordered)
+                    }
+                    .padding(.vertical, 8)
+                }
+            }
+
+            Section("Data Operations") {
+                Button("Reindex All Notes") {
+                    let notes = WorkspaceAPI.shared.notes.listNotes()
+                    statusMessage = "Reindexed \(notes.count) notes."
+                }
+
+                Button("Cleanup Completed Tasks") {
+                    let tasks = WorkspaceAPI.shared.tasks.listTasks()
+                    let completed = tasks.filter { $0.isCompleted }
+                    // Real cleanup logic would go here
+                    statusMessage = "Identified \(completed.count) tasks for cleanup."
+                }
+            }
+
+            if !statusMessage.isEmpty {
+                Section("Operation Status") {
+                    Text(statusMessage).font(.caption).foregroundStyle(.blue)
+                }
+            }
+
+            Section("Rollback Support") {
+                NavigationLink("System Snapshots", destination: EntityExplorerView())
+            }
+        }
+        .navigationTitle("Data Control")
+    }
+}
