@@ -33,6 +33,11 @@ jobs:
           xcodebuild -version
           xcodebuild -showsdks
 
+
+      - name: Validate Xcode project file (quick check)
+        run: |
+          plutil -lint Tools-Kit.xcodeproj/project.pbxproj
+
       - name: Clean DerivedData
         run: rm -rf ~/Library/Developer/Xcode/DerivedData
 
