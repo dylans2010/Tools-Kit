@@ -59,6 +59,7 @@ struct WorkspaceHomeView: View {
             spatialTab
             extensionsTab
         }
+        .withPluginOverlay()
     }
 
     private var overviewTab: some View {
