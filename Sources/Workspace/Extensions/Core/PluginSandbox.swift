@@ -129,14 +129,26 @@ final class PluginSandbox {
     // MARK: - Execution
 
     func execute(plugin: PluginDefinition, event: PluginEvent) {
+        // Core Execution Pipeline (Final)
+        // 1. Capability Match
+        // 2. Action Match
+        // 3. Scope Validation
+        // 4. Prerequisite Verification
+
         let result = validateExecution(plugin: plugin, event: event)
 
         switch result {
         case .success:
+            // 5. Inject Context & Toolkit
             performExecution(plugin: plugin, event: event)
         case .failure(let reason, let detail):
+            // 6. Block & Persist Logs
             print("Blocking plugin \(plugin.name) execution: \(reason.rawValue) - \(detail)")
             NotificationCenter.default.post(name: .pluginExecutionBlocked, object: nil, userInfo: ["pluginID": plugin.id, "reason": reason, "detail": detail])
+
+            // Log rejection
+            let log = ConnectorLog(connectorID: plugin.id, timestamp: Date(), type: .error, message: "Pipeline Blocked: \(reason.rawValue)", details: detail)
+            ConnectorManager.shared.addLog(log)
         }
     }
 

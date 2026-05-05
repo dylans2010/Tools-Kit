@@ -1129,6 +1129,17 @@
 		ML020000000000000000000013 /* NotebookAddCommentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML010000000000000000000013 /* NotebookAddCommentsView.swift */; };
 		ML020000000000000000000014 /* NotebookAuditLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML010000000000000000000014 /* NotebookAuditLogsView.swift */; };
 		PL020000000000000000000004 /* PluginSecurityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000004 /* PluginSecurityView.swift */; };
+		PL020000000000000000000101 /* ConnectorsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000101 /* ConnectorsMainView.swift */; };
+		PL020000000000000000000102 /* ConnectorBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000102 /* ConnectorBuilderView.swift */; };
+		PL020000000000000000000103 /* ConnectorDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000103 /* ConnectorDetailView.swift */; };
+		PL020000000000000000000104 /* ConnectorExecutionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000104 /* ConnectorExecutionView.swift */; };
+		PL020000000000000000000105 /* ConnectorLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000105 /* ConnectorLogsView.swift */; };
+		PL020000000000000000000106 /* ConnectorAuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000106 /* ConnectorAuthView.swift */; };
+		PL020000000000000000000107 /* ConnectorSchemaBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000107 /* ConnectorSchemaBuilderView.swift */; };
+		PL020000000000000000000108 /* ConnectorFlowBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000108 /* ConnectorFlowBuilderView.swift */; };
+		PL020000000000000000000109 /* ConnectorTestConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000109 /* ConnectorTestConsoleView.swift */; };
+		PL02000000000000000000010A /* ConnectorSecurityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000010A /* ConnectorSecurityView.swift */; };
+		PL02000000000000000000010B /* ConnectorVersioningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000010B /* ConnectorVersioningView.swift */; };
 		PL020000000000000000000005 /* PluginLimitedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000005 /* PluginLimitedView.swift */; };
 		PL020000000000000000000006 /* SecurityScopeApplicationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000006 /* SecurityScopeApplicationView.swift */; };
 /* End PBXBuildFile section */
@@ -2198,6 +2209,17 @@
 		SV016A6A8C64AFF84AADB98F /* SecurityAuditDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityAuditDashboardView.swift; sourceTree = "<group>"; };
 		SV017C6FA6D76B1B4F51B5C4 /* SecurityAppLockRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityAppLockRulesView.swift; sourceTree = "<group>"; };
 		SV01753ABE02878346C2A212 /* SecurityActivityLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityActivityLogView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000101 /* ConnectorsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/Connectors/ConnectorsMainView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000102 /* ConnectorBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/Connectors/ConnectorBuilderView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000103 /* ConnectorDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/Connectors/ConnectorDetailView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000104 /* ConnectorExecutionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/Connectors/ConnectorExecutionView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000105 /* ConnectorLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/Connectors/ConnectorLogsView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000106 /* ConnectorAuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/Connectors/ConnectorAuthView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000107 /* ConnectorSchemaBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/Connectors/ConnectorSchemaBuilderView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000108 /* ConnectorFlowBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/Connectors/ConnectorFlowBuilderView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000109 /* ConnectorTestConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/Connectors/ConnectorTestConsoleView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000010A /* ConnectorSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/Connectors/ConnectorSecurityView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000010B /* ConnectorVersioningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/Connectors/ConnectorVersioningView.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000000 /* UnifiedDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/Data/UnifiedDataStore.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000001 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/Data/SyncManager.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000002 /* AIOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/AI/AIOrchestrator.swift; sourceTree = "<group>"; };
@@ -4095,8 +4117,27 @@
 		AA1000000000000000000006 /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
+				PL000000000000000000000100 /* Connectors */,
 			);
 			path = Plugins;
+			sourceTree = "<group>";
+		};
+		PL000000000000000000000100 /* Connectors */ = {
+			isa = PBXGroup;
+			children = (
+				PL010000000000000000000101 /* ConnectorsMainView.swift */,
+				PL010000000000000000000102 /* ConnectorBuilderView.swift */,
+				PL010000000000000000000103 /* ConnectorDetailView.swift */,
+				PL010000000000000000000104 /* ConnectorExecutionView.swift */,
+				PL010000000000000000000105 /* ConnectorLogsView.swift */,
+				PL010000000000000000000106 /* ConnectorAuthView.swift */,
+				PL010000000000000000000107 /* ConnectorSchemaBuilderView.swift */,
+				PL010000000000000000000108 /* ConnectorFlowBuilderView.swift */,
+				PL010000000000000000000109 /* ConnectorTestConsoleView.swift */,
+				PL01000000000000000000010A /* ConnectorSecurityView.swift */,
+				PL01000000000000000000010B /* ConnectorVersioningView.swift */,
+			);
+			path = Connectors;
 			sourceTree = "<group>";
 		};
 		AA1000000000000000000007 /* GitHub */ = {
@@ -4416,6 +4457,17 @@
 				PL020000000000000000000004 /* PluginSecurityView.swift in Sources */,
 				PL020000000000000000000005 /* PluginLimitedView.swift in Sources */,
 				PL020000000000000000000006 /* SecurityScopeApplicationView.swift in Sources */,
+				PL020000000000000000000101 /* ConnectorsMainView.swift in Sources */,
+				PL020000000000000000000102 /* ConnectorBuilderView.swift in Sources */,
+				PL020000000000000000000103 /* ConnectorDetailView.swift in Sources */,
+				PL020000000000000000000104 /* ConnectorExecutionView.swift in Sources */,
+				PL020000000000000000000105 /* ConnectorLogsView.swift in Sources */,
+				PL020000000000000000000106 /* ConnectorAuthView.swift in Sources */,
+				PL020000000000000000000107 /* ConnectorSchemaBuilderView.swift in Sources */,
+				PL020000000000000000000108 /* ConnectorFlowBuilderView.swift in Sources */,
+				PL020000000000000000000109 /* ConnectorTestConsoleView.swift in Sources */,
+				PL02000000000000000000010A /* ConnectorSecurityView.swift in Sources */,
+				PL02000000000000000000010B /* ConnectorVersioningView.swift in Sources */,
 				TKBF0000000000000000000000 /* UnifiedDataStore.swift in Sources */,
 				TKBF0000000000000000000001 /* SyncManager.swift in Sources */,
 				TKBF0000000000000000000002 /* AIOrchestrator.swift in Sources */,

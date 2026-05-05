@@ -22,6 +22,12 @@ struct RepoDetailView: View {
             }
             .padding(16)
         }
+
+            Section("Extensions") {
+                NavigationLink(destination: PluginsMainView()) {
+                    Label("Plugin Tools", systemImage: "puzzlepiece.extension")
+                }
+            }
         .navigationTitle(repository.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

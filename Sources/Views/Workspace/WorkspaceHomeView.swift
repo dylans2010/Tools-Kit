@@ -250,6 +250,8 @@ struct WorkspaceDashboardView: View {
         ("Integrations", "puzzlepiece.extension", .green, AnyView(IntegrationsHomeView())),
         ("Time Travel", "clock.arrow.circlepath", .indigo, AnyView(TimeTravelHomeView())),
         ("AI Persona", "person.and.sparkles", .purple, AnyView(PersonaHomeView())),
+        ("Plugins", "puzzlepiece.extension.fill", .purple, AnyView(PluginsMainView())),
+        ("Connectors", "puzzlepiece.extension", .green, AnyView(ConnectorsMainView())),
         ("Extensions", "puzzlepiece.extension.fill", .green, AnyView(PluginsMainView()))
     ]
 

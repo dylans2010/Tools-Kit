@@ -61,6 +61,7 @@ export async function onEvent(event, ctx) {
 
     @State private var showingIdentifierLockAlert = false
     @State private var errorMessage: String?
+    @State private var showingDocs = false
 
     @State private var selectedSection: BuildSection = .identity
 
@@ -112,6 +113,16 @@ export async function onEvent(event, ctx) {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button("Cancel") { dismiss() }
             }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showingDocs = true
+                } label: {
+                    Image(systemName: "book.closed")
+                }
+            }
+        }
+        .sheet(isPresented: $showingDocs) {
+            PluginDocumentationView()
         }
         .alert("Identifier Locked", isPresented: $showingIdentifierLockAlert) {
             Button("OK", role: .cancel) { }
@@ -324,6 +335,26 @@ export async function onEvent(event, ctx) {
 
     private var uiInjectionSection: some View {
         Section("UI Injection") {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("UI Configuration").font(.headline)
+
+                Toggle("Enable Command Palette Integration", isOn: Binding(
+                    get: { toolkitTools.contains { $0.name == "Command Palette Integration" } },
+                    set: { val in toggleTool("Command Palette Integration", .workspace, val) }
+                ))
+
+                Toggle("Enable Context Menu Extensions", isOn: Binding(
+                    get: { toolkitTools.contains { $0.name == "Context Menu Extensions" } },
+                    set: { val in toggleTool("Context Menu Extensions", .workspace, val) }
+                ))
+
+                Toggle("Custom UI Injection", isOn: Binding(
+                    get: { toolkitTools.contains { $0.name == "UI Injection Config" } },
+                    set: { val in toggleTool("UI Injection Config", .workspace, val) }
+                ))
+            }
+            .padding(.vertical, 8)
+
             ForEach($uiExtensions) { $ext in
                 VStack {
                     Picker("Type", selection: $ext.type) {
@@ -341,6 +372,16 @@ export async function onEvent(event, ctx) {
             Button("Add UI Extension") {
                 uiExtensions.append(UIExtension(type: .overlay, component: .button, targetView: "", actionBinding: ""))
             }
+        }
+    }
+
+    private func toggleTool(_ name: String, _ category: PluginToolCategory, _ enabled: Bool) {
+        if enabled {
+            if !toolkitTools.contains(where: { $0.name == name }) {
+                toolkitTools.append(PluginToolkitTool(name: name, category: category, config: [:]))
+            }
+        } else {
+            toolkitTools.removeAll { $0.name == name }
         }
     }
 
@@ -370,14 +411,14 @@ export async function onEvent(event, ctx) {
 
     private func availableToolkitTools(for category: PluginToolCategory) -> [String] {
         switch category {
-        case .ai: return ["AI Text Summarizer", "AI Code Generator", "AI Context Analyzer", "AI Classification Engine"]
-        case .data: return ["Data Filter Engine", "Data Transformer", "JSON Builder", "CSV Exporter"]
-        case .automation: return ["Workflow Trigger Builder", "Multi-Step Executor", "Delay Scheduler", "Conditional Router"]
-        case .integrations: return ["Webhook Sender", "API Request Builder", "Response Parser", "Retry Handler"]
-        case .workspace: return ["Notes Updater", "Task Generator", "Calendar Sync Tool", "File Organizer"]
-        case .developer: return ["Log Stream Viewer", "Error Catcher", "Performance Tracker", "Debug Breakpoints"]
-        case .security: return ["Permission Validator", "Scope Checker", "Data Sanitizer", "Access Logger"]
-        case .event: return ["Event Listener Builder", "Event Transformer", "Event Replay Tool", "Event Filter Engine"]
+        case .ai: return ["AI Prompt Builder", "AI Behavior Tuner", "AI Text Summarizer", "AI Code Generator", "AI Context Analyzer", "AI Classification Engine"]
+        case .data: return ["Data Transformer", "Data Filtering Engine", "JSON Schema Builder", "Batch Processor", "Data Filter Engine", "JSON Builder", "CSV Exporter"]
+        case .automation: return ["Event Trigger Designer", "Execution Scheduler", "Retry Strategy Builder", "Conditional Execution Engine", "Multi-step Action Builder", "Workflow Trigger Builder", "Multi-Step Executor", "Delay Scheduler", "Conditional Router"]
+        case .integrations: return ["Webhook Listener", "External Sync Config", "Webhook Sender", "API Request Builder", "Response Parser", "Retry Handler"]
+        case .workspace: return ["Workspace Modifier Rules", "Notification System", "Notes Updater", "Task Generator", "Calendar Sync Tool", "File Organizer"]
+        case .developer: return ["Logging Configurator", "Performance Monitor", "Plugin Analytics Dashboard", "Log Stream Viewer", "Error Catcher", "Performance Tracker", "Debug Breakpoints"]
+        case .security: return ["Rate Limiter Config", "Memory Storage Config", "Permission Validator", "Scope Checker", "Data Sanitizer", "Access Logger"]
+        case .event: return ["Event Replay Tool", "Error Handling Engine", "Event Listener Builder", "Event Transformer", "Event Filter Engine"]
         }
     }
 
@@ -791,5 +832,68 @@ struct EditEndpointView: View {
 extension View {
     func secondary() -> some View {
         self.foregroundColor(.secondary)
+    }
+}
+
+// MARK: - Plugin Documentation
+
+struct PluginDocumentationView: View {
+    @Environment(\.dismiss) var dismiss
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Group {
+                        Text("Plugin Development Guide")
+                            .font(.title.bold())
+
+                        Text("Creating a Plugin")
+                            .font(.headline)
+                        Text("Plugins are event-driven modules that react to workspace activity. Start by defining an immutable identifier 'com.toolskit.<name>' and selecting relevant capabilities.")
+                            .foregroundColor(.secondary)
+
+                        Text("Capabilities & Scopes")
+                            .font(.headline)
+                        Text("Capabilities define what system services your plugin can access (e.g., 'notes', 'ai'). High-risk scopes require an API Key and Privacy Note justification.")
+                            .foregroundColor(.secondary)
+                    }
+
+                    Group {
+                        Text("Execution Logic")
+                            .font(.headline)
+                        Text("Plugins execute JavaScript code in a secure sandbox. Use 'ctx' to access authorized modules:")
+                            .foregroundColor(.secondary)
+                        Text("await ctx.ai.summarize(text)\nawait ctx.notes.updateNote(id, content)")
+                            .font(.system(.caption, design: .monospaced))
+                            .padding()
+                            .background(Color.black.opacity(0.05))
+                            .cornerRadius(8)
+                    }
+
+                    Group {
+                        Text("Debugging")
+                            .font(.headline)
+                        Text("Use the Test Console to simulate events and view execution logs. The Dev Console provides real-time error tracking and performance metrics.")
+                            .foregroundColor(.secondary)
+                    }
+
+                    Text("Example: Note Summarizer")
+                        .font(.subheadline.bold())
+                    Text("export async function onEvent(event, ctx) {\n  if (event.type === 'note.created') {\n    const s = await ctx.ai.summarize(event.payload.content)\n    await ctx.notes.updateNote(event.payload.id, s)\n  }\n}")
+                        .font(.system(size: 10, design: .monospaced))
+                        .padding()
+                        .background(Color.blue.opacity(0.05))
+                        .cornerRadius(8)
+                }
+                .padding()
+            }
+            .navigationTitle("Documentation")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
     }
 }
