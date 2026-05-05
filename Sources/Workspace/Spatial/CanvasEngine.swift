@@ -10,10 +10,12 @@ final class CanvasEngine: ObservableObject {
     }
 
     func addElement(_ type: ElementType, at position: CGPoint) {
-        let element = SpatialElement(
+        var element = SpatialElement(
             type: type,
-            position: position,
-            size: CGSize(width: 150, height: 150),
+            x: Double(position.x),
+            y: Double(position.y),
+            width: 150,
+            height: 150,
             properties: ["color": "yellow", "text": "New Note"]
         )
 
