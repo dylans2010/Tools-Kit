@@ -9,61 +9,59 @@ struct SecurityOnboardingView: View {
     @State private var isAuthenticating = false
 
     var body: some View {
-        VStack(spacing: 24) {
-            Image(systemName: "lock.shield.fill")
-                .font(.system(size: 80))
+        VStack(spacing: 20) {
+            Spacer(minLength: 20)
+
+            Image(systemName: "lock.shield")
+                .font(.system(size: 62, weight: .semibold))
                 .foregroundStyle(.blue.gradient)
-                .padding(.top, 40)
+                .padding()
+                .background(.ultraThinMaterial, in: Circle())
 
-            VStack(spacing: 8) {
-                Text("Secure Your Workspace")
-                    .font(.title.bold())
-                Text("Create a master password to encrypt your credentials, documents, and files on this device.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-            }
+            Text("Set up your vault")
+                .font(.largeTitle.bold())
 
-            VStack(spacing: 16) {
-                SecureField("Master Password", text: $password)
+            Text("Create a master password to protect everything stored in Security Hub.")
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+            VStack(spacing: 12) {
+                SecureField("Master password", text: $password)
                     .textFieldStyle(.roundedBorder)
-                    .padding(.horizontal)
-
-                SecureField("Confirm Password", text: $confirmPassword)
+                SecureField("Confirm password", text: $confirmPassword)
                     .textFieldStyle(.roundedBorder)
-                    .padding(.horizontal)
-
-                Toggle("Use Face ID / Touch ID", isOn: $useBiometrics)
-                    .padding(.horizontal)
+                Toggle(isOn: $useBiometrics) {
+                    Label("Use Face ID / Touch ID", systemImage: "faceid")
+                }
             }
+            .padding()
+            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+            .padding(.horizontal)
 
-            if let error = error {
-                Text(error)
+            if let error {
+                Label(error, systemImage: "exclamationmark.triangle.fill")
                     .font(.caption)
-                    .foregroundColor(.red)
+                    .foregroundStyle(.red)
+                    .padding(.horizontal)
             }
 
-            Spacer()
-
-            Button {
-                Task { await setupVault() }
-            } label: {
-                Text("Initialize Vault")
+            Button(action: { Task { await setupVault() } }) {
+                Label("Initialize Vault", systemImage: "shield.checkered")
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
             }
+            .buttonStyle(.borderedProminent)
             .disabled(isAuthenticating || password.isEmpty || password != confirmPassword)
-            .padding()
+            .padding(.horizontal)
+
+            Spacer()
         }
+        .padding(.vertical)
         .background(Color(.systemGroupedBackground))
     }
 
-    @MainActor
-    private func setupVault() async {
+    @MainActor private func setupVault() async {
         isAuthenticating = true
         defer { isAuthenticating = false }
         do {
@@ -82,86 +80,56 @@ struct SecurityLoginView: View {
     @State private var isAuthenticating = false
 
     var body: some View {
-        VStack(spacing: 24) {
-            Image(systemName: "lock.fill")
-                .font(.system(size: 60))
+        VStack(spacing: 18) {
+            Spacer(minLength: 24)
+            Image(systemName: "lock.circle")
+                .font(.system(size: 58))
                 .foregroundStyle(.blue.gradient)
-                .padding(.top, 60)
 
             Text("Vault Locked")
-                .font(.title2.bold())
+                .font(.title.bold())
 
-            SecureField("Enter Master Password", text: $password)
+            SecureField("Master password", text: $password)
                 .textFieldStyle(.roundedBorder)
                 .padding(.horizontal)
 
-            if let error = error {
-                Text(error)
-                    .font(.caption)
-                    .foregroundColor(.red)
+            if let error {
+                Text(error).font(.caption).foregroundStyle(.red)
             }
 
-            Button {
-                Task { await login() }
-            } label: {
-                Text("Unlock")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-            }
-            .disabled(isAuthenticating || password.isEmpty)
-            .padding(.horizontal)
+            Button("Unlock") { Task { await login() } }
+                .buttonStyle(.borderedProminent)
+                .disabled(isAuthenticating || password.isEmpty)
 
             Button {
                 isAuthenticating = true
                 authService.authenticateWithBiometrics { success in
                     isAuthenticating = false
-                    if !success {
-                        error = "Biometric authentication failed"
-                    }
+                    if !success { error = "Biometric authentication failed" }
                 }
             } label: {
                 Label("Unlock with Biometrics", systemImage: "faceid")
             }
-            .padding(.top)
 
-            Button(role: .destructive) {
+            Button("Reset Password", role: .destructive) {
                 authService.resetVaultAndPassword()
                 password = ""
                 error = nil
-            } label: {
-                Text("Reset Password")
-                    .font(.subheadline)
             }
-            .padding(.top, 6)
-
-            Text("Resetting your password permanently erases all encrypted vault data on this device.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
 
             Spacer()
         }
         .onAppear {
             authService.authenticateWithBiometrics { success in
-                if !success {
-                    isAuthenticating = false
-                }
+                if !success { isAuthenticating = false }
             }
         }
         .onChange(of: authService.isAuthenticated) { _, value in
-            if value {
-                isAuthenticating = false
-                error = nil
-            }
+            if value { isAuthenticating = false; error = nil }
         }
     }
 
-    @MainActor
-    private func login() async {
+    @MainActor private func login() async {
         isAuthenticating = true
         defer { isAuthenticating = false }
         do {

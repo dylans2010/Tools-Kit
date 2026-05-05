@@ -5,27 +5,18 @@ import UniformTypeIdentifiers
 struct AddInfoView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var vaultManager = VaultManager.shared
-
     @State private var category: VaultCategory = .credentials
     @State private var title = ""
     @State private var note = ""
-
-    // Credentials
     @State private var username = ""
     @State private var password = ""
     @State private var domain = ""
-
-    // Document/File
     @State private var showingFilePicker = false
     @State private var selectedFile: URL?
     @State private var documentType = "ID"
     @State private var expirationDate = Date()
-
-    // Photo
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var selectedPhotoData: Data?
-
-    // TOTP
     @State private var totpSecret = ""
     @State private var totpIssuer = ""
     @State private var totpAccount = ""
@@ -33,205 +24,69 @@ struct AddInfoView: View {
     @State private var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State private var errorMessage: String?
 
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Add Secure Item")
-                            .font(.headline)
-                        Text("Everything is encrypted and stored locally in your vault.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, 4)
-                }
+    var body: some View { NavigationStack { formContent } }
 
-                Section {
-                    Picker("Type", selection: $category) {
-                        ForEach(VaultCategory.allCases) { cat in
-                            Label(cat.rawValue, systemImage: cat.icon).tag(cat)
-                        }
-                    }
+    private var formContent: some View {
+        Form {
+            Section {
+                Label("Add Secure Item", systemImage: "lock.doc")
+                Text("Encrypted locally before being stored.").font(.caption).foregroundStyle(.secondary)
+            }
+            Section("Details") {
+                Picker("Type", selection: $category) { ForEach(VaultCategory.allCases) { Label($0.rawValue, systemImage: $0.icon).tag($0) } }
                     .pickerStyle(.segmented)
-
-                    TextField("Title", text: $title)
-                }
-
-                dynamicSection
-
-                Section("Notes") {
-                    TextEditor(text: $note)
-                        .frame(minHeight: 100)
-                }
-
-                if let errorMessage {
-                    Section {
-                        Text(errorMessage)
-                            .foregroundStyle(.red)
-                    }
-                }
+                TextField("Title", text: $title)
             }
-            .navigationTitle("New Entry")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        saveItem()
-                    }
-                    .disabled(title.isEmpty)
-                }
-            }
-            .sheet(isPresented: $showingFilePicker) {
-                FileImporterView(allowedContentTypes: [.data, .item, .pdf], allowsMultipleSelection: false) { urls in
-                    selectedFile = urls.first
-                }
-            }
-            .onReceive(timer) { _ in
-                if category == .totp && !totpSecret.isEmpty {
-                    updateTOTPCode()
-                }
-            }
+            dynamicSection
+            Section("Notes") { TextEditor(text: $note).frame(minHeight: 80) }
+            if let errorMessage { Section { Label(errorMessage, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.red) } }
         }
+        .navigationTitle("New Entry")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+            ToolbarItem(placement: .confirmationAction) { Button("Save", action: saveItem).disabled(title.isEmpty) }
+        }
+        .sheet(isPresented: $showingFilePicker) { FileImporterView(allowedContentTypes: [.data, .item, .pdf], allowsMultipleSelection: false) { selectedFile = $0.first } }
+        .onReceive(timer) { _ in if category == .totp && !totpSecret.isEmpty { updateTOTPCode() } }
     }
 
-    @ViewBuilder
-    private var dynamicSection: some View {
+    @ViewBuilder private var dynamicSection: some View {
         switch category {
         case .credentials:
-            Section("Credentials") {
-                TextField("Username", text: $username)
-                    .textContentType(.username)
-                SecureField("Password", text: $password)
-                    .textContentType(.password)
-                TextField("Domain", text: $domain)
-                    .textContentType(.URL)
-                    .autocapitalization(.none)
-            }
+            Section("Credentials") { TextField("Username", text: $username); SecureField("Password", text: $password); TextField("Domain", text: $domain).autocapitalization(.none) }
         case .documents:
-            Section("Document Details") {
-                Picker("Document Type", selection: $documentType) {
-                    Text("ID").tag("ID")
-                    Text("Passport").tag("Passport")
-                    Text("Driver's License").tag("Driver's License")
-                    Text("Insurance").tag("Insurance")
-                }
-                DatePicker("Expiration Date", selection: $expirationDate, displayedComponents: .date)
-
-                Button {
-                    showingFilePicker = true
-                } label: {
-                    Label(selectedFile?.lastPathComponent ?? "Select Document", systemImage: "doc.badge.plus")
-                }
-            }
+            Section("Document") { Picker("Type", selection: $documentType) { Text("ID").tag("ID"); Text("Passport").tag("Passport"); Text("Driver's License").tag("Driver's License"); Text("Insurance").tag("Insurance") }; DatePicker("Expiration", selection: $expirationDate, displayedComponents: .date); Button { showingFilePicker = true } label: { Label(selectedFile?.lastPathComponent ?? "Select Document", systemImage: "doc.badge.plus") } }
         case .photos:
-            Section("Photo") {
-                PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
-                    if let selectedPhotoData, let uiImage = UIImage(data: selectedPhotoData) {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(maxHeight: 200)
-                            .cornerRadius(12)
-                    } else {
-                        Label("Select Photo", systemImage: "photo.badge.plus")
-                    }
-                }
-                .onChange(of: selectedPhotoItem) { _, newItem in
-                    Task {
-                        if let data = try? await newItem?.loadTransferable(type: Data.self) {
-                            selectedPhotoData = data
-                        }
-                    }
-                }
-            }
+            Section("Photo") { PhotosPicker(selection: $selectedPhotoItem, matching: .images) { Label("Select Photo", systemImage: "photo.badge.plus") }.onChange(of: selectedPhotoItem) { _, item in Task { selectedPhotoData = try? await item?.loadTransferable(type: Data.self) } } }
         case .files:
-            Section("File") {
-                Button {
-                    showingFilePicker = true
-                } label: {
-                    Label(selectedFile?.lastPathComponent ?? "Select File", systemImage: "folder.badge.plus")
-                }
-            }
+            Section("File") { Button { showingFilePicker = true } label: { Label(selectedFile?.lastPathComponent ?? "Select File", systemImage: "folder.badge.plus") } }
         case .totp:
-            Section("TOTP Settings") {
-                TextField("Issuer (e.g. Google)", text: $totpIssuer)
-                TextField("Account (e.g. email@me.com)", text: $totpAccount)
-                TextField("Secret Key", text: $totpSecret)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-
-                HStack {
-                    Text("Live Code:")
-                        .font(.subheadline.bold())
-                    Spacer()
-                    Text(totpCode)
-                        .font(.system(.title3, design: .monospaced).bold())
-                        .foregroundColor(.blue)
-                }
-            }
+            Section("Authenticator") { TextField("Issuer", text: $totpIssuer); TextField("Account", text: $totpAccount); TextField("Secret", text: $totpSecret).autocapitalization(.none); LabeledContent("Live Code") { Text(totpCode).font(.system(.title3, design: .monospaced).bold()).foregroundStyle(.blue) } }
         }
     }
 
-    private func updateTOTPCode() {
-        if let code = TOTPService.shared.generateTOTP(secret: totpSecret) {
-            totpCode = code
-        }
-    }
-
+    private func updateTOTPCode() { if let code = TOTPService.shared.generateTOTP(secret: totpSecret) { totpCode = code } }
     private func saveItem() {
         errorMessage = nil
-        let itemData: Data
-        var metadata: [String: String] = [:]
-
         do {
+            let itemData: Data
+            var metadata: [String: String] = [:]
             switch category {
             case .credentials:
-                guard !username.isEmpty, !password.isEmpty else {
-                    errorMessage = "Username and password are required."
-                    return
-                }
-                let data = CredentialData(username: username, password: password, website: domain)
-                itemData = try JSONEncoder().encode(data)
-                metadata["username"] = username
-                metadata["domain"] = domain
+                guard !username.isEmpty, !password.isEmpty else { errorMessage = "Username and password are required."; return }
+                itemData = try JSONEncoder().encode(CredentialData(username: username, password: password, website: domain)); metadata = ["username": username, "domain": domain]
             case .documents:
-                let data = DocumentData(documentType: documentType, expirationDate: expirationDate)
-                itemData = selectedFile != nil ? try Data(contentsOf: selectedFile!) : try JSONEncoder().encode(data)
-                metadata["documentType"] = documentType
-                metadata["expiration"] = expirationDate.ISO8601Format()
+                itemData = selectedFile != nil ? try Data(contentsOf: selectedFile!) : try JSONEncoder().encode(DocumentData(documentType: documentType, expirationDate: expirationDate)); metadata = ["documentType": documentType, "expiration": expirationDate.ISO8601Format()]
             case .photos:
-                itemData = selectedPhotoData ?? Data()
-                metadata["type"] = "photo"
+                itemData = selectedPhotoData ?? Data(); metadata = ["type": "photo"]
             case .files:
-                itemData = selectedFile != nil ? try Data(contentsOf: selectedFile!) : Data()
-                metadata["filename"] = selectedFile?.lastPathComponent ?? "unknown"
+                itemData = selectedFile != nil ? try Data(contentsOf: selectedFile!) : Data(); metadata = ["filename": selectedFile?.lastPathComponent ?? "unknown"]
             case .totp:
-                guard !totpSecret.isEmpty else {
-                    errorMessage = "TOTP secret is required."
-                    return
-                }
-                let data = TOTPData(secret: totpSecret, issuer: totpIssuer, account: totpAccount)
-                itemData = try JSONEncoder().encode(data)
-                metadata["issuer"] = totpIssuer
-                metadata["account"] = totpAccount
+                guard !totpSecret.isEmpty else { errorMessage = "TOTP secret is required."; return }
+                itemData = try JSONEncoder().encode(TOTPData(secret: totpSecret, issuer: totpIssuer, account: totpAccount)); metadata = ["issuer": totpIssuer, "account": totpAccount]
             }
-
-            let newItem = VaultItem(
-                category: category,
-                title: title,
-                note: note,
-                payloadIdentifier: "", // Will be set by VaultManager
-                metadata: metadata
-            )
-
-            try vaultManager.addItem(newItem, data: itemData)
+            try vaultManager.addItem(VaultItem(category: category, title: title, note: note, payloadIdentifier: "", metadata: metadata), data: itemData)
             dismiss()
-        } catch {
-            errorMessage = "Failed to save vault item: \(error.localizedDescription)"
-        }
+        } catch { errorMessage = "Failed to save vault item: \(error.localizedDescription)" }
     }
 }
