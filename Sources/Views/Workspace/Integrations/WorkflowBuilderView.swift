@@ -19,17 +19,34 @@ struct WorkflowBuilderView: View {
 
                 Section("Trigger") {
                     Picker("When this happens", selection: $triggerSource) {
-                        Text("Note Created").tag("note.created")
-                        Text("Task Completed").tag("task.completed")
-                        Text("File Uploaded").tag("file.uploaded")
+                        Group {
+                            Text("Note Created").tag("note.created")
+                            Text("Task Completed").tag("task.completed")
+                            Text("File Uploaded").tag("file.uploaded")
+                            Text("Scheduled (Daily)").tag("scheduled.daily")
+                            Text("Scheduled (Weekly)").tag("scheduled.weekly")
+                        }
+                        Group {
+                            Text("Incoming Webhook").tag("webhook.incoming")
+                            Text("Health Data Update").tag("health.update")
+                            Text("Location Arrival").tag("location.arrival")
+                        }
                     }
                 }
 
                 Section("Action") {
                     Picker("Do this", selection: $actionDestination) {
-                        Text("Post to Slack").tag("slack")
-                        Text("Send Email").tag("gmail")
-                        Text("Create GitHub Issue").tag("github.issue")
+                        Group {
+                            Text("Post to Slack").tag("slack")
+                            Text("Send Email").tag("gmail")
+                            Text("Create GitHub Issue").tag("github.issue")
+                        }
+                        Group {
+                            Text("HTTP Request (POST)").tag("http.post")
+                            Text("Custom JS Script").tag("script.js")
+                            Text("System Notification").tag("notification")
+                            Text("Add to Calendar").tag("calendar.add")
+                        }
                     }
                 }
             }
