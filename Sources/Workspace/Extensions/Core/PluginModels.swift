@@ -10,11 +10,11 @@ struct PluginDefinition: Codable, Identifiable {
     var version: String
     var icon: String
     var identifier: String // com.ToolsKit.<userInput>
-    var isEnabled: Bool
-    var isInstalled: Bool
-    var installedAt: Date?
-    var lastExecutedAt: Date?
-    var errorCount: Int
+    var isEnabled: Bool = false
+    var isInstalled: Bool = false
+    var installedAt: Date? = nil
+    var lastExecutedAt: Date? = nil
+    var errorCount: Int = 0
 
     var capabilities: [PluginCapability]
     var actions: [PluginAction]

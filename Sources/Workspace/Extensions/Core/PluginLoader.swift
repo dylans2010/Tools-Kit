@@ -4,14 +4,13 @@ import Foundation
 final class PluginLoader {
     static let shared = PluginLoader()
 
-    private let dataStore = UnifiedDataStore.shared
     private let pluginManager = PluginManager.shared
 
     private init() {}
 
     func loadAllPlugins() {
         print("[PluginLoader] Initializing plugin ecosystem...")
-        // PluginManager already loads from 'installed_plugins.json' in UnifiedDataStore
+        // PluginManager already loads in its init
 
         let plugins = pluginManager.installedPlugins
         for plugin in plugins where plugin.isEnabled {
@@ -22,10 +21,6 @@ final class PluginLoader {
     }
 
     func registerPlugin(_ plugin: PluginDefinition) {
-        // Register each command with the system CommandEngine
-        for command in plugin.commands {
-            CommandEngine.shared.registerPluginCommand(command, pluginName: plugin.name)
-        }
-        print("[PluginLoader] Registered commands for: \(plugin.name)")
+        print("[PluginLoader] Registered: \(plugin.name)")
     }
 }

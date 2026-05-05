@@ -188,8 +188,6 @@ export async function onEvent(event, ctx) {
             isEnabled: true,
             isInstalled: true,
             installedAt: Date(),
-            lastExecutedAt: nil,
-            errorCount: 0,
             capabilities: Array(selectedCapabilities),
             actions: Array(selectedActions),
             sourceCode: sourceCode

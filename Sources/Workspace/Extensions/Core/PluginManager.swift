@@ -27,8 +27,6 @@ final class PluginManager: ObservableObject {
                 version: "1.2.0",
                 icon: "calendar.badge.clock",
                 identifier: "com.ToolsKit.taskscheduler",
-                isEnabled: false,
-                isInstalled: false,
                 capabilities: [.tasks, .calendar],
                 actions: [.taskCreated, .calendarEventCreated],
                 sourceCode: "// JS Source code here"
@@ -41,8 +39,6 @@ final class PluginManager: ObservableObject {
                 version: "2.0.1",
                 icon: "eye.fill",
                 identifier: "com.ToolsKit.codereview",
-                isEnabled: false,
-                isInstalled: false,
                 capabilities: [.github, .ai],
                 actions: [.repoPROpened],
                 sourceCode: "// JS Source code here"
@@ -55,8 +51,6 @@ final class PluginManager: ObservableObject {
                 version: "1.0.5",
                 icon: "chart.bar.xaxis",
                 identifier: "com.ToolsKit.analytics",
-                isEnabled: false,
-                isInstalled: false,
                 capabilities: [.collaboration, .intelligence],
                 actions: [.repoCommitPushed],
                 sourceCode: "// JS Source code here"

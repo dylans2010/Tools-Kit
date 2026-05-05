@@ -128,8 +128,6 @@ struct ValidationTests {
             isEnabled: true,
             isInstalled: true,
             installedAt: Date(),
-            lastExecutedAt: nil,
-            errorCount: 0,
             capabilities: [.notes],
             actions: [.noteCreated],
             sourceCode: "console.log('test')"
