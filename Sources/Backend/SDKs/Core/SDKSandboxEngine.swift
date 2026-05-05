@@ -30,8 +30,15 @@ public final class SDKSandboxEngine {
             WorkspaceAPI.shared.notes.listNotes().map { ["id": $0.id, "title": $0.title, "content": $0.content] }
         }
         let createNote: @convention(block) (String, String) -> [String: Any] = { title, content in
-            let note = WorkspaceAPI.shared.notes.createNote(title: title, content: content)
-            return ["id": note.id, "title": note.title]
+            let action = SDKAction.createNote(title: title, content: content)
+            let context = SDKExecutionContext(projectID: UUID(), noSandbox: SDKRuntimeEngine.shared.isNoSandboxModeEnabled)
+
+            // Execute via Kernel asynchronously to avoid deadlocks
+            Task {
+                try? await SDKExecutionKernel.shared.execute(action: action, context: context)
+            }
+
+            return ["status": "queued_via_kernel"]
         }
         notes?.setObject(listNotes, forKeyedSubscript: "list" as NSString)
         notes?.setObject(createNote, forKeyedSubscript: "create" as NSString)
@@ -130,11 +137,21 @@ public final class SDKSandboxEngine {
 
     public func executeSandboxed(sourceCode: String) async throws {
         let context = createNewContext()
+        // Sandbox-specific overrides could be added here
         context.evaluateScript(sourceCode)
     }
 
     public func executeUnrestricted(sourceCode: String) async throws {
         let context = createNewContext()
+
+        // Inject high-power Workspace Bridge for direct access
+        let bridge = JSValue(object: [:], in: context)
+        let getLiveState: @convention(block) () -> [String: Any] = {
+            return SDKWorkspaceBridge.shared.getLiveSystemState()
+        }
+        bridge?.setObject(getLiveState, forKeyedSubscript: "getLiveState" as NSString)
+        context.setObject(bridge, forKeyedSubscript: "sdk_bridge" as NSString)
+
         context.evaluateScript(sourceCode)
     }
 }
