@@ -76,6 +76,7 @@ export async function onEvent(event, ctx) {
         case toolkit = "Toolkit"
         case testing = "Testing"
         case release = "Release"
+        case docs = "Documentation"
     }
 
     var body: some View {
@@ -103,6 +104,7 @@ export async function onEvent(event, ctx) {
             case .toolkit: toolkitSection
             case .testing: testingSection
             case .release: releaseSection
+            case .docs: pluginDocsSection
             }
 
             buildSection
@@ -370,14 +372,14 @@ export async function onEvent(event, ctx) {
 
     private func availableToolkitTools(for category: PluginToolCategory) -> [String] {
         switch category {
-        case .ai: return ["AI Text Summarizer", "AI Code Generator", "AI Context Analyzer", "AI Classification Engine"]
-        case .data: return ["Data Filter Engine", "Data Transformer", "JSON Builder", "CSV Exporter"]
-        case .automation: return ["Workflow Trigger Builder", "Multi-Step Executor", "Delay Scheduler", "Conditional Router"]
-        case .integrations: return ["Webhook Sender", "API Request Builder", "Response Parser", "Retry Handler"]
-        case .workspace: return ["Notes Updater", "Task Generator", "Calendar Sync Tool", "File Organizer"]
-        case .developer: return ["Log Stream Viewer", "Error Catcher", "Performance Tracker", "Debug Breakpoints"]
-        case .security: return ["Permission Validator", "Scope Checker", "Data Sanitizer", "Access Logger"]
-        case .event: return ["Event Listener Builder", "Event Transformer", "Event Replay Tool", "Event Filter Engine"]
+        case .ai: return ["AI Prompt Builder", "AI Behavior Tuner", "AI Text Summarizer", "AI Code Generator", "AI Context Analyzer", "AI Classification Engine"]
+        case .data: return ["Data Transformer", "JSON Schema Builder", "Data Filtering Engine", "Data Filter Engine", "JSON Builder", "CSV Exporter"]
+        case .automation: return ["Event Trigger Designer", "Execution Scheduler", "Multi-step Action Builder", "Conditional Execution Engine", "Workflow Trigger Builder", "Multi-Step Executor", "Delay Scheduler", "Conditional Router"]
+        case .integrations: return ["Webhook Listener", "External Sync Config", "Webhook Sender", "API Request Builder", "Response Parser", "Retry Handler"]
+        case .workspace: return ["Workspace Modifier Rules", "Notification System", "Notes Updater", "Task Generator", "Calendar Sync Tool", "File Organizer"]
+        case .developer: return ["Plugin Analytics Dashboard", "Performance Monitor", "Logging Configuration", "Log Stream Viewer", "Error Catcher", "Performance Tracker", "Debug Breakpoints"]
+        case .security: return ["Rate Limiter Config", "Error Handling Rules", "Retry Strategy Builder", "Permission Validator", "Scope Checker", "Data Sanitizer", "Access Logger"]
+        case .event: return ["Event Replay Tool", "Batch Processor", "Event Listener Builder", "Event Transformer", "Event Filter Engine"]
         }
     }
 
@@ -585,6 +587,25 @@ export async function onEvent(event, ctx) {
         }
 
         simulatedBuildOutput = output
+    }
+
+    private var pluginDocsSection: some View {
+        Section("Plugin Development Guide") {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("How to create a plugin").font(.headline)
+                Text("Use the Identity section to define your plugin's unique identifier and basic info.").font(.caption)
+
+                Text("Capabilities & Scopes").font(.headline)
+                Text("Select only the capabilities you need. High-risk scopes require an API Key and Privacy Note.").font(.caption)
+
+                Text("Logic & Execution").font(.headline)
+                Text("Write JS logic in the Logic Editor. Use the 'ctx' object to access workspace APIs.").font(.caption)
+
+                Text("Debugging").font(.headline)
+                Text("Use the Testing section to simulate events and inspect execution logs.").font(.caption)
+            }
+            .padding(.vertical, 8)
+        }
     }
 
     private var dummyPluginForSecurity: PluginDefinition {

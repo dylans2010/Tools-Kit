@@ -54,7 +54,7 @@ struct PluginsMainView: View {
             navLinkCard("Marketplace", "cart.fill", .orange, MarketplaceView())
             navLinkCard("Dev Console", "terminal.fill", .purple, PluginDevConsoleView())
             navLinkCard("Security", "shield.fill", .red, PluginSecurityView())
-            navLinkCard("Sandbox", "shippingbox.fill", .gray, PluginsInstalledView())
+            navLinkCard("Connectors", "arrow.triangle.2.circlepath", .indigo, ConnectorsMainView())
         }
     }
 
