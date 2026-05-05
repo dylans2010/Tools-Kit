@@ -51,9 +51,9 @@ struct PersonaHomeView: View {
             }
 
             Section("Suggestions") {
-                SuggestionRow(icon: "calendar.badge.clock", title: "Meeting Prep", detail: "Generate a quick briefing from recent notes.")
-                SuggestionRow(icon: "chart.bar.xaxis", title: "Weekly Summary", detail: "Summarize your accomplishments for this week.")
-                SuggestionRow(icon: "book.closed", title: "Knowledge Gaps", detail: "Find topics you have not revisited recently.")
+                PersonaSuggestionRow(icon: "calendar.badge.clock", title: "Meeting Prep", detail: "Generate a quick briefing from recent notes.")
+                PersonaSuggestionRow(icon: "chart.bar.xaxis", title: "Weekly Summary", detail: "Summarize your accomplishments for this week.")
+                PersonaSuggestionRow(icon: "book.closed", title: "Knowledge Gaps", detail: "Find topics you have not revisited recently.")
             }
 
             Section("Recent History") {
@@ -95,7 +95,7 @@ struct PersonaHomeView: View {
     }
 }
 
-private struct SuggestionRow: View {
+private struct PersonaSuggestionRow: View {
     let icon: String
     let title: String
     let detail: String
