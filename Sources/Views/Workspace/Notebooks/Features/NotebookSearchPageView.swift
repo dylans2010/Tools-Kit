@@ -35,7 +35,7 @@ struct NotebookSearchPageView: View {
                 if searchText.isEmpty {
                     ContentUnavailableView("Search Workspace", systemImage: "magnifyingglass", description: Text("Enter a title or content to search across all notebooks."))
                 } else if searchResults.isEmpty {
-                    ContentUnavailableView.search(text: searchText)
+                    ContentUnavailableView("No Results", systemImage: "magnifyingglass", description: Text("No notebooks matched “\(searchText)”."))
                 }
             }
         }
