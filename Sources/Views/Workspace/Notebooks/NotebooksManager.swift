@@ -47,12 +47,14 @@ final class NotebooksManager: ObservableObject {
 
     // MARK: - Folders
 
-    func addFolder(to notebookID: UUID, name: String) {
-        guard let idx = notebooks.firstIndex(where: { $0.id == notebookID }) else { return }
+    @discardableResult
+    func addFolder(to notebookID: UUID, name: String) -> NotebookFolder? {
+        guard let idx = notebooks.firstIndex(where: { $0.id == notebookID }) else { return nil }
         let folder = NotebookFolder(name: name)
         notebooks[idx].folders.append(folder)
         notebooks[idx].updatedAt = Date()
         saveNotebooks()
+        return folder
     }
 
     func deleteFolder(_ folder: NotebookFolder, from notebookID: UUID) {
@@ -65,9 +67,14 @@ final class NotebooksManager: ObservableObject {
     // MARK: - Pages
 
     func addPage(to folderID: UUID, in notebookID: UUID, title: String) {
+        addPage(to: folderID, in: notebookID, title: title, content: "")
+    }
+
+    func addPage(to folderID: UUID, in notebookID: UUID, title: String, content: String) {
         guard let nbIdx = notebooks.firstIndex(where: { $0.id == notebookID }),
               let fIdx = notebooks[nbIdx].folders.firstIndex(where: { $0.id == folderID }) else { return }
-        let page = NotebookPage(title: title)
+        var page = NotebookPage(title: title)
+        page.content = content
         notebooks[nbIdx].folders[fIdx].pages.append(page)
         notebooks[nbIdx].updatedAt = Date()
         saveNotebooks()
