@@ -1168,12 +1168,12 @@
 		PL02000000000000000000000A /* SDKSystemExplorerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000A /* SDKSystemExplorerView.swift */; };
 		PL02000000000000000000000B /* SDKAPIBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000B /* SDKAPIBrowserView.swift */; };
 		PL02000000000000000000000C /* SDKConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000C /* SDKConsoleView.swift */; };
-		PL02000000000000000000000D /* SDKControlCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000D /* SDKControlCenterView.swift */; };
-		PL02000000000000000000000E /* SDKWorkspaceExplorerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000E /* SDKWorkspaceExplorerView.swift */; };
-		PL02000000000000000000000F /* SDKActionConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000F /* SDKActionConsoleView.swift */; };
-		PL020000000000000000000010 /* SDKIntegrationTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000010 /* SDKIntegrationTestView.swift */; };
-		PL020000000000000000000011 /* SDKEventStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000011 /* SDKEventStreamView.swift */; };
-		PL020000000000000000000012 /* SDKSecurityMonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000012 /* SDKSecurityMonitorView.swift */; };
+		PL020000000000000000000020 /* SDKControlCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000020 /* SDKControlCenterView.swift */; };
+		PL020000000000000000000021 /* SDKWorkspaceExplorerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000021 /* SDKWorkspaceExplorerView.swift */; };
+		PL020000000000000000000022 /* SDKActionConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000022 /* SDKActionConsoleView.swift */; };
+		PL020000000000000000000023 /* SDKIntegrationTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000023 /* SDKIntegrationTestView.swift */; };
+		PL020000000000000000000024 /* SDKEventStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000024 /* SDKEventStreamView.swift */; };
+		PL020000000000000000000025 /* SDKSecurityMonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000025 /* SDKSecurityMonitorView.swift */; };
 		PL02000000000000000000000D /* SDKDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000D /* SDKDebugView.swift */; };
 		PL02000000000000000000000E /* SDKFlowBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000E /* SDKFlowBuilderView.swift */; };
 		PL02000000000000000000000F /* SDKDataControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000F /* SDKDataControlView.swift */; };
@@ -2341,12 +2341,12 @@
 		PL01000000000000000000000A /* SDKSystemExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKSystemExplorerView.swift; sourceTree = "<group>"; };
 		PL01000000000000000000000B /* SDKAPIBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKAPIBrowserView.swift; sourceTree = "<group>"; };
 		PL01000000000000000000000C /* SDKConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKConsoleView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000000D /* SDKControlCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKControlCenterView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000000E /* SDKWorkspaceExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKWorkspaceExplorerView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000000F /* SDKActionConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKActionConsoleView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000010 /* SDKIntegrationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKIntegrationTestView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000011 /* SDKEventStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKEventStreamView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000012 /* SDKSecurityMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKSecurityMonitorView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000020 /* SDKControlCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKControlCenterView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000021 /* SDKWorkspaceExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKWorkspaceExplorerView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000022 /* SDKActionConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKActionConsoleView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000023 /* SDKIntegrationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKIntegrationTestView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000024 /* SDKEventStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKEventStreamView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000025 /* SDKSecurityMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKSecurityMonitorView.swift; sourceTree = "<group>"; };
 		PL01000000000000000000000D /* SDKDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKDebugView.swift; sourceTree = "<group>"; };
 		PL01000000000000000000000E /* SDKFlowBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKFlowBuilderView.swift; sourceTree = "<group>"; };
 		PL01000000000000000000000F /* SDKDataControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKDataControlView.swift; sourceTree = "<group>"; };
@@ -3686,12 +3686,12 @@
 				PL01000000000000000000000A /* SDKSystemExplorerView.swift */,
 				PL01000000000000000000000B /* SDKAPIBrowserView.swift */,
 				PL01000000000000000000000C /* SDKConsoleView.swift */,
-				PL01000000000000000000000D /* SDKControlCenterView.swift */,
-				PL01000000000000000000000E /* SDKWorkspaceExplorerView.swift */,
-				PL01000000000000000000000F /* SDKActionConsoleView.swift */,
-				PL010000000000000000000010 /* SDKIntegrationTestView.swift */,
-				PL010000000000000000000011 /* SDKEventStreamView.swift */,
-				PL010000000000000000000012 /* SDKSecurityMonitorView.swift */,
+				PL010000000000000000000020 /* SDKControlCenterView.swift */,
+				PL010000000000000000000021 /* SDKWorkspaceExplorerView.swift */,
+				PL010000000000000000000022 /* SDKActionConsoleView.swift */,
+				PL010000000000000000000023 /* SDKIntegrationTestView.swift */,
+				PL010000000000000000000024 /* SDKEventStreamView.swift */,
+				PL010000000000000000000025 /* SDKSecurityMonitorView.swift */,
 				PL01000000000000000000000D /* SDKDebugView.swift */,
 				PL01000000000000000000000E /* SDKFlowBuilderView.swift */,
 				PL01000000000000000000000F /* SDKDataControlView.swift */,
@@ -5638,12 +5638,12 @@
 				PL02000000000000000000000A /* SDKSystemExplorerView.swift in Sources */,
 				PL02000000000000000000000B /* SDKAPIBrowserView.swift in Sources */,
 				PL02000000000000000000000C /* SDKConsoleView.swift in Sources */,
-				PL02000000000000000000000D /* SDKControlCenterView.swift in Sources */,
-				PL02000000000000000000000E /* SDKWorkspaceExplorerView.swift in Sources */,
-				PL02000000000000000000000F /* SDKActionConsoleView.swift in Sources */,
-				PL020000000000000000000010 /* SDKIntegrationTestView.swift in Sources */,
-				PL020000000000000000000011 /* SDKEventStreamView.swift in Sources */,
-				PL020000000000000000000012 /* SDKSecurityMonitorView.swift in Sources */,
+				PL020000000000000000000020 /* SDKControlCenterView.swift in Sources */,
+				PL020000000000000000000021 /* SDKWorkspaceExplorerView.swift in Sources */,
+				PL020000000000000000000022 /* SDKActionConsoleView.swift in Sources */,
+				PL020000000000000000000023 /* SDKIntegrationTestView.swift in Sources */,
+				PL020000000000000000000024 /* SDKEventStreamView.swift in Sources */,
+				PL020000000000000000000025 /* SDKSecurityMonitorView.swift in Sources */,
 				PL02000000000000000000000D /* SDKDebugView.swift in Sources */,
 				PL02000000000000000000000E /* SDKFlowBuilderView.swift in Sources */,
 				PL02000000000000000000000F /* SDKDataControlView.swift in Sources */,
