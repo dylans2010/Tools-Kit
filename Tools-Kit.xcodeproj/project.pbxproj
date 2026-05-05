@@ -82,7 +82,6 @@
 		CL020000000000000000000F /* PluginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000F /* PluginManager.swift */; };
 		ED020000000000000000000A /* EditingHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000A /* EditingHomeView.swift */; };
 		ED020000000000000000000B /* FullEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED010000000000000000000B /* FullEditorView.swift */; };
-		VT0200000000000000000001 /* ValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = VT0100000000000000000001 /* ValidationTests.swift */; };
 		KB0200000000000000000050 /* KeyboardValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = KB0100000000000000000050 /* KeyboardValidationTests.swift */; };
 		TH0200000000000000000001 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = TH0100000000000000000001 /* Theme.swift */; };
 		IW0200000000000000000001 /* WorkspaceColorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = IW0100000000000000000001 /* WorkspaceColorManager.swift */; };
