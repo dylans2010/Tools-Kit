@@ -8,12 +8,16 @@ public final class SDKSandboxEngine {
 
     private init() {}
 
+    @MainActor
     private func createNewContext() -> JSContext {
-        let context = JSContext()
+        guard let context = JSContext() else {
+            fatalError("Failed to create JSContext")
+        }
         setupContext(context)
         return context
     }
 
+    @MainActor
     private func setupContext(_ context: JSContext) {
         // Logging
         let log: @convention(block) (String) -> Void = { message in
@@ -140,19 +144,23 @@ public final class SDKSandboxEngine {
         context.setObject(workspace, forKeyedSubscript: "workspace" as NSString)
     }
 
+    @MainActor
     public func executeSandboxed(sourceCode: String) async throws {
         let context = createNewContext()
         // Sandbox-specific overrides could be added here
         context.evaluateScript(sourceCode)
     }
 
+    @MainActor
     public func executeUnrestricted(sourceCode: String) async throws {
         let context = createNewContext()
 
         // Inject high-power Workspace Bridge for direct access
         let bridge = JSValue(object: [:], in: context)
         let getLiveState: @convention(block) () -> [String: Any] = {
-            return SDKWorkspaceBridge.shared.getLiveSystemState()
+            return MainActor.assumeIsolated {
+                SDKWorkspaceBridge.shared.getLiveSystemState()
+            }
         }
         bridge?.setObject(getLiveState, forKeyedSubscript: "getLiveState" as NSString)
         context.setObject(bridge, forKeyedSubscript: "sdk_bridge" as NSString)

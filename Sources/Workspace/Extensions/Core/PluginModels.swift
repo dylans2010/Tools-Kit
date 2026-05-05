@@ -284,6 +284,7 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
         case .uiOverlayPresent, .uiPanelInject, .uiCommandbarExtend, .uiContextmenuModify: return "macwindow"
         case .workspaceEvent, .workspaceModifySelective, .workspaceFetchFullData: return "tray.full"
         case .securityFetchData: return "shield.lefthalf.filled"
+        case .sdkDeveloperNoSandbox: return "hammer.fill"
         }
     }
 }

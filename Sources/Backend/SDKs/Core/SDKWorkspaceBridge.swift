@@ -16,6 +16,7 @@ public final class SDKWorkspaceBridge {
         mutation()
     }
 
+    @MainActor
     public func getLiveSystemState() -> [String: Any] {
         return [
             "notes_count": api.notes.listNotes().count,
