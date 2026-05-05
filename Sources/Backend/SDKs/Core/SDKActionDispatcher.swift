@@ -28,7 +28,7 @@ public final class SDKActionDispatcher {
         case .calendar(let calendarAction):
             switch calendarAction {
             case .create(let title, let start, let end):
-                api.calendar.createEvent(title: title, start: start, end: end)
+                await api.calendar.createEvent(title: title, start: start, end: end)
             }
         case .files(let filesAction):
             switch filesAction {

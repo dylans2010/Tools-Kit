@@ -64,6 +64,14 @@ final class NotebooksManager: ObservableObject {
         saveNotebooks()
     }
 
+    func updateFolder(_ folder: NotebookFolder, in notebook: Notebook) {
+        guard let nbIdx = notebooks.firstIndex(where: { $0.id == notebook.id }),
+              let fIdx = notebooks[nbIdx].folders.firstIndex(where: { $0.id == folder.id }) else { return }
+        notebooks[nbIdx].folders[fIdx] = folder
+        notebooks[nbIdx].updatedAt = Date()
+        saveNotebooks()
+    }
+
     // MARK: - Pages
 
     func addPage(to folderID: UUID, in notebookID: UUID, title: String) {

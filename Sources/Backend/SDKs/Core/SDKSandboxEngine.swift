@@ -9,7 +9,7 @@ public final class SDKSandboxEngine {
     private init() {}
 
     private func createNewContext() -> JSContext {
-        let context = JSContext() ?? JSContext()
+        let context = JSContext()
         setupContext(context)
         return context
     }
@@ -72,10 +72,15 @@ public final class SDKSandboxEngine {
         // Calendar Module
         let calendar = JSValue(object: [:], in: context)
         let listEvents: @convention(block) () -> [[String: Any]] = {
-            WorkspaceAPI.shared.calendar.listEvents().map { ["id": $0.id.uuidString, "title": $0.title] }
+            guard Thread.isMainThread else { return [] }
+            return MainActor.assumeIsolated {
+                WorkspaceAPI.shared.calendar.listEvents().map { ["id": $0.id.uuidString, "title": $0.title] }
+            }
         }
         let createEvent: @convention(block) (String, Double, Double) -> Void = { title, start, end in
-            WorkspaceAPI.shared.calendar.createEvent(title: title, start: Date(timeIntervalSince1970: start), end: Date(timeIntervalSince1970: end))
+            Task { @MainActor in
+                WorkspaceAPI.shared.calendar.createEvent(title: title, start: Date(timeIntervalSince1970: start), end: Date(timeIntervalSince1970: end))
+            }
         }
         calendar?.setObject(listEvents, forKeyedSubscript: "list" as NSString)
         calendar?.setObject(createEvent, forKeyedSubscript: "create" as NSString)
@@ -84,7 +89,7 @@ public final class SDKSandboxEngine {
         // Files Module
         let files = JSValue(object: [:], in: context)
         let listFiles: @convention(block) () -> [[String: Any]] = {
-            WorkspaceAPI.shared.files.listFiles().map { ["id": $0.id.uuidString, "name": $0.name] }
+            WorkspaceAPI.shared.files.listFiles().map { ["id": $0.id, "name": $0.name] }
         }
         files?.setObject(listFiles, forKeyedSubscript: "list" as NSString)
         workspace?.setObject(files, forKeyedSubscript: "files" as NSString)

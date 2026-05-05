@@ -1,6 +1,6 @@
 import Foundation
 
-struct MailAccount: Identifiable, Codable, Hashable {
+struct MailAccount: Identifiable, Codable, Hashable, Sendable {
     let id: String
     var emailAddress: String
     var providerType: ProviderType
@@ -12,7 +12,7 @@ struct MailAccount: Identifiable, Codable, Hashable {
     var smtpPort: UInt16?
     var isActive: Bool
 
-    enum ProviderType: String, Codable, CaseIterable {
+    enum ProviderType: String, Codable, CaseIterable, Sendable {
         case gmail
         case outlook
         case yahoo
