@@ -125,7 +125,7 @@ struct ValidationTests {
             author: "Validator",
             version: "1.0.0",
             icon: "puzzlepiece",
-            identifier: "com.ToolsKit.validation",
+            identifier: "com.toolskit.validation",
             isEnabled: true,
             isInstalled: true,
             installedAt: Date(),
@@ -134,11 +134,40 @@ struct ValidationTests {
             sourceCode: "console.log('test')"
         )
         manager.savePlugin(plugin)
-        assert(manager.installedPlugins.contains(where: { $0.identifier == "com.ToolsKit.validation" }))
+        assert(manager.installedPlugins.contains(where: { $0.identifier == "com.toolskit.validation" }))
 
         let runtime = PluginRuntime.shared
         // Verification of subscription logic
         assert(plugin.actions.contains { $0.rawValue == "note.created" })
+
+        // Test High-Risk Validation
+        let highRiskPlugin = PluginDefinition(
+            id: UUID(),
+            name: "High Risk Plugin",
+            description: "Test",
+            author: "Validator",
+            version: "1.0.0",
+            icon: "shield",
+            identifier: "com.toolskit.highrisk",
+            capabilities: [.mailFetchData],
+            actions: [.mailReceived],
+            sourceCode: "console.log('test')"
+            // No API key or privacy note
+        )
+
+        // Should fail install
+        manager.install(pluginID: highRiskPlugin.id) // This won't work as it's not in availablePlugins, but let's test savePlugin logic
+
+        let sandbox = PluginSandbox.shared
+        let event = PluginEvent(id: UUID(), capability: .mailFetchData, action: "mail.received", payload: [:], timestamp: Date())
+        let result = sandbox.validateExecution(plugin: highRiskPlugin, event: event)
+
+        switch result {
+        case .failure(let reason, _):
+            assert(reason == .scopeInvalid, "High-risk plugin should fail scope validation without API Key")
+        case .success:
+            fatalError("High-risk plugin should not succeed without API Key")
+        }
     }
 
     private static func testWorkspaceOS() async {

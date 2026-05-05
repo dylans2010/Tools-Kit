@@ -17,6 +17,12 @@ struct PluginBuildView: View {
     @State private var selectedCapabilities: Set<PluginCapability> = []
     @State private var selectedActions: Set<PluginAction> = []
 
+    // Security Scopes (High-Risk)
+    @State private var apiKey: String?
+    @State private var privacyNote: String?
+    @State private var dataUsageExplanation: String?
+    @State private var retentionPolicy: String?
+
     // Logic
     @State private var sourceCode = """
 export async function onEvent(event, ctx) {
@@ -40,6 +46,7 @@ export async function onEvent(event, ctx) {
             identitySection
             capabilitiesSection
             actionsSection
+            securitySection
             permissionsSummarySection
             logicEditorSection
             validationSection
@@ -49,7 +56,7 @@ export async function onEvent(event, ctx) {
         .alert("Identifier Locked", isPresented: $showingIdentifierLockAlert) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text("The identifier 'com.ToolsKit.\(identifier)' cannot be changed after creation.")
+            Text("The identifier 'com.toolskit.\(identifier)' cannot be changed after creation.")
         }
     }
 
@@ -66,10 +73,10 @@ export async function onEvent(event, ctx) {
                 Text("Identifier")
                 Spacer()
                 if isIdentifierLocked {
-                    Text("com.ToolsKit.\(identifier)")
+                    Text("com.toolskit.\(identifier)")
                         .foregroundColor(.secondary)
                 } else {
-                    Text("com.ToolsKit.")
+                    Text("com.toolskit.")
                         .foregroundColor(.secondary)
                     TextField("unique-id", text: $identifier)
                         .multilineTextAlignment(.trailing)
@@ -122,6 +129,37 @@ export async function onEvent(event, ctx) {
         }
     }
 
+    private var securitySection: some View {
+        Section("Security & Scopes") {
+            let highRiskSelected = selectedCapabilities.contains { $0.riskLevel == .high }
+
+            if highRiskSelected {
+                NavigationLink(destination: SecurityScopeApplicationView(plugin: Binding(
+                    get: { dummyPluginForSecurity },
+                    set: { updated in
+                        self.apiKey = updated.apiKey
+                        self.privacyNote = updated.privacyNote
+                        self.dataUsageExplanation = updated.dataUsageExplanation
+                        self.retentionPolicy = updated.retentionPolicy
+                    }
+                ))) {
+                    HStack {
+                        Label("High-Risk Security Gate", systemImage: "shield.fill")
+                            .foregroundColor(.red)
+                        Spacer()
+                        if apiKey != nil && privacyNote != nil {
+                            Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
+                        } else {
+                            Image(systemName: "exclamationmark.triangle.fill").foregroundColor(.orange)
+                        }
+                    }
+                }
+            } else {
+                Text("No high-risk scopes selected.").font(.caption).foregroundColor(.secondary)
+            }
+        }
+    }
+
     private var permissionsSummarySection: some View {
         Section("Permissions Summary") {
             if selectedCapabilities.isEmpty {
@@ -129,13 +167,35 @@ export async function onEvent(event, ctx) {
             } else {
                 ForEach(Array(selectedCapabilities), id: \.self) { cap in
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(cap.displayName).font(.subheadline.bold())
-                        Text(PluginPermission(capability: cap).description)
+                        HStack {
+                            Text(cap.displayName).font(.subheadline.bold())
+                            Spacer()
+                            riskPill(cap.riskLevel)
+                        }
+                        Text(cap.description)
                             .font(.caption).foregroundColor(.secondary)
                     }
                     .padding(.vertical, 2)
                 }
             }
+        }
+    }
+
+    private func riskPill(_ risk: RiskLevel) -> some View {
+        Text(risk.rawValue.uppercased())
+            .font(.system(size: 8, weight: .bold))
+            .padding(.horizontal, 4)
+            .padding(.vertical, 2)
+            .background(riskColor(risk).opacity(0.1))
+            .foregroundColor(riskColor(risk))
+            .clipShape(Capsule())
+    }
+
+    private func riskColor(_ risk: RiskLevel) -> Color {
+        switch risk {
+        case .low: return .green
+        case .medium: return .orange
+        case .high, .critical: return .red
         }
     }
 
@@ -156,7 +216,7 @@ export async function onEvent(event, ctx) {
 
     private var validationSection: some View {
         Section("Quick Validation") {
-            LabeledContent("Identifier", value: "com.ToolsKit.\(identifier.isEmpty ? "<missing>" : identifier)")
+            LabeledContent("Identifier", value: "com.toolskit.\(identifier.isEmpty ? "<missing>" : identifier)")
             LabeledContent("Capabilities", value: "\(selectedCapabilities.count)")
             LabeledContent("Actions", value: "\(selectedActions.count)")
 
@@ -202,12 +262,15 @@ export async function onEvent(event, ctx) {
     // MARK: - Validation & Actions
 
     private var isValid: Bool {
-        !name.isEmpty && !identifier.isEmpty && !selectedCapabilities.isEmpty && !selectedActions.isEmpty && !sourceCode.isEmpty
+        let highRiskSelected = selectedCapabilities.contains { $0.riskLevel == .high }
+        let securityValid = !highRiskSelected || (apiKey != nil && privacyNote != nil)
+
+        return !name.isEmpty && !identifier.isEmpty && !selectedCapabilities.isEmpty && !selectedActions.isEmpty && !sourceCode.isEmpty && securityValid
     }
 
     private func buildAndInstall() {
         // Validation engine
-        if manager.installedPlugins.contains(where: { $0.identifier == "com.ToolsKit.\(identifier)" }) {
+        if manager.installedPlugins.contains(where: { $0.identifier == "com.toolskit.\(identifier)" }) {
             errorMessage = "Identifier already in use."
             return
         }
@@ -219,13 +282,17 @@ export async function onEvent(event, ctx) {
             author: author,
             version: version,
             icon: icon,
-            identifier: "com.ToolsKit.\(identifier)",
+            identifier: "com.toolskit.\(identifier)",
             isEnabled: true,
             isInstalled: true,
             installedAt: Date(),
             capabilities: Array(selectedCapabilities),
             actions: Array(selectedActions),
-            sourceCode: sourceCode
+            sourceCode: sourceCode,
+            apiKey: apiKey,
+            privacyNote: privacyNote,
+            dataUsageExplanation: dataUsageExplanation,
+            retentionPolicy: retentionPolicy
         )
 
         manager.savePlugin(newPlugin)
@@ -244,6 +311,11 @@ export async function onEvent(event, ctx) {
             output.append("ERROR: at least one capability is required")
         }
 
+        let highRiskSelected = selectedCapabilities.contains { $0.riskLevel == .high }
+        if highRiskSelected && (apiKey == nil || privacyNote == nil) {
+            output.append("ERROR: high-risk scopes require API Key and Privacy Note")
+        }
+
         if selectedActions.isEmpty {
             output.append("ERROR: at least one action is required")
         }
@@ -254,10 +326,30 @@ export async function onEvent(event, ctx) {
             output.append("✓ test event payload JSON is valid")
         }
 
-        if output.count == 2 {
+        if output.count == 1 {
             output.append("✓ ready to build")
         }
 
         simulatedBuildOutput = output
+    }
+
+    // Helper to interface with SecurityScopeApplicationView
+    private var dummyPluginForSecurity: PluginDefinition {
+        PluginDefinition(
+            id: UUID(),
+            name: name,
+            description: description,
+            author: author,
+            version: version,
+            icon: icon,
+            identifier: "com.toolskit.\(identifier)",
+            capabilities: Array(selectedCapabilities),
+            actions: Array(selectedActions),
+            sourceCode: sourceCode,
+            apiKey: apiKey,
+            privacyNote: privacyNote,
+            dataUsageExplanation: dataUsageExplanation,
+            retentionPolicy: retentionPolicy
+        )
     }
 }

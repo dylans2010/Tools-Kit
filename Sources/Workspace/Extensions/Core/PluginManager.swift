@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 /// Manages the plugin lifecycle: install, enable/disable, sandbox execution.
+/// Acts as the PluginRegistry and PluginLifecycleManager.
 final class PluginManager: ObservableObject {
     static let shared = PluginManager()
 
@@ -15,7 +16,7 @@ final class PluginManager: ObservableObject {
         seedMarketplace()
     }
 
-    // MARK: - Marketplace
+    // MARK: - Marketplace (PluginRegistry)
 
     private func seedMarketplace() {
         availablePlugins = [
@@ -26,7 +27,7 @@ final class PluginManager: ObservableObject {
                 author: "ToolsKit Labs",
                 version: "1.2.0",
                 icon: "calendar.badge.clock",
-                identifier: "com.ToolsKit.taskscheduler",
+                identifier: "com.toolskit.taskscheduler",
                 capabilities: [.tasks, .calendar],
                 actions: [.taskCreated, .calendarEventCreated],
                 sourceCode: "// JS Source code here"
@@ -38,7 +39,7 @@ final class PluginManager: ObservableObject {
                 author: "DevOps Team",
                 version: "2.0.1",
                 icon: "eye.fill",
-                identifier: "com.ToolsKit.codereview",
+                identifier: "com.toolskit.codereview",
                 capabilities: [.github, .ai],
                 actions: [.repoPROpened],
                 sourceCode: "// JS Source code here"
@@ -50,22 +51,41 @@ final class PluginManager: ObservableObject {
                 author: "Analytics Core",
                 version: "1.0.5",
                 icon: "chart.bar.xaxis",
-                identifier: "com.ToolsKit.analytics",
+                identifier: "com.toolskit.analytics",
                 capabilities: [.collaboration, .intelligence],
                 actions: [.repoCommitPushed],
+                sourceCode: "// JS Source code here"
+            ),
+            PluginDefinition(
+                id: UUID(),
+                name: "Persona Insights",
+                description: "AI Persona driven behavioral modeling and workspace analysis.",
+                author: "Intelligence Team",
+                version: "1.0.0",
+                icon: "person.and.sparkles",
+                identifier: "com.toolskit.personainsights",
+                capabilities: [.aiPersonaQuery, .aiPersonaWorkspaceAnalysis, .aiPersonaBehaviorModel],
+                actions: [.workspaceEvent],
                 sourceCode: "// JS Source code here"
             )
         ]
     }
 
-    // MARK: - Management
+    // MARK: - Management (PluginLifecycleManager)
 
     func install(pluginID: UUID) {
         guard let index = availablePlugins.firstIndex(where: { $0.id == pluginID }) else { return }
         var plugin = availablePlugins[index]
+
+        // Validation check before installation
+        guard validatePluginForInstall(plugin) else { return }
+
         plugin.isInstalled = true
         plugin.isEnabled = true
         plugin.installedAt = Date()
+
+        // Add initial changelog entry
+        plugin.changelog.append(PluginChangeLogEntry(version: plugin.version, date: Date(), notes: "Initial installation"))
 
         availablePlugins[index] = plugin
         installedPlugins.append(plugin)
@@ -89,12 +109,68 @@ final class PluginManager: ObservableObject {
     }
 
     func savePlugin(_ plugin: PluginDefinition) {
+        // Identifier Locking: Check if a plugin with same identifier exists but different ID
+        if let existing = installedPlugins.first(where: { $0.identifier == plugin.identifier }), existing.id != plugin.id {
+            print("Error: Plugin identifier \(plugin.identifier) is locked.")
+            return
+        }
+
         if let index = installedPlugins.firstIndex(where: { $0.id == plugin.id }) {
-            installedPlugins[index] = plugin
+            var updatedPlugin = plugin
+            let currentVersion = installedPlugins[index].version
+
+            // Versioning: Must increment
+            if isNewerVersion(new: plugin.version, current: currentVersion) {
+                updatedPlugin.changelog.append(PluginChangeLogEntry(version: plugin.version, date: Date(), notes: plugin.releaseNotes ?? "Version updated"))
+            } else if plugin.version != currentVersion {
+                print("Warning: Version should be incremented. Current: \(currentVersion), New: \(plugin.version)")
+                // Optionally block save if version is not incremented? Spec says "must increment"
+                // For now we allow it but log a warning, or we could revert version.
+                updatedPlugin.version = currentVersion
+            }
+
+            // Keep immutable fields
+            updatedPlugin.identifier = installedPlugins[index].identifier
+
+            installedPlugins[index] = updatedPlugin
         } else {
-            installedPlugins.append(plugin)
+            var newPlugin = plugin
+            newPlugin.changelog.append(PluginChangeLogEntry(version: plugin.version, date: Date(), notes: "Plugin created"))
+            installedPlugins.append(newPlugin)
         }
         saveInstalled()
+    }
+
+    // MARK: - Validation
+
+    private func validatePluginForInstall(_ plugin: PluginDefinition) -> Bool {
+        // Enforce identifier format: com.toolskit.<name>
+        if !plugin.identifier.starts(with: "com.toolskit.") {
+            return false
+        }
+
+        // High-risk scopes require API key and privacy note
+        let hasHighRisk = plugin.capabilities.contains { $0.riskLevel == .high }
+        if hasHighRisk {
+            if plugin.apiKey == nil || plugin.privacyNote == nil {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    private func isNewerVersion(new: String, current: String) -> Bool {
+        let newParts = new.split(separator: ".").compactMap { Int($0) }
+        let currentParts = current.split(separator: ".").compactMap { Int($0) }
+
+        for i in 0..<max(newParts.count, currentParts.count) {
+            let n = i < newParts.count ? newParts[i] : 0
+            let c = i < currentParts.count ? currentParts[i] : 0
+            if n > c { return true }
+            if n < c { return false }
+        }
+        return false
     }
 
     // MARK: - Persistence

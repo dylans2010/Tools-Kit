@@ -7,6 +7,12 @@ struct PluginsMainView: View {
     @State private var cancellables = Set<AnyCancellable>()
     @State private var selectedDestination: PluginDestination?
 
+    // Limited View state
+    @State private var blockedPlugin: PluginDefinition?
+    @State private var blockedReason: ValidationFailureReason = .capabilityMismatch
+    @State private var blockedDetail: String = ""
+    @State private var showingLimitedView = false
+
     var body: some View {
         List {
             headerSection
@@ -21,6 +27,14 @@ struct PluginsMainView: View {
         }
         .navigationTitle("Plugins")
         .onAppear(perform: setupActivityStream)
+        .onAppear(perform: setupBlockedExecutionListener)
+        .sheet(isPresented: $showingLimitedView) {
+            if let plugin = blockedPlugin {
+                NavigationStack {
+                    PluginLimitedView(plugin: plugin, reason: blockedReason, detail: blockedDetail)
+                }
+            }
+        }
     }
 
     // MARK: - Sections
@@ -151,6 +165,23 @@ struct PluginsMainView: View {
             if recentEvents.count > 20 { recentEvents.removeLast() }
         }
         .store(in: &cancellables)
+    }
+
+    private func setupBlockedExecutionListener() {
+        NotificationCenter.default.publisher(for: .pluginExecutionBlocked)
+            .sink { notification in
+                if let pluginID = notification.userInfo?["pluginID"] as? UUID,
+                   let plugin = manager.installedPlugins.first(where: { $0.id == pluginID }),
+                   let reason = notification.userInfo?["reason"] as? ValidationFailureReason,
+                   let detail = notification.userInfo?["detail"] as? String {
+
+                    self.blockedPlugin = plugin
+                    self.blockedReason = reason
+                    self.blockedDetail = detail
+                    self.showingLimitedView = true
+                }
+            }
+            .store(in: &cancellables)
     }
 
     @ViewBuilder
