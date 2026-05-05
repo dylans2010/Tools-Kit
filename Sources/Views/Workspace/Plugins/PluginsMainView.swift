@@ -5,6 +5,7 @@ struct PluginsMainView: View {
     @StateObject private var manager = PluginManager.shared
     @State private var recentEvents: [PluginEvent] = []
     @State private var cancellables = Set<AnyCancellable>()
+    @State private var selectedDestination: PluginDestination?
 
     var body: some View {
         List {
@@ -43,29 +44,12 @@ struct PluginsMainView: View {
     private var primaryActionsSection: some View {
         Section {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                NavigationLink(destination: PluginBuildView()) {
-                    ActionCard(title: "Create Plugin", icon: "plus.circle.fill", color: .blue) { }
-                }
-
-                NavigationLink(destination: PluginsInstalledView()) {
-                    ActionCard(title: "Installed", icon: "puzzlepiece.extension.fill", color: .green) { }
-                }
-
-                NavigationLink(destination: MarketplaceView()) {
-                    ActionCard(title: "Marketplace", icon: "cart.fill", color: .orange) { }
-                }
-
-                NavigationLink(destination: PluginDevConsoleView()) {
-                    ActionCard(title: "Dev Console", icon: "terminal.fill", color: .purple) { }
-                }
-
-                NavigationLink(destination: PluginSecurityView()) {
-                    ActionCard(title: "Security", icon: "shield.fill", color: .red) { }
-                }
-
-                Button(action: { /* Action */ }) {
-                    ActionCard(title: "Sandbox", icon: "box.truck.fill", color: .gray) { }
-                }
+                navActionCard(title: "Create Plugin", icon: "plus.circle.fill", color: .blue, destination: .build)
+                navActionCard(title: "Installed", icon: "puzzlepiece.extension.fill", color: .green, destination: .installed)
+                navActionCard(title: "Marketplace", icon: "cart.fill", color: .orange, destination: .marketplace)
+                navActionCard(title: "Dev Console", icon: "terminal.fill", color: .purple, destination: .devConsole)
+                navActionCard(title: "Security", icon: "shield.fill", color: .red, destination: .security)
+                navActionCard(title: "Sandbox", icon: "box.truck.fill", color: .gray, destination: .sandbox)
             }
             .padding(.vertical, 8)
             .buttonStyle(.plain)
@@ -168,6 +152,31 @@ struct PluginsMainView: View {
         }
         .store(in: &cancellables)
     }
+
+    @ViewBuilder
+    private func navActionCard(title: String, icon: String, color: Color, destination: PluginDestination) -> some View {
+        Button {
+            selectedDestination = destination
+        } label: {
+            ActionCardContent(title: title, icon: icon, color: color)
+        }
+        .buttonStyle(.plain)
+        .navigationDestination(item: $selectedDestination) { destination in
+            switch destination {
+            case .build: PluginBuildView()
+            case .installed: PluginsInstalledView()
+            case .marketplace: MarketplaceView()
+            case .devConsole: PluginDevConsoleView()
+            case .security: PluginSecurityView()
+            case .sandbox: PluginGlobalOverlay()
+            }
+        }
+    }
+}
+
+private enum PluginDestination: Hashable, Identifiable {
+    case build, installed, marketplace, devConsole, security, sandbox
+    var id: Self { self }
 }
 
 // MARK: - Subviews
@@ -237,5 +246,23 @@ struct PluginStatusPill: View {
         case .idle: return .blue
         case .error: return .red
         }
+    }
+}
+
+private struct ActionCardContent: View {
+    let title: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        VStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.title3)
+            Text(title)
+                .font(.caption.bold())
+        }
+        .frame(maxWidth: .infinity, minHeight: 96)
+        .padding()
+        .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
     }
 }
