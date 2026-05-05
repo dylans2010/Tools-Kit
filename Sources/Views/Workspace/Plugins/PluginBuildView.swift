@@ -27,7 +27,9 @@ export async function onEvent(event, ctx) {
 }
 """
 
-    @State private var testEventPayload = """{"type":"note.created","payload":{"id":"sample-id","content":"Draft note text"}}"""
+    @State private var testEventPayload = """
+{"type":"note.created","payload":{"id":"sample-id","content":"Draft note text"}}
+"""
     @State private var simulatedBuildOutput: [String] = []
 
     @State private var showingIdentifierLockAlert = false
