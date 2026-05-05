@@ -27,7 +27,20 @@ final class PluginSandbox {
     }
 
     private func setupSDK() {
-        // Implementation of Notes, Mail, Tasks, AI, etc. APIs for JS environment
+        guard let context = context else { return }
+
+        // External API SDK
+        let fetch: @convention(block) (String, [String: Any]) -> JSValue? = { url, options in
+            print("[Plugin Sandbox] Fetching \(url) with options \(options)")
+            return JSValue(object: ["status": 200, "data": [:]], in: context)
+        }
+        context.setObject(fetch, forKeyedSubscript: "fetch" as NSString)
+
+        // UI Injection SDK
+        let presentOverlay: @convention(block) (String) -> Void = { content in
+            print("[Plugin Sandbox] Presenting overlay: \(content)")
+        }
+        context.setObject(presentOverlay, forKeyedSubscript: "presentOverlay" as NSString)
     }
 
     // MARK: - Validation Pipeline
@@ -44,12 +57,19 @@ final class PluginSandbox {
             return .failure(reason: .actionMismatch, detail: "Plugin does not support action: \(event.action)")
         }
 
-        // 3. Scope Validation (PluginSecurityService / ScopeValidator)
+        // 3. Scope Validation
         if !validateScope(plugin: plugin, capability: event.capability) {
             return .failure(reason: .scopeInvalid, detail: "Security scope validation failed for \(event.capability.rawValue)")
         }
 
-        // 4. Prerequisite Check (PluginPrerequisiteEngine)
+        // 4. Execution Rules Validation (NEW)
+        for rule in plugin.executionRules {
+            if !evaluateRule(rule, plugin: plugin, event: event) {
+                return .failure(reason: .ruleBlocked, detail: "Execution blocked by rule: \(rule.type.rawValue)")
+            }
+        }
+
+        // 5. Prerequisite Check
         let unmet = checkPrerequisites(plugin: plugin)
         if !unmet.isEmpty {
             return .failure(reason: .prerequisitesUnmet, detail: "Unmet prerequisites: \(unmet.map { $0.rawValue }.joined(separator: ", "))")
@@ -58,19 +78,35 @@ final class PluginSandbox {
         return .success
     }
 
+    private func evaluateRule(_ rule: ExecutionRule, plugin: PluginDefinition, event: PluginEvent) -> Bool {
+        // Simple evaluation logic for simulation
+        switch rule.type {
+        case .eventFilter:
+            return true // Simplified
+        case .frequencyLimit:
+            if let limit = rule.limit, plugin.errorCount > limit { return false }
+            return true
+        default:
+            return true
+        }
+    }
+
     private func validateScope(plugin: PluginDefinition, capability: PluginCapability) -> Bool {
-        // High-risk scopes must have API key and privacy note (enforced at install/save)
-        // Here we can do runtime checks, e.g. checking if system-wide toggles are on.
         if capability.riskLevel == .high && (plugin.apiKey == nil || plugin.apiKey?.isEmpty == true) {
             return false
         }
+
+        // External API scope check
+        if capability == .externalApiSendRequest && plugin.endpoints.isEmpty {
+            return false
+        }
+
         return true
     }
 
     private func checkPrerequisites(plugin: PluginDefinition) -> [PluginPrerequisite] {
         var unmet: [PluginPrerequisite] = []
 
-        // Map capabilities to prerequisites for this check
         for cap in plugin.capabilities {
             switch cap {
             case .notes: if !checkServiceEnabled(.notes) { unmet.append(.notes) }
@@ -87,8 +123,6 @@ final class PluginSandbox {
     }
 
     private func checkServiceEnabled(_ prerequisite: PluginPrerequisite) -> Bool {
-        // In a real system, this would check actual service availability
-        // For simulation, we assume services are available unless specified otherwise
         return true
     }
 
@@ -102,7 +136,6 @@ final class PluginSandbox {
             performExecution(plugin: plugin, event: event)
         case .failure(let reason, let detail):
             print("Blocking plugin \(plugin.name) execution: \(reason.rawValue) - \(detail)")
-            // Routing to PluginLimitedView is handled by the UI/Runtime layer via a notification or state change
             NotificationCenter.default.post(name: .pluginExecutionBlocked, object: nil, userInfo: ["pluginID": plugin.id, "reason": reason, "detail": detail])
         }
     }
@@ -110,14 +143,30 @@ final class PluginSandbox {
     private func performExecution(plugin: PluginDefinition, event: PluginEvent) {
         guard let context = context else { return }
 
-        // Inject event payload
-        context.setObject(event.payload, forKeyedSubscript: "eventPayload" as NSString)
+        // Data Mapping (NEW)
+        let mappedPayload = applyDataMappings(plugin.dataMappings, payload: event.payload)
+
+        // Inject event payload & context
+        context.setObject(mappedPayload, forKeyedSubscript: "eventPayload" as NSString)
+
+        // Inject toolkit tools (NEW)
+        let toolkit = plugin.toolkitTools.reduce(into: [String: Any]()) { $0[$1.name] = $1.config }
+        context.setObject(toolkit, forKeyedSubscript: "toolkit" as NSString)
 
         // Execute source
         context.evaluateScript(plugin.sourceCode)
 
-        // Log to DevConsole (simulated)
         print("Executed plugin \(plugin.name) successfully.")
+    }
+
+    private func applyDataMappings(_ mappings: [DataMapping], payload: [String: String]) -> [String: String] {
+        var result = payload
+        for mapping in mappings {
+            if let value = payload[mapping.sourceField] {
+                result[mapping.targetField] = value
+            }
+        }
+        return result
     }
 }
 
@@ -133,6 +182,7 @@ enum ValidationFailureReason: String {
     case actionMismatch = "Action Mismatch"
     case scopeInvalid = "Scope Invalid"
     case prerequisitesUnmet = "Prerequisites Unmet"
+    case ruleBlocked = "Execution Rule Blocked"
 }
 
 extension NSNotification.Name {

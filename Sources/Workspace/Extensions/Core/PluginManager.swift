@@ -124,8 +124,6 @@ final class PluginManager: ObservableObject {
                 updatedPlugin.changelog.append(PluginChangeLogEntry(version: plugin.version, date: Date(), notes: plugin.releaseNotes ?? "Version updated"))
             } else if plugin.version != currentVersion {
                 print("Warning: Version should be incremented. Current: \(currentVersion), New: \(plugin.version)")
-                // Optionally block save if version is not incremented? Spec says "must increment"
-                // For now we allow it but log a warning, or we could revert version.
                 updatedPlugin.version = currentVersion
             }
 
@@ -154,6 +152,16 @@ final class PluginManager: ObservableObject {
         if hasHighRisk {
             if plugin.apiKey == nil || plugin.privacyNote == nil {
                 return false
+            }
+        }
+
+        // External API validation
+        if !plugin.endpoints.isEmpty {
+            if !plugin.capabilities.contains(.externalApiConnect) {
+                return false
+            }
+            for ep in plugin.endpoints {
+                if ep.baseURL.isEmpty || ep.name.isEmpty { return false }
             }
         }
 
