@@ -3,6 +3,7 @@ import SwiftUI
 struct PullRequestDashboardView: View {
     let spaceID: UUID
     @StateObject private var prManager = PullRequestManager.shared
+    @State private var showingCreatePR = false
 
     var body: some View {
         List {
@@ -34,6 +35,14 @@ struct PullRequestDashboardView: View {
             }
         }
         .navigationTitle("Pull Requests")
+        .toolbar {
+            Button(action: { showingCreatePR = true }) {
+                Image(systemName: "plus.circle")
+            }
+        }
+        .sheet(isPresented: $showingCreatePR) {
+            CreatePRCollabView(spaceID: spaceID)
+        }
     }
 
     private func statusColor(_ status: PullRequestStatus) -> Color {

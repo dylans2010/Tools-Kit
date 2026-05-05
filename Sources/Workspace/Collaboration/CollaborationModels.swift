@@ -66,6 +66,8 @@ struct CollaborationSpace: Codable, Identifiable {
     var branches: [CollaborationBranch]
     var currentBranchID: UUID
     var activityFeed: [ActivityLog]
+    var messages: [SpaceMessage] = []
+    var sharedFiles: [SpaceFile] = []
 
     // IDs of objects linked to this space
     var notebookIDs: [UUID]
@@ -82,4 +84,22 @@ struct CollaborationSpace: Codable, Identifiable {
     var createdAt: Date
     var updatedAt: Date
     var metadata: [String: String] = [:]
+}
+
+struct SpaceMessage: Codable, Identifiable {
+    let id: UUID
+    let senderID: UUID
+    let senderName: String
+    let content: String
+    let timestamp: Date
+}
+
+struct SpaceFile: Codable, Identifiable {
+    let id: UUID
+    let name: String
+    let size: Int64
+    let type: String
+    let uploaderID: UUID
+    let timestamp: Date
+    let localPath: String?
 }

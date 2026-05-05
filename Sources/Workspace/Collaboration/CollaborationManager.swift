@@ -44,6 +44,8 @@ final class CollaborationManager: ObservableObject {
             branches: [initialBranch],
             currentBranchID: initialBranch.id,
             activityFeed: [],
+            messages: [],
+            sharedFiles: [],
             notebookIDs: [],
             slideDeckIDs: [],
             meetingIDs: [],

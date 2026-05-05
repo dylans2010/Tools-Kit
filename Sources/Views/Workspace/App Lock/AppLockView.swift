@@ -2,22 +2,21 @@ import SwiftUI
 
 struct AppLockView: View {
     @StateObject private var manager = AppLockManager.shared
+    @StateObject private var authManager = ScreenTimeAuthorizationManager.shared
     @State private var showingAddProfile = false
     @State private var newProfileName = ""
-    @State private var isAuthorized = false
 
     var body: some View {
         List {
             Section(header: Text("Permissions"), footer: Text("App Lock requires Screen Time permissions to function correctly.")) {
-                if isAuthorized {
+                if authManager.isAuthorized {
                     Label("Authorized", systemImage: "checkmark.circle.fill")
                         .foregroundColor(.green)
                 } else {
                     Button(action: {
                         Task {
                             do {
-                                try await manager.requestAuthorization()
-                                isAuthorized = true
+                                try await authManager.requestAuthorization()
                             } catch {
                                 print("Authorization failed: \(error)")
                             }

@@ -7,16 +7,22 @@ final class UnifiedDataStore: ObservableObject {
     static let shared = UnifiedDataStore()
 
     @Published private(set) var workflows: [String] = []
-    @Published private(set) var canvases: [String] = []
+    @Published private(set) var integrationWorkflows: [IntegrationWorkflow] = []
+    @Published private(set) var spatialCanvases: [SpatialCanvas] = []
     @Published private(set) var secureFolders: [SecureFolder] = []
+    @Published private(set) var snapshots: [WorkspaceSnapshot] = []
+    @Published private(set) var personaInteractions: [PersonaInteraction] = []
 
     private let persistence = WorkspacePersistence.shared
     private let eventBus = PluginEventBus.shared
 
     private init() {
         self.workflows = loadWorkflowsFromDisk()
-        self.canvases = loadCanvasesFromDisk()
+        self.integrationWorkflows = (try? load([IntegrationWorkflow].self, key: "integration_workflows")) ?? []
+        self.spatialCanvases = (try? load([SpatialCanvas].self, key: "spatial_canvases")) ?? []
         self.secureFolders = loadSecureFoldersFromDisk()
+        self.snapshots = (try? load([WorkspaceSnapshot].self, key: "workspace_snapshots")) ?? []
+        self.personaInteractions = (try? load([PersonaInteraction].self, key: "persona_interactions")) ?? []
     }
 
     // MARK: - Specialized Storage
@@ -34,19 +40,42 @@ final class UnifiedDataStore: ObservableObject {
         return (try? load([String].self, key: "workspace_workflows")) ?? []
     }
 
-    func saveCanvas(_ canvas: String) throws {
-        if !canvases.contains(canvas) {
-            canvases.append(canvas)
+    func saveSpatialCanvas(_ canvas: SpatialCanvas) throws {
+        if let index = spatialCanvases.firstIndex(where: { $0.id == canvas.id }) {
+            spatialCanvases[index] = canvas
+        } else {
+            spatialCanvases.append(canvas)
         }
-        try save(canvases, key: "spatial_canvases")
+        try save(spatialCanvases, key: "spatial_canvases")
     }
 
-    func loadCanvases() -> [String] {
-        return canvases
+    func loadSpatialCanvases() -> [SpatialCanvas] {
+        return spatialCanvases
     }
 
-    private func loadCanvasesFromDisk() -> [String] {
-        return (try? load([String].self, key: "spatial_canvases")) ?? []
+    // MARK: - Integration Workflows
+
+    func saveIntegrationWorkflow(_ workflow: IntegrationWorkflow) throws {
+        if let index = integrationWorkflows.firstIndex(where: { $0.id == workflow.id }) {
+            integrationWorkflows[index] = workflow
+        } else {
+            integrationWorkflows.append(workflow)
+        }
+        try save(integrationWorkflows, key: "integration_workflows")
+    }
+
+    // MARK: - Time Travel Snapshots
+
+    func saveSnapshot(_ snapshot: WorkspaceSnapshot) throws {
+        snapshots.append(snapshot)
+        try save(snapshots, key: "workspace_snapshots")
+    }
+
+    // MARK: - Persona Interactions
+
+    func savePersonaInteraction(_ interaction: PersonaInteraction) throws {
+        personaInteractions.append(interaction)
+        try save(personaInteractions, key: "persona_interactions")
     }
 
     // MARK: - Secure Folders

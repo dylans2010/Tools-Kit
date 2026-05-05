@@ -14,6 +14,7 @@ struct ValidationTests {
         testPluginSystem()
         await testSecuritySystem()
         testMessagesExtension()
+        await testWorkspaceOS()
 
         print("All Validation Tests Passed!")
     }
@@ -138,6 +139,36 @@ struct ValidationTests {
         let runtime = PluginRuntime.shared
         // Verification of subscription logic
         assert(plugin.actions.contains { $0.rawValue == "note.created" })
+    }
+
+    private static func testWorkspaceOS() async {
+        print("Testing Workspace OS...")
+
+        // 1. Intelligence
+        let insights = try? await IntelligenceFramework.shared.scanWorkspace()
+        assert(insights != nil)
+
+        // 2. Collaboration
+        let space = SpaceCollabManager.shared.createSpace(name: "Collab Test", description: "Test", icon: "person.2", visibility: .shared)
+        assert(space.name == "Collab Test")
+        SpaceCollabManager.shared.sendMessage(spaceID: space.id, content: "Hello Test")
+        let updatedSpace = SpaceCollabManager.shared.spaces.first { $0.id == space.id }
+        assert(updatedSpace?.messages.count == 1)
+
+        // 3. Time Travel
+        try? TimeTravelFramework.shared.createSnapshot(message: "Initial", entityType: "Space", entityID: space.id, data: Data())
+        assert(!TimeTravelManager.shared.snapshots.isEmpty)
+
+        // 4. Integrations
+        let workflow = IntegrationWorkflow(name: "Test Workflow", description: "Test", trigger: IntegrationTrigger(type: .internalApp, source: "note.created"), actions: [])
+        try? UnifiedDataStore.shared.saveIntegrationWorkflow(workflow)
+        assert(!UnifiedDataStore.shared.integrationWorkflows.isEmpty)
+
+        // 5. Spatial
+        let canvas = WhiteboardService.shared.createNewCanvas(name: "Test Canvas")
+        assert(UnifiedDataStore.shared.spatialCanvases.contains(where: { $0.id == canvas.id }))
+
+        print("Workspace OS Logic Verified.")
     }
 
     private static func testEditingSystem() {
