@@ -1124,6 +1124,11 @@
 		ML028FFC6949369149FA8496 /* WhiteboardCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML01A8B623046E0549E89D14 /* WhiteboardCanvasView.swift */; };
 		ML022F1EBBD1C64D48F4A5F8 /* CitationFormatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML012C87341CFA2C46D9A708 /* CitationFormatsView.swift */; };
 		ML02B9C001F45A2E4FCA868D /* NotebookVersionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */; };
+		ML020000000000000000000011 /* NotebookSearchPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML010000000000000000000011 /* NotebookSearchPageView.swift */; };
+		ML020000000000000000000012 /* NotebookComparePagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML010000000000000000000012 /* NotebookComparePagesView.swift */; };
+		ML020000000000000000000013 /* NotebookAddCommentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML010000000000000000000013 /* NotebookAddCommentsView.swift */; };
+		ML020000000000000000000014 /* NotebookAuditLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML010000000000000000000014 /* NotebookAuditLogsView.swift */; };
+		PL020000000000000000000004 /* PluginSecurityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000004 /* PluginSecurityView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2243,6 +2248,11 @@
 		ML01A8B623046E0549E89D14 /* WhiteboardCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Spatial/WhiteboardCanvasView.swift; sourceTree = "<group>"; };
 		ML012C87341CFA2C46D9A708 /* CitationFormatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Notebooks/Features/CitationFormatsView.swift; sourceTree = "<group>"; };
 		ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Notebooks/Features/NotebookVersionHistoryView.swift; sourceTree = "<group>"; };
+		ML010000000000000000000011 /* NotebookSearchPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Notebooks/Features/NotebookSearchPageView.swift; sourceTree = "<group>"; };
+		ML010000000000000000000012 /* NotebookComparePagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Notebooks/Features/NotebookComparePagesView.swift; sourceTree = "<group>"; };
+		ML010000000000000000000013 /* NotebookAddCommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Notebooks/Features/NotebookAddCommentsView.swift; sourceTree = "<group>"; };
+		ML010000000000000000000014 /* NotebookAuditLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Notebooks/Features/NotebookAuditLogsView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000004 /* PluginSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginSecurityView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -2732,6 +2742,11 @@
 				ML01A8B623046E0549E89D14 /* WhiteboardCanvasView.swift */,
 				ML012C87341CFA2C46D9A708 /* CitationFormatsView.swift */,
 				ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */,
+				ML010000000000000000000011 /* NotebookSearchPageView.swift */,
+				ML010000000000000000000012 /* NotebookComparePagesView.swift */,
+				ML010000000000000000000013 /* NotebookAddCommentsView.swift */,
+				ML010000000000000000000014 /* NotebookAuditLogsView.swift */,
+				PL010000000000000000000004 /* PluginSecurityView.swift */,
 				MS01A1B2C3D4E5F600000001 /* SecureFolderModels.swift */,
 				MS01A1B2C3D4E5F600000002 /* SecureFolderManager.swift */,
 				MS01A1B2C3D4E5F600000003 /* AppLockManager.swift */,
@@ -4388,6 +4403,11 @@
 				ML028FFC6949369149FA8496 /* WhiteboardCanvasView.swift in Sources */,
 				ML022F1EBBD1C64D48F4A5F8 /* CitationFormatsView.swift in Sources */,
 				ML02B9C001F45A2E4FCA868D /* NotebookVersionHistoryView.swift in Sources */,
+				ML020000000000000000000011 /* NotebookSearchPageView.swift in Sources */,
+				ML020000000000000000000012 /* NotebookComparePagesView.swift in Sources */,
+				ML020000000000000000000013 /* NotebookAddCommentsView.swift in Sources */,
+				ML020000000000000000000014 /* NotebookAuditLogsView.swift in Sources */,
+				PL020000000000000000000004 /* PluginSecurityView.swift in Sources */,
 				TKBF0000000000000000000000 /* UnifiedDataStore.swift in Sources */,
 				TKBF0000000000000000000001 /* SyncManager.swift in Sources */,
 				TKBF0000000000000000000002 /* AIOrchestrator.swift in Sources */,
