@@ -38,16 +38,3 @@ final class PluginEventBus {
     }
 }
 
-// MARK: - Event Models
-
-struct PluginEvent: Codable, Identifiable {
-    let id: UUID
-    let capability: PluginCapability
-    let action: String
-    let payload: [String: String]
-    let timestamp: Date
-}
-
-enum PluginCapability: String, Codable, CaseIterable {
-    case notes, tasks, mail, calendar, files, whiteboard, slides, media, meet, github, automation, intelligence, collaboration
-}

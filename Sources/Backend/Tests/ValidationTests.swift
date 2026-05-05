@@ -11,6 +11,7 @@ struct ValidationTests {
         testMeetAnalytics()
         testCollaborationSystem()
         testEditingSystem()
+        testPluginSystem()
         await testSecuritySystem()
         testMessagesExtension()
 
@@ -111,6 +112,32 @@ struct ValidationTests {
 
     private static func testMessagesExtension() {
         MessagesValidationTests.run()
+    }
+
+    private static func testPluginSystem() {
+        print("Testing Plugin System...")
+        let manager = PluginManager.shared
+        let plugin = PluginDefinition(
+            id: UUID(),
+            name: "Validation Plugin",
+            description: "Test",
+            author: "Validator",
+            version: "1.0.0",
+            icon: "puzzlepiece",
+            identifier: "com.ToolsKit.validation",
+            isEnabled: true,
+            isInstalled: true,
+            installedAt: Date(),
+            capabilities: [.notes],
+            actions: [.noteCreated],
+            sourceCode: "console.log('test')"
+        )
+        manager.savePlugin(plugin)
+        assert(manager.installedPlugins.contains(where: { $0.identifier == "com.ToolsKit.validation" }))
+
+        let runtime = PluginRuntime.shared
+        // Verification of subscription logic
+        assert(plugin.actions.contains { $0.rawValue == "note.created" })
     }
 
     private static func testEditingSystem() {

@@ -1043,7 +1043,6 @@
 		AA100000000000000000000E /* WorkspaceSnapshotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100000000000000000000D /* WorkspaceSnapshotView.swift */; };
 		AA1000000000000000000010 /* WorkspaceAdvancedViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100000000000000000000F /* WorkspaceAdvancedViews.swift */; };
 		AA1000000000000000000012 /* GlobalCommandPaletteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000011 /* GlobalCommandPaletteView.swift */; };
-		AA1000000000000000000014 /* PluginMarketplaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000013 /* PluginMarketplaceView.swift */; };
 		AA1000000000000000000016 /* LocalGitEngineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000015 /* LocalGitEngineView.swift */; };
 		AA1000000000000000000018 /* GitHubIntelligenceViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000017 /* GitHubIntelligenceViews.swift */; };
 		AA100000000000000000001A /* GitHubToolPanelViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000019 /* GitHubToolPanelViews.swift */; };
@@ -1092,6 +1091,9 @@
 		TKBF0000000000000000000010 /* PluginsInstalledView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000010 /* PluginsInstalledView.swift */; };
 		TKBF0000000000000000000011 /* MarketplaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000011 /* MarketplaceView.swift */; };
 		TKBF0000000000000000000012 /* PluginDevConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000012 /* PluginDevConsoleView.swift */; };
+		PL0200000000000000000001 /* PluginModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000001 /* PluginModels.swift */; };
+		PL0200000000000000000002 /* PluginDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000002 /* PluginDetailView.swift */; };
+		PL0200000000000000000003 /* PluginGlobalOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL0100000000000000000003 /* PluginGlobalOverlay.swift */; };
 		MS02A1B2C3D4E5F600000001 /* SecureFolderModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01A1B2C3D4E5F600000001 /* SecureFolderModels.swift */; };
 		MS02A1B2C3D4E5F600000002 /* SecureFolderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01A1B2C3D4E5F600000002 /* SecureFolderManager.swift */; };
 		MS02A1B2C3D4E5F600000003 /* AppLockManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS01A1B2C3D4E5F600000003 /* AppLockManager.swift */; };
@@ -1180,7 +1182,7 @@
 		CL010000000000000000000C /* WorkspaceSnapshotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Collaboration/WorkspaceSnapshotService.swift; sourceTree = "<group>"; };
 		CL010000000000000000000D /* WorkspaceServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Collaboration/WorkspaceServices.swift; sourceTree = "<group>"; };
 		CL010000000000000000000E /* CommandEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/CommandPalette/CommandEngine.swift; sourceTree = "<group>"; };
-		CL010000000000000000000F /* PluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Plugins/PluginManager.swift; sourceTree = "<group>"; };
+		CL010000000000000000000F /* PluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Extensions/Core/PluginManager.swift; sourceTree = "<group>"; };
 		ED010000000000000000000A /* EditingHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Editing/EditingHomeView.swift; sourceTree = "<group>"; };
 		ED010000000000000000000B /* FullEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Editing/FullEditorView.swift; sourceTree = "<group>"; };
 		3C4B3171C5B7494C8A67B0CF /* AgentResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Agent/AgentResultView.swift; sourceTree = "<group>"; };
@@ -2139,7 +2141,6 @@
 		AA100000000000000000000D /* WorkspaceSnapshotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSnapshotView.swift; sourceTree = "<group>"; };
 		AA100000000000000000000F /* WorkspaceAdvancedViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAdvancedViews.swift; sourceTree = "<group>"; };
 		AA1000000000000000000011 /* GlobalCommandPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalCommandPaletteView.swift; sourceTree = "<group>"; };
-		AA1000000000000000000013 /* PluginMarketplaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginMarketplaceView.swift; sourceTree = "<group>"; };
 		AA1000000000000000000015 /* LocalGitEngineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalGitEngineView.swift; sourceTree = "<group>"; };
 		AA1000000000000000000017 /* GitHubIntelligenceViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubIntelligenceViews.swift; sourceTree = "<group>"; };
 		AA1000000000000000000019 /* GitHubToolPanelViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubToolPanelViews.swift; sourceTree = "<group>"; };
@@ -2188,6 +2189,9 @@
 		TKRF0000000000000000000010 /* PluginsInstalledView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginsInstalledView.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000011 /* MarketplaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/MarketplaceView.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000012 /* PluginDevConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginDevConsoleView.swift; sourceTree = "<group>"; };
+		PL0100000000000000000001 /* PluginModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace/Extensions/Core/PluginModels.swift; sourceTree = "<group>"; };
+		PL0100000000000000000002 /* PluginDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginDetailView.swift; sourceTree = "<group>"; };
+		PL0100000000000000000003 /* PluginGlobalOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginGlobalOverlay.swift; sourceTree = "<group>"; };
 		MS01A1B2C3D4E5F600000001 /* SecureFolderModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Security/SecureFolderModels.swift; sourceTree = "<group>"; };
 		MS01A1B2C3D4E5F600000002 /* SecureFolderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/Security/SecureFolderManager.swift; sourceTree = "<group>"; };
 		MS01A1B2C3D4E5F600000003 /* AppLockManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Workspace/App Lock/AppLockManager.swift"; sourceTree = "<group>"; };
@@ -2693,6 +2697,9 @@
 				TKRF0000000000000000000010 /* PluginsInstalledView.swift */,
 				TKRF0000000000000000000011 /* MarketplaceView.swift */,
 				TKRF0000000000000000000012 /* PluginDevConsoleView.swift */,
+				PL0100000000000000000001 /* PluginModels.swift */,
+				PL0100000000000000000002 /* PluginDetailView.swift */,
+				PL0100000000000000000003 /* PluginGlobalOverlay.swift */,
 				E10000000000000000000001 /* Backend */,
 				E10000000000000000000006 /* Workspace */,
 				AA10000000000000000000A1 /* Workspace */,
@@ -4004,7 +4011,6 @@
 		AA1000000000000000000006 /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
-				AA1000000000000000000013 /* PluginMarketplaceView.swift */,
 			);
 			path = Plugins;
 			sourceTree = "<group>";
@@ -4317,6 +4323,9 @@
 				TKBF0000000000000000000010 /* PluginsInstalledView.swift in Sources */,
 				TKBF0000000000000000000011 /* MarketplaceView.swift in Sources */,
 				TKBF0000000000000000000012 /* PluginDevConsoleView.swift in Sources */,
+				PL0200000000000000000001 /* PluginModels.swift in Sources */,
+				PL0200000000000000000002 /* PluginDetailView.swift in Sources */,
+				PL0200000000000000000003 /* PluginGlobalOverlay.swift in Sources */,
 				WS020000000000000000000001 /* WorkspacePersistence.swift in Sources */,
 				WS020000000000000000000002 /* SyncEngine.swift in Sources */,
 				IW0200000000000000000001 /* WorkspaceColorManager.swift in Sources */,
@@ -5317,7 +5326,6 @@
 				AA100000000000000000000E /* WorkspaceSnapshotView.swift in Sources */,
 				AA1000000000000000000010 /* WorkspaceAdvancedViews.swift in Sources */,
 				AA1000000000000000000012 /* GlobalCommandPaletteView.swift in Sources */,
-				AA1000000000000000000014 /* PluginMarketplaceView.swift in Sources */,
 				AA1000000000000000000016 /* LocalGitEngineView.swift in Sources */,
 				AA1000000000000000000018 /* GitHubIntelligenceViews.swift in Sources */,
 				AA100000000000000000001A /* GitHubToolPanelViews.swift in Sources */,
