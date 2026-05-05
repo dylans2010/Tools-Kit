@@ -17,7 +17,7 @@ struct SDKBuildView: View {
                 } else if let project = selectedProject {
                     ProjectEditorView(project: project)
                 } else {
-                    ContentUnavailableView("Select a Project", systemImage: "hammer")
+                    ContentUnavailableView("Select a Project", systemImage: "hammer", description: Text("Choose a project from the dashboard to start editing."))
                 }
             }
             .navigationTitle("Build with ToolsKit")

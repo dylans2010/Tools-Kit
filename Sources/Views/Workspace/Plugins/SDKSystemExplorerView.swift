@@ -56,7 +56,7 @@ struct EntityExplorerView: View {
             }
 
             Section("Files") {
-                ForEach(WorkspaceAPI.shared.files.listFiles()) { file in
+                ForEach(WorkspaceAPI.shared.files.listFiles(), id: \.id) { file in
                     Label(file.name, systemImage: "doc")
                 }
             }

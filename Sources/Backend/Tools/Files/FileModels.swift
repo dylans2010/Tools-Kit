@@ -2,6 +2,7 @@ import Foundation
 
 struct ManagedFileItem: Identifiable, Hashable {
     var id: String { url.path }
+    var name: String { url.lastPathComponent }
     let url: URL
     let isDirectory: Bool
     let size: Int64

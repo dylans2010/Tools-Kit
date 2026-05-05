@@ -20,7 +20,7 @@ struct SDKDataControlView: View {
                 }
             }
 
-            Section("Data Operations") {
+            Section(header: Text("Data Operations")) {
                 Button("Reindex All Notes") {
                     let notes = WorkspaceAPI.shared.notes.listNotes()
                     statusMessage = "Reindexed \(notes.count) notes."
@@ -28,19 +28,19 @@ struct SDKDataControlView: View {
 
                 Button("Cleanup Completed Tasks") {
                     let tasks = WorkspaceAPI.shared.tasks.listTasks()
-                    let completed = tasks.filter { $0.isCompleted }
+                    let completed = tasks.filter { $0.completed }
                     // Real cleanup logic would go here
                     statusMessage = "Identified \(completed.count) tasks for cleanup."
                 }
             }
 
             if !statusMessage.isEmpty {
-                Section("Operation Status") {
+                Section(header: Text("Operation Status")) {
                     Text(statusMessage).font(.caption).foregroundStyle(.blue)
                 }
             }
 
-            Section("Rollback Support") {
+            Section(header: Text("Rollback Support")) {
                 NavigationLink("System Snapshots", destination: EntityExplorerView())
             }
         }

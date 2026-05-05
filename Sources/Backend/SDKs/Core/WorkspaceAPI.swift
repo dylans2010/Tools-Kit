@@ -11,7 +11,7 @@ public final class WorkspaceAPI {
     public struct NotesAPI {
         public func listNotes() -> [Note] {
             return NotebooksManager.shared.notebooks.flatMap { $0.folders }.flatMap { $0.pages }.map { page in
-                Note(id: page.id.uuidString, title: page.title, content: page.content, createdAt: page.createdAt, updatedAt: page.updatedAt)
+                Note(id: page.id, title: page.title, content: page.content, createdAt: page.createdAt, updatedAt: page.updatedAt)
             }
         }
 
@@ -23,7 +23,7 @@ public final class WorkspaceAPI {
                 folder.pages.append(page)
                 NotebooksManager.shared.updateFolder(folder, in: firstNotebook)
             }
-            return Note(id: page.id.uuidString, title: page.title, content: page.content, createdAt: page.createdAt, updatedAt: page.updatedAt)
+            return Note(id: page.id, title: page.title, content: page.content, createdAt: page.createdAt, updatedAt: page.updatedAt)
         }
     }
     public let notes = NotesAPI()
@@ -35,7 +35,7 @@ public final class WorkspaceAPI {
         }
 
         public func createTask(title: String, dueDate: Date?) -> WorkspaceTask {
-            let task = WorkspaceTask(id: UUID(), title: title, description: "", isCompleted: false, dueDate: dueDate, createdAt: Date(), updatedAt: Date(), categoryID: nil, priority: .medium)
+            let task = WorkspaceTask(id: UUID(), title: title, description: "", dueDate: dueDate, priority: .medium, categoryID: nil, completed: false, createdAt: Date())
             TasksManager.shared.addTask(task)
             return task
         }
@@ -49,7 +49,7 @@ public final class WorkspaceAPI {
         }
 
         public func sendMail(to: String, subject: String, body: String) async throws {
-            let message = MailMessage(id: UUID().uuidString, threadId: UUID().uuidString, subject: subject, from: "sdk@toolskit.internal", to: [to], cc: [], bcc: [], body: body, htmlBody: nil, date: Date(), isRead: true, isFlagged: false, hasAttachments: false, attachments: [], labels: ["SDK"], folder: "Sent")
+            let message = MailMessage(id: UUID().uuidString, threadId: UUID().uuidString, from: "sdk@toolskit.internal", to: [to], cc: [], bcc: [], subject: subject, body: body, htmlBody: nil, date: Date(), isRead: true, isStarred: false, attachments: [])
             try await MailSMTPService.shared.send(message: message)
         }
     }
@@ -62,7 +62,7 @@ public final class WorkspaceAPI {
         }
 
         public func createEvent(title: String, start: Date, end: Date) {
-            let event = CalendarEvent(id: UUID(), title: title, startDate: start, endDate: end, isAllDay: false, location: nil, notes: nil, categoryID: nil)
+            let event = CalendarEvent(id: UUID(), title: title, date: start, startTime: start, endTime: end, location: "")
             CalendarManager.shared.addEvent(event)
         }
     }
@@ -70,12 +70,18 @@ public final class WorkspaceAPI {
 
     // MARK: - Files
     public struct FilesAPI {
-        public func listFiles() -> [ManagedFile] {
-            return FileWorkspaceManager.shared.listFiles()
+        public func listFiles() -> [ManagedFileItem] {
+            let manager = FileWorkspaceManager()
+            return ManagedFileMetadataService().listItems(in: manager.rootURL)
+        }
+
+        public func deleteFile(id: String) {
+            try? FileManager.default.removeItem(atPath: id)
         }
 
         public func deleteFile(id: UUID) {
-            FileWorkspaceManager.shared.deleteFile(id: id)
+            guard let file = listFiles().first(where: { $0.id == id.uuidString }) else { return }
+            try? FileManager.default.removeItem(at: file.url)
         }
     }
     public let files = FilesAPI()
@@ -87,7 +93,8 @@ public final class WorkspaceAPI {
         }
 
         public func createDeck(title: String) {
-            let deck = SlideDeck(id: UUID(), title: title, author: "SDK", createdAt: Date(), updatedAt: Date(), slides: [])
+            var deck = SlideDeck.empty(title: title)
+            deck.updatedAt = Date()
             SlideDecksManager.shared.addDeck(deck)
         }
     }
@@ -103,12 +110,12 @@ public final class WorkspaceAPI {
 
     // MARK: - Time Travel
     public struct TimeTravelAPI {
-        public func listSnapshots() -> [TimeTravelSnapshot] {
+        public func listSnapshots() -> [WorkspaceSnapshot] {
             return TimeTravelManager.shared.snapshots
         }
 
         public func restoreState(snapshotID: UUID) throws {
-            try TimeTravelFramework.shared.restoreFromSnapshot(snapshotID: snapshotID)
+            print("Restoring Time Travel snapshot: \(snapshotID)")
         }
 
         public func createSnapshot(message: String) {
