@@ -1123,7 +1123,7 @@
 		ML02B06DC3006D57495DB2DC /* WhiteboardsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML01742CECDC03174132BEBE /* WhiteboardsHomeView.swift */; };
 		ML028FFC6949369149FA8496 /* WhiteboardCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML01A8B623046E0549E89D14 /* WhiteboardCanvasView.swift */; };
 		ML022F1EBBD1C64D48F4A5F8 /* CitationFormatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML012C87341CFA2C46D9A708 /* CitationFormatsView.swift */; };
-		ML02B9C001F45A2E4FCA868D /* VersionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0130D0F9E841DE468381A7 /* VersionHistoryView.swift */; };
+		ML02B9C001F45A2E4FCA868D /* NotebookVersionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2242,7 +2242,7 @@
 		ML01742CECDC03174132BEBE /* WhiteboardsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Spatial/WhiteboardsHomeView.swift; sourceTree = "<group>"; };
 		ML01A8B623046E0549E89D14 /* WhiteboardCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Spatial/WhiteboardCanvasView.swift; sourceTree = "<group>"; };
 		ML012C87341CFA2C46D9A708 /* CitationFormatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Notebooks/Features/CitationFormatsView.swift; sourceTree = "<group>"; };
-		ML0130D0F9E841DE468381A7 /* VersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Notebooks/Features/VersionHistoryView.swift; sourceTree = "<group>"; };
+		ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Notebooks/Features/NotebookVersionHistoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -2731,7 +2731,7 @@
 				ML01742CECDC03174132BEBE /* WhiteboardsHomeView.swift */,
 				ML01A8B623046E0549E89D14 /* WhiteboardCanvasView.swift */,
 				ML012C87341CFA2C46D9A708 /* CitationFormatsView.swift */,
-				ML0130D0F9E841DE468381A7 /* VersionHistoryView.swift */,
+				ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */,
 				MS01A1B2C3D4E5F600000001 /* SecureFolderModels.swift */,
 				MS01A1B2C3D4E5F600000002 /* SecureFolderManager.swift */,
 				MS01A1B2C3D4E5F600000003 /* AppLockManager.swift */,
@@ -4387,7 +4387,7 @@
 				ML02B06DC3006D57495DB2DC /* WhiteboardsHomeView.swift in Sources */,
 				ML028FFC6949369149FA8496 /* WhiteboardCanvasView.swift in Sources */,
 				ML022F1EBBD1C64D48F4A5F8 /* CitationFormatsView.swift in Sources */,
-				ML02B9C001F45A2E4FCA868D /* VersionHistoryView.swift in Sources */,
+				ML02B9C001F45A2E4FCA868D /* NotebookVersionHistoryView.swift in Sources */,
 				TKBF0000000000000000000000 /* UnifiedDataStore.swift in Sources */,
 				TKBF0000000000000000000001 /* SyncManager.swift in Sources */,
 				TKBF0000000000000000000002 /* AIOrchestrator.swift in Sources */,
