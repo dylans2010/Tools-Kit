@@ -124,6 +124,14 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
     case securityFetchData = "security.fetchData"
     case workspaceFetchFullData = "workspace.fetchFullData"
 
+    // Connector Specific (New)
+    case connectorApiRead = "connector.api.read"
+    case connectorApiWrite = "connector.api.write"
+    case connectorDataMap = "connector.data.map"
+    case connectorFlowExecute = "connector.flow.execute"
+    case connectorAuthManage = "connector.auth.manage"
+    case connectorWebhookReceive = "connector.webhook.receive"
+
     var id: String { rawValue }
 
     var displayName: String {
@@ -231,13 +239,20 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
         case .mailFetchData: return "Allows retrieval of email data for processing inside sandboxed plugin environment."
         case .securityFetchData: return "Allows access to security logs, authentication events, and audit trails."
         case .workspaceFetchFullData: return "Allows full workspace dataset access excluding Vault and encrypted Mail content."
+
+        case .connectorApiRead: return "Allows reading data from external APIs."
+        case .connectorApiWrite: return "Allows sending data to external APIs."
+        case .connectorDataMap: return "Enables transformation of API data into workspace structures."
+        case .connectorFlowExecute: return "Allows execution of multi-step pipelines."
+        case .connectorAuthManage: return "Handles authentication lifecycle."
+        case .connectorWebhookReceive: return "Accepts external triggers."
         }
     }
 
     var riskLevel: RiskLevel {
         switch self {
         case .mailFetchData, .securityFetchData, .workspaceFetchFullData, .workspaceModifySelective: return .high
-        case .aiPersonaMemoryAccess, .timeRestoreState, .automationExecuteTrigger, .integrationsConnectService, .externalApiConnect, .externalApiSendRequest, .externalApiSecureHeaders: return .medium
+        case .aiPersonaMemoryAccess, .timeRestoreState, .automationExecuteTrigger, .integrationsConnectService, .externalApiConnect, .externalApiSendRequest, .externalApiSecureHeaders, .connectorFlowExecute, .connectorAuthManage: return .medium
         default: return .low
         }
     }
@@ -246,7 +261,7 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .mailFetchData, .securityFetchData, .workspaceFetchFullData: return .full
         case .workspaceModifySelective, .uiOverlayPresent, .uiPanelInject, .uiCommandbarExtend, .uiContextmenuModify: return .selective
-        case .notes, .tasks, .files, .whiteboard, .slides, .media, .externalApiSendRequest: return .write
+        case .notes, .tasks, .files, .whiteboard, .slides, .media, .externalApiSendRequest, .connectorApiWrite: return .write
         default: return .read
         }
     }
@@ -274,6 +289,11 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
         case .uiOverlayPresent, .uiPanelInject, .uiCommandbarExtend, .uiContextmenuModify: return "macwindow"
         case .workspaceModifySelective, .workspaceFetchFullData: return "tray.full"
         case .securityFetchData: return "shield.lefthalf.filled"
+        case .connectorApiRead, .connectorApiWrite: return "arrow.up.arrow.down.square"
+        case .connectorDataMap: return "arrow.left.arrow.right.square"
+        case .connectorFlowExecute: return "arrow.triangle.2.circlepath"
+        case .connectorAuthManage: return "key.fill"
+        case .connectorWebhookReceive: return "antenna.radiowaves.left.and.right"
         }
     }
 }
@@ -433,6 +453,83 @@ struct PluginScope: Codable, Equatable {
 
 enum PluginPrerequisite: String, Codable, CaseIterable {
     case notes, repo, mail, ai, automation, calendar
+}
+
+// MARK: - Connector Models
+
+struct ConnectorDefinition: Codable, Identifiable {
+    let id: UUID
+    var name: String
+    var identifier: String // com.toolskit.connector.<name>
+    var version: String
+    var description: String
+    var author: String
+
+    var endpoints: [ExternalAPIEndpoint] = []
+    var auth: ConnectorAuth = ConnectorAuth()
+    var flows: [ConnectorFlow] = []
+    var dataMappings: [DataMapping] = []
+
+    var isEnabled: Bool = false
+    var status: ConnectorStatus = .disconnected
+
+    var capabilities: [PluginCapability] {
+        var caps: [PluginCapability] = []
+        if !endpoints.isEmpty { caps.append(.connectorApiRead); caps.append(.connectorApiWrite) }
+        if !flows.isEmpty { caps.append(.connectorFlowExecute) }
+        if !dataMappings.isEmpty { caps.append(.connectorDataMap) }
+        if auth.type != .none { caps.append(.connectorAuthManage) }
+        return caps
+    }
+}
+
+enum ConnectorStatus: String, Codable {
+    case active, disconnected, error, degraded
+}
+
+struct ConnectorAuth: Codable {
+    var type: AuthType = .none
+    var apiKey: String?
+    var oauthConfig: OAuthConfig?
+    var bearerToken: String?
+    var customHeaders: [String: String] = [:]
+}
+
+struct OAuthConfig: Codable {
+    var clientID: String
+    var clientSecret: String
+    var authURL: String
+    var tokenURL: String
+    var redirectURI: String
+}
+
+struct ConnectorFlow: Codable, Identifiable {
+    var id: UUID = UUID()
+    var name: String
+    var trigger: FlowTrigger
+    var steps: [FlowStep] = []
+    var retryRule: RetryPolicy = RetryPolicy()
+}
+
+struct FlowTrigger: Codable {
+    var type: FlowTriggerType
+    var config: [String: String] = [:]
+}
+
+enum FlowTriggerType: String, Codable {
+    case webhook, schedule, event, manual
+}
+
+struct FlowStep: Codable, Identifiable {
+    var id: UUID = UUID()
+    var type: FlowStepType
+    var endpointID: UUID?
+    var condition: String?
+    var transformation: String?
+}
+
+enum FlowStepType: String, Codable {
+    case apiCall, condition, transformation, notification, script
 }
 
 // MARK: - Security Helpers

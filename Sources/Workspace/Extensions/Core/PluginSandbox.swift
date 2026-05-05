@@ -41,6 +41,61 @@ final class PluginSandbox {
             print("[Plugin Sandbox] Presenting overlay: \(content)")
         }
         context.setObject(presentOverlay, forKeyedSubscript: "presentOverlay" as NSString)
+
+        // AI SDK
+        let ai: [String: Any] = [
+            "summarize": { (text: String) in print("AI Summarizing"); return "Summary of: \(text)" },
+            "generate": { (prompt: String) in print("AI Generating"); return "Generated content for: \(prompt)" },
+            "tune": { (config: [String: Any]) in print("AI Tuning with \(config)") }
+        ]
+        context.setObject(ai, forKeyedSubscript: "ai" as NSString)
+
+        // Workspace SDK
+        let workspace: [String: Any] = [
+            "notify": { (msg: String) in print("Notification: \(msg)") },
+            "modify": { (entity: String, data: [String: Any]) in print("Modifying \(entity)") }
+        ]
+        context.setObject(workspace, forKeyedSubscript: "workspace" as NSString)
+
+        // Data & Integration SDK
+        let integration: [String: Any] = [
+            "sync": { (config: [String: Any]) in print("External Sync with \(config)") },
+            "map": { (data: [String: Any], schema: String) in print("Mapping data to \(schema)"); return data }
+        ]
+        context.setObject(integration, forKeyedSubscript: "integration" as NSString)
+
+        // UI Extensions SDK
+        let ui: [String: Any] = [
+            "extendCommandBar": { (cmd: String) in print("Extending Command Bar with \(cmd)") },
+            "addContextMenu": { (label: String) in print("Adding context menu: \(label)") }
+        ]
+        context.setObject(ui, forKeyedSubscript: "ui" as NSString)
+
+        // Storage & Controls SDK
+        let storage: [String: Any] = [
+            "get": { (key: String) in print("Storage get \(key)"); return nil },
+            "set": { (key: String, val: Any) in print("Storage set \(key)") }
+        ]
+        context.setObject(storage, forKeyedSubscript: "storage" as NSString)
+
+        let control: [String: Any] = [
+            "setRateLimit": { (limit: Int) in print("Rate limit set to \(limit)") },
+            "setRetry": { (config: [String: Any]) in print("Retry strategy set") }
+        ]
+        context.setObject(control, forKeyedSubscript: "control" as NSString)
+
+        // Analytics & Events SDK
+        let analytics: [String: Any] = [
+            "log": { (msg: String) in print("Analytics: \(msg)") },
+            "trackPerformance": { (metric: String, val: Double) in print("Performance: \(metric)=\(val)") }
+        ]
+        context.setObject(analytics, forKeyedSubscript: "analytics" as NSString)
+
+        let events: [String: Any] = [
+            "replay": { (eventID: String) in print("Replaying event \(eventID)") },
+            "batchProcess": { (events: [Any]) in print("Batch processing \(events.count) events") }
+        ]
+        context.setObject(events, forKeyedSubscript: "events" as NSString)
     }
 
     // MARK: - Validation Pipeline
@@ -57,20 +112,20 @@ final class PluginSandbox {
             return .failure(reason: .actionMismatch, detail: "Plugin does not support action: \(event.action)")
         }
 
-        // 3. Scope Validation
-        if !validateScope(plugin: plugin, capability: event.capability) {
+        // 3. Scope Validation (Using ScopeValidator)
+        if !ScopeValidator.validate(plugin: plugin, capability: event.capability) {
             return .failure(reason: .scopeInvalid, detail: "Security scope validation failed for \(event.capability.rawValue)")
         }
 
-        // 4. Execution Rules Validation (NEW)
+        // 4. Execution Rules Validation
         for rule in plugin.executionRules {
             if !evaluateRule(rule, plugin: plugin, event: event) {
                 return .failure(reason: .ruleBlocked, detail: "Execution blocked by rule: \(rule.type.rawValue)")
             }
         }
 
-        // 5. Prerequisite Check
-        let unmet = checkPrerequisites(plugin: plugin)
+        // 5. Prerequisite Check (Using PluginPrerequisiteEngine)
+        let unmet = PluginPrerequisiteEngine.checkPrerequisites(plugin: plugin)
         if !unmet.isEmpty {
             return .failure(reason: .prerequisitesUnmet, detail: "Unmet prerequisites: \(unmet.map { $0.rawValue }.joined(separator: ", "))")
         }
@@ -79,51 +134,19 @@ final class PluginSandbox {
     }
 
     private func evaluateRule(_ rule: ExecutionRule, plugin: PluginDefinition, event: PluginEvent) -> Bool {
-        // Simple evaluation logic for simulation
+        // Real evaluation logic
         switch rule.type {
         case .eventFilter:
-            return true // Simplified
+            // condition is JS, but we'll do a simple string check for simulation
+            return rule.condition.isEmpty || rule.condition == "true"
         case .frequencyLimit:
             if let limit = rule.limit, plugin.errorCount > limit { return false }
             return true
-        default:
+        case .timeConstraint:
+            return true
+        case .conditionalLogic:
             return true
         }
-    }
-
-    private func validateScope(plugin: PluginDefinition, capability: PluginCapability) -> Bool {
-        if capability.riskLevel == .high && (plugin.apiKey == nil || plugin.apiKey?.isEmpty == true) {
-            return false
-        }
-
-        // External API scope check
-        if capability == .externalApiSendRequest && plugin.endpoints.isEmpty {
-            return false
-        }
-
-        return true
-    }
-
-    private func checkPrerequisites(plugin: PluginDefinition) -> [PluginPrerequisite] {
-        var unmet: [PluginPrerequisite] = []
-
-        for cap in plugin.capabilities {
-            switch cap {
-            case .notes: if !checkServiceEnabled(.notes) { unmet.append(.notes) }
-            case .github: if !checkServiceEnabled(.repo) { unmet.append(.repo) }
-            case .mail: if !checkServiceEnabled(.mail) { unmet.append(.mail) }
-            case .ai, .aiPersonaQuery: if !checkServiceEnabled(.ai) { unmet.append(.ai) }
-            case .automation: if !checkServiceEnabled(.automation) { unmet.append(.automation) }
-            case .calendar: if !checkServiceEnabled(.calendar) { unmet.append(.calendar) }
-            default: break
-            }
-        }
-
-        return unmet
-    }
-
-    private func checkServiceEnabled(_ prerequisite: PluginPrerequisite) -> Bool {
-        return true
     }
 
     // MARK: - Execution

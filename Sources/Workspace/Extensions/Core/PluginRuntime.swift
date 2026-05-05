@@ -30,5 +30,15 @@ final class PluginRuntime {
                 sandbox.execute(plugin: plugin, event: event)
             }
         }
+
+        // Connectors Execution (NEW)
+        let enabledConnectors = ConnectorManager.shared.connectors.filter { $0.isEnabled }
+        for connector in enabledConnectors {
+            for flow in connector.flows {
+                if flow.trigger.type == .event && flow.trigger.config["action"] == event.action {
+                    ConnectorFlowEngine.shared.executeFlow(flow, connector: connector, initialPayload: event.payload)
+                }
+            }
+        }
     }
 }

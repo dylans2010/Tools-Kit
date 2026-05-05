@@ -79,6 +79,7 @@ struct PluginLimitedView: View {
                 requirementRow(title: "Action Access", met: reason != .actionMismatch)
                 requirementRow(title: "Security Scopes", met: reason != .scopeInvalid)
                 requirementRow(title: "System Services", met: reason != .prerequisitesUnmet)
+                requirementRow(title: "Execution Rules", met: reason != .ruleBlocked)
             }
         }
     }
@@ -106,6 +107,7 @@ struct PluginLimitedView: View {
                 resolutionButton(title: "Check System Settings", icon: "gearshape")
                 resolutionButton(title: "Enable Required Services", icon: "bolt.fill")
                 resolutionButton(title: "Update Plugin Permissions", icon: "shield.fill")
+                resolutionButton(title: "View Execution Logs", icon: "terminal")
             }
         }
     }
