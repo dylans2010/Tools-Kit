@@ -148,7 +148,7 @@ struct PersonaHomeView: View {
                             .lineLimit(2)
                         Text(interaction.timestamp, style: .relative)
                             .font(.caption2)
-                            .foregroundColor(Color.tertiary)
+                            .foregroundColor(.secondary)
                     }
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
