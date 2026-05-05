@@ -14,6 +14,7 @@ struct ValidationTests {
         testPluginSystem()
         await testSecuritySystem()
         testMessagesExtension()
+        testConnectorsSystem()
         await testWorkspaceOS()
 
         print("All Validation Tests Passed!")
@@ -113,6 +114,31 @@ struct ValidationTests {
 
     private static func testMessagesExtension() {
         MessagesValidationTests.run()
+    }
+
+    private static func testConnectorsSystem() {
+        print("Testing Connectors System...")
+        let manager = ConnectorManager.shared
+        let id = UUID()
+        let connector = ConnectorDefinition(
+            id: id,
+            name: "Test Connector",
+            identifier: "com.toolskit.test",
+            version: "1.0.0",
+            description: "Test description",
+            authConfig: ConnectorAuthConfig(type: .none),
+            schema: ConnectorSchema(mappings: [:], jsonSchema: "{}"),
+            flow: ConnectorFlow(steps: [])
+        )
+        manager.addConnector(connector)
+        assert(manager.connectors.contains(where: { $0.id == id }))
+
+        manager.addLog(ConnectorLog(connectorID: id, timestamp: Date(), type: .info, message: "Validation test log"))
+        assert(manager.logs.first?.connectorID == id)
+
+        manager.deleteConnector(id: id)
+        assert(!manager.connectors.contains(where: { $0.id == id }))
+        print("Connectors System Logic Verified.")
     }
 
     private static func testPluginSystem() {
