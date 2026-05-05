@@ -55,7 +55,7 @@ public enum SystemAction {
     public enum TasksAction { case create(title: String, dueDate: Date?) }
     public enum MailAction { case send(to: String, subject: String, body: String) }
     public enum CalendarAction { case create(title: String, start: Date, end: Date) }
-    public enum FilesAction { case delete(id: UUID) }
+    public enum FilesAction { case delete(id: String) }
     public enum SlidesAction { case createDeck(title: String); case generateContent(id: UUID, prompt: String) }
     public enum MeetAction { case start(title: String) }
     public enum TimeTravelAction { case restore(id: UUID) }

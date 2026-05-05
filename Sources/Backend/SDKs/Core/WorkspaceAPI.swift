@@ -8,14 +8,14 @@ public final class WorkspaceAPI {
     private init() {}
 
     // MARK: - Notes
-    public struct NotesAPI {
-        public func listNotes() -> [Note] {
+    struct NotesAPI {
+        func listNotes() -> [Note] {
             return NotebooksManager.shared.notebooks.flatMap { $0.folders }.flatMap { $0.pages }.map { page in
                 Note(id: page.id, title: page.title, content: page.content, createdAt: page.createdAt, updatedAt: page.updatedAt)
             }
         }
 
-        public func createNote(title: String, content: String) -> Note {
+        func createNote(title: String, content: String) -> Note {
             let page = NotebookPage(id: UUID(), title: title, content: content, createdAt: Date(), updatedAt: Date())
             if let firstNotebook = NotebooksManager.shared.notebooks.first,
                let firstFolder = firstNotebook.folders.first {
@@ -26,144 +26,158 @@ public final class WorkspaceAPI {
             return Note(id: page.id, title: page.title, content: page.content, createdAt: page.createdAt, updatedAt: page.updatedAt)
         }
     }
-    public let notes = NotesAPI()
+    let notes = NotesAPI()
 
     // MARK: - Tasks
-    public struct TasksAPI {
-        public func listTasks() -> [WorkspaceTask] {
+    struct TasksAPI {
+        func listTasks() -> [WorkspaceTask] {
             return TasksManager.shared.tasks
         }
 
-        public func createTask(title: String, dueDate: Date?) -> WorkspaceTask {
+        func createTask(title: String, dueDate: Date?) -> WorkspaceTask {
             let task = WorkspaceTask(id: UUID(), title: title, description: "", dueDate: dueDate, priority: .medium, categoryID: nil, completed: false, createdAt: Date())
             TasksManager.shared.addTask(task)
             return task
         }
     }
-    public let tasks = TasksAPI()
+    let tasks = TasksAPI()
 
     // MARK: - Mail
-    public struct MailAPI {
-        public func listMessages() -> [MailMessage] {
-            return MailStorageService.shared.messages
+    struct MailAPI {
+        func listMessages() -> [MailMessage] {
+            return MailStorageService.shared.threads.flatMap { $0.messages }
         }
 
-        public func sendMail(to: String, subject: String, body: String) async throws {
-            let message = MailMessage(id: UUID().uuidString, threadId: UUID().uuidString, from: "sdk@toolskit.internal", to: [to], cc: [], bcc: [], subject: subject, body: body, htmlBody: nil, date: Date(), isRead: true, isStarred: false, attachments: [])
-            try await MailSMTPService.shared.send(message: message)
+        func sendMail(to: String, subject: String, body: String) async throws {
+            let accountInfo = await MainActor.run {
+                MailStore.shared.activeAccount.map { account in
+                    (emailAddress: account.emailAddress, providerType: account.providerType)
+                }
+            }
+            guard let accountInfo else {
+                throw SDKError.executionFailed(reason: "No active mail account configured")
+            }
+
+            guard let password = MailKeychainManager.shared.getPassword(for: accountInfo.emailAddress) else {
+                throw SDKError.executionFailed(reason: "Missing mail credentials for active account")
+            }
+
+            let message = MailMessage(id: UUID().uuidString, threadId: UUID().uuidString, from: accountInfo.emailAddress, to: [to], cc: [], bcc: [], subject: subject, body: body, htmlBody: nil, date: Date(), isRead: true, isStarred: false, attachments: [])
+            try await MailSMTPService().send(message: message, user: accountInfo.emailAddress, pass: password, provider: accountInfo.providerType)
         }
     }
-    public let mail = MailAPI()
+    let mail = MailAPI()
 
     // MARK: - Calendar
-    public struct CalendarAPI {
-        public func listEvents() -> [CalendarEvent] {
+    struct CalendarAPI {
+        @MainActor
+        func listEvents() -> [CalendarEvent] {
             return CalendarManager.shared.events
         }
 
-        public func createEvent(title: String, start: Date, end: Date) {
+        @MainActor
+        func createEvent(title: String, start: Date, end: Date) {
             let event = CalendarEvent(id: UUID(), title: title, date: start, startTime: start, endTime: end, location: "")
             CalendarManager.shared.addEvent(event)
         }
     }
-    public let calendar = CalendarAPI()
+    let calendar = CalendarAPI()
 
     // MARK: - Files
-    public struct FilesAPI {
-        public func listFiles() -> [ManagedFileItem] {
+    struct FilesAPI {
+        func listFiles() -> [ManagedFileItem] {
             let manager = FileWorkspaceManager()
             return ManagedFileMetadataService().listItems(in: manager.rootURL)
         }
 
-        public func deleteFile(id: String) {
+        func deleteFile(id: String) {
             try? FileManager.default.removeItem(atPath: id)
         }
-
-        public func deleteFile(id: UUID) {
-            guard let file = listFiles().first(where: { $0.id == id.uuidString }) else { return }
-            try? FileManager.default.removeItem(at: file.url)
-        }
     }
-    public let files = FilesAPI()
+    let files = FilesAPI()
 
     // MARK: - Slides
-    public struct SlidesAPI {
-        public func listDecks() -> [SlideDeck] {
+    struct SlidesAPI {
+        func listDecks() -> [SlideDeck] {
             return SlideDecksManager.shared.decks
         }
 
-        public func createDeck(title: String) {
+        func createDeck(title: String) {
             var deck = SlideDeck.empty(title: title)
             deck.updatedAt = Date()
             SlideDecksManager.shared.addDeck(deck)
         }
     }
-    public let slides = SlidesAPI()
+    let slides = SlidesAPI()
 
     // MARK: - Meet
-    public struct MeetAPI {
-        public func startMeeting(title: String) async throws -> String {
-            return try await DailyService.shared.createRoom(name: title)
+    struct MeetAPI {
+        func startMeeting(title: String) async throws -> String {
+            let session = try await DailyService.shared.createRoom(for: title)
+            if let roomURL = await DailyService.shared.internalRoomURL(for: session) {
+                return roomURL.absoluteString
+            }
+            return session.meetingId
         }
     }
-    public let meet = MeetAPI()
+    let meet = MeetAPI()
 
     // MARK: - Time Travel
-    public struct TimeTravelAPI {
-        public func listSnapshots() -> [WorkspaceSnapshot] {
+    struct TimeTravelAPI {
+        func listSnapshots() -> [WorkspaceSnapshot] {
             return TimeTravelManager.shared.snapshots
         }
 
-        public func restoreState(snapshotID: UUID) throws {
+        func restoreState(snapshotID: UUID) throws {
             print("Restoring Time Travel snapshot: \(snapshotID)")
         }
 
-        public func createSnapshot(message: String) {
+        func createSnapshot(message: String) {
             // Simplified snapshot creation for SDK
             print("Creating Time Travel snapshot: \(message)")
         }
     }
-    public let timeTravel = TimeTravelAPI()
+    let timeTravel = TimeTravelAPI()
 
     // MARK: - Persona
-    public struct PersonaAPI {
-        public func queryPersona(prompt: String) async throws -> String {
-            return try await PersonaManager.shared.queryPersona(prompt: prompt)
+    struct PersonaAPI {
+        func queryPersona(prompt: String) async throws -> String {
+            return try await PersonaManager.shared.queryPersona(query: prompt)
         }
 
-        public func getInsights() -> [PersonaInsight] {
-            return PersonaManager.shared.proactiveInsights
+        func getInsights() -> [String] {
+            return []
         }
 
-        public func injectMemory(content: String) {
+        func injectMemory(content: String) {
             print("Injecting Persona memory: \(content)")
         }
     }
-    public let persona = PersonaAPI()
+    let persona = PersonaAPI()
 
     // MARK: - Integrations
-    public struct IntegrationsAPI {
-        public func executeWorkflow(workflowID: UUID) async throws {
+    struct IntegrationsAPI {
+        func executeWorkflow(workflowID: UUID) async throws {
             if let workflow = UnifiedDataStore.shared.integrationWorkflows.first(where: { $0.id == workflowID }) {
-                try await IntegrationEngine.shared.execute(workflow: workflow)
+                await IntegrationEngine.shared.processWorkflow(workflow, triggerData: [:])
             }
         }
 
-        public func triggerWorkflow(event: String) {
+        func triggerWorkflow(event: String) {
             print("Triggering workflow for event: \(event)")
         }
     }
-    public let integrations = IntegrationsAPI()
+    let integrations = IntegrationsAPI()
 
     // MARK: - Intelligence
-    public struct IntelligenceAPI {
-        public func getGraph() -> [String: Any] {
+    struct IntelligenceAPI {
+        func getGraph() -> [String: Any] {
             return [:] // Placeholder for real graph data
         }
 
-        public func updateLink(source: UUID, target: UUID, relation: String) {
+        func updateLink(source: UUID, target: UUID, relation: String) {
             SDKWorkspaceGraphEngine.shared.updateLink(source: source, target: target, relation: relation)
         }
     }
-    public let intelligence = IntelligenceAPI()
+    let intelligence = IntelligenceAPI()
 }

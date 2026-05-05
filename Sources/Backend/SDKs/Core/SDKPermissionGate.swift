@@ -3,7 +3,7 @@ import Foundation
 /// Final authority on SDK API access.
 /// Enforces scopes strictly.
 public final class SDKPermissionGate {
-    public static let shared = SDKPermissionGate.shared
+    public static let shared = SDKPermissionGate()
 
     private init() {}
 

@@ -50,7 +50,7 @@ public enum SDKAction {
     case createTask(title: String, dueDate: Date?)
     case sendMail(to: String, subject: String, body: String)
     case createEvent(title: String, start: Date, end: Date)
-    case deleteFile(id: UUID)
+    case deleteFile(id: String)
     case createDeck(title: String)
     case startMeeting(title: String)
     case restoreSnapshot(id: UUID)
