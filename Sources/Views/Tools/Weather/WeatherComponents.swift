@@ -137,7 +137,7 @@ struct InsightCard: View {
         .cornerRadius(16)
     }
 
-    private func iconForType(_ type: InsightType) -> String {
+    private func iconForType(_ type: WeatherInsightType) -> String {
         switch type {
         case .rain: return "cloud.rain.fill"
         case .temperature: return "thermometer.medium"

@@ -35,10 +35,10 @@ struct WeatherInsight: Codable, Identifiable {
     var id = UUID()
     let title: String
     let description: String
-    let type: InsightType
+    let type: WeatherInsightType
 }
 
-enum InsightType: String, Codable {
+enum WeatherInsightType: String, Codable {
     case rain
     case temperature
     case uv

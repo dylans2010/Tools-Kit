@@ -58,13 +58,14 @@ struct CreateFolderView: View {
                     Button("Create") {
                         let n = name.trimmingCharacters(in: .whitespacesAndNewlines)
                         let folderName = n.isEmpty ? "New Folder" : n
-                        let folderID = UUID()
-
-                        manager.addFolder(to: notebookID, name: folderName)
+                        guard let folder = manager.addFolder(to: notebookID, name: folderName) else {
+                            dismiss()
+                            return
+                        }
 
                         // Apply template if selected
                         if let template = selectedTemplate {
-                            applyTemplate(template, to: folderID)
+                            applyTemplate(template, to: folder.id)
                         }
 
                         dismiss()
@@ -79,17 +80,17 @@ struct CreateFolderView: View {
     private func applyTemplate(_ template: FolderTemplate, to folderID: UUID) {
         switch template {
         case .project:
-            manager.addPage(to: folderID, title: "Project Overview", content: "# Project Overview\n\n- [ ] Goals\n- [ ] Timeline\n- [ ] Stakeholders")
-            manager.addPage(to: folderID, title: "Milestones", content: "# Milestones\n\n1. Initial Design\n2. Prototype\n3. Final Release")
+            manager.addPage(to: folderID, in: notebookID, title: "Project Overview", content: "# Project Overview\n\n- [ ] Goals\n- [ ] Timeline\n- [ ] Stakeholders")
+            manager.addPage(to: folderID, in: notebookID, title: "Milestones", content: "# Milestones\n\n1. Initial Design\n2. Prototype\n3. Final Release")
         case .meeting:
-            manager.addPage(to: folderID, title: "Agenda", content: "# Meeting Agenda\n\n- Topic 1\n- Topic 2")
-            manager.addPage(to: folderID, title: "Action Items", content: "# Action Items\n\n- [ ] Action 1")
+            manager.addPage(to: folderID, in: notebookID, title: "Agenda", content: "# Meeting Agenda\n\n- Topic 1\n- Topic 2")
+            manager.addPage(to: folderID, in: notebookID, title: "Action Items", content: "# Action Items\n\n- [ ] Action 1")
         case .research:
-            manager.addPage(to: folderID, title: "Bibliography", content: "# Bibliography\n\n- Source 1")
-            manager.addPage(to: folderID, title: "Notes", content: "# Research Notes")
+            manager.addPage(to: folderID, in: notebookID, title: "Bibliography", content: "# Bibliography\n\n- Source 1")
+            manager.addPage(to: folderID, in: notebookID, title: "Notes", content: "# Research Notes")
         case .planning:
-            manager.addPage(to: folderID, title: "Roadmap", content: "# Product Roadmap")
-            manager.addPage(to: folderID, title: "Requirements", content: "# Product Requirements Document")
+            manager.addPage(to: folderID, in: notebookID, title: "Roadmap", content: "# Product Roadmap")
+            manager.addPage(to: folderID, in: notebookID, title: "Requirements", content: "# Product Requirements Document")
         }
     }
 }
