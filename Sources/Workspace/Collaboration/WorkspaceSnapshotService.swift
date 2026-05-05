@@ -1,6 +1,16 @@
 import Foundation
 import Combine
 
+struct WorkspaceSnapshot: Codable, Identifiable {
+    let id: UUID
+    var name: String
+    var branch: String
+    let timestamp: Date
+
+    var message: String { name }
+    var entityType: String { branch }
+}
+
 /// Saves, restores, and compares full workspace snapshots.
 final class WorkspaceSnapshotService: ObservableObject {
     static let shared = WorkspaceSnapshotService()
