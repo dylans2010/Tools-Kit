@@ -76,20 +76,25 @@ struct CreateFolderView: View {
         .presentationDetents([.medium])
     }
 
-    private func applyTemplate(_ template: FolderTemplate, to folderID: UUID) {
+    private func applyTemplate(_ template: FolderTemplate, to folderName: String) {
+        guard let notebook = manager.notebooks.first(where: { $0.id == notebookID }),
+              let folder = notebook.folders.first(where: { $0.name == folderName }) else { return }
+
+        let folderID = folder.id
+
         switch template {
         case .project:
-            manager.addPage(to: folderID, title: "Project Overview", content: "# Project Overview\n\n- [ ] Goals\n- [ ] Timeline\n- [ ] Stakeholders")
-            manager.addPage(to: folderID, title: "Milestones", content: "# Milestones\n\n1. Initial Design\n2. Prototype\n3. Final Release")
+            manager.addPage(to: folderID, in: notebookID, title: "Project Overview")
+            manager.addPage(to: folderID, in: notebookID, title: "Milestones")
         case .meeting:
-            manager.addPage(to: folderID, title: "Agenda", content: "# Meeting Agenda\n\n- Topic 1\n- Topic 2")
-            manager.addPage(to: folderID, title: "Action Items", content: "# Action Items\n\n- [ ] Action 1")
+            manager.addPage(to: folderID, in: notebookID, title: "Agenda")
+            manager.addPage(to: folderID, in: notebookID, title: "Action Items")
         case .research:
-            manager.addPage(to: folderID, title: "Bibliography", content: "# Bibliography\n\n- Source 1")
-            manager.addPage(to: folderID, title: "Notes", content: "# Research Notes")
+            manager.addPage(to: folderID, in: notebookID, title: "Bibliography")
+            manager.addPage(to: folderID, in: notebookID, title: "Notes")
         case .planning:
-            manager.addPage(to: folderID, title: "Roadmap", content: "# Product Roadmap")
-            manager.addPage(to: folderID, title: "Requirements", content: "# Product Requirements Document")
+            manager.addPage(to: folderID, in: notebookID, title: "Roadmap")
+            manager.addPage(to: folderID, in: notebookID, title: "Requirements")
         }
     }
 }
