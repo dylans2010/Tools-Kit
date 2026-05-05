@@ -18,17 +18,7 @@ struct NotebookSearchPageView: View {
         NavigationStack {
             List {
                 ForEach(searchResults) { result in
-                    let destination = PageEditorView(page: result.page, folderID: result.folderID, notebookID: result.notebookID)
-                    NavigationLink(destination: destination) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(result.page.title)
-                                .font(.headline)
-                            Text(result.matchContext)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .lineLimit(2)
-                        }
-                    }
+                    searchResultRow(result)
                 }
             }
             .navigationTitle("Search Pages")
@@ -47,6 +37,25 @@ struct NotebookSearchPageView: View {
                 } else if searchResults.isEmpty {
                     ContentUnavailableView.search(text: searchText)
                 }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func searchResultRow(_ result: SearchResult) -> some View {
+        let page: NotebookPage = result.page
+        let folderID: UUID = result.folderID
+        let notebookID: UUID = result.notebookID
+        let destination: PageEditorView = PageEditorView(page: page, folderID: folderID, notebookID: notebookID)
+
+        NavigationLink(destination: destination) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(page.title)
+                    .font(.headline)
+                Text(result.matchContext)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
             }
         }
     }

@@ -76,10 +76,12 @@ struct PluginsMainView: View {
 
     private var activePluginsSection: some View {
         Section("Active Plugins") {
-            if manager.installedPlugins.filter({ $0.isEnabled }).isEmpty {
+            let activePlugins: [PluginDefinition] = manager.installedPlugins.filter { $0.isEnabled }
+
+            if activePlugins.isEmpty {
                 Text("No active plugins").foregroundColor(.secondary).font(.subheadline)
             } else {
-                ForEach(manager.installedPlugins.filter({ $0.isEnabled })) { plugin in
+                ForEach(activePlugins) { plugin in
                     NavigationLink(destination: PluginDetailView(pluginID: plugin.id)) {
                         HStack(spacing: 12) {
                             Image(systemName: plugin.icon)
@@ -100,7 +102,7 @@ struct PluginsMainView: View {
                             VStack(alignment: .trailing, spacing: 2) {
                                 if let lastExec = plugin.lastExecutedAt {
                                     Text(lastExec.formatted(.relative(presentation: .named)))
-                                        .font(.caption2).foregroundColor(Color.tertiary)
+                                        .font(.caption2).foregroundColor(.secondary)
                                 }
                                 PluginStatusPill(status: .running)
                             }

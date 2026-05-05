@@ -144,7 +144,7 @@ export async function onEvent(event, ctx) {
                 )
 
             Text("Access full PluginContext via 'ctx' object.")
-                .font(.caption2).foregroundColor(Color.tertiary)
+                .font(.caption2).foregroundColor(.secondary)
         }
     }
 
