@@ -41,7 +41,7 @@ struct WorkspaceAutomationView: View {
 
             Section("Recent Execution Log") {
                 if engine.executionLog.isEmpty {
-                    Text("No executions yet.")
+                    Text("No Executions Yet")
                         .foregroundStyle(.secondary)
                         .font(.caption)
                 } else {
@@ -82,14 +82,14 @@ struct AutomationRow: View {
                     Text("Trigger: \(automation.triggerType.rawValue)")
                         .font(.caption).foregroundStyle(.secondary)
                     if let last = automation.lastExecuted {
-                        Text("Last run: \(last, style: .relative)").font(.caption2).foregroundStyle(.tertiary)
+                        Text("Last Run: \(last, style: .relative)").font(.caption2).foregroundStyle(.tertiary)
                     }
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 4) {
                     Toggle("", isOn: Binding(get: { automation.isEnabled }, set: { _ in engine.toggleAutomation(id: automation.id) }))
                         .labelsHidden()
-                    Text("\(automation.executionCount) runs").font(.caption2).foregroundStyle(.secondary)
+                    Text("\(automation.executionCount) Runs").font(.caption2).foregroundStyle(.secondary)
                 }
             }
         }
@@ -115,7 +115,7 @@ struct CreateAutomationView: View {
         NavigationStack {
             Form {
                 Section("Name") {
-                    TextField("Automation name", text: $name)
+                    TextField("Automation Name", text: $name)
                 }
 
                 Section("Trigger") {
@@ -126,7 +126,7 @@ struct CreateAutomationView: View {
                     }
                 }
 
-                Section("Condition (optional)") {
+                Section("Condition (Optional)") {
                     Picker("Operator", selection: $conditionOp) {
                         ForEach(WorkspaceAutomationEngine.ConditionOperator.allCases, id: \.self) { op in
                             Text(op.rawValue).tag(op)
@@ -144,7 +144,7 @@ struct CreateAutomationView: View {
                             Text(a.rawValue).tag(a)
                         }
                     }
-                    TextField("Parameter (optional)", text: $actionParam)
+                    TextField("Parameter (Optional)", text: $actionParam)
                 }
             }
             .navigationTitle("New Automation")
@@ -190,7 +190,7 @@ struct AutomationDetailView: View {
                 }
                 Section("Conditions") {
                     if automation.conditions.isEmpty {
-                        Text("No conditions (always runs)").foregroundStyle(.secondary)
+                        Text("No Conditions (Always Runs)").foregroundStyle(.secondary)
                     } else {
                         ForEach(automation.conditions) { c in
                             Text("\(c.field) \(c.conditionOperator.rawValue) \(c.value)")
@@ -199,7 +199,7 @@ struct AutomationDetailView: View {
                 }
                 Section("Actions") {
                     if automation.actions.isEmpty {
-                        Text("No actions defined").foregroundStyle(.secondary)
+                        Text("No Actions Defined").foregroundStyle(.secondary)
                     } else {
                         ForEach(automation.actions) { a in
                             Label(a.actionType.rawValue, systemImage: "play.fill")

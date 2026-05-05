@@ -69,7 +69,7 @@ struct SecureFolderDetailView: View {
     var body: some View {
         List {
             if folder.items.isEmpty {
-                Text("No items in this folder")
+                Text("Empty Folder")
                     .foregroundColor(.secondary)
             } else {
                 ForEach(Array(folder.items.enumerated()), id: \.offset) { _, item in

@@ -224,7 +224,7 @@ struct MailThreadView: View {
                 if isAISummarizing {
                     ProgressView().tint(.white)
                 } else {
-                    Label("AI Catch Up", systemImage: "sparkles")
+                    Label("Catch Up", systemImage: "sparkles")
                         .font(.subheadline.bold())
                 }
             }
@@ -270,7 +270,7 @@ struct MailThreadView: View {
             HStack {
                 Image(systemName: "sparkles")
                     .foregroundColor(.purple)
-                Text("AI Summary")
+                Text("Summary")
                     .font(.headline)
                     .foregroundColor(.purple)
                 Spacer()

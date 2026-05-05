@@ -1,10 +1,5 @@
 import SwiftUI
 
-// MARK: - Workspace Advanced Home
-
-/// Top-level hub for advanced workspace features.
-/// Provides NavigationStack-compatible NavigationLink routing to
-/// WorkspaceSnapshotView, ContentGraphView, and WorkspaceAutomationView.
 struct WorkspaceAdvancedHomeView: View {
     var body: some View {
         List {
@@ -49,7 +44,7 @@ struct WorkspaceGlobalSearchView: View {
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.secondary)
-                TextField("Search workspace…", text: $query)
+                TextField("Search Workspace", text: $query)
                     .focused($isFocused)
                     .onSubmit { searchService.search(query: query, types: selectedTypes) }
                     .onChange(of: query) { _, new in

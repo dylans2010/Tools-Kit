@@ -9,7 +9,7 @@ struct CollaborationHomeView: View {
         List {
             Section("Your Spaces") {
                 if manager.spaces.isEmpty {
-                    Text("No collaboration spaces yet.")
+                    Text("No Collaboration Spaces Yet")
                         .foregroundColor(.secondary)
                 } else {
                     ForEach(manager.spaces) { space in
@@ -79,7 +79,7 @@ struct CollaborationHomeView: View {
             Section("Recent Activity") {
                 let recentActivity = manager.spaces.flatMap { $0.activityFeed }.sorted { $0.timestamp > $1.timestamp }.prefix(10)
                 if recentActivity.isEmpty {
-                    Text("No recent activity.")
+                    Text("No Recent Activity")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else {

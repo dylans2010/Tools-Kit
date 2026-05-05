@@ -39,7 +39,7 @@ struct WorkspaceSearchView: View {
 
     var body: some View {
         VStack {
-            TextField("Search workspace...", text: $query)
+            TextField("Search Workspace", text: $query)
                 .textFieldStyle(.roundedBorder)
                 .padding()
                 .onChange(of: query) { newValue in

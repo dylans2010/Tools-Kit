@@ -7,7 +7,7 @@ struct TimeTravelHomeView: View {
         List {
             Section("Global Activity Timeline") {
                 if manager.snapshots.isEmpty {
-                    Text("No version history yet.")
+                    Text("No Version History Yet")
                         .foregroundColor(.secondary)
                 } else {
                     ForEach(manager.snapshots.reversed()) { snapshot in
@@ -44,7 +44,7 @@ struct SnapshotDetailView: View {
 
             Divider()
 
-            Button("Restore this state") {
+            Button("Restore This State") {
                 // Restoration logic would go here
             }
             .buttonStyle(.borderedProminent)

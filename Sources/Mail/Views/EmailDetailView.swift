@@ -194,7 +194,7 @@ struct EmailDetailView: View {
         HStack {
             ProgressView()
                 .tint(.purple)
-            Text("AI is processing...")
+            Text("AI Is Processing...")
                 .font(.caption.bold())
                 .foregroundStyle(.secondary)
         }

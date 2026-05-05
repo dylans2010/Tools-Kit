@@ -17,7 +17,6 @@ struct GitHubDependencyDebuggerView: View {
 
             Section {
                 Button("Scan Sources for Cycles") {
-                    // In a real app we would use the real repo path
                     analyzer.scanForCircularDependencies(rootPath: "Sources")
                 }
                 .frame(maxWidth: .infinity)

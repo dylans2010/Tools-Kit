@@ -95,7 +95,7 @@ struct NodeRow: View {
                 Spacer()
                 VStack(alignment: .trailing) {
                     Text("\(edgeCount)").font(.caption).bold().foregroundStyle(.blue)
-                    Text("links").font(.caption2).foregroundStyle(.secondary)
+                    Text("Links").font(.caption2).foregroundStyle(.secondary)
                 }
             }
         }
@@ -152,7 +152,7 @@ struct NodeDetailView: View {
 
                 Section("Connections (\(neighbors.count))") {
                     if neighbors.isEmpty {
-                        Text("No connections yet.").foregroundStyle(.secondary).font(.caption)
+                        Text("No Connections Yet").foregroundStyle(.secondary).font(.caption)
                     } else {
                         ForEach(neighbors) { neighbor in
                             HStack {
@@ -168,7 +168,7 @@ struct NodeDetailView: View {
                             }
                         }
                     }
-                    Button("Link to Node…") { showingLinkPicker = true }
+                    Button("Link To Node…") { showingLinkPicker = true }
                         .foregroundStyle(.blue)
                 }
 
@@ -270,7 +270,7 @@ struct AddNodeView: View {
                         }
                     }
                 }
-                Section("Tags (comma-separated)") {
+                Section("Tags") {
                     TextField("e.g. design, sprint-2", text: $tagText)
                 }
             }

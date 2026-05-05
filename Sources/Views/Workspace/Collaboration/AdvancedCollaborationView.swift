@@ -24,7 +24,7 @@ struct AdvancedCollaborationView: View {
                     .clipShape(Circle())
                     .overlay(Circle().stroke(Color.white, lineWidth: 2))
             }
-            Text("\(participants.count) active now")
+            Text("\(participants.count) Active Now")
                 .font(.caption)
                 .foregroundColor(.secondary)
             Spacer()
@@ -38,7 +38,7 @@ struct AdvancedCollaborationView: View {
                 .font(.system(size: 60))
                 .foregroundColor(.blue)
 
-            Text("Real-time presence and co-editing enabled.")
+            Text("Real time presence and co-editing enabled.")
                 .font(.headline)
 
             Text("Changes made by any participant will propagate instantly across the workspace.")

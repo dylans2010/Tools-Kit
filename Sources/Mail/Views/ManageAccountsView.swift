@@ -19,7 +19,6 @@ struct ManageAccountsView: View {
             ZStack {
                 Color.workspaceBackground.ignoresSafeArea()
 
-                // Ambient Background
                 Circle()
                     .fill(Color.blue.opacity(0.1))
                     .frame(width: 300, height: 300)
@@ -80,7 +79,7 @@ struct ManageAccountsView: View {
                     Image(systemName: "envelope.badge.shield.half.filled")
                         .font(.system(size: 40))
                         .foregroundStyle(.secondary)
-                    Text("No accounts connected yet.")
+                    Text("No Accounts Connected")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -284,7 +283,7 @@ struct ManageAccountsView: View {
         } catch {
             await MainActor.run {
                 loadingProvider = nil
-                triggerFeedback(message: "Failed to connect: \(error.localizedDescription)", error: true)
+                triggerFeedback(message: "Failed To Connect: \(error.localizedDescription)", error: true)
             }
         }
     }

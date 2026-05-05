@@ -13,7 +13,7 @@ struct PluginsInstalledView: View {
                             .foregroundColor(.secondary)
                         Text("No Plugins Installed")
                             .font(.headline)
-                        Text("Visit the marketplace to discover new extensions.")
+                        Text("Visit the Marketplace to discover new extensions.")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)

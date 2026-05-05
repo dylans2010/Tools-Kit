@@ -161,7 +161,7 @@ struct AIWriteView: View {
             Text("Draft with Precision")
                 .font(.title3.bold())
 
-            Text("Select a tool and provide context to generate high-quality email content instantly.")
+            Text("Select a tool and provide context to generate high quality email content instantly.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

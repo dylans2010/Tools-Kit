@@ -122,15 +122,15 @@ struct DraftingEmailsView: View {
 
     private var headerSection: some View {
         VStack(spacing: 12) {
-            Image(systemName: "pencil.and.outline")
+            Image(systemName: "apple.intelligence")
                 .font(.system(size: 40))
                 .foregroundStyle(LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom))
                 .padding(.bottom, 4)
 
-            Text("Advanced Email Drafting")
+            Text("Email Assist")
                 .font(.title2.bold())
 
-            Text("Power your communication with AI-driven contextual drafting.")
+            Text("Draft a perfect email with AI.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -162,7 +162,7 @@ struct DraftingEmailsView: View {
                     onApply(.init(recipient: recipient, subject: subject, body: generatedBody))
                     dismiss()
                 } label: {
-                    Text("Apply to Email")
+                    Text("Apply To Email")
                         .font(.caption.bold())
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
@@ -218,7 +218,7 @@ struct DraftingEmailsView: View {
                 ProgressView()
                     .scaleEffect(1.2)
                     .tint(.white)
-                Text("Drafting your email...")
+                Text("Drafting Your Email...")
                     .font(.headline)
                     .foregroundStyle(.white)
             }

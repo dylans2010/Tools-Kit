@@ -23,17 +23,17 @@ struct GitHubCommandCenterView: View {
                 HStack {
                     Label("Behind", systemImage: "arrow.down.circle")
                     Spacer()
-                    Text("0 commits").foregroundStyle(.secondary)
+                    Text("0 Commits").foregroundStyle(.secondary)
                 }
             }
 
             Section("Sync Operations") {
                 CommandButton(title: "Fetch & Pull", icon: "arrow.down.to.line", color: .blue) {
-                    performSyncAction("Pulling latest changes...")
+                    performSyncAction("Pulling Latest Changes...")
                 }
 
                 CommandButton(title: "Push Commits", icon: "arrow.up.to.line", color: .green) {
-                    performSyncAction("Pushing local commits...")
+                    performSyncAction("Pushing Local Commits...")
                 }
 
                 CommandButton(title: "Switch Branch", icon: "arrow.left.and.right", color: .purple) {
@@ -43,7 +43,7 @@ struct GitHubCommandCenterView: View {
 
             Section("Offline Queue") {
                 if gitEngine.commitQueue.isEmpty {
-                    Text("No pending operations.").font(.caption).foregroundStyle(.secondary)
+                    Text("No Pending Operations").font(.caption).foregroundStyle(.secondary)
                 } else {
                     ForEach(gitEngine.commitQueue, id: \.self) { commitID in
                         if let commit = gitEngine.localCommits.first(where: { $0.id == commitID }) {

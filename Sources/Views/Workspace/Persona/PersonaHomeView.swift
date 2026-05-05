@@ -11,7 +11,7 @@ struct PersonaHomeView: View {
     var body: some View {
         List {
             Section {
-                TextField("Ask your Persona…", text: $query)
+                TextField("Ask Persona", text: $query)
                     .textInputAutocapitalization(.sentences)
                 Button {
                     askPersona()
@@ -40,7 +40,7 @@ struct PersonaHomeView: View {
 
             if isAsking {
                 Section {
-                    ProgressView("Persona is thinking…")
+                    ProgressView("Persona Is Thinking…")
                 }
             }
 
@@ -58,7 +58,7 @@ struct PersonaHomeView: View {
 
             Section("Recent History") {
                 if manager.interactions.isEmpty {
-                    Text("No interactions yet")
+                    Text("No Interactions Yet")
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(manager.interactions.reversed()) { interaction in

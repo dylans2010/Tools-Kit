@@ -101,7 +101,7 @@ struct AIChatSettingsView: View {
     }
 
     private var internalSection: some View {
-        Section("Internal") {
+        Section("Internal (Debug)") {
             Button {
                 showFileImporter = true
             } label: {
@@ -124,7 +124,7 @@ struct AIChatSettingsView: View {
     }
 
     private var agentSettingsSection: some View {
-        Section("Agent Settings") {
+        Section("Agent (Beta)") {
             Toggle("Use System Tools", isOn: $settings.useSystemTools)
             Toggle("Agent", isOn: $agentEnabled)
                 .help("Choose which agent handles your sessions")
@@ -172,7 +172,7 @@ struct AIChatSettingsView: View {
                         .frame(width: 34, height: 34)
                         .background(.blue.opacity(0.12), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("\(provider.name) selected")
+                        Text("\(provider.name) Selected")
                             .font(.subheadline.weight(.semibold))
                         Text("Keys are stored per provider and preserved when switching.")
                             .font(.caption)
@@ -225,7 +225,7 @@ struct AIChatSettingsView: View {
                         .foregroundColor(settings.aiModelSource == .ownKey ? .green : .blue)
 
                     HStack(spacing: 8) {
-                        Text(settings.aiModelSource == .ownKey ? "Unlimited requests with your API key." : "App key mode currently rate-limited.")
+                        Text(settings.aiModelSource == .ownKey ? "Unlimited Requests" : "Daily Limit Reached")
                             .font(.caption)
                             .foregroundColor(.secondary)
                         Spacer()
@@ -241,7 +241,7 @@ struct AIChatSettingsView: View {
         } header: {
             Text("AI Usage")
         } footer: {
-            Text("App Model uses PRODUCTION_API_KEY with a 10 requests/day limit. My API Key mode is unlimited.")
+            Text("App Model uses the cloud for any AI tasks which you will be limited to 10 tasks a day. Your own API key will be fully controlled by you.")
         }
     }
 
@@ -269,13 +269,13 @@ struct AIChatSettingsView: View {
                 if let model = availableModels.first(where: { $0.id == settings.modelID }) {
                     HStack {
                         if model.supportsVision {
-                            Label("Vision supported", systemImage: "eye.fill")
+                            Label("Vision Supported", systemImage: "eye.fill")
                                 .font(.caption)
                                 .foregroundColor(.blue)
                         }
                         if let ctx = model.contextLength {
                             Spacer()
-                            Text("\(ctx / 1000)K context")
+                            Text("\(ctx / 1000)K Context")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -294,7 +294,7 @@ struct AIChatSettingsView: View {
             } else if modelCatalog.loadingProviders.contains(settings.selectedProviderID) {
                 HStack {
                     ProgressView()
-                    Text("Loading models…")
+                    Text("Loading Models…")
                         .foregroundColor(.secondary)
                 }
             } else {
@@ -445,7 +445,7 @@ struct AIChatSettingsView: View {
     private var keyboardExtensionSection: some View {
         Section {
             VStack(alignment: .leading, spacing: 8) {
-                Label("AI Keyboard Extension", systemImage: "keyboard")
+                Label("Keyboard (Beta)", systemImage: "keyboard")
                     .font(.headline)
 
                 Text("Enable the ToolsKit keyboard to get AI writing assistance in any app.")
@@ -669,7 +669,7 @@ struct AIChatSettingsView: View {
             do {
                 try await AccountAuthService.shared.signOut()
                 await MainActor.run {
-                    signOutStatusMessage = "Signed out."
+                    signOutStatusMessage = "Signed Out"
                     isSigningOut = false
                     onSignOut?()
                     dismiss()

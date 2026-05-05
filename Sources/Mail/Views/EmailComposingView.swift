@@ -243,7 +243,7 @@ struct EmailComposingView: View {
                     .opacity(messageBody.isEmpty ? 0.25 : 1.0)
 
                 if messageBody.isEmpty && !bodyFocused {
-                    Text("Compose your email...")
+                    Text("Compose Email")
                         .font(.body)
                         .foregroundStyle(.secondary)
                         .padding(.top, 8)
@@ -366,7 +366,7 @@ struct EmailComposingView: View {
 
     private var undoSendBannerView: some View {
         HStack {
-            Text("Sending in \(undoCountdown)s...")
+            Text("Sending In \(undoCountdown)s...")
                 .font(.subheadline.bold())
             Spacer()
             Button("Undo") { cancelPendingUndoSend() }

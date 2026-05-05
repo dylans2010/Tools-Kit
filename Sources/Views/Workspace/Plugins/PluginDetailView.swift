@@ -40,8 +40,8 @@ struct PluginDetailView: View {
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(plugin.name).font(.title3.bold())
-                    Text("by \(plugin.author)").font(.caption).foregroundStyle(.secondary)
-                    Text("v\(plugin.version)").font(.caption2).foregroundStyle(.tertiary)
+                    Text("By \(plugin.author)").font(.caption).foregroundStyle(.secondary)
+                    Text("Version \(plugin.version)").font(.caption2).foregroundStyle(.tertiary)
                 }
             }
             .padding(.vertical, 4)

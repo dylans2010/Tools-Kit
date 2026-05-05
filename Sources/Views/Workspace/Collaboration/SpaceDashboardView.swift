@@ -81,7 +81,7 @@ struct SpaceDashboardView: View {
                     AddDataCollabView(spaceID: space.id)
                 }
             } else {
-                Text("Space not found.")
+                Text("Space Not Found")
             }
         }
     }
@@ -256,7 +256,7 @@ struct SpaceOverviewTab: View {
                     .padding(.horizontal)
 
                 if space.activityFeed.isEmpty {
-                    Text("No activity yet.")
+                    Text("No Activity Yet")
                         .foregroundColor(.secondary)
                         .padding(.horizontal)
                 } else {

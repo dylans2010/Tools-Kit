@@ -14,7 +14,7 @@ struct DecisionEngineView: View {
         List {
             Section("Decisions") {
                 if filteredDecisions.isEmpty {
-                    Text("No decisions in this space.")
+                    Text("No Decisions In This Space")
                         .foregroundColor(.secondary)
                 } else {
                     ForEach(filteredDecisions) { decision in

@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Displays raw metadata for an email message in an inspector sheet.
 struct MetadataInspectorView: View {
     let email: EmailMessage
 

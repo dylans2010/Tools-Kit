@@ -46,7 +46,7 @@ struct MarketplaceView: View {
 
             Section("Discover Plugins") {
                 if filteredPlugins.isEmpty {
-                    Text("No plugins found").foregroundColor(.secondary).font(.subheadline)
+                    Text("No Plugins Found").foregroundColor(.secondary).font(.subheadline)
                 } else {
                     ForEach(filteredPlugins) { plugin in
                         NavigationLink(destination: PluginDetailView(pluginID: plugin.id)) {
@@ -56,7 +56,7 @@ struct MarketplaceView: View {
                 }
             }
         }
-        .searchable(text: $searchText, prompt: "Search marketplace...")
+        .searchable(text: $searchText, prompt: "Search Marketplace")
         .navigationTitle("Marketplace")
     }
 }

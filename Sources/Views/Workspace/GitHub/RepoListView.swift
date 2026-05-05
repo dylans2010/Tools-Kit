@@ -91,7 +91,7 @@ struct RepoListView: View {
         Task {
             do {
                 try await GitHubAPIClient.shared.requestEmpty(.starred(owner: repo.owner.login, repo: repo.name))
-                // In a real app, we might update local state to reflect starred status
+
             } catch {
                 await MainActor.run {
                     self.errorMessage = "Failed to star repository: \(error.localizedDescription)"

@@ -18,18 +18,18 @@ struct SecurityOnboardingView: View {
                 .padding()
                 .background(.ultraThinMaterial, in: Circle())
 
-            Text("Set up your vault")
+            Text("Set Up Your Vault")
                 .font(.largeTitle.bold())
 
-            Text("Create a master password to protect everything stored in Security Hub.")
+            Text("Start by setting up a passcode, but remember to save it somewhere secure because if you forget, all data will be lost.")
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 
             VStack(spacing: 12) {
-                SecureField("Master password", text: $password)
+                SecureField("Master Password", text: $password)
                     .textFieldStyle(.roundedBorder)
-                SecureField("Confirm password", text: $confirmPassword)
+                SecureField("Confirm Password", text: $confirmPassword)
                     .textFieldStyle(.roundedBorder)
                 Toggle(isOn: $useBiometrics) {
                     Label("Use Face ID / Touch ID", systemImage: "faceid")
@@ -89,7 +89,7 @@ struct SecurityLoginView: View {
             Text("Vault Locked")
                 .font(.title.bold())
 
-            SecureField("Master password", text: $password)
+            SecureField("Master Password", text: $password)
                 .textFieldStyle(.roundedBorder)
                 .padding(.horizontal)
 
@@ -105,13 +105,13 @@ struct SecurityLoginView: View {
                 isAuthenticating = true
                 authService.authenticateWithBiometrics { success in
                     isAuthenticating = false
-                    if !success { error = "Biometric authentication failed" }
+                    if !success { error = "Biometric Authentication Failed" }
                 }
             } label: {
-                Label("Unlock with Biometrics", systemImage: "faceid")
+                Label("Unlock With Biometrics", systemImage: "faceid")
             }
 
-            Button("Reset Password", role: .destructive) {
+            Button("Reset Password?", role: .destructive) {
                 authService.resetVaultAndPassword()
                 password = ""
                 error = nil
@@ -136,7 +136,7 @@ struct SecurityLoginView: View {
             try authService.authenticate(password: password)
             error = nil
         } catch {
-            self.error = "Incorrect password"
+            self.error = "Incorrect Password"
         }
     }
 }

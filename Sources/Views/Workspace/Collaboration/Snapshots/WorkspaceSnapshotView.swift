@@ -35,7 +35,7 @@ struct WorkspaceSnapshotView: View {
 
             Section("Saved Snapshots (\(service.snapshots.count))") {
                 if service.snapshots.isEmpty {
-                    Text("No snapshots saved yet.").foregroundStyle(.secondary).font(.caption)
+                    Text("No Snapshots Saved Yet").foregroundStyle(.secondary).font(.caption)
                 } else {
                     ForEach(service.snapshots) { snapshot in
                         SnapshotRow(snapshot: snapshot)
@@ -103,8 +103,8 @@ struct SaveSnapshotView: View {
         NavigationStack {
             Form {
                 Section("Snapshot") {
-                    TextField("Label (e.g. 'Pre-sprint review')", text: $label)
-                    TextField("Notes (optional)", text: $notes, axis: .vertical)
+                    TextField("Label", text: $label)
+                    TextField("Notes (Optional)", text: $notes, axis: .vertical)
                         .lineLimit(3...)
                 }
             }
@@ -157,7 +157,7 @@ struct SnapshotDiffView: View {
 
                 Section("Changes (\(diffs.count))") {
                     if diffs.isEmpty {
-                        Text("No differences found.").foregroundStyle(.secondary).font(.caption)
+                        Text("No Differences Found.").foregroundStyle(.secondary).font(.caption)
                     } else {
                         ForEach(diffs) { diff in
                             VStack(alignment: .leading, spacing: 4) {

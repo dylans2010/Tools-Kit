@@ -150,7 +150,7 @@ export async function onEvent(event, ctx) {
                 } else {
                     Text("com.toolskit.")
                         .foregroundColor(.secondary)
-                    TextField("unique-id", text: $identifier)
+                    TextField("Identifier", text: $identifier)
                         .multilineTextAlignment(.trailing)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
@@ -185,7 +185,7 @@ export async function onEvent(event, ctx) {
     private var actionsSection: some View {
         Section("Actions (Event Subscriptions)") {
             if selectedCapabilities.isEmpty {
-                Text("Select capabilities first").foregroundColor(.secondary).font(.caption)
+                Text("Select Capabilities First").foregroundColor(.secondary).font(.caption)
             } else {
                 ForEach(PluginAction.allCases.filter { selectedCapabilities.contains($0.parentCapability) }) { action in
                     Toggle(action.rawValue, isOn: Binding(
@@ -215,7 +215,7 @@ export async function onEvent(event, ctx) {
                     }
                 ))) {
                     HStack {
-                        Label("High-Risk Security Gate", systemImage: "shield.fill")
+                        Label("High Risk Security Gate", systemImage: "shield.fill")
                             .foregroundColor(.red)
                         Spacer()
                         if apiKey != nil && privacyNote != nil {
@@ -433,7 +433,7 @@ export async function onEvent(event, ctx) {
                 Text("+ Added \(endpoints.count) Endpoints").font(.caption).foregroundColor(.green)
                 Text("+ Added \(uiExtensions.count) UI Extensions").font(.caption).foregroundColor(.green)
                 if !releaseNotes.isEmpty {
-                    Text("+ Release Notes updated").font(.caption).foregroundColor(.green)
+                    Text("+ Release Notes Updated").font(.caption).foregroundColor(.green)
                 }
             }
 
@@ -490,7 +490,7 @@ export async function onEvent(event, ctx) {
 
         let highRiskSelected = selectedCapabilities.contains { $0.riskLevel == .high }
         if highRiskSelected && (apiKey == nil || privacyNote == nil) {
-            errors.append("High-risk scopes require API Key and Privacy Note.")
+            errors.append("High risk scopes require API Key and Privacy Note.")
         }
 
         // External API validation
@@ -565,7 +565,7 @@ export async function onEvent(event, ctx) {
 
     private func runLocalValidation() {
         var output: [String] = []
-        output.append("• [\(Date().formatted())] Initializing simulation...")
+        output.append("• [\(Date().formatted())] Initializing Simulation...")
 
         let errors = performStrictValidation()
         for error in errors {

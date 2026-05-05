@@ -30,7 +30,7 @@ struct SpaceVersionHistoryView: View {
                     Image(systemName: "clock.arrow.circlepath")
                         .font(.largeTitle)
                         .foregroundColor(.secondary)
-                    Text("No version history yet.")
+                    Text("No Version History Yet")
                         .font(.headline)
                     Text("Every change you make will appear here as a commit.")
                         .font(.subheadline)
@@ -45,7 +45,7 @@ struct SpaceVersionHistoryView: View {
                         VStack(alignment: .leading) {
                             Text(commit.message)
                                 .font(.headline)
-                            Text("\(commit.author) • \(commit.timestamp, style: .date) at \(commit.timestamp, style: .time)")
+                            Text("\(commit.author) • \(commit.timestamp, style: .date) At \(commit.timestamp, style: .time)")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                             Text(commit.id.uuidString.prefix(8))

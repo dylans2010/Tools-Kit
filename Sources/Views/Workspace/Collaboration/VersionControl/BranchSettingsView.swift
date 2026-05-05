@@ -21,7 +21,7 @@ struct BranchSettingsView: View {
                         }
                     }
                 } else {
-                    Text("No protection rules defined.")
+                    Text("No Protection Rules Defined")
                         .foregroundColor(.secondary)
                 }
             }

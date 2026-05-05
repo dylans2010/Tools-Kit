@@ -15,14 +15,14 @@ struct SecurityPackageView: View {
         NavigationStack {
             Form {
                 Section("Backup") {
-                    Label("Create encrypted package", systemImage: "archivebox.fill")
+                    Label("Create Encrypted Package", systemImage: "archivebox.fill")
                     SecureField("Master Password", text: $password)
                     Button { exportVault() } label: { Label("Export Vault", systemImage: "square.and.arrow.up") }
                         .disabled(password.isEmpty || isWorking)
                 }
                 Section("Restore") {
                     Button { showingImportPicker = true } label: { Label("Import Vault", systemImage: "square.and.arrow.down") }
-                    Button { showingImportBridge = true } label: { Label("Document Picker Import", systemImage: "doc.badge.plus") }
+                    Button { showingImportBridge = true } label: { Label("Import File", systemImage: "doc.badge.plus") }
                 }
                 if let statusMessage { Label(statusMessage, systemImage: isError ? "xmark.circle.fill" : "checkmark.circle.fill").foregroundStyle(isError ? .red : .green) }
             }
@@ -33,8 +33,8 @@ struct SecurityPackageView: View {
             .sheet(isPresented: $showingImportBridge) { FileImporterRepresentableView(allowedContentTypes: [UTType(filenameExtension: "toolkitsec") ?? .data], allowsMultipleSelection: false) { handleImport(urls: $0) } }
         }
     }
-    private func exportVault() { Task { isWorking = true; defer { isWorking = false }; do { let url = try await SecurityPackageService.shared.exportPackage(password: password); exportURL = url; showingExportShare = true; statusMessage = "Backup generated successfully."; isError = false } catch { statusMessage = "Export failed: \(error.localizedDescription)"; isError = true } } }
-    private func handleImport(urls: [URL]) { guard let url = urls.first else { return }; Task { isWorking = true; defer { isWorking = false }; do { try await SecurityPackageService.shared.importPackage(at: url, password: password); statusMessage = "Vault imported successfully."; isError = false } catch { statusMessage = "Import failed: \(error.localizedDescription)"; isError = true } } }
+    private func exportVault() { Task { isWorking = true; defer { isWorking = false }; do { let url = try await SecurityPackageService.shared.exportPackage(password: password); exportURL = url; showingExportShare = true; statusMessage = "Backup Generated Successfully."; isError = false } catch { statusMessage = "Export failed: \(error.localizedDescription)"; isError = true } } }
+    private func handleImport(urls: [URL]) { guard let url = urls.first else { return }; Task { isWorking = true; defer { isWorking = false }; do { try await SecurityPackageService.shared.importPackage(at: url, password: password); statusMessage = "Vault Imported Successfully."; isError = false } catch { statusMessage = "Import failed: \(error.localizedDescription)"; isError = true } } }
 }
 
 struct ShareSheet: UIViewControllerRepresentable {
