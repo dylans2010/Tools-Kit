@@ -67,9 +67,3 @@ struct GitHubWorkspaceSnapshotView: View {
     }
 }
 
-struct WorkspaceSnapshot: Identifiable {
-    let id: UUID
-    let name: String
-    let branch: String
-    let timestamp: Date
-}
