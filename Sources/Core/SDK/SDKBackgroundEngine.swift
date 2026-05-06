@@ -36,11 +36,11 @@ public final class SDKBackgroundEngine: ObservableObject {
             // Check connectors
             let connectorsHealthy = await checkConnectors()
 
-            // Check plugins (mock)
-            let pluginsHealthy = true
+            // Check plugins via sandbox engine
+            let pluginsHealthy = SDKSandboxEngine.shared.isHealthy
 
-            // Check CoreData (mock)
-            let storageHealthy = true
+            // Check persistent store health
+            let storageHealthy = SDKProjectManager.shared.currentProject != nil
 
             systemHealth = SDKHealthReport(
                 connectorReachability: connectorsHealthy,

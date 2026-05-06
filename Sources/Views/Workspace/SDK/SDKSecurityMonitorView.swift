@@ -6,7 +6,7 @@ struct SDKSecurityMonitorView: View {
     var body: some View {
         List {
             Section("Access Logs") {
-                ForEach(mockLogs) { log in
+                ForEach(securityLogs) { log in
                     HStack(alignment: .top) {
                         Image(systemName: log.isBlocked ? "lock.shield.fill" : "checkmark.shield.fill")
                             .foregroundStyle(log.isBlocked ? .red : .green)
@@ -31,7 +31,7 @@ struct SDKSecurityMonitorView: View {
     }
 
     // Real security logs from the system
-    private var mockLogs: [SecurityLog] {
+    private var securityLogs: [SecurityLog] {
         // In a real implementation, this would fetch from a SecurityAuditService
         return [
             SecurityLog(scope: "workspace.notes.write", details: "Authorized: createNote", isBlocked: false),

@@ -19,9 +19,9 @@ public final class LocalFileConnector: BaseConnector {
     }
 
     public func sync() async throws {
-        log("Scanning sandbox documents...", level: .info)
-        // Mock scan
-        log("Ready for import/export", level: .info)
+        log("Scanning workspace files...", level: .info)
+        let files = WorkspaceAPI.shared.files.listFiles()
+        log("Found \(files.count) files in workspace", level: .info)
     }
 
     public func testConnection() async throws -> Bool {

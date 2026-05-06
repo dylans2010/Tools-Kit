@@ -1178,6 +1178,24 @@
 		PL02000000000000000000000E /* SDKFlowBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000E /* SDKFlowBuilderView.swift */; };
 		PL02000000000000000000000F /* SDKDataControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000F /* SDKDataControlView.swift */; };
 		PL020000000000000000000010 /* SDKPermissionControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000010 /* SDKPermissionControlView.swift */; };
+		PL020000000000000000000030 /* SDKUIScreenEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000030 /* SDKUIScreenEditorView.swift */; };
+		PL020000000000000000000031 /* SDKLogicEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000031 /* SDKLogicEditorView.swift */; };
+		PL020000000000000000000032 /* SDKConnectorManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000032 /* SDKConnectorManagerView.swift */; };
+		PL020000000000000000000033 /* SDKAppRuntimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000033 /* SDKAppRuntimeView.swift */; };
+		PL020000000000000000000034 /* SDKStateInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000034 /* SDKStateInspectorView.swift */; };
+		PL020000000000000000000035 /* SDKDataFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000035 /* SDKDataFlowView.swift */; };
+		SK020000000000000000000001 /* SDKAppRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000001 /* SDKAppRuntime.swift */; };
+		SK020000000000000000000002 /* SDKModuleSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000002 /* SDKModuleSystem.swift */; };
+		SK020000000000000000000003 /* SDKUIBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000003 /* SDKUIBridge.swift */; };
+		SK020000000000000000000004 /* SDKStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000004 /* SDKStateStore.swift */; };
+		SK020000000000000000000005 /* SDKNavigationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000005 /* SDKNavigationEngine.swift */; };
+		SK020000000000000000000006 /* SDKToolDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000006 /* SDKToolDefinition.swift */; };
+		SK020000000000000000000007 /* SDKAppManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000007 /* SDKAppManifest.swift */; };
+		SK020000000000000000000008 /* SDKExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000008 /* SDKExecutionContext.swift */; };
+		NW020000000000000000000001 /* SDKConnectorRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = NW010000000000000000000001 /* SDKConnectorRuntime.swift */; };
+		NW020000000000000000000002 /* SDKAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = NW010000000000000000000002 /* SDKAuthManager.swift */; };
+		NW020000000000000000000003 /* SDKRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = NW010000000000000000000003 /* SDKRequestBuilder.swift */; };
+		NW020000000000000000000004 /* SDKResponseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = NW010000000000000000000004 /* SDKResponseParser.swift */; };
 		A5F7D48ADA8B4BF8BF3E570D /* ToolsKitSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A185A33DEA747ABB81E5845 /* ToolsKitSDK.swift */; };
 		50B8F220745A4AC3BA164240 /* SDKLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 402EA872FE4B42E9919BB931 /* SDKLogStore.swift */; };
 		93FD31B2B54D4C338A601E5E /* SDKProjectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AAB3375BCD4B6BAC538FDC /* SDKProjectManager.swift */; };
@@ -2374,6 +2392,24 @@
 		PL01000000000000000000000E /* SDKFlowBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKFlowBuilderView.swift; sourceTree = "<group>"; };
 		PL01000000000000000000000F /* SDKDataControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDataControlView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000010 /* SDKPermissionControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPermissionControlView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000030 /* SDKUIScreenEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKUIScreenEditorView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000031 /* SDKLogicEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLogicEditorView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000032 /* SDKConnectorManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConnectorManagerView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000033 /* SDKAppRuntimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAppRuntimeView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000034 /* SDKStateInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKStateInspectorView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000035 /* SDKDataFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDataFlowView.swift; sourceTree = "<group>"; };
+		SK010000000000000000000001 /* SDKAppRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAppRuntime.swift; sourceTree = "<group>"; };
+		SK010000000000000000000002 /* SDKModuleSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKModuleSystem.swift; sourceTree = "<group>"; };
+		SK010000000000000000000003 /* SDKUIBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKUIBridge.swift; sourceTree = "<group>"; };
+		SK010000000000000000000004 /* SDKStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKStateStore.swift; sourceTree = "<group>"; };
+		SK010000000000000000000005 /* SDKNavigationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKNavigationEngine.swift; sourceTree = "<group>"; };
+		SK010000000000000000000006 /* SDKToolDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKToolDefinition.swift; sourceTree = "<group>"; };
+		SK010000000000000000000007 /* SDKAppManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAppManifest.swift; sourceTree = "<group>"; };
+		SK010000000000000000000008 /* SDKExecutionContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKExecutionContext.swift; sourceTree = "<group>"; };
+		NW010000000000000000000001 /* SDKConnectorRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConnectorRuntime.swift; sourceTree = "<group>"; };
+		NW010000000000000000000002 /* SDKAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAuthManager.swift; sourceTree = "<group>"; };
+		NW010000000000000000000003 /* SDKRequestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKRequestBuilder.swift; sourceTree = "<group>"; };
+		NW010000000000000000000004 /* SDKResponseParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKResponseParser.swift; sourceTree = "<group>"; };
 		2A185A33DEA747ABB81E5845 /* ToolsKitSDK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsKitSDK.swift; sourceTree = "<group>"; };
 		402EA872FE4B42E9919BB931 /* SDKLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLogStore.swift; sourceTree = "<group>"; };
 		E4AAB3375BCD4B6BAC538FDC /* SDKProjectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKProjectManager.swift; sourceTree = "<group>"; };
@@ -4396,6 +4432,14 @@
 				E4AAB3375BCD4B6BAC538FDC /* SDKProjectManager.swift */,
 				402EA872FE4B42E9919BB931 /* SDKLogStore.swift */,
 				2A185A33DEA747ABB81E5845 /* ToolsKitSDK.swift */,
+				SK010000000000000000000001 /* SDKAppRuntime.swift */,
+				SK010000000000000000000002 /* SDKModuleSystem.swift */,
+				SK010000000000000000000003 /* SDKUIBridge.swift */,
+				SK010000000000000000000004 /* SDKStateStore.swift */,
+				SK010000000000000000000005 /* SDKNavigationEngine.swift */,
+				SK010000000000000000000006 /* SDKToolDefinition.swift */,
+				SK010000000000000000000007 /* SDKAppManifest.swift */,
+				SK010000000000000000000008 /* SDKExecutionContext.swift */,
 			);
 			path = SDK;
 			sourceTree = "<group>";
@@ -4418,6 +4462,10 @@
 				C03232FF64E642A897463C54 /* GmailConnector.swift */,
 				9B0A6E9DC700472B88DD7AC1 /* SDKConnectorManager.swift */,
 				288397E824F048869DC9ACC3 /* BaseConnector.swift */,
+				NW010000000000000000000001 /* SDKConnectorRuntime.swift */,
+				NW010000000000000000000002 /* SDKAuthManager.swift */,
+				NW010000000000000000000003 /* SDKRequestBuilder.swift */,
+				NW010000000000000000000004 /* SDKResponseParser.swift */,
 			);
 			path = Connectors;
 			sourceTree = "<group>";
@@ -4472,6 +4520,12 @@
 				06C00EFEC47F4EFA82E82DD7 /* SDKLogsView.swift */,
 				94F7CA9EB7294F5194434142 /* SDKAppBuilderView.swift */,
 				57F836A766414E69B1E15432 /* SDKPluginsView.swift */,
+				PL010000000000000000000030 /* SDKUIScreenEditorView.swift */,
+				PL010000000000000000000031 /* SDKLogicEditorView.swift */,
+				PL010000000000000000000032 /* SDKConnectorManagerView.swift */,
+				PL010000000000000000000033 /* SDKAppRuntimeView.swift */,
+				PL010000000000000000000034 /* SDKStateInspectorView.swift */,
+				PL010000000000000000000035 /* SDKDataFlowView.swift */,
 			);
 			path = SDK;
 			sourceTree = "<group>";
@@ -5032,6 +5086,24 @@
 				93FD31B2B54D4C338A601E5E /* SDKProjectManager.swift in Sources */,
 				50B8F220745A4AC3BA164240 /* SDKLogStore.swift in Sources */,
 				A5F7D48ADA8B4BF8BF3E570D /* ToolsKitSDK.swift in Sources */,
+				SK020000000000000000000001 /* SDKAppRuntime.swift in Sources */,
+				SK020000000000000000000002 /* SDKModuleSystem.swift in Sources */,
+				SK020000000000000000000003 /* SDKUIBridge.swift in Sources */,
+				SK020000000000000000000004 /* SDKStateStore.swift in Sources */,
+				SK020000000000000000000005 /* SDKNavigationEngine.swift in Sources */,
+				SK020000000000000000000006 /* SDKToolDefinition.swift in Sources */,
+				SK020000000000000000000007 /* SDKAppManifest.swift in Sources */,
+				SK020000000000000000000008 /* SDKExecutionContext.swift in Sources */,
+				NW020000000000000000000001 /* SDKConnectorRuntime.swift in Sources */,
+				NW020000000000000000000002 /* SDKAuthManager.swift in Sources */,
+				NW020000000000000000000003 /* SDKRequestBuilder.swift in Sources */,
+				NW020000000000000000000004 /* SDKResponseParser.swift in Sources */,
+				PL020000000000000000000030 /* SDKUIScreenEditorView.swift in Sources */,
+				PL020000000000000000000031 /* SDKLogicEditorView.swift in Sources */,
+				PL020000000000000000000032 /* SDKConnectorManagerView.swift in Sources */,
+				PL020000000000000000000033 /* SDKAppRuntimeView.swift in Sources */,
+				PL020000000000000000000034 /* SDKStateInspectorView.swift in Sources */,
+				PL020000000000000000000035 /* SDKDataFlowView.swift in Sources */,
 				WS02634D13801CC4452CAC00 /* IntegrationWorkflow.swift in Sources */,
 				WS02F29CA192362B45BA9F72 /* TimeTravelModels.swift in Sources */,
 				WS02A2803D2D6C14415D892F /* SpatialModels.swift in Sources */,

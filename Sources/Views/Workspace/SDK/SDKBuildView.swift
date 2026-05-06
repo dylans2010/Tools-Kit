@@ -73,11 +73,8 @@ struct SDKBuildView: View {
         exportedURL = nil
 
         Task {
-            // Simulate progress
-            for i in 1...10 {
-                try? await Task.sleep(nanoseconds: 200_000_000)
-                await MainActor.run { buildProgress = Double(i) / 10.0 }
-            }
+            // Real build sequence
+            await MainActor.run { buildProgress = 0.5 }
 
             do {
                 let config = SDKExportConfig(

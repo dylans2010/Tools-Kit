@@ -24,9 +24,9 @@ public final class CalendarConnector: BaseConnector {
 
     public func sync() async throws {
         guard status == .connected else { return }
-        log("Syncing calendar events...", level: .info)
-        // Mock sync
-        log("Calendar sync complete", level: .info)
+        log("Syncing calendar events from Workspace API...", level: .info)
+        let events = await WorkspaceAPI.shared.calendar.listEvents()
+        log("Synced \(events.count) calendar events", level: .info)
     }
 
     public func testConnection() async throws -> Bool {

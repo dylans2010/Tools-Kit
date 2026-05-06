@@ -6,6 +6,10 @@ import JavaScriptCore
 public final class SDKSandboxEngine {
     public static let shared = SDKSandboxEngine()
 
+    @MainActor public var isHealthy: Bool {
+        return JSContext() != nil
+    }
+
     private init() {}
 
     @MainActor

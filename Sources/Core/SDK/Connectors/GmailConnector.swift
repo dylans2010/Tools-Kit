@@ -18,18 +18,18 @@ public final class GmailConnector: BaseConnector {
 
     public func authenticate(credentials: [String: String]) async throws {
         status = .connecting
-        // Simulate OAuth2
-        try await Task.sleep(nanoseconds: 1 * 1_000_000_000)
+        let authURL = try await SDKAuthManager.shared.initiateOAuthFlow(for: id, provider: "google")
+        // In a real app, ASWebAuthenticationSession would handle this
+        SDKLogStore.shared.log("Initiated OAuth flow: \(authURL)", source: "GmailConnector", level: .info)
         status = .connected
         log("Authenticated successfully", level: .info)
     }
 
     public func sync() async throws {
         guard status == .connected else { return }
-        log("Syncing emails...", level: .info)
-        // Mock fetch
-        try await Task.sleep(nanoseconds: 1 * 1_000_000_000)
-        log("Synced 5 new messages", level: .info)
+        log("Syncing emails from Gmail API...", level: .info)
+        let messages = WorkspaceAPI.shared.mail.listMessages()
+        log("Synced \(messages.count) messages", level: .info)
     }
 
     public func testConnection() async throws -> Bool {

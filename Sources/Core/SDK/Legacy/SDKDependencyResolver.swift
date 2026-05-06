@@ -7,9 +7,7 @@ public final class SDKDependencyResolver {
     private init() {}
 
     public func validate(action: SDKAction) throws {
-        // Logic to ensure that prerequisites for an action are met.
-        // E.g. can't delete a file if it doesn't exist (simulated).
-
+        // Enforce that all prerequisites for workspace actions are met using real system state.
         switch action {
         case .deleteFile(let id):
             let files = WorkspaceAPI.shared.files.listFiles()

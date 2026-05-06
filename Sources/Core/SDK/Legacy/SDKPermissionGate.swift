@@ -39,7 +39,8 @@ public final class SDKPermissionGate {
     }
 
     private func isScopeAuthorized(_ scope: String) -> Bool {
-        // Mock authorization
-        return true
+        // Real authorization check against project enabled scopes
+        guard let currentProject = SDKProjectManager.shared.currentProject else { return false }
+        return currentProject.enabledScopes.contains(scope) || currentProject.enabledScopes.contains("workspace.all")
     }
 }

@@ -96,24 +96,33 @@ struct SDKAppBuilderView: View {
     }
 
     private var step6: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 60))
-                .foregroundStyle(.green)
-            Text("Ready to Build").font(.title)
-            Text("Your app configuration is complete.").foregroundStyle(.secondary)
-
-            Button {
-                exportApp()
-            } label: {
-                if isExporting {
-                    ProgressView().progressViewStyle(.circular)
-                } else {
-                    Label("Export as .zip", systemImage: "archivebox")
-                }
+        Form {
+            Section("Production Resources") {
+                NavigationLink("Define Custom UI Screens") { SDKUIScreenEditorView() }
+                NavigationLink("Define Execution Logic") { SDKLogicEditorView() }
+                NavigationLink("Manage External Connectors") { SDKConnectorManagerView() }
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(isExporting || viewModel.name.isEmpty)
+
+            Section("Runtime & Debug") {
+                NavigationLink("App Runtime Monitor") { SDKAppRuntimeView() }
+                NavigationLink("State Inspector") { SDKStateInspectorView() }
+                NavigationLink("Data Flow Visualizer") { SDKDataFlowView() }
+            }
+
+            Section {
+                Button {
+                    exportApp()
+                } label: {
+                    if isExporting {
+                        ProgressView().progressViewStyle(.circular)
+                    } else {
+                        Label("Export Production Bundle", systemImage: "archivebox.fill")
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .buttonStyle(.borderedProminent)
+                .disabled(isExporting || viewModel.name.isEmpty)
+            }
         }
     }
 

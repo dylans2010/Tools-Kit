@@ -74,7 +74,16 @@ public final class SDKAutomationEngine: ObservableObject {
             let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
             try await UNUserNotificationCenter.current().add(request)
         case .exportData(let scope):
-            // Mock export
+            let exportConfig = SDKExportConfig(
+                projectName: "AutoExport",
+                scopes: [.all],
+                pluginIDs: [],
+                toolIDs: [],
+                connectorIDs: [],
+                automationRules: [],
+                exportedAt: Date()
+            )
+            _ = try await SDKExportService().export(config: exportConfig)
             SDKLogStore.shared.log("Auto-export triggered for \(scope)", source: "SDKAutomationEngine", level: .info)
         }
 

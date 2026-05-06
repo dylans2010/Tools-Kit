@@ -24,10 +24,27 @@ public final class GitHubConnector: BaseConnector {
     }
 
     public func sync() async throws {
-        log("Syncing repos...", level: .info)
-        // Mock sync
-        try await Task.sleep(nanoseconds: 1 * 1_000_000_000)
-        log("Synced 3 repositories", level: .info)
+        log("Syncing repositories from GitHub API...", level: .info)
+
+        guard let token = self.token else {
+            throw SDKError.executionFailed(reason: "Missing GitHub token")
+        }
+
+        let request = SDKRequestBuilder()
+            .setEndpoint("https://api.github.com/user/repos")
+            .addHeader("Authorization", value: "Bearer \(token)")
+            .addHeader("Accept", value: "application/vnd.github.v3+json")
+            .build()
+
+        guard let request = request else { throw SDKError.executionFailed(reason: "Failed to build request") }
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw SDKError.executionFailed(reason: "GitHub API returned status \((response as? HTTPURLResponse)?.statusCode ?? 0)")
+        }
+
+        let nodes = SDKResponseParser.shared.mapToDataNodes(["raw": data], scope: .files)
+        log("Synced \(nodes.count) repositories", level: .info)
     }
 
     public func testConnection() async throws -> Bool {

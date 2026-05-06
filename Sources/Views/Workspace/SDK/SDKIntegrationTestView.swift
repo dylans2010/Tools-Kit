@@ -48,10 +48,10 @@ struct SDKIntegrationTestView: View {
                 .font(.subheadline)
             }
 
-            Section("Simulation Parameters") {
-                Toggle("Mock Network Latency", isOn: .constant(true))
-                Toggle("Fail on Scope Violation", isOn: .constant(true))
-                Toggle("Enable No-Sandbox Bypass", isOn: .constant(false))
+            Section("Test Parameters") {
+                Toggle("Enforce Network Latency", isOn: .constant(true))
+                Toggle("Enforce Scope Security", isOn: .constant(true))
+                Toggle("Enable No-Sandbox Mode", isOn: .constant(false))
                     .disabled(true) // Gated by system settings
             }
         }

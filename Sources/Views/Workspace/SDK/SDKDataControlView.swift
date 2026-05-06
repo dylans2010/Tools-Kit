@@ -29,8 +29,11 @@ struct SDKDataControlView: View {
                 Button("Cleanup Completed Tasks") {
                     let tasks = WorkspaceAPI.shared.tasks.listTasks()
                     let completed = tasks.filter { $0.completed }
-                    // Real cleanup logic would go here
-                    statusMessage = "Identified \(completed.count) tasks for cleanup."
+                    // Real cleanup logic via TasksManager
+                    for task in completed {
+                        TasksManager.shared.deleteTask(id: task.id)
+                    }
+                    statusMessage = "Cleaned up \(completed.count) completed tasks."
                 }
             }
 

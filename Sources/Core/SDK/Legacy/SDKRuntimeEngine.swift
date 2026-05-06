@@ -61,7 +61,3 @@ public struct SDKProjectLegacy: Identifiable, Codable {
     }
 }
 
-public struct SDKExecutionContext {
-    public let projectID: UUID
-    public let noSandbox: Bool
-}

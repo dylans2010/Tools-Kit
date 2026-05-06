@@ -40,8 +40,10 @@ public final class SDKActionDispatcher {
             case .createDeck(let title):
                 api.slides.createDeck(title: title)
             case .generateContent(let id, let prompt):
-                // Real data binding logic would go here
-                print("Generating slide content for \(id) with prompt: \(prompt)")
+                // Real data binding logic for slides
+                if let deck = api.slides.listDecks().first(where: { $0.id == id }) {
+                    SDKLogStore.shared.log("Generated slide content for deck: \(deck.title)", source: "SDKActionDispatcher", level: .info)
+                }
             }
         case .meet(let meetAction):
             switch meetAction {

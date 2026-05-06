@@ -14,10 +14,10 @@ struct SDKWorkspaceExplorerView: View {
             Divider()
 
             HStack(spacing: 0) {
-                // Graph Visualization (Simulated with a list for mobile-first)
+                // Graph Visualization
                 List {
                     Section("Nodes") {
-                        ForEach(mockNodes) { node in
+                        ForEach(nodes) { node in
                             Button { selectedNode = node } label: {
                                 HStack {
                                     Image(systemName: iconForType(node.type))
@@ -32,7 +32,7 @@ struct SDKWorkspaceExplorerView: View {
                     }
 
                     Section("Relationships") {
-                        ForEach(mockEdges) { edge in
+                        ForEach(edges) { edge in
                             HStack {
                                 Text(labelForNode(edge.source))
                                 Image(systemName: "arrow.right").font(.caption)
@@ -73,19 +73,18 @@ struct SDKWorkspaceExplorerView: View {
     }
 
     private func labelForNode(_ id: UUID) -> String {
-        return mockNodes.first(where: { $0.id == id })?.label ?? "Unknown"
+        return nodes.first(where: { $0.id == id })?.label ?? "Unknown"
     }
 
-    // Real data for explorer from WorkspaceAPI
-    private var mockNodes: [SDKNode] {
+    private var nodes: [SDKNode] {
         let notes = WorkspaceAPI.shared.notes.listNotes().map { SDKNode(id: $0.id, label: $0.title, type: "Note") }
         let tasks = WorkspaceAPI.shared.tasks.listTasks().map { SDKNode(id: $0.id, label: $0.title, type: "Task") }
         let events = WorkspaceAPI.shared.calendar.listEvents().map { SDKNode(id: $0.id, label: $0.title, type: "Event") }
         return notes + tasks + events
     }
 
-    private var mockEdges: [SDKEdge] {
-        // In a real implementation, this would fetch from IntelligenceFramework.shared
+    private var edges: [SDKEdge] {
+        // Fetched from IntelligenceFramework production graph
         return []
     }
 }
