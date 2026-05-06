@@ -260,6 +260,16 @@ struct ValidationTests {
         SDKTelemetryEngine.shared.startTrace(id: traceID, action: action)
         SDKTelemetryEngine.shared.endTrace(id: traceID, status: .success)
 
+        // 6. Test fetchData
+        let fetchRequest = SDKFetchRequest(dataTypes: [.notes, .tasks], scopes: [.notes, .tasks])
+        do {
+            let fetchResult = try await ToolsKitSDK.shared.fetchData(fetchRequest)
+            assert(fetchResult.metadata.totalCount >= 0)
+            assert(fetchResult.performance.fetchTime >= 0)
+        } catch {
+            fatalError("SDK fetchData failed: \(error.localizedDescription)")
+        }
+
         print("SDK Platform Logic Verified.")
     }
 

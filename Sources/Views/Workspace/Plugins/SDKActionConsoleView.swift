@@ -60,8 +60,16 @@ struct SDKActionConsoleView: View {
                 } else if cmd == "list notes" {
                     let notes = WorkspaceAPI.shared.notes.listNotes()
                     logBus.log("Found \(notes.count) notes.", type: .info)
+                } else if cmd.starts(with: "fetch ") {
+                    let typeStr = cmd.replacingOccurrences(of: "fetch ", with: "")
+                    if let type = SDKDataType(rawValue: typeStr) {
+                        let result = try await ToolsKitSDK.shared.fetchData(SDKFetchRequest(dataTypes: [type]))
+                        logBus.log("Fetch success: Found \(result.data.count) \(typeStr) nodes.", type: .success)
+                    } else {
+                        logBus.log("Invalid data type: \(typeStr)", type: .error)
+                    }
                 } else if cmd == "help" {
-                    logBus.log("Available commands: note [title], list notes, clear, help", type: .info)
+                    logBus.log("Available commands: note [title], list notes, fetch [type], clear, help", type: .info)
                 } else if cmd == "clear" {
                     logBus.clear()
                 } else {

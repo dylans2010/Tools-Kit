@@ -1162,6 +1162,12 @@
 		DV0200000000000000000012 /* SDKPermissionGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000012 /* SDKPermissionGate.swift */; };
 		DV0200000000000000000013 /* SDKSandboxController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000013 /* SDKSandboxController.swift */; };
 		DV0200000000000000000014 /* SDKNoSandboxOverrideController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000014 /* SDKNoSandboxOverrideController.swift */; };
+		DV0200000000000000000015 /* SDKModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000015 /* SDKModels.swift */; };
+		DV0200000000000000000016 /* ToolsKitSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000016 /* ToolsKitSDK.swift */; };
+		DV0200000000000000000017 /* SDKFeatureExpansion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000017 /* SDKFeatureExpansion.swift */; };
+		PL020000000000000000000026 /* SDKDataInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000026 /* SDKDataInspectorView.swift */; };
+		PL020000000000000000000027 /* SDKEventSimulatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000027 /* SDKEventSimulatorView.swift */; };
+		PL020000000000000000000028 /* SDKScopeEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000028 /* SDKScopeEditorView.swift */; };
 		PL020000000000000000000007 /* SDKBuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000007 /* SDKBuildView.swift */; };
 		PL020000000000000000000008 /* SDKProjectDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000008 /* SDKProjectDashboardView.swift */; };
 		PL020000000000000000000009 /* SDKDeploymentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000009 /* SDKDeploymentView.swift */; };
@@ -2335,7 +2341,13 @@
 		DV0100000000000000000012 /* SDKPermissionGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKPermissionGate.swift; sourceTree = "<group>"; };
 		DV0100000000000000000013 /* SDKSandboxController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKSandboxController.swift; sourceTree = "<group>"; };
 		DV0100000000000000000014 /* SDKNoSandboxOverrideController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKNoSandboxOverrideController.swift; sourceTree = "<group>"; };
+		DV0100000000000000000015 /* SDKModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SDKModels.swift; sourceTree = "<group>"; };
+		DV0100000000000000000016 /* ToolsKitSDK.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToolsKitSDK.swift; sourceTree = "<group>"; };
+		DV0100000000000000000017 /* SDKFeatureExpansion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SDKFeatureExpansion.swift; sourceTree = "<group>"; };
 		PL010000000000000000000007 /* SDKBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKBuildView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000026 /* SDKDataInspectorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SDKDataInspectorView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000027 /* SDKEventSimulatorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SDKEventSimulatorView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000028 /* SDKScopeEditorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SDKScopeEditorView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000008 /* SDKProjectDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKProjectDashboardView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000009 /* SDKDeploymentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKDeploymentView.swift; sourceTree = "<group>"; };
 		PL01000000000000000000000A /* SDKSystemExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKSystemExplorerView.swift; sourceTree = "<group>"; };
@@ -3680,6 +3692,9 @@
 				DV0100000000000000000012 /* SDKPermissionGate.swift */,
 				DV0100000000000000000013 /* SDKSandboxController.swift */,
 				DV0100000000000000000014 /* SDKNoSandboxOverrideController.swift */,
+				DV0100000000000000000015 /* SDKModels.swift */,
+				DV0100000000000000000016 /* ToolsKitSDK.swift */,
+				DV0100000000000000000017 /* SDKFeatureExpansion.swift */,
 				PL010000000000000000000007 /* SDKBuildView.swift */,
 				PL010000000000000000000008 /* SDKProjectDashboardView.swift */,
 				PL010000000000000000000009 /* SDKDeploymentView.swift */,
@@ -3692,6 +3707,9 @@
 				PL010000000000000000000023 /* SDKIntegrationTestView.swift */,
 				PL010000000000000000000024 /* SDKEventStreamView.swift */,
 				PL010000000000000000000025 /* SDKSecurityMonitorView.swift */,
+				PL010000000000000000000026 /* SDKDataInspectorView.swift */,
+				PL010000000000000000000027 /* SDKEventSimulatorView.swift */,
+				PL010000000000000000000028 /* SDKScopeEditorView.swift */,
 				PL01000000000000000000000D /* SDKDebugView.swift */,
 				PL01000000000000000000000E /* SDKFlowBuilderView.swift */,
 				PL01000000000000000000000F /* SDKDataControlView.swift */,
@@ -5632,6 +5650,9 @@
 				DV0200000000000000000012 /* SDKPermissionGate.swift in Sources */,
 				DV0200000000000000000013 /* SDKSandboxController.swift in Sources */,
 				DV0200000000000000000014 /* SDKNoSandboxOverrideController.swift in Sources */,
+				DV0200000000000000000015 /* SDKModels.swift in Sources */,
+				DV0200000000000000000016 /* ToolsKitSDK.swift in Sources */,
+				DV0200000000000000000017 /* SDKFeatureExpansion.swift in Sources */,
 				PL020000000000000000000007 /* SDKBuildView.swift in Sources */,
 				PL020000000000000000000008 /* SDKProjectDashboardView.swift in Sources */,
 				PL020000000000000000000009 /* SDKDeploymentView.swift in Sources */,
@@ -5644,6 +5665,9 @@
 				PL020000000000000000000023 /* SDKIntegrationTestView.swift in Sources */,
 				PL020000000000000000000024 /* SDKEventStreamView.swift in Sources */,
 				PL020000000000000000000025 /* SDKSecurityMonitorView.swift in Sources */,
+				PL020000000000000000000026 /* SDKDataInspectorView.swift in Sources */,
+				PL020000000000000000000027 /* SDKEventSimulatorView.swift in Sources */,
+				PL020000000000000000000028 /* SDKScopeEditorView.swift in Sources */,
 				PL02000000000000000000000D /* SDKDebugView.swift in Sources */,
 				PL02000000000000000000000E /* SDKFlowBuilderView.swift in Sources */,
 				PL02000000000000000000000F /* SDKDataControlView.swift in Sources */,
