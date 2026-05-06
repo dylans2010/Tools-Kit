@@ -1277,7 +1277,6 @@
 		CL0100000000000000000001 /* CollaborationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaborationManager.swift; sourceTree = "<group>"; };
 		CL0100000000000000000002 /* CollaborationFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaborationFramework.swift; sourceTree = "<group>"; };
 		2054E7AF12EB68C41BECE760 /* GitEngineService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitEngineService.swift; sourceTree = "<group>"; };
-		CL010000000000000000000B /* ContentGraphService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentGraphService.swift; sourceTree = "<group>"; };
 		CL010000000000000000000C /* WorkspaceAutomationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAutomationEngine.swift; sourceTree = "<group>"; };
 		CL010000000000000000000D /* WorkspaceServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceServices.swift; sourceTree = "<group>"; };
 		CL010000000000000000000E /* WorkspaceSnapshotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSnapshotService.swift; sourceTree = "<group>"; };
