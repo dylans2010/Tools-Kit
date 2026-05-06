@@ -22,7 +22,7 @@ public final class SDKExecutionBridge {
     }
 
     /// Converts an SDK project to a PluginDefinition for deployment
-    func deployToPlugin(project: SDKProject) -> PluginDefinition {
+    func deployToPlugin(project: SDKProjectLegacy) -> PluginDefinition {
         return PluginDefinition(
             id: UUID(),
             name: project.name,

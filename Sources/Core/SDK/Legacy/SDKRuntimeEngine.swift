@@ -6,7 +6,7 @@ import Combine
 public final class SDKRuntimeEngine: ObservableObject {
     public static let shared = SDKRuntimeEngine()
 
-    @Published public var activeProjects: [SDKProject] = []
+    @Published public var activeProjects: [SDKProjectLegacy] = []
     @Published public var isNoSandboxModeEnabled: Bool = false
 
     private let permissionManager = SDKPermissionManager.shared
@@ -14,7 +14,7 @@ public final class SDKRuntimeEngine: ObservableObject {
 
     private init() {}
 
-    public func runProject(_ project: SDKProject) {
+    public func runProject(_ project: SDKProjectLegacy) {
         SDKConsoleView.LogBus.shared.log("Starting project: \(project.name)", type: .info)
 
         let executionContext = SDKExecutionContext(
@@ -33,7 +33,7 @@ public final class SDKRuntimeEngine: ObservableObject {
         }
     }
 
-    private func performExecution(project: SDKProject, context: SDKExecutionContext) async throws {
+    private func performExecution(project: SDKProjectLegacy, context: SDKExecutionContext) async throws {
         // Use SDKExecutionKernel for coordinated execution
         if context.noSandbox {
             SDKConsoleView.LogBus.shared.log("WARNING: Running in noSandbox mode. Restrictions bypassed.", type: .warning)
@@ -49,7 +49,7 @@ public final class SDKRuntimeEngine: ObservableObject {
     }
 }
 
-public struct SDKProject: Identifiable, Codable {
+public struct SDKProjectLegacy: Identifiable, Codable {
     public let id: UUID
     public var name: String
     public var sourceCode: String
