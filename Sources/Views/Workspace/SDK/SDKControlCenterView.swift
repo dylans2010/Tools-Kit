@@ -4,6 +4,8 @@ struct SDKControlCenterView: View {
     @StateObject private var runtime = SDKRuntimeEngine.shared
     @StateObject private var telemetry = SDKTelemetryEngine.shared
     @StateObject private var backgroundEngine = SDKBackgroundEngine.shared
+    @StateObject private var realtimeSync = SDKRealtimeSync.shared
+    @StateObject private var connectorManager = SDKConnectorManager.shared
 
     var body: some View {
         ScrollView {
@@ -81,6 +83,54 @@ struct SDKControlCenterView: View {
                         Text("\(metrics.failureCount) failures detected")
                             .font(.caption)
                             .foregroundStyle(.red)
+                    }
+                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(12)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("Realtime Sync", systemImage: "antenna.radiowaves.left.and.right")
+                        .font(.headline)
+
+                    HStack {
+                        Circle().fill(realtimeSync.isConnected ? .green : .gray).frame(width: 8, height: 8)
+                        Text(realtimeSync.isConnected ? "Connected" : "Idle")
+                            .font(.caption)
+                        Spacer()
+                        Text("\(realtimeSync.activeChannels.count) channels")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+
+                    if !realtimeSync.activeChannels.isEmpty {
+                        ForEach(Array(realtimeSync.activeChannels).sorted(), id: \.self) { channel in
+                            Text(channel)
+                                .font(.system(size: 11, design: .monospaced))
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(12)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("Connectors", systemImage: "link")
+                        .font(.headline)
+
+                    if connectorManager.connectors.isEmpty {
+                        Text("No connectors registered").font(.caption).foregroundStyle(.secondary)
+                    } else {
+                        ForEach(connectorManager.connectors, id: \.id) { connector in
+                            HStack {
+                                Circle()
+                                    .fill(connector.status == .connected ? .green : .gray)
+                                    .frame(width: 8, height: 8)
+                                Text(connector.name).font(.caption)
+                                Spacer()
+                                Text(connector.status.rawValue).font(.caption2).foregroundStyle(.secondary)
+                            }
+                        }
                     }
                 }
                 .padding()

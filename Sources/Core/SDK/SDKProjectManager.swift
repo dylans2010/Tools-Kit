@@ -12,6 +12,8 @@ public struct SDKProject: Identifiable, Codable {
     public var enabledConnectorIDs: [UUID]
     public var automationRules: [SDKAutomationRule]
     public var healthStatus: HealthStatus
+    public var sourceCode: String
+    public var requiredScopes: [String]
 }
 
 public enum HealthStatus: String, Codable {
@@ -45,7 +47,9 @@ public final class SDKProjectManager: ObservableObject {
             enabledToolIDs: [],
             enabledConnectorIDs: [],
             automationRules: [],
-            healthStatus: .healthy
+            healthStatus: .healthy,
+            sourceCode: "",
+            requiredScopes: []
         )
         projects.append(defaultProject)
         currentProject = defaultProject

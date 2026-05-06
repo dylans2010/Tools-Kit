@@ -48,7 +48,7 @@ struct SDKBuildView: View {
                                 .foregroundStyle(.blue)
                             VStack(alignment: .leading) {
                                 Text(url.lastPathComponent).font(.headline)
-                                Text("Size: 1.2 MB").font(.caption).foregroundStyle(.secondary)
+                                Text("Size: \(fileSizeString(url))").font(.caption).foregroundStyle(.secondary)
                             }
                             Spacer()
                             ShareLink(item: url)
@@ -66,6 +66,14 @@ struct SDKBuildView: View {
         .navigationTitle("Build")
     }
 
+    private func fileSizeString(_ url: URL) -> String {
+        guard let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
+              let size = attrs[.size] as? UInt64 else { return "Unknown" }
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        return formatter.string(fromByteCount: Int64(size))
+    }
+
     private func startBuild() {
         guard let project = projectManager.currentProject else { return }
         isBuilding = true
@@ -73,24 +81,23 @@ struct SDKBuildView: View {
         exportedURL = nil
 
         Task {
-            // Simulate progress
-            for i in 1...10 {
-                try? await Task.sleep(nanoseconds: 200_000_000)
-                await MainActor.run { buildProgress = Double(i) / 10.0 }
-            }
+            await MainActor.run { buildProgress = 0.1 }
 
             do {
+                await MainActor.run { buildProgress = 0.3 }
                 let config = SDKExportConfig(
                     projectName: project.name,
-                    scopes: project.enabledScopes.compactMap { _ in nil }, // In real app, map strings to enums
+                    scopes: project.enabledScopes.compactMap { scopeStr in SDKScope.allCases.first { String(describing: $0) == scopeStr } },
                     pluginIDs: project.enabledPluginIDs,
                     toolIDs: project.enabledToolIDs,
                     connectorIDs: project.enabledConnectorIDs,
                     automationRules: project.automationRules,
                     exportedAt: Date()
                 )
+                await MainActor.run { buildProgress = 0.6 }
                 let url = try await SDKExportService().export(config: config)
                 await MainActor.run {
+                    buildProgress = 1.0
                     self.exportedURL = url
                     self.isBuilding = false
                     projectManager.currentProject?.lastBuiltAt = Date()

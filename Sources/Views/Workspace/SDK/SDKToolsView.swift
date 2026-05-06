@@ -25,6 +25,26 @@ struct SDKToolsView: View {
                     }
                 }
             }
+
+            Section("Execution History") {
+                let history = SDKToolRuntime.shared.getHistory().prefix(10)
+                if history.isEmpty {
+                    Text("No executions yet").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(Array(history), id: \.toolID) { record in
+                        HStack {
+                            Image(systemName: record.success ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                .foregroundStyle(record.success ? .green : .red)
+                            VStack(alignment: .leading) {
+                                Text(record.toolID.uuidString.prefix(8))
+                                    .font(.system(.caption, design: .monospaced))
+                                Text("\(String(format: "%.1fms", record.duration * 1000))")
+                                    .font(.caption2).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
         }
         .navigationTitle("Tools")
         .sheet(item: $selectedTool) { tool in
@@ -44,8 +64,10 @@ struct SDKToolsView: View {
 struct ToolRunnerView: View {
     let tool: SDKTool
     @Environment(\.dismiss) var dismiss
+    @StateObject private var runtime = SDKRuntimeEngine.shared
     @State private var inputs: [String: String] = [:]
     @State private var result: SDKToolResult?
+    @State private var errorMessage: String?
     @State private var isRunning = false
 
     var body: some View {
@@ -53,7 +75,17 @@ struct ToolRunnerView: View {
             Form {
                 Section("Inputs") {
                     ForEach(tool.inputSchema, id: \.key) { param in
-                        TextField(param.key + (param.required ? "*" : ""), text: binding(for: param.key))
+                        TextField(param.key + (param.required ? " *" : ""), text: binding(for: param.key))
+                    }
+                }
+
+                Section("Scope Validation") {
+                    HStack {
+                        Text("Execution Mode")
+                        Spacer()
+                        Text(runtime.isNoSandboxModeEnabled ? "Unrestricted" : "Sandboxed")
+                            .font(.caption)
+                            .foregroundStyle(runtime.isNoSandboxModeEnabled ? .red : .green)
                     }
                 }
 
@@ -67,16 +99,17 @@ struct ToolRunnerView: View {
                             Text("Execute")
                         }
                     }
-                    .disabled(isRunning)
+                    .disabled(isRunning || missingRequiredInputs)
                 }
 
                 if let result = result {
                     Section("Result") {
                         if result.success {
-                            ForEach(Array(result.output.keys), id: \.self) { key in
+                            ForEach(Array(result.output.keys.sorted()), id: \.self) { key in
                                 VStack(alignment: .leading) {
                                     Text(key).font(.caption).foregroundStyle(.secondary)
                                     Text("\(String(describing: result.output[key] ?? ""))")
+                                        .font(.system(.body, design: .monospaced))
                                 }
                             }
                             Text("Duration: \(String(format: "%.2fms", result.duration * 1000))")
@@ -84,6 +117,14 @@ struct ToolRunnerView: View {
                         } else {
                             Text("Execution failed").foregroundStyle(.red)
                         }
+                    }
+                }
+
+                if let error = errorMessage {
+                    Section("Error") {
+                        Text(error)
+                            .font(.system(.caption, design: .monospaced))
+                            .foregroundStyle(.red)
                     }
                 }
             }
@@ -96,6 +137,12 @@ struct ToolRunnerView: View {
         }
     }
 
+    private var missingRequiredInputs: Bool {
+        tool.inputSchema.filter { $0.required }.contains { param in
+            (inputs[param.key] ?? "").isEmpty
+        }
+    }
+
     private func binding(for key: String) -> Binding<String> {
         Binding(
             get: { inputs[key] ?? "" },
@@ -105,6 +152,8 @@ struct ToolRunnerView: View {
 
     private func runTool() {
         isRunning = true
+        errorMessage = nil
+        result = nil
         Task {
             do {
                 let res = try await SDKToolManager.shared.execute(toolID: tool.id, input: inputs)
@@ -115,7 +164,8 @@ struct ToolRunnerView: View {
             } catch {
                 await MainActor.run {
                     isRunning = false
-                    // Handle error
+                    errorMessage = error.localizedDescription
+                    SDKLogStore.shared.log("Tool execution failed: \(error.localizedDescription)", source: "ToolRunnerView", level: .error)
                 }
             }
         }
