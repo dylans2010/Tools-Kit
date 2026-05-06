@@ -64,6 +64,7 @@ public final class SDKTelemetryEngine: ObservableObject {
     }
 
     private func persistTraces() {
+        let tracesSnapshot = completedTraces
         queue.async { [weak self] in
             guard let self = self else { return }
 
@@ -75,7 +76,7 @@ public final class SDKTelemetryEngine: ObservableObject {
                 let success: Bool
             }
 
-            let records = self.completedTraces.prefix(100).compactMap { trace -> TraceRecord? in
+            let records = tracesSnapshot.prefix(100).compactMap { trace -> TraceRecord? in
                 guard let endTime = trace.endTime else { return nil }
                 let success: Bool
                 if case .success = trace.status { success = true } else { success = false }

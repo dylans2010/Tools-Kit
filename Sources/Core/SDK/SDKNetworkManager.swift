@@ -85,6 +85,9 @@ public final class SDKNetworkManager {
             }
 
             if httpResponse.statusCode == 429 {
+                guard attempt < maxRetries else {
+                    throw SDKError.executionFailed(reason: "Rate limited after \(maxRetries) retries")
+                }
                 let retryAfter = Double(httpResponse.value(forHTTPHeaderField: "Retry-After") ?? "5") ?? 5
                 SDKLogStore.shared.log("Rate limited. Retrying after \(retryAfter)s", source: "SDKNetworkManager", level: .warning)
                 try await Task.sleep(nanoseconds: UInt64(retryAfter * 1_000_000_000))

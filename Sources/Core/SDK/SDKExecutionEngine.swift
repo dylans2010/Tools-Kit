@@ -53,6 +53,7 @@ public final class SDKExecutionEngine: ObservableObject {
         } catch {
             activeExecutions[executionID]?.status = .failed(error)
             recordExecution(id: executionID, action: action, startTime: startTime, success: false, error: error.localizedDescription)
+            activeExecutions.removeValue(forKey: executionID)
             throw error
         }
 
