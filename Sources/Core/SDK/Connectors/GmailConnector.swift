@@ -13,32 +13,95 @@ public final class GmailConnector: BaseConnector {
     }
 
     @Published public var activityLog: [ConnectorEvent] = []
+    private var accessToken: String?
+    private var refreshToken: String?
 
     public init() {}
 
     public func authenticate(credentials: [String: String]) async throws {
         status = .connecting
-        // Simulate OAuth2
-        try await Task.sleep(nanoseconds: 1 * 1_000_000_000)
-        status = .connected
-        log("Authenticated successfully", level: .info)
+        log("Initiating Gmail OAuth2 authentication...", level: .info)
+
+        guard let token = credentials["oauth"] ?? credentials["token"] else {
+            status = .error
+            log("OAuth2 token not provided", level: .error)
+            throw SDKError.executionFailed(reason: "Gmail OAuth2 token required")
+        }
+
+        accessToken = token
+        refreshToken = credentials["refresh_token"]
+
+        let isValid = try await validateToken(token)
+        if isValid {
+            status = .connected
+            log("Gmail authenticated successfully", level: .info)
+        } else {
+            status = .error
+            log("Gmail authentication failed: invalid token", level: .error)
+            throw SDKError.executionFailed(reason: "Gmail OAuth2 token validation failed")
+        }
     }
 
     public func sync() async throws {
-        guard status == .connected else { return }
-        log("Syncing emails...", level: .info)
-        // Mock fetch
-        try await Task.sleep(nanoseconds: 1 * 1_000_000_000)
-        log("Synced 5 new messages", level: .info)
+        guard status == .connected, let token = accessToken else {
+            throw SDKError.executionFailed(reason: "Gmail not connected")
+        }
+
+        log("Syncing Gmail messages...", level: .info)
+
+        let url = URL(string: "https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=10")!
+        var request = URLRequest(url: url)
+        request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw SDKError.executionFailed(reason: "Invalid Gmail API response")
+        }
+
+        if httpResponse.statusCode == 401 {
+            status = .error
+            log("Gmail token expired, re-authentication required", level: .error)
+            throw SDKError.executionFailed(reason: "Gmail token expired")
+        }
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            log("Gmail sync failed with status \(httpResponse.statusCode)", level: .error)
+            throw SDKError.executionFailed(reason: "Gmail API error: HTTP \(httpResponse.statusCode)")
+        }
+
+        if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let messages = json["messages"] as? [[String: Any]] {
+            log("Synced \(messages.count) Gmail messages", level: .info)
+        } else {
+            log("Gmail sync completed (no new messages)", level: .info)
+        }
     }
 
     public func testConnection() async throws -> Bool {
-        return status == .connected
+        guard let token = accessToken else { return false }
+        return await validateTokenSilent(token)
     }
 
     public func disconnect() {
         status = .disconnected
-        log("Disconnected", level: .info)
+        accessToken = nil
+        refreshToken = nil
+        log("Gmail disconnected", level: .info)
+    }
+
+    private func validateToken(_ token: String) async throws -> Bool {
+        let url = URL(string: "https://oauth2.googleapis.com/tokeninfo?access_token=\(token)")!
+        let (_, response) = try await URLSession.shared.data(from: url)
+        return (response as? HTTPURLResponse)?.statusCode == 200
+    }
+
+    private func validateTokenSilent(_ token: String) async -> Bool {
+        do {
+            return try await validateToken(token)
+        } catch {
+            return false
+        }
     }
 
     private func log(_ message: String, level: LogLevel) {

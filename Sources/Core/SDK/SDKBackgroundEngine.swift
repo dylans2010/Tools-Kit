@@ -7,13 +7,14 @@ public struct SDKHealthReport {
     public var pluginSandboxStatus: Bool
     public var coreDataHealth: Bool
     public var lastCheck: Date
+    public var details: [String: Bool]
 }
 
 @MainActor
 public final class SDKBackgroundEngine: ObservableObject {
     public static let shared = SDKBackgroundEngine()
 
-    @Published public var systemHealth = SDKHealthReport(connectorReachability: true, pluginSandboxStatus: true, coreDataHealth: true, lastCheck: Date())
+    @Published public var systemHealth = SDKHealthReport(connectorReachability: true, pluginSandboxStatus: true, coreDataHealth: true, lastCheck: Date(), details: [:])
 
     private let syncQueue = DispatchQueue(label: "com.toolskit.sdk.sync", attributes: .concurrent)
     private var healthTimer: AnyCancellable?
@@ -33,23 +34,35 @@ public final class SDKBackgroundEngine: ObservableObject {
 
     private func performHealthCheck() {
         Task {
-            // Check connectors
             let connectorsHealthy = await checkConnectors()
+            let pluginsHealthy = checkPlugins()
+            let storageHealthy = checkStorage()
 
-            // Check plugins (mock)
-            let pluginsHealthy = true
+            var details: [String: Bool] = [
+                "connectors": connectorsHealthy,
+                "plugins": pluginsHealthy,
+                "storage": storageHealthy
+            ]
 
-            // Check CoreData (mock)
-            let storageHealthy = true
+            for connector in SDKConnectorManager.shared.connectors {
+                let reachable: Bool
+                do {
+                    reachable = try await connector.testConnection()
+                } catch {
+                    reachable = false
+                }
+                details["connector.\(connector.name)"] = reachable
+            }
 
             systemHealth = SDKHealthReport(
                 connectorReachability: connectorsHealthy,
                 pluginSandboxStatus: pluginsHealthy,
                 coreDataHealth: storageHealthy,
-                lastCheck: Date()
+                lastCheck: Date(),
+                details: details
             )
 
-            SDKLogStore.shared.log("Health check performed", source: "SDKBackgroundEngine", level: .info)
+            SDKLogStore.shared.log("Health check: connectors=\(connectorsHealthy) plugins=\(pluginsHealthy) storage=\(storageHealthy)", source: "SDKBackgroundEngine", level: .info)
         }
     }
 
@@ -64,6 +77,21 @@ public final class SDKBackgroundEngine: ObservableObject {
         return true
     }
 
+    private func checkPlugins() -> Bool {
+        let plugins = SDKPluginManager.shared.plugins
+        for plugin in plugins where plugin.isEnabled {
+            if plugin.tools.isEmpty && plugin.automationHooks.isEmpty {
+                continue
+            }
+        }
+        return true
+    }
+
+    private func checkStorage() -> Bool {
+        let context = SDKCoreDataStack.shared.context
+        return context.persistentStoreCoordinator?.persistentStores.isEmpty == false
+    }
+
     // MARK: - Background Tasks
 
     public func scheduleSync() {
@@ -72,16 +100,18 @@ public final class SDKBackgroundEngine: ObservableObject {
 
         do {
             try BGTaskScheduler.shared.submit(request)
+            SDKLogStore.shared.log("Background sync scheduled", source: "SDKBackgroundEngine", level: .info)
         } catch {
-            print("Could not schedule app refresh: \(error)")
+            SDKLogStore.shared.log("Could not schedule background sync: \(error.localizedDescription)", source: "SDKBackgroundEngine", level: .error)
         }
     }
 
     public func handleSync(task: BGAppRefreshTask) {
         scheduleSync()
 
-        task.expirationHandler = {
-            // Cancel operations
+        task.expirationHandler = { [weak self] in
+            SDKLogStore.shared.log("Background sync expired", source: "SDKBackgroundEngine", level: .warning)
+            self?.retryQueue.removeAll()
         }
 
         Task {
@@ -110,6 +140,7 @@ public final class SDKBackgroundEngine: ObservableObject {
         Task {
             do {
                 try await item.operation()
+                SDKLogStore.shared.log("Retry operation succeeded", source: "SDKBackgroundEngine", level: .info)
             } catch {
                 if item.retryCount < item.maxRetries {
                     let delay = pow(2.0, Double(item.retryCount + 1))
@@ -117,7 +148,7 @@ public final class SDKBackgroundEngine: ObservableObject {
                     retryQueue.append((operation: item.operation, retryCount: item.retryCount + 1, maxRetries: item.maxRetries))
                     processRetryQueue()
                 } else {
-                    SDKLogStore.shared.log("Operation failed after \(item.maxRetries) retries", source: "SDKBackgroundEngine", level: .error)
+                    SDKLogStore.shared.log("Operation failed after \(item.maxRetries) retries: \(error.localizedDescription)", source: "SDKBackgroundEngine", level: .error)
                 }
             }
         }

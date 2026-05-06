@@ -32,8 +32,21 @@ final class PersonaManager: ObservableObject {
         return response
     }
 
+    func recentMemories() -> [PersonaInteraction] {
+        return Array(interactions.suffix(20))
+    }
+
+    func injectMemory(entityID: UUID, content: String) {
+        let interaction = PersonaInteraction(
+            query: "[Memory Injection] \(entityID)",
+            response: content,
+            contextUsed: [entityID.uuidString]
+        )
+        interactions.append(interaction)
+        try? dataStore.savePersonaInteraction(interaction)
+    }
+
     private func buildWorkspaceContext() -> String {
-        // Collect summaries of notes, tasks, etc.
         let notebooks = NotebooksManager.shared.notebooks.map { $0.name }.joined(separator: ", ")
         let tasks = TasksManager.shared.todayTasks.map { $0.title }.joined(separator: ", ")
         return "Workspace Context: Notebooks: [\(notebooks)]. Tasks: [\(tasks)]."

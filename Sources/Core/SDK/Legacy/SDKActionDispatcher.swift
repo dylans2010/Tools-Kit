@@ -1,6 +1,5 @@
 import Foundation
 
-/// Executes atomic workspace actions ensuring transaction safety.
 public final class SDKActionDispatcher {
     public static let shared = SDKActionDispatcher()
 
@@ -14,61 +13,73 @@ public final class SDKActionDispatcher {
             switch notesAction {
             case .create(let title, let content):
                 _ = api.notes.createNote(title: title, content: content)
+                SDKLogStore.shared.log("Note created: \(title)", source: "SDKActionDispatcher", level: .info)
             }
         case .tasks(let tasksAction):
             switch tasksAction {
             case .create(let title, let dueDate):
                 _ = api.tasks.createTask(title: title, dueDate: dueDate)
+                SDKLogStore.shared.log("Task created: \(title)", source: "SDKActionDispatcher", level: .info)
             }
         case .mail(let mailAction):
             switch mailAction {
             case .send(let to, let subject, let body):
                 try await api.mail.sendMail(to: to, subject: subject, body: body)
+                SDKLogStore.shared.log("Mail sent to \(to): \(subject)", source: "SDKActionDispatcher", level: .info)
             }
         case .calendar(let calendarAction):
             switch calendarAction {
             case .create(let title, let start, let end):
                 await api.calendar.createEvent(title: title, start: start, end: end)
+                SDKLogStore.shared.log("Calendar event created: \(title)", source: "SDKActionDispatcher", level: .info)
             }
         case .files(let filesAction):
             switch filesAction {
             case .delete(let id):
                 api.files.deleteFile(id: id)
+                SDKLogStore.shared.log("File deleted: \(id)", source: "SDKActionDispatcher", level: .info)
             }
         case .slides(let slidesAction):
             switch slidesAction {
             case .createDeck(let title):
                 api.slides.createDeck(title: title)
+                SDKLogStore.shared.log("Slide deck created: \(title)", source: "SDKActionDispatcher", level: .info)
             case .generateContent(let id, let prompt):
-                // Real data binding logic would go here
-                print("Generating slide content for \(id) with prompt: \(prompt)")
+                try await api.slides.generateContent(deckID: id, prompt: prompt)
+                SDKLogStore.shared.log("Slide content generated for deck \(id)", source: "SDKActionDispatcher", level: .info)
             }
         case .meet(let meetAction):
             switch meetAction {
             case .start(let title):
-                _ = try await api.meet.startMeeting(title: title)
+                let meetingID = try await api.meet.startMeeting(title: title)
+                SDKLogStore.shared.log("Meeting started: \(title) (\(meetingID))", source: "SDKActionDispatcher", level: .info)
             }
         case .timeTravel(let timeTravelAction):
             switch timeTravelAction {
             case .restore(let id):
                 try api.timeTravel.restoreState(snapshotID: id)
+                SDKLogStore.shared.log("Snapshot restored: \(id)", source: "SDKActionDispatcher", level: .info)
             }
         case .persona(let personaAction):
             switch personaAction {
             case .query(let prompt):
-                _ = try await api.persona.queryPersona(prompt: prompt)
+                let response = try await api.persona.queryPersona(prompt: prompt)
+                SDKLogStore.shared.log("Persona query completed: \(response.prefix(50))...", source: "SDKActionDispatcher", level: .info)
             case .injectMemory(let id, let content):
-                print("Injecting memory for \(id): \(content)")
+                api.persona.injectMemory(entityID: id, content: content)
+                SDKLogStore.shared.log("Persona memory injected for entity \(id)", source: "SDKActionDispatcher", level: .info)
             }
         case .automation(let automationAction):
             switch automationAction {
             case .execute(let id):
                 try await api.integrations.executeWorkflow(workflowID: id)
+                SDKLogStore.shared.log("Workflow executed: \(id)", source: "SDKActionDispatcher", level: .info)
             }
         case .intelligence(let intelligenceAction):
             switch intelligenceAction {
             case .updateLink(let source, let target, let relation):
-                print("Updating graph link: \(source) -> \(target) [\(relation)]")
+                api.intelligence.updateLink(source: source, target: target, relation: relation)
+                SDKLogStore.shared.log("Graph link updated: \(source) -> \(target) [\(relation)]", source: "SDKActionDispatcher", level: .info)
             }
         }
     }

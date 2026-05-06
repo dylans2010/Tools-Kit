@@ -1,25 +1,24 @@
 import Foundation
 
-/// Final authority on SDK API access.
-/// Enforces scopes strictly.
 public final class SDKPermissionGate {
     public static let shared = SDKPermissionGate()
 
     private init() {}
 
     public func enforce(action: SDKAction, context: SDKExecutionContext) throws {
-        // If noSandbox mode is enabled and it's a developer context, bypass
         if context.noSandbox {
-            SDKConsoleView.LogBus.shared.log("PermissionGate: Bypassing scope check for noSandbox mode.", type: .warning)
+            SDKLogStore.shared.log("PermissionGate: Bypassing scope check for noSandbox mode", source: "SDKPermissionGate", level: .warning)
             return
         }
 
         let requiredScope = getRequiredScope(for: action)
 
-        // Simplified check: In a real app, check against authorized project scopes
-        guard isScopeAuthorized(requiredScope) else {
+        guard SDKScopeManager.shared.isAuthorized(scope: mapActionToSDKScope(action), operation: .execute) else {
+            SDKLogStore.shared.log("PermissionGate: Denied scope \(requiredScope) for action \(action)", source: "SDKPermissionGate", level: .error)
             throw SDKError.permissionDenied(scope: requiredScope)
         }
+
+        SDKLogStore.shared.log("PermissionGate: Granted scope \(requiredScope)", source: "SDKPermissionGate", level: .debug)
     }
 
     private func getRequiredScope(for action: SDKAction) -> String {
@@ -38,8 +37,19 @@ public final class SDKPermissionGate {
         }
     }
 
-    private func isScopeAuthorized(_ scope: String) -> Bool {
-        // Mock authorization
-        return true
+    private func mapActionToSDKScope(_ action: SDKAction) -> SDKScope {
+        switch action {
+        case .createNote: return .notes
+        case .createTask: return .tasks
+        case .sendMail: return .emails
+        case .createEvent: return .calendar
+        case .deleteFile: return .files
+        case .createDeck, .generateSlideContent: return .slides
+        case .startMeeting: return .meet
+        case .restoreSnapshot: return .all
+        case .queryPersona, .injectMemory: return .persona
+        case .executeWorkflow: return .automations
+        case .updateGraphLink: return .intelligence
+        }
     }
 }

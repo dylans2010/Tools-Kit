@@ -1,20 +1,35 @@
 import Foundation
 import Combine
 
-public struct SDKDataItem: Identifiable {
+// MARK: - SDK Data Types
+
+public struct SDKDataItem: Identifiable, Codable {
     public let id: UUID
     public let scope: SDKScope
     public let title: String
-    public let payload: [String: Any]
+    public let codablePayload: [String: String]
     public let timestamp: Date
+
+    public var payload: [String: Any] { codablePayload.reduce(into: [:]) { $0[$1.key] = $1.value } }
+
+    public init(id: UUID, scope: SDKScope, title: String, payload: [String: Any], timestamp: Date) {
+        self.id = id
+        self.scope = scope
+        self.title = title
+        self.codablePayload = payload.reduce(into: [:]) { $0[$1.key] = String(describing: $1.value) }
+        self.timestamp = timestamp
+    }
 }
 
 public enum SDKScope: Hashable, CaseIterable, Codable {
     case all, tasks, notes, calendar, files, emails, whiteboards, plugins
+    case slides, media, meet, repos, automations, intelligence, persona
     case custom(query: String)
 
     public static var allCases: [SDKScope] {
-        return [.all, .tasks, .notes, .calendar, .files, .emails, .whiteboards, .plugins]
+        return [.all, .tasks, .notes, .calendar, .files, .emails, .whiteboards,
+                .plugins, .slides, .media, .meet, .repos, .automations,
+                .intelligence, .persona]
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -33,6 +48,13 @@ public enum SDKScope: Hashable, CaseIterable, Codable {
         case "emails": self = .emails
         case "whiteboards": self = .whiteboards
         case "plugins": self = .plugins
+        case "slides": self = .slides
+        case "media": self = .media
+        case "meet": self = .meet
+        case "repos": self = .repos
+        case "automations": self = .automations
+        case "intelligence": self = .intelligence
+        case "persona": self = .persona
         case "custom":
             let query = try container.decode(String.self, forKey: .query)
             self = .custom(query: query)
@@ -52,6 +74,13 @@ public enum SDKScope: Hashable, CaseIterable, Codable {
         case .emails: try container.encode("emails", forKey: .type)
         case .whiteboards: try container.encode("whiteboards", forKey: .type)
         case .plugins: try container.encode("plugins", forKey: .type)
+        case .slides: try container.encode("slides", forKey: .type)
+        case .media: try container.encode("media", forKey: .type)
+        case .meet: try container.encode("meet", forKey: .type)
+        case .repos: try container.encode("repos", forKey: .type)
+        case .automations: try container.encode("automations", forKey: .type)
+        case .intelligence: try container.encode("intelligence", forKey: .type)
+        case .persona: try container.encode("persona", forKey: .type)
         case .custom(let query):
             try container.encode("custom", forKey: .type)
             try container.encode(query, forKey: .query)
@@ -66,95 +95,421 @@ public enum SDKScope: Hashable, CaseIterable, Codable {
     }
 }
 
+// MARK: - SDK Query Types
+
+public struct SDKQuery {
+    public var scope: SDKScope
+    public var filters: [SDKFilter]
+    public var pagination: SDKPagination?
+    public var streaming: Bool
+    public var partialDataset: Bool
+
+    public init(scope: SDKScope, filters: [SDKFilter] = [], pagination: SDKPagination? = nil, streaming: Bool = false, partialDataset: Bool = false) {
+        self.scope = scope
+        self.filters = filters
+        self.pagination = pagination
+        self.streaming = streaming
+        self.partialDataset = partialDataset
+    }
+}
+
+public struct SDKFilter {
+    public enum FilterType {
+        case date(from: Date?, to: Date?)
+        case tags([String])
+        case ownership(String)
+        case type(String)
+        case keyword(String)
+    }
+
+    public let type: FilterType
+
+    public init(_ type: FilterType) {
+        self.type = type
+    }
+}
+
+public struct SDKPagination {
+    public var page: Int
+    public var pageSize: Int
+
+    public init(page: Int = 1, pageSize: Int = 50) {
+        self.page = page
+        self.pageSize = pageSize
+    }
+}
+
+public struct SDKBatchResult {
+    public let succeeded: Int
+    public let failed: Int
+    public let errors: [Error]
+}
+
+public struct SDKWriteResult {
+    public let id: UUID
+    public let scope: SDKScope
+    public let success: Bool
+}
+
+// MARK: - ToolsKitSDK Central Orchestrator
+
 @MainActor
 public final class ToolsKitSDK: ObservableObject {
     public static let shared = ToolsKitSDK()
 
-    private let cache = NSCache<NSString, CacheEntry>()
-    private let cacheTTL: TimeInterval = 300 // 5 minutes
-
     @Published public var isSyncing = false
+    @Published public var isInitialized = false
 
-    private init() {}
+    private let dataEngine = SDKDataEngine.shared
+    private let scopeManager = SDKScopeManager.shared
+    private let eventBridge = SDKEventBridge.shared
+    private let realtimeSync = SDKRealtimeSync.shared
+    private let storageManager = SDKStorageManager.shared
+    private let networkManager = SDKNetworkManager.shared
+    private let graphInterface = SDKGraphInterface.shared
+    private let personaBridge = SDKPersonaBridge.shared
+    private let timeTravelBridge = SDKTimeTravelBridge.shared
+    private let executionEngine = SDKExecutionEngine.shared
+    private let connectorEngine = SDKConnectorEngine.shared
+    private let toolRuntime = SDKToolRuntime.shared
 
-    private class CacheEntry {
-        let items: [SDKDataItem]
-        let timestamp: Date
-        init(items: [SDKDataItem], timestamp: Date) {
-            self.items = items
-            self.timestamp = timestamp
-        }
+    private init() {
+        initialize()
     }
+
+    private func initialize() {
+        SDKLogStore.shared.log("ToolsKitSDK initializing", source: "ToolsKitSDK", level: .info)
+        isInitialized = true
+        SDKLogStore.shared.log("ToolsKitSDK ready", source: "ToolsKitSDK", level: .info)
+    }
+
+    // MARK: - 1. sdk.fetchData
 
     public func fetchData(scope: SDKScope) async throws -> [SDKDataItem] {
-        if let cached = cache.object(forKey: scope.cacheKey as NSString),
-           Date().timeIntervalSince(cached.timestamp) < cacheTTL {
-            return cached.items
-        }
-
-        // Simulating data fetch from CoreData/WorkspaceAPI
-        let items = try await fetchFromSource(scope: scope)
-        let normalized = normalize(items, for: scope)
-
-        cache.setObject(CacheEntry(items: normalized, timestamp: Date()), forKey: scope.cacheKey as NSString)
-        return normalized
+        try scopeManager.validateAccess(scope: scope, operation: .read)
+        SDKLogStore.shared.log("fetchData scope=\(scope)", source: "ToolsKitSDK", level: .info)
+        return try await dataEngine.fetch(scope: scope)
     }
 
-    private func fetchFromSource(scope: SDKScope) async throws -> [Any] {
-        // Integration with WorkspaceAPI
-        switch scope {
-        case .tasks:
-            return WorkspaceAPI.shared.tasks.listTasks()
-        case .notes:
-            return WorkspaceAPI.shared.notes.listNotes()
-        case .calendar:
-            return WorkspaceAPI.shared.calendar.listEvents()
-        case .files:
-            return WorkspaceAPI.shared.files.listFiles()
-        case .emails:
-            return WorkspaceAPI.shared.mail.listMessages()
-        default:
-            return []
-        }
+    public func fetchData(query: SDKQuery) async throws -> [SDKDataItem] {
+        try scopeManager.validateAccess(scope: query.scope, operation: .read)
+        return try await dataEngine.fetch(query: query)
     }
 
-    private func normalize(_ items: [Any], for scope: SDKScope) -> [SDKDataItem] {
-        return items.compactMap { item in
-            if let task = item as? WorkspaceTask {
-                return SDKDataItem(id: task.id, scope: .tasks, title: task.title, payload: ["completed": task.completed], timestamp: task.createdAt)
-            } else if let note = item as? Note {
-                return SDKDataItem(id: note.id, scope: .notes, title: note.title, payload: ["content": note.content], timestamp: note.updatedAt)
-            } else if let event = item as? CalendarEvent {
-                return SDKDataItem(id: event.id, scope: .calendar, title: event.title, payload: ["location": event.location], timestamp: event.date)
-            } else if let file = item as? ManagedFileItem {
-                return SDKDataItem(id: UUID(), scope: .files, title: file.name, payload: ["path": file.path], timestamp: Date())
-            } else if let mail = item as? MailMessage {
-                return SDKDataItem(id: UUID(), scope: .emails, title: mail.subject, payload: ["from": mail.from], timestamp: mail.date)
+    // MARK: - 2. sdk.writeData
+
+    public func writeData(scope: SDKScope, title: String, payload: [String: Any]) async throws -> SDKWriteResult {
+        try scopeManager.validateAccess(scope: scope, operation: .write)
+        let result = try await dataEngine.write(scope: scope, title: title, payload: payload)
+        eventBridge.emit(type: "data.written", payload: ["scope": "\(scope)", "title": title])
+        return result
+    }
+
+    // MARK: - 3. sdk.deleteData
+
+    public func deleteData(scope: SDKScope, id: UUID) async throws {
+        try scopeManager.validateAccess(scope: scope, operation: .delete)
+        try await dataEngine.delete(scope: scope, id: id)
+        eventBridge.emit(type: "data.deleted", payload: ["scope": "\(scope)", "id": id.uuidString])
+    }
+
+    // MARK: - 4. sdk.batchUpdate
+
+    public func batchUpdate(operations: [(scope: SDKScope, title: String, payload: [String: Any])]) async throws -> SDKBatchResult {
+        var succeeded = 0
+        var failed = 0
+        var errors: [Error] = []
+
+        for operation in operations {
+            do {
+                try scopeManager.validateAccess(scope: operation.scope, operation: .write)
+                _ = try await dataEngine.write(scope: operation.scope, title: operation.title, payload: operation.payload)
+                succeeded += 1
+            } catch {
+                failed += 1
+                errors.append(error)
             }
-            return nil
+        }
+
+        SDKLogStore.shared.log("batchUpdate: \(succeeded) succeeded, \(failed) failed", source: "ToolsKitSDK", level: .info)
+        return SDKBatchResult(succeeded: succeeded, failed: failed, errors: errors)
+    }
+
+    // MARK: - 5. sdk.cacheLayer
+
+    public func cacheLayer(scope: SDKScope) -> SDKCacheInfo {
+        return dataEngine.cacheInfo(for: scope)
+    }
+
+    public func invalidateCache(scope: SDKScope? = nil) {
+        dataEngine.invalidateCache(scope: scope)
+    }
+
+    // MARK: - 6. sdk.localStorage
+
+    public func localStorage(key: String) -> Any? {
+        return storageManager.getValue(key: key)
+    }
+
+    public func setLocalStorage(key: String, value: Any) {
+        storageManager.setValue(key: key, value: value)
+    }
+
+    // MARK: - 7. sdk.secureStorage
+
+    public func secureStorage(key: String) -> String? {
+        return storageManager.getSecureValue(key: key)
+    }
+
+    public func setSecureStorage(key: String, value: String) throws {
+        try storageManager.setSecureValue(key: key, value: value)
+    }
+
+    // MARK: - 8. sdk.subscribeEvent
+
+    public func subscribeEvent(type: String, handler: @escaping (SDKEvent) -> Void) -> AnyCancellable {
+        return eventBridge.subscribe(type: type, handler: handler)
+    }
+
+    // MARK: - 9. sdk.emitEvent
+
+    public func emitEvent(type: String, payload: [String: Any]) {
+        eventBridge.emit(type: type, payload: payload)
+    }
+
+    // MARK: - 10. sdk.replayEvents
+
+    public func replayEvents(from: Date, to: Date) -> [SDKEvent] {
+        return eventBridge.replay(from: from, to: to)
+    }
+
+    // MARK: - 11. sdk.filterEvents
+
+    public func filterEvents(type: String?, source: String?) -> [SDKEvent] {
+        return eventBridge.filter(type: type, source: source)
+    }
+
+    // MARK: - 12. sdk.ai.generate
+
+    public func aiGenerate(prompt: String, context: [String: Any] = [:]) async throws -> String {
+        try scopeManager.validateAccess(scope: .persona, operation: .read)
+        return try await personaBridge.generate(prompt: prompt, context: context)
+    }
+
+    // MARK: - 13. sdk.ai.analyze
+
+    public func aiAnalyze(data: [SDKDataItem], prompt: String) async throws -> String {
+        try scopeManager.validateAccess(scope: .persona, operation: .read)
+        return try await personaBridge.analyze(data: data, prompt: prompt)
+    }
+
+    // MARK: - 14. sdk.ai.summarize
+
+    public func aiSummarize(items: [SDKDataItem]) async throws -> String {
+        try scopeManager.validateAccess(scope: .persona, operation: .read)
+        return try await personaBridge.summarize(items: items)
+    }
+
+    // MARK: - 15. sdk.persona.query
+
+    public func personaQuery(prompt: String) async throws -> String {
+        try scopeManager.validateAccess(scope: .persona, operation: .read)
+        return try await personaBridge.queryPersona(prompt: prompt)
+    }
+
+    // MARK: - 16. sdk.persona.memory.write
+
+    public func personaMemoryWrite(entityID: UUID, memory: String) async throws {
+        try scopeManager.validateAccess(scope: .persona, operation: .write)
+        try await personaBridge.writeMemory(entityID: entityID, memory: memory)
+    }
+
+    // MARK: - 17. sdk.automation.trigger
+
+    public func automationTrigger(event: String, context: [String: Any] = [:]) async {
+        await SDKAutomationEngine.shared.evaluate(trigger: .dataUpdated(scope: event), context: context)
+        eventBridge.emit(type: "automation.triggered", payload: ["event": event])
+    }
+
+    // MARK: - 18. sdk.automation.createWorkflow
+
+    public func automationCreateWorkflow(rule: SDKAutomationRule) {
+        SDKAutomationEngine.shared.add(rule)
+        SDKLogStore.shared.log("Workflow created: \(rule.name)", source: "ToolsKitSDK", level: .info)
+    }
+
+    // MARK: - 19. sdk.automation.modify
+
+    public func automationModify(ruleID: UUID, updates: (inout SDKAutomationRule) -> Void) {
+        guard var rule = SDKAutomationEngine.shared.rules.first(where: { $0.id == ruleID }) else { return }
+        updates(&rule)
+        SDKAutomationEngine.shared.remove(id: ruleID)
+        SDKAutomationEngine.shared.add(rule)
+    }
+
+    // MARK: - 20. sdk.external.connect
+
+    public func externalConnect(connector: any BaseConnector, credentials: [String: String]) async throws {
+        try await connectorEngine.connect(connector: connector, credentials: credentials)
+    }
+
+    // MARK: - 21. sdk.external.fetch
+
+    public func externalFetch(url: String, headers: [String: String] = [:]) async throws -> Data {
+        return try await networkManager.fetch(url: url, headers: headers)
+    }
+
+    // MARK: - 22. sdk.external.webhook
+
+    public func externalWebhook(url: String, payload: [String: Any], apiKey: String? = nil) async throws -> Data {
+        return try await networkManager.postWebhook(url: url, payload: payload, apiKey: apiKey)
+    }
+
+    // MARK: - 23. sdk.external.sync
+
+    public func externalSync() async throws {
+        isSyncing = true
+        defer { isSyncing = false }
+        try await connectorEngine.syncAll()
+    }
+
+    // MARK: - 24. sdk.realtime.subscribe
+
+    public func realtimeSubscribe(channel: String, handler: @escaping ([String: Any]) -> Void) -> AnyCancellable {
+        return realtimeSync.subscribe(channel: channel, handler: handler)
+    }
+
+    // MARK: - 25. sdk.realtime.broadcast
+
+    public func realtimeBroadcast(channel: String, data: [String: Any]) {
+        realtimeSync.broadcast(channel: channel, data: data)
+    }
+
+    // MARK: - 26. sdk.graph.query
+
+    public func graphQuery(entityType: String?, relation: String?) -> SDKGraph {
+        return graphInterface.query(entityType: entityType, relation: relation)
+    }
+
+    // MARK: - 27. sdk.graph.linkEntities
+
+    public func graphLinkEntities(source: UUID, target: UUID, relation: String) {
+        graphInterface.linkEntities(source: source, target: target, relation: relation)
+        eventBridge.emit(type: "graph.linked", payload: ["source": source.uuidString, "target": target.uuidString, "relation": relation])
+    }
+
+    // MARK: - 28. sdk.time.getHistory
+
+    public func timeGetHistory(scope: SDKScope?, from: Date?, to: Date?) -> [WorkspaceSnapshot] {
+        return timeTravelBridge.getHistory(scope: scope, from: from, to: to)
+    }
+
+    // MARK: - 29. sdk.time.restore
+
+    public func timeRestore(snapshotID: UUID) throws {
+        try timeTravelBridge.restore(snapshotID: snapshotID)
+        eventBridge.emit(type: "time.restored", payload: ["snapshotID": snapshotID.uuidString])
+    }
+
+    // MARK: - 30. sdk.time.diff
+
+    public func timeDiff(snapshotA: UUID, snapshotB: UUID) -> [String: Any] {
+        return timeTravelBridge.diff(snapshotA: snapshotA, snapshotB: snapshotB)
+    }
+
+    // MARK: - 31. sdk.ui.renderComponent
+
+    public func uiRenderComponent(name: String, props: [String: Any]) {
+        eventBridge.emit(type: "ui.render", payload: ["component": name, "props": props.reduce(into: [:]) { $0[$1.key] = String(describing: $1.value) }])
+    }
+
+    // MARK: - 32. sdk.ui.injectPanel
+
+    public func uiInjectPanel(position: String, content: String) {
+        eventBridge.emit(type: "ui.injectPanel", payload: ["position": position, "content": content])
+    }
+
+    // MARK: - 33. sdk.ui.triggerAction
+
+    public func uiTriggerAction(actionID: String, context: [String: Any] = [:]) {
+        eventBridge.emit(type: "ui.action", payload: ["actionID": actionID])
+    }
+
+    // MARK: - 34. sdk.validateScope
+
+    public func validateScope(scope: SDKScope, operation: SDKScopeManager.Operation) -> Bool {
+        do {
+            try scopeManager.validateAccess(scope: scope, operation: operation)
+            return true
+        } catch {
+            return false
         }
     }
 
-    // MARK: - SDK Methods
+    // MARK: - 35. sdk.auditLog
+
+    public func auditLog(entries: Int = 100) -> [SDKLogEntry] {
+        return Array(SDKLogStore.shared.entries.prefix(entries))
+    }
+
+    public func auditLog(source: String) -> [SDKLogEntry] {
+        return SDKLogStore.shared.entries(for: source)
+    }
+
+    // MARK: - Plugin Registration
 
     public func registerPlugin(_ plugin: SDKPlugin) throws {
         try SDKPluginManager.shared.install(plugin)
+        eventBridge.emit(type: "plugin.registered", payload: ["name": plugin.name])
     }
 
-    public func executeTool(toolID: UUID) async throws -> SDKToolResult {
-        return try await SDKToolManager.shared.execute(toolID: toolID, input: [:])
+    // MARK: - Tool Execution
+
+    public func executeTool(toolID: UUID, input: [String: Any] = [:]) async throws -> SDKToolResult {
+        return try await toolRuntime.execute(toolID: toolID, input: input)
     }
+
+    // MARK: - Automation Execution
 
     public func runAutomation(_ rule: SDKAutomationRule) async throws {
         SDKAutomationEngine.shared.add(rule)
+        try await SDKAutomationEngine.shared.run(rule: rule, context: [:])
     }
+
+    // MARK: - Connector Sync
 
     public func syncConnectors() async throws {
         isSyncing = true
         defer { isSyncing = false }
-        try await SDKConnectorManager.shared.syncAll()
+        try await connectorEngine.syncAll()
+    }
+
+    // MARK: - Developer NoSandbox Mode
+
+    public var developer: SDKDeveloperAPI { SDKDeveloperAPI() }
+
+    public struct SDKDeveloperAPI {
+        public var noSandbox: SDKNoSandboxAPI { SDKNoSandboxAPI() }
+
+        public struct SDKNoSandboxAPI {
+            public var isEnabled: Bool {
+                SDKRuntimeEngine.shared.isNoSandboxModeEnabled
+            }
+
+            public func enable() {
+                SDKRuntimeEngine.shared.isNoSandboxModeEnabled = true
+                SDKLogStore.shared.log("NoSandbox mode ENABLED - all scope restrictions bypassed", source: "SDK.Developer", level: .warning)
+            }
+
+            public func disable() {
+                SDKRuntimeEngine.shared.isNoSandboxModeEnabled = false
+                SDKLogStore.shared.log("NoSandbox mode DISABLED", source: "SDK.Developer", level: .info)
+            }
+        }
     }
 }
+
+// MARK: - Workspace Data Models
 
 public struct Note: Identifiable {
     public let id: UUID
@@ -162,4 +517,12 @@ public struct Note: Identifiable {
     public let content: String
     public let createdAt: Date
     public let updatedAt: Date
+}
+
+public struct SDKCacheInfo {
+    public let scope: SDKScope
+    public let itemCount: Int
+    public let lastRefreshed: Date?
+    public let isValid: Bool
+    public let ttlRemaining: TimeInterval
 }

@@ -1,0 +1,264 @@
+import Foundation
+import Combine
+
+@MainActor
+public final class SDKDataEngine: ObservableObject {
+    public static let shared = SDKDataEngine()
+
+    private let cache = NSCache<NSString, CacheEntry>()
+    private let cacheTTL: TimeInterval = 300
+    private var cacheTimestamps: [String: Date] = [:]
+    private let batchQueue = DispatchQueue(label: "com.toolskit.sdk.data.batch", attributes: .concurrent)
+
+    private init() {
+        cache.countLimit = 100
+        cache.totalCostLimit = 50 * 1024 * 1024
+    }
+
+    private class CacheEntry {
+        let items: [SDKDataItem]
+        let timestamp: Date
+        init(items: [SDKDataItem], timestamp: Date) {
+            self.items = items
+            self.timestamp = timestamp
+        }
+    }
+
+    // MARK: - Fetch
+
+    public func fetch(scope: SDKScope) async throws -> [SDKDataItem] {
+        if let cached = getCachedItems(for: scope) {
+            return cached
+        }
+
+        let items = try await fetchFromWorkspace(scope: scope)
+        setCachedItems(items, for: scope)
+        return items
+    }
+
+    public func fetch(query: SDKQuery) async throws -> [SDKDataItem] {
+        var items = try await fetch(scope: query.scope)
+
+        for filter in query.filters {
+            items = applyFilter(filter, to: items)
+        }
+
+        if let pagination = query.pagination {
+            let start = (pagination.page - 1) * pagination.pageSize
+            let end = min(start + pagination.pageSize, items.count)
+            guard start < items.count else { return [] }
+            items = Array(items[start..<end])
+        }
+
+        return items
+    }
+
+    // MARK: - Write
+
+    public func write(scope: SDKScope, title: String, payload: [String: Any]) async throws -> SDKWriteResult {
+        let id = UUID()
+
+        switch scope {
+        case .notes:
+            _ = WorkspaceAPI.shared.notes.createNote(title: title, content: payload["content"] as? String ?? "")
+        case .tasks:
+            let dueDate = payload["dueDate"] as? Date
+            _ = WorkspaceAPI.shared.tasks.createTask(title: title, dueDate: dueDate)
+        case .calendar:
+            let start = payload["start"] as? Date ?? Date()
+            let end = payload["end"] as? Date ?? Date().addingTimeInterval(3600)
+            WorkspaceAPI.shared.calendar.createEvent(title: title, start: start, end: end)
+        case .slides:
+            WorkspaceAPI.shared.slides.createDeck(title: title)
+        case .emails:
+            let to = payload["to"] as? String ?? ""
+            let body = payload["body"] as? String ?? ""
+            try await WorkspaceAPI.shared.mail.sendMail(to: to, subject: title, body: body)
+        default:
+            break
+        }
+
+        invalidateCache(scope: scope)
+        SDKLogStore.shared.log("writeData scope=\(scope) title=\(title)", source: "SDKDataEngine", level: .info)
+        return SDKWriteResult(id: id, scope: scope, success: true)
+    }
+
+    // MARK: - Delete
+
+    public func delete(scope: SDKScope, id: UUID) async throws {
+        switch scope {
+        case .files:
+            WorkspaceAPI.shared.files.deleteFile(id: id.uuidString)
+        default:
+            break
+        }
+
+        invalidateCache(scope: scope)
+        SDKLogStore.shared.log("deleteData scope=\(scope) id=\(id)", source: "SDKDataEngine", level: .info)
+    }
+
+    // MARK: - Cache Management
+
+    public func cacheInfo(for scope: SDKScope) -> SDKCacheInfo {
+        let key = scope.cacheKey
+        if let entry = cache.object(forKey: key as NSString) {
+            let elapsed = Date().timeIntervalSince(entry.timestamp)
+            let remaining = max(0, cacheTTL - elapsed)
+            return SDKCacheInfo(
+                scope: scope,
+                itemCount: entry.items.count,
+                lastRefreshed: entry.timestamp,
+                isValid: remaining > 0,
+                ttlRemaining: remaining
+            )
+        }
+        return SDKCacheInfo(scope: scope, itemCount: 0, lastRefreshed: nil, isValid: false, ttlRemaining: 0)
+    }
+
+    public func invalidateCache(scope: SDKScope? = nil) {
+        if let scope = scope {
+            cache.removeObject(forKey: scope.cacheKey as NSString)
+            cacheTimestamps.removeValue(forKey: scope.cacheKey)
+        } else {
+            cache.removeAllObjects()
+            cacheTimestamps.removeAll()
+        }
+    }
+
+    // MARK: - Private
+
+    private func getCachedItems(for scope: SDKScope) -> [SDKDataItem]? {
+        guard let entry = cache.object(forKey: scope.cacheKey as NSString),
+              Date().timeIntervalSince(entry.timestamp) < cacheTTL else {
+            return nil
+        }
+        return entry.items
+    }
+
+    private func setCachedItems(_ items: [SDKDataItem], for scope: SDKScope) {
+        let entry = CacheEntry(items: items, timestamp: Date())
+        cache.setObject(entry, forKey: scope.cacheKey as NSString)
+        cacheTimestamps[scope.cacheKey] = Date()
+    }
+
+    private func fetchFromWorkspace(scope: SDKScope) async throws -> [SDKDataItem] {
+        switch scope {
+        case .tasks:
+            return WorkspaceAPI.shared.tasks.listTasks().map { task in
+                SDKDataItem(id: task.id, scope: .tasks, title: task.title,
+                           payload: ["completed": "\(task.completed)", "description": task.description],
+                           timestamp: task.createdAt)
+            }
+        case .notes:
+            return WorkspaceAPI.shared.notes.listNotes().map { note in
+                SDKDataItem(id: note.id, scope: .notes, title: note.title,
+                           payload: ["content": note.content],
+                           timestamp: note.updatedAt)
+            }
+        case .calendar:
+            return WorkspaceAPI.shared.calendar.listEvents().map { event in
+                SDKDataItem(id: event.id, scope: .calendar, title: event.title,
+                           payload: ["location": event.location],
+                           timestamp: event.date)
+            }
+        case .files:
+            return WorkspaceAPI.shared.files.listFiles().map { file in
+                SDKDataItem(id: UUID(), scope: .files, title: file.name,
+                           payload: ["path": file.path],
+                           timestamp: Date())
+            }
+        case .emails:
+            return WorkspaceAPI.shared.mail.listMessages().map { mail in
+                SDKDataItem(id: UUID(), scope: .emails, title: mail.subject,
+                           payload: ["from": mail.from, "to": mail.to.joined(separator: ", ")],
+                           timestamp: mail.date)
+            }
+        case .slides:
+            return WorkspaceAPI.shared.slides.listDecks().map { deck in
+                SDKDataItem(id: deck.id, scope: .slides, title: deck.title,
+                           payload: ["slideCount": "\(deck.slides.count)"],
+                           timestamp: deck.updatedAt)
+            }
+        case .automations:
+            return SDKAutomationEngine.shared.rules.map { rule in
+                SDKDataItem(id: rule.id, scope: .automations, title: rule.name,
+                           payload: ["enabled": "\(rule.isEnabled)", "runCount": "\(rule.runCount)"],
+                           timestamp: rule.lastRunAt ?? Date())
+            }
+        case .meet:
+            return []
+        case .repos:
+            return []
+        case .media:
+            return []
+        case .whiteboards:
+            return []
+        case .intelligence:
+            let graph = SDKGraphInterface.shared.query(entityType: nil, relation: nil)
+            return graph.nodes.map { node in
+                SDKDataItem(id: node.id, scope: .intelligence, title: node.label,
+                           payload: ["type": node.type],
+                           timestamp: Date())
+            }
+        case .persona:
+            return []
+        case .plugins:
+            return SDKPluginManager.shared.plugins.map { plugin in
+                SDKDataItem(id: plugin.id, scope: .plugins, title: plugin.name,
+                           payload: ["version": plugin.version, "enabled": "\(plugin.isEnabled)"],
+                           timestamp: plugin.installedAt)
+            }
+        case .all:
+            var allItems: [SDKDataItem] = []
+            for childScope in SDKScope.allCases where childScope != .all {
+                if let items = try? await fetchFromWorkspace(scope: childScope) {
+                    allItems.append(contentsOf: items)
+                }
+            }
+            return allItems.sorted { $0.timestamp > $1.timestamp }
+        case .custom(let query):
+            return try await searchWorkspace(query: query)
+        }
+    }
+
+    private func searchWorkspace(query: String) async throws -> [SDKDataItem] {
+        let lowered = query.lowercased()
+        var results: [SDKDataItem] = []
+
+        for scope in SDKScope.allCases where scope != .all {
+            if let items = try? await fetchFromWorkspace(scope: scope) {
+                results.append(contentsOf: items.filter {
+                    $0.title.lowercased().contains(lowered)
+                })
+            }
+        }
+
+        return results
+    }
+
+    private func applyFilter(_ filter: SDKFilter, to items: [SDKDataItem]) -> [SDKDataItem] {
+        switch filter.type {
+        case .date(let from, let to):
+            return items.filter { item in
+                if let from = from, item.timestamp < from { return false }
+                if let to = to, item.timestamp > to { return false }
+                return true
+            }
+        case .tags(let tags):
+            return items.filter { item in
+                let itemTags = item.codablePayload["tags"]?.components(separatedBy: ",") ?? []
+                return !Set(tags).isDisjoint(with: Set(itemTags))
+            }
+        case .ownership(let owner):
+            return items.filter { $0.codablePayload["owner"] == owner }
+        case .type(let type):
+            return items.filter { "\($0.scope)" == type }
+        case .keyword(let keyword):
+            let lowered = keyword.lowercased()
+            return items.filter {
+                $0.title.lowercased().contains(lowered) ||
+                $0.codablePayload.values.contains { $0.lowercased().contains(lowered) }
+            }
+        }
+    }
+}
