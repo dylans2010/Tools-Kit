@@ -3,27 +3,33 @@ import SwiftUI
 struct SDKControlCenterView: View {
     @StateObject private var runtime = SDKRuntimeEngine.shared
     @StateObject private var telemetry = SDKTelemetryEngine.shared
-    @State private var systemHealth = 0.98
+    @StateObject private var backgroundEngine = SDKBackgroundEngine.shared
 
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // System Health Overview
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Label("System Health", systemImage: "heart.text.square.fill")
                             .font(.headline)
                         Spacer()
-                        Text("\(Int(systemHealth * 100))%")
+                        let healthPercent = computeHealthPercent()
+                        Text("\(healthPercent)%")
                             .font(.system(.title3, design: .monospaced))
                             .bold()
-                            .foregroundStyle(systemHealth > 0.9 ? .green : .orange)
+                            .foregroundStyle(healthPercent > 90 ? .green : .orange)
                     }
 
-                    ProgressView(value: systemHealth)
-                        .tint(systemHealth > 0.9 ? .green : .orange)
+                    ProgressView(value: Double(computeHealthPercent()) / 100.0)
+                        .tint(computeHealthPercent() > 90 ? .green : .orange)
 
-                    Text("SDK Execution Core is stable and connected to Workspace systems.")
+                    VStack(alignment: .leading, spacing: 4) {
+                        healthRow("Connectors", healthy: backgroundEngine.systemHealth.connectorReachability)
+                        healthRow("Plugins", healthy: backgroundEngine.systemHealth.pluginSandboxStatus)
+                        healthRow("Storage", healthy: backgroundEngine.systemHealth.coreDataHealth)
+                    }
+
+                    Text("Last checked: \(backgroundEngine.systemHealth.lastCheck, style: .relative) ago")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -31,7 +37,6 @@ struct SDKControlCenterView: View {
                 .background(Color(.secondarySystemBackground))
                 .cornerRadius(12)
 
-                // Active Execution Monitoring
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Label("Active Projects", systemImage: "cpu.fill")
@@ -61,22 +66,27 @@ struct SDKControlCenterView: View {
                 .background(Color(.secondarySystemBackground))
                 .cornerRadius(12)
 
-                // Runtime Metrics
                 VStack(alignment: .leading, spacing: 12) {
-                    Label("Runtime Load", systemImage: "chart.bar.fill")
+                    Label("Runtime Metrics", systemImage: "chart.bar.fill")
                         .font(.headline)
 
+                    let metrics = telemetry.getMetrics()
                     HStack(spacing: 20) {
-                        MetricCard(title: "Latency", value: "12ms", icon: "timer")
-                        MetricCard(title: "Mem Use", value: "45MB", icon: "memorychip")
-                        MetricCard(title: "TPS", value: "240", icon: "bolt.fill")
+                        MetricCard(title: "Latency", value: "\(String(format: "%.0f", metrics.averageDurationMs))ms", icon: "timer")
+                        MetricCard(title: "Traces", value: "\(metrics.totalTraces)", icon: "memorychip")
+                        MetricCard(title: "Success", value: "\(metrics.successCount)", icon: "bolt.fill")
+                    }
+
+                    if metrics.failureCount > 0 {
+                        Text("\(metrics.failureCount) failures detected")
+                            .font(.caption)
+                            .foregroundStyle(.red)
                     }
                 }
                 .padding()
                 .background(Color(.secondarySystemBackground))
                 .cornerRadius(12)
 
-                // NoSandbox Toggle (Duplicate for visibility)
                 VStack {
                     Toggle(isOn: $runtime.isNoSandboxModeEnabled) {
                         VStack(alignment: .leading) {
@@ -87,6 +97,11 @@ struct SDKControlCenterView: View {
                         }
                     }
                     .tint(.red)
+                    .onChange(of: runtime.isNoSandboxModeEnabled) { enabled in
+                        if enabled {
+                            SDKLogStore.shared.log("NoSandbox mode ENABLED via Control Center", source: "SDKControlCenterView", level: .warning)
+                        }
+                    }
                 }
                 .padding()
                 .background(Color.red.opacity(0.1))
@@ -96,6 +111,26 @@ struct SDKControlCenterView: View {
             .padding()
         }
         .navigationTitle("SDK Control Center")
+    }
+
+    private func computeHealthPercent() -> Int {
+        let health = backgroundEngine.systemHealth
+        var score = 100
+        if !health.connectorReachability { score -= 30 }
+        if !health.pluginSandboxStatus { score -= 20 }
+        if !health.coreDataHealth { score -= 40 }
+        return max(0, score)
+    }
+
+    private func healthRow(_ label: String, healthy: Bool) -> some View {
+        HStack {
+            Circle().fill(healthy ? .green : .red).frame(width: 8, height: 8)
+            Text(label).font(.caption)
+            Spacer()
+            Text(healthy ? "Healthy" : "Degraded")
+                .font(.caption)
+                .foregroundStyle(healthy ? .green : .red)
+        }
     }
 }
 

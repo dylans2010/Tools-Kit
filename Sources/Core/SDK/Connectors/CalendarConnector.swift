@@ -17,16 +17,32 @@ public final class CalendarConnector: BaseConnector {
 
     public func authenticate(credentials: [String: String]) async throws {
         status = .connecting
+        log("Requesting calendar access...", level: .info)
+
         let granted = try await eventStore.requestFullAccessToEvents()
-        status = granted ? .connected : .error
-        log(granted ? "Calendar access granted" : "Calendar access denied", level: granted ? .info : .error)
+        if granted {
+            status = .connected
+            log("Calendar access granted", level: .info)
+        } else {
+            status = .error
+            log("Calendar access denied by user", level: .error)
+            throw SDKError.permissionDenied(scope: "calendar.fullAccess")
+        }
     }
 
     public func sync() async throws {
-        guard status == .connected else { return }
-        log("Syncing calendar events...", level: .info)
-        // Mock sync
-        log("Calendar sync complete", level: .info)
+        guard status == .connected else {
+            throw SDKError.executionFailed(reason: "Calendar not connected")
+        }
+
+        log("Syncing calendar events from EventKit...", level: .info)
+
+        let startDate = Date()
+        let endDate = Calendar.current.date(byAdding: .month, value: 1, to: startDate) ?? startDate
+        let predicate = eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: nil)
+        let events = eventStore.events(matching: predicate)
+
+        log("Synced \(events.count) calendar events from EventKit", level: .info)
     }
 
     public func testConnection() async throws -> Bool {
@@ -35,6 +51,7 @@ public final class CalendarConnector: BaseConnector {
 
     public func disconnect() {
         status = .disconnected
+        log("Calendar disconnected", level: .info)
     }
 
     private func log(_ message: String, level: LogLevel) {

@@ -13,30 +13,89 @@ public final class GitHubConnector: BaseConnector {
 
     @Published public var activityLog: [ConnectorEvent] = []
     private var token: String?
+    private var authenticatedUser: String?
 
     public init() {}
 
     public func authenticate(credentials: [String: String]) async throws {
-        guard let token = credentials["token"] else { throw SDKError.executionFailed(reason: "Missing token") }
+        guard let token = credentials["token"], !token.isEmpty else {
+            throw SDKError.executionFailed(reason: "GitHub Personal Access Token required")
+        }
+
+        status = .connecting
+        log("Authenticating with GitHub...", level: .info)
+
         self.token = token
+
+        let url = URL(string: "https://api.github.com/user")!
+        var request = URLRequest(url: url)
+        request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.addValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            status = .error
+            throw SDKError.executionFailed(reason: "Invalid GitHub API response")
+        }
+
+        guard httpResponse.statusCode == 200 else {
+            status = .error
+            log("GitHub auth failed: HTTP \(httpResponse.statusCode)", level: .error)
+            throw SDKError.executionFailed(reason: "GitHub authentication failed: HTTP \(httpResponse.statusCode)")
+        }
+
+        if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let login = json["login"] as? String {
+            authenticatedUser = login
+            log("GitHub authenticated as \(login)", level: .info)
+        }
+
         status = .connected
-        log("GitHub Authenticated", level: .info)
     }
 
     public func sync() async throws {
-        log("Syncing repos...", level: .info)
-        // Mock sync
-        try await Task.sleep(nanoseconds: 1 * 1_000_000_000)
-        log("Synced 3 repositories", level: .info)
+        guard status == .connected, let token = token else {
+            throw SDKError.executionFailed(reason: "GitHub not connected")
+        }
+
+        log("Syncing GitHub repositories...", level: .info)
+
+        let url = URL(string: "https://api.github.com/user/repos?sort=updated&per_page=10")!
+        var request = URLRequest(url: url)
+        request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.addValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+            log("GitHub sync failed: HTTP \(statusCode)", level: .error)
+            throw SDKError.executionFailed(reason: "GitHub API error: HTTP \(statusCode)")
+        }
+
+        if let repos = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] {
+            log("Synced \(repos.count) repositories", level: .info)
+        }
     }
 
     public func testConnection() async throws -> Bool {
-        return token != nil
+        guard let token = token else { return false }
+
+        let url = URL(string: "https://api.github.com/user")!
+        var request = URLRequest(url: url)
+        request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.timeoutInterval = 10
+
+        let (_, response) = try await URLSession.shared.data(for: request)
+        return (response as? HTTPURLResponse)?.statusCode == 200
     }
 
     public func disconnect() {
         status = .disconnected
         token = nil
+        authenticatedUser = nil
+        log("GitHub disconnected", level: .info)
     }
 
     private func log(_ message: String, level: LogLevel) {

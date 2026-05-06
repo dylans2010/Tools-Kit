@@ -1,8 +1,6 @@
 import Foundation
 import JavaScriptCore
 
-/// Manages sandboxed vs non-sandboxed execution.
-/// Injects real WorkspaceAPI into the execution context.
 public final class SDKSandboxEngine {
     public static let shared = SDKSandboxEngine()
 
@@ -19,29 +17,24 @@ public final class SDKSandboxEngine {
 
     @MainActor
     private func setupContext(_ context: JSContext) {
-        // Logging
         let log: @convention(block) (String) -> Void = { message in
             SDKConsoleView.LogBus.shared.log(message, type: .info)
         }
         context.setObject(log, forKeyedSubscript: "print" as NSString)
 
-        // Workspace API
         let workspace = JSValue(object: [:], in: context)
 
         // Notes Module
         let notes = JSValue(object: [:], in: context)
         let listNotes: @convention(block) () -> [[String: Any]] = {
-            WorkspaceAPI.shared.notes.listNotes().map { ["id": $0.id, "title": $0.title, "content": $0.content] }
+            WorkspaceAPI.shared.notes.listNotes().map { ["id": $0.id.uuidString, "title": $0.title, "content": $0.content] }
         }
         let createNote: @convention(block) (String, String) -> [String: Any] = { title, content in
             let action = SDKAction.createNote(title: title, content: content)
             let context = SDKExecutionContext(projectID: UUID(), noSandbox: SDKRuntimeEngine.shared.isNoSandboxModeEnabled)
-
-            // Execute via Kernel asynchronously to avoid deadlocks
             Task {
                 try? await SDKExecutionKernel.shared.execute(action: action, context: context)
             }
-
             return ["status": "queued_via_kernel"]
         }
         notes?.setObject(listNotes, forKeyedSubscript: "list" as NSString)
@@ -108,9 +101,17 @@ public final class SDKSandboxEngine {
 
         // Meet Module
         let meet = JSValue(object: [:], in: context)
-        let startMeeting: @convention(block) (String) -> JSValue = { title in
-            // Handle async bridge if possible, or return a handle
-            return JSValue(object: "meeting-started", in: context)
+        let startMeeting: @convention(block) (String) -> [String: Any] = { title in
+            var result: [String: Any] = ["status": "starting"]
+            Task {
+                do {
+                    let meetingID = try await WorkspaceAPI.shared.meet.startMeeting(title: title)
+                    SDKConsoleView.LogBus.shared.log("Meeting started: \(meetingID)", type: .success)
+                } catch {
+                    SDKConsoleView.LogBus.shared.log("Meeting failed: \(error.localizedDescription)", type: .error)
+                }
+            }
+            return result
         }
         meet?.setObject(startMeeting, forKeyedSubscript: "start" as NSString)
         workspace?.setObject(meet, forKeyedSubscript: "meet" as NSString)
@@ -120,13 +121,34 @@ public final class SDKSandboxEngine {
         let listSnapshots: @convention(block) () -> [[String: Any]] = {
             WorkspaceAPI.shared.timeTravel.listSnapshots().map { ["id": $0.id.uuidString, "message": $0.message] }
         }
+        let restoreSnapshot: @convention(block) (String) -> [String: Any] = { idString in
+            guard let uuid = UUID(uuidString: idString) else { return ["error": "Invalid UUID"] }
+            do {
+                try WorkspaceAPI.shared.timeTravel.restoreState(snapshotID: uuid)
+                return ["status": "restored"]
+            } catch {
+                return ["error": error.localizedDescription]
+            }
+        }
         timeTravel?.setObject(listSnapshots, forKeyedSubscript: "list" as NSString)
+        timeTravel?.setObject(restoreSnapshot, forKeyedSubscript: "restore" as NSString)
         workspace?.setObject(timeTravel, forKeyedSubscript: "timeTravel" as NSString)
 
         // Persona Module
         let persona = JSValue(object: [:], in: context)
         let queryPersona: @convention(block) (String) -> String = { prompt in
-            return "Persona response to: \(prompt)"
+            var result = ""
+            let semaphore = DispatchSemaphore(value: 0)
+            Task {
+                do {
+                    result = try await WorkspaceAPI.shared.persona.queryPersona(prompt: prompt)
+                } catch {
+                    result = "Error: \(error.localizedDescription)"
+                }
+                semaphore.signal()
+            }
+            _ = semaphore.wait(timeout: .now() + 10)
+            return result
         }
         persona?.setObject(queryPersona, forKeyedSubscript: "query" as NSString)
         workspace?.setObject(persona, forKeyedSubscript: "persona" as NSString)
@@ -141,21 +163,40 @@ public final class SDKSandboxEngine {
         integrations?.setObject(executeWorkflow, forKeyedSubscript: "execute" as NSString)
         workspace?.setObject(integrations, forKeyedSubscript: "integrations" as NSString)
 
+        // Graph Module
+        let graph = JSValue(object: [:], in: context)
+        let queryGraph: @convention(block) () -> [[String: Any]] = {
+            let g = WorkspaceAPI.shared.intelligence.getGraph()
+            return g.nodes.map { ["id": $0.id.uuidString, "label": $0.label, "type": $0.type] }
+        }
+        let linkEntities: @convention(block) (String, String, String) -> Void = { source, target, relation in
+            if let sourceUUID = UUID(uuidString: source), let targetUUID = UUID(uuidString: target) {
+                WorkspaceAPI.shared.intelligence.updateLink(source: sourceUUID, target: targetUUID, relation: relation)
+            }
+        }
+        graph?.setObject(queryGraph, forKeyedSubscript: "query" as NSString)
+        graph?.setObject(linkEntities, forKeyedSubscript: "link" as NSString)
+        workspace?.setObject(graph, forKeyedSubscript: "graph" as NSString)
+
         context.setObject(workspace, forKeyedSubscript: "workspace" as NSString)
     }
 
     @MainActor
     public func executeSandboxed(sourceCode: String) async throws {
         let context = createNewContext()
-        // Sandbox-specific overrides could be added here
         context.evaluateScript(sourceCode)
+
+        if let exception = context.exception {
+            let errorMsg = exception.toString() ?? "Unknown JS error"
+            SDKLogStore.shared.log("Sandbox execution error: \(errorMsg)", source: "SDKSandboxEngine", level: .error)
+            throw SDKError.executionFailed(reason: errorMsg)
+        }
     }
 
     @MainActor
     public func executeUnrestricted(sourceCode: String) async throws {
         let context = createNewContext()
 
-        // Inject high-power Workspace Bridge for direct access
         let bridge = JSValue(object: [:], in: context)
         let getLiveState: @convention(block) () -> [String: Any] = {
             return MainActor.assumeIsolated {
@@ -166,5 +207,11 @@ public final class SDKSandboxEngine {
         context.setObject(bridge, forKeyedSubscript: "sdk_bridge" as NSString)
 
         context.evaluateScript(sourceCode)
+
+        if let exception = context.exception {
+            let errorMsg = exception.toString() ?? "Unknown JS error"
+            SDKLogStore.shared.log("Unrestricted execution error: \(errorMsg)", source: "SDKSandboxEngine", level: .error)
+            throw SDKError.executionFailed(reason: errorMsg)
+        }
     }
 }

@@ -1201,6 +1201,18 @@
 		F62EFA4014B343CEAECD9272 /* SDKDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862B9D21ECC745D8AB7D01C3 /* SDKDiagnosticsView.swift */; };
 		0C72E9426CD74630957FB2C6 /* SDKConnectorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5851B51F6765499BABAC81DE /* SDKConnectorsView.swift */; };
 		6A5AF291FDFD481DA38AF12F /* SDKCoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB759BF5EDA4D3F98452ADD /* SDKCoreDataStack.swift */; };
+		1E8F9980F2C346C58906F055 /* SDKDataEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE17BF24E77546EB89BFE5EB /* SDKDataEngine.swift */; };
+		3BEED8D4CE29494D805D8A8F /* SDKExecutionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A87BE1C659F46ADB1FD423A /* SDKExecutionEngine.swift */; };
+		4C8280025F0F45EFBD38A281 /* SDKScopeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B36AA1809E413797A8201E /* SDKScopeManager.swift */; };
+		22AA5754349D4F49AF78FCE5 /* SDKEventBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 671209AE670E45C08441CFFB /* SDKEventBridge.swift */; };
+		148899A9C28C44B9B1B42387 /* SDKRealtimeSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64A76CF976C45DCB6E06EA8 /* SDKRealtimeSync.swift */; };
+		5177B9F3B6704437A508876A /* SDKStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 199E88CE72114DFBBC05FBC8 /* SDKStorageManager.swift */; };
+		E3EF9894FCC54365B3AB71C9 /* SDKNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE43595B01FD4DB1B293E4AF /* SDKNetworkManager.swift */; };
+		C5537EE46B17468B8EF164E6 /* SDKConnectorEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A200B0BE824BDE819FCA40 /* SDKConnectorEngine.swift */; };
+		C693BAC89C214B4B8EAF7285 /* SDKToolRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32B02B351D1F4085B81EDC9E /* SDKToolRuntime.swift */; };
+		52ED09C3546249B5B01680A4 /* SDKGraphInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE065F83E8BF4778B41FC729 /* SDKGraphInterface.swift */; };
+		620309ED7C364E48B16741D0 /* SDKPersonaBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFC385876F3D41169524EB77 /* SDKPersonaBridge.swift */; };
+		B6C26F1B82A6417AAF15FCB0 /* SDKTimeTravelBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C9A5E807044F10A177FDAE /* SDKTimeTravelBridge.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2397,6 +2409,18 @@
 		862B9D21ECC745D8AB7D01C3 /* SDKDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDiagnosticsView.swift; sourceTree = "<group>"; };
 		5851B51F6765499BABAC81DE /* SDKConnectorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConnectorsView.swift; sourceTree = "<group>"; };
 		ADB759BF5EDA4D3F98452ADD /* SDKCoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKCoreDataStack.swift; sourceTree = "<group>"; };
+		AE17BF24E77546EB89BFE5EB /* SDKDataEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDataEngine.swift; sourceTree = "<group>"; };
+		3A87BE1C659F46ADB1FD423A /* SDKExecutionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKExecutionEngine.swift; sourceTree = "<group>"; };
+		99B36AA1809E413797A8201E /* SDKScopeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKScopeManager.swift; sourceTree = "<group>"; };
+		671209AE670E45C08441CFFB /* SDKEventBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKEventBridge.swift; sourceTree = "<group>"; };
+		A64A76CF976C45DCB6E06EA8 /* SDKRealtimeSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKRealtimeSync.swift; sourceTree = "<group>"; };
+		199E88CE72114DFBBC05FBC8 /* SDKStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKStorageManager.swift; sourceTree = "<group>"; };
+		EE43595B01FD4DB1B293E4AF /* SDKNetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKNetworkManager.swift; sourceTree = "<group>"; };
+		D2A200B0BE824BDE819FCA40 /* SDKConnectorEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConnectorEngine.swift; sourceTree = "<group>"; };
+		32B02B351D1F4085B81EDC9E /* SDKToolRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKToolRuntime.swift; sourceTree = "<group>"; };
+		BE065F83E8BF4778B41FC729 /* SDKGraphInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKGraphInterface.swift; sourceTree = "<group>"; };
+		DFC385876F3D41169524EB77 /* SDKPersonaBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPersonaBridge.swift; sourceTree = "<group>"; };
+		F9C9A5E807044F10A177FDAE /* SDKTimeTravelBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKTimeTravelBridge.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -3460,6 +3484,18 @@
 				E4AAB3375BCD4B6BAC538FDC /* */,
 				402EA872FE4B42E9919BB931 /* */,
 				2A185A33DEA747ABB81E5845 /* */,
+				AE17BF24E77546EB89BFE5EB /* SDKDataEngine.swift */,
+				3A87BE1C659F46ADB1FD423A /* SDKExecutionEngine.swift */,
+				99B36AA1809E413797A8201E /* SDKScopeManager.swift */,
+				671209AE670E45C08441CFFB /* SDKEventBridge.swift */,
+				A64A76CF976C45DCB6E06EA8 /* SDKRealtimeSync.swift */,
+				199E88CE72114DFBBC05FBC8 /* SDKStorageManager.swift */,
+				EE43595B01FD4DB1B293E4AF /* SDKNetworkManager.swift */,
+				D2A200B0BE824BDE819FCA40 /* SDKConnectorEngine.swift */,
+				32B02B351D1F4085B81EDC9E /* SDKToolRuntime.swift */,
+				BE065F83E8BF4778B41FC729 /* SDKGraphInterface.swift */,
+				DFC385876F3D41169524EB77 /* SDKPersonaBridge.swift */,
+				F9C9A5E807044F10A177FDAE /* SDKTimeTravelBridge.swift */,
 			);
 			path = SDK;
 			sourceTree = "<group>";
@@ -5700,6 +5736,18 @@
 				93FD31B2B54D4C338A601E5E /* SDKProjectManager.swift in Sources */,
 				50B8F220745A4AC3BA164240 /* SDKLogStore.swift in Sources */,
 				A5F7D48ADA8B4BF8BF3E570D /* ToolsKitSDK.swift in Sources */,
+				1E8F9980F2C346C58906F055 /* SDKDataEngine.swift in Sources */,
+				3BEED8D4CE29494D805D8A8F /* SDKExecutionEngine.swift in Sources */,
+				4C8280025F0F45EFBD38A281 /* SDKScopeManager.swift in Sources */,
+				22AA5754349D4F49AF78FCE5 /* SDKEventBridge.swift in Sources */,
+				148899A9C28C44B9B1B42387 /* SDKRealtimeSync.swift in Sources */,
+				5177B9F3B6704437A508876A /* SDKStorageManager.swift in Sources */,
+				E3EF9894FCC54365B3AB71C9 /* SDKNetworkManager.swift in Sources */,
+				C5537EE46B17468B8EF164E6 /* SDKConnectorEngine.swift in Sources */,
+				C693BAC89C214B4B8EAF7285 /* SDKToolRuntime.swift in Sources */,
+				52ED09C3546249B5B01680A4 /* SDKGraphInterface.swift in Sources */,
+				620309ED7C364E48B16741D0 /* SDKPersonaBridge.swift in Sources */,
+				B6C26F1B82A6417AAF15FCB0 /* SDKTimeTravelBridge.swift in Sources */,
 				WS02634D13801CC4452CAC00 /* IntegrationWorkflow.swift in Sources */,
 				WS02F29CA192362B45BA9F72 /* TimeTravelModels.swift in Sources */,
 				WS02A2803D2D6C14415D892F /* SpatialModels.swift in Sources */,
