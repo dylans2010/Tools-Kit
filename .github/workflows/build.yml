@@ -33,6 +33,9 @@ jobs:
           xcodebuild -version
           xcodebuild -showsdks
 
+      - name: Clean DerivedData
+        run: rm -rf ~/Library/Developer/Xcode/DerivedData
+
       - name: Verify CI secrets
         run: |
           [ -n "$CLIENT_SECRET" ] && echo "CLIENT_SECRET OK" || echo "CLIENT_SECRET missing"
