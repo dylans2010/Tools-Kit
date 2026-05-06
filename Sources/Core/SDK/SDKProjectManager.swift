@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import CoreData
 
 public struct SDKProject: Identifiable, Codable {
     public var id: UUID
@@ -24,6 +25,8 @@ public final class SDKProjectManager: ObservableObject {
 
     @Published public var currentProject: SDKProject?
     @Published public var projects: [SDKProject] = []
+
+    private let context = SDKCoreDataStack.shared.context
 
     private init() {
         load()
@@ -53,21 +56,55 @@ public final class SDKProjectManager: ObservableObject {
     }
 
     public func save() throws {
-        // Sync current project back to projects array
-        if let current = currentProject, let index = projects.firstIndex(where: { $0.id == current.id }) {
-            projects[index] = current
+        if let current = currentProject {
+            if let index = projects.firstIndex(where: { $0.id == current.id }) {
+                projects[index] = current
+            }
+
+            // CoreData Persistence
+            let fetchRequest: NSFetchRequest<SDKProjectMO> = NSFetchRequest(entityName: "SDKProject")
+            fetchRequest.predicate = NSPredicate(format: "id == %@", current.id as CVarArg)
+
+            let mo: SDKProjectMO
+            if let existing = try? context.fetch(fetchRequest).first {
+                mo = existing
+            } else {
+                mo = SDKProjectMO(context: context)
+                mo.id = current.id
+            }
+
+            mo.name = current.name
+            mo.createdAt = current.createdAt
+            mo.lastBuiltAt = current.lastBuiltAt
+            mo.healthStatus = current.healthStatus.rawValue
+            mo.enabledScopesJSON = try? String(data: JSONEncoder().encode(current.enabledScopes), encoding: .utf8)
+            mo.enabledPluginIDsJSON = try? String(data: JSONEncoder().encode(current.enabledPluginIDs), encoding: .utf8)
+            mo.enabledToolIDsJSON = try? String(data: JSONEncoder().encode(current.enabledToolIDs), encoding: .utf8)
+            mo.enabledConnectorIDsJSON = try? String(data: JSONEncoder().encode(current.enabledConnectorIDs), encoding: .utf8)
+
+            SDKCoreDataStack.shared.save()
         }
 
-        // Persistence logic using WorkspacePersistence (JSON based as a proxy for CoreData
-        // since we cannot compile xcdatamodel in this environment but must follow its spirit)
-        try WorkspacePersistence.shared.save(projects, to: "sdk_projects_v3.json")
-
-        SDKLogStore.shared.log("Project saved", source: "SDKProjectManager", level: .info)
+        SDKLogStore.shared.log("Project saved to CoreData", source: "SDKProjectManager", level: .info)
     }
 
     private func load() {
-        if let loaded = try? WorkspacePersistence.shared.load([SDKProject].self, from: "sdk_projects_v3.json") {
-            projects = loaded
+        let fetchRequest: NSFetchRequest<SDKProjectMO> = NSFetchRequest(entityName: "SDKProject")
+        if let results = try? context.fetch(fetchRequest) {
+            self.projects = results.map { mo in
+                SDKProject(
+                    id: mo.id ?? UUID(),
+                    name: mo.name ?? "Unknown",
+                    createdAt: mo.createdAt ?? Date(),
+                    lastBuiltAt: mo.lastBuiltAt,
+                    enabledScopes: mo.enabledScopesJSON?.data(using: .utf8).flatMap { try? JSONDecoder().decode([String].self, from: $0) } ?? [],
+                    enabledPluginIDs: mo.enabledPluginIDsJSON?.data(using: .utf8).flatMap { try? JSONDecoder().decode([UUID].self, from: $0) } ?? [],
+                    enabledToolIDs: mo.enabledToolIDsJSON?.data(using: .utf8).flatMap { try? JSONDecoder().decode([UUID].self, from: $0) } ?? [],
+                    enabledConnectorIDs: mo.enabledConnectorIDsJSON?.data(using: .utf8).flatMap { try? JSONDecoder().decode([UUID].self, from: $0) } ?? [],
+                    automationRules: [], // Rules handled by AutomationEngine
+                    healthStatus: HealthStatus(rawValue: mo.healthStatus ?? "") ?? .healthy
+                )
+            }
         }
     }
 

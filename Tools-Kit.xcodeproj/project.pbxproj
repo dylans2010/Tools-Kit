@@ -4064,6 +4064,7 @@
 		117DFDA49E73E8187907B96E /* Automation */ = {
 			isa = PBXGroup;
 			children = (
+				7635B332CBA34F029CE8B795 /* SDKAutomationEngine.swift */,
 				BBBFC16369B83FCCFE22AFBE /* AgentAutomationEngine.swift */,
 				D2007076E4F9F28A4D445A40 /* AgentAutomationResult.swift */,
 				CB6B3D2AFDB50435727EC3C0 /* AgentAutomationScheduler.swift */,
@@ -4198,6 +4199,7 @@
 		E10000000000000000000003 /* Tools */ = {
 			isa = PBXGroup;
 			children = (
+				A47E16E3713E47C8B668F9A4 /* SDKToolManager.swift */,
 				E10000000000000000000004 /* AIChat */,
 			);
 			path = Tools;
@@ -4308,6 +4310,7 @@
 		AA1000000000000000000006 /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
+				7C8B3D77A06A46AC8C9F338D /* SDKPluginManager.swift */,
 				PL000000000000000000000100 /* Connectors */,
 			);
 			path = Plugins;
@@ -4316,6 +4319,25 @@
 		PL000000000000000000000100 /* Connectors */ = {
 			isa = PBXGroup;
 			children = (
+				010000000000000000000107 /* ConnectorSchemaBuilderView.swift */,
+				01000000000000000000010B /* ConnectorVersioningView.swift */,
+				01000000000000000000010A /* ConnectorSecurityView.swift */,
+				010000000000000000000108 /* ConnectorFlowBuilderView.swift */,
+				010000000000000000000109 /* ConnectorTestConsoleView.swift */,
+				010000000000000000000105 /* ConnectorLogsView.swift */,
+				010000000000000000000104 /* ConnectorExecutionView.swift */,
+				010000000000000000000102 /* ConnectorBuilderView.swift */,
+				010000000000000000000101 /* ConnectorsMainView.swift */,
+				010000000000000000000106 /* ConnectorAuthView.swift */,
+				010000000000000000000103 /* ConnectorDetailView.swift */,
+				5851B51F6765499BABAC81DE /* SDKConnectorsView.swift */,
+				17DF0AFC8D854FAC9706801A /* CalendarConnector.swift */,
+				AABEAE48E3D14202BF990AB8 /* LocalFileConnector.swift */,
+				271B5BEA56B24B98833ADD50 /* GitHubConnector.swift */,
+				88CA0CAD86554F92BADABB89 /* WebhookConnector.swift */,
+				C03232FF64E642A897463C54 /* GmailConnector.swift */,
+				9B0A6E9DC700472B88DD7AC1 /* SDKConnectorManager.swift */,
+				288397E824F048869DC9ACC3 /* BaseConnector.swift */,
 				PL010000000000000000000101 /* ConnectorsMainView.swift */,
 				PL010000000000000000000102 /* ConnectorBuilderView.swift */,
 				PL010000000000000000000103 /* ConnectorDetailView.swift */,
@@ -4385,71 +4407,6 @@
 		7C0A3202F90F4064B52AC392 /* SDK */ = {
 			isa = PBXGroup;
 			children = (
-				7CD45F7AF64649DBADB0741C /* Legacy */,
-				F250DA5B4D05461B809B5F9B /* Tools */,
-				99CAE2FBEFE24A3FBD4310BE /* Plugins */,
-				F5E2482A753F4279B1D77597 /* Connectors */,
-				017AEE4C9C5346B39294CB17 /* Automation */,
-				ADB759BF5EDA4D3F98452ADD /* SDKCoreDataStack.swift */,
-				A8BD36B371A04D52BFEA0DA8 /* SDKExportService.swift */,
-				99F4C9203BC64DCD816A2F89 /* SDKBackgroundEngine.swift */,
-				E4AAB3375BCD4B6BAC538FDC /* SDKProjectManager.swift */,
-				402EA872FE4B42E9919BB931 /* SDKLogStore.swift */,
-				2A185A33DEA747ABB81E5845 /* ToolsKitSDK.swift */,
-			);
-			path = SDK;
-			sourceTree = "<group>";
-		};
-		017AEE4C9C5346B39294CB17 /* Automation */ = {
-			isa = PBXGroup;
-			children = (
-				7635B332CBA34F029CE8B795 /* SDKAutomationEngine.swift */,
-			);
-			path = Automation;
-			sourceTree = "<group>";
-		};
-		F5E2482A753F4279B1D77597 /* Connectors */ = {
-			isa = PBXGroup;
-			children = (
-				17DF0AFC8D854FAC9706801A /* CalendarConnector.swift */,
-				AABEAE48E3D14202BF990AB8 /* LocalFileConnector.swift */,
-				271B5BEA56B24B98833ADD50 /* GitHubConnector.swift */,
-				88CA0CAD86554F92BADABB89 /* WebhookConnector.swift */,
-				C03232FF64E642A897463C54 /* GmailConnector.swift */,
-				9B0A6E9DC700472B88DD7AC1 /* SDKConnectorManager.swift */,
-				288397E824F048869DC9ACC3 /* BaseConnector.swift */,
-			);
-			path = Connectors;
-			sourceTree = "<group>";
-		};
-		99CAE2FBEFE24A3FBD4310BE /* Plugins */ = {
-			isa = PBXGroup;
-			children = (
-				7C8B3D77A06A46AC8C9F338D /* SDKPluginManager.swift */,
-			);
-			path = Plugins;
-			sourceTree = "<group>";
-		};
-		F250DA5B4D05461B809B5F9B /* Tools */ = {
-			isa = PBXGroup;
-			children = (
-				A47E16E3713E47C8B668F9A4 /* SDKToolManager.swift */,
-			);
-			path = Tools;
-			sourceTree = "<group>";
-		};
-		MEG0000000000000000000002 /* Workspace */ = {
-			isa = PBXGroup;
-			children = (
-				B486E5E093744B55A419E9C8 /* Plugins */,
-				89F7FA2CC5CC4B6A9B8697F0 /* SDK */,
-			);
-			path = Workspace;
-			sourceTree = "<group>";
-		};
-		89F7FA2CC5CC4B6A9B8697F0 /* SDK */ = {
-			isa = PBXGroup;
-			children = (
 				010000000000000000000010 /* SDKPermissionControlView.swift */,
 				01000000000000000000000F /* SDKDataControlView.swift */,
 				01000000000000000000000E /* SDKFlowBuilderView.swift */,
@@ -4472,6 +4429,61 @@
 				06C00EFEC47F4EFA82E82DD7 /* SDKLogsView.swift */,
 				94F7CA9EB7294F5194434142 /* SDKAppBuilderView.swift */,
 				57F836A766414E69B1E15432 /* SDKPluginsView.swift */,
+				ADB759BF5EDA4D3F98452ADD /* SDKCoreDataStack.swift */,
+				A8BD36B371A04D52BFEA0DA8 /* SDKExportService.swift */,
+				99F4C9203BC64DCD816A2F89 /* SDKBackgroundEngine.swift */,
+				E4AAB3375BCD4B6BAC538FDC /* SDKProjectManager.swift */,
+				402EA872FE4B42E9919BB931 /* SDKLogStore.swift */,
+				2A185A33DEA747ABB81E5845 /* ToolsKitSDK.swift */,
+				7CD45F7AF64649DBADB0741C /* Legacy */,
+				F250DA5B4D05461B809B5F9B /* Tools */,
+				99CAE2FBEFE24A3FBD4310BE /* Plugins */,
+				F5E2482A753F4279B1D77597 /* Connectors */,
+				017AEE4C9C5346B39294CB17 /* Automation */,
+			);
+			path = SDK;
+			sourceTree = "<group>";
+		};
+		017AEE4C9C5346B39294CB17 /* Automation */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Automation;
+			sourceTree = "<group>";
+		};
+		F5E2482A753F4279B1D77597 /* Connectors */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Connectors;
+			sourceTree = "<group>";
+		};
+		99CAE2FBEFE24A3FBD4310BE /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Plugins;
+			sourceTree = "<group>";
+		};
+		F250DA5B4D05461B809B5F9B /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+				89F7FA2CC5CC4B6A9B8697F0 /* SDK */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		89F7FA2CC5CC4B6A9B8697F0 /* SDK */ = {
+			isa = PBXGroup;
+			children = (
 			);
 			path = SDK;
 			sourceTree = "<group>";
@@ -4663,18 +4675,6 @@
 		6D9B782B23364B0B8BCC0B0F /* Connectors */ = {
 			isa = PBXGroup;
 			children = (
-				010000000000000000000107 /* ConnectorSchemaBuilderView.swift */,
-				01000000000000000000010B /* ConnectorVersioningView.swift */,
-				01000000000000000000010A /* ConnectorSecurityView.swift */,
-				010000000000000000000108 /* ConnectorFlowBuilderView.swift */,
-				010000000000000000000109 /* ConnectorTestConsoleView.swift */,
-				010000000000000000000105 /* ConnectorLogsView.swift */,
-				010000000000000000000104 /* ConnectorExecutionView.swift */,
-				010000000000000000000102 /* ConnectorBuilderView.swift */,
-				010000000000000000000101 /* ConnectorsMainView.swift */,
-				010000000000000000000106 /* ConnectorAuthView.swift */,
-				010000000000000000000103 /* ConnectorDetailView.swift */,
-				5851B51F6765499BABAC81DE /* SDKConnectorsView.swift */,
 			);
 			path = Connectors;
 			sourceTree = "<group>";
