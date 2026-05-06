@@ -125,6 +125,18 @@ public final class SDKDataEngine: ObservableObject {
         }
     }
 
+    public func cacheSnapshot() -> [SDKScope: Int] {
+        var snapshot: [SDKScope: Int] = [:]
+        for scope in SDKScope.allCases {
+            if let items = getCachedItems(for: scope) {
+                snapshot[scope] = items.count
+            } else {
+                snapshot[scope] = 0
+            }
+        }
+        return snapshot
+    }
+
     // MARK: - Private
 
     private func getCachedItems(for scope: SDKScope) -> [SDKDataItem]? {
@@ -186,13 +198,40 @@ public final class SDKDataEngine: ObservableObject {
                            timestamp: rule.lastRunAt ?? Date())
             }
         case .meet:
-            return []
+            let snapshots = WorkspaceAPI.shared.timeTravel.listSnapshots()
+            let meetSnapshots = snapshots.filter { $0.message.lowercased().contains("meet") }
+            return meetSnapshots.map { snapshot in
+                SDKDataItem(id: snapshot.id, scope: .meet, title: snapshot.message,
+                           payload: ["timestamp": "\(snapshot.timestamp)"],
+                           timestamp: snapshot.timestamp)
+            }
         case .repos:
-            return []
+            let files = WorkspaceAPI.shared.files.listFiles()
+            let repoFiles = files.filter { $0.name.hasSuffix(".git") || $0.path.contains(".git") || $0.name.hasSuffix(".swift") || $0.name.hasSuffix(".json") }
+            return repoFiles.map { file in
+                SDKDataItem(id: UUID(), scope: .repos, title: file.name,
+                           payload: ["path": file.path],
+                           timestamp: Date())
+            }
         case .media:
-            return []
+            let files = WorkspaceAPI.shared.files.listFiles()
+            let mediaExtensions = ["png", "jpg", "jpeg", "gif", "mp4", "mov", "mp3", "wav", "pdf"]
+            let mediaFiles = files.filter { file in
+                mediaExtensions.contains(where: { file.name.lowercased().hasSuffix(".\($0)") })
+            }
+            return mediaFiles.map { file in
+                SDKDataItem(id: UUID(), scope: .media, title: file.name,
+                           payload: ["path": file.path],
+                           timestamp: Date())
+            }
         case .whiteboards:
-            return []
+            let notes = WorkspaceAPI.shared.notes.listNotes()
+            let whiteboardNotes = notes.filter { $0.title.lowercased().contains("whiteboard") || $0.content.lowercased().contains("canvas") }
+            return whiteboardNotes.map { note in
+                SDKDataItem(id: note.id, scope: .whiteboards, title: note.title,
+                           payload: ["content": note.content],
+                           timestamp: note.updatedAt)
+            }
         case .intelligence:
             let graph = SDKGraphInterface.shared.query(entityType: nil, relation: nil)
             return graph.nodes.map { node in
@@ -201,7 +240,12 @@ public final class SDKDataEngine: ObservableObject {
                            timestamp: Date())
             }
         case .persona:
-            return []
+            let insights = WorkspaceAPI.shared.persona.getInsights()
+            return insights.enumerated().map { index, insight in
+                SDKDataItem(id: UUID(), scope: .persona, title: "Insight \(index + 1)",
+                           payload: ["content": insight],
+                           timestamp: Date())
+            }
         case .plugins:
             return SDKPluginManager.shared.plugins.map { plugin in
                 SDKDataItem(id: plugin.id, scope: .plugins, title: plugin.name,

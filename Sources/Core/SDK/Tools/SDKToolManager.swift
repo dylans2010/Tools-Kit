@@ -4,7 +4,7 @@ import Combine
 public struct SDKTool: Identifiable, Codable {
     public var id: UUID
     public var name: String
-    public var category: ToolCategory
+    public var category: SDKToolCategory
     public var inputSchema: [ToolParameter]
     public var outputSchema: [ToolParameter]
     public var pluginID: UUID?
@@ -16,7 +16,7 @@ public struct ToolParameter: Codable {
     public var required: Bool
 }
 
-public enum ToolCategory: String, Codable, CaseIterable {
+public enum SDKToolCategory: String, Codable, CaseIterable {
     case dataProcessor, aiUtility, fileTransformer, workflowAction
 }
 
@@ -56,32 +56,50 @@ public final class SDKToolManager: ObservableObject {
         let start = Date()
         var output: [String: Any] = [:]
 
-        // Concrete tool logic
         switch tool.name {
         case "JSON Formatter":
             if let jsonString = input["json"] as? String,
                let data = jsonString.data(using: .utf8),
                let json = try? JSONSerialization.jsonObject(with: data),
                let prettyData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
-                output["formatted"] = String(data: prettyData, encoding: .utf8)
+                output["formatted"] = String(data: prettyData, encoding: .utf8) ?? ""
+            } else {
+                throw SDKError.executionFailed(reason: "Invalid JSON input")
             }
         case "Text Summarizer":
             if let text = input["text"] as? String {
-                output["summary"] = String(text.prefix(100)) + "..."
+                let response = try await WorkspaceAPI.shared.persona.queryPersona(prompt: "Summarize in 2-3 sentences: \(text.prefix(2000))")
+                output["summary"] = response
+            } else {
+                throw SDKError.executionFailed(reason: "Missing text input")
             }
         case "File Renamer":
-            output["message"] = "Renamed files matching pattern \(input["pattern"] ?? "*")"
+            let pattern = input["pattern"] as? String ?? "*"
+            let files = WorkspaceAPI.shared.files.listFiles()
+            let matched = files.filter { $0.name.contains(pattern) || pattern == "*" }
+            output["matchedCount"] = "\(matched.count)"
+            output["files"] = matched.map { $0.name }.joined(separator: ", ")
         case "Data Exporter":
-            output["url"] = "file:///tmp/export.json"
+            let scopeStr = input["scope"] as? String ?? "all"
+            let scope: SDKScope = SDKScope.allCases.first { String(describing: $0) == scopeStr } ?? .all
+            let items = try await SDKDataEngine.shared.fetch(scope: scope)
+            let exportData = items.map { ["id": $0.id.uuidString, "title": $0.title, "scope": String(describing: $0.scope)] }
+            if let jsonData = try? JSONSerialization.data(withJSONObject: exportData, options: .prettyPrinted) {
+                let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+                let exportURL = appSupport.appendingPathComponent("sdk_export_\(Int(Date().timeIntervalSince1970)).json")
+                try jsonData.write(to: exportURL)
+                output["url"] = exportURL.absoluteString
+                output["itemCount"] = "\(items.count)"
+            }
         default:
-            break
+            SDKLogStore.shared.log("No handler for tool: \(tool.name)", source: "SDKToolManager", level: .warning)
         }
 
         let duration = Date().timeIntervalSince(start)
         return SDKToolResult(toolID: toolID, output: output, duration: duration, success: true)
     }
 
-    public func tools(for category: ToolCategory) -> [SDKTool] {
+    public func tools(for category: SDKToolCategory) -> [SDKTool] {
         return tools.filter { $0.category == category }
     }
 
@@ -107,7 +125,7 @@ public final class SDKToolManager: ObservableObject {
             name: "File Renamer",
             category: .fileTransformer,
             inputSchema: [ToolParameter(key: "pattern", type: "string", required: true)],
-            outputSchema: [ToolParameter(key: "message", type: "string", required: true)]
+            outputSchema: [ToolParameter(key: "matchedCount", type: "string", required: true), ToolParameter(key: "files", type: "string", required: false)]
         ))
 
         register(SDKTool(
@@ -115,7 +133,7 @@ public final class SDKToolManager: ObservableObject {
             name: "Data Exporter",
             category: .workflowAction,
             inputSchema: [ToolParameter(key: "scope", type: "string", required: true)],
-            outputSchema: [ToolParameter(key: "url", type: "string", required: true)]
+            outputSchema: [ToolParameter(key: "url", type: "string", required: true), ToolParameter(key: "itemCount", type: "string", required: false)]
         ))
     }
 }

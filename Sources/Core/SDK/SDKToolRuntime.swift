@@ -95,6 +95,12 @@ public final class SDKToolRuntime: ObservableObject {
         return results
     }
 
+    // MARK: - History
+
+    public func getHistory() -> [ToolExecutionRecord] {
+        return executionHistory
+    }
+
     // MARK: - Metrics
 
     public func getMetrics() -> ToolRuntimeMetrics {
