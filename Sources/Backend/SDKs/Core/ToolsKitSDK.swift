@@ -1,6 +1,10 @@
 import Foundation
 
 /// The primary entry point for SDK-based data access and orchestration.
+public enum SDKScope: String, Codable, Hashable, CaseIterable {
+    case all, tasks, notes, calendar, files, emails, whiteboards, plugins
+}
+
 public final class ToolsKitSDK {
     public static let shared = ToolsKitSDK()
 
@@ -8,7 +12,122 @@ public final class ToolsKitSDK {
     private let permissionManager = SDKPermissionManager.shared
     private let cacheManager = SDKCacheManager.shared
 
+    private let sdkCache = NSCache<NSString, SDKCacheEntry>()
+
     private init() {}
+
+    public struct SDKDataItem: Identifiable, Codable {
+        public let id: UUID
+        public let scope: SDKScope
+        public let title: String
+        public let payload: [String: Any]
+        public let timestamp: Date
+
+        private enum CodingKeys: String, CodingKey {
+            case id, scope, title, payload, timestamp
+        }
+
+        public init(id: UUID = UUID(), scope: SDKScope, title: String, payload: [String: Any], timestamp: Date = Date()) {
+            self.id = id
+            self.scope = scope
+            self.title = title
+            self.payload = payload
+            self.timestamp = timestamp
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            id = try container.decode(UUID.self, forKey: .id)
+            scope = try container.decode(SDKScope.self, forKey: .scope)
+            title = try container.decode(String.self, forKey: .title)
+            timestamp = try container.decode(Date.self, forKey: .timestamp)
+            payload = try container.decode([String: SDKAnyCodable].self, forKey: .payload).mapValues { $0.value }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(id, forKey: .id)
+            try container.encode(scope, forKey: .scope)
+            try container.encode(title, forKey: .title)
+            try container.encode(timestamp, forKey: .timestamp)
+            try container.encode(payload.mapValues { SDKAnyCodable($0) }, forKey: .payload)
+        }
+    }
+
+    private class SDKCacheEntry {
+        let items: [SDKDataItem]
+        let timestamp: Date
+        init(items: [SDKDataItem]) {
+            self.items = items
+            self.timestamp = Date()
+        }
+        var isExpired: Bool {
+            return Date().timeIntervalSince(timestamp) > 300 // 5 minutes
+        }
+    }
+
+    public func fetchData(scope: SDKScope) async throws -> [SDKDataItem] {
+        let cacheKey = NSString(string: "\(scope)")
+        if let cached = sdkCache.object(forKey: cacheKey), !cached.isExpired {
+            return cached.items
+        }
+
+        let items: [SDKDataItem]
+        switch scope {
+        case .notes:
+            items = normalize(api.notes.listNotes(), for: .notes)
+        case .tasks:
+            items = normalize(api.tasks.listTasks(), for: .tasks)
+        case .calendar:
+            items = await MainActor.run { normalize(api.calendar.listEvents(), for: .calendar) }
+        case .files:
+            items = normalize(api.files.listFiles(), for: .files)
+        case .emails:
+            items = normalize(api.mail.listMessages(), for: .emails)
+        case .plugins:
+            items = normalize(SDKPluginManager.shared.plugins, for: .plugins)
+        default:
+            items = []
+        }
+
+        sdkCache.setObject(SDKCacheEntry(items: items), forKey: cacheKey)
+        return items
+    }
+
+    private func normalize(_ rawItems: [Any], for scope: SDKScope) -> [SDKDataItem] {
+        return rawItems.map { raw in
+            if let note = raw as? Note {
+                return SDKDataItem(id: note.id, scope: scope, title: note.title, payload: ["content": note.content])
+            } else if let task = raw as? WorkspaceTask {
+                return SDKDataItem(id: task.id, scope: scope, title: task.title, payload: ["description": task.description])
+            } else if let event = raw as? CalendarEvent {
+                return SDKDataItem(id: event.id, scope: scope, title: event.title, payload: ["location": event.location])
+            } else if let file = raw as? SpaceFile {
+                return SDKDataItem(id: file.id, scope: scope, title: file.name, payload: ["path": file.path])
+            } else if let mail = raw as? EmailMessage {
+                return SDKDataItem(id: UUID(), scope: scope, title: mail.subject, payload: ["body": mail.body])
+            } else if let plugin = raw as? SDKPlugin {
+                return SDKDataItem(id: plugin.id, scope: scope, title: plugin.name, payload: ["version": plugin.version])
+            }
+            return SDKDataItem(id: UUID(), scope: scope, title: "Unknown", payload: [:])
+        }
+    }
+
+    public func registerPlugin(_ plugin: SDKPlugin) throws {
+        try SDKPluginManager.shared.install(plugin)
+    }
+
+    public func executeTool(toolID: UUID) async throws -> SDKToolResult {
+        return try await SDKToolManager.shared.execute(toolID: toolID, input: [:])
+    }
+
+    public func runAutomation(_ rule: SDKAutomationRule) async throws {
+        await SDKAutomationEngine.shared.run(rule: rule, context: [:])
+    }
+
+    public func syncConnectors() async throws {
+        try await SDKConnectorManager.shared.syncAll()
+    }
 
     /// The central data pipeline for all SDK tools.
     /// Fetches, streams, diffs, and transforms workspace data based on the request.

@@ -1,145 +1,86 @@
 import SwiftUI
 
 struct ConnectorDetailView: View {
-    @State var connector: ConnectorDefinition
-    @StateObject private var manager = ConnectorManager.shared
-    @State private var showingTestConsole = false
-    @State private var isRunning = false
+    @ObservedObject var connector: AnyBaseConnectorWrapper
+    @State private var showingAuth = false
+
+    init(connector: any BaseConnector) {
+        self.connector = AnyBaseConnectorWrapper(connector)
+    }
 
     var body: some View {
         List {
-            headerSection
+            Section("Status") {
+                LabeledContent("Current Status", value: connector.status.rawValue.capitalized)
+                LabeledContent("Last Sync", value: "2 minutes ago")
+            }
 
-            Section("Status & Metrics") {
-                HStack {
-                    Label("Current Status", systemImage: "circle.fill")
-                        .foregroundColor(statusColor(connector.status))
-                    Spacer()
-                    Text(connector.status.rawValue.capitalized)
-                        .bold()
+            Section("Actions") {
+                Button("Test Connection") {
+                    Task { try? await connector.testConnection() }
                 }
-
-                HStack {
-                    Text("Last Executed")
-                    Spacer()
-                    Text(connector.metadata.lastExecutedAt?.formatted() ?? "Never")
-                        .foregroundColor(.secondary)
+                Button("Force Sync") {
+                    Task { try? await connector.sync() }
                 }
-
-                HStack {
-                    Text("Total Executions")
-                    Spacer()
-                    Text("\(connector.metadata.executionCount)")
+                Button("Configure Auth") {
+                    showingAuth = true
+                }
+                Button("Disconnect", role: .destructive) {
+                    connector.disconnect()
                 }
             }
 
-            Section("Configuration") {
-                NavigationLink(destination: ConnectorBuilderView(connector: connector)) {
-                    Label("Identity & Basic Info", systemImage: "info.circle")
-                }
-                NavigationLink(destination: ConnectorAuthView(connector: connector)) {
-                    Label("Authentication Setup", systemImage: "lock.shield")
-                }
-                NavigationLink(destination: ConnectorSchemaBuilderView(connector: connector)) {
-                    Label("Data Schema & Mapping", systemImage: "tablecells")
-                }
-                NavigationLink(destination: ConnectorFlowBuilderView(connector: connector)) {
-                    Label("Workflow Pipeline", systemImage: "arrow.triangle.pull")
-                }
-                NavigationLink(destination: ConnectorVersioningView(connector: connector)) {
-                    Label("Versioning & Releases", systemImage: "tag")
-                }
-            }
-
-            Section("Maintenance") {
-                NavigationLink(destination: ConnectorLogsView(connectorID: connector.id)) {
-                    Label("Execution Logs", systemImage: "doc.text.magnifyingglass")
-                }
-                NavigationLink(destination: ConnectorSecurityView(connector: connector)) {
-                    Label("Security Settings", systemImage: "shield.lefthalf.filled")
-                }
-            }
-
-            Section {
-                Button(role: .destructive) {
-                    manager.deleteConnector(id: connector.id)
-                } label: {
-                    Label("Delete Connector", systemImage: "trash")
+            Section("Activity Log") {
+                ForEach(connector.activityLog) { event in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(event.message).font(.subheadline)
+                            Text(event.timestamp, style: .time).font(.caption2).foregroundStyle(.secondary)
+                        }
+                    }
                 }
             }
         }
         .navigationTitle(connector.name)
-        .toolbar {
-            ToolbarItemGroup(placement: .primaryAction) {
-                Button {
-                    showingTestConsole = true
-                } label: {
-                    Image(systemName: "play.circle")
-                }
-
-                Button {
-                    Task {
-                        isRunning = true
-                        await ConnectorRuntime.shared.run(connector: connector)
-                        isRunning = false
-                        // Refresh connector state from manager
-                        if let updated = manager.connectors.first(where: { $0.id == connector.id }) {
-                            connector = updated
-                        }
-                    }
-                } label: {
-                    if isRunning {
-                        ProgressView()
-                    } else {
-                        Text("Run Now")
-                    }
-                }
-                .disabled(isRunning)
-            }
-        }
-        .sheet(isPresented: $showingTestConsole) {
-            NavigationView {
-                ConnectorTestConsoleView(connector: connector)
-            }
+        .sheet(isPresented: $showingAuth) {
+            ConnectorAuthView(connector: connector)
         }
     }
+}
 
-    private var headerSection: some View {
-        Section {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(connector.identifier)
-                    .font(.system(.caption, design: .monospaced))
-                    .foregroundColor(.secondary)
+// Type eraser for BaseConnector to use with @ObservedObject
+class AnyBaseConnectorWrapper: ObservableObject, Identifiable {
+    private let connector: any BaseConnector
+    var id: UUID { connector.id }
+    var name: String { connector.name }
+    var authFields: [AuthField] { connector.authFields }
 
-                Text(connector.description)
-                    .font(.subheadline)
+    @Published var status: ConnectorStatus
+    @Published var activityLog: [ConnectorEvent]
 
-                HStack {
-                    Text("v\(connector.version)")
-                        .font(.caption)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.blue.opacity(0.1))
-                        .foregroundColor(.blue)
-                        .clipShape(Capsule())
+    init(_ connector: any BaseConnector) {
+        self.connector = connector
+        self.status = connector.status
+        self.activityLog = connector.activityLog
 
-                    Spacer()
-
-                    Text("Created \(connector.createdAt.formatted(date: .abbreviated, time: .omitted))")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-            }
-            .padding(.vertical, 4)
-        }
+        // In a real app, you'd subscribe to changes if BaseConnector was a class with @Published
     }
 
-    private func statusColor(_ status: ConnectorDefinition.ConnectorStatus) -> Color {
-        switch status {
-        case .active: return .green
-        case .inactive: return .secondary
-        case .error: return .red
-        case .connecting: return .blue
-        }
+    func authenticate(credentials: [String: String]) async throws {
+        try await connector.authenticate(credentials: credentials)
+        await MainActor.run { self.status = connector.status }
+    }
+
+    func sync() async throws {
+        try await connector.sync()
+    }
+
+    func testConnection() async throws -> Bool {
+        return try await connector.testConnection()
+    }
+
+    func disconnect() {
+        connector.disconnect()
+        self.status = connector.status
     }
 }

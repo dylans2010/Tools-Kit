@@ -230,7 +230,7 @@ struct ValidationTests {
     private static func testSDKPlatform() async {
         print("Testing SDK Platform Expansion...")
 
-        let project = SDKProject(id: UUID(), name: "Test Project", sourceCode: "print('hello')", requiredScopes: ["workspace.notes.write"], status: .idle)
+        let project = SDKProject(id: UUID(), name: "Test Project", sourceCode: "print('hello')", createdAt: Date(), lastBuiltAt: nil, enabledScopes: [], enabledPluginIDs: [], enabledToolIDs: [], enabledConnectorIDs: [], automationRules: [], healthStatus: .healthy, status: .idle)
         let context = SDKExecutionContext(projectID: project.id, noSandbox: false)
 
         // 1. Test Kernel routing

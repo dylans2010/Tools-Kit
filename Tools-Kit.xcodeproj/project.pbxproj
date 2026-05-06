@@ -7,6 +7,30 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		SK020000000000000000000001 /* SDKLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000001 /* SDKLogStore.swift */; };
+		SK020000000000000000000002 /* SDKProjectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000002 /* SDKProjectManager.swift */; };
+		SK020000000000000000000003 /* SDKBackgroundEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000003 /* SDKBackgroundEngine.swift */; };
+		SK020000000000000000000004 /* SDKAnyCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000004 /* SDKAnyCodable.swift */; };
+		SK020000000000000000000005 /* SDKExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000005 /* SDKExportService.swift */; };
+		SK020000000000000000000006 /* BaseConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000006 /* BaseConnector.swift */; };
+		SK020000000000000000000007 /* SDKConnectorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000007 /* SDKConnectorManager.swift */; };
+		SK020000000000000000000008 /* GmailConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000008 /* GmailConnector.swift */; };
+		SK020000000000000000000009 /* WebhookConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000009 /* WebhookConnector.swift */; };
+		SK020000000000000000000010 /* GitHubConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000010 /* GitHubConnector.swift */; };
+		SK020000000000000000000011 /* LocalFileConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000011 /* LocalFileConnector.swift */; };
+		SK020000000000000000000012 /* CalendarConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000012 /* CalendarConnector.swift */; };
+		SK020000000000000000000013 /* SDKPluginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000013 /* SDKPluginManager.swift */; };
+		SK020000000000000000000014 /* SDKToolManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000014 /* SDKToolManager.swift */; };
+		SK020000000000000000000015 /* SDKAutomationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000015 /* SDKAutomationEngine.swift */; };
+		SK020000000000000000000016 /* SDKLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000016 /* SDKLogsView.swift */; };
+		SK020000000000000000000017 /* SDKDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000017 /* SDKDiagnosticsView.swift */; };
+		SK020000000000000000000018 /* SDKPluginsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000018 /* SDKPluginsView.swift */; };
+		SK020000000000000000000019 /* SDKToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000019 /* SDKToolsView.swift */; };
+		SK020000000000000000000020 /* SDKAutomationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000020 /* SDKAutomationView.swift */; };
+		SK020000000000000000000021 /* SDKAppBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000021 /* SDKAppBuilderView.swift */; };
+		SK020000000000000000000022 /* SDKConnectorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000022 /* SDKConnectorsView.swift */; };
+		SK020000000000000000000023 /* ConnectorDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000023 /* ConnectorDetailView.swift */; };
+		SK020000000000000000000024 /* ConnectorAuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010000000000000000000024 /* ConnectorAuthView.swift */; };
 		MS028A4E8FF9A0449D039277 /* JSONCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS018A4E8FF9A0449D039277 /* JSONCoder.swift */; };
 		MS026A2894802C56D5AB5FC3 /* SegmentSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */; };
 		MS028F0C9AC0045039A23CD0 /* MessageBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS018F0C9AC0045039A23CD0 /* MessageBubbleView.swift */; };
@@ -45,6 +69,30 @@
 		CL020000000000000000000009 /* ReviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL010000000000000000000009 /* ReviewManager.swift */; };
 		CL02000000000000000000000A /* CollaborationTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = CL01000000000000000000000A /* CollaborationTools.swift */; };
 		5397745A2D02C0A7F9F9276A /* EditingFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4279371F37A11E68D21F0DB0 /* EditingFramework.swift */; };
+				SK010000000000000000000001 /* SDKLogStore.swift */,
+				SK010000000000000000000002 /* SDKProjectManager.swift */,
+				SK010000000000000000000003 /* SDKBackgroundEngine.swift */,
+				SK010000000000000000000004 /* SDKAnyCodable.swift */,
+				SK010000000000000000000005 /* SDKExportService.swift */,
+				SK010000000000000000000006 /* BaseConnector.swift */,
+				SK010000000000000000000007 /* SDKConnectorManager.swift */,
+				SK010000000000000000000008 /* GmailConnector.swift */,
+				SK010000000000000000000009 /* WebhookConnector.swift */,
+				SK010000000000000000000010 /* GitHubConnector.swift */,
+				SK010000000000000000000011 /* LocalFileConnector.swift */,
+				SK010000000000000000000012 /* CalendarConnector.swift */,
+				SK010000000000000000000013 /* SDKPluginManager.swift */,
+				SK010000000000000000000014 /* SDKToolManager.swift */,
+				SK010000000000000000000015 /* SDKAutomationEngine.swift */,
+				SK010000000000000000000016 /* SDKLogsView.swift */,
+				SK010000000000000000000017 /* SDKDiagnosticsView.swift */,
+				SK010000000000000000000018 /* SDKPluginsView.swift */,
+				SK010000000000000000000019 /* SDKToolsView.swift */,
+				SK010000000000000000000020 /* SDKAutomationView.swift */,
+				SK010000000000000000000021 /* SDKAppBuilderView.swift */,
+				SK010000000000000000000022 /* SDKConnectorsView.swift */,
+				SK010000000000000000000023 /* ConnectorDetailView.swift */,
+				SK010000000000000000000024 /* ConnectorAuthView.swift */,
 		41E58AD7343E2A2492A1C3CA /* EditingHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CBA21622F31EF8FD1A4205B /* EditingHistoryManager.swift */; };
 		74CE99E96BFD131D9E7A7A63 /* AIEditingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1230BE816EF0AC627E1F83EE /* AIEditingEngine.swift */; };
 		B1714C0480D5B39A5A1F6004 /* ProfessionalEditingSuite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F530BFF8DE562022C02C25 /* ProfessionalEditingSuite.swift */; };
@@ -1187,6 +1235,30 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		SK010000000000000000000001 /* SDKLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/SDKLogStore.swift; sourceTree = "<group>"; };
+		SK010000000000000000000002 /* SDKProjectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/SDKProjectManager.swift; sourceTree = "<group>"; };
+		SK010000000000000000000003 /* SDKBackgroundEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/SDKBackgroundEngine.swift; sourceTree = "<group>"; };
+		SK010000000000000000000004 /* SDKAnyCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/SDKAnyCodable.swift; sourceTree = "<group>"; };
+		SK010000000000000000000005 /* SDKExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/SDKExportService.swift; sourceTree = "<group>"; };
+		SK010000000000000000000006 /* BaseConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Connectors/BaseConnector.swift; sourceTree = "<group>"; };
+		SK010000000000000000000007 /* SDKConnectorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Connectors/SDKConnectorManager.swift; sourceTree = "<group>"; };
+		SK010000000000000000000008 /* GmailConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Connectors/GmailConnector.swift; sourceTree = "<group>"; };
+		SK010000000000000000000009 /* WebhookConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Connectors/WebhookConnector.swift; sourceTree = "<group>"; };
+		SK010000000000000000000010 /* GitHubConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Connectors/GitHubConnector.swift; sourceTree = "<group>"; };
+		SK010000000000000000000011 /* LocalFileConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Connectors/LocalFileConnector.swift; sourceTree = "<group>"; };
+		SK010000000000000000000012 /* CalendarConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Connectors/CalendarConnector.swift; sourceTree = "<group>"; };
+		SK010000000000000000000013 /* SDKPluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Plugins/SDKPluginManager.swift; sourceTree = "<group>"; };
+		SK010000000000000000000014 /* SDKToolManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Tools/SDKToolManager.swift; sourceTree = "<group>"; };
+		SK010000000000000000000015 /* SDKAutomationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Automation/SDKAutomationEngine.swift; sourceTree = "<group>"; };
+		SK010000000000000000000016 /* SDKLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/SDK/SDKLogsView.swift; sourceTree = "<group>"; };
+		SK010000000000000000000017 /* SDKDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/SDK/SDKDiagnosticsView.swift; sourceTree = "<group>"; };
+		SK010000000000000000000018 /* SDKPluginsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/SDK/SDKPluginsView.swift; sourceTree = "<group>"; };
+		SK010000000000000000000019 /* SDKToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/SDK/SDKToolsView.swift; sourceTree = "<group>"; };
+		SK010000000000000000000020 /* SDKAutomationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/SDK/SDKAutomationView.swift; sourceTree = "<group>"; };
+		SK010000000000000000000021 /* SDKAppBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/SDK/SDKAppBuilderView.swift; sourceTree = "<group>"; };
+		SK010000000000000000000022 /* SDKConnectorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/Connectors/SDKConnectorsView.swift; sourceTree = "<group>"; };
+		SK010000000000000000000023 /* ConnectorDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/Connectors/ConnectorDetailView.swift; sourceTree = "<group>"; };
+		SK010000000000000000000024 /* ConnectorAuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/Connectors/ConnectorAuthView.swift; sourceTree = "<group>"; };
 		MS018A4E8FF9A0449D039277 /* JSONCoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONCoder.swift; sourceTree = "<group>"; };
 		MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentSwitcher.swift; sourceTree = "<group>"; };
 		MS018F0C9AC0045039A23CD0 /* MessageBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubbleView.swift; sourceTree = "<group>"; };
@@ -4521,6 +4593,30 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				SK020000000000000000000001 /* SDKLogStore.swift in Sources */,
+				SK020000000000000000000002 /* SDKProjectManager.swift in Sources */,
+				SK020000000000000000000003 /* SDKBackgroundEngine.swift in Sources */,
+				SK020000000000000000000004 /* SDKAnyCodable.swift in Sources */,
+				SK020000000000000000000005 /* SDKExportService.swift in Sources */,
+				SK020000000000000000000006 /* BaseConnector.swift in Sources */,
+				SK020000000000000000000007 /* SDKConnectorManager.swift in Sources */,
+				SK020000000000000000000008 /* GmailConnector.swift in Sources */,
+				SK020000000000000000000009 /* WebhookConnector.swift in Sources */,
+				SK020000000000000000000010 /* GitHubConnector.swift in Sources */,
+				SK020000000000000000000011 /* LocalFileConnector.swift in Sources */,
+				SK020000000000000000000012 /* CalendarConnector.swift in Sources */,
+				SK020000000000000000000013 /* SDKPluginManager.swift in Sources */,
+				SK020000000000000000000014 /* SDKToolManager.swift in Sources */,
+				SK020000000000000000000015 /* SDKAutomationEngine.swift in Sources */,
+				SK020000000000000000000016 /* SDKLogsView.swift in Sources */,
+				SK020000000000000000000017 /* SDKDiagnosticsView.swift in Sources */,
+				SK020000000000000000000018 /* SDKPluginsView.swift in Sources */,
+				SK020000000000000000000019 /* SDKToolsView.swift in Sources */,
+				SK020000000000000000000020 /* SDKAutomationView.swift in Sources */,
+				SK020000000000000000000021 /* SDKAppBuilderView.swift in Sources */,
+				SK020000000000000000000022 /* SDKConnectorsView.swift in Sources */,
+				SK020000000000000000000023 /* ConnectorDetailView.swift in Sources */,
+				SK020000000000000000000024 /* ConnectorAuthView.swift in Sources */,
 				MS0207C4CA60A1926E94DEC9 /* MessagesViewController.swift in Sources */,
 				MS02F387A7A65E6019196A12 /* MessagesRootView.swift in Sources */,
 				MS0277F553B9F980351B8A6B /* MessagesAIService.swift in Sources */,

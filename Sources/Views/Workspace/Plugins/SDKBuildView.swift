@@ -9,6 +9,9 @@ struct SDKBuildView: View {
     @State private var showingSystemExplorer = false
     @State private var showingConsole = false
     @State private var showingDataFetch = false
+    @State private var isExporting = false
+    @State private var exportURL: URL?
+    @State private var showingExportShare = false
 
     var body: some View {
         NavigationStack {
@@ -57,7 +60,7 @@ struct SDKBuildView: View {
 }
 
 struct SDKFetchConfigView: View {
-    @State private var selectedTypes: Set<SDKDataType> = [.notes]
+    @State private var selectedTypes: Set<SDKScope> = [.notes]
     @State private var selectedScopes: Set<PluginCapability> = [.notes, .tasks]
     @State private var mode: SDKFetchMode = .full
     @State private var includeRelations = false
@@ -70,7 +73,7 @@ struct SDKFetchConfigView: View {
     var body: some View {
         Form {
             Section("Data Configuration") {
-                List(SDKDataType.allCases, id: \.self) { type in
+                List(SDKScope.allCases, id: \.self) { type in
                     Toggle(type.rawValue.capitalized, isOn: Binding(
                         get: { selectedTypes.contains(type) },
                         set: { if $0 { selectedTypes.insert(type) } else { selectedTypes.remove(type) } }
@@ -206,16 +209,67 @@ struct ProjectEditorView: View {
 
             HStack {
                 Button(action: { SDKRuntimeEngine.shared.runProject(project) }) {
-                    Label("Run Project", systemImage: "play.fill")
+                    Label("Run", systemImage: "play.fill")
                 }
                 .buttonStyle(.borderedProminent)
 
-                Button(action: { SDKStateManager.shared.saveProject(project) }) {
+                Button(action: { try? SDKProjectManager.shared.save() }) {
                     Label("Save", systemImage: "plus.circle")
                 }
                 .buttonStyle(.bordered)
+
+                Button(action: exportProject) {
+                    if isExporting {
+                        ProgressView()
+                    } else {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
+                }
+                .buttonStyle(.bordered)
+                .disabled(isExporting)
             }
             .padding()
         }
+        .sheet(isPresented: $showingExportShare) {
+            if let url = exportURL {
+                ShareSheet(items: [url])
+            }
+        }
     }
+
+    private func exportProject() {
+        isExporting = true
+        Task {
+            let config = SDKExportConfig(
+                projectName: project.name,
+                scopes: project.enabledScopes,
+                pluginIDs: project.enabledPluginIDs,
+                toolIDs: project.enabledToolIDs,
+                connectorIDs: project.enabledConnectorIDs,
+                automationRules: project.automationRules,
+                exportedAt: Date()
+            )
+            do {
+                let url = try await SDKExportService.shared.export(config: config)
+                await MainActor.run {
+                    self.exportURL = url
+                    self.isExporting = false
+                    self.showingExportShare = true
+                }
+            } catch {
+                await MainActor.run {
+                    self.isExporting = false
+                    SDKLogStore.shared.log("Export failed: \(error.localizedDescription)", source: "SDKBuildView", level: .error)
+                }
+            }
+        }
+    }
+}
+
+struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }

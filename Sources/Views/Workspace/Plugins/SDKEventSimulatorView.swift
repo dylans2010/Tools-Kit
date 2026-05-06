@@ -1,14 +1,14 @@
 import SwiftUI
 
 struct SDKEventSimulatorView: View {
-    @State private var selectedType: SDKDataType = .notes
+    @State private var selectedType: SDKScope = .notes
     @State private var eventMessage = ""
 
     var body: some View {
         Form {
             Section("Trigger Data Event") {
                 Picker("Data Type", selection: $selectedType) {
-                    ForEach(SDKDataType.allCases, id: \.self) { type in
+                    ForEach(SDKScope.allCases, id: \.self) { type in
                         Text(type.rawValue.capitalized).tag(type)
                     }
                 }

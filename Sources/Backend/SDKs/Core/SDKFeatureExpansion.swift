@@ -65,7 +65,7 @@ extension ToolsKitSDK {
     public func naturalLanguageQuery(_ prompt: String) async throws -> SDKFetchRequest {
         // In a real implementation, this would use AI to generate a request.
         // For now, return a basic request based on keywords.
-        var types: [SDKDataType] = []
+        var types: [SDKScope] = []
         if prompt.lowercased().contains("note") { types.append(.notes) }
         if prompt.lowercased().contains("task") { types.append(.tasks) }
         if types.isEmpty { types = [.notes, .tasks] }
@@ -121,7 +121,7 @@ extension ToolsKitSDK {
     }
 
     /// 15. sdk.automation.pipeline.bind
-    public func bindPipeline(sourceTypes: [SDKDataType], action: String) {
+    public func bindPipeline(sourceTypes: [SDKScope], action: String) {
         print("SDK: Binding pipeline from \(sourceTypes) to \(action)")
     }
 
@@ -157,7 +157,7 @@ extension ToolsKitSDK {
     // MARK: - REALTIME
 
     /// 19. sdk.realtime.filter.stream
-    public func filterStream(_ stream: AsyncThrowingStream<SDKDataNode, Error>, type: SDKDataType) -> AsyncThrowingStream<SDKDataNode, Error> {
+    public func filterStream(_ stream: AsyncThrowingStream<SDKDataNode, Error>, type: SDKScope) -> AsyncThrowingStream<SDKDataNode, Error> {
         return AsyncThrowingStream { continuation in
             Task {
                 do {
@@ -257,7 +257,7 @@ extension ToolsKitSDK {
     }
 
     /// 31. sdk.performance.prefetch
-    public func prefetch(types: [SDKDataType]) {
+    public func prefetch(types: [SDKScope]) {
         Task {
             _ = try? await fetchData(SDKFetchRequest(dataTypes: types, limit: 10))
         }
@@ -271,7 +271,7 @@ extension ToolsKitSDK {
     }
 
     /// 33. sdk.dev.simulate.fetch
-    public func simulateFetch(type: SDKDataType) -> SDKDataNode {
+    public func simulateFetch(type: SDKScope) -> SDKDataNode {
         return SDKDataNode(id: "sim-\(UUID().uuidString)", type: type, title: "Simulated \(type.rawValue)", content: "This is simulated content for testing.")
     }
 
