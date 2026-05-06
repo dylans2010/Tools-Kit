@@ -93,7 +93,7 @@ struct SDKConsoleView: View {
     }
 
     private func forwardSDKLogs() {
-        let recentLogs = SDKLogStore.shared.entries()
+        let recentLogs = SDKLogStore.shared.entries
         for entry in recentLogs.suffix(50) {
             let logType: SDKLog.LogType
             switch entry.level {

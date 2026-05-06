@@ -37,7 +37,7 @@ struct SDKDataControlView: View {
                     let tasks = WorkspaceAPI.shared.tasks.listTasks()
                     let completed = tasks.filter { $0.completed }
                     for task in completed {
-                        TasksManager.shared.removeTask(id: task.id)
+                        TasksManager.shared.deleteTask(task)
                     }
                     SDKLogStore.shared.log("Cleaned up \(completed.count) completed tasks", source: "SDKDataControlView", level: .info)
                     statusMessage = "Cleaned up \(completed.count) completed tasks."

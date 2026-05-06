@@ -80,7 +80,7 @@ public final class SDKPersonaBridge: ObservableObject {
     // MARK: - Write Memory
 
     public func writeMemory(entityID: UUID, memory: String) async throws {
-        WorkspaceAPI.shared.persona.injectMemory(content: "[\(entityID)] \(memory)")
+        WorkspaceAPI.shared.persona.injectMemory(entityID: entityID, content: memory)
         recordQuery(prompt: "Memory write for \(entityID)", response: "Written", type: .memoryWrite)
 
         let action = SDKAction.injectMemory(entityID: entityID, memory: memory)
