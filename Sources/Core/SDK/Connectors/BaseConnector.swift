@@ -1,0 +1,51 @@
+import Foundation
+
+public enum ConnectorType: String, CaseIterable, Codable {
+    case gmail, webhook, github, localFileSystem, calendar
+}
+
+public enum ConnectorStatus: String, Codable {
+    case disconnected, connecting, connected, error
+}
+
+public struct AuthField: Codable {
+    public var label: String
+    public var placeholder: String
+    public var isSecure: Bool
+    public var key: String
+
+    public init(label: String, placeholder: String, isSecure: Bool, key: String) {
+        self.label = label
+        self.placeholder = placeholder
+        self.isSecure = isSecure
+        self.key = key
+    }
+}
+
+public struct ConnectorEvent: Identifiable, Codable {
+    public var id: UUID
+    public var timestamp: Date
+    public var message: String
+    public var level: LogLevel
+
+    public init(id: UUID = UUID(), timestamp: Date = Date(), message: String, level: LogLevel) {
+        self.id = id
+        self.timestamp = timestamp
+        self.message = message
+        self.level = level
+    }
+}
+
+public protocol BaseConnector: AnyObject, ObservableObject, Identifiable {
+    var id: UUID { get }
+    var name: String { get }
+    var type: ConnectorType { get }
+    var status: ConnectorStatus { get set }
+    var authFields: [AuthField] { get }
+    var activityLog: [ConnectorEvent] { get }
+
+    func authenticate(credentials: [String: String]) async throws
+    func sync() async throws
+    func testConnection() async throws -> Bool
+    func disconnect()
+}

@@ -49,17 +49,6 @@ public final class SDKRuntimeEngine: ObservableObject {
     }
 }
 
-public struct SDKProject: Identifiable, Codable {
-    public let id: UUID
-    public var name: String
-    public var sourceCode: String
-    public var requiredScopes: [String]
-    public var status: ProjectStatus
-
-    public enum ProjectStatus: String, Codable {
-        case idle, running, error, deployed
-    }
-}
 
 public struct SDKExecutionContext {
     public let projectID: UUID
