@@ -4,7 +4,7 @@ import Foundation
 public final class SDKStateManager: ObservableObject {
     public static let shared = SDKStateManager()
 
-    @Published public var savedProjects: [SDKProject] = []
+    @Published public var savedProjects: [SDKProjectLegacy] = []
 
     private let savePath: URL
 
@@ -14,7 +14,7 @@ public final class SDKStateManager: ObservableObject {
         loadProjects()
     }
 
-    public func saveProject(_ project: SDKProject) {
+    public func saveProject(_ project: SDKProjectLegacy) {
         if let index = savedProjects.firstIndex(where: { $0.id == project.id }) {
             savedProjects[index] = project
         } else {
@@ -25,7 +25,7 @@ public final class SDKStateManager: ObservableObject {
 
     private func loadProjects() {
         guard let data = try? Data(contentsOf: savePath) else { return }
-        if let decoded = try? JSONDecoder().decode([SDKProject].self, from: data) {
+        if let decoded = try? JSONDecoder().decode([SDKProjectLegacy].self, from: data) {
             savedProjects = decoded
         }
     }

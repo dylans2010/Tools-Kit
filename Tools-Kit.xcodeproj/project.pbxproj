@@ -1178,6 +1178,29 @@
 		PL02000000000000000000000E /* SDKFlowBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000E /* SDKFlowBuilderView.swift */; };
 		PL02000000000000000000000F /* SDKDataControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000F /* SDKDataControlView.swift */; };
 		PL020000000000000000000010 /* SDKPermissionControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000010 /* SDKPermissionControlView.swift */; };
+		A5F7D48ADA8B4BF8BF3E570D /* ToolsKitSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A185A33DEA747ABB81E5845 /* ToolsKitSDK.swift */; };
+		50B8F220745A4AC3BA164240 /* SDKLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 402EA872FE4B42E9919BB931 /* SDKLogStore.swift */; };
+		93FD31B2B54D4C338A601E5E /* SDKProjectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AAB3375BCD4B6BAC538FDC /* SDKProjectManager.swift */; };
+		6F002D3D99544A26AAE23201 /* SDKBackgroundEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99F4C9203BC64DCD816A2F89 /* SDKBackgroundEngine.swift */; };
+		24E74F98F4B740F99C551BDE /* SDKExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8BD36B371A04D52BFEA0DA8 /* SDKExportService.swift */; };
+		47DB557219934D60AE8B5A4B /* SDKAutomationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7635B332CBA34F029CE8B795 /* SDKAutomationEngine.swift */; };
+		252E24728B34456FB87766DF /* BaseConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288397E824F048869DC9ACC3 /* BaseConnector.swift */; };
+		CF282A4390B540929595EE2E /* SDKConnectorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B0A6E9DC700472B88DD7AC1 /* SDKConnectorManager.swift */; };
+		97F29FE0E99F48E1BE03BAD3 /* GmailConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03232FF64E642A897463C54 /* GmailConnector.swift */; };
+		BC393296CF154D2ABD48354B /* WebhookConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CA0CAD86554F92BADABB89 /* WebhookConnector.swift */; };
+		B23DC8A142F14DBB9E0DAE67 /* GitHubConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271B5BEA56B24B98833ADD50 /* GitHubConnector.swift */; };
+		FAD26B7B6535492AB9F8C803 /* LocalFileConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEAE48E3D14202BF990AB8 /* LocalFileConnector.swift */; };
+		F2315F32F51848FF938FD42E /* CalendarConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17DF0AFC8D854FAC9706801A /* CalendarConnector.swift */; };
+		B5598AC2D82C42CCA5157918 /* SDKPluginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C8B3D77A06A46AC8C9F338D /* SDKPluginManager.swift */; };
+		CA104057FB2A409B8449E91E /* SDKToolManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47E16E3713E47C8B668F9A4 /* SDKToolManager.swift */; };
+		B8434BAC026A47748965C855 /* SDKPluginsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F836A766414E69B1E15432 /* SDKPluginsView.swift */; };
+		7475AC82123845ACB951457C /* SDKAppBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F7CA9EB7294F5194434142 /* SDKAppBuilderView.swift */; };
+		18291A4DF7984C9CA4B10D3A /* SDKLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06C00EFEC47F4EFA82E82DD7 /* SDKLogsView.swift */; };
+		ABB62ECF61904A058B821E4E /* SDKToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D12F91040E4F5EBF1520B1 /* SDKToolsView.swift */; };
+		D7D9473E5FC2491C9C8BB049 /* SDKAutomationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D09A5B508388459689A2623D /* SDKAutomationView.swift */; };
+		F62EFA4014B343CEAECD9272 /* SDKDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862B9D21ECC745D8AB7D01C3 /* SDKDiagnosticsView.swift */; };
+		0C72E9426CD74630957FB2C6 /* SDKConnectorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5851B51F6765499BABAC81DE /* SDKConnectorsView.swift */; };
+		6A5AF291FDFD481DA38AF12F /* SDKCoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB759BF5EDA4D3F98452ADD /* SDKCoreDataStack.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2315,42 +2338,65 @@
 		PL010000000000000000000004 /* PluginSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginSecurityView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000005 /* PluginLimitedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/PluginLimitedView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000006 /* SecurityScopeApplicationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SecurityScopeApplicationView.swift; sourceTree = "<group>"; };
-		DV0100000000000000000001 /* WorkspaceAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/WorkspaceAPI.swift; sourceTree = "<group>"; };
-		DV0100000000000000000002 /* SDKRuntimeEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKRuntimeEngine.swift; sourceTree = "<group>"; };
-		DV0100000000000000000003 /* SDKExecutionBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKExecutionBridge.swift; sourceTree = "<group>"; };
-		DV0100000000000000000004 /* SDKPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKPermissionManager.swift; sourceTree = "<group>"; };
-		DV0100000000000000000005 /* SDKSandboxEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKSandboxEngine.swift; sourceTree = "<group>"; };
-		DV0100000000000000000006 /* SDKEventSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKEventSystem.swift; sourceTree = "<group>"; };
-		DV0100000000000000000007 /* SDKStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKStateManager.swift; sourceTree = "<group>"; };
-		DV0100000000000000000008 /* SDKExecutionKernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKExecutionKernel.swift; sourceTree = "<group>"; };
-		DV0100000000000000000009 /* SDKWorkspaceBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKWorkspaceBridge.swift; sourceTree = "<group>"; };
-		DV010000000000000000000A /* SDKSystemRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKSystemRouter.swift; sourceTree = "<group>"; };
-		DV010000000000000000000B /* SDKActionDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKActionDispatcher.swift; sourceTree = "<group>"; };
-		DV010000000000000000000C /* SDKStateSynchronizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKStateSynchronizer.swift; sourceTree = "<group>"; };
-		DV010000000000000000000D /* SDKDependencyResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKDependencyResolver.swift; sourceTree = "<group>"; };
-		DV010000000000000000000E /* SDKWorkspaceGraphEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKWorkspaceGraphEngine.swift; sourceTree = "<group>"; };
-		DV010000000000000000000F /* SDKEventInjectionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKEventInjectionEngine.swift; sourceTree = "<group>"; };
-		DV0100000000000000000010 /* SDKMutationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKMutationEngine.swift; sourceTree = "<group>"; };
-		DV0100000000000000000011 /* SDKTelemetryEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKTelemetryEngine.swift; sourceTree = "<group>"; };
-		DV0100000000000000000012 /* SDKPermissionGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKPermissionGate.swift; sourceTree = "<group>"; };
-		DV0100000000000000000013 /* SDKSandboxController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKSandboxController.swift; sourceTree = "<group>"; };
-		DV0100000000000000000014 /* SDKNoSandboxOverrideController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend/SDKs/Core/SDKNoSandboxOverrideController.swift; sourceTree = "<group>"; };
-		PL010000000000000000000007 /* SDKBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKBuildView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000008 /* SDKProjectDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKProjectDashboardView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000009 /* SDKDeploymentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKDeploymentView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000000A /* SDKSystemExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKSystemExplorerView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000000B /* SDKAPIBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKAPIBrowserView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000000C /* SDKConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKConsoleView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000020 /* SDKControlCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKControlCenterView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000021 /* SDKWorkspaceExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKWorkspaceExplorerView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000022 /* SDKActionConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKActionConsoleView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000023 /* SDKIntegrationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKIntegrationTestView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000024 /* SDKEventStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKEventStreamView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000025 /* SDKSecurityMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKSecurityMonitorView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000000D /* SDKDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKDebugView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000000E /* SDKFlowBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKFlowBuilderView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000000F /* SDKDataControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKDataControlView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000010 /* SDKPermissionControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Workspace/Plugins/SDKPermissionControlView.swift; sourceTree = "<group>"; };
+		DV0100000000000000000001 /* WorkspaceAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/WorkspaceAPI.swift; sourceTree = "<group>"; };
+		DV0100000000000000000002 /* SDKRuntimeEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKRuntimeEngine.swift; sourceTree = "<group>"; };
+		DV0100000000000000000003 /* SDKExecutionBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKExecutionBridge.swift; sourceTree = "<group>"; };
+		DV0100000000000000000004 /* SDKPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKPermissionManager.swift; sourceTree = "<group>"; };
+		DV0100000000000000000005 /* SDKSandboxEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKSandboxEngine.swift; sourceTree = "<group>"; };
+		DV0100000000000000000006 /* SDKEventSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKEventSystem.swift; sourceTree = "<group>"; };
+		DV0100000000000000000007 /* SDKStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKStateManager.swift; sourceTree = "<group>"; };
+		DV0100000000000000000008 /* SDKExecutionKernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKExecutionKernel.swift; sourceTree = "<group>"; };
+		DV0100000000000000000009 /* SDKWorkspaceBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKWorkspaceBridge.swift; sourceTree = "<group>"; };
+		DV010000000000000000000A /* SDKSystemRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKSystemRouter.swift; sourceTree = "<group>"; };
+		DV010000000000000000000B /* SDKActionDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKActionDispatcher.swift; sourceTree = "<group>"; };
+		DV010000000000000000000C /* SDKStateSynchronizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKStateSynchronizer.swift; sourceTree = "<group>"; };
+		DV010000000000000000000D /* SDKDependencyResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKDependencyResolver.swift; sourceTree = "<group>"; };
+		DV010000000000000000000E /* SDKWorkspaceGraphEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKWorkspaceGraphEngine.swift; sourceTree = "<group>"; };
+		DV010000000000000000000F /* SDKEventInjectionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKEventInjectionEngine.swift; sourceTree = "<group>"; };
+		DV0100000000000000000010 /* SDKMutationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKMutationEngine.swift; sourceTree = "<group>"; };
+		DV0100000000000000000011 /* SDKTelemetryEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKTelemetryEngine.swift; sourceTree = "<group>"; };
+		DV0100000000000000000012 /* SDKPermissionGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKPermissionGate.swift; sourceTree = "<group>"; };
+		DV0100000000000000000013 /* SDKSandboxController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKSandboxController.swift; sourceTree = "<group>"; };
+		DV0100000000000000000014 /* SDKNoSandboxOverrideController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/SDK/Legacy/SDKNoSandboxOverrideController.swift; sourceTree = "<group>"; };
+		PL010000000000000000000007 /* SDKBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKBuildView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000008 /* SDKProjectDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKProjectDashboardView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000009 /* SDKDeploymentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDeploymentView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000000A /* SDKSystemExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKSystemExplorerView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000000B /* SDKAPIBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAPIBrowserView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000000C /* SDKConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConsoleView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000020 /* SDKControlCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKControlCenterView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000021 /* SDKWorkspaceExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKWorkspaceExplorerView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000022 /* SDKActionConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKActionConsoleView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000023 /* SDKIntegrationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKIntegrationTestView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000024 /* SDKEventStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKEventStreamView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000025 /* SDKSecurityMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKSecurityMonitorView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000000D /* SDKDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDebugView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000000E /* SDKFlowBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKFlowBuilderView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000000F /* SDKDataControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDataControlView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000010 /* SDKPermissionControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPermissionControlView.swift; sourceTree = "<group>"; };
+		2A185A33DEA747ABB81E5845 /* ToolsKitSDK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsKitSDK.swift; sourceTree = "<group>"; };
+		402EA872FE4B42E9919BB931 /* SDKLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLogStore.swift; sourceTree = "<group>"; };
+		E4AAB3375BCD4B6BAC538FDC /* SDKProjectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKProjectManager.swift; sourceTree = "<group>"; };
+		99F4C9203BC64DCD816A2F89 /* SDKBackgroundEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKBackgroundEngine.swift; sourceTree = "<group>"; };
+		A8BD36B371A04D52BFEA0DA8 /* SDKExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKExportService.swift; sourceTree = "<group>"; };
+		7635B332CBA34F029CE8B795 /* SDKAutomationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAutomationEngine.swift; sourceTree = "<group>"; };
+		288397E824F048869DC9ACC3 /* BaseConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseConnector.swift; sourceTree = "<group>"; };
+		9B0A6E9DC700472B88DD7AC1 /* SDKConnectorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConnectorManager.swift; sourceTree = "<group>"; };
+		C03232FF64E642A897463C54 /* GmailConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GmailConnector.swift; sourceTree = "<group>"; };
+		88CA0CAD86554F92BADABB89 /* WebhookConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookConnector.swift; sourceTree = "<group>"; };
+		271B5BEA56B24B98833ADD50 /* GitHubConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubConnector.swift; sourceTree = "<group>"; };
+		AABEAE48E3D14202BF990AB8 /* LocalFileConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalFileConnector.swift; sourceTree = "<group>"; };
+		17DF0AFC8D854FAC9706801A /* CalendarConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarConnector.swift; sourceTree = "<group>"; };
+		7C8B3D77A06A46AC8C9F338D /* SDKPluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginManager.swift; sourceTree = "<group>"; };
+		A47E16E3713E47C8B668F9A4 /* SDKToolManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKToolManager.swift; sourceTree = "<group>"; };
+		57F836A766414E69B1E15432 /* SDKPluginsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginsView.swift; sourceTree = "<group>"; };
+		94F7CA9EB7294F5194434142 /* SDKAppBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAppBuilderView.swift; sourceTree = "<group>"; };
+		06C00EFEC47F4EFA82E82DD7 /* SDKLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLogsView.swift; sourceTree = "<group>"; };
+		73D12F91040E4F5EBF1520B1 /* SDKToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKToolsView.swift; sourceTree = "<group>"; };
+		D09A5B508388459689A2623D /* SDKAutomationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAutomationView.swift; sourceTree = "<group>"; };
+		862B9D21ECC745D8AB7D01C3 /* SDKDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDiagnosticsView.swift; sourceTree = "<group>"; };
+		5851B51F6765499BABAC81DE /* SDKConnectorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConnectorsView.swift; sourceTree = "<group>"; };
+		ADB759BF5EDA4D3F98452ADD /* SDKCoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKCoreDataStack.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -2550,6 +2596,40 @@
 		4A2CB0E156D82F6EAA22B391 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
+				MEG0000000000000000000002 /* Workspace */,
 				54244EAC19ED294008A5A839 /* ContentView.swift */,
 				A7D9E2F14C3B4A8192D0E6F1 /* LoginView.swift */,
 				BFA101000000000000000001 /* CreateAccountView.swift */,
@@ -2585,6 +2665,8 @@
 		MEG0000000000000000000002 /* Workspace */ = {
 			isa = PBXGroup;
 			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+				89F7FA2CC5CC4B6A9B8697F0 /* SDK */,
 				AGT000000000000000000001 /* Agent */,
 				MEG0000000000000000000003 /* Meet */,
 			);
@@ -2819,6 +2901,7 @@
 		8DF4BF69CF55A81CB6EBF3DE /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				12B4BF323FCC4B958B938E81 /* Core */,
 				WS0146AAEAC6C99F44618AFC /* IntegrationWorkflow.swift */,
 				WS01461357B998A54AEBA31C /* TimeTravelModels.swift */,
 				WS01566D85144B6340BC8D72 /* SpatialModels.swift */,
@@ -4291,6 +4374,395 @@
 			path = "Views/Workspace";
 			sourceTree = "<group>";
 		};
+		12B4BF323FCC4B958B938E81 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				7C0A3202F90F4064B52AC392 /* SDK */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		7C0A3202F90F4064B52AC392 /* SDK */ = {
+			isa = PBXGroup;
+			children = (
+				7CD45F7AF64649DBADB0741C /* Legacy */,
+				F250DA5B4D05461B809B5F9B /* Tools */,
+				99CAE2FBEFE24A3FBD4310BE /* Plugins */,
+				F5E2482A753F4279B1D77597 /* Connectors */,
+				017AEE4C9C5346B39294CB17 /* Automation */,
+				ADB759BF5EDA4D3F98452ADD /* SDKCoreDataStack.swift */,
+				A8BD36B371A04D52BFEA0DA8 /* SDKExportService.swift */,
+				99F4C9203BC64DCD816A2F89 /* SDKBackgroundEngine.swift */,
+				E4AAB3375BCD4B6BAC538FDC /* SDKProjectManager.swift */,
+				402EA872FE4B42E9919BB931 /* SDKLogStore.swift */,
+				2A185A33DEA747ABB81E5845 /* ToolsKitSDK.swift */,
+			);
+			path = SDK;
+			sourceTree = "<group>";
+		};
+		017AEE4C9C5346B39294CB17 /* Automation */ = {
+			isa = PBXGroup;
+			children = (
+				7635B332CBA34F029CE8B795 /* SDKAutomationEngine.swift */,
+			);
+			path = Automation;
+			sourceTree = "<group>";
+		};
+		F5E2482A753F4279B1D77597 /* Connectors */ = {
+			isa = PBXGroup;
+			children = (
+				17DF0AFC8D854FAC9706801A /* CalendarConnector.swift */,
+				AABEAE48E3D14202BF990AB8 /* LocalFileConnector.swift */,
+				271B5BEA56B24B98833ADD50 /* GitHubConnector.swift */,
+				88CA0CAD86554F92BADABB89 /* WebhookConnector.swift */,
+				C03232FF64E642A897463C54 /* GmailConnector.swift */,
+				9B0A6E9DC700472B88DD7AC1 /* SDKConnectorManager.swift */,
+				288397E824F048869DC9ACC3 /* BaseConnector.swift */,
+			);
+			path = Connectors;
+			sourceTree = "<group>";
+		};
+		99CAE2FBEFE24A3FBD4310BE /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+				7C8B3D77A06A46AC8C9F338D /* SDKPluginManager.swift */,
+			);
+			path = Plugins;
+			sourceTree = "<group>";
+		};
+		F250DA5B4D05461B809B5F9B /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				A47E16E3713E47C8B668F9A4 /* SDKToolManager.swift */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+				89F7FA2CC5CC4B6A9B8697F0 /* SDK */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		89F7FA2CC5CC4B6A9B8697F0 /* SDK */ = {
+			isa = PBXGroup;
+			children = (
+				010000000000000000000010 /* SDKPermissionControlView.swift */,
+				01000000000000000000000F /* SDKDataControlView.swift */,
+				01000000000000000000000E /* SDKFlowBuilderView.swift */,
+				01000000000000000000000D /* SDKDebugView.swift */,
+				010000000000000000000025 /* SDKSecurityMonitorView.swift */,
+				010000000000000000000024 /* SDKEventStreamView.swift */,
+				010000000000000000000023 /* SDKIntegrationTestView.swift */,
+				010000000000000000000022 /* SDKActionConsoleView.swift */,
+				010000000000000000000021 /* SDKWorkspaceExplorerView.swift */,
+				010000000000000000000020 /* SDKControlCenterView.swift */,
+				01000000000000000000000C /* SDKConsoleView.swift */,
+				01000000000000000000000B /* SDKAPIBrowserView.swift */,
+				01000000000000000000000A /* SDKSystemExplorerView.swift */,
+				010000000000000000000009 /* SDKDeploymentView.swift */,
+				010000000000000000000008 /* SDKProjectDashboardView.swift */,
+				010000000000000000000007 /* SDKBuildView.swift */,
+				862B9D21ECC745D8AB7D01C3 /* SDKDiagnosticsView.swift */,
+				D09A5B508388459689A2623D /* SDKAutomationView.swift */,
+				73D12F91040E4F5EBF1520B1 /* SDKToolsView.swift */,
+				06C00EFEC47F4EFA82E82DD7 /* SDKLogsView.swift */,
+				94F7CA9EB7294F5194434142 /* SDKAppBuilderView.swift */,
+				57F836A766414E69B1E15432 /* SDKPluginsView.swift */,
+			);
+			path = SDK;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+				B486E5E093744B55A419E9C8 /* Plugins */,
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		B486E5E093744B55A419E9C8 /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+				6D9B782B23364B0B8BCC0B0F /* Connectors */,
+			);
+			path = Plugins;
+			sourceTree = "<group>";
+		};
+		6D9B782B23364B0B8BCC0B0F /* Connectors */ = {
+			isa = PBXGroup;
+			children = (
+				010000000000000000000107 /* ConnectorSchemaBuilderView.swift */,
+				01000000000000000000010B /* ConnectorVersioningView.swift */,
+				01000000000000000000010A /* ConnectorSecurityView.swift */,
+				010000000000000000000108 /* ConnectorFlowBuilderView.swift */,
+				010000000000000000000109 /* ConnectorTestConsoleView.swift */,
+				010000000000000000000105 /* ConnectorLogsView.swift */,
+				010000000000000000000104 /* ConnectorExecutionView.swift */,
+				010000000000000000000102 /* ConnectorBuilderView.swift */,
+				010000000000000000000101 /* ConnectorsMainView.swift */,
+				010000000000000000000106 /* ConnectorAuthView.swift */,
+				010000000000000000000103 /* ConnectorDetailView.swift */,
+				5851B51F6765499BABAC81DE /* SDKConnectorsView.swift */,
+			);
+			path = Connectors;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		MEG0000000000000000000002 /* Workspace */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Workspace;
+			sourceTree = "<group>";
+		};
+		7CD45F7AF64649DBADB0741C /* Legacy */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Legacy;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -4537,6 +5009,29 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6A5AF291FDFD481DA38AF12F /* SDKCoreDataStack.swift in Sources */,
+				0C72E9426CD74630957FB2C6 /* SDKConnectorsView.swift in Sources */,
+				F62EFA4014B343CEAECD9272 /* SDKDiagnosticsView.swift in Sources */,
+				D7D9473E5FC2491C9C8BB049 /* SDKAutomationView.swift in Sources */,
+				ABB62ECF61904A058B821E4E /* SDKToolsView.swift in Sources */,
+				18291A4DF7984C9CA4B10D3A /* SDKLogsView.swift in Sources */,
+				7475AC82123845ACB951457C /* SDKAppBuilderView.swift in Sources */,
+				B8434BAC026A47748965C855 /* SDKPluginsView.swift in Sources */,
+				CA104057FB2A409B8449E91E /* SDKToolManager.swift in Sources */,
+				B5598AC2D82C42CCA5157918 /* SDKPluginManager.swift in Sources */,
+				F2315F32F51848FF938FD42E /* CalendarConnector.swift in Sources */,
+				FAD26B7B6535492AB9F8C803 /* LocalFileConnector.swift in Sources */,
+				B23DC8A142F14DBB9E0DAE67 /* GitHubConnector.swift in Sources */,
+				BC393296CF154D2ABD48354B /* WebhookConnector.swift in Sources */,
+				97F29FE0E99F48E1BE03BAD3 /* GmailConnector.swift in Sources */,
+				CF282A4390B540929595EE2E /* SDKConnectorManager.swift in Sources */,
+				252E24728B34456FB87766DF /* BaseConnector.swift in Sources */,
+				47DB557219934D60AE8B5A4B /* SDKAutomationEngine.swift in Sources */,
+				24E74F98F4B740F99C551BDE /* SDKExportService.swift in Sources */,
+				6F002D3D99544A26AAE23201 /* SDKBackgroundEngine.swift in Sources */,
+				93FD31B2B54D4C338A601E5E /* SDKProjectManager.swift in Sources */,
+				50B8F220745A4AC3BA164240 /* SDKLogStore.swift in Sources */,
+				A5F7D48ADA8B4BF8BF3E570D /* ToolsKitSDK.swift in Sources */,
 				WS02634D13801CC4452CAC00 /* IntegrationWorkflow.swift in Sources */,
 				WS02F29CA192362B45BA9F72 /* TimeTravelModels.swift in Sources */,
 				WS02A2803D2D6C14415D892F /* SpatialModels.swift in Sources */,

@@ -9,7 +9,7 @@ public final class SDKPermissionManager {
 
     private init() {}
 
-    public func validateProjectScopes(_ project: SDKProject) throws {
+    public func validateProjectScopes(_ project: SDKProjectLegacy) throws {
         for scope in project.requiredScopes {
             if !isScopeAuthorized(scope) {
                 throw SDKError.permissionDenied(scope: scope)
