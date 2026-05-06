@@ -4,6 +4,7 @@ struct SDKConsoleView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var logBus = LogBus.shared
     @StateObject private var runtime = SDKRuntimeEngine.shared
+    @State private var showingEventSimulator = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -46,6 +47,10 @@ struct SDKConsoleView: View {
             HStack {
                 Button("Clear") { logBus.clear() }
                 Spacer()
+                Button(action: { showingEventSimulator = true }) {
+                    Label("Simulator", systemImage: "bolt.fill")
+                }
+                Spacer()
                 Button("Export") { /* Export logs */ }
             }
             .padding()
@@ -54,6 +59,9 @@ struct SDKConsoleView: View {
         .navigationTitle("SDK Console")
         .toolbar {
             Button("Done") { dismiss() }
+        }
+        .sheet(isPresented: $showingEventSimulator) {
+            NavigationStack { SDKEventSimulatorView() }
         }
     }
 
