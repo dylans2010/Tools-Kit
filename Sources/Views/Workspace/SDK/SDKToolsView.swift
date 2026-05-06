@@ -6,7 +6,7 @@ struct SDKToolsView: View {
 
     var body: some View {
         List {
-            ForEach(ToolCategory.allCases, id: \.self) { category in
+            ForEach(SDKToolCategory.allCases, id: \.self) { category in
                 Section(header: Text(category.rawValue.capitalized)) {
                     ForEach(manager.tools(for: category)) { tool in
                         HStack {
@@ -52,7 +52,7 @@ struct SDKToolsView: View {
         }
     }
 
-    private func categoryBadge(_ category: ToolCategory) -> some View {
+    private func categoryBadge(_ category: SDKToolCategory) -> some View {
         Text(category.rawValue)
             .font(.caption2)
             .padding(.horizontal, 6)

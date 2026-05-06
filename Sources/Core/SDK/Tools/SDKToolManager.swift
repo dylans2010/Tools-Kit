@@ -4,7 +4,7 @@ import Combine
 public struct SDKTool: Identifiable, Codable {
     public var id: UUID
     public var name: String
-    public var category: ToolCategory
+    public var category: SDKToolCategory
     public var inputSchema: [ToolParameter]
     public var outputSchema: [ToolParameter]
     public var pluginID: UUID?
@@ -16,7 +16,7 @@ public struct ToolParameter: Codable {
     public var required: Bool
 }
 
-public enum ToolCategory: String, Codable, CaseIterable {
+public enum SDKToolCategory: String, Codable, CaseIterable {
     case dataProcessor, aiUtility, fileTransformer, workflowAction
 }
 
@@ -99,7 +99,7 @@ public final class SDKToolManager: ObservableObject {
         return SDKToolResult(toolID: toolID, output: output, duration: duration, success: true)
     }
 
-    public func tools(for category: ToolCategory) -> [SDKTool] {
+    public func tools(for category: SDKToolCategory) -> [SDKTool] {
         return tools.filter { $0.category == category }
     }
 
