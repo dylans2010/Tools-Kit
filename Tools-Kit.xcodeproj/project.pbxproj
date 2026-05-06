@@ -1221,6 +1221,21 @@
 		6A5AF291FDFD481DA38AF12F /* SDKCoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB759BF5EDA4D3F98452ADD /* SDKCoreDataStack.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		EE0400000000000000000001 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				KB0200000000000000000099 /* KeyboardExtension.appex in Embed App Extensions */,
+				MS0200000000000000000099 /* MessagesExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		MS018A4E8FF9A0449D039277 /* JSONCoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONCoder.swift; sourceTree = "<group>"; };
 		MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentSwitcher.swift; sourceTree = "<group>"; };
@@ -2434,6 +2449,31 @@
 		5851B51F6765499BABAC81DE /* SDKConnectorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConnectorsView.swift; sourceTree = "<group>"; };
 		ADB759BF5EDA4D3F98452ADD /* SDKCoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKCoreDataStack.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		MS0400000000000000000202 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		KB0400000000000000000202 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ZF0000000000000000000004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ZF0000000000000000000003 /* ZIPFoundation in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		MS01A6BB6CA6F42ED04EDA16 /* Controllers */ = {
@@ -4943,22 +4983,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		EE0400000000000000000001 /* Embed App Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
+		B1C2D3E4F5A60708090A0E01 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
 			files = (
-				KB0200000000000000000099 /* KeyboardExtension.appex in Embed App Extensions */,
-				MS0200000000000000000099 /* MessagesExtension.appex in Embed App Extensions */,
+				B1C2D3E4F5A60708090A0D05 /* Config.plist in Resources */,
 			);
-			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXCopyFilesBuildPhase section */
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		KB0400000000000000000201 /* Sources */ = {
@@ -4994,37 +5027,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXSourcesBuildPhase section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		MS0400000000000000000202 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		KB0400000000000000000202 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
-
-/* Begin PBXResourcesBuildPhase section */
-		B1C2D3E4F5A60708090A0E01 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				B1C2D3E4F5A60708090A0D05 /* Config.plist in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXSourcesBuildPhase section */
 		MS0400000000000000000201 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -6219,17 +6221,6 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXFrameworksBuildPhase section */
-		ZF0000000000000000000004 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				ZF0000000000000000000003 /* ZIPFoundation in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
-
 /* Begin XCBuildConfiguration section */
 		4F3991E4C199BDE1FC4135AC /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -6570,6 +6561,7 @@
 			productName = ZIPFoundation;
 		};
 /* End XCSwiftPackageProductDependency section */
-	};
-	rootObject = 0F81FBDC64413435A909E984 /* Project object */;
+
+};
+rootObject = 0F81FBDC64413435A909E984 /* Project object */;
 }
