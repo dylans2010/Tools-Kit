@@ -78,7 +78,7 @@ public final class SDKRouter: SDKRouterProtocol {
 
         registerHandler("/sdk/info", method: .get) { _ in
             let env = SDKEnvironment.shared.configuration
-            SDKResponse(requestId: UUID(), status: .success, data: [
+            return SDKResponse(requestId: UUID(), status: .success, data: [
                 "version": env.sdkVersion,
                 "build": "\(env.buildNumber)",
                 "environment": env.environment.rawValue
@@ -87,7 +87,7 @@ public final class SDKRouter: SDKRouterProtocol {
 
         registerHandler("/sdk/services", method: .get) { _ in
             let services = await ServiceContainer.shared.registeredServiceNames()
-            SDKResponse(requestId: UUID(), status: .success, data: ["services": services.joined(separator: ",")])
+            return SDKResponse(requestId: UUID(), status: .success, data: ["services": services.joined(separator: ",")])
         }
 
         registerHandler("/mail/send", method: .post) { request in
