@@ -133,6 +133,7 @@ struct ConnectorLog: Codable, Identifiable {
 
 // MARK: - Connector Manager
 
+@MainActor
 final class ConnectorManager: ObservableObject {
     static let shared = ConnectorManager()
 

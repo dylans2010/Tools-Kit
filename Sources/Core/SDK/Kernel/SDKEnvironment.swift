@@ -2,6 +2,7 @@ import Foundation
 
 /// SDK-wide configuration and environment settings.
 /// Manages build configuration, feature flags, and runtime parameters.
+@MainActor
 public final class SDKEnvironment: ObservableObject {
     public static let shared = SDKEnvironment()
 

@@ -9,6 +9,7 @@ public protocol SDKRouterProtocol {
 
 /// On-device API routing system for the SDK.
 /// Routes internal calls to the appropriate service handlers.
+@MainActor
 public final class SDKRouter: SDKRouterProtocol {
     public static let shared = SDKRouter()
 
@@ -77,8 +78,8 @@ public final class SDKRouter: SDKRouterProtocol {
         }
 
         registerHandler("/sdk/info", method: .get) { _ in
-            let env = SDKEnvironment.shared.configuration
-            SDKResponse(requestId: UUID(), status: .success, data: [
+            let env = await SDKEnvironment.shared.configuration
+            return SDKResponse(requestId: UUID(), status: .success, data: [
                 "version": env.sdkVersion,
                 "build": "\(env.buildNumber)",
                 "environment": env.environment.rawValue
@@ -86,8 +87,8 @@ public final class SDKRouter: SDKRouterProtocol {
         }
 
         registerHandler("/sdk/services", method: .get) { _ in
-            let services = ServiceContainer.shared.registeredServiceNames()
-            SDKResponse(requestId: UUID(), status: .success, data: ["services": services.joined(separator: ",")])
+            let services = await ServiceContainer.shared.registeredServiceNames()
+            return SDKResponse(requestId: UUID(), status: .success, data: ["services": services.joined(separator: ",")])
         }
 
         registerHandler("/mail/send", method: .post) { request in
