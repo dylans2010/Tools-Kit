@@ -23,7 +23,56 @@ struct ConnectorFlowBuilderView: View {
             if !steps.isEmpty {
                 flowSummarySection
             }
-            workflowPipelineSection
+
+            Section {
+                if steps.isEmpty {
+                    emptyPipelineView
+                } else {
+                    ForEach($steps) { $step in
+                        stepRow(step: $step)
+                            .contextMenu {
+                                Button {
+                                    duplicateStep(step.wrappedValue)
+                                } label: {
+                                    Label("Duplicate", systemImage: "doc.on.doc")
+                                }
+
+                                if step.wrappedValue.type != .trigger {
+                                    Button {
+                                        toggleStepEnabled(step: &step.wrappedValue)
+                                    } label: {
+                                        Label(
+                                            step.wrappedValue.config["disabled"] == "true" ? "Enable Step" : "Disable Step",
+                                            systemImage: step.wrappedValue.config["disabled"] == "true" ? "checkmark.circle" : "xmark.circle"
+                                        )
+                                    }
+                                }
+
+                                Divider()
+
+                                Button(role: .destructive) {
+                                    if let index = steps.firstIndex(where: { $0.id == step.wrappedValue.id }) {
+                                        steps.remove(at: index)
+                                        hasUnsavedChanges = true
+                                    }
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
+                    }
+                    .onMove { indices, newOffset in
+                        steps.move(fromOffsets: indices, toOffset: newOffset)
+                        hasUnsavedChanges = true
+                    }
+                    .onDelete { indices in
+                        steps.remove(atOffsets: indices)
+                        hasUnsavedChanges = true
+                    }
+                }
+            } header: {
+                Text("Workflow Pipeline")
+            }
+
             addStepSection
             if !validationErrors.isEmpty {
                 validationSection
@@ -85,58 +134,6 @@ struct ConnectorFlowBuilderView: View {
         }
     }
 
-    // MARK: - Workflow Pipeline
-
-    private var workflowPipelineSection: some View {
-        Section {
-            if steps.isEmpty {
-                emptyPipelineView
-            } else {
-                ForEach($steps) { $step in
-                    stepRow(step: $step)
-                        .contextMenu {
-                            Button {
-                                duplicateStep(step.wrappedValue)
-                            } label: {
-                                Label("Duplicate", systemImage: "doc.on.doc")
-                            }
-
-                            if step.wrappedValue.type != .trigger {
-                                Button {
-                                    toggleStepEnabled(step: &step.wrappedValue)
-                                } label: {
-                                    Label(
-                                        step.wrappedValue.config["disabled"] == "true" ? "Enable Step" : "Disable Step",
-                                        systemImage: step.wrappedValue.config["disabled"] == "true" ? "checkmark.circle" : "xmark.circle"
-                                    )
-                                }
-                            }
-
-                            Divider()
-
-                            Button(role: .destructive) {
-                                if let index = steps.firstIndex(where: { $0.id == step.wrappedValue.id }) {
-                                    steps.remove(at: index)
-                                    hasUnsavedChanges = true
-                                }
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                        }
-                }
-                .onMove { indices, newOffset in
-                    steps.move(fromOffsets: indices, toOffset: newOffset)
-                    hasUnsavedChanges = true
-                }
-                .onDelete { indices in
-                    steps.remove(atOffsets: indices)
-                    hasUnsavedChanges = true
-                }
-            }
-        } header: {
-            Text("Workflow Pipeline")
-        }
-    }
 
     private var emptyPipelineView: some View {
         VStack(spacing: 12) {
