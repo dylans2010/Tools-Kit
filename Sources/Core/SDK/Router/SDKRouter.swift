@@ -99,37 +99,37 @@ public final class SDKRouter: SDKRouterProtocol {
         }
 
         registerHandler("/mail/list", method: .get) { request in
-            let messages = SDKMailService.shared.listMessages()
-            SDKResponse(requestId: request.id, status: .success, data: ["count": "\(messages.count)"])
+            let messages = await SDKMailService.shared.listMessages()
+            return SDKResponse(requestId: request.id, status: .success, data: ["count": "\(messages.count)"])
         }
 
         registerHandler("/notebooks/create", method: .post) { request in
             let title = request.parameters["title"] ?? "Untitled"
-            let notebook = try SDKNotebookService.shared.createNotebook(title: title)
+            let notebook = try await SDKNotebookService.shared.createNotebook(title: title)
             return SDKResponse(requestId: request.id, status: .success, data: ["id": notebook.id.uuidString, "title": notebook.title])
         }
 
         registerHandler("/notebooks/list", method: .get) { request in
-            let notebooks = SDKNotebookService.shared.listNotebooks()
-            SDKResponse(requestId: request.id, status: .success, data: ["count": "\(notebooks.count)"])
+            let notebooks = await SDKNotebookService.shared.listNotebooks()
+            return SDKResponse(requestId: request.id, status: .success, data: ["count": "\(notebooks.count)"])
         }
 
         registerHandler("/meet/create", method: .post) { request in
             let title = request.parameters["title"] ?? "Meeting"
-            let session = try SDKMeetService.shared.createSession(title: title)
+            let session = try await SDKMeetService.shared.createSession(title: title)
             return SDKResponse(requestId: request.id, status: .success, data: ["id": session.id.uuidString])
         }
 
         registerHandler("/articles/create", method: .post) { request in
             let title = request.parameters["title"] ?? "Untitled"
             let content = request.parameters["content"] ?? ""
-            let article = try SDKArticleService.shared.createArticle(title: title, content: content)
+            let article = try await SDKArticleService.shared.createArticle(title: title, content: content)
             return SDKResponse(requestId: request.id, status: .success, data: ["id": article.id.uuidString])
         }
 
         registerHandler("/articles/list", method: .get) { request in
-            let articles = SDKArticleService.shared.listArticles()
-            SDKResponse(requestId: request.id, status: .success, data: ["count": "\(articles.count)"])
+            let articles = await SDKArticleService.shared.listArticles()
+            return SDKResponse(requestId: request.id, status: .success, data: ["count": "\(articles.count)"])
         }
     }
 
