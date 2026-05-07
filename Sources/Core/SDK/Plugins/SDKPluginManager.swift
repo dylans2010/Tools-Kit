@@ -41,14 +41,14 @@ public final class SDKPluginManager: ObservableObject {
 
         plugins.append(plugin)
         savePlugins()
-        SDKLogStore.shared.log("Plugin installed: \(plugin.name) v\(plugin.version)", source: "SDKPluginManager", level: .info)
+        SDKLogStore.shared.log("Plugin installed: \(plugin.name) v\(plugin.version)", source: "SDKPluginManager", level: LogLevel.info)
     }
 
     public func enable(id: UUID) {
         if let index = plugins.firstIndex(where: { $0.id == id }) {
             plugins[index].isEnabled = true
             savePlugins()
-            SDKLogStore.shared.log("Plugin enabled: \(plugins[index].name)", source: "SDKPluginManager", level: .info)
+            SDKLogStore.shared.log("Plugin enabled: \(plugins[index].name)", source: "SDKPluginManager", level: LogLevel.info)
         }
     }
 
@@ -56,13 +56,13 @@ public final class SDKPluginManager: ObservableObject {
         if let index = plugins.firstIndex(where: { $0.id == id }) {
             plugins[index].isEnabled = false
             savePlugins()
-            SDKLogStore.shared.log("Plugin disabled: \(plugins[index].name)", source: "SDKPluginManager", level: .info)
+            SDKLogStore.shared.log("Plugin disabled: \(plugins[index].name)", source: "SDKPluginManager", level: LogLevel.info)
         }
     }
 
     public func remove(id: UUID) {
         if let plugin = plugins.first(where: { $0.id == id }) {
-            SDKLogStore.shared.log("Plugin removed: \(plugin.name)", source: "SDKPluginManager", level: .info)
+            SDKLogStore.shared.log("Plugin removed: \(plugin.name)", source: "SDKPluginManager", level: LogLevel.info)
         }
         plugins.removeAll { $0.id == id }
         savePlugins()
@@ -72,13 +72,13 @@ public final class SDKPluginManager: ObservableObject {
         let applicablePlugins = plugins.filter { $0.isEnabled && $0.automationHooks.contains(event) }
 
         for plugin in applicablePlugins {
-            SDKLogStore.shared.log("Executing hook '\(event)' for plugin \(plugin.name)", source: "SDKPluginManager", level: .info)
+            SDKLogStore.shared.log("Executing hook '\(event)' for plugin \(plugin.name)", source: "SDKPluginManager", level: LogLevel.info)
 
             for toolID in plugin.tools {
                 do {
                     _ = try await SDKToolManager.shared.execute(toolID: toolID, input: context.reduce(into: [:]) { $0[$1.key] = $1.value })
                 } catch {
-                    SDKLogStore.shared.log("Hook execution failed for \(plugin.name): \(error.localizedDescription)", source: "SDKPluginManager", level: .error)
+                    SDKLogStore.shared.log("Hook execution failed for \(plugin.name): \(error.localizedDescription)", source: "SDKPluginManager", level: LogLevel.error)
                 }
             }
         }

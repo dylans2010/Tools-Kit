@@ -79,7 +79,7 @@ public final class SDKDataEngine: ObservableObject {
         }
 
         invalidateCache(scope: scope)
-        SDKLogStore.shared.log("writeData scope=\(scope) title=\(title)", source: "SDKDataEngine", level: .info)
+        SDKLogStore.shared.log("writeData scope=\(scope) title=\(title)", source: "SDKDataEngine", level: LogLevel.info)
         return SDKWriteResult(id: id, scope: scope, success: true)
     }
 
@@ -94,7 +94,7 @@ public final class SDKDataEngine: ObservableObject {
         }
 
         invalidateCache(scope: scope)
-        SDKLogStore.shared.log("deleteData scope=\(scope) id=\(id)", source: "SDKDataEngine", level: .info)
+        SDKLogStore.shared.log("deleteData scope=\(scope) id=\(id)", source: "SDKDataEngine", level: LogLevel.info)
     }
 
     // MARK: - Cache Management

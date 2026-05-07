@@ -178,16 +178,16 @@ public final class ToolsKitSDK: ObservableObject {
     }
 
     private func initialize() {
-        SDKLogStore.shared.log("ToolsKitSDK initializing", source: "ToolsKitSDK", level: .info)
+        SDKLogStore.shared.log("ToolsKitSDK initializing", source: "ToolsKitSDK", level: LogLevel.info)
         isInitialized = true
-        SDKLogStore.shared.log("ToolsKitSDK ready", source: "ToolsKitSDK", level: .info)
+        SDKLogStore.shared.log("ToolsKitSDK ready", source: "ToolsKitSDK", level: LogLevel.info)
     }
 
     // MARK: - 1. sdk.fetchData
 
     public func fetchData(scope: SDKScope) async throws -> [SDKDataItem] {
         try scopeManager.validateAccess(scope: scope, operation: .read)
-        SDKLogStore.shared.log("fetchData scope=\(scope)", source: "ToolsKitSDK", level: .info)
+        SDKLogStore.shared.log("fetchData scope=\(scope)", source: "ToolsKitSDK", level: LogLevel.info)
         return try await dataEngine.fetch(scope: scope)
     }
 
@@ -231,7 +231,7 @@ public final class ToolsKitSDK: ObservableObject {
             }
         }
 
-        SDKLogStore.shared.log("batchUpdate: \(succeeded) succeeded, \(failed) failed", source: "ToolsKitSDK", level: .info)
+        SDKLogStore.shared.log("batchUpdate: \(succeeded) succeeded, \(failed) failed", source: "ToolsKitSDK", level: LogLevel.info)
         return SDKBatchResult(succeeded: succeeded, failed: failed, errors: errors)
     }
 
@@ -335,7 +335,7 @@ public final class ToolsKitSDK: ObservableObject {
 
     public func automationCreateWorkflow(rule: SDKAutomationRule) {
         SDKAutomationEngine.shared.add(rule)
-        SDKLogStore.shared.log("Workflow created: \(rule.name)", source: "ToolsKitSDK", level: .info)
+        SDKLogStore.shared.log("Workflow created: \(rule.name)", source: "ToolsKitSDK", level: LogLevel.info)
     }
 
     // MARK: - 19. sdk.automation.modify
@@ -498,12 +498,12 @@ public final class ToolsKitSDK: ObservableObject {
 
             public func enable() {
                 SDKRuntimeEngine.shared.isNoSandboxModeEnabled = true
-                SDKLogStore.shared.log("NoSandbox mode ENABLED - all scope restrictions bypassed", source: "SDK.Developer", level: .warning)
+                SDKLogStore.shared.log("NoSandbox mode ENABLED - all scope restrictions bypassed", source: "SDK.Developer", level: LogLevel.warning)
             }
 
             public func disable() {
                 SDKRuntimeEngine.shared.isNoSandboxModeEnabled = false
-                SDKLogStore.shared.log("NoSandbox mode DISABLED", source: "SDK.Developer", level: .info)
+                SDKLogStore.shared.log("NoSandbox mode DISABLED", source: "SDK.Developer", level: LogLevel.info)
             }
         }
     }

@@ -56,7 +56,7 @@ public final class SDKToolRuntime: ObservableObject {
             )
 
             appendRecord(record)
-            SDKLogStore.shared.log("Tool executed: \(record.toolName) in \(String(format: "%.3f", result.duration))s", source: "SDKToolRuntime", level: .info)
+            SDKLogStore.shared.log("Tool executed: \(record.toolName) in \(String(format: "%.3f", result.duration))s", source: "SDKToolRuntime", level: LogLevel.info)
 
             return result
         } catch {

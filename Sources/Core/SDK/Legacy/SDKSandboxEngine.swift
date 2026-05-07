@@ -188,7 +188,7 @@ public final class SDKSandboxEngine {
 
         if let exception = context.exception {
             let errorMsg = exception.toString() ?? "Unknown JS error"
-            SDKLogStore.shared.log("Sandbox execution error: \(errorMsg)", source: "SDKSandboxEngine", level: .error)
+            SDKLogStore.shared.log("Sandbox execution error: \(errorMsg)", source: "SDKSandboxEngine", level: LogLevel.error)
             throw SDKError.executionFailed(reason: errorMsg)
         }
     }
@@ -210,7 +210,7 @@ public final class SDKSandboxEngine {
 
         if let exception = context.exception {
             let errorMsg = exception.toString() ?? "Unknown JS error"
-            SDKLogStore.shared.log("Unrestricted execution error: \(errorMsg)", source: "SDKSandboxEngine", level: .error)
+            SDKLogStore.shared.log("Unrestricted execution error: \(errorMsg)", source: "SDKSandboxEngine", level: LogLevel.error)
             throw SDKError.executionFailed(reason: errorMsg)
         }
     }

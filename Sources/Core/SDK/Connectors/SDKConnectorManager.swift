@@ -17,13 +17,13 @@ public final class SDKConnectorManager: ObservableObject {
         guard !connectors.contains(where: { $0.id == connector.id }) else { return }
         connectors.append(connector)
         saveConnectors()
-        SDKLogStore.shared.log("Connector registered: \(connector.name)", source: "SDKConnectorManager", level: .info)
+        SDKLogStore.shared.log("Connector registered: \(connector.name)", source: "SDKConnectorManager", level: LogLevel.info)
     }
 
     public func remove(id: UUID) {
         if let connector = connectors.first(where: { $0.id == id }) {
             connector.disconnect()
-            SDKLogStore.shared.log("Connector removed: \(connector.name)", source: "SDKConnectorManager", level: .info)
+            SDKLogStore.shared.log("Connector removed: \(connector.name)", source: "SDKConnectorManager", level: LogLevel.info)
         }
         connectors.removeAll { $0.id == id }
         saveConnectors()
@@ -32,7 +32,7 @@ public final class SDKConnectorManager: ObservableObject {
     public func syncAll() async throws {
         guard !connectors.isEmpty else { return }
 
-        SDKLogStore.shared.log("Starting sync for \(connectors.count) connectors", source: "SDKConnectorManager", level: .info)
+        SDKLogStore.shared.log("Starting sync for \(connectors.count) connectors", source: "SDKConnectorManager", level: LogLevel.info)
 
         try await withThrowingTaskGroup(of: Void.self) { group in
             for connector in connectors where connector.status == .connected {
@@ -43,7 +43,7 @@ public final class SDKConnectorManager: ObservableObject {
             try await group.waitForAll()
         }
 
-        SDKLogStore.shared.log("All connector syncs completed", source: "SDKConnectorManager", level: .info)
+        SDKLogStore.shared.log("All connector syncs completed", source: "SDKConnectorManager", level: LogLevel.info)
     }
 
     public func status(for id: UUID) -> ConnectorStatus {

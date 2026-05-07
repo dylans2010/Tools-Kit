@@ -23,7 +23,7 @@ public final class GitHubConnector: BaseConnector {
         }
 
         status = .connecting
-        log("Authenticating with GitHub...", level: .info)
+        log("Authenticating with GitHub...", level: LogLevel.info)
 
         self.token = token
 
@@ -41,14 +41,14 @@ public final class GitHubConnector: BaseConnector {
 
         guard httpResponse.statusCode == 200 else {
             status = .error
-            log("GitHub auth failed: HTTP \(httpResponse.statusCode)", level: .error)
+            log("GitHub auth failed: HTTP \(httpResponse.statusCode)", level: LogLevel.error)
             throw SDKError.executionFailed(reason: "GitHub authentication failed: HTTP \(httpResponse.statusCode)")
         }
 
         if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
            let login = json["login"] as? String {
             authenticatedUser = login
-            log("GitHub authenticated as \(login)", level: .info)
+            log("GitHub authenticated as \(login)", level: LogLevel.info)
         }
 
         status = .connected
@@ -59,7 +59,7 @@ public final class GitHubConnector: BaseConnector {
             throw SDKError.executionFailed(reason: "GitHub not connected")
         }
 
-        log("Syncing GitHub repositories...", level: .info)
+        log("Syncing GitHub repositories...", level: LogLevel.info)
 
         let url = URL(string: "https://api.github.com/user/repos?sort=updated&per_page=10")!
         var request = URLRequest(url: url)
@@ -70,12 +70,12 @@ public final class GitHubConnector: BaseConnector {
 
         guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
             let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
-            log("GitHub sync failed: HTTP \(statusCode)", level: .error)
+            log("GitHub sync failed: HTTP \(statusCode)", level: LogLevel.error)
             throw SDKError.executionFailed(reason: "GitHub API error: HTTP \(statusCode)")
         }
 
         if let repos = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] {
-            log("Synced \(repos.count) repositories", level: .info)
+            log("Synced \(repos.count) repositories", level: LogLevel.info)
         }
     }
 
@@ -95,7 +95,7 @@ public final class GitHubConnector: BaseConnector {
         status = .disconnected
         token = nil
         authenticatedUser = nil
-        log("GitHub disconnected", level: .info)
+        log("GitHub disconnected", level: LogLevel.info)
     }
 
     private func log(_ message: String, level: LogLevel) {
