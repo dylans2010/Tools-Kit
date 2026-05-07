@@ -50,7 +50,8 @@ struct PluginsMainView: View {
     private var navigationGrid: some View {
         LazyVGrid(columns: columns, spacing: 12) {
             navLinkCard("Create Plugin", "plus.circle.fill", .blue, PluginBuildView())
-            navLinkCard("Build with ToolsKit", "hammer.fill", .orange, SDKBuildView())
+            navLinkCard("Build with ToolsKit", "hammer.fill", .orange, SDKHomeView())
+            navLinkCard("App Builder", "wand.and.stars", .pink, SDKBuildView())
             navLinkCard("Connectors", "puzzlepiece.extension", .green, ConnectorsMainView())
             navLinkCard("Marketplace", "cart.fill", .orange, MarketplaceView())
             navLinkCard("Installed", "puzzlepiece.extension.fill", .indigo, PluginsInstalledView())

@@ -10,6 +10,9 @@ public final class SDKConnectorEngine: ObservableObject {
 
     private var backgroundSyncTimers: [UUID: AnyCancellable] = [:]
     private let maxSyncRetries = 3
+    private let policyEngine = SDKPolicyEngine.shared
+    private let securityManager = SDKSecurityManager.shared
+    private let auditLogger = SDKAuditLogger.shared
 
     public struct ConnectorHealthInfo {
         public let connectorID: UUID
@@ -25,14 +28,21 @@ public final class SDKConnectorEngine: ObservableObject {
     // MARK: - Connect
 
     public func connect(connector: any BaseConnector, credentials: [String: String]) async throws {
+        try validateConnectorConfiguration(connector)
         SDKLogStore.shared.log("Connecting \(connector.name)...", source: "SDKConnectorEngine", level: LogLevel.info)
 
         do {
+            _ = try await SDKRateLimiter.shared.enforce(
+                key: "connector.connect.\(connector.id.uuidString)",
+                rule: .init(requestsPerMinute: 60, dataFetchLimit: 1000, executionFrequencyCap: 60)
+            )
             try await connector.authenticate(credentials: credentials)
             SDKConnectorManager.shared.register(connector)
             await updateHealth(for: connector)
+            auditLogger.log(eventType: .externalAPICall, projectID: SDKProjectManager.shared.currentProject?.id, scope: "external.api.unrestricted", message: "Connector connected: \(connector.name)")
             SDKLogStore.shared.log("\(connector.name) connected successfully", source: "SDKConnectorEngine", level: LogLevel.info)
         } catch {
+            auditLogger.log(eventType: .externalAPICall, projectID: SDKProjectManager.shared.currentProject?.id, scope: "external.api.unrestricted", message: "Connector connect failed: \(connector.name)", metadata: ["error": error.localizedDescription])
             SDKLogStore.shared.log("\(connector.name) connection failed: \(error.localizedDescription)", source: "SDKConnectorEngine", level: LogLevel.error)
             throw error
         }
@@ -126,8 +136,10 @@ public final class SDKConnectorEngine: ObservableObject {
 
         for attempt in 0..<maxSyncRetries {
             do {
+                try enforceConnectorPolicy(connector: connector, operation: "sync")
                 try await connector.sync()
                 await updateHealth(for: connector)
+                auditLogger.log(eventType: .externalAPICall, projectID: SDKProjectManager.shared.currentProject?.id, scope: "external.api.unrestricted", message: "Connector sync succeeded: \(connector.name)")
                 return
             } catch {
                 lastError = error
@@ -140,6 +152,7 @@ public final class SDKConnectorEngine: ObservableObject {
         }
 
         SDKLogStore.shared.log("\(connector.name) sync failed after \(maxSyncRetries) attempts", source: "SDKConnectorEngine", level: LogLevel.error)
+        auditLogger.log(eventType: .externalAPICall, projectID: SDKProjectManager.shared.currentProject?.id, scope: "external.api.unrestricted", message: "Connector sync failed: \(connector.name)", metadata: ["error": lastError?.localizedDescription ?? "Unknown"])
         throw lastError ?? SDKError.executionFailed(reason: "Sync failed")
     }
 
@@ -159,5 +172,26 @@ public final class SDKConnectorEngine: ObservableObject {
             lastError: reachable ? nil : "Unreachable",
             responseTime: nil
         )
+    }
+
+    private func validateConnectorConfiguration(_ connector: any BaseConnector) throws {
+        guard !connector.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw SDKError.validationError(reason: "Connector name is required")
+        }
+    }
+
+    private func enforceConnectorPolicy(connector: any BaseConnector, operation: String) throws {
+        let request = SDKPolicyRequest(
+            operationName: "connector.\(operation)",
+            scope: "external.api.unrestricted",
+            projectID: SDKProjectManager.shared.currentProject?.id,
+            actorID: "connector-engine",
+            apiKey: nil,
+            allowedScopes: ["external.api.unrestricted", "*"],
+            justification: "Connector operation \(operation)",
+            privacyNote: "Connector operation \(operation)"
+        )
+        let decision = try policyEngine.evaluate(request)
+        try securityManager.enforce(request: request, definition: decision.scopeDefinition)
     }
 }

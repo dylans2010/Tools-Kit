@@ -189,6 +189,20 @@ struct ConnectorsMainView: View {
                 NavigationLink(destination: ConnectorSecurityView()) {
                     Label("Security & Scopes", systemImage: "shield.lefthalf.filled")
                 }
+                NavigationLink(destination: ConnectorBuilderView()) {
+                    Label("Connector Builder", systemImage: "plus.rectangle.on.folder")
+                }
+                if let first = connectors.first {
+                    NavigationLink(destination: ConnectorExecutionView(connector: first)) {
+                        Label("Connector Execution", systemImage: "play.circle")
+                    }
+                    NavigationLink(destination: ConnectorFlowBuilderView(connector: first)) {
+                        Label("Connector Flow Builder", systemImage: "arrow.triangle.branch")
+                    }
+                    NavigationLink(destination: ConnectorScopeView(connector: first)) {
+                        Label("Connector Scope Assignment", systemImage: "lock.shield")
+                    }
+                }
                 NavigationLink(destination: SDKConnectorsView()) {
                     Label("SDK Connectors", systemImage: "cable.connector")
                 }
@@ -501,6 +515,9 @@ struct ConnectorDefinitionDetailView: View {
                 }
                 NavigationLink(destination: ConnectorSecurityView(connector: connector)) {
                     Label("Security & Scopes", systemImage: "shield.lefthalf.filled")
+                }
+                NavigationLink(destination: ConnectorScopeView(connector: connector)) {
+                    Label("Scope Assignment", systemImage: "lock.shield")
                 }
             }
 
