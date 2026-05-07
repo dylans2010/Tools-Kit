@@ -178,16 +178,18 @@ public final class ToolsKitSDK: ObservableObject {
     }
 
     private func initialize() {
-        SDKLogStore.shared.log("ToolsKitSDK initializing", source: "ToolsKitSDK", level: .info)
+        Task {
+            await SDKLogStore.shared.log("ToolsKitSDK initializing", source: "ToolsKitSDK", level: .info)
+            await SDKLogStore.shared.log("ToolsKitSDK ready", source: "ToolsKitSDK", level: .info)
+        }
         isInitialized = true
-        SDKLogStore.shared.log("ToolsKitSDK ready", source: "ToolsKitSDK", level: .info)
     }
 
     // MARK: - 1. sdk.fetchData
 
     public func fetchData(scope: SDKScope) async throws -> [SDKDataItem] {
         try scopeManager.validateAccess(scope: scope, operation: .read)
-        SDKLogStore.shared.log("fetchData scope=\(scope)", source: "ToolsKitSDK", level: .info)
+        await SDKLogStore.shared.log("fetchData scope=\(scope)", source: "ToolsKitSDK", level: .info)
         return try await dataEngine.fetch(scope: scope)
     }
 
@@ -231,7 +233,7 @@ public final class ToolsKitSDK: ObservableObject {
             }
         }
 
-        SDKLogStore.shared.log("batchUpdate: \(succeeded) succeeded, \(failed) failed", source: "ToolsKitSDK", level: .info)
+        await SDKLogStore.shared.log("batchUpdate: \(succeeded) succeeded, \(failed) failed", source: "ToolsKitSDK", level: .info)
         return SDKBatchResult(succeeded: succeeded, failed: failed, errors: errors)
     }
 
@@ -335,7 +337,9 @@ public final class ToolsKitSDK: ObservableObject {
 
     public func automationCreateWorkflow(rule: SDKAutomationRule) {
         SDKAutomationEngine.shared.add(rule)
-        SDKLogStore.shared.log("Workflow created: \(rule.name)", source: "ToolsKitSDK", level: .info)
+        Task {
+            await SDKLogStore.shared.log("Workflow created: \(rule.name)", source: "ToolsKitSDK", level: .info)
+        }
     }
 
     // MARK: - 19. sdk.automation.modify
@@ -387,7 +391,7 @@ public final class ToolsKitSDK: ObservableObject {
 
     // MARK: - 26. sdk.graph.query
 
-    public func graphQuery(entityType: String?, relation: String?) -> SDKGraph {
+    internal func graphQuery(entityType: String?, relation: String?) -> SDKGraph {
         return graphInterface.query(entityType: entityType, relation: relation)
     }
 
@@ -514,6 +518,7 @@ public final class ToolsKitSDK: ObservableObject {
 }
 
 // MARK: - Workspace Data Models
+
 
 public struct SDKCacheInfo {
     public let scope: SDKScope

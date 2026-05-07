@@ -57,7 +57,7 @@ struct NotesView: View {
 
                 // Empty state
                 if notesToShow.isEmpty {
-                    let message = searchText.isEmpty
+                    let message: String = searchText.isEmpty
                         ? "Tap the + button to create your first note."
                         : "No notes match your search."
                     let action: (() -> Void)? = searchText.isEmpty ? { createNote() } : nil
