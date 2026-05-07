@@ -35,6 +35,41 @@ public final class SDKExecutionEngine: ObservableObject {
 
     private init() {}
 
+    public func executeGovernedOperation<T>(
+        name: String,
+        scope: String,
+        projectID: UUID?,
+        operation: @escaping () async throws -> T
+    ) async throws -> T {
+        let start = Date()
+        SDKAuditLogger.shared.log(
+            eventType: .execution,
+            projectID: projectID,
+            scope: scope,
+            message: "Execution started: \(name)"
+        )
+        do {
+            let result = try await operation()
+            SDKAuditLogger.shared.log(
+                eventType: .execution,
+                projectID: projectID,
+                scope: scope,
+                message: "Execution completed: \(name)",
+                metadata: ["durationMs": "\(Int(Date().timeIntervalSince(start) * 1000))"]
+            )
+            return result
+        } catch {
+            SDKAuditLogger.shared.log(
+                eventType: .execution,
+                projectID: projectID,
+                scope: scope,
+                message: "Execution failed: \(name)",
+                metadata: ["error": error.localizedDescription]
+            )
+            throw error
+        }
+    }
+
     public func execute(action: SDKAction, context: SDKExecutionContext) async throws {
         let executionID = UUID()
 

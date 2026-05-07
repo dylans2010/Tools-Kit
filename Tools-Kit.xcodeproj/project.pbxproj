@@ -1138,6 +1138,7 @@
 		PL020000000000000000000109 /* ConnectorTestConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000109 /* ConnectorTestConsoleView.swift */; };
 		PL02000000000000000000010A /* ConnectorSecurityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000010A /* ConnectorSecurityView.swift */; };
 		PL02000000000000000000010B /* ConnectorVersioningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000010B /* ConnectorVersioningView.swift */; };
+		PL02000000000000000000010C /* ConnectorScopeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000010C /* ConnectorScopeView.swift */; };
 		PL020000000000000000000005 /* PluginLimitedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000005 /* PluginLimitedView.swift */; };
 		PL020000000000000000000006 /* SecurityScopeApplicationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000006 /* SecurityScopeApplicationView.swift */; };
 		DV0200000000000000000001 /* WorkspaceAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000001 /* WorkspaceAPI.swift */; };
@@ -1172,6 +1173,7 @@
 		PL020000000000000000000023 /* SDKIntegrationTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000023 /* SDKIntegrationTestView.swift */; };
 		PL020000000000000000000024 /* SDKEventStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000024 /* SDKEventStreamView.swift */; };
 		PL020000000000000000000025 /* SDKSecurityMonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000025 /* SDKSecurityMonitorView.swift */; };
+		PL020000000000000000000026 /* SDKInternalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000026 /* SDKInternalView.swift */; };
 		PL02000000000000000000000D /* SDKDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000D /* SDKDebugView.swift */; };
 		PL02000000000000000000000E /* SDKFlowBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000E /* SDKFlowBuilderView.swift */; };
 		PL02000000000000000000000F /* SDKDataControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000F /* SDKDataControlView.swift */; };
@@ -1225,6 +1227,10 @@
 		SDK25B67731E3C6B02A19566 /* SDKEventBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1E496599593B87C6A16D6 /* SDKEventBus.swift */; };
 		SDK2D1658FA791CC253F16FB /* SDKAppRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1BD6F05634EA5DCE9CCD7 /* SDKAppRuntime.swift */; };
 		SDK27F76A5396432C0BC261E /* SDKSecurityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK18595CEF3856DDD0CFC32 /* SDKSecurityManager.swift */; };
+		SDK2C2F744FA2B14E0BAFA001 /* SDKPrivacyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1C2F744FA2B14E0BAFA001 /* SDKPrivacyManager.swift */; };
+		SDK2C2F744FA2B14E0BAFA002 /* SDKRateLimiter.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1C2F744FA2B14E0BAFA002 /* SDKRateLimiter.swift */; };
+		SDK2C2F744FA2B14E0BAFA003 /* SDKAuditLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1C2F744FA2B14E0BAFA003 /* SDKAuditLogger.swift */; };
+		SDK2C2F744FA2B14E0BAFA004 /* SDKPolicyEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1C2F744FA2B14E0BAFA004 /* SDKPolicyEngine.swift */; };
 		SDK2794F041FAE423CA8FEB4 /* SDKMailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK178D40446D42F18991AF8 /* SDKMailService.swift */; };
 		SDK2065E9BA28CDD37D46AD8 /* SDKNotebookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1FAA6D7ED6ADAFA63D593 /* SDKNotebookService.swift */; };
 		SDK277F284C03A68F2B2572E /* SDKMeetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK15DBE0E80391E2E7833B8 /* SDKMeetService.swift */; };
@@ -2309,6 +2315,7 @@
 		PL010000000000000000000109 /* ConnectorTestConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorTestConsoleView.swift; sourceTree = "<group>"; };
 		PL01000000000000000000010A /* ConnectorSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorSecurityView.swift; sourceTree = "<group>"; };
 		PL01000000000000000000010B /* ConnectorVersioningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorVersioningView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000010C /* ConnectorScopeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorScopeView.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000000 /* UnifiedDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnifiedDataStore.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000001 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000002 /* AIOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIOrchestrator.swift; sourceTree = "<group>"; };
@@ -2453,6 +2460,10 @@
 		SDK1E496599593B87C6A16D6 /* SDKEventBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKEventBus.swift; sourceTree = "<group>"; };
 		SDK1BD6F05634EA5DCE9CCD7 /* SDKAppRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAppRuntime.swift; sourceTree = "<group>"; };
 		SDK18595CEF3856DDD0CFC32 /* SDKSecurityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKSecurityManager.swift; sourceTree = "<group>"; };
+		SDK1C2F744FA2B14E0BAFA001 /* SDKPrivacyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPrivacyManager.swift; sourceTree = "<group>"; };
+		SDK1C2F744FA2B14E0BAFA002 /* SDKRateLimiter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKRateLimiter.swift; sourceTree = "<group>"; };
+		SDK1C2F744FA2B14E0BAFA003 /* SDKAuditLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAuditLogger.swift; sourceTree = "<group>"; };
+		SDK1C2F744FA2B14E0BAFA004 /* SDKPolicyEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPolicyEngine.swift; sourceTree = "<group>"; };
 		SDK178D40446D42F18991AF8 /* SDKMailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKMailService.swift; sourceTree = "<group>"; };
 		SDK1FAA6D7ED6ADAFA63D593 /* SDKNotebookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKNotebookService.swift; sourceTree = "<group>"; };
 		SDK15DBE0E80391E2E7833B8 /* SDKMeetService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKMeetService.swift; sourceTree = "<group>"; };
@@ -2463,6 +2474,7 @@
 		SDK19CD0E48D6C30B006E472 /* SDKDataInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDataInspectorView.swift; sourceTree = "<group>"; };
 		SDK15392AF5F3C4210ACFFE1 /* SDKPluginManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginManagerView.swift; sourceTree = "<group>"; };
 		SDK1245FB85BF006D2EE4B2D /* SDKDeveloperGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDeveloperGuideView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000026 /* SDKInternalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKInternalView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -3122,6 +3134,7 @@
 				PL010000000000000000000109 /* ConnectorTestConsoleView.swift */,
 				PL01000000000000000000010A /* ConnectorSecurityView.swift */,
 				PL01000000000000000000010B /* ConnectorVersioningView.swift */,
+				PL01000000000000000000010C /* ConnectorScopeView.swift */,
 			);
 			path = Connectors;
 			sourceTree = "<group>";
@@ -6883,6 +6896,7 @@
 				PL010000000000000000000023 /* SDKIntegrationTestView.swift */,
 				PL010000000000000000000024 /* SDKEventStreamView.swift */,
 				PL010000000000000000000025 /* SDKSecurityMonitorView.swift */,
+				PL010000000000000000000026 /* SDKInternalView.swift */,
 				SDK1B55D96C7DAC4DDF9EB93 /* SDKHomeView.swift */,
 				SDK1338A34AFE3BD36538341 /* SDKAPIExplorerView.swift */,
 				SDK19CD0E48D6C30B006E472 /* SDKDataInspectorView.swift */,
@@ -8831,6 +8845,10 @@
 			isa = PBXGroup;
 			children = (
 				SDK18595CEF3856DDD0CFC32 /* SDKSecurityManager.swift */,
+				SDK1C2F744FA2B14E0BAFA001 /* SDKPrivacyManager.swift */,
+				SDK1C2F744FA2B14E0BAFA002 /* SDKRateLimiter.swift */,
+				SDK1C2F744FA2B14E0BAFA003 /* SDKAuditLogger.swift */,
+				SDK1C2F744FA2B14E0BAFA004 /* SDKPolicyEngine.swift */,
 			);
 			path = Security;
 			sourceTree = "<group>";
@@ -9048,6 +9066,10 @@
 				SDK25B67731E3C6B02A19566 /* SDKEventBus.swift in Sources */,
 				SDK2D1658FA791CC253F16FB /* SDKAppRuntime.swift in Sources */,
 				SDK27F76A5396432C0BC261E /* SDKSecurityManager.swift in Sources */,
+				SDK2C2F744FA2B14E0BAFA001 /* SDKPrivacyManager.swift in Sources */,
+				SDK2C2F744FA2B14E0BAFA002 /* SDKRateLimiter.swift in Sources */,
+				SDK2C2F744FA2B14E0BAFA003 /* SDKAuditLogger.swift in Sources */,
+				SDK2C2F744FA2B14E0BAFA004 /* SDKPolicyEngine.swift in Sources */,
 				SDK2794F041FAE423CA8FEB4 /* SDKMailService.swift in Sources */,
 				SDK2065E9BA28CDD37D46AD8 /* SDKNotebookService.swift in Sources */,
 				SDK277F284C03A68F2B2572E /* SDKMeetService.swift in Sources */,
@@ -9132,6 +9154,8 @@
 				PL020000000000000000000109 /* ConnectorTestConsoleView.swift in Sources */,
 				PL02000000000000000000010A /* ConnectorSecurityView.swift in Sources */,
 				PL02000000000000000000010B /* ConnectorVersioningView.swift in Sources */,
+				PL02000000000000000000010C /* ConnectorScopeView.swift in Sources */,
+				PL020000000000000000000026 /* SDKInternalView.swift in Sources */,
 				TKBF0000000000000000000000 /* UnifiedDataStore.swift in Sources */,
 				TKBF0000000000000000000001 /* SyncManager.swift in Sources */,
 				TKBF0000000000000000000002 /* AIOrchestrator.swift in Sources */,

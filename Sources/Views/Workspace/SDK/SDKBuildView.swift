@@ -6,6 +6,8 @@ struct SDKBuildView: View {
     @StateObject private var logStore = SDKLogStore.shared
     @StateObject private var pluginManager = SDKPluginManager.shared
     @StateObject private var connectorManager = SDKConnectorManager.shared
+    @StateObject private var toolManager = SDKToolManager.shared
+    @StateObject private var policyEngine = SDKPolicyEngine.shared
     @State private var isBuilding = false
     @State private var buildProgress: Double = 0.0
     @State private var exportedURL: URL?
@@ -22,6 +24,9 @@ struct SDKBuildView: View {
 
     @State private var showingConsole = false
     @State private var showingSystemExplorer = false
+    @State private var metadataName = ""
+    @State private var metadataDescription = ""
+    @State private var metadataStatus: SDKProject.ProjectStatus = .draft
 
     enum BuildMode: String, CaseIterable {
         case debug = "Debug"
@@ -41,6 +46,7 @@ struct SDKBuildView: View {
         List {
             if let project = projectManager.currentProject {
                 projectOverviewSection(project)
+                projectMetadataEditorSection(project)
                 buildConfigSection
                 buildActionsSection
                 buildOutputSection
@@ -66,6 +72,13 @@ struct SDKBuildView: View {
         }
         .sheet(isPresented: $showingSystemExplorer) {
             NavigationStack { SDKSystemExplorerView() }
+        }
+        .onAppear {
+            if let project = projectManager.currentProject {
+                metadataName = project.name
+                metadataDescription = project.description
+                metadataStatus = project.status
+            }
         }
     }
 
@@ -110,6 +123,22 @@ struct SDKBuildView: View {
 
     // MARK: - Build Configuration
 
+    @ViewBuilder
+    private func projectMetadataEditorSection(_ project: SDKProject) -> some View {
+        Section("Project Metadata") {
+            TextField("Project name", text: $metadataName)
+            TextField("Description", text: $metadataDescription, axis: .vertical)
+                .lineLimit(2...4)
+            Picker("Status", selection: $metadataStatus) {
+                ForEach(SDKProject.ProjectStatus.allCases, id: \.self) { status in
+                    Text(status.rawValue.capitalized).tag(status)
+                }
+            }
+            scopeSelector
+            connectorAndToolAssignment
+        }
+    }
+
     private var buildConfigSection: some View {
         Section("Build Configuration") {
             Picker("Mode", selection: $buildMode) {
@@ -148,6 +177,11 @@ struct SDKBuildView: View {
                 } else {
                     Label("Build & Export", systemImage: "hammer.fill")
                 }
+            }
+            .disabled(isBuilding)
+
+            Button(action: saveBuild) {
+                Label("Save Build", systemImage: "square.and.arrow.down.fill")
             }
             .disabled(isBuilding)
 
@@ -533,5 +567,90 @@ struct SDKBuildView: View {
     private func cleanBuildCache() {
         SDKDataEngine.shared.invalidateCache()
         SDKLogStore.shared.log("Build cache cleaned", source: "SDKBuildView", level: .info)
+    }
+
+    private var scopeSelector: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Scopes").font(.caption).foregroundStyle(.secondary)
+            ForEach(policyEngine.availableScopes(), id: \.name) { definition in
+                Toggle(isOn: Binding(
+                    get: { projectManager.currentProject?.enabledScopes.contains(definition.name) ?? false },
+                    set: { isEnabled in
+                        guard var project = projectManager.currentProject else { return }
+                        if isEnabled {
+                            if !project.enabledScopes.contains(definition.name) { project.enabledScopes.append(definition.name) }
+                        } else {
+                            project.enabledScopes.removeAll { $0 == definition.name }
+                        }
+                        projectManager.currentProject = project
+                    }
+                )) {
+                    HStack {
+                        Text(definition.name).font(.caption)
+                        Spacer()
+                        Text(definition.riskLevel.rawValue.capitalized).font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+    }
+
+    private var connectorAndToolAssignment: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Connectors").font(.caption).foregroundStyle(.secondary)
+            ForEach(connectorManager.connectors, id: \.id) { connector in
+                Toggle(connector.name, isOn: Binding(
+                    get: { projectManager.currentProject?.enabledConnectorIDs.contains(connector.id) ?? false },
+                    set: { enabled in
+                        guard var project = projectManager.currentProject else { return }
+                        if enabled {
+                            if !project.enabledConnectorIDs.contains(connector.id) { project.enabledConnectorIDs.append(connector.id) }
+                        } else {
+                            project.enabledConnectorIDs.removeAll { $0 == connector.id }
+                        }
+                        projectManager.currentProject = project
+                    }
+                ))
+            }
+
+            Text("Tools").font(.caption).foregroundStyle(.secondary)
+            ForEach(toolManager.tools, id: \.id) { tool in
+                Toggle(tool.name, isOn: Binding(
+                    get: { projectManager.currentProject?.enabledToolIDs.contains(tool.id) ?? false },
+                    set: { enabled in
+                        guard var project = projectManager.currentProject else { return }
+                        if enabled {
+                            if !project.enabledToolIDs.contains(tool.id) { project.enabledToolIDs.append(tool.id) }
+                        } else {
+                            project.enabledToolIDs.removeAll { $0 == tool.id }
+                        }
+                        projectManager.currentProject = project
+                    }
+                ))
+            }
+        }
+    }
+
+    private func saveBuild() {
+        guard var project = projectManager.currentProject else { return }
+        if metadataName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            errorMessage = "Project name is required."
+            return
+        }
+        project.name = metadataName
+        project.description = metadataDescription
+        project.status = metadataStatus
+        let selectedDefinitions = policyEngine.availableScopes().filter { project.enabledScopes.contains($0.name) }
+        if selectedDefinitions.contains(where: { $0.requiresJustification }) &&
+            metadataDescription.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            errorMessage = "Description/justification is required for high-risk scopes."
+            return
+        }
+        project.updatedAt = Date()
+        project.version += 1
+        projectManager.updateProject(project)
+        projectManager.currentProject = project
+        errorMessage = nil
+        SDKLogStore.shared.log("Build configuration saved (v\(project.version))", source: "SDKBuildView", level: .info)
     }
 }
