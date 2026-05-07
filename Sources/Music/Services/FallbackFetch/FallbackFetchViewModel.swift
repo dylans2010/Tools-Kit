@@ -4,7 +4,7 @@ import ZIPFoundation
 
 // MARK: - Logging
 
-enum LogLevel: String {
+enum FetchLogLevel: String {
     case debug = "DEBUG"
     case info  = "INFO"
     case warning = "WARN"
@@ -35,7 +35,7 @@ enum PipelineStage: String {
 struct LogEntry: Identifiable {
     let id: UUID = UUID()
     let timestamp: Date
-    let level: LogLevel
+    let level: FetchLogLevel
     let stage: PipelineStage
     let message: String
     let metadata: [String: String]?
@@ -56,7 +56,7 @@ final class LogManager: ObservableObject {
     var debugMode: Bool = true
 
     func log(
-        level: LogLevel,
+        level: FetchLogLevel,
         stage: PipelineStage,
         message: String,
         metadata: [String: String]? = nil

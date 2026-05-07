@@ -47,13 +47,13 @@ public final class SDKScopeManager: ObservableObject {
     public func authorizeScope(_ scope: String) {
         authorizedScopes.insert(scope)
         persistScopes()
-        SDKLogStore.shared.log("Scope authorized: \(scope)", source: "SDKScopeManager", level: .info)
+        SDKLogStore.shared.log("Scope authorized: \(scope)", source: "SDKScopeManager", level: LogLevel.info)
     }
 
     public func revokeScope(_ scope: String) {
         authorizedScopes.remove(scope)
         persistScopes()
-        SDKLogStore.shared.log("Scope revoked: \(scope)", source: "SDKScopeManager", level: .info)
+        SDKLogStore.shared.log("Scope revoked: \(scope)", source: "SDKScopeManager", level: LogLevel.info)
     }
 
     public func authorizeAllScopes() {
@@ -114,7 +114,7 @@ public final class SDKScopeManager: ObservableObject {
         }
 
         if !granted {
-            SDKLogStore.shared.log("Scope denied: \(scope) [\(operation.rawValue)]", source: "SDKScopeManager", level: .warning)
+            SDKLogStore.shared.log("Scope denied: \(scope) [\(operation.rawValue)]", source: "SDKScopeManager", level: LogLevel.warning)
         }
     }
 

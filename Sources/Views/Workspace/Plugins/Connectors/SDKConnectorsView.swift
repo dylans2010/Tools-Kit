@@ -31,7 +31,15 @@ struct SDKConnectorsView: View {
         }
         .navigationTitle("Connectors")
         .navigationDestination(for: UUID.self) { id in
-            if let connector = manager.connectors.first(where: { $0.id == id }) {
+            if let connector = manager.connectors.first(where: { $0.id == id }) as? GmailConnector {
+                ConnectorDetailView(connector: connector)
+            } else if let connector = manager.connectors.first(where: { $0.id == id }) as? GitHubConnector {
+                ConnectorDetailView(connector: connector)
+            } else if let connector = manager.connectors.first(where: { $0.id == id }) as? WebhookConnector {
+                ConnectorDetailView(connector: connector)
+            } else if let connector = manager.connectors.first(where: { $0.id == id }) as? CalendarConnector {
+                ConnectorDetailView(connector: connector)
+            } else if let connector = manager.connectors.first(where: { $0.id == id }) as? LocalFileConnector {
                 ConnectorDetailView(connector: connector)
             }
         }

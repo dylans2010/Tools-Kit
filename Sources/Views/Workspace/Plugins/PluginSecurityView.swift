@@ -4,15 +4,15 @@ struct PluginSecurityView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var manager = PluginManager.shared
 
-    @State private var permissions: [PluginPermission] = [
-        PluginPermission(name: "Network Access", description: "Allow plugins to make external API calls.", isEnabled: true, icon: "network"),
-        PluginPermission(name: "File Storage", description: "Allow plugins to read and write to workspace files.", isEnabled: false, icon: "folder.fill"),
-        PluginPermission(name: "Notifications", description: "Allow plugins to send system-level alerts.", isEnabled: true, icon: "bell.fill"),
-        PluginPermission(name: "AI Context", description: "Allow plugins to access conversation history for reasoning.", isEnabled: true, icon: "brain"),
-        PluginPermission(name: "Contacts", description: "Allow access to workspace member directory.", isEnabled: false, icon: "person.2.fill")
+    @State private var permissions: [PluginSecurityPermission] = [
+        PluginSecurityPermission(name: "Network Access", description: "Allow plugins to make external API calls.", isEnabled: true, icon: "network"),
+        PluginSecurityPermission(name: "File Storage", description: "Allow plugins to read and write to workspace files.", isEnabled: false, icon: "folder.fill"),
+        PluginSecurityPermission(name: "Notifications", description: "Allow plugins to send system-level alerts.", isEnabled: true, icon: "bell.fill"),
+        PluginSecurityPermission(name: "AI Context", description: "Allow plugins to access conversation history for reasoning.", isEnabled: true, icon: "brain"),
+        PluginSecurityPermission(name: "Contacts", description: "Allow access to workspace member directory.", isEnabled: false, icon: "person.2.fill")
     ]
 
-    struct PluginPermission: Identifiable {
+    struct PluginSecurityPermission: Identifiable {
         let id = UUID()
         let name: String
         let description: String

@@ -92,7 +92,7 @@ public final class SDKToolManager: ObservableObject {
                 output["itemCount"] = "\(items.count)"
             }
         default:
-            SDKLogStore.shared.log("No handler for tool: \(tool.name)", source: "SDKToolManager", level: .warning)
+            SDKLogStore.shared.log("No handler for tool: \(tool.name)", source: "SDKToolManager", level: LogLevel.warning)
         }
 
         let duration = Date().timeIntervalSince(start)

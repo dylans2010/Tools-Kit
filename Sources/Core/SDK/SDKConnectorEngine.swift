@@ -25,15 +25,15 @@ public final class SDKConnectorEngine: ObservableObject {
     // MARK: - Connect
 
     public func connect(connector: any BaseConnector, credentials: [String: String]) async throws {
-        SDKLogStore.shared.log("Connecting \(connector.name)...", source: "SDKConnectorEngine", level: .info)
+        SDKLogStore.shared.log("Connecting \(connector.name)...", source: "SDKConnectorEngine", level: LogLevel.info)
 
         do {
             try await connector.authenticate(credentials: credentials)
             SDKConnectorManager.shared.register(connector)
             await updateHealth(for: connector)
-            SDKLogStore.shared.log("\(connector.name) connected successfully", source: "SDKConnectorEngine", level: .info)
+            SDKLogStore.shared.log("\(connector.name) connected successfully", source: "SDKConnectorEngine", level: LogLevel.info)
         } catch {
-            SDKLogStore.shared.log("\(connector.name) connection failed: \(error.localizedDescription)", source: "SDKConnectorEngine", level: .error)
+            SDKLogStore.shared.log("\(connector.name) connection failed: \(error.localizedDescription)", source: "SDKConnectorEngine", level: LogLevel.error)
             throw error
         }
     }
@@ -55,7 +55,7 @@ public final class SDKConnectorEngine: ObservableObject {
             try await group.waitForAll()
         }
 
-        SDKLogStore.shared.log("All connectors synced", source: "SDKConnectorEngine", level: .info)
+        SDKLogStore.shared.log("All connectors synced", source: "SDKConnectorEngine", level: LogLevel.info)
     }
 
     // MARK: - Sync Individual
@@ -81,7 +81,7 @@ public final class SDKConnectorEngine: ObservableObject {
                 }
             }
 
-        SDKLogStore.shared.log("Background sync enabled for \(connectorID) every \(interval)s", source: "SDKConnectorEngine", level: .info)
+        SDKLogStore.shared.log("Background sync enabled for \(connectorID) every \(interval)s", source: "SDKConnectorEngine", level: LogLevel.info)
     }
 
     public func disableBackgroundSync(connectorID: UUID) {
@@ -134,12 +134,12 @@ public final class SDKConnectorEngine: ObservableObject {
                 if attempt < maxSyncRetries - 1 {
                     let delay = pow(2.0, Double(attempt))
                     try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-                    SDKLogStore.shared.log("\(connector.name) sync retry \(attempt + 1)/\(maxSyncRetries)", source: "SDKConnectorEngine", level: .warning)
+                    SDKLogStore.shared.log("\(connector.name) sync retry \(attempt + 1)/\(maxSyncRetries)", source: "SDKConnectorEngine", level: LogLevel.warning)
                 }
             }
         }
 
-        SDKLogStore.shared.log("\(connector.name) sync failed after \(maxSyncRetries) attempts", source: "SDKConnectorEngine", level: .error)
+        SDKLogStore.shared.log("\(connector.name) sync failed after \(maxSyncRetries) attempts", source: "SDKConnectorEngine", level: LogLevel.error)
         throw lastError ?? SDKError.executionFailed(reason: "Sync failed")
     }
 

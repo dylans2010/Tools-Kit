@@ -37,7 +37,7 @@ public final class SDKPersonaBridge: ObservableObject {
     // MARK: - Query Persona
 
     public func queryPersona(prompt: String) async throws -> String {
-        SDKLogStore.shared.log("Persona query: \(prompt.prefix(50))...", source: "SDKPersonaBridge", level: .info)
+        SDKLogStore.shared.log("Persona query: \(prompt.prefix(50))...", source: "SDKPersonaBridge", level: LogLevel.info)
 
         let response = try await WorkspaceAPI.shared.persona.queryPersona(prompt: prompt)
         recordQuery(prompt: prompt, response: response, type: .query)
@@ -87,7 +87,7 @@ public final class SDKPersonaBridge: ObservableObject {
         let context = SDKExecutionContext(projectID: UUID(), noSandbox: SDKRuntimeEngine.shared.isNoSandboxModeEnabled)
         try await SDKExecutionKernel.shared.execute(action: action, context: context)
 
-        SDKLogStore.shared.log("Persona memory written for entity \(entityID)", source: "SDKPersonaBridge", level: .info)
+        SDKLogStore.shared.log("Persona memory written for entity \(entityID)", source: "SDKPersonaBridge", level: LogLevel.info)
     }
 
     // MARK: - Private

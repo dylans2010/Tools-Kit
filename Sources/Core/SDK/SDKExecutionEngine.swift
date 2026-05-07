@@ -72,7 +72,7 @@ public final class SDKExecutionEngine: ObservableObject {
                 if attempt < maxRetries {
                     let delay = pow(2.0, Double(attempt))
                     try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-                    SDKLogStore.shared.log("Retrying action (attempt \(attempt + 1)/\(maxRetries))", source: "SDKExecutionEngine", level: .warning)
+                    SDKLogStore.shared.log("Retrying action (attempt \(attempt + 1)/\(maxRetries))", source: "SDKExecutionEngine", level: LogLevel.warning)
                 }
             }
         }
@@ -82,7 +82,7 @@ public final class SDKExecutionEngine: ObservableObject {
 
     public func cancelExecution(id: UUID) {
         activeExecutions.removeValue(forKey: id)
-        SDKLogStore.shared.log("Execution cancelled: \(id)", source: "SDKExecutionEngine", level: .info)
+        SDKLogStore.shared.log("Execution cancelled: \(id)", source: "SDKExecutionEngine", level: LogLevel.info)
     }
 
     public func getMetrics() -> ExecutionMetrics {

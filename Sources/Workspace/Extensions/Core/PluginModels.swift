@@ -35,8 +35,8 @@ struct PluginDefinition: Codable, Identifiable {
     var uiExtensions: [UIExtension] = []
     var toolkitTools: [PluginToolkitTool] = []
 
-    var permissions: [PluginPermission] {
-        capabilities.map { PluginPermission(capability: $0) }
+    var permissions: [PluginCapabilityPermission] {
+        capabilities.map { PluginCapabilityPermission(capability: $0) }
     }
 }
 
@@ -47,7 +47,7 @@ struct PluginChangeLogEntry: Codable, Identifiable {
     let notes: String
 }
 
-struct PluginPermission: Codable, Identifiable {
+struct PluginCapabilityPermission: Codable, Identifiable {
     var id: String { capability.technicalKey }
     let capability: PluginCapability
 
