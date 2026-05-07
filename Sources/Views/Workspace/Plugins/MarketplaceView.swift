@@ -44,6 +44,20 @@ struct MarketplaceView: View {
                 }
             }
 
+            Section("Projects (Built with WorkspaceSDK)") {
+                // Mock projects for now as real ones come from WorkspaceSDK runtime
+                NavigationLink(destination: Text("Project Detail")) {
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("CRM Plus").font(.headline)
+                            Text("Advanced customer management").font(.caption).foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        MadeForWorkspaceBadge()
+                    }
+                }
+            }
+
             Section("Discover Plugins") {
                 if filteredPlugins.isEmpty {
                     Text("No Plugins Found").foregroundColor(.secondary).font(.subheadline)
@@ -79,6 +93,8 @@ struct MarketplacePluginRow: View {
                     if plugin.isInstalled {
                         Image(systemName: "checkmark.seal.fill").font(.caption).foregroundStyle(.green)
                     }
+                    Spacer()
+                    MadeForWorkspaceBadge()
                 }
                 Text(plugin.description).font(.caption).foregroundStyle(.secondary).lineLimit(2)
                 HStack {
@@ -89,5 +105,20 @@ struct MarketplacePluginRow: View {
             }
         }
         .padding(.vertical, 4)
+    }
+}
+
+struct MadeForWorkspaceBadge: View {
+    var body: some View {
+        Text("Made For Workspace")
+            .font(.system(size: 8, weight: .bold))
+            .padding(4)
+            .background(Color.purple.opacity(0.1))
+            .foregroundColor(.purple)
+            .cornerRadius(4)
+            .overlay(
+                RoundedRectangle(cornerRadius: 4)
+                    .stroke(Color.purple.opacity(0.3), lineWidth: 1)
+            )
     }
 }
