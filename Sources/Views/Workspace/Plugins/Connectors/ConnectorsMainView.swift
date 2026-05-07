@@ -51,7 +51,9 @@ struct ConnectorsMainView: View {
                     .padding(.vertical, 24)
                 } else {
                     ForEach(connectors) { connector in
-                        NavigationLink(destination: ConnectorDetailView(connector: connector)) {
+                        NavigationLink {
+                            ConnectorDefinitionDetailView(connector: connector)
+                        } label: {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(connector.name)
@@ -132,6 +134,45 @@ struct ConnectorsMainView: View {
         case .error: return .red
         case .connecting: return .blue
         }
+    }
+}
+
+// MARK: - Connector Definition Detail
+
+struct ConnectorDefinitionDetailView: View {
+    let connector: ConnectorDefinition
+
+    var body: some View {
+        List {
+            Section("Info") {
+                LabeledContent("Name", value: connector.name)
+                LabeledContent("Identifier", value: connector.identifier)
+                LabeledContent("Version", value: connector.version)
+                LabeledContent("Status", value: connector.status.rawValue.capitalized)
+            }
+
+            if !connector.description.isEmpty {
+                Section("Description") {
+                    Text(connector.description)
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            Section("Endpoints") {
+                if connector.endpoints.isEmpty {
+                    Text("No endpoints configured")
+                        .foregroundColor(.secondary)
+                } else {
+                    ForEach(connector.endpoints) { endpoint in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("\(endpoint.method) \(endpoint.path)")
+                                .font(.system(.subheadline, design: .monospaced))
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle(connector.name)
     }
 }
 

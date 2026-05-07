@@ -30,7 +30,7 @@ public final class SDKWorkspaceGraphEngine {
         edges.append(SDKEdge(source: source, target: target, label: relation))
         persistGraph()
 
-        SDKLogStore.shared.log("Graph link updated: \(source) -[\(relation)]-> \(target)", source: "SDKWorkspaceGraphEngine", level: LogLevel.info)
+        Task { @MainActor in SDKLogStore.shared.log("Graph link updated: \(source) -[\(relation)]-> \(target)", source: "SDKWorkspaceGraphEngine", level: LogLevel.info) }
     }
 
     public func removeLink(source: UUID, target: UUID) {

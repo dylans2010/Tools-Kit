@@ -12,7 +12,7 @@ public final class SDKMutationEngine {
 
     public func performMutation(_ action: SDKAction, context: SDKExecutionContext) async throws {
         // Enforce permissions
-        try gate.enforce(action: action, context: context)
+        try await gate.enforce(action: action, context: context)
 
         // Convert to system action and dispatch
         let systemAction = try SDKSystemRouter.shared.route(action: action)
