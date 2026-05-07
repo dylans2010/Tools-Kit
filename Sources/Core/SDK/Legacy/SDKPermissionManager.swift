@@ -15,7 +15,7 @@ public final class SDKPermissionManager {
     public func validateProjectScopes(_ project: SDKProjectLegacy) throws {
         for scope in project.requiredScopes {
             if !isScopeAuthorized(scope) {
-                SDKLogStore.shared.log("Permission denied for scope: \(scope)", source: "SDKPermissionManager", level: LogLevel.error)
+                Task { @MainActor in SDKLogStore.shared.log("Permission denied for scope: \(scope)", source: "SDKPermissionManager", level: LogLevel.error) }
                 throw SDKError.permissionDenied(scope: scope)
             }
         }
@@ -31,13 +31,13 @@ public final class SDKPermissionManager {
     public func grantPermission(_ scope: String) {
         grantedPermissions.insert(scope)
         persistPermissions()
-        SDKLogStore.shared.log("Permission granted: \(scope)", source: "SDKPermissionManager", level: LogLevel.info)
+        Task { @MainActor in SDKLogStore.shared.log("Permission granted: \(scope)", source: "SDKPermissionManager", level: LogLevel.info) }
     }
 
     public func revokePermission(_ scope: String) {
         grantedPermissions.remove(scope)
         persistPermissions()
-        SDKLogStore.shared.log("Permission revoked: \(scope)", source: "SDKPermissionManager", level: LogLevel.info)
+        Task { @MainActor in SDKLogStore.shared.log("Permission revoked: \(scope)", source: "SDKPermissionManager", level: LogLevel.info) }
     }
 
     public func listGrantedPermissions() -> [String] {

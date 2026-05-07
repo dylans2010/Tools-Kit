@@ -5,6 +5,7 @@ public final class SDKPermissionGate {
 
     private init() {}
 
+    @MainActor
     public func enforce(action: SDKAction, context: SDKExecutionContext) throws {
         if context.noSandbox {
             SDKLogStore.shared.log("PermissionGate: Bypassing scope check for noSandbox mode", source: "SDKPermissionGate", level: LogLevel.warning)
