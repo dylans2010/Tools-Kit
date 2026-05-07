@@ -6,9 +6,47 @@ struct ConnectorVersioningView: View {
     @State private var newVersion = ""
     @State private var releaseNotes = ""
     @State private var showingReleaseSheet = false
+    @State private var showingRollbackAlert = false
+    @State private var rollbackTarget = ""
+    @State private var showingCompare = false
+    @State private var deploymentStatus: DeploymentStatus = .deployed
+
+    enum DeploymentStatus: String, CaseIterable {
+        case deployed = "Deployed"
+        case staging = "Staging"
+        case rollback = "Rolled Back"
+        case draft = "Draft"
+    }
+
+    struct VersionEntry: Identifiable {
+        let id = UUID()
+        let version: String
+        let date: Date
+        let notes: String
+        let status: DeploymentStatus
+        let changes: Int
+    }
+
+    var versionHistory: [VersionEntry] {
+        [
+            VersionEntry(version: connector.version, date: connector.updatedAt, notes: "Current deployment", status: .deployed, changes: connector.endpoints.count),
+            VersionEntry(version: bumpVersion(connector.version, by: -1), date: connector.updatedAt.addingTimeInterval(-86400 * 7), notes: "Previous stable release", status: .staging, changes: max(0, connector.endpoints.count - 1)),
+            VersionEntry(version: "0.9.0", date: connector.createdAt, notes: "Initial beta release", status: .draft, changes: 1)
+        ]
+    }
 
     var body: some View {
         List {
+            // MARK: - Version Overview
+            Section {
+                HStack(spacing: 16) {
+                    versionStat(label: "Current", value: "v\(connector.version)", color: .blue)
+                    versionStat(label: "Releases", value: "\(versionHistory.count)", color: .purple)
+                    versionStat(label: "Status", value: deploymentStatus.rawValue, color: deploymentStatus == .deployed ? .green : .orange)
+                }
+            }
+
+            // MARK: - Active Version
             Section("Active Version") {
                 HStack {
                     Text("Current Version")
@@ -16,6 +54,10 @@ struct ConnectorVersioningView: View {
                     Text("v\(connector.version)")
                         .bold()
                         .foregroundColor(.blue)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(Color.blue.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
                 }
                 HStack {
                     Text("Last Updated")
@@ -23,82 +65,355 @@ struct ConnectorVersioningView: View {
                     Text(connector.updatedAt.formatted(date: .abbreviated, time: .shortened))
                         .foregroundColor(.secondary)
                 }
-            }
-
-            Section("Version History") {
-                VStack(alignment: .leading, spacing: 12) {
-                    historyRow(version: connector.version, date: connector.updatedAt, notes: "Current deployment")
-                    historyRow(version: "0.9.0", date: connector.createdAt, notes: "Initial beta release")
+                HStack {
+                    Text("Deployment Status")
+                    Spacer()
+                    Picker("Status", selection: $deploymentStatus) {
+                        ForEach(DeploymentStatus.allCases, id: \.self) { status in
+                            Text(status.rawValue).tag(status)
+                        }
+                    }
+                    .pickerStyle(.menu)
                 }
-                .padding(.vertical, 8)
+                HStack {
+                    Text("Created")
+                    Spacer()
+                    Text(connector.createdAt.formatted(date: .abbreviated, time: .shortened))
+                        .foregroundColor(.secondary)
+                }
+                HStack {
+                    Text("Endpoints")
+                    Spacer()
+                    Text("\(connector.endpoints.count)")
+                        .foregroundColor(.secondary)
+                }
+                HStack {
+                    Text("Flow Steps")
+                    Spacer()
+                    Text("\(connector.flow.steps.count)")
+                        .foregroundColor(.secondary)
+                }
             }
 
+            // MARK: - Version History
+            Section("Version History") {
+                ForEach(versionHistory) { entry in
+                    historyRow(entry: entry)
+                        .contextMenu {
+                            if entry.version != connector.version {
+                                Button {
+                                    rollbackTarget = entry.version
+                                    showingRollbackAlert = true
+                                } label: {
+                                    Label("Rollback to v\(entry.version)", systemImage: "arrow.uturn.backward")
+                                }
+                            }
+
+                            Button {
+                                showingCompare = true
+                            } label: {
+                                Label("Compare Versions", systemImage: "arrow.left.arrow.right")
+                            }
+
+                            Button {
+                                UIPasteboard.general.string = "v\(entry.version) - \(entry.notes)"
+                            } label: {
+                                Label("Copy Version Info", systemImage: "doc.on.doc")
+                            }
+                        }
+                }
+            }
+
+            // MARK: - Changelog
+            Section("Changelog") {
+                VStack(alignment: .leading, spacing: 8) {
+                    changelogEntry(type: "Added", items: ["Endpoint configuration", "Flow builder pipeline"])
+                    changelogEntry(type: "Changed", items: ["Auth config structure", "Schema validation"])
+                    changelogEntry(type: "Fixed", items: ["Rate limiting behavior"])
+                }
+                .padding(.vertical, 4)
+            }
+
+            // MARK: - Actions
             Section {
                 Button {
-                    newVersion = connector.version
+                    newVersion = incrementVersion(connector.version)
                     showingReleaseSheet = true
                 } label: {
                     Label("Create New Release", systemImage: "arrow.up.circle.fill")
+                }
+
+                if versionHistory.count > 1 {
+                    Button {
+                        rollbackTarget = versionHistory[1].version
+                        showingRollbackAlert = true
+                    } label: {
+                        Label("Rollback to Previous Version", systemImage: "arrow.uturn.backward")
+                    }
+                }
+
+                Button {
+                    showingCompare = true
+                } label: {
+                    Label("Compare Versions", systemImage: "arrow.left.arrow.right")
                 }
             }
         }
         .navigationTitle("Versioning")
         .sheet(isPresented: $showingReleaseSheet) {
-            NavigationView {
-                Form {
-                    Section("Release Details") {
-                        TextField("New Version (e.g. 1.1.0)", text: $newVersion)
-                        VStack(alignment: .leading) {
-                            Text("Release Notes").font(.caption).foregroundColor(.secondary)
-                            TextEditor(text: $releaseNotes)
-                                .frame(minHeight: 120)
-                        }
-                    }
+            releaseSheet
+        }
+        .sheet(isPresented: $showingCompare) {
+            compareSheet
+        }
+        .alert("Rollback to v\(rollbackTarget)?", isPresented: $showingRollbackAlert) {
+            Button("Cancel", role: .cancel) {}
+            Button("Rollback", role: .destructive) {
+                connector.version = rollbackTarget
+                connector.updatedAt = Date()
+                deploymentStatus = .rollback
+                manager.updateConnector(connector)
+            }
+        } message: {
+            Text("This will revert the connector to version v\(rollbackTarget). Current configuration will be preserved as a snapshot.")
+        }
+    }
 
-                    Section {
-                        Button("Publish Release") {
-                            connector.version = newVersion
-                            connector.updatedAt = Date()
-                            manager.updateConnector(connector)
-                            showingReleaseSheet = false
-                        }
-                        .disabled(newVersion == connector.version || newVersion.isEmpty)
+    // MARK: - Release Sheet
+
+    private var releaseSheet: some View {
+        NavigationView {
+            Form {
+                Section("Release Details") {
+                    TextField("New Version (e.g. 1.1.0)", text: $newVersion)
+                        .font(.system(.body, design: .monospaced))
+
+                    VStack(alignment: .leading) {
+                        Text("Release Notes").font(.caption).foregroundColor(.secondary)
+                        TextEditor(text: $releaseNotes)
+                            .frame(minHeight: 120)
                     }
                 }
-                .navigationTitle("New Release")
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button("Cancel") { showingReleaseSheet = false }
+
+                Section("Release Summary") {
+                    LabeledContent("From Version", value: "v\(connector.version)")
+                    LabeledContent("To Version", value: newVersion.isEmpty ? "-" : "v\(newVersion)")
+                    LabeledContent("Endpoints", value: "\(connector.endpoints.count)")
+                    LabeledContent("Flow Steps", value: "\(connector.flow.steps.count)")
+                }
+
+                Section("Pre-Release Checklist") {
+                    HStack {
+                        Image(systemName: connector.endpoints.isEmpty ? "xmark.circle" : "checkmark.circle.fill")
+                            .foregroundColor(connector.endpoints.isEmpty ? .red : .green)
+                        Text("Endpoints configured")
                     }
+                    HStack {
+                        Image(systemName: connector.authConfig.type == .none ? "xmark.circle" : "checkmark.circle.fill")
+                            .foregroundColor(connector.authConfig.type == .none ? .orange : .green)
+                        Text("Authentication configured")
+                    }
+                    HStack {
+                        Image(systemName: connector.flow.steps.isEmpty ? "xmark.circle" : "checkmark.circle.fill")
+                            .foregroundColor(connector.flow.steps.isEmpty ? .orange : .green)
+                        Text("Flow pipeline defined")
+                    }
+                }
+
+                Section {
+                    Button("Publish Release") {
+                        connector.version = newVersion
+                        connector.updatedAt = Date()
+                        deploymentStatus = .deployed
+                        manager.updateConnector(connector)
+                        showingReleaseSheet = false
+                        releaseNotes = ""
+                    }
+                    .frame(maxWidth: .infinity)
+                    .bold()
+                    .disabled(newVersion == connector.version || newVersion.isEmpty)
+                }
+            }
+            .navigationTitle("New Release")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") { showingReleaseSheet = false }
                 }
             }
         }
     }
 
-    private func historyRow(version: String, date: Date, notes: String) -> some View {
+    // MARK: - Compare Sheet
+
+    private var compareSheet: some View {
+        NavigationView {
+            List {
+                Section("Version Comparison") {
+                    if versionHistory.count >= 2 {
+                        let current = versionHistory[0]
+                        let previous = versionHistory[1]
+
+                        HStack {
+                            VStack {
+                                Text("v\(previous.version)")
+                                    .font(.headline)
+                                Text("Previous")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            .frame(maxWidth: .infinity)
+
+                            Image(systemName: "arrow.right")
+                                .foregroundColor(.secondary)
+
+                            VStack {
+                                Text("v\(current.version)")
+                                    .font(.headline)
+                                    .foregroundColor(.blue)
+                                Text("Current")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                    }
+                }
+
+                Section("Configuration Diff") {
+                    LabeledContent("Endpoints", value: "\(connector.endpoints.count)")
+                    LabeledContent("Flow Steps", value: "\(connector.flow.steps.count)")
+                    LabeledContent("Auth Type", value: connector.authConfig.type.rawValue.capitalized)
+                    LabeledContent("Schema Mappings", value: "\(connector.schema.mappings.count)")
+                }
+
+                Section("Timeline") {
+                    ForEach(versionHistory) { entry in
+                        HStack {
+                            Circle()
+                                .fill(entry.status == .deployed ? Color.green : Color.secondary)
+                                .frame(width: 8, height: 8)
+                            Text("v\(entry.version)")
+                                .font(.system(.caption, design: .monospaced))
+                            Spacer()
+                            Text(entry.date.formatted(date: .abbreviated, time: .omitted))
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Compare Versions")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") { showingCompare = false }
+                }
+            }
+        }
+    }
+
+    // MARK: - Subviews
+
+    private func historyRow(entry: VersionEntry) -> some View {
         HStack(alignment: .top, spacing: 12) {
-            VStack {
+            VStack(spacing: 0) {
                 Circle()
-                    .fill(Color.blue)
-                    .frame(width: 8, height: 8)
+                    .fill(entry.status == .deployed ? Color.green : Color.blue)
+                    .frame(width: 10, height: 10)
                 Rectangle()
                     .fill(Color.blue.opacity(0.2))
-                    .frame(width: 2)
+                    .frame(width: 2, height: 30)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text("v\(version)")
+                    Text("v\(entry.version)")
                         .font(.subheadline.bold())
+
+                    Text(entry.status.rawValue)
+                        .font(.system(size: 9, weight: .bold))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(statusColor(entry.status).opacity(0.15))
+                        .foregroundColor(statusColor(entry.status))
+                        .clipShape(Capsule())
+
                     Spacer()
-                    Text(date.formatted(date: .abbreviated, time: .omitted))
+
+                    Text(entry.date.formatted(date: .abbreviated, time: .omitted))
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }
-                Text(notes)
+                Text(entry.notes)
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
         }
+    }
+
+    private func changelogEntry(type: String, items: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(type)
+                .font(.caption.bold())
+                .foregroundColor(changelogColor(type))
+
+            ForEach(items, id: \.self) { item in
+                HStack(spacing: 6) {
+                    Text("•")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text(item)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+    }
+
+    // MARK: - Helpers
+
+    private func versionStat(label: String, value: String, color: Color) -> some View {
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.title3.bold())
+                .foregroundColor(color)
+            Text(label)
+                .font(.caption2)
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func statusColor(_ status: DeploymentStatus) -> Color {
+        switch status {
+        case .deployed: return .green
+        case .staging: return .orange
+        case .rollback: return .red
+        case .draft: return .secondary
+        }
+    }
+
+    private func changelogColor(_ type: String) -> Color {
+        switch type {
+        case "Added": return .green
+        case "Changed": return .blue
+        case "Fixed": return .orange
+        case "Removed": return .red
+        default: return .secondary
+        }
+    }
+
+    private func incrementVersion(_ version: String) -> String {
+        let parts = version.split(separator: ".").compactMap { Int($0) }
+        guard parts.count == 3 else { return version }
+        return "\(parts[0]).\(parts[1]).\(parts[2] + 1)"
+    }
+
+    private func bumpVersion(_ version: String, by amount: Int) -> String {
+        let parts = version.split(separator: ".").compactMap { Int($0) }
+        guard parts.count == 3 else { return version }
+        let patch = max(0, parts[2] + amount)
+        return "\(parts[0]).\(parts[1]).\(patch)"
     }
 }

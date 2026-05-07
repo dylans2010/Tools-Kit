@@ -6,44 +6,190 @@ struct ConnectorAuthView<T: BaseConnector>: View {
     @State private var credentials: [String: String] = [:]
     @State private var isAuthenticating = false
     @State private var error: String?
+    @State private var showingSuccess = false
+    @State private var showingHelp = false
+    @State private var revealedFields: Set<String> = []
+
+    var filledFieldsCount: Int {
+        credentials.values.filter { !$0.isEmpty }.count
+    }
+
+    var allFieldsFilled: Bool {
+        connector.authFields.allSatisfy { field in
+            !(credentials[field.key] ?? "").isEmpty
+        }
+    }
 
     var body: some View {
         NavigationStack {
             Form {
+                // MARK: - Status
+                Section {
+                    HStack(spacing: 16) {
+                        VStack(spacing: 2) {
+                            Text(connector.status.rawValue.capitalized)
+                                .font(.title3.bold())
+                                .foregroundColor(connector.status == .connected ? .green : .red)
+                            Text("Status")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+
+                        VStack(spacing: 2) {
+                            Text("\(filledFieldsCount)/\(connector.authFields.count)")
+                                .font(.title3.bold())
+                                .foregroundColor(allFieldsFilled ? .green : .orange)
+                            Text("Fields")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+
+                        VStack(spacing: 2) {
+                            Text(connector.type.rawValue.capitalized)
+                                .font(.title3.bold())
+                                .foregroundColor(.blue)
+                            Text("Type")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                }
+
+                // MARK: - Auth Fields
                 Section("Authentication Fields") {
-                    ForEach(connector.authFields, id: \.key) { field in
-                        if field.isSecure {
-                            SecureField(field.label, text: binding(for: field.key))
-                        } else {
-                            TextField(field.label, text: binding(for: field.key))
+                    if connector.authFields.isEmpty {
+                        Text("No authentication fields required for this connector.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    } else {
+                        ForEach(connector.authFields, id: \.key) { field in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(field.label)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+
+                                if field.isSecure && !revealedFields.contains(field.key) {
+                                    HStack {
+                                        SecureField(field.label, text: binding(for: field.key))
+                                        Button {
+                                            revealedFields.insert(field.key)
+                                        } label: {
+                                            Image(systemName: "eye")
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
+                                    }
+                                } else {
+                                    HStack {
+                                        TextField(field.label, text: binding(for: field.key))
+                                        if field.isSecure {
+                                            Button {
+                                                revealedFields.remove(field.key)
+                                            } label: {
+                                                Image(systemName: "eye.slash")
+                                                    .font(.caption)
+                                                    .foregroundColor(.secondary)
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (credentials[field.key] ?? "").isEmpty {
+                                    Text("Required")
+                                        .font(.caption2)
+                                        .foregroundColor(.orange)
+                                }
+                            }
+                            .padding(.vertical, 2)
                         }
                     }
                 }
 
+                // MARK: - Error
                 if let error = error {
-                    Section {
-                        Text(error).foregroundStyle(.red)
+                    Section("Error") {
+                        HStack(spacing: 8) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.red)
+                            Text(error)
+                                .foregroundStyle(.red)
+                                .font(.caption)
+                        }
+
+                        Button {
+                            self.error = nil
+                        } label: {
+                            Text("Dismiss Error")
+                                .font(.caption)
+                        }
                     }
                 }
 
+                // MARK: - Actions
                 Section {
                     Button {
                         authenticate()
                     } label: {
-                        if isAuthenticating {
-                            ProgressView().progressViewStyle(.circular)
-                        } else {
-                            Text("Connect")
+                        HStack {
+                            Spacer()
+                            if isAuthenticating {
+                                ProgressView()
+                                    .progressViewStyle(.circular)
+                                Text("Connecting...")
+                                    .font(.subheadline)
+                            } else {
+                                Image(systemName: "link")
+                                Text("Connect")
+                                    .bold()
+                            }
+                            Spacer()
                         }
                     }
-                    .disabled(isAuthenticating)
+                    .disabled(isAuthenticating || !allFieldsFilled)
+
+                    if !credentials.values.allSatisfy({ $0.isEmpty }) {
+                        Button(role: .destructive) {
+                            credentials = [:]
+                            error = nil
+                        } label: {
+                            Label("Clear All Fields", systemImage: "xmark.circle")
+                                .font(.caption)
+                        }
+                    }
+                }
+
+                // MARK: - Help
+                Section("Help") {
+                    DisclosureGroup("Authentication Guide") {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("1. Fill in all required authentication fields above.")
+                                .font(.caption)
+                            Text("2. Click 'Connect' to authenticate with the service.")
+                                .font(.caption)
+                            Text("3. If authentication succeeds, the connector status will update to 'Connected'.")
+                                .font(.caption)
+                            Text("4. If you receive an error, verify your credentials and try again.")
+                                .font(.caption)
+                        }
+                        .foregroundColor(.secondary)
+                        .padding(.vertical, 4)
+                    }
                 }
             }
             .navigationTitle("Authenticate \(connector.name)")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
+            }
+            .alert("Connected!", isPresented: $showingSuccess) {
+                Button("OK") { dismiss() }
+            } message: {
+                Text("\(connector.name) has been authenticated successfully.")
             }
         }
     }
@@ -63,7 +209,7 @@ struct ConnectorAuthView<T: BaseConnector>: View {
                 try await connector.authenticate(credentials: credentials)
                 await MainActor.run {
                     isAuthenticating = false
-                    dismiss()
+                    showingSuccess = true
                 }
             } catch {
                 await MainActor.run {
