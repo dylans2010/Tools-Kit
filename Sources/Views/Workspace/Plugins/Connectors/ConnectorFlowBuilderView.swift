@@ -20,213 +20,20 @@ struct ConnectorFlowBuilderView: View {
 
     var body: some View {
         List {
-            // MARK: - Flow Summary
             if !steps.isEmpty {
-                Section {
-                    HStack(spacing: 16) {
-                        flowStat(label: "Steps", value: "\(steps.count)", color: .blue)
-                        flowStat(label: "Triggers", value: "\(steps.filter { $0.type == .trigger }.count)", color: .orange)
-                        flowStat(label: "Actions", value: "\(steps.filter { $0.type == .action }.count)", color: .green)
-                        flowStat(label: "Conditions", value: "\(steps.filter { $0.type == .condition }.count)", color: .purple)
-                    }
-
-                    // Visual Flow Preview
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 4) {
-                            ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
-                                HStack(spacing: 4) {
-                                    stepIcon(step.type)
-                                        .font(.caption2)
-                                    Text(step.type.rawValue.prefix(4).uppercased())
-                                        .font(.system(size: 9, weight: .bold, design: .monospaced))
-                                }
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 4)
-                                .background(stepColor(step.type).opacity(0.1))
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-
-                                if index < steps.count - 1 {
-                                    Image(systemName: "arrow.right")
-                                        .font(.system(size: 8))
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                        }
-                    }
-                }
+                flowSummarySection
             }
-
-            // MARK: - Workflow Pipeline
-            Section("Workflow Pipeline") {
-                if steps.isEmpty {
-                    VStack(spacing: 12) {
-                        Image(systemName: "arrow.triangle.branch")
-                            .font(.system(size: 32))
-                            .foregroundColor(.secondary)
-                        Text("No steps defined")
-                            .font(.headline)
-                        Text("Add a trigger to start building your automation pipeline, or use a template to get started quickly.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-
-                        HStack(spacing: 12) {
-                            Button {
-                                addStep(.trigger)
-                            } label: {
-                                Label("Add Trigger", systemImage: "bolt.fill")
-                                    .font(.caption)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .tint(.orange)
-
-                            Button {
-                                showingTemplates = true
-                            } label: {
-                                Label("Use Template", systemImage: "doc.on.doc")
-                                    .font(.caption)
-                            }
-                            .buttonStyle(.bordered)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                } else {
-                    ForEach($steps) { $step in
-                        stepRow(step: $step)
-                            .contextMenu {
-                                Button {
-                                    duplicateStep(step.wrappedValue)
-                                } label: {
-                                    Label("Duplicate", systemImage: "doc.on.doc")
-                                }
-
-                                if step.wrappedValue.type != .trigger {
-                                    Button {
-                                        toggleStepEnabled(step: &step.wrappedValue)
-                                    } label: {
-                                        Label(
-                                            step.wrappedValue.config["disabled"] == "true" ? "Enable Step" : "Disable Step",
-                                            systemImage: step.wrappedValue.config["disabled"] == "true" ? "checkmark.circle" : "xmark.circle"
-                                        )
-                                    }
-                                }
-
-                                Divider()
-
-                                Button(role: .destructive) {
-                                    if let index = steps.firstIndex(where: { $0.id == step.wrappedValue.id }) {
-                                        steps.remove(at: index)
-                                        hasUnsavedChanges = true
-                                    }
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                            }
-                    }
-                    .onMove { indices, newOffset in
-                        steps.move(fromOffsets: indices, toOffset: newOffset)
-                        hasUnsavedChanges = true
-                    }
-                    .onDelete { indices in
-                        steps.remove(atOffsets: indices)
-                        hasUnsavedChanges = true
-                    }
-                }
-            }
-
-            // MARK: - Add Step
-            Section {
-                Menu {
-                    Button {
-                        addStep(.trigger)
-                    } label: {
-                        Label("Add Trigger", systemImage: "bolt.fill")
-                    }
-                    Button {
-                        addStep(.condition)
-                    } label: {
-                        Label("Add Condition", systemImage: "arrow.branch")
-                    }
-                    Button {
-                        addStep(.action)
-                    } label: {
-                        Label("Add Action", systemImage: "play.fill")
-                    }
-                    Button {
-                        addStep(.delay)
-                    } label: {
-                        Label("Add Delay", systemImage: "clock.fill")
-                    }
-                } label: {
-                    Label("Add Step", systemImage: "plus.circle")
-                }
-            }
-
-            // MARK: - Validation
+            workflowPipelineSection
+            addStepSection
             if !validationErrors.isEmpty {
-                Section("Validation Issues") {
-                    ForEach(validationErrors, id: \.self) { error in
-                        HStack(spacing: 8) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.orange)
-                                .font(.caption)
-                            Text(error)
-                                .font(.caption)
-                                .foregroundColor(.orange)
-                        }
-                    }
-                }
+                validationSection
             }
-
-            // MARK: - Actions
-            Section {
-                Button {
-                    validateFlow()
-                } label: {
-                    Label("Validate Flow", systemImage: "checkmark.shield")
-                }
-
-                Button("Save Workflow") {
-                    connector.flow = ConnectorFlow(steps: steps)
-                    connector.updatedAt = Date()
-                    manager.updateConnector(connector)
-                    hasUnsavedChanges = false
-                    showingSaveConfirmation = true
-                }
-                .frame(maxWidth: .infinity)
-                .bold()
-                .disabled(steps.isEmpty)
-
-                Button {
-                    exportFlowAsJSON()
-                } label: {
-                    Label("Export as JSON", systemImage: "square.and.arrow.up")
-                }
-                .disabled(steps.isEmpty)
-            }
+            actionsSection
         }
         .navigationTitle("Flow Builder")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Menu {
-                    Button {
-                        showingTemplates = true
-                    } label: {
-                        Label("Templates", systemImage: "doc.on.doc")
-                    }
-
-                    Button {
-                        steps = []
-                        hasUnsavedChanges = true
-                    } label: {
-                        Label("Clear All Steps", systemImage: "trash")
-                    }
-
-                    EditButton()
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                }
+                flowToolbarMenu
             }
         }
         .sheet(isPresented: $showingTemplates) {
@@ -239,6 +46,229 @@ struct ConnectorFlowBuilderView: View {
             Button("OK") {}
         } message: {
             Text("Your workflow with \(steps.count) steps has been saved successfully.")
+        }
+    }
+
+    // MARK: - Flow Summary
+
+    private var flowSummarySection: some View {
+        Section {
+            HStack(spacing: 16) {
+                flowStat(label: "Steps", value: "\(steps.count)", color: .blue)
+                flowStat(label: "Triggers", value: "\(steps.filter { $0.type == .trigger }.count)", color: .orange)
+                flowStat(label: "Actions", value: "\(steps.filter { $0.type == .action }.count)", color: .green)
+                flowStat(label: "Conditions", value: "\(steps.filter { $0.type == .condition }.count)", color: .purple)
+            }
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 4) {
+                    ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
+                        HStack(spacing: 4) {
+                            stepIcon(step.type)
+                                .font(.caption2)
+                            Text(step.type.rawValue.prefix(4).uppercased())
+                                .font(.system(size: 9, weight: .bold, design: .monospaced))
+                        }
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 4)
+                        .background(stepColor(step.type).opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+
+                        if index < steps.count - 1 {
+                            Image(systemName: "arrow.right")
+                                .font(.system(size: 8))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Workflow Pipeline
+
+    private var workflowPipelineSection: some View {
+        Section("Workflow Pipeline") {
+            if steps.isEmpty {
+                emptyPipelineView
+            } else {
+                ForEach($steps) { $step in
+                    stepRow(step: $step)
+                        .contextMenu {
+                            Button {
+                                duplicateStep(step.wrappedValue)
+                            } label: {
+                                Label("Duplicate", systemImage: "doc.on.doc")
+                            }
+
+                            if step.wrappedValue.type != .trigger {
+                                Button {
+                                    toggleStepEnabled(step: &step.wrappedValue)
+                                } label: {
+                                    Label(
+                                        step.wrappedValue.config["disabled"] == "true" ? "Enable Step" : "Disable Step",
+                                        systemImage: step.wrappedValue.config["disabled"] == "true" ? "checkmark.circle" : "xmark.circle"
+                                    )
+                                }
+                            }
+
+                            Divider()
+
+                            Button(role: .destructive) {
+                                if let index = steps.firstIndex(where: { $0.id == step.wrappedValue.id }) {
+                                    steps.remove(at: index)
+                                    hasUnsavedChanges = true
+                                }
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
+                }
+                .onMove { indices, newOffset in
+                    steps.move(fromOffsets: indices, toOffset: newOffset)
+                    hasUnsavedChanges = true
+                }
+                .onDelete { indices in
+                    steps.remove(atOffsets: indices)
+                    hasUnsavedChanges = true
+                }
+            }
+        }
+    }
+
+    private var emptyPipelineView: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "arrow.triangle.branch")
+                .font(.system(size: 32))
+                .foregroundColor(.secondary)
+            Text("No steps defined")
+                .font(.headline)
+            Text("Add a trigger to start building your automation pipeline, or use a template to get started quickly.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+
+            HStack(spacing: 12) {
+                Button {
+                    addStep(.trigger)
+                } label: {
+                    Label("Add Trigger", systemImage: "bolt.fill")
+                        .font(.caption)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.orange)
+
+                Button {
+                    showingTemplates = true
+                } label: {
+                    Label("Use Template", systemImage: "doc.on.doc")
+                        .font(.caption)
+                }
+                .buttonStyle(.bordered)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+    }
+
+    // MARK: - Add Step
+
+    private var addStepSection: some View {
+        Section {
+            Menu {
+                Button {
+                    addStep(.trigger)
+                } label: {
+                    Label("Add Trigger", systemImage: "bolt.fill")
+                }
+                Button {
+                    addStep(.condition)
+                } label: {
+                    Label("Add Condition", systemImage: "arrow.branch")
+                }
+                Button {
+                    addStep(.action)
+                } label: {
+                    Label("Add Action", systemImage: "play.fill")
+                }
+                Button {
+                    addStep(.delay)
+                } label: {
+                    Label("Add Delay", systemImage: "clock.fill")
+                }
+            } label: {
+                Label("Add Step", systemImage: "plus.circle")
+            }
+        }
+    }
+
+    // MARK: - Validation
+
+    private var validationSection: some View {
+        Section("Validation Issues") {
+            ForEach(validationErrors, id: \.self) { error in
+                HStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.orange)
+                        .font(.caption)
+                    Text(error)
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                }
+            }
+        }
+    }
+
+    // MARK: - Actions
+
+    private var actionsSection: some View {
+        Section {
+            Button {
+                validateFlow()
+            } label: {
+                Label("Validate Flow", systemImage: "checkmark.shield")
+            }
+
+            Button("Save Workflow") {
+                connector.flow = ConnectorFlow(steps: steps)
+                connector.updatedAt = Date()
+                manager.updateConnector(connector)
+                hasUnsavedChanges = false
+                showingSaveConfirmation = true
+            }
+            .frame(maxWidth: .infinity)
+            .bold()
+            .disabled(steps.isEmpty)
+
+            Button {
+                exportFlowAsJSON()
+            } label: {
+                Label("Export as JSON", systemImage: "square.and.arrow.up")
+            }
+            .disabled(steps.isEmpty)
+        }
+    }
+
+    // MARK: - Toolbar Menu
+
+    private var flowToolbarMenu: some View {
+        Menu {
+            Button {
+                showingTemplates = true
+            } label: {
+                Label("Templates", systemImage: "doc.on.doc")
+            }
+
+            Button {
+                steps = []
+                hasUnsavedChanges = true
+            } label: {
+                Label("Clear All Steps", systemImage: "trash")
+            }
+
+            EditButton()
+        } label: {
+            Image(systemName: "ellipsis.circle")
         }
     }
 

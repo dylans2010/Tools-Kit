@@ -17,7 +17,7 @@ struct ConnectorDetailView<T: BaseConnector>: View {
         case info = "Info"
     }
 
-    var filteredActivityLog: [ConnectorActivityEvent] {
+    var filteredActivityLog: [ConnectorEvent] {
         let logs = Array(connector.activityLog.prefix(50))
         switch logFilter {
         case .all: return logs

@@ -69,6 +69,24 @@ struct ConnectorExecutionView: View {
         }
     }
 
+    // MARK: - Idle State
+
+    private var idleState: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "bolt.slash")
+                .font(.system(size: 40))
+                .foregroundColor(.secondary)
+            Text("No Recent Activity")
+                .font(.headline)
+            Text("Run the pipeline to see execution details here.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 32)
+    }
+
     // MARK: - Header
 
     private var executionHeader: some View {
