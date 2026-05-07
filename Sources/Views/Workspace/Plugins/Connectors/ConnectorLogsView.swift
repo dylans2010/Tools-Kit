@@ -65,100 +65,15 @@ struct ConnectorLogsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // MARK: - Stats Bar
-            HStack(spacing: 16) {
-                logStatBadge(label: "Total", value: logStats.total, color: .blue)
-                logStatBadge(label: "Errors", value: logStats.errors, color: .red)
-                logStatBadge(label: "Warnings", value: logStats.warnings, color: .orange)
-                logStatBadge(label: "Perf", value: logStats.performance, color: .purple)
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-
-            // MARK: - Filters
-            VStack(spacing: 8) {
-                Picker("Filter", selection: $filter) {
-                    ForEach(LogFilter.allCases, id: \.self) { f in
-                        Text(f.rawValue).tag(f)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal)
-
-                HStack {
-                    Picker("Date", selection: $selectedDateRange) {
-                        ForEach(DateRange.allCases, id: \.self) { range in
-                            Text(range.rawValue).tag(range)
-                        }
-                    }
-                    .pickerStyle(.menu)
-
-                    Spacer()
-
-                    Toggle(isOn: $autoRefreshEnabled) {
-                        Label("Auto-refresh", systemImage: "arrow.clockwise")
-                            .font(.caption2)
-                    }
-                    .toggleStyle(.button)
-                    .buttonStyle(.bordered)
-                    .controlSize(.mini)
-                }
-                .padding(.horizontal)
-            }
-            .padding(.bottom, 8)
-
-            // MARK: - Log List
-            List {
-                if filteredLogs.isEmpty {
-                    VStack(spacing: 12) {
-                        Image(systemName: "doc.text.magnifyingglass")
-                            .font(.system(size: 32))
-                            .foregroundColor(.secondary)
-                        Text("No logs found")
-                            .font(.headline)
-                        Text(searchText.isEmpty ? "No log entries match the current filter." : "No logs match '\(searchText)'.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 32)
-                } else {
-                    ForEach(filteredLogs) { log in
-                        logRow(log)
-                            .onTapGesture {
-                                withAnimation {
-                                    expandedLogID = expandedLogID == log.id ? nil : log.id
-                                }
-                            }
-                    }
-                }
-            }
+            statsBar
+            filtersSection
+            logListSection
         }
         .searchable(text: $searchText, prompt: "Search logs...")
         .navigationTitle(connectorID == nil ? "Global Logs" : "Execution Logs")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Menu {
-                    Button {
-                        showingClearAlert = true
-                    } label: {
-                        Label("Clear All Logs", systemImage: "trash")
-                    }
-
-                    Button {
-                        exportLogs()
-                    } label: {
-                        Label("Export Logs", systemImage: "square.and.arrow.up")
-                    }
-
-                    Divider()
-
-                    Toggle(isOn: $autoRefreshEnabled) {
-                        Label("Auto-Refresh", systemImage: "arrow.clockwise")
-                    }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                }
+                toolbarMenu
             }
         }
         .alert("Clear All Logs?", isPresented: $showingClearAlert) {
@@ -172,6 +87,110 @@ struct ConnectorLogsView: View {
             }
         } message: {
             Text("This will permanently remove all log entries. This action cannot be undone.")
+        }
+    }
+
+    // MARK: - Stats Bar
+
+    private var statsBar: some View {
+        HStack(spacing: 16) {
+            logStatBadge(label: "Total", value: logStats.total, color: .blue)
+            logStatBadge(label: "Errors", value: logStats.errors, color: .red)
+            logStatBadge(label: "Warnings", value: logStats.warnings, color: .orange)
+            logStatBadge(label: "Perf", value: logStats.performance, color: .purple)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+    }
+
+    // MARK: - Filters
+
+    private var filtersSection: some View {
+        VStack(spacing: 8) {
+            Picker("Filter", selection: $filter) {
+                ForEach(LogFilter.allCases, id: \.self) { f in
+                    Text(f.rawValue).tag(f)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+
+            HStack {
+                Picker("Date", selection: $selectedDateRange) {
+                    ForEach(DateRange.allCases, id: \.self) { range in
+                        Text(range.rawValue).tag(range)
+                    }
+                }
+                .pickerStyle(.menu)
+
+                Spacer()
+
+                Toggle(isOn: $autoRefreshEnabled) {
+                    Label("Auto-refresh", systemImage: "arrow.clockwise")
+                        .font(.caption2)
+                }
+                .toggleStyle(.button)
+                .buttonStyle(.bordered)
+                .controlSize(.mini)
+            }
+            .padding(.horizontal)
+        }
+        .padding(.bottom, 8)
+    }
+
+    // MARK: - Log List
+
+    private var logListSection: some View {
+        List {
+            if filteredLogs.isEmpty {
+                VStack(spacing: 12) {
+                    Image(systemName: "doc.text.magnifyingglass")
+                        .font(.system(size: 32))
+                        .foregroundColor(.secondary)
+                    Text("No logs found")
+                        .font(.headline)
+                    Text(searchText.isEmpty ? "No log entries match the current filter." : "No logs match '\(searchText)'.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 32)
+            } else {
+                ForEach(filteredLogs) { log in
+                    logRow(log)
+                        .onTapGesture {
+                            withAnimation {
+                                expandedLogID = expandedLogID == log.id ? nil : log.id
+                            }
+                        }
+                }
+            }
+        }
+    }
+
+    // MARK: - Toolbar Menu
+
+    private var toolbarMenu: some View {
+        Menu {
+            Button {
+                showingClearAlert = true
+            } label: {
+                Label("Clear All Logs", systemImage: "trash")
+            }
+
+            Button {
+                exportLogs()
+            } label: {
+                Label("Export Logs", systemImage: "square.and.arrow.up")
+            }
+
+            Divider()
+
+            Toggle(isOn: $autoRefreshEnabled) {
+                Label("Auto-Refresh", systemImage: "arrow.clockwise")
+            }
+        } label: {
+            Image(systemName: "ellipsis.circle")
         }
     }
 

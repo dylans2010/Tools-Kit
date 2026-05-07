@@ -183,6 +183,16 @@ final class ConnectorManager: ObservableObject {
         if logs.count > 1000 { logs.removeLast() }
         save()
     }
+
+    func clearLogs(for connectorID: UUID) {
+        logs.removeAll { $0.connectorID == connectorID }
+        save()
+    }
+
+    func clearAllLogs() {
+        logs.removeAll()
+        save()
+    }
 }
 
 // MARK: - Connector Execution Service
