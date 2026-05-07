@@ -51,14 +51,14 @@ public final class SDKAutomationEngine: ObservableObject {
                 do {
                     try await run(rule: rule, context: context)
                 } catch {
-                    SDKLogStore.shared.log("Automation rule '\(rule.name)' failed: \(error.localizedDescription)", source: "SDKAutomationEngine", level: .error)
+                    await SDKLogStore.shared.log("Automation rule '\(rule.name)' failed: \(error.localizedDescription)", source: "SDKAutomationEngine", level: .error)
                 }
             }
         }
     }
 
     public func run(rule: SDKAutomationRule, context: [String: Any]) async throws {
-        SDKLogStore.shared.log("Running automation: \(rule.name)", source: "SDKAutomationEngine", level: .info)
+        await SDKLogStore.shared.log("Running automation: \(rule.name)", source: "SDKAutomationEngine", level: .info)
 
         switch rule.action {
         case .runTool(let toolID, let input):
@@ -84,7 +84,7 @@ public final class SDKAutomationEngine: ObservableObject {
                 exportedAt: Date()
             )
             _ = try await SDKExportService().export(config: config)
-            SDKLogStore.shared.log("Auto-export completed for \(scope)", source: "SDKAutomationEngine", level: .info)
+            await SDKLogStore.shared.log("Auto-export completed for \(scope)", source: "SDKAutomationEngine", level: .info)
         }
 
         // Update rule stats in ProjectManager

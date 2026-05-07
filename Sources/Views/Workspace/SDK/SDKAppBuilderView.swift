@@ -9,13 +9,14 @@ class SDKAppBuilderViewModel: ObservableObject {
     @Published var selectedConnectors: Set<UUID> = []
 
     func export() async throws -> URL {
+        let rules = await SDKAutomationEngine.shared.rules
         let config = SDKExportConfig(
             projectName: name,
             scopes: Array(selectedScopes),
             pluginIDs: Array(selectedPlugins),
             toolIDs: Array(selectedTools),
             connectorIDs: Array(selectedConnectors),
-            automationRules: SDKAutomationEngine.shared.rules,
+            automationRules: rules,
             exportedAt: Date()
         )
         return try await SDKExportService().export(config: config)
@@ -134,14 +135,26 @@ struct SDKAppBuilderView: View {
     private func binding(for scope: SDKScope) -> Binding<Bool> {
         Binding(
             get: { viewModel.selectedScopes.contains(scope) },
-            set: { $0 ? viewModel.selectedScopes.insert(scope) : viewModel.selectedScopes.remove(scope) }
+            set: { (inserted: Bool) in
+                if inserted {
+                    _ = viewModel.selectedScopes.insert(scope)
+                } else {
+                    viewModel.selectedScopes.remove(scope)
+                }
+            }
         )
     }
 
     private func binding(for id: UUID, in keyPath: ReferenceWritableKeyPath<SDKAppBuilderViewModel, Set<UUID>>) -> Binding<Bool> {
-        Binding(
+        Binding<Bool>(
             get: { viewModel[keyPath: keyPath].contains(id) },
-            set: { $0 ? viewModel[keyPath: keyPath].insert(id) : viewModel[keyPath: keyPath].remove(id) }
+            set: { (inserted: Bool) in
+                if inserted {
+                    _ = viewModel[keyPath: keyPath].insert(id)
+                } else {
+                    viewModel[keyPath: keyPath].remove(id)
+                }
+            }
         )
     }
 

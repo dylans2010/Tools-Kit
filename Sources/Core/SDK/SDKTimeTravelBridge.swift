@@ -35,7 +35,9 @@ public final class SDKTimeTravelBridge: ObservableObject {
             snapshots = snapshots.filter { $0.timestamp <= to }
         }
 
-        SDKLogStore.shared.log("Retrieved \(snapshots.count) snapshots", source: "SDKTimeTravelBridge", level: .info)
+        Task {
+            await SDKLogStore.shared.log("Retrieved \(snapshots.count) snapshots", source: "SDKTimeTravelBridge", level: .info)
+        }
         return snapshots
     }
 
@@ -53,7 +55,9 @@ public final class SDKTimeTravelBridge: ObservableObject {
         )
         appendRecord(record)
 
-        SDKLogStore.shared.log("Snapshot restored: \(snapshotID)", source: "SDKTimeTravelBridge", level: .info)
+        Task {
+            await SDKLogStore.shared.log("Snapshot restored: \(snapshotID)", source: "SDKTimeTravelBridge", level: .info)
+        }
     }
 
     // MARK: - Create Snapshot
@@ -70,7 +74,9 @@ public final class SDKTimeTravelBridge: ObservableObject {
         )
         appendRecord(record)
 
-        SDKLogStore.shared.log("Snapshot created: \(message)", source: "SDKTimeTravelBridge", level: .info)
+        Task {
+            await SDKLogStore.shared.log("Snapshot created: \(message)", source: "SDKTimeTravelBridge", level: .info)
+        }
     }
 
     // MARK: - Diff
@@ -102,7 +108,9 @@ public final class SDKTimeTravelBridge: ObservableObject {
         )
         appendRecord(record)
 
-        SDKLogStore.shared.log("Diff computed: \(snapshotA) vs \(snapshotB)", source: "SDKTimeTravelBridge", level: .info)
+        Task {
+            await SDKLogStore.shared.log("Diff computed: \(snapshotA) vs \(snapshotB)", source: "SDKTimeTravelBridge", level: .info)
+        }
         return diffResult
     }
 
