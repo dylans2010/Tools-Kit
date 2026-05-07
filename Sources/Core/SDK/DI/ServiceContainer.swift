@@ -2,6 +2,7 @@ import Foundation
 
 /// High-level service container that manages the SDK's dependency graph.
 /// Provides convenient registration and resolution of all SDK services.
+@MainActor
 public final class ServiceContainer {
     public static let shared = ServiceContainer()
 
