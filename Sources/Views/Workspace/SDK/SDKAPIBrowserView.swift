@@ -105,12 +105,12 @@ struct SDKAPIBrowserView: View {
         let tools = SDKToolManager.shared.tools
         for tool in tools {
             let params = tool.inputSchema.map { $0.key }.joined(separator: ", ")
-            methods.append(APIMethod(name: "sdk.tools.\(tool.name.lowercased().replacingOccurrences(of: " ", with: "_"))(\(params))", description: "Execute tool: \(tool.name)", category: .tools, isAsync: true))
+            methods.append(APIMethod(name: "sdk.tools.\(tool.name.lowercased().replacingOccurrences(of: " ", with: "_"))(\(params))", description: "Execute Tool: \(tool.name)", category: .tools, isAsync: true))
         }
 
         let connectors = SDKConnectorManager.shared.connectors
         for connector in connectors {
-            methods.append(APIMethod(name: "sdk.connectors.\(connector.name.lowercased()).sync()", description: "Sync \(connector.name) connector", category: .connectors, isAsync: true))
+            methods.append(APIMethod(name: "sdk.connectors.\(connector.name.lowercased()).sync()", description: "Sync \(connector.name) Connector", category: .connectors, isAsync: true))
         }
 
         return methods

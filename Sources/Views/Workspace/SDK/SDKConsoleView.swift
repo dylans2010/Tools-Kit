@@ -16,7 +16,7 @@ struct SDKConsoleView: View {
             HStack {
                 Text("Runtime Output").font(.headline)
                 Spacer()
-                Toggle("Try with SDK", isOn: $runtime.isNoSandboxModeEnabled)
+                Toggle("Try With SDK", isOn: $runtime.isNoSandboxModeEnabled)
                     .toggleStyle(.button)
                     .tint(.red)
                     .controlSize(.small)
@@ -31,7 +31,7 @@ struct SDKConsoleView: View {
                 filterButton("Error", type: .error)
                 filterButton("OK", type: .success)
                 Spacer()
-                Text("\(filteredLogs.count) entries")
+                Text("\(filteredLogs.count) Entries")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

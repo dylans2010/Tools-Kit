@@ -33,7 +33,7 @@ struct SDKDiagnosticsView: View {
                         Text(String(describing: scope).capitalized)
                         Spacer()
                         let itemCount = cachedItemCount(for: scope)
-                        Text(itemCount > 0 ? "\(itemCount) items" : "Empty")
+                        Text(itemCount > 0 ? "\(itemCount) Items" : "Empty")
                             .font(.caption)
                             .foregroundStyle(itemCount > 0 ? .green : .secondary)
                     }
@@ -71,7 +71,7 @@ struct SDKDiagnosticsView: View {
 
             Section("Plugin Integrity") {
                 if pluginManager.plugins.isEmpty {
-                    Text("No plugins installed").font(.caption).foregroundStyle(.secondary)
+                    Text("No Plugins Installed").font(.caption).foregroundStyle(.secondary)
                 } else {
                     ForEach(pluginManager.plugins) { plugin in
                         HStack {
@@ -89,7 +89,7 @@ struct SDKDiagnosticsView: View {
 
             Section("Connector Status") {
                 if connectorManager.connectors.isEmpty {
-                    Text("No connectors registered").font(.caption).foregroundStyle(.secondary)
+                    Text("No Connectors Registered").font(.caption).foregroundStyle(.secondary)
                 } else {
                     ForEach(connectorManager.connectors, id: \.id) { connector in
                         HStack {

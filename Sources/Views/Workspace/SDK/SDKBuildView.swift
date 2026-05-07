@@ -34,7 +34,7 @@ struct SDKBuildView: View {
         case macOS = "macOS"
         case watchOS = "watchOS"
         case tvOS = "tvOS"
-        case multiPlatform = "Multi-Platform"
+        case multiPlatform = "Multi Platform"
     }
 
     var body: some View {
@@ -55,7 +55,7 @@ struct SDKBuildView: View {
                     ContentUnavailableView(
                         "No Project",
                         systemImage: "hammer.fill",
-                        description: Text("Open or create a project to start building.")
+                        description: Text("Open or create a project to start building with the Workspace SDK.")
                     )
                 }
             }
@@ -98,7 +98,7 @@ struct SDKBuildView: View {
                     if let lastBuild = project.lastBuiltAt {
                         Label(lastBuild.formatted(.relative(presentation: .numeric)), systemImage: "hammer.fill")
                     } else {
-                        Label("Never built", systemImage: "hammer")
+                        Label("Never Built", systemImage: "hammer")
                     }
                 }
                 .font(.caption)
@@ -181,7 +181,7 @@ struct SDKBuildView: View {
                         .foregroundStyle(.blue)
                     VStack(alignment: .leading) {
                         Text(url.lastPathComponent).font(.headline)
-                        Text("Size: \(fileSizeString(url))").font(.caption).foregroundStyle(.secondary)
+                        Text("Total Size: \(fileSizeString(url))").font(.caption).foregroundStyle(.secondary)
                     }
                     Spacer()
                     ShareLink(item: url)
@@ -419,7 +419,7 @@ struct SDKBuildView: View {
 
         if verboseLogging {
             SDKLogStore.shared.log(
-                "Build started: \(buildMode.rawValue) | \(targetPlatform.rawValue)",
+                "Build Started: \(buildMode.rawValue) | \(targetPlatform.rawValue)",
                 source: "SDKBuildView", level: .info
             )
         }
@@ -456,7 +456,7 @@ struct SDKBuildView: View {
                 if includeTests {
                     if verboseLogging {
                         SDKLogStore.shared.log(
-                            "Running pre-build validation...",
+                            "Running pre build validation...",
                             source: "SDKBuildView", level: .info
                         )
                     }
@@ -472,7 +472,7 @@ struct SDKBuildView: View {
                     try? projectManager.save()
                     if verboseLogging {
                         SDKLogStore.shared.log(
-                            "Build completed: \(url.lastPathComponent)",
+                            "Build Completed: \(url.lastPathComponent)",
                             source: "SDKBuildView", level: .info
                         )
                     }
@@ -483,7 +483,7 @@ struct SDKBuildView: View {
                     self.isBuilding = false
                     if verboseLogging {
                         SDKLogStore.shared.log(
-                            "Build failed: \(error.localizedDescription)",
+                            "Build Failed: \(error.localizedDescription)",
                             source: "SDKBuildView", level: .error
                         )
                     }

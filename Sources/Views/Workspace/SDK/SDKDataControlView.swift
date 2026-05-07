@@ -11,7 +11,7 @@ struct SDKDataControlView: View {
             if showingWarning {
                 Section {
                     VStack(alignment: .leading, spacing: 8) {
-                        Label("HIGH RISK ACCESS", systemImage: "exclamationmark.triangle.fill")
+                        Label("High Risk Access", systemImage: "exclamationmark.triangle.fill")
                             .foregroundColor(.red).bold()
                         Text("This interface allows direct manipulation of workspace data structures. Incorrect operations may lead to data loss.")
                             .font(.caption)
@@ -26,8 +26,8 @@ struct SDKDataControlView: View {
                 Button("Reindex All Notes") {
                     isProcessing = true
                     let notes = WorkspaceAPI.shared.notes.listNotes()
-                    SDKLogStore.shared.log("Reindexed \(notes.count) notes", source: "SDKDataControlView", level: .info)
-                    statusMessage = "Reindexed \(notes.count) notes."
+                    SDKLogStore.shared.log("Reindexed \(notes.count) Notes", source: "SDKDataControlView", level: .info)
+                    statusMessage = "Reindexed \(notes.count) Notes."
                     isProcessing = false
                 }
                 .disabled(isProcessing)
@@ -78,7 +78,7 @@ struct SDKDataControlView: View {
             }
 
             Section(header: Text("SDK Scope Control")) {
-                Toggle("NoSandbox Mode", isOn: $runtime.isNoSandboxModeEnabled)
+                Toggle("No Sandbox Mode", isOn: $runtime.isNoSandboxModeEnabled)
                     .tint(.red)
 
                 if runtime.isNoSandboxModeEnabled {

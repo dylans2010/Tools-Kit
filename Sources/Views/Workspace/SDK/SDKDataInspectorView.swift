@@ -45,7 +45,7 @@ struct SDKDataInspectorView: View {
         Section("Collections") {
             let stats = dataStore.collectionStats()
             if stats.isEmpty {
-                Text("No collections found").font(.caption).foregroundStyle(.secondary)
+                Text("No Collections Found").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach(stats.sorted(by: { $0.key < $1.key }), id: \.key) { name, count in
                     Button {
@@ -58,7 +58,7 @@ struct SDKDataInspectorView: View {
                             Text(name)
                                 .font(.system(.subheadline, design: .monospaced))
                             Spacer()
-                            Text("\(count) items")
+                            Text("\(count) Items")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                             if selectedCollection == name {
@@ -82,7 +82,7 @@ struct SDKDataInspectorView: View {
                 inspectedItems.filter { $0.preview.localizedCaseInsensitiveContains(searchText) }
 
             if filtered.isEmpty {
-                Text("No items").font(.caption).foregroundStyle(.secondary)
+                Text("No Items").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach(filtered) { item in
                     VStack(alignment: .leading, spacing: 4) {

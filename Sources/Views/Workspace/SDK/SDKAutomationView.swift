@@ -58,9 +58,9 @@ struct SDKAutomationView: View {
 
     private func triggerSummary(_ trigger: AutomationTrigger) -> String {
         switch trigger {
-        case .dataUpdated(let scope): return "When \(scope) updated"
-        case .connectorEvent(_, let event): return "On connector event: \(event)"
-        case .timeBased(let interval): return "Every \(Int(interval)) seconds"
+        case .dataUpdated(let scope): return "When \(scope) Updated"
+        case .connectorEvent(_, let event): return "On Connector Event: \(event)"
+        case .timeBased(let interval): return "Every \(Int(interval)) Seconds"
         }
     }
 
@@ -130,7 +130,7 @@ struct AddAutomationRuleView: View {
             name: name,
             trigger: trigger,
             condition: nil,
-            action: .sendNotification(title: "Automation Run", body: "Rule \(name) triggered"),
+            action: .sendNotification(title: "Automation Run", body: "Rule \(name) Triggered"),
             isEnabled: true,
             lastRunAt: nil,
             runCount: 0

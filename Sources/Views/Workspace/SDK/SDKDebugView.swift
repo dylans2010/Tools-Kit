@@ -75,7 +75,7 @@ struct SDKDebugView: View {
             Section("Recent Errors") {
                 let errors = logStore.entries.filter { $0.level == .error }.prefix(10)
                 if errors.isEmpty {
-                    Text("No errors recorded").foregroundStyle(.secondary).font(.caption)
+                    Text("No Errors Recorded").foregroundStyle(.secondary).font(.caption)
                 } else {
                     ForEach(Array(errors)) { entry in
                         VStack(alignment: .leading, spacing: 2) {

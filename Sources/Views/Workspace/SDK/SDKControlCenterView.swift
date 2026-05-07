@@ -31,7 +31,7 @@ struct SDKControlCenterView: View {
                         healthRow("Storage", healthy: backgroundEngine.systemHealth.coreDataHealth)
                     }
 
-                    Text("Last checked: \(backgroundEngine.systemHealth.lastCheck, style: .relative) ago")
+                    Text("Last Checked: \(backgroundEngine.systemHealth.lastCheck, style: .relative) ago")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -49,7 +49,7 @@ struct SDKControlCenterView: View {
                     }
 
                     if runtime.activeProjects.isEmpty {
-                        ContentUnavailableView("No projects running", systemImage: "play.slash", description: Text("Start a project from the build tab."))
+                        ContentUnavailableView("No Projects Running", systemImage: "play.slash", description: Text("Start a project from the Build tab."))
                             .frame(height: 100)
                     } else {
                         ForEach(runtime.activeProjects) { project in
@@ -80,7 +80,7 @@ struct SDKControlCenterView: View {
                     }
 
                     if metrics.failureCount > 0 {
-                        Text("\(metrics.failureCount) failures detected")
+                        Text("\(metrics.failureCount) Failures Detected")
                             .font(.caption)
                             .foregroundStyle(.red)
                     }
@@ -98,7 +98,7 @@ struct SDKControlCenterView: View {
                         Text(realtimeSync.isConnected ? "Connected" : "Idle")
                             .font(.caption)
                         Spacer()
-                        Text("\(realtimeSync.activeChannels.count) channels")
+                        Text("\(realtimeSync.activeChannels.count) Channels")
                             .font(.caption).foregroundStyle(.secondary)
                     }
 
@@ -119,7 +119,7 @@ struct SDKControlCenterView: View {
                         .font(.headline)
 
                     if connectorManager.connectors.isEmpty {
-                        Text("No connectors registered").font(.caption).foregroundStyle(.secondary)
+                        Text("No Connectors Registered").font(.caption).foregroundStyle(.secondary)
                     } else {
                         ForEach(connectorManager.connectors, id: \.id) { connector in
                             HStack {
@@ -149,7 +149,7 @@ struct SDKControlCenterView: View {
                     .tint(.red)
                     .onChange(of: runtime.isNoSandboxModeEnabled) { enabled in
                         if enabled {
-                            SDKLogStore.shared.log("NoSandbox mode ENABLED via Control Center", source: "SDKControlCenterView", level: .warning)
+                            SDKLogStore.shared.log("No Sandbox mode ENABLED via Control Center", source: "SDKControlCenterView", level: .warning)
                         }
                     }
                 }

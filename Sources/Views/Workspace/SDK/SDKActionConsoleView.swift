@@ -28,7 +28,7 @@ struct SDKActionConsoleView: View {
                     .foregroundStyle(.secondary)
                     .font(.system(.body, design: .monospaced))
 
-                TextField("Enter SDK command...", text: $command)
+                TextField("Enter SDK Command...", text: $command)
                     .font(.system(.body, design: .monospaced))
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
