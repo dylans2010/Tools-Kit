@@ -427,7 +427,7 @@ public final class ToolsKitSDK: ObservableObject {
             eventType: .externalAPICall
         ) {
             let sanitized = self.privacyManager.redactRestrictedFields(payload, scope: "external.api.unrestricted")
-            try await self.networkManager.postWebhook(url: url, payload: sanitized, apiKey: apiKey)
+            return try await self.networkManager.postWebhook(url: url, payload: sanitized, apiKey: apiKey)
         }
     }
 
