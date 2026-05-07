@@ -1,6 +1,6 @@
 import SwiftUI
 
-enum SDKRoute: Hashable {
+enum SDKDashboardRoute: Hashable {
     case build
     case connectors
     case automation
@@ -31,7 +31,7 @@ struct SDKProjectDashboardView: View {
                 }
             }
             .navigationTitle("SDK Dashboard")
-            .navigationDestination(for: SDKRoute.self) { route in
+            .navigationDestination(for: SDKDashboardRoute.self) { route in
                 destinationView(for: route)
             }
             .onAppear {
@@ -87,7 +87,7 @@ struct SDKProjectDashboardView: View {
         return "Not built yet"
     }
 
-    private func hubRow(route: SDKRoute, title: String, subtitle: String, icon: String, color: Color, status: ConnectorStatus) -> some View {
+    private func hubRow(route: SDKDashboardRoute, title: String, subtitle: String, icon: String, color: Color, status: ConnectorStatus) -> some View {
         Button {
             navPath.append(route)
         } label: {
@@ -149,7 +149,7 @@ struct SDKProjectDashboardView: View {
     }
 
     @ViewBuilder
-    private func destinationView(for route: SDKRoute) -> some View {
+    private func destinationView(for route: SDKDashboardRoute) -> some View {
         switch route {
         case .build: SDKBuildView()
         case .connectors: SDKConnectorsView()

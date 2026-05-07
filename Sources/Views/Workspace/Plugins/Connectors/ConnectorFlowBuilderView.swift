@@ -88,7 +88,7 @@ struct ConnectorFlowBuilderView: View {
     // MARK: - Workflow Pipeline
 
     private var workflowPipelineSection: some View {
-        Section("Workflow Pipeline") {
+        Section {
             if steps.isEmpty {
                 emptyPipelineView
             } else {
@@ -133,6 +133,8 @@ struct ConnectorFlowBuilderView: View {
                     hasUnsavedChanges = true
                 }
             }
+        } header: {
+            Text("Workflow Pipeline")
         }
     }
 
