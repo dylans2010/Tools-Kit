@@ -60,7 +60,7 @@ public final class SDKExportService {
         try configData.write(to: zipURL) // Minimal fallback
         #endif
 
-        SDKLogStore.shared.log("Project exported to \(zipURL.lastPathComponent)", source: "SDKExportService", level: LogLevel.info)
+        await SDKLogStore.shared.log("Project exported to \(zipURL.lastPathComponent)", source: "SDKExportService", level: .info)
         return zipURL
     }
 }

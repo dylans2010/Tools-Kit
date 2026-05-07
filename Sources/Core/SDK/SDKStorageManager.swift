@@ -96,7 +96,9 @@ public final class SDKStorageManager {
             }
         }
 
-        SDKLogStore.shared.log("Secure value stored for key: \(key)", source: "SDKStorageManager", level: LogLevel.info)
+        Task {
+            await SDKLogStore.shared.log("Secure value stored for key: \(key)", source: "SDKStorageManager", level: .info)
+        }
     }
 
     public func deleteSecureValue(key: String) {

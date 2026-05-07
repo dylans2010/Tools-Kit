@@ -21,7 +21,9 @@ public final class WorkspaceAPI {
                 folder.pages.append(page)
                 NotebooksManager.shared.updateFolder(folder, in: firstNotebook)
             }
-            SDKLogStore.shared.log("Note created via WorkspaceAPI: \(title)", source: "WorkspaceAPI.Notes", level: LogLevel.info)
+            Task {
+                await SDKLogStore.shared.log("Note created via WorkspaceAPI: \(title)", source: "WorkspaceAPI.Notes", level: .info)
+            }
             return Note(id: page.id, title: page.title, content: page.content, createdAt: page.createdAt, updatedAt: page.updatedAt)
         }
     }
@@ -36,7 +38,9 @@ public final class WorkspaceAPI {
         func createTask(title: String, dueDate: Date?) -> WorkspaceTask {
             let task = WorkspaceTask(id: UUID(), title: title, description: "", dueDate: dueDate, priority: .medium, categoryID: nil, completed: false, createdAt: Date())
             TasksManager.shared.addTask(task)
-            SDKLogStore.shared.log("Task created via WorkspaceAPI: \(title)", source: "WorkspaceAPI.Tasks", level: LogLevel.info)
+            Task {
+                await SDKLogStore.shared.log("Task created via WorkspaceAPI: \(title)", source: "WorkspaceAPI.Tasks", level: .info)
+            }
             return task
         }
     }
@@ -64,7 +68,7 @@ public final class WorkspaceAPI {
 
             let message = MailMessage(id: UUID().uuidString, threadId: UUID().uuidString, from: accountInfo.emailAddress, to: [to], cc: [], bcc: [], subject: subject, body: body, htmlBody: nil, date: Date(), isRead: true, isStarred: false, attachments: [])
             try await MailSMTPService().send(message: message, user: accountInfo.emailAddress, pass: password, provider: accountInfo.providerType)
-            SDKLogStore.shared.log("Mail sent via WorkspaceAPI to \(to)", source: "WorkspaceAPI.Mail", level: LogLevel.info)
+            await SDKLogStore.shared.log("Mail sent via WorkspaceAPI to \(to)", source: "WorkspaceAPI.Mail", level: .info)
         }
     }
     let mail = MailAPI()
@@ -80,7 +84,9 @@ public final class WorkspaceAPI {
         func createEvent(title: String, start: Date, end: Date) {
             let event = CalendarEvent(id: UUID(), title: title, date: start, startTime: start, endTime: end, location: "")
             CalendarManager.shared.addEvent(event)
-            SDKLogStore.shared.log("Calendar event created via WorkspaceAPI: \(title)", source: "WorkspaceAPI.Calendar", level: LogLevel.info)
+            Task {
+                await SDKLogStore.shared.log("Calendar event created via WorkspaceAPI: \(title)", source: "WorkspaceAPI.Calendar", level: .info)
+            }
         }
     }
     let calendar = CalendarAPI()
@@ -96,9 +102,13 @@ public final class WorkspaceAPI {
             let path = id
             if FileManager.default.fileExists(atPath: path) {
                 try? FileManager.default.removeItem(atPath: path)
-                SDKLogStore.shared.log("File deleted via WorkspaceAPI: \(path)", source: "WorkspaceAPI.Files", level: LogLevel.info)
+                Task {
+                    await SDKLogStore.shared.log("File deleted via WorkspaceAPI: \(path)", source: "WorkspaceAPI.Files", level: .info)
+                }
             } else {
-                SDKLogStore.shared.log("File not found for deletion: \(path)", source: "WorkspaceAPI.Files", level: LogLevel.warning)
+                Task {
+                    await SDKLogStore.shared.log("File not found for deletion: \(path)", source: "WorkspaceAPI.Files", level: .warning)
+                }
             }
         }
     }
@@ -114,7 +124,9 @@ public final class WorkspaceAPI {
             var deck = SlideDeck.empty(title: title)
             deck.updatedAt = Date()
             SlideDecksManager.shared.addDeck(deck)
-            SDKLogStore.shared.log("Slide deck created via WorkspaceAPI: \(title)", source: "WorkspaceAPI.Slides", level: LogLevel.info)
+            Task {
+                await SDKLogStore.shared.log("Slide deck created via WorkspaceAPI: \(title)", source: "WorkspaceAPI.Slides", level: .info)
+            }
         }
 
         func generateContent(deckID: UUID, prompt: String) async throws {
@@ -122,7 +134,7 @@ public final class WorkspaceAPI {
                 throw SDKError.executionFailed(reason: "Slide deck not found: \(deckID)")
             }
             let response = try await PersonaManager.shared.queryPersona(query: "Generate slide content for '\(deck.title)': \(prompt)")
-            SDKLogStore.shared.log("Slide content generated for \(deck.title): \(response.prefix(50))...", source: "WorkspaceAPI.Slides", level: LogLevel.info)
+            await SDKLogStore.shared.log("Slide content generated for \(deck.title): \(response.prefix(50))...", source: "WorkspaceAPI.Slides", level: .info)
         }
     }
     let slides = SlidesAPI()
@@ -132,10 +144,10 @@ public final class WorkspaceAPI {
         func startMeeting(title: String) async throws -> String {
             let session = try await DailyService.shared.createRoom(for: title)
             if let roomURL = await DailyService.shared.internalRoomURL(for: session) {
-                SDKLogStore.shared.log("Meeting started via WorkspaceAPI: \(title) at \(roomURL)", source: "WorkspaceAPI.Meet", level: LogLevel.info)
+                await SDKLogStore.shared.log("Meeting started via WorkspaceAPI: \(title) at \(roomURL)", source: "WorkspaceAPI.Meet", level: .info)
                 return roomURL.absoluteString
             }
-            SDKLogStore.shared.log("Meeting started via WorkspaceAPI: \(title) (ID: \(session.meetingId))", source: "WorkspaceAPI.Meet", level: LogLevel.info)
+            await SDKLogStore.shared.log("Meeting started via WorkspaceAPI: \(title) (ID: \(session.meetingId))", source: "WorkspaceAPI.Meet", level: .info)
             return session.meetingId
         }
     }
@@ -152,12 +164,16 @@ public final class WorkspaceAPI {
                 throw SDKError.executionFailed(reason: "Snapshot not found: \(snapshotID)")
             }
             TimeTravelManager.shared.restore(snapshot)
-            SDKLogStore.shared.log("Snapshot restored via WorkspaceAPI: \(snapshotID)", source: "WorkspaceAPI.TimeTravel", level: LogLevel.info)
+            Task {
+                await SDKLogStore.shared.log("Snapshot restored via WorkspaceAPI: \(snapshotID)", source: "WorkspaceAPI.TimeTravel", level: .info)
+            }
         }
 
         func createSnapshot(message: String) {
             TimeTravelManager.shared.takeSnapshot(message: message)
-            SDKLogStore.shared.log("Snapshot created via WorkspaceAPI: \(message)", source: "WorkspaceAPI.TimeTravel", level: LogLevel.info)
+            Task {
+                await SDKLogStore.shared.log("Snapshot created via WorkspaceAPI: \(message)", source: "WorkspaceAPI.TimeTravel", level: .info)
+            }
         }
     }
     let timeTravel = TimeTravelAPI()
@@ -166,7 +182,7 @@ public final class WorkspaceAPI {
     struct PersonaAPI {
         func queryPersona(prompt: String) async throws -> String {
             let response = try await PersonaManager.shared.queryPersona(query: prompt)
-            SDKLogStore.shared.log("Persona query via WorkspaceAPI", source: "WorkspaceAPI.Persona", level: LogLevel.info)
+            await SDKLogStore.shared.log("Persona query via WorkspaceAPI", source: "WorkspaceAPI.Persona", level: .info)
             return response
         }
 
@@ -177,7 +193,9 @@ public final class WorkspaceAPI {
 
         func injectMemory(entityID: UUID, content: String) {
             PersonaManager.shared.injectMemory(entityID: entityID, content: content)
-            SDKLogStore.shared.log("Persona memory injected for \(entityID)", source: "WorkspaceAPI.Persona", level: LogLevel.info)
+            Task {
+                await SDKLogStore.shared.log("Persona memory injected for \(entityID)", source: "WorkspaceAPI.Persona", level: .info)
+            }
         }
     }
     let persona = PersonaAPI()
@@ -187,7 +205,7 @@ public final class WorkspaceAPI {
         func executeWorkflow(workflowID: UUID) async throws {
             if let workflow = UnifiedDataStore.shared.integrationWorkflows.first(where: { $0.id == workflowID }) {
                 await IntegrationEngine.shared.processWorkflow(workflow, triggerData: [:])
-                SDKLogStore.shared.log("Workflow executed via WorkspaceAPI: \(workflowID)", source: "WorkspaceAPI.Integrations", level: LogLevel.info)
+                await SDKLogStore.shared.log("Workflow executed via WorkspaceAPI: \(workflowID)", source: "WorkspaceAPI.Integrations", level: .info)
             } else {
                 throw SDKError.executionFailed(reason: "Workflow not found: \(workflowID)")
             }
@@ -195,7 +213,9 @@ public final class WorkspaceAPI {
 
         func triggerWorkflow(event: String) {
             SDKEventBridge.shared.emit(type: "workflow.trigger", payload: ["event": event])
-            SDKLogStore.shared.log("Workflow triggered for event: \(event)", source: "WorkspaceAPI.Integrations", level: LogLevel.info)
+            Task {
+                await SDKLogStore.shared.log("Workflow triggered for event: \(event)", source: "WorkspaceAPI.Integrations", level: .info)
+            }
         }
     }
     let integrations = IntegrationsAPI()

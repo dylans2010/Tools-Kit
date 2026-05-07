@@ -89,7 +89,7 @@ public final class SDKNetworkManager {
                     throw SDKError.executionFailed(reason: "Rate limited after \(maxRetries) retries")
                 }
                 let retryAfter = Double(httpResponse.value(forHTTPHeaderField: "Retry-After") ?? "5") ?? 5
-                SDKLogStore.shared.log("Rate limited. Retrying after \(retryAfter)s", source: "SDKNetworkManager", level: LogLevel.warning)
+                await SDKLogStore.shared.log("Rate limited. Retrying after \(retryAfter)s", source: "SDKNetworkManager", level: .warning)
                 try await Task.sleep(nanoseconds: UInt64(retryAfter * 1_000_000_000))
                 return try await executeWithRetry(request: request, attempt: attempt + 1)
             }
@@ -103,7 +103,7 @@ public final class SDKNetworkManager {
                 throw SDKError.executionFailed(reason: "HTTP \(httpResponse.statusCode)")
             }
 
-            SDKLogStore.shared.log("Request succeeded: \(request.url?.absoluteString ?? "")", source: "SDKNetworkManager", level: LogLevel.debug)
+            await SDKLogStore.shared.log("Request succeeded: \(request.url?.absoluteString ?? "")", source: "SDKNetworkManager", level: .debug)
             return data
         } catch let error as SDKError {
             throw error
@@ -111,7 +111,7 @@ public final class SDKNetworkManager {
             if attempt < maxRetries {
                 let delay = pow(2.0, Double(attempt))
                 try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-                SDKLogStore.shared.log("Network error, retrying (attempt \(attempt + 1)): \(error.localizedDescription)", source: "SDKNetworkManager", level: LogLevel.warning)
+                await SDKLogStore.shared.log("Network error, retrying (attempt \(attempt + 1)): \(error.localizedDescription)", source: "SDKNetworkManager", level: .warning)
                 return try await executeWithRetry(request: request, attempt: attempt + 1)
             }
             throw SDKError.executionFailed(reason: "Network error: \(error.localizedDescription)")

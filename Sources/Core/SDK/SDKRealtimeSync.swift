@@ -9,7 +9,7 @@ public final class SDKRealtimeSync: ObservableObject {
     @Published public var isConnected = false
 
     private var channelSubjects: [String: PassthroughSubject<[String: Any], Never>] = [:]
-    private var subscriptions: [String: [AnyCancellable]] = []
+    private var subscriptions: [String: [AnyCancellable]] = [:]
     private var syncTimer: AnyCancellable?
     private let syncInterval: TimeInterval = 5
 
