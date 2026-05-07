@@ -53,7 +53,7 @@ public final class SDKGraphInterface: ObservableObject {
         SDKWorkspaceGraphEngine.shared.updateLink(source: source, target: target, relation: relation)
         persistGraph()
 
-        SDKLogStore.shared.log("Graph link created: \(source) -[\(relation)]-> \(target)", source: "SDKGraphInterface", level: .info)
+        SDKLogStore.shared.log("Graph link created: \(source) -[\(relation)]-> \(target)", source: "SDKGraphInterface", level: LogLevel.info)
     }
 
     // MARK: - Add Node

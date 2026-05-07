@@ -20,11 +20,11 @@ public final class GmailConnector: BaseConnector {
 
     public func authenticate(credentials: [String: String]) async throws {
         status = .connecting
-        log("Initiating Gmail OAuth2 authentication...", level: .info)
+        log("Initiating Gmail OAuth2 authentication...", level: LogLevel.info)
 
         guard let token = credentials["oauth"] ?? credentials["token"] else {
             status = .error
-            log("OAuth2 token not provided", level: .error)
+            log("OAuth2 token not provided", level: LogLevel.error)
             throw SDKError.executionFailed(reason: "Gmail OAuth2 token required")
         }
 
@@ -34,10 +34,10 @@ public final class GmailConnector: BaseConnector {
         let isValid = try await validateToken(token)
         if isValid {
             status = .connected
-            log("Gmail authenticated successfully", level: .info)
+            log("Gmail authenticated successfully", level: LogLevel.info)
         } else {
             status = .error
-            log("Gmail authentication failed: invalid token", level: .error)
+            log("Gmail authentication failed: invalid token", level: LogLevel.error)
             throw SDKError.executionFailed(reason: "Gmail OAuth2 token validation failed")
         }
     }
@@ -47,7 +47,7 @@ public final class GmailConnector: BaseConnector {
             throw SDKError.executionFailed(reason: "Gmail not connected")
         }
 
-        log("Syncing Gmail messages...", level: .info)
+        log("Syncing Gmail messages...", level: LogLevel.info)
 
         let url = URL(string: "https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=10")!
         var request = URLRequest(url: url)
@@ -61,20 +61,20 @@ public final class GmailConnector: BaseConnector {
 
         if httpResponse.statusCode == 401 {
             status = .error
-            log("Gmail token expired, re-authentication required", level: .error)
+            log("Gmail token expired, re-authentication required", level: LogLevel.error)
             throw SDKError.executionFailed(reason: "Gmail token expired")
         }
 
         guard (200...299).contains(httpResponse.statusCode) else {
-            log("Gmail sync failed with status \(httpResponse.statusCode)", level: .error)
+            log("Gmail sync failed with status \(httpResponse.statusCode)", level: LogLevel.error)
             throw SDKError.executionFailed(reason: "Gmail API error: HTTP \(httpResponse.statusCode)")
         }
 
         if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
            let messages = json["messages"] as? [[String: Any]] {
-            log("Synced \(messages.count) Gmail messages", level: .info)
+            log("Synced \(messages.count) Gmail messages", level: LogLevel.info)
         } else {
-            log("Gmail sync completed (no new messages)", level: .info)
+            log("Gmail sync completed (no new messages)", level: LogLevel.info)
         }
     }
 
@@ -87,7 +87,7 @@ public final class GmailConnector: BaseConnector {
         status = .disconnected
         accessToken = nil
         refreshToken = nil
-        log("Gmail disconnected", level: .info)
+        log("Gmail disconnected", level: LogLevel.info)
     }
 
     private func validateToken(_ token: String) async throws -> Bool {

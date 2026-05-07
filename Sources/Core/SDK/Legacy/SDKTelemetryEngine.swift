@@ -22,7 +22,7 @@ public final class SDKTelemetryEngine: ObservableObject {
     public func startTrace(id: UUID, action: SDKAction) {
         let trace = SDKTrace(id: id, action: action, startTime: Date())
         activeTraces[id] = trace
-        SDKLogStore.shared.log("Trace started: \(action)", source: "SDKTelemetryEngine", level: .debug)
+        SDKLogStore.shared.log("Trace started: \(action)", source: "SDKTelemetryEngine", level: LogLevel.debug)
     }
 
     public func endTrace(id: UUID, status: TraceStatus) {
@@ -37,7 +37,7 @@ public final class SDKTelemetryEngine: ObservableObject {
         }
 
         let duration = trace.endTime!.timeIntervalSince(trace.startTime)
-        SDKLogStore.shared.log("Trace ended: \(trace.action) in \(String(format: "%.3f", duration))s [\(status)]", source: "SDKTelemetryEngine", level: .info)
+        SDKLogStore.shared.log("Trace ended: \(trace.action) in \(String(format: "%.3f", duration))s [\(status)]", source: "SDKTelemetryEngine", level: LogLevel.info)
 
         persistTraces()
     }

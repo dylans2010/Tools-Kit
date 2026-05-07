@@ -22,11 +22,11 @@ public final class WebhookConnector: BaseConnector {
     public func authenticate(credentials: [String: String]) async throws {
         self.config = credentials
         status = .connected
-        log("Webhook configured", level: .info)
+        log("Webhook configured", level: LogLevel.info)
     }
 
     public func sync() async throws {
-        log("Checking webhook health...", level: .info)
+        log("Checking webhook health...", level: LogLevel.info)
         _ = try await testConnection()
     }
 

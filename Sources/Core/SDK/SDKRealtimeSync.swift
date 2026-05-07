@@ -24,7 +24,7 @@ public final class SDKRealtimeSync: ObservableObject {
         activeChannels.insert(channel)
         isConnected = true
 
-        SDKLogStore.shared.log("Subscribed to channel: \(channel)", source: "SDKRealtimeSync", level: .info)
+        SDKLogStore.shared.log("Subscribed to channel: \(channel)", source: "SDKRealtimeSync", level: LogLevel.info)
 
         return subject
             .receive(on: DispatchQueue.main)
@@ -39,7 +39,7 @@ public final class SDKRealtimeSync: ObservableObject {
         }
 
         SDKEventBridge.shared.emit(type: "realtime.\(channel)", payload: data)
-        SDKLogStore.shared.log("Broadcast on channel: \(channel)", source: "SDKRealtimeSync", level: .debug)
+        SDKLogStore.shared.log("Broadcast on channel: \(channel)", source: "SDKRealtimeSync", level: LogLevel.debug)
     }
 
     // MARK: - Unsubscribe

@@ -66,7 +66,7 @@ public final class SDKProjectManager: ObservableObject {
         // since we cannot compile xcdatamodel in this environment but must follow its spirit)
         try WorkspacePersistence.shared.save(projects, to: "sdk_projects_v3.json")
 
-        SDKLogStore.shared.log("Project saved", source: "SDKProjectManager", level: .info)
+        SDKLogStore.shared.log("Project saved", source: "SDKProjectManager", level: LogLevel.info)
     }
 
     private func load() {
