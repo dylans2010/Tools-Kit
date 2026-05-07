@@ -72,6 +72,7 @@ public final class SDKSecurityPolicy {
 
     // MARK: - Sandbox Enforcement
 
+    @MainActor
     public func enforceSandbox(for appId: UUID, action: String) throws {
         guard let app = PluginRuntimeEngine.shared.getApp(appId) else {
             throw SDKError.executionFailed(reason: "App not found for sandbox check")

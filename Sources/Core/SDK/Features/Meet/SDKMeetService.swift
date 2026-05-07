@@ -3,7 +3,7 @@ import Combine
 
 /// Protocol for the SDK meet service.
 public protocol SDKMeetServiceProtocol {
-    func createSession(title: String) throws -> SDKMeetSession
+    func createSession(title: String, participants: [String]) throws -> SDKMeetSession
     func listSessions() -> [SDKMeetSession]
 }
 

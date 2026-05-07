@@ -3,7 +3,7 @@ import Combine
 
 /// Protocol for the SDK articles service.
 public protocol SDKArticleServiceProtocol {
-    func createArticle(title: String, content: String) throws -> SDKArticle
+    func createArticle(title: String, content: String, author: String, tags: [String]) throws -> SDKArticle
     func listArticles() -> [SDKArticle]
     func getArticle(id: UUID) -> SDKArticle?
 }
@@ -132,7 +132,7 @@ public final class SDKArticleService: SDKArticleServiceProtocol, ObservableObjec
     }
 
     private func syncFromWorkspace() {
-        let collections = UnifiedDataStore.shared.articleCollections
+        let collections = ArticlesManager.shared.collections
         for collection in collections {
             for article in collection.articles {
                 let exists = articles.contains { $0.title == article.title }
@@ -140,8 +140,8 @@ public final class SDKArticleService: SDKArticleServiceProtocol, ObservableObjec
                     let sdkArticle = SDKArticle(
                         title: article.title,
                         content: article.content,
-                        author: article.source ?? "",
-                        tags: article.tags
+                        author: article.sourceURL,
+                        tags: []
                     )
                     try? dataStore.save(sdkArticle)
                     articles.append(sdkArticle)

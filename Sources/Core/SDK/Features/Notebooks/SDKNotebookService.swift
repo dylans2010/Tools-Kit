@@ -146,12 +146,12 @@ public final class SDKNotebookService: SDKNotebookServiceProtocol, ObservableObj
     private func syncFromWorkspace() {
         let workspaceNotebooks = NotebooksManager.shared.notebooks
         for wb in workspaceNotebooks {
-            let exists = notebooks.contains { $0.title == wb.title }
+            let exists = notebooks.contains { $0.title == wb.name }
             if !exists {
                 let pages = wb.folders.flatMap { $0.pages }.map { page in
                     SDKNotebookPage(id: page.id, title: page.title, content: page.content)
                 }
-                let sdkNotebook = SDKNotebook(title: wb.title, pages: pages)
+                let sdkNotebook = SDKNotebook(title: wb.name, pages: pages)
                 try? dataStore.save(sdkNotebook)
                 notebooks.append(sdkNotebook)
             }
