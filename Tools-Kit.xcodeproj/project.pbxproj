@@ -1193,11 +1193,6 @@
 		CA104057FB2A409B8449E91E /* SDKToolManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47E16E3713E47C8B668F9A4 /* SDKToolManager.swift */; };
 		B8434BAC026A47748965C855 /* SDKPluginsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F836A766414E69B1E15432 /* SDKPluginsView.swift */; };
 		7475AC82123845ACB951457C /* SDKAppBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F7CA9EB7294F5194434142 /* SDKAppBuilderView.swift */; };
-				SDK1B55D96C7DAC4DDF9EB93 /* SDKHomeView.swift */,
-				SDK1338A34AFE3BD36538341 /* SDKAPIExplorerView.swift */,
-				SDK19CD0E48D6C30B006E472 /* SDKDataInspectorView.swift */,
-				SDK15392AF5F3C4210ACFFE1 /* SDKPluginManagerView.swift */,
-				SDK1245FB85BF006D2EE4B2D /* SDKDeveloperGuideView.swift */,
 		18291A4DF7984C9CA4B10D3A /* SDKLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06C00EFEC47F4EFA82E82DD7 /* SDKLogsView.swift */; };
 		ABB62ECF61904A058B821E4E /* SDKToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D12F91040E4F5EBF1520B1 /* SDKToolsView.swift */; };
 		D7D9473E5FC2491C9C8BB049 /* SDKAutomationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D09A5B508388459689A2623D /* SDKAutomationView.swift */; };
@@ -1208,15 +1203,6 @@
 		3BEED8D4CE29494D805D8A8F /* SDKExecutionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A87BE1C659F46ADB1FD423A /* SDKExecutionEngine.swift */; };
 		4C8280025F0F45EFBD38A281 /* SDKScopeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B36AA1809E413797A8201E /* SDKScopeManager.swift */; };
 		22AA5754349D4F49AF78FCE5 /* SDKEventBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 671209AE670E45C08441CFFB /* SDKEventBridge.swift */; };
-				SDK3000000000000000000001 /* Kernel */,
-				SDK3000000000000000000002 /* DI */,
-				SDK3000000000000000000003 /* Data */,
-				SDK3000000000000000000004 /* Router */,
-				SDK3000000000000000000005 /* Events */,
-				SDK3000000000000000000006 /* Runtime */,
-				SDK3000000000000000000007 /* Security */,
-				SDK300000000000000000000C /* Features */,
-				SDK15DBFE25CCC42CE7BDF3A /* WorkspaceSDK.swift */,
 		148899A9C28C44B9B1B42387 /* SDKRealtimeSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64A76CF976C45DCB6E06EA8 /* SDKRealtimeSync.swift */; };
 		5177B9F3B6704437A508876A /* SDKStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 199E88CE72114DFBBC05FBC8 /* SDKStorageManager.swift */; };
 		E3EF9894FCC54365B3AB71C9 /* SDKNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE43595B01FD4DB1B293E4AF /* SDKNetworkManager.swift */; };
@@ -5068,6 +5054,15 @@
 				F250DA5B4D05461B809B5F9B /* Tools */,
 				F5E2482A753F4279B1D77597 /* Connectors */,
 				F9C9A5E807044F10A177FDAE /* SDKTimeTravelBridge.swift */,
+				SD3000000000000000000001 /* Kernel */,
+				SD3000000000000000000002 /* DI */,
+				SD3000000000000000000003 /* Data */,
+				SD3000000000000000000004 /* Router */,
+				SD3000000000000000000005 /* Events */,
+				SD3000000000000000000006 /* Runtime */,
+				SD3000000000000000000007 /* Security */,
+				SD300000000000000000000C /* Features */,
+				SDK15DBFE25CCC42CE7BDF3A /* WorkspaceSDK.swift */,
 			);
 			path = SDK;
 			sourceTree = "<group>";
@@ -6888,6 +6883,11 @@
 				PL010000000000000000000023 /* SDKIntegrationTestView.swift */,
 				PL010000000000000000000024 /* SDKEventStreamView.swift */,
 				PL010000000000000000000025 /* SDKSecurityMonitorView.swift */,
+				SDK1B55D96C7DAC4DDF9EB93 /* SDKHomeView.swift */,
+				SDK1338A34AFE3BD36538341 /* SDKAPIExplorerView.swift */,
+				SDK19CD0E48D6C30B006E472 /* SDKDataInspectorView.swift */,
+				SDK15392AF5F3C4210ACFFE1 /* SDKPluginManagerView.swift */,
+				SDK1245FB85BF006D2EE4B2D /* SDKDeveloperGuideView.swift */,
 			);
 			path = SDK;
 			sourceTree = "<group>";
@@ -8772,7 +8772,7 @@
 			path = Connectors;
 			sourceTree = "<group>";
 		};
-		SDK3000000000000000000001 /* Kernel */ = {
+		SD3000000000000000000001 /* Kernel */ = {
 			isa = PBXGroup;
 			children = (
 				SDK1337D007855EE8E0E9985 /* WorkspaceSDKKernel.swift */,
@@ -8782,7 +8782,7 @@
 			path = Kernel;
 			sourceTree = "<group>";
 		};
-		SDK3000000000000000000002 /* DI */ = {
+		SD3000000000000000000002 /* DI */ = {
 			isa = PBXGroup;
 			children = (
 				SDK1EDDA998AE9A4D0479B1B /* ServiceRegistry.swift */,
@@ -8792,7 +8792,7 @@
 			path = DI;
 			sourceTree = "<group>";
 		};
-		SDK3000000000000000000003 /* Data */ = {
+		SD3000000000000000000003 /* Data */ = {
 			isa = PBXGroup;
 			children = (
 				SDK17B4EFCADDE69BB13DDD0 /* SDKDataStore.swift */,
@@ -8801,7 +8801,7 @@
 			path = Data;
 			sourceTree = "<group>";
 		};
-		SDK3000000000000000000004 /* Router */ = {
+		SD3000000000000000000004 /* Router */ = {
 			isa = PBXGroup;
 			children = (
 				SDK1F0D252D3F6593FA906AC /* SDKRouter.swift */,
@@ -8811,7 +8811,7 @@
 			path = Router;
 			sourceTree = "<group>";
 		};
-		SDK3000000000000000000005 /* Events */ = {
+		SD3000000000000000000005 /* Events */ = {
 			isa = PBXGroup;
 			children = (
 				SDK1E496599593B87C6A16D6 /* SDKEventBus.swift */,
@@ -8819,7 +8819,7 @@
 			path = Events;
 			sourceTree = "<group>";
 		};
-		SDK3000000000000000000006 /* Runtime */ = {
+		SD3000000000000000000006 /* Runtime */ = {
 			isa = PBXGroup;
 			children = (
 				SDK1BD6F05634EA5DCE9CCD7 /* SDKAppRuntime.swift */,
@@ -8827,7 +8827,7 @@
 			path = Runtime;
 			sourceTree = "<group>";
 		};
-		SDK3000000000000000000007 /* Security */ = {
+		SD3000000000000000000007 /* Security */ = {
 			isa = PBXGroup;
 			children = (
 				SDK18595CEF3856DDD0CFC32 /* SDKSecurityManager.swift */,
@@ -8835,7 +8835,7 @@
 			path = Security;
 			sourceTree = "<group>";
 		};
-		SDK3000000000000000000008 /* Mail */ = {
+		SD3000000000000000000008 /* Mail */ = {
 			isa = PBXGroup;
 			children = (
 				SDK178D40446D42F18991AF8 /* SDKMailService.swift */,
@@ -8843,7 +8843,7 @@
 			path = Mail;
 			sourceTree = "<group>";
 		};
-		SDK3000000000000000000009 /* Notebooks */ = {
+		SD3000000000000000000009 /* Notebooks */ = {
 			isa = PBXGroup;
 			children = (
 				SDK1FAA6D7ED6ADAFA63D593 /* SDKNotebookService.swift */,
@@ -8851,7 +8851,7 @@
 			path = Notebooks;
 			sourceTree = "<group>";
 		};
-		SDK300000000000000000000A /* Meet */ = {
+		SD300000000000000000000A /* Meet */ = {
 			isa = PBXGroup;
 			children = (
 				SDK15DBE0E80391E2E7833B8 /* SDKMeetService.swift */,
@@ -8859,7 +8859,7 @@
 			path = Meet;
 			sourceTree = "<group>";
 		};
-		SDK300000000000000000000B /* Articles */ = {
+		SD300000000000000000000B /* Articles */ = {
 			isa = PBXGroup;
 			children = (
 				SDK134F02928F3FCE2BF609D /* SDKArticleService.swift */,
@@ -8867,13 +8867,13 @@
 			path = Articles;
 			sourceTree = "<group>";
 		};
-		SDK300000000000000000000C /* Features */ = {
+		SD300000000000000000000C /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				SDK3000000000000000000008 /* Mail */,
-				SDK3000000000000000000009 /* Notebooks */,
-				SDK300000000000000000000A /* Meet */,
-				SDK300000000000000000000B /* Articles */,
+				SD3000000000000000000008 /* Mail */,
+				SD3000000000000000000009 /* Notebooks */,
+				SD300000000000000000000A /* Meet */,
+				SD300000000000000000000B /* Articles */,
 			);
 			path = Features;
 			sourceTree = "<group>";
