@@ -665,10 +665,10 @@
 		B1C2D3E4F5A60708090A0D04 /* AppwriteClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C04 /* AppwriteClient.swift */; };
 		B1B2C3D4E5F60718293A0001 /* UserDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A0001 /* UserDataManager.swift */; };
 		B1B2C3D4E5F60718293A0002 /* AIFeatureCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A0002 /* AIFeatureCheck.swift */; };
-		KB02AIPROTO000000000001 /* AIProviderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11EE22FF33AA44BB55CC01 /* AIProviderProtocol.swift */; };
-		KB02AICHAT0000000000001 /* AIChatSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B0B52F727678316A6551CB /* AIChatSettings.swift */; };
+		KB02AIPROTO0000000000001 /* AIProviderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11EE22FF33AA44BB55CC01 /* AIProviderProtocol.swift */; };
+		KB02AICHAT00000000000001 /* AIChatSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B0B52F727678316A6551CB /* AIChatSettings.swift */; };
 		8A06539AC054402AAE166EE9 /* AIModelCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7EF938890D4F8AA5D57456 /* AIModelCatalog.swift */; };
-		KB02OPENRT0000000000001 /* OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */; };
+		KB02OPENRT00000000000001 /* OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */; };
 		B1C2D3E4F5A60708090A0D05 /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60708090A0C05 /* Config.plist */; };
 		1D850FF7369F4F688D80DA62 /* ToolCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3614DB596A94EBEA3646F6A /* ToolCard.swift */; };
 		9899E0E87F5E483AAFE3DC1E /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8089CEDC467040D2B38719FF /* SectionHeader.swift */; };
@@ -2480,9 +2480,6 @@
 			children = (
 				MS019A665425135215447E81 /* Services */,
 				MS01CE56D5B0FFDCBAE186F7 /* Views */,
-				MS01CE56D5B0FFDCBAE186F7 /* Views */,
-				MS01CE56D5B0FFDCBAE186F7 /* Views */,
-				MS01CE56D5B0FFDCBAE186F7 /* Views */,
 				MS019EBACE0548994ADE76AD /* Models */,
 			);
 			path = AI;
@@ -2510,8 +2507,6 @@
 			isa = PBXGroup;
 			children = (
 				MS01E8ABD4E371A2E9D249A1 /* Messaging */,
-				MS01E8ABD4E371A2E9D249A1 /* Messaging */,
-				MS01499B5E0948C02B5EC3AA /* State */,
 				MS01499B5E0948C02B5EC3AA /* State */,
 			);
 			path = Core;
@@ -2561,16 +2556,8 @@
 			isa = PBXGroup;
 			children = (
 				MS0164DF0792B2CA4257190E /* Engine */,
-				MS0164DF0792B2CA4257190E /* Engine */,
-				MS014678665BAD644EBA1728 /* Logic */,
-				MS014678665BAD644EBA1728 /* Logic */,
 				MS014678665BAD644EBA1728 /* Logic */,
 				MS013A164AE474C087F6D824 /* Views */,
-				MS013A164AE474C087F6D824 /* Views */,
-				MS013A164AE474C087F6D824 /* Views */,
-				MS013A164AE474C087F6D824 /* Views */,
-				MS01A88B918360575AAFD4D1 /* Models */,
-				MS01A88B918360575AAFD4D1 /* Models */,
 				MS01A88B918360575AAFD4D1 /* Models */,
 			);
 			path = Games;
@@ -2596,7 +2583,6 @@
 		MS013C8E64C5B046ED9E34E3 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				MS01F966B11ABA79C7BDF62D /* Components */,
 				MS01F966B11ABA79C7BDF62D /* Components */,
 				MS0188AA1F3B54B83550EFF9 /* Utils */,
 			);
@@ -3319,7 +3305,10 @@
 		E10000000000000000000004 /* AIChat */ = {
 			isa = PBXGroup;
 			children = (
-				E10000000000000000000005 /* */,
+				E10000000000000000000005 /* Providers */,
+				AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */,
+				DD11EE22FF33AA44BB55CC01 /* AIProviderProtocol.swift */,
+				B4B0B52F727678316A6551CB /* AIChatSettings.swift */,
 			);
 			path = AIChat;
 			sourceTree = "<group>";
@@ -5638,9 +5627,9 @@
 				KB0200000000000000000021 /* TextAnalyzer.swift in Sources */,
 				KB0200000000000000000022 /* JSONCoder.swift in Sources */,
 				KB0200000000000000000023 /* Debouncer.swift in Sources */,
-				KB02OPENRT0000000000001 /* OpenRouterService.swift in Sources */,
-				KB02AIPROTO000000000001 /* AIProviderProtocol.swift in Sources */,
-				KB02AICHAT0000000000001 /* AIChatSettings.swift in Sources */,
+				KB02OPENRT00000000000001 /* OpenRouterService.swift in Sources */,
+				KB02AIPROTO0000000000001 /* AIProviderProtocol.swift in Sources */,
+				KB02AICHAT00000000000001 /* AIChatSettings.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
