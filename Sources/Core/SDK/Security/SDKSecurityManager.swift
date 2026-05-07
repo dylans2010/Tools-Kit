@@ -123,6 +123,7 @@ public final class SDKSecurityManager: ObservableObject {
     }
 }
 
+@MainActor
 public final class SDKSecurityPolicy {
     public static let shared = SDKSecurityPolicy()
 
