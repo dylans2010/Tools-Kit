@@ -28,8 +28,8 @@ struct ConnectorFlowBuilderView: View {
                 if steps.isEmpty {
                     emptyPipelineView
                 } else {
-                    ForEach($steps) { $step in
-                        stepRow(step: $step)
+                    ForEach($steps) { (step: Binding<FlowStep>) in
+                        stepRow(step: step)
                             .contextMenu {
                                 Button {
                                     duplicateStep(step.wrappedValue)
@@ -39,7 +39,9 @@ struct ConnectorFlowBuilderView: View {
 
                                 if step.wrappedValue.type != .trigger {
                                     Button {
-                                        toggleStepEnabled(step: &step.wrappedValue)
+                                        var mutableStep = step.wrappedValue
+                                        toggleStepEnabled(step: &mutableStep)
+                                        step.wrappedValue = mutableStep
                                     } label: {
                                         Label(
                                             step.wrappedValue.config["disabled"] == "true" ? "Enable Step" : "Disable Step",
