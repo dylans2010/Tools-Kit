@@ -86,7 +86,7 @@ public final class SDKRouter: SDKRouterProtocol {
         }
 
         registerHandler("/sdk/services", method: .get) { _ in
-            let services = ServiceContainer.shared.registeredServiceNames()
+            let services = await ServiceContainer.shared.registeredServiceNames()
             SDKResponse(requestId: UUID(), status: .success, data: ["services": services.joined(separator: ",")])
         }
 
