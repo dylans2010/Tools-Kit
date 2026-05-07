@@ -25,7 +25,7 @@ public final class SDKTimeTravelBridge: ObservableObject {
 
     // MARK: - Get History
 
-    public func getHistory(scope: SDKScope?, from: Date?, to: Date?) -> [WorkspaceSnapshot] {
+    internal func getHistory(scope: SDKScope?, from: Date?, to: Date?) -> [WorkspaceSnapshot] {
         var snapshots = WorkspaceAPI.shared.timeTravel.listSnapshots()
 
         if let from = from {

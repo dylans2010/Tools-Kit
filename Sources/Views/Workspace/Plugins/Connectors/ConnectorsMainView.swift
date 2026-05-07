@@ -6,7 +6,11 @@ struct ConnectorsMainView: View {
     @State private var showingDocs = false
 
     var body: some View {
-        List {
+        let connectors: [ConnectorDefinition] = manager.connectors
+        let activeCount: Int = connectors.filter { $0.status == .active }.count
+        let errorCount: Int = connectors.filter { $0.status == .error }.count
+
+        return List {
             Section {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Connectors Platform")
@@ -16,9 +20,9 @@ struct ConnectorsMainView: View {
                         .foregroundColor(.secondary)
 
                     HStack(spacing: 16) {
-                        statView(label: "Connectors", value: "\(manager.connectors.count)", color: .blue)
-                        statView(label: "Active", value: "\(manager.connectors.filter { $0.status == .active }.count)", color: .green)
-                        statView(label: "Errors", value: "\(manager.connectors.filter { $0.status == .error }.count)", color: .red)
+                        statView(label: "Connectors", value: "\(connectors.count)", color: .blue)
+                        statView(label: "Active", value: "\(activeCount)", color: .green)
+                        statView(label: "Errors", value: "\(errorCount)", color: .red)
                     }
                     .padding(.top, 4)
                 }
@@ -26,7 +30,7 @@ struct ConnectorsMainView: View {
             }
 
             Section("Your Connectors") {
-                if manager.connectors.isEmpty {
+                if connectors.isEmpty {
                     VStack(alignment: .center, spacing: 12) {
                         Image(systemName: "puzzlepiece.extension")
                             .font(.system(size: 40))
@@ -46,7 +50,7 @@ struct ConnectorsMainView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 24)
                 } else {
-                    ForEach(manager.connectors) { connector in
+                    ForEach(connectors) { connector in
                         NavigationLink(destination: ConnectorDetailView(connector: connector)) {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
