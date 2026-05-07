@@ -178,18 +178,16 @@ public final class ToolsKitSDK: ObservableObject {
     }
 
     private func initialize() {
-        Task {
-            await SDKLogStore.shared.log("ToolsKitSDK initializing", source: "ToolsKitSDK", level: .info)
-            await SDKLogStore.shared.log("ToolsKitSDK ready", source: "ToolsKitSDK", level: .info)
-        }
+        SDKLogStore.shared.log("ToolsKitSDK initializing", source: "ToolsKitSDK", level: .info)
         isInitialized = true
+        SDKLogStore.shared.log("ToolsKitSDK ready", source: "ToolsKitSDK", level: .info)
     }
 
     // MARK: - 1. sdk.fetchData
 
     public func fetchData(scope: SDKScope) async throws -> [SDKDataItem] {
         try scopeManager.validateAccess(scope: scope, operation: .read)
-        await SDKLogStore.shared.log("fetchData scope=\(scope)", source: "ToolsKitSDK", level: .info)
+        SDKLogStore.shared.log("fetchData scope=\(scope)", source: "ToolsKitSDK", level: .info)
         return try await dataEngine.fetch(scope: scope)
     }
 
@@ -233,7 +231,7 @@ public final class ToolsKitSDK: ObservableObject {
             }
         }
 
-        await SDKLogStore.shared.log("batchUpdate: \(succeeded) succeeded, \(failed) failed", source: "ToolsKitSDK", level: .info)
+        SDKLogStore.shared.log("batchUpdate: \(succeeded) succeeded, \(failed) failed", source: "ToolsKitSDK", level: .info)
         return SDKBatchResult(succeeded: succeeded, failed: failed, errors: errors)
     }
 
@@ -337,9 +335,7 @@ public final class ToolsKitSDK: ObservableObject {
 
     public func automationCreateWorkflow(rule: SDKAutomationRule) {
         SDKAutomationEngine.shared.add(rule)
-        Task {
-            await SDKLogStore.shared.log("Workflow created: \(rule.name)", source: "ToolsKitSDK", level: .info)
-        }
+        SDKLogStore.shared.log("Workflow created: \(rule.name)", source: "ToolsKitSDK", level: .info)
     }
 
     // MARK: - 19. sdk.automation.modify
@@ -404,7 +400,7 @@ public final class ToolsKitSDK: ObservableObject {
 
     // MARK: - 28. sdk.time.getHistory
 
-    public func timeGetHistory(scope: SDKScope?, from: Date?, to: Date?) -> [WorkspaceSnapshot] {
+    internal func timeGetHistory(scope: SDKScope?, from: Date?, to: Date?) -> [WorkspaceSnapshot] {
         return timeTravelBridge.getHistory(scope: scope, from: from, to: to)
     }
 

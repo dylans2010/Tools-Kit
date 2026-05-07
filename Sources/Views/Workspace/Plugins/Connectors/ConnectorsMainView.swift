@@ -6,9 +6,9 @@ struct ConnectorsMainView: View {
     @State private var showingDocs = false
 
     var body: some View {
-        let connectors = manager.connectors
-        let activeCount = connectors.filter { $0.status == .active }.count
-        let errorCount = connectors.filter { $0.status == .error }.count
+        let connectors: [ConnectorDefinition] = manager.connectors
+        let activeCount: Int = connectors.filter { $0.status == .active }.count
+        let errorCount: Int = connectors.filter { $0.status == .error }.count
 
         return List {
             Section {

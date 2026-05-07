@@ -1,21 +1,14 @@
 import Foundation
 import Combine
 
-public struct WorkspaceSnapshot: Codable, Identifiable {
-    public let id: UUID
-    public var name: String
-    public var branch: String
-    public let timestamp: Date
+struct WorkspaceSnapshot: Codable, Identifiable {
+    let id: UUID
+    var name: String
+    var branch: String
+    let timestamp: Date
 
-    public var message: String { name }
-    public var entityType: String { branch }
-
-    public init(id: UUID, name: String, branch: String, timestamp: Date) {
-        self.id = id
-        self.name = name
-        self.branch = branch
-        self.timestamp = timestamp
-    }
+    var message: String { name }
+    var entityType: String { branch }
 }
 
 /// Saves, restores, and compares full workspace snapshots.

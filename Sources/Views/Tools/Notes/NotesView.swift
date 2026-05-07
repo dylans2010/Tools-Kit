@@ -30,8 +30,8 @@ struct NotesView: View {
     }
 
     var body: some View {
-        let notesToShow = filteredNotes
-        let currentViewMode = viewMode
+        let notesToShow: [Note] = filteredNotes
+        let currentViewMode: ViewMode = viewMode
 
         return ScrollView {
             VStack(alignment: .leading, spacing: 0) {
