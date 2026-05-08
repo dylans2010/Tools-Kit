@@ -17,7 +17,7 @@ public struct SDKStatusPill: View {
     public let label: String
     public let systemImage: String?
     public let color: Color
-    public var isCapsule: Bool = true
+    public let isCapsule: Bool
 
     public init(_ label: String, systemImage: String? = nil, color: Color = .secondary, isCapsule: Bool = true) {
         self.label = label
@@ -54,7 +54,7 @@ public struct SDKSectionHeader: View {
     public let title: String
     public let subtitle: String?
     public let systemImage: String?
-    public var alignment: HorizontalAlignment = .center
+    public let alignment: HorizontalAlignment
 
     public init(_ title: String, subtitle: String? = nil, systemImage: String? = nil, alignment: HorizontalAlignment = .center) {
         self.title = title
@@ -90,20 +90,20 @@ public struct SDKSectionHeader: View {
 // MARK: - SDK Modern Card
 
 public struct SDKModernCard<Content: View>: View {
-    public let content: () -> Content
-    public var padding: CGFloat = 16
+    private let content: Content
+    private let padding: CGFloat
 
-    public init(padding: CGFloat = 16, @ViewBuilder content: @escaping () -> Content) {
+    public init(padding: CGFloat = 16, @ViewBuilder content: () -> Content) {
         self.padding = padding
-        self.content = content
+        self.content = content()
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            content()
+            content
         }
         .padding(padding)
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(Color(UIColor.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -118,7 +118,7 @@ public struct SDKStatPill: View {
     public let label: String
     public let value: String
     public let color: Color
-    public var icon: String? = nil
+    public let icon: String?
 
     public init(label: String, value: String, color: Color = .blue, icon: String? = nil) {
         self.label = label
@@ -192,7 +192,7 @@ public struct SDKActionTile: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
-            .background(Color(.secondarySystemGroupedBackground))
+            .background(Color(UIColor.secondarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -219,10 +219,10 @@ public struct SDKNotificationBanner: View {
 
         public var color: Color {
             switch self {
-            case .success: return .sdkSuccess
-            case .warning: return .sdkWarning
-            case .error: return .sdkError
-            case .info: return .blue
+            case .success: return Color.sdkSuccess
+            case .warning: return Color.sdkWarning
+            case .error: return Color.sdkError
+            case .info: return Color.blue
             }
         }
 
