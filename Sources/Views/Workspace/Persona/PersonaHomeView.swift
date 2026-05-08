@@ -3,6 +3,7 @@ import SwiftUI
 struct PersonaHomeView: View {
     @ObservedObject private var manager = PersonaManager.shared
     @State private var query = ""
+    @AppStorage("persona.welcome_shown") private var hasShownWelcome = false
     @State private var showWelcome = false
     @State private var showTuning = false
     @State private var shuffledPrompts: [String] = []
@@ -168,8 +169,9 @@ struct PersonaHomeView: View {
             }
         }
         .onAppear {
-            if manager.chatHistory.isEmpty {
+            if manager.chatHistory.isEmpty && !hasShownWelcome {
                 showWelcome = true
+                hasShownWelcome = true
             }
             shufflePrompts()
         }
@@ -188,7 +190,7 @@ struct PersonaHomeView: View {
         query = ""
 
         Task {
-            try? await manager.queryPersona(query: trimmed)
+            await manager.queryPersonaSafely(query: trimmed)
         }
     }
 
@@ -280,6 +282,7 @@ struct ThinkingIndicator: View {
 }
 
 struct WelcomePersonaView: View {
+    @State private var animateGradient = false
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -288,7 +291,11 @@ struct WelcomePersonaView: View {
                 VStack(spacing: 30) {
                     Image(systemName: "sparkles")
                         .font(.system(size: 80))
-                        .foregroundStyle(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .foregroundStyle(LinearGradient(colors: animateGradient ? [.mint, .indigo, .purple] : [.blue, .cyan, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .symbolEffect(.pulse.byLayer, options: .nonRepeating)
+                        .onAppear {
+                            withAnimation(.easeInOut(duration: 1.1)) { animateGradient.toggle() }
+                        }
                         .padding(.top, 40)
 
                     VStack(spacing: 8) {
