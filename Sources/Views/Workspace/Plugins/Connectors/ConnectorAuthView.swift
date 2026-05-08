@@ -58,6 +58,24 @@ struct ConnectorAuthView<T: BaseConnector>: View {
                     }
                 }
 
+                Section("Connector Data") {
+                    LabeledContent("Connector ID", value: connector.id.uuidString)
+                    LabeledContent("Auth Fields", value: "\(connector.authFields.count)")
+                    LabeledContent("Activity Events", value: "\(connector.activityLog.count)")
+                    if let latest = connector.activityLog.first {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Latest activity")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Text(latest.message)
+                                .font(.caption)
+                            Text(latest.timestamp.formatted(date: .abbreviated, time: .shortened))
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+
                 // MARK: - Auth Fields
                 Section("Authentication Fields") {
                     if connector.authFields.isEmpty {
@@ -157,6 +175,19 @@ struct ConnectorAuthView<T: BaseConnector>: View {
                         } label: {
                             Label("Clear All Fields", systemImage: "xmark.circle")
                                 .font(.caption)
+                        }
+                    }
+                }
+
+                if !connector.activityLog.isEmpty {
+                    Section("Authentication Activity") {
+                        ForEach(connector.activityLog.prefix(5)) { event in
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(event.message).font(.caption)
+                                Text(event.timestamp.formatted(date: .abbreviated, time: .shortened))
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
                 }

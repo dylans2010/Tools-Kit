@@ -4,6 +4,14 @@ import SwiftUI
 /// Provides architecture explanation, module breakdown, and real Swift code examples.
 struct SDKDeveloperGuideView: View {
     @State private var selectedSection: GuideSection = .gettingStarted
+    @State private var guideMode: GuideMode = .basic
+
+    enum GuideMode: String, CaseIterable, Identifiable {
+        case basic = "Basic"
+        case advanced = "Advanced"
+
+        var id: String { rawValue }
+    }
 
     enum GuideSection: String, CaseIterable, Identifiable {
         case gettingStarted = "Getting Started"
@@ -38,6 +46,19 @@ struct SDKDeveloperGuideView: View {
 
     var body: some View {
         List {
+            Section("Guide Mode") {
+                Picker("Guide Mode", selection: $guideMode) {
+                    ForEach(GuideMode.allCases) { mode in
+                        Text(mode.rawValue).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                Text(guideMode == .basic ? "Simple walkthroughs with tiny code snippets and plain-English explanations." : "Deep architecture notes, production patterns, and full developer examples.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Documentation") {
                 ForEach(GuideSection.allCases) { section in
                     Button {
@@ -69,6 +90,15 @@ struct SDKDeveloperGuideView: View {
 
     @ViewBuilder
     private func guideContent(for section: GuideSection) -> some View {
+        if guideMode == .basic {
+            basicGuideContent(for: section)
+        } else {
+            advancedGuideContent(for: section)
+        }
+    }
+
+    @ViewBuilder
+    private func advancedGuideContent(for section: GuideSection) -> some View {
         switch section {
         case .gettingStarted: gettingStartedContent
         case .architecture: architectureContent
@@ -81,6 +111,98 @@ struct SDKDeveloperGuideView: View {
         case .dataLayer: dataLayerContent
         case .apiRouter: apiRouterContent
         case .security: securityContent
+        }
+    }
+
+    @ViewBuilder
+    private func basicGuideContent(for section: GuideSection) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            docText(basicIntro(for: section))
+            codeBlock(basicSnippet(for: section))
+            docSection("How it works", content: basicExplanation(for: section))
+        }
+    }
+
+    private func basicIntro(for section: GuideSection) -> String {
+        switch section {
+        case .gettingStarted: return "Start here. Create one SDK instance, initialize it, then call the modules you need."
+        case .architecture: return "Think of the SDK as layers: app UI at the top, services in the middle, storage and security at the bottom."
+        case .mail: return "Use the mail module when your feature needs to read, organize, or send messages."
+        case .notebooks: return "Use notebooks to create pages, save edits, and search user notes."
+        case .meet: return "Use meet to create sessions, add people, and keep meeting notes together."
+        case .articles: return "Use articles for long-form content, publishing, tags, and search."
+        case .events: return "Events let one part of your app announce something and another part react to it."
+        case .plugins: return "Plugins are small apps that run inside Workspace with permissions and lifecycle hooks."
+        case .dataLayer: return "The data layer saves user records locally so features can work offline."
+        case .apiRouter: return "The router gives your app simple named endpoints for SDK actions."
+        case .security: return "Security scopes decide what each app or plugin is allowed to do."
+        }
+    }
+
+    private func basicSnippet(for section: GuideSection) -> String {
+        switch section {
+        case .gettingStarted: return """
+let sdk = WorkspaceSDK.shared
+await sdk.initialize()
+print(sdk.version)
+"""
+        case .architecture: return """
+// UI asks a service to do work.
+let notes = sdk.notebooks.listNotebooks()
+"""
+        case .mail: return """
+let inbox = sdk.mail.listMessages()
+print(inbox.count)
+"""
+        case .notebooks: return """
+let page = try sdk.notebooks.createPage(
+    title: "Ideas"
+)
+"""
+        case .meet: return """
+let session = try sdk.meet.createSession(
+    title: "Planning"
+)
+"""
+        case .articles: return """
+let article = try sdk.articles.createArticle(
+    title: "Launch Notes"
+)
+"""
+        case .events: return """
+sdk.emit(channel: "app", name: "saved")
+"""
+        case .plugins: return """
+try await sdk.plugins.start(appId: plugin.id)
+"""
+        case .dataLayer: return """
+try sdk.save(myRecord)
+let records = sdk.fetchAll(MyRecord.self)
+"""
+        case .apiRouter: return """
+let response = try await sdk.api("/sdk/health")
+"""
+        case .security: return """
+let ok = sdk.security.checkPermission(
+    for: appId, scope: "read"
+)
+"""
+        }
+    }
+
+    private func basicExplanation(for section: GuideSection) -> String {
+        switch section {
+        case .gettingStarted: return "Initialize once at launch. After that, every SDK service is available from the shared SDK object."
+        case .architecture: return "Views stay simple. Services own business logic. Storage persists user data. Security checks permissions before sensitive work runs."
+        case .mail: return "The mail service talks to configured accounts, returns user messages, and emits events when messages change."
+        case .notebooks: return "Notebook calls update local data first, then notify the rest of the app so lists and search refresh."
+        case .meet: return "Meeting sessions group participants, notes, and lifecycle state so your UI can show what is active."
+        case .articles: return "Article records keep content, metadata, and publishing state together for editing and discovery."
+        case .events: return "Publish an event when something happens. Subscribers receive it without tight coupling."
+        case .plugins: return "A plugin registers its metadata, requests permissions, then starts and stops through the runtime."
+        case .dataLayer: return "Models are encoded to local storage by type, so user content survives relaunches and works offline."
+        case .apiRouter: return "Routes wrap SDK actions behind predictable paths so automation and plugins can call them consistently."
+        case .security: return "Before a plugin reads, writes, or connects externally, the SDK checks whether its scopes allow that action."
         }
     }
 

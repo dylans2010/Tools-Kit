@@ -2,6 +2,8 @@ import SwiftUI
 
 struct SDKConnectorsView: View {
     @StateObject private var manager = SDKConnectorManager.shared
+    @StateObject private var projectManager = SDKProjectManager.shared
+    @StateObject private var logStore = SDKLogStore.shared
     @State private var showingAddSheet = false
     @State private var searchText = ""
     @State private var filterStatus: FilterStatus = .all
@@ -61,6 +63,23 @@ struct SDKConnectorsView: View {
                         connectorStat(label: "Total", value: "\(connectorStats.total)", color: .blue)
                         connectorStat(label: "Connected", value: "\(connectorStats.connected)", color: .green)
                         connectorStat(label: "Disconnected", value: "\(connectorStats.disconnected)", color: .red)
+                    }
+                }
+
+                Section("Live Project Usage") {
+                    LabeledContent("Current Project", value: projectManager.currentProject?.name ?? "None")
+                    LabeledContent("Enabled Here", value: "\(projectManager.currentProject?.enabledConnectorIDs.count ?? 0)")
+                    LabeledContent("SDK Log Entries", value: "\(logStore.entries.count)")
+                }
+
+                if let latestEvent = manager.connectors.flatMap({ $0.activityLog }).sorted(by: { $0.timestamp > $1.timestamp }).first {
+                    Section("Latest Connector Activity") {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(latestEvent.message).font(.caption)
+                            Text(latestEvent.timestamp.formatted(date: .abbreviated, time: .shortened))
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
 
@@ -135,11 +154,21 @@ struct SDKConnectorsView: View {
                                         Text(connector.type.rawValue.capitalized)
                                             .font(.caption)
                                             .foregroundStyle(.secondary)
-                                        if !connector.activityLog.isEmpty {
-                                            Text("• \(connector.activityLog.count) events")
+                                        Text("• \(connector.activityLog.count) events")
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+                                        if let current = projectManager.currentProject,
+                                           current.enabledConnectorIDs.contains(connector.id) {
+                                            Text("• Project enabled")
                                                 .font(.caption2)
                                                 .foregroundColor(.secondary)
                                         }
+                                    }
+                                    if let latest = connector.activityLog.first {
+                                        Text(latest.message)
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(1)
                                     }
                                 }
 

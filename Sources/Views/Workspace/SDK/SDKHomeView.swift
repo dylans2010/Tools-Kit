@@ -66,6 +66,9 @@ struct SDKHomeView: View {
             }
 
             Section("Workspace") {
+                NavigationLink(destination: SDKDeveloperGuideView()) {
+                    Label("Developer Guide", systemImage: "book.closed.fill")
+                }
                 NavigationLink(destination: SDKBuildView()) {
                     Label("App Builder", systemImage: "hammer.fill")
                 }

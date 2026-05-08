@@ -1129,6 +1129,7 @@
 		PL020000000000000000000004 /* PluginSecurityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000004 /* PluginSecurityView.swift */; };
 		PL020000000000000000000101 /* ConnectorsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000101 /* ConnectorsMainView.swift */; };
 		PL020000000000000000000102 /* ConnectorBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000102 /* ConnectorBuilderView.swift */; };
+		ABCD1234567890ABCDEF0101 /* PresetConnectorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCD1234567890ABCDEF0100 /* PresetConnectorsView.swift */; };
 		PL020000000000000000000103 /* ConnectorDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000103 /* ConnectorDetailView.swift */; };
 		PL020000000000000000000104 /* ConnectorExecutionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000104 /* ConnectorExecutionView.swift */; };
 		PL020000000000000000000105 /* ConnectorLogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000105 /* ConnectorLogsView.swift */; };
@@ -2306,6 +2307,7 @@
 		SV01753ABE02878346C2A212 /* SecurityActivityLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityActivityLogView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000101 /* ConnectorsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorsMainView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000102 /* ConnectorBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorBuilderView.swift; sourceTree = "<group>"; };
+		ABCD1234567890ABCDEF0100 /* PresetConnectorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetConnectorsView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000103 /* ConnectorDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorDetailView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000104 /* ConnectorExecutionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorExecutionView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000105 /* ConnectorLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorLogsView.swift; sourceTree = "<group>"; };
@@ -3125,6 +3127,7 @@
 				5851B51F6765499BABAC81DE /* SDKConnectorsView.swift */,
 				PL010000000000000000000101 /* ConnectorsMainView.swift */,
 				PL010000000000000000000102 /* ConnectorBuilderView.swift */,
+				ABCD1234567890ABCDEF0100 /* PresetConnectorsView.swift */,
 				PL010000000000000000000103 /* ConnectorDetailView.swift */,
 				PL010000000000000000000104 /* ConnectorExecutionView.swift */,
 				PL010000000000000000000105 /* ConnectorLogsView.swift */,
@@ -9145,6 +9148,7 @@
 				PL020000000000000000000006 /* SecurityScopeApplicationView.swift in Sources */,
 				PL020000000000000000000101 /* ConnectorsMainView.swift in Sources */,
 				PL020000000000000000000102 /* ConnectorBuilderView.swift in Sources */,
+				ABCD1234567890ABCDEF0101 /* PresetConnectorsView.swift in Sources */,
 				PL020000000000000000000103 /* ConnectorDetailView.swift in Sources */,
 				PL020000000000000000000104 /* ConnectorExecutionView.swift in Sources */,
 				PL020000000000000000000105 /* ConnectorLogsView.swift in Sources */,

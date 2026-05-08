@@ -24,6 +24,7 @@ struct SDKBuildView: View {
 
     @State private var showingConsole = false
     @State private var showingSystemExplorer = false
+    @State private var showingMetadataSheet = false
     @State private var metadataName = ""
     @State private var metadataDescription = ""
     @State private var metadataStatus: SDKProject.ProjectStatus = .draft
@@ -57,13 +58,7 @@ struct SDKBuildView: View {
                 exploreSection
                 deploySection(project)
             } else {
-                Section {
-                    ContentUnavailableView(
-                        "No Project",
-                        systemImage: "hammer.fill",
-                        description: Text("Open or create a project to start building with the Workspace SDK.")
-                    )
-                }
+                emptyProjectSection
             }
         }
         .navigationTitle("Build")
@@ -72,6 +67,11 @@ struct SDKBuildView: View {
         }
         .sheet(isPresented: $showingSystemExplorer) {
             NavigationStack { SDKSystemExplorerView() }
+        }
+        .sheet(isPresented: $showingMetadataSheet) {
+            NavigationStack { metadataSheetContent }
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
         }
         .onAppear {
             if let project = projectManager.currentProject {
@@ -126,17 +126,96 @@ struct SDKBuildView: View {
     @ViewBuilder
     private func projectMetadataEditorSection(_ project: SDKProject) -> some View {
         Section("Project Metadata") {
-            TextField("Project name", text: $metadataName)
-            TextField("Description", text: $metadataDescription, axis: .vertical)
-                .lineLimit(2...4)
-            Picker("Status", selection: $metadataStatus) {
-                ForEach(SDKProject.ProjectStatus.allCases, id: \.self) { status in
-                    Text(status.rawValue.capitalized).tag(status)
+            Button {
+                metadataName = project.name
+                metadataDescription = project.description
+                metadataStatus = project.status
+                showingMetadataSheet = true
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "slider.horizontal.3")
+                        .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Edit Metadata")
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                        Text("Name, description, status, scopes, connectors, and tools")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.up.forward.app")
+                        .foregroundStyle(.tertiary)
                 }
             }
-            scopeSelector
-            connectorAndToolAssignment
+            .buttonStyle(.plain)
         }
+    }
+
+    private var metadataSheetContent: some View {
+        Form {
+            Section("Details") {
+                TextField("Project name", text: $metadataName)
+                TextField("Description", text: $metadataDescription, axis: .vertical)
+                    .lineLimit(3...5)
+                Picker("Status", selection: $metadataStatus) {
+                    ForEach(SDKProject.ProjectStatus.allCases, id: \.self) { status in
+                        Text(status.rawValue.capitalized).tag(status)
+                    }
+                }
+            }
+
+            Section("Access") {
+                scopeSelector
+            }
+
+            Section("Assignments") {
+                connectorAndToolAssignment
+            }
+        }
+        .navigationTitle("Project Metadata")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") { showingMetadataSheet = false }
+            }
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Save") {
+                    saveBuild()
+                    showingMetadataSheet = false
+                }
+            }
+        }
+    }
+
+    private var emptyProjectSection: some View {
+        Section {
+            VStack(spacing: 14) {
+                Image(systemName: "hammer.circle")
+                    .font(.system(size: 42))
+                    .foregroundStyle(.secondary)
+                Text("No Project")
+                    .font(.title3.bold())
+                Text("Create a clean SDK project to configure scopes, connectors, tools, and builds.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                Button {
+                    let project = projectManager.createProject(name: "New SDK Project", status: .draft)
+                    metadataName = project.name
+                    metadataDescription = project.description
+                    metadataStatus = project.status
+                    showingMetadataSheet = true
+                } label: {
+                    Label("Create Project", systemImage: "plus")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 28)
+        }
+        .listRowBackground(Color.clear)
     }
 
     private var buildConfigSection: some View {
