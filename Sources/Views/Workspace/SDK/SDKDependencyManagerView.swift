@@ -105,6 +105,9 @@ struct SDKDependencyManagerView: View {
                 .buttonStyle(.bordered)
             }
         }
+        .onChange(of: state.dependencies) { _, _ in
+            state.saveSnapshot()
+        }
         .navigationTitle("Dependencies")
     }
 }

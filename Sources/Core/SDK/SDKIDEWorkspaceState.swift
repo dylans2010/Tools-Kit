@@ -54,6 +54,49 @@ public enum SDKWorkspaceNode: String, CaseIterable, Codable, Hashable, Identifia
     }
 }
 
+
+public struct SDKScopeDefinition: Identifiable, Codable, Hashable {
+    public var id: String { key }
+    public var key: String
+    public var category: String
+    public var description: String
+    public var riskLevel: String
+    public var approvals: String
+    public var linkedCapability: SDKWorkspaceNode
+    public var dependsOn: [String]
+
+    public init(
+        key: String,
+        category: String,
+        description: String,
+        riskLevel: String,
+        approvals: String,
+        linkedCapability: SDKWorkspaceNode,
+        dependsOn: [String] = []
+    ) {
+        self.key = key
+        self.category = category
+        self.description = description
+        self.riskLevel = riskLevel
+        self.approvals = approvals
+        self.linkedCapability = linkedCapability
+        self.dependsOn = dependsOn
+    }
+}
+
+public struct SDKCapabilityDefinition: Identifiable, Codable, Hashable {
+    public var id: SDKWorkspaceNode { node }
+    public var node: SDKWorkspaceNode
+    public var description: String
+    public var requiredScopes: [String]
+
+    public init(node: SDKWorkspaceNode, description: String, requiredScopes: [String]) {
+        self.node = node
+        self.description = description
+        self.requiredScopes = requiredScopes
+    }
+}
+
 public enum SDKPanelZone: String, Codable, CaseIterable {
     case left
     case center
@@ -250,6 +293,27 @@ public final class SDKRuntimeWorkspaceState: ObservableObject {
     @Published public var memoryEstimateMB: Int = 0
     @Published public var runtimeFailureMessage: String?
 
+    public static let scopeCatalog: [SDKScopeDefinition] = [
+        SDKScopeDefinition(key: "workspace.files.read", category: "Data", description: "Read project files", riskLevel: "Low", approvals: "None", linkedCapability: .config),
+        SDKScopeDefinition(key: "workspace.files.write", category: "Data", description: "Write project files", riskLevel: "Medium", approvals: "Maintainer", linkedCapability: .runtimeScripts, dependsOn: ["workspace.files.read"]),
+        SDKScopeDefinition(key: "workspace.persona.read", category: "AI", description: "Use persona context", riskLevel: "Medium", approvals: "Maintainer", linkedCapability: .capabilities),
+        SDKScopeDefinition(key: "workspace.persona.write", category: "AI", description: "Persist persona memory", riskLevel: "High", approvals: "Security review", linkedCapability: .libraries, dependsOn: ["workspace.persona.read"]),
+        SDKScopeDefinition(key: "workspace.automation.execute", category: "Automation", description: "Run workflow scripts", riskLevel: "High", approvals: "Maintainer", linkedCapability: .runtimeScripts, dependsOn: ["workspace.files.read"]),
+        SDKScopeDefinition(key: "external.api.unrestricted", category: "Integrations", description: "External connector access", riskLevel: "High", approvals: "Security review", linkedCapability: .connectors),
+        SDKScopeDefinition(key: "workspace.runtime.admin", category: "System", description: "Runtime administration", riskLevel: "Critical", approvals: "Admin", linkedCapability: .config, dependsOn: ["workspace.files.read", "workspace.automation.execute"])
+    ]
+
+    public static let capabilityCatalog: [SDKCapabilityDefinition] = [
+        SDKCapabilityDefinition(node: .config, description: "Project metadata, runtime defaults, and selected run configuration.", requiredScopes: ["workspace.files.read"]),
+        SDKCapabilityDefinition(node: .capabilities, description: "SDK feature matrix driven by dependencies, libraries, and granted scopes.", requiredScopes: ["workspace.files.read"]),
+        SDKCapabilityDefinition(node: .scopes, description: "Permission grants validated before SDK execution.", requiredScopes: ["workspace.files.read"]),
+        SDKCapabilityDefinition(node: .libraries, description: "Callable SDK library exports and pipeline stages.", requiredScopes: ["workspace.files.read"]),
+        SDKCapabilityDefinition(node: .dependencies, description: "Execution graph consumed by the SDK dependency planner.", requiredScopes: ["workspace.files.read"]),
+        SDKCapabilityDefinition(node: .connectors, description: "External API and connector federation.", requiredScopes: ["external.api.unrestricted"]),
+        SDKCapabilityDefinition(node: .runtimeScripts, description: "Automation flows and pre/post run hooks.", requiredScopes: ["workspace.automation.execute"]),
+        SDKCapabilityDefinition(node: .apiEndpoints, description: "HTTP route explorer and SDK endpoint contracts.", requiredScopes: ["workspace.files.read"])
+    ]
+
     private let persistenceKey = "sdk_ide_workspace_state_v1"
 
     private struct PersistedState: Codable {
@@ -316,13 +380,101 @@ public final class SDKRuntimeWorkspaceState: ObservableObject {
         save()
     }
 
+    public var selectedRunConfiguration: SDKRunConfiguration? {
+        runConfigurations.first { $0.id == selectedRunConfigurationID } ?? runConfigurations.first
+    }
+
+    public func effectiveScopes(for project: SDKProject?) -> Set<String> {
+        var scopes = Set(project?.enabledScopes ?? [])
+        scopes.formUnion(project?.requiredScopes ?? [])
+        scopes.formUnion(selectedRunConfiguration?.scopedExecution ?? [])
+        return scopes
+    }
+
+    public func setScope(_ key: String, enabled: Bool, for projectManager: SDKProjectManager = .shared) {
+        guard var project = projectManager.currentProject else { return }
+        if enabled {
+            grantScope(key, to: &project)
+        } else {
+            project.enabledScopes.removeAll { $0 == key }
+        }
+        projectManager.updateProject(project)
+        syncSDKGraphFromProject(project)
+        recalculateDiagnostics()
+    }
+
+    public func grantScope(_ key: String, to project: inout SDKProject) {
+        guard !project.enabledScopes.contains(key) else { return }
+        if let definition = Self.scopeCatalog.first(where: { $0.key == key }) {
+            for dependency in definition.dependsOn {
+                grantScope(dependency, to: &project)
+            }
+        }
+        project.enabledScopes.append(key)
+    }
+
+    public func syncSDKGraphFromProject(_ project: SDKProject? = SDKProjectManager.shared.currentProject) {
+        guard let project else { return }
+        for index in libraries.indices {
+            libraries[index].usageCount = dependencies.filter { $0.name == libraries[index].name }.count
+        }
+        for library in libraries {
+            if let dependencyIndex = dependencies.firstIndex(where: { $0.name == library.name && $0.kind == .library }) {
+                dependencies[dependencyIndex].version = library.version
+                dependencies[dependencyIndex].requiredScopes = library.linkedScopes
+            } else {
+                dependencies.append(SDKDependencyNode(name: library.name, kind: .library, version: library.version, requiredScopes: library.linkedScopes))
+            }
+        }
+        save()
+    }
+
+    public func upsertLibrary(_ library: SDKLibraryDefinition) {
+        if let index = libraries.firstIndex(where: { $0.id == library.id }) {
+            libraries[index] = library
+        } else {
+            libraries.append(library)
+        }
+        if let dependencyIndex = dependencies.firstIndex(where: { $0.name == library.name && $0.kind == .library }) {
+            dependencies[dependencyIndex].version = library.version
+            dependencies[dependencyIndex].requiredScopes = library.linkedScopes
+        } else {
+            dependencies.append(SDKDependencyNode(name: library.name, kind: .library, version: library.version, requiredScopes: library.linkedScopes))
+        }
+        recalculateDiagnostics()
+    }
+
     public func recalculateDiagnostics() {
         var next: [SDKRuntimeDiagnostic] = []
         let project = SDKProjectManager.shared.currentProject
-        let scopes = Set(project?.enabledScopes ?? [])
+        let scopes = effectiveScopes(for: project)
 
         if scopes.isEmpty {
             next.append(.init(severity: .warning, node: .scopes, message: "Project has no enabled scopes.", suggestion: "Enable at least one read scope for runtime startup."))
+        }
+
+        for capability in Self.capabilityCatalog {
+            let missing = Set(capability.requiredScopes).subtracting(scopes)
+            if !missing.isEmpty {
+                next.append(.init(
+                    severity: capability.node == .connectors ? .warning : .error,
+                    node: capability.node,
+                    message: "\(capability.node.title) is missing required scopes: \(missing.sorted().joined(separator: ", ")).",
+                    suggestion: "Grant the required scope from Scopes or add it to the selected run configuration."
+                ))
+            }
+        }
+
+        for definition in Self.scopeCatalog where scopes.contains(definition.key) {
+            let missingParents = Set(definition.dependsOn).subtracting(scopes)
+            if !missingParents.isEmpty {
+                next.append(.init(
+                    severity: .error,
+                    node: .scopes,
+                    message: "\(definition.key) is enabled without dependencies: \(missingParents.sorted().joined(separator: ", ")).",
+                    suggestion: "Enable the dependent scopes so SDK validation can pass."
+                ))
+            }
         }
 
         for library in libraries {

@@ -58,6 +58,10 @@ struct SDKRunConfigurationView: View {
                 }
             }
         }
+        .onChange(of: state.runConfigurations) { _, _ in
+            state.saveSnapshot()
+            state.recalculateDiagnostics()
+        }
         .navigationTitle("Run Configuration")
     }
 }
