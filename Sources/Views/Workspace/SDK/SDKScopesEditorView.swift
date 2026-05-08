@@ -100,7 +100,7 @@ struct SDKScopesEditorView: View {
     }
 
     private func scopeRow(_ item: SDKScopeDefinition) -> some View {
-        SDKModernCard(padding: 12) {
+        SDKModernCard(padding: 12, content: {
             VStack(alignment: .leading, spacing: 10) {
                 Toggle(isOn: binding(for: item.key)) {
                     VStack(alignment: .leading, spacing: 2) {

@@ -15,9 +15,9 @@ struct CodeAuditView: View {
                             .foregroundColor(.secondary)
 
                         HStack {
-                            StatPill(label: module.type.rawValue.capitalized, value: "", color: color(for: module.type))
+                            SDKStatPill(label: module.type.rawValue.capitalized, value: "", color: color(for: module.type))
                             if !module.dependencies.isEmpty {
-                                StatPill(label: "\(module.dependencies.count) Deps", value: "", color: .gray)
+                                SDKStatPill(label: "\(module.dependencies.count) Deps", value: "", color: .gray)
                             }
                         }
                         .padding(.top, 4)

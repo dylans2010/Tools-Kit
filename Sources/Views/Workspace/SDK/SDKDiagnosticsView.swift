@@ -10,7 +10,7 @@ struct SDKDiagnosticsView: View {
     var body: some View {
         List {
             Section {
-                SDKModernCard(padding: 12) {
+                SDKModernCard(padding: 12, content: {
                     VStack(alignment: .leading, spacing: 12) {
                         healthRow(title: "Connector Reachability", status: bgEngine.systemHealth.connectorReachability)
                         healthRow(title: "Plugin Sandbox", status: bgEngine.systemHealth.pluginSandboxStatus)

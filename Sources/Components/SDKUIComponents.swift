@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// A collection of modern, monochrome UI components optimized for the ToolsKit SDK Workspace.
 /// These components follow a clean design language with heavy use of SF Symbols and subtexts.
@@ -6,9 +7,9 @@ import SwiftUI
 // MARK: - Semantic Colors
 
 public extension Color {
-    static let sdkSuccess = Color.green
-    static let sdkWarning = Color.orange
-    static let sdkError = Color.red
+    static var sdkSuccess: Color { Color.green }
+    static var sdkWarning: Color { Color.orange }
+    static var sdkError: Color { Color.red }
 }
 
 // MARK: - SDK Status Pill
@@ -38,13 +39,15 @@ public struct SDKStatusPill: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
         .foregroundStyle(color)
-        .background {
-            if isCapsule {
-                Capsule().fill(color.opacity(0.12))
-            } else {
-                RoundedRectangle(cornerRadius: 6).fill(color.opacity(0.12))
+        .background(
+            Group {
+                if isCapsule {
+                    Capsule().fill(color.opacity(0.12))
+                } else {
+                    RoundedRectangle(cornerRadius: 6).fill(color.opacity(0.12))
+                }
             }
-        }
+        )
     }
 }
 
@@ -79,19 +82,25 @@ public struct SDKSectionHeader: View {
                 Text(subtitle)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
-                    .multilineTextAlignment(alignment == .center ? .center : .leading)
+                    .multilineTextAlignment(alignment == .leading ? .leading : (alignment == .trailing ? .trailing : .center))
             }
         }
-        .frame(maxWidth: .infinity, alignment: alignment == .center ? .center : .leading)
+        .frame(maxWidth: .infinity, alignment: frameAlignment)
         .padding(.vertical, 8)
+    }
+
+    private var frameAlignment: Alignment {
+        if alignment == .leading { return .leading }
+        if alignment == .trailing { return .trailing }
+        return .center
     }
 }
 
 // MARK: - SDK Modern Card
 
 public struct SDKModernCard<Content: View>: View {
-    private let content: Content
-    private let padding: CGFloat
+    public let content: Content
+    public let padding: CGFloat
 
     public init(padding: CGFloat = 16, @ViewBuilder content: () -> Content) {
         self.padding = padding
@@ -103,7 +112,7 @@ public struct SDKModernCard<Content: View>: View {
             content
         }
         .padding(padding)
-        .background(Color(UIColor.secondarySystemGroupedBackground))
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -192,7 +201,7 @@ public struct SDKActionTile: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
-            .background(Color(UIColor.secondarySystemGroupedBackground))
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)

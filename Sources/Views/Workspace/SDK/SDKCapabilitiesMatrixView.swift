@@ -69,7 +69,7 @@ struct SDKCapabilitiesMatrixView: View {
 
     private func capabilityRow(_ capability: SDKCapabilityDefinition) -> some View {
         let isEnabled = Set(capability.requiredScopes).isSubset(of: effectiveScopes)
-        return SDKModernCard(padding: 12) {
+        return SDKModernCard(padding: 12, content: {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     Label(capability.node.title, systemImage: capability.node.icon)

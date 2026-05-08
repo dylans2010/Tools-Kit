@@ -59,7 +59,7 @@ struct SDKConnectorsView: View {
             // MARK: - Stats
             if !manager.connectors.isEmpty {
                 Section {
-                    SDKModernCard(padding: 12) {
+                    SDKModernCard(padding: 12, content: {
                         HStack(spacing: 0) {
                             SDKStatPill(label: "Total", value: "\(connectorStats.total)", color: .blue)
                             SDKStatPill(label: "Connected", value: "\(connectorStats.connected)", color: .sdkSuccess)

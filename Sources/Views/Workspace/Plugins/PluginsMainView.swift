@@ -43,7 +43,7 @@ struct PluginsMainView: View {
     }
 
     private var pluginStatsCard: some View {
-        SDKModernCard(padding: 12) {
+        SDKModernCard(padding: 12, content: {
             HStack(spacing: 0) {
                 SDKStatPill(label: "Active", value: "\(manager.installedPlugins.filter(\.isEnabled).count)", color: .sdkSuccess)
                 SDKStatPill(label: "Disabled", value: "\(manager.installedPlugins.filter { !$0.isEnabled }.count)", color: .secondary)
@@ -73,7 +73,7 @@ struct PluginsMainView: View {
             } else {
                 ForEach(manager.installedPlugins.filter(\.isEnabled)) { plugin in
                     NavigationLink(destination: PluginDetailView(pluginID: plugin.id)) {
-                        SDKModernCard(padding: 12) {
+                        SDKModernCard(padding: 12, content: {
                             HStack(spacing: 12) {
                                 Image(systemName: plugin.icon)
                                     .font(.subheadline)

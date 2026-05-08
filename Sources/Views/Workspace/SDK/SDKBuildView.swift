@@ -129,7 +129,7 @@ struct SDKBuildView: View {
 
     @ViewBuilder
     private func projectOverviewSection(_ project: SDKProject) -> some View {
-        SDKModernCard {
+        SDKModernCard(content: {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
@@ -568,13 +568,6 @@ struct SDKBuildView: View {
         .padding(.vertical, 2)
     }
 
-    private func statPill(label: String, caption: String) -> some View {
-        VStack(spacing: 2) {
-            Text(label).font(.system(.headline, design: .rounded)).bold()
-            Text(caption).font(.caption2).foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-    }
 
     @ViewBuilder
     private func healthBadge(_ status: HealthStatus) -> some View {

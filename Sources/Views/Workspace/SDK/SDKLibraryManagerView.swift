@@ -58,7 +58,7 @@ struct SDKLibraryManagerView: View {
 
             Section {
                 if let first = state.libraries.first {
-                    SDKModernCard(padding: 12) {
+                    SDKModernCard(padding: 12, content: {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
                                 Label(first.name, systemImage: "arrow.triangle.2.circlepath")
@@ -99,7 +99,7 @@ struct SDKLibraryManagerView: View {
     }
 
     private func libraryCard(_ library: SDKLibraryDefinition) -> some View {
-        SDKModernCard(padding: 12) {
+        SDKModernCard(padding: 12, content: {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {

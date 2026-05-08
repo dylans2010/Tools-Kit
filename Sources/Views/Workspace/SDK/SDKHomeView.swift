@@ -117,7 +117,7 @@ struct SDKHomeView: View {
             SDKBuildView()
                 .onAppear { projectManager.loadProject(id: project.id) }
         } label: {
-            SDKModernCard(padding: 12) {
+            SDKModernCard(padding: 12, content: {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text(project.name).font(.headline)

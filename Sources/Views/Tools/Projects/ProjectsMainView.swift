@@ -75,9 +75,9 @@ struct ProjectsMainView: View {
     private var projectList: some View {
         VStack(spacing: 0) {
             HStack {
-                StatPill(label: "Active", value: "\(manager.activeProjects.count)", color: .green)
-                StatPill(label: "Completed", value: "\(manager.completedProjects.count)", color: .blue)
-                StatPill(label: "Total", value: "\(manager.projects.count)", color: .secondary)
+                SDKStatPill(label: "Active", value: "\(manager.activeProjects.count)", color: .green)
+                SDKStatPill(label: "Completed", value: "\(manager.completedProjects.count)", color: .blue)
+                SDKStatPill(label: "Total", value: "\(manager.projects.count)", color: .secondary)
             }
             .padding(.horizontal)
             .padding(.top, 8)

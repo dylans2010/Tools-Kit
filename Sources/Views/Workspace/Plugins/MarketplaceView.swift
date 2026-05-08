@@ -34,7 +34,7 @@ struct MarketplaceView: View {
     var body: some View {
         List {
             Section {
-                SDKModernCard(padding: 12) {
+                SDKModernCard(padding: 12, content: {
                     HStack(spacing: 0) {
                         SDKStatPill(label: "Available", value: "\(manager.availablePlugins.count)", color: .blue)
                         SDKStatPill(label: "Installed", value: "\(manager.installedPlugins.count)", color: .sdkSuccess)
