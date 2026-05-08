@@ -16,7 +16,7 @@ struct SDKIntegrationTestView: View {
     var body: some View {
         List {
             Section {
-                SDKModernCard(padding: 12, content: {
+                SDKModernCard(padding: 12) {
                     VStack(alignment: .leading, spacing: 14) {
                         Picker("Select Scenario", selection: $selectedScenario) {
                             ForEach(0..<scenarios.count, id: \.self) { index in

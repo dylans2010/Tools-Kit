@@ -55,7 +55,7 @@ struct SDKProjectDashboardView: View {
 
     @ViewBuilder
     private func projectMetadataCard(_ project: SDKProject) -> some View {
-        SDKModernCard(content: {
+        SDKModernCard {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {

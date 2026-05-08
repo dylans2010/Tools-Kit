@@ -10,7 +10,7 @@ struct SDKDataControlView: View {
         List {
             if showingWarning {
                 Section {
-                    SDKModernCard(padding: 12, content: {
+                    SDKModernCard(padding: 12) {
                         VStack(alignment: .leading, spacing: 10) {
                             HStack {
                                 Image(systemName: "exclamationmark.shield.fill").foregroundStyle(.sdkError)

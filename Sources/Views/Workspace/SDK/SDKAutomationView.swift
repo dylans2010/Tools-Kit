@@ -38,7 +38,7 @@ struct SDKAutomationView: View {
 
     @ViewBuilder
     private func automationRuleCard(_ rule: SDKAutomationRule) -> some View {
-        SDKModernCard(padding: 12, content: {
+        SDKModernCard(padding: 12) {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {

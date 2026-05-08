@@ -8,7 +8,7 @@ struct SDKLogsView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 12) {
-                SDKModernCard(padding: 8, content: {
+                SDKModernCard(padding: 8) {
                     HStack {
                         Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
                         TextField("Filter by source...", text: $searchText)
