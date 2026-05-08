@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct SDKScopesEditorView: View {
+struct IDEScopesView: View {
     @StateObject private var projectManager = SDKProjectManager.shared
     @StateObject private var state = SDKRuntimeWorkspaceState.shared
     #if os(iOS)

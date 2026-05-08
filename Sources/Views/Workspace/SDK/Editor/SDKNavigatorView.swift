@@ -88,9 +88,20 @@ struct SDKNavigatorView: View {
                 }
 
                 Section {
-                    statusRow(title: "Libraries", value: "\(state.libraries.count)", icon: "shippingbox")
-                    statusRow(title: "Dependencies", value: "\(state.dependencies.count)", icon: "link")
-                    statusRow(title: "Diagnostics", value: "\(state.diagnostics.count)", icon: "stethoscope")
+                    Button { state.open(node: .libraries) } label: {
+                        statusRow(title: "Libraries", value: "\(state.libraries.count)", icon: "shippingbox")
+                    }
+                    .buttonStyle(.plain)
+
+                    Button { state.open(node: .dependencies) } label: {
+                        statusRow(title: "Dependencies", value: "\(state.dependencies.count)", icon: "link")
+                    }
+                    .buttonStyle(.plain)
+
+                    Button { state.open(node: .diagnostics) } label: {
+                        statusRow(title: "Diagnostics", value: "\(state.diagnostics.count)", icon: "stethoscope")
+                    }
+                    .buttonStyle(.plain)
                 } header: {
                     Text(statusSectionTitle)
                         .font(.system(size: 11, weight: .bold))

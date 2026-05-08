@@ -11,6 +11,7 @@ public enum SDKWorkspaceNode: String, CaseIterable, Codable, Hashable, Identifia
     case connectors
     case runtimeScripts
     case apiEndpoints
+    case diagnostics
 
     public var id: String { rawValue }
 
@@ -24,6 +25,7 @@ public enum SDKWorkspaceNode: String, CaseIterable, Codable, Hashable, Identifia
         case .connectors: return "Connectors"
         case .runtimeScripts: return "Runtime Scripts"
         case .apiEndpoints: return "API Endpoints"
+        case .diagnostics: return "Diagnostics"
         }
     }
 
@@ -37,6 +39,7 @@ public enum SDKWorkspaceNode: String, CaseIterable, Codable, Hashable, Identifia
         case .connectors: return "link"
         case .runtimeScripts: return "terminal"
         case .apiEndpoints: return "network"
+        case .diagnostics: return "exclamationmark.triangle.fill"
         }
     }
 
@@ -50,6 +53,7 @@ public enum SDKWorkspaceNode: String, CaseIterable, Codable, Hashable, Identifia
         case .connectors: return ["external", "integration"]
         case .runtimeScripts: return ["automation", "pipeline"]
         case .apiEndpoints: return ["http", "routes"]
+        case .diagnostics: return ["health", "monitoring"]
         }
     }
 }
@@ -172,6 +176,8 @@ public struct SDKLibraryDefinition: Identifiable, Codable, Hashable {
     public let id: UUID
     public var name: String
     public var version: String
+    public var category: String
+    public var description: String
     public var linkedScopes: [String]
     public var dependencies: [String]
     public var exportedFunctions: [SDKLibraryFunctionExport]
@@ -182,6 +188,8 @@ public struct SDKLibraryDefinition: Identifiable, Codable, Hashable {
         id: UUID = UUID(),
         name: String,
         version: String = "1.0.0",
+        category: String = "General",
+        description: String = "",
         linkedScopes: [String] = [],
         dependencies: [String] = [],
         exportedFunctions: [SDKLibraryFunctionExport] = [],
@@ -191,6 +199,8 @@ public struct SDKLibraryDefinition: Identifiable, Codable, Hashable {
         self.id = id
         self.name = name
         self.version = version
+        self.category = category
+        self.description = description
         self.linkedScopes = linkedScopes
         self.dependencies = dependencies
         self.exportedFunctions = exportedFunctions
@@ -541,6 +551,31 @@ public final class SDKRuntimeWorkspaceState: ObservableObject {
 
     public func saveSnapshot() {
         save()
+    }
+
+    public func resolveAllConflicts() {
+        guard var project = SDKProjectManager.shared.currentProject else { return }
+
+        // Auto-grant missing scopes from diagnostics
+        for diagnostic in diagnostics {
+            if diagnostic.message.contains("missing required scopes") || diagnostic.message.contains("is enabled without dependencies") {
+                if let key = diagnostic.message.split(separator: ":").last?.split(separator: ",").first?.trimmingCharacters(in: .whitespaces) {
+                    grantScope(key, to: &project)
+                }
+            }
+        }
+
+        // Auto-grant scopes for all libraries
+        for library in libraries {
+            for scope in library.linkedScopes {
+                grantScope(scope, to: &project)
+            }
+        }
+
+        // Sync and recalculate
+        SDKProjectManager.shared.updateProject(project)
+        syncSDKGraphFromProject(project)
+        recalculateDiagnostics()
     }
 
     private func updateInspectorJSON() {

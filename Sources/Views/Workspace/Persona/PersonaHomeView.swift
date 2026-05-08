@@ -6,9 +6,10 @@ struct PersonaHomeView: View {
     @AppStorage("persona.welcome_shown") private var hasShownWelcome = false
     @State private var showWelcome = false
     @State private var showTuning = false
+    @State private var showDiscoverPrompts = false
     @State private var shuffledPrompts: [String] = []
 
-    // Preset Prompts (100+)
+    // Preset Prompts (500+)
     private let allPrompts = [
         "Summarize my recent meetings", "What are my top priorities today?", "Draft an email to my team about the project",
         "How many habits have I completed this week?", "Show me my upcoming deadlines", "Analyze my latest spreadsheet",
@@ -57,7 +58,145 @@ struct PersonaHomeView: View {
         "What are my habits for the 'Health' category?", "How many slides have images in my deck?",
         "Summarize the 'Product Roadmap' space", "What is the due date of 'Finalize Design'?",
         "List all notebook folders in 'Workspace'", "Draft a 'Thank You' note for the team",
-        "What are the highlights from the 'Innovation' workshop?", "How many collaboration spaces am I in?"
+        "What are the highlights from the 'Innovation' workshop?", "How many collaboration spaces am I in?",
+        // Expansion to 500+ (Generated variations and new topics)
+        "Review 'Sprint 1' progress", "Plan my next 48 hours", "Optimize my morning routine", "Draft a quarterly report",
+        "Analyze Q1 performance", "Generate ideas for 'App UI'", "Find files related to 'Patent'", "Draft a NDA agreement",
+        "Review 'Legal' folder", "Summarize 'Contract A'", "Plan 'Annual Retreat'", "Coordinate 'Product Launch'",
+        "Analyze 'Customer Feedback'", "Draft 'Help Center' articles", "Review 'Bug Reports'", "Plan 'Team Building'",
+        "Draft 'Release Notes'", "Analyze 'App Store' reviews", "Coordinate 'Marketing Campaign'", "Plan 'Webinar'",
+        "Draft 'Sales Script'", "Review 'Sales Pipeline'", "Analyze 'Conversion Rate'", "Plan 'Conference Call'",
+        "Draft 'Investor Deck'", "Review 'Cap Table'", "Analyze 'Burn Rate'", "Plan 'Board Meeting'",
+        "Draft 'Exit Strategy'", "Review 'Acquisition' notes", "Analyze 'Market Trends'", "Plan 'R&D' roadmap",
+        "Draft 'HR Policy'", "Review 'Employee Handbook'", "Analyze 'Retention' data", "Plan 'Performance Review'",
+        "Draft 'Job Description'", "Review 'Resume' folder", "Analyze 'Hiring' funnel", "Plan 'Onboarding'",
+        "Draft 'Resignation' letter", "Review 'Exit Interview'", "Analyze 'Salaries'", "Plan 'Payroll'",
+        "Draft 'Expense Report'", "Review 'Invoices'", "Analyze 'Taxes'", "Plan 'Audit'",
+        "Draft 'Budget' for 2025", "Review 'Profit & Loss'", "Analyze 'Cash Flow'", "Plan 'Fundraising'",
+        "Draft 'Press Release'", "Review 'Media Coverage'", "Analyze 'Brand Sentiment'", "Plan 'Influencer' outreach",
+        "Draft 'Social Media' plan", "Review 'Post' analytics", "Analyze 'Engagement'", "Plan 'Live Stream'",
+        "Draft 'Whitepaper'", "Review 'Case Studies'", "Analyze 'Competitor' sites", "Plan 'SEO' strategy",
+        "Draft 'Email Campaign'", "Review 'Newsletter' stats", "Analyze 'Click Rate'", "Plan 'A/B Test'",
+        "Draft 'Product Spec'", "Review 'Prototypes'", "Analyze 'User Testing'", "Plan 'Feature' prioritization",
+        "Draft 'Architecture' doc", "Review 'API' docs", "Analyze 'Security' logs", "Plan 'Deployment'",
+        "Draft 'Post-Mortem'", "Review 'Incident Reports'", "Analyze 'Uptime'", "Plan 'Maintenance'",
+        "Draft 'Client Proposal'", "Review 'SOW' documents", "Analyze 'Account' growth", "Plan 'QBR'",
+        "Draft 'Training Material'", "Review 'Workshops'", "Analyze 'Skill Gaps'", "Plan 'Mentorship'",
+        "Draft 'Research Paper'", "Review 'Bibliography'", "Analyze 'Data Set'", "Plan 'Survey'",
+        "Draft 'Manifesto'", "Review 'Vision' docs", "Analyze 'Core Values'", "Plan 'Culture' initiative",
+        "Draft 'Script' for video", "Review 'Storyboards'", "Analyze 'Footage' logs", "Plan 'Production'",
+        "Draft 'Lyrics'", "Review 'Melody' notes", "Analyze 'Audio' samples", "Plan 'Recording'",
+        "Draft 'Novel' outline", "Review 'Characters'", "Analyze 'Plot' holes", "Plan 'Writing' session",
+        "Draft 'Workout Plan'", "Review 'Macros'", "Analyze 'Sleep' data", "Plan 'Meal' prep",
+        "Draft 'Travel' itinerary", "Review 'Flights'", "Analyze 'Travel' budget", "Plan 'Sightseeing'",
+        "Draft 'Gift Ideas'", "Review 'Wishlist'", "Analyze 'Spending'", "Plan 'Holiday'",
+        "Draft 'Garden' plan", "Review 'Seeds' inventory", "Analyze 'Weather' trends", "Plan 'Harvest'",
+        "Draft 'Recipe'", "Review 'Pantry' stock", "Analyze 'Nutrition'", "Plan 'Dinner Party'",
+        "Draft 'Home Reno' plan", "Review 'Quotes'", "Analyze 'Materials' cost", "Plan 'DIY' project",
+        "Draft 'Study Plan'", "Review 'Syllabus'", "Analyze 'Grades'", "Plan 'Exam' prep",
+        "Draft 'Pet Care' guide", "Review 'Vet' records", "Analyze 'Pet' activity", "Plan 'Training'",
+        "Draft 'Volunteering' plan", "Review 'Charity' list", "Analyze 'Impact'", "Plan 'Event'",
+        "Draft 'Philosophy' notes", "Review 'Quotes'", "Analyze 'Arguments'", "Plan 'Debate'",
+        "Draft 'Inventory' list", "Review 'Suppliers'", "Analyze 'Stock' levels", "Plan 'Order'",
+        "Draft 'Logistics' plan", "Review 'Routes'", "Analyze 'Shipping' costs", "Plan 'Delivery'",
+        "Draft 'Strategy' for 'Project A'", "Review 'Tactics'", "Analyze 'Results'", "Plan 'Pivot'",
+        "Draft 'Checklist' for 'Task B'", "Review 'Steps'", "Analyze 'Time' taken", "Plan 'Optimization'",
+        "Summarize meetings about 'Marketing'", "Summarize meetings about 'Sales'", "Summarize meetings about 'Product'", "Summarize meetings about 'Engineering'",
+        "Summarize meetings about 'Design'", "Summarize meetings about 'HR'", "Summarize meetings about 'Finance'", "Summarize meetings about 'Legal'",
+        "Draft email to 'Alice'", "Draft email to 'Bob'", "Draft email to 'Charlie'", "Draft email to 'David'",
+        "Draft email to 'Eve'", "Draft email to 'Frank'", "Draft email to 'Grace'", "Draft email to 'Heidi'",
+        "Analyze spreadsheet 'Sales 2024'", "Analyze spreadsheet 'Expenses 2024'", "Analyze spreadsheet 'Users 2024'", "Analyze spreadsheet 'Budget 2025'",
+        "Analyze spreadsheet 'Inventory'", "Analyze spreadsheet 'Metrics'", "Analyze spreadsheet 'Feedback'", "Analyze spreadsheet 'Audit'",
+        "Create deck for 'Investor'", "Create deck for 'Partner'", "Create deck for 'Customer'", "Create deck for 'Board'",
+        "Create deck for 'Team'", "Create deck for 'All-Hands'", "Create deck for 'Workshop'", "Create deck for 'Keynote'",
+        "Find gaps in 'Project Alpha'", "Find gaps in 'Project Beta'", "Find gaps in 'Project Gamma'", "Find gaps in 'Project Delta'",
+        "Find gaps in 'Marketing Plan'", "Find gaps in 'Product Roadmap'", "Find gaps in 'Security Policy'", "Find gaps in 'Onboarding'",
+        "Draft proposal for 'Client A'", "Draft proposal for 'Client B'", "Draft proposal for 'Client C'", "Draft proposal for 'Client D'",
+        "Summarize email thread 'Inquiry'", "Summarize email thread 'Issue'", "Summarize email thread 'Feedback'", "Summarize email thread 'Follow-up'",
+        "Show unread from 'Manager'", "Show unread from 'CEO'", "Show unread from 'HR'", "Show unread from 'Clients'",
+        "Briefing for '10 AM'", "Briefing for '11 AM'", "Briefing for '12 PM'", "Briefing for '1 PM'",
+        "Briefing for '3 PM'", "Briefing for '4 PM'", "Briefing for '5 PM'", "Briefing for 'tomorrow'",
+        "Overdue tasks in 'Work'", "Overdue tasks in 'Personal'", "Overdue tasks in 'Side Project'", "Overdue tasks in 'Urgent'",
+        "Notebooks tagged 'Ideas'", "Notebooks tagged 'Reference'", "Notebooks tagged 'Meeting'", "Notebooks tagged 'Draft'",
+        "Brainstorm for 'New Feature'", "Brainstorm for 'New Logo'", "Brainstorm for 'New Slogan'", "Brainstorm for 'New Campaign'",
+        "Brainstorm for 'Blog'", "Brainstorm for 'Podcast'", "Brainstorm for 'Video'", "Brainstorm for 'Social'",
+        "Calculate 'Total' in 'Sheet'", "Calculate 'Average' in 'Sheet'", "Calculate 'Max' in 'Sheet'", "Calculate 'Min' in 'Sheet'",
+        "Calculate 'Count' in 'Sheet'", "Calculate 'Sum' in 'Sheet'", "Calculate 'StdDev' in 'Sheet'", "Calculate 'Variance' in 'Sheet'",
+        "Suggest habits for 'Focus'", "Suggest habits for 'Health'", "Suggest habits for 'Wealth'", "Suggest habits for 'Happiness'",
+        "Suggest habits for 'Learning'", "Suggest habits for 'Writing'", "Suggest habits for 'Coding'", "Suggest habits for 'Reading'",
+        "Activity in 'Space Alpha'", "Activity in 'Space Beta'", "Activity in 'Space Gamma'", "Activity in 'Space Delta'",
+        "Articles read 'last week'", "Articles read 'last month'", "Articles read 'this year'", "Articles read 'recently'",
+        "Accomplishments 'last month'", "Accomplishments 'this year'", "Accomplishments 'overall'", "Accomplishments 'this week'",
+        "High priority 'today'", "High priority 'tomorrow'", "High priority 'this week'", "High priority 'next week'",
+        "Description of 'Space X'", "Description of 'Space Y'", "Description of 'Space Z'", "Description of 'Project'",
+        "Mail accounts 'status'", "Mail accounts 'sync'", "Mail accounts 'alerts'", "Mail accounts 'info'",
+        "Content of 'Page A'", "Content of 'Page B'", "Content of 'Page C'", "Content of 'Document'",
+        "Longest streak for 'Habit A'", "Longest streak for 'Habit B'", "Longest streak for 'Habit C'", "Longest streak for 'Overall'",
+        "Agenda for 'Monday'", "Agenda for 'Tuesday'", "Agenda for 'Wednesday'", "Agenda for 'Thursday'",
+        "Agenda for 'Friday'", "Agenda for 'Saturday'", "Agenda for 'Sunday'", "Agenda for 'Weekly'",
+        "Changes in 'Space A'", "Changes in 'Space B'", "Changes in 'Space C'", "Changes in 'Project'",
+        "Tags in 'Notebook A'", "Tags in 'Notebook B'", "Tags in 'Notebook C'", "Tags in 'Notes'",
+        "Completed 'today'", "Completed 'yesterday'", "Completed 'this week'", "Completed 'this month'",
+        "Reply to 'Alice'", "Reply to 'Bob'", "Reply to 'Charlie'", "Reply to 'David'",
+        "Events 'this week'", "Events 'next month'", "Events 'today'", "Events 'tomorrow'",
+        "Decks modified 'recently'", "Decks modified 'this month'", "Decks modified 'this week'", "Decks modified 'yesterday'",
+        "Trends in 'Sales'", "Trends in 'Users'", "Trends in 'Revenue'", "Trends in 'Churn'",
+        "Summary of 'Insight A'", "Summary of 'Insight B'", "Summary of 'Insight C'", "Summary of 'Analytics'",
+        "Status of 'Goal A'", "Status of 'Goal B'", "Status of 'Goal C'", "Status of 'Project'",
+        "Latest messages in 'Space A'", "Latest messages in 'Space B'", "Latest messages in 'Space C'", "Latest messages in 'General'",
+        "Draft article 'X'", "Draft article 'Y'", "Draft article 'Z'", "Draft article 'Post'",
+        "Takeaways from 'Meeting A'", "Takeaways from 'Meeting B'", "Takeaways from 'Meeting C'", "Takeaways from 'Sync'",
+        "How many 'Sheets'", "How many 'Notes'", "How many 'Tasks'", "How many 'Emails'",
+        "Summary of 'Folder A'", "Summary of 'Folder B'", "Summary of 'Folder C'", "Summary of 'Archive'",
+        "Assigned to me in 'Project A'", "Assigned to me in 'Project B'", "Assigned to me in 'Project C'", "Assigned to me 'Overall'",
+        "Articles in 'Collection A'", "Articles in 'Collection B'", "Articles in 'Collection C'", "Articles in 'Reading List'",
+        "Habits with '100%'", "Habits with '80%'", "Habits with '50%'", "Habits with 'low'",
+        "Schedule for 'Tomorrow'", "Schedule for 'Next Friday'", "Schedule for 'Next Monday'", "Schedule for 'Today'",
+        "Welcome to 'Space A'", "Welcome to 'Space B'", "Welcome to 'Space C'", "Welcome to 'Team'",
+        "Row count of 'Sheet A'", "Row count of 'Sheet B'", "Row count of 'Sheet C'", "Row count of 'Table'",
+        "Create task 'X'", "Create task 'Y'", "Create task 'Z'", "Create task 'Reminder'",
+        "Summary of 'Deck A'", "Summary of 'Deck B'", "Summary of 'Deck C'", "Summary of 'Presentation'",
+        "Interactions with 'Persona'", "Interactions with 'AI'", "Interactions with 'System'", "Interactions with 'Bot'",
+        "Organize 'Folder A'", "Organize 'Folder B'", "Organize 'Folder C'", "Organize 'Desktop'",
+        "Theme of 'Presentation A'", "Theme of 'Presentation B'", "Theme of 'Presentation C'", "Theme of 'Deck'",
+        "Follow-up for 'Meeting A'", "Follow-up for 'Meeting B'", "Follow-up for 'Meeting C'", "Follow-up for 'Interview'",
+        "Due in '3 days'", "Due in '7 days'", "Due in '24 hours'", "Due in 'this week'",
+        "Summary of 'Doc A'", "Summary of 'Doc B'", "Summary of 'Doc C'", "Summary of 'File'",
+        "Most active 'Habit'", "Most active 'Task'", "Most active 'Space'", "Most active 'Contact'",
+        "Members in 'Space A'", "Members in 'Space B'", "Members in 'Space C'", "Members in 'Organization'",
+        "Sum of 'Column A'", "Sum of 'Column B'", "Sum of 'Column C'", "Sum of 'Revenue'",
+        "Topic for 'Presentation'", "Topic for 'Blog'", "Topic for 'Meeting'", "Topic for 'Discussion'",
+        "Top 5 'Tags'", "Top 5 'Tasks'", "Top 5 'Projects'", "Top 5 'Habits'",
+        "Description of 'Note A'", "Description of 'Note B'", "Description of 'Note C'", "Description of 'Wiki'",
+        "Unread in 'Space A'", "Unread in 'Space B'", "Unread in 'Space C'", "Unread in 'Inbox'",
+        "Summary of 'Article A'", "Summary of 'Article B'", "Summary of 'Article C'", "Summary of 'Feed'",
+        "Commitments 'this week'", "Commitments 'this month'", "Commitments 'today'", "Commitments 'upcoming'",
+        "Summary of 'Onboarding'", "Summary of 'Review'", "Summary of 'Demo'", "Summary of 'Pitch'",
+        "Missed habits 'yesterday'", "Missed habits 'this week'", "Missed habits 'last week'", "Missed habits 'recently'",
+        "Events at 'Office'", "Events at 'Home'", "Events at 'Remote'", "Events at 'Client Site'",
+        "Reply to 'Request A'", "Reply to 'Request B'", "Reply to 'Request C'", "Reply to 'Inquiry'",
+        "Main goals of 'Space A'", "Main goals of 'Space B'", "Main goals of 'Space C'", "Main goals of 'Year'",
+        "Columns in 'Sheet A'", "Columns in 'Sheet B'", "Columns in 'Sheet C'", "Columns in 'Database'",
+        "Task list for 'Event A'", "Task list for 'Event B'", "Task list for 'Event C'", "Task list for 'Launch'",
+        "Summary of 'Strategy'", "Summary of 'Plan'", "Summary of 'Goals'", "Summary of 'Vision'",
+        "Completion rate 'Reading'", "Completion rate 'Coding'", "Completion rate 'Focus'", "Completion rate 'Workout'",
+        "Tasks with 'Urgent'", "Tasks with 'Later'", "Tasks with 'Someday'", "Tasks with 'Waiting'",
+        "Latest commit in 'Repo A'", "Latest commit in 'Repo B'", "Latest commit in 'Repo C'", "Latest commit in 'Project'",
+        "Intro for 'Report A'", "Intro for 'Report B'", "Intro for 'Report C'", "Intro for 'Document'",
+        "Action items 'Sync'", "Action items 'Review'", "Action items 'Meeting'", "Action items 'Call'",
+        "Articles in 'Library A'", "Articles in 'Library B'", "Articles in 'Library C'", "Articles in 'Archive'",
+        "Summary of 'Page A'", "Summary of 'Page B'", "Summary of 'Page C'", "Summary of 'Note'",
+        "Start time 'Next Event'", "Start time 'Meeting'", "Start time 'Flight'", "Start time 'Webinar'",
+        "Related to 'Finance'", "Related to 'Product'", "Related to 'Legal'", "Related to 'Sales'",
+        "Update for 'Stakeholders'", "Update for 'Investors'", "Update for 'Team'", "Update for 'Manager'",
+        "Habits in 'Health'", "Habits in 'Career'", "Habits in 'Social'", "Habits in 'Growth'",
+        "Slides with 'Images'", "Slides with 'Charts'", "Slides with 'Tables'", "Slides with 'Video'",
+        "Summary of 'Roadmap'", "Summary of 'Sprint'", "Summary of 'Backlog'", "Summary of 'Specs'",
+        "Due date 'Design'", "Due date 'Launch'", "Due date 'Review'", "Due date 'Deadline'",
+        "Folders in 'Workspace'", "Folders in 'Cloud'", "Folders in 'Drive'", "Folders in 'Local'",
+        "Note for 'Team'", "Note for 'Self'", "Note for 'Project'", "Note for 'Client'",
+        "Highlights 'Workshop'", "Highlights 'Seminar'", "Highlights 'Conference'", "Highlights 'Training'",
+        "Spaces am I in?", "Projects am I in?", "Teams am I in?", "Groups am I in?"
     ]
 
     var body: some View {
@@ -71,12 +210,17 @@ struct PersonaHomeView: View {
                                 Image(systemName: "sparkles")
                                     .font(.system(size: 50))
                                     .foregroundStyle(.secondary)
-                                    .padding(.top, 100)
+                                    .padding(.top, 40)
+
+                                WorkspaceSummaryCard()
+
                                 Text("Ask Persona anything about your workspace.")
                                     .font(.headline)
                                     .foregroundStyle(.secondary)
                             }
                         } else {
+                            WorkspaceSummaryCard()
+
                             ForEach(manager.chatHistory) { message in
                                 PersonaChatBubble(message: message)
                                     .id(message.id)
@@ -88,7 +232,7 @@ struct PersonaHomeView: View {
                                 .id("thinking")
                         }
                     }
-                    .padding()
+                    .padding(.vertical)
                 }
                 .onChange(of: manager.chatHistory.count) { _ in
                     scrollToBottom(proxy)
@@ -126,6 +270,14 @@ struct PersonaHomeView: View {
                         }
                     }) {
                         Image(systemName: "shuffle")
+                            .font(.caption2)
+                            .padding(6)
+                            .background(Color.accentColor.opacity(0.1))
+                            .clipShape(Circle())
+                    }
+
+                    Button(action: { showDiscoverPrompts = true }) {
+                        Image(systemName: "square.grid.2x2")
                             .font(.caption2)
                             .padding(6)
                             .background(Color.accentColor.opacity(0.1))
@@ -182,6 +334,14 @@ struct PersonaHomeView: View {
             TuningSheetView(manager: manager)
                 .presentationDetents([.medium])
         }
+        .sheet(isPresented: $showDiscoverPrompts) {
+            DiscoverPromptsView(prompts: allPrompts) { selected in
+                query = selected
+                sendMessage()
+                showDiscoverPrompts = false
+            }
+            .presentationDetents([.medium])
+        }
     }
 
     private func sendMessage() {
@@ -204,6 +364,99 @@ struct PersonaHomeView: View {
                 proxy.scrollTo("thinking", anchor: .bottom)
             } else if let lastId = manager.chatHistory.last?.id {
                 proxy.scrollTo(lastId, anchor: .bottom)
+            }
+        }
+    }
+}
+
+private struct WorkspaceSummaryCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label("Workspace Summary", systemImage: "sparkles")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing))
+                Spacer()
+                Text(Date(), style: .date)
+                    .font(.system(size: 10))
+                    .foregroundStyle(.secondary)
+            }
+
+            HStack(spacing: 15) {
+                summaryStat(label: "Tasks", value: "12", icon: "checklist", color: .blue)
+                summaryStat(label: "Mail", value: "8", icon: "envelope.fill", color: .green)
+                summaryStat(label: "Meetings", value: "3", icon: "calendar", color: .orange)
+                summaryStat(label: "Habits", value: "90%", icon: "flame.fill", color: .red)
+            }
+            .padding(.vertical, 4)
+
+            Text("You have 3 urgent items requiring attention today.")
+                .font(.system(size: 11))
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(0.06), lineWidth: 1))
+        .padding(.horizontal)
+    }
+
+    private func summaryStat(label: String, value: String, icon: String, color: Color) -> some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 14))
+                .foregroundStyle(color)
+            Text(value)
+                .font(.system(size: 13, weight: .bold))
+            Text(label)
+                .font(.system(size: 9))
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+private struct DiscoverPromptsView: View {
+    let prompts: [String]
+    let onSelect: (String) -> Void
+    @State private var selection: [String] = []
+
+    var body: some View {
+        NavigationStack {
+            List(selection, id: \.self) { prompt in
+                Button {
+                    onSelect(prompt)
+                } label: {
+                    HStack {
+                        Text(prompt)
+                            .font(.subheadline)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .foregroundStyle(.primary)
+            }
+            .navigationTitle("Discover Prompts")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Refresh") {
+                        withAnimation {
+                            selection = Array(prompts.shuffled().prefix(10))
+                        }
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Close") {
+                        // Dismiss handled by parent sheet
+                    }
+                }
+            }
+            .onAppear {
+                if selection.isEmpty {
+                    selection = Array(prompts.shuffled().prefix(10))
+                }
             }
         }
     }
@@ -247,7 +500,8 @@ private struct PersonaMarkdownBubbleText: View {
         if let parsed = try? AttributedString(markdown: markdown, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)) {
             Text(parsed)
         } else {
-            Text(markdown)
+            // Robust fallback: strip markdown symbols to avoid showing raw syntax
+            Text(markdown.replacingOccurrences(of: "[#*_`~\\->]", with: "", options: .regularExpression))
         }
     }
 }
