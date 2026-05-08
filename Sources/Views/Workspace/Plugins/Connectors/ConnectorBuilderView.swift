@@ -67,39 +67,46 @@ struct ConnectorBuilderView: View {
         Form {
             // MARK: - Identity
             Section {
-                TextField("Name", text: $name)
+                VStack(alignment: .leading, spacing: 12) {
+                    TextField("Connector Name", text: $name)
+                        .font(.headline)
 
-                HStack {
-                    Text("Identifier")
-                    Spacer()
-                    if isIdentifierLocked {
-                        Text("com.toolskit.\(identifier)")
-                            .foregroundColor(.secondary)
-                    } else {
+                    HStack {
                         Text("com.toolskit.")
-                            .foregroundColor(.secondary)
-                        TextField("myconnector", text: $identifier)
-                            .multilineTextAlignment(.trailing)
-                            .autocapitalization(.none)
-                            .disableAutocorrection(true)
+                            .font(.system(.subheadline, design: .monospaced))
+                            .foregroundStyle(.tertiary)
+                        if isIdentifierLocked {
+                            Text(identifier)
+                                .font(.system(.subheadline, design: .monospaced))
+                                .foregroundStyle(.secondary)
+                        } else {
+                            TextField("identifier", text: $identifier)
+                                .font(.system(.subheadline, design: .monospaced))
+                                .autocapitalization(.none)
+                                .disableAutocorrection(true)
+                        }
                     }
-                }
 
-                TextField("Version (e.g. 1.0.0)", text: $version)
+                    HStack {
+                        Image(systemName: "tag.fill").font(.caption2).foregroundStyle(.secondary)
+                        TextField("v1.0.0", text: $version)
+                            .font(.system(.caption2, design: .monospaced))
+                    }
 
-                VStack(alignment: .leading) {
-                    Text("Description").font(.caption).foregroundColor(.secondary)
                     TextEditor(text: $description)
                         .frame(minHeight: 80)
+                        .font(.caption)
+                        .padding(4)
+                        .background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 8))
                 }
-
-                TextField("Tags (comma-separated)", text: $tags)
-                    .autocapitalization(.none)
+                .padding(.vertical, 4)
             } header: {
-                Text("Connector Identity")
+                SDKSectionHeader("Identity", subtitle: "Core module metadata", alignment: .leading)
             } footer: {
                 if !isIdentifierLocked {
-                    Text("The identifier 'com.toolskit.\(identifier)' will be locked after creation.")
+                    Text("Identifier will be locked after initialization.")
+                        .font(.system(size: 8))
+                        .foregroundStyle(.tertiary)
                 }
             }
 
@@ -119,39 +126,45 @@ struct ConnectorBuilderView: View {
 
             // MARK: - Authentication
             Section {
-                Picker("Auth Type", selection: $selectedAuthType) {
+                Picker("Strategy", selection: $selectedAuthType) {
                     Text("None").tag(ConnectorAuthConfig.AuthType.none)
                     Text("API Key").tag(ConnectorAuthConfig.AuthType.apiKey)
-                    Text("Bearer Token").tag(ConnectorAuthConfig.AuthType.bearer)
+                    Text("Bearer").tag(ConnectorAuthConfig.AuthType.bearer)
                     Text("OAuth 2.0").tag(ConnectorAuthConfig.AuthType.oauth2)
                 }
+                .tint(.primary)
 
                 switch selectedAuthType {
                 case .apiKey:
-                    TextField("Header Name", text: $apiKeyHeaderName)
-                        .autocapitalization(.none)
-                    SecureField("API Key Value", text: $apiKeyValue)
+                    VStack(alignment: .leading, spacing: 10) {
+                        TextField("Header Name", text: $apiKeyHeaderName)
+                            .font(.system(.subheadline, design: .monospaced))
+                        SecureField("API Key Value", text: $apiKeyValue)
+                            .font(.system(.subheadline, design: .monospaced))
+                    }
+                    .padding(.vertical, 4)
                 case .bearer:
                     SecureField("Bearer Token", text: $bearerToken)
+                        .font(.system(.subheadline, design: .monospaced))
+                        .padding(.vertical, 4)
                 case .oauth2:
-                    TextField("Client ID", text: $oauthClientID)
-                        .autocapitalization(.none)
-                    SecureField("Client Secret", text: $oauthClientSecret)
-                    TextField("Authorization URL", text: $oauthAuthURL)
-                        .autocapitalization(.none)
-                        .keyboardType(.URL)
-                    TextField("Token URL", text: $oauthTokenURL)
-                        .autocapitalization(.none)
-                        .keyboardType(.URL)
-                    TextField("Scopes (comma-separated)", text: $oauthScopes)
-                        .autocapitalization(.none)
+                    VStack(alignment: .leading, spacing: 10) {
+                        TextField("Client ID", text: $oauthClientID)
+                        SecureField("Client Secret", text: $oauthClientSecret)
+                        TextField("Auth URL", text: $oauthAuthURL).keyboardType(.URL)
+                        TextField("Token URL", text: $oauthTokenURL).keyboardType(.URL)
+                    }
+                    .font(.system(.caption, design: .monospaced))
+                    .padding(.vertical, 4)
                 case .none:
-                    Text("No authentication will be applied to requests.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    HStack {
+                        Image(systemName: "shield.slash").foregroundStyle(.secondary)
+                        Text("No authentication required").font(.caption).foregroundColor(.secondary)
+                    }
+                    .padding(.vertical, 8)
                 }
             } header: {
-                Text("Authentication")
+                SDKSectionHeader("Authentication", subtitle: "External security handshake", alignment: .leading)
             }
 
             // MARK: - Endpoints
@@ -270,12 +283,16 @@ struct ConnectorBuilderView: View {
             // MARK: - Save
             Section {
                 Button(action: validateAndSave) {
-                    Text(connectorID == nil ? "Create Connector" : "Save Changes")
+                    Label(connectorID == nil ? "Initialize Connector" : "Commit Changes", systemImage: "checkmark.circle.fill")
+                        .font(.subheadline.bold())
                         .frame(maxWidth: .infinity)
-                        .bold()
                 }
+                .buttonStyle(.borderedProminent)
+                .tint(.primary)
                 .disabled(name.isEmpty || identifier.isEmpty)
             }
+            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+            .listRowBackground(Color.clear)
         }
         .navigationTitle(connectorID == nil ? "New Connector" : "Edit Connector")
         .toolbar {

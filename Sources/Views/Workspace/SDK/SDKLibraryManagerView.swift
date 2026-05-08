@@ -20,38 +20,66 @@ struct SDKLibraryManagerView: View {
         List {
             Section {
                 HStack {
-                    Label("SDK Libraries", systemImage: "books.vertical.fill")
-                        .font(.headline)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("SDK Libraries").font(.headline)
+                        Text("Shared modules and pipeline stages.").font(.caption2).foregroundStyle(.secondary)
+                    }
                     Spacer()
-                    Button { editingLibrary = newLibrary() } label: { Label("Add", systemImage: "plus") }
-                        .buttonStyle(.borderedProminent)
-                }
-                Text("Libraries are synchronized into dependency nodes and executed through SDKExecutionCoordinator.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Section("Linked Libraries") {
-                ForEach(state.libraries) { library in
-                    Button { editingLibrary = library } label: {
-                        libraryCard(library)
+                    Button { editingLibrary = newLibrary() } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(.primary)
                     }
                     .buttonStyle(.plain)
                 }
-                .onDelete { offsets in
-                    state.libraries.remove(atOffsets: offsets)
-                    state.recalculateDiagnostics()
-                }
+            } header: {
+                SDKSectionHeader("Module Registry", subtitle: "Managed SDK execution units", systemImage: "books.vertical.fill")
             }
 
-            Section("Version Diff Viewer") {
-                if let first = state.libraries.first {
-                    Text(resolver.diff(from: first.version, to: resolver.resolvePreferredVersion(for: first.name, availableVersions: [first.version, "2.0.0"], preferredVersion: nil) ?? first.version))
-                        .font(.caption)
+            Section {
+                if state.libraries.isEmpty {
+                    ContentUnavailableView("No Libraries", systemImage: "books.vertical", description: Text("Add a library to start building SDK modules."))
+                        .padding(.vertical, 20)
                 } else {
-                    Text("Add libraries to compare versions")
-                        .foregroundStyle(.secondary)
+                    ForEach(state.libraries) { library in
+                        Button { editingLibrary = library } label: {
+                            libraryCard(library)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .onDelete { offsets in
+                        state.libraries.remove(atOffsets: offsets)
+                        state.recalculateDiagnostics()
+                    }
                 }
+            } header: {
+                SDKSectionHeader("Linked Libraries", subtitle: "Active system modules", alignment: .leading)
+            }
+
+            Section {
+                if let first = state.libraries.first {
+                    SDKModernCard(padding: 12, content: {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Label(first.name, systemImage: "arrow.triangle.2.circlepath")
+                                    .font(.subheadline.bold())
+                                Spacer()
+                                SDKStatusPill("Preferred", color: .blue)
+                            }
+                            Text(resolver.diff(from: first.version, to: resolver.resolvePreferredVersion(for: first.name, availableVersions: [first.version, "2.0.0"], preferredVersion: nil) ?? first.version))
+                                .font(.system(size: 10, design: .monospaced))
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                } else {
+                    Text("Register libraries to enable version analysis.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical, 12)
+                }
+            } header: {
+                SDKSectionHeader("Version Analysis", subtitle: "Dependency and update tracking", systemImage: "clock.arrow.circlepath")
             }
         }
         .sheet(item: $editingLibrary) { library in
@@ -71,32 +99,43 @@ struct SDKLibraryManagerView: View {
     }
 
     private func libraryCard(_ library: SDKLibraryDefinition) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(library.name).font(.headline)
-                Spacer()
-                Text("v\(library.version)").font(.caption.monospaced()).foregroundStyle(.secondary)
-            }
-            if isCompact {
-                VStack(alignment: .leading, spacing: 3) {
-                    metric("Calls", "\(library.usageCount)")
-                    metric("Scopes", "\(library.linkedScopes.count)")
-                    metric("Exports", "\(library.exportedFunctions.count)")
-                    metric("Stages", "\(library.pipelineStages.count)")
-                }
-            } else {
+        SDKModernCard(padding: 12, content: {
+            VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    metric("Calls", "\(library.usageCount)")
-                    metric("Scopes", "\(library.linkedScopes.count)")
-                    metric("Exports", "\(library.exportedFunctions.count)")
-                    metric("Stages", "\(library.pipelineStages.count)")
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(library.name).font(.subheadline.bold())
+                        Text("v\(library.version)").font(.system(size: 9, design: .monospaced)).foregroundStyle(.tertiary)
+                    }
+                    Spacer()
+                    SDKStatusPill(library.usageCount > 0 ? "Active" : "Idle", color: library.usageCount > 0 ? .sdkSuccess : .secondary)
                 }
+
+                HStack(spacing: 16) {
+                    metric("Calls", "\(library.usageCount)", icon: "phone.fill")
+                    metric("Scopes", "\(library.linkedScopes.count)", icon: "lock.shield.fill")
+                    metric("Exports", "\(library.exportedFunctions.count)", icon: "shippingbox.fill")
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Pipeline Stages").font(.system(size: 8, weight: .bold)).foregroundStyle(.tertiary).textCase(.uppercase)
+                    Text(library.pipelineStages.joined(separator: " → ").ifEmpty("No stages configured"))
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(.secondary)
+                }
+                .padding(8)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 8))
             }
-            Text("Pipeline: \(library.pipelineStages.joined(separator: " → ").ifEmpty("Not configured"))")
-                .font(.caption)
-                .foregroundStyle(.secondary)
         }
-        .padding(.vertical, 5)
+        .padding(.vertical, 4)
+    }
+
+    private func metric(_ label: String, _ value: String, icon: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon).font(.system(size: 8))
+            Text("\(value) \(label)").font(.system(size: 9, weight: .semibold))
+        }
+        .foregroundStyle(.secondary)
     }
 
     private func metric(_ key: String, _ value: String) -> some View {

@@ -107,9 +107,9 @@ struct WorkspaceHabitTrackerView: View {
             let completed = manager.habits.filter { $0.isCompletedToday() }.count
             let habitCount = manager.habits.count
             let safeTotal = max(habitCount, 1)
-            StatPill(label: "Done", value: "\(completed)/\(habitCount)", color: .green)
-            StatPill(label: "Rate", value: "\(Int((Double(completed) / Double(safeTotal)) * 100))%", color: .blue)
-            StatPill(label: "Streaking", value: "\(manager.habits.filter { $0.currentStreak > 0 }.count)", color: .orange)
+            SDKStatPill(label: "Done", value: "\(completed)/\(habitCount)", color: .green)
+            SDKStatPill(label: "Rate", value: "\(Int((Double(completed) / Double(safeTotal)) * 100))%", color: .blue)
+            SDKStatPill(label: "Streaking", value: "\(manager.habits.filter { $0.currentStreak > 0 }.count)", color: .orange)
         }
     }
 

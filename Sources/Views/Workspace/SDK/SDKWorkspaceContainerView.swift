@@ -61,12 +61,16 @@ struct SDKWorkspaceContainerView: View {
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
                             ToolbarItem(placement: .topBarTrailing) {
-                                Button("Done") { activeSheet = nil }
+                                Button { activeSheet = nil } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundStyle(.tertiary)
+                                }
                             }
                         }
                 }
-                .presentationDetents(sheet == .console ? [.medium, .large] : [.large])
+                .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
+                .presentationCornerRadius(24)
             }
         }
         .navigationTitle("SDK IDE")
@@ -117,18 +121,32 @@ struct SDKWorkspaceContainerView: View {
     }
 
     private var compactBottomBar: some View {
-        HStack(spacing: 10) {
-            Button { activeSheet = .navigator } label: { Label("Files", systemImage: "sidebar.left") }
-            Button { activeSheet = .inspector } label: { Label("Inspect", systemImage: "info.circle") }
-            Button { activeSheet = .console } label: { Label("Console", systemImage: "terminal") }
-            Button { activeSheet = .runConfiguration } label: { Label("Run", systemImage: "slider.horizontal.3") }
+        HStack(spacing: 0) {
+            compactTabItem(title: "Files", icon: "sidebar.left", sheet: .navigator)
+            compactTabItem(title: "Inspect", icon: "info.circle", sheet: .inspector)
+            compactTabItem(title: "Console", icon: "terminal", sheet: .console)
+            compactTabItem(title: "Config", icon: "slider.horizontal.3", sheet: .runConfiguration)
         }
-        .font(.caption.weight(.semibold))
-        .labelStyle(.iconOnly)
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .background(.bar)
+        .padding(.horizontal, 8)
+        .padding(.top, 10)
+        .padding(.bottom, 20)
+        .background(.ultraThinMaterial)
+        .overlay(Divider(), alignment: .top)
+    }
+
+    private func compactTabItem(title: String, icon: String, sheet: WorkspaceSheet) -> some View {
+        Button {
+            activeSheet = sheet
+        } label: {
+            VStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.system(size: 20))
+                Text(title)
+                    .font(.system(size: 10, weight: .medium))
+            }
+            .foregroundStyle(activeSheet == sheet ? .primary : .secondary)
+            .frame(maxWidth: .infinity)
+        }
     }
 
     private var clampedLeftWidth: CGFloat { CGFloat(min(max(180, state.layout.leftSidebarWidth), 420)) }
@@ -136,49 +154,76 @@ struct SDKWorkspaceContainerView: View {
     private var clampedBottomHeight: CGFloat { CGFloat(min(max(120, state.layout.bottomPanelHeight), 420)) }
 
     private var topToolbar: some View {
-        HStack(spacing: 10) {
-            Label("SDK", systemImage: "hammer.circle.fill")
-                .font(.headline)
+        HStack(spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: "hammer.circle.fill")
+                    .foregroundStyle(.primary)
+                Text("SDK IDE")
+                    .font(.subheadline.bold())
+            }
+
             Spacer()
 
-            if isCompact {
-                Menu {
-                    Button { activeSheet = .navigator } label: { Label("Navigator", systemImage: "sidebar.left") }
-                    Button { activeSheet = .inspector } label: { Label("Inspector", systemImage: "sidebar.right") }
-                    Button { activeSheet = .console } label: { Label("Console", systemImage: "terminal") }
-                    Button { activeSheet = .runConfiguration } label: { Label("Run Configuration", systemImage: "slider.horizontal.3") }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
+            if !isCompact {
+                HStack(spacing: 4) {
+                    toolbarIconButton(icon: state.layout.isLeftCollapsed ? "sidebar.left" : "sidebar.left.hide") { toggle(\.isLeftCollapsed) }
+                    toolbarIconButton(icon: state.layout.isRightCollapsed ? "sidebar.right" : "sidebar.right.hide") { toggle(\.isRightCollapsed) }
+                    toolbarIconButton(icon: state.layout.isBottomCollapsed ? "rectangle.bottomthird.inset.filled" : "rectangle.bottomthird.inset") { toggle(\.isBottomCollapsed) }
                 }
-            } else {
-                Button { toggle(\.isLeftCollapsed) } label: { Image(systemName: state.layout.isLeftCollapsed ? "sidebar.left" : "sidebar.left.hide") }
-                    .buttonStyle(.borderless)
-                Button { toggle(\.isRightCollapsed) } label: { Image(systemName: state.layout.isRightCollapsed ? "sidebar.right" : "sidebar.right.hide") }
-                    .buttonStyle(.borderless)
-                Button { toggle(\.isBottomCollapsed) } label: { Image(systemName: state.layout.isBottomCollapsed ? "rectangle.bottomthird.inset.filled" : "rectangle.bottomthird.inset") }
-                    .buttonStyle(.borderless)
-                NavigationLink { SDKRunConfigurationView() } label: { Label("Config", systemImage: "slider.horizontal.3") }
-                    .buttonStyle(.bordered)
+
+                NavigationLink { SDKRunConfigurationView() } label: {
+                    Label("Config", systemImage: "slider.horizontal.3")
+                        .font(.caption.bold())
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .tint(.secondary)
             }
 
             Button {
-                Task {
-                    isRunning = true
-                    defer { isRunning = false }
-                    _ = await state.executeGuarded("SDK Run") {
-                        try await SDKExecutionCoordinator.shared.executeSelectedRunConfiguration()
-                    }
-                    state.recalculateDiagnostics()
-                }
+                runProject()
             } label: {
-                Label(isRunning ? "Running" : "Run", systemImage: "play.fill")
+                HStack(spacing: 6) {
+                    if isRunning {
+                        ProgressView().controlSize(.mini)
+                    } else {
+                        Image(systemName: "play.fill")
+                    }
+                    Text(isRunning ? "Running" : "Run")
+                }
+                .font(.caption.bold())
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(isRunning ? Color.gray.opacity(0.2) : Color.primary)
+                .foregroundStyle(isRunning ? .primary : Color(.systemBackground))
+                .clipShape(Capsule())
             }
-            .buttonStyle(.borderedProminent)
             .disabled(isRunning)
         }
         .padding(.horizontal)
-        .padding(.vertical, 8)
-        .background(.thinMaterial)
+        .padding(.vertical, 10)
+        .background(.ultraThinMaterial)
+    }
+
+    private func toolbarIconButton(icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(.secondary)
+                .frame(width: 32, height: 32)
+                .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 6))
+        }
+    }
+
+    private func runProject() {
+        Task {
+            isRunning = true
+            defer { isRunning = false }
+            _ = await state.executeGuarded("SDK Run") {
+                try await SDKExecutionCoordinator.shared.executeSelectedRunConfiguration()
+            }
+            state.recalculateDiagnostics()
+        }
     }
 
     @ViewBuilder

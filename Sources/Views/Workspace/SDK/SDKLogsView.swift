@@ -6,34 +6,60 @@ struct SDKLogsView: View {
     @State private var searchText = ""
 
     var body: some View {
-        VStack {
-            HStack {
-                Picker("Level", selection: $selectedLevel) {
-                    Text("All").tag(LogLevel?.none)
-                    ForEach(LogLevel.allCases, id: \.self) { level in
-                        Text(level.rawValue.capitalized).tag(LogLevel?.some(level))
+        VStack(spacing: 0) {
+            VStack(spacing: 12) {
+                SDKModernCard(padding: 8, content: {
+                    HStack {
+                        Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                        TextField("Filter by source...", text: $searchText)
+                            .font(.subheadline)
+
+                        Menu {
+                            Picker("Level", selection: $selectedLevel) {
+                                Text("All Levels").tag(LogLevel?.none)
+                                ForEach(LogLevel.allCases, id: \.self) { level in
+                                    Text(level.rawValue.capitalized).tag(LogLevel?.some(level))
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                                .foregroundStyle(selectedLevel == nil ? .secondary : .blue)
+                        }
                     }
                 }
-                .pickerStyle(.menu)
 
-                TextField("Search Source", text: $searchText)
-                    .textFieldStyle(.roundedBorder)
+                HStack {
+                    SDKStatusPill("\(filteredEntries.count) events", color: .blue)
+                    Spacer()
+                    Button {
+                        logStore.clear()
+                    } label: {
+                        Label("Clear Logs", systemImage: "trash")
+                            .font(.caption2.bold())
+                            .foregroundStyle(.sdkError)
+                    }
+                }
+                .padding(.horizontal, 4)
             }
             .padding()
+            .background(Color(.systemGroupedBackground))
 
             List(filteredEntries) { entry in
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
                     HStack {
-                        levelBadge(entry.level)
-                        Text(entry.source).font(.caption).bold().foregroundStyle(.secondary)
+                        SDKStatusPill(entry.level.rawValue, color: levelColor(entry.level), isCapsule: false)
+                        Text(entry.source).font(.system(size: 10, weight: .bold, design: .monospaced)).foregroundStyle(.secondary)
                         Spacer()
                         Text(entry.timestamp.formatted(date: .omitted, time: .shortened))
-                            .font(.caption2).foregroundStyle(.secondary)
+                            .font(.system(size: 9, design: .monospaced)).foregroundStyle(.tertiary)
                     }
-                    Text(entry.message).font(.subheadline)
+                    Text(entry.message)
+                        .font(.system(.subheadline, design: .monospaced))
+                        .foregroundStyle(.primary)
                 }
-                .padding(.vertical, 2)
+                .padding(.vertical, 4)
             }
+            .listStyle(.plain)
         }
         .navigationTitle("System Logs")
         .toolbar {

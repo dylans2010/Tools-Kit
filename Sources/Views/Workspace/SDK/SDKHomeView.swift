@@ -20,68 +20,74 @@ struct SDKHomeView: View {
                     )
                 } else {
                     ForEach(projects) { project in
-                        NavigationLink {
-                            SDKBuildView()
-                                .onAppear { projectManager.loadProject(id: project.id) }
-                        } label: {
-                            VStack(alignment: .leading, spacing: 6) {
-                                HStack {
-                                    Text(project.name).font(.headline)
-                                    Spacer()
-                                    Text(project.status.rawValue.capitalized)
-                                        .font(.caption2.bold())
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 3)
-                                        .background((project.status == .active ? Color.green : Color.orange).opacity(0.2), in: Capsule())
+                        projectCard(project)
+                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                            .swipeActions(edge: .trailing) {
+                                Button(role: .destructive) {
+                                    projectManager.deleteProject(id: project.id)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
                                 }
-                                Text(project.description.isEmpty ? "No description" : project.description)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                HStack {
-                                    Text("Updated \(project.updatedAt.formatted(date: .abbreviated, time: .shortened))")
-                                    Spacer()
-                                    Text("Scopes: \(project.enabledScopes.count)")
+                            }
+                            .swipeActions(edge: .leading) {
+                                Button {
+                                    _ = projectManager.duplicateProject(id: project.id)
+                                } label: {
+                                    Label("Duplicate", systemImage: "doc.on.doc")
                                 }
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .tint(.blue)
                             }
-                        }
-                        .swipeActions(edge: .trailing) {
-                            Button(role: .destructive) {
-                                projectManager.deleteProject(id: project.id)
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                        }
-                        .swipeActions(edge: .leading) {
-                            Button {
-                                _ = projectManager.duplicateProject(id: project.id)
-                            } label: {
-                                Label("Duplicate", systemImage: "doc.on.doc")
-                            }
-                            .tint(.blue)
-                        }
                     }
                 }
             } header: {
-                Text("SDK Projects")
+                SDKSectionHeader("SDK Projects", subtitle: "Managed workspace integrations and builds", systemImage: "folder.fill")
             }
 
             Section {
                 NavigationLink(destination: SDKWorkspaceContainerView()) {
-                    Label("IDE Workspace", systemImage: "square.split.2x2.fill")
+                    Label {
+                        VStack(alignment: .leading) {
+                            Text("IDE Workspace").font(.subheadline.bold())
+                            Text("Multi-panel runtime editor").font(.caption2).foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "square.split.2x2.fill").foregroundStyle(.indigo)
+                    }
                 }
                 NavigationLink(destination: SDKDeveloperGuideView()) {
-                    Label("Developer Guide", systemImage: "book.closed.fill")
+                    Label {
+                        VStack(alignment: .leading) {
+                            Text("Developer Guide").font(.subheadline.bold())
+                            Text("Architecture & API documentation").font(.caption2).foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "book.closed.fill").foregroundStyle(.blue)
+                    }
                 }
                 NavigationLink(destination: SDKBuildView()) {
-                    Label("App Builder", systemImage: "hammer.fill")
+                    Label {
+                        VStack(alignment: .leading) {
+                            Text("App Builder").font(.subheadline.bold())
+                            Text("Visual project configuration").font(.caption2).foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "hammer.fill").foregroundStyle(.orange)
+                    }
                 }
                 NavigationLink(destination: SDKInternalView()) {
-                    Label("SDK Internal", systemImage: "terminal.fill")
+                    Label {
+                        VStack(alignment: .leading) {
+                            Text("SDK Internal").font(.subheadline.bold())
+                            Text("Advanced system debugging").font(.caption2).foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "terminal.fill").foregroundStyle(.primary)
+                    }
                 }
             } header: {
-                Text("Workspace")
+                SDKSectionHeader("Workspace", subtitle: "System-level development tools", systemImage: "square.grid.2x2.fill")
             }
         }
         .navigationTitle("WorkspaceSDK")
@@ -103,5 +109,41 @@ struct SDKHomeView: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private func projectCard(_ project: SDKProject) -> some View {
+        NavigationLink {
+            SDKBuildView()
+                .onAppear { projectManager.loadProject(id: project.id) }
+        } label: {
+            SDKModernCard(padding: 12, content: {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text(project.name).font(.headline)
+                        Spacer()
+                        SDKStatusPill(
+                            project.status.rawValue,
+                            systemImage: project.status == .active ? "checkmark.circle.fill" : "pencil.circle",
+                            color: project.status == .active ? .sdkSuccess : .sdkWarning
+                        )
+                    }
+
+                    Text(project.description.isEmpty ? "No description provided for this SDK project." : project.description)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+
+                    HStack {
+                        Label("\(project.enabledScopes.count) Scopes", systemImage: "lock.shield")
+                        Spacer()
+                        Text("Updated \(project.updatedAt.formatted(date: .abbreviated, time: .shortened))")
+                    }
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(.tertiary)
+                }
+            }
+        }
+        .buttonStyle(.plain)
     }
 }

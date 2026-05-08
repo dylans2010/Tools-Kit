@@ -59,31 +59,37 @@ struct SDKConnectorsView: View {
             // MARK: - Stats
             if !manager.connectors.isEmpty {
                 Section {
-                    HStack(spacing: 16) {
-                        connectorStat(label: "Total", value: "\(connectorStats.total)", color: .blue)
-                        connectorStat(label: "Connected", value: "\(connectorStats.connected)", color: .green)
-                        connectorStat(label: "Disconnected", value: "\(connectorStats.disconnected)", color: .red)
+                    SDKModernCard(padding: 12, content: {
+                        HStack(spacing: 0) {
+                            SDKStatPill(label: "Total", value: "\(connectorStats.total)", color: .blue)
+                            SDKStatPill(label: "Connected", value: "\(connectorStats.connected)", color: .sdkSuccess)
+                            SDKStatPill(label: "Offline", value: "\(connectorStats.disconnected)", color: .secondary)
+                        }
                     }
                 }
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
 
                 Section {
                     LabeledContent("Current Project", value: projectManager.currentProject?.name ?? "None")
-                    LabeledContent("Enabled Here", value: "\(projectManager.currentProject?.enabledConnectorIDs.count ?? 0)")
-                    LabeledContent("SDK Log Entries", value: "\(logStore.entries.count)")
+                    LabeledContent("Active Links", value: "\(projectManager.currentProject?.enabledConnectorIDs.count ?? 0)")
+                    LabeledContent("System Events", value: "\(logStore.entries.count)")
                 } header: {
-                    Text("Live Project Usage")
+                    SDKSectionHeader("Project Integration", subtitle: "Active module utilization", alignment: .leading)
                 }
 
                 if let latestEvent = manager.connectors.flatMap({ $0.activityLog }).sorted(by: { $0.timestamp > $1.timestamp }).first {
                     Section {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(latestEvent.message).font(.caption)
+                            Text(latestEvent.message).font(.subheadline)
                             Text(latestEvent.timestamp.formatted(date: .abbreviated, time: .shortened))
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .font(.system(size: 9, design: .monospaced))
+                                .foregroundStyle(.tertiary)
                         }
+                        .padding(.vertical, 4)
                     } header: {
-                        Text("Latest Connector Activity")
+                        SDKSectionHeader("Latest Event", subtitle: "Real-time activity stream", alignment: .leading)
                     }
                 }
 
@@ -285,13 +291,11 @@ struct SDKConnectorsView: View {
     }
 
     private func statusBadge(_ status: ConnectorStatus) -> some View {
-        Text(status.rawValue.capitalized)
-            .font(.caption2)
-            .bold()
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(status == .connected ? Color.green.opacity(0.2) : Color.gray.opacity(0.2), in: Capsule())
-            .foregroundStyle(status == .connected ? .green : .secondary)
+        SDKStatusPill(
+            status.rawValue,
+            systemImage: status == .connected ? "checkmark.circle.fill" : "xmark.circle.fill",
+            color: status == .connected ? .sdkSuccess : .secondary
+        )
     }
 
     private func deleteConnectors(at offsets: IndexSet) {
