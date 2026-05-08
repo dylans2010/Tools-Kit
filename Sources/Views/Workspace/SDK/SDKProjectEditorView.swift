@@ -74,7 +74,7 @@ struct SDKProjectEditorView: View {
                 SDKAPIExplorerView()
             }
         } else {
-            ContentUnavailableView("No tab selected", systemImage: "rectangle.stack")
+            ContentUnavailableView("No tab selected", systemImage: "rectangle.stack", description: Text("Select a project editor tab to continue."))
         }
     }
 
