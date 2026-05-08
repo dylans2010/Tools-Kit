@@ -4727,17 +4727,6 @@
 		6D9B782B23364B0B8BCC0B0F /* Connectors */ = {
 			isa = PBXGroup;
 			children = (
-				010000000000000000000101 /* Unknown */,
-				010000000000000000000102 /* Unknown */,
-				010000000000000000000103 /* Unknown */,
-				010000000000000000000104 /* Unknown */,
-				010000000000000000000105 /* Unknown */,
-				010000000000000000000106 /* Unknown */,
-				010000000000000000000107 /* Unknown */,
-				010000000000000000000108 /* Unknown */,
-				010000000000000000000109 /* Unknown */,
-				01000000000000000000010A /* Unknown */,
-				01000000000000000000010B /* Unknown */,
 			);
 			path = Connectors;
 			sourceTree = "<group>";
@@ -5430,22 +5419,6 @@
 		89F7FA2CC5CC4B6A9B8697F0 /* SDK */ = {
 			isa = PBXGroup;
 			children = (
-				010000000000000000000007 /* Unknown */,
-				010000000000000000000008 /* Unknown */,
-				010000000000000000000009 /* Unknown */,
-				01000000000000000000000A /* Unknown */,
-				01000000000000000000000B /* Unknown */,
-				01000000000000000000000C /* Unknown */,
-				01000000000000000000000D /* Unknown */,
-				01000000000000000000000E /* Unknown */,
-				01000000000000000000000F /* Unknown */,
-				010000000000000000000010 /* Unknown */,
-				010000000000000000000020 /* Unknown */,
-				010000000000000000000021 /* Unknown */,
-				010000000000000000000022 /* Unknown */,
-				010000000000000000000023 /* Unknown */,
-				010000000000000000000024 /* Unknown */,
-				010000000000000000000025 /* Unknown */,
 			);
 			path = SDK;
 			sourceTree = "<group>";
@@ -7166,10 +7139,6 @@
 			isa = PBXGroup;
 			children = (
 				2054E7AF12EB68C41BECE760 /* GitEngineService.swift */,
-				CollaborationFramework /* Unknown */,
-				CollaborationManager /* Unknown */,
-				WorkspaceAutomationEngine /* Unknown */,
-				WorkspaceSnapshotService /* Unknown */,
 			);
 			path = Collaboration;
 			sourceTree = "<group>";
@@ -8507,7 +8476,6 @@
 			isa = PBXGroup;
 			children = (
 				KB0100000000000000000001 /* KeyboardViewController.swift */,
-				KeyboardViewController /* Unknown */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -8618,8 +8586,6 @@
 		MEG0000000000000000000001 /* Meet */ = {
 			isa = PBXGroup;
 			children = (
-				MeetPermissionService /* Unknown */,
-				MeetSessionController /* Unknown */,
 			);
 			path = Meet;
 			sourceTree = "<group>";
@@ -8634,18 +8600,6 @@
 		MEG0000000000000000000003 /* Meet */ = {
 			isa = PBXGroup;
 			children = (
-				AIAssistantPanelView /* Unknown */,
-				BackgroundEffectsView /* Unknown */,
-				BreakoutRoomCardView /* Unknown */,
-				BreakoutRoomManagerView /* Unknown */,
-				ChatMessageBubbleView /* Unknown */,
-				MeetDeveloperToolsView /* Unknown */,
-				MeetingContainerView /* Unknown */,
-				MeetingDiagnosticsView /* Unknown */,
-				ParticipantAdminPanelView /* Unknown */,
-				PerformanceWarningView /* Unknown */,
-				ReactionsOverlayView /* Unknown */,
-				WorkspaceMeetingNotesView /* Unknown */,
 			);
 			path = Meet;
 			sourceTree = "<group>";
@@ -8772,7 +8726,6 @@
 			isa = PBXGroup;
 			children = (
 				MS0107C4CA60A1926E94DEC9 /* MessagesViewController.swift */,
-				MessagesViewController /* Unknown */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -8794,8 +8747,6 @@
 				MS017E7FE63D8D555B572718 /* MessagesReplyGenerator.swift */,
 				MS0198D4E695260224D8850A /* MessagesSummarizeTool.swift */,
 				MS01B0FF40CAEAEC26586CD6 /* MessagesAIHomeView.swift */,
-				MessagesReplyGenerator /* Unknown */,
-				MessagesSummarizeTool /* Unknown */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -8842,13 +8793,6 @@
 		PL000000000000000000000100 /* Connectors */ = {
 			isa = PBXGroup;
 			children = (
-				ConnectorBuilderView /* Unknown */,
-				ConnectorExecutionView /* Unknown */,
-				ConnectorFlowBuilderView /* Unknown */,
-				ConnectorSchemaBuilderView /* Unknown */,
-				ConnectorSecurityView /* Unknown */,
-				ConnectorTestConsoleView /* Unknown */,
-				ConnectorVersioningView /* Unknown */,
 			);
 			path = Connectors;
 			sourceTree = "<group>";
