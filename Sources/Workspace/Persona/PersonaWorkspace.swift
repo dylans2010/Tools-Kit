@@ -13,6 +13,7 @@ struct PersonaWorkspace {
     @MainActor
     static func gatherFullWorkspaceData() -> String {
         var fullData: [String: Any] = [:]
+        let isoFormatter = ISO8601DateFormatter()
 
         // 1. Mail
         fullData["mail_accounts"] = AccountManager.shared.accounts.map { account in
@@ -26,7 +27,13 @@ struct PersonaWorkspace {
 
         // 3. Calendar
         fullData["calendar_events"] = CalendarManager.shared.events.map { event in
-            ["title": event.title, "date": event.date, "start": event.startTime, "end": event.endTime, "description": event.description]
+            [
+                "title": event.title,
+                "date": isoFormatter.string(from: event.date),
+                "start": isoFormatter.string(from: event.startTime),
+                "end": isoFormatter.string(from: event.endTime),
+                "description": event.description
+            ]
         }
 
         // 4. Habits
