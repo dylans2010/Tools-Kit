@@ -35,8 +35,8 @@ struct SDKNavigatorView: View {
         #endif
     }
 
-    private var listStyleValue: DefaultListStyle {
-        let plainStyle: DefaultListStyle = .plain
+    private var listStyleValue: PlainListStyle {
+        let plainStyle: PlainListStyle = .plain
         return plainStyle
     }
 
@@ -64,7 +64,7 @@ struct SDKNavigatorView: View {
         let spacing: CGFloat = 8
         let horizontalTopPadding: CGFloat = 10
         let compactListStyle: InsetGroupedListStyle = listStyleValueCompact
-        let regularListStyle: DefaultListStyle = listStyleValue
+        let regularListStyle: PlainListStyle = listStyleValue
         let shouldUseCompactListStyle: Bool = isCompact
 
         return VStack(spacing: spacing) {
@@ -72,7 +72,7 @@ struct SDKNavigatorView: View {
                 .textFieldStyle(.roundedBorder)
                 .padding([.horizontal, .top], horizontalTopPadding)
 
-            List {
+            let navigatorList = List {
                 Section(nodeSectionTitle) {
                     ForEach(filteredNodes) { node in
                         let isSelected: Bool = state.selectedNode == node
@@ -125,7 +125,14 @@ struct SDKNavigatorView: View {
                     LabeledContent("Diagnostics", value: diagnosticsValue)
                 }
             }
-            .listStyle(shouldUseCompactListStyle ? compactListStyle : regularListStyle)
+
+            if shouldUseCompactListStyle {
+                navigatorList
+                    .listStyle(compactListStyle)
+            } else {
+                navigatorList
+                    .listStyle(regularListStyle)
+            }
         }
         .background(.background)
     }
