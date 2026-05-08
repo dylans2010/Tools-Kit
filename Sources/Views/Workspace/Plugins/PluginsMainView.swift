@@ -15,19 +15,13 @@ struct PluginsMainView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                pluginStatsCard
-
-                SDKSectionHeader("Management", subtitle: "Core plugin development and deployment", systemImage: "hammer.fill")
-                navigationGrid
-
-                SDKSectionHeader("Active Plugins", subtitle: "Currently running in the background", systemImage: "bolt.fill")
-                activePluginsCard
-
-                SDKSectionHeader("Recent Activity", subtitle: "Latest capability execution events", systemImage: "list.bullet.rectangle.fill")
-                recentActivityCard
+            VStack(alignment: .leading, spacing: 20) {
+                statsStrip
+                managementSection
+                activePluginsSection
+                recentActivitySection
             }
-            .padding()
+            .padding(16)
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Plugins")
@@ -42,57 +36,63 @@ struct PluginsMainView: View {
         }
     }
 
-    private var pluginStatsCard: some View {
-        SDKModernCard(padding: 12) {
-            HStack(spacing: 0) {
-                SDKStatPill(label: "Active", value: "\(manager.installedPlugins.filter(\.isEnabled).count)", color: .sdkSuccess)
-                SDKStatPill(label: "Disabled", value: "\(manager.installedPlugins.filter { !$0.isEnabled }.count)", color: .secondary)
-                SDKStatPill(label: "Errors", value: "\(manager.installedPlugins.reduce(0) { $0 + $1.errorCount })", color: .sdkError)
+    private var statsStrip: some View {
+        HStack(spacing: 12) {
+            statCard("Active", value: manager.installedPlugins.filter(\.isEnabled).count, color: .green, icon: "bolt.fill")
+            statCard("Disabled", value: manager.installedPlugins.filter { !$0.isEnabled }.count, color: .gray, icon: "pause.fill")
+            statCard("Errors", value: manager.installedPlugins.reduce(0) { $0 + $1.errorCount }, color: .red, icon: "exclamationmark.triangle.fill")
+        }
+    }
+
+    private var managementSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Management")
+                .font(.title3.weight(.semibold))
+
+            LazyVGrid(columns: columns, spacing: 12) {
+                navTile("Create Plugin", subtitle: "Scaffold a new plugin", icon: "plus.circle.fill", color: .blue, destination: PluginBuildView())
+                navTile("Build with ToolsKit", subtitle: "SDK and workflow tools", icon: "hammer.fill", color: .orange, destination: SDKHomeView())
+                navTile("App Builder", subtitle: "Visual assembly", icon: "wand.and.stars", color: .pink, destination: SDKBuildView())
+                navTile("Connectors", subtitle: "External integrations", icon: "cable.connector", color: .green, destination: ConnectorsMainView())
+                navTile("Marketplace", subtitle: "Discover packages", icon: "cart.fill", color: .indigo, destination: MarketplaceView())
+                navTile("Installed", subtitle: "Manage local plugins", icon: "puzzlepiece.extension.fill", color: .teal, destination: PluginsInstalledView())
+                navTile("Dev Console", subtitle: "Runtime diagnostics", icon: "terminal.fill", color: .purple, destination: PluginDevConsoleView())
+                navTile("Security", subtitle: "Scopes and policies", icon: "shield.fill", color: .red, destination: PluginSecurityView())
             }
         }
     }
 
-    private var navigationGrid: some View {
-        LazyVGrid(columns: columns, spacing: 12) {
-            navLinkCard("Create Plugin", "plus.circle.fill", .blue, PluginBuildView())
-            navLinkCard("Build with ToolsKit", "hammer.fill", .orange, SDKHomeView())
-            navLinkCard("App Builder", "wand.and.stars", .pink, SDKBuildView())
-            navLinkCard("Connectors", "puzzlepiece.extension", .green, ConnectorsMainView())
-            navLinkCard("Marketplace", "cart.fill", .orange, MarketplaceView())
-            navLinkCard("Installed", "puzzlepiece.extension.fill", .indigo, PluginsInstalledView())
-            navLinkCard("Dev Console", "terminal.fill", .purple, PluginDevConsoleView())
-            navLinkCard("Security", "shield.fill", .red, PluginSecurityView())
-        }
-    }
-
-    private var activePluginsCard: some View {
-        VStack(spacing: 12) {
-            if manager.installedPlugins.filter(\.isEnabled).isEmpty {
+    private var activePluginsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Active Plugins").font(.title3.weight(.semibold))
+            let enabled = manager.installedPlugins.filter(\.isEnabled)
+            if enabled.isEmpty {
                 ContentUnavailableView("No Active Plugins", systemImage: "puzzlepiece", description: Text("Enable installed plugins in the Plugin Manager."))
-                    .padding(.vertical, 20)
             } else {
-                ForEach(manager.installedPlugins.filter(\.isEnabled)) { plugin in
+                ForEach(enabled) { plugin in
                     NavigationLink(destination: PluginDetailView(pluginID: plugin.id)) {
-                        SDKModernCard(padding: 12) {
-                            HStack(spacing: 12) {
-                                Image(systemName: plugin.icon)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.white)
-                                    .frame(width: 32, height: 32)
-                                    .background(Color.blue.gradient, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(plugin.name).font(.subheadline.bold())
-                                    Text(plugin.capabilities.map(\.displayName).joined(separator: ", "))
-                                        .font(.system(size: 10))
-                                        .foregroundStyle(.secondary)
-                                }
-
-                                Spacer()
-
-                                SDKStatusPill("Running", color: .sdkSuccess)
+                        HStack(spacing: 12) {
+                            Image(systemName: plugin.icon)
+                                .foregroundStyle(.white)
+                                .frame(width: 32, height: 32)
+                                .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(plugin.name).font(.subheadline.weight(.semibold))
+                                Text(plugin.capabilities.map(\.displayName).joined(separator: ", "))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
                             }
+                            Spacer()
+                            Text("Running")
+                                .font(.caption.weight(.semibold))
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                                .background(.green.opacity(0.15), in: Capsule())
+                                .foregroundStyle(.green)
                         }
+                        .padding(12)
+                        .background(.background, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                     }
                     .buttonStyle(.plain)
                 }
@@ -100,13 +100,11 @@ struct PluginsMainView: View {
         }
     }
 
-    private var recentActivityCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Recent Activity").font(.headline)
+    private var recentActivitySection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Recent Activity").font(.title3.weight(.semibold))
             if recentEvents.isEmpty {
-                Text("No recent activity")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                Text("No recent activity").font(.subheadline).foregroundStyle(.secondary)
             } else {
                 ForEach(recentEvents.prefix(5)) { event in
                     HStack {
@@ -117,11 +115,47 @@ struct PluginsMainView: View {
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
+                    .padding(.vertical, 2)
                 }
             }
         }
-        .padding()
-        .background(.background, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .padding(12)
+        .background(.background, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private func statCard(_ title: String, value: Int, color: Color, icon: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label(title, systemImage: icon)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text("\(value)")
+                .font(.title3.weight(.bold))
+                .foregroundStyle(color)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(.background, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private func navTile<Destination: View>(_ title: String, subtitle: String, icon: String, color: Color, destination: Destination) -> some View {
+        NavigationLink(destination: destination) {
+            VStack(alignment: .leading, spacing: 8) {
+                Image(systemName: icon)
+                    .font(.headline)
+                    .foregroundStyle(color)
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+            }
+            .frame(maxWidth: .infinity, minHeight: 88, alignment: .leading)
+            .padding(12)
+            .background(.background, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
+        .buttonStyle(.plain)
     }
 
     private func setupActivityStream() {
@@ -146,13 +180,6 @@ struct PluginsMainView: View {
                 }
             }
             .store(in: &cancellables)
-    }
-
-    private func navLinkCard<Destination: View>(_ title: String, _ icon: String, _ color: Color, _ destination: Destination) -> some View {
-        NavigationLink(destination: destination) {
-            SDKActionTile(title, subtitle: "Manage system \(title.lowercased())", systemImage: icon, color: color) {}
-        }
-        .buttonStyle(.plain)
     }
 }
 

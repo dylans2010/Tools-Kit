@@ -24,7 +24,6 @@ struct ConnectorsMainView: View {
 
     var filteredConnectors: [ConnectorDefinition] {
         var result = manager.connectors
-
         if !searchText.isEmpty {
             result = result.filter {
                 $0.name.localizedCaseInsensitiveContains(searchText) ||
@@ -32,321 +31,176 @@ struct ConnectorsMainView: View {
                 $0.description.localizedCaseInsensitiveContains(searchText)
             }
         }
-
         switch selectedFilter {
         case .all: break
         case .active: result = result.filter { $0.status == .active }
         case .inactive: result = result.filter { $0.status == .inactive }
         case .error: result = result.filter { $0.status == .error }
         }
-
         switch sortOrder {
         case .name: result.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         case .recent: result.sort { $0.updatedAt > $1.updatedAt }
         case .status: result.sort { $0.status.rawValue < $1.status.rawValue }
         }
-
         return result
     }
 
     var body: some View {
-        let connectors = manager.connectors
-        let activeCount = connectors.filter { $0.status == .active }.count
-        let errorCount = connectors.filter { $0.status == .error }.count
-        let connectingCount = connectors.filter { $0.status == .connecting }.count
-        let totalEndpoints = connectors.reduce(0) { $0 + $1.endpoints.count }
-        let totalFlowSteps = connectors.reduce(0) { $0 + $1.flow.steps.count }
-        let avgLatency = connectors.isEmpty ? 0.0 : connectors.reduce(0.0) { $0 + $1.metadata.averageLatency } / Double(connectors.count)
-
-        return List {
-            // MARK: - Dashboard Header
-            Section {
-                SDKModernCard {
-                    VStack(alignment: .center, spacing: 14) {
-                        SDKSectionHeader("Connectors Platform", subtitle: "Advanced external API federation engine", systemImage: "cable.connector")
-
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                            statView(label: "Total", value: "\(connectors.count)", color: .blue, icon: "puzzlepiece.extension")
-                            statView(label: "Active", value: "\(activeCount)", color: .sdkSuccess, icon: "checkmark.circle.fill")
-                            statView(label: "Errors", value: "\(errorCount)", color: .sdkError, icon: "exclamationmark.triangle.fill")
-                            statView(label: "Latency", value: String(format: "%.0fms", avgLatency), color: .teal, icon: "speedometer")
-                            statView(label: "Endpoints", value: "\(totalEndpoints)", color: .purple, icon: "point.3.connected.trianglepath.dotted")
-                            statView(label: "Waiting", value: "\(connectingCount)", color: .sdkWarning, icon: "arrow.triangle.2.circlepath")
-                        }
-                    }
-                }
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                summaryCards
+                actionRow
+                controlsCard
+                connectorsCard
+                toolsCard
             }
-
-            // MARK: - Quick Actions
-            Section {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        quickActionButton(title: "New Connector", icon: "plus.circle.fill", color: .blue) {
-                            showingBuilder = true
-                        }
-                        quickActionButton(title: "Run All Active", icon: "play.circle.fill", color: .green) {
-                            Task {
-                                for connector in connectors where connector.status == .active {
-                                    await ConnectorRuntime.shared.run(connector: connector)
-                                }
-                            }
-                        }
-                        quickActionButton(title: "Sync All SDK", icon: "arrow.triangle.2.circlepath.circle.fill", color: .orange) {
-                            Task { try? await sdkManager.syncAll() }
-                        }
-                        quickActionButton(title: "View Docs", icon: "book.circle.fill", color: .purple) {
-                            showingDocs = true
-                        }
-                    }
-                    .padding(.vertical, 4)
-                }
-            } header: {
-                Text("Quick Actions")
-            }
-
-            // MARK: - Filter & Search Controls
-            if !connectors.isEmpty {
-                Section {
-                    Picker("Filter", selection: $selectedFilter) {
-                        ForEach(ConnectorFilter.allCases, id: \.self) { filter in
-                            Text(filter.rawValue).tag(filter)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-
-                    HStack {
-                        Text("Sort By")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        Picker("Sort", selection: $sortOrder) {
-                            ForEach(SortOrder.allCases, id: \.self) { order in
-                                Text(order.rawValue).tag(order)
-                            }
-                        }
-                        .pickerStyle(.menu)
-                    }
-                }
-            }
-
-            // MARK: - Your Connectors
-            Section {
-                if filteredConnectors.isEmpty && connectors.isEmpty {
-                    VStack(alignment: .center, spacing: 12) {
-                        Image(systemName: "puzzlepiece.extension")
-                            .font(.system(size: 40))
-                            .foregroundColor(.secondary)
-                        Text("No Connectors Created")
-                            .font(.headline)
-                        Text("Build your first integration engine to connect external services.")
-                            .font(.caption)
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(.secondary)
-
-                        Button("Create Connector") {
-                            showingBuilder = true
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 24)
-                } else if filteredConnectors.isEmpty {
-                    VStack(spacing: 8) {
-                        Image(systemName: "magnifyingglass")
-                            .font(.title2)
-                            .foregroundColor(.secondary)
-                        Text("No connectors match your filter.")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                } else {
-                    ForEach(filteredConnectors) { connector in
-                        NavigationLink {
-                            ConnectorDefinitionDetailView(connector: connector)
-                        } label: {
-                            connectorRow(connector)
-                        }
-                    }
-                    .onDelete { indices in
-                        let sorted = filteredConnectors
-                        for index in indices {
-                            let connector = sorted[index]
-                            manager.deleteConnector(id: connector.id)
-                        }
-                    }
-                }
-            } header: {
-                Text("Your Connectors")
-            }
-
-            // MARK: - Platform Tools
-            Section {
-                NavigationLink(destination: ConnectorLogsView()) {
-                    Label("Global Execution Logs", systemImage: "list.bullet.rectangle")
-                }
-                NavigationLink(destination: ConnectorSecurityView()) {
-                    Label("Security & Scopes", systemImage: "shield.lefthalf.filled")
-                }
-                NavigationLink(destination: ConnectorBuilderView()) {
-                    Label("Connector Builder", systemImage: "plus.rectangle.on.folder")
-                }
-                if let first = connectors.first {
-                    NavigationLink(destination: ConnectorExecutionView(connector: first)) {
-                        Label("Connector Execution", systemImage: "play.circle")
-                    }
-                    NavigationLink(destination: ConnectorFlowBuilderView(connector: first)) {
-                        Label("Connector Flow Builder", systemImage: "arrow.triangle.branch")
-                    }
-                    NavigationLink(destination: ConnectorScopeView(connector: first)) {
-                        Label("Connector Scope Assignment", systemImage: "lock.shield")
-                    }
-                }
-                NavigationLink(destination: SDKConnectorsView()) {
-                    Label("SDK Connectors", systemImage: "cable.connector")
-                }
-                Button {
-                    showingDocs = true
-                } label: {
-                    Label("Connectors Documentation", systemImage: "book.closed")
-                }
-            } header: {
-                Text("Platform Tools")
-            }
-
-            // MARK: - Analytics Overview
-            if !connectors.isEmpty {
-                Section {
-                    let totalExecs = connectors.reduce(0) { $0 + $1.metadata.executionCount }
-                    let avgError = connectors.isEmpty ? 0.0 : connectors.reduce(0.0) { $0 + $1.metadata.errorRate } / Double(connectors.count)
-
-                    LabeledContent("Total Executions") {
-                        Text("\(totalExecs)")
-                            .bold()
-                            .foregroundColor(.blue)
-                    }
-                    LabeledContent("Average Error Rate") {
-                        Text(String(format: "%.1f%%", avgError * 100))
-                            .bold()
-                            .foregroundColor(avgError > 0.1 ? .red : .green)
-                    }
-                    LabeledContent("Total Flow Steps") {
-                        Text("\(totalFlowSteps)")
-                            .bold()
-                    }
-                    LabeledContent("Connectors with Flows") {
-                        Text("\(connectors.filter { !$0.flow.steps.isEmpty }.count)")
-                            .bold()
-                    }
-
-                    if let lastExecuted = connectors.compactMap({ $0.metadata.lastExecutedAt }).max() {
-                        LabeledContent("Last Execution") {
-                            Text(lastExecuted.formatted(.relative(presentation: .numeric)))
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                } header: {
-                    Text("Analytics Overview")
-                }
-            }
+            .padding(16)
         }
-        .searchable(text: $searchText, prompt: "Search Connectors")
+        .background(Color(.systemGroupedBackground))
         .navigationTitle("Connectors")
+        .searchable(text: $searchText, prompt: "Search Connectors")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Menu {
-                    Button {
-                        showingBuilder = true
-                    } label: {
-                        Label("New Connector", systemImage: "plus")
-                    }
-                    Button {
-                        showingDocs = true
-                    } label: {
-                        Label("Documentation", systemImage: "book.closed")
-                    }
+                Button {
+                    showingBuilder = true
                 } label: {
-                    Image(systemName: "plus")
+                    Label("New", systemImage: "plus")
                 }
             }
         }
         .sheet(isPresented: $showingBuilder) {
-            NavigationView {
-                ConnectorBuilderView()
-            }
+            NavigationStack { ConnectorBuilderView() }
         }
         .sheet(isPresented: $showingDocs) {
             ConnectorDocumentationView()
         }
     }
 
-    // MARK: - Connector Row
+    private var summaryCards: some View {
+        let connectors = manager.connectors
+        let activeCount = connectors.filter { $0.status == .active }.count
+        let errorCount = connectors.filter { $0.status == .error }.count
+        let totalEndpoints = connectors.reduce(0) { $0 + $1.endpoints.count }
+        return HStack(spacing: 12) {
+            metric("Total", value: connectors.count, color: .blue)
+            metric("Active", value: activeCount, color: .green)
+            metric("Errors", value: errorCount, color: .red)
+            metric("Endpoints", value: totalEndpoints, color: .purple)
+        }
+    }
 
-    private func connectorRow(_ connector: ConnectorDefinition) -> some View {
-        SDKModernCard(padding: 12) {
-            HStack(spacing: 14) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(connector.name)
-                        .font(.subheadline.bold())
-                    Text(connector.identifier)
-                        .font(.system(size: 9, design: .monospaced))
-                        .foregroundStyle(.tertiary)
-
-                    HStack(spacing: 10) {
-                        if !connector.endpoints.isEmpty {
-                            Label("\(connector.endpoints.count)", systemImage: "network").font(.system(size: 9))
-                        }
-                        if !connector.flow.steps.isEmpty {
-                            Label("\(connector.flow.steps.count)", systemImage: "arrow.triangle.branch").font(.system(size: 9))
-                        }
-                        if connector.metadata.executionCount > 0 {
-                            Label("\(connector.metadata.executionCount)", systemImage: "play.circle").font(.system(size: 9))
+    private var actionRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                actionButton("New", icon: "plus.circle.fill", color: .blue) { showingBuilder = true }
+                actionButton("Run Active", icon: "play.circle.fill", color: .green) {
+                    Task {
+                        for connector in manager.connectors where connector.status == .active {
+                            await ConnectorRuntime.shared.run(connector: connector)
                         }
                     }
-                    .foregroundColor(.secondary)
                 }
-                Spacer()
-                SDKStatusPill(connector.status.rawValue, color: statusColor(connector.status), isCapsule: false)
+                actionButton("Sync SDK", icon: "arrow.triangle.2.circlepath", color: .orange) {
+                    Task { try? await sdkManager.syncAll() }
+                }
+                actionButton("Docs", icon: "book.closed.fill", color: .indigo) { showingDocs = true }
             }
         }
-        .padding(.vertical, 4)
     }
 
-    // MARK: - Helpers
-
-    private func statView(label: String, value: String, color: Color, icon: String) -> some View {
-        SDKStatPill(label: label, value: value, color: color, icon: icon)
-    }
-
-    private func quickActionButton(title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            VStack(spacing: 6) {
-                Image(systemName: icon)
-                    .font(.title2)
-                    .foregroundColor(color)
-                Text(title)
-                    .font(.caption2)
-                    .foregroundColor(.primary)
+    private var controlsCard: some View {
+        VStack(spacing: 12) {
+            Picker("Filter", selection: $selectedFilter) {
+                ForEach(ConnectorFilter.allCases, id: \.self) { Text($0.rawValue).tag($0) }
             }
-            .frame(width: 80, height: 70)
-            .background(color.opacity(0.1))
-            .cornerRadius(12)
+            .pickerStyle(.segmented)
+
+            HStack {
+                Text("Sort by").font(.caption).foregroundStyle(.secondary)
+                Spacer()
+                Picker("Sort", selection: $sortOrder) {
+                    ForEach(SortOrder.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                }
+                .pickerStyle(.menu)
+            }
+        }
+        .padding(12)
+        .background(.background, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private var connectorsCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Your Connectors").font(.title3.weight(.semibold))
+            if manager.connectors.isEmpty {
+                ContentUnavailableView("No Connectors", systemImage: "puzzlepiece.extension", description: Text("Create your first connector to integrate external services."))
+            } else if filteredConnectors.isEmpty {
+                ContentUnavailableView.search
+            } else {
+                ForEach(filteredConnectors) { connector in
+                    NavigationLink {
+                        ConnectorDefinitionDetailView(connector: connector)
+                    } label: {
+                        connectorRow(connector)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    private var toolsCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Platform Tools").font(.title3.weight(.semibold))
+            Group {
+                NavigationLink("Global Execution Logs", destination: ConnectorLogsView())
+                NavigationLink("Security & Scopes", destination: ConnectorSecurityView())
+                NavigationLink("Connector Builder", destination: ConnectorBuilderView())
+                NavigationLink("SDK Connectors", destination: SDKConnectorsView())
+            }
+            .padding(.vertical, 2)
+            Button("Connectors Documentation") { showingDocs = true }
+        }
+        .padding(12)
+        .background(.background, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private func metric(_ title: String, value: Int, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title).font(.caption).foregroundStyle(.secondary)
+            Text("\(value)").font(.headline).foregroundStyle(color)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(.background, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private func actionButton(_ title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: icon)
+                .font(.subheadline.weight(.semibold))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .background(color.opacity(0.12), in: Capsule())
         }
         .buttonStyle(.plain)
     }
 
-    private func connectorStatusPill(status: ConnectorDefinition.ConnectorStatus) -> some View {
-        Text(status.rawValue.capitalized)
-            .font(.system(size: 10, weight: .bold))
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(statusColor(status).opacity(0.15))
-            .foregroundColor(statusColor(status))
-            .clipShape(Capsule())
+    private func connectorRow(_ connector: ConnectorDefinition) -> some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(connector.name).font(.subheadline.weight(.semibold))
+                Text(connector.identifier).font(.caption.monospaced()).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Text(connector.status.rawValue.capitalized)
+                .font(.caption.weight(.semibold))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(statusColor(connector.status).opacity(0.15), in: Capsule())
+                .foregroundStyle(statusColor(connector.status))
+        }
+        .padding(12)
+        .background(.background, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private func statusColor(_ status: ConnectorDefinition.ConnectorStatus) -> Color {
