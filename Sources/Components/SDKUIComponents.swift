@@ -12,6 +12,12 @@ public extension Color {
     static var sdkError: Color { Color.red }
 }
 
+public extension ShapeStyle where Self == Color {
+    static var sdkSuccess: Color { .sdkSuccess }
+    static var sdkWarning: Color { .sdkWarning }
+    static var sdkError: Color { .sdkError }
+}
+
 // MARK: - SDK Status Pill
 
 public struct SDKStatusPill: View {

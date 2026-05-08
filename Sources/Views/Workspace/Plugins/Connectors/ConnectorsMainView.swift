@@ -61,7 +61,7 @@ struct ConnectorsMainView: View {
         return List {
             // MARK: - Dashboard Header
             Section {
-                SDKModernCard(content: {
+                SDKModernCard {
                     VStack(alignment: .center, spacing: 14) {
                         SDKSectionHeader("Connectors Platform", subtitle: "Advanced external API federation engine", systemImage: "cable.connector")
 
@@ -287,7 +287,7 @@ struct ConnectorsMainView: View {
     // MARK: - Connector Row
 
     private func connectorRow(_ connector: ConnectorDefinition) -> some View {
-        SDKModernCard(padding: 12, content: {
+        SDKModernCard(padding: 12) {
             HStack(spacing: 14) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(connector.name)

@@ -129,7 +129,7 @@ struct SDKBuildView: View {
 
     @ViewBuilder
     private func projectOverviewSection(_ project: SDKProject) -> some View {
-        SDKModernCard(content: {
+        SDKModernCard {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {

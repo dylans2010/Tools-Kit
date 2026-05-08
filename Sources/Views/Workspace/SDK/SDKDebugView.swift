@@ -9,7 +9,7 @@ struct SDKDebugView: View {
     var body: some View {
         List {
             Section {
-                SDKModernCard(padding: 12, content: {
+                SDKModernCard(padding: 12) {
                     VStack(spacing: 12) {
                         HStack {
                             Label("Execution Mode", systemImage: "shield.fill")
