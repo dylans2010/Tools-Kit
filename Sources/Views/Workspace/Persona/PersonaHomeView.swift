@@ -77,7 +77,7 @@ struct PersonaHomeView: View {
                             }
                         } else {
                             ForEach(manager.chatHistory) { message in
-                                ChatBubble(message: message)
+                                PersonaChatBubble(message: message)
                                     .id(message.id)
                             }
                         }
@@ -207,7 +207,7 @@ struct PersonaHomeView: View {
     }
 }
 
-struct ChatBubble: View {
+private struct PersonaChatBubble: View {
     let message: PersonaMessage
 
     var body: some View {
@@ -215,7 +215,7 @@ struct ChatBubble: View {
             if message.role == "user" { Spacer() }
 
             VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 4) {
-                MarkdownBubbleText(markdown: message.content, isUser: message.role == "user")
+                PersonaMarkdownBubbleText(markdown: message.content, isUser: message.role == "user")
                     .padding(12)
                     .background(
                         RoundedRectangle(cornerRadius: 18)
@@ -237,7 +237,7 @@ struct ChatBubble: View {
     }
 }
 
-struct MarkdownBubbleText: View {
+private struct PersonaMarkdownBubbleText: View {
     let markdown: String
     let isUser: Bool
 
@@ -300,9 +300,9 @@ struct WelcomePersonaView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 25) {
-                        InfoRow(icon: "brain.head.profile", title: "Intelligent Analysis", detail: "Persona analyzes your Mail, Calendar, Tasks, and more to provide context-aware insights.")
-                        InfoRow(icon: "bubble.left.and.bubble.right", title: "Natural Chat", detail: "Talk to your data naturally. Ask questions, draft replies, or plan your week effortlessly.")
-                        InfoRow(icon: "lock.shield", title: "Secure & Private", detail: "All data processing happens within your workspace. We prioritize your privacy and data sovereignty.")
+                        PersonaInfoRow(icon: "brain.head.profile", title: "Intelligent Analysis", detail: "Persona analyzes your Mail, Calendar, Tasks, and more to provide context-aware insights.")
+                        PersonaInfoRow(icon: "bubble.left.and.bubble.right", title: "Natural Chat", detail: "Talk to your data naturally. Ask questions, draft replies, or plan your week effortlessly.")
+                        PersonaInfoRow(icon: "lock.shield", title: "Secure & Private", detail: "All data processing happens within your workspace. We prioritize your privacy and data sovereignty.")
                     }
                     .padding(.horizontal, 30)
 
@@ -373,7 +373,7 @@ struct TuningSheetView: View {
     }
 }
 
-struct InfoRow: View {
+private struct PersonaInfoRow: View {
     let icon: String
     let title: String
     let detail: String
@@ -382,7 +382,7 @@ struct InfoRow: View {
         HStack(alignment: .top, spacing: 18) {
             Image(systemName: icon)
                 .font(.title2)
-                .foregroundStyle(.accentColor)
+                .foregroundStyle(Color.accentColor)
                 .frame(width: 35)
 
             VStack(alignment: .leading, spacing: 4) {
