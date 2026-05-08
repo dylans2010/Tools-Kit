@@ -2,6 +2,9 @@ import SwiftUI
 
 struct SDKNavigatorView: View {
     @StateObject private var state = SDKRuntimeWorkspaceState.shared
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    #endif
 
     private var filteredNodes: [SDKWorkspaceNode] {
         let query = state.navigatorFilterText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -12,9 +15,17 @@ struct SDKNavigatorView: View {
         }
     }
 
+    private var isCompact: Bool {
+        #if os(iOS)
+        return horizontalSizeClass == .compact
+        #else
+        return false
+        #endif
+    }
+
     var body: some View {
         VStack(spacing: 8) {
-            TextField("Search navigator", text: $state.navigatorFilterText)
+            TextField("Search SDK areas", text: $state.navigatorFilterText)
                 .textFieldStyle(.roundedBorder)
                 .padding([.horizontal, .top], 10)
 
@@ -24,29 +35,40 @@ struct SDKNavigatorView: View {
                         Button {
                             state.open(node: node)
                         } label: {
-                            HStack {
+                            HStack(spacing: 12) {
                                 Image(systemName: node.icon)
-                                VStack(alignment: .leading, spacing: 2) {
+                                    .frame(width: 22)
+                                    .foregroundStyle(state.selectedNode == node ? .accent : .secondary)
+                                VStack(alignment: .leading, spacing: 3) {
                                     Text(node.title)
-                                    Text(node.tags.joined(separator: " • "))
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
+                                        .font(.subheadline.weight(state.selectedNode == node ? .semibold : .regular))
+                                    if !isCompact {
+                                        Text(node.tags.joined(separator: " • "))
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
                                 }
                                 Spacer()
                                 if hasBrokenLink(for: node) {
                                     Image(systemName: "exclamationmark.triangle.fill")
                                         .foregroundStyle(.red)
-                                }
-                                if hasDependencyHighlight(for: node) {
+                                } else if hasDependencyHighlight(for: node) {
                                     Circle().fill(.orange).frame(width: 8, height: 8)
                                 }
                             }
+                            .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
                     }
                 }
+
+                Section("SDK Status") {
+                    LabeledContent("Libraries", value: "\(state.libraries.count)")
+                    LabeledContent("Dependencies", value: "\(state.dependencies.count)")
+                    LabeledContent("Diagnostics", value: "\(state.diagnostics.count)")
+                }
             }
-            .listStyle(.plain)
+            .listStyle(isCompact ? .insetGrouped : .plain)
         }
         .background(.background)
     }

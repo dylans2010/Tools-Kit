@@ -24,11 +24,16 @@ public final class SDKExecutionCoordinator {
         }
 
         let startedAt = Date()
-        let grantedScopes = Set(project.enabledScopes).union(project.requiredScopes)
+        let grantedScopes = workspaceState.effectiveScopes(for: project)
+        let selectedConfig = workspaceState.selectedRunConfiguration
+        let plannedDependencies = workspaceState.dependencies.filter { node in
+            guard let config = selectedConfig, !config.scopedExecution.isEmpty else { return true }
+            return Set(node.requiredScopes).isSubset(of: grantedScopes) || node.requiredScopes.isEmpty
+        }
 
-        try scopeValidator.validate(dependencies: workspaceState.dependencies, grantedScopes: grantedScopes)
+        try scopeValidator.validate(dependencies: plannedDependencies, grantedScopes: grantedScopes)
 
-        let ordered = try dependencyPlanner.resolveExecutionOrder(for: workspaceState.dependencies)
+        let ordered = try dependencyPlanner.resolveExecutionOrder(for: plannedDependencies)
 
         let libraryMap = Dictionary(uniqueKeysWithValues: workspaceState.libraries.map { ($0.name, $0) })
         var executedLibraries: [String] = []
