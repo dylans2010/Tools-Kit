@@ -1,54 +1,98 @@
 import Foundation
+import SwiftUI
 
 /// Manages the AI Persona based on workspace data.
+@MainActor
 final class PersonaManager: ObservableObject {
     static let shared = PersonaManager()
 
     @Published var interactions: [PersonaInteraction] = []
+    @Published var chatHistory: [PersonaMessage] = []
+    @Published var config: PersonaConfig = PersonaConfig(name: "Expert Assistant", instructions: "You are an expert AI Persona.", baseModel: "gpt-4", workspaceScope: ["All"])
+    @Published var isThinking: Bool = false
 
     private let dataStore = UnifiedDataStore.shared
     private let aiService = AIService.shared
 
     private init() {
         self.interactions = dataStore.personaInteractions
+        // Load chat history from disk if exists
+        if let data = try? dataStore.load([PersonaMessage].self, key: "persona_chat_history") {
+            self.chatHistory = data
+        }
+        if let savedConfig = try? dataStore.load(PersonaConfig.self, key: "persona_config") {
+            self.config = savedConfig
+        }
     }
 
     func queryPersona(query: String) async throws -> String {
-        // 1. Gather Context
-        let context = buildWorkspaceContext()
+        isThinking = true
+        defer { isThinking = false }
 
-        // 2. Query AI Service
-        let response = try await aiService.generateResponse(prompt: query)
+        // 1. Gather Full Context
+        let workspaceContext = PersonaWorkspace.gatherFullWorkspaceData()
 
-        // 3. Save Interaction
+        // 2. Build High-Complex Training Prompt
+        let systemPrompt = """
+        \(config.instructions)
+
+        PERSONALITY & BEHAVIOR:
+        - You are a highly sophisticated AI Persona integrated into the user's Workspace.
+        - You have access to the user's full data (Mail, Calendar, Tasks, Notes, etc.).
+        - Your goal is to provide deeply personalized, actionable, and expert-level assistance.
+        - Analyze the provided Workspace JSON context to answer questions accurately.
+        - If the user asks about their schedule, look at 'calendar_events'.
+        - If they ask about emails, refer to 'mail_accounts'.
+        - Be concise but thorough. Use professional yet approachable tone.
+        - Respond using rich Markdown formatting (headers, lists, bold text, etc.).
+
+        WORKSPACE CONTEXT (JSON):
+        \(workspaceContext)
+
+        PREVIOUS CHAT HISTORY:
+        \(chatHistory.suffix(10).map { "\($0.role): \($0.content)" }.joined(separator: "\n"))
+        """
+
+        // 3. Update Chat History (User)
+        let userMessage = PersonaMessage(role: "user", content: query)
+        chatHistory.append(userMessage)
+
+        // 4. Query AI Service
+        let response = try await aiService.processText(prompt: query, systemPrompt: systemPrompt)
+
+        // 5. Update Chat History (Assistant)
+        let assistantMessage = PersonaMessage(role: "assistant", content: response)
+        chatHistory.append(assistantMessage)
+        saveChatHistory()
+
+        // 6. Save Interaction for Training (if enabled)
+        if config.isTrainingEnabled {
+            let trainingEntry = PersonaModelTraining(userQuery: query, aiResponse: response)
+            try? dataStore.save(trainingEntry, key: "persona_training_\(trainingEntry.id.uuidString)")
+        }
+
+        // 7. Legacy Compatibility
         let interaction = PersonaInteraction(
             query: query,
             response: response,
-            contextUsed: ["workspace_index"]
+            contextUsed: ["full_workspace_context"]
         )
         interactions.append(interaction)
-        try dataStore.savePersonaInteraction(interaction)
+        try? dataStore.savePersonaInteraction(interaction)
 
         return response
     }
 
-    func recentMemories() -> [PersonaInteraction] {
-        return Array(interactions.suffix(20))
+    func saveChatHistory() {
+        try? dataStore.save(chatHistory, key: "persona_chat_history")
     }
 
-    func injectMemory(entityID: UUID, content: String) {
-        let interaction = PersonaInteraction(
-            query: "[Memory Injection] \(entityID)",
-            response: content,
-            contextUsed: [entityID.uuidString]
-        )
-        interactions.append(interaction)
-        try? dataStore.savePersonaInteraction(interaction)
+    func saveConfig() {
+        try? dataStore.save(config, key: "persona_config")
     }
 
-    private func buildWorkspaceContext() -> String {
-        let notebooks = NotebooksManager.shared.notebooks.map { $0.name }.joined(separator: ", ")
-        let tasks = TasksManager.shared.todayTasks.map { $0.title }.joined(separator: ", ")
-        return "Workspace Context: Notebooks: [\(notebooks)]. Tasks: [\(tasks)]."
+    func clearHistory() {
+        chatHistory.removeAll()
+        saveChatHistory()
     }
 }
