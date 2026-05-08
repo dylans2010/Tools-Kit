@@ -18,34 +18,38 @@ struct SDKActionConsoleView: View {
                     Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
                     Text("NoSandbox Mode Active").font(.caption).bold()
                 }
-                .padding(.vertical, 4)
+                .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
                 .background(Color.orange.opacity(0.1))
             }
 
-            HStack(spacing: 12) {
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(.secondary)
-                    .font(.system(.body, design: .monospaced))
+            VStack(spacing: 12) {
+                HStack(spacing: 12) {
+                    Image(systemName: "terminal.fill")
+                        .foregroundStyle(.accent)
+                        .font(.title3)
 
-                TextField("Enter SDK Command...", text: $command)
-                    .font(.system(.body, design: .monospaced))
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-                    .onSubmit { executeCommand() }
+                    TextField("Enter SDK Command...", text: $command)
+                        .font(.system(.body, design: .monospaced))
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
+                        .onSubmit { executeCommand() }
 
-                if isExecuting {
-                    ProgressView().controlSize(.small)
-                } else {
-                    Button(action: executeCommand) {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.title2)
+                    if isExecuting {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Button(action: executeCommand) {
+                            Image(systemName: "arrow.up.circle.fill")
+                                .font(.title2)
+                        }
+                        .disabled(command.isEmpty)
                     }
-                    .disabled(command.isEmpty)
                 }
+                .padding()
+                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
             }
             .padding()
-            .background(Color(.secondarySystemBackground))
+            .background(.thinMaterial)
         }
         .navigationTitle("Action Console")
     }
@@ -85,61 +89,30 @@ struct SDKActionConsoleView: View {
                 } else if cmd == "list notes" {
                     let notes = WorkspaceAPI.shared.notes.listNotes()
                     logBus.log("Found \(notes.count) notes:", type: .info)
-                    for note in notes.prefix(10) {
-                        logBus.log("  - \(note.title)", type: .info)
-                    }
+                    for note in notes.prefix(10) { logBus.log("  - \(note.title)", type: .info) }
                 } else if cmd == "list tasks" {
                     let tasks = WorkspaceAPI.shared.tasks.listTasks()
                     logBus.log("Found \(tasks.count) tasks:", type: .info)
-                    for task in tasks.prefix(10) {
-                        logBus.log("  - [\(task.completed ? "x" : " ")] \(task.title)", type: .info)
-                    }
+                    for task in tasks.prefix(10) { logBus.log("  - [\(task.completed ? "x" : " ")] \(task.title)", type: .info) }
                 } else if cmd == "list files" {
                     let files = WorkspaceAPI.shared.files.listFiles()
                     logBus.log("Found \(files.count) files:", type: .info)
-                    for file in files.prefix(10) {
-                        logBus.log("  - \(file.name)", type: .info)
-                    }
-                } else if cmd == "list decks" {
-                    let decks = WorkspaceAPI.shared.slides.listDecks()
-                    logBus.log("Found \(decks.count) slide decks:", type: .info)
-                    for deck in decks.prefix(10) {
-                        logBus.log("  - \(deck.title)", type: .info)
-                    }
-                } else if cmd == "list snapshots" {
-                    let snapshots = WorkspaceAPI.shared.timeTravel.listSnapshots()
-                    logBus.log("Found \(snapshots.count) snapshots:", type: .info)
-                    for snap in snapshots.prefix(10) {
-                        logBus.log("  - \(snap.message) (\(snap.timestamp.formatted()))", type: .info)
-                    }
+                    for file in files.prefix(10) { logBus.log("  - \(file.name)", type: .info) }
                 } else if cmd == "status" {
                     logBus.log("SDK Status:", type: .info)
                     logBus.log("  Mode: \(runtime.isNoSandboxModeEnabled ? "NoSandbox" : "Sandboxed")", type: .info)
-                    logBus.log("  Active Projects: \(runtime.activeProjects.count)", type: .info)
-                    logBus.log("  Connectors: \(SDKConnectorManager.shared.connectors.count)", type: .info)
-                    logBus.log("  Plugins: \(SDKPluginManager.shared.plugins.count)", type: .info)
                     let metrics = SDKTelemetryEngine.shared.getMetrics()
                     logBus.log("  Traces: \(metrics.totalTraces) (avg \(String(format: "%.0f", metrics.averageDurationMs))ms)", type: .info)
                 } else if cmd == "clear" {
                     logBus.clear()
                 } else if cmd == "help" {
-                    logBus.log("Available commands:", type: .info)
-                    logBus.log("  note [title]       - Create a note", type: .info)
-                    logBus.log("  task [title]       - Create a task", type: .info)
-                    logBus.log("  deck [title]       - Create a slide deck", type: .info)
-                    logBus.log("  persona [prompt]   - Query AI persona", type: .info)
-                    logBus.log("  snapshot [message] - Create workspace snapshot", type: .info)
-                    logBus.log("  list notes/tasks/files/decks/snapshots", type: .info)
-                    logBus.log("  status             - Show SDK status", type: .info)
-                    logBus.log("  clear              - Clear console", type: .info)
-                    logBus.log("  help               - Show this help", type: .info)
+                    logBus.log("Commands: note, task, deck, persona, snapshot, list [notes/tasks/files], status, clear", type: .info)
                 } else {
-                    logBus.log("Unknown command: \(cmd). Type 'help' for available commands.", type: .error)
+                    logBus.log("Unknown command: \(cmd)", type: .error)
                 }
             } catch {
                 logBus.log("Execution failed: \(error.localizedDescription)", type: .error)
             }
-
             await MainActor.run { isExecuting = false }
         }
     }

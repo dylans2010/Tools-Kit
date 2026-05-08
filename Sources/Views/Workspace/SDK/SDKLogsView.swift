@@ -6,41 +6,61 @@ struct SDKLogsView: View {
     @State private var searchText = ""
 
     var body: some View {
-        VStack {
-            HStack {
-                Picker("Level", selection: $selectedLevel) {
-                    Text("All").tag(LogLevel?.none)
-                    ForEach(LogLevel.allCases, id: \.self) { level in
-                        Text(level.rawValue.capitalized).tag(LogLevel?.some(level))
+        ScrollView {
+            VStack(spacing: 24) {
+                SDKSectionHeader(
+                    title: "System Logs",
+                    subtext: "Platform-wide event stream and diagnostics.",
+                    isCentered: true
+                )
+
+                SDKModernCard {
+                    VStack(spacing: 16) {
+                        HStack {
+                            Text("Level Filter").sdkSubtext()
+                            Spacer()
+                            Picker("Level", selection: $selectedLevel) {
+                                Text("All").tag(LogLevel?.none)
+                                ForEach(LogLevel.allCases, id: \.self) { level in
+                                    Text(level.rawValue.capitalized).tag(LogLevel?.some(level))
+                                }
+                            }
+                            .pickerStyle(.menu)
+                        }
+
+                        TextField("Search source...", text: $searchText)
+                            .textFieldStyle(.roundedBorder)
                     }
                 }
-                .pickerStyle(.menu)
 
-                TextField("Search Source", text: $searchText)
-                    .textFieldStyle(.roundedBorder)
+                SDKSectionHeader(title: "Log Stream", subtext: "Filtered kernel entries.")
+                VStack(spacing: 12) {
+                    if filteredEntries.isEmpty {
+                        SDKModernCard { Text("No matching logs").sdkSubtext().frame(maxWidth: .infinity) }
+                    } else {
+                        ForEach(filteredEntries.prefix(50)) { entry in
+                            SDKModernCard {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
+                                        SDKStatusPill(status: levelToStatus(entry.level), text: entry.level.rawValue.uppercased())
+                                        Text(entry.source).font(.caption.bold()).foregroundStyle(.secondary)
+                                        Spacer()
+                                        Text(entry.timestamp.formatted(date: .omitted, time: .shortened)).font(.caption2).foregroundStyle(.tertiary)
+                                    }
+                                    Text(entry.message).font(.subheadline)
+                                }
+                            }
+                        }
+                    }
+                }
             }
             .padding()
-
-            List(filteredEntries) { entry in
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        levelBadge(entry.level)
-                        Text(entry.source).font(.caption).bold().foregroundStyle(.secondary)
-                        Spacer()
-                        Text(entry.timestamp.formatted(date: .omitted, time: .shortened))
-                            .font(.caption2).foregroundStyle(.secondary)
-                    }
-                    Text(entry.message).font(.subheadline)
-                }
-                .padding(.vertical, 2)
-            }
         }
+        .background(Color(.systemGroupedBackground))
         .navigationTitle("System Logs")
         .toolbar {
             ToolbarItem(placement: .destructiveAction) {
-                Button("Clear", role: .destructive) {
-                    logStore.clear()
-                }
+                Button("Clear", role: .destructive) { logStore.clear() }
             }
         }
     }
@@ -52,21 +72,12 @@ struct SDKLogsView: View {
         }
     }
 
-    private func levelBadge(_ level: LogLevel) -> some View {
-        Text(level.rawValue.uppercased())
-            .font(.system(size: 8, weight: .bold))
-            .padding(.horizontal, 4)
-            .padding(.vertical, 2)
-            .background(levelColor(level).opacity(0.2), in: RoundedRectangle(cornerRadius: 4))
-            .foregroundStyle(levelColor(level))
-    }
-
-    private func levelColor(_ level: LogLevel) -> Color {
+    private func levelToStatus(_ level: LogLevel) -> SDKStatus {
         switch level {
-        case .debug: return .gray
-        case .info: return .blue
-        case .warning: return .orange
-        case .error: return .red
+        case .error: return .error
+        case .warning: return .warning
+        case .info: return .info
+        case .debug: return .info
         }
     }
 }
