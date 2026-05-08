@@ -1,104 +1,76 @@
 import SwiftUI
 
 struct SDKHomeView: View {
-    @StateObject private var projectManager = SDKProjectManager.shared
-    @State private var searchText = ""
-    @State private var statusFilter: SDKProject.ProjectStatus?
-
-    private var projects: [SDKProject] {
-        projectManager.filteredProjects(search: searchText, status: statusFilter)
-    }
+    @ObservedObject var sdk = WorkspaceSDK.shared
 
     var body: some View {
         List {
             Section {
-                if projects.isEmpty {
-                    ContentUnavailableView(
-                        "No Projects",
-                        systemImage: "folder.badge.plus",
-                        description: Text("Create a project in App Builder to get started.")
-                    )
-                } else {
-                    ForEach(projects) { project in
-                        NavigationLink {
-                            SDKBuildView()
-                                .onAppear { projectManager.loadProject(id: project.id) }
-                        } label: {
-                            VStack(alignment: .leading, spacing: 6) {
-                                HStack {
-                                    Text(project.name).font(.headline)
-                                    Spacer()
-                                    Text(project.status.rawValue.capitalized)
-                                        .font(.caption2.bold())
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 3)
-                                        .background((project.status == .active ? Color.green : Color.orange).opacity(0.2), in: Capsule())
-                                }
-                                Text(project.description.isEmpty ? "No description" : project.description)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                HStack {
-                                    Text("Updated \(project.updatedAt.formatted(date: .abbreviated, time: .shortened))")
-                                    Spacer()
-                                    Text("Scopes: \(project.enabledScopes.count)")
-                                }
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                            }
-                        }
-                        .swipeActions(edge: .trailing) {
-                            Button(role: .destructive) {
-                                projectManager.deleteProject(id: project.id)
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                        }
-                        .swipeActions(edge: .leading) {
-                            Button {
-                                _ = projectManager.duplicateProject(id: project.id)
-                            } label: {
-                                Label("Duplicate", systemImage: "doc.on.doc")
-                            }
-                            .tint(.blue)
-                        }
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Kernel Status")
+                        Spacer()
+                        StatusBadge(status: sdk.kernel.state.rawValue, color: sdk.kernel.isReady ? .green : .orange)
+                    }
+
+                    HStack {
+                        Text("SDK Version")
+                        Spacer()
+                        Text(sdk.version).foregroundStyle(.secondary)
+                    }
+
+                    HStack {
+                        Text("Active Services")
+                        Spacer()
+                        Text("\(sdk.kernel.healthCheck().registeredServices)").foregroundStyle(.secondary)
                     }
                 }
             } header: {
-                Text("SDK Projects")
+                Text("System Health")
             }
 
             Section {
                 NavigationLink(destination: SDKDeveloperGuideView()) {
-                    Label("Developer Guide", systemImage: "book.closed.fill")
+                    Label("Developer Guide", systemImage: "book.fill")
                 }
-                NavigationLink(destination: SDKBuildView()) {
+                NavigationLink(destination: SDKAppBuilderView()) {
                     Label("App Builder", systemImage: "hammer.fill")
                 }
-                NavigationLink(destination: SDKInternalView()) {
-                    Label("SDK Internal", systemImage: "terminal.fill")
+                NavigationLink(destination: SDKAPIBrowserView()) {
+                    Label("API Browser", systemImage: "network")
+                }
+                NavigationLink(destination: SDKDataControlView()) {
+                    Label("Data Control", systemImage: "database")
+                }
+                NavigationLink(destination: SDKPluginManagerView()) {
+                    Label("Plugin Manager", systemImage: "puzzlepiece.fill")
                 }
             } header: {
-                Text("Workspace")
+                Text("Developer Tools")
             }
         }
         .navigationTitle("WorkspaceSDK")
-        .searchable(text: $searchText, prompt: "Search projects")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Button("All") { statusFilter = nil }
-                    Button("Active") { statusFilter = .active }
-                    Button("Draft") { statusFilter = .draft }
-                    Divider()
-                    Button {
-                        _ = projectManager.createProject(name: "New SDK Project", status: .draft)
-                    } label: {
-                        Label("Create Project", systemImage: "plus")
-                    }
-                } label: {
-                    Image(systemName: "line.3.horizontal.decrease.circle")
+                Button("Boot") {
+                    Task { await sdk.initialize() }
                 }
             }
         }
+    }
+}
+
+struct StatusBadge: View {
+    let status: String
+    let color: Color
+
+    var body: some View {
+        Text(status.uppercased())
+            .font(.caption2.bold())
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.1))
+            .foregroundColor(color)
+            .cornerRadius(4)
     }
 }

@@ -8,6 +8,7 @@ public protocol SDKNotebookServiceProtocol {
     func listNotebooks() -> [SDKNotebook]
     func getNotebook(id: UUID) -> SDKNotebook?
     func deleteNotebook(id: UUID) throws
+    func searchNotebooks(query: String) -> [SDKNotebook]
 }
 
 /// Full SDK Notebooks module — handles document management, version history, and persistence.
@@ -18,6 +19,7 @@ public final class SDKNotebookService: SDKNotebookServiceProtocol, ObservableObj
     @Published public private(set) var notebooks: [SDKNotebook] = []
 
     private let dataStore = SDKDataStore.shared
+    private let queryEngine = SDKQueryEngine.self
 
     private init() {}
 
@@ -29,14 +31,18 @@ public final class SDKNotebookService: SDKNotebookServiceProtocol, ObservableObj
     // MARK: - Create
 
     public func createNotebook(title: String) throws -> SDKNotebook {
+        guard SDKPermissionManager.shared.isScopeAuthorized("notebooks.write") else {
+            throw SDKError.permissionDenied(scope: "notebooks.write")
+        }
+
         var notebook = SDKNotebook(title: title)
-        let defaultPage = SDKNotebookPage(title: "Untitled Page")
+        let defaultPage = SDKNotebookPage(title: "Welcome Page", content: "Start writing here...")
         notebook.pages = [defaultPage]
 
         try dataStore.save(notebook)
         notebooks.insert(notebook, at: 0)
 
-        // Sync to workspace
+        // Sync to workspace legacy store
         let page = NotebookPage(id: defaultPage.id, title: defaultPage.title, content: defaultPage.content, createdAt: defaultPage.createdAt, updatedAt: defaultPage.updatedAt)
         if let firstNotebook = NotebooksManager.shared.notebooks.first,
            let firstFolder = firstNotebook.folders.first {
@@ -53,7 +59,7 @@ public final class SDKNotebookService: SDKNotebookServiceProtocol, ObservableObj
     // MARK: - Read
 
     public func listNotebooks() -> [SDKNotebook] {
-        return notebooks
+        return queryEngine.sort(notebooks, by: \.updatedAt, order: .descending)
     }
 
     public func getNotebook(id: UUID) -> SDKNotebook? {
@@ -68,6 +74,7 @@ public final class SDKNotebookService: SDKNotebookServiceProtocol, ObservableObj
         if let tags = tags { notebooks[index].tags = tags }
         notebooks[index].updatedAt = Date()
         try dataStore.save(notebooks[index])
+
         SDKEventBus.shared.publish(SDKBusEvent(channel: "notebooks", name: "notebook.updated", data: ["id": id.uuidString]))
     }
 
@@ -90,24 +97,33 @@ public final class SDKNotebookService: SDKNotebookServiceProtocol, ObservableObj
         guard let nbIndex = notebooks.firstIndex(where: { $0.id == notebookId }),
               let pgIndex = notebooks[nbIndex].pages.firstIndex(where: { $0.id == pageId }) else { return }
 
-        // Save version history
+        // Persistent Version History
         let currentContent = notebooks[nbIndex].pages[pgIndex].content
-        let versionNumber = notebooks[nbIndex].pages[pgIndex].versionHistory.count + 1
-        let version = SDKPageVersion(content: currentContent, versionNumber: versionNumber)
-        notebooks[nbIndex].pages[pgIndex].versionHistory.append(version)
+        if currentContent != content {
+            let versionNumber = notebooks[nbIndex].pages[pgIndex].versionHistory.count + 1
+            let version = SDKPageVersion(content: currentContent, versionNumber: versionNumber)
+            notebooks[nbIndex].pages[pgIndex].versionHistory.append(version)
 
-        notebooks[nbIndex].pages[pgIndex].content = content
-        notebooks[nbIndex].pages[pgIndex].updatedAt = Date()
-        notebooks[nbIndex].updatedAt = Date()
-        try dataStore.save(notebooks[nbIndex])
+            notebooks[nbIndex].pages[pgIndex].content = content
+            notebooks[nbIndex].pages[pgIndex].updatedAt = Date()
+            notebooks[nbIndex].updatedAt = Date()
+            try dataStore.save(notebooks[nbIndex])
 
-        SDKEventBus.shared.publish(SDKBusEvent(channel: "notebooks", name: "page.updated", data: ["pageId": pageId.uuidString]))
+            SDKEventBus.shared.publish(SDKBusEvent(channel: "notebooks", name: "page.updated", data: ["pageId": pageId.uuidString]))
+        }
     }
 
-    public func getPageHistory(notebookId: UUID, pageId: UUID) -> [SDKPageVersion] {
-        guard let notebook = notebooks.first(where: { $0.id == notebookId }),
-              let page = notebook.pages.first(where: { $0.id == pageId }) else { return [] }
-        return page.versionHistory
+    // MARK: - Search
+
+    public func searchNotebooks(query: String) -> [SDKNotebook] {
+        if query.isEmpty { return notebooks }
+        let lowered = query.lowercased()
+
+        return queryEngine.filter(notebooks) { notebook in
+            notebook.title.lowercased().contains(lowered) ||
+            notebook.tags.contains { $0.lowercased().contains(lowered) } ||
+            notebook.pages.contains { $0.title.lowercased().contains(lowered) || $0.content.lowercased().contains(lowered) }
+        }
     }
 
     // MARK: - Delete
@@ -118,26 +134,6 @@ public final class SDKNotebookService: SDKNotebookServiceProtocol, ObservableObj
         SDKEventBus.shared.publish(SDKBusEvent(channel: "notebooks", name: "notebook.deleted", data: ["id": id.uuidString]))
     }
 
-    // MARK: - Search
-
-    public func searchNotebooks(query: String) -> [SDKNotebook] {
-        let lowered = query.lowercased()
-        return notebooks.filter { notebook in
-            notebook.title.lowercased().contains(lowered) ||
-            notebook.tags.contains { $0.lowercased().contains(lowered) } ||
-            notebook.pages.contains { $0.title.lowercased().contains(lowered) || $0.content.lowercased().contains(lowered) }
-        }
-    }
-
-    // MARK: - Pin
-
-    public func togglePin(id: UUID) throws {
-        guard let index = notebooks.firstIndex(where: { $0.id == id }) else { return }
-        notebooks[index].isPinned.toggle()
-        notebooks[index].updatedAt = Date()
-        try dataStore.save(notebooks[index])
-    }
-
     // MARK: - Private
 
     private func loadFromStore() {
@@ -146,6 +142,7 @@ public final class SDKNotebookService: SDKNotebookServiceProtocol, ObservableObj
 
     private func syncFromWorkspace() {
         let workspaceNotebooks = NotebooksManager.shared.notebooks
+        var added = false
         for wb in workspaceNotebooks {
             let exists = notebooks.contains { $0.title == wb.name }
             if !exists {
@@ -155,7 +152,11 @@ public final class SDKNotebookService: SDKNotebookServiceProtocol, ObservableObj
                 let sdkNotebook = SDKNotebook(title: wb.name, pages: pages)
                 try? dataStore.save(sdkNotebook)
                 notebooks.append(sdkNotebook)
+                added = true
             }
+        }
+        if added {
+            notebooks.sort { $0.updatedAt > $1.updatedAt }
         }
     }
 }

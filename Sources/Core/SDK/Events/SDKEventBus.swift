@@ -123,27 +123,3 @@ public final class SDKEventBus: SDKEventBusProtocol, ObservableObject {
     }
 }
 
-// MARK: - Bus Event
-
-public struct SDKBusEvent: Identifiable, Codable {
-    public let id: UUID
-    public let channel: String
-    public let name: String
-    public let data: [String: String]
-    public let source: String
-    public let timestamp: Date
-
-    public init(
-        channel: String,
-        name: String,
-        data: [String: String] = [:],
-        source: String = "SDK"
-    ) {
-        self.id = UUID()
-        self.channel = channel
-        self.name = name
-        self.data = data
-        self.source = source
-        self.timestamp = Date()
-    }
-}

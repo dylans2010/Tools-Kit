@@ -7,6 +7,8 @@ public protocol SDKArticleServiceProtocol {
     func createArticle(title: String, content: String, author: String, tags: [String]) throws -> SDKArticle
     func listArticles() -> [SDKArticle]
     func getArticle(id: UUID) -> SDKArticle?
+    func publish(id: UUID) throws
+    func unpublish(id: UUID) throws
 }
 
 /// Full SDK Articles module — handles article creation, parsing, content storage, and search.
@@ -18,6 +20,7 @@ public final class SDKArticleService: SDKArticleServiceProtocol, ObservableObjec
     @Published public private(set) var publishedCount: Int = 0
 
     private let dataStore = SDKDataStore.shared
+    private let queryEngine = SDKQueryEngine.self
 
     private init() {}
 
@@ -30,6 +33,10 @@ public final class SDKArticleService: SDKArticleServiceProtocol, ObservableObjec
     // MARK: - Create
 
     public func createArticle(title: String, content: String, author: String = "", tags: [String] = []) throws -> SDKArticle {
+        guard SDKPermissionManager.shared.isScopeAuthorized("articles.write") else {
+            throw SDKError.permissionDenied(scope: "articles.write")
+        }
+
         let article = SDKArticle(title: title, content: content, author: author, tags: tags)
         try dataStore.save(article)
         articles.insert(article, at: 0)
@@ -42,7 +49,7 @@ public final class SDKArticleService: SDKArticleServiceProtocol, ObservableObjec
     // MARK: - Read
 
     public func listArticles() -> [SDKArticle] {
-        return articles
+        return queryEngine.sort(articles, by: \.createdAt, order: .descending)
     }
 
     public func getArticle(id: UUID) -> SDKArticle? {
@@ -65,6 +72,7 @@ public final class SDKArticleService: SDKArticleServiceProtocol, ObservableObjec
         if let tags = tags { articles[index].tags = tags }
         articles[index].updatedAt = Date()
         try dataStore.save(articles[index])
+
         SDKEventBus.shared.publish(SDKBusEvent(channel: "articles", name: "article.updated", data: ["id": id.uuidString]))
     }
 
@@ -76,6 +84,7 @@ public final class SDKArticleService: SDKArticleServiceProtocol, ObservableObjec
         articles[index].updatedAt = Date()
         try dataStore.save(articles[index])
         updatePublishedCount()
+
         SDKEventBus.shared.publish(SDKBusEvent(channel: "articles", name: "article.published", data: ["id": id.uuidString]))
     }
 
@@ -85,6 +94,8 @@ public final class SDKArticleService: SDKArticleServiceProtocol, ObservableObjec
         articles[index].updatedAt = Date()
         try dataStore.save(articles[index])
         updatePublishedCount()
+
+        SDKEventBus.shared.publish(SDKBusEvent(channel: "articles", name: "article.unpublished", data: ["id": id.uuidString]))
     }
 
     // MARK: - Delete
@@ -93,19 +104,14 @@ public final class SDKArticleService: SDKArticleServiceProtocol, ObservableObjec
         try dataStore.delete(SDKArticle.self, id: id)
         articles.removeAll { $0.id == id }
         updatePublishedCount()
+
         SDKEventBus.shared.publish(SDKBusEvent(channel: "articles", name: "article.deleted", data: ["id": id.uuidString]))
     }
 
     // MARK: - Search
 
     public func searchArticles(query: String) -> [SDKArticle] {
-        let lowered = query.lowercased()
-        return articles.filter {
-            $0.title.lowercased().contains(lowered) ||
-            $0.content.lowercased().contains(lowered) ||
-            $0.author.lowercased().contains(lowered) ||
-            $0.tags.contains { $0.lowercased().contains(lowered) }
-        }
+        return queryEngine.search(articles, query: query, fields: [\.title, \.content, \.author])
     }
 
     // MARK: - Parsing
@@ -134,6 +140,7 @@ public final class SDKArticleService: SDKArticleServiceProtocol, ObservableObjec
 
     private func syncFromWorkspace() {
         let collections = ArticlesManager.shared.collections
+        var added = false
         for collection in collections {
             for article in collection.articles {
                 let exists = articles.contains { $0.title == article.title }
@@ -146,8 +153,12 @@ public final class SDKArticleService: SDKArticleServiceProtocol, ObservableObjec
                     )
                     try? dataStore.save(sdkArticle)
                     articles.append(sdkArticle)
+                    added = true
                 }
             }
+        }
+        if added {
+            articles.sort { $0.createdAt > $1.createdAt }
         }
     }
 
@@ -158,7 +169,7 @@ public final class SDKArticleService: SDKArticleServiceProtocol, ObservableObjec
 
 // MARK: - Parsed Content
 
-public struct ParsedArticleContent {
+public struct ParsedArticleContent: Codable {
     public let title: String
     public let body: String
     public let wordCount: Int

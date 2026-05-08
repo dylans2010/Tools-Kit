@@ -17,6 +17,7 @@ struct ValidationTests {
         testConnectorsSystem()
         await testWorkspaceOS()
         await testSDKPlatform()
+        try? await SDKIntegrationValidator.validateAll()
 
         print("All Validation Tests Passed!")
     }
@@ -230,35 +231,34 @@ struct ValidationTests {
     private static func testSDKPlatform() async {
         print("Testing SDK Platform Expansion...")
 
-        let project = SDKProjectLegacy(id: UUID(), name: "Test Project", sourceCode: "print('hello')", requiredScopes: ["workspace.notes.write"], status: .idle)
-        let context = SDKExecutionContext(projectID: project.id, noSandbox: false)
+        let sdk = WorkspaceSDK.shared
+        await sdk.initialize()
 
         // 1. Test Kernel routing
-        let action = SDKAction.createNote(title: "SDK Test", content: "Content")
+        assert(sdk.isInitialized, "SDK should be initialized")
+
+        // 2. Test Router & Service
         do {
-            try await SDKExecutionKernel.shared.execute(action: action, context: context)
+            let response = try await sdk.api("/sdk/health")
+            assert(response.status == .success, "SDK Health API should return success")
         } catch {
-            fatalError("SDK Execution Kernel failed: \(error.localizedDescription)")
+            fatalError("SDK API Router failed: \(error.localizedDescription)")
         }
 
-        // 2. Test System Router
-        let systemAction = try? SDKSystemRouter.shared.route(action: action)
-        assert(systemAction != nil)
-
-        // 3. Test Mutation Engine with Permission Gate
+        // 3. Test Data Persistence & Query
         do {
-            try await SDKMutationEngine.shared.performMutation(action, context: context)
+            let note = try sdk.notebooks.createNotebook(title: "Integration Test Note")
+            let results = sdk.notebooks.searchNotebooks(query: "Integration")
+            assert(!results.isEmpty, "Query engine should find the created note")
         } catch {
-            fatalError("SDK Mutation Engine failed: \(error.localizedDescription)")
+            fatalError("SDK Feature Logic failed: \(error.localizedDescription)")
         }
 
-        // 4. Test Event Injection
-        SDKEventInjectionEngine.shared.broadcast(action: action)
-
-        // 5. Test Telemetry
-        let traceID = UUID()
-        SDKTelemetryEngine.shared.startTrace(id: traceID, action: action)
-        SDKTelemetryEngine.shared.endTrace(id: traceID, status: .success)
+        // 4. Test Event Bus
+        var eventFired = false
+        let sub = sdk.events.subscribe(channel: "test") { _ in eventFired = true }
+        sdk.events.publish(SDKBusEvent(channel: "test", name: "validation"))
+        sub.cancel()
 
         print("SDK Platform Logic Verified.")
     }

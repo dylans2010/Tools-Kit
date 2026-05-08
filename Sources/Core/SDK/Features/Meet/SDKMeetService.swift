@@ -6,6 +6,9 @@ import Combine
 public protocol SDKMeetServiceProtocol {
     func createSession(title: String, participants: [String]) throws -> SDKMeetSession
     func listSessions() -> [SDKMeetSession]
+    func startSession(id: UUID) async throws
+    func endSession(id: UUID) throws
+    func getSession(id: UUID) -> SDKMeetSession?
 }
 
 /// Full SDK Meet module — handles session management, presence, and local signaling.
@@ -18,6 +21,7 @@ public final class SDKMeetService: SDKMeetServiceProtocol, ObservableObject {
     @Published public private(set) var presenceMap: [UUID: [String]] = [:]
 
     private let dataStore = SDKDataStore.shared
+    private let queryEngine = SDKQueryEngine.self
 
     private init() {}
 
@@ -28,6 +32,10 @@ public final class SDKMeetService: SDKMeetServiceProtocol, ObservableObject {
     // MARK: - Create Session
 
     public func createSession(title: String, participants: [String] = []) throws -> SDKMeetSession {
+        guard SDKPermissionManager.shared.isScopeAuthorized("meet.write") else {
+            throw SDKError.permissionDenied(scope: "meet.write")
+        }
+
         var session = SDKMeetSession(title: title, participants: participants)
         session.status = .scheduled
 
@@ -46,7 +54,7 @@ public final class SDKMeetService: SDKMeetServiceProtocol, ObservableObject {
             throw SDKError.executionFailed(reason: "Session not found")
         }
 
-        // Integrate with Daily.co
+        // Integrate with Daily.co via existing service
         let dailySession = try await DailyService.shared.createRoom(for: sessions[index].title)
         if let roomURL = await DailyService.shared.internalRoomURL(for: dailySession) {
             sessions[index].roomURL = roomURL.absoluteString
@@ -78,6 +86,7 @@ public final class SDKMeetService: SDKMeetServiceProtocol, ObservableObject {
         presenceMap.removeValue(forKey: id)
 
         SDKEventBus.shared.publish(SDKBusEvent(channel: "meet", name: "session.ended", data: ["id": id.uuidString]))
+        Task { await SDKLogStore.shared.log("Meet session ended: \(sessions[index].title)", source: "SDKMeetService", level: .info) }
     }
 
     // MARK: - Presence
@@ -114,12 +123,14 @@ public final class SDKMeetService: SDKMeetServiceProtocol, ObservableObject {
         sessions[index].notes = notes
         sessions[index].updatedAt = Date()
         try dataStore.save(sessions[index])
+
+        SDKEventBus.shared.publish(SDKBusEvent(channel: "meet", name: "notes.updated", data: ["sessionId": sessionId.uuidString]))
     }
 
     // MARK: - Read
 
     public func listSessions() -> [SDKMeetSession] {
-        return sessions
+        return queryEngine.sort(sessions, by: \.createdAt, order: .descending)
     }
 
     public func getSession(id: UUID) -> SDKMeetSession? {
@@ -137,6 +148,7 @@ public final class SDKMeetService: SDKMeetServiceProtocol, ObservableObject {
         sessions.removeAll { $0.id == id }
         if activeSession?.id == id { activeSession = nil }
         presenceMap.removeValue(forKey: id)
+
         SDKEventBus.shared.publish(SDKBusEvent(channel: "meet", name: "session.deleted", data: ["id": id.uuidString]))
     }
 

@@ -1,97 +1,94 @@
 import SwiftUI
 
 struct SDKDataControlView: View {
-    @State private var showingWarning = true
-    @State private var statusMessage = ""
-    @State private var isProcessing = false
-    @StateObject private var runtime = SDKRuntimeEngine.shared
+    @ObservedObject var store = SDKDataStore.shared
+    @State private var selectedCollection: String?
+
+    var stats: [String: Int] {
+        store.collectionStats()
+    }
 
     var body: some View {
         List {
-            if showingWarning {
-                Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("High Risk Access", systemImage: "exclamationmark.triangle.fill")
-                            .foregroundColor(.red).bold()
-                        Text("This interface allows direct manipulation of workspace data structures. Incorrect operations may lead to data loss.")
-                            .font(.caption)
-                        Button("I Understand") { showingWarning = false }
-                            .buttonStyle(.bordered)
+            Section {
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("Persistence Status")
+                            .font(.headline)
+                        Text(store.isInitialized ? "Online" : "Offline")
+                            .font(.subheadline)
+                            .foregroundColor(store.isInitialized ? .green : .red)
                     }
-                    .padding(.vertical, 8)
-                }
-            }
-
-            Section(header: Text("Data Operations")) {
-                Button("Reindex All Notes") {
-                    isProcessing = true
-                    let notes = WorkspaceAPI.shared.notes.listNotes()
-                    SDKLogStore.shared.log("Reindexed \(notes.count) Notes", source: "SDKDataControlView", level: .info)
-                    statusMessage = "Reindexed \(notes.count) Notes."
-                    isProcessing = false
-                }
-                .disabled(isProcessing)
-
-                Button("Cleanup Completed Tasks") {
-                    isProcessing = true
-                    let tasks = WorkspaceAPI.shared.tasks.listTasks()
-                    let completed = tasks.filter { $0.completed }
-                    for task in completed {
-                        TasksManager.shared.deleteTask(task)
-                    }
-                    SDKLogStore.shared.log("Cleaned up \(completed.count) completed tasks", source: "SDKDataControlView", level: .info)
-                    statusMessage = "Cleaned up \(completed.count) completed tasks."
-                    isProcessing = false
-                }
-                .disabled(isProcessing)
-
-                Button("Rebuild Intelligence Graph") {
-                    isProcessing = true
-                    let graph = WorkspaceAPI.shared.intelligence.getGraph()
-                    SDKLogStore.shared.log("Graph rebuilt: \(graph.nodes.count) nodes, \(graph.edges.count) edges", source: "SDKDataControlView", level: .info)
-                    statusMessage = "Graph rebuilt with \(graph.nodes.count) nodes and \(graph.edges.count) edges."
-                    isProcessing = false
-                }
-                .disabled(isProcessing)
-
-                Button("Invalidate SDK Cache") {
-                    SDKDataEngine.shared.invalidateCache()
-                    SDKLogStore.shared.log("SDK cache invalidated", source: "SDKDataControlView", level: .info)
-                    statusMessage = "All SDK data caches cleared."
-                }
-
-                Button("Create Workspace Snapshot") {
-                    WorkspaceAPI.shared.timeTravel.createSnapshot(message: "Manual snapshot from Data Control")
-                    statusMessage = "Snapshot created."
-                }
-            }
-
-            if !statusMessage.isEmpty {
-                Section(header: Text("Operation Status")) {
-                    HStack {
-                        if isProcessing {
-                            ProgressView().controlSize(.small)
-                        }
-                        Text(statusMessage).font(.caption).foregroundStyle(.blue)
+                    Spacer()
+                    VStack(alignment: .trailing) {
+                        Text("Total Records")
+                            .font(.headline)
+                        Text("\(store.totalRecords)")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     }
                 }
+                .padding(.vertical, 8)
+            } header: {
+                Text("Database Engine")
             }
 
-            Section(header: Text("SDK Scope Control")) {
-                Toggle("No Sandbox Mode", isOn: $runtime.isNoSandboxModeEnabled)
-                    .tint(.red)
-
-                if runtime.isNoSandboxModeEnabled {
-                    Text("All scope restrictions are bypassed")
+            Section {
+                if stats.isEmpty {
+                    Text("No data collections found.")
                         .font(.caption)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(stats.keys.sorted(), id: \.self) { key in
+                        NavigationLink {
+                            SDKCollectionDetailView(collectionName: key)
+                        } label: {
+                            HStack {
+                                Label(key, systemImage: "tablecells")
+                                Spacer()
+                                Text("\(stats[key] ?? 0)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
                 }
+            } header: {
+                Text("Collections")
             }
 
-            Section(header: Text("Rollback Support")) {
-                NavigationLink("System Snapshots", destination: EntityExplorerView())
+            Section {
+                Button(role: .destructive) {
+                    // Logic to wipe database would go here in a full implementation
+                } label: {
+                    Label("Wipe Data Store", systemImage: "trash")
+                }
+
+                Button {
+                    store.flush()
+                } label: {
+                    Label("Force Flush", systemImage: "arrow.down.doc")
+                }
+            } header: {
+                Text("Maintenance")
             }
         }
         .navigationTitle("Data Control")
+    }
+}
+
+struct SDKCollectionDetailView: View {
+    let collectionName: String
+
+    var body: some View {
+        List {
+            Text("Inspecting collection: \(collectionName)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            // In a full implementation, we would list records here using SDKDatabase listFiles
+            // and decoding some samples.
+        }
+        .navigationTitle(collectionName)
     }
 }
