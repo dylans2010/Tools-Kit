@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 /// Protocol for the SDK articles service.
+@MainActor
 public protocol SDKArticleServiceProtocol {
     func createArticle(title: String, content: String, author: String, tags: [String]) throws -> SDKArticle
     func listArticles() -> [SDKArticle]

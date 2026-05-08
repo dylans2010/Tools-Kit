@@ -365,7 +365,7 @@ actor DailyService {
         } catch let error as ServiceError {
             throw error
         } catch {
-            throw ServiceError.networkFailure(underlying: error as! Error)
+            throw ServiceError.networkFailure(underlying: error)
         }
     }
 

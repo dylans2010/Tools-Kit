@@ -1,4 +1,4 @@
-import Foundation
+@preconcurrency import Foundation
 import Security
 import CommonCrypto
 
@@ -23,7 +23,7 @@ final class CertificatePinningDelegate: NSObject, URLSessionDelegate, @unchecked
         self.pins = pins
     }
 
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge,
+    nonisolated func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge,
                     completionHandler: @escaping @Sendable (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
               let trust = challenge.protectionSpace.serverTrust else {

@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 
 struct ConnectorBuilderView: View {
@@ -246,12 +247,12 @@ struct ConnectorBuilderView: View {
             }
 
             Section {
-                LabeledContent("Connectors", value: "\(manager.connectors.count)")
-                LabeledContent("Activity Logs", value: "\(manager.logs.count)")
-                if let existing = connectorID.flatMap({ id in manager.connectors.first(where: { $0.id == id }) }) {
-                    LabeledContent("Executions", value: "\(existing.metadata.executionCount)")
-                    LabeledContent("Average Latency", value: "\(existing.metadata.averageLatency, specifier: "%.0f") ms")
-                    LabeledContent("Error Rate", value: "\(existing.metadata.errorRate, specifier: "%.1f")%")
+                connectorStatRow("Connectors", value: String(manager.connectors.count))
+                connectorStatRow("Activity Logs", value: String(manager.logs.count))
+                if let existing = existingConnector {
+                    connectorStatRow("Executions", value: String(existing.metadata.executionCount))
+                    connectorStatRow("Average Latency", value: String(format: "%.0f ms", existing.metadata.averageLatency))
+                    connectorStatRow("Error Rate", value: String(format: "%.1f%%", existing.metadata.errorRate))
                 }
                 if let lastLog = manager.logs.first {
                     VStack(alignment: .leading, spacing: 4) {
@@ -298,6 +299,21 @@ struct ConnectorBuilderView: View {
             Button("OK") {}
         } message: {
             Text(validationMessage)
+        }
+    }
+
+
+    private var existingConnector: ConnectorDefinition? {
+        guard let connectorID else { return nil }
+        return manager.connectors.first { $0.id == connectorID }
+    }
+
+    @ViewBuilder
+    private func connectorStatRow(_ title: String, value: String) -> some View {
+        LabeledContent {
+            Text(value)
+        } label: {
+            Text(title)
         }
     }
 

@@ -1243,6 +1243,8 @@
 		SDK2BA0988D1EE1A43E76AA8 /* SDKDataInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK19CD0E48D6C30B006E472 /* SDKDataInspectorView.swift */; };
 		SDK25C1917C78E8B7E88E46A /* SDKPluginManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK15392AF5F3C4210ACFFE1 /* SDKPluginManagerView.swift */; };
 		SDK20B1ADEA78ACBE8387443 /* SDKDeveloperGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1245FB85BF006D2EE4B2D /* SDKDeveloperGuideView.swift */; };
+		WK02AICONTEXT0000000001 /* AIContextEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK01AICONTEXT0000000001 /* AIContextEngine.swift */; };
+		WK02VERSIONCTRL00000001 /* VersionControlManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK01VERSIONCTRL00000001 /* VersionControlManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2479,6 +2481,8 @@
 		SDK15392AF5F3C4210ACFFE1 /* SDKPluginManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginManagerView.swift; sourceTree = "<group>"; };
 		SDK1245FB85BF006D2EE4B2D /* SDKDeveloperGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDeveloperGuideView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000026 /* SDKInternalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKInternalView.swift; sourceTree = "<group>"; };
+		WK01AICONTEXT0000000001 /* AIContextEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Workspace/AIContextEngine.swift; sourceTree = SOURCE_ROOT; };
+		WK01VERSIONCTRL00000001 /* VersionControlManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Workspace/VersionControlManager.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -9058,6 +9062,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				WK02AICONTEXT0000000001 /* AIContextEngine.swift in Sources */,
+				WK02VERSIONCTRL00000001 /* VersionControlManager.swift in Sources */,
 				SDK25D57A9783E6597D2D336 /* WorkspaceSDKKernel.swift in Sources */,
 				SDK2A3A30CEDA4E1DEA01B5B /* SDKContext.swift in Sources */,
 				SDK240E5CF46615C7D64E5DC /* SDKEnvironment.swift in Sources */,

@@ -80,6 +80,30 @@ final class AIContextEngine: ObservableObject {
         return Array(semanticIndex.keys.prefix(3))
     }
 
+    func analyzePage(content: String = "", metadata: [String: String] = [:]) async -> SemanticEntry {
+        let id = UUID()
+        await indexContent(content, forID: id, metadata: metadata)
+        return semanticIndex[id] ?? SemanticEntry(
+            id: id,
+            contentHash: content.hashValue.description,
+            embedding: nil,
+            tags: ["workspace"],
+            relatedIDs: [],
+            metadata: metadata
+        )
+    }
+
+    func generateInsights(for content: String = "") async -> [String] {
+        let tags = await extractTags(from: content)
+        let relatedIDs = suggestLinks(forContent: content)
+
+        var insights = tags.map { "Related topic: \($0)" }
+        if !relatedIDs.isEmpty {
+            insights.append("Found \(relatedIDs.count) related workspace item(s).")
+        }
+        return insights.isEmpty ? ["No insights available yet."] : insights
+    }
+
     func addRelationship(source: UUID, target: UUID, type: RelationshipType, weight: Double = 1.0) {
         let relationship = SemanticRelationship(id: UUID(), sourceID: source, targetID: target, type: type, weight: weight)
 
