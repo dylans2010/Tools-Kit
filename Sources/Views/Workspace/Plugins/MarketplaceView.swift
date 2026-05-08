@@ -54,7 +54,7 @@ struct MarketplaceView: View {
                 }
                 .pickerStyle(.segmented)
             } header: {
-                SDKSectionHeader("Repository", subtitle: "Select module type", alignment: .leading)
+                SDKSectionHeader("Repository", subtitle: "Select Module Type", alignment: .leading)
             }
 
             if selectedTab == .plugins {
@@ -74,7 +74,7 @@ struct MarketplaceView: View {
                         .padding(.horizontal, 4)
                     }
                 } header: {
-                    SDKSectionHeader("Categories", subtitle: "Filter by capability", alignment: .leading)
+                    SDKSectionHeader("Categories", subtitle: "Filter By Capability", alignment: .leading)
                 }
 
                 Section {
@@ -88,19 +88,19 @@ struct MarketplaceView: View {
                         }
                     }
                 } header: {
-                    SDKSectionHeader("Discover Plugins", subtitle: "Verified community extensions", alignment: .leading)
+                    SDKSectionHeader("Discover Plugins", subtitle: "Verified Community Extensions", alignment: .leading)
                 }
             } else {
                 Section {
                     if filteredSDKApps.isEmpty {
-                        ContentUnavailableView("No SDK Apps", systemImage: "hammer.fill", description: Text("Applications built with WorkspaceSDK will appear here."))
+                        ContentUnavailableView("No SDK Apps", systemImage: "hammer.fill", description: Text("Applications built with Workspace SDK will appear here."))
                     } else {
                         ForEach(filteredSDKApps) { app in
                             MarketplaceSDKAppRow(app: app, isRunning: sdkRuntime.isRunning(app.id))
                         }
                     }
                 } header: {
-                    SDKSectionHeader("Native Apps", subtitle: "SDK-powered applications", alignment: .leading)
+                    SDKSectionHeader("Native Apps", subtitle: "SDK powered applications", alignment: .leading)
                 }
             }
         }
@@ -179,7 +179,6 @@ struct MarketplaceSDKAppRow: View {
     }
 }
 
-/// "Made For Workspace" badge — visually distinct, auto-detected via SDK metadata.
 struct MadeForWorkspaceBadge: View {
     var body: some View {
         Text("Made For Workspace")

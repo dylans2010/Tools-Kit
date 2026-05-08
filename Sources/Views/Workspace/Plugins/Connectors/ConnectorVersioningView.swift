@@ -200,7 +200,7 @@ struct ConnectorVersioningView: View {
                 manager.addLog(ConnectorLog(connectorID: connector.id, timestamp: Date(), type: .warning, message: "Rolled back to v\(rollbackTarget)", details: nil))
             }
         } message: {
-            Text("This will revert the connector to version v\(rollbackTarget). Current configuration will be preserved as a snapshot.")
+            Text("This will revert the connector to version \(rollbackTarget). Current configuration will be preserved as a snapshot.")
         }
     }
 
@@ -235,20 +235,20 @@ struct ConnectorVersioningView: View {
                     HStack {
                         Image(systemName: connector.endpoints.isEmpty ? "xmark.circle" : "checkmark.circle.fill")
                             .foregroundColor(connector.endpoints.isEmpty ? .red : .green)
-                        Text("Endpoints configured")
+                        Text("Endpoints Configured")
                     }
                     HStack {
                         Image(systemName: connector.authConfig.type == .none ? "xmark.circle" : "checkmark.circle.fill")
                             .foregroundColor(connector.authConfig.type == .none ? .orange : .green)
-                        Text("Authentication configured")
+                        Text("Authentication Configured")
                     }
                     HStack {
                         Image(systemName: connector.flow.steps.isEmpty ? "xmark.circle" : "checkmark.circle.fill")
                             .foregroundColor(connector.flow.steps.isEmpty ? .orange : .green)
-                        Text("Flow pipeline defined")
+                        Text("Flow Pipeline Defined")
                     }
                 } header: {
-                    Text("Pre-Release Checklist")
+                    Text("Pre Release Checklist")
                 }
 
                 Section {

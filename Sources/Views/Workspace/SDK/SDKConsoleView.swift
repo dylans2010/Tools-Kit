@@ -215,7 +215,7 @@ struct SDKConsoleView: View {
         """
         source: \(entry.source)
         level: \(entry.level.rawValue)
-        diagnostic-hint: \(runtimeState.diagnostics.first(where: { entry.message.localizedCaseInsensitiveContains($0.node.title) })?.suggestion ?? "No linked diagnostic")
+        diagnostic-hint: \(runtimeState.diagnostics.first(where: { entry.message.localizedCaseInsensitiveContains($0.node.title) })?.suggestion ?? "No Linked Diagnostic")
         """
     }
 }

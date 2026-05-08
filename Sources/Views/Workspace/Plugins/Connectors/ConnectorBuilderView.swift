@@ -101,7 +101,7 @@ struct ConnectorBuilderView: View {
                 }
                 .padding(.vertical, 4)
             } header: {
-                SDKSectionHeader("Identity", subtitle: "Core module metadata", alignment: .leading)
+                SDKSectionHeader("Identity", subtitle: "Core Module Metadata", alignment: .leading)
             } footer: {
                 if !isIdentifierLocked {
                     Text("Identifier will be locked after initialization.")
@@ -159,12 +159,12 @@ struct ConnectorBuilderView: View {
                 case .none:
                     HStack {
                         Image(systemName: "shield.slash").foregroundStyle(.secondary)
-                        Text("No authentication required").font(.caption).foregroundColor(.secondary)
+                        Text("No Authentication Required").font(.caption).foregroundColor(.secondary)
                     }
                     .padding(.vertical, 8)
                 }
             } header: {
-                SDKSectionHeader("Authentication", subtitle: "External security handshake", alignment: .leading)
+                SDKSectionHeader("Authentication", subtitle: "External Security Handshake", alignment: .leading)
             }
 
             // MARK: - Endpoints
@@ -269,7 +269,7 @@ struct ConnectorBuilderView: View {
                 }
                 if let lastLog = manager.logs.first {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Latest user activity")
+                        Text("Latest User Activity")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                         Text(lastLog.message)

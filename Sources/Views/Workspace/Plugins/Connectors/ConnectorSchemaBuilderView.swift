@@ -142,7 +142,7 @@ struct ConnectorSchemaBuilderView: View {
 
                         Spacer()
 
-                        Text("\(jsonSchema.count) characters")
+                        Text("\(jsonSchema.count) Characters")
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
@@ -203,12 +203,12 @@ struct ConnectorSchemaBuilderView: View {
                 ForEach($mappings) { $entry in
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
-                            TextField("API Field (source)", text: $entry.source)
+                            TextField("API Field (Source)", text: $entry.source)
                                 .font(.system(.caption, design: .monospaced))
                             Image(systemName: "arrow.right")
                                 .foregroundColor(.secondary)
                                 .font(.caption)
-                            TextField("Workspace Model (target)", text: $entry.target)
+                            TextField("Workspace Model (Target)", text: $entry.target)
                                 .font(.system(.caption, design: .monospaced))
                         }
 
@@ -287,7 +287,7 @@ struct ConnectorSchemaBuilderView: View {
                 }
 
                 if mappings.filter({ !$0.source.isEmpty && !$0.target.isEmpty }).isEmpty {
-                    Text("No active mappings defined.")
+                    Text("No Active Mappings Defined")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

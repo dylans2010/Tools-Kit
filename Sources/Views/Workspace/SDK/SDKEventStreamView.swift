@@ -23,7 +23,7 @@ struct SDKEventStreamView: View {
             .padding()
             .background(.thinMaterial)
 
-            TextField("Filter events...", text: $filterText)
+            TextField("Filter Events", text: $filterText)
                 .textFieldStyle(.roundedBorder)
                 .padding(.horizontal)
                 .padding(.vertical, 6)

@@ -212,7 +212,7 @@ struct SDKBuildView: View {
     private var metadataSheetContent: some View {
         Form {
             Section {
-                TextField("Project name", text: $metadataName)
+                TextField("Project Name", text: $metadataName)
                 TextField("Description", text: $metadataDescription, axis: .vertical)
                     .lineLimit(3...5)
                 Picker("Status", selection: $metadataStatus) {
@@ -684,7 +684,7 @@ struct SDKBuildView: View {
         isBuilding = true
         errorMessage = nil
 
-        SDKLogStore.shared.log("Quick build started", source: "SDKBuildView", level: .info)
+        SDKLogStore.shared.log("Quick Build Started", source: "SDKBuildView", level: .info)
 
         Task {
             await MainActor.run { buildProgress = 0.5 }
@@ -694,7 +694,7 @@ struct SDKBuildView: View {
                 isBuilding = false
                 projectManager.currentProject?.lastBuiltAt = Date()
                 try? projectManager.save()
-                SDKLogStore.shared.log("Quick build completed", source: "SDKBuildView", level: .info)
+                SDKLogStore.shared.log("Quick Build Completed", source: "SDKBuildView", level: .info)
             }
         }
     }
@@ -703,12 +703,12 @@ struct SDKBuildView: View {
         guard let project = projectManager.currentProject else { return }
 
         var issues: [String] = []
-        if project.enabledScopes.isEmpty { issues.append("No scopes enabled") }
-        if project.enabledPluginIDs.isEmpty { issues.append("No plugins selected") }
-        if project.enabledToolIDs.isEmpty { issues.append("No tools selected") }
+        if project.enabledScopes.isEmpty { issues.append("No Scopes Enabled") }
+        if project.enabledPluginIDs.isEmpty { issues.append("No Plugins Selected") }
+        if project.enabledToolIDs.isEmpty { issues.append("No Tools Selected") }
 
         if issues.isEmpty {
-            SDKLogStore.shared.log("Project validation passed", source: "SDKBuildView", level: .info)
+            SDKLogStore.shared.log("Project Validation Passed", source: "SDKBuildView", level: .info)
             errorMessage = nil
         } else {
             let msg = "Validation warnings: " + issues.joined(separator: ", ")

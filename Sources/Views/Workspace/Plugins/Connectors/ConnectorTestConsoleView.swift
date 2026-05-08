@@ -6,7 +6,7 @@ struct ConnectorTestConsoleView: View {
 
     @State private var selectedEndpointID: UUID?
     @State private var requestBody = "{}"
-    @State private var responseOutput = "No data yet."
+    @State private var responseOutput = "No Data"
     @State private var isExecuting = false
     @State private var statusCode: Int?
     @State private var responseTime: TimeInterval?
@@ -319,7 +319,7 @@ struct ConnectorTestConsoleView: View {
     private var historySection: some View {
         Section {
             if requestHistory.isEmpty {
-                Text("No requests made yet.")
+                Text("No Requests Made")
                     .font(.caption)
                     .foregroundColor(.secondary)
             } else {
@@ -415,14 +415,14 @@ struct ConnectorTestConsoleView: View {
               let endpoint = connector.endpoints.first(where: { $0.id == endpointID }) else { return }
 
         isExecuting = true
-        responseOutput = "Executing request..."
+        responseOutput = "Executing Request..."
         let startTime = Date()
 
         Task {
             do {
                 let data = try await ConnectorExecutionService.shared.execute(endpoint: endpoint, connector: connector)
                 let elapsed = Date().timeIntervalSince(startTime)
-                let output = String(data: data, encoding: .utf8) ?? "Invalid response data"
+                let output = String(data: data, encoding: .utf8) ?? "Invalid Response Data"
 
                 await MainActor.run {
                     self.responseOutput = output
@@ -482,7 +482,7 @@ struct ConnectorTestConsoleView: View {
     }
 
     private func clearResponse() {
-        responseOutput = "No data yet."
+        responseOutput = "No Data"
         statusCode = nil
         responseTime = nil
         responseContentType = ""

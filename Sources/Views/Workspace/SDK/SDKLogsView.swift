@@ -11,7 +11,7 @@ struct SDKLogsView: View {
                 SDKModernCard(padding: 8) {
                     HStack {
                         Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
-                        TextField("Filter by source...", text: $searchText)
+                        TextField("Filter By Source", text: $searchText)
                             .font(.subheadline)
 
                         Menu {
@@ -29,7 +29,7 @@ struct SDKLogsView: View {
                 }
 
                 HStack {
-                    SDKStatusPill("\(filteredEntries.count) events", color: .blue)
+                    SDKStatusPill("\(filteredEntries.count) Events", color: .blue)
                     Spacer()
                     Button {
                         logStore.clear()

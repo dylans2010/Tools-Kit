@@ -142,7 +142,7 @@ struct ConnectorFlowBuilderView: View {
             Image(systemName: "arrow.triangle.branch")
                 .font(.system(size: 32))
                 .foregroundColor(.secondary)
-            Text("No steps defined")
+            Text("No Steps Defined")
                 .font(.headline)
             Text("Add a trigger to start building your automation pipeline, or use a template to get started quickly.")
                 .font(.caption)
@@ -288,7 +288,7 @@ struct ConnectorFlowBuilderView: View {
                 Spacer()
 
                 if isDisabled {
-                    Text("DISABLED")
+                    Text("Disabled")
                         .font(.system(size: 9, weight: .bold))
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
@@ -322,7 +322,7 @@ struct ConnectorFlowBuilderView: View {
                 ))
                 .font(.system(.caption, design: .monospaced))
 
-                TextField("Description (optional)", text: Binding(
+                TextField("Description (Optional)", text: Binding(
                     get: { step.wrappedValue.config["description"] ?? "" },
                     set: { step.wrappedValue.config["description"] = $0; hasUnsavedChanges = true }
                 ))

@@ -8,7 +8,7 @@ struct SDKPluginsView: View {
         List {
             Section {
                 if manager.plugins.isEmpty {
-                    Text("No plugins installed").foregroundStyle(.secondary)
+                    Text("No Plugins Installed").foregroundStyle(.secondary)
                 } else {
                     ForEach(manager.plugins) { plugin in
                         HStack {
@@ -103,7 +103,7 @@ struct PluginCatalogView: View {
         NavigationStack {
             List {
                 if availablePlugins.isEmpty {
-                    ContentUnavailableView("All plugins installed", systemImage: "checkmark.circle", description: Text("All available plugins are already installed."))
+                    ContentUnavailableView("All Plugins Installed", systemImage: "checkmark.circle", description: Text("All available plugins are already installed."))
                 } else {
                     ForEach(availablePlugins) { plugin in
                         HStack {
@@ -123,7 +123,7 @@ struct PluginCatalogView: View {
                             Spacer()
                             Button("Install") {
                                 try? manager.install(plugin)
-                                SDKLogStore.shared.log("Plugin installed: \(plugin.name)", source: "PluginCatalog", level: .info)
+                                SDKLogStore.shared.log("Plugin Installed: \(plugin.name)", source: "PluginCatalog", level: .info)
                             }
                             .buttonStyle(.bordered)
                         }

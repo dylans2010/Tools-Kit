@@ -33,7 +33,7 @@ struct SDKWorkspaceExplorerView: View {
 
                     Section {
                         if graphEdges.isEmpty {
-                            Text("No relationships found").foregroundStyle(.secondary).font(.caption)
+                            Text("No Relationships Found").foregroundStyle(.secondary).font(.caption)
                         } else {
                             ForEach(graphEdges) { edge in
                                 HStack {

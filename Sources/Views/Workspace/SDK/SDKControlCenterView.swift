@@ -140,7 +140,7 @@ struct SDKControlCenterView: View {
                 VStack {
                     Toggle(isOn: $runtime.isNoSandboxModeEnabled) {
                         VStack(alignment: .leading) {
-                            Text("No-Sandbox Mode")
+                            Text("No Sandbox Mode")
                                 .bold()
                             Text("Bypass execution restrictions (Developer Only)")
                                 .font(.caption)

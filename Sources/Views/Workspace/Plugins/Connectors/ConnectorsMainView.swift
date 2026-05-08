@@ -118,7 +118,7 @@ struct ConnectorsMainView: View {
                     .pickerStyle(.segmented)
 
                     HStack {
-                        Text("Sort by")
+                        Text("Sort By")
                             .font(.caption)
                             .foregroundColor(.secondary)
                         Spacer()
@@ -254,7 +254,7 @@ struct ConnectorsMainView: View {
                 }
             }
         }
-        .searchable(text: $searchText, prompt: "Search connectors...")
+        .searchable(text: $searchText, prompt: "Search Connectors")
         .navigationTitle("Connectors")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -458,7 +458,7 @@ struct ConnectorDefinitionDetailView: View {
             // MARK: - Endpoints
             Section {
                 if connector.endpoints.isEmpty {
-                    Text("No endpoints configured")
+                    Text("No Endpoints Configured")
                         .foregroundColor(.secondary)
                         .font(.subheadline)
                 } else {
@@ -479,7 +479,7 @@ struct ConnectorDefinitionDetailView: View {
                             }
 
                             if !endpoint.headers.isEmpty {
-                                Text("\(endpoint.headers.count) headers")
+                                Text("\(endpoint.headers.count) Headers")
                                     .font(.caption2)
                                     .foregroundColor(.secondary)
                             }
@@ -550,7 +550,7 @@ struct ConnectorDefinitionDetailView: View {
                 }
 
                 if !connector.authConfig.credentials.isEmpty {
-                    LabeledContent("Stored Credentials", value: "\(connector.authConfig.credentials.count) keys")
+                    LabeledContent("Stored Credentials", value: "\(connector.authConfig.credentials.count) Keys")
                 }
             } header: {
                 Text("Authentication")

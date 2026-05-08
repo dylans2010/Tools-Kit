@@ -76,7 +76,7 @@ struct SDKProjectDashboardView: View {
                     if let lastBuild = project.lastBuiltAt {
                         Label("Last Build: \(lastBuild.formatted(.relative(presentation: .numeric)))", systemImage: "hammer.fill")
                     } else {
-                        Label("Not yet built", systemImage: "hammer")
+                        Label("Not Yet Built", systemImage: "hammer")
                     }
                     Label("\(project.enabledScopes.count) Scopes Enabled", systemImage: "lock.shield")
                 }
@@ -102,9 +102,9 @@ struct SDKProjectDashboardView: View {
 
     private var buildSubtitle: String {
         if let last = projectManager.currentProject?.lastBuiltAt {
-            return "Last build: \(last.formatted(.relative(presentation: .numeric)))"
+            return "Last Build: \(last.formatted(.relative(presentation: .numeric)))"
         }
-        return "Not built yet"
+        return "Not Built Yet"
     }
 
     private func hubRow(route: SDKDashboardRoute, title: String, subtitle: String, icon: String, color: Color, status: ConnectorStatus) -> some View {

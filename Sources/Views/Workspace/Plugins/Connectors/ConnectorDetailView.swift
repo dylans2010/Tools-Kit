@@ -150,7 +150,7 @@ struct ConnectorDetailView<T: BaseConnector>: View {
 
             Section {
                 if filteredActivityLog.isEmpty {
-                    Text("No activity recorded.")
+                    Text("No Activity Recorded")
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .frame(maxWidth: .infinity)

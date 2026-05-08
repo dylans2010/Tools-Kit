@@ -61,7 +61,7 @@ struct SDKIntegrationTestView: View {
                     case .idle:
                         HStack {
                             Image(systemName: "clock.arrow.circlepath").foregroundStyle(.secondary)
-                            Text("Awaiting execution...").foregroundStyle(.secondary)
+                            Text("Awaiting Execution...").foregroundStyle(.secondary)
                         }
                     case .running:
                         HStack {
@@ -96,7 +96,7 @@ struct SDKIntegrationTestView: View {
                 Toggle(isOn: $runtime.isNoSandboxModeEnabled) {
                     Label {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("No-Sandbox Mode").font(.subheadline.bold())
+                            Text("No Sandbox Mode").font(.subheadline.bold())
                             Text("Bypass all execution restrictions").font(.caption2).foregroundStyle(.secondary)
                         }
                     } icon: {

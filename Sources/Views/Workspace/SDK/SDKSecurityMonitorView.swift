@@ -15,7 +15,7 @@ struct SDKSecurityMonitorView: View {
         List {
             Section {
                 if filteredLogs.isEmpty {
-                    Text("No access logs recorded yet").foregroundStyle(.secondary)
+                    Text("No Access Logs Recorded").foregroundStyle(.secondary)
                 } else {
                     Picker("Filter", selection: $selectedFilter) {
                         ForEach(SecurityFilter.allCases, id: \.self) { filter in
@@ -45,7 +45,7 @@ struct SDKSecurityMonitorView: View {
             }
 
             Section {
-                InfoRow(label: "Enforcement Mode", value: runtime.isNoSandboxModeEnabled ? "Unrestricted (NoSandbox)" : "Strict (Sandbox)")
+                InfoRow(label: "Enforcement Mode", value: runtime.isNoSandboxModeEnabled ? "Unrestricted (No Sandbox)" : "Strict (Sandbox)")
                 InfoRow(label: "Active Scopes", value: "\(scopeManager.authorizedScopes.count)")
 
                 let blockedCount = scopeManager.scopeAuditLog.filter { !$0.granted }.count

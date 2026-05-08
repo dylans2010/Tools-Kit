@@ -139,7 +139,7 @@ struct ConnectorExecutionView: View {
                     .font(.caption.bold())
                     .foregroundColor(.secondary)
                 Spacer()
-                Text("\(connector.flow.steps.count) steps")
+                Text("\(connector.flow.steps.count) Steps")
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }

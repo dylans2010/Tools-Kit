@@ -25,7 +25,7 @@ struct PresetConnectorsView: View {
                 }
 
                 Section {
-                    TextField("Display name", text: $displayName)
+                    TextField("Display Name", text: $displayName)
                     SecureField(selectedProvider.secretLabel, text: $apiKey)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()

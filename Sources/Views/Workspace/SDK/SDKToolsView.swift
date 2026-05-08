@@ -12,7 +12,7 @@ struct SDKToolsView: View {
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(tool.name).font(.headline)
-                                Text("\(tool.inputSchema.count) inputs").font(.caption).foregroundStyle(.secondary)
+                                Text("\(tool.inputSchema.count) Inputs").font(.caption).foregroundStyle(.secondary)
                             }
                             Spacer()
                             categoryBadge(category)
@@ -29,7 +29,7 @@ struct SDKToolsView: View {
             Section {
                 let history = SDKToolRuntime.shared.getHistory().prefix(10)
                 if history.isEmpty {
-                    Text("No executions yet").font(.caption).foregroundStyle(.secondary)
+                    Text("No Executions Yet").font(.caption).foregroundStyle(.secondary)
                 } else {
                     ForEach(Array(history), id: \.toolID) { record in
                         HStack {
@@ -121,7 +121,7 @@ struct ToolRunnerView: View {
                             Text("Duration: \(String(format: "%.2fms", result.duration * 1000))")
                                 .font(.caption2).foregroundStyle(.secondary)
                         } else {
-                            Text("Execution failed").foregroundStyle(.red)
+                            Text("Execution Failed").foregroundStyle(.red)
                         }
                     } header: {
                         Text("Result")

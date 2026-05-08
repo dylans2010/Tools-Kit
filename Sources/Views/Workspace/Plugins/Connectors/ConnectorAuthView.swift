@@ -64,7 +64,7 @@ struct ConnectorAuthView<T: BaseConnector>: View {
                     LabeledContent("Activity Events", value: "\(connector.activityLog.count)")
                     if let latest = connector.activityLog.first {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Latest activity")
+                            Text("Latest Activity")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                             Text(latest.message)
@@ -230,7 +230,7 @@ struct ConnectorAuthView<T: BaseConnector>: View {
             .alert("Connected!", isPresented: $showingSuccess) {
                 Button("OK") { dismiss() }
             } message: {
-                Text("\(connector.name) has been authenticated successfully.")
+                Text("\(connector.name) has been authenticated successfully!")
             }
         }
     }

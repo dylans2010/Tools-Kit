@@ -97,7 +97,7 @@ struct SDKDebugView: View {
             Section {
                 Button {
                     isStepping.toggle()
-                    let msg = isStepping ? "Debug trace started" : "Debug trace stopped"
+                    let msg = isStepping ? "Debug Trace Started" : "Debug Trace Stopped"
                     SDKLogStore.shared.log(msg, source: "SDKDebugView", level: .info)
                 } label: {
                     Label(isStepping ? "Stop Runtime Trace" : "Start Runtime Trace", systemImage: isStepping ? "stop.circle.fill" : "play.circle.fill")

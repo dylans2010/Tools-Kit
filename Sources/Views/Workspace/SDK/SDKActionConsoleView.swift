@@ -16,7 +16,7 @@ struct SDKActionConsoleView: View {
             if runtime.isNoSandboxModeEnabled {
                 HStack {
                     Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
-                    Text("NoSandbox Mode Active").font(.caption).bold()
+                    Text("No Sandbox Mode Active").font(.caption).bold()
                 }
                 .padding(.vertical, 4)
                 .frame(maxWidth: .infinity)

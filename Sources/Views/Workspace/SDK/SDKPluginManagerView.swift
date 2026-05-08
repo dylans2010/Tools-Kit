@@ -24,7 +24,7 @@ struct SDKPluginManagerView: View {
             statsSection
             appsSection
         }
-        .searchable(text: $searchText, prompt: "Search plugins")
+        .searchable(text: $searchText, prompt: "Search Plugins")
         .navigationTitle("Plugin Manager")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {

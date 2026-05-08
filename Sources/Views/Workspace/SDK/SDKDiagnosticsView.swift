@@ -54,7 +54,7 @@ struct SDKDiagnosticsView: View {
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
             } header: {
-                SDKSectionHeader("Performance", subtitle: "Real-time execution metrics", systemImage: "chart.bar.fill")
+                SDKSectionHeader("Performance", subtitle: "Real time execution metrics", systemImage: "chart.bar.fill")
             }
 
             Section {

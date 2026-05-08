@@ -128,7 +128,7 @@ struct ConnectorSecurityView: View {
             Section {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Token Expiry").font(.caption).foregroundColor(.secondary)
-                    Stepper("\(tokenExpiryHours) hours", value: $tokenExpiryHours, in: 1...720)
+                    Stepper("\(tokenExpiryHours) Hours", value: $tokenExpiryHours, in: 1...720)
                 }
 
                 Toggle("Auto-Refresh Tokens", isOn: $autoRefreshTokens)

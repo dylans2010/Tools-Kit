@@ -15,7 +15,7 @@ struct SDKDataInspectorView: View {
                 itemsSection(for: selected)
             }
         }
-        .searchable(text: $searchText, prompt: "Search data")
+        .searchable(text: $searchText, prompt: "Search Data")
         .navigationTitle("Data Inspector")
     }
 

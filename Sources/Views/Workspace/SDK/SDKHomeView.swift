@@ -50,7 +50,7 @@ struct SDKHomeView: View {
                     Label {
                         VStack(alignment: .leading) {
                             Text("IDE Workspace").font(.subheadline.bold())
-                            Text("Multi-panel runtime editor").font(.caption2).foregroundStyle(.secondary)
+                            Text("Multi panel runtime editor").font(.caption2).foregroundStyle(.secondary)
                         }
                     } icon: {
                         Image(systemName: "square.split.2x2.fill").foregroundStyle(.indigo)
@@ -90,8 +90,8 @@ struct SDKHomeView: View {
                 SDKSectionHeader("Workspace", subtitle: "System-level development tools", systemImage: "square.grid.2x2.fill")
             }
         }
-        .navigationTitle("WorkspaceSDK")
-        .searchable(text: $searchText, prompt: "Search projects")
+        .navigationTitle("Workspace SDK")
+        .searchable(text: $searchText, prompt: "Search Projects")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
