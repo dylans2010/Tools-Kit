@@ -1,6 +1,31 @@
 import SwiftUI
 
 struct SDKConsoleView: View {
+    final class LogBus: ObservableObject {
+        static let shared = LogBus()
+
+        enum LogType {
+            case info
+            case success
+            case warning
+            case error
+        }
+
+        private init() {}
+
+        func log(_ message: String, type: LogType) {
+            Task { @MainActor in
+                SDKLogStore.shared.log(message, source: "SDKConsole", level: type.logLevel)
+            }
+        }
+
+        func clear() {
+            Task { @MainActor in
+                SDKLogStore.shared.clear()
+            }
+        }
+    }
+
     @Environment(\.dismiss) private var dismiss
     @StateObject private var logStore = SDKLogStore.shared
     @StateObject private var runtimeState = SDKRuntimeWorkspaceState.shared
@@ -192,6 +217,19 @@ struct SDKConsoleView: View {
         level: \(entry.level.rawValue)
         diagnostic-hint: \(runtimeState.diagnostics.first(where: { entry.message.localizedCaseInsensitiveContains($0.node.title) })?.suggestion ?? "No linked diagnostic")
         """
+    }
+}
+
+private extension SDKConsoleView.LogBus.LogType {
+    var logLevel: LogLevel {
+        switch self {
+        case .info, .success:
+            return .info
+        case .warning:
+            return .warning
+        case .error:
+            return .error
+        }
     }
 }
 
