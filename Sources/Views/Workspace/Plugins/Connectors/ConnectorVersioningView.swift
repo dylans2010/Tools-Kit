@@ -28,11 +28,11 @@ struct ConnectorVersioningView: View {
     }
 
     var versionHistory: [VersionEntry] {
-        [
-            VersionEntry(version: connector.version, date: connector.updatedAt, notes: "Current deployment", status: .deployed, changes: connector.endpoints.count),
-            VersionEntry(version: bumpVersion(connector.version, by: -1), date: connector.updatedAt.addingTimeInterval(-86400 * 7), notes: "Previous stable release", status: .staging, changes: max(0, connector.endpoints.count - 1)),
-            VersionEntry(version: "0.9.0", date: connector.createdAt, notes: "Initial beta release", status: .draft, changes: 1)
-        ]
+        [VersionEntry(version: connector.version, date: connector.updatedAt, notes: "Current saved connector configuration", status: deploymentStatus, changes: connector.endpoints.count + connector.flow.steps.count + connector.schema.mappings.count)]
+    }
+
+    private var connectorLogs: [ConnectorLog] {
+        manager.logs.filter { $0.connectorID == connector.id }
     }
 
     var body: some View {
@@ -97,6 +97,11 @@ struct ConnectorVersioningView: View {
 
             // MARK: - Version History
             Section("Version History") {
+                if versionHistory.count == 1 {
+                    Text("Only the current saved version is available. No generated or mock versions are shown.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
                 ForEach(versionHistory) { entry in
                     historyRow(entry: entry)
                         .contextMenu {
@@ -125,13 +130,24 @@ struct ConnectorVersioningView: View {
             }
 
             // MARK: - Changelog
-            Section("Changelog") {
+            Section("Configuration Changelog") {
                 VStack(alignment: .leading, spacing: 8) {
-                    changelogEntry(type: "Added", items: ["Endpoint configuration", "Flow builder pipeline"])
-                    changelogEntry(type: "Changed", items: ["Auth config structure", "Schema validation"])
-                    changelogEntry(type: "Fixed", items: ["Rate limiting behavior"])
+                    changelogEntry(type: "Current", items: configurationChangeItems)
                 }
                 .padding(.vertical, 4)
+            }
+
+            if !connectorLogs.isEmpty {
+                Section("User Activity") {
+                    ForEach(connectorLogs.prefix(5)) { log in
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(log.message).font(.caption)
+                            Text(log.timestamp.formatted(date: .abbreviated, time: .shortened))
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
             }
 
             // MARK: - Actions
@@ -173,6 +189,7 @@ struct ConnectorVersioningView: View {
                 connector.updatedAt = Date()
                 deploymentStatus = .rollback
                 manager.updateConnector(connector)
+                manager.addLog(ConnectorLog(connectorID: connector.id, timestamp: Date(), type: .warning, message: "Rolled back to v\(rollbackTarget)", details: nil))
             }
         } message: {
             Text("This will revert the connector to version v\(rollbackTarget). Current configuration will be preserved as a snapshot.")
@@ -226,6 +243,7 @@ struct ConnectorVersioningView: View {
                         connector.updatedAt = Date()
                         deploymentStatus = .deployed
                         manager.updateConnector(connector)
+                        manager.addLog(ConnectorLog(connectorID: connector.id, timestamp: Date(), type: .info, message: "Published version v\(connector.version)", details: releaseNotes.isEmpty ? nil : releaseNotes))
                         showingReleaseSheet = false
                         releaseNotes = ""
                     }
@@ -311,6 +329,19 @@ struct ConnectorVersioningView: View {
                 }
             }
         }
+    }
+
+    private var configurationChangeItems: [String] {
+        var items = [
+            "\(connector.endpoints.count) endpoint(s) configured",
+            "\(connector.flow.steps.count) flow step(s) configured",
+            "Auth type: \(connector.authConfig.type.rawValue.capitalized)",
+            "\(connector.schema.mappings.count) schema mapping(s)"
+        ]
+        if let lastLog = connectorLogs.first {
+            items.append("Latest user activity: \(lastLog.message)")
+        }
+        return items
     }
 
     // MARK: - Subviews
@@ -410,10 +441,4 @@ struct ConnectorVersioningView: View {
         return "\(parts[0]).\(parts[1]).\(parts[2] + 1)"
     }
 
-    private func bumpVersion(_ version: String, by amount: Int) -> String {
-        let parts = version.split(separator: ".").compactMap { Int($0) }
-        guard parts.count == 3 else { return version }
-        let patch = max(0, parts[2] + amount)
-        return "\(parts[0]).\(parts[1]).\(patch)"
-    }
 }

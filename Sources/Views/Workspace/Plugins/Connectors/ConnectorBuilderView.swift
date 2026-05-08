@@ -35,6 +35,7 @@ struct ConnectorBuilderView: View {
     // Validation
     @State private var showingValidationAlert = false
     @State private var validationMessage = ""
+    @State private var showingPresetConnectors = false
 
     init(connector: ConnectorDefinition? = nil) {
         if let connector = connector {
@@ -236,6 +237,25 @@ struct ConnectorBuilderView: View {
                 }
             }
 
+            Section("Saved Connector Data") {
+                LabeledContent("Connectors", value: "\(manager.connectors.count)")
+                LabeledContent("Activity Logs", value: "\(manager.logs.count)")
+                if let existing = connectorID.flatMap({ id in manager.connectors.first(where: { $0.id == id }) }) {
+                    LabeledContent("Executions", value: "\(existing.metadata.executionCount)")
+                    LabeledContent("Average Latency", value: "\(existing.metadata.averageLatency, specifier: "%.0f") ms")
+                    LabeledContent("Error Rate", value: "\(existing.metadata.errorRate, specifier: "%.1f")%")
+                }
+                if let lastLog = manager.logs.first {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Latest user activity")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text(lastLog.message)
+                            .font(.caption)
+                    }
+                }
+            }
+
             // MARK: - Save
             Section {
                 Button(action: validateAndSave) {
@@ -253,6 +273,16 @@ struct ConnectorBuilderView: View {
                     Button("Cancel") { dismiss() }
                 }
             }
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    showingPresetConnectors = true
+                } label: {
+                    Label("Add Preset", systemImage: "square.grid.2x2")
+                }
+            }
+        }
+        .sheet(isPresented: $showingPresetConnectors) {
+            PresetConnectorsView()
         }
         .alert("Validation", isPresented: $showingValidationAlert) {
             Button("OK") {}
@@ -354,6 +384,7 @@ struct ConnectorBuilderView: View {
                 connector.endpoints = pendingEndpoints
                 connector.updatedAt = Date()
                 manager.updateConnector(connector)
+                manager.addLog(ConnectorLog(connectorID: connector.id, timestamp: Date(), type: .info, message: "Connector updated", details: "Version \(connector.version) with \(connector.endpoints.count) endpoint(s)"))
             }
         } else {
             let newConnector = ConnectorDefinition(
@@ -369,6 +400,7 @@ struct ConnectorBuilderView: View {
             var mutableConnector = newConnector
             mutableConnector.endpoints = pendingEndpoints
             manager.addConnector(mutableConnector)
+            manager.addLog(ConnectorLog(connectorID: mutableConnector.id, timestamp: Date(), type: .info, message: "Connector created", details: "\(mutableConnector.endpoints.count) endpoint(s) configured"))
         }
         dismiss()
     }
