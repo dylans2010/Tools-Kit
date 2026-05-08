@@ -369,6 +369,10 @@ struct SDKBuildView: View {
 
     private var developmentToolsSection: some View {
         Section {
+            NavigationLink { SDKWorkspaceContainerView() } label: {
+                toolkitRow(icon: "square.split.2x2.fill", color: .indigo, title: "IDE Workspace", subtitle: "Navigator, editor, inspector, console")
+            }
+
             NavigationLink { SDKActionConsoleView() } label: {
                 toolkitRow(icon: "terminal", color: .teal, title: "Action Console", subtitle: "Execute SDK commands")
             }

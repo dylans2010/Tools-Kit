@@ -1,157 +1,237 @@
 import SwiftUI
 
 struct SDKConsoleView: View {
-    @Environment(\.dismiss) var dismiss
-    @StateObject private var logBus = LogBus.shared
-    @StateObject private var runtime = SDKRuntimeEngine.shared
-    @State private var filterType: SDKLog.LogType?
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var logStore = SDKLogStore.shared
+    @StateObject private var runtimeState = SDKRuntimeWorkspaceState.shared
 
-    var filteredLogs: [SDKLog] {
-        guard let filter = filterType else { return logBus.logs }
-        return logBus.logs.filter { $0.type == filter }
+    let embedded: Bool
+
+    @State private var selectedLevel: ConsoleLogLevel?
+    @State private var pluginFilter = "All"
+    @State private var connectorFilter = "All"
+    @State private var appFilter = "All"
+    @State private var selectedEventID: UUID?
+    @State private var showPerformanceTimeline = false
+
+    init(embedded: Bool = false) {
+        self.embedded = embedded
+    }
+
+    private var pluginOptions: [String] {
+        ["All"] + SDKPluginManager.shared.plugins.map(\.name).sorted()
+    }
+
+    private var connectorOptions: [String] {
+        ["All"] + SDKConnectorManager.shared.connectors.map(\.name).sorted()
+    }
+
+    private var appOptions: [String] {
+        ["All"] + SDKProjectManager.shared.projects.map(\.name).sorted()
+    }
+
+    private var filteredEntries: [SDKLogEntry] {
+        logStore.entries.filter { entry in
+            let levelMatches = selectedLevel == nil || selectedLevel?.matches(entry.level) == true
+            let pluginMatches = pluginFilter == "All" || entry.source.localizedCaseInsensitiveContains(pluginFilter)
+            let connectorMatches = connectorFilter == "All" || entry.source.localizedCaseInsensitiveContains(connectorFilter)
+            let appMatches = appFilter == "All" || entry.message.localizedCaseInsensitiveContains(appFilter)
+            return levelMatches && pluginMatches && connectorMatches && appMatches
+        }
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                Text("Runtime Output").font(.headline)
-                Spacer()
-                Toggle("Try With SDK", isOn: $runtime.isNoSandboxModeEnabled)
-                    .toggleStyle(.button)
-                    .tint(.red)
-                    .controlSize(.small)
-            }
-            .padding()
-            .background(.thinMaterial)
-
-            HStack(spacing: 8) {
-                filterButton("All", type: nil)
-                filterButton("Info", type: .info)
-                filterButton("Warn", type: .warning)
-                filterButton("Error", type: .error)
-                filterButton("OK", type: .success)
-                Spacer()
-                Text("\(filteredLogs.count) Entries")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 6)
-
-            ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 4) {
-                        ForEach(filteredLogs) { log in
-                            HStack(alignment: .top) {
-                                Text(log.timestamp, style: .time)
-                                    .font(.system(size: 10, design: .monospaced))
-                                    .foregroundStyle(.secondary)
-                                    .frame(width: 60, alignment: .leading)
-
-                                Text(log.type.badge)
-                                    .font(.system(size: 10, design: .monospaced))
-                                    .foregroundStyle(log.color)
-                                    .frame(width: 30)
-
-                                Text(log.message)
-                                    .font(.system(size: 12, design: .monospaced))
-                                    .foregroundStyle(log.color)
-                            }
-                        }
-                    }
-                    .padding()
-                }
-                .onChange(of: logBus.logs.count) { _, _ in
-                    if let last = filteredLogs.last {
-                        proxy.scrollTo(last.id)
-                    }
-                }
-            }
-
-            HStack {
-                Button("Clear") { logBus.clear() }
-                Spacer()
-                Button("Export") { exportLogs() }
-            }
-            .padding()
-            .background(.thinMaterial)
+        VStack(spacing: 0) {
+            header
+            filters
+            Divider()
+            logList
+            footer
         }
         .navigationTitle("SDK Console")
         .toolbar {
-            Button("Done") { dismiss() }
+            if !embedded {
+                Button("Done") { dismiss() }
+            }
         }
         .onAppear {
-            forwardSDKLogs()
+            runtimeState.recalculateDiagnostics()
         }
     }
 
-    private func filterButton(_ label: String, type: SDKLog.LogType?) -> some View {
-        Button(label) { filterType = type }
+    private var header: some View {
+        HStack {
+            Label("Runtime Output", systemImage: "terminal.fill")
+                .font(.headline)
+            Spacer()
+            Toggle("Timeline", isOn: $showPerformanceTimeline)
+                .toggleStyle(.switch)
+                .labelsHidden()
+            Text("Events: \(filteredEntries.count)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(.thinMaterial)
+    }
+
+    private var filters: some View {
+        VStack(spacing: 8) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    filterPill("All", level: nil)
+                    filterPill("Info", level: .info)
+                    filterPill("Warn", level: .warning)
+                    filterPill("Error", level: .error)
+                    filterPill("Critical", level: .critical)
+                }
+                .padding(.horizontal)
+            }
+
+            HStack {
+                Picker("Plugin", selection: $pluginFilter) {
+                    ForEach(pluginOptions, id: \.self) { Text($0).tag($0) }
+                }
+                .pickerStyle(.menu)
+                Picker("Connector", selection: $connectorFilter) {
+                    ForEach(connectorOptions, id: \.self) { Text($0).tag($0) }
+                }
+                .pickerStyle(.menu)
+                Picker("App", selection: $appFilter) {
+                    ForEach(appOptions, id: \.self) { Text($0).tag($0) }
+                }
+                .pickerStyle(.menu)
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 6)
+        }
+    }
+
+    private var logList: some View {
+        List(filteredEntries) { entry in
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text(entry.timestamp.formatted(date: .omitted, time: .standard))
+                        .font(.caption2.monospaced())
+                        .foregroundStyle(.secondary)
+                    badge(for: entry)
+                    Spacer()
+                    if showPerformanceTimeline {
+                        Text(timelineMarker(for: entry))
+                            .font(.caption2.monospaced())
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                Text(entry.message)
+                    .font(.system(.caption, design: .monospaced))
+                if selectedEventID == entry.id {
+                    Text(stackTrace(for: entry))
+                        .font(.caption2.monospaced())
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                selectedEventID = selectedEventID == entry.id ? nil : entry.id
+            }
+        }
+        .listStyle(.plain)
+    }
+
+    private var footer: some View {
+        HStack {
+            Button("Replay Last 10") {
+                for replay in filteredEntries.prefix(10).reversed() {
+                    logStore.log("Replayed: \(replay.message)", source: "SDKConsoleReplay", level: replay.level)
+                }
+            }
             .buttonStyle(.bordered)
-            .controlSize(.mini)
-            .tint(filterType == type ? .blue : .secondary)
-    }
 
-    private func forwardSDKLogs() {
-        let recentLogs = SDKLogStore.shared.entries
-        for entry in recentLogs.suffix(50) {
-            let logType: SDKLog.LogType
-            switch entry.level {
-            case .debug, .info: logType = .info
-            case .warning: logType = .warning
-            case .error: logType = .error
+            Button("Clear") {
+                logStore.clear()
             }
-            logBus.log("[\(entry.source)] \(entry.message)", type: logType)
+            .buttonStyle(.bordered)
+
+            Spacer()
+
+            Text("Memory \(runtimeState.memoryEstimateMB) MB")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
+        .padding()
+        .background(.thinMaterial)
     }
 
-    private func exportLogs() {
-        let logText = filteredLogs.map { "[\($0.timestamp)] [\($0.type.badge)] \($0.message)" }.joined(separator: "\n")
-        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        let exportURL = appSupport.appendingPathComponent("sdk_console_export_\(Int(Date().timeIntervalSince1970)).log")
-        try? logText.write(to: exportURL, atomically: true, encoding: .utf8)
-        logBus.log("Logs exported to \(exportURL.lastPathComponent)", type: .success)
+    private func filterPill(_ text: String, level: ConsoleLogLevel?) -> some View {
+        Button(text) {
+            selectedLevel = level
+        }
+        .buttonStyle(.bordered)
+        .tint(selectedLevel == level ? .blue : .secondary)
     }
 
-    final class LogBus: ObservableObject {
-        static let shared = LogBus()
-        @Published var logs: [SDKLog] = []
+    private func badge(for entry: SDKLogEntry) -> some View {
+        let mapped = ConsoleLogLevel(from: entry.level)
+        return Text(mapped.shortLabel)
+            .font(.caption2.bold().monospaced())
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(mapped.color.opacity(0.2), in: Capsule())
+            .foregroundStyle(mapped.color)
+    }
 
-        func log(_ message: String, type: SDKLog.LogType = .info) {
-            DispatchQueue.main.async {
-                self.logs.append(SDKLog(message: message, type: type))
-            }
-        }
+    private func timelineMarker(for entry: SDKLogEntry) -> String {
+        let ms = Int(entry.timestamp.timeIntervalSince1970.truncatingRemainder(dividingBy: 1000) * 1000)
+        return "t+\(max(0, ms))ms"
+    }
 
-        func clear() { logs.removeAll() }
+    private func stackTrace(for entry: SDKLogEntry) -> String {
+        """
+        source: \(entry.source)
+        level: \(entry.level.rawValue)
+        diagnostic-hint: \(runtimeState.diagnostics.first(where: { entry.message.localizedCaseInsensitiveContains($0.node.title) })?.suggestion ?? "No linked diagnostic")
+        """
     }
 }
 
-struct SDKLog: Identifiable {
-    let id = UUID()
-    let message: String
-    let type: LogType
-    let timestamp = Date()
+private enum ConsoleLogLevel: String, CaseIterable {
+    case info
+    case warning
+    case error
+    case critical
 
-    enum LogType {
-        case info, warning, error, success
+    init(from level: LogLevel) {
+        switch level {
+        case .debug, .info: self = .info
+        case .warning: self = .warning
+        case .error: self = .error
+        }
+    }
 
-        var badge: String {
-            switch self {
-            case .info: return "INF"
-            case .warning: return "WRN"
-            case .error: return "ERR"
-            case .success: return "OK"
-            }
+    func matches(_ level: LogLevel) -> Bool {
+        switch self {
+        case .info: return level == .info || level == .debug
+        case .warning: return level == .warning
+        case .error, .critical: return level == .error
+        }
+    }
+
+    var shortLabel: String {
+        switch self {
+        case .info: return "INF"
+        case .warning: return "WRN"
+        case .error: return "ERR"
+        case .critical: return "CRT"
         }
     }
 
     var color: Color {
-        switch type {
-        case .info: return .primary
+        switch self {
+        case .info: return .blue
         case .warning: return .orange
         case .error: return .red
-        case .success: return .green
+        case .critical: return .purple
         }
     }
 }

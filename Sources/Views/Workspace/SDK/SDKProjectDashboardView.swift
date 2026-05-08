@@ -1,6 +1,7 @@
 import SwiftUI
 
 enum SDKDashboardRoute: Hashable {
+    case ideWorkspace
     case build
     case connectors
     case automation
@@ -70,6 +71,7 @@ struct SDKProjectDashboardView: View {
     private var controlHubSection: some View {
         Section {
             hubRow(route: .build, title: "Build & Export", subtitle: buildSubtitle, icon: "hammer", color: .blue, status: .connected)
+            hubRow(route: .ideWorkspace, title: "IDE Workspace", subtitle: "Multi-panel runtime editor", icon: "square.split.2x2.fill", color: .indigo, status: .connected)
             hubRow(route: .connectors, title: "Connectors", subtitle: "\(connectorManager.connectors.count) active", icon: "link", color: .green, status: connectorManager.connectors.isEmpty ? .disconnected : .connected)
             hubRow(route: .automation, title: "Automation", subtitle: "\(automationEngine.rules.count) rules", icon: "bolt.fill", color: .orange, status: .connected)
             hubRow(route: .plugins, title: "Plugins", subtitle: "Expand capabilities", icon: "puzzlepiece.fill", color: .purple, status: .connected)
@@ -153,6 +155,7 @@ struct SDKProjectDashboardView: View {
     @ViewBuilder
     private func destinationView(for route: SDKDashboardRoute) -> some View {
         switch route {
+        case .ideWorkspace: SDKWorkspaceContainerView()
         case .build: SDKBuildView()
         case .connectors: SDKConnectorsView()
         case .automation: SDKAutomationView()

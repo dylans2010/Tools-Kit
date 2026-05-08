@@ -68,6 +68,9 @@ struct SDKHomeView: View {
             }
 
             Section {
+                NavigationLink(destination: SDKWorkspaceContainerView()) {
+                    Label("IDE Workspace", systemImage: "square.split.2x2.fill")
+                }
                 NavigationLink(destination: SDKDeveloperGuideView()) {
                     Label("Developer Guide", systemImage: "book.closed.fill")
                 }
