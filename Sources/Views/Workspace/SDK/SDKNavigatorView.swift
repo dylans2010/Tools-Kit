@@ -7,12 +7,20 @@ struct SDKNavigatorView: View {
     #endif
 
     private var filteredNodes: [SDKWorkspaceNode] {
-        let query = state.navigatorFilterText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let query: String = state.navigatorFilterText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return SDKWorkspaceNode.allCases }
-        return SDKWorkspaceNode.allCases.filter {
-            $0.title.localizedCaseInsensitiveContains(query) ||
-            $0.tags.contains(where: { $0.localizedCaseInsensitiveContains(query) })
+
+        let allNodes: [SDKWorkspaceNode] = SDKWorkspaceNode.allCases
+        let matchingNodes: [SDKWorkspaceNode] = allNodes.filter { node in
+            let titleMatches: Bool = node.title.localizedCaseInsensitiveContains(query)
+            let tagMatches: Bool = node.tags.contains { tag in
+                let matchesQuery: Bool = tag.localizedCaseInsensitiveContains(query)
+                return matchesQuery
+            }
+            let nodeMatches: Bool = titleMatches || tagMatches
+            return nodeMatches
         }
+        return matchingNodes
     }
 
     private var isCompact: Bool {
