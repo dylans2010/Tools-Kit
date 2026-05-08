@@ -80,10 +80,10 @@ struct ArticleSearchView: View {
                 performSearch(initialQuery)
             }
         }
-        .onChange(of: searchText) { newValue in
+        .onChange(of: searchText) { _, newValue in
             debounceSearch(newValue)
         }
-        .onChange(of: selectedLanguage) { _ in
+        .onChange(of: selectedLanguage) { _, _ in
             if !searchText.isEmpty { performSearch(searchText) }
         }
     }

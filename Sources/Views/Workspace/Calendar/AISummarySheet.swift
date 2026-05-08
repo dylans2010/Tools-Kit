@@ -39,9 +39,11 @@ struct AISummarySheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("AI Draft") {
+                Section {
                     TextEditor(text: $draft)
                         .frame(minHeight: 220)
+                } header: {
+                    Text("AI Draft")
                 }
             }
             .navigationTitle("AI Agenda")

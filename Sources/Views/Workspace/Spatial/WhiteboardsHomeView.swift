@@ -7,7 +7,7 @@ struct WhiteboardsHomeView: View {
 
     var body: some View {
         List {
-            Section("My Whiteboards") {
+            Section {
                 if dataStore.spatialCanvases.isEmpty {
                     Text("No whiteboards yet.")
                         .foregroundColor(.secondary)
@@ -22,6 +22,8 @@ struct WhiteboardsHomeView: View {
                 Button("Create New Whiteboard") {
                     showingCreate = true
                 }
+            } header: {
+                Text("My Whiteboards")
             }
         }
         .navigationTitle("Spatial Whiteboards")

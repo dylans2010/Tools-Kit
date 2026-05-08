@@ -25,25 +25,31 @@ struct FeedbackDetailView: View {
 
     var body: some View {
         Form {
-            Section("Message") {
+            Section {
                 Text(feedback.message)
                     .font(.body)
+            } header: {
+                Text("Message")
             }
 
-            Section("Reporter") {
+            Section {
                 LabeledContent("Name", value: feedback.userName)
                 if let userId = feedback.userId {
                     LabeledContent("User ID", value: userId)
                 }
+            } header: {
+                Text("Reporter")
             }
 
-            Section("Environment") {
+            Section {
                 LabeledContent("Device", value: feedback.device)
                 LabeledContent("App Version", value: feedback.appVersion)
                 LabeledContent("Created", value: feedback.createdAt.formatted(date: .abbreviated, time: .shortened))
+            } header: {
+                Text("Environment")
             }
 
-            Section("Moderation") {
+            Section {
                 Picker("Status", selection: $status) {
                     ForEach(FeedbackStatus.allCases) { value in
                         Text(value.displayName).tag(value)
@@ -57,11 +63,15 @@ struct FeedbackDetailView: View {
                 }
 
                 TextField("Assigned developer", text: $assignedTo)
+            } header: {
+                Text("Moderation")
             }
 
-            Section("Internal Notes") {
+            Section {
                 TextEditor(text: $internalNotes)
                     .frame(minHeight: 140)
+            } header: {
+                Text("Internal Notes")
             }
 
             if let errorMessage {

@@ -6,7 +6,7 @@ struct IntegrationsHomeView: View {
 
     var body: some View {
         List {
-            Section("My Workflows") {
+            Section {
                 if dataStore.integrationWorkflows.isEmpty {
                     Text("No workflows created yet.")
                         .foregroundColor(.secondary)
@@ -30,15 +30,19 @@ struct IntegrationsHomeView: View {
                 Button("Create New Workflow") {
                     showingWorkflowBuilder = true
                 }
+            } header: {
+                Text("My Workflows")
             }
 
-            Section("Execution History") {
+            Section {
                 HistoryRow(name: "Daily Sync", status: "Success", time: "2h ago")
                 HistoryRow(name: "Slack Notify", status: "Failed", time: "5h ago")
                 HistoryRow(name: "GitHub Issue Creator", status: "Success", time: "1d ago")
+            } header: {
+                Text("Execution History")
             }
 
-            Section("Performance Analytics") {
+            Section {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("Total Executions").font(.caption).foregroundColor(.secondary)
@@ -51,12 +55,16 @@ struct IntegrationsHomeView: View {
                     }
                 }
                 .padding(.vertical, 4)
+            } header: {
+                Text("Performance Analytics")
             }
 
-            Section("Connections") {
+            Section {
                 NavigationLink("Manage Connections") {
                     IntegrationConnectionsView()
                 }
+            } header: {
+                Text("Connections")
             }
         }
         .navigationTitle("Integrations")

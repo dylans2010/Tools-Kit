@@ -9,7 +9,7 @@ struct RegexTesterView: View {
                 TextField("Pattern", text: $backend.pattern)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled(true)
-                    .onChange(of: backend.pattern) { _ in backend.findMatches() }
+                    .onChange(of: backend.pattern) { _, _ in backend.findMatches() }
             } header: {
                 Text("Regex Pattern")
             }
@@ -17,7 +17,7 @@ struct RegexTesterView: View {
             Section {
                 TextEditor(text: $backend.testText)
                     .frame(height: 150)
-                    .onChange(of: backend.testText) { _ in backend.findMatches() }
+                    .onChange(of: backend.testText) { _, _ in backend.findMatches() }
             } header: {
                 Text("Test Text")
             }

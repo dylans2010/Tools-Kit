@@ -7,7 +7,7 @@ struct GitHubCommandCenterView: View {
 
     var body: some View {
         List {
-            Section("Repository State") {
+            Section {
                 HStack {
                     Label("Current Branch", systemImage: "arrow.branch")
                     Spacer()
@@ -25,9 +25,11 @@ struct GitHubCommandCenterView: View {
                     Spacer()
                     Text("0 Commits").foregroundStyle(.secondary)
                 }
+            } header: {
+                Text("Repository State")
             }
 
-            Section("Sync Operations") {
+            Section {
                 CommandButton(title: "Fetch & Pull", icon: "arrow.down.to.line", color: .blue) {
                     performSyncAction("Pulling Latest Changes...")
                 }
@@ -39,9 +41,11 @@ struct GitHubCommandCenterView: View {
                 CommandButton(title: "Switch Branch", icon: "arrow.left.and.right", color: .purple) {
                     // Branch switching logic
                 }
+            } header: {
+                Text("Sync Operations")
             }
 
-            Section("Offline Queue") {
+            Section {
                 if gitEngine.commitQueue.isEmpty {
                     Text("No Pending Operations").font(.caption).foregroundStyle(.secondary)
                 } else {
@@ -56,6 +60,8 @@ struct GitHubCommandCenterView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Offline Queue")
             }
         }
         .navigationTitle("Command Center")

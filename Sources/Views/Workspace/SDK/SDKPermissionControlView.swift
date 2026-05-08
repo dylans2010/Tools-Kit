@@ -5,7 +5,7 @@ struct SDKPermissionControlView: View {
 
     var body: some View {
         List {
-            Section("API Scopes") {
+            Section {
                 ForEach(PluginCapability.allCases) { cap in
                     Toggle(isOn: Binding(
                         get: { project.requiredScopes.contains(cap.rawValue) },
@@ -20,9 +20,11 @@ struct SDKPermissionControlView: View {
                         Label(cap.displayName, systemImage: cap.icon)
                     }
                 }
+            } header: {
+                Text("API Scopes")
             }
 
-            Section("Elevated Access") {
+            Section {
                 Toggle("sdk.developer.noSandbox", isOn: Binding(
                     get: { project.requiredScopes.contains(SDKPermissionManager.noSandboxScope) },
                     set: { val in
@@ -34,6 +36,8 @@ struct SDKPermissionControlView: View {
                     }
                 ))
                 .tint(.red)
+            } header: {
+                Text("Elevated Access")
             }
         }
         .navigationTitle("Permissions")

@@ -12,7 +12,7 @@ struct PresetConnectorsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Provider") {
+                Section {
                     Picker("Provider", selection: $selectedProvider) {
                         ForEach(PresetConnectorProvider.allCases) { provider in
                             Label(provider.name, systemImage: provider.icon).tag(provider)
@@ -20,9 +20,11 @@ struct PresetConnectorsView: View {
                     }
 
                     providerSummary(selectedProvider)
+                } header: {
+                    Text("Provider")
                 }
 
-                Section("Credentials") {
+                Section {
                     TextField("Display name", text: $displayName)
                     SecureField(selectedProvider.secretLabel, text: $apiKey)
                         .textInputAutocapitalization(.never)
@@ -31,9 +33,11 @@ struct PresetConnectorsView: View {
                     Text(selectedProvider.credentialHelp)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                } header: {
+                    Text("Credentials")
                 }
 
-                Section("Configured Endpoints") {
+                Section {
                     ForEach(selectedProvider.endpoints) { endpoint in
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
@@ -53,6 +57,8 @@ struct PresetConnectorsView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Configured Endpoints")
                 }
 
                 Section {
@@ -72,7 +78,7 @@ struct PresetConnectorsView: View {
                     Button("Cancel") { dismiss() }
                 }
             }
-            .onChange(of: selectedProvider) { provider in
+            .onChange(of: selectedProvider) { _, provider in
                 displayName = provider.name
                 apiKey = ""
             }

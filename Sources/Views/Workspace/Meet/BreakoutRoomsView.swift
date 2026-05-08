@@ -6,7 +6,7 @@ struct BreakoutRoomsView: View {
 
     var body: some View {
         List {
-            Section("Create Room") {
+            Section {
                 TextField("Room Name", text: $newRoomName)
                 Button("Create") {
                     let name = newRoomName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -14,9 +14,11 @@ struct BreakoutRoomsView: View {
                     Task { await manager.createBreakoutRoom(named: name) }
                     newRoomName = ""
                 }
+            } header: {
+                Text("Create Room")
             }
 
-            Section("Rooms") {
+            Section {
                 if manager.breakoutRooms.isEmpty {
                     ContentUnavailableView(
                         "No Breakout Rooms",
@@ -28,6 +30,8 @@ struct BreakoutRoomsView: View {
                         BreakoutRoomCardView(room: room, participants: manager.participants)
                     }
                 }
+            } header: {
+                Text("Rooms")
             }
         }
         .navigationTitle("Breakout Rooms")

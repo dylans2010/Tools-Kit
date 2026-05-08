@@ -40,7 +40,7 @@ struct ConnectorDetailView<T: BaseConnector>: View {
             }
 
             // MARK: - Connection Details
-            Section("Connection Details") {
+            Section {
                 HStack {
                     Text("Connection Status")
                     Spacer()
@@ -87,10 +87,12 @@ struct ConnectorDetailView<T: BaseConnector>: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+            } header: {
+                Text("Connection Details")
             }
 
             // MARK: - Actions
-            Section("Actions") {
+            Section {
                 Button {
                     isTesting = true
                     Task {
@@ -132,6 +134,8 @@ struct ConnectorDetailView<T: BaseConnector>: View {
                 } label: {
                     Label("Disconnect", systemImage: "xmark.circle")
                 }
+            } header: {
+                Text("Actions")
             }
 
             // MARK: - Activity Log
@@ -144,7 +148,7 @@ struct ConnectorDetailView<T: BaseConnector>: View {
                 .pickerStyle(.segmented)
             }
 
-            Section("Activity Log (\(filteredActivityLog.count))") {
+            Section {
                 if filteredActivityLog.isEmpty {
                     Text("No activity recorded.")
                         .font(.caption)
@@ -188,6 +192,8 @@ struct ConnectorDetailView<T: BaseConnector>: View {
                         }
                     }
                 }
+            } header: {
+                Text("Activity Log (\(filteredActivityLog.count))")
             }
         }
         .navigationTitle(connector.name)

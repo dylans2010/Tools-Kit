@@ -30,7 +30,7 @@ struct CreateHabitView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Habit Details") {
+                Section {
                     HStack {
                         Button {
                             showingIconPicker = true
@@ -55,9 +55,11 @@ struct CreateHabitView: View {
                     }
 
                     Stepper("Target: \(targetCount)x Per Day", value: $targetCount, in: 1...20)
+                } header: {
+                    Text("Habit Details")
                 }
 
-                Section("Color") {
+                Section {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8), spacing: 12) {
                         ForEach(presetColors, id: \.0) { hex, color in
                             Circle()
@@ -72,6 +74,8 @@ struct CreateHabitView: View {
                         }
                     }
                     .padding(.vertical, 4)
+                } header: {
+                    Text("Color")
                 }
 
                 Section {

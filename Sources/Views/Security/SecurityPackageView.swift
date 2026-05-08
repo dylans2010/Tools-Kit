@@ -14,15 +14,19 @@ struct SecurityPackageView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Backup") {
+                Section {
                     Label("Create Encrypted Package", systemImage: "archivebox.fill")
                     SecureField("Master Password", text: $password)
                     Button { exportVault() } label: { Label("Export Vault", systemImage: "square.and.arrow.up") }
                         .disabled(password.isEmpty || isWorking)
+                } header: {
+                    Text("Backup")
                 }
-                Section("Restore") {
+                Section {
                     Button { showingImportPicker = true } label: { Label("Import Vault", systemImage: "square.and.arrow.down") }
                     Button { showingImportBridge = true } label: { Label("Import File", systemImage: "doc.badge.plus") }
+                } header: {
+                    Text("Restore")
                 }
                 if let statusMessage { Label(statusMessage, systemImage: isError ? "xmark.circle.fill" : "checkmark.circle.fill").foregroundStyle(isError ? .red : .green) }
             }

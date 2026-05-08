@@ -8,7 +8,7 @@ struct GitHubConflictResolutionView: View {
 
     var body: some View {
         List {
-            Section("Merge Conflicts Detected") {
+            Section {
                 ForEach(conflicts) { conflict in
                     VStack(alignment: .leading, spacing: 12) {
                         Text(conflict.fileName).font(.caption.bold()).foregroundStyle(.secondary)
@@ -35,6 +35,8 @@ struct GitHubConflictResolutionView: View {
                     }
                     .padding(.vertical, 8)
                 }
+            } header: {
+                Text("Merge Conflicts Detected")
             }
         }
         .navigationTitle("Conflict Resolution")

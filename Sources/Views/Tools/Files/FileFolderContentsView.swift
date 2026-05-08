@@ -162,8 +162,10 @@ private struct CreateFolderSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Folder Name") {
+                Section {
                     TextField("Name", text: $name)
+                } header: {
+                    Text("Folder Name")
                 }
                 Button("Create Folder") {
                     onCreate(name)
@@ -188,13 +190,15 @@ private struct CreateFileSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("File Details") {
+                Section {
                     TextField("Name", text: $name)
                     Picker("Type", selection: $type) {
                         ForEach(ManagedFileType.allCases) { t in
                             Text(".\(t.rawValue)").tag(t)
                         }
                     }
+                } header: {
+                    Text("File Details")
                 }
                 Button("Create File") {
                     onCreate(name, type)

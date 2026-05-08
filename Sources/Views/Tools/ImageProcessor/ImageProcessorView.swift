@@ -31,7 +31,7 @@ struct ImageProcessorView: View {
                         }
                     }
                 }
-                .onChange(of: selectedItem) { newItem in
+                .onChange(of: selectedItem) { _, newItem in
                     Task {
                         if let data = try? await newItem?.loadItemContent(type: .data) {
                             if let image = UIImage(data: data) {

@@ -24,7 +24,7 @@ struct ProjectCreateView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Project Details") {
+                Section {
                     TextField("Project Name", text: $name)
                     TextEditor(text: $description)
                         .frame(minHeight: 80)
@@ -37,9 +37,11 @@ struct ProjectCreateView: View {
                                     .allowsHitTesting(false)
                             }
                         }
+                } header: {
+                    Text("Project Details")
                 }
 
-                Section("Icon") {
+                Section {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8), spacing: 12) {
                         ForEach(icons, id: \.self) { icon in
                             Button {
@@ -55,9 +57,11 @@ struct ProjectCreateView: View {
                         }
                     }
                     .padding(.vertical, 4)
+                } header: {
+                    Text("Icon")
                 }
 
-                Section("Color") {
+                Section {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 10), spacing: 10) {
                         ForEach(colors, id: \.0) { hex, _ in
                             Button {
@@ -75,6 +79,8 @@ struct ProjectCreateView: View {
                         }
                     }
                     .padding(.vertical, 4)
+                } header: {
+                    Text("Color")
                 }
             }
             .navigationTitle("New Project")

@@ -16,7 +16,7 @@ struct CurrencyConverterView: View {
                             TextField("Amount", text: $backend.amount)
                                 .keyboardType(.decimalPad)
                                 .font(.system(size: 32, weight: .bold, design: .rounded))
-                                .onChange(of: backend.amount) { _ in backend.convert() }
+                                .onChange(of: backend.amount) { _, _ in backend.convert() }
 
                             Spacer()
 

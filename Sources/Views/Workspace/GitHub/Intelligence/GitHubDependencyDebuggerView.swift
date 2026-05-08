@@ -22,11 +22,13 @@ struct GitHubDependencyDebuggerView: View {
                 .frame(maxWidth: .infinity)
             }
 
-            Section("Module Chains") {
+            Section {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("System Discovery").font(.subheadline.bold())
                     Text("Scanning real .swift files for 'import' statements.").font(.caption2).foregroundStyle(.secondary)
                 }
+            } header: {
+                Text("Module Chains")
             }
         }
         .navigationTitle("Dependency Debugger")

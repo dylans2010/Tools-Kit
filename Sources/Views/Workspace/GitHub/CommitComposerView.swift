@@ -30,14 +30,18 @@ struct CommitComposerView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section("Commit Message") {
+                Section {
                     TextField("Update \(path)", text: $message)
+                } header: {
+                    Text("Commit Message")
                 }
 
-                Section("Content") {
+                Section {
                     TextEditor(text: $content)
                         .font(.system(.body, design: .monospaced))
                         .frame(minHeight: 200)
+                } header: {
+                    Text("Content")
                 }
             }
             .navigationTitle("Commit Changes")

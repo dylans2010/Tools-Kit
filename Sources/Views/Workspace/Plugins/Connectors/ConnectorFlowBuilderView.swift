@@ -206,7 +206,7 @@ struct ConnectorFlowBuilderView: View {
     // MARK: - Validation
 
     private var validationSection: some View {
-        Section("Validation Issues") {
+        Section {
             ForEach(validationErrors, id: \.self) { error in
                 HStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle.fill")
@@ -217,6 +217,8 @@ struct ConnectorFlowBuilderView: View {
                         .foregroundColor(.orange)
                 }
             }
+        } header: {
+            Text("Validation Issues")
         }
     }
 
@@ -367,7 +369,7 @@ struct ConnectorFlowBuilderView: View {
     private var templatePickerSheet: some View {
         NavigationView {
             List {
-                Section("Starter Templates") {
+                Section {
                     Button {
                         applyTemplate(name: "Basic API Sync", steps: [
                             FlowStep(type: .trigger, config: ["name": "Scheduled Sync", "event": "schedule.hourly"]),
@@ -419,6 +421,8 @@ struct ConnectorFlowBuilderView: View {
                                 .foregroundColor(.secondary)
                         }
                     }
+                } header: {
+                    Text("Starter Templates")
                 }
             }
             .navigationTitle("Flow Templates")

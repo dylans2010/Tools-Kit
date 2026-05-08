@@ -4,7 +4,7 @@ struct VideoSettingsView: View {
     @ObservedObject var manager: MeetingStateManager
 
     var body: some View {
-        Section("Video") {
+        Section {
             if manager.videoDeviceOptions.isEmpty {
                 Text("No video devices reported by runtime.")
                     .foregroundStyle(.secondary)
@@ -21,6 +21,8 @@ struct VideoSettingsView: View {
                     Text(quality.rawValue).tag(quality)
                 }
             }
+        } header: {
+            Text("Video")
         }
     }
 }

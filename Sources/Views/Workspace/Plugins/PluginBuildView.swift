@@ -146,7 +146,7 @@ export async function onEvent(event, ctx) {
     // MARK: - Sections
 
     private var identitySection: some View {
-        Section("Plugin Identity") {
+        Section {
             TextField("Name", text: $name)
             TextField("Description", text: $description)
             TextField("Author", text: $author)
@@ -170,11 +170,13 @@ export async function onEvent(event, ctx) {
             .onTapGesture {
                 if isIdentifierLocked { showingIdentifierLockAlert = true }
             }
+        } header: {
+            Text("Plugin Identity")
         }
     }
 
     private var capabilitiesSection: some View {
-        Section("Capabilities (System Access)") {
+        Section {
             ForEach(PluginCapability.allCases) { cap in
                 Toggle(isOn: Binding(
                     get: { selectedCapabilities.contains(cap) },
@@ -190,11 +192,13 @@ export async function onEvent(event, ctx) {
                     Label(cap.displayName, systemImage: cap.icon)
                 }
             }
+        } header: {
+            Text("Capabilities (System Access)")
         }
     }
 
     private var actionsSection: some View {
-        Section("Actions (Event Subscriptions)") {
+        Section {
             if selectedCapabilities.isEmpty {
                 Text("Select Capabilities First").foregroundColor(.secondary).font(.caption)
             } else {
@@ -208,11 +212,13 @@ export async function onEvent(event, ctx) {
                     ))
                 }
             }
+        } header: {
+            Text("Actions (Event Subscriptions)")
         }
     }
 
     private var securitySection: some View {
-        Section("Security & Scopes") {
+        Section {
             let highRiskSelected = selectedCapabilities.contains { $0.riskLevel == .high }
 
             if highRiskSelected {
@@ -239,11 +245,13 @@ export async function onEvent(event, ctx) {
             } else {
                 Text("No high-risk scopes selected.").font(.caption).foregroundColor(.secondary)
             }
+        } header: {
+            Text("Security & Scopes")
         }
     }
 
     private var externalEndpointsSection: some View {
-        Section("External Endpoints") {
+        Section {
             ForEach(endpoints) { endpoint in
                 HStack {
                     VStack(alignment: .leading) {
@@ -267,11 +275,13 @@ export async function onEvent(event, ctx) {
             Button(action: { showingAddEndpoint = true }) {
                 Label("Add Endpoint", systemImage: "plus.circle")
             }
+        } header: {
+            Text("External Endpoints")
         }
     }
 
     private var logicEditorSection: some View {
-        Section("Logic Editor (JS)") {
+        Section {
             VStack(alignment: .leading) {
                 Text("Source Code").font(.caption).foregroundColor(.secondary)
                 TextEditor(text: $sourceCode)
@@ -286,11 +296,13 @@ export async function onEvent(event, ctx) {
                     .font(.system(size: 10, design: .monospaced))
                     .foregroundColor(.blue)
             }
+        } header: {
+            Text("Logic Editor (JS)")
         }
     }
 
     private var dataMappingSection: some View {
-        Section("Data Mapping") {
+        Section {
             ForEach($dataMappings) { $mapping in
                 VStack {
                     TextField("Source (e.g. event.note.content)", text: $mapping.sourceField)
@@ -309,11 +321,13 @@ export async function onEvent(event, ctx) {
             Button("Add Mapping") {
                 dataMappings.append(DataMapping(sourceField: "", targetField: ""))
             }
+        } header: {
+            Text("Data Mapping")
         }
     }
 
     private var executionRulesSection: some View {
-        Section("Execution Rules") {
+        Section {
             ForEach($executionRules) { $rule in
                 VStack {
                     Picker("Type", selection: $rule.type) {
@@ -330,11 +344,13 @@ export async function onEvent(event, ctx) {
             Button("Add Rule") {
                 executionRules.append(ExecutionRule(type: .eventFilter, condition: "true"))
             }
+        } header: {
+            Text("Execution Rules")
         }
     }
 
     private var uiInjectionSection: some View {
-        Section("UI Injection") {
+        Section {
             VStack(alignment: .leading, spacing: 12) {
                 Text("UI Configuration").font(.headline)
 
@@ -372,6 +388,8 @@ export async function onEvent(event, ctx) {
             Button("Add UI Extension") {
                 uiExtensions.append(UIExtension(type: .overlay, component: .button, targetView: "", actionBinding: ""))
             }
+        } header: {
+            Text("UI Injection")
         }
     }
 
@@ -386,7 +404,7 @@ export async function onEvent(event, ctx) {
     }
 
     private var toolkitSection: some View {
-        Section("Plugin Toolkit") {
+        Section {
             ForEach($toolkitTools) { $tool in
                 VStack {
                     Picker("Category", selection: $tool.category) {
@@ -406,6 +424,8 @@ export async function onEvent(event, ctx) {
             Button("Add Toolkit Tool") {
                 toolkitTools.append(PluginToolkitTool(name: "AI Text Summarizer", category: .ai, config: [:]))
             }
+        } header: {
+            Text("Plugin Toolkit")
         }
     }
 
@@ -423,7 +443,7 @@ export async function onEvent(event, ctx) {
     }
 
     private var testingSection: some View {
-        Section("Test Plugin (Sandbox)") {
+        Section {
             TextEditor(text: $testEventPayload)
                 .font(.system(.caption, design: .monospaced))
                 .frame(minHeight: 100)
@@ -444,11 +464,13 @@ export async function onEvent(event, ctx) {
                     }
                 }
             }
+        } header: {
+            Text("Test Plugin (Sandbox)")
         }
     }
 
     private var releaseSection: some View {
-        Section("Release & Versioning") {
+        Section {
             TextField("Version", text: $version)
             TextEditor(text: $releaseNotes)
                 .frame(minHeight: 100)
@@ -486,6 +508,8 @@ export async function onEvent(event, ctx) {
                     Text(entry.notes).font(.caption)
                 }
             }
+        } header: {
+            Text("Release & Versioning")
         }
     }
 
@@ -668,24 +692,30 @@ struct AddEndpointView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section("Basic Info") {
+                Section {
                     TextField("Endpoint Name", text: $name)
                     TextField("Base URL", text: $baseURL)
                     TextField("Path", text: $path)
                     Picker("Method", selection: $method) {
                         ForEach(HTTPMethod.allCases, id: \.self) { Text($0.rawValue).tag($0) }
                     }
+                } header: {
+                    Text("Basic Info")
                 }
 
-                Section("Authentication") {
+                Section {
                     Picker("Auth Type", selection: $authType) {
                         ForEach(AuthType.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
                     }
+                } header: {
+                    Text("Authentication")
                 }
 
-                Section("Configuration") {
+                Section {
                     Text("Headers, Query Params, and Body Schema can be edited after creation.")
                         .font(.caption).foregroundColor(.secondary)
+                } header: {
+                    Text("Configuration")
                 }
             }
             .navigationTitle("Add Endpoint")
@@ -728,16 +758,18 @@ struct EditEndpointView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section("API Details") {
+                Section {
                     TextField("Name", text: $endpoint.name)
                     TextField("Base URL", text: $endpoint.baseURL)
                     TextField("Path", text: $endpoint.path)
                     Picker("Method", selection: $endpoint.method) {
                         ForEach(HTTPMethod.allCases, id: \.self) { Text($0.rawValue).tag($0) }
                     }
+                } header: {
+                    Text("API Details")
                 }
 
-                Section("Headers") {
+                Section {
                     ForEach(Array(endpoint.headers.keys.sorted()), id: \.self) { key in
                         HStack {
                             Text(key).bold()
@@ -779,9 +811,11 @@ struct EditEndpointView: View {
                         }
                     }
                     .padding(.vertical, 4)
+                } header: {
+                    Text("Headers")
                 }
 
-                Section("Query Parameters") {
+                Section {
                     ForEach(Array(endpoint.queryParams.keys.sorted()), id: \.self) { key in
                         HStack {
                             Text(key).bold()
@@ -804,15 +838,19 @@ struct EditEndpointView: View {
                         }
                         .disabled(newParamKey.isEmpty)
                     }
+                } header: {
+                    Text("Query Parameters")
                 }
 
-                Section("Body Schema (JSON)") {
+                Section {
                     TextEditor(text: Binding(
                         get: { endpoint.bodySchema ?? "" },
                         set: { endpoint.bodySchema = $0.isEmpty ? nil : $0 }
                     ))
                     .font(.system(.caption, design: .monospaced))
                     .frame(minHeight: 100)
+                } header: {
+                    Text("Body Schema (JSON)")
                 }
             }
             .navigationTitle("Edit Endpoint")

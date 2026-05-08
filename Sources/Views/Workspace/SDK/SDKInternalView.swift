@@ -16,7 +16,7 @@ struct SDKInternalView: View {
 
     var body: some View {
         List {
-            Section("Rate Limit Monitor") {
+            Section {
                 ForEach(rateLimitLines, id: \.self) { line in
                     Text(line).font(.system(.caption, design: .monospaced))
                 }
@@ -26,9 +26,11 @@ struct SDKInternalView: View {
                         rateUsage = await SDKRateLimiter.shared.currentUsage()
                     }
                 }
+            } header: {
+                Text("Rate Limit Monitor")
             }
 
-            Section("Scope Inspector") {
+            Section {
                 ForEach(policyEngine.availableScopes(), id: \.name) { scope in
                     HStack {
                         Text(scope.name)
@@ -39,9 +41,11 @@ struct SDKInternalView: View {
                             .foregroundStyle(scope.riskLevel == .critical || scope.riskLevel == .high ? .red : .secondary)
                     }
                 }
+            } header: {
+                Text("Scope Inspector")
             }
 
-            Section("Privacy Inspector") {
+            Section {
                 ForEach(privacyManager.exposureLogs.prefix(20)) { log in
                     VStack(alignment: .leading, spacing: 3) {
                         Text(log.scope).font(.caption.bold())
@@ -50,9 +54,11 @@ struct SDKInternalView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+            } header: {
+                Text("Privacy Inspector")
             }
 
-            Section("Raw Data Explorer") {
+            Section {
                 Picker("Scope", selection: $rawScope) {
                     ForEach(SDKScope.allCases, id: \.self) { scope in
                         Text(String(describing: scope)).tag(scope)
@@ -67,9 +73,11 @@ struct SDKInternalView: View {
                 if !rawData.isEmpty {
                     Text(rawData).font(.system(.caption, design: .monospaced))
                 }
+            } header: {
+                Text("Raw Data Explorer")
             }
 
-            Section("Endpoint Tester") {
+            Section {
                 TextField("URL", text: $endpointURL)
                     .textInputAutocapitalization(.never)
                 Button("Test Endpoint") {
@@ -85,9 +93,11 @@ struct SDKInternalView: View {
                 if !endpointResult.isEmpty {
                     Text(endpointResult).font(.system(.caption, design: .monospaced))
                 }
+            } header: {
+                Text("Endpoint Tester")
             }
 
-            Section("Execution Trace Viewer") {
+            Section {
                 ForEach(SDKExecutionEngine.shared.executionHistory.prefix(20)) { entry in
                     HStack {
                         Text(entry.actionLabel)
@@ -97,9 +107,11 @@ struct SDKInternalView: View {
                     }
                     .font(.caption)
                 }
+            } header: {
+                Text("Execution Trace Viewer")
             }
 
-            Section("Audit Logs Panel") {
+            Section {
                 Picker("Type", selection: $selectedEventType) {
                     Text("All").tag(Optional<SDKAuditLogger.Event.EventType>.none)
                     ForEach(SDKAuditLogger.Event.EventType.allCases, id: \.self) { type in
@@ -114,15 +126,19 @@ struct SDKInternalView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+            } header: {
+                Text("Audit Logs Panel")
             }
 
-            Section("Sensitive Operations") {
+            Section {
                 ForEach(securityManager.sensitiveOperations.prefix(20)) { op in
                     VStack(alignment: .leading, spacing: 3) {
                         Text(op.scope).font(.caption.bold())
                         Text(op.reason).font(.caption2).foregroundStyle(.secondary)
                     }
                 }
+            } header: {
+                Text("Sensitive Operations")
             }
         }
         .navigationTitle("SDK Internal")

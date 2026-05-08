@@ -125,7 +125,7 @@ struct SDKBuildView: View {
 
     @ViewBuilder
     private func projectMetadataEditorSection(_ project: SDKProject) -> some View {
-        Section("Project Metadata") {
+        Section {
             Button {
                 metadataName = project.name
                 metadataDescription = project.description
@@ -149,12 +149,14 @@ struct SDKBuildView: View {
                 }
             }
             .buttonStyle(.plain)
+        } header: {
+            Text("Project Metadata")
         }
     }
 
     private var metadataSheetContent: some View {
         Form {
-            Section("Details") {
+            Section {
                 TextField("Project name", text: $metadataName)
                 TextField("Description", text: $metadataDescription, axis: .vertical)
                     .lineLimit(3...5)
@@ -163,14 +165,20 @@ struct SDKBuildView: View {
                         Text(status.rawValue.capitalized).tag(status)
                     }
                 }
+            } header: {
+                Text("Details")
             }
 
-            Section("Access") {
+            Section {
                 scopeSelector
+            } header: {
+                Text("Access")
             }
 
-            Section("Assignments") {
+            Section {
                 connectorAndToolAssignment
+            } header: {
+                Text("Assignments")
             }
         }
         .navigationTitle("Project Metadata")
@@ -219,7 +227,7 @@ struct SDKBuildView: View {
     }
 
     private var buildConfigSection: some View {
-        Section("Build Configuration") {
+        Section {
             Picker("Mode", selection: $buildMode) {
                 ForEach(BuildMode.allCases, id: \.self) { mode in
                     Text(mode.rawValue).tag(mode)
@@ -238,13 +246,15 @@ struct SDKBuildView: View {
             Toggle("Code Signing", isOn: $codeSigningEnabled)
             Toggle("Optimize Assets", isOn: $optimizeAssets)
             Toggle("Parallel Build", isOn: $parallelBuild)
+        } header: {
+            Text("Build Configuration")
         }
     }
 
     // MARK: - Build Actions
 
     private var buildActionsSection: some View {
-        Section("Actions") {
+        Section {
             Button(action: startBuild) {
                 if isBuilding {
                     HStack {
@@ -279,6 +289,8 @@ struct SDKBuildView: View {
             }
             .disabled(isBuilding)
             .foregroundStyle(.orange)
+        } header: {
+            Text("Actions")
         }
     }
 
@@ -287,7 +299,7 @@ struct SDKBuildView: View {
     @ViewBuilder
     private var buildOutputSection: some View {
         if let url = exportedURL {
-            Section("Build Output") {
+            Section {
                 HStack {
                     Image(systemName: "doc.zipper")
                         .font(.title2)
@@ -299,14 +311,18 @@ struct SDKBuildView: View {
                     Spacer()
                     ShareLink(item: url)
                 }
+            } header: {
+                Text("Build Output")
             }
         }
 
         if let error = errorMessage {
-            Section("Build Errors") {
+            Section {
                 Label(error, systemImage: "exclamationmark.triangle.fill")
                     .foregroundStyle(.red)
                     .font(.subheadline)
+            } header: {
+                Text("Build Errors")
             }
         }
     }
@@ -314,7 +330,7 @@ struct SDKBuildView: View {
     // MARK: - Build Metrics
 
     private var buildMetricsSection: some View {
-        Section("Build Metrics") {
+        Section {
             let metrics = telemetry.getMetrics()
             HStack {
                 Text("Total Executions")
@@ -344,13 +360,15 @@ struct SDKBuildView: View {
                     .font(.system(.body, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
+        } header: {
+            Text("Build Metrics")
         }
     }
 
     // MARK: - Development Tools
 
     private var developmentToolsSection: some View {
-        Section("Development") {
+        Section {
             NavigationLink { SDKActionConsoleView() } label: {
                 toolkitRow(icon: "terminal", color: .teal, title: "Action Console", subtitle: "Execute SDK commands")
             }
@@ -370,6 +388,8 @@ struct SDKBuildView: View {
             NavigationLink { SDKEventStreamView() } label: {
                 toolkitRow(icon: "waveform.path.ecg", color: .purple, title: "Event Stream", subtitle: "Live system events")
             }
+        } header: {
+            Text("Development")
         }
     }
 
@@ -377,7 +397,7 @@ struct SDKBuildView: View {
 
     @ViewBuilder
     private func projectConfigSection(_ project: SDKProject) -> some View {
-        Section("Configuration") {
+        Section {
             NavigationLink {
                 SDKPermissionControlView(project: Binding(
                     get: { projectManager.currentProject ?? project },
@@ -407,13 +427,15 @@ struct SDKBuildView: View {
             NavigationLink { SDKToolsView() } label: {
                 toolkitRow(icon: "wrench.and.screwdriver.fill", color: .gray, title: "Tools", subtitle: "Data utilities")
             }
+        } header: {
+            Text("Configuration")
         }
     }
 
     // MARK: - Monitoring & Security
 
     private var monitoringSection: some View {
-        Section("Monitoring & Security") {
+        Section {
             NavigationLink { SDKDiagnosticsView() } label: {
                 toolkitRow(icon: "heart.text.square.fill", color: .red, title: "Diagnostics", subtitle: "System health check")
             }
@@ -429,13 +451,15 @@ struct SDKBuildView: View {
             NavigationLink { SDKDataControlView() } label: {
                 toolkitRow(icon: "externaldrive.fill", color: .orange, title: "Data Control", subtitle: "Data operations")
             }
+        } header: {
+            Text("Monitoring & Security")
         }
     }
 
     // MARK: - Explore
 
     private var exploreSection: some View {
-        Section("Explore") {
+        Section {
             Button { showingSystemExplorer = true } label: {
                 toolkitRow(icon: "cpu", color: .teal, title: "System Explorer", subtitle: "Workspace API graph")
             }
@@ -447,6 +471,8 @@ struct SDKBuildView: View {
             NavigationLink { SDKAPIBrowserView() } label: {
                 toolkitRow(icon: "book.closed.fill", color: .indigo, title: "API Browser", subtitle: "Browse SDK methods")
             }
+        } header: {
+            Text("Explore")
         }
     }
 
@@ -454,7 +480,7 @@ struct SDKBuildView: View {
 
     @ViewBuilder
     private func deploySection(_ project: SDKProject) -> some View {
-        Section("Build & Deploy") {
+        Section {
             NavigationLink { SDKIntegrationTestView() } label: {
                 toolkitRow(icon: "testtube.2", color: .green, title: "Integration Tests", subtitle: "Run test scenarios")
             }
@@ -466,6 +492,8 @@ struct SDKBuildView: View {
             NavigationLink { SDKDeploymentView(project: project) } label: {
                 toolkitRow(icon: "icloud.and.arrow.up", color: .blue, title: "Deployment", subtitle: "Deploy project")
             }
+        } header: {
+            Text("Build & Deploy")
         }
     }
 

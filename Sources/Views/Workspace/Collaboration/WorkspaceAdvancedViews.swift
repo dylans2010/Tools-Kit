@@ -3,7 +3,7 @@ import SwiftUI
 struct WorkspaceAdvancedHomeView: View {
     var body: some View {
         List {
-            Section("Advanced Features") {
+            Section {
                 NavigationLink(destination: WorkspaceSnapshotView()) {
                     Label("Snapshots", systemImage: "camera.fill")
                 }
@@ -13,15 +13,19 @@ struct WorkspaceAdvancedHomeView: View {
                 NavigationLink(destination: WorkspaceAutomationView()) {
                     Label("Automations", systemImage: "bolt.fill")
                 }
+            } header: {
+                Text("Advanced Features")
             }
 
-            Section("Workspace Utilities") {
+            Section {
                 NavigationLink(destination: WorkspaceGlobalSearchView()) {
                     Label("Global Search", systemImage: "magnifyingglass")
                 }
                 NavigationLink(destination: WorkspaceToolsPanelView()) {
                     Label("Workspace Tools", systemImage: "wrench.and.screwdriver.fill")
                 }
+            } header: {
+                Text("Workspace Utilities")
             }
         }
         .navigationTitle("Advanced Workspace")
@@ -158,7 +162,7 @@ struct WorkspaceToolsPanelView: View {
 
     var body: some View {
         List {
-            Section("Analytics") {
+            Section {
                 Button {
                     if let id = spaceID { analytics.fetchAnalytics(for: id) }
                 } label: {
@@ -168,9 +172,11 @@ struct WorkspaceToolsPanelView: View {
                     LabeledContent("Total Commits", value: "\(analytics.totalCommits)")
                     LabeledContent("Active Users", value: "\(analytics.activeUsersCount)")
                 }
+            } header: {
+                Text("Analytics")
             }
 
-            Section("Integrity") {
+            Section {
                 Button {
                     integrity.runScan()
                 } label: {
@@ -185,9 +191,11 @@ struct WorkspaceToolsPanelView: View {
                 ForEach(integrity.issues) { issue in
                     IntegrityIssueRow(issue: issue)
                 }
+            } header: {
+                Text("Integrity")
             }
 
-            Section("Reports") {
+            Section {
                 Button {
                     generatedReport = generateFullReport()
                     showingReport = true
@@ -204,9 +212,11 @@ struct WorkspaceToolsPanelView: View {
                     Label("Clean Unused Data", systemImage: "trash")
                         .foregroundStyle(.orange)
                 }
+            } header: {
+                Text("Reports")
             }
 
-            Section("Notifications (\(notif.unreadCount) unread)") {
+            Section {
                 ForEach(notif.notifications.prefix(5)) { n in
                     NotificationRow(notification: n)
                 }
@@ -217,6 +227,8 @@ struct WorkspaceToolsPanelView: View {
                     Button("Mark All Read") { notif.markAllRead() }
                         .foregroundStyle(.blue)
                 }
+            } header: {
+                Text("Notifications (\(notif.unreadCount) unread)")
             }
         }
         .navigationTitle("Workspace Tools")

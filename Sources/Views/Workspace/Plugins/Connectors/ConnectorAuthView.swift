@@ -58,7 +58,7 @@ struct ConnectorAuthView<T: BaseConnector>: View {
                     }
                 }
 
-                Section("Connector Data") {
+                Section {
                     LabeledContent("Connector ID", value: connector.id.uuidString)
                     LabeledContent("Auth Fields", value: "\(connector.authFields.count)")
                     LabeledContent("Activity Events", value: "\(connector.activityLog.count)")
@@ -74,10 +74,12 @@ struct ConnectorAuthView<T: BaseConnector>: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
+                } header: {
+                    Text("Connector Data")
                 }
 
                 // MARK: - Auth Fields
-                Section("Authentication Fields") {
+                Section {
                     if connector.authFields.isEmpty {
                         Text("No authentication fields required for this connector.")
                             .font(.caption)
@@ -124,11 +126,13 @@ struct ConnectorAuthView<T: BaseConnector>: View {
                             .padding(.vertical, 2)
                         }
                     }
+                } header: {
+                    Text("Authentication Fields")
                 }
 
                 // MARK: - Error
                 if let error = error {
-                    Section("Error") {
+                    Section {
                         HStack(spacing: 8) {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .foregroundColor(.red)
@@ -143,6 +147,8 @@ struct ConnectorAuthView<T: BaseConnector>: View {
                             Text("Dismiss Error")
                                 .font(.caption)
                         }
+                    } header: {
+                        Text("Error")
                     }
                 }
 
@@ -180,7 +186,7 @@ struct ConnectorAuthView<T: BaseConnector>: View {
                 }
 
                 if !connector.activityLog.isEmpty {
-                    Section("Authentication Activity") {
+                    Section {
                         ForEach(connector.activityLog.prefix(5)) { event in
                             VStack(alignment: .leading, spacing: 3) {
                                 Text(event.message).font(.caption)
@@ -189,11 +195,13 @@ struct ConnectorAuthView<T: BaseConnector>: View {
                                     .foregroundStyle(.secondary)
                             }
                         }
+                    } header: {
+                        Text("Authentication Activity")
                     }
                 }
 
                 // MARK: - Help
-                Section("Help") {
+                Section {
                     DisclosureGroup("Authentication Guide") {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("1. Fill in all required authentication fields above.")
@@ -208,6 +216,8 @@ struct ConnectorAuthView<T: BaseConnector>: View {
                         .foregroundColor(.secondary)
                         .padding(.vertical, 4)
                     }
+                } header: {
+                    Text("Help")
                 }
             }
             .navigationTitle("Authenticate \(connector.name)")

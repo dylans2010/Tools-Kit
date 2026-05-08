@@ -56,7 +56,7 @@ struct ConnectorExecutionView: View {
         }
         .navigationTitle("Live Execution")
         .background(Color(.systemGroupedBackground))
-        .onChange(of: isRunning) { running in
+        .onChange(of: isRunning) { _, running in
             if running {
                 executionStartTime = Date()
                 startTimer()
@@ -333,7 +333,7 @@ struct ConnectorExecutionView: View {
     private var executionParametersSheet: some View {
         NavigationView {
             Form {
-                Section("Execution Mode") {
+                Section {
                     Picker("Mode", selection: $executionMode) {
                         ForEach(ExecutionMode.allCases, id: \.self) { mode in
                             Text(mode.rawValue).tag(mode)
@@ -351,18 +351,24 @@ struct ConnectorExecutionView: View {
                         Text("Simulate execution without making real API calls.")
                             .font(.caption).foregroundColor(.secondary)
                     }
+                } header: {
+                    Text("Execution Mode")
                 }
 
-                Section("Pipeline Summary") {
+                Section {
                     LabeledContent("Steps", value: "\(connector.flow.steps.count)")
                     LabeledContent("Endpoints", value: "\(connector.endpoints.count)")
                     LabeledContent("Auth Type", value: connector.authConfig.type.rawValue.capitalized)
+                } header: {
+                    Text("Pipeline Summary")
                 }
 
-                Section("Environment") {
+                Section {
                     LabeledContent("Connector", value: connector.name)
                     LabeledContent("Version", value: "v\(connector.version)")
                     LabeledContent("Status", value: connector.status.rawValue.capitalized)
+                } header: {
+                    Text("Environment")
                 }
             }
             .navigationTitle("Execution Parameters")

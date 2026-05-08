@@ -52,7 +52,7 @@ struct MarketplaceView: View {
             }
 
             if selectedTab == .plugins {
-                Section("Categories") {
+                Section {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
                             FilterChip(title: "All", isSelected: selectedCategory == nil) {
@@ -67,9 +67,11 @@ struct MarketplaceView: View {
                         }
                         .padding(.vertical, 4)
                     }
+                } header: {
+                    Text("Categories")
                 }
 
-                Section("Discover Plugins") {
+                Section {
                     if filteredPlugins.isEmpty {
                         Text("No Plugins Found").foregroundColor(.secondary).font(.subheadline)
                     } else {
@@ -79,9 +81,11 @@ struct MarketplaceView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Discover Plugins")
                 }
             } else {
-                Section("SDK Projects & Apps") {
+                Section {
                     if filteredSDKApps.isEmpty {
                         ContentUnavailableView("No SDK Apps", systemImage: "puzzlepiece.extension", description: Text("Apps built with WorkspaceSDK will appear here."))
                     } else {
@@ -89,6 +93,8 @@ struct MarketplaceView: View {
                             MarketplaceSDKAppRow(app: app, isRunning: sdkRuntime.isRunning(app.id))
                         }
                     }
+                } header: {
+                    Text("SDK Projects & Apps")
                 }
             }
         }

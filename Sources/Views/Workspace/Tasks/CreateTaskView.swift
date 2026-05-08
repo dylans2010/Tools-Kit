@@ -18,7 +18,7 @@ struct CreateTaskView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Task Details") {
+                Section {
                     TextField("Task title", text: $title)
                     ZStack(alignment: .topLeading) {
                         if description.isEmpty {
@@ -30,9 +30,11 @@ struct CreateTaskView: View {
                         TextEditor(text: $description)
                             .frame(minHeight: 80)
                     }
+                } header: {
+                    Text("Task Details")
                 }
 
-                Section("Priority") {
+                Section {
                     Picker("Priority", selection: $priority) {
                         ForEach(WorkspaceTask.TaskPriority.allCases, id: \.self) { p in
                             Label(p.rawValue, systemImage: p.icon)
@@ -40,17 +42,21 @@ struct CreateTaskView: View {
                         }
                     }
                     .pickerStyle(.segmented)
+                } header: {
+                    Text("Priority")
                 }
 
-                Section("Due Date") {
+                Section {
                     Toggle("Set Due Date", isOn: $hasDueDate)
                     if hasDueDate {
                         DatePicker("Due Date", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
                             .datePickerStyle(.compact)
                     }
+                } header: {
+                    Text("Due Date")
                 }
 
-                Section("Category") {
+                Section {
                     Picker("Category", selection: $categoryID) {
                         Text("None").tag(Optional<UUID>.none)
                         ForEach(manager.categories) { cat in
@@ -58,6 +64,8 @@ struct CreateTaskView: View {
                                 .tag(Optional(cat.id))
                         }
                     }
+                } header: {
+                    Text("Category")
                 }
 
                 Section {

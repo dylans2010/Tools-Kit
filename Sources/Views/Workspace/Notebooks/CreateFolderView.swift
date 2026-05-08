@@ -52,11 +52,13 @@ struct CreateFolderView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Folder Name") {
+                Section {
                     TextField("Enter Folder Name", text: $name)
+                } header: {
+                    Text("Folder Name")
                 }
 
-                Section("Templates") {
+                Section {
                     ForEach(FolderTemplate.allCases) { template in
                         Button(action: { selectedTemplate = template; name = template.rawValue }) {
                             HStack {
@@ -70,6 +72,8 @@ struct CreateFolderView: View {
                         }
                         .foregroundColor(.primary)
                     }
+                } header: {
+                    Text("Templates")
                 }
             }
             .navigationTitle("New Folder")

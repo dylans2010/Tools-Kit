@@ -14,7 +14,7 @@ struct SDKWorkspaceExplorerView: View {
 
             HStack(spacing: 0) {
                 List {
-                    Section("Nodes (\(filteredNodes.count))") {
+                    Section {
                         ForEach(filteredNodes) { node in
                             Button { selectedNode = node } label: {
                                 HStack {
@@ -27,9 +27,11 @@ struct SDKWorkspaceExplorerView: View {
                                 }
                             }
                         }
+                    } header: {
+                        Text("Nodes (\(filteredNodes.count))")
                     }
 
-                    Section("Relationships (\(graphEdges.count))") {
+                    Section {
                         if graphEdges.isEmpty {
                             Text("No relationships found").foregroundStyle(.secondary).font(.caption)
                         } else {
@@ -48,6 +50,8 @@ struct SDKWorkspaceExplorerView: View {
                                 }
                             }
                         }
+                    } header: {
+                        Text("Relationships (\(graphEdges.count))")
                     }
                 }
                 .listStyle(.insetGrouped)

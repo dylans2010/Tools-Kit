@@ -36,7 +36,7 @@ struct CreateEventView: View {
                     }
                     .listRowBackground(Color.workspaceSurface)
 
-                    Section("Intelligence") {
+                    Section {
                         Button { showingAISummarySheet = true } label: {
                             Label("Generate AI Agenda", systemImage: "sparkles")
                                 .foregroundStyle(.purple)
@@ -49,6 +49,8 @@ struct CreateEventView: View {
                             TextEditor(text: $description)
                                 .frame(minHeight: 120)
                         }
+                    } header: {
+                        Text("Intelligence")
                     }
                     .listRowBackground(Color.workspaceSurface)
 

@@ -15,21 +15,25 @@ struct SDKDeploymentView: View {
 
     var body: some View {
         List {
-            Section("Project Info") {
+            Section {
                 LabeledContent("Name", value: project.name)
                 LabeledContent("Health", value: project.healthStatus.rawValue.capitalized)
                 LabeledContent("Scopes", value: "\(project.enabledScopes.count)")
+            } header: {
+                Text("Project Info")
             }
 
-            Section("Deployment Settings") {
+            Section {
                 Picker("Target", selection: $deploymentTarget) {
                     ForEach(DeploymentTarget.allCases, id: \.self) { target in
                         Text(target.rawValue).tag(target)
                     }
                 }
+            } header: {
+                Text("Deployment Settings")
             }
 
-            Section("Immediate Action") {
+            Section {
                 Button(action: deploy) {
                     if isDeploying {
                         ProgressView().padding(.trailing, 8)
@@ -39,19 +43,25 @@ struct SDKDeploymentView: View {
                 }
                 .disabled(isDeploying)
                 .frame(maxWidth: .infinity)
+            } header: {
+                Text("Immediate Action")
             }
 
             if let plugin = deployedPlugin {
-                Section("Live Plugin Info") {
+                Section {
                     Label("Active", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
                     Text("ID: \(plugin.identifier)")
                         .font(.system(.caption, design: .monospaced))
+                } header: {
+                    Text("Live Plugin Info")
                 }
             }
 
             if let error = errorMessage {
-                Section("Error") {
+                Section {
                     Text(error).foregroundStyle(.red).font(.caption)
+                } header: {
+                    Text("Error")
                 }
             }
         }

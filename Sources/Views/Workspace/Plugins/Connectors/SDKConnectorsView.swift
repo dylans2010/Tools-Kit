@@ -66,20 +66,24 @@ struct SDKConnectorsView: View {
                     }
                 }
 
-                Section("Live Project Usage") {
+                Section {
                     LabeledContent("Current Project", value: projectManager.currentProject?.name ?? "None")
                     LabeledContent("Enabled Here", value: "\(projectManager.currentProject?.enabledConnectorIDs.count ?? 0)")
                     LabeledContent("SDK Log Entries", value: "\(logStore.entries.count)")
+                } header: {
+                    Text("Live Project Usage")
                 }
 
                 if let latestEvent = manager.connectors.flatMap({ $0.activityLog }).sorted(by: { $0.timestamp > $1.timestamp }).first {
-                    Section("Latest Connector Activity") {
+                    Section {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(latestEvent.message).font(.caption)
                             Text(latestEvent.timestamp.formatted(date: .abbreviated, time: .shortened))
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
                         }
+                    } header: {
+                        Text("Latest Connector Activity")
                     }
                 }
 
@@ -139,7 +143,7 @@ struct SDKConnectorsView: View {
                     .padding(.vertical, 24)
                 }
             } else {
-                Section("Connectors") {
+                Section {
                     ForEach(filteredConnectors, id: \.id) { connector in
                         NavigationLink(value: connector.id) {
                             HStack {
@@ -197,12 +201,14 @@ struct SDKConnectorsView: View {
                         }
                     }
                     .onDelete(perform: deleteConnectors)
+                } header: {
+                    Text("Connectors")
                 }
             }
 
             // MARK: - Quick Actions
             if !manager.connectors.isEmpty {
-                Section("Quick Actions") {
+                Section {
                     Button {
                         Task {
                             for connector in manager.connectors {
@@ -222,6 +228,8 @@ struct SDKConnectorsView: View {
                     } label: {
                         Label("Sync All Connectors", systemImage: "arrow.clockwise")
                     }
+                } header: {
+                    Text("Quick Actions")
                 }
             }
         }
@@ -303,7 +311,7 @@ struct AddConnectorView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Connector Type") {
+                Section {
                     Picker("Type", selection: $selectedType) {
                         ForEach(ConnectorType.allCases, id: \.self) { type in
                             HStack {
@@ -317,10 +325,14 @@ struct AddConnectorView: View {
                     Text(typeDescription(selectedType))
                         .font(.caption)
                         .foregroundColor(.secondary)
+                } header: {
+                    Text("Connector Type")
                 }
 
-                Section("Configuration") {
+                Section {
                     TextField("Connector Name (optional)", text: $connectorName)
+                } header: {
+                    Text("Configuration")
                 }
 
                 Section {

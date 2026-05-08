@@ -35,7 +35,7 @@ struct UnitConverterView: View {
                             TextField("Value", text: $backend.input)
                                 .keyboardType(.decimalPad)
                                 .font(.title3.bold())
-                                .onChange(of: backend.input) { _ in backend.convert() }
+                                .onChange(of: backend.input) { _, _ in backend.convert() }
                         }
 
                         Spacer()
@@ -92,49 +92,49 @@ struct UnitConverterView: View {
                     Text(unit.symbol).tag(unit)
                 }
             }
-            .onChange(of: type == .from ? backend.lengthUnitFrom : backend.lengthUnitTo) { _ in backend.convert() }
+            .onChange(of: type == .from ? backend.lengthUnitFrom : backend.lengthUnitTo) { _, _ in backend.convert() }
         case .mass:
             Picker("", selection: type == .from ? $backend.massUnitFrom : $backend.massUnitTo) {
                 ForEach(backend.massUnits, id: \.self) { unit in
                     Text(unit.symbol).tag(unit)
                 }
             }
-            .onChange(of: type == .from ? backend.massUnitFrom : backend.massUnitTo) { _ in backend.convert() }
+            .onChange(of: type == .from ? backend.massUnitFrom : backend.massUnitTo) { _, _ in backend.convert() }
         case .temperature:
             Picker("", selection: type == .from ? $backend.tempUnitFrom : $backend.tempUnitTo) {
                 ForEach(backend.tempUnits, id: \.self) { unit in
                     Text(unit.symbol).tag(unit)
                 }
             }
-            .onChange(of: type == .from ? backend.tempUnitFrom : backend.tempUnitTo) { _ in backend.convert() }
+            .onChange(of: type == .from ? backend.tempUnitFrom : backend.tempUnitTo) { _, _ in backend.convert() }
         case .volume:
             Picker("", selection: type == .from ? $backend.volumeUnitFrom : $backend.volumeUnitTo) {
                 ForEach(backend.volumeUnits, id: \.self) { unit in
                     Text(unit.symbol).tag(unit)
                 }
             }
-            .onChange(of: type == .from ? backend.volumeUnitFrom : backend.volumeUnitTo) { _ in backend.convert() }
+            .onChange(of: type == .from ? backend.volumeUnitFrom : backend.volumeUnitTo) { _, _ in backend.convert() }
         case .speed:
             Picker("", selection: type == .from ? $backend.speedUnitFrom : $backend.speedUnitTo) {
                 ForEach(backend.speedUnits, id: \.self) { unit in
                     Text(unit.symbol).tag(unit)
                 }
             }
-            .onChange(of: type == .from ? backend.speedUnitFrom : backend.speedUnitTo) { _ in backend.convert() }
+            .onChange(of: type == .from ? backend.speedUnitFrom : backend.speedUnitTo) { _, _ in backend.convert() }
         case .pressure:
             Picker("", selection: type == .from ? $backend.pressureUnitFrom : $backend.pressureUnitTo) {
                 ForEach(backend.pressureUnits, id: \.self) { unit in
                     Text(unit.symbol).tag(unit)
                 }
             }
-            .onChange(of: type == .from ? backend.pressureUnitFrom : backend.pressureUnitTo) { _ in backend.convert() }
+            .onChange(of: type == .from ? backend.pressureUnitFrom : backend.pressureUnitTo) { _, _ in backend.convert() }
         case .energy:
             Picker("", selection: type == .from ? $backend.energyUnitFrom : $backend.energyUnitTo) {
                 ForEach(backend.energyUnits, id: \.self) { unit in
                     Text(unit.symbol).tag(unit)
                 }
             }
-            .onChange(of: type == .from ? backend.energyUnitFrom : backend.energyUnitTo) { _ in backend.convert() }
+            .onChange(of: type == .from ? backend.energyUnitFrom : backend.energyUnitTo) { _, _ in backend.convert() }
         }
     }
 }

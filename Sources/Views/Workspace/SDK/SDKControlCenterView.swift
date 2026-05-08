@@ -147,7 +147,7 @@ struct SDKControlCenterView: View {
                         }
                     }
                     .tint(.red)
-                    .onChange(of: runtime.isNoSandboxModeEnabled) { enabled in
+                    .onChange(of: runtime.isNoSandboxModeEnabled) { _, enabled in
                         if enabled {
                             SDKLogStore.shared.log("No Sandbox mode ENABLED via Control Center", source: "SDKControlCenterView", level: .warning)
                         }

@@ -42,7 +42,7 @@ struct WorkspaceSearchView: View {
             TextField("Search Workspace", text: $query)
                 .textFieldStyle(.roundedBorder)
                 .padding()
-                .onChange(of: query) { newValue in
+                .onChange(of: query) { _, newValue in
                     results = CollaborationFramework.shared.globalSearch(query: newValue)
                 }
 

@@ -10,7 +10,7 @@ struct NATOView: View {
                 ToolInputSection("Text Input") {
                     TextField("Enter word or name", text: $input)
                         .padding()
-                        .onChange(of: input) { _ in backend.translate(input) }
+                        .onChange(of: input) { _, _ in backend.translate(input) }
                 }
 
                 if !backend.output.isEmpty {

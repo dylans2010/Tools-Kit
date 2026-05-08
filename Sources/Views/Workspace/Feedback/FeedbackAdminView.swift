@@ -86,7 +86,7 @@ struct FeedbackAdminView: View {
     }
 
     private var filterSection: some View {
-        Section("Filters & Sort") {
+        Section {
             Picker("Category", selection: $selectedCategoryFilter) {
                 Text("All").tag("all")
                 ForEach(FeedbackCategory.allCases) { category in
@@ -113,6 +113,8 @@ struct FeedbackAdminView: View {
                 Text("Priority").tag(SortOption.priority)
             }
             .pickerStyle(.segmented)
+        } header: {
+            Text("Filters & Sort")
         }
     }
 

@@ -139,7 +139,7 @@ struct SpaceMessagesTab: View {
                     }
                     .padding()
                 }
-                .onChange(of: space?.messages.count) { _ in
+                .onChange(of: space?.messages.count) { _, _ in
                     if let lastID = space?.messages.last?.id {
                         withAnimation { proxy.scrollTo(lastID) }
                     }
@@ -205,7 +205,7 @@ struct SpaceSettingsTab: View {
 
     var body: some View {
         List {
-            Section("Members") {
+            Section {
                 if let space = space {
                     ForEach(space.members) { member in
                         HStack {
@@ -228,6 +228,8 @@ struct SpaceSettingsTab: View {
                 Button("Add Member") {
                     showingAddMember = true
                 }
+            } header: {
+                Text("Members")
             }
         }
     }

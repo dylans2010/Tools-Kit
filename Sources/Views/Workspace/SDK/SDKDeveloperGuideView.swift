@@ -46,7 +46,7 @@ struct SDKDeveloperGuideView: View {
 
     var body: some View {
         List {
-            Section("Guide Mode") {
+            Section {
                 Picker("Guide Mode", selection: $guideMode) {
                     ForEach(GuideMode.allCases) { mode in
                         Text(mode.rawValue).tag(mode)
@@ -57,9 +57,11 @@ struct SDKDeveloperGuideView: View {
                 Text(guideMode == .basic ? "Simple walkthroughs with tiny code snippets and plain-English explanations." : "Deep architecture notes, production patterns, and full developer examples.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            } header: {
+                Text("Guide Mode")
             }
 
-            Section("Documentation") {
+            Section {
                 ForEach(GuideSection.allCases) { section in
                     Button {
                         selectedSection = section
@@ -77,6 +79,8 @@ struct SDKDeveloperGuideView: View {
                     }
                     .buttonStyle(.plain)
                 }
+            } header: {
+                Text("Documentation")
             }
 
             Section(selectedSection.rawValue) {

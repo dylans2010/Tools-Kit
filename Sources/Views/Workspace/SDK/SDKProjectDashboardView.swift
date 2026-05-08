@@ -68,7 +68,7 @@ struct SDKProjectDashboardView: View {
     }
 
     private var controlHubSection: some View {
-        Section("Control Hub") {
+        Section {
             hubRow(route: .build, title: "Build & Export", subtitle: buildSubtitle, icon: "hammer", color: .blue, status: .connected)
             hubRow(route: .connectors, title: "Connectors", subtitle: "\(connectorManager.connectors.count) active", icon: "link", color: .green, status: connectorManager.connectors.isEmpty ? .disconnected : .connected)
             hubRow(route: .automation, title: "Automation", subtitle: "\(automationEngine.rules.count) rules", icon: "bolt.fill", color: .orange, status: .connected)
@@ -77,6 +77,8 @@ struct SDKProjectDashboardView: View {
             hubRow(route: .appBuilder, title: "App Builder", subtitle: "Visual editor", icon: "wand.and.stars", color: .indigo, status: .connected)
             hubRow(route: .logs, title: "System Logs", subtitle: "\(logStore.entries.count) events", icon: "terminal.fill", color: .black, status: .connected)
             hubRow(route: .diagnostics, title: "Diagnostics", subtitle: "System health", icon: "heart.text.square.fill", color: .red, status: .connected)
+        } header: {
+            Text("Control Hub")
         }
     }
 

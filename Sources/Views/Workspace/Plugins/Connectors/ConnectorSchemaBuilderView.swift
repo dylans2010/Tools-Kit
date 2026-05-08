@@ -119,7 +119,7 @@ struct ConnectorSchemaBuilderView: View {
 
     private var schemaEditor: some View {
         Group {
-            Section("JSON Response Schema") {
+            Section {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Define the expected API response structure in JSON format.")
                         .font(.caption)
@@ -148,11 +148,13 @@ struct ConnectorSchemaBuilderView: View {
                     }
                 }
                 .padding(.vertical, 8)
+            } header: {
+                Text("JSON Response Schema")
             }
 
             // MARK: - Validation Results
             if !validationErrors.isEmpty {
-                Section("Validation Issues") {
+                Section {
                     ForEach(validationErrors, id: \.self) { error in
                         HStack(spacing: 8) {
                             Image(systemName: "exclamationmark.triangle.fill")
@@ -163,11 +165,13 @@ struct ConnectorSchemaBuilderView: View {
                                 .foregroundColor(.orange)
                         }
                     }
+                } header: {
+                    Text("Validation Issues")
                 }
             }
 
             // MARK: - Quick Templates
-            Section("Schema Templates") {
+            Section {
                 Button {
                     jsonSchema = "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"id\": { \"type\": \"string\" },\n    \"name\": { \"type\": \"string\" },\n    \"data\": { \"type\": \"array\", \"items\": { \"type\": \"object\" } }\n  }\n}"
                 } label: {
@@ -181,6 +185,8 @@ struct ConnectorSchemaBuilderView: View {
                     Label("Paginated Response", systemImage: "doc.text")
                         .font(.caption)
                 }
+            } header: {
+                Text("Schema Templates")
             }
         }
     }
@@ -189,7 +195,7 @@ struct ConnectorSchemaBuilderView: View {
 
     private var mappingsEditor: some View {
         Group {
-            Section("Data Mapping") {
+            Section {
                 Text("Map API response fields to internal Workspace models. Use dot notation for nested fields (e.g. data.user.name).")
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -225,6 +231,8 @@ struct ConnectorSchemaBuilderView: View {
                 } label: {
                     Label("Add Mapping", systemImage: "plus.circle")
                 }
+            } header: {
+                Text("Data Mapping")
             }
         }
     }
@@ -233,7 +241,7 @@ struct ConnectorSchemaBuilderView: View {
 
     private var previewSection: some View {
         Group {
-            Section("Schema Preview") {
+            Section {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Current Schema")
                         .font(.caption.bold())
@@ -246,9 +254,11 @@ struct ConnectorSchemaBuilderView: View {
                         .background(Color(.systemGroupedBackground))
                         .cornerRadius(8)
                 }
+            } header: {
+                Text("Schema Preview")
             }
 
-            Section("Active Mappings (\(mappings.filter { !$0.source.isEmpty && !$0.target.isEmpty }.count))") {
+            Section {
                 ForEach(mappings.filter { !$0.source.isEmpty && !$0.target.isEmpty }) { entry in
                     HStack {
                         Text(entry.source)
@@ -281,6 +291,8 @@ struct ConnectorSchemaBuilderView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
+            } header: {
+                Text("Active Mappings (\(mappings.filter { !$0.source.isEmpty && !$0.target.isEmpty }.count))")
             }
         }
     }
@@ -290,10 +302,12 @@ struct ConnectorSchemaBuilderView: View {
     private var importSchemaSheet: some View {
         NavigationView {
             Form {
-                Section("Paste JSON Schema") {
+                Section {
                     TextEditor(text: $importJSON)
                         .font(.system(.caption, design: .monospaced))
                         .frame(minHeight: 200)
+                } header: {
+                    Text("Paste JSON Schema")
                 }
 
                 Section {

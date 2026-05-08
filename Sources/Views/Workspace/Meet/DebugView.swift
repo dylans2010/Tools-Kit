@@ -11,11 +11,13 @@ struct DebugView: View {
 
     var body: some View {
         Form {
-            Section("Daily API Key") {
+            Section {
                 SecureField("Daily API key", text: $persistedAPIKey)
+            } header: {
+                Text("Daily API Key")
             }
 
-            Section("Session Traces") {
+            Section {
                 if manager.debugSnapshot.mappings.isEmpty {
                     Text("No session mappings yet.")
                         .foregroundColor(.secondary)
@@ -32,9 +34,11 @@ struct DebugView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Session Traces")
             }
 
-            Section("API Logs / WebRTC Events") {
+            Section {
                 if logger.entries.isEmpty {
                     Text("No logs yet.")
                         .foregroundColor(.secondary)
@@ -53,6 +57,8 @@ struct DebugView: View {
                 Button("Clear Logs", role: .destructive) {
                     logger.clear()
                 }
+            } header: {
+                Text("API Logs / WebRTC Events")
             }
         }
         .navigationTitle("Meet Debug Console")

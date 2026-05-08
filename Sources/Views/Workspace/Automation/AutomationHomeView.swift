@@ -5,15 +5,19 @@ struct AutomationHomeView: View {
 
     var body: some View {
         List {
-            Section("Active Workflows") {
+            Section {
                 Text("No active workflows.")
                     .foregroundColor(.secondary)
+            } header: {
+                Text("Active Workflows")
             }
 
-            Section("Templates") {
+            Section {
                 WorkflowTemplateRow(title: "Auto-task from Email", description: "Create a task when an email is marked as priority.", icon: "envelope.badge.shield.half.filled")
                 WorkflowTemplateRow(title: "Commit to Note", description: "Summarize daily commits into a notebook page.", icon: "terminal.fill")
                 WorkflowTemplateRow(title: "Meeting Summary", description: "Generate action items after a call ends.", icon: "video.fill")
+            } header: {
+                Text("Templates")
             }
         }
         .navigationTitle("Automation")

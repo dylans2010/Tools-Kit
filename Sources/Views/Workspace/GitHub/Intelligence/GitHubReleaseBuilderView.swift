@@ -8,7 +8,7 @@ struct GitHubReleaseBuilderView: View {
 
     var body: some View {
         Form {
-            Section("Semantic Versioning") {
+            Section {
                 TextField("Version Tag", text: $version)
                 HStack {
                     Button("Major") { bumpVersion(major: true) }
@@ -16,9 +16,11 @@ struct GitHubReleaseBuilderView: View {
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
+            } header: {
+                Text("Semantic Versioning")
             }
 
-            Section("Release Notes") {
+            Section {
                 TextEditor(text: $changelog)
                     .font(.system(.body, design: .monospaced))
                     .frame(minHeight: 150)
@@ -27,12 +29,16 @@ struct GitHubReleaseBuilderView: View {
                     generateChangelog()
                 }
                 .font(.caption)
+            } header: {
+                Text("Release Notes")
             }
 
-            Section("Validation Checklist") {
+            Section {
                 Label("No Merge Conflicts", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
                 Label("All Changes Reviewed", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
                 Label("Tests Passing", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+            } header: {
+                Text("Validation Checklist")
             }
 
             Section {

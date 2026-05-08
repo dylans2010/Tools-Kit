@@ -6,7 +6,7 @@ struct SDKPluginsView: View {
 
     var body: some View {
         List {
-            Section("Installed Plugins (\(manager.plugins.count))") {
+            Section {
                 if manager.plugins.isEmpty {
                     Text("No plugins installed").foregroundStyle(.secondary)
                 } else {
@@ -37,10 +37,12 @@ struct SDKPluginsView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Installed Plugins (\(manager.plugins.count))")
             }
 
             if !manager.plugins.isEmpty {
-                Section("Plugin Hooks") {
+                Section {
                     ForEach(manager.plugins.filter { !$0.automationHooks.isEmpty }) { plugin in
                         VStack(alignment: .leading, spacing: 4) {
                             Text(plugin.name).font(.caption).bold()
@@ -51,6 +53,8 @@ struct SDKPluginsView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Plugin Hooks")
                 }
             }
         }

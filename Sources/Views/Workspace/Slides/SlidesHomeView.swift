@@ -117,8 +117,10 @@ struct SlidesHomeView: View {
     private var createDeckSheet: some View {
         NavigationStack {
             Form {
-                Section("Deck Title") {
+                Section {
                     TextField("e.g. Q4 Business Review", text: $newDeckTitle)
+                } header: {
+                    Text("Deck Title")
                 }
             }
             .navigationTitle("New Presentation")

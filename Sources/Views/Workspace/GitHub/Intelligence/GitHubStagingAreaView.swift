@@ -8,7 +8,7 @@ struct GitHubStagingAreaView: View {
     var body: some View {
         VStack(spacing: 0) {
             List {
-                Section("Staged Changes (\(gitEngine.stagedChanges.count))") {
+                Section {
                     if gitEngine.stagedChanges.isEmpty {
                         Text("No files staged for commit.").font(.caption).foregroundStyle(.secondary)
                     } else {
@@ -29,14 +29,18 @@ struct GitHubStagingAreaView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Staged Changes (\(gitEngine.stagedChanges.count))")
                 }
 
-                Section("Commit Details") {
+                Section {
                     TextField("Commit Message", text: $commitMessage)
                     Picker("Target Branch", selection: $selectedBranch) {
                         Text("main").tag("main")
                         Text("feature/mobile-git").tag("feature/mobile-git")
                     }
+                } header: {
+                    Text("Commit Details")
                 }
             }
 

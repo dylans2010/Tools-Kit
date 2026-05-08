@@ -22,11 +22,13 @@ struct RunWorkflowView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Target") {
+                Section {
                     Text("Repo: \(owner)/\(repo)")
                     TextField("Branch / Ref", text: $ref)
+                } header: {
+                    Text("Target")
                 }
-                Section("Manual Inputs") {
+                Section {
                     HStack {
                         TextField("Key", text: $inputKey)
                         TextField("Value", text: $inputValue)
@@ -44,9 +46,13 @@ struct RunWorkflowView: View {
                     ForEach(inputs.keys.sorted(), id: \.self) { key in
                         Text("\(key): \(inputs[key] ?? "")")
                     }
+                } header: {
+                    Text("Manual Inputs")
                 }
                 if !status.isEmpty {
-                    Section("Status") { Text(status) }
+                    Section { Text(status) } header: {
+                        Text("Status")
+                    }
                 }
             }
             .navigationTitle("Run Workflow")

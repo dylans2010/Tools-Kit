@@ -9,7 +9,7 @@ struct NotebookAddCommentsView: View {
     @State private var comments: [NotebookComment] = []
 
     struct NotebookComment: Identifiable, Codable {
-        let id = UUID()
+        var id = UUID()
         let author: String
         let text: String
         let timestamp: Date

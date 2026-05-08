@@ -4,7 +4,7 @@ struct AudioSettingsView: View {
     @ObservedObject var manager: MeetingStateManager
 
     var body: some View {
-        Section("Audio") {
+        Section {
             if manager.availableAudioDevices.isEmpty {
                 Text("No audio devices reported by runtime.")
                     .foregroundStyle(.secondary)
@@ -20,6 +20,8 @@ struct AudioSettingsView: View {
                 Text("Volume")
                 Slider(value: $manager.settings.outputVolume, in: 0...1)
             }
+        } header: {
+            Text("Audio")
         }
     }
 }

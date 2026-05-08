@@ -6,7 +6,7 @@ struct GitHubFileRecoveryView: View {
 
     var body: some View {
         List {
-            Section("Local File History") {
+            Section {
                 if snapshots.isEmpty {
                     Text("No snapshots found in local storage.")
                         .font(.caption).foregroundStyle(.secondary)
@@ -40,6 +40,8 @@ struct GitHubFileRecoveryView: View {
                         .padding(.vertical, 4)
                     }
                 }
+            } header: {
+                Text("Local File History")
             }
 
             Section {

@@ -51,7 +51,7 @@ struct SDKAPIExplorerView: View {
     // MARK: - Route List
 
     private var routeListSection: some View {
-        Section("Endpoints (\(filteredRoutes.count))") {
+        Section {
             ForEach(filteredRoutes) { route in
                 Button {
                     testPath = route.path
@@ -78,13 +78,15 @@ struct SDKAPIExplorerView: View {
                 }
                 .buttonStyle(.plain)
             }
+        } header: {
+            Text("Endpoints (\(filteredRoutes.count))")
         }
     }
 
     // MARK: - Test Console
 
     private var testConsoleSection: some View {
-        Section("Test Console") {
+        Section {
             HStack {
                 Picker("Method", selection: $testMethod) {
                     ForEach(SDKRoute.Method.allCases, id: \.self) { method in
@@ -116,13 +118,15 @@ struct SDKAPIExplorerView: View {
             }
             .buttonStyle(.borderedProminent)
             .disabled(testPath.isEmpty || isTesting)
+        } header: {
+            Text("Test Console")
         }
     }
 
     // MARK: - Test Result
 
     private func testResultSection(_ result: SDKResponse) -> some View {
-        Section("Response") {
+        Section {
             HStack {
                 Text("Status")
                 Spacer()
@@ -150,6 +154,8 @@ struct SDKAPIExplorerView: View {
                     .font(.caption)
                     .foregroundStyle(.red)
             }
+        } header: {
+            Text("Response")
         }
     }
 

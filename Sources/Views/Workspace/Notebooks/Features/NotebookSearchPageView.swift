@@ -23,7 +23,7 @@ struct NotebookSearchPageView: View {
             }
             .navigationTitle("Search Pages")
             .searchable(text: $searchText, prompt: "Search all pages...")
-            .onChange(of: searchText) { _ in
+            .onChange(of: searchText) { _, _ in
                 performSearch()
             }
             .toolbar {

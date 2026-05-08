@@ -118,7 +118,7 @@ struct LyricsEditorView: View {
                     }
                 }
                 .listStyle(.plain)
-                .onChange(of: syncLines.count) { _ in
+                .onChange(of: syncLines.count) { _, _ in
                     if let last = syncLines.indices.last {
                         withAnimation { proxy.scrollTo(last, anchor: .bottom) }
                     }

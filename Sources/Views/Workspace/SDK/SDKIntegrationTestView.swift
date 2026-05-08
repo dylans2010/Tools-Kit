@@ -15,7 +15,7 @@ struct SDKIntegrationTestView: View {
 
     var body: some View {
         List {
-            Section("Test Scenarios") {
+            Section {
                 Picker("Scenario", selection: $selectedScenario) {
                     ForEach(0..<scenarios.count, id: \.self) { index in
                         Text(scenarios[index]).tag(index)
@@ -30,9 +30,11 @@ struct SDKIntegrationTestView: View {
                 .frame(maxWidth: .infinity)
                 .buttonStyle(.borderedProminent)
                 .disabled(testStatus == .running)
+            } header: {
+                Text("Test Scenarios")
             }
 
-            Section("Execution Log") {
+            Section {
                 VStack(alignment: .leading, spacing: 8) {
                     switch testStatus {
                     case .idle:
@@ -49,9 +51,11 @@ struct SDKIntegrationTestView: View {
                     }
                 }
                 .font(.subheadline)
+            } header: {
+                Text("Execution Log")
             }
 
-            Section("Test Parameters") {
+            Section {
                 Toggle("Validate Scopes Before Execution", isOn: $enableScopeValidation)
                 Toggle("No-Sandbox Mode", isOn: $runtime.isNoSandboxModeEnabled)
                     .tint(.red)
@@ -61,6 +65,8 @@ struct SDKIntegrationTestView: View {
                         .font(.caption)
                         .foregroundStyle(.orange)
                 }
+            } header: {
+                Text("Test Parameters")
             }
         }
         .navigationTitle("Integration Test Lab")

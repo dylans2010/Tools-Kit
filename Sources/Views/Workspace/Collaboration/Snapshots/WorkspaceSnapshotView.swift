@@ -19,7 +19,7 @@ struct WorkspaceSnapshotView: View {
             }
 
             if service.snapshots.count >= 2 {
-                Section("Compare Snapshots") {
+                Section {
                     HStack {
                         SnapshotPicker(label: "Before", selection: $compareA, snapshots: service.snapshots)
                         Image(systemName: "arrow.right")
@@ -30,10 +30,12 @@ struct WorkspaceSnapshotView: View {
                         showingDiff = true
                     }
                     .disabled(compareA == nil || compareB == nil)
+                } header: {
+                    Text("Compare Snapshots")
                 }
             }
 
-            Section("Saved Snapshots (\(service.snapshots.count))") {
+            Section {
                 if service.snapshots.isEmpty {
                     Text("No Snapshots Saved Yet").foregroundStyle(.secondary).font(.caption)
                 } else {
@@ -44,6 +46,8 @@ struct WorkspaceSnapshotView: View {
                         offsets.map { service.snapshots[$0].id }.forEach { service.deleteSnapshot(id: $0) }
                     }
                 }
+            } header: {
+                Text("Saved Snapshots (\(service.snapshots.count))")
             }
         }
         .navigationTitle("Snapshots")
@@ -102,10 +106,12 @@ struct SaveSnapshotView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Snapshot") {
+                Section {
                     TextField("Label", text: $label)
                     TextField("Notes (Optional)", text: $notes, axis: .vertical)
                         .lineLimit(3...)
+                } header: {
+                    Text("Snapshot")
                 }
             }
             .navigationTitle("Save Snapshot")
@@ -155,7 +161,7 @@ struct SnapshotDiffView: View {
                     }
                 }
 
-                Section("Changes (\(diffs.count))") {
+                Section {
                     if diffs.isEmpty {
                         Text("No Differences Found.").foregroundStyle(.secondary).font(.caption)
                     } else {
@@ -176,6 +182,8 @@ struct SnapshotDiffView: View {
                             .padding(.vertical, 2)
                         }
                     }
+                } header: {
+                    Text("Changes (\(diffs.count))")
                 }
             }
             .navigationTitle("Snapshot Diff")

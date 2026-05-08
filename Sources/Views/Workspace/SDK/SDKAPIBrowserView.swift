@@ -14,7 +14,7 @@ struct SDKAPIBrowserView: View {
 
     var body: some View {
         List {
-            Section("Available Methods (\(filteredMethods.count))") {
+            Section {
                 ForEach(filteredMethods, id: \.name) { method in
                     VStack(alignment: .leading, spacing: 4) {
                         Text(method.name)
@@ -40,6 +40,8 @@ struct SDKAPIBrowserView: View {
                     }
                     .padding(.vertical, 4)
                 }
+            } header: {
+                Text("Available Methods (\(filteredMethods.count))")
             }
         }
         .searchable(text: $searchText)

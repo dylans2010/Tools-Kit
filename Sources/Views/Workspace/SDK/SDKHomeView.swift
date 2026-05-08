@@ -11,7 +11,7 @@ struct SDKHomeView: View {
 
     var body: some View {
         List {
-            Section("SDK Projects") {
+            Section {
                 if projects.isEmpty {
                     ContentUnavailableView(
                         "No Projects",
@@ -63,9 +63,11 @@ struct SDKHomeView: View {
                         }
                     }
                 }
+            } header: {
+                Text("SDK Projects")
             }
 
-            Section("Workspace") {
+            Section {
                 NavigationLink(destination: SDKDeveloperGuideView()) {
                     Label("Developer Guide", systemImage: "book.closed.fill")
                 }
@@ -75,6 +77,8 @@ struct SDKHomeView: View {
                 NavigationLink(destination: SDKInternalView()) {
                     Label("SDK Internal", systemImage: "terminal.fill")
                 }
+            } header: {
+                Text("Workspace")
             }
         }
         .navigationTitle("WorkspaceSDK")

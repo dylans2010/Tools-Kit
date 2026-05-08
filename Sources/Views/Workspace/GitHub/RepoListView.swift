@@ -53,7 +53,7 @@ struct RepoListView: View {
         .task {
             await fetchRepositories()
         }
-        .onChange(of: searchText) { _ in
+        .onChange(of: searchText) { _, _ in
             filterRepositories()
         }
     }

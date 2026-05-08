@@ -8,14 +8,16 @@ struct ConnectorScopeView: View {
 
     var body: some View {
         List {
-            Section("Connector") {
+            Section {
                 Text(connector.name)
                 Text(connector.identifier)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            } header: {
+                Text("Connector")
             }
 
-            Section("Assign SDK Scopes") {
+            Section {
                 ForEach(policyEngine.availableScopes(), id: \.name) { scope in
                     Toggle(isOn: Binding(
                         get: { assignedScopes.contains(scope.name) },
@@ -36,6 +38,8 @@ struct ConnectorScopeView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Assign SDK Scopes")
             }
 
             Section {
