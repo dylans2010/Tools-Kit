@@ -204,7 +204,7 @@ struct SDKWorkspaceContainerView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 .background(isRunning ? Color.secondary.opacity(0.2) : Color.blue)
-                .foregroundStyle(isRunning ? .secondary : .white)
+                .foregroundStyle(isRunning ? Color.secondary : Color.white)
                 .clipShape(Capsule())
                 .shadow(color: isRunning ? .clear : .blue.opacity(0.3), radius: 4, y: 2)
             }
