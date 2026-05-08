@@ -186,11 +186,13 @@ public final class WorkspaceAPI {
             return response
         }
 
+        @MainActor
         func getInsights() -> [String] {
             let memories = PersonaManager.shared.recentMemories()
             return memories.map { $0.response }
         }
 
+        @MainActor
         func injectMemory(entityID: UUID, content: String) {
             PersonaManager.shared.injectMemory(entityID: entityID, content: content)
             Task {
