@@ -134,7 +134,7 @@ struct ConnectorsMainView: View {
             if manager.connectors.isEmpty {
                 ContentUnavailableView("No Connectors", systemImage: "puzzlepiece.extension", description: Text("Create your first connector to integrate external services."))
             } else if filteredConnectors.isEmpty {
-                ContentUnavailableView.search
+                ContentUnavailableView("No Results", systemImage: "magnifyingglass", description: Text("Try a different connector name, identifier, or filter."))
             } else {
                 ForEach(filteredConnectors) { connector in
                     NavigationLink {

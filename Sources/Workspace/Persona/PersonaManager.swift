@@ -95,4 +95,20 @@ final class PersonaManager: ObservableObject {
         chatHistory.removeAll()
         saveChatHistory()
     }
+
+
+    /// Legacy compatibility API used by Workspace SDK wrappers.
+    func recentMemories(limit: Int? = nil) -> [PersonaInteraction] {
+        let history = interactions
+        guard let limit else { return history }
+        return Array(history.suffix(max(0, limit)))
+    }
+
+    /// Legacy compatibility API used by Workspace SDK wrappers.
+    func injectMemory(entityID: UUID, content: String) {
+        let memory = PersonaInteraction(query: "Memory Injection [\(entityID.uuidString)]", response: content, contextUsed: ["manual_memory_injection"])
+        interactions.append(memory)
+        try? dataStore.savePersonaInteraction(memory)
+    }
+
 }
