@@ -12,13 +12,16 @@ struct SDKInspectorPanelView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 0) {
             Picker("Inspector Mode", selection: $editorMode) {
                 ForEach(InspectorMode.allCases, id: \.self) { mode in
                     Text(mode.rawValue).tag(mode)
                 }
             }
             .pickerStyle(.segmented)
+            .padding(10)
+
+            Divider()
 
             switch editorMode {
             case .form:
@@ -28,14 +31,18 @@ struct SDKInspectorPanelView: View {
             }
 
             if let error = jsonError {
-                Text(error)
-                    .font(.caption)
-                    .foregroundStyle(.red)
+                HStack {
+                    Image(systemName: "exclamationmark.circle.fill")
+                    Text(error)
+                }
+                .font(.caption)
+                .foregroundStyle(.red)
+                .padding()
             }
 
             Spacer()
         }
-        .padding(10)
+        .background(Color(.systemGroupedBackground))
         .onAppear { jsonDraft = state.inspectorJSON }
         .onChange(of: state.inspectorJSON) { _, newValue in
             if editorMode == .json { jsonDraft = newValue }
@@ -44,28 +51,53 @@ struct SDKInspectorPanelView: View {
 
     private var formInspector: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                GroupBox("Identity") {
+            VStack(alignment: .leading, spacing: 20) {
+                inspectorSection("Identity", icon: "info.circle") {
                     keyValue("Node", state.selectedNode.title)
                     keyValue("Tabs", "\(state.openTabs.count)")
                 }
-                GroupBox("Runtime Config") {
-                    keyValue("Run configurations", "\(state.runConfigurations.count)")
-                    keyValue("Memory estimate", "\(state.memoryEstimateMB) MB")
+
+                inspectorSection("Runtime Config", icon: "cpu") {
+                    keyValue("Configurations", "\(state.runConfigurations.count)")
+                    keyValue("Memory", "\(state.memoryEstimateMB) MB")
                 }
-                GroupBox("Permissions") {
-                    keyValue("Project scopes", "\(SDKProjectManager.shared.currentProject?.enabledScopes.count ?? 0)")
-                    keyValue("Scope diagnostics", "\(state.diagnostics.filter { $0.node == .scopes }.count)")
+
+                inspectorSection("Permissions", icon: "lock.shield") {
+                    keyValue("Enabled Scopes", "\(SDKProjectManager.shared.currentProject?.enabledScopes.count ?? 0)")
+                    keyValue("Diagnostics", "\(state.diagnostics.filter { $0.node == .scopes }.count)")
                 }
-                GroupBox("Linked Libraries") {
-                    keyValue("Count", "\(state.libraries.count)")
+
+                inspectorSection("Libraries", icon: "shippingbox") {
+                    keyValue("Linked", "\(state.libraries.count)")
                     keyValue("Unused", "\(state.libraries.filter { $0.usageCount == 0 }.count)")
                 }
-                GroupBox("Dependency Graph Hooks") {
+
+                inspectorSection("Dependencies", icon: "link") {
                     keyValue("Nodes", "\(state.dependencies.count)")
                     keyValue("Conditional", "\(state.dependencies.filter { !$0.conditionalExpression.isEmpty }.count)")
                 }
             }
+            .padding()
+        }
+    }
+
+    private func inspectorSection<Content: View>(_ title: String, icon: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 10, weight: .bold))
+                Text(title.uppercased())
+                    .font(.system(size: 10, weight: .bold))
+            }
+            .foregroundStyle(.secondary)
+            .padding(.leading, 4)
+
+            VStack(spacing: 0) {
+                content()
+            }
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.primary.opacity(0.05), lineWidth: 1))
         }
     }
 
@@ -100,10 +132,20 @@ struct SDKInspectorPanelView: View {
     }
 
     private func keyValue(_ key: String, _ value: String) -> some View {
-        HStack {
-            Text(key).foregroundStyle(.secondary)
-            Spacer()
-            Text(value).font(.caption.monospaced())
+        VStack(spacing: 0) {
+            HStack {
+                Text(key)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text(value)
+                    .font(.system(size: 12, design: .monospaced))
+                    .foregroundStyle(.primary)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+
+            Divider().padding(.leading, 10)
         }
     }
 }

@@ -282,7 +282,8 @@ struct ThinkingIndicator: View {
 }
 
 struct WelcomePersonaView: View {
-    @State private var animateGradient = false
+    @State private var gradientStart = UnitPoint.topLeading
+    @State private var gradientEnd = UnitPoint.bottomTrailing
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -291,10 +292,19 @@ struct WelcomePersonaView: View {
                 VStack(spacing: 30) {
                     Image(systemName: "sparkles")
                         .font(.system(size: 80))
-                        .foregroundStyle(LinearGradient(colors: animateGradient ? [.mint, .indigo, .purple] : [.blue, .cyan, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [.blue, .purple, .mint, .indigo, .cyan],
+                                startPoint: gradientStart,
+                                endPoint: gradientEnd
+                            )
+                        )
                         .symbolEffect(.pulse.byLayer, options: .nonRepeating)
                         .onAppear {
-                            withAnimation(.easeInOut(duration: 1.1)) { animateGradient.toggle() }
+                            withAnimation(.linear(duration: 3).repeatForever(autoreverses: true)) {
+                                gradientStart = .bottomTrailing
+                                gradientEnd = .topLeading
+                            }
                         }
                         .padding(.top, 40)
 

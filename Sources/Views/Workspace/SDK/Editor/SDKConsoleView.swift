@@ -74,6 +74,7 @@ struct SDKConsoleView: View {
             footer
         }
         .navigationTitle("SDK Console")
+        .background(Color(uiColor: .systemBackground))
         .toolbar {
             if !embedded {
                 Button("Done") { dismiss() }
@@ -85,52 +86,70 @@ struct SDKConsoleView: View {
     }
 
     private var header: some View {
-        HStack {
-            Label("Runtime Output", systemImage: "terminal.fill")
-                .font(.headline)
+        HStack(spacing: 12) {
+            HStack(spacing: 6) {
+                Image(systemName: "terminal.fill")
+                Text("CONSOLE")
+            }
+            .font(.system(size: 10, weight: .bold))
+            .foregroundStyle(.secondary)
+
             Spacer()
-            Toggle("Timeline", isOn: $showPerformanceTimeline)
-                .toggleStyle(.switch)
-                .labelsHidden()
-            Text("Events: \(filteredEntries.count)")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+
+            HStack(spacing: 12) {
+                Toggle(isOn: $showPerformanceTimeline) {
+                    Text("TIMELINE").font(.system(size: 10, weight: .bold))
+                }
+                .toggleStyle(ConsoleToggleStyle())
+
+                Text("\(filteredEntries.count) ENTRIES")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(.secondary)
+            }
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .background(.thinMaterial)
+        .background(Color.primary.opacity(0.03))
+        .overlay(Divider(), alignment: .bottom)
     }
 
     private var filters: some View {
         VStack(spacing: 8) {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    filterPill("All", level: nil)
-                    filterPill("Info", level: .info)
-                    filterPill("Warn", level: .warning)
-                    filterPill("Error", level: .error)
-                    filterPill("Critical", level: .critical)
-                }
-                .padding(.horizontal)
-            }
-
             HStack {
-                Picker("Plugin", selection: $pluginFilter) {
-                    ForEach(pluginOptions, id: \.self) { Text($0).tag($0) }
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        filterButton("ALL", level: nil)
+                        filterButton("INFO", level: .info)
+                        filterButton("WARN", level: .warning)
+                        filterButton("ERR", level: .error)
+                        filterButton("CRT", level: .critical)
+                    }
                 }
-                .pickerStyle(.menu)
-                Picker("Connector", selection: $connectorFilter) {
-                    ForEach(connectorOptions, id: \.self) { Text($0).tag($0) }
+
+                Spacer()
+
+                HStack(spacing: 8) {
+                    Menu {
+                        Picker("Plugin", selection: $pluginFilter) {
+                            ForEach(pluginOptions, id: \.self) { Text($0).tag($0) }
+                        }
+                    } label: {
+                        filterMenuLabel(pluginFilter, icon: "puzzlepiece")
+                    }
+
+                    Menu {
+                        Picker("Connector", selection: $connectorFilter) {
+                            ForEach(connectorOptions, id: \.self) { Text($0).tag($0) }
+                        }
+                    } label: {
+                        filterMenuLabel(connectorFilter, icon: "link")
+                    }
                 }
-                .pickerStyle(.menu)
-                Picker("App", selection: $appFilter) {
-                    ForEach(appOptions, id: \.self) { Text($0).tag($0) }
-                }
-                .pickerStyle(.menu)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 6)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
         }
+        .background(Color.primary.opacity(0.02))
     }
 
     private var logList: some View {
@@ -165,35 +184,86 @@ struct SDKConsoleView: View {
     }
 
     private var footer: some View {
-        HStack {
-            Button("Replay Last 10") {
-                for replay in filteredEntries.prefix(10).reversed() {
-                    logStore.log("Replayed: \(replay.message)", source: "SDKConsoleReplay", level: replay.level)
-                }
-            }
-            .buttonStyle(.bordered)
-
-            Button("Clear") {
+        HStack(spacing: 16) {
+            Button {
                 logStore.clear()
+            } label: {
+                Image(systemName: "trash")
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(.plain)
+
+            Button {
+                for replay in filteredEntries.prefix(10).reversed() {
+                    logStore.log("REPLAY: \(replay.message)", source: "REPLAY", level: replay.level)
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "play.circle")
+                    Text("REPLAY 10")
+                }
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
 
             Spacer()
 
-            Text("Memory \(runtimeState.memoryEstimateMB) MB")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            HStack(spacing: 4) {
+                Image(systemName: "memorychip")
+                Text("\(runtimeState.memoryEstimateMB) MB")
+            }
+            .font(.system(size: 10, weight: .bold, design: .monospaced))
+            .foregroundStyle(.secondary)
         }
-        .padding()
-        .background(.thinMaterial)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Color.primary.opacity(0.03))
+        .overlay(Divider(), alignment: .top)
     }
 
-    private func filterPill(_ text: String, level: ConsoleLogLevel?) -> some View {
-        Button(text) {
+    private func filterButton(_ text: String, level: ConsoleLogLevel?) -> some View {
+        Button {
             selectedLevel = level
+        } label: {
+            Text(text)
+                .font(.system(size: 9, weight: .bold))
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(selectedLevel == level ? Color.blue : Color.primary.opacity(0.05), in: Capsule())
+                .foregroundStyle(selectedLevel == level ? .white : .secondary)
         }
-        .buttonStyle(.bordered)
-        .tint(selectedLevel == level ? .blue : .secondary)
+        .buttonStyle(.plain)
+    }
+
+    private func filterMenuLabel(_ text: String, icon: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+            Text(text.uppercased())
+            Image(systemName: "chevron.down")
+        }
+        .font(.system(size: 9, weight: .bold))
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 4))
+    }
+
+    struct ConsoleToggleStyle: ToggleStyle {
+        func makeBody(configuration: Configuration) -> some View {
+            Button {
+                configuration.isOn.toggle()
+            } label: {
+                HStack(spacing: 4) {
+                    configuration.label
+                    Image(systemName: configuration.isOn ? "checkmark.square.fill" : "square")
+                        .font(.system(size: 10))
+                }
+                .foregroundStyle(configuration.isOn ? .blue : .secondary)
+            }
+            .buttonStyle(.plain)
+        }
     }
 
     private func badge(for entry: SDKLogEntry) -> some View {

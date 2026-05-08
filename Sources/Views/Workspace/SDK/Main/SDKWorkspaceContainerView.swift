@@ -154,30 +154,39 @@ struct SDKWorkspaceContainerView: View {
     private var clampedBottomHeight: CGFloat { CGFloat(min(max(120, state.layout.bottomPanelHeight), 420)) }
 
     private var topToolbar: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 16) {
             HStack(spacing: 8) {
-                Image(systemName: "hammer.circle.fill")
-                    .foregroundStyle(.primary)
+                Image(systemName: "hammer.fill")
+                    .foregroundStyle(.blue)
                 Text("SDK IDE")
-                    .font(.subheadline.bold())
+                    .font(.system(.subheadline, design: .rounded).bold())
             }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(Color.blue.opacity(0.1), in: Capsule())
 
             Spacer()
 
             if !isCompact {
-                HStack(spacing: 4) {
-                    toolbarIconButton(icon: state.layout.isLeftCollapsed ? "sidebar.left" : "sidebar.left.hide") { toggle(\.isLeftCollapsed) }
-                    toolbarIconButton(icon: state.layout.isRightCollapsed ? "sidebar.right" : "sidebar.right.hide") { toggle(\.isRightCollapsed) }
-                    toolbarIconButton(icon: state.layout.isBottomCollapsed ? "rectangle.bottomthird.inset.filled" : "rectangle.bottomthird.inset") { toggle(\.isBottomCollapsed) }
-                }
+                HStack(spacing: 12) {
+                    HStack(spacing: 0) {
+                        toolbarIconButton(icon: state.layout.isLeftCollapsed ? "sidebar.left" : "sidebar.left", active: !state.layout.isLeftCollapsed) { toggle(\.isLeftCollapsed) }
+                        Divider().frame(height: 16).padding(.horizontal, 4)
+                        toolbarIconButton(icon: state.layout.isBottomCollapsed ? "sidebar.bottom" : "sidebar.bottom", active: !state.layout.isBottomCollapsed) { toggle(\.isBottomCollapsed) }
+                        Divider().frame(height: 16).padding(.horizontal, 4)
+                        toolbarIconButton(icon: state.layout.isRightCollapsed ? "sidebar.right" : "sidebar.right", active: !state.layout.isRightCollapsed) { toggle(\.isRightCollapsed) }
+                    }
+                    .padding(4)
+                    .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
 
-                NavigationLink { SDKRunConfigurationView() } label: {
-                    Label("Config", systemImage: "slider.horizontal.3")
-                        .font(.caption.bold())
+                    Button { activeSheet = .runConfiguration } label: {
+                        Image(systemName: "slider.horizontal.3")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 32, height: 32)
+                            .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
+                    }
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-                .tint(.secondary)
             }
 
             Button {
@@ -191,29 +200,32 @@ struct SDKWorkspaceContainerView: View {
                     }
                     Text(isRunning ? "Running" : "Run")
                 }
-                .font(.caption.bold())
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(isRunning ? Color.gray.opacity(0.2) : Color.primary)
-                .foregroundStyle(isRunning ? .primary : Color(.systemBackground))
+                .font(.system(.caption, design: .rounded).bold())
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(isRunning ? Color.secondary.opacity(0.2) : Color.blue)
+                .foregroundStyle(isRunning ? .secondary : .white)
                 .clipShape(Capsule())
+                .shadow(color: isRunning ? .clear : .blue.opacity(0.3), radius: 4, y: 2)
             }
             .disabled(isRunning)
         }
         .padding(.horizontal)
-        .padding(.vertical, 10)
+        .padding(.vertical, 8)
         .background(.ultraThinMaterial)
+        .overlay(Divider(), alignment: .bottom)
     }
 
-    private func toolbarIconButton(icon: String, action: @escaping () -> Void) -> some View {
+    private func toolbarIconButton(icon: String, active: Bool = false, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(active ? Color.blue : .secondary)
                 .frame(width: 32, height: 32)
-                .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 6))
+                .background(active ? Color.blue.opacity(0.1) : Color.clear, in: RoundedRectangle(cornerRadius: 6))
         }
     }
+
 
     private func runProject() {
         Task {

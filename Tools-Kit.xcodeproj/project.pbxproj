@@ -2328,19 +2328,19 @@
 		SV016A6A8C64AFF84AADB98F /* SecurityAuditDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityAuditDashboardView.swift; sourceTree = "<group>"; };
 		SV017C6FA6D76B1B4F51B5C4 /* SecurityAppLockRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityAppLockRulesView.swift; sourceTree = "<group>"; };
 		SV01753ABE02878346C2A212 /* SecurityActivityLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityActivityLogView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000101 /* ConnectorsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorsMainView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000102 /* ConnectorBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorBuilderView.swift; sourceTree = "<group>"; };
-		ABCD1234567890ABCDEF0100 /* PresetConnectorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetConnectorsView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000103 /* ConnectorDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorDetailView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000104 /* ConnectorExecutionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorExecutionView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000105 /* ConnectorLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorLogsView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000106 /* ConnectorAuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorAuthView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000107 /* ConnectorSchemaBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorSchemaBuilderView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000108 /* ConnectorFlowBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorFlowBuilderView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000109 /* ConnectorTestConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorTestConsoleView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000010A /* ConnectorSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorSecurityView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000010B /* ConnectorVersioningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorVersioningView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000010C /* ConnectorScopeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorScopeView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000101 /* ConnectorsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/ConnectorsMainView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000102 /* ConnectorBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/ConnectorBuilderView.swift; sourceTree = "<group>"; };
+		ABCD1234567890ABCDEF0100 /* PresetConnectorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/PresetConnectorsView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000103 /* ConnectorDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Detail/ConnectorDetailView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000104 /* ConnectorExecutionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Execution/ConnectorExecutionView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000105 /* ConnectorLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Execution/ConnectorLogsView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000106 /* ConnectorAuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth/ConnectorAuthView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000107 /* ConnectorSchemaBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/ConnectorSchemaBuilderView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000108 /* ConnectorFlowBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/ConnectorFlowBuilderView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000109 /* ConnectorTestConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Execution/ConnectorTestConsoleView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000010A /* ConnectorSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/ConnectorSecurityView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000010B /* ConnectorVersioningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Versioning/ConnectorVersioningView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000010C /* ConnectorScopeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/ConnectorScopeView.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000000 /* UnifiedDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnifiedDataStore.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000001 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000002 /* AIOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIOrchestrator.swift; sourceTree = "<group>"; };
@@ -2355,14 +2355,14 @@
 		TKRF000000000000000000000B /* AutomationHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationHomeView.swift; sourceTree = "<group>"; };
 		TKRF000000000000000000000C /* AdvancedCollaborationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedCollaborationView.swift; sourceTree = "<group>"; };
 		TKRF000000000000000000000D /* SpatialWorkspaceHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpatialWorkspaceHomeView.swift; sourceTree = "<group>"; };
-		TKRF000000000000000000000E /* PluginsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginsMainView.swift; sourceTree = "<group>"; };
-		TKRF000000000000000000000F /* PluginBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginBuildView.swift; sourceTree = "<group>"; };
-		TKRF0000000000000000000010 /* PluginsInstalledView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginsInstalledView.swift; sourceTree = "<group>"; };
-		TKRF0000000000000000000011 /* MarketplaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplaceView.swift; sourceTree = "<group>"; };
-		TKRF0000000000000000000012 /* PluginDevConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginDevConsoleView.swift; sourceTree = "<group>"; };
+		TKRF000000000000000000000E /* PluginsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/PluginsMainView.swift; sourceTree = "<group>"; };
+		TKRF000000000000000000000F /* PluginBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/PluginBuildView.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000010 /* PluginsInstalledView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/PluginsInstalledView.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000011 /* MarketplaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/MarketplaceView.swift; sourceTree = "<group>"; };
+		TKRF0000000000000000000012 /* PluginDevConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/PluginDevConsoleView.swift; sourceTree = "<group>"; };
 		PL0100000000000000000001 /* PluginModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginModels.swift; sourceTree = "<group>"; };
-		PL0100000000000000000002 /* PluginDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginDetailView.swift; sourceTree = "<group>"; };
-		PL0100000000000000000003 /* PluginGlobalOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginGlobalOverlay.swift; sourceTree = "<group>"; };
+		PL0100000000000000000002 /* PluginDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Detail/PluginDetailView.swift; sourceTree = "<group>"; };
+		PL0100000000000000000003 /* PluginGlobalOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Overlay/PluginGlobalOverlay.swift; sourceTree = "<group>"; };
 		MS01A1B2C3D4E5F600000001 /* SecureFolderModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureFolderModels.swift; sourceTree = "<group>"; };
 		MS01A1B2C3D4E5F600000002 /* SecureFolderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureFolderManager.swift; sourceTree = "<group>"; };
 		MS01A1B2C3D4E5F600000003 /* AppLockManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockManager.swift; sourceTree = "<group>"; };
@@ -2397,9 +2397,9 @@
 		ML010000000000000000000012 /* NotebookComparePagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookComparePagesView.swift; sourceTree = "<group>"; };
 		ML010000000000000000000013 /* NotebookAddCommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookAddCommentsView.swift; sourceTree = "<group>"; };
 		ML010000000000000000000014 /* NotebookAuditLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookAuditLogsView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000004 /* PluginSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginSecurityView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000005 /* PluginLimitedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginLimitedView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000006 /* SecurityScopeApplicationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityScopeApplicationView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000004 /* PluginSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/PluginSecurityView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000005 /* PluginLimitedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/PluginLimitedView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000006 /* SecurityScopeApplicationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/SecurityScopeApplicationView.swift; sourceTree = "<group>"; };
 		DV0100000000000000000001 /* WorkspaceAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAPI.swift; sourceTree = "<group>"; };
 		DV0100000000000000000002 /* SDKRuntimeEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKRuntimeEngine.swift; sourceTree = "<group>"; };
 		DV0100000000000000000003 /* SDKExecutionBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKExecutionBridge.swift; sourceTree = "<group>"; };
@@ -2420,22 +2420,22 @@
 		DV0100000000000000000012 /* SDKPermissionGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPermissionGate.swift; sourceTree = "<group>"; };
 		DV0100000000000000000013 /* SDKSandboxController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKSandboxController.swift; sourceTree = "<group>"; };
 		DV0100000000000000000014 /* SDKNoSandboxOverrideController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKNoSandboxOverrideController.swift; sourceTree = "<group>"; };
-		PL010000000000000000000007 /* SDKBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKBuildView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000008 /* SDKProjectDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKProjectDashboardView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000009 /* SDKDeploymentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDeploymentView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000000A /* SDKSystemExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKSystemExplorerView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000000B /* SDKAPIBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAPIBrowserView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000000C /* SDKConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConsoleView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000020 /* SDKControlCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKControlCenterView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000021 /* SDKWorkspaceExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKWorkspaceExplorerView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000022 /* SDKActionConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKActionConsoleView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000023 /* SDKIntegrationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKIntegrationTestView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000024 /* SDKEventStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKEventStreamView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000025 /* SDKSecurityMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKSecurityMonitorView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000000D /* SDKDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDebugView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000000E /* SDKFlowBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKFlowBuilderView.swift; sourceTree = "<group>"; };
-		PL01000000000000000000000F /* SDKDataControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDataControlView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000010 /* SDKPermissionControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPermissionControlView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000007 /* SDKBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKBuildView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000008 /* SDKProjectDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKProjectDashboardView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000009 /* SDKDeploymentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deployment/SDKDeploymentView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000000A /* SDKSystemExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKSystemExplorerView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000000B /* SDKAPIBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Explorer/SDKAPIBrowserView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000000C /* SDKConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/SDKConsoleView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000020 /* SDKControlCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKControlCenterView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000021 /* SDKWorkspaceExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Explorer/SDKWorkspaceExplorerView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000022 /* SDKActionConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKActionConsoleView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000023 /* SDKIntegrationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKIntegrationTestView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000024 /* SDKEventStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKEventStreamView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000025 /* SDKSecurityMonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKSecurityMonitorView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000000D /* SDKDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKDebugView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000000E /* SDKFlowBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKFlowBuilderView.swift; sourceTree = "<group>"; };
+		PL01000000000000000000000F /* SDKDataControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Explorer/SDKDataControlView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000010 /* SDKPermissionControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/SDKPermissionControlView.swift; sourceTree = "<group>"; };
 		2A185A33DEA747ABB81E5845 /* ToolsKitSDK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsKitSDK.swift; sourceTree = "<group>"; };
 		402EA872FE4B42E9919BB931 /* SDKLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLogStore.swift; sourceTree = "<group>"; };
 		E4AAB3375BCD4B6BAC538FDC /* SDKProjectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKProjectManager.swift; sourceTree = "<group>"; };
@@ -2451,13 +2451,13 @@
 		17DF0AFC8D854FAC9706801A /* CalendarConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarConnector.swift; sourceTree = "<group>"; };
 		7C8B3D77A06A46AC8C9F338D /* SDKPluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginManager.swift; sourceTree = "<group>"; };
 		A47E16E3713E47C8B668F9A4 /* SDKToolManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKToolManager.swift; sourceTree = "<group>"; };
-		57F836A766414E69B1E15432 /* SDKPluginsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginsView.swift; sourceTree = "<group>"; };
-		94F7CA9EB7294F5194434142 /* SDKAppBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAppBuilderView.swift; sourceTree = "<group>"; };
-		06C00EFEC47F4EFA82E82DD7 /* SDKLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLogsView.swift; sourceTree = "<group>"; };
-		73D12F91040E4F5EBF1520B1 /* SDKToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKToolsView.swift; sourceTree = "<group>"; };
-		D09A5B508388459689A2623D /* SDKAutomationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAutomationView.swift; sourceTree = "<group>"; };
-		862B9D21ECC745D8AB7D01C3 /* SDKDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDiagnosticsView.swift; sourceTree = "<group>"; };
-		5851B51F6765499BABAC81DE /* SDKConnectorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConnectorsView.swift; sourceTree = "<group>"; };
+		57F836A766414E69B1E15432 /* SDKPluginsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKPluginsView.swift; sourceTree = "<group>"; };
+		94F7CA9EB7294F5194434142 /* SDKAppBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKAppBuilderView.swift; sourceTree = "<group>"; };
+		06C00EFEC47F4EFA82E82DD7 /* SDKLogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKLogsView.swift; sourceTree = "<group>"; };
+		73D12F91040E4F5EBF1520B1 /* SDKToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/SDKToolsView.swift; sourceTree = "<group>"; };
+		D09A5B508388459689A2623D /* SDKAutomationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Explorer/SDKAutomationView.swift; sourceTree = "<group>"; };
+		862B9D21ECC745D8AB7D01C3 /* SDKDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKDiagnosticsView.swift; sourceTree = "<group>"; };
+		5851B51F6765499BABAC81DE /* SDKConnectorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKConnectorsView.swift; sourceTree = "<group>"; };
 		ADB759BF5EDA4D3F98452ADD /* SDKCoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKCoreDataStack.swift; sourceTree = "<group>"; };
 		AE17BF24E77546EB89BFE5EB /* SDKDataEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDataEngine.swift; sourceTree = "<group>"; };
 		3A87BE1C659F46ADB1FD423A /* SDKExecutionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKExecutionEngine.swift; sourceTree = "<group>"; };
@@ -2494,11 +2494,11 @@
 		SDK15DBE0E80391E2E7833B8 /* SDKMeetService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKMeetService.swift; sourceTree = "<group>"; };
 		SDK134F02928F3FCE2BF609D /* SDKArticleService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKArticleService.swift; sourceTree = "<group>"; };
 		SDK15DBFE25CCC42CE7BDF3A /* WorkspaceSDK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSDK.swift; sourceTree = "<group>"; };
-		SDK1B55D96C7DAC4DDF9EB93 /* SDKHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKHomeView.swift; sourceTree = "<group>"; };
-		SDK1338A34AFE3BD36538341 /* SDKAPIExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAPIExplorerView.swift; sourceTree = "<group>"; };
-		SDK19CD0E48D6C30B006E472 /* SDKDataInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDataInspectorView.swift; sourceTree = "<group>"; };
-		SDK15392AF5F3C4210ACFFE1 /* SDKPluginManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginManagerView.swift; sourceTree = "<group>"; };
-		SDK1245FB85BF006D2EE4B2D /* SDKDeveloperGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDeveloperGuideView.swift; sourceTree = "<group>"; };
+		SDK1B55D96C7DAC4DDF9EB93 /* SDKHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKHomeView.swift; sourceTree = "<group>"; };
+		SDK1338A34AFE3BD36538341 /* SDKAPIExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Explorer/SDKAPIExplorerView.swift; sourceTree = "<group>"; };
+		SDK19CD0E48D6C30B006E472 /* SDKDataInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Explorer/SDKDataInspectorView.swift; sourceTree = "<group>"; };
+		SDK15392AF5F3C4210ACFFE1 /* SDKPluginManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/SDKPluginManagerView.swift; sourceTree = "<group>"; };
+		SDK1245FB85BF006D2EE4B2D /* SDKDeveloperGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Docs/SDKDeveloperGuideView.swift; sourceTree = "<group>"; };
 		SDK1A00000000000000000001 /* SDKIDEWorkspaceState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKIDEWorkspaceState.swift; sourceTree = "<group>"; };
 		SDK1A00000000000000000002 /* SDKExecutionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKExecutionCoordinator.swift; sourceTree = "<group>"; };
 		SDK1A00000000000000000003 /* SDKLibraryExecutionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLibraryExecutionEngine.swift; sourceTree = "<group>"; };
@@ -2509,16 +2509,16 @@
 		SDK1A00000000000000000008 /* SDKDependencyConflictResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDependencyConflictResolver.swift; sourceTree = "<group>"; };
 		SDK1A00000000000000000009 /* SDKDependencyScopeValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDependencyScopeValidator.swift; sourceTree = "<group>"; };
 		SDK1A0000000000000000000A /* SDKStructureValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKStructureValidator.swift; sourceTree = "<group>"; };
-		SDK1A0000000000000000000B /* SDKWorkspaceContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKWorkspaceContainerView.swift; sourceTree = "<group>"; };
-		SDK1A0000000000000000000C /* SDKNavigatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKNavigatorView.swift; sourceTree = "<group>"; };
-		SDK1A0000000000000000000D /* SDKProjectEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKProjectEditorView.swift; sourceTree = "<group>"; };
-		SDK1A0000000000000000000E /* SDKInspectorPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKInspectorPanelView.swift; sourceTree = "<group>"; };
-		SDK1A0000000000000000000F /* SDKScopesEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKScopesEditorView.swift; sourceTree = "<group>"; };
-		SDK1A00000000000000000010 /* SDKCapabilitiesMatrixView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKCapabilitiesMatrixView.swift; sourceTree = "<group>"; };
-		SDK1A00000000000000000011 /* SDKRunConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKRunConfigurationView.swift; sourceTree = "<group>"; };
-		SDK1A00000000000000000012 /* SDKLibraryManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLibraryManagerView.swift; sourceTree = "<group>"; };
-		SDK1A00000000000000000013 /* SDKDependencyManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDependencyManagerView.swift; sourceTree = "<group>"; };
-		PL010000000000000000000026 /* SDKInternalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKInternalView.swift; sourceTree = "<group>"; };
+		SDK1A0000000000000000000B /* SDKWorkspaceContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKWorkspaceContainerView.swift; sourceTree = "<group>"; };
+		SDK1A0000000000000000000C /* SDKNavigatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/SDKNavigatorView.swift; sourceTree = "<group>"; };
+		SDK1A0000000000000000000D /* SDKProjectEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/SDKProjectEditorView.swift; sourceTree = "<group>"; };
+		SDK1A0000000000000000000E /* SDKInspectorPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/SDKInspectorPanelView.swift; sourceTree = "<group>"; };
+		SDK1A0000000000000000000F /* SDKScopesEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/SDKScopesEditorView.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000010 /* SDKCapabilitiesMatrixView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Explorer/SDKCapabilitiesMatrixView.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000011 /* SDKRunConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/SDKRunConfigurationView.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000012 /* SDKLibraryManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/SDKLibraryManagerView.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000013 /* SDKDependencyManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/SDKDependencyManagerView.swift; sourceTree = "<group>"; };
+		PL010000000000000000000026 /* SDKInternalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKInternalView.swift; sourceTree = "<group>"; };
 		WK01AICONTEXT0000000001 /* AIContextEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Workspace/AIContextEngine.swift; sourceTree = SOURCE_ROOT; };
 		WK01VERSIONCTRL00000001 /* VersionControlManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Workspace/VersionControlManager.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -4727,17 +4727,6 @@
 		6D9B782B23364B0B8BCC0B0F /* Connectors */ = {
 			isa = PBXGroup;
 			children = (
-				010000000000000000000101 /* Unknown */,
-				010000000000000000000102 /* Unknown */,
-				010000000000000000000103 /* Unknown */,
-				010000000000000000000104 /* Unknown */,
-				010000000000000000000105 /* Unknown */,
-				010000000000000000000106 /* Unknown */,
-				010000000000000000000107 /* Unknown */,
-				010000000000000000000108 /* Unknown */,
-				010000000000000000000109 /* Unknown */,
-				01000000000000000000010A /* Unknown */,
-				01000000000000000000010B /* Unknown */,
 			);
 			path = Connectors;
 			sourceTree = "<group>";
@@ -5430,22 +5419,6 @@
 		89F7FA2CC5CC4B6A9B8697F0 /* SDK */ = {
 			isa = PBXGroup;
 			children = (
-				010000000000000000000007 /* Unknown */,
-				010000000000000000000008 /* Unknown */,
-				010000000000000000000009 /* Unknown */,
-				01000000000000000000000A /* Unknown */,
-				01000000000000000000000B /* Unknown */,
-				01000000000000000000000C /* Unknown */,
-				01000000000000000000000D /* Unknown */,
-				01000000000000000000000E /* Unknown */,
-				01000000000000000000000F /* Unknown */,
-				010000000000000000000010 /* Unknown */,
-				010000000000000000000020 /* Unknown */,
-				010000000000000000000021 /* Unknown */,
-				010000000000000000000022 /* Unknown */,
-				010000000000000000000023 /* Unknown */,
-				010000000000000000000024 /* Unknown */,
-				010000000000000000000025 /* Unknown */,
 			);
 			path = SDK;
 			sourceTree = "<group>";
@@ -7166,10 +7139,6 @@
 			isa = PBXGroup;
 			children = (
 				2054E7AF12EB68C41BECE760 /* GitEngineService.swift */,
-				CollaborationFramework /* Unknown */,
-				CollaborationManager /* Unknown */,
-				WorkspaceAutomationEngine /* Unknown */,
-				WorkspaceSnapshotService /* Unknown */,
 			);
 			path = Collaboration;
 			sourceTree = "<group>";
@@ -8507,7 +8476,6 @@
 			isa = PBXGroup;
 			children = (
 				KB0100000000000000000001 /* KeyboardViewController.swift */,
-				KeyboardViewController /* Unknown */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -8618,8 +8586,6 @@
 		MEG0000000000000000000001 /* Meet */ = {
 			isa = PBXGroup;
 			children = (
-				MeetPermissionService /* Unknown */,
-				MeetSessionController /* Unknown */,
 			);
 			path = Meet;
 			sourceTree = "<group>";
@@ -8634,18 +8600,6 @@
 		MEG0000000000000000000003 /* Meet */ = {
 			isa = PBXGroup;
 			children = (
-				AIAssistantPanelView /* Unknown */,
-				BackgroundEffectsView /* Unknown */,
-				BreakoutRoomCardView /* Unknown */,
-				BreakoutRoomManagerView /* Unknown */,
-				ChatMessageBubbleView /* Unknown */,
-				MeetDeveloperToolsView /* Unknown */,
-				MeetingContainerView /* Unknown */,
-				MeetingDiagnosticsView /* Unknown */,
-				ParticipantAdminPanelView /* Unknown */,
-				PerformanceWarningView /* Unknown */,
-				ReactionsOverlayView /* Unknown */,
-				WorkspaceMeetingNotesView /* Unknown */,
 			);
 			path = Meet;
 			sourceTree = "<group>";
@@ -8772,7 +8726,6 @@
 			isa = PBXGroup;
 			children = (
 				MS0107C4CA60A1926E94DEC9 /* MessagesViewController.swift */,
-				MessagesViewController /* Unknown */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -8794,8 +8747,6 @@
 				MS017E7FE63D8D555B572718 /* MessagesReplyGenerator.swift */,
 				MS0198D4E695260224D8850A /* MessagesSummarizeTool.swift */,
 				MS01B0FF40CAEAEC26586CD6 /* MessagesAIHomeView.swift */,
-				MessagesReplyGenerator /* Unknown */,
-				MessagesSummarizeTool /* Unknown */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -8842,13 +8793,6 @@
 		PL000000000000000000000100 /* Connectors */ = {
 			isa = PBXGroup;
 			children = (
-				ConnectorBuilderView /* Unknown */,
-				ConnectorExecutionView /* Unknown */,
-				ConnectorFlowBuilderView /* Unknown */,
-				ConnectorSchemaBuilderView /* Unknown */,
-				ConnectorSecurityView /* Unknown */,
-				ConnectorTestConsoleView /* Unknown */,
-				ConnectorVersioningView /* Unknown */,
 			);
 			path = Connectors;
 			sourceTree = "<group>";

@@ -61,80 +61,93 @@ struct SDKNavigatorView: View {
     }
 
     var body: some View {
-        let spacing: CGFloat = 8
-        let horizontalTopPadding: CGFloat = 10
-        let compactListStyle: InsetGroupedListStyle = listStyleValueCompact
-        let regularListStyle: PlainListStyle = listStyleValue
-        let shouldUseCompactListStyle: Bool = isCompact
+        VStack(spacing: 0) {
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                TextField(searchPrompt, text: $state.navigatorFilterText)
+                    .font(.subheadline)
+            }
+            .padding(8)
+            .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 6))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
 
-        return VStack(spacing: spacing) {
-            TextField(searchPrompt, text: $state.navigatorFilterText)
-                .textFieldStyle(.roundedBorder)
-                .padding([.horizontal, .top], horizontalTopPadding)
+            Divider()
 
-            let navigatorList = List {
-                Section(nodeSectionTitle) {
+            List {
+                Section {
                     ForEach(filteredNodes) { node in
-                        let isSelected: Bool = state.selectedNode == node
-                        let iconStyle: Color = isSelected ? .accentColor : .secondary
-                        let titleWeight: Font.Weight = isSelected ? .semibold : .regular
-                        let titleFont: Font = .subheadline.weight(titleWeight)
-                        let tagsText: String = node.tags.joined(separator: " • ")
-                        let hasBrokenLinkValue: Bool = hasBrokenLink(for: node)
-                        let hasDependencyHighlightValue: Bool = hasDependencyHighlight(for: node)
+                        let isSelected = state.selectedNode == node
+
                         Button {
                             state.open(node: node)
                         } label: {
-                            HStack(spacing: 12) {
+                            HStack(spacing: 8) {
                                 Image(systemName: node.icon)
-                                    .frame(width: 22)
-                                    .foregroundStyle(iconStyle)
-                                VStack(alignment: .leading, spacing: 3) {
-                                    Text(node.title)
-                                        .font(titleFont)
-                                    if !isCompact {
-                                        Text(tagsText)
-                                            .font(.caption2)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
+                                    .font(.system(size: 14))
+                                    .frame(width: 20)
+                                    .foregroundStyle(isSelected ? .blue : .secondary)
+
+                                Text(node.title)
+                                    .font(.system(size: 13, weight: isSelected ? .medium : .regular))
+                                    .foregroundStyle(isSelected ? .primary : .primary.opacity(0.8))
+
                                 Spacer()
-                                if hasBrokenLinkValue {
+
+                                if hasBrokenLink(for: node) {
                                     Image(systemName: "exclamationmark.triangle.fill")
+                                        .font(.system(size: 10))
                                         .foregroundStyle(.red)
-                                } else if hasDependencyHighlightValue {
-                                    Circle().fill(.orange).frame(width: 8, height: 8)
+                                } else if hasDependencyHighlight(for: node) {
+                                    Circle().fill(.orange).frame(width: 6, height: 6)
                                 }
                             }
-                            .contentShape(Rectangle())
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 8)
+                            .background(isSelected ? Color.blue.opacity(0.1) : Color.clear)
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
                         }
                         .buttonStyle(.plain)
                     }
+                } header: {
+                    Text(nodeSectionTitle)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.secondary)
                 }
 
-                Section(statusSectionTitle) {
-                    let librariesCount: Int = state.libraries.count
-                    let dependenciesCount: Int = state.dependencies.count
-                    let diagnosticsCount: Int = state.diagnostics.count
-                    let librariesValue: String = "\(librariesCount)"
-                    let dependenciesValue: String = "\(dependenciesCount)"
-                    let diagnosticsValue: String = "\(diagnosticsCount)"
-
-                    LabeledContent("Libraries", value: librariesValue)
-                    LabeledContent("Dependencies", value: dependenciesValue)
-                    LabeledContent("Diagnostics", value: diagnosticsValue)
+                Section {
+                    statusRow(title: "Libraries", value: "\(state.libraries.count)", icon: "shippingbox")
+                    statusRow(title: "Dependencies", value: "\(state.dependencies.count)", icon: "link")
+                    statusRow(title: "Diagnostics", value: "\(state.diagnostics.count)", icon: "stethoscope")
+                } header: {
+                    Text(statusSectionTitle)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.secondary)
                 }
             }
-
-            if shouldUseCompactListStyle {
-                navigatorList
-                    .listStyle(compactListStyle)
-            } else {
-                navigatorList
-                    .listStyle(regularListStyle)
-            }
+            .listStyle(.plain)
         }
-        .background(.background)
+        .background(Color(.systemGroupedBackground))
+    }
+
+    private func statusRow(title: String, value: String, icon: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 12))
+                .frame(width: 20)
+                .foregroundStyle(.secondary)
+            Text(title)
+                .font(.system(size: 12))
+            Spacer()
+            Text(value)
+                .font(.system(size: 12, design: .monospaced))
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Color.primary.opacity(0.05), in: Capsule())
+        }
     }
 
     private func hasDependencyHighlight(for node: SDKWorkspaceNode) -> Bool {
