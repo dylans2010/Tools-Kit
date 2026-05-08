@@ -25,31 +25,39 @@ struct MeetingLobbyView: View {
     }
 
     private var sessionSection: some View {
-        Section("Session") {
+        Section {
             if let session = manager.currentSession {
                 LabeledContent("Meeting ID", value: session.meetingId)
                     .font(.headline.monospaced())
             }
+        } header: {
+            Text("Session")
         }
     }
 
     private var participantsSection: some View {
-        Section("Participants") { participantsRow }
+        Section { participantsRow } header: {
+            Text("Participants")
+        }
     }
 
     private var deviceChecksSection: some View {
-        Section("Device Checks") {
+        Section {
             permissionRow(title: "Microphone", state: manager.lobbyState.microphonePermission, icon: "mic")
             permissionRow(title: "Camera", state: manager.lobbyState.cameraPermission, icon: "video")
+        } header: {
+            Text("Device Checks")
         }
     }
 
     private var prejoinSection: some View {
-        Section("Prejoin") {
+        Section {
             PreJoinView(manager: manager) {
                 DebugLogger.shared.log("Join button tapped from prejoin.", level: .info, category: "Meet")
                 Task { await manager.startMeeting() }
             }
+        } header: {
+            Text("Prejoin")
         }
     }
 

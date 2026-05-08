@@ -121,20 +121,24 @@ struct RadioView: View {
                     // Favorites section
                     if !player.favorites.isEmpty && viewModel.searchText.isEmpty
                         && viewModel.activeFilter == .none {
-                        Section("Favorites") {
+                        Section {
                             ForEach(player.favorites) { station in
                                 stationRow(station)
                             }
+                        } header: {
+                            Text("Favorites")
                         }
                     }
 
                     // Recently played section
                     if !player.recentlyPlayed.isEmpty && viewModel.searchText.isEmpty
                         && viewModel.activeFilter == .none {
-                        Section("Recently Played") {
+                        Section {
                             ForEach(player.recentlyPlayed.prefix(5)) { station in
                                 stationRow(station)
                             }
+                        } header: {
+                            Text("Recently Played")
                         }
                     }
 

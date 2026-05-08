@@ -107,7 +107,7 @@ struct NotebookDetailView: View {
             concept: "\(liveNotebook.name) clean notebook cover with productivity visuals",
             onResult: handleImagePlaygroundResult
         ))
-        .onChange(of: photoPickerItem) { newItem in
+        .onChange(of: photoPickerItem) { _, newItem in
             guard let newItem else { return }
             Task {
                 if let data = try? await newItem.loadTransferable(type: Data.self),

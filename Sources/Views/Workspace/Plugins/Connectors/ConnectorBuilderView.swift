@@ -103,7 +103,7 @@ struct ConnectorBuilderView: View {
             }
 
             // MARK: - Base URL
-            Section("Base URL") {
+            Section {
                 TextField("https://api.example.com/v1", text: $baseURL)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
@@ -112,10 +112,12 @@ struct ConnectorBuilderView: View {
                 Text("All endpoint paths will be relative to this base URL.")
                     .font(.caption)
                     .foregroundColor(.secondary)
+            } header: {
+                Text("Base URL")
             }
 
             // MARK: - Authentication
-            Section("Authentication") {
+            Section {
                 Picker("Auth Type", selection: $selectedAuthType) {
                     Text("None").tag(ConnectorAuthConfig.AuthType.none)
                     Text("API Key").tag(ConnectorAuthConfig.AuthType.apiKey)
@@ -147,10 +149,12 @@ struct ConnectorBuilderView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
+            } header: {
+                Text("Authentication")
             }
 
             // MARK: - Endpoints
-            Section("Endpoints") {
+            Section {
                 if !pendingEndpoints.isEmpty {
                     ForEach(pendingEndpoints) { endpoint in
                         HStack {
@@ -199,10 +203,12 @@ struct ConnectorBuilderView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
+            } header: {
+                Text("Endpoints")
             }
 
             // MARK: - Capabilities Summary
-            Section("Capabilities") {
+            Section {
                 HStack {
                     Label("REST Integration", systemImage: "network")
                         .font(.caption)
@@ -235,9 +241,11 @@ struct ConnectorBuilderView: View {
                         .foregroundColor(selectedAuthType != .none ? .green : .secondary)
                         .font(.caption)
                 }
+            } header: {
+                Text("Capabilities")
             }
 
-            Section("Saved Connector Data") {
+            Section {
                 LabeledContent("Connectors", value: "\(manager.connectors.count)")
                 LabeledContent("Activity Logs", value: "\(manager.logs.count)")
                 if let existing = connectorID.flatMap({ id in manager.connectors.first(where: { $0.id == id }) }) {
@@ -254,6 +262,8 @@ struct ConnectorBuilderView: View {
                             .font(.caption)
                     }
                 }
+            } header: {
+                Text("Saved Connector Data")
             }
 
             // MARK: - Save

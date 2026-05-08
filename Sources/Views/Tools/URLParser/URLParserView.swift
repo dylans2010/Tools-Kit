@@ -10,7 +10,7 @@ struct URLParserView: View {
                 ToolInputSection("URL") {
                     TextField("Enter URL Here", text: $input)
                         .padding()
-                        .onChange(of: input) { _ in backend.parse(urlString: input) }
+                        .onChange(of: input) { _, _ in backend.parse(urlString: input) }
                 }
 
                 if !backend.components.isEmpty {

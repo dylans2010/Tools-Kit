@@ -84,11 +84,13 @@ struct AddAutomationRuleView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Rule Name") {
+                Section {
                     TextField("New Rule", text: $name)
+                } header: {
+                    Text("Rule Name")
                 }
 
-                Section("Trigger") {
+                Section {
                     Picker("Trigger Type", selection: $selectedTrigger) {
                         ForEach(TriggerType.allCases, id: \.self) { type in
                             Text(type.rawValue).tag(type)
@@ -98,6 +100,8 @@ struct AddAutomationRuleView: View {
                     if selectedTrigger == .data {
                         TextField("Scope (e.g. tasks)", text: $scope)
                     }
+                } header: {
+                    Text("Trigger")
                 }
 
                 Section {

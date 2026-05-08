@@ -11,7 +11,7 @@ struct MorseCodeView: View {
                     TextEditor(text: $input)
                         .frame(height: 100)
                         .padding(8)
-                        .onChange(of: input) { _ in backend.encode(input) }
+                        .onChange(of: input) { _, _ in backend.encode(input) }
                 }
 
                 if !backend.output.isEmpty {

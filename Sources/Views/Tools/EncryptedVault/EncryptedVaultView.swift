@@ -137,15 +137,17 @@ struct AddVaultEntrySheet: View {
     var body: some View {
         NavigationView {
             Form {
-                Section("Details") {
+                Section {
                     TextField("Label (e.g. GitHub Token)", text: $label)
                     Picker("Category", selection: $category) {
                         ForEach(VaultEntry.VaultCategory.allCases) { c in
                             Label(c.rawValue, systemImage: c.icon).tag(c)
                         }
                     }
+                } header: {
+                    Text("Details")
                 }
-                Section("Secret") {
+                Section {
                     HStack {
                         if showSecret {
                             TextField("Secret Value", text: $secret)
@@ -159,6 +161,8 @@ struct AddVaultEntrySheet: View {
                                 .foregroundColor(.secondary)
                         }
                     }
+                } header: {
+                    Text("Secret")
                 }
             }
             .navigationTitle("New Secret")

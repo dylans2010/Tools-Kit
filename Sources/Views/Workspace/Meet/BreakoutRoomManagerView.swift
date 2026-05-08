@@ -6,7 +6,7 @@ struct BreakoutRoomManagerView: View {
 
     var body: some View {
         List {
-            Section("Create Room") {
+            Section {
                 TextField("Room Name", text: $newRoomName)
                 Button("Create") {
                     let name = newRoomName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -14,15 +14,19 @@ struct BreakoutRoomManagerView: View {
                     Task { await manager.createBreakoutRoom(named: name) }
                     newRoomName = ""
                 }
+            } header: {
+                Text("Create Room")
             }
 
-            Section("Rooms") {
+            Section {
                 ForEach(manager.breakoutRooms) { room in
                     BreakoutRoomCardView(room: room, participants: manager.participants)
                 }
+            } header: {
+                Text("Rooms")
             }
 
-            Section("Assign Participants") {
+            Section {
                 ForEach(manager.participants.filter { $0.role != .host }) { participant in
                     Picker(participant.displayName, selection: breakoutBinding(for: participant.id)) {
                         Text("Main Room").tag(String?.none)
@@ -31,6 +35,8 @@ struct BreakoutRoomManagerView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Assign Participants")
             }
         }
         .navigationTitle("Breakout Manager")

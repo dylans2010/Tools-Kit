@@ -82,7 +82,7 @@ struct ConnectorsMainView: View {
             }
 
             // MARK: - Quick Actions
-            Section("Quick Actions") {
+            Section {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         quickActionButton(title: "New Connector", icon: "plus.circle.fill", color: .blue) {
@@ -104,6 +104,8 @@ struct ConnectorsMainView: View {
                     }
                     .padding(.vertical, 4)
                 }
+            } header: {
+                Text("Quick Actions")
             }
 
             // MARK: - Filter & Search Controls
@@ -132,7 +134,7 @@ struct ConnectorsMainView: View {
             }
 
             // MARK: - Your Connectors
-            Section("Your Connectors") {
+            Section {
                 if filteredConnectors.isEmpty && connectors.isEmpty {
                     VStack(alignment: .center, spacing: 12) {
                         Image(systemName: "puzzlepiece.extension")
@@ -179,10 +181,12 @@ struct ConnectorsMainView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Your Connectors")
             }
 
             // MARK: - Platform Tools
-            Section("Platform Tools") {
+            Section {
                 NavigationLink(destination: ConnectorLogsView()) {
                     Label("Global Execution Logs", systemImage: "list.bullet.rectangle")
                 }
@@ -211,11 +215,13 @@ struct ConnectorsMainView: View {
                 } label: {
                     Label("Connectors Documentation", systemImage: "book.closed")
                 }
+            } header: {
+                Text("Platform Tools")
             }
 
             // MARK: - Analytics Overview
             if !connectors.isEmpty {
-                Section("Analytics Overview") {
+                Section {
                     let totalExecs = connectors.reduce(0) { $0 + $1.metadata.executionCount }
                     let avgError = connectors.isEmpty ? 0.0 : connectors.reduce(0.0) { $0 + $1.metadata.errorRate } / Double(connectors.count)
 
@@ -244,6 +250,8 @@ struct ConnectorsMainView: View {
                                 .foregroundColor(.secondary)
                         }
                     }
+                } header: {
+                    Text("Analytics Overview")
                 }
             }
         }
@@ -388,7 +396,7 @@ struct ConnectorDefinitionDetailView: View {
     var body: some View {
         List {
             // MARK: - Status & Health
-            Section("Status & Health") {
+            Section {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(connector.name)
@@ -416,17 +424,21 @@ struct ConnectorDefinitionDetailView: View {
                         LabeledContent("Last Executed", value: lastExec.formatted(.relative(presentation: .numeric)))
                     }
                 }
+            } header: {
+                Text("Status & Health")
             }
 
             if !connector.description.isEmpty {
-                Section("Description") {
+                Section {
                     Text(connector.description)
                         .foregroundColor(.secondary)
+                } header: {
+                    Text("Description")
                 }
             }
 
             // MARK: - Quick Actions
-            Section("Quick Actions") {
+            Section {
                 Button {
                     Task { await runtime.run(connector: connector) }
                 } label: {
@@ -456,10 +468,12 @@ struct ConnectorDefinitionDetailView: View {
                 } label: {
                     Label("Duplicate Connector", systemImage: "doc.on.doc")
                 }
+            } header: {
+                Text("Quick Actions")
             }
 
             // MARK: - Endpoints
-            Section("Endpoints (\(connector.endpoints.count))") {
+            Section {
                 if connector.endpoints.isEmpty {
                     Text("No endpoints configured")
                         .foregroundColor(.secondary)
@@ -500,10 +514,12 @@ struct ConnectorDefinitionDetailView: View {
                 } label: {
                     Label("Add Endpoint", systemImage: "plus.circle")
                 }
+            } header: {
+                Text("Endpoints (\(connector.endpoints.count))")
             }
 
             // MARK: - Navigation to All Configuration Views
-            Section("Configuration") {
+            Section {
                 NavigationLink(destination: ConnectorBuilderView(connector: connector)) {
                     Label("Edit Identity", systemImage: "pencil.circle")
                 }
@@ -519,9 +535,11 @@ struct ConnectorDefinitionDetailView: View {
                 NavigationLink(destination: ConnectorScopeView(connector: connector)) {
                     Label("Scope Assignment", systemImage: "lock.shield")
                 }
+            } header: {
+                Text("Configuration")
             }
 
-            Section("Operations") {
+            Section {
                 NavigationLink(destination: ConnectorExecutionView(connector: connector)) {
                     Label("Live Execution", systemImage: "play.circle")
                 }
@@ -531,10 +549,12 @@ struct ConnectorDefinitionDetailView: View {
                 NavigationLink(destination: ConnectorVersioningView(connector: connector)) {
                     Label("Versioning & Releases", systemImage: "clock.arrow.circlepath")
                 }
+            } header: {
+                Text("Operations")
             }
 
             // MARK: - Auth Configuration
-            Section("Authentication") {
+            Section {
                 LabeledContent("Auth Type", value: connector.authConfig.type.rawValue.capitalized)
 
                 if connector.authConfig.type == .oauth2, let oauth = connector.authConfig.oauthConfig {
@@ -549,6 +569,8 @@ struct ConnectorDefinitionDetailView: View {
                 if !connector.authConfig.credentials.isEmpty {
                     LabeledContent("Stored Credentials", value: "\(connector.authConfig.credentials.count) keys")
                 }
+            } header: {
+                Text("Authentication")
             }
 
             // MARK: - Danger Zone
@@ -620,7 +642,7 @@ struct ConnectorDefinitionDetailView: View {
 
     private var endpointEditorSheet: some View {
         Form {
-            Section("New Endpoint") {
+            Section {
                 TextField("URL Path (e.g. https://api.example.com/data)", text: $newEndpointPath)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
@@ -630,6 +652,8 @@ struct ConnectorDefinitionDetailView: View {
                         Text(method).tag(method)
                     }
                 }
+            } header: {
+                Text("New Endpoint")
             }
 
             Section {

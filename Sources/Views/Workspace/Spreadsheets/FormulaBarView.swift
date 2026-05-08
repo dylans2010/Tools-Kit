@@ -33,8 +33,8 @@ struct FormulaBarView: View {
             TextField("Enter value or formula", text: $editingFormula)
                 .font(.system(.body, design: .monospaced))
                 .onSubmit { onFormulaChanged(editingFormula) }
-                .onChange(of: selectedCell?.row) { editingFormula = currentFormula }
-                .onChange(of: selectedCell?.col) { editingFormula = currentFormula }
+                .onChange(of: selectedCell?.row) { _, _ in editingFormula = currentFormula }
+                .onChange(of: selectedCell?.col) { _, _ in editingFormula = currentFormula }
         }
         .padding(10)
         .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))

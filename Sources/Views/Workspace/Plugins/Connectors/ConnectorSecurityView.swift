@@ -47,7 +47,7 @@ struct ConnectorSecurityView: View {
             }
 
             // MARK: - Access Control
-            Section("Access Control") {
+            Section {
                 Toggle("Enforce TLS 1.3+", isOn: $enforceTLS)
                 Toggle("Allow Public Access", isOn: $allowPublicAccess)
 
@@ -72,10 +72,12 @@ struct ConnectorSecurityView: View {
                             .foregroundColor(.orange)
                     }
                 }
+            } header: {
+                Text("Access Control")
             }
 
             // MARK: - IP Whitelist
-            Section("IP Whitelist") {
+            Section {
                 Toggle("Enable IP Whitelist", isOn: $enableIPWhitelist)
 
                 if enableIPWhitelist {
@@ -118,10 +120,12 @@ struct ConnectorSecurityView: View {
                         .disabled(newIPAddress.isEmpty)
                     }
                 }
+            } header: {
+                Text("IP Whitelist")
             }
 
             // MARK: - Token Management
-            Section("Token Management") {
+            Section {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Token Expiry").font(.caption).foregroundColor(.secondary)
                     Stepper("\(tokenExpiryHours) hours", value: $tokenExpiryHours, in: 1...720)
@@ -134,10 +138,12 @@ struct ConnectorSecurityView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
+            } header: {
+                Text("Token Management")
             }
 
             // MARK: - CORS
-            Section("CORS Configuration") {
+            Section {
                 Toggle("Enable CORS", isOn: $enableCORS)
 
                 if enableCORS {
@@ -184,10 +190,12 @@ struct ConnectorSecurityView: View {
                         }
                     }
                 }
+            } header: {
+                Text("CORS Configuration")
             }
 
             // MARK: - Webhook Signatures
-            Section("Webhook Security") {
+            Section {
                 Toggle("Require Webhook Signatures", isOn: $enableWebhookSignatures)
 
                 if enableWebhookSignatures {
@@ -207,10 +215,12 @@ struct ConnectorSecurityView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
+            } header: {
+                Text("Webhook Security")
             }
 
             // MARK: - Required Scopes
-            Section("Required Scopes") {
+            Section {
                 ForEach(Array(requestedScopes).sorted(), id: \.self) { scope in
                     HStack {
                         Image(systemName: "shield.fill").foregroundColor(.blue).font(.caption)
@@ -260,10 +270,12 @@ struct ConnectorSecurityView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Required Scopes")
             }
 
             // MARK: - Compliance & Data
-            Section("Compliance & Data") {
+            Section {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Label("Data Residency", systemImage: "mappin.and.ellipse")
@@ -299,6 +311,8 @@ struct ConnectorSecurityView: View {
                     }
                 }
                 .padding(.vertical, 4)
+            } header: {
+                Text("Compliance & Data")
             }
 
             // MARK: - Actions

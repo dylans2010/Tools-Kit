@@ -8,8 +8,10 @@ struct CreateNotebookView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Notebook Name") {
+                Section {
                     TextField("Enter Notebook Name", text: $name)
+                } header: {
+                    Text("Notebook Name")
                 }
             }
             .navigationTitle("New Notebook")

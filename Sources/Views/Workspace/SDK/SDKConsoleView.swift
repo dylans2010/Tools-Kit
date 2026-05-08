@@ -61,7 +61,7 @@ struct SDKConsoleView: View {
                     }
                     .padding()
                 }
-                .onChange(of: logBus.logs.count) { _ in
+                .onChange(of: logBus.logs.count) { _, _ in
                     if let last = filteredLogs.last {
                         proxy.scrollTo(last.id)
                     }

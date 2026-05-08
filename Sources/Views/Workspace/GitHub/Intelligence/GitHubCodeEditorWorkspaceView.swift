@@ -17,7 +17,7 @@ struct GitHubCodeEditorWorkspaceView: View {
             TextEditor(text: $content)
                 .font(.system(.body, design: .monospaced))
                 .padding(4)
-                .onChange(of: content) { newValue in
+                .onChange(of: content) { _, newValue in
                     hasUnsavedChanges = newValue != originalContent
                 }
         }

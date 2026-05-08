@@ -22,7 +22,7 @@ struct ToggleBlockView: View {
 
                 TextField("Toggle Title", text: $block.content)
                     .font(.body.weight(.semibold))
-                    .onChange(of: block.content) { _ in onUpdate() }
+                    .onChange(of: block.content) { _, _ in onUpdate() }
 
                 Spacer()
             }
@@ -36,7 +36,7 @@ struct ToggleBlockView: View {
                 .frame(minHeight: 40)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.leading, 24)
-                .onChange(of: block.metadata["details"]) { _ in onUpdate() }
+                .onChange(of: block.metadata["details"]) { _, _ in onUpdate() }
             }
         }
     }

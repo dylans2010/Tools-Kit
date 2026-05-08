@@ -47,7 +47,7 @@ struct ConnectorVersioningView: View {
             }
 
             // MARK: - Active Version
-            Section("Active Version") {
+            Section {
                 HStack {
                     Text("Current Version")
                     Spacer()
@@ -93,10 +93,12 @@ struct ConnectorVersioningView: View {
                     Text("\(connector.flow.steps.count)")
                         .foregroundColor(.secondary)
                 }
+            } header: {
+                Text("Active Version")
             }
 
             // MARK: - Version History
-            Section("Version History") {
+            Section {
                 if versionHistory.count == 1 {
                     Text("Only the current saved version is available. No generated or mock versions are shown.")
                         .font(.caption)
@@ -127,18 +129,22 @@ struct ConnectorVersioningView: View {
                             }
                         }
                 }
+            } header: {
+                Text("Version History")
             }
 
             // MARK: - Changelog
-            Section("Configuration Changelog") {
+            Section {
                 VStack(alignment: .leading, spacing: 8) {
                     changelogEntry(type: "Current", items: configurationChangeItems)
                 }
                 .padding(.vertical, 4)
+            } header: {
+                Text("Configuration Changelog")
             }
 
             if !connectorLogs.isEmpty {
-                Section("User Activity") {
+                Section {
                     ForEach(connectorLogs.prefix(5)) { log in
                         VStack(alignment: .leading, spacing: 3) {
                             Text(log.message).font(.caption)
@@ -147,6 +153,8 @@ struct ConnectorVersioningView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
+                } header: {
+                    Text("User Activity")
                 }
             }
 
@@ -201,7 +209,7 @@ struct ConnectorVersioningView: View {
     private var releaseSheet: some View {
         NavigationView {
             Form {
-                Section("Release Details") {
+                Section {
                     TextField("New Version (e.g. 1.1.0)", text: $newVersion)
                         .font(.system(.body, design: .monospaced))
 
@@ -210,16 +218,20 @@ struct ConnectorVersioningView: View {
                         TextEditor(text: $releaseNotes)
                             .frame(minHeight: 120)
                     }
+                } header: {
+                    Text("Release Details")
                 }
 
-                Section("Release Summary") {
+                Section {
                     LabeledContent("From Version", value: "v\(connector.version)")
                     LabeledContent("To Version", value: newVersion.isEmpty ? "-" : "v\(newVersion)")
                     LabeledContent("Endpoints", value: "\(connector.endpoints.count)")
                     LabeledContent("Flow Steps", value: "\(connector.flow.steps.count)")
+                } header: {
+                    Text("Release Summary")
                 }
 
-                Section("Pre-Release Checklist") {
+                Section {
                     HStack {
                         Image(systemName: connector.endpoints.isEmpty ? "xmark.circle" : "checkmark.circle.fill")
                             .foregroundColor(connector.endpoints.isEmpty ? .red : .green)
@@ -235,6 +247,8 @@ struct ConnectorVersioningView: View {
                             .foregroundColor(connector.flow.steps.isEmpty ? .orange : .green)
                         Text("Flow pipeline defined")
                     }
+                } header: {
+                    Text("Pre-Release Checklist")
                 }
 
                 Section {
@@ -267,7 +281,7 @@ struct ConnectorVersioningView: View {
     private var compareSheet: some View {
         NavigationView {
             List {
-                Section("Version Comparison") {
+                Section {
                     if versionHistory.count >= 2 {
                         let current = versionHistory[0]
                         let previous = versionHistory[1]
@@ -296,16 +310,20 @@ struct ConnectorVersioningView: View {
                             .frame(maxWidth: .infinity)
                         }
                     }
+                } header: {
+                    Text("Version Comparison")
                 }
 
-                Section("Configuration Diff") {
+                Section {
                     LabeledContent("Endpoints", value: "\(connector.endpoints.count)")
                     LabeledContent("Flow Steps", value: "\(connector.flow.steps.count)")
                     LabeledContent("Auth Type", value: connector.authConfig.type.rawValue.capitalized)
                     LabeledContent("Schema Mappings", value: "\(connector.schema.mappings.count)")
+                } header: {
+                    Text("Configuration Diff")
                 }
 
-                Section("Timeline") {
+                Section {
                     ForEach(versionHistory) { entry in
                         HStack {
                             Circle()
@@ -319,6 +337,8 @@ struct ConnectorVersioningView: View {
                                 .foregroundColor(.secondary)
                         }
                     }
+                } header: {
+                    Text("Timeline")
                 }
             }
             .navigationTitle("Compare Versions")

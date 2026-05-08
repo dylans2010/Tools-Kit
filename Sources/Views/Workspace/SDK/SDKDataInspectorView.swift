@@ -22,7 +22,7 @@ struct SDKDataInspectorView: View {
     // MARK: - Overview
 
     private var overviewSection: some View {
-        Section("Storage Overview") {
+        Section {
             HStack {
                 Label("Initialized", systemImage: "cylinder.fill")
                 Spacer()
@@ -36,13 +36,15 @@ struct SDKDataInspectorView: View {
                     .font(.system(.body, design: .monospaced))
                     .bold()
             }
+        } header: {
+            Text("Storage Overview")
         }
     }
 
     // MARK: - Collections
 
     private var collectionsSection: some View {
-        Section("Collections") {
+        Section {
             let stats = dataStore.collectionStats()
             if stats.isEmpty {
                 Text("No Collections Found").font(.caption).foregroundStyle(.secondary)
@@ -71,13 +73,15 @@ struct SDKDataInspectorView: View {
                     .buttonStyle(.plain)
                 }
             }
+        } header: {
+            Text("Collections")
         }
     }
 
     // MARK: - Items
 
     private func itemsSection(for collection: String) -> some View {
-        Section("\(collection) Items") {
+        Section {
             let filtered = searchText.isEmpty ? inspectedItems :
                 inspectedItems.filter { $0.preview.localizedCaseInsensitiveContains(searchText) }
 
@@ -102,6 +106,8 @@ struct SDKDataInspectorView: View {
                     .padding(.vertical, 4)
                 }
             }
+        } header: {
+            Text("\(collection) Items")
         }
     }
 

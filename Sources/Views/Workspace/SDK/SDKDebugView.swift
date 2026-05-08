@@ -8,7 +8,7 @@ struct SDKDebugView: View {
 
     var body: some View {
         List {
-            Section("Runtime Status") {
+            Section {
                 HStack {
                     Text("Execution Mode")
                     Spacer()
@@ -26,9 +26,11 @@ struct SDKDebugView: View {
                     Text("\(telemetry.activeTraces.count)")
                         .foregroundStyle(telemetry.activeTraces.count > 0 ? .orange : .green)
                 }
+            } header: {
+                Text("Runtime Status")
             }
 
-            Section("Execution Metrics") {
+            Section {
                 let metrics = telemetry.getMetrics()
                 HStack {
                     Text("Total Executions")
@@ -49,9 +51,11 @@ struct SDKDebugView: View {
                     Text("\(String(format: "%.1f", metrics.averageDurationMs))ms")
                         .font(.system(.body, design: .monospaced))
                 }
+            } header: {
+                Text("Execution Metrics")
             }
 
-            Section("Memory & Process") {
+            Section {
                 HStack {
                     Text("Physical Memory")
                     Spacer()
@@ -70,9 +74,11 @@ struct SDKDebugView: View {
                     Text("\(Int(ProcessInfo.processInfo.systemUptime / 3600))h \(Int(ProcessInfo.processInfo.systemUptime.truncatingRemainder(dividingBy: 3600) / 60))m")
                         .font(.system(.body, design: .monospaced))
                 }
+            } header: {
+                Text("Memory & Process")
             }
 
-            Section("Recent Errors") {
+            Section {
                 let errors = logStore.entries.filter { $0.level == .error }.prefix(10)
                 if errors.isEmpty {
                     Text("No Errors Recorded").foregroundStyle(.secondary).font(.caption)
@@ -85,14 +91,18 @@ struct SDKDebugView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Recent Errors")
             }
 
-            Section("Thread Trace") {
+            Section {
                 ForEach(Thread.callStackSymbols.prefix(5), id: \.self) { symbol in
                     Text(symbol)
                         .font(.system(size: 8, design: .monospaced))
                         .lineLimit(1)
                 }
+            } header: {
+                Text("Thread Trace")
             }
 
             Section {

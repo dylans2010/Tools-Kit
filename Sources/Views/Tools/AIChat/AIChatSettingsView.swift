@@ -101,7 +101,7 @@ struct AIChatSettingsView: View {
     }
 
     private var internalSection: some View {
-        Section("Internal (Debug)") {
+        Section {
             Button {
                 showFileImporter = true
             } label: {
@@ -120,11 +120,13 @@ struct AIChatSettingsView: View {
                 }
                 .padding(.vertical, 4)
             }
+        } header: {
+            Text("Internal (Debug)")
         }
     }
 
     private var agentSettingsSection: some View {
-        Section("Agent (Beta)") {
+        Section {
             Toggle("Use System Tools", isOn: $settings.useSystemTools)
             Toggle("Agent", isOn: $agentEnabled)
                 .help("Choose which agent handles your sessions")
@@ -141,6 +143,8 @@ struct AIChatSettingsView: View {
                 providerName: jules.name,
                 placeholder: jules.apiKeyPlaceholder
             )
+        } header: {
+            Text("Agent (Beta)")
         }
     }
 
@@ -248,7 +252,7 @@ struct AIChatSettingsView: View {
     // MARK: - Model Section
 
     private var modelSection: some View {
-        Section("Model") {
+        Section {
             let availableModels = modelCatalog.models(for: settings.selectedProviderID)
             if !availableModels.isEmpty {
                 Picker("Model", selection: $settings.modelID) {
@@ -305,13 +309,15 @@ struct AIChatSettingsView: View {
                     Task { await loadProviderModels(force: true) }
                 }
             }
+        } header: {
+            Text("Model")
         }
     }
 
     // MARK: - System Prompt Section
 
     private var systemPromptSection: some View {
-        Section("System Prompt") {
+        Section {
             Toggle("Use Preset", isOn: Binding(
                 get: { settings.selectedPresetID != nil },
                 set: { usePreset in
@@ -337,33 +343,39 @@ struct AIChatSettingsView: View {
                 TextEditor(text: $settings.systemPrompt)
                     .frame(minHeight: 80)
             }
+        } header: {
+            Text("System Prompt")
         }
     }
 
     // MARK: - Personality Section
 
     private var personalitySection: some View {
-        Section("AI Personality") {
+        Section {
             Toggle("Use Custom Personality", isOn: $settings.useCustomPersonality)
             if settings.useCustomPersonality {
                 TextField("Personality Name", text: $settings.personalityName)
                 TagEditorView(tags: $settings.personalityTraits, placeholder: "Add trait...")
             }
+        } header: {
+            Text("AI Personality")
         }
     }
 
     // MARK: - Expertise Section
 
     private var expertiseSection: some View {
-        Section("Expertise Areas") {
+        Section {
             TagEditorView(tags: $settings.expertiseAreas, placeholder: "Add Expertise")
+        } header: {
+            Text("Expertise Areas")
         }
     }
 
     // MARK: - Style Section
 
     private var styleSection: some View {
-        Section("Personality & Style") {
+        Section {
             Picker("Response Tone", selection: $settings.responseTone) {
                 ForEach(ResponseTone.allCases, id: \.self) { tone in
                     Text(tone.rawValue).tag(tone)
@@ -374,22 +386,26 @@ struct AIChatSettingsView: View {
                     Text(length.rawValue).tag(length)
                 }
             }
+        } header: {
+            Text("Personality & Style")
         }
     }
 
     // MARK: - Context Section
 
     private var contextSection: some View {
-        Section("Knowledge & Context") {
+        Section {
             TextEditor(text: $settings.knowledgeContext)
                 .frame(minHeight: 80)
+        } header: {
+            Text("Knowledge & Context")
         }
     }
 
     // MARK: - Advanced Section
 
     private var advancedSection: some View {
-        Section("Advanced") {
+        Section {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Temperature: \(settings.temperature, specifier: "%.1f")")
                 Slider(value: $settings.temperature, in: 0...2, step: 0.1)
@@ -399,36 +415,42 @@ struct AIChatSettingsView: View {
                 Text("Top P: \(settings.topP, specifier: "%.2f")")
                 Slider(value: $settings.topP, in: 0...1, step: 0.05)
             }
+        } header: {
+            Text("Advanced")
         }
     }
 
     // MARK: - Chat Interface Section
 
     private var chatInterfaceSection: some View {
-        Section("Chat Interface") {
+        Section {
             ColorPickerRow(label: "Bubble Color", hexColor: $settings.bubbleColorHex)
             VStack(alignment: .leading, spacing: 4) {
                 Text("Font Size: \(Int(settings.fontSize))pt")
                 Slider(value: $settings.fontSize, in: 12...22, step: 1)
             }
             Toggle("Show Timestamps", isOn: $settings.showTimestamps)
+        } header: {
+            Text("Chat Interface")
         }
     }
 
     // MARK: - Storage Section
 
     private var storageSection: some View {
-        Section("Storage & Reliability") {
+        Section {
             Toggle("Save Chat History", isOn: $settings.saveChatHistory)
             Toggle("Detailed Error Logging", isOn: $settings.logErrorsToConsole)
             Toggle("Enable Streaming (Experimental)", isOn: $settings.streamResponseText)
+        } header: {
+            Text("Storage & Reliability")
         }
     }
 
     // MARK: - Memory Section
 
     private var memorySection: some View {
-        Section("Memory (CoreML Powered)") {
+        Section {
             Toggle("Enable Memory", isOn: $settings.memoryEnabled)
             VStack(alignment: .leading, spacing: 4) {
                 Text("Sensitivity: \(settings.memorySensitivity, specifier: "%.2f")")
@@ -437,6 +459,8 @@ struct AIChatSettingsView: View {
             NavigationLink("Manage Saved Memory") {
                 MemoryManagerView(memoryStore: memoryStore)
             }
+        } header: {
+            Text("Memory (CoreML Powered)")
         }
     }
 
@@ -563,7 +587,7 @@ struct AIChatSettingsView: View {
 
 
     private var developerToolsSection: some View {
-        Section("Developer") {
+        Section {
             NavigationLink("Developer Tools") {
                 MeetDeveloperToolsView(manager: .shared)
             }
@@ -577,19 +601,23 @@ struct AIChatSettingsView: View {
                     Label("Agent Config (Debug)", systemImage: "ant.fill")
                 }
             }
+        } header: {
+            Text("Developer")
         }
     }
 
     private var supportSection: some View {
-        Section("Support") {
+        Section {
             NavigationLink("Send Feedback") {
                 FeedbackView()
             }
+        } header: {
+            Text("Support")
         }
     }
 
     private var cloudDataSection: some View {
-        Section("Cloud Sync") {
+        Section {
             Button {
                 uploadDataToCloud()
             } label: {
@@ -607,11 +635,13 @@ struct AIChatSettingsView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+        } header: {
+            Text("Cloud Sync")
         }
     }
 
     private var accountSection: some View {
-        Section("Account") {
+        Section {
             Button(role: .destructive) {
                 signOutCurrentUser()
             } label: {
@@ -629,6 +659,8 @@ struct AIChatSettingsView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+        } header: {
+            Text("Account")
         }
     }
 

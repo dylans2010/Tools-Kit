@@ -14,7 +14,7 @@ struct TimezoneConverterView: View {
                         .foregroundColor(.secondary)
 
                     DatePicker("Select Source Time", selection: $backend.sourceDate)
-                        .onChange(of: backend.sourceDate) { _ in backend.convert() }
+                        .onChange(of: backend.sourceDate) { _, _ in backend.convert() }
 
                     HStack {
                         Button(action: { backend.sourceDate = Date(); backend.convert() }) {

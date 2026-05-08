@@ -41,7 +41,7 @@ struct ConnectorTestConsoleView: View {
     var body: some View {
         List {
             // MARK: - Endpoint Selector
-            Section("API Simulation") {
+            Section {
                 Picker("Endpoint", selection: $selectedEndpointID) {
                     Text("Select Endpoint").tag(Optional<UUID>.none)
                     ForEach(connector.endpoints) { ep in
@@ -87,6 +87,8 @@ struct ConnectorTestConsoleView: View {
                         }
                     }
                 }
+            } header: {
+                Text("API Simulation")
             }
 
             // MARK: - Request Configuration
@@ -125,7 +127,7 @@ struct ConnectorTestConsoleView: View {
             }
 
             // MARK: - Response Console
-            Section("Response Console") {
+            Section {
                 if let code = statusCode {
                     HStack {
                         Text("Status")
@@ -206,6 +208,8 @@ struct ConnectorTestConsoleView: View {
                         .controlSize(.small)
                     }
                 }
+            } header: {
+                Text("Response Console")
             }
         }
         .navigationTitle("Test Console")
@@ -223,7 +227,7 @@ struct ConnectorTestConsoleView: View {
     // MARK: - Request Body
 
     private var requestBodySection: some View {
-        Section("Request Body") {
+        Section {
             TextEditor(text: $requestBody)
                 .font(.system(.caption, design: .monospaced))
                 .frame(minHeight: 150)
@@ -245,13 +249,15 @@ struct ConnectorTestConsoleView: View {
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }
+        } header: {
+            Text("Request Body")
         }
     }
 
     // MARK: - Headers
 
     private var headersSection: some View {
-        Section("Custom Headers") {
+        Section {
             if customHeaders.isEmpty {
                 Text("No custom headers. Default headers from endpoint configuration will be used.")
                     .font(.caption)
@@ -303,13 +309,15 @@ struct ConnectorTestConsoleView: View {
                     }
                 }
             }
+        } header: {
+            Text("Custom Headers")
         }
     }
 
     // MARK: - History
 
     private var historySection: some View {
-        Section("Request History") {
+        Section {
             if requestHistory.isEmpty {
                 Text("No requests made yet.")
                     .font(.caption)
@@ -364,6 +372,8 @@ struct ConnectorTestConsoleView: View {
                         .font(.caption)
                 }
             }
+        } header: {
+            Text("Request History")
         }
     }
 

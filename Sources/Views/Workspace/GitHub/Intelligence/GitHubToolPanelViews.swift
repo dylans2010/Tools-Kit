@@ -12,7 +12,7 @@ struct RepoToolsPanelView: View {
 
     var body: some View {
         List {
-            Section("Health Analysis") {
+            Section {
                 Button {
                     // Demo scan
                     intelligence.scanContent(files: [
@@ -35,9 +35,11 @@ struct RepoToolsPanelView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Health Analysis")
             }
 
-            Section("Cleanup") {
+            Section {
                 Button {
                     gitEngine.clearStagingArea()
                 } label: {
@@ -48,9 +50,11 @@ struct RepoToolsPanelView: View {
                 NavigationLink(destination: LocalGitEngineView()) {
                     Label("Manage Local Git", systemImage: "externaldrive.connected.to.line.below")
                 }
+            } header: {
+                Text("Cleanup")
             }
 
-            Section("Reports") {
+            Section {
                 Button {
                     reportText = generateRepoReport()
                     showingReport = true
@@ -58,9 +62,11 @@ struct RepoToolsPanelView: View {
                     Label("Generate Repo Report", systemImage: "doc.text.fill")
                 }
                 .foregroundStyle(.blue)
+            } header: {
+                Text("Reports")
             }
 
-            Section("Quick Actions") {
+            Section {
                 NavigationLink(destination: WorkflowBuilderView()) {
                     Label("Workflow Builder", systemImage: "play.rectangle.on.rectangle")
                 }
@@ -70,6 +76,8 @@ struct RepoToolsPanelView: View {
                 NavigationLink(destination: SecurityToolsView(owner: owner, repo: repo)) {
                     Label("Security Scan", systemImage: "lock.shield")
                 }
+            } header: {
+                Text("Quick Actions")
             }
         }
         .navigationTitle("Repo Tools")
@@ -110,12 +118,14 @@ struct ReleaseManagerView: View {
 
     var body: some View {
         Form {
-            Section("Release Info") {
+            Section {
                 TextField("Tag (e.g. v1.0.0)", text: $tagName)
                 TextField("Release Name", text: $releaseName)
+            } header: {
+                Text("Release Info")
             }
 
-            Section("Release Notes") {
+            Section {
                 TextEditor(text: $releaseBody)
                     .font(.system(.body, design: .monospaced))
                     .frame(minHeight: 120)
@@ -124,14 +134,18 @@ struct ReleaseManagerView: View {
                     releaseBody = generatedNotes
                 }
                 .foregroundStyle(.blue)
+            } header: {
+                Text("Release Notes")
             }
 
-            Section("Options") {
+            Section {
                 Toggle("Draft Release", isOn: $isDraft)
                 Toggle("Pre-release", isOn: $isPrerelease)
+            } header: {
+                Text("Options")
             }
 
-            Section("Preview") {
+            Section {
                 if !tagName.isEmpty {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("\(releaseName.isEmpty ? tagName : releaseName)")
@@ -144,6 +158,8 @@ struct ReleaseManagerView: View {
                             .font(.caption).foregroundStyle(.secondary)
                     }
                 }
+            } header: {
+                Text("Preview")
             }
 
             Section {
@@ -198,7 +214,7 @@ struct SecurityToolsView: View {
 
     var body: some View {
         List {
-            Section("Secret Detection") {
+            Section {
                 Button {
                     let stagingFiles = gitEngine.stagedChanges.map {
                         (path: $0.filePath, content: $0.modifiedContent)
@@ -249,9 +265,11 @@ struct SecurityToolsView: View {
                         Text("No secrets detected.").font(.caption).foregroundStyle(.secondary)
                     }
                 }
+            } header: {
+                Text("Secret Detection")
             }
 
-            Section("Pre-commit Validation") {
+            Section {
                 let staged = gitEngine.stagedChanges
                 if staged.isEmpty {
                     Text("No staged changes to validate.").foregroundStyle(.secondary).font(.caption)
@@ -266,16 +284,20 @@ struct SecurityToolsView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Pre-commit Validation")
             }
 
             if !blockedFiles.isEmpty {
-                Section("Blocked Files (\(blockedFiles.count))") {
+                Section {
                     ForEach(Array(blockedFiles), id: \.self) { path in
                         Label(URL(fileURLWithPath: path).lastPathComponent, systemImage: "nosign")
                             .font(.caption).foregroundStyle(.red)
                     }
                     Button("Clear Block List") { blockedFiles = [] }
                         .foregroundStyle(.orange)
+                } header: {
+                    Text("Blocked Files (\(blockedFiles.count))")
                 }
             }
         }

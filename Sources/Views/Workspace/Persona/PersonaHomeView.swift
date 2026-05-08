@@ -21,7 +21,7 @@ struct PersonaHomeView: View {
                 .disabled(query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isAsking)
             }
 
-            Section("Tuning") {
+            Section {
                 Picker("Tone", selection: $personaTone) {
                     Text("Professional").tag("Professional")
                     Text("Creative").tag("Creative")
@@ -36,6 +36,8 @@ struct PersonaHomeView: View {
                     Text("Notes").tag("Notes Only")
                     Text("Tasks").tag("Tasks Only")
                 }
+            } header: {
+                Text("Tuning")
             }
 
             if isAsking {
@@ -45,18 +47,22 @@ struct PersonaHomeView: View {
             }
 
             if let lastResponse {
-                Section("Latest Response") {
+                Section {
                     Text(lastResponse)
+                } header: {
+                    Text("Latest Response")
                 }
             }
 
-            Section("Suggestions") {
+            Section {
                 PersonaSuggestionRow(icon: "calendar.badge.clock", title: "Meeting Prep", detail: "Generate a quick briefing from recent notes.")
                 PersonaSuggestionRow(icon: "chart.bar.xaxis", title: "Weekly Summary", detail: "Summarize your accomplishments for this week.")
                 PersonaSuggestionRow(icon: "book.closed", title: "Knowledge Gaps", detail: "Find topics you have not revisited recently.")
+            } header: {
+                Text("Suggestions")
             }
 
-            Section("Recent History") {
+            Section {
                 if manager.interactions.isEmpty {
                     Text("No Interactions Yet")
                         .foregroundStyle(.secondary)
@@ -68,6 +74,8 @@ struct PersonaHomeView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Recent History")
             }
         }
         .navigationTitle("AI Persona")

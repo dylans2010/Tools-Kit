@@ -43,7 +43,7 @@ struct SDKPluginManagerView: View {
     // MARK: - Stats
 
     private var statsSection: some View {
-        Section("Overview") {
+        Section {
             HStack(spacing: 20) {
                 VStack {
                     Text("\(runtime.loadedApps.count)")
@@ -66,13 +66,15 @@ struct SDKPluginManagerView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
+        } header: {
+            Text("Overview")
         }
     }
 
     // MARK: - Apps List
 
     private var appsSection: some View {
-        Section("Apps & Plugins (\(filteredApps.count))") {
+        Section {
             if filteredApps.isEmpty {
                 ContentUnavailableView("No Apps Installed", systemImage: "puzzlepiece.extension", description: Text("Register an app to get started."))
             } else {
@@ -81,6 +83,8 @@ struct SDKPluginManagerView: View {
                 }
                 .onDelete(perform: deleteApps)
             }
+        } header: {
+            Text("Apps & Plugins (\(filteredApps.count))")
         }
     }
 
@@ -149,15 +153,19 @@ struct SDKPluginManagerView: View {
     private var addAppSheet: some View {
         NavigationView {
             Form {
-                Section("App Details") {
+                Section {
                     TextField("Name", text: $newAppName)
                     TextField("Version", text: $newAppVersion)
                     TextField("Author", text: $newAppAuthor)
                     TextField("Description", text: $newAppDescription)
+                } header: {
+                    Text("App Details")
                 }
-                Section("Permissions (comma-separated)") {
+                Section {
                     TextField("read, write, network", text: $newAppPermissions)
                         .font(.system(.body, design: .monospaced))
+                } header: {
+                    Text("Permissions (comma-separated)")
                 }
             }
             .navigationTitle("Register App")

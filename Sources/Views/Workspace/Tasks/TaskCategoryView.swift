@@ -68,10 +68,12 @@ struct TaskCategoryView: View {
     private func categoryFormSheet(isEdit: Bool) -> some View {
         NavigationStack {
             Form {
-                Section("Category Name") {
+                Section {
                     TextField("Name", text: $newName)
+                } header: {
+                    Text("Category Name")
                 }
-                Section("Color") {
+                Section {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8), spacing: 12) {
                         ForEach(presetColors, id: \.0) { hex, color in
                             Circle()
@@ -86,6 +88,8 @@ struct TaskCategoryView: View {
                         }
                     }
                     .padding(.vertical, 4)
+                } header: {
+                    Text("Color")
                 }
                 Section {
                     Button(action: {

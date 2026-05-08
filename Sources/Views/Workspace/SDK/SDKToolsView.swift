@@ -26,7 +26,7 @@ struct SDKToolsView: View {
                 }
             }
 
-            Section("Execution History") {
+            Section {
                 let history = SDKToolRuntime.shared.getHistory().prefix(10)
                 if history.isEmpty {
                     Text("No executions yet").font(.caption).foregroundStyle(.secondary)
@@ -44,6 +44,8 @@ struct SDKToolsView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Execution History")
             }
         }
         .navigationTitle("Tools")
@@ -73,13 +75,15 @@ struct ToolRunnerView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Inputs") {
+                Section {
                     ForEach(tool.inputSchema, id: \.key) { param in
                         TextField(param.key + (param.required ? " *" : ""), text: binding(for: param.key))
                     }
+                } header: {
+                    Text("Inputs")
                 }
 
-                Section("Scope Validation") {
+                Section {
                     HStack {
                         Text("Execution Mode")
                         Spacer()
@@ -87,6 +91,8 @@ struct ToolRunnerView: View {
                             .font(.caption)
                             .foregroundStyle(runtime.isNoSandboxModeEnabled ? .red : .green)
                     }
+                } header: {
+                    Text("Scope Validation")
                 }
 
                 Section {
@@ -103,7 +109,7 @@ struct ToolRunnerView: View {
                 }
 
                 if let result = result {
-                    Section("Result") {
+                    Section {
                         if result.success {
                             ForEach(Array(result.output.keys.sorted()), id: \.self) { key in
                                 VStack(alignment: .leading) {
@@ -117,14 +123,18 @@ struct ToolRunnerView: View {
                         } else {
                             Text("Execution failed").foregroundStyle(.red)
                         }
+                    } header: {
+                        Text("Result")
                     }
                 }
 
                 if let error = errorMessage {
-                    Section("Error") {
+                    Section {
                         Text(error)
                             .font(.system(.caption, design: .monospaced))
                             .foregroundStyle(.red)
+                    } header: {
+                        Text("Error")
                     }
                 }
             }

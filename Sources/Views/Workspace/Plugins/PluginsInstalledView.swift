@@ -31,7 +31,7 @@ struct PluginsInstalledView: View {
                     .padding(.vertical, 40)
                 }
             } else {
-                Section("Installed (\(manager.installedPlugins.count))") {
+                Section {
                     ForEach(manager.installedPlugins) { plugin in
                         NavigationLink(destination: PluginDetailView(pluginID: plugin.id)) {
                             HStack(spacing: 12) {
@@ -65,6 +65,8 @@ struct PluginsInstalledView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Installed (\(manager.installedPlugins.count))")
                 }
             }
         }

@@ -21,7 +21,7 @@ struct ExtendedTranslationView: View {
                         Text(languages[key] ?? key).tag(key)
                     }
                 }
-                .onChange(of: backend.sourceLanguage) { newValue in
+                .onChange(of: backend.sourceLanguage) { _, newValue in
                     backend.updateSourceLanguage(newValue)
                 }
 

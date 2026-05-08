@@ -5,7 +5,7 @@ struct TimeTravelHomeView: View {
 
     var body: some View {
         List {
-            Section("Global Activity Timeline") {
+            Section {
                 if manager.snapshots.isEmpty {
                     Text("No Version History Yet")
                         .foregroundColor(.secondary)
@@ -22,6 +22,8 @@ struct TimeTravelHomeView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Global Activity Timeline")
             }
         }
         .navigationTitle("Time Travel")

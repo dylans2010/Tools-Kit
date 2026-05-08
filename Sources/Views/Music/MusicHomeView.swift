@@ -131,7 +131,7 @@ struct MusicHomeView: View {
             }
         }
         .onAppear { computeSuggestions() }
-        .onChange(of: library.songs.count) { _ in computeSuggestions() }
+        .onChange(of: library.songs.count) { _, _ in computeSuggestions() }
     }
 
     private func computeSuggestions() {

@@ -19,7 +19,7 @@ struct SecurityScopeApplicationView: View {
                 .padding(.vertical, 4)
             }
 
-            Section("Credentials & Identification") {
+            Section {
                 HStack {
                     Text("API Key")
                     Spacer()
@@ -48,9 +48,11 @@ struct SecurityScopeApplicationView: View {
                         .foregroundColor(.secondary)
                 }
                 .padding(.vertical, 4)
+            } header: {
+                Text("Credentials & Identification")
             }
 
-            Section("Data Governance") {
+            Section {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Usage Explanation")
                         .font(.caption.bold())
@@ -70,6 +72,8 @@ struct SecurityScopeApplicationView: View {
                     ))
                     .font(.subheadline)
                 }
+            } header: {
+                Text("Data Governance")
             }
 
             Section {

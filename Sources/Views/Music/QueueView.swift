@@ -13,7 +13,7 @@ struct QueueView: View {
                     shuffleRepeatRow
                     sleepTimerRow
                 }
-                Section("Up Next") {
+                Section {
                     ForEach(Array(player.queue.enumerated()), id: \.element.id) { index, song in
                         HStack(spacing: 12) {
                             Group {
@@ -51,6 +51,8 @@ struct QueueView: View {
                     }
                     .onMove { player.moveInQueue(from: $0, to: $1) }
                     .onDelete { player.removeFromQueue(at: $0) }
+                } header: {
+                    Text("Up Next")
                 }
             }
             .navigationTitle("Queue")
@@ -106,9 +108,11 @@ struct QueueView: View {
     private var sleepTimerSheet: some View {
         NavigationStack {
             Form {
-                Section("Set Sleep Timer") {
+                Section {
                     Stepper("Stop in \(Int(sleepMinutes)) min",
                             value: $sleepMinutes, in: 5...120, step: 5)
+                } header: {
+                    Text("Set Sleep Timer")
                 }
                 Section {
                     Button("Start Timer") {

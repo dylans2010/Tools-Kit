@@ -173,7 +173,7 @@ struct PageEditorView: View {
             }
             Button("Cancel", role: .cancel) {}
         }
-        .onChange(of: selectedPhotoItem) { newItem in
+        .onChange(of: selectedPhotoItem) { _, newItem in
             Task { await importPhoto(newItem) }
         }
         .fileImporter(isPresented: $showingFilePicker, allowedContentTypes: [.item], allowsMultipleSelection: true) { result in
@@ -197,7 +197,7 @@ struct PageEditorView: View {
         VStack(alignment: .leading, spacing: 6) {
             TextField("Untitled Page", text: $title)
                 .font(.system(size: 30, weight: .bold, design: .rounded))
-                .onChange(of: title) { _ in scheduleAutosave() }
+                .onChange(of: title) { _, _ in scheduleAutosave() }
             HStack(spacing: 8) {
                 Label("\(content.split { $0.isWhitespace }.count) words", systemImage: "textformat.abc")
                 Text("•")

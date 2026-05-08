@@ -22,11 +22,13 @@ struct CreateCollectionView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Name") {
+                Section {
                     TextField("Collection Name", text: $name)
+                } header: {
+                    Text("Name")
                 }
 
-                Section("Icon") {
+                Section {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 12) {
                         ForEach(icons, id: \.self) { icon in
                             Image(systemName: icon)
@@ -38,9 +40,11 @@ struct CreateCollectionView: View {
                         }
                     }
                     .padding(.vertical, 4)
+                } header: {
+                    Text("Icon")
                 }
 
-                Section("Color") {
+                Section {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 12) {
                         ForEach(colors, id: \.self) { hex in
                             Circle()
@@ -53,6 +57,8 @@ struct CreateCollectionView: View {
                         }
                     }
                     .padding(.vertical, 4)
+                } header: {
+                    Text("Color")
                 }
             }
             .navigationTitle("New Collection")

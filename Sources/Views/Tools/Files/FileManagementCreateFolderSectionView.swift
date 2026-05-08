@@ -9,9 +9,11 @@ struct FileManagementCreateFolderSectionView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Folder Name") {
+                Section {
                     TextField("Name", text: $newFolderName)
                         .autocorrectionDisabled()
+                } header: {
+                    Text("Folder Name")
                 }
             }
             .navigationTitle("New Folder")

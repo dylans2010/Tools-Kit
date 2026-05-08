@@ -15,19 +15,25 @@ struct CreatePRCollabView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("PR Details") {
+                Section {
                     TextField("Title", text: $title)
                     TextField("Description", text: $description, axis: .vertical)
                         .lineLimit(3...10)
+                } header: {
+                    Text("PR Details")
                 }
 
-                Section("Branches") {
+                Section {
                     TextField("Source Branch", text: $sourceBranch)
                     TextField("Target Branch", text: $targetBranch)
+                } header: {
+                    Text("Branches")
                 }
 
-                Section("Repository") {
+                Section {
                     TextField("Repository Name", text: $selectedRepo)
+                } header: {
+                    Text("Repository")
                 }
             }
             .navigationTitle("Create Pull Request")

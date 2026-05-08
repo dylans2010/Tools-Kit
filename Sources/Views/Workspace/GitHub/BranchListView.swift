@@ -68,13 +68,15 @@ struct BranchListView: View {
         .sheet(isPresented: $showingCreateBranch) {
             NavigationView {
                 Form {
-                    Section("Branch Info") {
+                    Section {
                         TextField("New Branch Name", text: $newBranchName)
                         Picker("Base Branch", selection: $baseBranch) {
                             ForEach(branches, id: \.name) { branch in
                                 Text(branch.name).tag(branch.name)
                             }
                         }
+                    } header: {
+                        Text("Branch Info")
                     }
                 }
                 .navigationTitle("New Branch")

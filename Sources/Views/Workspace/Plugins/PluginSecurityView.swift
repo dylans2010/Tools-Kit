@@ -29,7 +29,7 @@ struct PluginSecurityView: View {
                         .foregroundColor(.secondary)
                 }
 
-                Section("Permissions") {
+                Section {
                     ForEach($permissions) { $perm in
                         Toggle(isOn: $perm.isEnabled) {
                             HStack(spacing: 12) {
@@ -44,15 +44,19 @@ struct PluginSecurityView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Permissions")
                 }
 
-                Section("Advanced") {
+                Section {
                     NavigationLink("Sandbox Execution Mode") {
                         Text("Sandbox Settings")
                     }
                     NavigationLink("Security Audit Logs") {
                         Text("Audit Logs")
                     }
+                } header: {
+                    Text("Advanced")
                 }
             }
             .navigationTitle("Plugin Security")

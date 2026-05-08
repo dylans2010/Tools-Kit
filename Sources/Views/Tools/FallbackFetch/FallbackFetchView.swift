@@ -231,7 +231,7 @@ private struct InternalLogsView: View {
                     }
                     .padding(.vertical, 4)
                 }
-                .onChange(of: logger.entries.count) { _ in
+                .onChange(of: logger.entries.count) { _, _ in
                     if let last = logger.entries.last {
                         withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
                     }

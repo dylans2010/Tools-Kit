@@ -647,10 +647,12 @@ struct GitHubRouterView: View {
         .sheet(isPresented: $showingAuth) {
             NavigationView {
                 Form {
-                    Section("Personal Access Token") {
+                    Section {
                         SecureField("Enter PAT", text: $token)
                         Link("How to create a PAT?", destination: URL(string: "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token")!)
                             .font(.caption)
+                    } header: {
+                        Text("Personal Access Token")
                     }
                 }
                 .navigationTitle("GitHub Auth")

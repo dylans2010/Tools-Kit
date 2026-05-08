@@ -7,13 +7,15 @@ struct SecuritySessionManagerView: View {
 
     var body: some View {
         List {
-            Section("Current Session") {
+            Section {
                 if let current = activeSessions.first(where: { $0.isCurrent }) {
                     SessionRow(session: current)
                 }
+            } header: {
+                Text("Current Session")
             }
 
-            Section("Other Active Sessions") {
+            Section {
                 ForEach(activeSessions.filter { !$0.isCurrent }) { session in
                     SessionRow(session: session)
                         .swipeActions {
@@ -24,6 +26,8 @@ struct SecuritySessionManagerView: View {
                             }
                         }
                 }
+            } header: {
+                Text("Other Active Sessions")
             }
 
             Section {

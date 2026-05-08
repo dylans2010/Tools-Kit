@@ -13,7 +13,7 @@ struct SDKSecurityMonitorView: View {
 
     var body: some View {
         List {
-            Section("Access Logs") {
+            Section {
                 if filteredLogs.isEmpty {
                     Text("No access logs recorded yet").foregroundStyle(.secondary)
                 } else {
@@ -40,9 +40,11 @@ struct SDKSecurityMonitorView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Access Logs")
             }
 
-            Section("Security Summary") {
+            Section {
                 InfoRow(label: "Enforcement Mode", value: runtime.isNoSandboxModeEnabled ? "Unrestricted (NoSandbox)" : "Strict (Sandbox)")
                 InfoRow(label: "Active Scopes", value: "\(scopeManager.authorizedScopes.count)")
 
@@ -51,9 +53,11 @@ struct SDKSecurityMonitorView: View {
 
                 let grantedCount = scopeManager.scopeAuditLog.filter { $0.granted }.count
                 InfoRow(label: "Granted Access", value: "\(grantedCount)")
+            } header: {
+                Text("Security Summary")
             }
 
-            Section("Authorized Scopes") {
+            Section {
                 if scopeManager.authorizedScopes.isEmpty {
                     Text("All scopes implicitly authorized (no restrictions set)")
                         .font(.caption).foregroundStyle(.secondary)
@@ -65,6 +69,8 @@ struct SDKSecurityMonitorView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Authorized Scopes")
             }
         }
         .navigationTitle("Security Monitor")

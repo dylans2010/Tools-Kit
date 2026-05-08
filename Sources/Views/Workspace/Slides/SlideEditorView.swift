@@ -112,7 +112,7 @@ struct SlideEditorView: View {
                 }
             }
         ))
-        .onChange(of: photoPickerItem) { newItem in
+        .onChange(of: photoPickerItem) { _, newItem in
             guard let newItem else { return }
             Task {
                 if let data = try? await newItem.loadTransferable(type: Data.self) {
@@ -270,14 +270,16 @@ struct SlideEditorView: View {
     private var slideToolsSheet: some View {
         NavigationStack {
             Form {
-                Section("Slide Actions") {
+                Section {
                     Button("Duplicate Current Slide", action: duplicateCurrentSlide)
                     Button("Move Slide Left") { moveSlide(at: selectedSlideIndex, by: -1) }
                     Button("Move Slide Right") { moveSlide(at: selectedSlideIndex, by: 1) }
                     Button("Delete Current Slide", role: .destructive) { deleteSlide(at: selectedSlideIndex) }
+                } header: {
+                    Text("Slide Actions")
                 }
 
-                Section("Smart Layout Helpers") {
+                Section {
                     Button("Add Title + Body Block") { addSlideWithLayout("Content") }
                     Button("Add Quote Layout") { addSlideWithLayout("Quote") }
                     Button("Add Agenda Slide") { addSlideWithLayout("Agenda") }
@@ -290,14 +292,18 @@ struct SlideEditorView: View {
                     Button("Nudge Down") { nudgeSelectedElement(dx: 0, dy: 10) }
                     Button("Nudge Left") { nudgeSelectedElement(dx: -10, dy: 0) }
                     Button("Nudge Right") { nudgeSelectedElement(dx: 10, dy: 0) }
+                } header: {
+                    Text("Smart Layout Helpers")
                 }
 
-                Section("Background Tools") {
+                Section {
                     Button("Randomize Color") { randomizeBackgroundColor() }
                     if supportsImagePlayground {
                         Button("Generate with Image Playground") { showingImagePlayground = true }
                     }
                     Button("Clear Background Image") { clearSlideBackgroundImage() }
+                } header: {
+                    Text("Background Tools")
                 }
             }
             .navigationTitle("Slide Tools")
@@ -314,15 +320,17 @@ struct SlideEditorView: View {
         NavigationStack {
             Form {
                 if let element = selectedElement {
-                    Section("Position & Size") {
+                    Section {
                         Stepper("X: \(Int(element.x))", value: bindingFor(\.x, element: element), in: 0...2000, step: 10)
                         Stepper("Y: \(Int(element.y))", value: bindingFor(\.y, element: element), in: 0...2000, step: 10)
                         Stepper("Width: \(Int(element.width))", value: bindingFor(\.width, element: element), in: 20...1600, step: 10)
                         Stepper("Height: \(Int(element.height))", value: bindingFor(\.height, element: element), in: 20...1200, step: 10)
+                    } header: {
+                        Text("Position & Size")
                     }
 
                     if element.kind == .text {
-                        Section("Text") {
+                        Section {
                             TextField("Text", text: bindingText(element: element), axis: .vertical)
                                 .textFieldStyle(.roundedBorder)
                             VStack(alignment: .leading, spacing: 6) {
@@ -336,13 +344,17 @@ struct SlideEditorView: View {
                                     updateElementProperty(element) { $0.fontWeight = isBold ? "bold" : "regular" }
                                 }
                             ))
+                        } header: {
+                            Text("Text")
                         }
                     }
 
                     if element.kind == .shape {
-                        Section("Shape") {
+                        Section {
                             Stepper("Corner Radius: \(Int(element.cornerRadius))", value: bindingFor(\.cornerRadius, element: element), in: 0...60, step: 1)
                             Stepper("Stroke Width: \(Int(element.strokeWidth))", value: bindingFor(\.strokeWidth, element: element), in: 0...20, step: 1)
+                        } header: {
+                            Text("Shape")
                         }
                     }
                 } else {

@@ -32,14 +32,18 @@ struct CellEditorView: View {
                     .listRowBackground(Color.workspaceSurface)
 
                     if isFormulaMode {
-                        Section("Formula") {
+                        Section {
                             TextField("=SUM(A1:A10)", text: $formula)
                                 .font(.system(.body, design: .monospaced))
+                        } header: {
+                            Text("Formula")
                         }
                         .listRowBackground(Color.workspaceSurface)
                     } else {
-                        Section("Value") {
+                        Section {
                             TextField("Cell value", text: $rawValue)
+                        } header: {
+                            Text("Value")
                         }
                         .listRowBackground(Color.workspaceSurface)
                     }

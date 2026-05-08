@@ -18,14 +18,16 @@ struct WorkflowListView: View {
 
     var body: some View {
         List {
-            Section("Dashboard") {
+            Section {
                 LabeledContent("Total Workflows", value: "\(manager.summaries.count)")
                 LabeledContent("Active", value: "\(manager.summaries.filter { $0.workflow.state == "active" }.count)")
                 LabeledContent("Pinned", value: "\(manager.summaries.filter(\.isFavorite).count)")
                 LabeledContent("Templates Available", value: "\(manager.templates.count)")
+            } header: {
+                Text("Dashboard")
             }
 
-            Section("Workflows") {
+            Section {
                 ForEach(filtered) { summary in
                     NavigationLink(destination: WorkflowDetailView(owner: owner, repo: repo, workflow: summary.workflow, lastRun: summary.lastRun)) {
                         VStack(alignment: .leading, spacing: 6) {
@@ -50,6 +52,8 @@ struct WorkflowListView: View {
                         .tint(.orange)
                     }
                 }
+            } header: {
+                Text("Workflows")
             }
         }
         .overlay {

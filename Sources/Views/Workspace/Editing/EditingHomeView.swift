@@ -6,7 +6,7 @@ struct EditingHomeView: View {
 
     var body: some View {
         List {
-            Section("Recent Projects") {
+            Section {
                 if manager.projects.isEmpty {
                     Text("No projects yet.")
                         .foregroundColor(.secondary)
@@ -30,6 +30,8 @@ struct EditingHomeView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Recent Projects")
             }
 
             Section(header: Text("Professional Suite")) {
@@ -41,7 +43,7 @@ struct EditingHomeView: View {
                 }
             }
 
-            Section("Workflow") {
+            Section {
                 NavigationLink(destination: AssetManagerView()) {
                     Label("Asset Manager", systemImage: "folder.fill")
                 }
@@ -51,6 +53,8 @@ struct EditingHomeView: View {
                 NavigationLink(destination: BatchProcessingView(projects: manager.projects)) {
                     Label("Batch Processing", systemImage: "square.stack.3d.down.right.fill")
                 }
+            } header: {
+                Text("Workflow")
             }
         }
         .navigationTitle("Media Editing")

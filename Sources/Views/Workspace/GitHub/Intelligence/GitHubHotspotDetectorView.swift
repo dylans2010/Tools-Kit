@@ -6,7 +6,7 @@ struct GitHubHotspotDetectorView: View {
 
     var body: some View {
         List {
-            Section("High Churn Files") {
+            Section {
                 if analyzer.hotspots.isEmpty {
                     Text("No hotspot data. Analyze commits first.")
                         .font(.caption).foregroundStyle(.secondary)
@@ -32,6 +32,8 @@ struct GitHubHotspotDetectorView: View {
                         .padding(.vertical, 4)
                     }
                 }
+            } header: {
+                Text("High Churn Files")
             }
 
             Section {

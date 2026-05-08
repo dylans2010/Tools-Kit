@@ -13,7 +13,7 @@ struct MarkdownPreviewView: View {
                         .frame(height: 200)
                         .font(.system(.body, design: .monospaced))
                         .padding(8)
-                        .onChange(of: markdown) { _ in backend.renderMarkdown(markdown) }
+                        .onChange(of: markdown) { _, _ in backend.renderMarkdown(markdown) }
                 }
 
                 ToolInputSection("Preview") {

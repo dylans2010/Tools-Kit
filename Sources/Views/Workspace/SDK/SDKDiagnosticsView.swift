@@ -9,7 +9,7 @@ struct SDKDiagnosticsView: View {
 
     var body: some View {
         List {
-            Section("System Health") {
+            Section {
                 healthRow(title: "Connector Reachability", status: bgEngine.systemHealth.connectorReachability)
                 healthRow(title: "Plugin Sandbox", status: bgEngine.systemHealth.pluginSandboxStatus)
                 healthRow(title: "Data Store Health", status: bgEngine.systemHealth.coreDataHealth)
@@ -25,9 +25,11 @@ struct SDKDiagnosticsView: View {
                     bgEngine.startHealthCheckLoop()
                 }
                 .font(.caption)
+            } header: {
+                Text("System Health")
             }
 
-            Section("Data Sync") {
+            Section {
                 ForEach(SDKScope.allCases, id: \.self) { scope in
                     HStack {
                         Text(String(describing: scope).capitalized)
@@ -38,9 +40,11 @@ struct SDKDiagnosticsView: View {
                             .foregroundStyle(itemCount > 0 ? .green : .secondary)
                     }
                 }
+            } header: {
+                Text("Data Sync")
             }
 
-            Section("Performance Metrics") {
+            Section {
                 let metrics = telemetry.getMetrics()
                 HStack {
                     Text("Avg Latency")
@@ -67,9 +71,11 @@ struct SDKDiagnosticsView: View {
                     Spacer()
                     Text("\(metrics.activeTraces)").font(.caption)
                 }
+            } header: {
+                Text("Performance Metrics")
             }
 
-            Section("Plugin Integrity") {
+            Section {
                 if pluginManager.plugins.isEmpty {
                     Text("No Plugins Installed").font(.caption).foregroundStyle(.secondary)
                 } else {
@@ -85,9 +91,11 @@ struct SDKDiagnosticsView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Plugin Integrity")
             }
 
-            Section("Connector Status") {
+            Section {
                 if connectorManager.connectors.isEmpty {
                     Text("No Connectors Registered").font(.caption).foregroundStyle(.secondary)
                 } else {
@@ -104,6 +112,8 @@ struct SDKDiagnosticsView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Connector Status")
             }
         }
         .navigationTitle("Diagnostics")

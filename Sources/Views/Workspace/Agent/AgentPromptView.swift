@@ -64,7 +64,7 @@ struct AgentPromptView: View {
                         Text("Provide a clear description of what you want Agent to accomplish in this repository.")
                     }
 
-                    Section("Quick Templates") {
+                    Section {
                         ForEach(templates, id: \.0) { title, template in
                             Button {
                                 withAnimation {
@@ -83,6 +83,8 @@ struct AgentPromptView: View {
                                 }
                             }
                         }
+                    } header: {
+                        Text("Quick Templates")
                     }
                 }
                 .listStyle(.insetGrouped)

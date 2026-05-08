@@ -33,7 +33,7 @@ struct ProjectTaskDetailView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Task Details") {
+                Section {
                     TextField("Title", text: $title)
                     TextEditor(text: $description)
                         .frame(minHeight: 60)
@@ -46,9 +46,11 @@ struct ProjectTaskDetailView: View {
                                     .allowsHitTesting(false)
                             }
                         }
+                } header: {
+                    Text("Task Details")
                 }
 
-                Section("Status & Priority") {
+                Section {
                     Picker("Status", selection: $status) {
                         ForEach(TaskStatus.allCases, id: \.self) { s in
                             Text(s.rawValue).tag(s)
@@ -61,9 +63,11 @@ struct ProjectTaskDetailView: View {
                             Text(p.rawValue).tag(p)
                         }
                     }
+                } header: {
+                    Text("Status & Priority")
                 }
 
-                Section("Due Date") {
+                Section {
                     Toggle("Set Due Date", isOn: $hasDueDate)
                     if hasDueDate {
                         DatePicker("Due Date", selection: Binding(
@@ -71,13 +75,17 @@ struct ProjectTaskDetailView: View {
                             set: { dueDate = $0 }
                         ), displayedComponents: .date)
                     }
+                } header: {
+                    Text("Due Date")
                 }
 
-                Section("Assignment") {
+                Section {
                     TextField("Assigned To", text: $assignedTo)
+                } header: {
+                    Text("Assignment")
                 }
 
-                Section("Tags") {
+                Section {
                     ForEach(tags, id: \.self) { tag in
                         Text(tag)
                     }
@@ -94,6 +102,8 @@ struct ProjectTaskDetailView: View {
                         }
                         .disabled(tagInput.trimmingCharacters(in: .whitespaces).isEmpty)
                     }
+                } header: {
+                    Text("Tags")
                 }
             }
             .navigationTitle(task == nil ? "New Task" : "Edit Task")

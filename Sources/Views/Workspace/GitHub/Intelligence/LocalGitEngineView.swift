@@ -39,7 +39,7 @@ struct LocalGitEngineView: View {
 
             // Commit builder
             if !gitEngine.stagedChanges.isEmpty {
-                Section("Build Commit") {
+                Section {
                     TextField("Commit message…", text: $newMessage)
                     TextField("Branch", text: $newBranch)
                     Button("Auto-Generate Message") {
@@ -53,11 +53,13 @@ struct LocalGitEngineView: View {
                     }
                     .disabled(newMessage.isEmpty)
                     .foregroundStyle(.green)
+                } header: {
+                    Text("Build Commit")
                 }
             }
 
             // Local commit history
-            Section("Local Commits (\(gitEngine.localCommits.count))") {
+            Section {
                 if gitEngine.localCommits.isEmpty {
                     Text("No local commits yet.").foregroundStyle(.secondary).font(.caption)
                 } else {
@@ -65,11 +67,13 @@ struct LocalGitEngineView: View {
                         LocalCommitRow(commit: commit)
                     }
                 }
+            } header: {
+                Text("Local Commits (\(gitEngine.localCommits.count))")
             }
 
             // Push queue
             if !gitEngine.commitQueue.isEmpty {
-                Section("Push Queue (\(gitEngine.commitQueue.count))") {
+                Section {
                     ForEach(gitEngine.commitQueue, id: \.self) { id in
                         if let commit = gitEngine.localCommits.first(where: { $0.id == id }) {
                             HStack {
@@ -80,6 +84,8 @@ struct LocalGitEngineView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Push Queue (\(gitEngine.commitQueue.count))")
                 }
             }
         }
@@ -176,26 +182,34 @@ struct StageFileView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("File Path") {
+                Section {
                     TextField("e.g. Sources/Models/User.swift", text: $filePath)
+                } header: {
+                    Text("File Path")
                 }
-                Section("Change Type") {
+                Section {
                     Picker("Type", selection: $changeType) {
                         ForEach(GitEngineService.ChangeType.allCases, id: \.self) { t in
                             Text(t.rawValue).tag(t)
                         }
                     }
                     .pickerStyle(.segmented)
+                } header: {
+                    Text("Change Type")
                 }
-                Section("Original Content (optional)") {
+                Section {
                     TextEditor(text: $originalContent)
                         .font(.system(.caption, design: .monospaced))
                         .frame(minHeight: 80)
+                } header: {
+                    Text("Original Content (optional)")
                 }
-                Section("Modified Content") {
+                Section {
                     TextEditor(text: $modifiedContent)
                         .font(.system(.caption, design: .monospaced))
                         .frame(minHeight: 80)
+                } header: {
+                    Text("Modified Content")
                 }
             }
             .navigationTitle("Stage Change")

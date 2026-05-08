@@ -7,7 +7,7 @@ struct CollaborationHomeView: View {
 
     var body: some View {
         List {
-            Section("Your Spaces") {
+            Section {
                 if manager.spaces.isEmpty {
                     Text("No Collaboration Spaces Yet")
                         .foregroundColor(.secondary)
@@ -18,9 +18,11 @@ struct CollaborationHomeView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Your Spaces")
             }
 
-            Section("Tools & Management") {
+            Section {
                 if let firstSpace = manager.spaces.first {
                     NavigationLink(destination: PullRequestDashboardView(spaceID: firstSpace.id)) {
                         Label("Pull Requests", systemImage: "arrow.triangle.pull")
@@ -41,9 +43,11 @@ struct CollaborationHomeView: View {
                 NavigationLink(destination: SpaceVersionHistoryView()) {
                     Label("Version History", systemImage: "clock.fill")
                 }
+            } header: {
+                Text("Tools & Management")
             }
 
-            Section("Automation & Intelligence") {
+            Section {
                 NavigationLink(destination: WorkspaceAdvancedHomeView()) {
                     Label("Advanced Workspace", systemImage: "square.3.layers.3d")
                 }
@@ -62,9 +66,11 @@ struct CollaborationHomeView: View {
                 NavigationLink(destination: WorkspaceGlobalSearchView()) {
                     Label("Global Search", systemImage: "magnifyingglass")
                 }
+            } header: {
+                Text("Automation & Intelligence")
             }
 
-            Section("Analytics & Tools") {
+            Section {
                 NavigationLink(destination: WorkspaceToolsPanelView(spaceID: manager.spaces.first?.id)) {
                     Label("Workspace Tools", systemImage: "wrench.and.screwdriver.fill")
                 }
@@ -74,9 +80,11 @@ struct CollaborationHomeView: View {
                 NavigationLink(destination: PluginsMainView()) {
                     Label("Workspace Extensions", systemImage: "puzzlepiece.extension.fill")
                 }
+            } header: {
+                Text("Analytics & Tools")
             }
 
-            Section("Recent Activity") {
+            Section {
                 let recentActivity = manager.spaces.flatMap { $0.activityFeed }.sorted { $0.timestamp > $1.timestamp }.prefix(10)
                 if recentActivity.isEmpty {
                     Text("No Recent Activity")
@@ -93,6 +101,8 @@ struct CollaborationHomeView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Recent Activity")
             }
         }
         .navigationTitle("Collaboration")
@@ -125,18 +135,22 @@ struct CreateSpaceView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Information") {
+                Section {
                     TextField("Name", text: $name)
                     TextField("Description", text: $description)
+                } header: {
+                    Text("Information")
                 }
 
-                Section("Privacy") {
+                Section {
                     Picker("Visibility", selection: $visibility) {
                         Text("Private").tag(SpaceVisibility.privateSpace)
                         Text("Shared").tag(SpaceVisibility.shared)
                         Text("Public").tag(SpaceVisibility.publicSpace)
                     }
                     .pickerStyle(.segmented)
+                } header: {
+                    Text("Privacy")
                 }
             }
             .navigationTitle("New Space")

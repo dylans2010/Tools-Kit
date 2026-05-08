@@ -92,7 +92,7 @@ struct PluginDevConsoleView: View {
                 }
                 .padding(.vertical, 8)
             }
-            .onChange(of: logs.count) { _ in
+            .onChange(of: logs.count) { _, _ in
                 if let last = logs.last {
                     proxy.scrollTo(last.id, anchor: .bottom)
                 }

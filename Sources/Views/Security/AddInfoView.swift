@@ -32,13 +32,17 @@ struct AddInfoView: View {
                 Label("Add Secure Item", systemImage: "lock.doc")
                 Text("Encrypted locally before being stored.").font(.caption).foregroundStyle(.secondary)
             }
-            Section("Details") {
+            Section {
                 Picker("Type", selection: $category) { ForEach(VaultCategory.allCases) { Label($0.rawValue, systemImage: $0.icon).tag($0) } }
                     .pickerStyle(.segmented)
                 TextField("Title", text: $title)
+            } header: {
+                Text("Details")
             }
             dynamicSection
-            Section("Notes") { TextEditor(text: $note).frame(minHeight: 80) }
+            Section { TextEditor(text: $note).frame(minHeight: 80) } header: {
+                Text("Notes")
+            }
             if let errorMessage { Section { Label(errorMessage, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.red) } }
         }
         .navigationTitle("New Entry")
@@ -53,15 +57,25 @@ struct AddInfoView: View {
     @ViewBuilder private var dynamicSection: some View {
         switch category {
         case .credentials:
-            Section("Credentials") { TextField("Username", text: $username); SecureField("Password", text: $password); TextField("Domain", text: $domain).autocapitalization(.none) }
+            Section { TextField("Username", text: $username); SecureField("Password", text: $password); TextField("Domain", text: $domain).autocapitalization(.none) } header: {
+                Text("Credentials")
+            }
         case .documents:
-            Section("Document") { Picker("Type", selection: $documentType) { Text("ID").tag("ID"); Text("Passport").tag("Passport"); Text("Driver's License").tag("Driver's License"); Text("Insurance").tag("Insurance") }; DatePicker("Expiration", selection: $expirationDate, displayedComponents: .date); Button { showingFilePicker = true } label: { Label(selectedFile?.lastPathComponent ?? "Select Document", systemImage: "doc.badge.plus") } }
+            Section { Picker("Type", selection: $documentType) { Text("ID").tag("ID"); Text("Passport").tag("Passport"); Text("Driver's License").tag("Driver's License"); Text("Insurance").tag("Insurance") }; DatePicker("Expiration", selection: $expirationDate, displayedComponents: .date); Button { showingFilePicker = true } label: { Label(selectedFile?.lastPathComponent ?? "Select Document", systemImage: "doc.badge.plus") } } header: {
+                Text("Document")
+            }
         case .photos:
-            Section("Photo") { PhotosPicker(selection: $selectedPhotoItem, matching: .images) { Label("Select Photo", systemImage: "photo.badge.plus") }.onChange(of: selectedPhotoItem) { _, item in Task { selectedPhotoData = try? await item?.loadTransferable(type: Data.self) } } }
+            Section { PhotosPicker(selection: $selectedPhotoItem, matching: .images) { Label("Select Photo", systemImage: "photo.badge.plus") }.onChange(of: selectedPhotoItem) { _, item in Task { selectedPhotoData = try? await item?.loadTransferable(type: Data.self) } } } header: {
+                Text("Photo")
+            }
         case .files:
-            Section("File") { Button { showingFilePicker = true } label: { Label(selectedFile?.lastPathComponent ?? "Select File", systemImage: "folder.badge.plus") } }
+            Section { Button { showingFilePicker = true } label: { Label(selectedFile?.lastPathComponent ?? "Select File", systemImage: "folder.badge.plus") } } header: {
+                Text("File")
+            }
         case .totp:
-            Section("Authenticator") { TextField("Issuer", text: $totpIssuer); TextField("Account", text: $totpAccount); TextField("Secret", text: $totpSecret).autocapitalization(.none); LabeledContent("Live Code") { Text(totpCode).font(.system(.title3, design: .monospaced).bold()).foregroundStyle(.blue) } }
+            Section { TextField("Issuer", text: $totpIssuer); TextField("Account", text: $totpAccount); TextField("Secret", text: $totpSecret).autocapitalization(.none); LabeledContent("Live Code") { Text(totpCode).font(.system(.title3, design: .monospaced).bold()).foregroundStyle(.blue) } } header: {
+                Text("Authenticator")
+            }
         }
     }
 

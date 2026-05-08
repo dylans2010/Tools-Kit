@@ -55,7 +55,7 @@ struct ProjectDetailsView: View {
                 showFileImporter = false
             }
         }
-        .onChange(of: selectedPhotoItem) { item in
+        .onChange(of: selectedPhotoItem) { _, item in
             guard let item = item else { return }
             loadPhoto(from: item)
         }

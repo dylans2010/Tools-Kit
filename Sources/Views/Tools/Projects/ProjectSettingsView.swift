@@ -24,7 +24,7 @@ struct ProjectSettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("General") {
+                Section {
                     TextField("Name", text: $project.name)
                     TextEditor(text: $project.description)
                         .frame(minHeight: 60)
@@ -33,9 +33,11 @@ struct ProjectSettingsView: View {
                             Text(status.rawValue).tag(status)
                         }
                     }
+                } header: {
+                    Text("General")
                 }
 
-                Section("Icon") {
+                Section {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8), spacing: 10) {
                         ForEach(icons, id: \.self) { icon in
                             Button {
@@ -50,9 +52,11 @@ struct ProjectSettingsView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Icon")
                 }
 
-                Section("Color") {
+                Section {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8), spacing: 10) {
                         ForEach(colors, id: \.0) { hex, _ in
                             Button {
@@ -67,26 +71,34 @@ struct ProjectSettingsView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Color")
                 }
 
-                Section("Privacy") {
+                Section {
                     Toggle("Public Project", isOn: $project.settings.isPublic)
+                } header: {
+                    Text("Privacy")
                 }
 
-                Section("Permissions") {
+                Section {
                     Toggle("Allow File Uploads", isOn: $project.settings.allowFileUploads)
                     Toggle("Allow Annotations", isOn: $project.settings.allowAnnotations)
+                } header: {
+                    Text("Permissions")
                 }
 
-                Section("Defaults") {
+                Section {
                     Picker("Default Task Priority", selection: $project.settings.defaultTaskPriority) {
                         ForEach(ProjectTask.TaskPriority.allCases, id: \.self) { priority in
                             Text(priority.rawValue).tag(priority)
                         }
                     }
+                } header: {
+                    Text("Defaults")
                 }
 
-                Section("Tags") {
+                Section {
                     ForEach(project.settings.tags, id: \.self) { tag in
                         Text(tag)
                     }
@@ -103,10 +115,14 @@ struct ProjectSettingsView: View {
                         }
                         .disabled(newTag.trimmingCharacters(in: .whitespaces).isEmpty)
                     }
+                } header: {
+                    Text("Tags")
                 }
 
-                Section("Notifications") {
+                Section {
                     Toggle("Enable Notifications", isOn: $project.settings.notificationsEnabled)
+                } header: {
+                    Text("Notifications")
                 }
 
                 Section {

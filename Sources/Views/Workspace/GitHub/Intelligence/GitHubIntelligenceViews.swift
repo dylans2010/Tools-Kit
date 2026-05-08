@@ -125,7 +125,7 @@ struct WorkflowBuilderView: View {
                 .foregroundStyle(.blue)
             }
 
-            Section("My Workflows (\(builder.workflows.count))") {
+            Section {
                 if builder.workflows.isEmpty {
                     Text("No workflows yet. Create one above.").foregroundStyle(.secondary).font(.caption)
                 } else {
@@ -139,6 +139,8 @@ struct WorkflowBuilderView: View {
                         offsets.map { builder.workflows[$0].id }.forEach { builder.deleteWorkflow(id: $0) }
                     }
                 }
+            } header: {
+                Text("My Workflows (\(builder.workflows.count))")
             }
         }
         .navigationTitle("Workflow Builder")
@@ -192,11 +194,15 @@ struct CreateWorkflowView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Name") { TextField("My Workflow", text: $name) }
-                Section("Triggers") {
+                Section { TextField("My Workflow", text: $name) } header: {
+                    Text("Name")
+                }
+                Section {
                     Toggle("push", isOn: $pushTrigger)
                     Toggle("pull_request", isOn: $prTrigger)
                     Toggle("schedule", isOn: $scheduleTrigger)
+                } header: {
+                    Text("Triggers")
                 }
             }
             .navigationTitle("New Workflow")
@@ -232,12 +238,14 @@ struct WorkflowEditorView: View {
         NavigationStack {
             List {
                 if let wf = workflow {
-                    Section("Triggers") {
+                    Section {
                         ForEach(wf.triggers, id: \.self) { trigger in
                             Label(trigger, systemImage: "bolt.fill")
                         }
+                    } header: {
+                        Text("Triggers")
                     }
-                    Section("Jobs") {
+                    Section {
                         ForEach(wf.jobs) { job in
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(job.name).font(.subheadline.bold())
@@ -245,8 +253,10 @@ struct WorkflowEditorView: View {
                                 Text("\(job.steps.count) step(s)").font(.caption2).foregroundStyle(.tertiary)
                             }
                         }
+                    } header: {
+                        Text("Jobs")
                     }
-                    Section("Export YAML") {
+                    Section {
                         Button("Generate YAML Preview") {
                             yamlOutput = builder.exportYAML(workflowID: workflowID)
                         }
@@ -262,6 +272,8 @@ struct WorkflowEditorView: View {
                             .background(Color(uiColor: .secondarySystemBackground))
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
+                    } header: {
+                        Text("Export YAML")
                     }
                 }
             }

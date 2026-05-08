@@ -51,7 +51,7 @@ struct PluginDetailView: View {
     }
 
     private func detailsSection(_ plugin: PluginDefinition) -> some View {
-        Section("Details") {
+        Section {
             LabeledContent("Identifier", value: plugin.identifier)
             if let installed = plugin.installedAt {
                 LabeledContent("Installed", value: installed.formatted(date: .abbreviated, time: .omitted))
@@ -60,27 +60,33 @@ struct PluginDetailView: View {
                 LabeledContent("Last Executed", value: lastExec.formatted(.relative(presentation: .named)))
             }
             LabeledContent("Error Count", value: "\(plugin.errorCount)")
+        } header: {
+            Text("Details")
         }
     }
 
     private func permissionsSection(_ plugin: PluginDefinition) -> some View {
-        Section("Permissions") {
+        Section {
             ForEach(plugin.permissions) { permission in
                 VStack(alignment: .leading, spacing: 2) {
                     Text(permission.capability.displayName).font(.caption.bold())
                     Text(permission.description).font(.caption2).foregroundColor(.secondary)
                 }
             }
+        } header: {
+            Text("Permissions")
         }
     }
 
     private func actionsSection(_ plugin: PluginDefinition) -> some View {
-        Section("Active Triggers") {
+        Section {
             ForEach(plugin.actions) { action in
                 Label(action.rawValue, systemImage: "bolt.fill")
                     .font(.caption)
                     .foregroundColor(.orange)
             }
+        } header: {
+            Text("Active Triggers")
         }
     }
 

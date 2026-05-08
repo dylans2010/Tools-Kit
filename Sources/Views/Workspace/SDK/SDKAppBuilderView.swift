@@ -64,10 +64,12 @@ struct SDKAppBuilderView: View {
 
     private var step1: some View {
         Form {
-            Section("Project Identity") {
+            Section {
                 TextField("App Name", text: $viewModel.name)
                 TextEditor(text: $viewModel.description)
                     .frame(height: 100)
+            } header: {
+                Text("Project Identity")
             }
         }
     }
