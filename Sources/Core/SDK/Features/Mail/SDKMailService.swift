@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 /// Protocol for the SDK mail service.
+@MainActor
 public protocol SDKMailServiceProtocol {
     func send(to: String, subject: String, body: String) async throws
     func listMessages() -> [SDKMailMessage]

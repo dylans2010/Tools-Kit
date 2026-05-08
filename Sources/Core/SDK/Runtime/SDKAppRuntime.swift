@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 /// Protocol for plugin/app lifecycle management.
+@MainActor
 public protocol SDKAppLifecycle {
     var appId: UUID { get }
     var appName: String { get }
@@ -11,6 +12,7 @@ public protocol SDKAppLifecycle {
 }
 
 /// Protocol for the plugin runtime engine.
+@MainActor
 public protocol PluginRuntimeProtocol {
     func register(_ app: SDKAppDefinition) throws
     func start(appId: UUID) async throws

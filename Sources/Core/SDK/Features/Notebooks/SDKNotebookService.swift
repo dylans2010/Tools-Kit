@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 /// Protocol for the SDK notebook service.
+@MainActor
 public protocol SDKNotebookServiceProtocol {
     func createNotebook(title: String) throws -> SDKNotebook
     func listNotebooks() -> [SDKNotebook]

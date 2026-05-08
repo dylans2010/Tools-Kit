@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 /// Protocol for the SDK meet service.
+@MainActor
 public protocol SDKMeetServiceProtocol {
     func createSession(title: String, participants: [String]) throws -> SDKMeetSession
     func listSessions() -> [SDKMeetSession]
