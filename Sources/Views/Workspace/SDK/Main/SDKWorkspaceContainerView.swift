@@ -255,7 +255,7 @@ struct SDKWorkspaceContainerView: View {
 
     private func dragHandle(vertical: Bool = false, onChanged: @escaping (CGSize) -> Void) -> some View {
         Rectangle()
-            .fill(.secondary.opacity(0.2))
+            .fill(Color.secondary.opacity(0.2))
             .frame(width: vertical ? nil : 4, height: vertical ? 4 : nil)
             .contentShape(Rectangle())
             .gesture(DragGesture(minimumDistance: 0).onChanged { onChanged($0.translation) })
