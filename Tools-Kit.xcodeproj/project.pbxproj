@@ -1255,6 +1255,15 @@
 		SDK2A0000000000000000000A /* SDKStructureValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A0000000000000000000A /* SDKStructureValidator.swift */; };
 		SDK2A0000000000000000000B /* SDKWorkspaceContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A0000000000000000000B /* SDKWorkspaceContainerView.swift */; };
 		SDK2A0000000000000000000C /* SDKNavigatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A0000000000000000000C /* SDKNavigatorView.swift */; };
+		DV1100000000000000000001 /* IDEAPIEndpointsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV1000000000000000000001 /* IDEAPIEndpointsView.swift */; };
+		DV1100000000000000000002 /* IDECapabilitiesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV1000000000000000000002 /* IDECapabilitiesView.swift */; };
+		DV1100000000000000000003 /* IDEConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV1000000000000000000003 /* IDEConfigView.swift */; };
+		DV1100000000000000000004 /* IDEConnectorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV1000000000000000000004 /* IDEConnectorsView.swift */; };
+		DV1100000000000000000005 /* IDEDependenciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV1000000000000000000005 /* IDEDependenciesView.swift */; };
+		DV1100000000000000000006 /* IDEDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV1000000000000000000006 /* IDEDiagnosticsView.swift */; };
+		DV1100000000000000000007 /* IDELibrariesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV1000000000000000000007 /* IDELibrariesView.swift */; };
+		DV1100000000000000000008 /* IDERuntimeScriptsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV1000000000000000000008 /* IDERuntimeScriptsView.swift */; };
+		DV1100000000000000000009 /* IDEScopesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV1000000000000000000009 /* IDEScopesView.swift */; };
 		SDK2A0000000000000000000D /* SDKProjectEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A0000000000000000000D /* SDKProjectEditorView.swift */; };
 		SDK2A0000000000000000000E /* SDKInspectorPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A0000000000000000000E /* SDKInspectorPanelView.swift */; };
 		SDK2A0000000000000000000F /* SDKScopesEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A0000000000000000000F /* SDKScopesEditorView.swift */; };
@@ -2511,6 +2520,15 @@
 		SDK1A0000000000000000000A /* SDKStructureValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKStructureValidator.swift; sourceTree = "<group>"; };
 		SDK1A0000000000000000000B /* SDKWorkspaceContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKWorkspaceContainerView.swift; sourceTree = "<group>"; };
 		SDK1A0000000000000000000C /* SDKNavigatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/SDKNavigatorView.swift; sourceTree = "<group>"; };
+		DV1000000000000000000001 /* IDEAPIEndpointsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/IDEAPIEndpointsView.swift; sourceTree = "<group>"; };
+		DV1000000000000000000002 /* IDECapabilitiesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/IDECapabilitiesView.swift; sourceTree = "<group>"; };
+		DV1000000000000000000003 /* IDEConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/IDEConfigView.swift; sourceTree = "<group>"; };
+		DV1000000000000000000004 /* IDEConnectorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/IDEConnectorsView.swift; sourceTree = "<group>"; };
+		DV1000000000000000000005 /* IDEDependenciesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/IDEDependenciesView.swift; sourceTree = "<group>"; };
+		DV1000000000000000000006 /* IDEDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/IDEDiagnosticsView.swift; sourceTree = "<group>"; };
+		DV1000000000000000000007 /* IDELibrariesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/IDELibrariesView.swift; sourceTree = "<group>"; };
+		DV1000000000000000000008 /* IDERuntimeScriptsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/IDERuntimeScriptsView.swift; sourceTree = "<group>"; };
+		DV1000000000000000000009 /* IDEScopesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/IDEScopesView.swift; sourceTree = "<group>"; };
 		SDK1A0000000000000000000D /* SDKProjectEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/SDKProjectEditorView.swift; sourceTree = "<group>"; };
 		SDK1A0000000000000000000E /* SDKInspectorPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/SDKInspectorPanelView.swift; sourceTree = "<group>"; };
 		SDK1A0000000000000000000F /* SDKScopesEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/SDKScopesEditorView.swift; sourceTree = "<group>"; };
@@ -6935,6 +6953,15 @@
 				SDK1245FB85BF006D2EE4B2D /* SDKDeveloperGuideView.swift */,
 				SDK1A0000000000000000000B /* SDKWorkspaceContainerView.swift */,
 				SDK1A0000000000000000000C /* SDKNavigatorView.swift */,
+				DV1000000000000000000001 /* IDEAPIEndpointsView.swift */,
+				DV1000000000000000000002 /* IDECapabilitiesView.swift */,
+				DV1000000000000000000003 /* IDEConfigView.swift */,
+				DV1000000000000000000004 /* IDEConnectorsView.swift */,
+				DV1000000000000000000005 /* IDEDependenciesView.swift */,
+				DV1000000000000000000006 /* IDEDiagnosticsView.swift */,
+				DV1000000000000000000007 /* IDELibrariesView.swift */,
+				DV1000000000000000000008 /* IDERuntimeScriptsView.swift */,
+				DV1000000000000000000009 /* IDEScopesView.swift */,
 				SDK1A0000000000000000000D /* SDKProjectEditorView.swift */,
 				SDK1A0000000000000000000E /* SDKInspectorPanelView.swift */,
 				SDK1A0000000000000000000F /* SDKScopesEditorView.swift */,
@@ -9095,6 +9122,15 @@
 				SDK20B1ADEA78ACBE8387443 /* SDKDeveloperGuideView.swift in Sources */,
 				SDK2A0000000000000000000B /* SDKWorkspaceContainerView.swift in Sources */,
 				SDK2A0000000000000000000C /* SDKNavigatorView.swift in Sources */,
+				DV1100000000000000000001 /* IDEAPIEndpointsView.swift in Sources */,
+				DV1100000000000000000002 /* IDECapabilitiesView.swift in Sources */,
+				DV1100000000000000000003 /* IDEConfigView.swift in Sources */,
+				DV1100000000000000000004 /* IDEConnectorsView.swift in Sources */,
+				DV1100000000000000000005 /* IDEDependenciesView.swift in Sources */,
+				DV1100000000000000000006 /* IDEDiagnosticsView.swift in Sources */,
+				DV1100000000000000000007 /* IDELibrariesView.swift in Sources */,
+				DV1100000000000000000008 /* IDERuntimeScriptsView.swift in Sources */,
+				DV1100000000000000000009 /* IDEScopesView.swift in Sources */,
 				SDK2A0000000000000000000D /* SDKProjectEditorView.swift in Sources */,
 				SDK2A0000000000000000000E /* SDKInspectorPanelView.swift in Sources */,
 				SDK2A0000000000000000000F /* SDKScopesEditorView.swift in Sources */,

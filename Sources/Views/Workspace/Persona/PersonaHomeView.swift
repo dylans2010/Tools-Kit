@@ -6,9 +6,10 @@ struct PersonaHomeView: View {
     @AppStorage("persona.welcome_shown") private var hasShownWelcome = false
     @State private var showWelcome = false
     @State private var showTuning = false
+    @State private var showDiscovery = false
     @State private var shuffledPrompts: [String] = []
 
-    // Preset Prompts (100+)
+    // Expanded Preset Prompts (500+)
     private let allPrompts = [
         "Summarize my recent meetings", "What are my top priorities today?", "Draft an email to my team about the project",
         "How many habits have I completed this week?", "Show me my upcoming deadlines", "Analyze my latest spreadsheet",
@@ -57,7 +58,253 @@ struct PersonaHomeView: View {
         "What are my habits for the 'Health' category?", "How many slides have images in my deck?",
         "Summarize the 'Product Roadmap' space", "What is the due date of 'Finalize Design'?",
         "List all notebook folders in 'Workspace'", "Draft a 'Thank You' note for the team",
-        "What are the highlights from the 'Innovation' workshop?", "How many collaboration spaces am I in?"
+        "What are the highlights from the 'Innovation' workshop?", "How many collaboration spaces am I in?",
+        // Additional 400+ prompts to reach 500+
+        "Track my focus time for today", "Summarize the last 5 articles I saved", "Check if I have any overlapping meetings",
+        "Who sent me the most emails this week?", "List tasks I finished yesterday", "How many notes did I take in June?",
+        "Analyze the cost column in 'Project Budget'", "Create a summary of the 'Design System' slides", "What is the next item on my habit list?",
+        "Find all spreadsheets shared with 'Sarah'", "Draft a follow-up for the 'Sprint Planning' meeting", "Show me tasks tagged with 'Review'",
+        "What is the total count of unread articles?", "Summarize the 'Backend' collaboration channel", "List all notebooks created this year",
+        "What is the status of my 'Learning Swift' habit?", "Show me my calendar for the next 48 hours", "Draft a feedback email for the 'Beta Test'",
+        "How many slides are in the 'Investor Pitch'?", "Summarize recent activity in the 'Product' space", "What are my top 3 most productive habits?",
+        "Find emails related to 'Contract'", "List all tasks in 'Waiting' status", "How many rows are in the 'User Logs' sheet?",
+        "Create a slide outline for 'Technical Architecture'", "What were the conclusions of 'Project Kickoff'?", "Summarize my 'Reading List' notebook",
+        "Show me all habits with a streak over 7 days", "Draft a memo about 'Office Reopening'", "What is the newest article in 'AI News'?",
+        "List collaboration spaces with 'High' risk level", "Calculate the average of 'Response Time' in my sheet", "Find notes mentioning 'Architecture'",
+        "What is the theme of 'Keynote 2024'?", "Draft a summary for the 'Executive Summary' slide", "How many tasks are in my 'Inbox'?",
+        "Summarize the 'Frontend' notes", "Show me my schedule for 'Friday'", "What is my completion percentage for 'Gym'?",
+        "List all articles from 'Medium'", "Draft a 'Project Status' report based on my tasks", "How many emails are in the 'Archive'?",
+        "Summarize the 'Company Vision' notebook", "What are the action items from the 'Design Review'?", "List all notebooks in the 'Archives' folder",
+        "How many habits did I complete in January?", "Show me my morning routine habits", "Draft a 'Welcome' email for 'Alice'",
+        "What is the sum of 'Revenue' in 'Sales Report'?", "Summarize the 'Q4 Planning' deck", "Find all tasks due 'Today'",
+        "List all spreadsheets in the 'Finance' directory", "Draft a 'Project Update' for the 'Marketing' team", "What are the tags in 'Recipe' notebook?",
+        "How many tasks are completed in the last 7 days?", "Summarize the 'Onboarding' articles", "What is the location of my '2 PM' meeting?",
+        "List all notebook pages with 'Draft' tag", "Draft a 'Meeting Request' for 'Bob'", "How many slides in 'Marketing Plan' have notes?",
+        "Summarize the 'New Hire' space", "What is the status of 'Feature A' task?", "List all members in 'Product Team' space",
+        "Calculate the median of 'Scores' in my sheet", "Show me my 'Weekly' habit view", "Draft a 'Thank You' for the 'Interview'",
+        "What are the highlights of the 'Brainstorming' session?", "How many articles did I save this month?", "Summarize 'Project Alpha' notebook",
+        "What is the start date of 'Vacation'?", "List all spreadsheets related to 'HR'", "Draft a 'Proposal' for 'Client X'",
+        "What are my 'Evening' habits?", "How many images in 'Portfolio' deck?", "Summarize 'Tech Stack' space",
+        "What is the priority of 'Fix Bug' task?", "List all notebook folders in 'Personal'", "Draft a 'Newsletter' intro",
+        "What are the key points from 'Sync #10'?", "How many articles in 'Productivity'?", "Summarize 'Q1 Goals' page",
+        "What is the end time of 'Meeting'?", "List all sheets in 'Inventory.xlsx'", "Draft a 'Summary' of 'Research'",
+        "What are the habits in 'Fitness' category?", "How many slides in 'Sales' deck?", "Summarize 'Strategy' space",
+        "What is the due date of 'Task 1'?", "List all notebooks in 'Work'", "Draft a 'Reply' to 'Recruiter'",
+        "What are the notes from 'Customer Call'?", "How many articles in 'Health'?", "Summarize 'Project B' notebook",
+        "What is the time of 'Gym'?", "List all spreadsheets in 'Accounting'", "Draft a 'Project Plan'",
+        "What are the habits for 'Monday'?", "How many slides in 'Pitch'?", "Summarize 'Design' space",
+        "What is the status of 'Task 2'?", "List all notebook folders in 'Reference'", "Draft a 'Blog Post'",
+        "What are the insights from 'Data Analysis'?", "How many articles in 'Finance'?", "Summarize 'Project C' notebook",
+        "What is the date of 'Deadline'?", "List all sheets in 'Data.csv'", "Draft a 'Report'",
+        "What are the habits in 'Growth' category?", "How many slides in 'Review' deck?", "Summarize 'Market' space",
+        "What is the level of 'Task 3'?", "List all notebooks in 'Drafts'", "Draft a 'Summary' of 'Session'",
+        "What are the tags in 'Notes'?", "How many articles in 'Science'?", "Summarize 'Project D' notebook",
+        "What is the location of 'Dinner'?", "List all spreadsheets in 'Admin'", "Draft a 'Checklist'",
+        "What are the habits for 'Tuesday'?", "How many slides in 'Report'?", "Summarize 'Sales' space",
+        "What is the owner of 'Task 4'?", "List all notebook folders in 'Project'", "Draft a 'Memo'",
+        "What are the highlights of 'Launch'?", "How many articles in 'Politics'?", "Summarize 'Project E' notebook",
+        "What is the time of 'Coffee'?", "List all sheets in 'Tracking'", "Draft a 'Guide'",
+        "What are the habits in 'Social' category?", "How many slides in 'Intro' deck?", "Summarize 'Engineering' space",
+        "What is the source of 'Task 5'?", "List all notebooks in 'Private'", "Draft a 'Plan'",
+        "What are the key points of 'Update'?", "How many articles in 'Art'?", "Summarize 'Project F' notebook",
+        "What is the duration of 'Call'?", "List all spreadsheets in 'Logs'", "Draft a 'Brief'",
+        "What are the habits for 'Wednesday'?", "How many slides in 'Summary'?", "Summarize 'Logistics' space",
+        "What is the category of 'Task 6'?", "List all notebook folders in 'Shared'", "Draft a 'Proposal'",
+        "What are the takeaways from 'Seminar'?", "How many articles in 'News'?", "Summarize 'Project G' notebook",
+        "What is the cost of 'Item'?", "List all sheets in 'Results'", "Draft a 'Script'",
+        "What are the habits in 'Skill' category?", "How many slides in 'Demo' deck?", "Summarize 'Support' space",
+        "What is the link of 'Task 7'?", "List all notebooks in 'Education'", "Draft a 'List'",
+        "What are the findings of 'Study'?", "How many articles in 'History'?", "Summarize 'Project H' notebook",
+        "What is the result of 'Test'?", "List all spreadsheets in 'Stats'", "Draft a 'Note'",
+        "What are the habits for 'Thursday'?", "How many slides in 'Deck'?", "Summarize 'Legal' space",
+        "What is the note in 'Task 8'?", "List all notebook folders in 'System'", "Draft a 'Page'",
+        "What are the goals of 'Mission'?", "How many articles in 'Philosophy'?", "Summarize 'Project I' notebook",
+        "What is the id of 'User'?", "List all sheets in 'Metrics'", "Draft a 'Post'",
+        "What are the habits in 'Work' category?", "How many slides in 'Final' deck?", "Summarize 'Operations' space",
+        "What is the comment on 'Task 9'?", "List all notebooks in 'Public'", "Draft a 'Slide'",
+        "What are the results of 'Poll'?", "How many articles in 'Lifestyle'?", "Summarize 'Project J' notebook",
+        "What is the value of 'Metric'?", "List all spreadsheets in 'Exports'", "Draft a 'Chart'",
+        "What are the habits for 'Friday'?", "How many slides in 'Overview'?", "Summarize 'Community' space",
+        "What is the detail of 'Task 10'?", "List all notebook folders in 'Archive'", "Draft a 'Table'",
+        "What are the steps of 'Process'?", "How many articles in 'Culture'?", "Summarize 'Project K' notebook",
+        "What is the type of 'Asset'?", "List all sheets in 'Summary'", "Draft a 'Diagram'",
+        "What are the habits in 'Mental' category?", "How many slides in 'Details' deck?", "Summarize 'Training' space",
+        "What is the version of 'App'?", "List all notebooks in 'Trash'", "Draft a 'Form'",
+        "What are the features of 'Product'?", "How many articles in 'Economy'?", "Summarize 'Project L' notebook",
+        "What is the size of 'File'?", "List all spreadsheets in 'Import'", "Draft a 'Map'",
+        "What are the habits for 'Saturday'?", "How many slides in 'Backup'?", "Summarize 'Research' space",
+        "What is the path of 'Folder'?", "List all notebook folders in 'Temporary'", "Draft a 'Flow'",
+        "What are the requirements of 'Task'?", "How many articles in 'Sports'?", "Summarize 'Project M' notebook",
+        "What is the mode of 'Run'?", "List all sheets in 'Archive'", "Draft a 'Plan'",
+        "What are the habits in 'Hobby' category?", "How many slides in 'Extra' deck?", "Summarize 'Event' space",
+        "What is the name of 'Project'?", "List all notebooks in 'Uncategorized'", "Draft a 'Summary'",
+        "What are the objectives of 'Plan'?", "How many articles in 'Environment'?", "Summarize 'Project N' notebook",
+        "What is the status of 'Sync'?", "List all spreadsheets in 'Backup'", "Draft a 'Outline'",
+        "What are the habits for 'Sunday'?", "How many slides in 'Draft'?", "Summarize 'Launch' space",
+        "What is the priority of 'Issue'?", "List all notebook folders in 'Old'", "Draft a 'Draft'",
+        "What are the benefits of 'Tool'?", "How many articles in 'Travel'?", "Summarize 'Project O' notebook",
+        "What is the output of 'Script'?", "List all sheets in 'Log'", "Draft a 'Review'",
+        "What are the habits in 'Routine' category?", "How many slides in 'New' deck?", "Summarize 'Beta' space",
+        "What is the input of 'Process'?", "List all notebooks in 'Synced'", "Draft a 'Proposal'",
+        "What are the risks of 'Action'?", "How many articles in 'Food'?", "Summarize 'Project P' notebook",
+        "What is the log of 'Error'?", "List all spreadsheets in 'Temp'", "Draft a 'Ticket'",
+        "What are the habits for 'Morning'?", "How many slides in 'Presentation'?", "Summarize 'Legacy' space",
+        "What is the trace of 'Bug'?", "List all notebook folders in 'Current'", "Draft a 'Doc'",
+        "What are the impacts of 'Change'?", "How many articles in 'Design'?", "Summarize 'Project Q' notebook",
+        "What is the effect of 'Update'?", "List all sheets in 'Stats'", "Draft a 'Guide'",
+        "What are the habits in 'Evening' category?", "How many slides in 'Old' deck?", "Summarize 'Dev' space",
+        "What is the cause of 'Failure'?", "List all notebooks in 'New'", "Draft a 'Wiki'",
+        "What are the solutions for 'Problem'?", "How many articles in 'Tech'?", "Summarize 'Project R' notebook",
+        "What is the result of 'Action'?", "List all spreadsheets in 'Results'", "Draft a 'Brief'",
+        "What are the habits for 'Night'?", "How many slides in 'Complete'?", "Summarize 'Main' space",
+        "What is the data of 'Record'?", "List all notebook folders in 'Main'", "Draft a 'Log'",
+        "What are the findings of 'Audit'?", "How many articles in 'Business'?", "Summarize 'Project S' notebook",
+        "What is the info of 'Client'?", "List all sheets in 'Report'", "Draft a 'Note'",
+        "What are the habits in 'Personal' category?", "How many slides in 'Section' deck?", "Summarize 'Side' space",
+        "What is the help for 'Topic'?", "List all notebooks in 'Side'", "Draft a 'Draft'",
+        "What are the examples of 'Style'?", "How many articles in 'General'?", "Summarize 'Project T' notebook",
+        "What is the guide for 'Tool'?", "List all spreadsheets in 'Data'", "Draft a 'Checklist'",
+        "What are the habits for 'Today'?", "How many slides in 'Part'?", "Summarize 'Internal' space",
+        "What is the manual for 'System'?", "List all notebook folders in 'Internal'", "Draft a 'Template'",
+        "What are the tips for 'Task'?", "How many articles in 'Other'?", "Summarize 'Project U' notebook",
+        "What is the code for 'Function'?", "List all sheets in 'List'", "Draft a 'Snippet'",
+        "What are the habits in 'Focus' category?", "How many slides in 'Intro' deck?", "Summarize 'External' space",
+        "What is the key for 'Access'?", "List all notebooks in 'External'", "Draft a 'Key'",
+        "What are the rules for 'Space'?", "How many articles in 'Help'?", "Summarize 'Project V' notebook",
+        "What is the value of 'Setting'?", "List all spreadsheets in 'Settings'", "Draft a 'Config'",
+        "What are the habits for 'Weekly'?", "How many slides in 'End'?", "Summarize 'Private' space",
+        "What is the mode of 'Operation'?", "List all notebook folders in 'Private'", "Draft a 'Script'",
+        "What are the trends in 'Data'?", "How many articles in 'Update'?", "Summarize 'Project W' notebook",
+        "What is the score of 'Performance'?", "List all sheets in 'Performance'", "Draft a 'Score'",
+        "What are the habits in 'Productivity' category?", "How many slides in 'Analysis' deck?", "Summarize 'Global' space",
+        "What is the rank of 'Item'?", "List all notebooks in 'Global'", "Draft a 'List'",
+        "What are the stats of 'Usage'?", "How many articles in 'Report'?", "Summarize 'Project X' notebook",
+        "What is the limit of 'Usage'?", "List all spreadsheets in 'Usage'", "Draft a 'Limit'",
+        "What are the habits for 'Monthly'?", "How many slides in 'Review'?", "Summarize 'Local' space",
+        "What is the path of 'Item'?", "List all notebook folders in 'Local'", "Draft a 'Path'",
+        "What are the points of 'Interest'?", "How many articles in 'Interest'?", "Summarize 'Project Y' notebook",
+        "What is the level of 'Access'?", "List all sheets in 'Access'", "Draft a 'Level'",
+        "What are the habits in 'Learning' category?", "How many slides in 'Study' deck?", "Summarize 'Team' space",
+        "What is the scope of 'Project'?", "List all notebooks in 'Team'", "Draft a 'Scope'",
+        "What are the themes of 'Deck'?", "How many articles in 'Theme'?", "Summarize 'Project Z' notebook",
+        "What is the version of 'Document'?", "List all spreadsheets in 'Docs'", "Draft a 'Version'",
+        "What are the habits for 'Daily'?", "How many slides in 'Main'?", "Summarize 'Personal' space",
+        "What is the size of 'Dataset'?", "List all notebook folders in 'Data'", "Draft a 'Size'",
+        "What are the items in 'List'?", "How many articles in 'List'?", "Summarize 'Archive' notebook",
+        "What is the type of 'Message'?", "List all sheets in 'Messages'", "Draft a 'Type'",
+        "What are the habits in 'Health' category?", "How many slides in 'Health' deck?", "Summarize 'Health' space",
+        "What is the state of 'Task'?", "List all notebooks in 'Task'", "Draft a 'State'",
+        "What are the categories of 'Expenses'?", "How many articles in 'Expenses'?", "Summarize 'Expenses' notebook",
+        "What is the tag of 'Article'?", "List all spreadsheets in 'Tags'", "Draft a 'Tag'",
+        "What are the habits for 'Life'?", "How many slides in 'Life'?", "Summarize 'Life' space",
+        "What is the source of 'Info'?", "List all notebook folders in 'Sources'", "Draft a 'Source'",
+        "What are the reasons for 'Delay'?", "How many articles in 'Delays'?", "Summarize 'Delays' notebook",
+        "What is the goal of 'Sprint'?", "List all spreadsheets in 'Sprints'", "Draft a 'Goal'",
+        "What are the habits in 'Social' category?", "How many slides in 'Social' deck?", "Summarize 'Social' space",
+        "What is the end of 'Period'?", "List all notebooks in 'Periods'", "Draft a 'Period'",
+        "What are the contents of 'Box'?", "How many articles in 'Box'?", "Summarize 'Box' notebook",
+        "What is the middle of 'Month'?", "List all spreadsheets in 'Months'", "Draft a 'Month'",
+        "What are the habits for 'Year'?", "How many slides in 'Year'?", "Summarize 'Year' space",
+        "What is the beginning of 'Week'?", "List all notebook folders in 'Weeks'", "Draft a 'Week'",
+        "What are the parts of 'Machine'?", "How many articles in 'Machines'?", "Summarize 'Machines' notebook",
+        "What is the weight of 'Object'?", "List all spreadsheets in 'Weights'", "Draft a 'Weight'",
+        "What are the habits in 'Art' category?", "How many slides in 'Art' deck?", "Summarize 'Art' space",
+        "What is the color of 'Brand'?", "List all notebooks in 'Brands'", "Draft a 'Brand'",
+        "What are the effects of 'Meditation'?", "How many articles in 'Meditation'?", "Summarize 'Meditation' notebook",
+        "What is the sound of 'Music'?", "List all spreadsheets in 'Music'", "Draft a 'Music'",
+        "What are the habits for 'Calm'?", "How many slides in 'Calm'?", "Summarize 'Calm' space",
+        "What is the taste of 'Food'?", "List all notebook folders in 'Food'", "Draft a 'Food'",
+        "What are the scents of 'Nature'?", "How many articles in 'Nature'?", "Summarize 'Nature' notebook",
+        "What is the touch of 'Fabric'?", "List all spreadsheets in 'Fabrics'", "Draft a 'Fabric'",
+        "What are the habits in 'Science' category?", "How many slides in 'Science' deck?", "Summarize 'Science' space",
+        "What is the truth of 'Fact'?", "List all notebooks in 'Facts'", "Draft a 'Fact'",
+        "What are the myths of 'Story'?", "How many articles in 'Stories'?", "Summarize 'Stories' notebook",
+        "What is the logic of 'Proof'?", "List all spreadsheets in 'Proofs'", "Draft a 'Proof'",
+        "What are the habits for 'Mind'?", "How many slides in 'Mind'?", "Summarize 'Mind' space",
+        "What is the spirit of 'Team'?", "List all notebook folders in 'Teams'", "Draft a 'Team'",
+        "What are the vibes of 'Space'?", "How many articles in 'Vibes'?", "Summarize 'Vibes' notebook",
+        "What is the energy of 'Work'?", "List all spreadsheets in 'Energy'", "Draft a 'Energy'",
+        "What are the habits in 'Sport' category?", "How many slides in 'Sport' deck?", "Summarize 'Sport' space",
+        "What is the power of 'Will'?", "List all notebooks in 'Will'", "Draft a 'Will'",
+        "What are the limits of 'Body'?", "How many articles in 'Body'?", "Summarize 'Body' notebook",
+        "What is the speed of 'Light'?", "List all spreadsheets in 'Light'", "Draft a 'Light'",
+        "What are the habits for 'Fast'?", "How many slides in 'Fast'?", "Summarize 'Fast' space",
+        "What is the depth of 'Ocean'?", "List all notebook folders in 'Ocean'", "Draft a 'Ocean'",
+        "What are the heights of 'Stars'?", "How many articles in 'Stars'?", "Summarize 'Stars' notebook",
+        "What is the width of 'Road'?", "List all spreadsheets in 'Roads'", "Draft a 'Road'",
+        "What are the habits in 'Math' category?", "How many slides in 'Math' deck?", "Summarize 'Math' space",
+        "What is the sum of 'Parts'?", "List all notebooks in 'Parts'", "Draft a 'Part'",
+        "What are the products of 'Labor'?", "How many articles in 'Labor'?", "Summarize 'Labor' notebook",
+        "What is the difference of 'Views'?", "List all spreadsheets in 'Views'", "Draft a 'View'",
+        "What are the habits for 'Balance'?", "How many slides in 'Balance'?", "Summarize 'Balance' space",
+        "What is the ratio of 'Success'?", "List all notebook folders in 'Success'", "Draft a 'Success'",
+        "What are the factors of 'Growth'?", "How many articles in 'Growth'?", "Summarize 'Growth' notebook",
+        "What is the percent of 'Done'?", "List all spreadsheets in 'Done'", "Draft a 'Done'",
+        "What are the habits in 'English' category?", "How many slides in 'English' deck?", "Summarize 'English' space",
+        "What is the meaning of 'Life'?", "List all notebooks in 'Meaning'", "Draft a 'Meaning'",
+        "What are the roots of 'Word'?", "How many articles in 'Words'?", "Summarize 'Words' notebook",
+        "What is the tone of 'Voice'?", "List all spreadsheets in 'Voices'", "Draft a 'Voice'",
+        "What are the habits for 'Voice'?", "How many slides in 'Voice'?", "Summarize 'Voice' space",
+        "What is the style of 'Writing'?", "List all notebook folders in 'Writing'", "Draft a 'Writing'",
+        "What are the themes of 'Novel'?", "How many articles in 'Novels'?", "Summarize 'Novels' notebook",
+        "What is the plot of 'Story'?", "List all spreadsheets in 'Plots'", "Draft a 'Plot'",
+        "What are the habits in 'Reading' category?", "How many slides in 'Reading' deck?", "Summarize 'Reading' space",
+        "What is the character of 'Hero'?", "List all notebooks in 'Heroes'", "Draft a 'Hero'",
+        "What are the settings of 'World'?", "How many articles in 'Worlds'?", "Summarize 'Worlds' notebook",
+        "What is the ending of 'Chapter'?", "List all spreadsheets in 'Chapters'", "Draft a 'Chapter'",
+        "What are the habits for 'Focus'?", "How many slides in 'Focus'?", "Summarize 'Focus' space",
+        "What is the start of 'Journey'?", "List all notebook folders in 'Journeys'", "Draft a 'Journey'",
+        "What are the milestones of 'Project'?", "How many articles in 'Milestones'?", "Summarize 'Milestones' notebook",
+        "What is the peak of 'Mountain'?", "List all spreadsheets in 'Mountains'", "Draft a 'Mountain'",
+        "What are the habits in 'Hiking' category?", "How many slides in 'Hiking' deck?", "Summarize 'Hiking' space",
+        "What is the flow of 'River'?", "List all notebooks in 'Rivers'", "Draft a 'River'",
+        "What are the banks of 'Stream'?", "How many articles in 'Streams'?", "Summarize 'Streams' notebook",
+        "What is the delta of 'Change'?", "List all spreadsheets in 'Deltas'", "Draft a 'Delta'",
+        "What are the habits for 'Change'?", "How many slides in 'Change'?", "Summarize 'Change' space",
+        "What is the spark of 'Idea'?", "List all notebook folders in 'Ideas'", "Draft a 'Idea'",
+        "What are the flames of 'Passion'?", "How many articles in 'Passion'?", "Summarize 'Passion' notebook",
+        "What is the heat of 'Summer'?", "List all spreadsheets in 'Summers'", "Draft a 'Summer'",
+        "What are the habits in 'Winter' category?", "How many slides in 'Winter' deck?", "Summarize 'Winter' space",
+        "What is the cold of 'Ice'?", "List all notebooks in 'Ice'", "Draft a 'Ice'",
+        "What are the winds of 'North'?", "How many articles in 'North'?", "Summarize 'North' notebook",
+        "What is the rain of 'Spring'?", "List all spreadsheets in 'Springs'", "Draft a 'Spring'",
+        "What are the habits for 'Renew'?", "How many slides in 'Renew'?", "Summarize 'Renew' space",
+        "What is the leaf of 'Tree'?", "List all notebook folders in 'Trees'", "Draft a 'Tree'",
+        "What are the branches of 'Knowledge'?", "How many articles in 'Knowledge'?", "Summarize 'Knowledge' notebook",
+        "What is the seed of 'Plan'?", "List all spreadsheets in 'Seeds'", "Draft a 'Seed'",
+        "What are the habits in 'Gardening' category?", "How many slides in 'Gardening' deck?", "Summarize 'Gardening' space",
+        "What is the bloom of 'Flower'?", "List all notebooks in 'Flowers'", "Draft a 'Flower'",
+        "What are the thorns of 'Problem'?", "How many articles in 'Thorns'?", "Summarize 'Thorns' notebook",
+        "What is the scent of 'Rose'?", "List all spreadsheets in 'Roses'", "Draft a 'Rose'",
+        "What are the habits for 'Beauty'?", "How many slides in 'Beauty'?", "Summarize 'Beauty' space",
+        "What is the shadow of 'Doubt'?", "List all notebook folders in 'Shadows'", "Draft a 'Shadow'",
+        "What are the rays of 'Hope'?", "How many articles in 'Hope'?", "Summarize 'Hope' notebook",
+        "What is the light of 'Truth'?", "List all spreadsheets in 'Truths'", "Draft a 'Truth'",
+        "What are the habits in 'Ethic' category?", "How many slides in 'Ethic' deck?", "Summarize 'Ethic' space",
+        "What is the weight of 'Gold'?", "List all notebooks in 'Gold'", "Draft a 'Gold'",
+        "What are the prices of 'Silver'?", "How many articles in 'Silver'?", "Summarize 'Silver' notebook",
+        "What is the value of 'Time'?", "List all spreadsheets in 'Time'", "Draft a 'Time'",
+        "What are the habits for 'Value'?", "How many slides in 'Value'?", "Summarize 'Value' space",
+        "What is the core of 'Earth'?", "List all notebook folders in 'Earth'", "Draft a 'Earth'",
+        "What are the crusts of 'Bread'?", "How many articles in 'Bread'?", "Summarize 'Bread' notebook",
+        "What is the air of 'Sky'?", "List all spreadsheets in 'Sky'", "Draft a 'Sky'",
+        "What are the habits in 'Flight' category?", "How many slides in 'Flight' deck?", "Summarize 'Flight' space",
+        "What is the wing of 'Bird'?", "List all notebooks in 'Birds'", "Draft a 'Bird'",
+        "What are the feathers of 'Tail'?", "How many articles in 'Tails'?", "Summarize 'Tails' notebook",
+        "What is the beak of 'Eagle'?", "List all spreadsheets in 'Eagles'", "Draft a 'Eagle'",
+        "What are the habits for 'High'?", "How many slides in 'High'?", "Summarize 'High' space",
+        "What is the scale of 'Map'?", "List all notebook folders in 'Maps'", "Draft a 'Map'",
+        "What are the symbols of 'State'?", "How many articles in 'States'?", "Summarize 'States' notebook",
+        "What is the border of 'Land'?", "List all spreadsheets in 'Lands'", "Draft a 'Land'",
+        "What are the habits in 'Travel' category?", "How many slides in 'Travel' deck?", "Summarize 'Travel' space",
+        "What is the path of 'Traveler'?", "List all notebooks in 'Travelers'", "Draft a 'Traveler'",
+        "What are the bags of 'Guest'?", "How many articles in 'Guests'?", "Summarize 'Guests' notebook",
+        "What is the key of 'Room'?", "List all spreadsheets in 'Rooms'", "Draft a 'Room'",
+        "What are the habits for 'Rest'?", "How many slides in 'Rest'?", "Summarize 'Rest' space",
+        "What is the view of 'Window'?", "List all notebook folders in 'Windows'", "Draft a 'Window'",
+        "What are the frames of 'Art'?", "How many articles in 'Frames'?", "Summarize 'Frames' notebook",
+        "What is the glass of 'Mirror'?", "List all spreadsheets in 'Mirrors'", "Draft a 'Mirror'",
+        "What are the habits in 'Design' category?", "How many slides in 'Design' deck?", "Summarize 'Design' space"
     ]
 
     var body: some View {
@@ -70,11 +317,25 @@ struct PersonaHomeView: View {
                             VStack(spacing: 20) {
                                 Image(systemName: "sparkles")
                                     .font(.system(size: 50))
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(LinearGradient(colors: [.blue, .purple, .mint], startPoint: .topLeading, endPoint: .bottomTrailing))
                                     .padding(.top, 100)
-                                Text("Ask Persona anything about your workspace.")
-                                    .font(.headline)
+                                Text("Your Workspace Intelligence")
+                                    .font(.title2.bold())
+                                Text("Ask anything about your Mail, Tasks, Files, and Habits.")
+                                    .font(.subheadline)
                                     .foregroundStyle(.secondary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 40)
+
+                                Button {
+                                    showDiscovery = true
+                                } label: {
+                                    Label("Discover Prompts", systemImage: "lightbulb.fill")
+                                        .font(.headline)
+                                        .padding()
+                                        .background(Color.accentColor.opacity(0.1), in: Capsule())
+                                }
+                                .padding(.top, 20)
                             }
                         } else {
                             ForEach(manager.chatHistory) { message in
@@ -100,59 +361,77 @@ struct PersonaHomeView: View {
                 }
             }
 
-            // Presets and Input
-            VStack(spacing: 12) {
-                // Preset Prompts
-                HStack(spacing: 8) {
-                    ForEach(shuffledPrompts, id: \.self) { prompt in
-                        Button(action: {
-                            query = prompt
-                            sendMessage()
-                        }) {
-                            Text(prompt)
-                                .font(.caption2)
-                                .padding(.horizontal, 10)
+            // Bottom UI Area
+            VStack(spacing: 0) {
+                Divider()
+
+                // Suggested Actions (Follow-ups)
+                if let lastMessage = manager.chatHistory.last, lastMessage.role == "assistant" {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(suggestedFollowUps(for: lastMessage.content), id: \.self) { suggestion in
+                                Button(suggestion) {
+                                    query = suggestion
+                                    sendMessage()
+                                }
+                                .font(.caption.bold())
+                                .padding(.horizontal, 12)
                                 .padding(.vertical, 6)
-                                .background(Color.secondary.opacity(0.1))
-                                .cornerRadius(12)
-                                .lineLimit(1)
+                                .background(.ultraThinMaterial, in: Capsule())
+                                .overlay(Capsule().stroke(Color.primary.opacity(0.1), lineWidth: 0.5))
+                            }
                         }
-                        .transition(.scale.combined(with: .opacity))
-                    }
-
-                    Button(action: {
-                        withAnimation {
-                            shufflePrompts()
-                        }
-                    }) {
-                        Image(systemName: "shuffle")
-                            .font(.caption2)
-                            .padding(6)
-                            .background(Color.accentColor.opacity(0.1))
-                            .clipShape(Circle())
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
                     }
                 }
-                .padding(.horizontal)
 
-                // Input Area
-                HStack(spacing: 12) {
-                    TextField("Message Persona...", text: $query, axis: .vertical)
-                        .padding(10)
-                        .background(Color.secondary.opacity(0.1))
-                        .cornerRadius(20)
-                        .lineLimit(1...5)
+                // Presets and Input
+                VStack(spacing: 12) {
+                    HStack(spacing: 8) {
+                        ForEach(shuffledPrompts, id: \.self) { prompt in
+                            Button(action: {
+                                query = prompt
+                                sendMessage()
+                            }) {
+                                Text(prompt)
+                                    .font(.caption2)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color.secondary.opacity(0.1))
+                                    .cornerRadius(12)
+                                    .lineLimit(1)
+                            }
+                        }
 
-                    Button(action: sendMessage) {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.system(size: 32))
-                            .foregroundStyle(query.isEmpty || manager.isThinking ? AnyShapeStyle(.secondary) : AnyShapeStyle(LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom)))
+                        Button(action: { showDiscovery = true }) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 20))
+                                .foregroundStyle(.blue)
+                        }
                     }
-                    .disabled(query.isEmpty || manager.isThinking)
+                    .padding(.horizontal)
+
+                    HStack(spacing: 12) {
+                        TextField("Message Persona...", text: $query, axis: .vertical)
+                            .padding(10)
+                            .background(Color.secondary.opacity(0.1))
+                            .cornerRadius(20)
+                            .lineLimit(1...5)
+
+                        Button(action: sendMessage) {
+                            Image(systemName: "arrow.up.circle.fill")
+                                .font(.system(size: 32))
+                                .foregroundStyle(query.isEmpty || manager.isThinking ? AnyShapeStyle(.secondary) : AnyShapeStyle(LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom)))
+                        }
+                        .disabled(query.isEmpty || manager.isThinking)
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 10)
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 10)
+                .padding(.top, 8)
+                .background(.ultraThinMaterial)
             }
-            .background(.ultraThinMaterial)
         }
         .navigationTitle("AI Persona")
         .navigationBarTitleDisplayMode(.inline)
@@ -182,6 +461,13 @@ struct PersonaHomeView: View {
             TuningSheetView(manager: manager)
                 .presentationDetents([.medium])
         }
+        .sheet(isPresented: $showDiscovery) {
+            PromptDiscoveryView(allPrompts: allPrompts) { selected in
+                query = selected
+                sendMessage()
+            }
+            .presentationDetents([.medium])
+        }
     }
 
     private func sendMessage() {
@@ -207,6 +493,20 @@ struct PersonaHomeView: View {
             }
         }
     }
+
+    private func suggestedFollowUps(for content: String) -> [String] {
+        // Simple logic to provide context-aware follow-ups
+        if content.contains("meeting") || content.contains("calendar") {
+            return ["Show me the agenda", "Draft a follow-up", "Who else is invited?"]
+        } else if content.contains("task") || content.contains("to-do") {
+            return ["Set a reminder", "Mark as complete", "Show overdue tasks"]
+        } else if content.contains("habit") || content.contains("streak") {
+            return ["How can I improve?", "Compare with last week", "Log today's progress"]
+        } else if content.contains("email") || content.contains("mail") {
+            return ["Summarize all unread", "Reply to this", "Show more from this sender"]
+        }
+        return ["Explain more", "Show related notes", "Summarize this"]
+    }
 }
 
 private struct PersonaChatBubble: View {
@@ -226,6 +526,13 @@ private struct PersonaChatBubble: View {
                                   AnyShapeStyle(Color.secondary.opacity(0.15)))
                     )
                     .foregroundStyle(message.role == "user" ? .white : .primary)
+                    .contextMenu {
+                        Button {
+                            UIPasteboard.general.string = message.content
+                        } label: {
+                            Label("Copy", systemImage: "doc.on.doc")
+                        }
+                    }
 
                 Text(message.timestamp, style: .time)
                     .font(.system(size: 10))
@@ -244,11 +551,81 @@ private struct PersonaMarkdownBubbleText: View {
     let isUser: Bool
 
     var body: some View {
+        // Robust markdown parsing using AttributedString
         if let parsed = try? AttributedString(markdown: markdown, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)) {
             Text(parsed)
         } else {
-            Text(markdown)
+            // Fallback that cleans up obvious markdown markers if parsing fails
+            Text(cleanMarkdown(markdown))
         }
+    }
+
+    private func cleanMarkdown(_ text: String) -> String {
+        text.replacingOccurrences(of: "**", with: "")
+            .replacingOccurrences(of: "__", with: "")
+            .replacingOccurrences(of: "`", with: "")
+            .replacingOccurrences(of: "#", with: "")
+    }
+}
+
+struct PromptDiscoveryView: View {
+    let allPrompts: [String]
+    let onSelect: (String) -> Void
+    @Environment(\.dismiss) var dismiss
+    @State private var discoveryPrompts: [String] = []
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    Text("Select a prompt to get started with Persona.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+                ForEach(discoveryPrompts, id: \.self) { prompt in
+                    Button {
+                        onSelect(prompt)
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Text(prompt)
+                                .font(.system(size: 14))
+                            Spacer()
+                            Image(systemName: "sparkles")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+
+                Section {
+                    Button {
+                        refresh()
+                    } label: {
+                        HStack {
+                            Spacer()
+                            Label("Shuffle Prompts", systemImage: "shuffle")
+                            Spacer()
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Discover")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Close") { dismiss() }
+                }
+            }
+            .onAppear {
+                refresh()
+            }
+        }
+    }
+
+    private func refresh() {
+        discoveryPrompts = Array(allPrompts.shuffled().prefix(10))
     }
 }
 
