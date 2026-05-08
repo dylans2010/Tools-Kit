@@ -108,18 +108,14 @@ struct SDKProjectEditorView: View {
     private var activeTabView: some View {
         if let activeTab {
             switch activeTab.node {
-            case .config: configView
-            case .capabilities: SDKCapabilitiesMatrixView()
-            case .scopes: SDKScopesEditorView()
-            case .libraries: SDKLibraryManagerView()
-            case .dependencies: SDKDependencyManagerView()
-            case .connectors: SDKConnectorsView()
-            case .runtimeScripts:
-                SDKFlowBuilderView(project: Binding(
-                    get: { projectManager.currentProject ?? SDKProject(name: "Runtime") },
-                    set: { projectManager.currentProject = $0; state.syncSDKGraphFromProject($0); state.recalculateDiagnostics() }
-                ))
-            case .apiEndpoints: SDKAPIExplorerView()
+            case .config: IDEConfigView()
+            case .capabilities: IDECapabilitiesView()
+            case .scopes: IDEScopesView()
+            case .libraries: IDELibrariesView()
+            case .dependencies: IDEDependenciesView()
+            case .connectors: IDEConnectorsView()
+            case .runtimeScripts: IDERuntimeScriptsView()
+            case .apiEndpoints: IDEAPIEndpointsView()
             }
         } else {
             ContentUnavailableView("No tab selected", systemImage: "rectangle.stack", description: Text("Select a project editor tab to continue."))
@@ -148,52 +144,4 @@ struct SDKProjectEditorView: View {
         .background(.bar)
     }
 
-    private var configView: some View {
-        Form {
-            Section("Project") {
-                TextField("Name", text: Binding(
-                    get: { projectManager.currentProject?.name ?? "" },
-                    set: {
-                        guard var project = projectManager.currentProject else { return }
-                        project.name = $0
-                        projectManager.updateProject(project)
-                        state.syncSDKGraphFromProject(project)
-                        state.recalculateDiagnostics()
-                    }
-                ))
-                TextField("Description", text: Binding(
-                    get: { projectManager.currentProject?.description ?? "" },
-                    set: {
-                        guard var project = projectManager.currentProject else { return }
-                        project.description = $0
-                        projectManager.updateProject(project)
-                    }
-                ), axis: .vertical)
-                Picker("Status", selection: Binding(
-                    get: { projectManager.currentProject?.status ?? .draft },
-                    set: {
-                        guard var project = projectManager.currentProject else { return }
-                        project.status = $0
-                        projectManager.updateProject(project)
-                    }
-                )) {
-                    ForEach(SDKProject.ProjectStatus.allCases, id: \.self) { status in
-                        Text(status.rawValue.capitalized).tag(status)
-                    }
-                }
-            }
-            Section("SDK Runtime") {
-                LabeledContent("Run configuration", value: state.selectedRunConfiguration?.name ?? "Default Sandbox")
-                LabeledContent("Effective scopes", value: "\(state.effectiveScopes(for: projectManager.currentProject).count)")
-                LabeledContent("Libraries", value: "\(state.libraries.count)")
-                LabeledContent("Dependencies", value: "\(state.dependencies.count)")
-                LabeledContent("Memory estimate", value: "\(state.memoryEstimateMB) MB")
-                Button("Sync Project With SDK Graph") {
-                    state.syncSDKGraphFromProject()
-                    state.recalculateDiagnostics()
-                }
-            }
-        }
-        .formStyle(.grouped)
-    }
 }
