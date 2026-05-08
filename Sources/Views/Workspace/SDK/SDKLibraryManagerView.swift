@@ -2,58 +2,45 @@ import SwiftUI
 
 struct SDKLibraryManagerView: View {
     @StateObject private var state = SDKRuntimeWorkspaceState.shared
-    #if os(iOS)
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    #endif
     @State private var editingLibrary: SDKLibraryDefinition?
-    private let resolver = SDKLibraryVersionResolver()
-
-    private var isCompact: Bool {
-        #if os(iOS)
-        return horizontalSizeClass == .compact
-        #else
-        return false
-        #endif
-    }
 
     var body: some View {
-        List {
-            Section {
-                HStack {
-                    Label("SDK Libraries", systemImage: "books.vertical.fill")
-                        .font(.headline)
-                    Spacer()
-                    Button { editingLibrary = newLibrary() } label: { Label("Add", systemImage: "plus") }
+        ScrollView {
+            VStack(spacing: 20) {
+                SDKSectionHeader(
+                    title: "SDK Libraries",
+                    subtext: "Reusable modules managed by SDKExecutionCoordinator."
+                )
+
+                SDKModernCard {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Active Modules").font(.subheadline.bold())
+                            Text("\(state.libraries.count) linked libraries").sdkSubtext()
+                        }
+                        Spacer()
+                        Button { editingLibrary = newLibrary() } label: {
+                            Label("Add Library", systemImage: "plus")
+                        }
                         .buttonStyle(.borderedProminent)
-                }
-                Text("Libraries are synchronized into dependency nodes and executed through SDKExecutionCoordinator.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Section("Linked Libraries") {
-                ForEach(state.libraries) { library in
-                    Button { editingLibrary = library } label: {
-                        libraryCard(library)
                     }
-                    .buttonStyle(.plain)
                 }
-                .onDelete { offsets in
-                    state.libraries.remove(atOffsets: offsets)
-                    state.recalculateDiagnostics()
-                }
-            }
 
-            Section("Version Diff Viewer") {
-                if let first = state.libraries.first {
-                    Text(resolver.diff(from: first.version, to: resolver.resolvePreferredVersion(for: first.name, availableVersions: [first.version, "2.0.0"], preferredVersion: nil) ?? first.version))
-                        .font(.caption)
-                } else {
-                    Text("Add libraries to compare versions")
-                        .foregroundStyle(.secondary)
+                SDKSectionHeader(title: "Linked Libraries", subtext: "Synchronized into the dependency graph.")
+
+                VStack(spacing: 12) {
+                    ForEach(state.libraries) { library in
+                        Button { editingLibrary = library } label: {
+                            libraryCard(library)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
             }
+            .padding()
         }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("Libraries")
         .sheet(item: $editingLibrary) { library in
             NavigationStack {
                 SDKLibraryEditorSheet(library: library) { updated in
@@ -65,44 +52,32 @@ struct SDKLibraryManagerView: View {
                 .toolbar { ToolbarItem(placement: .topBarLeading) { Button("Cancel") { editingLibrary = nil } } }
             }
             .presentationDetents([.large])
-            .presentationDragIndicator(.visible)
         }
-        .navigationTitle("Libraries")
     }
 
     private func libraryCard(_ library: SDKLibraryDefinition) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(library.name).font(.headline)
-                Spacer()
-                Text("v\(library.version)").font(.caption.monospaced()).foregroundStyle(.secondary)
-            }
-            if isCompact {
-                VStack(alignment: .leading, spacing: 3) {
-                    metric("Calls", "\(library.usageCount)")
-                    metric("Scopes", "\(library.linkedScopes.count)")
-                    metric("Exports", "\(library.exportedFunctions.count)")
-                    metric("Stages", "\(library.pipelineStages.count)")
-                }
-            } else {
+        SDKModernCard {
+            VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    metric("Calls", "\(library.usageCount)")
-                    metric("Scopes", "\(library.linkedScopes.count)")
-                    metric("Exports", "\(library.exportedFunctions.count)")
-                    metric("Stages", "\(library.pipelineStages.count)")
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(library.name).font(.subheadline.bold())
+                        Text("v\(library.version)").font(.caption.monospaced()).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    SDKStatusPill(status: .info, text: "\(library.usageCount) CALLS")
                 }
-            }
-            Text("Pipeline: \(library.pipelineStages.joined(separator: " → ").ifEmpty("Not configured"))")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .padding(.vertical, 5)
-    }
 
-    private func metric(_ key: String, _ value: String) -> some View {
-        Label("\(key): \(value)", systemImage: "circle.fill")
-            .font(.caption2)
-            .foregroundStyle(.secondary)
+                Text("Pipeline: \(library.pipelineStages.joined(separator: " → ").ifEmpty("No Stages"))")
+                    .sdkSubtext()
+
+                HStack(spacing: 16) {
+                    Label("\(library.linkedScopes.count)", systemImage: "lock.shield").font(.caption2)
+                    Label("\(library.exportedFunctions.count)", systemImage: "bolt.fill").font(.caption2)
+                    Spacer()
+                }
+                .foregroundStyle(.tertiary)
+            }
+        }
     }
 
     private func newLibrary() -> SDKLibraryDefinition {
@@ -122,33 +97,33 @@ private struct SDKLibraryEditorSheet: View {
     var body: some View {
         Form {
             Section("Identity") {
-                TextField("Library", text: $library.name)
+                TextField("Library Name", text: $library.name)
                 TextField("Version", text: $library.version)
             }
             Section("SDK Scope Bindings") {
-                TextField("Linked scopes", text: arrayBinding(\.linkedScopes))
+                TextField("Linked scopes (comma-separated)", text: arrayBinding(\.linkedScopes))
                     .font(.system(.caption, design: .monospaced))
-                Text("Comma-separated scopes used by SDK validation and execution.")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                Text("Scopes required for library execution.").sdkSubtext()
             }
             Section("Exports") {
-                TextField("Exported function names", text: Binding(
+                TextField("Function names (comma-separated)", text: Binding(
                     get: { library.exportedFunctions.map(\.name).joined(separator: ", ") },
                     set: { names in
                         library.exportedFunctions = split(names).map { SDKLibraryFunctionExport(name: $0, signature: "() -> Void") }
                     }
                 ))
             }
-            Section("Pipeline") {
-                TextField("Pipeline stages", text: arrayBinding(\.pipelineStages))
+            Section("Pipeline & Dependencies") {
+                TextField("Stages", text: arrayBinding(\.pipelineStages))
                 TextField("Dependencies", text: arrayBinding(\.dependencies))
             }
-            Section {
-                Button("Save Library") { onSave(library) }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(library.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+            Button { onSave(library) } label: {
+                Text("Save Library").frame(maxWidth: .infinity).bold()
             }
+            .buttonStyle(.borderedProminent)
+            .disabled(library.name.trimmingCharacters(in: .whitespaces).isEmpty)
+            .listRowBackground(Color.clear)
         }
     }
 

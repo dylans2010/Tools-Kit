@@ -15,11 +15,86 @@ struct PluginsMainView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                pluginStatsCard
-                navigationGrid
-                activePluginsCard
-                recentActivityCard
+            VStack(spacing: 24) {
+                SDKSectionHeader(
+                    title: "Plugin Ecosystem",
+                    subtext: "Extend your workspace with sandboxed logic and intelligence modules.",
+                    isCentered: true
+                )
+
+                SDKModernCard {
+                    HStack(spacing: 0) {
+                        StatusIndicator(label: "Active", count: manager.installedPlugins.filter(\.isEnabled).count, color: .green)
+                        Divider().padding(.vertical, 4)
+                        StatusIndicator(label: "Disabled", count: manager.installedPlugins.filter { !$0.isEnabled }.count, color: .secondary)
+                        Divider().padding(.vertical, 4)
+                        StatusIndicator(label: "Errors", count: manager.installedPlugins.reduce(0) { $0 + $1.errorCount }, color: .red)
+                    }
+                }
+
+                SDKSectionHeader(title: "Management & Discovery", subtext: "Build and browse platform extensions.")
+
+                LazyVGrid(columns: columns, spacing: 12) {
+                    navLinkCard("Marketplace", "cart.fill", .orange, MarketplaceView())
+                    navLinkCard("Connectors", "puzzlepiece.extension", .green, ConnectorsMainView())
+                    navLinkCard("App Builder", "wand.and.stars", .pink, SDKBuildView())
+                    navLinkCard("IDE Workspace", "hammer.fill", .indigo, SDKHomeView())
+                }
+
+                SDKSectionHeader(title: "Active Plugins", subtext: "Currently running in the workspace runtime.")
+
+                VStack(spacing: 12) {
+                    let active = manager.installedPlugins.filter(\.isEnabled)
+                    if active.isEmpty {
+                        SDKModernCard {
+                            Text("No active plugins").sdkSubtext().frame(maxWidth: .infinity)
+                        }
+                    } else {
+                        ForEach(active) { plugin in
+                            NavigationLink(destination: PluginDetailView(pluginID: plugin.id)) {
+                                SDKModernCard {
+                                    HStack(spacing: 12) {
+                                        Image(systemName: plugin.icon)
+                                            .font(.title3)
+                                            .foregroundStyle(.white)
+                                            .frame(width: 36, height: 36)
+                                            .background(Color.accentColor.gradient, in: RoundedRectangle(cornerRadius: 8))
+
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(plugin.name).font(.subheadline.bold())
+                                            Text(plugin.capabilities.map(\.displayName).joined(separator: ", "))
+                                                .sdkSubtext().lineLimit(1)
+                                        }
+                                        Spacer()
+                                        SDKStatusPill(status: .success, text: "RUNNING")
+                                    }
+                                }
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+
+                SDKSectionHeader(title: "Recent Activity", subtext: "Plugin event bus stream.")
+
+                SDKModernCard {
+                    VStack(alignment: .leading, spacing: 10) {
+                        if recentEvents.isEmpty {
+                            Text("No recent activity").sdkSubtext().frame(maxWidth: .infinity)
+                        } else {
+                            ForEach(recentEvents.prefix(5)) { event in
+                                HStack {
+                                    Label("\(event.capability.rawValue).\(event.action)", systemImage: event.capability.icon)
+                                        .font(.caption.bold())
+                                    Spacer()
+                                    Text(event.timestamp.formatted(date: .omitted, time: .shortened))
+                                        .font(.caption2).foregroundStyle(.tertiary)
+                                }
+                                if event.id != recentEvents.prefix(5).last?.id { Divider() }
+                            }
+                        }
+                    }
+                }
             }
             .padding()
         }
@@ -34,86 +109,6 @@ struct PluginsMainView: View {
                 }
             }
         }
-    }
-
-    private var pluginStatsCard: some View {
-        HStack(spacing: 16) {
-            StatusIndicator(label: "Active", count: manager.installedPlugins.filter(\.isEnabled).count, color: .green)
-            StatusIndicator(label: "Disabled", count: manager.installedPlugins.filter { !$0.isEnabled }.count, color: .secondary)
-            StatusIndicator(label: "Errors", count: manager.installedPlugins.reduce(0) { $0 + $1.errorCount }, color: .red)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-    }
-
-    private var navigationGrid: some View {
-        LazyVGrid(columns: columns, spacing: 12) {
-            navLinkCard("Create Plugin", "plus.circle.fill", .blue, PluginBuildView())
-            navLinkCard("Build with ToolsKit", "hammer.fill", .orange, SDKHomeView())
-            navLinkCard("App Builder", "wand.and.stars", .pink, SDKBuildView())
-            navLinkCard("Connectors", "puzzlepiece.extension", .green, ConnectorsMainView())
-            navLinkCard("Marketplace", "cart.fill", .orange, MarketplaceView())
-            navLinkCard("Installed", "puzzlepiece.extension.fill", .indigo, PluginsInstalledView())
-            navLinkCard("Dev Console", "terminal.fill", .purple, PluginDevConsoleView())
-            navLinkCard("Security", "shield.fill", .red, PluginSecurityView())
-        }
-    }
-
-    private var activePluginsCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Active Plugins").font(.headline)
-            if manager.installedPlugins.filter(\.isEnabled).isEmpty {
-                Text("No active plugins")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            } else {
-                ForEach(manager.installedPlugins.filter(\.isEnabled)) { plugin in
-                    NavigationLink(destination: PluginDetailView(pluginID: plugin.id)) {
-                        HStack(spacing: 10) {
-                            Image(systemName: plugin.icon)
-                                .frame(width: 32, height: 32)
-                                .background(Color.blue.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(plugin.name).font(.subheadline.weight(.semibold))
-                                Text(plugin.capabilities.map(\.displayName).joined(separator: ", "))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            PluginStatusPill(status: .running)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-        .padding()
-        .background(.background, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-    }
-
-    private var recentActivityCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Recent Activity").font(.headline)
-            if recentEvents.isEmpty {
-                Text("No recent activity")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            } else {
-                ForEach(recentEvents.prefix(5)) { event in
-                    HStack {
-                        Label("\(event.capability.rawValue).\(event.action)", systemImage: event.capability.icon)
-                            .font(.caption.weight(.semibold))
-                        Spacer()
-                        Text(event.timestamp.formatted(date: .omitted, time: .shortened))
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-        }
-        .padding()
-        .background(.background, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private func setupActivityStream() {
@@ -142,65 +137,14 @@ struct PluginsMainView: View {
 
     private func navLinkCard<Destination: View>(_ title: String, _ icon: String, _ color: Color, _ destination: Destination) -> some View {
         NavigationLink(destination: destination) {
-            VStack(alignment: .leading, spacing: 8) {
-                Image(systemName: icon).foregroundStyle(color).font(.title3)
-                Text(title).font(.subheadline.weight(.semibold)).foregroundStyle(.primary)
+            SDKModernCard {
+                VStack(alignment: .leading, spacing: 10) {
+                    Image(systemName: icon).foregroundStyle(color).font(.title3)
+                    Text(title).font(.caption.bold()).foregroundStyle(.primary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxWidth: .infinity, minHeight: 88, alignment: .leading)
-            .padding()
-            .background(.background, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
         .buttonStyle(.plain)
-    }
-}
-
-struct StatusIndicator: View {
-    let label: String
-    let count: Int
-    let color: Color
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("\(count)").font(.title2.weight(.bold)).foregroundStyle(color)
-            Text(label).font(.caption).foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-}
-
-
-enum PluginStatus {
-    case running
-    case stopped
-    case error
-}
-
-struct PluginStatusPill: View {
-    let status: PluginStatus
-
-    var body: some View {
-        Text(label)
-            .font(.caption.weight(.semibold))
-            .padding(.horizontal, 10)
-            .padding(.vertical, 4)
-            .background(color.opacity(0.15))
-            .foregroundStyle(color)
-            .clipShape(Capsule())
-    }
-
-    private var label: String {
-        switch status {
-        case .running: "Running"
-        case .stopped: "Stopped"
-        case .error: "Error"
-        }
-    }
-
-    private var color: Color {
-        switch status {
-        case .running: .green
-        case .stopped: .secondary
-        case .error: .red
-        }
     }
 }

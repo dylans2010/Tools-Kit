@@ -8,13 +8,9 @@ struct ConnectorDetailView<T: BaseConnector>: View {
     @State private var showingDisconnectAlert = false
     @State private var expandedLogID: UUID?
     @State private var logFilter: LogFilterType = .all
-    @State private var showingClearLogsAlert = false
 
     enum LogFilterType: String, CaseIterable {
-        case all = "All"
-        case errors = "Errors"
-        case warnings = "Warnings"
-        case info = "Info"
+        case all = "All", errors = "Errors", warnings = "Warnings", info = "Info"
     }
 
     var filteredActivityLog: [ConnectorEvent] {
@@ -28,208 +24,152 @@ struct ConnectorDetailView<T: BaseConnector>: View {
     }
 
     var body: some View {
-        List {
-            // MARK: - Status Overview
-            Section {
-                HStack(spacing: 16) {
-                    detailStat(label: "Status", value: connector.status.rawValue.capitalized,
-                              color: connector.status == .connected ? .green : .red)
-                    detailStat(label: "Events", value: "\(connector.activityLog.count)", color: .blue)
-                    detailStat(label: "Type", value: connector.type.rawValue.capitalized, color: .purple)
-                }
-            }
-
-            // MARK: - Connection Details
-            Section {
-                HStack {
-                    Text("Connection Status")
-                    Spacer()
-                    HStack(spacing: 6) {
-                        Circle()
-                            .fill(connector.status == .connected ? Color.green : Color.red)
-                            .frame(width: 8, height: 8)
-                        Text(connector.status.rawValue.capitalized)
-                            .foregroundStyle(connector.status == .connected ? .green : .red)
-                            .bold()
-                    }
-                }
-
-                HStack {
-                    Text("Connector Type")
-                    Spacer()
-                    Text(connector.type.rawValue.capitalized)
-                        .foregroundColor(.secondary)
-                }
-
-                HStack {
-                    Text("Auth Fields")
-                    Spacer()
-                    Text("\(connector.authFields.count)")
-                        .foregroundColor(.secondary)
-                }
-
-                if let lastEvent = connector.activityLog.first {
-                    HStack {
-                        Text("Last Activity")
-                        Spacer()
-                        Text(lastEvent.timestamp.formatted(.relative(presentation: .numeric)))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                if let firstEvent = connector.activityLog.last {
-                    HStack {
-                        Text("First Activity")
-                        Spacer()
-                        Text(firstEvent.timestamp.formatted(date: .abbreviated, time: .shortened))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            } header: {
-                Text("Connection Details")
-            }
-
-            // MARK: - Actions
-            Section {
-                Button {
-                    isTesting = true
-                    Task {
-                        try? await connector.testConnection()
-                        await MainActor.run { isTesting = false }
-                    }
-                } label: {
-                    HStack {
-                        Label("Test Connection", systemImage: "antenna.radiowaves.left.and.right")
-                        Spacer()
-                        if isTesting { ProgressView().scaleEffect(0.7) }
-                    }
-                }
-                .disabled(isTesting)
-
-                Button {
-                    isSyncing = true
-                    Task {
-                        try? await connector.sync()
-                        await MainActor.run { isSyncing = false }
-                    }
-                } label: {
-                    HStack {
-                        Label("Force Sync", systemImage: "arrow.clockwise")
-                        Spacer()
-                        if isSyncing { ProgressView().scaleEffect(0.7) }
-                    }
-                }
-                .disabled(isSyncing)
-
-                Button {
-                    showingAuth = true
-                } label: {
-                    Label("Configure Auth", systemImage: "key")
-                }
-
-                Button(role: .destructive) {
-                    showingDisconnectAlert = true
-                } label: {
-                    Label("Disconnect", systemImage: "xmark.circle")
-                }
-            } header: {
-                Text("Actions")
-            }
-
-            // MARK: - Activity Log
-            Section {
-                Picker("Filter", selection: $logFilter) {
-                    ForEach(LogFilterType.allCases, id: \.self) { filter in
-                        Text(filter.rawValue).tag(filter)
-                    }
-                }
-                .pickerStyle(.segmented)
-            }
-
-            Section {
-                if filteredActivityLog.isEmpty {
-                    Text("No activity recorded.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                } else {
-                    ForEach(filteredActivityLog) { event in
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Text(event.level.rawValue.uppercased())
-                                    .font(.system(size: 10, weight: .bold))
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(color(for: event.level).opacity(0.15))
-                                    .foregroundStyle(color(for: event.level))
-                                    .clipShape(RoundedRectangle(cornerRadius: 4))
-
-                                Spacer()
-
-                                Text(event.timestamp.formatted(date: .omitted, time: .standard))
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
+        ScrollView {
+            VStack(spacing: 24) {
+                // MARK: - Header
+                SDKModernCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(connector.name).font(.title3.bold())
+                                Text(connector.type.rawValue.capitalized).sdkSubtext()
                             }
-
-                            Text(event.message)
-                                .font(.subheadline)
-
-                            if expandedLogID == event.id {
-                                Text(event.timestamp.formatted(date: .abbreviated, time: .standard))
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                                    .padding(.top, 2)
-                            }
+                            Spacer()
+                            SDKStatusPill(
+                                status: connector.status == .connected ? .success : .error,
+                                text: connector.status.rawValue.uppercased()
+                            )
                         }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            withAnimation {
-                                expandedLogID = expandedLogID == event.id ? nil : event.id
+
+                        Divider()
+
+                        HStack(spacing: 20) {
+                            statItem(label: "Fields", value: "\(connector.authFields.count)")
+                            statItem(label: "Events", value: "\(connector.activityLog.count)")
+                            if let last = connector.activityLog.first {
+                                statItem(label: "Last Seen", value: last.timestamp.formatted(.relative(presentation: .numeric)))
                             }
                         }
                     }
                 }
-            } header: {
-                Text("Activity Log (\(filteredActivityLog.count))")
+
+                // MARK: - Actions
+                SDKSectionHeader(title: "Operations", subtext: "Live connection management.")
+                SDKModernCard {
+                    VStack(spacing: 12) {
+                        actionButton(title: "Test Connection", icon: "antenna.radiowaves.left.and.right", loading: isTesting) {
+                            isTesting = true
+                            Task { try? await connector.testConnection(); isTesting = false }
+                        }
+
+                        actionButton(title: "Force Sync", icon: "arrow.clockwise", loading: isSyncing) {
+                            isSyncing = true
+                            Task { try? await connector.sync(); isSyncing = false }
+                        }
+
+                        Button { showingAuth = true } label: {
+                            managementRow(title: "Configure Auth", icon: "key", subtitle: "Credentials and fields")
+                        }
+
+                        Divider().padding(.vertical, 4)
+
+                        Button(role: .destructive) { showingDisconnectAlert = true } label: {
+                            Label("Disconnect", systemImage: "xmark.circle")
+                                .frame(maxWidth: .infinity).font(.subheadline.bold())
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                }
+
+                // MARK: - Activity Log
+                SDKSectionHeader(title: "Activity Log", subtext: "Filtered event stream.")
+                VStack(spacing: 12) {
+                    Picker("Filter", selection: $logFilter) {
+                        ForEach(LogFilterType.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+
+                    if filteredActivityLog.isEmpty {
+                        SDKModernCard { Text("No activity recorded.").sdkSubtext().frame(maxWidth: .infinity) }
+                    } else {
+                        ForEach(filteredActivityLog) { event in
+                            SDKModernCard {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
+                                        SDKStatusPill(status: levelToStatus(event.level), text: event.level.rawValue.uppercased())
+                                        Spacer()
+                                        Text(event.timestamp.formatted(date: .omitted, time: .shortened)).font(.caption2).foregroundStyle(.tertiary)
+                                    }
+                                    Text(event.message).font(.subheadline.bold())
+
+                                    if expandedLogID == event.id {
+                                        Text(event.timestamp.formatted(date: .abbreviated, time: .standard))
+                                            .font(.caption2).foregroundStyle(.secondary).padding(.top, 2)
+                                    }
+                                }
+                                .contentShape(Rectangle())
+                                .onTapGesture { withAnimation { expandedLogID = expandedLogID == event.id ? nil : event.id } }
+                            }
+                        }
+                    }
+                }
             }
+            .padding()
         }
+        .background(Color(.systemGroupedBackground))
         .navigationTitle(connector.name)
         .sheet(isPresented: $showingAuth) {
-            ConnectorAuthView(connector: connector)
+            NavigationStack { ConnectorAuthView(connector: connector) }
+                .presentationDetents([.medium, .large])
         }
         .alert("Disconnect \(connector.name)?", isPresented: $showingDisconnectAlert) {
             Button("Cancel", role: .cancel) {}
-            Button("Disconnect", role: .destructive) {
-                connector.disconnect()
+            Button("Disconnect", role: .destructive) { connector.disconnect() }
+        }
+    }
+
+    private func statItem(label: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(value).font(.headline)
+            Text(label).font(.caption2).foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func actionButton(title: String, icon: String, loading: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack {
+                Label(title, systemImage: icon)
+                Spacer()
+                if loading { ProgressView().scaleEffect(0.8) }
             }
-        } message: {
-            Text("This will disconnect the connector and stop all sync operations.")
+            .font(.subheadline.bold())
+            .padding()
+            .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
         }
+        .buttonStyle(.plain)
+        .disabled(loading)
     }
 
-    // MARK: - Helpers
-
-    private func detailStat(label: String, value: String, color: Color) -> some View {
-        VStack(spacing: 2) {
-            Text(value)
-                .font(.title3.bold())
-                .foregroundColor(color)
-            Text(label)
-                .font(.caption2)
-                .foregroundColor(.secondary)
+    private func managementRow(title: String, icon: String, subtitle: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon).font(.title3).foregroundStyle(.accent)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.subheadline.bold())
+                Text(subtitle).sdkSubtext()
+            }
+            Spacer()
+            Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
         }
-        .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
     }
 
-    private func color(for level: LogLevel) -> Color {
+    private func levelToStatus(_ level: LogLevel) -> SDKStatus {
         switch level {
-        case .error: return .red
-        case .warning: return .orange
-        case .info: return .blue
-        case .debug: return .gray
+        case .error: return .error
+        case .warning: return .warning
+        case .info: return .info
+        case .debug: return .info
         }
     }
 }

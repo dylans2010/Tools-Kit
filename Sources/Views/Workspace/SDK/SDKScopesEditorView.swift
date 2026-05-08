@@ -3,9 +3,6 @@ import SwiftUI
 struct SDKScopesEditorView: View {
     @StateObject private var projectManager = SDKProjectManager.shared
     @StateObject private var state = SDKRuntimeWorkspaceState.shared
-    #if os(iOS)
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    #endif
     @State private var showingReview = false
 
     private var categories: [(String, [SDKScopeDefinition])] {
@@ -15,59 +12,66 @@ struct SDKScopesEditorView: View {
     }
 
     private var enabledScopes: Set<String> { state.effectiveScopes(for: projectManager.currentProject) }
-    private var isCompact: Bool {
-        #if os(iOS)
-        return horizontalSizeClass == .compact
-        #else
-        return false
-        #endif
-    }
 
     var body: some View {
-        List {
-            Section {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("SDK Permissions")
-                            .font(.headline)
-                        Text("These grants are used by SDK dependency validation and selected run configurations.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Text("\(enabledScopes.count)")
-                        .font(.title3.bold())
-                        .foregroundStyle(Color.accentColor)
-                }
-                Button("Review Effective Scope Set") { showingReview = true }
-            }
+        ScrollView {
+            VStack(spacing: 20) {
+                SDKSectionHeader(
+                    title: "SDK Permissions",
+                    subtext: "Grants used by SDK dependency validation and selected run configurations."
+                )
 
-            ForEach(categories, id: \.0) { category, items in
-                Section(category) {
-                    ForEach(items) { item in
-                        scopeRow(item)
+                SDKModernCard {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Effective Scope Set").font(.subheadline.bold())
+                            Text("\(enabledScopes.count) scopes enabled").sdkSubtext()
+                        }
+                        Spacer()
+                        Button("Review") { showingReview = true }
+                            .buttonStyle(.bordered)
                     }
                 }
-            }
 
-            if !scopeDiagnostics.isEmpty {
-                Section("SDK Validation") {
-                    ForEach(scopeDiagnostics) { diagnostic in
-                        Button { state.open(node: diagnostic.node) } label: {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Label(diagnostic.message, systemImage: diagnostic.severity == .error ? "xmark.octagon.fill" : "exclamationmark.triangle.fill")
-                                    .foregroundStyle(diagnostic.severity == .error ? .red : .orange)
-                                Text(diagnostic.suggestion)
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
+                ForEach(categories, id: \.0) { category, items in
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(category).font(.caption.bold()).foregroundStyle(.secondary).padding(.leading, 4)
+
+                        VStack(spacing: 12) {
+                            ForEach(items) { item in
+                                scopeCard(item)
                             }
                         }
                     }
-                    Button("Auto Resolve Required Scopes") { autoResolveScopeSuggestions() }
-                        .buttonStyle(.borderedProminent)
+                }
+
+                if !scopeDiagnostics.isEmpty {
+                    SDKSectionHeader(title: "SDK Validation", subtext: "Issues detected in scope configuration.")
+
+                    VStack(spacing: 12) {
+                        ForEach(scopeDiagnostics) { diagnostic in
+                            SDKModernCard {
+                                HStack(spacing: 12) {
+                                    Image(systemName: diagnostic.severity == .error ? "xmark.octagon.fill" : "exclamationmark.triangle.fill")
+                                        .foregroundStyle(diagnostic.severity == .error ? .red : .orange)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(diagnostic.message).font(.subheadline.bold())
+                                        Text(diagnostic.suggestion).sdkSubtext()
+                                    }
+                                    Spacer()
+                                }
+                            }
+                        }
+
+                        Button("Auto Resolve") { autoResolveScopeSuggestions() }
+                            .buttonStyle(.borderedProminent)
+                    }
                 }
             }
+            .padding()
         }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("Scopes")
         .sheet(isPresented: $showingReview) {
             NavigationStack {
                 List {
@@ -83,48 +87,30 @@ struct SDKScopesEditorView: View {
             }
             .presentationDetents([.medium, .large])
         }
-        .onAppear { state.recalculateDiagnostics() }
-        .navigationTitle("Scopes")
     }
 
-    private func scopeRow(_ item: SDKScopeDefinition) -> some View {
-        VStack(alignment: .leading, spacing: 7) {
-            Toggle(isOn: binding(for: item.key)) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text(item.key)
-                        .font(.system(.subheadline, design: .monospaced))
-                        .lineLimit(isCompact ? 2 : 1)
-                    Spacer(minLength: 8)
-                    Text(item.riskLevel)
-                        .font(.caption2.bold())
-                        .foregroundStyle(riskColor(item.riskLevel))
-                }
-            }
-            Text(item.description).font(.caption).foregroundStyle(.secondary)
-            if isCompact {
-                VStack(alignment: .leading, spacing: 3) {
-                    Label(item.approvals, systemImage: "person.badge.shield.checkmark")
-                    Label(item.linkedCapability.title, systemImage: item.linkedCapability.icon)
-                }
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            } else {
+    private func scopeCard(_ item: SDKScopeDefinition) -> some View {
+        SDKModernCard {
+            VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Label(item.approvals, systemImage: "person.badge.shield.checkmark")
+                    Text(item.key).font(.system(.subheadline, design: .monospaced)).bold()
                     Spacer()
-                    Label(item.linkedCapability.title, systemImage: item.linkedCapability.icon)
+                    SDKStatusPill(status: riskToStatus(item.riskLevel), text: item.riskLevel.uppercased())
                 }
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            }
 
-            if !item.dependsOn.isEmpty {
-                Text("Depends on: \(item.dependsOn.joined(separator: ", "))")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                Text(item.description).sdkSubtext()
+
+                Divider()
+
+                HStack {
+                    Toggle("Enabled", isOn: binding(for: item.key))
+                        .labelsHidden()
+                    Text("Enable Scope").font(.caption.bold())
+                    Spacer()
+                    Label(item.approvals, systemImage: "person.badge.shield.checkmark").font(.caption2).foregroundStyle(.tertiary)
+                }
             }
         }
-        .padding(.vertical, 5)
     }
 
     private var scopeDiagnostics: [SDKRuntimeDiagnostic] {
@@ -151,12 +137,12 @@ struct SDKScopesEditorView: View {
         state.recalculateDiagnostics()
     }
 
-    private func riskColor(_ level: String) -> Color {
+    private func riskToStatus(_ level: String) -> SDKStatus {
         switch level.lowercased() {
-        case "critical": return .red
-        case "high": return .orange
-        case "medium": return .yellow
-        default: return .green
+        case "critical": return .error
+        case "high": return .warning
+        case "medium": return .warning
+        default: return .success
         }
     }
 }

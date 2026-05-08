@@ -19,18 +19,56 @@ struct SDKProjectDashboardView: View {
     @StateObject private var logStore = SDKLogStore.shared
     @State private var navPath = NavigationPath()
 
+    private let columns = [GridItem(.flexible()), GridItem(.flexible())]
+
     var body: some View {
         NavigationStack(path: $navPath) {
-            List {
-                if let project = projectManager.currentProject {
-                    projectMetadataCard(project)
-                    controlHubSection
-                } else {
-                    Section {
-                        ContentUnavailableView("No Project Found", systemImage: "folder.badge.plus", description: Text("Create a new project to get started."))
+            ScrollView {
+                VStack(spacing: 24) {
+                    if let project = projectManager.currentProject {
+                        projectHeader(project)
+
+                        SDKSectionHeader(title: "Control Hub", subtext: "Integrated tools and runtime management.")
+
+                        LazyVGrid(columns: columns, spacing: 16) {
+                            hubCard(route: .build, title: "Build", subtitle: "Export & Build", icon: "hammer.fill", color: .blue)
+                            hubCard(route: .ideWorkspace, title: "IDE", subtitle: "Runtime Editor", icon: "square.split.2x2.fill", color: .indigo)
+                            hubCard(route: .connectors, title: "Connect", subtitle: "\(connectorManager.connectors.count) Active", icon: "link", color: .green)
+                            hubCard(route: .automation, title: "Rules", subtitle: "\(automationEngine.rules.count) Rules", icon: "bolt.fill", color: .orange)
+                            hubCard(route: .plugins, title: "Plugins", subtitle: "Capabilities", icon: "puzzlepiece.fill", color: .purple)
+                            hubCard(route: .tools, title: "Tools", subtitle: "Utilities", icon: "wrench.and.screwdriver.fill", color: .gray)
+                            hubCard(route: .appBuilder, title: "Designer", subtitle: "Visual Editor", icon: "wand.and.stars", color: .indigo)
+                            hubCard(route: .logs, title: "Logs", subtitle: "\(logStore.entries.count) Entries", icon: "terminal.fill", color: .black)
+                        }
+
+                        SDKSectionHeader(title: "Diagnostics", subtext: "System health and status.")
+
+                        SDKModernCard {
+                            NavigationLink(value: SDKDashboardRoute.diagnostics) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("System Health").font(.subheadline.bold())
+                                        Text("View detailed diagnostics").sdkSubtext()
+                                    }
+                                    Spacer()
+                                    SDKStatusPill(status: project.healthStatus.toSDKStatus(), text: project.healthStatus.rawValue.uppercased())
+                                    Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
+                                }
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    } else {
+                        ContentUnavailableView(
+                            "No Project Found",
+                            systemImage: "folder.badge.plus",
+                            description: Text("Create a new project to get started.")
+                        )
+                        .padding(.top, 40)
                     }
                 }
+                .padding()
             }
+            .background(Color(.systemGroupedBackground))
             .navigationTitle("SDK Dashboard")
             .navigationDestination(for: SDKDashboardRoute.self) { route in
                 destinationView(for: route)
@@ -41,114 +79,64 @@ struct SDKProjectDashboardView: View {
         }
     }
 
-    @ViewBuilder
-    private func projectMetadataCard(_ project: SDKProject) -> some View {
-        Section {
-            VStack(alignment: .leading, spacing: 10) {
+    private func projectHeader(_ project: SDKProject) -> some View {
+        SDKModernCard {
+            VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Text(project.name)
-                        .font(.title2)
-                        .bold()
-                    Spacer()
-                    healthBadge(project.healthStatus)
-                }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Label("Created: \(project.createdAt.formatted(date: .abbreviated, time: .omitted))", systemImage: "calendar")
-                    if let lastBuild = project.lastBuiltAt {
-                        Label("Last Build: \(lastBuild.formatted(.relative(presentation: .numeric)))", systemImage: "hammer.fill")
-                    } else {
-                        Label("Not yet built", systemImage: "hammer")
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(project.name)
+                            .font(.title2.bold())
+                        Text("v\(project.version)")
+                            .font(.caption.monospaced())
+                            .foregroundStyle(.secondary)
                     }
+                    Spacer()
+                    SDKStatusPill(status: project.healthStatus.toSDKStatus(), text: project.healthStatus.rawValue.uppercased())
                 }
-                .font(.caption)
-                .foregroundStyle(.secondary)
+
+                Divider()
+
+                HStack(spacing: 20) {
+                    statItem(label: "Scopes", value: "\(project.enabledScopes.count)")
+                    statItem(label: "Plugins", value: "\(project.enabledPluginIDs.count)")
+                    statItem(label: "Tools", value: "\(project.enabledToolIDs.count)")
+                }
+
+                if let lastBuild = project.lastBuiltAt {
+                    Text("Last Build: \(lastBuild.formatted(.relative(presentation: .numeric)))")
+                        .sdkSubtext()
+                }
             }
-            .padding(.vertical, 4)
         }
     }
 
-    private var controlHubSection: some View {
-        Section {
-            hubRow(route: .build, title: "Build & Export", subtitle: buildSubtitle, icon: "hammer", color: .blue, status: .connected)
-            hubRow(route: .ideWorkspace, title: "IDE Workspace", subtitle: "Multi-panel runtime editor", icon: "square.split.2x2.fill", color: .indigo, status: .connected)
-            hubRow(route: .connectors, title: "Connectors", subtitle: "\(connectorManager.connectors.count) active", icon: "link", color: .green, status: connectorManager.connectors.isEmpty ? .disconnected : .connected)
-            hubRow(route: .automation, title: "Automation", subtitle: "\(automationEngine.rules.count) rules", icon: "bolt.fill", color: .orange, status: .connected)
-            hubRow(route: .plugins, title: "Plugins", subtitle: "Expand capabilities", icon: "puzzlepiece.fill", color: .purple, status: .connected)
-            hubRow(route: .tools, title: "Tools", subtitle: "Data utilities", icon: "wrench.and.screwdriver.fill", color: .gray, status: .connected)
-            hubRow(route: .appBuilder, title: "App Builder", subtitle: "Visual editor", icon: "wand.and.stars", color: .indigo, status: .connected)
-            hubRow(route: .logs, title: "System Logs", subtitle: "\(logStore.entries.count) events", icon: "terminal.fill", color: .black, status: .connected)
-            hubRow(route: .diagnostics, title: "Diagnostics", subtitle: "System health", icon: "heart.text.square.fill", color: .red, status: .connected)
-        } header: {
-            Text("Control Hub")
-        }
-    }
-
-    private var buildSubtitle: String {
-        if let last = projectManager.currentProject?.lastBuiltAt {
-            return "Last build: \(last.formatted(.relative(presentation: .numeric)))"
-        }
-        return "Not built yet"
-    }
-
-    private func hubRow(route: SDKDashboardRoute, title: String, subtitle: String, icon: String, color: Color, status: ConnectorStatus) -> some View {
+    private func hubCard(route: SDKDashboardRoute, title: String, subtitle: String, icon: String, color: Color) -> some View {
         Button {
             navPath.append(route)
         } label: {
-            HStack(spacing: 12) {
-                Image(systemName: icon)
-                    .foregroundStyle(.white)
-                    .frame(width: 32, height: 32)
-                    .background(color, in: RoundedRectangle(cornerRadius: 8))
+            SDKModernCard {
+                VStack(alignment: .leading, spacing: 12) {
+                    Image(systemName: icon)
+                        .font(.title3)
+                        .foregroundStyle(.white)
+                        .frame(width: 40, height: 40)
+                        .background(color.gradient, in: RoundedRectangle(cornerRadius: 10))
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                    Text(subtitle)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(title).font(.headline)
+                        Text(subtitle).sdkSubtext()
+                    }
                 }
-
-                Spacer()
-
-                Circle()
-                    .fill(statusColor(status))
-                    .frame(width: 8, height: 8)
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.tertiary)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(.vertical, 2)
         }
+        .buttonStyle(.plain)
     }
 
-    @ViewBuilder
-    private func healthBadge(_ status: HealthStatus) -> some View {
-        Text(status.rawValue.uppercased())
-            .font(.system(size: 10, weight: .bold))
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(statusColor(status).opacity(0.2), in: Capsule())
-            .foregroundStyle(statusColor(status))
-    }
-
-    private func statusColor(_ status: HealthStatus) -> Color {
-        switch status {
-        case .healthy: return .green
-        case .degraded: return .yellow
-        case .critical: return .red
-        case .unknown: return .gray
-        }
-    }
-
-    private func statusColor(_ status: ConnectorStatus) -> Color {
-        switch status {
-        case .connected: return .green
-        case .connecting: return .yellow
-        case .error: return .red
-        case .disconnected: return .gray
+    private func statItem(label: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(value).font(.headline)
+            Text(label).font(.caption2).foregroundStyle(.secondary)
         }
     }
 
@@ -164,6 +152,17 @@ struct SDKProjectDashboardView: View {
         case .plugins: SDKPluginsView()
         case .tools: SDKToolsView()
         case .appBuilder: SDKAppBuilderView()
+        }
+    }
+}
+
+extension HealthStatus {
+    func toSDKStatus() -> SDKStatus {
+        switch self {
+        case .healthy: return .success
+        case .degraded: return .warning
+        case .critical: return .error
+        case .unknown: return .info
         }
     }
 }

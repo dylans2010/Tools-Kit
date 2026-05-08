@@ -9,10 +9,7 @@ struct SDKWorkspaceContainerView: View {
     @State private var activeSheet: WorkspaceSheet?
 
     private enum WorkspaceSheet: Identifiable, Equatable {
-        case navigator
-        case inspector
-        case console
-        case runConfiguration
+        case navigator, inspector, console, runConfiguration
 
         var id: String {
             switch self {
@@ -118,17 +115,25 @@ struct SDKWorkspaceContainerView: View {
 
     private var compactBottomBar: some View {
         HStack(spacing: 10) {
-            Button { activeSheet = .navigator } label: { Label("Files", systemImage: "sidebar.left") }
-            Button { activeSheet = .inspector } label: { Label("Inspect", systemImage: "info.circle") }
-            Button { activeSheet = .console } label: { Label("Console", systemImage: "terminal") }
-            Button { activeSheet = .runConfiguration } label: { Label("Run", systemImage: "slider.horizontal.3") }
+            bottomBarButton(sheet: .navigator, icon: "sidebar.left")
+            bottomBarButton(sheet: .inspector, icon: "info.circle")
+            bottomBarButton(sheet: .console, icon: "terminal")
+            bottomBarButton(sheet: .runConfiguration, icon: "slider.horizontal.3")
         }
-        .font(.caption.weight(.semibold))
-        .labelStyle(.iconOnly)
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .background(.bar)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .background(.ultraThinMaterial)
+        .clipShape(Capsule())
+        .padding(.bottom, 10)
+    }
+
+    private func bottomBarButton(sheet: WorkspaceSheet, icon: String) -> some View {
+        Button { activeSheet = sheet } label: {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .medium))
+                .frame(maxWidth: .infinity)
+                .foregroundStyle(activeSheet == sheet ? .accent : .secondary)
+        }
     }
 
     private var clampedLeftWidth: CGFloat { CGFloat(min(max(180, state.layout.leftSidebarWidth), 420)) }
@@ -136,29 +141,18 @@ struct SDKWorkspaceContainerView: View {
     private var clampedBottomHeight: CGFloat { CGFloat(min(max(120, state.layout.bottomPanelHeight), 420)) }
 
     private var topToolbar: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             Label("SDK", systemImage: "hammer.circle.fill")
                 .font(.headline)
             Spacer()
 
-            if isCompact {
-                Menu {
-                    Button { activeSheet = .navigator } label: { Label("Navigator", systemImage: "sidebar.left") }
-                    Button { activeSheet = .inspector } label: { Label("Inspector", systemImage: "sidebar.right") }
-                    Button { activeSheet = .console } label: { Label("Console", systemImage: "terminal") }
-                    Button { activeSheet = .runConfiguration } label: { Label("Run Configuration", systemImage: "slider.horizontal.3") }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                }
-            } else {
+            if !isCompact {
                 Button { toggle(\.isLeftCollapsed) } label: { Image(systemName: state.layout.isLeftCollapsed ? "sidebar.left" : "sidebar.left.hide") }
                     .buttonStyle(.borderless)
                 Button { toggle(\.isRightCollapsed) } label: { Image(systemName: state.layout.isRightCollapsed ? "sidebar.right" : "sidebar.right.hide") }
                     .buttonStyle(.borderless)
                 Button { toggle(\.isBottomCollapsed) } label: { Image(systemName: state.layout.isBottomCollapsed ? "rectangle.bottomthird.inset.filled" : "rectangle.bottomthird.inset") }
                     .buttonStyle(.borderless)
-                NavigationLink { SDKRunConfigurationView() } label: { Label("Config", systemImage: "slider.horizontal.3") }
-                    .buttonStyle(.bordered)
             }
 
             Button {
@@ -171,13 +165,17 @@ struct SDKWorkspaceContainerView: View {
                     state.recalculateDiagnostics()
                 }
             } label: {
-                Label(isRunning ? "Running" : "Run", systemImage: "play.fill")
+                if isRunning {
+                    ProgressView().controlSize(.small).padding(.horizontal, 4)
+                } else {
+                    Label("Run", systemImage: "play.fill")
+                }
             }
             .buttonStyle(.borderedProminent)
             .disabled(isRunning)
         }
         .padding(.horizontal)
-        .padding(.vertical, 8)
+        .padding(.vertical, 10)
         .background(.thinMaterial)
     }
 

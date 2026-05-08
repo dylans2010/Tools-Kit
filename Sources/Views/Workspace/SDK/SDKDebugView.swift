@@ -7,116 +7,85 @@ struct SDKDebugView: View {
     @State private var isStepping = false
 
     var body: some View {
-        List {
-            Section {
-                HStack {
-                    Text("Execution Mode")
-                    Spacer()
-                    Text(runtime.isNoSandboxModeEnabled ? "Unrestricted" : "Sandboxed")
-                        .foregroundStyle(runtime.isNoSandboxModeEnabled ? .red : .green)
-                }
-                HStack {
-                    Text("Active Projects")
-                    Spacer()
-                    Text("\(runtime.activeProjects.count)")
-                }
-                HStack {
-                    Text("Active Traces")
-                    Spacer()
-                    Text("\(telemetry.activeTraces.count)")
-                        .foregroundStyle(telemetry.activeTraces.count > 0 ? .orange : .green)
-                }
-            } header: {
-                Text("Runtime Status")
-            }
+        ScrollView {
+            VStack(spacing: 24) {
+                SDKSectionHeader(title: "Runtime Debug", subtext: "Live inspection of the SDK kernel and processes.")
 
-            Section {
-                let metrics = telemetry.getMetrics()
-                HStack {
-                    Text("Total Executions")
-                    Spacer()
-                    Text("\(metrics.totalTraces)")
-                        .font(.system(.body, design: .monospaced))
+                SDKModernCard {
+                    VStack(spacing: 12) {
+                        HStack {
+                            Text("Execution Mode")
+                            Spacer()
+                            SDKStatusPill(status: runtime.isNoSandboxModeEnabled ? .error : .success, text: runtime.isNoSandboxModeEnabled ? "UNRESTRICTED" : "SANDBOXED")
+                        }
+                        LabeledContent("Active Projects", value: "\(runtime.activeProjects.count)")
+                        LabeledContent("Active Traces", value: "\(telemetry.activeTraces.count)")
+                    }
                 }
-                HStack {
-                    Text("Success / Failure")
-                    Spacer()
-                    Text("\(metrics.successCount) / \(metrics.failureCount)")
-                        .font(.system(.body, design: .monospaced))
-                        .foregroundStyle(metrics.failureCount > 0 ? .orange : .primary)
-                }
-                HStack {
-                    Text("Avg Duration")
-                    Spacer()
-                    Text("\(String(format: "%.1f", metrics.averageDurationMs))ms")
-                        .font(.system(.body, design: .monospaced))
-                }
-            } header: {
-                Text("Execution Metrics")
-            }
 
-            Section {
-                HStack {
-                    Text("Physical Memory")
-                    Spacer()
-                    Text("\(ProcessInfo.processInfo.physicalMemory / 1024 / 1024) MB")
-                        .font(.system(.body, design: .monospaced))
-                }
-                HStack {
-                    Text("Active Processors")
-                    Spacer()
-                    Text("\(ProcessInfo.processInfo.activeProcessorCount)")
-                        .font(.system(.body, design: .monospaced))
-                }
-                HStack {
-                    Text("Uptime")
-                    Spacer()
-                    Text("\(Int(ProcessInfo.processInfo.systemUptime / 3600))h \(Int(ProcessInfo.processInfo.systemUptime.truncatingRemainder(dividingBy: 3600) / 60))m")
-                        .font(.system(.body, design: .monospaced))
-                }
-            } header: {
-                Text("Memory & Process")
-            }
-
-            Section {
-                let errors = logStore.entries.filter { $0.level == .error }.prefix(10)
-                if errors.isEmpty {
-                    Text("No Errors Recorded").foregroundStyle(.secondary).font(.caption)
-                } else {
-                    ForEach(Array(errors)) { entry in
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(entry.message).font(.system(size: 11, design: .monospaced)).foregroundStyle(.red)
-                            Text("[\(entry.source)] \(entry.timestamp.formatted(date: .omitted, time: .shortened))")
-                                .font(.system(size: 9, design: .monospaced)).foregroundStyle(.secondary)
+                SDKSectionHeader(title: "Live Traces", subtext: "Currently executing SDK operations.")
+                VStack(spacing: 12) {
+                    let active = Array(telemetry.activeTraces.values)
+                    if active.isEmpty {
+                        SDKModernCard { Text("No active traces").sdkSubtext().frame(maxWidth: .infinity) }
+                    } else {
+                        ForEach(active, id: \.id) { trace in
+                            SDKModernCard {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("\(trace.action)").font(.subheadline.bold())
+                                        Text(trace.startTime.formatted(date: .omitted, time: .standard)).sdkSubtext()
+                                    }
+                                    Spacer()
+                                    ProgressView().scaleEffect(0.8)
+                                }
+                            }
                         }
                     }
                 }
-            } header: {
-                Text("Recent Errors")
-            }
 
-            Section {
-                ForEach(Thread.callStackSymbols.prefix(5), id: \.self) { symbol in
-                    Text(symbol)
-                        .font(.system(size: 8, design: .monospaced))
-                        .lineLimit(1)
-                }
-            } header: {
-                Text("Thread Trace")
-            }
-
-            Section {
-                Button(isStepping ? "Stop Debug" : "Start Trace") {
-                    isStepping.toggle()
-                    if isStepping {
-                        SDKLogStore.shared.log("Debug trace started", source: "SDKDebugView", level: .info)
-                    } else {
-                        SDKLogStore.shared.log("Debug trace stopped", source: "SDKDebugView", level: .info)
+                SDKSectionHeader(title: "Performance Metrics", subtext: "Resource consumption and timing.")
+                SDKModernCard {
+                    let metrics = telemetry.getMetrics()
+                    VStack(spacing: 12) {
+                        LabeledContent("Avg Duration", value: "\(String(format: "%.1f", metrics.averageDurationMs))ms")
+                        LabeledContent("Total Runs", value: "\(metrics.totalTraces)")
+                        LabeledContent("Memory Estimate", value: "\(ProcessInfo.processInfo.physicalMemory / 1024 / 1024) MB")
+                        LabeledContent("System Uptime", value: "\(Int(ProcessInfo.processInfo.systemUptime / 3600))h")
                     }
                 }
-                .foregroundStyle(isStepping ? .red : .blue)
+
+                SDKSectionHeader(title: "Recent Failures", subtext: "Critical errors from the log store.")
+                VStack(spacing: 12) {
+                    let errors = logStore.entries.filter { $0.level == .error }.prefix(5)
+                    if errors.isEmpty {
+                        SDKModernCard { Text("No critical errors").sdkSubtext().frame(maxWidth: .infinity) }
+                    } else {
+                        ForEach(Array(errors)) { entry in
+                            SDKModernCard {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    HStack {
+                                        SDKStatusPill(status: .error, text: "ERROR")
+                                        Spacer()
+                                        Text(entry.source).font(.caption2.monospaced()).foregroundStyle(.tertiary)
+                                    }
+                                    Text(entry.message).font(.system(.caption, design: .monospaced)).sdkErrorText()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Button(action: { isStepping.toggle() }) {
+                    Label(isStepping ? "Stop Debug Trace" : "Start Debug Trace", systemImage: "ladybug.fill")
+                        .frame(maxWidth: .infinity).bold()
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(isStepping ? .red : .accentColor)
             }
+            .padding()
         }
-        .navigationTitle("SDK Runtime Debug")
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("Runtime Debug")
     }
 }

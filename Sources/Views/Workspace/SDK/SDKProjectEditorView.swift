@@ -22,6 +22,7 @@ struct SDKProjectEditorView: View {
             tabHeader
             Divider()
             activeTabView
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             if !state.diagnostics.isEmpty {
                 Divider()
                 diagnosticsBanner
@@ -34,8 +35,7 @@ struct SDKProjectEditorView: View {
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { showingTabPicker = false } } }
             }
-            .presentationDetents([.medium, .large])
-            .presentationDragIndicator(.visible)
+            .presentationDetents([.medium])
         }
         .onChange(of: projectManager.currentProject?.id) { _, _ in
             state.syncSDKGraphFromProject()
@@ -48,17 +48,28 @@ struct SDKProjectEditorView: View {
             if isCompact {
                 HStack {
                     Button { showingTabPicker = true } label: {
-                        Label(activeTab?.title ?? "Config", systemImage: activeTab?.node.icon ?? "square.stack")
-                            .font(.subheadline.weight(.semibold))
+                        HStack(spacing: 8) {
+                            Image(systemName: activeTab?.node.icon ?? "square.stack")
+                                .foregroundStyle(.accent)
+                            Text(activeTab?.title ?? "Config")
+                                .font(.subheadline.bold())
+                                .foregroundStyle(.primary)
+                            Image(systemName: "chevron.down")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.accentColor.opacity(0.1), in: Capsule())
                     }
                     Spacer()
-                    Text("\(state.diagnostics.count) issues")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(state.diagnostics.contains { $0.severity == .error } ? .red : .secondary)
+                    if !state.diagnostics.isEmpty {
+                        SDKStatusPill(status: .warning, text: "\(state.diagnostics.count) ISSUES")
+                    }
                 }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
-                .background(.bar)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(.thinMaterial)
             } else {
                 tabStrip
             }
@@ -73,25 +84,28 @@ struct SDKProjectEditorView: View {
                         Button(tab.title) { state.setSelected(tabID: tab.id) }
                             .buttonStyle(.borderless)
                             .font(.caption.weight(state.selectedTabID == tab.id ? .semibold : .regular))
+                            .foregroundStyle(state.selectedTabID == tab.id ? .primary : .secondary)
                         if state.openTabs.count > 1 {
                             Button { state.close(tabID: tab.id) } label: { Image(systemName: "xmark") }
                                 .buttonStyle(.borderless)
                                 .font(.caption2)
+                                .foregroundStyle(.tertiary)
                         }
                     }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 6)
-                    .background(state.selectedTabID == tab.id ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.08), in: Capsule())
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .background(state.selectedTabID == tab.id ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
                 }
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
         }
+        .background(.thinMaterial)
     }
 
     private var tabPicker: some View {
         List {
-            Section("Workspace") {
+            Section("Workspace Navigation") {
                 ForEach(SDKWorkspaceNode.allCases) { node in
                     Button {
                         state.open(node: node)
@@ -122,36 +136,37 @@ struct SDKProjectEditorView: View {
             case .apiEndpoints: SDKAPIExplorerView()
             }
         } else {
-            ContentUnavailableView("No tab selected", systemImage: "rectangle.stack", description: Text("Select a project editor tab to continue."))
+            ContentUnavailableView("No active tab", systemImage: "square.stack.3d.up.fill", description: Text("Select an editor tab to view content."))
         }
     }
 
     private var diagnosticsBanner: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(state.diagnostics.prefix(isCompact ? 2 : 4)) { diagnostic in
-                    Label {
-                        Text(diagnostic.message).lineLimit(1)
-                    } icon: {
+            HStack(spacing: 12) {
+                ForEach(state.diagnostics.prefix(4)) { diagnostic in
+                    HStack(spacing: 6) {
                         Image(systemName: diagnostic.severity == .error ? "xmark.octagon.fill" : "exclamationmark.triangle.fill")
                             .foregroundStyle(diagnostic.severity == .error ? .red : .orange)
+                        Text(diagnostic.message)
+                            .font(.caption2.bold())
+                            .lineLimit(1)
                     }
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 5)
-                    .background(.regularMaterial, in: Capsule())
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.secondary.opacity(0.1), in: Capsule())
                     .onTapGesture { state.open(node: diagnostic.node) }
                 }
             }
-            .padding(8)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
         }
-        .background(.bar)
+        .background(.ultraThinMaterial)
     }
 
     private var configView: some View {
         Form {
-            Section("Project") {
-                TextField("Name", text: Binding(
+            Section {
+                TextField("Project Name", text: Binding(
                     get: { projectManager.currentProject?.name ?? "" },
                     set: {
                         guard var project = projectManager.currentProject else { return }
@@ -169,31 +184,24 @@ struct SDKProjectEditorView: View {
                         projectManager.updateProject(project)
                     }
                 ), axis: .vertical)
-                Picker("Status", selection: Binding(
-                    get: { projectManager.currentProject?.status ?? .draft },
-                    set: {
-                        guard var project = projectManager.currentProject else { return }
-                        project.status = $0
-                        projectManager.updateProject(project)
-                    }
-                )) {
-                    ForEach(SDKProject.ProjectStatus.allCases, id: \.self) { status in
-                        Text(status.rawValue.capitalized).tag(status)
-                    }
-                }
+            } header: {
+                Text("Project Metadata")
             }
-            Section("SDK Runtime") {
-                LabeledContent("Run configuration", value: state.selectedRunConfiguration?.name ?? "Default Sandbox")
-                LabeledContent("Effective scopes", value: "\(state.effectiveScopes(for: projectManager.currentProject).count)")
-                LabeledContent("Libraries", value: "\(state.libraries.count)")
-                LabeledContent("Dependencies", value: "\(state.dependencies.count)")
-                LabeledContent("Memory estimate", value: "\(state.memoryEstimateMB) MB")
-                Button("Sync Project With SDK Graph") {
+
+            Section {
+                LabeledContent("Selected Run Config", value: state.selectedRunConfiguration?.name ?? "None")
+                LabeledContent("Active Scopes", value: "\(state.effectiveScopes(for: projectManager.currentProject).count)")
+                LabeledContent("Memory Footprint", value: "\(state.memoryEstimateMB) MB")
+            } header: {
+                Text("Runtime Context")
+            }
+
+            Section {
+                Button("Sync with SDK Graph") {
                     state.syncSDKGraphFromProject()
                     state.recalculateDiagnostics()
                 }
             }
         }
-        .formStyle(.grouped)
     }
 }

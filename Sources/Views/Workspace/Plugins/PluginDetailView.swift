@@ -13,107 +13,107 @@ struct PluginDetailView: View {
     var body: some View {
         Group {
             if let plugin = plugin {
-                List {
-                    headerSection(plugin)
-                    detailsSection(plugin)
-                    permissionsSection(plugin)
-                    actionsSection(plugin)
-                    controlsSection(plugin)
+                ScrollView {
+                    VStack(spacing: 24) {
+                        headerSection(plugin)
+
+                        SDKSectionHeader(title: "Status", subtext: "Real-time plugin runtime state.")
+                        SDKModernCard {
+                            HStack {
+                                LabeledContent("Status", value: plugin.isEnabled ? "ENABLED" : "DISABLED")
+                                Spacer()
+                                SDKStatusPill(status: plugin.isEnabled ? .success : .info, text: plugin.isEnabled ? "ACTIVE" : "IDLE")
+                            }
+                        }
+
+                        SDKSectionHeader(title: "Capabilities", subtext: "Permissions and triggers.")
+                        SDKModernCard {
+                            VStack(alignment: .leading, spacing: 12) {
+                                ForEach(plugin.permissions) { permission in
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(permission.capability.displayName).font(.caption.bold())
+                                        Text(permission.description).sdkSubtext()
+                                    }
+                                }
+                                if !plugin.actions.isEmpty {
+                                    Divider()
+                                    ForEach(plugin.actions) { action in
+                                        Label(action.rawValue, systemImage: "bolt.fill")
+                                            .font(.caption).foregroundStyle(.orange)
+                                    }
+                                }
+                            }
+                        }
+
+                        SDKSectionHeader(title: "Management", subtext: "Plugin lifecycle controls.")
+                        SDKModernCard {
+                            VStack(spacing: 16) {
+                                if plugin.isInstalled {
+                                    Toggle("Plugin Enabled", isOn: Binding(
+                                        get: { plugin.isEnabled },
+                                        set: { _ in manager.toggle(pluginID: plugin.id) }
+                                    ))
+                                    .font(.subheadline.bold())
+
+                                    Divider()
+
+                                    Button(role: .destructive) {
+                                        manager.uninstall(pluginID: plugin.id)
+                                        dismiss()
+                                    } label: {
+                                        Label("Uninstall Plugin", systemImage: "trash")
+                                            .frame(maxWidth: .infinity)
+                                    }
+                                    .buttonStyle(.bordered)
+                                } else {
+                                    Button {
+                                        manager.install(pluginID: plugin.id)
+                                        dismiss()
+                                    } label: {
+                                        Label("Install Plugin", systemImage: "plus.app.fill")
+                                            .frame(maxWidth: .infinity).bold()
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                }
+                            }
+                        }
+                    }
+                    .padding()
                 }
+                .background(Color(.systemGroupedBackground))
                 .navigationTitle(plugin.name)
                 .navigationBarTitleDisplayMode(.inline)
             } else {
-                Text("Plugin not found").foregroundColor(.secondary)
+                ContentUnavailableView("Plugin not found", systemImage: "puzzlepiece")
             }
         }
     }
 
     private func headerSection(_ plugin: PluginDefinition) -> some View {
-        Section {
-            HStack(spacing: 16) {
-                Image(systemName: plugin.icon)
-                    .font(.largeTitle)
-                    .foregroundStyle(.blue)
-                    .frame(width: 60, height: 60)
-                    .background(Color.blue.opacity(0.1))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
+        SDKModernCard {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(spacing: 16) {
+                    Image(systemName: plugin.icon)
+                        .font(.title)
+                        .foregroundStyle(.white)
+                        .frame(width: 54, height: 54)
+                        .background(Color.accentColor.gradient, in: RoundedRectangle(cornerRadius: 12))
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(plugin.name).font(.title3.bold())
-                    Text("By \(plugin.author)").font(.caption).foregroundStyle(.secondary)
-                    Text("Version \(plugin.version)").font(.caption2).foregroundStyle(.tertiary)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(plugin.name).font(.title3.bold())
+                        Text("By \(plugin.author)").sdkSubtext()
+                    }
                 }
-            }
-            .padding(.vertical, 4)
 
-            Text(plugin.description).font(.body).foregroundStyle(.secondary)
-        }
-    }
+                Text(plugin.description).font(.body).foregroundStyle(.secondary)
 
-    private func detailsSection(_ plugin: PluginDefinition) -> some View {
-        Section {
-            LabeledContent("Identifier", value: plugin.identifier)
-            if let installed = plugin.installedAt {
-                LabeledContent("Installed", value: installed.formatted(date: .abbreviated, time: .omitted))
-            }
-            if let lastExec = plugin.lastExecutedAt {
-                LabeledContent("Last Executed", value: lastExec.formatted(.relative(presentation: .named)))
-            }
-            LabeledContent("Error Count", value: "\(plugin.errorCount)")
-        } header: {
-            Text("Details")
-        }
-    }
+                Divider()
 
-    private func permissionsSection(_ plugin: PluginDefinition) -> some View {
-        Section {
-            ForEach(plugin.permissions) { permission in
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(permission.capability.displayName).font(.caption.bold())
-                    Text(permission.description).font(.caption2).foregroundColor(.secondary)
+                HStack {
+                    Text("v\(plugin.version)").font(.caption.monospaced()).foregroundStyle(.tertiary)
+                    Spacer()
+                    Text(plugin.identifier).font(.caption2.monospaced()).foregroundStyle(.tertiary)
                 }
-            }
-        } header: {
-            Text("Permissions")
-        }
-    }
-
-    private func actionsSection(_ plugin: PluginDefinition) -> some View {
-        Section {
-            ForEach(plugin.actions) { action in
-                Label(action.rawValue, systemImage: "bolt.fill")
-                    .font(.caption)
-                    .foregroundColor(.orange)
-            }
-        } header: {
-            Text("Active Triggers")
-        }
-    }
-
-    private func controlsSection(_ plugin: PluginDefinition) -> some View {
-        Section {
-            if plugin.isInstalled {
-                Toggle("Enabled", isOn: Binding(
-                    get: { plugin.isEnabled },
-                    set: { _ in manager.toggle(pluginID: plugin.id) }
-                ))
-
-                Button(role: .destructive) {
-                    manager.uninstall(pluginID: plugin.id)
-                    dismiss()
-                } label: {
-                    Label("Uninstall Plugin", systemImage: "trash")
-                        .frame(maxWidth: .infinity)
-                }
-            } else {
-                Button {
-                    manager.install(pluginID: plugin.id)
-                    dismiss()
-                } label: {
-                    Label("Install Plugin", systemImage: "plus.app.fill")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
             }
         }
     }

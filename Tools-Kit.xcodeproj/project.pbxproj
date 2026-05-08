@@ -343,6 +343,7 @@
 		WS020000000000000000000A /* SlideDecksManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000A /* SlideDecksManager.swift */; };
 		WS020000000000000000000B /* ToolHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000B /* ToolHeaderView.swift */; };
 		WS020000000000000000000C /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000C /* CardView.swift */; };
+		SK0200000000000000000001 /* SDKUIComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK0100000000000000000001 /* SDKUIComponents.swift */; };
 		WS020000000000000000000D /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000D /* EmptyStateView.swift */; };
 		WS020000000000000000000E /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000E /* Article.swift */; };
 		WS020000000000000000000F /* ArticleCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000F /* ArticleCollection.swift */; };
@@ -1885,6 +1886,7 @@
 		WS010000000000000000000A /* SlideDecksManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideDecksManager.swift; sourceTree = "<group>"; };
 		WS010000000000000000000B /* ToolHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolHeaderView.swift; sourceTree = "<group>"; };
 		WS010000000000000000000C /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
+		SK0100000000000000000001 /* SDKUIComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKUIComponents.swift; sourceTree = "<group>"; };
 		WS010000000000000000000D /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		WS010000000000000000000E /* Article.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Article.swift; sourceTree = "<group>"; };
 		WS010000000000000000000F /* ArticleCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleCollection.swift; sourceTree = "<group>"; };
@@ -3799,6 +3801,7 @@
 				WS010000000000000000000B /* ToolHeaderView.swift */,
 				WS010000000000000000000C /* CardView.swift */,
 				WS010000000000000000000D /* EmptyStateView.swift */,
+				SK0100000000000000000001 /* SDKUIComponents.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -9989,6 +9992,7 @@
 				WS020000000000000000000A /* SlideDecksManager.swift in Sources */,
 				WS020000000000000000000B /* ToolHeaderView.swift in Sources */,
 				WS020000000000000000000C /* CardView.swift in Sources */,
+				SK0200000000000000000001 /* SDKUIComponents.swift in Sources */,
 				WS020000000000000000000D /* EmptyStateView.swift in Sources */,
 				FC0200000000000000000001 /* FilterChip.swift in Sources */,
 				FI0200000000000000000001 /* FileImporterView.swift in Sources */,
