@@ -32,16 +32,19 @@ struct SDKNavigatorView: View {
             List {
                 Section("Project Root") {
                     ForEach(filteredNodes) { node in
+                        let isSelected: Bool = state.selectedNode == node
+                        let iconStyle: Color = isSelected ? .accentColor : .secondary
+                        let titleWeight: Font.Weight = isSelected ? .semibold : .regular
                         Button {
                             state.open(node: node)
                         } label: {
                             HStack(spacing: 12) {
                                 Image(systemName: node.icon)
                                     .frame(width: 22)
-                                    .foregroundStyle(state.selectedNode == node ? .accent : .secondary)
+                                    .foregroundStyle(iconStyle)
                                 VStack(alignment: .leading, spacing: 3) {
                                     Text(node.title)
-                                        .font(.subheadline.weight(state.selectedNode == node ? .semibold : .regular))
+                                        .font(.subheadline.weight(titleWeight))
                                     if !isCompact {
                                         Text(node.tags.joined(separator: " • "))
                                             .font(.caption2)

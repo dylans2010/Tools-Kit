@@ -37,7 +37,7 @@ struct SDKScopesEditorView: View {
                     Spacer()
                     Text("\(enabledScopes.count)")
                         .font(.title3.bold())
-                        .foregroundStyle(.accent)
+                        .foregroundStyle(Color.accentColor)
                 }
                 Button("Review Effective Scope Set") { showingReview = true }
             }

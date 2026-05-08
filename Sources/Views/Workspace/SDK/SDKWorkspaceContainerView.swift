@@ -181,6 +181,7 @@ struct SDKWorkspaceContainerView: View {
         .background(.thinMaterial)
     }
 
+    @ViewBuilder
     private func sheetContent(_ sheet: WorkspaceSheet) -> some View {
         switch sheet {
         case .navigator: SDKNavigatorView()

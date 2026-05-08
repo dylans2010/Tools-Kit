@@ -413,7 +413,7 @@ public final class SDKRuntimeWorkspaceState: ObservableObject {
         project.enabledScopes.append(key)
     }
 
-    public func syncSDKGraphFromProject(_ project: SDKProject? = SDKProjectManager.shared.currentProject) {
+    public func syncSDKGraphFromProject(_ project: SDKProject?) {
         guard let project else { return }
         for index in libraries.indices {
             libraries[index].usageCount = dependencies.filter { $0.name == libraries[index].name }.count
@@ -427,6 +427,10 @@ public final class SDKRuntimeWorkspaceState: ObservableObject {
             }
         }
         save()
+    }
+
+    public func syncSDKGraphFromProject() {
+        syncSDKGraphFromProject(SDKProjectManager.shared.currentProject)
     }
 
     public func upsertLibrary(_ library: SDKLibraryDefinition) {
