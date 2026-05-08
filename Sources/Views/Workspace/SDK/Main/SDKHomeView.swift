@@ -136,9 +136,8 @@ struct SDKHomeView: View {
                 }
             }
         }
+        }
     }
-
-
 
     private enum SDKRoute: Hashable {
         case build

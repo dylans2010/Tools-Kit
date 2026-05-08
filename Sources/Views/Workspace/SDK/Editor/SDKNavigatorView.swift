@@ -79,37 +79,7 @@ struct SDKNavigatorView: View {
             List {
                 Section {
                     ForEach(filteredNodes) { node in
-                        let isSelected = state.selectedNode == node
-
-                        Button {
-                            state.open(node: node)
-                        } label: {
-                            HStack(spacing: 8) {
-                                Image(systemName: node.icon)
-                                    .font(.system(size: 14))
-                                    .frame(width: 20)
-                                    .foregroundStyle(isSelected ? .blue : .secondary)
-
-                                Text(node.title)
-                                    .font(.system(size: 13, weight: isSelected ? .medium : .regular))
-                                    .foregroundStyle(isSelected ? .primary : .primary.opacity(0.8))
-
-                                Spacer()
-
-                                if hasBrokenLink(for: node) {
-                                    Image(systemName: "exclamationmark.triangle.fill")
-                                        .font(.system(size: 10))
-                                        .foregroundStyle(.red)
-                                } else if hasDependencyHighlight(for: node) {
-                                    Circle().fill(.orange).frame(width: 6, height: 6)
-                                }
-                            }
-                            .padding(.vertical, 4)
-                            .padding(.horizontal, 8)
-                            .background(isSelected ? Color.blue.opacity(0.1) : Color.clear)
-                            .clipShape(RoundedRectangle(cornerRadius: 4))
-                        }
-                        .buttonStyle(.plain)
+                        nodeButton(for: node)
                     }
                 } header: {
                     Text(nodeSectionTitle)
@@ -130,6 +100,44 @@ struct SDKNavigatorView: View {
             .listStyle(.plain)
         }
         .background(Color(.systemGroupedBackground))
+    }
+
+    private func nodeButton(for node: SDKWorkspaceNode) -> some View {
+        let isSelected: Bool = state.selectedNode == node
+        let titleFontWeight: Font.Weight = isSelected ? .medium : .regular
+        let iconStyle: Color = isSelected ? .blue : .secondary
+        let titleStyle: Color = isSelected ? .primary : Color.primary.opacity(0.8)
+        let backgroundColor: Color = isSelected ? Color.blue.opacity(0.1) : .clear
+
+        return Button {
+            state.open(node: node)
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: node.icon)
+                    .font(.system(size: 14))
+                    .frame(width: 20)
+                    .foregroundStyle(iconStyle)
+
+                Text(node.title)
+                    .font(.system(size: 13, weight: titleFontWeight))
+                    .foregroundStyle(titleStyle)
+
+                Spacer()
+
+                if hasBrokenLink(for: node) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.red)
+                } else if hasDependencyHighlight(for: node) {
+                    Circle().fill(.orange).frame(width: 6, height: 6)
+                }
+            }
+            .padding(.vertical, 4)
+            .padding(.horizontal, 8)
+            .background(backgroundColor)
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
+        .buttonStyle(.plain)
     }
 
     private func statusRow(title: String, value: String, icon: String) -> some View {
