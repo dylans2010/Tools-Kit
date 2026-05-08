@@ -23,7 +23,7 @@ struct SDKLogsView: View {
                             }
                         } label: {
                             Image(systemName: "line.3.horizontal.decrease.circle")
-                                .foregroundStyle(selectedLevel == nil ? .secondary : .blue)
+                                .foregroundStyle(selectedLevel == nil ? Color.secondary : Color.blue)
                         }
                     }
                 }

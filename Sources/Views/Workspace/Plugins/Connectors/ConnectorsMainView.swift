@@ -294,7 +294,7 @@ struct ConnectorsMainView: View {
                         .font(.subheadline.bold())
                     Text(connector.identifier)
                         .font(.system(size: 9, design: .monospaced))
-                        .foregroundColor(.tertiary)
+                        .foregroundStyle(.tertiary)
 
                     HStack(spacing: 10) {
                         if !connector.endpoints.isEmpty {
