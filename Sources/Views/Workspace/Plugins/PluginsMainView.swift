@@ -25,6 +25,13 @@ struct PluginsMainView: View {
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Plugins")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink(destination: PluginsInstalledView()) {
+                    Image(systemName: "line.3.horizontal.decrease.circle")
+                }
+            }
+        }
         .onAppear(perform: setupActivityStream)
         .onAppear(perform: setupBlockedExecutionListener)
         .sheet(isPresented: $showingLimitedView) {

@@ -151,11 +151,23 @@ struct ConnectorsMainView: View {
     private var toolsCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Platform Tools").font(.title3.weight(.semibold))
-            Group {
-                NavigationLink("Global Execution Logs", destination: ConnectorLogsView())
-                NavigationLink("Security & Scopes", destination: ConnectorSecurityView())
+            Text("Organized by build, operations, and security").font(.caption).foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 8) {
+                Label("Build", systemImage: "hammer")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
                 NavigationLink("Connector Builder", destination: ConnectorBuilderView())
                 NavigationLink("SDK Connectors", destination: SDKConnectorsView())
+
+                Label("Operate", systemImage: "waveform.path.ecg")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                NavigationLink("Global Execution Logs", destination: ConnectorLogsView())
+
+                Label("Secure", systemImage: "lock.shield")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                NavigationLink("Security & Scopes", destination: ConnectorSecurityView())
             }
             .padding(.vertical, 2)
             Button("Connectors Documentation") { showingDocs = true }

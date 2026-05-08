@@ -9,8 +9,20 @@ struct SDKHomeView: View {
         projectManager.filteredProjects(search: searchText, status: statusFilter)
     }
 
+    private let quickColumns = [GridItem(.flexible()), GridItem(.flexible())]
+
     var body: some View {
         List {
+            Section {
+                LazyVGrid(columns: quickColumns, spacing: 10) {
+                    quickTile("Build", subtitle: "Create and package", icon: "hammer.fill", color: .orange, destination: SDKBuildView())
+                    quickTile("IDE", subtitle: "Edit and run", icon: "square.split.2x2.fill", color: .indigo, destination: SDKWorkspaceContainerView())
+                    quickTile("Debug", subtitle: "Diagnostics tools", icon: "ladybug.fill", color: .red, destination: SDKDebugView())
+                    quickTile("Docs", subtitle: "Guides and APIs", icon: "book.closed.fill", color: .blue, destination: SDKDeveloperGuideView())
+                }
+            } header: {
+                SDKSectionHeader("Quick Start", subtitle: "Organized by workflow", systemImage: "sparkles")
+            }
             Section {
                 if projects.isEmpty {
                     ContentUnavailableView(
@@ -109,6 +121,22 @@ struct SDKHomeView: View {
                 }
             }
         }
+    }
+
+
+
+    private func quickTile(_ title: String, subtitle: String, icon: String, color: Color, destination: some View) -> some View {
+        NavigationLink(destination: destination) {
+            VStack(alignment: .leading, spacing: 8) {
+                Image(systemName: icon).foregroundStyle(color)
+                Text(title).font(.subheadline.weight(.semibold))
+                Text(subtitle).font(.caption2).foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
+            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+        .buttonStyle(.plain)
     }
 
     @ViewBuilder

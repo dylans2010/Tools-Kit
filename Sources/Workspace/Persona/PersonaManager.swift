@@ -83,6 +83,18 @@ final class PersonaManager: ObservableObject {
         return response
     }
 
+
+
+    func queryPersonaSafely(query: String) async {
+        do {
+            _ = try await queryPersona(query: query)
+        } catch {
+            let fallback = PersonaMessage(role: "assistant", content: "I couldn't complete that request right now. Please check your AI provider configuration and try again.\n\nError: `\(error.localizedDescription)`")
+            chatHistory.append(fallback)
+            saveChatHistory()
+        }
+    }
+
     func saveChatHistory() {
         try? dataStore.save(chatHistory, key: "persona_chat_history")
     }
