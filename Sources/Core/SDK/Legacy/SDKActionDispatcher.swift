@@ -66,7 +66,7 @@ public final class SDKActionDispatcher {
                 let response = try await api.persona.queryPersona(prompt: prompt)
                 await SDKLogStore.shared.log("Persona query completed: \(response.prefix(50))...", source: "SDKActionDispatcher", level: LogLevel.info)
             case .injectMemory(let id, let content):
-                api.persona.injectMemory(entityID: id, content: content)
+                await api.persona.injectMemory(entityID: id, content: content)
                 await SDKLogStore.shared.log("Persona memory injected for entity \(id)", source: "SDKActionDispatcher", level: LogLevel.info)
             }
         case .automation(let automationAction):
