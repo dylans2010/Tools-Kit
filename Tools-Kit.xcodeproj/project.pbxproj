@@ -1243,6 +1243,25 @@
 		SDK2BA0988D1EE1A43E76AA8 /* SDKDataInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK19CD0E48D6C30B006E472 /* SDKDataInspectorView.swift */; };
 		SDK25C1917C78E8B7E88E46A /* SDKPluginManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK15392AF5F3C4210ACFFE1 /* SDKPluginManagerView.swift */; };
 		SDK20B1ADEA78ACBE8387443 /* SDKDeveloperGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1245FB85BF006D2EE4B2D /* SDKDeveloperGuideView.swift */; };
+		SDK2A00000000000000000001 /* SDKIDEWorkspaceState.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000001 /* SDKIDEWorkspaceState.swift */; };
+		SDK2A00000000000000000002 /* SDKExecutionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000002 /* SDKExecutionCoordinator.swift */; };
+		SDK2A00000000000000000003 /* SDKLibraryExecutionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000003 /* SDKLibraryExecutionEngine.swift */; };
+		SDK2A00000000000000000004 /* SDKLibraryDependencyBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000004 /* SDKLibraryDependencyBridge.swift */; };
+		SDK2A00000000000000000005 /* SDKLibraryScopeBinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000005 /* SDKLibraryScopeBinder.swift */; };
+		SDK2A00000000000000000006 /* SDKLibraryVersionResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000006 /* SDKLibraryVersionResolver.swift */; };
+		SDK2A00000000000000000007 /* SDKDependencyExecutionPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000007 /* SDKDependencyExecutionPlanner.swift */; };
+		SDK2A00000000000000000008 /* SDKDependencyConflictResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000008 /* SDKDependencyConflictResolver.swift */; };
+		SDK2A00000000000000000009 /* SDKDependencyScopeValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000009 /* SDKDependencyScopeValidator.swift */; };
+		SDK2A0000000000000000000A /* SDKStructureValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A0000000000000000000A /* SDKStructureValidator.swift */; };
+		SDK2A0000000000000000000B /* SDKWorkspaceContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A0000000000000000000B /* SDKWorkspaceContainerView.swift */; };
+		SDK2A0000000000000000000C /* SDKNavigatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A0000000000000000000C /* SDKNavigatorView.swift */; };
+		SDK2A0000000000000000000D /* SDKProjectEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A0000000000000000000D /* SDKProjectEditorView.swift */; };
+		SDK2A0000000000000000000E /* SDKInspectorPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A0000000000000000000E /* SDKInspectorPanelView.swift */; };
+		SDK2A0000000000000000000F /* SDKScopesEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A0000000000000000000F /* SDKScopesEditorView.swift */; };
+		SDK2A00000000000000000010 /* SDKCapabilitiesMatrixView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000010 /* SDKCapabilitiesMatrixView.swift */; };
+		SDK2A00000000000000000011 /* SDKRunConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000011 /* SDKRunConfigurationView.swift */; };
+		SDK2A00000000000000000012 /* SDKLibraryManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000012 /* SDKLibraryManagerView.swift */; };
+		SDK2A00000000000000000013 /* SDKDependencyManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000013 /* SDKDependencyManagerView.swift */; };
 		WK02AICONTEXT0000000001 /* AIContextEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK01AICONTEXT0000000001 /* AIContextEngine.swift */; };
 		WK02VERSIONCTRL00000001 /* VersionControlManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK01VERSIONCTRL00000001 /* VersionControlManager.swift */; };
 /* End PBXBuildFile section */
@@ -2480,6 +2499,25 @@
 		SDK19CD0E48D6C30B006E472 /* SDKDataInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDataInspectorView.swift; sourceTree = "<group>"; };
 		SDK15392AF5F3C4210ACFFE1 /* SDKPluginManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginManagerView.swift; sourceTree = "<group>"; };
 		SDK1245FB85BF006D2EE4B2D /* SDKDeveloperGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDeveloperGuideView.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000001 /* SDKIDEWorkspaceState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKIDEWorkspaceState.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000002 /* SDKExecutionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKExecutionCoordinator.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000003 /* SDKLibraryExecutionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLibraryExecutionEngine.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000004 /* SDKLibraryDependencyBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLibraryDependencyBridge.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000005 /* SDKLibraryScopeBinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLibraryScopeBinder.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000006 /* SDKLibraryVersionResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLibraryVersionResolver.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000007 /* SDKDependencyExecutionPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDependencyExecutionPlanner.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000008 /* SDKDependencyConflictResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDependencyConflictResolver.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000009 /* SDKDependencyScopeValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDependencyScopeValidator.swift; sourceTree = "<group>"; };
+		SDK1A0000000000000000000A /* SDKStructureValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKStructureValidator.swift; sourceTree = "<group>"; };
+		SDK1A0000000000000000000B /* SDKWorkspaceContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKWorkspaceContainerView.swift; sourceTree = "<group>"; };
+		SDK1A0000000000000000000C /* SDKNavigatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKNavigatorView.swift; sourceTree = "<group>"; };
+		SDK1A0000000000000000000D /* SDKProjectEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKProjectEditorView.swift; sourceTree = "<group>"; };
+		SDK1A0000000000000000000E /* SDKInspectorPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKInspectorPanelView.swift; sourceTree = "<group>"; };
+		SDK1A0000000000000000000F /* SDKScopesEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKScopesEditorView.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000010 /* SDKCapabilitiesMatrixView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKCapabilitiesMatrixView.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000011 /* SDKRunConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKRunConfigurationView.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000012 /* SDKLibraryManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLibraryManagerView.swift; sourceTree = "<group>"; };
+		SDK1A00000000000000000013 /* SDKDependencyManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDependencyManagerView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000026 /* SDKInternalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKInternalView.swift; sourceTree = "<group>"; };
 		WK01AICONTEXT0000000001 /* AIContextEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Workspace/AIContextEngine.swift; sourceTree = SOURCE_ROOT; };
 		WK01VERSIONCTRL00000001 /* VersionControlManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Workspace/VersionControlManager.swift; sourceTree = SOURCE_ROOT; };
@@ -5059,6 +5097,16 @@
 				2A185A33DEA747ABB81E5845 /* ToolsKitSDK.swift */,
 				32B02B351D1F4085B81EDC9E /* SDKToolRuntime.swift */,
 				3A87BE1C659F46ADB1FD423A /* SDKExecutionEngine.swift */,
+				SDK1A00000000000000000001 /* SDKIDEWorkspaceState.swift */,
+				SDK1A00000000000000000002 /* SDKExecutionCoordinator.swift */,
+				SDK1A00000000000000000003 /* SDKLibraryExecutionEngine.swift */,
+				SDK1A00000000000000000004 /* SDKLibraryDependencyBridge.swift */,
+				SDK1A00000000000000000005 /* SDKLibraryScopeBinder.swift */,
+				SDK1A00000000000000000006 /* SDKLibraryVersionResolver.swift */,
+				SDK1A00000000000000000007 /* SDKDependencyExecutionPlanner.swift */,
+				SDK1A00000000000000000008 /* SDKDependencyConflictResolver.swift */,
+				SDK1A00000000000000000009 /* SDKDependencyScopeValidator.swift */,
+				SDK1A0000000000000000000A /* SDKStructureValidator.swift */,
 				402EA872FE4B42E9919BB931 /* SDKLogStore.swift */,
 				671209AE670E45C08441CFFB /* SDKEventBridge.swift */,
 				7CD45F7AF64649DBADB0741C /* Legacy */,
@@ -6912,6 +6960,15 @@
 				SDK19CD0E48D6C30B006E472 /* SDKDataInspectorView.swift */,
 				SDK15392AF5F3C4210ACFFE1 /* SDKPluginManagerView.swift */,
 				SDK1245FB85BF006D2EE4B2D /* SDKDeveloperGuideView.swift */,
+				SDK1A0000000000000000000B /* SDKWorkspaceContainerView.swift */,
+				SDK1A0000000000000000000C /* SDKNavigatorView.swift */,
+				SDK1A0000000000000000000D /* SDKProjectEditorView.swift */,
+				SDK1A0000000000000000000E /* SDKInspectorPanelView.swift */,
+				SDK1A0000000000000000000F /* SDKScopesEditorView.swift */,
+				SDK1A00000000000000000010 /* SDKCapabilitiesMatrixView.swift */,
+				SDK1A00000000000000000011 /* SDKRunConfigurationView.swift */,
+				SDK1A00000000000000000012 /* SDKLibraryManagerView.swift */,
+				SDK1A00000000000000000013 /* SDKDependencyManagerView.swift */,
 			);
 			path = SDK;
 			sourceTree = "<group>";
@@ -9092,6 +9149,25 @@
 				SDK2BA0988D1EE1A43E76AA8 /* SDKDataInspectorView.swift in Sources */,
 				SDK25C1917C78E8B7E88E46A /* SDKPluginManagerView.swift in Sources */,
 				SDK20B1ADEA78ACBE8387443 /* SDKDeveloperGuideView.swift in Sources */,
+				SDK2A0000000000000000000B /* SDKWorkspaceContainerView.swift in Sources */,
+				SDK2A0000000000000000000C /* SDKNavigatorView.swift in Sources */,
+				SDK2A0000000000000000000D /* SDKProjectEditorView.swift in Sources */,
+				SDK2A0000000000000000000E /* SDKInspectorPanelView.swift in Sources */,
+				SDK2A0000000000000000000F /* SDKScopesEditorView.swift in Sources */,
+				SDK2A00000000000000000010 /* SDKCapabilitiesMatrixView.swift in Sources */,
+				SDK2A00000000000000000011 /* SDKRunConfigurationView.swift in Sources */,
+				SDK2A00000000000000000012 /* SDKLibraryManagerView.swift in Sources */,
+				SDK2A00000000000000000013 /* SDKDependencyManagerView.swift in Sources */,
+				SDK2A00000000000000000001 /* SDKIDEWorkspaceState.swift in Sources */,
+				SDK2A00000000000000000002 /* SDKExecutionCoordinator.swift in Sources */,
+				SDK2A00000000000000000003 /* SDKLibraryExecutionEngine.swift in Sources */,
+				SDK2A00000000000000000004 /* SDKLibraryDependencyBridge.swift in Sources */,
+				SDK2A00000000000000000005 /* SDKLibraryScopeBinder.swift in Sources */,
+				SDK2A00000000000000000006 /* SDKLibraryVersionResolver.swift in Sources */,
+				SDK2A00000000000000000007 /* SDKDependencyExecutionPlanner.swift in Sources */,
+				SDK2A00000000000000000008 /* SDKDependencyConflictResolver.swift in Sources */,
+				SDK2A00000000000000000009 /* SDKDependencyScopeValidator.swift in Sources */,
+				SDK2A0000000000000000000A /* SDKStructureValidator.swift in Sources */,
 				6A5AF291FDFD481DA38AF12F /* SDKCoreDataStack.swift in Sources */,
 				0C72E9426CD74630957FB2C6 /* SDKConnectorsView.swift in Sources */,
 				F62EFA4014B343CEAECD9272 /* SDKDiagnosticsView.swift in Sources */,
