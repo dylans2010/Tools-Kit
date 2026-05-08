@@ -61,24 +61,23 @@ struct ConnectorsMainView: View {
         return List {
             // MARK: - Dashboard Header
             Section {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Connectors Platform")
-                        .font(.headline)
-                    Text("Advanced integration modules for external APIs, secure authentication, and multi-step workflows.")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                SDKModernCard {
+                    VStack(alignment: .center, spacing: 14) {
+                        SDKSectionHeader("Connectors Platform", subtitle: "Advanced external API federation engine", systemImage: "cable.connector")
 
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                        statView(label: "Total", value: "\(connectors.count)", color: .blue, icon: "puzzlepiece.extension")
-                        statView(label: "Active", value: "\(activeCount)", color: .green, icon: "checkmark.circle.fill")
-                        statView(label: "Errors", value: "\(errorCount)", color: .red, icon: "exclamationmark.triangle.fill")
-                        statView(label: "Connecting", value: "\(connectingCount)", color: .orange, icon: "arrow.triangle.2.circlepath")
-                        statView(label: "Endpoints", value: "\(totalEndpoints)", color: .purple, icon: "point.3.connected.trianglepath.dotted")
-                        statView(label: "Avg Latency", value: String(format: "%.0fms", avgLatency), color: .teal, icon: "speedometer")
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                            statView(label: "Total", value: "\(connectors.count)", color: .blue, icon: "puzzlepiece.extension")
+                            statView(label: "Active", value: "\(activeCount)", color: .sdkSuccess, icon: "checkmark.circle.fill")
+                            statView(label: "Errors", value: "\(errorCount)", color: .sdkError, icon: "exclamationmark.triangle.fill")
+                            statView(label: "Latency", value: String(format: "%.0fms", avgLatency), color: .teal, icon: "speedometer")
+                            statView(label: "Endpoints", value: "\(totalEndpoints)", color: .purple, icon: "point.3.connected.trianglepath.dotted")
+                            statView(label: "Waiting", value: "\(connectingCount)", color: .sdkWarning, icon: "arrow.triangle.2.circlepath")
+                        }
                     }
-                    .padding(.top, 4)
                 }
-                .padding(.vertical, 8)
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
             }
 
             // MARK: - Quick Actions
@@ -288,55 +287,39 @@ struct ConnectorsMainView: View {
     // MARK: - Connector Row
 
     private func connectorRow(_ connector: ConnectorDefinition) -> some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(connector.name)
-                    .font(.headline)
-                Text(connector.identifier)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+        SDKModernCard(padding: 12) {
+            HStack(spacing: 14) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(connector.name)
+                        .font(.subheadline.bold())
+                    Text(connector.identifier)
+                        .font(.system(size: 9, design: .monospaced))
+                        .foregroundColor(.tertiary)
 
-                HStack(spacing: 8) {
-                    if !connector.endpoints.isEmpty {
-                        Label("\(connector.endpoints.count) endpoints", systemImage: "point.3.connected.trianglepath.dotted")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
+                    HStack(spacing: 10) {
+                        if !connector.endpoints.isEmpty {
+                            Label("\(connector.endpoints.count)", systemImage: "network").font(.system(size: 9))
+                        }
+                        if !connector.flow.steps.isEmpty {
+                            Label("\(connector.flow.steps.count)", systemImage: "arrow.triangle.branch").font(.system(size: 9))
+                        }
+                        if connector.metadata.executionCount > 0 {
+                            Label("\(connector.metadata.executionCount)", systemImage: "play.circle").font(.system(size: 9))
+                        }
                     }
-                    if !connector.flow.steps.isEmpty {
-                        Label("\(connector.flow.steps.count) steps", systemImage: "arrow.triangle.branch")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                    }
-                    if connector.metadata.executionCount > 0 {
-                        Label("\(connector.metadata.executionCount) runs", systemImage: "play.circle")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                    }
+                    .foregroundColor(.secondary)
                 }
+                Spacer()
+                SDKStatusPill(connector.status.rawValue, color: statusColor(connector.status), isCapsule: false)
             }
-            Spacer()
-            connectorStatusPill(status: connector.status)
         }
+        .padding(.vertical, 4)
     }
 
     // MARK: - Helpers
 
     private func statView(label: String, value: String, color: Color, icon: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.caption2)
-                    .foregroundColor(color)
-                Text(value)
-                    .font(.title3.bold())
-                    .foregroundColor(color)
-            }
-            Text(label)
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .textCase(.uppercase)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        SDKStatPill(label: label, value: value, color: color, icon: icon)
     }
 
     private func quickActionButton(title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {

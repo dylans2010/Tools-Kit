@@ -10,110 +10,107 @@ struct SDKDiagnosticsView: View {
     var body: some View {
         List {
             Section {
-                healthRow(title: "Connector Reachability", status: bgEngine.systemHealth.connectorReachability)
-                healthRow(title: "Plugin Sandbox", status: bgEngine.systemHealth.pluginSandboxStatus)
-                healthRow(title: "Data Store Health", status: bgEngine.systemHealth.coreDataHealth)
+                SDKModernCard(padding: 12) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        healthRow(title: "Connector Reachability", status: bgEngine.systemHealth.connectorReachability)
+                        healthRow(title: "Plugin Sandbox", status: bgEngine.systemHealth.pluginSandboxStatus)
+                        healthRow(title: "Data Store Health", status: bgEngine.systemHealth.coreDataHealth)
 
-                HStack {
-                    Text("Last Check")
-                    Spacer()
-                    Text(bgEngine.systemHealth.lastCheck.formatted(date: .omitted, time: .shortened))
-                        .foregroundStyle(.secondary)
-                }
+                        Divider().opacity(0.3)
 
-                Button("Run Health Check Now") {
-                    bgEngine.startHealthCheckLoop()
+                        HStack {
+                            Text("Last Check").font(.caption).foregroundStyle(.secondary)
+                            Spacer()
+                            Text(bgEngine.systemHealth.lastCheck.formatted(date: .omitted, time: .shortened))
+                                .font(.system(size: 10, design: .monospaced))
+                                .foregroundStyle(.tertiary)
+                        }
+
+                        Button {
+                            bgEngine.startHealthCheckLoop()
+                        } label: {
+                            Label("Run Health Audit", systemImage: "arrow.clockwise.circle.fill")
+                                .font(.subheadline.bold())
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
-                .font(.caption)
             } header: {
-                Text("System Health")
+                SDKSectionHeader("System Health", subtitle: "Core service reachability and integrity", systemImage: "heart.text.square.fill")
+            }
+
+            Section {
+                let metrics = telemetry.getMetrics()
+                HStack(spacing: 12) {
+                    SDKStatPill(label: "Latency", value: String(format: "%.0fms", metrics.averageDurationMs), color: metrics.averageDurationMs < 500 ? .sdkSuccess : .sdkWarning)
+                    SDKStatPill(label: "Traces", value: "\(metrics.totalTraces)", color: .blue)
+                    let rate = metrics.totalTraces > 0 ? Double(metrics.successCount) / Double(metrics.totalTraces) * 100 : 100
+                    SDKStatPill(label: "Health", value: "\(Int(rate))%", color: rate > 90 ? .sdkSuccess : .sdkError)
+                }
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+            } header: {
+                SDKSectionHeader("Performance", subtitle: "Real-time execution metrics", systemImage: "chart.bar.fill")
             }
 
             Section {
                 ForEach(SDKScope.allCases, id: \.self) { scope in
                     HStack {
-                        Text(String(describing: scope).capitalized)
+                        Label(String(describing: scope).capitalized, systemImage: "cylinder.split.1x2")
+                            .font(.subheadline)
                         Spacer()
                         let itemCount = cachedItemCount(for: scope)
-                        Text(itemCount > 0 ? "\(itemCount) Items" : "Empty")
-                            .font(.caption)
-                            .foregroundStyle(itemCount > 0 ? .green : .secondary)
+                        SDKStatusPill(
+                            itemCount > 0 ? "\(itemCount) Items" : "Empty",
+                            color: itemCount > 0 ? .sdkSuccess : .secondary,
+                            isCapsule: false
+                        )
                     }
                 }
             } header: {
-                Text("Data Sync")
-            }
-
-            Section {
-                let metrics = telemetry.getMetrics()
-                HStack {
-                    Text("Avg Latency")
-                    Spacer()
-                    Text("\(String(format: "%.0f", metrics.averageDurationMs))ms")
-                        .font(.system(.caption, design: .monospaced))
-                        .foregroundStyle(metrics.averageDurationMs < 500 ? .green : .orange)
-                }
-                HStack {
-                    Text("Total Traces")
-                    Spacer()
-                    Text("\(metrics.totalTraces)").font(.caption)
-                }
-                HStack {
-                    Text("Success Rate")
-                    Spacer()
-                    let rate = metrics.totalTraces > 0 ? Double(metrics.successCount) / Double(metrics.totalTraces) * 100 : 100
-                    Text("\(String(format: "%.0f", rate))%")
-                        .font(.caption)
-                        .foregroundStyle(rate > 90 ? .green : .red)
-                }
-                HStack {
-                    Text("Active Traces")
-                    Spacer()
-                    Text("\(metrics.activeTraces)").font(.caption)
-                }
-            } header: {
-                Text("Performance Metrics")
+                SDKSectionHeader("Data Sync", subtitle: "Storage utilization per scope", systemImage: "arrow.triangle.2.circlepath")
             }
 
             Section {
                 if pluginManager.plugins.isEmpty {
-                    Text("No Plugins Installed").font(.caption).foregroundStyle(.secondary)
+                    ContentUnavailableView("No Plugins", systemImage: "puzzlepiece", description: Text("No plugins installed in this project."))
                 } else {
                     ForEach(pluginManager.plugins) { plugin in
                         HStack {
-                            Text(plugin.name)
+                            Label(plugin.name, systemImage: "puzzlepiece.extension.fill")
+                                .font(.subheadline)
                             Spacer()
-                            Image(systemName: plugin.isEnabled ? "checkmark.shield.fill" : "xmark.shield.fill")
-                                .foregroundStyle(plugin.isEnabled ? .green : .orange)
-                            Text(plugin.isEnabled ? "Active" : "Disabled")
-                                .font(.caption)
-                                .foregroundStyle(plugin.isEnabled ? .green : .orange)
+                            SDKStatusPill(
+                                plugin.isEnabled ? "Active" : "Disabled",
+                                systemImage: plugin.isEnabled ? "checkmark.shield.fill" : "xmark.shield.fill",
+                                color: plugin.isEnabled ? .sdkSuccess : .sdkWarning
+                            )
                         }
                     }
                 }
             } header: {
-                Text("Plugin Integrity")
+                SDKSectionHeader("Plugin Integrity", subtitle: "Sandbox and permission status", systemImage: "shield.fill")
             }
 
             Section {
                 if connectorManager.connectors.isEmpty {
-                    Text("No Connectors Registered").font(.caption).foregroundStyle(.secondary)
+                    ContentUnavailableView("No Connectors", systemImage: "cable.connector", description: Text("No external links registered."))
                 } else {
                     ForEach(connectorManager.connectors, id: \.id) { connector in
                         HStack {
-                            Text(connector.name)
+                            Label(connector.name, systemImage: "link")
+                                .font(.subheadline)
                             Spacer()
-                            Circle()
-                                .fill(connectorStatusColor(connector.status))
-                                .frame(width: 8, height: 8)
-                            Text(connector.status.rawValue)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                            SDKStatusPill(connector.status.rawValue, color: connectorStatusColor(connector.status))
                         }
                     }
                 }
             } header: {
-                Text("Connector Status")
+                SDKSectionHeader("Connector Status", subtitle: "External API connectivity", systemImage: "network")
             }
         }
         .navigationTitle("Diagnostics")

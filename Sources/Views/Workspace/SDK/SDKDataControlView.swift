@@ -10,19 +10,34 @@ struct SDKDataControlView: View {
         List {
             if showingWarning {
                 Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("High Risk Access", systemImage: "exclamationmark.triangle.fill")
-                            .foregroundColor(.red).bold()
-                        Text("This interface allows direct manipulation of workspace data structures. Incorrect operations may lead to data loss.")
-                            .font(.caption)
-                        Button("I Understand") { showingWarning = false }
-                            .buttonStyle(.bordered)
+                    SDKModernCard(padding: 12) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                Image(systemName: "exclamationmark.shield.fill").foregroundStyle(.sdkError)
+                                Text("High Risk Access").font(.subheadline.bold())
+                            }
+                            Text("This interface allows direct manipulation of workspace data structures. Incorrect operations may lead to data loss.")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                            Button {
+                                showingWarning = false
+                            } label: {
+                                Text("Acknowledge & Continue")
+                                    .font(.caption.bold())
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 8)
+                                    .background(Color.sdkError.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
+                                    .foregroundStyle(.sdkError)
+                            }
+                        }
                     }
-                    .padding(.vertical, 8)
                 }
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
             }
 
-            Section(header: Text("Data Operations")) {
+            Section {
                 Button("Reindex All Notes") {
                     isProcessing = true
                     let notes = WorkspaceAPI.shared.notes.listNotes()
@@ -67,29 +82,42 @@ struct SDKDataControlView: View {
             }
 
             if !statusMessage.isEmpty {
-                Section(header: Text("Operation Status")) {
-                    HStack {
-                        if isProcessing {
-                            ProgressView().controlSize(.small)
+                Section {
+                    SDKNotificationBanner(message: statusMessage, type: isProcessing ? .info : .success)
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                } header: {
+                    SDKSectionHeader("Operation Status", subtitle: "Live execution feedback", alignment: .leading)
+                }
+            }
+
+            Section {
+                Toggle(isOn: $runtime.isNoSandboxModeEnabled) {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("No-Sandbox Mode").font(.subheadline.bold())
+                            Text("Bypass all execution restrictions").font(.caption2).foregroundStyle(.secondary)
                         }
-                        Text(statusMessage).font(.caption).foregroundStyle(.blue)
+                    } icon: {
+                        Image(systemName: "shield.slash.fill").foregroundStyle(.sdkError)
                     }
                 }
-            }
-
-            Section(header: Text("SDK Scope Control")) {
-                Toggle("No Sandbox Mode", isOn: $runtime.isNoSandboxModeEnabled)
-                    .tint(.red)
+                .tint(.sdkError)
 
                 if runtime.isNoSandboxModeEnabled {
-                    Text("All scope restrictions are bypassed")
-                        .font(.caption)
-                        .foregroundStyle(.red)
+                    SDKStatusPill("Restricted Mode Bypassed", color: .sdkError, isCapsule: false)
+                        .padding(.vertical, 4)
                 }
+            } header: {
+                SDKSectionHeader("Scope Control", subtitle: "Kernel environment flags", systemImage: "slider.horizontal.3")
             }
 
-            Section(header: Text("Rollback Support")) {
-                NavigationLink("System Snapshots", destination: EntityExplorerView())
+            Section {
+                NavigationLink(destination: EntityExplorerView()) {
+                    Label("System Snapshots", systemImage: "clock.arrow.circlepath")
+                }
+            } header: {
+                SDKSectionHeader("Rollback Support", subtitle: "Time travel and state recovery", systemImage: "arrow.uturn.backward")
             }
         }
         .navigationTitle("Data Control")

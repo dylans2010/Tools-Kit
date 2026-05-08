@@ -9,37 +9,45 @@ struct SDKCapabilitiesMatrixView: View {
         List {
             Section {
                 HStack {
-                    Label("Runtime Capability Matrix", systemImage: "square.grid.3x3.fill")
-                        .font(.headline)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Capability Matrix").font(.headline)
+                        Text("Live SDK feature availability based on granted scopes.").font(.caption2).foregroundStyle(.secondary)
+                    }
                     Spacer()
-                    Text("\(enabledCount)/\(SDKRuntimeWorkspaceState.capabilityCatalog.count)")
-                        .font(.caption.bold())
-                        .foregroundStyle(.secondary)
+                    SDKStatusPill("\(enabledCount)/\(SDKRuntimeWorkspaceState.capabilityCatalog.count)", systemImage: "bolt.fill", color: .blue)
                 }
-                Text("Capabilities are backed by SDK scope validation, dependency planning, and library execution state.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            } header: {
+                SDKSectionHeader("Runtime Status", subtitle: "System-level capability validation", systemImage: "square.grid.3x3.fill")
             }
 
-            Section("Capabilities") {
+            Section {
                 ForEach(SDKRuntimeWorkspaceState.capabilityCatalog) { capability in
                     Button { selectedCapability = capability } label: {
                         capabilityRow(capability)
                     }
                     .buttonStyle(.plain)
                 }
+            } header: {
+                SDKSectionHeader("Capabilities", subtitle: "Managed SDK functionality modules", systemImage: "circle.grid.cross.fill")
             }
 
-            Section("Conflict Markers") {
+            Section {
                 if dependencyConflicts.isEmpty {
-                    Text("No capability conflicts detected")
-                        .foregroundStyle(.secondary)
+                    HStack {
+                        Image(systemName: "checkmark.circle.fill").foregroundStyle(.sdkSuccess)
+                        Text("No capability conflicts detected").font(.subheadline).foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 8)
                 } else {
                     ForEach(dependencyConflicts, id: \.self) { message in
                         Label(message, systemImage: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.orange)
+                            .font(.caption)
+                            .foregroundStyle(.sdkWarning)
                     }
                 }
+            } header: {
+                SDKSectionHeader("Integrity", subtitle: "Conflict detection and resolution", systemImage: "shield.fill")
             }
         }
         .sheet(item: $selectedCapability) { capability in
@@ -61,49 +69,85 @@ struct SDKCapabilitiesMatrixView: View {
 
     private func capabilityRow(_ capability: SDKCapabilityDefinition) -> some View {
         let isEnabled = Set(capability.requiredScopes).isSubset(of: effectiveScopes)
-        return VStack(alignment: .leading, spacing: 7) {
-            HStack {
-                Label(capability.node.title, systemImage: capability.node.icon)
-                    .font(.headline)
-                Spacer()
-                runtimeImpactLabel(for: capability)
-            }
-            Text(capability.description)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            HStack {
-                heatmap(usage: usageIntensity(for: capability))
-                Spacer()
-                Label(isEnabled ? "Ready" : "Needs scopes", systemImage: isEnabled ? "checkmark.seal.fill" : "lock.trianglebadge.exclamationmark")
-                    .font(.caption2.bold())
-                    .foregroundStyle(isEnabled ? .green : .orange)
+        return SDKModernCard(padding: 12) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Label(capability.node.title, systemImage: capability.node.icon)
+                        .font(.subheadline.bold())
+                    Spacer()
+                    runtimeImpactLabel(for: capability)
+                }
+
+                Text(capability.description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+
+                HStack {
+                    heatmap(usage: usageIntensity(for: capability))
+                    Spacer()
+                    SDKStatusPill(
+                        isEnabled ? "Ready" : "Restricted",
+                        systemImage: isEnabled ? "checkmark.seal.fill" : "lock.fill",
+                        color: isEnabled ? .sdkSuccess : .sdkWarning
+                    )
+                }
             }
         }
-        .padding(.vertical, 5)
+        .padding(.vertical, 4)
     }
 
     private func capabilityDetail(_ capability: SDKCapabilityDefinition) -> some View {
         List {
-            Section("SDK Integration") {
-                Text(capability.description)
-                ForEach(capability.requiredScopes, id: \.self) { scope in
-                    HStack {
-                        Text(scope).font(.system(.caption, design: .monospaced))
-                        Spacer()
-                        if effectiveScopes.contains(scope) { Image(systemName: "checkmark.circle.fill").foregroundStyle(.green) }
+            Section {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(capability.description)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+
+                    SDKSectionHeader("Required Scopes", subtitle: "Permissions needed for this capability", alignment: .leading)
+
+                    ForEach(capability.requiredScopes, id: \.self) { scope in
+                        HStack {
+                            Text(scope).font(.system(.caption, design: .monospaced))
+                            Spacer()
+                            if effectiveScopes.contains(scope) {
+                                Image(systemName: "checkmark.circle.fill").foregroundStyle(.sdkSuccess)
+                            } else {
+                                Image(systemName: "lock.fill").foregroundStyle(.sdkWarning).font(.caption)
+                            }
+                        }
+                        .padding(.vertical, 4)
                     }
                 }
-                Button("Open Related Workspace") {
+            } header: {
+                SDKSectionHeader("Integration Details", subtitle: "SDK binding configuration", systemImage: "link")
+            }
+
+            Section {
+                Button {
                     state.open(node: capability.node)
                     selectedCapability = nil
+                } label: {
+                    Label("Open Dedicated Editor", systemImage: "arrow.up.right.square")
+                        .font(.subheadline.bold())
                 }
             }
-            Section("Runtime Usage") {
-                LabeledContent("Dependencies", value: "\(state.dependencies.count)")
-                LabeledContent("Libraries", value: "\(state.libraries.count)")
-                LabeledContent("Diagnostics", value: "\(state.diagnostics.filter { $0.node == capability.node }.count)")
+
+            Section {
+                LabeledContent("Active Dependencies", value: "\(state.dependencies.filter { $0.requiredScopes.contains { capability.requiredScopes.contains($0) } }.count)")
+                LabeledContent("Linked Libraries", value: "\(state.libraries.filter { $0.linkedScopes.contains { capability.requiredScopes.contains($0) } }.count)")
+                let diagnosticCount = state.diagnostics.filter { $0.node == capability.node }.count
+                LabeledContent("Current Issues") {
+                    Text("\(diagnosticCount)")
+                        .foregroundStyle(diagnosticCount > 0 ? .sdkError : .sdkSuccess)
+                        .bold()
+                }
+            } header: {
+                SDKSectionHeader("Runtime Usage", subtitle: "Live SDK execution metrics", systemImage: "chart.bar.fill")
             }
         }
+        .background(Color(.systemGroupedBackground))
     }
 
     private func usageIntensity(for capability: SDKCapabilityDefinition) -> Int {

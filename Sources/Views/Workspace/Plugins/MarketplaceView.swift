@@ -34,12 +34,16 @@ struct MarketplaceView: View {
     var body: some View {
         List {
             Section {
-                HStack(spacing: 20) {
-                    StatusIndicator(label: "Available", count: manager.availablePlugins.count, color: .blue)
-                    StatusIndicator(label: "Installed", count: manager.installedPlugins.count, color: .green)
-                    StatusIndicator(label: "SDK Apps", count: sdkRuntime.loadedApps.count, color: .purple)
+                SDKModernCard(padding: 12) {
+                    HStack(spacing: 0) {
+                        SDKStatPill(label: "Available", value: "\(manager.availablePlugins.count)", color: .blue)
+                        SDKStatPill(label: "Installed", value: "\(manager.installedPlugins.count)", color: .sdkSuccess)
+                        SDKStatPill(label: "SDK Apps", value: "\(sdkRuntime.loadedApps.count)", color: .purple)
+                    }
                 }
-                .padding(.vertical, 8)
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
             }
 
             Section {
@@ -49,12 +53,14 @@ struct MarketplaceView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+            } header: {
+                SDKSectionHeader("Repository", subtitle: "Select module type", alignment: .leading)
             }
 
             if selectedTab == .plugins {
                 Section {
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
+                        HStack(spacing: 10) {
                             FilterChip(title: "All", isSelected: selectedCategory == nil) {
                                 selectedCategory = nil
                             }
@@ -65,15 +71,15 @@ struct MarketplaceView: View {
                                 }
                             }
                         }
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, 4)
                     }
                 } header: {
-                    Text("Categories")
+                    SDKSectionHeader("Categories", subtitle: "Filter by capability", alignment: .leading)
                 }
 
                 Section {
                     if filteredPlugins.isEmpty {
-                        Text("No Plugins Found").foregroundColor(.secondary).font(.subheadline)
+                        ContentUnavailableView("No Plugins", systemImage: "magnifyingglass", description: Text("No plugins match your search or filter."))
                     } else {
                         ForEach(filteredPlugins) { plugin in
                             NavigationLink(destination: PluginDetailView(pluginID: plugin.id)) {
@@ -82,19 +88,19 @@ struct MarketplaceView: View {
                         }
                     }
                 } header: {
-                    Text("Discover Plugins")
+                    SDKSectionHeader("Discover Plugins", subtitle: "Verified community extensions", alignment: .leading)
                 }
             } else {
                 Section {
                     if filteredSDKApps.isEmpty {
-                        ContentUnavailableView("No SDK Apps", systemImage: "puzzlepiece.extension", description: Text("Apps built with WorkspaceSDK will appear here."))
+                        ContentUnavailableView("No SDK Apps", systemImage: "hammer.fill", description: Text("Applications built with WorkspaceSDK will appear here."))
                     } else {
                         ForEach(filteredSDKApps) { app in
                             MarketplaceSDKAppRow(app: app, isRunning: sdkRuntime.isRunning(app.id))
                         }
                     }
                 } header: {
-                    Text("SDK Projects & Apps")
+                    SDKSectionHeader("Native Apps", subtitle: "SDK-powered applications", alignment: .leading)
                 }
             }
         }

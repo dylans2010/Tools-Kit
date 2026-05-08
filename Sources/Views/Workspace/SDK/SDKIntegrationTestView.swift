@@ -16,60 +16,104 @@ struct SDKIntegrationTestView: View {
     var body: some View {
         List {
             Section {
-                Picker("Scenario", selection: $selectedScenario) {
-                    ForEach(0..<scenarios.count, id: \.self) { index in
-                        Text(scenarios[index]).tag(index)
+                SDKModernCard(padding: 12) {
+                    VStack(alignment: .leading, spacing: 14) {
+                        Picker("Select Scenario", selection: $selectedScenario) {
+                            ForEach(0..<scenarios.count, id: \.self) { index in
+                                Text(scenarios[index]).tag(index)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .tint(.primary)
+
+                        Button {
+                            runTest()
+                        } label: {
+                            HStack {
+                                Spacer()
+                                if testStatus == .running {
+                                    ProgressView().controlSize(.small).padding(.trailing, 8)
+                                    Text("Executing...")
+                                } else {
+                                    Image(systemName: "play.fill")
+                                    Text("Run Integration Test")
+                                }
+                                Spacer()
+                            }
+                            .font(.subheadline.bold())
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(Color.primary)
+                            .foregroundStyle(Color(.systemBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(testStatus == .running)
                     }
                 }
-                .pickerStyle(.menu)
-
-                Button("Run Integration Test") {
-                    runTest()
-                }
-                .bold()
-                .frame(maxWidth: .infinity)
-                .buttonStyle(.borderedProminent)
-                .disabled(testStatus == .running)
             } header: {
-                Text("Test Scenarios")
+                SDKSectionHeader("Test Scenarios", subtitle: "Managed SDK execution pipelines", systemImage: "testtube.2")
             }
 
             Section {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 10) {
                     switch testStatus {
                     case .idle:
-                        Text("Ready to test...").foregroundStyle(.secondary)
+                        HStack {
+                            Image(systemName: "clock.arrow.circlepath").foregroundStyle(.secondary)
+                            Text("Awaiting execution...").foregroundStyle(.secondary)
+                        }
                     case .running:
                         HStack {
                             ProgressView().padding(.trailing, 4)
-                            Text("Executing scenario: \(scenarios[selectedScenario])")
+                            Text("Running: \(scenarios[selectedScenario])")
                         }
                     case .success(let msg):
-                        Label(msg, systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+                        SDKNotificationBanner(message: msg, type: .success)
                     case .failure(let err):
-                        Label(err, systemImage: "xmark.octagon.fill").foregroundStyle(.red)
+                        SDKNotificationBanner(message: err, type: .error)
                     }
                 }
                 .font(.subheadline)
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
             } header: {
-                Text("Execution Log")
+                SDKSectionHeader("Execution Log", subtitle: "Kernel output and validation", alignment: .leading)
             }
 
             Section {
-                Toggle("Validate Scopes Before Execution", isOn: $enableScopeValidation)
-                Toggle("No-Sandbox Mode", isOn: $runtime.isNoSandboxModeEnabled)
-                    .tint(.red)
+                Toggle(isOn: $enableScopeValidation) {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Scope Validation").font(.subheadline.bold())
+                            Text("Enforce permission boundaries").font(.caption2).foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "lock.shield.fill").foregroundStyle(.blue)
+                    }
+                }
+
+                Toggle(isOn: $runtime.isNoSandboxModeEnabled) {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("No-Sandbox Mode").font(.subheadline.bold())
+                            Text("Bypass all execution restrictions").font(.caption2).foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.sdkError)
+                    }
+                }
+                .tint(.sdkError)
 
                 if runtime.isNoSandboxModeEnabled {
-                    Label("All scope restrictions bypassed", systemImage: "exclamationmark.triangle.fill")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
+                    SDKStatusPill("Restriction Bypassed", systemImage: "shield.slash.fill", color: .sdkWarning)
+                        .padding(.vertical, 4)
                 }
             } header: {
-                Text("Test Parameters")
+                SDKSectionHeader("Test Parameters", subtitle: "Runtime environment flags", systemImage: "slider.horizontal.3")
             }
         }
-        .navigationTitle("Integration Test Lab")
+        .navigationTitle("Integration Lab")
     }
 
     private func runTest() {

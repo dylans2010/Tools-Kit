@@ -15,10 +15,16 @@ struct PluginsMainView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 24) {
                 pluginStatsCard
+
+                SDKSectionHeader("Management", subtitle: "Core plugin development and deployment", systemImage: "hammer.fill")
                 navigationGrid
+
+                SDKSectionHeader("Active Plugins", subtitle: "Currently running in the background", systemImage: "bolt.fill")
                 activePluginsCard
+
+                SDKSectionHeader("Recent Activity", subtitle: "Latest capability execution events", systemImage: "list.bullet.rectangle.fill")
                 recentActivityCard
             }
             .padding()
@@ -37,14 +43,13 @@ struct PluginsMainView: View {
     }
 
     private var pluginStatsCard: some View {
-        HStack(spacing: 16) {
-            StatusIndicator(label: "Active", count: manager.installedPlugins.filter(\.isEnabled).count, color: .green)
-            StatusIndicator(label: "Disabled", count: manager.installedPlugins.filter { !$0.isEnabled }.count, color: .secondary)
-            StatusIndicator(label: "Errors", count: manager.installedPlugins.reduce(0) { $0 + $1.errorCount }, color: .red)
+        SDKModernCard(padding: 12) {
+            HStack(spacing: 0) {
+                SDKStatPill(label: "Active", value: "\(manager.installedPlugins.filter(\.isEnabled).count)", color: .sdkSuccess)
+                SDKStatPill(label: "Disabled", value: "\(manager.installedPlugins.filter { !$0.isEnabled }.count)", color: .secondary)
+                SDKStatPill(label: "Errors", value: "\(manager.installedPlugins.reduce(0) { $0 + $1.errorCount })", color: .sdkError)
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private var navigationGrid: some View {
@@ -61,35 +66,38 @@ struct PluginsMainView: View {
     }
 
     private var activePluginsCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Active Plugins").font(.headline)
+        VStack(spacing: 12) {
             if manager.installedPlugins.filter(\.isEnabled).isEmpty {
-                Text("No active plugins")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                ContentUnavailableView("No Active Plugins", systemImage: "puzzlepiece", description: Text("Enable installed plugins in the Plugin Manager."))
+                    .padding(.vertical, 20)
             } else {
                 ForEach(manager.installedPlugins.filter(\.isEnabled)) { plugin in
                     NavigationLink(destination: PluginDetailView(pluginID: plugin.id)) {
-                        HStack(spacing: 10) {
-                            Image(systemName: plugin.icon)
-                                .frame(width: 32, height: 32)
-                                .background(Color.blue.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(plugin.name).font(.subheadline.weight(.semibold))
-                                Text(plugin.capabilities.map(\.displayName).joined(separator: ", "))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                        SDKModernCard(padding: 12) {
+                            HStack(spacing: 12) {
+                                Image(systemName: plugin.icon)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.white)
+                                    .frame(width: 32, height: 32)
+                                    .background(Color.blue.gradient, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(plugin.name).font(.subheadline.bold())
+                                    Text(plugin.capabilities.map(\.displayName).joined(separator: ", "))
+                                        .font(.system(size: 10))
+                                        .foregroundStyle(.secondary)
+                                }
+
+                                Spacer()
+
+                                SDKStatusPill("Running", color: .sdkSuccess)
                             }
-                            Spacer()
-                            PluginStatusPill(status: .running)
                         }
                     }
                     .buttonStyle(.plain)
                 }
             }
         }
-        .padding()
-        .background(.background, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private var recentActivityCard: some View {
@@ -142,13 +150,7 @@ struct PluginsMainView: View {
 
     private func navLinkCard<Destination: View>(_ title: String, _ icon: String, _ color: Color, _ destination: Destination) -> some View {
         NavigationLink(destination: destination) {
-            VStack(alignment: .leading, spacing: 8) {
-                Image(systemName: icon).foregroundStyle(color).font(.title3)
-                Text(title).font(.subheadline.weight(.semibold)).foregroundStyle(.primary)
-            }
-            .frame(maxWidth: .infinity, minHeight: 88, alignment: .leading)
-            .padding()
-            .background(.background, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            SDKActionTile(title, subtitle: "Manage system \(title.lowercased())", systemImage: icon, color: color) {}
         }
         .buttonStyle(.plain)
     }
