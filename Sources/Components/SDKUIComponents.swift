@@ -5,7 +5,7 @@ import SwiftUI
 
 // MARK: - Semantic Colors
 
-extension Color {
+public extension Color {
     static let sdkSuccess = Color.green
     static let sdkWarning = Color.orange
     static let sdkError = Color.red
@@ -13,20 +13,20 @@ extension Color {
 
 // MARK: - SDK Status Pill
 
-struct SDKStatusPill: View {
-    let label: String
-    let systemImage: String?
-    let color: Color
-    var isCapsule: Bool = true
+public struct SDKStatusPill: View {
+    public let label: String
+    public let systemImage: String?
+    public let color: Color
+    public var isCapsule: Bool = true
 
-    init(_ label: String, systemImage: String? = nil, color: Color = .secondary, isCapsule: Bool = true) {
+    public init(_ label: String, systemImage: String? = nil, color: Color = .secondary, isCapsule: Bool = true) {
         self.label = label
         self.systemImage = systemImage
         self.color = color
         self.isCapsule = isCapsule
     }
 
-    var body: some View {
+    public var body: some View {
         HStack(spacing: 4) {
             if let systemImage = systemImage {
                 Image(systemName: systemImage)
@@ -37,28 +37,33 @@ struct SDKStatusPill: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .background(color.opacity(0.12))
         .foregroundStyle(color)
-        .clipShape(isCapsule ? AnyShape(Capsule()) : AnyShape(RoundedRectangle(cornerRadius: 6)))
+        .background {
+            if isCapsule {
+                Capsule().fill(color.opacity(0.12))
+            } else {
+                RoundedRectangle(cornerRadius: 6).fill(color.opacity(0.12))
+            }
+        }
     }
 }
 
 // MARK: - SDK Section Header
 
-struct SDKSectionHeader: View {
-    let title: String
-    let subtitle: String?
-    let systemImage: String?
-    var alignment: HorizontalAlignment = .center
+public struct SDKSectionHeader: View {
+    public let title: String
+    public let subtitle: String?
+    public let systemImage: String?
+    public var alignment: HorizontalAlignment = .center
 
-    init(_ title: String, subtitle: String? = nil, systemImage: String? = nil, alignment: HorizontalAlignment = .center) {
+    public init(_ title: String, subtitle: String? = nil, systemImage: String? = nil, alignment: HorizontalAlignment = .center) {
         self.title = title
         self.subtitle = subtitle
         self.systemImage = systemImage
         self.alignment = alignment
     }
 
-    var body: some View {
+    public var body: some View {
         VStack(alignment: alignment, spacing: 4) {
             HStack(spacing: 8) {
                 if let systemImage = systemImage {
@@ -84,18 +89,18 @@ struct SDKSectionHeader: View {
 
 // MARK: - SDK Modern Card
 
-struct SDKModernCard<Content: View>: View {
-    let content: Content
-    var padding: CGFloat = 16
+public struct SDKModernCard<Content: View>: View {
+    public let content: () -> Content
+    public var padding: CGFloat = 16
 
-    init(padding: CGFloat = 16, @ViewBuilder content: () -> Content) {
+    public init(padding: CGFloat = 16, @ViewBuilder content: @escaping () -> Content) {
         self.padding = padding
-        self.content = content()
+        self.content = content
     }
 
-    var body: some View {
+    public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            content
+            content()
         }
         .padding(padding)
         .background(Color(.secondarySystemGroupedBackground))
@@ -109,20 +114,20 @@ struct SDKModernCard<Content: View>: View {
 
 // MARK: - SDK Stat Pill
 
-struct SDKStatPill: View {
-    let label: String
-    let value: String
-    let color: Color
-    var icon: String? = nil
+public struct SDKStatPill: View {
+    public let label: String
+    public let value: String
+    public let color: Color
+    public var icon: String? = nil
 
-    init(label: String, value: String, color: Color = .blue, icon: String? = nil) {
+    public init(label: String, value: String, color: Color = .blue, icon: String? = nil) {
         self.label = label
         self.value = value
         self.color = color
         self.icon = icon
     }
 
-    var body: some View {
+    public var body: some View {
         VStack(spacing: 4) {
             HStack(spacing: 4) {
                 if let icon = icon {
@@ -147,14 +152,14 @@ struct SDKStatPill: View {
 
 // MARK: - SDK Action Tile
 
-struct SDKActionTile: View {
-    let title: String
-    let subtitle: String?
-    let systemImage: String
-    let color: Color
-    let action: () -> Void
+public struct SDKActionTile: View {
+    public let title: String
+    public let subtitle: String?
+    public let systemImage: String
+    public let color: Color
+    public let action: () -> Void
 
-    init(_ title: String, subtitle: String? = nil, systemImage: String, color: Color = .blue, action: @escaping () -> Void) {
+    public init(_ title: String, subtitle: String? = nil, systemImage: String, color: Color = .blue, action: @escaping () -> Void) {
         self.title = title
         self.subtitle = subtitle
         self.systemImage = systemImage
@@ -162,7 +167,7 @@ struct SDKActionTile: View {
         self.action = action
     }
 
-    var body: some View {
+    public var body: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 12) {
                 Image(systemName: systemImage)
@@ -200,14 +205,19 @@ struct SDKActionTile: View {
 
 // MARK: - Notification Components
 
-struct SDKNotificationBanner: View {
-    let message: String
-    let type: NotificationType
+public struct SDKNotificationBanner: View {
+    public let message: String
+    public let type: NotificationType
 
-    enum NotificationType {
+    public init(message: String, type: NotificationType) {
+        self.message = message
+        self.type = type
+    }
+
+    public enum NotificationType {
         case success, warning, error, info
 
-        var color: Color {
+        public var color: Color {
             switch self {
             case .success: return .sdkSuccess
             case .warning: return .sdkWarning
@@ -216,7 +226,7 @@ struct SDKNotificationBanner: View {
             }
         }
 
-        var icon: String {
+        public var icon: String {
             switch self {
             case .success: return "checkmark.circle.fill"
             case .warning: return "exclamationmark.triangle.fill"
@@ -226,7 +236,7 @@ struct SDKNotificationBanner: View {
         }
     }
 
-    var body: some View {
+    public var body: some View {
         HStack(spacing: 12) {
             Image(systemName: type.icon)
                 .foregroundStyle(type.color)

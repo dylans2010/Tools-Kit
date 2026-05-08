@@ -6,43 +6,69 @@ struct SDKAutomationView: View {
 
     var body: some View {
         List {
-            ForEach(engine.rules) { rule in
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text(rule.name).font(.headline)
-                        Spacer()
-                        Toggle("", isOn: binding(for: rule.id))
-                            .labelsHidden()
+            Section {
+                if engine.rules.isEmpty {
+                    ContentUnavailableView("No Automation Rules", systemImage: "bolt.slash.fill", description: Text("Create rules to automate SDK actions based on system events."))
+                        .padding(.vertical, 20)
+                } else {
+                    ForEach(engine.rules) { rule in
+                        automationRuleCard(rule)
                     }
-
-                    Text(triggerSummary(rule.trigger))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-
-                    HStack {
-                        Label("\(rule.runCount) runs", systemImage: "play.circle")
-                        if let lastRun = rule.lastRunAt {
-                            Text("• Last: \(lastRun.formatted(.relative(presentation: .numeric)))")
-                        }
-                    }
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .onDelete(perform: deleteRules)
                 }
-                .padding(.vertical, 4)
+            } header: {
+                SDKSectionHeader("Active Rules", subtitle: "Managed system event triggers", systemImage: "bolt.fill")
             }
-            .onDelete(perform: deleteRules)
         }
         .navigationTitle("Automation")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button { showingAddSheet = true } label: {
-                    Image(systemName: "plus")
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3)
                 }
             }
         }
         .sheet(isPresented: $showingAddSheet) {
             AddAutomationRuleView()
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
         }
+    }
+
+    @ViewBuilder
+    private func automationRuleCard(_ rule: SDKAutomationRule) -> some View {
+        SDKModernCard(padding: 12) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(rule.name).font(.subheadline.bold())
+                        Text(triggerSummary(rule.trigger))
+                            .font(.system(size: 10))
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle("", isOn: binding(for: rule.id))
+                        .labelsHidden()
+                        .tint(.primary)
+                }
+
+                Divider().opacity(0.3)
+
+                HStack {
+                    Label("\(rule.runCount) Executions", systemImage: "play.circle.fill")
+                    Spacer()
+                    if let lastRun = rule.lastRunAt {
+                        Text("Last: \(lastRun.formatted(.relative(presentation: .numeric)))")
+                    } else {
+                        Text("Never triggered")
+                    }
+                }
+                .font(.system(size: 9, weight: .medium))
+                .foregroundStyle(.tertiary)
+            }
+        }
+        .padding(.vertical, 4)
     }
 
     private func binding(for id: UUID) -> Binding<Bool> {
