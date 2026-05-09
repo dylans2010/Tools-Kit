@@ -109,7 +109,7 @@ private struct RequiredScopesList: View {
                     .frame(width: 6, height: 6)
                 Text(scope)
                     .font(.system(size: 9, design: .monospaced))
-                    .foregroundStyle(isAvailable ? .primary : .red)
+                    .foregroundStyle(isAvailable ? Color.primary : Color.red)
             }
         }
     }
