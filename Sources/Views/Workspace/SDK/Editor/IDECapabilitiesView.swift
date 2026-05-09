@@ -101,13 +101,15 @@ private struct RequiredScopesList: View {
 
     var body: some View {
         ForEach(requiredScopes, id: \.self) { scope in
+            let isAvailable = effectiveScopes.contains(scope)
+
             HStack(spacing: 6) {
                 Circle()
-                    .fill(effectiveScopes.contains(scope) ? Color.green : Color.red)
+                    .fill(isAvailable ? Color.green : Color.red)
                     .frame(width: 6, height: 6)
                 Text(scope)
                     .font(.system(size: 9, design: .monospaced))
-                    .foregroundStyle(effectiveScopes.contains(scope) ? .primary : .red)
+                    .foregroundStyle(isAvailable ? .primary : .red)
             }
         }
     }
