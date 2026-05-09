@@ -130,7 +130,7 @@ private struct ScopeManagementSection: View {
     @Binding var scopes: Set<String>; @Binding var newScope: String
     var body: some View {
         Section("Required Scopes") {
-            ForEach(Array(scopes).sorted(), id: \.self) { scope in HStack { Label(scope, systemImage: "shield.fill").font(.caption.monospaced()).foregroundStyle(.accent); Spacer(); Button { scopes.remove(scope) } label: { Image(systemName: "minus.circle.fill").foregroundStyle(.red) } } }
+            ForEach(Array(scopes).sorted(), id: \.self) { scope in HStack { Label(scope, systemImage: "shield.fill").font(.caption.monospaced()).foregroundStyle(Color.accentColor); Spacer(); Button { scopes.remove(scope) } label: { Image(systemName: "minus.circle.fill").foregroundStyle(.red) } } }
             HStack { TextField("New Scope", text: $newScope).font(.caption.monospaced()); Button { scopes.insert(newScope); newScope = "" } label: { Image(systemName: "plus.circle.fill") }.disabled(newScope.isEmpty) }
         }
     }

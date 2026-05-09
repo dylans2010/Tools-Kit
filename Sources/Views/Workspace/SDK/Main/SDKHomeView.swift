@@ -124,7 +124,7 @@ struct SDKHomeView: View {
         }
     }
 
-    private enum SDKRoute: Hashable {
+    enum SDKRoute: Hashable {
         case build, ide, debug, docs, `internal`, project(UUID)
     }
 }

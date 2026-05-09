@@ -19,7 +19,7 @@ struct IDEDependenciesView: View {
         List {
             Section("Execution Tree") {
                 LabeledContent("Graph Nodes") {
-                    Text("\(state.dependencies.count)").monospaced().bold().foregroundStyle(.accent)
+                    Text("\(state.dependencies.count)").monospaced().bold().foregroundStyle(Color.accentColor)
                 }
             }
 

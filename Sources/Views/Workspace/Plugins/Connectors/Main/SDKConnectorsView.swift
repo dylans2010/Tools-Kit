@@ -145,7 +145,7 @@ struct SDKConnectorsView: View {
             }
         }
         .sheet(isPresented: $showingAddSheet) {
-            AddConnectorView()
+            ConnectorBuilderView()
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
                 .presentationCornerRadius(20)

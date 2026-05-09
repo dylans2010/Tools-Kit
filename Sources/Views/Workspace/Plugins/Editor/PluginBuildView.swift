@@ -424,7 +424,7 @@ private struct BuildLogicSection: View {
 private struct BuildMappingSection: View {
     @Binding var dataMappings: [DataMapping]
     var body: some View {
-        Section("Data Mapping") {
+        Section {
             if dataMappings.isEmpty {
                 Text("No data mappings defined.").font(.caption).foregroundStyle(.secondary)
             } else {
@@ -434,7 +434,7 @@ private struct BuildMappingSection: View {
                         TextField("Target (e.g. payload.body.text)", text: $mapping.targetField).font(.caption.monospaced())
                         if let _ = mapping.transformer {
                             TextField("Transformer Logic", text: Binding(get: { mapping.transformer ?? "" }, set: { mapping.transformer = $0.isEmpty ? nil : $0 }))
-                                .font(.system(size: 10, design: .monospaced)).foregroundStyle(.accent)
+                                .font(.system(size: 10, design: .monospaced)).foregroundStyle(Color.accentColor)
                         }
                     }
                     .padding(.vertical, 4)
@@ -444,6 +444,8 @@ private struct BuildMappingSection: View {
             Button("Add Mapping", systemImage: "arrow.left.arrow.right") {
                 dataMappings.append(DataMapping(sourceField: "", targetField: ""))
             }
+        } header: {
+            Text("Data Mapping")
         }
     }
 }

@@ -31,13 +31,15 @@ struct SDKNavigatorView: View {
                 }
             }
 
-            Section("System Status") {
+            Section {
                 LabeledContent("Libraries") { Text("\(state.libraries.count)").monospaced() }
                 LabeledContent("Dependencies") { Text("\(state.dependencies.count)").monospaced() }
                 LabeledContent("Diagnostics") {
                     Text("\(state.diagnostics.count)").monospaced()
                         .foregroundStyle(state.diagnostics.isEmpty ? .secondary : .orange)
                 }
+            } header: {
+                Text("System Status")
             }
         }
         .listStyle(.sidebar)

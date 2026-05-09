@@ -106,7 +106,7 @@ struct FlowStep: Codable, Identifiable {
     var type: StepType
     var config: [String: String]
 
-    enum StepType: String, Codable {
+    enum StepType: String, Codable, CaseIterable {
         case trigger, condition, action, delay
     }
 }

@@ -160,7 +160,7 @@ private struct ActivePluginsSection: View {
                     HStack(spacing: 12) {
                         Image(systemName: plugin.icon)
                             .font(.headline)
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
                             .frame(width: 32, height: 32)
                             .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
                         VStack(alignment: .leading, spacing: 2) {

@@ -113,7 +113,7 @@ private struct PermissionBadge: View {
             .font(.caption2)
             .padding(4)
             .background(Color.accentColor.opacity(0.1), in: Circle())
-            .foregroundStyle(.accent)
+            .foregroundStyle(Color.accentColor)
     }
 
     private var icon: String {

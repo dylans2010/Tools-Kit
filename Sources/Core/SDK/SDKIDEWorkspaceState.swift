@@ -163,7 +163,8 @@ public struct SDKRuntimeDiagnostic: Identifiable, Codable, Hashable {
     }
 }
 
-public struct SDKLibraryFunctionExport: Codable, Hashable {
+public struct SDKLibraryFunctionExport: Identifiable, Codable, Hashable {
+    public var id: String { name }
     public var name: String
     public var signature: String
 }

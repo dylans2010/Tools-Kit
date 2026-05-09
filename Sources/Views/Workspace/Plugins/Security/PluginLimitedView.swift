@@ -25,7 +25,7 @@ struct PluginLimitedView: View {
                 VStack(spacing: 16) {
                     Image(systemName: plugin.icon)
                         .font(.system(size: 44))
-                        .foregroundStyle(.accent)
+                        .foregroundStyle(Color.accentColor)
                         .frame(width: 80, height: 80)
                         .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 20))
 

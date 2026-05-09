@@ -148,7 +148,7 @@ struct MarketplacePluginRow: View {
         HStack(spacing: 12) {
             Image(systemName: plugin.icon)
                 .font(.title3)
-                .foregroundStyle(.accent)
+                .foregroundStyle(Color.accentColor)
                 .frame(width: 44, height: 44)
                 .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
 

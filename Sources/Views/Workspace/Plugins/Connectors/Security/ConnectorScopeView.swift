@@ -74,7 +74,7 @@ struct ConnectorScopeView: View {
         manager.updateConnector(connector)
     }
 
-    private func riskColor(_ risk: SDKRiskLevel) -> Color {
+    private func riskColor(_ risk: SDKSecurityScopeDefinition.RiskLevel) -> Color {
         switch risk {
         case .high, .critical: return .red
         case .medium: return .orange

@@ -90,7 +90,7 @@ private struct ConsoleOutputArea: View {
                         ForEach(history) { entry in
                             VStack(alignment: .leading, spacing: 4) {
                                 HStack {
-                                    Text("> \(entry.command)").font(.system(.caption, design: .monospaced).bold()).foregroundStyle(.accent)
+                                    Text("> \(entry.command)").font(.system(.caption, design: .monospaced).bold()).foregroundStyle(Color.accentColor)
                                     Spacer()
                                     Text(entry.timestamp.formatted(date: .omitted, time: .standard)).font(.system(size: 8, design: .monospaced)).foregroundStyle(.secondary)
                                 }

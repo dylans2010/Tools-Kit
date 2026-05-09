@@ -78,7 +78,7 @@ private struct LibraryItemRow: View {
                 HStack {
                     Text(library.name).font(.headline)
                     Spacer()
-                    Text("v\(library.version)").font(.caption.monospaced()).foregroundStyle(.accent)
+                    Text("v\(library.version)").font(.caption.monospaced()).foregroundStyle(Color.accentColor)
                 }
 
                 Text("\(library.exportedFunctions.count) exports · \(library.linkedScopes.count) scopes")
