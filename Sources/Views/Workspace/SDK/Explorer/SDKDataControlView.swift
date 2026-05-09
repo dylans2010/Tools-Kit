@@ -36,14 +36,16 @@ struct SDKDataControlView: View {
             }
 
             if !statusMessage.isEmpty {
-                Section("Status") {
+                Section {
                     Text(statusMessage)
                         .font(.subheadline.bold())
                         .foregroundStyle(isProcessing ? .secondary : .green)
+                } header: {
+                    Text("Status")
                 }
             }
 
-            Section("Security Control") {
+            Section {
                 Toggle(isOn: $runtime.isNoSandboxModeEnabled) {
                     Label {
                         VStack(alignment: .leading, spacing: 2) {
@@ -58,14 +60,18 @@ struct SDKDataControlView: View {
                     }
                 }
                 .tint(.red)
+            } header: {
+                Text("Security Control")
             }
 
-            Section("State Recovery") {
+            Section {
                 NavigationLink {
                     EntityExplorerView()
                 } label: {
                     Label("System Snapshots", systemImage: "clock.arrow.circlepath")
                 }
+            } header: {
+                Text("State Recovery")
             }
         }
         .navigationTitle("Data Control")
