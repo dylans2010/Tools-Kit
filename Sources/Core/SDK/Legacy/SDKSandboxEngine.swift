@@ -18,7 +18,7 @@ public final class SDKSandboxEngine {
     @MainActor
     private func setupContext(_ context: JSContext) {
         let log: @convention(block) (String) -> Void = { message in
-            SDKConsoleView.LogBus.shared.log(message, type: .info)
+            SDKLogStore.shared.log(message, source: "SDKSandboxEngine", level: .info)
         }
         context.setObject(log, forKeyedSubscript: "print" as NSString)
 
@@ -106,9 +106,9 @@ public final class SDKSandboxEngine {
             Task {
                 do {
                     let meetingID = try await WorkspaceAPI.shared.meet.startMeeting(title: title)
-                    SDKConsoleView.LogBus.shared.log("Meeting started: \(meetingID)", type: .success)
+                    SDKLogStore.shared.log("Meeting started: \(meetingID)", source: "SDKSandboxEngine", level: .info)
                 } catch {
-                    SDKConsoleView.LogBus.shared.log("Meeting failed: \(error.localizedDescription)", type: .error)
+                    SDKLogStore.shared.log("Meeting failed: \(error.localizedDescription)", source: "SDKSandboxEngine", level: .error)
                 }
             }
             return result

@@ -86,7 +86,7 @@ struct APIExplorerDetail: View {
             }
             Section("Live Stats") {
                 LabeledContent("Object Count") {
-                    Text("\(count)").monospaced().bold().foregroundStyle(.accent)
+                    Text("\(count)").monospaced().bold().foregroundStyle(Color.accentColor)
                 }
             }
         }
