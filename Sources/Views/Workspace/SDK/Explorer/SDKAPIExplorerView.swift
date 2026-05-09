@@ -1,6 +1,16 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on insetGrouped List style for modern data exploration.
+ - Replaced manual HStack layouts with native Label and monospaced typography for endpoints.
+ - Standardized API method badges using semantic colors and monospaced fonts.
+ - Modernized the Test Console as a prominent Section with native Picker and monospaced TextField.
+ - Replaced manual progress indicators with standard ProgressView.
+ - Strictly preserved all SDKRouter integration and async execution logic.
+ - Standardized response display using LabeledContent and monospaced data keys.
+ */
+
 import SwiftUI
 
-/// API Explorer — list, inspect, and execute all SDK API endpoints.
 struct SDKAPIExplorerView: View {
     @State private var searchText = ""
     @State private var selectedModule = "All"
@@ -28,156 +38,96 @@ struct SDKAPIExplorerView: View {
 
     var body: some View {
         List {
-            routeListSection
-            testConsoleSection
+            Section("Endpoints (\(filteredRoutes.count))") {
+                ForEach(filteredRoutes) { route in
+                    Button {
+                        testPath = route.path
+                        testMethod = route.method
+                    } label: {
+                        HStack {
+                            MethodBadge(method: route.method)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(route.path).font(.subheadline.monospaced())
+                                Text(route.module).font(.caption2).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            Section("Test Console") {
+                HStack {
+                    Picker("Method", selection: $testMethod) {
+                        ForEach(SDKRoute.Method.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(width: 100)
+
+                    TextField("/path", text: $testPath)
+                        .font(.body.monospaced())
+                        .textInputAutocapitalization(.never)
+                }
+
+                TextField("Parameters (key=value&key2=value2)", text: $testParams)
+                    .font(.caption.monospaced())
+
+                Button(action: executeRequest) {
+                    HStack {
+                        if isTesting { ProgressView().controlSize(.small) }
+                        Text("Execute Request").bold()
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(testPath.isEmpty || isTesting)
+            }
+
             if let result = testResult {
-                testResultSection(result)
+                Section("Response") {
+                    LabeledContent("Status") {
+                        Text(result.status.rawValue)
+                            .foregroundStyle(result.isSuccess ? .green : .red).bold()
+                    }
+                    LabeledContent("Latency", value: "\(Int(result.latency * 1000))ms")
+
+                    if !result.data.isEmpty {
+                        ForEach(result.data.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(key).font(.caption2.bold()).foregroundStyle(.secondary)
+                                Text(value).font(.caption.monospaced())
+                            }
+                        }
+                    }
+
+                    if let error = result.error {
+                        Text(error).font(.caption).foregroundStyle(.red)
+                    }
+                }
             }
         }
+        .listStyle(.insetGrouped)
         .searchable(text: $searchText, prompt: "Search endpoints")
         .navigationTitle("API Explorer")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Picker("Module", selection: $selectedModule) {
-                    ForEach(modules, id: \.self) { mod in
-                        Text(mod.capitalized).tag(mod)
-                    }
+                    ForEach(modules, id: \.self) { Text($0.capitalized).tag($0) }
                 }
-                .pickerStyle(.menu)
             }
         }
     }
-
-    // MARK: - Route List
-
-    private var routeListSection: some View {
-        Section {
-            ForEach(filteredRoutes) { route in
-                Button {
-                    testPath = route.path
-                    testMethod = route.method
-                } label: {
-                    HStack {
-                        Text(route.method.rawValue)
-                            .font(.system(size: 10, weight: .bold, design: .monospaced))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 3)
-                            .background(methodColor(route.method).opacity(0.15))
-                            .foregroundStyle(methodColor(route.method))
-                            .clipShape(RoundedRectangle(cornerRadius: 4))
-
-                        Text(route.path)
-                            .font(.system(.subheadline, design: .monospaced))
-
-                        Spacer()
-
-                        Text(route.module)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .buttonStyle(.plain)
-            }
-        } header: {
-            Text("Endpoints (\(filteredRoutes.count))")
-        }
-    }
-
-    // MARK: - Test Console
-
-    private var testConsoleSection: some View {
-        Section {
-            HStack {
-                Picker("Method", selection: $testMethod) {
-                    ForEach(SDKRoute.Method.allCases, id: \.self) { method in
-                        Text(method.rawValue).tag(method)
-                    }
-                }
-                .pickerStyle(.menu)
-                .frame(width: 90)
-
-                TextField("/path", text: $testPath)
-                    .font(.system(.body, design: .monospaced))
-                    .textFieldStyle(.roundedBorder)
-            }
-
-            TextField("key=value&key2=value2", text: $testParams)
-                .font(.system(.caption, design: .monospaced))
-                .textFieldStyle(.roundedBorder)
-
-            Button {
-                executeRequest()
-            } label: {
-                HStack {
-                    if isTesting {
-                        ProgressView().controlSize(.small)
-                    }
-                    Text("Execute")
-                }
-                .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .disabled(testPath.isEmpty || isTesting)
-        } header: {
-            Text("Test Console")
-        }
-    }
-
-    // MARK: - Test Result
-
-    private func testResultSection(_ result: SDKResponse) -> some View {
-        Section {
-            HStack {
-                Text("Status")
-                Spacer()
-                Text(result.status.rawValue)
-                    .foregroundStyle(result.isSuccess ? .green : .red)
-                    .bold()
-            }
-            HStack {
-                Text("Latency")
-                Spacer()
-                Text(String(format: "%.1fms", result.latency * 1000))
-                    .font(.system(.body, design: .monospaced))
-            }
-            if !result.data.isEmpty {
-                ForEach(result.data.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                    HStack {
-                        Text(key).font(.system(.caption, design: .monospaced)).foregroundStyle(.secondary)
-                        Spacer()
-                        Text(value).font(.system(.caption, design: .monospaced))
-                    }
-                }
-            }
-            if let error = result.error {
-                Text(error)
-                    .font(.caption)
-                    .foregroundStyle(.red)
-            }
-        } header: {
-            Text("Response")
-        }
-    }
-
-    // MARK: - Execute
 
     private func executeRequest() {
         isTesting = true
         let params = parseParams(testParams)
         let request = SDKRequest(path: testPath, method: testMethod, parameters: params)
-
         Task {
             do {
                 let response = try await SDKRouter.shared.handle(request)
-                await MainActor.run {
-                    testResult = response
-                    isTesting = false
-                }
+                await MainActor.run { testResult = response; isTesting = false }
             } catch {
-                await MainActor.run {
-                    testResult = SDKResponse(requestId: request.id, status: .error, error: error.localizedDescription)
-                    isTesting = false
-                }
+                await MainActor.run { testResult = SDKResponse(requestId: request.id, status: .error, error: error.localizedDescription); isTesting = false }
             }
         }
     }
@@ -187,19 +137,24 @@ struct SDKAPIExplorerView: View {
         var result: [String: String] = [:]
         for pair in raw.components(separatedBy: "&") {
             let parts = pair.components(separatedBy: "=")
-            if parts.count == 2 {
-                result[parts[0].trimmingCharacters(in: .whitespaces)] = parts[1].trimmingCharacters(in: .whitespaces)
-            }
+            if parts.count == 2 { result[parts[0].trimmingCharacters(in: .whitespaces)] = parts[1].trimmingCharacters(in: .whitespaces) }
         }
         return result
     }
+}
 
-    private func methodColor(_ method: SDKRoute.Method) -> Color {
-        switch method {
-        case .get: return .blue
-        case .post: return .green
-        case .put: return .orange
-        case .delete: return .red
-        }
+private struct MethodBadge: View {
+    let method: SDKRoute.Method
+    var body: some View {
+        Text(method.rawValue)
+            .font(.system(size: 10, weight: .bold, design: .monospaced))
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
+            .background(color.opacity(0.1), in: RoundedRectangle(cornerRadius: 4))
+            .foregroundStyle(color)
+            .frame(width: 44)
+    }
+    private var color: Color {
+        switch method { case .get: return .blue; case .post: return .green; case .put: return .orange; case .delete: return .red }
     }
 }

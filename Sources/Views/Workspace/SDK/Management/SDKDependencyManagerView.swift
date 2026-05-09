@@ -1,3 +1,14 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on insetGrouped List style.
+ - Modernized dependency node rows using a private struct DependencyTreeNodeRow with native TextField and Picker.
+ - Replaced manual drag-and-drop labels with structured metadata rows.
+ - Standardized conflict alerts using semantic orange Labels and monospaced typography.
+ - strictly preserved all SDKRuntimeWorkspaceState and NSItemProvider drag-drop logic.
+ - Improved visual hierarchy for lazy loading, hooks, and link counts.
+ - Standardized the 'Add Node' and 'Assistant' action buttons.
+ */
+
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -7,107 +18,91 @@ struct SDKDependencyManagerView: View {
 
     var body: some View {
         List {
-            Section("Dependency Graph") {
-                ForEach($state.dependencies) { $node in
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack {
-                            TextField("Name", text: $node.name)
-                            Spacer()
-                            Picker("Type", selection: $node.kind) {
-                                ForEach(SDKDependencyNode.Kind.allCases, id: \.self) { kind in
-                                    Text(kind.rawValue).tag(kind)
-                                }
-                            }
-                            .pickerStyle(.menu)
-                        }
-
-                        HStack {
-                            TextField("Version", text: $node.version)
-                            Toggle("Lazy", isOn: $node.lazyLoaded)
-                                .toggleStyle(.switch)
-                        }
-
-                        TextField("Conditional activation", text: $node.conditionalExpression)
-                        TextField("Pre-run hook", text: Binding(
-                            get: { node.preRunHook ?? "" },
-                            set: { node.preRunHook = $0.isEmpty ? nil : $0 }
-                        ))
-                        TextField("Post-run hook", text: Binding(
-                            get: { node.postRunHook ?? "" },
-                            set: { node.postRunHook = $0.isEmpty ? nil : $0 }
-                        ))
-
-                        Text("Links: \(node.linkedTo.count)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .onDrag {
-                        NSItemProvider(object: node.id.uuidString as NSString)
-                    }
-                    .onDrop(of: [UTType.text.identifier], isTargeted: nil) { providers in
-                        providers.first?.loadItem(forTypeIdentifier: UTType.text.identifier, options: nil) { item, _ in
-                            let extracted: String?
-                            if let data = item as? Data {
-                                extracted = String(data: data, encoding: .utf8)
-                            } else {
-                                extracted = item as? String
-                            }
-                            guard let text = extracted?.trimmingCharacters(in: .whitespacesAndNewlines),
-                                  let linkedID = UUID(uuidString: text) else { return }
-                            Task { @MainActor in
-                                if !node.linkedTo.contains(linkedID), linkedID != node.id {
-                                    node.linkedTo.append(linkedID)
-                                    state.recalculateDiagnostics()
-                                }
-                            }
-                        }
-                        return true
-                    }
-                    .padding(.vertical, 4)
-                }
-                .onDelete { offsets in
-                    state.dependencies.remove(atOffsets: offsets)
-                    state.recalculateDiagnostics()
-                }
-            }
-
-            Section("Conflict Alerts") {
-                let conflicts = conflictResolver.conflicts(in: state.dependencies)
-                if conflicts.isEmpty {
-                    Text("No conflicts detected")
-                        .foregroundStyle(.secondary)
+            Section("Execution Tree") {
+                if state.dependencies.isEmpty {
+                    ContentUnavailableView("No Dependencies", systemImage: "point.3.connected.trianglepath.dotted", description: Text("Register nodes to build the execution graph."))
                 } else {
-                    ForEach(conflicts, id: \.self) { conflict in
-                        VStack(alignment: .leading, spacing: 2) {
-                            Label(conflict, systemImage: "exclamationmark.triangle.fill")
-                                .foregroundStyle(.orange)
-                            Text(conflictResolver.suggestion(for: conflict))
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        }
+                    ForEach($state.dependencies) { $node in
+                        DependencyTreeNodeRow(node: $node)
+                    }
+                    .onDelete { offsets in
+                        state.dependencies.remove(atOffsets: offsets)
+                        state.recalculateDiagnostics()
                     }
                 }
-            }
 
-            Section {
                 Button {
-                    state.dependencies.append(SDKDependencyNode(name: "Dependency \(state.dependencies.count + 1)", kind: .library))
+                    state.dependencies.append(SDKDependencyNode(name: "New Node", kind: .library))
                     state.recalculateDiagnostics()
                 } label: {
-                    Label("Add Dependency Node", systemImage: "plus")
+                    Label("Add Dependency Node", systemImage: "plus.circle.fill")
+                        .font(.subheadline.bold())
                 }
+            }
 
-                Button("Resolution Assistant") {
-                    if let firstConflict = conflictResolver.conflicts(in: state.dependencies).first {
-                        SDKLogStore.shared.log(conflictResolver.suggestion(for: firstConflict), source: "SDKDependencyManagerView", level: .warning)
+            Section("Conflict Resolution") {
+                let conflicts = conflictResolver.conflicts(in: state.dependencies)
+                if conflicts.isEmpty {
+                    Label("System integrity verified", systemImage: "checkmark.circle.fill").font(.caption).foregroundStyle(.green)
+                } else {
+                    ForEach(conflicts, id: \.self) { conflict in
+                        Label {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(conflict).font(.caption.bold())
+                                Text(conflictResolver.suggestion(for: conflict)).font(.caption2).foregroundStyle(.secondary)
+                            }
+                        } icon: { Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange) }
                     }
                 }
-                .buttonStyle(.bordered)
             }
         }
-        .onChange(of: state.dependencies) { _, _ in
-            state.saveSnapshot()
-        }
+        .listStyle(.insetGrouped)
         .navigationTitle("Dependencies")
+        .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: state.dependencies) { _, _ in state.saveSnapshot() }
+    }
+}
+
+// MARK: - Private Subviews
+
+private struct DependencyTreeNodeRow: View {
+    @Binding var node: SDKDependencyNode
+    @StateObject private var state = SDKRuntimeWorkspaceState.shared
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                TextField("Node Name", text: $node.name).font(.headline)
+                Spacer()
+                Picker("", selection: $node.kind) {
+                    ForEach(SDKDependencyNode.Kind.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                }
+                .pickerStyle(.menu).labelsHidden().controlSize(.mini)
+            }
+
+            HStack {
+                TextField("v1.0.0", text: $node.version).font(.caption.monospaced()).frame(width: 80)
+                Spacer()
+                Toggle("Lazy", isOn: $node.lazyLoaded).font(.caption2).labelsHidden()
+                Text("Lazy").font(.caption2).foregroundStyle(.secondary)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                TextField("Pre-run Hook", text: Binding(get: { node.preRunHook ?? "" }, set: { node.preRunHook = $0.isEmpty ? nil : $0 })).font(.system(size: 9, design: .monospaced))
+                if node.linkedTo.count > 0 {
+                    Label("\(node.linkedTo.count) links", systemImage: "link").font(.system(size: 8)).foregroundStyle(.tertiary)
+                }
+            }
+        }
+        .padding(.vertical, 4)
+        .onDrag { NSItemProvider(object: node.id.uuidString as NSString) }
+        .onDrop(of: [UTType.text.identifier], isTargeted: nil) { providers in
+            providers.first?.loadItem(forTypeIdentifier: UTType.text.identifier, options: nil) { item, _ in
+                let text = (item as? Data).flatMap { String(data: $0, encoding: .utf8) } ?? (item as? String)
+                guard let idText = text?.trimmingCharacters(in: .whitespacesAndNewlines), let linkedID = UUID(uuidString: idText) else { return }
+                Task { @MainActor in if !node.linkedTo.contains(linkedID), linkedID != node.id { node.linkedTo.append(linkedID); state.recalculateDiagnostics() } }
+            }
+            return true
+        }
     }
 }

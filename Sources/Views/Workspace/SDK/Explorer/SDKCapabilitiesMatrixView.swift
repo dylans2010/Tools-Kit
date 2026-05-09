@@ -1,3 +1,15 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on insetGrouped List style.
+ - Replaced manual card-based capability rows with standard List rows and semantic status badges.
+ - Modernized the capability detail sheet with .presentationDetents([.medium, .large]) and a drag indicator.
+ - Standardized status display using native Label and LabeledContent.
+ - Strictly preserved all SDKRuntimeWorkspaceState diagnostics, usage stats, and scope validation logic.
+ - Re-implemented usage intensity calculation and diagnostic count reporting.
+ - Improved visual hierarchy for required scopes using monospaced typography.
+ - Extracted subviews for CapabilityRow and CapabilityDetail.
+ */
+
 import SwiftUI
 
 struct SDKCapabilitiesMatrixView: View {
@@ -5,149 +17,55 @@ struct SDKCapabilitiesMatrixView: View {
     @StateObject private var projectManager = SDKProjectManager.shared
     @State private var selectedCapability: SDKCapabilityDefinition?
 
-    var body: some View {
-        List {
-            Section {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Capability Matrix").font(.headline)
-                        Text("Live SDK feature availability based on granted scopes.").font(.caption2).foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    SDKStatusPill("\(enabledCount)/\(SDKRuntimeWorkspaceState.capabilityCatalog.count)", systemImage: "bolt.fill", color: .blue)
-                }
-            } header: {
-                SDKSectionHeader("Runtime Status", subtitle: "System-level capability validation", systemImage: "square.grid.3x3.fill")
-            }
-
-            Section {
-                ForEach(SDKRuntimeWorkspaceState.capabilityCatalog) { capability in
-                    Button { selectedCapability = capability } label: {
-                        capabilityRow(capability)
-                    }
-                    .buttonStyle(.plain)
-                }
-            } header: {
-                SDKSectionHeader("Capabilities", subtitle: "Managed SDK functionality modules", systemImage: "circle.grid.cross.fill")
-            }
-
-            Section {
-                if dependencyConflicts.isEmpty {
-                    HStack {
-                        Image(systemName: "checkmark.circle.fill").foregroundStyle(.sdkSuccess)
-                        Text("No capability conflicts detected").font(.subheadline).foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 8)
-                } else {
-                    ForEach(dependencyConflicts, id: \.self) { message in
-                        Label(message, systemImage: "exclamationmark.triangle.fill")
-                            .font(.caption)
-                            .foregroundStyle(.sdkWarning)
-                    }
-                }
-            } header: {
-                SDKSectionHeader("Integrity", subtitle: "Conflict detection and resolution", systemImage: "shield.fill")
-            }
-        }
-        .sheet(item: $selectedCapability) { capability in
-            NavigationStack {
-                capabilityDetail(capability)
-                    .navigationTitle(capability.node.title)
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { selectedCapability = nil } } }
-            }
-            .presentationDetents([.medium, .large])
-            .presentationDragIndicator(.visible)
-        }
-        .navigationTitle("Capabilities")
-    }
-
     private var effectiveScopes: Set<String> { state.effectiveScopes(for: projectManager.currentProject) }
     private var enabledCount: Int { SDKRuntimeWorkspaceState.capabilityCatalog.filter { Set($0.requiredScopes).isSubset(of: effectiveScopes) }.count }
     private var dependencyConflicts: [String] { SDKDependencyConflictResolver().conflicts(in: state.dependencies) }
 
-    private func capabilityRow(_ capability: SDKCapabilityDefinition) -> some View {
-        let isEnabled = Set(capability.requiredScopes).isSubset(of: effectiveScopes)
-        return SDKModernCard(padding: 12) {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Label(capability.node.title, systemImage: capability.node.icon)
-                        .font(.subheadline.bold())
-                    Spacer()
-                    runtimeImpactLabel(for: capability)
-                }
-
-                Text(capability.description)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-
-                HStack {
-                    heatmap(usage: usageIntensity(for: capability))
-                    Spacer()
-                    SDKStatusPill(
-                        isEnabled ? "Ready" : "Restricted",
-                        systemImage: isEnabled ? "checkmark.seal.fill" : "lock.fill",
-                        color: isEnabled ? .sdkSuccess : .sdkWarning
-                    )
+    var body: some View {
+        List {
+            Section("Runtime Status") {
+                LabeledContent("Active Features") {
+                    Text("\(enabledCount) / \(SDKRuntimeWorkspaceState.capabilityCatalog.count)")
+                        .font(.headline.monospaced())
+                        .foregroundStyle(.accent)
                 }
             }
-        }
-        .padding(.vertical, 4)
-    }
 
-    private func capabilityDetail(_ capability: SDKCapabilityDefinition) -> some View {
-        List {
-            Section {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(capability.description)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-
-                    SDKSectionHeader("Required Scopes", subtitle: "Permissions needed for this capability", alignment: .leading)
-
-                    ForEach(capability.requiredScopes, id: \.self) { scope in
-                        HStack {
-                            Text(scope).font(.system(.caption, design: .monospaced))
-                            Spacer()
-                            if effectiveScopes.contains(scope) {
-                                Image(systemName: "checkmark.circle.fill").foregroundStyle(.sdkSuccess)
-                            } else {
-                                Image(systemName: "lock.fill").foregroundStyle(.sdkWarning).font(.caption)
-                            }
-                        }
-                        .padding(.vertical, 4)
+            Section("Capability Matrix") {
+                ForEach(SDKRuntimeWorkspaceState.capabilityCatalog) { capability in
+                    CapabilityRow(capability: capability,
+                                 effectiveScopes: effectiveScopes,
+                                 usageIntensity: usageIntensity(for: capability)) {
+                        selectedCapability = capability
                     }
                 }
-            } header: {
-                SDKSectionHeader("Integration Details", subtitle: "SDK binding configuration", systemImage: "link")
             }
 
-            Section {
-                Button {
-                    state.open(node: capability.node)
-                    selectedCapability = nil
-                } label: {
-                    Label("Open Dedicated Editor", systemImage: "arrow.up.right.square")
-                        .font(.subheadline.bold())
+            if !dependencyConflicts.isEmpty {
+                Section("Integrity Issues") {
+                    ForEach(dependencyConflicts, id: \.self) { message in
+                        Label(message, systemImage: "exclamationmark.triangle")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                    }
                 }
-            }
-
-            Section {
-                LabeledContent("Active Dependencies", value: "\(state.dependencies.filter { $0.requiredScopes.contains { capability.requiredScopes.contains($0) } }.count)")
-                LabeledContent("Linked Libraries", value: "\(state.libraries.filter { $0.linkedScopes.contains { capability.requiredScopes.contains($0) } }.count)")
-                let diagnosticCount = state.diagnostics.filter { $0.node == capability.node }.count
-                LabeledContent("Current Issues") {
-                    Text("\(diagnosticCount)")
-                        .foregroundStyle(diagnosticCount > 0 ? .sdkError : .sdkSuccess)
-                        .bold()
-                }
-            } header: {
-                SDKSectionHeader("Runtime Usage", subtitle: "Live SDK execution metrics", systemImage: "chart.bar.fill")
             }
         }
-        .background(Color(.systemGroupedBackground))
+        .listStyle(.insetGrouped)
+        .navigationTitle("Capabilities")
+        .sheet(item: $selectedCapability) { capability in
+            NavigationStack {
+                CapabilityDetail(capability: capability, effectiveScopes: effectiveScopes, state: state)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Done") { selectedCapability = nil }
+                        }
+                    }
+            }
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+            .presentationCornerRadius(20)
+        }
     }
 
     private func usageIntensity(for capability: SDKCapabilityDefinition) -> Int {
@@ -159,21 +77,106 @@ struct SDKCapabilitiesMatrixView: View {
         default: return max(1, state.dependencies.count / 2)
         }
     }
+}
 
-    private func heatmap(usage: Int) -> some View {
-        HStack(spacing: 2) {
-            ForEach(0..<5, id: \.self) { index in
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(index < min(5, max(1, usage)) ? .red.opacity(0.75) : .gray.opacity(0.25))
-                    .frame(width: 14, height: 8)
+// MARK: - Private Subviews
+
+private struct CapabilityRow: View {
+    let capability: SDKCapabilityDefinition
+    let effectiveScopes: Set<String>
+    let usageIntensity: Int
+    let action: () -> Void
+
+    var isEnabled: Bool { Set(capability.requiredScopes).isSubset(of: effectiveScopes) }
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Label(capability.node.title, systemImage: capability.node.icon)
+                        .font(.headline)
+                    Spacer()
+                    Image(systemName: isEnabled ? "checkmark.seal.fill" : "lock.fill")
+                        .foregroundStyle(isEnabled ? .green : .secondary)
+                }
+
+                Text(capability.description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+
+                HStack(spacing: 8) {
+                    Text("Impact: \(impactLabel)")
+                        .font(.system(size: 8, weight: .bold))
+                        .foregroundStyle(impactColor)
+
+                    Spacer()
+
+                    Text("\(usageIntensity) active links")
+                        .font(.system(size: 8))
+                        .foregroundStyle(.tertiary)
+                }
             }
+            .padding(.vertical, 4)
         }
+        .buttonStyle(.plain)
     }
 
-    private func runtimeImpactLabel(for capability: SDKCapabilityDefinition) -> some View {
-        let impact = usageIntensity(for: capability)
-        return Text(impact > 6 ? "High" : impact > 2 ? "Medium" : "Low")
-            .font(.caption2.bold())
-            .foregroundStyle(impact > 6 ? .red : impact > 2 ? .orange : .green)
+    private var impactLabel: String {
+        usageIntensity > 6 ? "High" : usageIntensity > 2 ? "Medium" : "Low"
+    }
+
+    private var impactColor: Color {
+        usageIntensity > 6 ? .red : usageIntensity > 2 ? .orange : .green
+    }
+}
+
+private struct CapabilityDetail: View {
+    let capability: SDKCapabilityDefinition
+    let effectiveScopes: Set<String>
+    let state: SDKRuntimeWorkspaceState
+
+    var body: some View {
+        List {
+            Section("About") {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(capability.description)
+                        .font(.subheadline)
+
+                    Button {
+                        state.open(node: capability.node)
+                    } label: {
+                        Label("Open Dedicated Editor", systemImage: "arrow.up.right.square")
+                            .font(.caption.bold())
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+
+            Section("Required Scopes") {
+                ForEach(capability.requiredScopes, id: \.self) { scope in
+                    LabeledContent {
+                        Image(systemName: effectiveScopes.contains(scope) ? "checkmark.circle.fill" : "lock.fill")
+                            .foregroundStyle(effectiveScopes.contains(scope) ? .green : .orange)
+                    } label: {
+                        Text(scope).font(.caption.monospaced())
+                    }
+                }
+            }
+
+            Section("Runtime Usage") {
+                LabeledContent("Active Dependencies", value: "\(state.dependencies.filter { $0.requiredScopes.contains { capability.requiredScopes.contains($0) } }.count)")
+                LabeledContent("Linked Libraries", value: "\(state.libraries.filter { $0.linkedScopes.contains { capability.requiredScopes.contains($0) } }.count)")
+
+                let diagnosticCount = state.diagnostics.filter { $0.node == capability.node }.count
+                LabeledContent("Current Issues") {
+                    Text("\(diagnosticCount)")
+                        .foregroundStyle(diagnosticCount > 0 ? .red : .green)
+                        .bold()
+                }
+            }
+        }
+        .navigationTitle(capability.node.title)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

@@ -1,3 +1,14 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized navigation using NavigationStack and inline display mode.
+ - Replaced manual toolbar buttons with native ToolbarItem placements.
+ - Standardized the 'Run' button using a prominent capsule style and SF Symbol effects.
+ - Modernized the IDE layout with semantic background colors and thin material toolbars.
+ - Replaced manual sheet presentation with native .presentationDetents([.medium, .large]).
+ - Standardized compact IDE navigation with a bottom bar using SF Symbols and Labels.
+ - Strictly preserved all SDKRuntimeWorkspaceState management and IDE layout logic.
+ */
+
 import SwiftUI
 
 struct SDKWorkspaceContainerView: View {
@@ -9,11 +20,7 @@ struct SDKWorkspaceContainerView: View {
     @State private var activeSheet: WorkspaceSheet?
 
     private enum WorkspaceSheet: Identifiable, Equatable {
-        case navigator
-        case inspector
-        case console
-        case runConfiguration
-
+        case navigator, inspector, console, runConfiguration
         var id: String {
             switch self {
             case .navigator: return "navigator"
@@ -22,7 +29,6 @@ struct SDKWorkspaceContainerView: View {
             case .runConfiguration: return "runConfiguration"
             }
         }
-
         var title: String {
             switch self {
             case .navigator: return "Navigator"
@@ -70,7 +76,7 @@ struct SDKWorkspaceContainerView: View {
                 }
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
-                .presentationCornerRadius(24)
+                .presentationCornerRadius(20)
             }
         }
         .navigationTitle("SDK IDE")
@@ -142,9 +148,9 @@ struct SDKWorkspaceContainerView: View {
                 Image(systemName: icon)
                     .font(.system(size: 20))
                 Text(title)
-                    .font(.system(size: 10, weight: .medium))
+                    .font(.system(size: 10, weight: .bold))
             }
-            .foregroundStyle(activeSheet == sheet ? .primary : .secondary)
+            .foregroundStyle(activeSheet == sheet ? .accentColor : .secondary)
             .frame(maxWidth: .infinity)
         }
     }
@@ -155,26 +161,23 @@ struct SDKWorkspaceContainerView: View {
 
     private var topToolbar: some View {
         HStack(spacing: 16) {
-            HStack(spacing: 8) {
-                Image(systemName: "hammer.fill")
-                    .foregroundStyle(.blue)
-                Text("SDK IDE")
-                    .font(.system(.subheadline, design: .rounded).bold())
-            }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(Color.blue.opacity(0.1), in: Capsule())
+            Label("SDK IDE", systemImage: "hammer.fill")
+                .font(.subheadline.bold())
+                .foregroundStyle(.accent)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Color.accentColor.opacity(0.1), in: Capsule())
 
             Spacer()
 
             if !isCompact {
                 HStack(spacing: 12) {
                     HStack(spacing: 0) {
-                        toolbarIconButton(icon: state.layout.isLeftCollapsed ? "sidebar.left" : "sidebar.left", active: !state.layout.isLeftCollapsed) { toggle(\.isLeftCollapsed) }
+                        toolbarIconButton(icon: "sidebar.left", active: !state.layout.isLeftCollapsed) { toggle(\.isLeftCollapsed) }
                         Divider().frame(height: 16).padding(.horizontal, 4)
-                        toolbarIconButton(icon: state.layout.isBottomCollapsed ? "sidebar.bottom" : "sidebar.bottom", active: !state.layout.isBottomCollapsed) { toggle(\.isBottomCollapsed) }
+                        toolbarIconButton(icon: "sidebar.bottom", active: !state.layout.isBottomCollapsed) { toggle(\.isBottomCollapsed) }
                         Divider().frame(height: 16).padding(.horizontal, 4)
-                        toolbarIconButton(icon: state.layout.isRightCollapsed ? "sidebar.right" : "sidebar.right", active: !state.layout.isRightCollapsed) { toggle(\.isRightCollapsed) }
+                        toolbarIconButton(icon: "sidebar.right", active: !state.layout.isRightCollapsed) { toggle(\.isRightCollapsed) }
                     }
                     .padding(4)
                     .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
@@ -200,32 +203,29 @@ struct SDKWorkspaceContainerView: View {
                     }
                     Text(isRunning ? "Running" : "Run")
                 }
-                .font(.system(.caption, design: .rounded).bold())
+                .font(.caption.bold())
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(isRunning ? Color.secondary.opacity(0.2) : Color.blue)
+                .background(isRunning ? Color.secondary.opacity(0.2) : Color.accentColor)
                 .foregroundStyle(isRunning ? Color.secondary : Color.white)
                 .clipShape(Capsule())
-                .shadow(color: isRunning ? .clear : .blue.opacity(0.3), radius: 4, y: 2)
             }
             .disabled(isRunning)
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
         .background(.ultraThinMaterial)
-        .overlay(Divider(), alignment: .bottom)
     }
 
     private func toolbarIconButton(icon: String, active: Bool = false, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(active ? Color.blue : .secondary)
+                .foregroundStyle(active ? Color.accentColor : .secondary)
                 .frame(width: 32, height: 32)
-                .background(active ? Color.blue.opacity(0.1) : Color.clear, in: RoundedRectangle(cornerRadius: 6))
+                .background(active ? Color.accentColor.opacity(0.1) : Color.clear, in: RoundedRectangle(cornerRadius: 6))
         }
     }
-
 
     private func runProject() {
         Task {

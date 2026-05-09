@@ -1,3 +1,10 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized as a navigation wrapper for SDKFlowBuilderView.
+ - Applied inline navigation title display mode.
+ - Strictly preserved project binding and state synchronization logic.
+ */
+
 import SwiftUI
 
 struct IDERuntimeScriptsView: View {
@@ -14,5 +21,6 @@ struct IDERuntimeScriptsView: View {
             }
         ))
         .navigationTitle("Runtime Scripts")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

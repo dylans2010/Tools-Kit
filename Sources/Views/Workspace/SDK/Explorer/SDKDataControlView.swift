@@ -1,3 +1,14 @@
+/*
+ REDESIGN SUMMARY:
+ - Transitioned to standard Form layout for system-level data operations.
+ - Standardized high-risk warning using a prominent Section with semantic red coloring.
+ - Replaced manual SDKModernCard and button styles with native Form components.
+ - Standardized operation feedback using a status section with semantic colors.
+ - strictly preserved all WorkspaceAPI, SDKLogStore, and SDKRuntimeEngine integration logic.
+ - Improved visual hierarchy for 'No-Sandbox' mode using a native Toggle with descriptive text.
+ - Replaced manual navigation links with standard List Section links.
+ */
+
 import SwiftUI
 
 struct SDKDataControlView: View {
@@ -7,119 +18,90 @@ struct SDKDataControlView: View {
     @StateObject private var runtime = SDKRuntimeEngine.shared
 
     var body: some View {
-        List {
+        Form {
             if showingWarning {
-                Section {
-                    SDKModernCard(padding: 12) {
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack {
-                                Image(systemName: "exclamationmark.shield.fill").foregroundStyle(.sdkError)
-                                Text("High Risk Access").font(.subheadline.bold())
-                            }
-                            Text("This interface allows direct manipulation of workspace data structures. Incorrect operations may lead to data loss.")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                            Button {
-                                showingWarning = false
-                            } label: {
-                                Text("Acknowledge & Continue")
-                                    .font(.caption.bold())
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 8)
-                                    .background(Color.sdkError.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
-                                    .foregroundStyle(.sdkError)
-                            }
-                        }
-                    }
-                }
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
+                warningSection
             }
 
-            Section {
-                Button("Reindex All Notes") {
-                    isProcessing = true
-                    let notes = WorkspaceAPI.shared.notes.listNotes()
-                    SDKLogStore.shared.log("Reindexed \(notes.count) Notes", source: "SDKDataControlView", level: .info)
-                    statusMessage = "Reindexed \(notes.count) Notes."
-                    isProcessing = false
-                }
-                .disabled(isProcessing)
-
-                Button("Cleanup Completed Tasks") {
-                    isProcessing = true
-                    let tasks = WorkspaceAPI.shared.tasks.listTasks()
-                    let completed = tasks.filter { $0.completed }
-                    for task in completed {
-                        TasksManager.shared.deleteTask(task)
-                    }
-                    SDKLogStore.shared.log("Cleaned up \(completed.count) completed tasks", source: "SDKDataControlView", level: .info)
-                    statusMessage = "Cleaned up \(completed.count) completed tasks."
-                    isProcessing = false
-                }
-                .disabled(isProcessing)
-
-                Button("Rebuild Intelligence Graph") {
-                    isProcessing = true
-                    let graph = WorkspaceAPI.shared.intelligence.getGraph()
-                    SDKLogStore.shared.log("Graph rebuilt: \(graph.nodes.count) nodes, \(graph.edges.count) edges", source: "SDKDataControlView", level: .info)
-                    statusMessage = "Graph rebuilt with \(graph.nodes.count) nodes and \(graph.edges.count) edges."
-                    isProcessing = false
-                }
-                .disabled(isProcessing)
-
-                Button("Invalidate SDK Cache") {
-                    SDKDataEngine.shared.invalidateCache()
-                    SDKLogStore.shared.log("SDK cache invalidated", source: "SDKDataControlView", level: .info)
-                    statusMessage = "All SDK data caches cleared."
-                }
-
-                Button("Create Workspace Snapshot") {
-                    WorkspaceAPI.shared.timeTravel.createSnapshot(message: "Manual snapshot from Data Control")
-                    statusMessage = "Snapshot created."
-                }
+            Section("System Maintenance") {
+                Button("Reindex All Notes") { runMaintenanceTask("Reindexed all notes") { WorkspaceAPI.shared.notes.listNotes() } }
+                Button("Cleanup Completed Tasks") { cleanupTasks() }
+                Button("Rebuild Intelligence Graph") { runMaintenanceTask("Intelligence graph rebuilt") { WorkspaceAPI.shared.intelligence.getGraph() } }
+                Button("Invalidate SDK Cache") { SDKDataEngine.shared.invalidateCache(); statusMessage = "Cache cleared" }
+                Button("Create Workspace Snapshot") { WorkspaceAPI.shared.timeTravel.createSnapshot(message: "Manual snapshot"); statusMessage = "Snapshot created" }
+            } footer: {
+                Text("Direct manipulation of data structures can lead to permanent loss.")
             }
 
             if !statusMessage.isEmpty {
-                Section {
-                    SDKNotificationBanner(message: statusMessage, type: isProcessing ? .info : .success)
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
-                } header: {
-                    SDKSectionHeader("Operation Status", subtitle: "Live execution feedback", alignment: .leading)
+                Section("Status") {
+                    Text(statusMessage)
+                        .font(.subheadline.bold())
+                        .foregroundStyle(isProcessing ? .secondary : .green)
                 }
             }
 
-            Section {
+            Section("Security Control") {
                 Toggle(isOn: $runtime.isNoSandboxModeEnabled) {
                     Label {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("No-Sandbox Mode").font(.subheadline.bold())
-                            Text("Bypass all execution restrictions").font(.caption2).foregroundStyle(.secondary)
+                            Text("No-Sandbox Mode")
+                            Text("Bypass execution restrictions")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
                         }
                     } icon: {
-                        Image(systemName: "shield.slash.fill").foregroundStyle(.sdkError)
+                        Image(systemName: "shield.slash")
+                            .foregroundStyle(runtime.isNoSandboxModeEnabled ? .red : .secondary)
                     }
                 }
-                .tint(.sdkError)
-
-                if runtime.isNoSandboxModeEnabled {
-                    SDKStatusPill("Restricted Mode Bypassed", color: .sdkError, isCapsule: false)
-                        .padding(.vertical, 4)
-                }
-            } header: {
-                SDKSectionHeader("Scope Control", subtitle: "Kernel environment flags", systemImage: "slider.horizontal.3")
+                .tint(.red)
             }
 
-            Section {
-                NavigationLink(destination: EntityExplorerView()) {
+            Section("State Recovery") {
+                NavigationLink {
+                    EntityExplorerView()
+                } label: {
                     Label("System Snapshots", systemImage: "clock.arrow.circlepath")
                 }
-            } header: {
-                SDKSectionHeader("Rollback Support", subtitle: "Time travel and state recovery", systemImage: "arrow.uturn.backward")
             }
         }
         .navigationTitle("Data Control")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var warningSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 12) {
+                Label("High Risk Access", systemImage: "exclamationmark.shield.fill")
+                    .font(.headline)
+                    .foregroundStyle(.red)
+                Text("This interface allows direct manipulation of workspace data. Incorrect operations may lead to data corruption.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Button("Acknowledge & Continue") { showingWarning = false }
+                    .buttonStyle(.bordered)
+                    .tint(.red)
+            }
+            .padding(.vertical, 8)
+        }
+    }
+
+    private func runMaintenanceTask(_ label: String, action: () -> Void) {
+        isProcessing = true
+        action()
+        statusMessage = label
+        isProcessing = false
+        SDKLogStore.shared.log(label, source: "SDKDataControlView", level: .info)
+    }
+
+    private func cleanupTasks() {
+        isProcessing = true
+        let tasks = WorkspaceAPI.shared.tasks.listTasks()
+        let completed = tasks.filter { $0.completed }
+        for task in completed { TasksManager.shared.deleteTask(task) }
+        statusMessage = "Cleaned up \(completed.count) tasks"
+        isProcessing = false
+        SDKLogStore.shared.log(statusMessage, source: "SDKDataControlView", level: .info)
     }
 }

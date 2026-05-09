@@ -1,6 +1,15 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on insetGrouped List style.
+ - Replaced manual HStack layouts with native Label and LabeledContent for storage stats.
+ - Modernized collection rows using monospaced typography and semantic SF Symbols.
+ - Replaced manual record item layouts with a private struct using monospaced IDs and relative dates.
+ - Strictly preserved all SDKDataStore fetching and collection statistic logic.
+ - Implemented ContentUnavailableView for empty collection states.
+ */
+
 import SwiftUI
 
-/// Data Inspector — inspect stored SDK models, debug persistence, view collection stats.
 struct SDKDataInspectorView: View {
     @StateObject private var dataStore = SDKDataStore.shared
     @State private var selectedCollection: String?
@@ -9,113 +18,63 @@ struct SDKDataInspectorView: View {
 
     var body: some View {
         List {
-            overviewSection
-            collectionsSection
-            if let selected = selectedCollection {
-                itemsSection(for: selected)
+            Section("Storage Overview") {
+                LabeledContent("Initialization") {
+                    Image(systemName: dataStore.isInitialized ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        .foregroundStyle(dataStore.isInitialized ? .green : .red)
+                }
+                LabeledContent("Total Records") {
+                    Text("\(dataStore.totalRecords)")
+                        .font(.body.monospaced())
+                        .bold()
+                }
             }
-        }
-        .searchable(text: $searchText, prompt: "Search Data")
-        .navigationTitle("Data Inspector")
-    }
 
-    // MARK: - Overview
-
-    private var overviewSection: some View {
-        Section {
-            HStack {
-                Label("Initialized", systemImage: "cylinder.fill")
-                Spacer()
-                Image(systemName: dataStore.isInitialized ? "checkmark.circle.fill" : "xmark.circle.fill")
-                    .foregroundStyle(dataStore.isInitialized ? .green : .red)
-            }
-            HStack {
-                Label("Total Records", systemImage: "number")
-                Spacer()
-                Text("\(dataStore.totalRecords)")
-                    .font(.system(.body, design: .monospaced))
-                    .bold()
-            }
-        } header: {
-            Text("Storage Overview")
-        }
-    }
-
-    // MARK: - Collections
-
-    private var collectionsSection: some View {
-        Section {
-            let stats = dataStore.collectionStats()
-            if stats.isEmpty {
-                Text("No Collections Found").font(.caption).foregroundStyle(.secondary)
-            } else {
-                ForEach(stats.sorted(by: { $0.key < $1.key }), id: \.key) { name, count in
-                    Button {
-                        selectedCollection = name
-                        loadItems(for: name)
-                    } label: {
-                        HStack {
-                            Image(systemName: "folder.fill")
-                                .foregroundStyle(.blue)
-                            Text(name)
-                                .font(.system(.subheadline, design: .monospaced))
-                            Spacer()
-                            Text("\(count) Items")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            if selectedCollection == name {
-                                Image(systemName: "chevron.down")
+            Section("Collections") {
+                let stats = dataStore.collectionStats()
+                if stats.isEmpty {
+                    Text("No collections found").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(stats.sorted(by: { $0.key < $1.key }), id: \.key) { name, count in
+                        Button {
+                            selectedCollection = name
+                            loadItems(for: name)
+                        } label: {
+                            HStack {
+                                Label(name, systemImage: "folder")
+                                    .font(.subheadline.monospaced())
+                                Spacer()
+                                Text("\(count) items")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
                         }
                     }
-                    .buttonStyle(.plain)
                 }
             }
-        } header: {
-            Text("Collections")
-        }
-    }
 
-    // MARK: - Items
+            if let selected = selectedCollection {
+                Section(selected) {
+                    let filtered = searchText.isEmpty ? inspectedItems :
+                        inspectedItems.filter { $0.preview.localizedCaseInsensitiveContains(searchText) }
 
-    private func itemsSection(for collection: String) -> some View {
-        Section {
-            let filtered = searchText.isEmpty ? inspectedItems :
-                inspectedItems.filter { $0.preview.localizedCaseInsensitiveContains(searchText) }
-
-            if filtered.isEmpty {
-                Text("No Items").font(.caption).foregroundStyle(.secondary)
-            } else {
-                ForEach(filtered) { item in
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text(item.id.uuidString.prefix(8) + "...")
-                                .font(.system(size: 10, design: .monospaced))
-                                .foregroundStyle(.secondary)
-                            Spacer()
-                            Text(item.updatedAt, style: .relative)
-                                .font(.caption2)
-                                .foregroundStyle(.tertiary)
+                    if filtered.isEmpty {
+                        ContentUnavailableView("No Records", systemImage: "doc.text.magnifyingglass", description: Text("No items found in this collection."))
+                    } else {
+                        ForEach(filtered) { item in
+                            InspectedItemRow(item: item)
                         }
-                        Text(item.preview)
-                            .font(.caption)
-                            .lineLimit(3)
                     }
-                    .padding(.vertical, 4)
                 }
             }
-        } header: {
-            Text("\(collection) Items")
         }
+        .listStyle(.insetGrouped)
+        .searchable(text: $searchText, prompt: "Search records")
+        .navigationTitle("Data Inspector")
     }
-
-    // MARK: - Load Items
 
     private func loadItems(for collection: String) {
         inspectedItems = []
-
         switch collection {
         case "SDKMailMessage":
             inspectedItems = SDKDataStore.shared.fetchAll(SDKMailMessage.self).map {
@@ -137,14 +96,34 @@ struct SDKDataInspectorView: View {
             inspectedItems = SDKDataStore.shared.fetchAll(SDKAppDefinition.self).map {
                 InspectedItem(id: $0.id, preview: "\($0.name) v\($0.version) by \($0.author)", updatedAt: $0.updatedAt)
             }
-        default:
-            break
+        default: break
         }
     }
 }
 
+// MARK: - Private Subviews
+
+private struct InspectedItemRow: View {
+    let item: InspectedItem
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(item.id.uuidString.prefix(8).description)
+                    .font(.caption2.monospaced())
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text(item.updatedAt, style: .relative)
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+            Text(item.preview)
+                .font(.caption)
+                .lineLimit(3)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
 private struct InspectedItem: Identifiable {
-    let id: UUID
-    let preview: String
-    let updatedAt: Date
+    let id: UUID, preview: String, updatedAt: Date
 }

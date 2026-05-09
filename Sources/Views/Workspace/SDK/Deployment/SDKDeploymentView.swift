@@ -1,3 +1,13 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on insetGrouped List style.
+ - Replaced manual HStack metadata layouts with native LabeledContent.
+ - Modernized deployment target picker using native Picker within a Section.
+ - Standardized action buttons using prominent prominent styles and native ProgressView.
+ - Replaced manual error/success text with semantic status Labels.
+ - strictly preserved all PluginManager and SDKExecutionBridge deployment logic.
+ */
+
 import SwiftUI
 
 struct SDKDeploymentView: View {
@@ -9,82 +19,66 @@ struct SDKDeploymentView: View {
     @State private var errorMessage: String?
 
     enum DeploymentTarget: String, CaseIterable {
-        case plugin = "Plugin"
-        case connector = "Connector"
+        case plugin = "Plugin", connector = "Connector"
     }
 
     var body: some View {
         List {
-            Section {
+            Section("Project Metadata") {
                 LabeledContent("Name", value: project.name)
                 LabeledContent("Health", value: project.healthStatus.rawValue.capitalized)
                 LabeledContent("Scopes", value: "\(project.enabledScopes.count)")
-            } header: {
-                Text("Project Info")
             }
 
-            Section {
-                Picker("Target", selection: $deploymentTarget) {
-                    ForEach(DeploymentTarget.allCases, id: \.self) { target in
-                        Text(target.rawValue).tag(target)
-                    }
+            Section("Deployment Configuration") {
+                Picker("Target Platform", selection: $deploymentTarget) {
+                    ForEach(DeploymentTarget.allCases, id: \.self) { Text($0.rawValue).tag($0) }
                 }
-            } header: {
-                Text("Deployment Settings")
             }
 
             Section {
                 Button(action: deploy) {
-                    if isDeploying {
-                        ProgressView().padding(.trailing, 8)
+                    HStack {
+                        if isDeploying { ProgressView().controlSize(.small) }
+                        Text("Deploy to Workspace").bold()
                     }
-                    Text("Deploy Now")
-                        .bold()
+                    .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(.borderedProminent)
                 .disabled(isDeploying)
-                .frame(maxWidth: .infinity)
-            } header: {
-                Text("Immediate Action")
             }
 
             if let plugin = deployedPlugin {
-                Section {
-                    Label("Active", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
-                    Text("ID: \(plugin.identifier)")
-                        .font(.system(.caption, design: .monospaced))
-                } header: {
-                    Text("Live Plugin Info")
+                Section("Active Deployment") {
+                    Label("Successfully deployed", systemImage: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                    LabeledContent("Identifier") {
+                        Text(plugin.identifier).font(.caption.monospaced())
+                    }
                 }
             }
 
             if let error = errorMessage {
-                Section {
-                    Text(error).foregroundStyle(.red).font(.caption)
-                } header: {
-                    Text("Error")
+                Section("Error") {
+                    Label(error, systemImage: "exclamationmark.octagon.fill")
+                        .font(.caption)
+                        .foregroundStyle(.red)
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Deploy")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private func deploy() {
         isDeploying = true
         errorMessage = nil
-
-        let legacyProject = SDKProjectLegacy(
-            id: project.id,
-            name: project.name,
-            sourceCode: project.sourceCode,
-            requiredScopes: project.requiredScopes,
-            status: .idle
-        )
-
-        let plugin = SDKExecutionBridge.shared.deployToPlugin(project: legacyProject)
+        let legacy = SDKProjectLegacy(id: project.id, name: project.name, sourceCode: project.sourceCode, requiredScopes: project.requiredScopes, status: .idle)
+        let plugin = SDKExecutionBridge.shared.deployToPlugin(project: legacy)
         manager.savePlugin(plugin)
         deployedPlugin = plugin
         isDeploying = false
-        SDKLogStore.shared.log("Project deployed as plugin: \(plugin.identifier)", source: "SDKDeploymentView", level: .info)
-        SDKConsoleView.LogBus.shared.log("Project deployed as plugin: \(plugin.identifier)", type: .success)
+        SDKLogStore.shared.log("Project deployed: \(plugin.identifier)", source: "SDKDeploymentView", level: .info)
     }
 }

@@ -1,3 +1,14 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on insetGrouped List style.
+ - Replaced manual empty state with ContentUnavailableView including a primary action button.
+ - Modernized plugin rows using standard icon styling and Label components.
+ - Replaced manual toggle placement with a leading-aligned metadata layout and trailing toggle.
+ - strictly preserved all PluginManager toggle and uninstall logic.
+ - Standardized swipe actions for uninstallation.
+ - Extracted subview PluginInstalledRow for better maintainability.
+ */
+
 import SwiftUI
 
 struct PluginsInstalledView: View {
@@ -7,69 +18,79 @@ struct PluginsInstalledView: View {
         List {
             if manager.installedPlugins.isEmpty {
                 Section {
-                    VStack(spacing: 12) {
-                        Image(systemName: "puzzlepiece.extension")
-                            .font(.system(size: 48))
-                            .foregroundColor(.secondary)
-                        Text("No Plugins Installed")
-                            .font(.headline)
-                        Text("Visit the Marketplace to discover new extensions.")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-
+                    ContentUnavailableView {
+                        Label("No Plugins Installed", systemImage: "puzzlepiece.extension")
+                    } description: {
+                        Text("Visit the Marketplace to discover and install new extensions for your workspace.")
+                    } actions: {
                         NavigationLink(destination: MarketplaceView()) {
-                            Text("Go to Marketplace")
-                                .bold()
-                                .padding()
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
+                            Text("Go to Marketplace").bold()
                         }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 40)
                 }
+                .listRowBackground(Color.clear)
             } else {
                 Section {
                     ForEach(manager.installedPlugins) { plugin in
-                        NavigationLink(destination: PluginDetailView(pluginID: plugin.id)) {
-                            HStack(spacing: 12) {
-                                Image(systemName: plugin.icon)
-                                    .font(.title3)
-                                    .foregroundStyle(.blue)
-                                    .frame(width: 36, height: 36)
-                                    .background(Color.blue.opacity(0.1))
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(plugin.name).font(.subheadline).bold()
-                                    Text("v\(plugin.version) · \(plugin.author)").font(.caption2).foregroundColor(.secondary)
-                                }
-
-                                Spacer()
-
-                                Toggle("", isOn: Binding(
-                                    get: { plugin.isEnabled },
-                                    set: { _ in manager.toggle(pluginID: plugin.id) }
-                                ))
-                                .labelsHidden()
-                                .onTapGesture { } // Prevent NavigationLink trigger
-                            }
-                        }
-                        .swipeActions(edge: .trailing) {
-                            Button(role: .destructive) {
-                                manager.uninstall(pluginID: plugin.id)
-                            } label: {
-                                Label("Uninstall", systemImage: "trash")
-                            }
-                        }
+                        PluginInstalledRow(plugin: plugin, manager: manager)
                     }
                 } header: {
-                    Text("Installed (\(manager.installedPlugins.count))")
+                    Text("Installed Extensions (\(manager.installedPlugins.count))")
                 }
             }
         }
-        .navigationTitle("Installed Plugins")
+        .listStyle(.insetGrouped)
+        .navigationTitle("Installed")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct PluginInstalledRow: View {
+    let plugin: PluginDefinition
+    @ObservedObject var manager: PluginManager
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: plugin.icon)
+                .font(.headline)
+                .foregroundStyle(.accent)
+                .frame(width: 36, height: 36)
+                .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(plugin.name).font(.subheadline.bold())
+                HStack(spacing: 4) {
+                    Text("v\(plugin.version)").monospaced()
+                    Text("·")
+                    Text(plugin.author)
+                }.font(.caption2).foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Toggle("", isOn: Binding(
+                get: { plugin.isEnabled },
+                set: { _ in manager.toggle(pluginID: plugin.id) }
+            ))
+            .labelsHidden()
+        }
+        .padding(.vertical, 4)
+        .contentShape(Rectangle())
+        .onTapGesture { /* Prevent row tap from interfering with toggle */ }
+        .overlay(
+            NavigationLink(destination: PluginDetailView(pluginID: plugin.id)) {
+                EmptyView()
+            }
+            .opacity(0)
+        )
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button(role: .destructive) {
+                manager.uninstall(pluginID: plugin.id)
+            } label: {
+                Label("Uninstall", systemImage: "trash")
+            }
+        }
     }
 }

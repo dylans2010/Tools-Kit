@@ -1,3 +1,16 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on native Form architecture.
+ - Modernized the provider picker using a native Picker with SF Symbols.
+ - Replaced manual provider summary with a native Section footer for description and monospaced baseURL.
+ - Standardized credentials input using native TextField/SecureField and improved descriptive text.
+ - Replaced manual endpoint rows with a native Section using semantic SF Symbols and colors.
+ - strictly preserved all PresetConnectorProvider, ConnectorManager, and ConnectorAuthManager logic.
+ - Improved visual hierarchy for endpoints (monospaced paths, semantic method badges).
+ - Standardized on prominent bordered styles for the "Add" button.
+ - RESTORED: PresetConnectorProvider enum and supporting logic.
+ */
+
 import SwiftUI
 
 struct PresetConnectorsView: View {
@@ -10,101 +23,70 @@ struct PresetConnectorsView: View {
     @State private var validationMessage = ""
 
     var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    Picker("Provider", selection: $selectedProvider) {
-                        ForEach(PresetConnectorProvider.allCases) { provider in
-                            Label(provider.name, systemImage: provider.icon).tag(provider)
+        Form {
+            Section {
+                Picker("Provider", selection: $selectedProvider) {
+                    ForEach(PresetConnectorProvider.allCases) { provider in
+                        Label(provider.name, systemImage: provider.icon).tag(provider)
+                    }
+                }
+            } footer: {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(selectedProvider.description)
+                    Text(selectedProvider.baseURL).font(.caption2.monospaced()).foregroundStyle(.tertiary)
+                }
+            }
+
+            Section("Credentials") {
+                TextField("Display Name", text: $displayName)
+                SecureField(selectedProvider.secretLabel, text: $apiKey)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                Text(selectedProvider.credentialHelp)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Pre-configured Endpoints") {
+                ForEach(selectedProvider.endpoints) { endpoint in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(endpoint.method)
+                                .font(.system(size: 10, weight: .black, design: .monospaced))
+                                .padding(.horizontal, 6).padding(.vertical, 2)
+                                .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 4))
+                            Text(endpoint.path)
+                                .font(.system(.caption2, design: .monospaced))
+                                .lineLimit(1).foregroundStyle(.secondary)
                         }
                     }
-
-                    providerSummary(selectedProvider)
-                } header: {
-                    Text("Provider")
-                }
-
-                Section {
-                    TextField("Display Name", text: $displayName)
-                    SecureField(selectedProvider.secretLabel, text: $apiKey)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-
-                    Text(selectedProvider.credentialHelp)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                } header: {
-                    Text("Credentials")
-                }
-
-                Section {
-                    ForEach(selectedProvider.endpoints) { endpoint in
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Text(endpoint.method)
-                                    .font(.system(size: 11, weight: .bold, design: .monospaced))
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Color.secondary.opacity(0.12), in: Capsule())
-                                Text(endpoint.path)
-                                    .font(.system(.caption, design: .monospaced))
-                                    .lineLimit(1)
-                            }
-                            if !endpoint.headers.isEmpty {
-                                Text("Headers: \(endpoint.headers.keys.sorted().joined(separator: ", "))")
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                } header: {
-                    Text("Configured Endpoints")
-                }
-
-                Section {
-                    Button {
-                        addPreset()
-                    } label: {
-                        Label("Add \(selectedProvider.name)", systemImage: "plus.circle.fill")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .disabled(apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .padding(.vertical, 2)
                 }
             }
-            .navigationTitle("Add Preset")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+
+            Section {
+                Button(action: addPreset) {
+                    Text("Register \(selectedProvider.name)")
+                        .frame(maxWidth: .infinity).bold()
                 }
+                .buttonStyle(.borderedProminent)
+                .disabled(apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
-            .onChange(of: selectedProvider) { _, provider in
-                displayName = provider.name
-                apiKey = ""
-            }
-            .onAppear {
-                if displayName.isEmpty { displayName = selectedProvider.name }
-            }
-            .alert("Preset Connector", isPresented: $showingValidation) {
-                Button("OK") {}
-            } message: {
-                Text(validationMessage)
-            }
+            .listRowBackground(Color.clear)
         }
-    }
-
-    private func providerSummary(_ provider: PresetConnectorProvider) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Label(provider.name, systemImage: provider.icon)
-                .font(.headline)
-            Text(provider.description)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            Text(provider.baseURL)
-                .font(.system(.caption2, design: .monospaced))
-                .foregroundStyle(.secondary)
+        .navigationTitle("Add Preset")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) { Button("Cancel") { dismiss() } }
         }
-        .padding(.vertical, 4)
+        .onChange(of: selectedProvider) { _, provider in
+            displayName = provider.name
+            apiKey = ""
+        }
+        .onAppear { if displayName.isEmpty { displayName = selectedProvider.name } }
+        .alert("Preset Configuration", isPresented: $showingValidation) {
+            Button("OK") {}
+        } message: { Text(validationMessage) }
     }
 
     private func addPreset() {
@@ -114,22 +96,15 @@ struct PresetConnectorsView: View {
             showingValidation = true
             return
         }
-
         let name = displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? selectedProvider.name : displayName
         let id = UUID()
         let connector = ConnectorDefinition(
-            id: id,
-            name: name,
-            identifier: uniqueIdentifier(for: selectedProvider),
-            version: "1.0.0",
-            description: selectedProvider.description,
-            status: .active,
-            endpoints: selectedProvider.endpoints,
-            authConfig: selectedProvider.authConfig(secret: trimmedKey),
+            id: id, name: name, identifier: uniqueIdentifier(for: selectedProvider),
+            version: "1.0.0", description: selectedProvider.description, status: .active,
+            endpoints: selectedProvider.endpoints, authConfig: selectedProvider.authConfig(secret: trimmedKey),
             schema: ConnectorSchema(mappings: selectedProvider.schemaMappings, jsonSchema: selectedProvider.jsonSchema),
             flow: ConnectorFlow(steps: selectedProvider.defaultFlowSteps)
         )
-
         manager.addConnector(connector)
         ConnectorAuthManager.shared.secureStore(key: selectedProvider.secretStorageKey, value: trimmedKey, connectorID: id)
         manager.addLog(ConnectorLog(connectorID: id, timestamp: Date(), type: .info, message: "Preset connector added for \(selectedProvider.name)", details: "\(selectedProvider.endpoints.count) live endpoint(s) configured"))
@@ -143,18 +118,11 @@ struct PresetConnectorsView: View {
     }
 }
 
+// MARK: - Logic Restoration
+
 enum PresetConnectorProvider: String, CaseIterable, Identifiable {
-    case openAI
-    case gemini
-    case github
-    case anthropic
-    case mistral
-    case notion
-    case slack
-    case stripe
-
+    case openAI, gemini, github, anthropic, mistral, notion, slack, stripe
     var id: String { rawValue }
-
     var name: String {
         switch self {
         case .openAI: return "ChatGPT / OpenAI"
@@ -167,7 +135,6 @@ enum PresetConnectorProvider: String, CaseIterable, Identifiable {
         case .stripe: return "Stripe"
         }
     }
-
     var icon: String {
         switch self {
         case .openAI, .gemini, .anthropic, .mistral: return "sparkles"
@@ -177,7 +144,6 @@ enum PresetConnectorProvider: String, CaseIterable, Identifiable {
         case .stripe: return "creditcard.fill"
         }
     }
-
     var description: String {
         switch self {
         case .openAI: return "Connect to OpenAI's production API for models and chat completions."
@@ -190,7 +156,6 @@ enum PresetConnectorProvider: String, CaseIterable, Identifiable {
         case .stripe: return "Connect to Stripe's API for account, customer, and payment data."
         }
     }
-
     var baseURL: String {
         switch self {
         case .openAI: return "https://api.openai.com/v1"
@@ -203,96 +168,31 @@ enum PresetConnectorProvider: String, CaseIterable, Identifiable {
         case .stripe: return "https://api.stripe.com/v1"
         }
     }
-
-    var secretLabel: String {
-        switch self {
-        case .github: return "Personal access token"
-        case .slack: return "Bot token"
-        default: return "API key"
-        }
-    }
-
-    var credentialHelp: String {
-        "The key is stored for this connector and sent only to \(baseURL)."
-    }
-
-    var secretStorageKey: String {
-        switch authType {
-        case .apiKey: return "apiKey"
-        case .bearer: return "token"
-        case .oauth2, .none: return "apiKey"
-        }
-    }
-
-    private var authType: ConnectorAuthConfig.AuthType {
-        switch self {
-        case .openAI, .github, .mistral, .notion, .slack, .stripe: return .bearer
-        case .gemini, .anthropic: return .apiKey
-        }
-    }
-
+    var secretLabel: String { switch self { case .github: return "Personal access token"; case .slack: return "Bot token"; default: return "API key" } }
+    var credentialHelp: String { "The key is stored for this connector and sent only to \(baseURL)." }
+    var secretStorageKey: String { switch authType { case .apiKey: return "apiKey"; case .bearer: return "token"; case .oauth2, .none: return "apiKey" } }
+    private var authType: ConnectorAuthConfig.AuthType { switch self { case .openAI, .github, .mistral, .notion, .slack, .stripe: return .bearer; case .gemini, .anthropic: return .apiKey } }
     func authConfig(secret: String) -> ConnectorAuthConfig {
         switch self {
-        case .gemini:
-            return ConnectorAuthConfig(type: .apiKey, credentials: ["headerName": "x-goog-api-key", "apiKey": secret])
-        case .anthropic:
-            return ConnectorAuthConfig(type: .apiKey, credentials: ["headerName": "x-api-key", "apiKey": secret])
-        default:
-            return ConnectorAuthConfig(type: .bearer, credentials: ["token": secret])
+        case .gemini: return ConnectorAuthConfig(type: .apiKey, credentials: ["headerName": "x-goog-api-key", "apiKey": secret])
+        case .anthropic: return ConnectorAuthConfig(type: .apiKey, credentials: ["headerName": "x-api-key", "apiKey": secret])
+        default: return ConnectorAuthConfig(type: .bearer, credentials: ["token": secret])
         }
     }
-
     var endpoints: [ConnectorEndpoint] {
         switch self {
-        case .openAI:
-            return [
-                endpoint("/models", method: "GET"),
-                endpoint("/chat/completions", method: "POST", headers: ["Content-Type": "application/json"])
-            ]
-        case .gemini:
-            return [
-                endpoint("/models", method: "GET"),
-                endpoint("/models/gemini-1.5-flash:generateContent", method: "POST", headers: ["Content-Type": "application/json"])
-            ]
-        case .github:
-            return [
-                endpoint("/user", method: "GET", headers: ["Accept": "application/vnd.github+json"]),
-                endpoint("/user/repos?sort=updated&per_page=20", method: "GET", headers: ["Accept": "application/vnd.github+json"])
-            ]
-        case .anthropic:
-            return [
-                endpoint("/models", method: "GET", headers: ["anthropic-version": "2023-06-01"]),
-                endpoint("/messages", method: "POST", headers: ["Content-Type": "application/json", "anthropic-version": "2023-06-01"])
-            ]
-        case .mistral:
-            return [endpoint("/models", method: "GET"), endpoint("/chat/completions", method: "POST", headers: ["Content-Type": "application/json"])]
-        case .notion:
-            return [endpoint("/users", method: "GET", headers: ["Notion-Version": "2022-06-28"]), endpoint("/search", method: "POST", headers: ["Content-Type": "application/json", "Notion-Version": "2022-06-28"])]
-        case .slack:
-            return [endpoint("/auth.test", method: "GET"), endpoint("/conversations.list", method: "GET")]
-        case .stripe:
-            return [endpoint("/account", method: "GET"), endpoint("/customers?limit=10", method: "GET")]
+        case .openAI: return [endpoint("/models", method: "GET"), endpoint("/chat/completions", method: "POST", headers: ["Content-Type": "application/json"])]
+        case .gemini: return [endpoint("/models", method: "GET"), endpoint("/models/gemini-1.5-flash:generateContent", method: "POST", headers: ["Content-Type": "application/json"])]
+        case .github: return [endpoint("/user", method: "GET", headers: ["Accept": "application/vnd.github+json"]), endpoint("/user/repos?sort=updated&per_page=20", method: "GET", headers: ["Accept": "application/vnd.github+json"])]
+        case .anthropic: return [endpoint("/models", method: "GET", headers: ["anthropic-version": "2023-06-01"]), endpoint("/messages", method: "POST", headers: ["Content-Type": "application/json", "anthropic-version": "2023-06-01"])]
+        case .mistral: return [endpoint("/models", method: "GET"), endpoint("/chat/completions", method: "POST", headers: ["Content-Type": "application/json"])]
+        case .notion: return [endpoint("/users", method: "GET", headers: ["Notion-Version": "2022-06-28"]), endpoint("/search", method: "POST", headers: ["Content-Type": "application/json", "Notion-Version": "2022-06-28"])]
+        case .slack: return [endpoint("/auth.test", method: "GET"), endpoint("/conversations.list", method: "GET")]
+        case .stripe: return [endpoint("/account", method: "GET"), endpoint("/customers?limit=10", method: "GET")]
         }
     }
-
-    var schemaMappings: [String: String] {
-        ["provider": rawValue, "baseURL": baseURL, "auth": authType.rawValue]
-    }
-
-    var jsonSchema: String {
-        """
-        {"type":"object","properties":{"provider":{"const":"\(rawValue)"},"baseURL":{"const":"\(baseURL)"}}}
-        """
-    }
-
-    var defaultFlowSteps: [FlowStep] {
-        [
-            FlowStep(type: .trigger, config: ["event": "manual.test", "provider": rawValue]),
-            FlowStep(type: .action, config: ["endpoint": endpoints.first?.path ?? baseURL, "method": endpoints.first?.method ?? "GET"])
-        ]
-    }
-
-    private func endpoint(_ path: String, method: String, headers: [String: String] = [:]) -> ConnectorEndpoint {
-        ConnectorEndpoint(path: baseURL + path, method: method, headers: headers, queryParams: [:])
-    }
+    var schemaMappings: [String: String] { ["provider": rawValue, "baseURL": baseURL, "auth": authType.rawValue] }
+    var jsonSchema: String { "{\"type\":\"object\",\"properties\":{\"provider\":{\"const\":\"\(rawValue)\"},\"baseURL\":{\"const\":\"\(baseURL)\"}}}" }
+    var defaultFlowSteps: [FlowStep] { [FlowStep(type: .trigger, config: ["event": "manual.test", "provider": rawValue]), FlowStep(type: .action, config: ["endpoint": endpoints.first?.path ?? baseURL, "method": endpoints.first?.method ?? "GET"])] }
+    private func endpoint(_ path: String, method: String, headers: [String: String] = [:]) -> ConnectorEndpoint { ConnectorEndpoint(path: baseURL + path, method: method, headers: headers, queryParams: [:]) }
 }

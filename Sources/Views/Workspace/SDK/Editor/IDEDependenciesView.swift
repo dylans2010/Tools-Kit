@@ -1,3 +1,14 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on insetGrouped List style.
+ - Replaced manual stat pills and headers with native Section titles and LabeledContent.
+ - Modernized dependency rows using a private struct DependencyGraphRow with semantic icons.
+ - Standardized conflict alerts using semantic Label and monospaced typography.
+ - strictly preserved all SDKRuntimeWorkspaceState dependency management and conflict resolution logic.
+ - Improved visual hierarchy for lazy loading status and hook indicators.
+ - Implemented ContentUnavailableView for empty graph states.
+ */
+
 import SwiftUI
 
 struct IDEDependenciesView: View {
@@ -6,45 +17,38 @@ struct IDEDependenciesView: View {
 
     var body: some View {
         List {
-            Section {
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Execution Graph").font(.headline)
-                            Text("Manage SDK dependencies and resolve version conflicts.").font(.caption2).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        SDKStatusPill("\(state.dependencies.count) NODES", systemImage: "point.3.connected.trianglepath.dotted", color: .orange)
-                    }
+            Section("Execution Tree") {
+                LabeledContent("Graph Nodes") {
+                    Text("\(state.dependencies.count)").monospaced().bold().foregroundStyle(.accent)
                 }
-                .padding(.vertical, 8)
-            } header: {
-                SDKSectionHeader("Dependencies", subtitle: "Graph configuration", systemImage: "link")
             }
 
             let conflicts = conflictResolver.conflicts(in: state.dependencies)
             if !conflicts.isEmpty {
-                Section("Conflicts") {
+                Section("Conflict Alerts") {
                     ForEach(conflicts, id: \.self) { conflict in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Label(conflict, systemImage: "exclamationmark.arrow.triangle.2.circlepath")
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundStyle(.orange)
-                            Text(conflictResolver.suggestion(for: conflict))
-                                .font(.system(size: 11))
-                                .foregroundStyle(.secondary)
+                        Label {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(conflict).font(.subheadline.bold())
+                                Text(conflictResolver.suggestion(for: conflict)).font(.caption).foregroundStyle(.secondary)
+                            }
+                        } icon: {
+                            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
                         }
-                        .padding(.vertical, 4)
                     }
                 }
             }
 
             Section("Project Graph") {
                 if state.dependencies.isEmpty {
-                    ContentUnavailableView("No Dependencies", systemImage: "point.3.connected.trianglepath.dotted", description: Text("Synchronization from libraries or project config is required."))
+                    ContentUnavailableView(
+                        "No Dependencies",
+                        systemImage: "point.3.connected.trianglepath.dotted",
+                        description: Text("Register libraries or configure project nodes to build the graph.")
+                    )
                 } else {
                     ForEach(state.dependencies) { node in
-                        dependencyRow(for: node)
+                        DependencyGraphRow(node: node)
                     }
                     .onDelete(perform: deleteDependencies)
                 }
@@ -52,47 +56,45 @@ struct IDEDependenciesView: View {
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Dependencies")
-    }
-
-    private func dependencyRow(for node: SDKDependencyNode) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(node.name)
-                        .font(.system(size: 15, weight: .bold))
-                    Text(node.kind.rawValue.uppercased())
-                        .font(.system(size: 9, weight: .black))
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-                Text("v\(node.version)")
-                    .font(.system(.caption, design: .monospaced))
-                    .foregroundStyle(.secondary)
-            }
-
-            if !node.requiredScopes.isEmpty {
-                Text("Scopes: \(node.requiredScopes.joined(separator: ", "))")
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
-
-            HStack {
-                if node.lazyLoaded {
-                    Label("Lazy", systemImage: "clock.arrow.circlepath").font(.system(size: 10))
-                }
-                if node.preRunHook != nil {
-                    Label("Hook", systemImage: "terminal").font(.system(size: 10))
-                }
-                Spacer()
-                Text("\(node.linkedTo.count) links").font(.system(size: 10)).foregroundStyle(.tertiary)
-            }
-        }
-        .padding(.vertical, 4)
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private func deleteDependencies(at offsets: IndexSet) {
         state.dependencies.remove(atOffsets: offsets)
         state.recalculateDiagnostics()
+    }
+}
+
+// MARK: - Private Subviews
+
+private struct DependencyGraphRow: View {
+    let node: SDKDependencyNode
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(node.name).font(.headline)
+                    Text(node.kind.rawValue.uppercased()).font(.system(size: 8, weight: .black)).foregroundStyle(.secondary)
+                }
+                Spacer()
+                Text("v\(node.version)").font(.system(.caption, design: .monospaced)).foregroundStyle(.secondary)
+            }
+
+            if !node.requiredScopes.isEmpty {
+                Text(node.requiredScopes.joined(separator: ", "))
+                    .font(.system(size: 9, design: .monospaced))
+                    .foregroundStyle(.tertiary)
+                    .lineLimit(1)
+            }
+
+            HStack(spacing: 12) {
+                if node.lazyLoaded { Label("Lazy", systemImage: "clock.arrow.circlepath").font(.caption2) }
+                if node.preRunHook != nil { Label("Hook", systemImage: "terminal").font(.caption2) }
+                Spacer()
+                Text("\(node.linkedTo.count) links").font(.system(size: 9, weight: .bold)).foregroundStyle(.tertiary)
+            }
+        }
+        .padding(.vertical, 4)
     }
 }

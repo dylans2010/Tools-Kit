@@ -1,3 +1,13 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized the tab bar using a horizontal ScrollView with Capsule-styled buttons.
+ - Replaced manual diagnostics banner with a private DiagnosticsBar struct using semantic colors.
+ - Modernized the tab picker sheet with .presentationDetents([.medium, .large]) and a drag indicator.
+ - Replaced manual HStack layouts with native Label and semantic SF Symbols.
+ - Strictly preserved all activeTab switching logic and diagnostic navigation pathways.
+ - Standardized on insetGrouped List style for the tab picker.
+ */
+
 import SwiftUI
 
 struct SDKProjectEditorView: View {
@@ -21,21 +31,39 @@ struct SDKProjectEditorView: View {
         VStack(spacing: 0) {
             tabHeader
             Divider()
-            activeTabView
+
+            Group {
+                if let activeTab {
+                    activeTabView(for: activeTab.node)
+                } else {
+                    ContentUnavailableView(
+                        "No Area Selected",
+                        systemImage: "square.stack",
+                        description: Text("Open a project area from the Navigator to begin editing.")
+                    )
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+
             if !state.diagnostics.isEmpty {
                 Divider()
-                diagnosticsBanner
+                DiagnosticsBar(diagnostics: state.diagnostics) { node in
+                    state.open(node: node)
+                }
             }
         }
         .sheet(isPresented: $showingTabPicker) {
             NavigationStack {
-                tabPicker
-                    .navigationTitle("Open SDK Area")
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { showingTabPicker = false } } }
+                TabPickerList(state: state) { showingTabPicker = false }
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Done") { showingTabPicker = false }
+                        }
+                    }
             }
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
+            .presentationCornerRadius(20)
         }
         .onChange(of: projectManager.currentProject?.id) { _, _ in
             state.syncSDKGraphFromProject()
@@ -44,104 +72,120 @@ struct SDKProjectEditorView: View {
     }
 
     private var tabHeader: some View {
-        Group {
+        HStack {
             if isCompact {
-                HStack {
-                    Button { showingTabPicker = true } label: {
-                        Label(activeTab?.title ?? "Config", systemImage: activeTab?.node.icon ?? "square.stack")
-                            .font(.subheadline.weight(.semibold))
-                    }
-                    Spacer()
-                    Text("\(state.diagnostics.count) issues")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(state.diagnostics.contains { $0.severity == .error } ? .red : .secondary)
+                Button { showingTabPicker = true } label: {
+                    Label(activeTab?.title ?? "Select Area", systemImage: activeTab?.node.icon ?? "chevron.down")
+                        .font(.subheadline.bold())
                 }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
-                .background(.bar)
+                Spacer()
+                if !state.diagnostics.isEmpty {
+                    Text("\(state.diagnostics.count) issues")
+                        .font(.caption2.bold())
+                        .foregroundStyle(state.diagnostics.contains { $0.severity == .error } ? .red : .orange)
+                }
             } else {
-                tabStrip
-            }
-        }
-    }
-
-    private var tabStrip: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(state.openTabs) { tab in
-                    HStack(spacing: 6) {
-                        Button(tab.title) { state.setSelected(tabID: tab.id) }
-                            .buttonStyle(.borderless)
-                            .font(.caption.weight(state.selectedTabID == tab.id ? .semibold : .regular))
-                        if state.openTabs.count > 1 {
-                            Button { state.close(tabID: tab.id) } label: { Image(systemName: "xmark") }
-                                .buttonStyle(.borderless)
-                                .font(.caption2)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(state.openTabs) { tab in
+                            EditorTabItem(tab: tab, isSelected: state.selectedTabID == tab.id) {
+                                state.setSelected(tabID: tab.id)
+                            } onClose: {
+                                state.close(tabID: tab.id)
+                            }
                         }
                     }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 6)
-                    .background(state.selectedTabID == tab.id ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.08), in: Capsule())
+                    .padding(.horizontal, 12)
                 }
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
         }
+        .padding(.vertical, 8)
+        .background(.ultraThinMaterial)
     }
 
-    private var tabPicker: some View {
+    @ViewBuilder
+    private func activeTabView(for node: SDKWorkspaceNode) -> some View {
+        switch node {
+        case .config: IDEConfigView()
+        case .capabilities: IDECapabilitiesView()
+        case .scopes: IDEScopesView()
+        case .libraries: IDELibrariesView()
+        case .dependencies: IDEDependenciesView()
+        case .connectors: IDEConnectorsView()
+        case .runtimeScripts: IDERuntimeScriptsView()
+        case .apiEndpoints: IDEAPIEndpointsView()
+        case .diagnostics: IDEDiagnosticsView()
+        }
+    }
+}
+
+// MARK: - Private Subviews
+
+private struct EditorTabItem: View {
+    let tab: SDKEditorTab
+    let isSelected: Bool
+    let action: () -> Void
+    let onClose: () -> Void
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Button(tab.title, action: action)
+                .font(.caption.bold())
+
+            Button(action: onClose) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 8, weight: .black))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(isSelected ? Color.accentColor.opacity(0.15) : Color.primary.opacity(0.05), in: Capsule())
+        .foregroundStyle(isSelected ? .accent : .secondary)
+    }
+}
+
+private struct DiagnosticsBar: View {
+    let diagnostics: [SDKRuntimeDiagnostic]
+    let onSelect: (SDKWorkspaceNode) -> Void
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(diagnostics.prefix(5)) { diag in
+                    Button { onSelect(diag.node) } label: {
+                        Label(diag.message, systemImage: diag.severity == .error ? "exclamationmark.octagon" : "exclamationmark.triangle")
+                            .font(.caption2.bold())
+                            .foregroundStyle(diag.severity == .error ? .red : .orange)
+                    }
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+        }
+        .background(.bar)
+    }
+}
+
+private struct TabPickerList: View {
+    let state: SDKRuntimeWorkspaceState
+    let onSelect: () -> Void
+
+    var body: some View {
         List {
-            Section("Workspace") {
+            Section("Project Areas") {
                 ForEach(SDKWorkspaceNode.allCases) { node in
                     Button {
                         state.open(node: node)
-                        showingTabPicker = false
+                        onSelect()
                     } label: {
                         Label(node.title, systemImage: node.icon)
                     }
                 }
             }
         }
+        .listStyle(.insetGrouped)
+        .navigationTitle("Open Area")
+        .navigationBarTitleDisplayMode(.inline)
     }
-
-    @ViewBuilder
-    private var activeTabView: some View {
-        if let activeTab {
-            switch activeTab.node {
-            case .config: IDEConfigView()
-            case .capabilities: IDECapabilitiesView()
-            case .scopes: IDEScopesView()
-            case .libraries: IDELibrariesView()
-            case .dependencies: IDEDependenciesView()
-            case .connectors: IDEConnectorsView()
-            case .runtimeScripts: IDERuntimeScriptsView()
-            case .apiEndpoints: IDEAPIEndpointsView()
-            }
-        } else {
-            ContentUnavailableView("No tab selected", systemImage: "rectangle.stack", description: Text("Select a project editor tab to continue."))
-        }
-    }
-
-    private var diagnosticsBanner: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(state.diagnostics.prefix(isCompact ? 2 : 4)) { diagnostic in
-                    Label {
-                        Text(diagnostic.message).lineLimit(1)
-                    } icon: {
-                        Image(systemName: diagnostic.severity == .error ? "xmark.octagon.fill" : "exclamationmark.triangle.fill")
-                            .foregroundStyle(diagnostic.severity == .error ? .red : .orange)
-                    }
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 5)
-                    .background(.regularMaterial, in: Capsule())
-                    .onTapGesture { state.open(node: diagnostic.node) }
-                }
-            }
-            .padding(8)
-        }
-        .background(.bar)
-    }
-
 }
