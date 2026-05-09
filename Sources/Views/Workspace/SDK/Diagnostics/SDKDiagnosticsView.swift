@@ -49,7 +49,7 @@ struct SDKDiagnosticsView: View {
                 Text("Performance Analytics")
             }
 
-            Section("Data Sync State") {
+            Section {
                 ForEach(SDKScope.allCases, id: \.self) { scope in
                     LabeledContent(String(describing: scope).capitalized) {
                         let count = cachedItemCount(for: scope)
@@ -58,9 +58,11 @@ struct SDKDiagnosticsView: View {
                             .foregroundStyle(count > 0 ? .green : .secondary)
                     }
                 }
+            } header: {
+                Text("Data Sync State")
             }
 
-            Section("Module Integrity") {
+            Section {
                 if pluginManager.plugins.isEmpty {
                     Text("No plugins loaded").font(.caption).foregroundStyle(.secondary)
                 } else {
@@ -72,9 +74,11 @@ struct SDKDiagnosticsView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Module Integrity")
             }
 
-            Section("External Connectivity") {
+            Section {
                 if connectorManager.connectors.isEmpty {
                     Text("No connectors registered").font(.caption).foregroundStyle(.secondary)
                 } else {
@@ -86,6 +90,8 @@ struct SDKDiagnosticsView: View {
                         }
                     }
                 }
+            } header: {
+                Text("External Connectivity")
             }
         }
         .listStyle(.insetGrouped)

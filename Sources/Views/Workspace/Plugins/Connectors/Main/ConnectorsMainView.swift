@@ -97,7 +97,7 @@ struct ConnectorDefinitionDetailView: View {
             }
             if !connector.description.isEmpty { Section("Description") { Text(connector.description).font(.subheadline).foregroundStyle(.secondary) } }
             Section("Quick Actions") {
-                Button { Task { await runtime.run(connector: connector) } } label: { Label(isRunning ? "Running..." : "Execute Pipeline", systemImage: isRunning ? "arrow.triangle.2.circlepath" : "play.fill").foregroundStyle(isRunning ? .secondary : .green) }.disabled(isRunning)
+                Button { Task { await runtime.run(connector: connector) } } label: { Label(isRunning ? "Running..." : "Execute Pipeline", systemImage: isRunning ? "arrow.triangle.2.circlepath" : "play.fill").foregroundStyle(isRunning ? Color.secondary : .green) }.disabled(isRunning)
                 Button { showingTestConsole = true } label: { Label("Open Test Console", systemImage: "terminal") }
                 Button { toggleStatus() } label: { Label(connector.status == .active ? "Deactivate" : "Activate", systemImage: connector.status == .active ? "pause.circle" : "checkmark.circle").foregroundStyle(connector.status == .active ? .orange : .green) }
             }
@@ -160,7 +160,7 @@ private struct ConnectorStatusBadge: View {
     var body: some View {
         Text(status.rawValue.uppercased()).font(.system(size: 8, weight: .black)).padding(.horizontal, 8).padding(.vertical, 4).background(color.opacity(0.1), in: Capsule()).foregroundStyle(color)
     }
-    private var color: Color { switch status { case .active: return .green; case .inactive: return .secondary; case .error: return .red; case .connecting: return .blue } }
+    private var color: Color { switch status { case .active: return .green; case .inactive: return Color.secondary; case .error: return .red; case .connecting: return .blue } }
 }
 
 private struct ConnectorStatHeader: View {

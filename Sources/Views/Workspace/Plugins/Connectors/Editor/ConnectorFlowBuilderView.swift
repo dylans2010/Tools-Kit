@@ -164,7 +164,7 @@ private struct EmptyPipelineView: View {
     let onAdd: (FlowStep.StepType) -> Void
     let onShowTemplates: () -> Void
     var body: some View {
-        ContentUnavailableView { Label("Empty Pipeline", systemImage: "arrow.triangle.branch") } description: { Text("Add a trigger to start building your automated workflow.") } actions: {
+        ContentUnavailableView("Empty Pipeline", systemImage: "arrow.triangle.branch", description: Text("Add a trigger to start building your automated workflow.")) {
             HStack {
                 Button("Add Trigger") { onAdd(.trigger) }.buttonStyle(.borderedProminent)
                 Button("Use Template") { onShowTemplates() }.buttonStyle(.bordered)

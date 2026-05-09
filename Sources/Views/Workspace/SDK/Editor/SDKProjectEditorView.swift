@@ -50,8 +50,6 @@ struct SDKProjectEditorView: View {
                 DiagnosticsBar(diagnostics: state.diagnostics) { node in
                     state.open(node: node)
                 }
-            } header: {
-                Text("Project Areas")
             }
         }
         .sheet(isPresented: $showingTabPicker) {

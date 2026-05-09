@@ -51,7 +51,7 @@ struct SecurityScopeApplicationView: View {
                 Text("Justification for accessing sensitive data.")
             }
 
-            Section("Data Governance") {
+            Section {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Usage Explanation").font(.caption.bold()).foregroundStyle(.secondary)
                     TextField("How will this data be used?", text: Binding(get: { plugin.dataUsageExplanation ?? "" }, set: { plugin.dataUsageExplanation = $0.isEmpty ? nil : $0 }))
@@ -60,9 +60,11 @@ struct SecurityScopeApplicationView: View {
                     Text("Retention Policy").font(.caption.bold()).foregroundStyle(.secondary)
                     TextField("How long is data stored?", text: Binding(get: { plugin.retentionPolicy ?? "" }, set: { plugin.retentionPolicy = $0.isEmpty ? nil : $0 }))
                 }
+            } header: {
+                Text("Data Governance")
             }
 
-            Section("Requested High-Risk Scopes") {
+            Section {
                 let highRiskCapabilities = plugin.capabilities.filter { $0.riskLevel == .high }
                 if highRiskCapabilities.isEmpty {
                     Text("No high-risk scopes requested.").font(.caption).foregroundStyle(.secondary)
@@ -79,6 +81,8 @@ struct SecurityScopeApplicationView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Requested High-Risk Scopes")
             } footer: {
                 Text("Changes are applied to the plugin definition. High-risk plugins without an API Key or Privacy Note will be blocked during installation or execution.")
             }

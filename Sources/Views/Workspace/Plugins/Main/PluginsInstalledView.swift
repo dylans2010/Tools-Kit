@@ -18,11 +18,7 @@ struct PluginsInstalledView: View {
         List {
             if manager.installedPlugins.isEmpty {
                 Section {
-                    ContentUnavailableView {
-                        Label("No Plugins Installed", systemImage: "puzzlepiece.extension")
-                    } description: {
-                        Text("Visit the Marketplace to discover and install new extensions for your workspace.")
-                    } actions: {
+                    ContentUnavailableView("No Plugins Installed", systemImage: "puzzlepiece.extension", description: Text("Visit the Marketplace to discover and install new extensions for your workspace.")) {
                         NavigationLink(destination: MarketplaceView()) {
                             Text("Go to Marketplace").bold()
                         }
