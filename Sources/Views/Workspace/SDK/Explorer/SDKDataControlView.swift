@@ -39,7 +39,7 @@ struct SDKDataControlView: View {
                 Section {
                     Text(statusMessage)
                         .font(.subheadline.bold())
-                        .foregroundStyle(isProcessing ? .secondary : .green)
+                        .foregroundStyle(isProcessing ? Color.secondary : .green)
                 } header: {
                     Text("Status")
                 }

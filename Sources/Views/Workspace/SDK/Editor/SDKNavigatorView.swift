@@ -34,11 +34,13 @@ struct SDKNavigatorView: View {
             }
 
             Section {
+                let diagnosticsCount = state.diagnostics.count
+
                 LabeledContent("Libraries") { Text("\(state.libraries.count)").monospaced() }
                 LabeledContent("Dependencies") { Text("\(state.dependencies.count)").monospaced() }
                 LabeledContent("Diagnostics") {
-                    Text("\(state.diagnostics.count)").monospaced()
-                        .foregroundStyle(state.diagnostics.isEmpty ? .secondary : .orange)
+                    Text("\(diagnosticsCount)").monospaced()
+                        .foregroundStyle(diagnosticsCount == 0 ? Color.secondary : .orange)
                 }
             } header: {
                 Text("System Status")
