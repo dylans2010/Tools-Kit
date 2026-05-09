@@ -40,13 +40,27 @@ struct SDKDiagnosticsView: View {
 // MARK: - Private Subviews
 
 private struct SDKDiagnosticsSystemHealthSection: View {
+    struct HealthItem: Identifiable {
+        let id: String
+        let title: String
+        let healthy: Bool
+    }
+
     let bgEngine: SDKBackgroundEngine
+
+    private var healthItems: [HealthItem] {
+        [
+            HealthItem(id: "connector-reachability", title: "Connector Reachability", healthy: bgEngine.systemHealth.connectorReachability),
+            HealthItem(id: "plugin-sandbox", title: "Plugin Sandbox", healthy: bgEngine.systemHealth.pluginSandboxStatus),
+            HealthItem(id: "data-store-health", title: "Data Store Health", healthy: bgEngine.systemHealth.coreDataHealth)
+        ]
+    }
 
     var body: some View {
         Section {
-            HealthStatusRow(title: "Connector Reachability", healthy: bgEngine.systemHealth.connectorReachability)
-            HealthStatusRow(title: "Plugin Sandbox", healthy: bgEngine.systemHealth.pluginSandboxStatus)
-            HealthStatusRow(title: "Data Store Health", healthy: bgEngine.systemHealth.coreDataHealth)
+            ForEach(healthItems) { item in
+                HealthStatusRow(title: item.title, healthy: item.healthy)
+            }
 
             LabeledContent("Last Audit", value: "\(bgEngine.systemHealth.lastCheck, style: .relative) ago")
                 .font(.caption2)
