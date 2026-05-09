@@ -1,170 +1,211 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Replaced manual card-based health reporting with native Section and LabeledContent.
- - Modernized status pills and metrics using semantic colors (.green, .yellow, .red) and bold monospaced fonts.
- - Replaced manual health row logic with a private HealthStatusRow struct.
- - strictly preserved all SDKBackgroundEngine, SDKTelemetryEngine, and SDKPluginManager data sources.
- - Improved visual hierarchy for storage utilization and connectivity status.
- - Standardized the 'Audit' action button with a prominent prominent style.
- */
-
 import SwiftUI
 
 struct SDKDiagnosticsView: View {
     @StateObject private var bgEngine = SDKBackgroundEngine.shared
-    @StateObject private var projectManager = SDKProjectManager.shared
     @StateObject private var connectorManager = SDKConnectorManager.shared
     @StateObject private var pluginManager = SDKPluginManager.shared
     @StateObject private var telemetry = SDKTelemetryEngine.shared
 
     var body: some View {
         List {
-            SDKDiagnosticsSystemHealthSection(bgEngine: bgEngine)
-            SDKDiagnosticsPerformanceSection(telemetry: telemetry)
-            SDKDiagnosticsDataSyncSection(cachedItemCount: cachedItemCount)
-            SDKDiagnosticsModuleIntegritySection(pluginManager: pluginManager)
-            SDKDiagnosticsConnectivitySection(connectorManager: connectorManager)
+            Section("System Health") {
+                ForEach(systemHealthRows) { row in
+                    StatusRow(title: row.title, isHealthy: row.isHealthy)
+                }
+
+                LabeledContent("Last Audit") {
+                    Text("\(bgEngine.systemHealth.lastCheck, style: .relative) ago")
+                        .foregroundStyle(.secondary)
+                }
+
+                Button {
+                    bgEngine.startHealthCheckLoop()
+                } label: {
+                    Label("Run System Audit", systemImage: "arrow.clockwise.circle")
+                        .fontWeight(.semibold)
+                }
+            }
+
+            Section("Performance Analytics") {
+                LabeledContent("Latency") {
+                    Text("\(performanceSummary.averageLatencyMs)ms")
+                }
+
+                LabeledContent("Total Traces") {
+                    Text("\(performanceSummary.totalTraces)")
+                }
+
+                LabeledContent("Execution Health") {
+                    Text("\(performanceSummary.successRatePercent)%")
+                        .foregroundStyle(performanceSummary.successRateColor)
+                        .fontWeight(.semibold)
+                }
+            }
+
+            Section("Data Sync State") {
+                ForEach(dataSyncRows) { row in
+                    LabeledContent(row.name) {
+                        Text(row.countText)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(row.countColor)
+                    }
+                }
+            }
+
+            Section("Module Integrity") {
+                if pluginRows.isEmpty {
+                    Text("No plugins loaded")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(pluginRows) { row in
+                        LabeledContent(row.name) {
+                            Text(row.stateText)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(row.stateColor)
+                        }
+                    }
+                }
+            }
+
+            Section("External Connectivity") {
+                if connectorRows.isEmpty {
+                    Text("No connectors registered")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(connectorRows) { row in
+                        LabeledContent(row.name) {
+                            Text(row.stateText)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(row.stateColor)
+                        }
+                    }
+                }
+            }
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Diagnostics")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { bgEngine.startHealthCheckLoop() }
+        .onAppear {
+            bgEngine.startHealthCheckLoop()
+        }
     }
 
-    private func cachedItemCount(for scope: SDKScope) -> Int {
-        return SDKDataEngine.shared.cacheSnapshot()[scope] ?? 0
-    }
-}
-
-// MARK: - Private Subviews
-
-private struct SDKDiagnosticsSystemHealthSection: View {
-    struct HealthItem: Identifiable {
-        let id: String
-        let title: String
-        let healthy: Bool
-    }
-
-    let bgEngine: SDKBackgroundEngine
-
-    private var healthItems: [HealthItem] {
+    private var systemHealthRows: [SystemHealthRowModel] {
         [
-            HealthItem(id: "connector-reachability", title: "Connector Reachability", healthy: bgEngine.systemHealth.connectorReachability),
-            HealthItem(id: "plugin-sandbox", title: "Plugin Sandbox", healthy: bgEngine.systemHealth.pluginSandboxStatus),
-            HealthItem(id: "data-store-health", title: "Data Store Health", healthy: bgEngine.systemHealth.coreDataHealth)
+            SystemHealthRowModel(id: "connector-reachability", title: "Connector Reachability", isHealthy: bgEngine.systemHealth.connectorReachability),
+            SystemHealthRowModel(id: "plugin-sandbox", title: "Plugin Sandbox", isHealthy: bgEngine.systemHealth.pluginSandboxStatus),
+            SystemHealthRowModel(id: "data-store-health", title: "Data Store Health", isHealthy: bgEngine.systemHealth.coreDataHealth)
         ]
     }
 
-    var body: some View {
-        Section {
-            ForEach(healthItems) { item in
-                HealthStatusRow(title: item.title, healthy: item.healthy)
-            }
-
-            LabeledContent("Last Audit", value: "\(bgEngine.systemHealth.lastCheck, style: .relative) ago")
-                .font(.caption2)
-                .foregroundStyle(Color.secondary)
-
-            Button(action: { bgEngine.startHealthCheckLoop() }) {
-                Label("Run System Audit", systemImage: "arrow.clockwise.circle").bold()
-            }
-            .frame(maxWidth: .infinity)
-        } header: {
-            Text("System Health")
-        }
-    }
-}
-
-private struct SDKDiagnosticsPerformanceSection: View {
-    let telemetry: SDKTelemetryEngine
-
-    var body: some View {
+    private var performanceSummary: PerformanceSummaryModel {
         let metrics = telemetry.getMetrics()
-        let rate = metrics.totalTraces > 0 ? Double(metrics.successCount) / Double(metrics.totalTraces) * 100 : 100
+        let successRate: Double
+        if metrics.totalTraces > 0 {
+            successRate = (Double(metrics.successCount) / Double(metrics.totalTraces)) * 100
+        } else {
+            successRate = 100
+        }
 
-        return Section {
-            LabeledContent("Latency", value: "\(Int(metrics.averageDurationMs))ms")
-            LabeledContent("Total Traces", value: "\(metrics.totalTraces)")
-            LabeledContent("Execution Health") {
-                Text("\(Int(rate))%")
-                    .foregroundStyle(rate > 90 ? .green : .orange)
-                    .bold()
-            }
-        } header: {
-            Text("Performance Analytics")
+        return PerformanceSummaryModel(
+            averageLatencyMs: Int(metrics.averageDurationMs),
+            totalTraces: metrics.totalTraces,
+            successRatePercent: Int(successRate.rounded()),
+            successRateColor: successRate >= 90 ? .green : .orange
+        )
+    }
+
+    private var dataSyncRows: [DataSyncRowModel] {
+        SDKScope.allCases.map { scope in
+            let count = SDKDataEngine.shared.cacheSnapshot()[scope] ?? 0
+            return DataSyncRowModel(id: String(describing: scope), name: String(describing: scope).capitalized, count: count)
+        }
+    }
+
+    private var pluginRows: [PluginRowModel] {
+        pluginManager.plugins.map { plugin in
+            PluginRowModel(id: plugin.id.uuidString, name: plugin.name, isEnabled: plugin.isEnabled)
+        }
+    }
+
+    private var connectorRows: [ConnectorRowModel] {
+        connectorManager.connectors.map { connector in
+            ConnectorRowModel(
+                id: connector.id.uuidString,
+                name: connector.name,
+                statusText: connector.status.rawValue.capitalized,
+                isConnected: connector.status == .connected
+            )
         }
     }
 }
 
-private struct SDKDiagnosticsDataSyncSection: View {
-    let cachedItemCount: (SDKScope) -> Int
+private struct SystemHealthRowModel: Identifiable {
+    let id: String
+    let title: String
+    let isHealthy: Bool
+}
 
-    var body: some View {
-        Section {
-            ForEach(SDKScope.allCases, id: \.self) { scope in
-                LabeledContent(String(describing: scope).capitalized) {
-                    Text(cachedItemCount(scope) > 0 ? "\(cachedItemCount(scope)) Items" : "Empty")
-                        .font(.caption2.bold())
-                        .foregroundStyle(cachedItemCount(scope) > 0 ? Color.green : Color.secondary)
-                }
-            }
-        } header: {
-            Text("Data Sync State")
-        }
+private struct PerformanceSummaryModel {
+    let averageLatencyMs: Int
+    let totalTraces: Int
+    let successRatePercent: Int
+    let successRateColor: Color
+}
+
+private struct DataSyncRowModel: Identifiable {
+    let id: String
+    let name: String
+    let count: Int
+
+    var countText: String {
+        count > 0 ? "\(count) Items" : "Empty"
+    }
+
+    var countColor: Color {
+        count > 0 ? .green : .secondary
     }
 }
 
-private struct SDKDiagnosticsModuleIntegritySection: View {
-    let pluginManager: SDKPluginManager
+private struct PluginRowModel: Identifiable {
+    let id: String
+    let name: String
+    let isEnabled: Bool
 
-    var body: some View {
-        Section {
-            if pluginManager.plugins.isEmpty {
-                Text("No plugins loaded").font(.caption).foregroundStyle(.secondary)
-            } else {
-                ForEach(pluginManager.plugins) { plugin in
-                    LabeledContent(plugin.name) {
-                        Text(plugin.isEnabled ? "Active" : "Disabled")
-                            .font(.caption2.bold())
-                            .foregroundStyle(plugin.isEnabled ? Color.green : Color.secondary)
-                    }
-                }
-            }
-        } header: {
-            Text("Module Integrity")
-        }
+    var stateText: String {
+        isEnabled ? "Active" : "Disabled"
+    }
+
+    var stateColor: Color {
+        isEnabled ? .green : .secondary
     }
 }
 
-private struct SDKDiagnosticsConnectivitySection: View {
-    let connectorManager: SDKConnectorManager
+private struct ConnectorRowModel: Identifiable {
+    let id: String
+    let name: String
+    let statusText: String
+    let isConnected: Bool
 
-    var body: some View {
-        Section {
-            if connectorManager.connectors.isEmpty {
-                Text("No connectors registered").font(.caption).foregroundStyle(.secondary)
-            } else {
-                ForEach(connectorManager.connectors, id: \.id) { connector in
-                    LabeledContent(connector.name) {
-                        Text(connector.status.rawValue.capitalized)
-                            .font(.caption2.bold())
-                            .foregroundStyle(connector.status == .connected ? Color.green : Color.orange)
-                    }
-                }
-            }
-        } header: {
-            Text("External Connectivity")
-        }
+    var stateText: String {
+        statusText
+    }
+
+    var stateColor: Color {
+        isConnected ? .green : .orange
     }
 }
 
-private struct HealthStatusRow: View {
-    let title: String, healthy: Bool
+private struct StatusRow: View {
+    let title: String
+    let isHealthy: Bool
+
     var body: some View {
         LabeledContent(title) {
-            Image(systemName: healthy ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                .foregroundStyle(healthy ? .green : .red)
+            Image(systemName: isHealthy ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                .foregroundStyle(isHealthy ? .green : .red)
         }
     }
 }
