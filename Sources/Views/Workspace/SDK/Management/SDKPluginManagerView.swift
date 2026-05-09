@@ -25,10 +25,12 @@ struct SDKPluginManagerView: View {
 
     var body: some View {
         List {
-            Section("System Status") {
+            Section {
                 LabeledContent("Installed Apps", value: "\(runtime.loadedApps.count)")
                 LabeledContent("Running Contexts", value: "\(runtime.runningApps.count)").foregroundStyle(.green).bold()
-                LabeledContent("Sandboxed", value: "\(runtime.loadedApps.filter { $0.isSandboxed }.count)").foregroundStyle(.accent)
+                LabeledContent("Sandboxed", value: "\(runtime.loadedApps.filter { $0.isSandboxed }.count)").foregroundStyle(Color.accentColor)
+            } header: {
+                Text("System Status")
             }
 
             Section("Registry") {
@@ -94,7 +96,7 @@ private struct PluginAppRow: View {
             }
 
             HStack(spacing: 8) {
-                if app.isSandboxed { Label("Sandboxed", systemImage: "lock.shield").foregroundStyle(.accent) }
+                if app.isSandboxed { Label("Sandboxed", systemImage: "lock.shield").foregroundStyle(Color.accentColor) }
                 if !app.permissions.isEmpty { Text(app.permissions.joined(separator: ", ")).foregroundStyle(.tertiary) }
             }
             .font(.system(size: 9, weight: .bold, design: .monospaced))

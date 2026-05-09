@@ -50,7 +50,7 @@ struct PluginSecurityView: View {
                                     Text(perm.description).font(.caption2).foregroundStyle(.secondary)
                                 }
                             } icon: {
-                                Image(systemName: perm.icon).foregroundStyle(.accent)
+                                Image(systemName: perm.icon).foregroundStyle(Color.accentColor)
                             }
                         }
                     }

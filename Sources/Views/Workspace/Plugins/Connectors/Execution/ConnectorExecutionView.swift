@@ -110,7 +110,7 @@ private struct ExecutionHeaderView: View {
                     .font(.system(.caption, design: .monospaced))
                     .padding(.horizontal, 10).padding(.vertical, 4)
                     .background(Color.accentColor.opacity(0.1), in: Capsule())
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(Color.accentColor)
             } else {
                 Picker("Mode", selection: $executionMode) {
                     ForEach(ConnectorExecutionView.ExecutionMode.allCases, id: \.self) { Text($0.rawValue).tag($0) }
@@ -210,7 +210,7 @@ private struct ExecutionHistorySection: View {
 }
 
 private struct ExecutionStatsSection: View {
-    let metadata: ConnectorDefinition.Metadata
+    let metadata: ConnectorMetadata
     var body: some View {
         HStack(spacing: 0) {
             DetailMetricPill(label: "Runs", value: "\(metadata.executionCount)", color: .blue)

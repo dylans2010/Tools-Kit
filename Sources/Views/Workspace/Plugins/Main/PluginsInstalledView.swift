@@ -55,7 +55,7 @@ private struct PluginInstalledRow: View {
         HStack(spacing: 12) {
             Image(systemName: plugin.icon)
                 .font(.headline)
-                .foregroundStyle(.accent)
+                .foregroundStyle(Color.accentColor)
                 .frame(width: 36, height: 36)
                 .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
 

@@ -241,6 +241,6 @@ private struct CapabilityRow: View {
     var body: some View {
         Label {
             HStack { Text(title).font(.caption); Spacer(); Image(systemName: met ? "checkmark.circle.fill" : "circle").foregroundStyle(met ? .green : .secondary) }
-        } icon: { Image(systemName: icon).foregroundStyle(.accent) }.font(.caption)
+        } icon: { Image(systemName: icon).foregroundStyle(Color.accentColor) }.font(.caption)
     }
 }

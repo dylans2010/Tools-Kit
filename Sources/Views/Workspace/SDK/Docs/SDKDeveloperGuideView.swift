@@ -106,7 +106,7 @@ private struct PluginsSection: View {
             DocRow(title: "onLoad", description: "Initialization hook for setting up internal plugin state.", icon: "power")
         }
         Section("Runtime Context") {
-            Text("ctx.notes, ctx.mail, ctx.ai, ctx.integrations").font(.system(size: 10, design: .monospaced)).foregroundStyle(.accent)
+            Text("ctx.notes, ctx.mail, ctx.ai, ctx.integrations").font(.system(size: 10, design: .monospaced)).foregroundStyle(Color.accentColor)
         }
     }
 }
@@ -141,6 +141,6 @@ private struct DocRow: View {
                 Text(title).font(.subheadline.bold())
                 Text(description).font(.caption2).foregroundStyle(.secondary)
             }
-        } icon: { Image(systemName: icon).foregroundStyle(.accent) }
+        } icon: { Image(systemName: icon).foregroundStyle(Color.accentColor) }
     }
 }

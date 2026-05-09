@@ -46,7 +46,7 @@ private struct ConnectorRegistryRow: View {
         HStack(spacing: 12) {
             Image(systemName: icon.contains(".") ? "app.badge" : icon)
                 .font(.title2)
-                .foregroundStyle(.accent)
+                .foregroundStyle(Color.accentColor)
                 .frame(width: 32)
 
             VStack(alignment: .leading, spacing: 2) {

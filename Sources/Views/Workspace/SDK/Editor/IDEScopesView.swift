@@ -29,7 +29,7 @@ struct IDEScopesView: View {
         List {
             Section("Security Profile") {
                 LabeledContent("Active Grants") {
-                    Text("\(enabledScopes.count)").monospaced().bold().foregroundStyle(.accent)
+                    Text("\(enabledScopes.count)").monospaced().bold().foregroundStyle(Color.accentColor)
                 }
 
                 Button { showingReview = true } label: {

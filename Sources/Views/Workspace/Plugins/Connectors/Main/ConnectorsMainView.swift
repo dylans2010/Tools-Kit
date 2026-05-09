@@ -90,7 +90,7 @@ struct ConnectorDefinitionDetailView: View {
     var body: some View {
         List {
             Section("Status & Health") {
-                HStack { VStack(alignment: .leading, spacing: 4) { Text(connector.name).font(.headline); Text(connector.identifier).font(.caption.monospaced()).foregroundStyle(.secondary) }; Spacer(); StatusBadge(status: connector.status) }
+                HStack { VStack(alignment: .leading, spacing: 4) { Text(connector.name).font(.headline); Text(connector.identifier).font(.caption.monospaced()).foregroundStyle(.secondary) }; Spacer(); ConnectorStatusBadge(status: connector.status) }
                 LabeledContent("Version", value: "v\(connector.version)")
                 LabeledContent("Created", value: connector.createdAt.formatted(date: .abbreviated, time: .shortened))
                 if connector.metadata.executionCount > 0 { LabeledContent("Executions", value: "\(connector.metadata.executionCount)"); LabeledContent("Avg Latency", value: String(format: "%.0fms", connector.metadata.averageLatency)) }
@@ -103,7 +103,7 @@ struct ConnectorDefinitionDetailView: View {
             }
             Section("Endpoints (\(connector.endpoints.count))") {
                 if connector.endpoints.isEmpty { Text("No endpoints configured.").font(.caption).foregroundStyle(.secondary) }
-                else { ForEach(connector.endpoints) { ep in HStack { Text(ep.method).font(.system(size: 8, weight: .black, design: .monospaced)).padding(4).background(Color.accentColor.opacity(0.1), in: Capsule()).foregroundStyle(.accent); Text(ep.path).font(.caption2.monospaced()).lineLimit(1) } }.onDelete { connector.endpoints.remove(atOffsets: $0); manager.updateConnector(connector) } }
+                else { ForEach(connector.endpoints) { ep in HStack { Text(ep.method).font(.system(size: 8, weight: .black, design: .monospaced)).padding(4).background(Color.accentColor.opacity(0.1), in: Capsule()).foregroundStyle(Color.accentColor); Text(ep.path).font(.caption2.monospaced()).lineLimit(1) } }.onDelete { connector.endpoints.remove(atOffsets: $0); manager.updateConnector(connector) } }
                 Button { showingEndpointEditor = true } label: { Label("Add Endpoint", systemImage: "plus.circle") }
             }
             Section("Configuration") {
@@ -155,7 +155,7 @@ struct ConnectorDocumentationView: View {
     }
 }
 
-private struct StatusBadge: View {
+private struct ConnectorStatusBadge: View {
     let status: ConnectorDefinition.ConnectorStatus
     var body: some View {
         Text(status.rawValue.uppercased()).font(.system(size: 8, weight: .black)).padding(.horizontal, 8).padding(.vertical, 4).background(color.opacity(0.1), in: Capsule()).foregroundStyle(color)
@@ -188,7 +188,7 @@ private struct ConnectorRow: View {
     var body: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) { Text(connector.name).font(.subheadline.bold()); Text(connector.identifier).font(.caption2.monospaced()).foregroundStyle(.secondary) }
-            Spacer(); StatusBadge(status: connector.status)
+            Spacer(); ConnectorStatusBadge(status: connector.status)
         }.padding(.vertical, 2)
     }
 }

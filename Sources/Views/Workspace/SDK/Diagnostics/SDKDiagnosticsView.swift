@@ -20,7 +20,7 @@ struct SDKDiagnosticsView: View {
 
     var body: some View {
         List {
-            Section("System Health") {
+            Section {
                 HealthStatusRow(title: "Connector Reachability", healthy: bgEngine.systemHealth.connectorReachability)
                 HealthStatusRow(title: "Plugin Sandbox", healthy: bgEngine.systemHealth.pluginSandboxStatus)
                 HealthStatusRow(title: "Data Store Health", healthy: bgEngine.systemHealth.coreDataHealth)
@@ -33,6 +33,8 @@ struct SDKDiagnosticsView: View {
                     Label("Run System Audit", systemImage: "arrow.clockwise.circle").bold()
                 }
                 .frame(maxWidth: .infinity)
+            } header: {
+                Text("System Health")
             }
 
             Section("Performance Analytics") {

@@ -26,7 +26,7 @@ struct SecurityScopeApplicationView: View {
             }
             .listRowBackground(Color.clear)
 
-            Section("Credentials & Identification") {
+            Section {
                 LabeledContent("API Key") {
                     if let key = plugin.apiKey {
                         Text(key).font(.system(.caption, design: .monospaced)).foregroundStyle(.secondary)
@@ -47,6 +47,8 @@ struct SecurityScopeApplicationView: View {
                 }
             } footer: {
                 Text("Justification for accessing sensitive data.")
+            } header: {
+                Text("Credentials & Identification")
             }
 
             Section("Data Governance") {

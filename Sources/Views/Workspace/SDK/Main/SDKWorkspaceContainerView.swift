@@ -163,7 +163,7 @@ struct SDKWorkspaceContainerView: View {
         HStack(spacing: 16) {
             Label("SDK IDE", systemImage: "hammer.fill")
                 .font(.subheadline.bold())
-                .foregroundStyle(.accent)
+                .foregroundStyle(Color.accentColor)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
                 .background(Color.accentColor.opacity(0.1), in: Capsule())

@@ -27,7 +27,7 @@ struct SDKCapabilitiesMatrixView: View {
                 LabeledContent("Active Features") {
                     Text("\(enabledCount) / \(SDKRuntimeWorkspaceState.capabilityCatalog.count)")
                         .font(.headline.monospaced())
-                        .foregroundStyle(.accent)
+                        .foregroundStyle(Color.accentColor)
                 }
             }
 

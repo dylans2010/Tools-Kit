@@ -40,7 +40,7 @@ struct PluginDetailView: View {
                                     Text(perm.capability.displayName).font(.subheadline.bold())
                                     Text(perm.description).font(.caption2).foregroundStyle(.secondary)
                                 }
-                            } icon: { Image(systemName: perm.capability.icon).foregroundStyle(.accent) }
+                            } icon: { Image(systemName: perm.capability.icon).foregroundStyle(Color.accentColor) }
                         }
                     }
 
@@ -80,7 +80,7 @@ private struct PluginProfileHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 16) {
-                Image(systemName: plugin.icon).font(.largeTitle).foregroundStyle(.accent).frame(width: 64, height: 64).background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 14))
+                Image(systemName: plugin.icon).font(.largeTitle).foregroundStyle(Color.accentColor).frame(width: 64, height: 64).background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 14))
                 VStack(alignment: .leading, spacing: 4) {
                     Text(plugin.name).font(.title3.bold())
                     Text("by \(plugin.author)").font(.subheadline).foregroundStyle(.secondary)
