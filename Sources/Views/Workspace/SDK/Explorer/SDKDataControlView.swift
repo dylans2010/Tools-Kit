@@ -54,7 +54,7 @@ struct SDKDataControlView: View {
                         }
                     } icon: {
                         Image(systemName: "shield.slash")
-                            .foregroundStyle(runtime.isNoSandboxModeEnabled ? .red : .secondary)
+                            .foregroundStyle(runtime.isNoSandboxModeEnabled ? .red : Color.secondary)
                     }
                 }
                 .tint(.red)
