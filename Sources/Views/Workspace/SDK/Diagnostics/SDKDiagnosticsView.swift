@@ -56,7 +56,7 @@ struct SDKDiagnosticsView: View {
                         let count = cachedItemCount(for: scope)
                         Text(count > 0 ? "\(count) Items" : "Empty")
                             .font(.caption2.bold())
-                            .foregroundStyle(count > 0 ? .green : .secondary)
+                            .foregroundStyle(count > 0 ? Color.green : Color.secondary)
                     }
                 }
             } header: {
@@ -71,7 +71,7 @@ struct SDKDiagnosticsView: View {
                         LabeledContent(plugin.name) {
                             Text(plugin.isEnabled ? "Active" : "Disabled")
                                 .font(.caption2.bold())
-                                .foregroundStyle(plugin.isEnabled ? .green : .secondary)
+                                .foregroundStyle(plugin.isEnabled ? Color.green : Color.secondary)
                         }
                     }
                 }
@@ -87,7 +87,7 @@ struct SDKDiagnosticsView: View {
                         LabeledContent(connector.name) {
                             Text(connector.status.rawValue.capitalized)
                                 .font(.caption2.bold())
-                                .foregroundStyle(connector.status == .connected ? .green : .orange)
+                                .foregroundStyle(connector.status == .connected ? Color.green : Color.orange)
                         }
                     }
                 }
