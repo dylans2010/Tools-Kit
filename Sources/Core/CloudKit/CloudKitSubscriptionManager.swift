@@ -32,7 +32,7 @@ public final class CloudKitSubscriptionManager {
 
         // Check if subscription already exists
         do {
-            _ = try await database.subscription(withID: subscriptionID)
+            _ = try await database.subscription(for: subscriptionID)
             return // Already exists
         } catch {
             // Continue to create
