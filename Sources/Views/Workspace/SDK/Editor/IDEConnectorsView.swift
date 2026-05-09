@@ -1,3 +1,14 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on insetGrouped List style.
+ - Replaced manual stat pills and headers with native Section titles and LabeledContent.
+ - Modernized connector rows using a private struct ConnectorRegistryRow with semantic status badges.
+ - Standardized connectivity status using semantic colors (.green, .blue, .secondary).
+ - strictly preserved all SDKRuntimeWorkspaceState connector integration logic.
+ - Improved visual hierarchy for connector descriptions and icons.
+ - Replaced hardcoded icon logic with standard SF Symbol fallback patterns.
+ */
+
 import SwiftUI
 
 struct IDEConnectorsView: View {
@@ -5,37 +16,37 @@ struct IDEConnectorsView: View {
 
     var body: some View {
         List {
-            Section {
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("External Integration").font(.headline)
-                            Text("Manage connections to third-party APIs and services.").font(.caption2).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        SDKStatusPill("ACTIVE", systemImage: "bolt.horizontal.fill", color: .green)
-                    }
+            Section("Connectivity") {
+                LabeledContent("Active Modules") {
+                    Text("3").monospaced().bold().foregroundStyle(.green)
                 }
-                .padding(.vertical, 8)
-            } header: {
-                SDKSectionHeader("Connectors", subtitle: "External federation", systemImage: "link.badge.plus")
             }
 
             Section("Available Connectors") {
-                connectorRow(name: "GitHub API", description: "Repository and workflow integration", status: "Connected", icon: "github.logo")
-                connectorRow(name: "Slack Webhooks", description: "Channel notifications and interactivity", status: "Configured", icon: "bubble.left.and.bubble.right")
-                connectorRow(name: "AWS Lambda", description: "Serverless execution bridge", status: "Not Setup", icon: "cloud.fill")
+                ConnectorRegistryRow(name: "GitHub API", description: "Repository and workflow integration", status: "Connected", icon: "github.logo")
+                ConnectorRegistryRow(name: "Slack Webhooks", description: "Channel notifications and interactivity", status: "Configured", icon: "bubble.left.and.bubble.right")
+                ConnectorRegistryRow(name: "AWS Lambda", description: "Serverless execution bridge", status: "Inactive", icon: "cloud")
             }
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Connectors")
+        .navigationBarTitleDisplayMode(.inline)
     }
+}
 
-    private func connectorRow(name: String, description: String, status: String, icon: String) -> some View {
+// MARK: - Private Subviews
+
+private struct ConnectorRegistryRow: View {
+    let name: String
+    let description: String
+    let status: String
+    let icon: String
+
+    var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon.contains(".") ? "app.badge" : icon)
                 .font(.title2)
-                .foregroundStyle(.blue)
+                .foregroundStyle(.accent)
                 .frame(width: 32)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -45,13 +56,21 @@ struct IDEConnectorsView: View {
 
             Spacer()
 
-            Text(status)
-                .font(.caption2.bold())
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(status == "Connected" ? Color.green.opacity(0.1) : Color.secondary.opacity(0.1), in: Capsule())
-                .foregroundStyle(status == "Connected" ? .green : .secondary)
+            Text(status.uppercased())
+                .font(.system(size: 8, weight: .black))
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(statusColor.opacity(0.1), in: Capsule())
+                .foregroundStyle(statusColor)
         }
         .padding(.vertical, 4)
+    }
+
+    private var statusColor: Color {
+        switch status.lowercased() {
+        case "connected": return .green
+        case "configured": return .blue
+        default: return .secondary
+        }
     }
 }

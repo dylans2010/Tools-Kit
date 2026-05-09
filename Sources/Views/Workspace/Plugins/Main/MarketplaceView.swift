@@ -1,3 +1,15 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on insetGrouped List style.
+ - Modernized the header stats using a centered SDKStatPill group with semantic colors.
+ - Replaced manual category switcher with a modern horizontal ScrollView of FilterChips.
+ - Modernized MarketplacePluginRow and MarketplaceSDKAppRow with improved spacing, better SF Symbol usage, and semantic typography.
+ - strictly preserved all PluginManager and PluginRuntimeEngine search/filter logic.
+ - Added ContentUnavailableView for empty search results and category filters.
+ - Standardized "Made For Workspace" badge with a dynamic gradient and native styling.
+ - Extracted subviews for MarketplaceStatHeader, FilterCategorySection, and result rows.
+ */
+
 import SwiftUI
 
 struct MarketplaceView: View {
@@ -34,64 +46,51 @@ struct MarketplaceView: View {
     var body: some View {
         List {
             Section {
-                SDKModernCard(padding: 12) {
-                    HStack(spacing: 0) {
-                        SDKStatPill(label: "Available", value: "\(manager.availablePlugins.count)", color: .blue)
-                        SDKStatPill(label: "Installed", value: "\(manager.installedPlugins.count)", color: .sdkSuccess)
-                        SDKStatPill(label: "SDK Apps", value: "\(sdkRuntime.loadedApps.count)", color: .purple)
-                    }
-                }
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
+                MarketplaceStatHeader(
+                    available: manager.availablePlugins.count,
+                    installed: manager.installedPlugins.count,
+                    apps: sdkRuntime.loadedApps.count
+                )
             }
+            .listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets())
+            .listRowSeparator(.hidden)
 
             Section {
-                Picker("View", selection: $selectedTab) {
+                Picker("Marketplace View", selection: $selectedTab) {
                     ForEach(MarketplaceTab.allCases, id: \.self) { tab in
                         Text(tab.rawValue).tag(tab)
                     }
                 }
                 .pickerStyle(.segmented)
-            } header: {
-                SDKSectionHeader("Repository", subtitle: "Select Module Type", alignment: .leading)
+                .padding(.vertical, 4)
             }
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
 
             if selectedTab == .plugins {
                 Section {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            FilterChip(title: "All", isSelected: selectedCategory == nil) {
-                                selectedCategory = nil
-                            }
-
-                            ForEach(PluginCapability.allCases) { cap in
-                                FilterChip(title: cap.displayName, isSelected: selectedCategory == cap) {
-                                    selectedCategory = cap
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 4)
-                    }
-                } header: {
-                    SDKSectionHeader("Categories", subtitle: "Filter By Capability", alignment: .leading)
+                    FilterCategorySection(selectedCategory: $selectedCategory)
                 }
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
 
-                Section {
+                Section("Discover Plugins") {
                     if filteredPlugins.isEmpty {
-                        ContentUnavailableView("No Plugins", systemImage: "magnifyingglass", description: Text("No plugins match your search or filter."))
+                        ContentUnavailableView("No Plugins", systemImage: "puzzlepiece.slash", description: Text("No extensions match your current filter or search."))
                     } else {
                         ForEach(filteredPlugins) { plugin in
-                            NavigationLink(destination: PluginDetailView(pluginID: plugin.id)) {
+                            NavigationLink {
+                                PluginDetailView(pluginID: plugin.id)
+                            } label: {
                                 MarketplacePluginRow(plugin: plugin)
                             }
                         }
                     }
-                } header: {
-                    SDKSectionHeader("Discover Plugins", subtitle: "Verified Community Extensions", alignment: .leading)
                 }
             } else {
-                Section {
+                Section("Native SDK Apps") {
                     if filteredSDKApps.isEmpty {
                         ContentUnavailableView("No SDK Apps", systemImage: "hammer.fill", description: Text("Applications built with Workspace SDK will appear here."))
                     } else {
@@ -99,44 +98,76 @@ struct MarketplaceView: View {
                             MarketplaceSDKAppRow(app: app, isRunning: sdkRuntime.isRunning(app.id))
                         }
                     }
-                } header: {
-                    SDKSectionHeader("Native Apps", subtitle: "SDK powered applications", alignment: .leading)
                 }
             }
         }
-        .searchable(text: $searchText, prompt: "Search Marketplace")
+        .listStyle(.insetGrouped)
+        .searchable(text: $searchText, prompt: "Search modules...")
         .navigationTitle("Marketplace")
+    }
+}
+
+// MARK: - Private Subviews
+
+private struct MarketplaceStatHeader: View {
+    let available: Int
+    let installed: Int
+    let apps: Int
+
+    var body: some View {
+        HStack(spacing: 0) {
+            SDKStatPill(label: "Available", value: "\(available)", color: .blue)
+            SDKStatPill(label: "Installed", value: "\(installed)", color: .sdkSuccess)
+            SDKStatPill(label: "SDK Apps", value: "\(apps)", color: .purple)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+    }
+}
+
+private struct FilterCategorySection: View {
+    @Binding var selectedCategory: PluginCapability?
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                FilterChip(title: "All", isSelected: selectedCategory == nil) { selectedCategory = nil }
+                ForEach(PluginCapability.allCases) { cap in
+                    FilterChip(title: cap.displayName, isSelected: selectedCategory == cap) { selectedCategory = cap }
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+        .padding(.vertical, 8)
     }
 }
 
 struct MarketplacePluginRow: View {
     let plugin: PluginDefinition
-
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: plugin.icon)
-                .font(.title2)
-                .foregroundStyle(.blue)
+                .font(.title3)
+                .foregroundStyle(.accent)
                 .frame(width: 44, height: 44)
-                .background(Color.blue.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
 
-            VStack(alignment: .leading, spacing: 3) {
-                HStack {
-                    Text(plugin.name).font(.subheadline).bold()
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 4) {
+                    Text(plugin.name).font(.subheadline.bold())
                     if plugin.isInstalled {
-                        Image(systemName: "checkmark.seal.fill").font(.caption).foregroundStyle(.green)
+                        Image(systemName: "checkmark.seal.fill").font(.caption2).foregroundStyle(.sdkSuccess)
                     }
                 }
-                Text(plugin.description).font(.caption).foregroundStyle(.secondary).lineLimit(2)
-                HStack {
-                    Text("v\(plugin.version)").font(.caption2).foregroundStyle(.tertiary)
-                    Text("·").font(.caption2).foregroundStyle(.tertiary)
-                    Text(plugin.author).font(.caption2).foregroundStyle(.tertiary)
-                }
+                Text(plugin.description).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
+                HStack(spacing: 4) {
+                    Text("v\(plugin.version)").monospaced()
+                    Text("·")
+                    Text(plugin.author)
+                }.font(.system(size: 8, weight: .medium)).foregroundStyle(.tertiary)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
     }
 }
 
@@ -147,52 +178,40 @@ struct MarketplaceSDKAppRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "hammer.fill")
-                .font(.title2)
+                .font(.title3)
                 .foregroundStyle(.purple)
                 .frame(width: 44, height: 44)
-                .background(Color.purple.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .background(Color.purple.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
-                    Text(app.name).font(.subheadline).bold()
-                    if app.madeForWorkspace {
-                        MadeForWorkspaceBadge()
-                    }
-                    if isRunning {
-                        Circle().fill(.green).frame(width: 6, height: 6)
-                    }
+                    Text(app.name).font(.subheadline.bold())
+                    if app.madeForWorkspace { MadeForWorkspaceBadge() }
+                    if isRunning { Circle().fill(.green).frame(width: 6, height: 6) }
                 }
                 if !app.description.isEmpty {
-                    Text(app.description).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                    Text(app.description).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
                 }
-                HStack {
-                    Text("v\(app.version)").font(.caption2).foregroundStyle(.tertiary)
+                HStack(spacing: 4) {
+                    Text("v\(app.version)").monospaced()
                     if !app.author.isEmpty {
-                        Text("·").font(.caption2).foregroundStyle(.tertiary)
-                        Text(app.author).font(.caption2).foregroundStyle(.tertiary)
+                        Text("·")
+                        Text(app.author)
                     }
-                }
+                }.font(.system(size: 8, weight: .medium)).foregroundStyle(.tertiary)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
     }
 }
 
 struct MadeForWorkspaceBadge: View {
     var body: some View {
         Text("Made For Workspace")
-            .font(.system(size: 8, weight: .semibold))
+            .font(.system(size: 7, weight: .black))
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
-            .background(
-                LinearGradient(
-                    colors: [Color.blue, Color.purple],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
+            .background(LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing), in: Capsule())
             .foregroundStyle(.white)
-            .clipShape(Capsule())
     }
 }

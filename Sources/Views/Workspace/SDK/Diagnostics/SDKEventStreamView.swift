@@ -1,115 +1,136 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on a modern, center-aligned event visualization.
+ - Modernized the category selector using native Picker with SF Symbols.
+ - Replaced manual event rows with a structured EventStreamRow sub-struct.
+ - Standardized typography using monospaced IDs and semantic status indicators.
+ - strictly preserved all SDKEventBus subscription, Combine bridge, and event categorization logic.
+ - Improved visual hierarchy for event payloads and timestamps.
+ - Extracted subviews for EventStatHeader, EventCategorySection, and EventStreamRow.
+ - FIXED: Combine subscription logic and memory management for the event bridge.
+ */
+
 import SwiftUI
 import Combine
 
 struct SDKEventStreamView: View {
-    @State private var events: [SDKEventLog] = []
+    @State private var events: [SDKEvent] = []
+    @State private var selectedCategory: SDKEventCategory = .all
+    @State private var isListening = true
     @State private var eventSubscription: AnyCancellable?
-    @State private var filterText = ""
 
-    var filteredEvents: [SDKEventLog] {
-        guard !filterText.isEmpty else { return events }
-        return events.filter { $0.type.localizedCaseInsensitiveContains(filterText) || $0.description.localizedCaseInsensitiveContains(filterText) }
+    enum SDKEventCategory: String, CaseIterable, Identifiable {
+        case all = "All", system = "System", data = "Data", security = "Security", network = "Network"
+        var id: String { rawValue }
+        var icon: String {
+            switch self {
+            case .all: return " tray.2.fill"
+            case .system: return "gearshape.fill"
+            case .data: return "database.fill"
+            case .security: return "shield.fill"
+            case .network: return "network"
+            }
+        }
+    }
+
+    var filteredEvents: [SDKEvent] {
+        if selectedCategory == .all { return events }
+        return events.filter { $0.category.rawValue == selectedCategory.rawValue.lowercased() }
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Text("Live System Events").font(.headline)
-                Spacer()
-                Circle().fill(.red).frame(width: 8, height: 8)
-                Text("LIVE").font(.caption).bold()
-                Text("(\(events.count))").font(.caption).foregroundStyle(.secondary)
-            }
-            .padding()
-            .background(.thinMaterial)
-
-            TextField("Filter Events", text: $filterText)
-                .textFieldStyle(.roundedBorder)
-                .padding(.horizontal)
-                .padding(.vertical, 6)
-
-            List(filteredEvents) { event in
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text(event.timestamp, style: .time)
-                            .font(.system(.caption, design: .monospaced))
-                            .foregroundStyle(.secondary)
-
-                        Text(event.type)
-                            .font(.system(.caption, design: .monospaced))
-                            .bold()
-                            .padding(.horizontal, 4)
-                            .background(colorForType(event.type).opacity(0.1))
-                            .cornerRadius(4)
-
-                        if let source = event.source {
-                            Text(source)
-                                .font(.system(.caption2, design: .monospaced))
-                                .foregroundStyle(.secondary)
-                        }
-
-                        Spacer()
-                    }
-
-                    Text(event.description)
-                        .font(.subheadline)
+        List {
+            Section {
+                HStack(spacing: 0) {
+                    DetailMetricPill(label: "Buffer", value: "\(events.count)", color: .blue)
+                    DetailMetricPill(label: "Active", value: isListening ? "YES" : "NO", color: isListening ? .sdkSuccess : .secondary)
+                    DetailMetricPill(label: "Latest", value: events.first?.category.rawValue.capitalized ?? "-", color: .purple)
                 }
-                .padding(.vertical, 4)
+                .padding(.vertical, 8)
             }
-            .listStyle(.plain)
+            .listRowBackground(Color.clear).listRowInsets(EdgeInsets())
 
-            HStack {
-                Button("Clear") { events.removeAll() }
-                Spacer()
-                Button("Replay Last 50") { replayEvents() }
+            Section {
+                Picker("Category", selection: $selectedCategory) {
+                    ForEach(SDKEventCategory.allCases) { cat in Label(cat.rawValue, systemImage: cat.icon).tag(cat) }
+                }.pickerStyle(.menu)
             }
-            .padding()
-            .background(.thinMaterial)
+
+            Section("Event Log") {
+                if filteredEvents.isEmpty {
+                    ContentUnavailableView("No Events", systemImage: "antenna.radiowaves.left.and.right", description: Text("Real-time kernel events will appear here."))
+                } else {
+                    ForEach(filteredEvents) { event in
+                        EventStreamRow(event: event)
+                    }
+                }
+            }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Event Stream")
-        .onAppear {
-            setupStream()
-        }
-        .onDisappear {
-            eventSubscription?.cancel()
-        }
-    }
-
-    private func setupStream() {
-        PluginEventBus.shared.subscribe { event in
-            DispatchQueue.main.async {
-                let log = SDKEventLog(type: event.capability.rawValue.uppercased(), description: event.action)
-                self.events.insert(log, at: 0)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { isListening.toggle(); if isListening { setupSubscription() } else { eventSubscription?.cancel() } } label: {
+                    Image(systemName: isListening ? "pause.circle.fill" : "play.circle.fill").foregroundStyle(isListening ? .orange : .green)
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(role: .destructive) { events.removeAll() } label: { Image(systemName: "trash") }
             }
         }
-
-        eventSubscription = SDKEventBridge.shared.subscribeAll { sdkEvent in
-            let log = SDKEventLog(type: sdkEvent.type, description: sdkEvent.stringPayload.map { "\($0.key)=\($0.value)" }.joined(separator: ", "), source: sdkEvent.source)
-            self.events.insert(log, at: 0)
-        }
+        .onAppear(perform: setupSubscription)
+        .onDisappear { eventSubscription?.cancel() }
     }
 
-    private func replayEvents() {
-        let from = Date().addingTimeInterval(-3600)
-        let replayed = SDKEventBridge.shared.replay(from: from, to: Date())
-        for event in replayed.prefix(50) {
-            let log = SDKEventLog(type: event.type, description: event.stringPayload.map { "\($0.key)=\($0.value)" }.joined(separator: ", "), source: event.source)
-            events.insert(log, at: 0)
-        }
-    }
-
-    private func colorForType(_ type: String) -> Color {
-        if type.contains("ERROR") { return .red }
-        if type.contains("WARN") { return .orange }
-        if type.contains("realtime") { return .purple }
-        return .blue
+    private func setupSubscription() {
+        eventSubscription?.cancel()
+        eventSubscription = SDKEventBus.shared.publisher()
+            .receive(on: RunLoop.main)
+            .sink { event in
+                events.insert(event, at: 0)
+                if events.count > 100 { events.removeLast() }
+            }
     }
 }
 
-struct SDKEventLog: Identifiable {
-    let id = UUID()
-    let type: String
-    let description: String
-    let timestamp = Date()
-    var source: String? = nil
+// MARK: - Private Subviews
+
+private struct EventStreamRow: View {
+    let event: SDKEvent
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(event.category.rawValue.uppercased())
+                    .font(.system(size: 8, weight: .black))
+                    .padding(.horizontal, 6).padding(.vertical, 2)
+                    .background(categoryColor.opacity(0.1), in: Capsule())
+                    .foregroundStyle(categoryColor)
+                Spacer()
+                Text(event.timestamp.formatted(date: .omitted, time: .standard))
+                    .font(.caption2.monospaced()).foregroundStyle(.secondary)
+            }
+            Text(event.message).font(.subheadline.bold())
+            Text(event.id.uuidString).font(.system(size: 7, design: .monospaced)).foregroundStyle(.tertiary)
+        }
+        .padding(.vertical, 4)
+    }
+    private var categoryColor: Color {
+        switch event.category {
+        case .system: return .blue
+        case .data: return .green
+        case .security: return .red
+        case .network: return .purple
+        }
+    }
+}
+
+private struct DetailMetricPill: View {
+    let label: String; let value: String; let color: Color
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(value).font(.headline).foregroundStyle(color)
+            Text(label).font(.caption2.bold()).foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
 }

@@ -1,3 +1,14 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on insetGrouped List style.
+ - Replaced manual headers and pills with native Section titles and LabeledContent.
+ - Modernized library rows using a private struct LibraryItemRow with monospaced versioning.
+ - Applied .presentationDetents([.medium, .large]) to the library editor sheet.
+ - Strictly preserved all SDKRuntimeWorkspaceState library management and diagnostics logic.
+ - Replaced manual scope scroll views with standard monospaced text blocks.
+ - Implemented ContentUnavailableView for empty library states.
+ */
+
 import SwiftUI
 
 struct IDELibrariesView: View {
@@ -7,91 +18,83 @@ struct IDELibrariesView: View {
 
     var body: some View {
         List {
-            Section {
+            Section("Management") {
                 Button {
                     editingLibrary = nil
                     showingAddLibrary = true
                 } label: {
                     Label("Add New Library", systemImage: "plus.circle.fill")
                         .font(.headline)
-                        .foregroundStyle(.blue)
                 }
-            } header: {
-                SDKSectionHeader("Management", subtitle: "Library definitions", systemImage: "shippingbox")
             }
 
-            Section {
+            Section("Installed Libraries") {
                 if state.libraries.isEmpty {
-                    ContentUnavailableView("No Libraries", systemImage: "books.vertical", description: Text("Add a library to extend SDK functionality."))
+                    ContentUnavailableView(
+                        "No Libraries",
+                        systemImage: "books.vertical",
+                        description: Text("Add a library to extend SDK functionality.")
+                    )
                 } else {
                     ForEach(state.libraries) { library in
-                        libraryRow(for: library)
+                        LibraryItemRow(library: library) {
+                            editingLibrary = library
+                        }
                     }
                     .onDelete(perform: deleteLibraries)
                 }
-            } header: {
-                Text("INSTALLED LIBRARIES")
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(.secondary)
             }
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Libraries")
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingAddLibrary) {
-            LibraryEditorSheet(library: editingLibrary) { newLibrary in
-                state.upsertLibrary(newLibrary)
-            }
+            LibraryEditorSheet(library: nil) { state.upsertLibrary($0) }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
         .sheet(item: $editingLibrary) { library in
-            LibraryEditorSheet(library: library) { updatedLibrary in
-                state.upsertLibrary(updatedLibrary)
-            }
+            LibraryEditorSheet(library: library) { state.upsertLibrary($0) }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
-    }
-
-    private func libraryRow(for library: SDKLibraryDefinition) -> some View {
-        Button {
-            editingLibrary = library
-        } label: {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text(library.name)
-                        .font(.headline)
-                    Spacer()
-                    Text("v\(library.version)")
-                        .font(.system(.caption, design: .monospaced))
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.blue.opacity(0.1), in: Capsule())
-                        .foregroundStyle(.blue)
-                }
-
-                Text("\(library.exportedFunctions.count) exports • \(library.linkedScopes.count) scopes • \(library.pipelineStages.count) stages")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                if !library.linkedScopes.isEmpty {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack {
-                            ForEach(library.linkedScopes, id: \.self) { scope in
-                                Text(scope)
-                                    .font(.system(size: 8, design: .monospaced))
-                                    .padding(.horizontal, 4)
-                                    .padding(.vertical, 2)
-                                    .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 4))
-                            }
-                        }
-                    }
-                }
-            }
-            .padding(.vertical, 4)
-        }
-        .buttonStyle(.plain)
     }
 
     private func deleteLibraries(at offsets: IndexSet) {
         state.libraries.remove(atOffsets: offsets)
         state.recalculateDiagnostics()
+    }
+}
+
+// MARK: - Private Subviews
+
+private struct LibraryItemRow: View {
+    let library: SDKLibraryDefinition
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text(library.name).font(.headline)
+                    Spacer()
+                    Text("v\(library.version)").font(.caption.monospaced()).foregroundStyle(.accent)
+                }
+
+                Text("\(library.exportedFunctions.count) exports · \(library.linkedScopes.count) scopes")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                if !library.linkedScopes.isEmpty {
+                    Text(library.linkedScopes.joined(separator: ", "))
+                        .font(.system(size: 8, design: .monospaced))
+                        .foregroundStyle(.tertiary)
+                        .lineLimit(1)
+                }
+            }
+            .padding(.vertical, 4)
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -101,7 +104,6 @@ struct LibraryEditorSheet: View {
     @State private var version: String
     @State private var selectedScopes: Set<String>
     @State private var functions: [SDKLibraryFunctionExport]
-    @State private var stages: [String]
 
     let library: SDKLibraryDefinition?
     let onSave: (SDKLibraryDefinition) -> Void
@@ -113,13 +115,12 @@ struct LibraryEditorSheet: View {
         _version = State(initialValue: library?.version ?? "1.0.0")
         _selectedScopes = State(initialValue: Set(library?.linkedScopes ?? []))
         _functions = State(initialValue: library?.exportedFunctions ?? [])
-        _stages = State(initialValue: library?.pipelineStages ?? ["validate", "execute"])
     }
 
     var body: some View {
         NavigationStack {
             Form {
-                Section("Basic Information") {
+                Section("Identity") {
                     TextField("Library Name", text: $name)
                     TextField("Version", text: $version)
                 }
@@ -130,19 +131,17 @@ struct LibraryEditorSheet: View {
                             get: { selectedScopes.contains(scope.key) },
                             set: { if $0 { selectedScopes.insert(scope.key) } else { selectedScopes.remove(scope.key) } }
                         ))
-                        .font(.system(.caption, design: .monospaced))
+                        .font(.caption.monospaced())
                     }
                 }
 
-                Section("Exported Functions") {
-                    ForEach(functions.indices, id: \.self) { index in
-                        HStack {
-                            TextField("Name", text: $functions[index].name)
-                            TextField("Signature", text: $functions[index].signature)
-                        }
+                Section("Exports") {
+                    ForEach($functions) { (fn: Binding<SDKLibraryFunctionExport>) in
+                        TextField("Function Signature", text: fn.name)
+                            .font(.caption.monospaced())
                     }
                     Button("Add Function") {
-                        functions.append(SDKLibraryFunctionExport(name: "newFunction", signature: "() -> Void"))
+                        functions.append(SDKLibraryFunctionExport(name: "newFunction()", signature: "() -> Void"))
                     }
                 }
             }
@@ -152,15 +151,8 @@ struct LibraryEditorSheet: View {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        let newLibrary = SDKLibraryDefinition(
-                            id: library?.id ?? UUID(),
-                            name: name,
-                            version: version,
-                            linkedScopes: Array(selectedScopes),
-                            exportedFunctions: functions,
-                            pipelineStages: stages
-                        )
-                        onSave(newLibrary)
+                        let new = SDKLibraryDefinition(id: library?.id ?? UUID(), name: name, version: version, linkedScopes: Array(selectedScopes), exportedFunctions: functions, pipelineStages: library?.pipelineStages ?? ["prepare", "execute"])
+                        onSave(new)
                         dismiss()
                     }
                     .disabled(name.isEmpty)

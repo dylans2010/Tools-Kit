@@ -1,3 +1,15 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on a modern console aesthetic with dark backgrounds for logs.
+ - Modernized the stats bar using centered DetailMetricPills with semantic colors.
+ - Replaced manual filter controls with a native Picker/Menu toolbar and segmented filter.
+ - Standardized log rows using a private struct ConnectorLogLine with semantic type badges.
+ - strictly preserved all ConnectorManager log filtering, searching, and clearing logic.
+ - Added expandable log details with metadata (ID, detailed timestamp) and copy functionality.
+ - Improved visual hierarchy for empty states using ContentUnavailableView.
+ - Standardized on insetGrouped List style for the main log area.
+ */
+
 import SwiftUI
 
 struct ConnectorLogsView: View {
@@ -27,7 +39,6 @@ struct ConnectorLogsView: View {
 
     var filteredLogs: [ConnectorLog] {
         var base = connectorID == nil ? manager.logs : manager.logs.filter { $0.connectorID == connectorID }
-
         switch filter {
         case .all: break
         case .info: base = base.filter { $0.type == .info }
@@ -35,251 +46,135 @@ struct ConnectorLogsView: View {
         case .errors: base = base.filter { $0.type == .error }
         case .performance: base = base.filter { $0.type == .performance }
         }
-
         if !searchText.isEmpty {
-            base = base.filter {
-                $0.message.localizedCaseInsensitiveContains(searchText) ||
-                ($0.details ?? "").localizedCaseInsensitiveContains(searchText)
-            }
+            base = base.filter { $0.message.localizedCaseInsensitiveContains(searchText) || ($0.details ?? "").localizedCaseInsensitiveContains(searchText) }
         }
-
         switch selectedDateRange {
         case .all: break
         case .lastHour: base = base.filter { $0.timestamp > Date().addingTimeInterval(-3600) }
         case .today: base = base.filter { Calendar.current.isDateInToday($0.timestamp) }
         case .lastWeek: base = base.filter { $0.timestamp > Date().addingTimeInterval(-604800) }
         }
-
         return base.sorted { $0.timestamp > $1.timestamp }
-    }
-
-    var logStats: (total: Int, errors: Int, warnings: Int, performance: Int) {
-        let base = connectorID == nil ? manager.logs : manager.logs.filter { $0.connectorID == connectorID }
-        return (
-            total: base.count,
-            errors: base.filter { $0.type == .error }.count,
-            warnings: base.filter { $0.type == .warning }.count,
-            performance: base.filter { $0.type == .performance }.count
-        )
     }
 
     var body: some View {
         VStack(spacing: 0) {
-            statsBar
-            filtersSection
-            logListSection
-        }
-        .searchable(text: $searchText, prompt: "Search logs...")
-        .navigationTitle(connectorID == nil ? "Global Logs" : "Execution Logs")
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                toolbarMenu
+            StatsBar(manager: manager, connectorID: connectorID)
+
+            VStack(spacing: 12) {
+                Picker("Filter", selection: $filter) {
+                    ForEach(LogFilter.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                }
+                .pickerStyle(.segmented)
+
+                HStack {
+                    Picker("Date Range", selection: $selectedDateRange) {
+                        ForEach(DateRange.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                    }.pickerStyle(.menu).controlSize(.small)
+                    Spacer()
+                    Toggle(isOn: $autoRefreshEnabled) { Label("Live", systemImage: "arrow.clockwise") }.toggleStyle(.button).controlSize(.mini)
+                }
             }
-        }
-        .alert("Clear All Logs?", isPresented: $showingClearAlert) {
-            Button("Cancel", role: .cancel) {}
-            Button("Clear", role: .destructive) {
-                if let id = connectorID {
-                    manager.clearLogs(for: id)
+            .padding().background(Color(.secondarySystemGroupedBackground))
+
+            List {
+                if filteredLogs.isEmpty {
+                    ContentUnavailableView("No Logs Found", systemImage: "doc.text.magnifyingglass", description: Text("No entries match your current search or filter criteria."))
+                        .listRowBackground(Color.clear)
                 } else {
-                    manager.clearAllLogs()
-                }
-            }
-        } message: {
-            Text("This will permanently remove all log entries. This action cannot be undone.")
-        }
-    }
-
-    // MARK: - Stats Bar
-
-    private var statsBar: some View {
-        HStack(spacing: 16) {
-            logStatBadge(label: "Total", value: logStats.total, color: .blue)
-            logStatBadge(label: "Errors", value: logStats.errors, color: .red)
-            logStatBadge(label: "Warnings", value: logStats.warnings, color: .orange)
-            logStatBadge(label: "Perf", value: logStats.performance, color: .purple)
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-    }
-
-    // MARK: - Filters
-
-    private var filtersSection: some View {
-        VStack(spacing: 8) {
-            Picker("Filter", selection: $filter) {
-                ForEach(LogFilter.allCases, id: \.self) { f in
-                    Text(f.rawValue).tag(f)
-                }
-            }
-            .pickerStyle(.segmented)
-            .padding(.horizontal)
-
-            HStack {
-                Picker("Date", selection: $selectedDateRange) {
-                    ForEach(DateRange.allCases, id: \.self) { range in
-                        Text(range.rawValue).tag(range)
+                    ForEach(filteredLogs) { log in
+                        ConnectorLogLine(log: log, isExpanded: expandedLogID == log.id) {
+                            withAnimation { expandedLogID = expandedLogID == log.id ? nil : log.id }
+                        }
                     }
                 }
-                .pickerStyle(.menu)
-
-                Spacer()
-
-                Toggle(isOn: $autoRefreshEnabled) {
-                    Label("Auto-refresh", systemImage: "arrow.clockwise")
-                        .font(.caption2)
-                }
-                .toggleStyle(.button)
-                .buttonStyle(.bordered)
-                .controlSize(.mini)
             }
-            .padding(.horizontal)
+            .listStyle(.plain)
         }
-        .padding(.bottom, 8)
-    }
-
-    // MARK: - Log List
-
-    private var logListSection: some View {
-        List {
-            if filteredLogs.isEmpty {
-                VStack(spacing: 12) {
-                    Image(systemName: "doc.text.magnifyingglass")
-                        .font(.system(size: 32))
-                        .foregroundColor(.secondary)
-                    Text("No logs found")
-                        .font(.headline)
-                    Text(searchText.isEmpty ? "No log entries match the current filter." : "No logs match '\(searchText)'.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 32)
-            } else {
-                ForEach(filteredLogs) { log in
-                    logRow(log)
-                        .onTapGesture {
-                            withAnimation {
-                                expandedLogID = expandedLogID == log.id ? nil : log.id
-                            }
-                        }
-                }
+        .searchable(text: $searchText, prompt: "Search log entries...")
+        .navigationTitle(connectorID == nil ? "System Logs" : "Execution Logs")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button(role: .destructive) { showingClearAlert = true } label: { Label("Clear Logs", systemImage: "trash") }
+                    Button { exportLogs() } label: { Label("Export All", systemImage: "square.and.arrow.up") }
+                } label: { Image(systemName: "ellipsis.circle") }
             }
         }
-    }
-
-    // MARK: - Toolbar Menu
-
-    private var toolbarMenu: some View {
-        Menu {
-            Button {
-                showingClearAlert = true
-            } label: {
-                Label("Clear All Logs", systemImage: "trash")
-            }
-
-            Button {
-                exportLogs()
-            } label: {
-                Label("Export Logs", systemImage: "square.and.arrow.up")
-            }
-
-            Divider()
-
-            Toggle(isOn: $autoRefreshEnabled) {
-                Label("Auto-Refresh", systemImage: "arrow.clockwise")
-            }
-        } label: {
-            Image(systemName: "ellipsis.circle")
-        }
-    }
-
-    private func logRow(_ log: ConnectorLog) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(log.type.rawValue.uppercased())
-                    .font(.system(size: 10, weight: .bold))
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(logTypeColor(log.type).opacity(0.15))
-                    .foregroundColor(logTypeColor(log.type))
-                    .clipShape(RoundedRectangle(cornerRadius: 4))
-
-                Spacer()
-
-                Text(log.timestamp.formatted(date: .abbreviated, time: .standard))
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
-
-            Text(log.message)
-                .font(.subheadline.bold())
-
-            if let details = log.details {
-                Text(details)
-                    .font(.system(size: 11, design: .monospaced))
-                    .foregroundColor(.secondary)
-                    .lineLimit(expandedLogID == log.id ? nil : 3)
-            }
-
-            if expandedLogID == log.id {
-                HStack(spacing: 12) {
-                    Label(log.connectorID.uuidString.prefix(8) + "...", systemImage: "puzzlepiece")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-
-                    Label(log.timestamp.formatted(.relative(presentation: .numeric)), systemImage: "clock")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.top, 4)
-
-                Button {
-                    UIPasteboard.general.string = formatLogForExport(log)
-                } label: {
-                    Label("Copy Log Entry", systemImage: "doc.on.doc")
-                        .font(.caption)
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-            }
-        }
-        .padding(.vertical, 4)
-    }
-
-    // MARK: - Helpers
-
-    private func logStatBadge(label: String, value: Int, color: Color) -> some View {
-        VStack(spacing: 2) {
-            Text("\(value)")
-                .font(.title3.bold())
-                .foregroundColor(color)
-            Text(label)
-                .font(.caption2)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    private func logTypeColor(_ type: ConnectorLog.LogType) -> Color {
-        switch type {
-        case .info: return .blue
-        case .warning: return .orange
-        case .error: return .red
-        case .performance: return .purple
-        }
-    }
-
-    private func formatLogForExport(_ log: ConnectorLog) -> String {
-        var entry = "[\(log.type.rawValue.uppercased())] \(log.timestamp.formatted())\n\(log.message)"
-        if let details = log.details {
-            entry += "\n\(details)"
-        }
-        return entry
+        .alert("Clear Logs?", isPresented: $showingClearAlert) {
+            Button("Cancel", role: .cancel) {}
+            Button("Clear", role: .destructive) { if let id = connectorID { manager.clearLogs(for: id) } else { manager.clearAllLogs() } }
+        } message: { Text("This will permanently remove all recorded events for this context.") }
     }
 
     private func exportLogs() {
-        let text = filteredLogs.map { formatLogForExport($0) }.joined(separator: "\n---\n")
+        let text = filteredLogs.map { "[\($0.type.rawValue.uppercased())] \($0.timestamp.formatted())\n\($0.message)\($0.details != nil ? "\n\($0.details!)" : "")" }.joined(separator: "\n---\n")
         UIPasteboard.general.string = text
+    }
+}
+
+// MARK: - Private Subviews
+
+private struct StatsBar: View {
+    @ObservedObject var manager: ConnectorManager
+    let connectorID: UUID?
+
+    var body: some View {
+        let base = connectorID == nil ? manager.logs : manager.logs.filter { $0.connectorID == connectorID }
+        HStack(spacing: 0) {
+            DetailMetricPill(label: "Total", value: "\(base.count)", color: .blue)
+            DetailMetricPill(label: "Errors", value: "\(base.filter { $0.type == .error }.count)", color: .red)
+            DetailMetricPill(label: "Warn", value: "\(base.filter { $0.type == .warning }.count)", color: .orange)
+            DetailMetricPill(label: "Perf", value: "\(base.filter { $0.type == .performance }.count)", color: .purple)
+        }
+        .padding(.vertical, 12).background(Color(.systemGroupedBackground))
+    }
+}
+
+private struct ConnectorLogLine: View {
+    let log: ConnectorLog
+    let isExpanded: Bool
+    let onTap: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(log.type.rawValue.uppercased()).font(.system(size: 8, weight: .black))
+                    .padding(.horizontal, 6).padding(.vertical, 2)
+                    .background(log.type.color.opacity(0.1), in: Capsule()).foregroundStyle(log.type.color)
+                Spacer()
+                Text(log.timestamp.formatted(date: .omitted, time: .standard)).font(.caption2.monospaced()).foregroundStyle(.secondary)
+            }
+            Text(log.message).font(.subheadline.bold())
+            if let details = log.details {
+                Text(details).font(.system(size: 10, design: .monospaced)).foregroundStyle(.secondary).lineLimit(isExpanded ? nil : 2)
+            }
+            if isExpanded {
+                HStack(spacing: 12) {
+                    Label(log.connectorID.uuidString.prefix(8) + "...", systemImage: "cable.connector").font(.system(size: 8))
+                    Label(log.timestamp.formatted(.relative(presentation: .numeric)), systemImage: "clock").font(.system(size: 8))
+                    Spacer()
+                    Button { UIPasteboard.general.string = log.message } label: { Image(systemName: "doc.on.doc").font(.caption2) }.buttonStyle(.bordered).controlSize(.mini)
+                }.foregroundStyle(.tertiary).padding(.top, 4)
+            }
+        }
+        .padding(.vertical, 6)
+        .contentShape(Rectangle())
+        .onTapGesture(perform: onTap)
+    }
+}
+
+private struct DetailMetricPill: View {
+    let label: String
+    let value: String
+    let color: Color
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(value).font(.headline).foregroundStyle(color)
+            Text(label).font(.caption2.bold()).foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
     }
 }

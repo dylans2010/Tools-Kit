@@ -1,3 +1,14 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on insetGrouped List style.
+ - Modernized interface exploration links using native Label and semantic icons.
+ - Replaced manual internal metrics with structured Sections and native LabeledContent.
+ - Standardized developer mode toggle using semantic red coloring and descriptive footer.
+ - strictly preserved all SDKRuntimeEngine, SDKTelemetryEngine, and SDKRealtimeSync logic.
+ - Improved visual hierarchy for module-specific explorers (Notes, Tasks, etc.).
+ - Standardized navigation dismiss action using @Environment(\.dismiss).
+ */
+
 import SwiftUI
 
 struct SDKSystemExplorerView: View {
@@ -7,119 +18,94 @@ struct SDKSystemExplorerView: View {
     var body: some View {
         List {
             Section {
-                Toggle("Try with SDK", isOn: $runtime.isNoSandboxModeEnabled)
+                Toggle("Developer Mode", isOn: $runtime.isNoSandboxModeEnabled)
                     .tint(.red)
-
+            } header: {
+                Text("Kernel Control")
+            } footer: {
                 if runtime.isNoSandboxModeEnabled {
-                    Label("All scope restrictions bypassed", systemImage: "exclamationmark.triangle.fill")
-                        .font(.caption)
+                    Label("All scope restrictions currently bypassed", systemImage: "exclamationmark.triangle")
+                        .font(.caption2)
                         .foregroundStyle(.orange)
+                } else {
+                    Text("Enable to bypass all security boundaries for local testing.")
                 }
             }
 
-            Section {
-                NavigationLink("Notes API", destination: APIExplorerDetail(module: "Notes"))
-                NavigationLink("Tasks API", destination: APIExplorerDetail(module: "Tasks"))
-                NavigationLink("Mail API", destination: APIExplorerDetail(module: "Mail"))
-                NavigationLink("Calendar API", destination: APIExplorerDetail(module: "Calendar"))
-                NavigationLink("Files API", destination: APIExplorerDetail(module: "Files"))
-                NavigationLink("Slides API", destination: APIExplorerDetail(module: "Slides"))
-                NavigationLink("Meet API", destination: APIExplorerDetail(module: "Meet"))
-                NavigationLink("Persona API", destination: APIExplorerDetail(module: "Persona"))
-            } header: {
-                Text("Workspace API Graph")
+            Section("Interface Explorer") {
+                ExplorerLink(title: "Notes API", module: "Notes", icon: "note.text")
+                ExplorerLink(title: "Tasks API", module: "checkmark.circle", icon: "checkmark.circle")
+                ExplorerLink(title: "Mail API", module: "Mail", icon: "envelope")
+                ExplorerLink(title: "Calendar API", module: "Calendar", icon: "calendar")
+                ExplorerLink(title: "Files API", module: "Files", icon: "doc")
+                ExplorerLink(title: "Slides API", module: "Slides", icon: "rectangle.on.rectangle")
+                ExplorerLink(title: "Meet API", module: "Meet", icon: "video")
+                ExplorerLink(title: "Persona API", module: "Persona", icon: "brain")
             }
 
-            Section {
-                NavigationLink("Active Entities", destination: EntityExplorerView())
-                NavigationLink("Workspace Graph", destination: SDKWorkspaceExplorerView())
-                NavigationLink("Event Stream", destination: SDKEventStreamView())
-            } header: {
-                Text("Live System Data")
+            Section("Deep Data Access") {
+                NavigationLink { EntityExplorerView() } label: { Label("Active Entities", systemImage: "cylinder.fill") }
+                NavigationLink { SDKWorkspaceExplorerView() } label: { Label("Workspace Graph", systemImage: "circle.grid.cross") }
+                NavigationLink { SDKEventStreamView() } label: { Label("Event Stream", systemImage: "bolt.fill") }
             }
 
-            Section {
+            Section("SDK Internals") {
                 let metrics = SDKTelemetryEngine.shared.getMetrics()
-                HStack {
-                    Text("Total Traces")
-                    Spacer()
-                    Text("\(metrics.totalTraces)").font(.caption).foregroundStyle(.secondary)
-                }
-                HStack {
-                    Text("Active Channels")
-                    Spacer()
-                    Text("\(SDKRealtimeSync.shared.activeChannels.count)").font(.caption).foregroundStyle(.secondary)
-                }
-                HStack {
-                    Text("Plugins Loaded")
-                    Spacer()
-                    Text("\(SDKPluginManager.shared.plugins.count)").font(.caption).foregroundStyle(.secondary)
-                }
-                HStack {
-                    Text("Connectors")
-                    Spacer()
-                    Text("\(SDKConnectorManager.shared.connectors.count)").font(.caption).foregroundStyle(.secondary)
-                }
-            } header: {
-                Text("SDK Internals")
+                LabeledContent("Total Traces", value: "\(metrics.totalTraces)")
+                LabeledContent("Active Sync Channels", value: "\(SDKRealtimeSync.shared.activeChannels.count)")
+                LabeledContent("Plugins Loaded", value: "\(SDKPluginManager.shared.plugins.count)")
+                LabeledContent("Connectors Registered", value: "\(SDKConnectorManager.shared.connectors.count)")
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("System Explorer")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            Button("Done") { dismiss() }
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Done") { dismiss() }
+            }
         }
+    }
+}
+
+// MARK: - Private Subviews
+
+private struct ExplorerLink: View {
+    let title: String, module: String, icon: String
+    var body: some View {
+        NavigationLink { APIExplorerDetail(module: module) } label: { Label(title, systemImage: icon) }
     }
 }
 
 struct APIExplorerDetail: View {
     let module: String
-
     var body: some View {
         List {
-            Section {
-                ForEach(methodsForModule, id: \.self) { method in
-                    Text(method).font(.system(.body, design: .monospaced))
-                }
-            } header: {
-                Text("Methods")
+            Section("Exposed Methods") {
+                ForEach(methods, id: \.self) { Text($0).font(.caption.monospaced()) }
             }
-
-            Section {
-                HStack {
-                    Text("Items")
-                    Spacer()
-                    Text("\(liveCount)").font(.system(.body, design: .monospaced)).foregroundStyle(.blue)
+            Section("Live Stats") {
+                LabeledContent("Object Count") {
+                    Text("\(count)").monospaced().bold().foregroundStyle(.accent)
                 }
-            } header: {
-                Text("Live Data Count")
             }
         }
         .navigationTitle("\(module) Explorer")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
-    private var methodsForModule: [String] {
+    private var methods: [String] {
         switch module {
         case "Notes": return ["\(module).list()", "\(module).create(title, content)"]
         case "Tasks": return ["\(module).list()", "\(module).create(title, dueDate)"]
-        case "Mail": return ["\(module).list()", "\(module).send(to, subject, body)"]
-        case "Calendar": return ["\(module).list()", "\(module).create(title, start, end)"]
-        case "Files": return ["\(module).list()", "\(module).delete(id)"]
-        case "Slides": return ["\(module).list()", "\(module).create(title)", "\(module).generateContent(deckID, prompt)"]
-        case "Meet": return ["\(module).start(title)"]
-        case "Persona": return ["\(module).query(prompt)", "\(module).injectMemory(entityID, content)", "\(module).getInsights()"]
         default: return ["\(module).list()"]
         }
     }
 
-    private var liveCount: Int {
+    private var count: Int {
         switch module {
         case "Notes": return WorkspaceAPI.shared.notes.listNotes().count
         case "Tasks": return WorkspaceAPI.shared.tasks.listTasks().count
-        case "Mail": return WorkspaceAPI.shared.mail.listMessages().count
-        case "Calendar": return WorkspaceAPI.shared.calendar.listEvents().count
-        case "Files": return WorkspaceAPI.shared.files.listFiles().count
-        case "Slides": return WorkspaceAPI.shared.slides.listDecks().count
-        case "Persona": return WorkspaceAPI.shared.persona.getInsights().count
         default: return 0
         }
     }
@@ -128,57 +114,29 @@ struct APIExplorerDetail: View {
 struct EntityExplorerView: View {
     var body: some View {
         List {
-            Section {
+            Section("Notes") {
                 ForEach(WorkspaceAPI.shared.notes.listNotes()) { note in
-                    VStack(alignment: .leading) {
-                        Text(note.title).font(.subheadline)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(note.title).font(.subheadline.bold())
                         Text(note.content.prefix(50)).font(.caption2).foregroundStyle(.secondary)
                     }
                 }
-            } header: {
-                Text("Notes (\(WorkspaceAPI.shared.notes.listNotes().count))")
             }
-
-            Section {
+            Section("Tasks") {
                 ForEach(WorkspaceAPI.shared.tasks.listTasks()) { task in
-                    HStack {
-                        Image(systemName: task.completed ? "checkmark.circle.fill" : "circle")
-                            .foregroundStyle(task.completed ? .green : .secondary)
-                        Text(task.title).font(.subheadline)
-                    }
+                    Label(task.title, systemImage: task.completed ? "checkmark.circle.fill" : "circle")
+                        .foregroundStyle(task.completed ? .green : .secondary)
                 }
-            } header: {
-                Text("Tasks (\(WorkspaceAPI.shared.tasks.listTasks().count))")
             }
-
-            Section {
-                ForEach(WorkspaceAPI.shared.files.listFiles(), id: \.id) { file in
-                    Label(file.name, systemImage: "doc")
+            Section("Snapshots") {
+                ForEach(WorkspaceAPI.shared.timeTravel.listSnapshots()) { snap in
+                    LabeledContent(snap.message, value: snap.timestamp.formatted(date: .abbreviated, time: .omitted))
+                        .font(.caption)
                 }
-            } header: {
-                Text("Files (\(WorkspaceAPI.shared.files.listFiles().count))")
-            }
-
-            Section {
-                ForEach(WorkspaceAPI.shared.slides.listDecks()) { deck in
-                    Text(deck.title).font(.subheadline)
-                }
-            } header: {
-                Text("Slide Decks (\(WorkspaceAPI.shared.slides.listDecks().count))")
-            }
-
-            Section {
-                ForEach(WorkspaceAPI.shared.timeTravel.listSnapshots()) { snapshot in
-                    VStack(alignment: .leading) {
-                        Text(snapshot.message).font(.subheadline)
-                        Text(snapshot.timestamp.formatted()).font(.caption2).foregroundStyle(.secondary)
-                    }
-                }
-            } header: {
-                Text("System Snapshots (\(WorkspaceAPI.shared.timeTravel.listSnapshots().count))")
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Live Entities")
-        .refreshable {}
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

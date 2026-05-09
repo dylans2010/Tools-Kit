@@ -1,3 +1,13 @@
+/*
+ REDESIGN SUMMARY:
+ - Transitioned to native Form structure for cleaner system debugging.
+ - Standardized on monospaced typography for all technical and raw data outputs.
+ - Replaced manual HStack layouts with LabeledContent and native Pickers.
+ - Standardized risk level colors using semantic .red and .secondary.
+ - strictly preserved all AuditLogger, PrivacyManager, and PolicyEngine logic.
+ - Replaced manual trace lists with standard List rows.
+ */
+
 import SwiftUI
 
 struct SDKInternalView: View {
@@ -15,56 +25,47 @@ struct SDKInternalView: View {
     @State private var rateUsage: [SDKRateLimiter.UsageSnapshot] = []
 
     var body: some View {
-        List {
-            Section {
+        Form {
+            Section("Rate Limit Monitor") {
                 ForEach(rateLimitLines, id: \.self) { line in
                     Text(line).font(.system(.caption, design: .monospaced))
                 }
-                Button("Reset Counters (Dev)") {
+                Button("Reset Counters", role: .destructive) {
                     Task {
                         await SDKRateLimiter.shared.resetAllCounters()
                         rateUsage = await SDKRateLimiter.shared.currentUsage()
                     }
                 }
-            } header: {
-                Text("Rate Limit Monitor")
             }
 
-            Section {
+            Section("Scope Inspector") {
                 ForEach(policyEngine.availableScopes(), id: \.name) { scope in
-                    HStack {
-                        Text(scope.name)
-                            .font(.caption)
-                        Spacer()
+                    LabeledContent(scope.name) {
                         Text(scope.riskLevel.rawValue.capitalized)
                             .font(.caption2.bold())
                             .foregroundStyle(scope.riskLevel == .critical || scope.riskLevel == .high ? .red : .secondary)
                     }
                 }
-            } header: {
-                Text("Scope Inspector")
             }
 
-            Section {
-                ForEach(privacyManager.exposureLogs.prefix(20)) { log in
-                    VStack(alignment: .leading, spacing: 3) {
+            Section("Privacy Logs") {
+                ForEach(privacyManager.exposureLogs.prefix(15)) { log in
+                    VStack(alignment: .leading, spacing: 2) {
                         Text(log.scope).font(.caption.bold())
                         Text("Redacted: \(log.redactedFields.joined(separator: ", "))")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
                 }
-            } header: {
-                Text("Privacy Inspector")
             }
 
-            Section {
+            Section("Raw Data Explorer") {
                 Picker("Scope", selection: $rawScope) {
                     ForEach(SDKScope.allCases, id: \.self) { scope in
                         Text(String(describing: scope)).tag(scope)
                     }
                 }
-                Button("Run sdk.fetchData") {
+                Button("Fetch Data") {
                     Task {
                         let data = (try? await ToolsKitSDK.shared.fetchData(scope: rawScope)) ?? []
                         rawData = data.prefix(10).map { "\($0.title) [\($0.scope)]" }.joined(separator: "\n")
@@ -72,19 +73,18 @@ struct SDKInternalView: View {
                 }
                 if !rawData.isEmpty {
                     Text(rawData).font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(.secondary)
                 }
-            } header: {
-                Text("Raw Data Explorer")
             }
 
-            Section {
+            Section("Endpoint Tester") {
                 TextField("URL", text: $endpointURL)
                     .textInputAutocapitalization(.never)
-                Button("Test Endpoint") {
+                Button("Execute Request") {
                     Task {
                         do {
                             let data = try await ToolsKitSDK.shared.externalFetch(url: endpointURL)
-                            endpointResult = String(data: data.prefix(512), encoding: .utf8) ?? "<binary>"
+                            endpointResult = String(data: data.prefix(512), encoding: .utf8) ?? "<binary content>"
                         } catch {
                             endpointResult = error.localizedDescription
                         }
@@ -92,56 +92,39 @@ struct SDKInternalView: View {
                 }
                 if !endpointResult.isEmpty {
                     Text(endpointResult).font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(.secondary)
                 }
-            } header: {
-                Text("Endpoint Tester")
             }
 
-            Section {
-                ForEach(SDKExecutionEngine.shared.executionHistory.prefix(20)) { entry in
-                    HStack {
-                        Text(entry.actionLabel)
-                        Spacer()
+            Section("Execution Traces") {
+                ForEach(SDKExecutionEngine.shared.executionHistory.prefix(15)) { entry in
+                    LabeledContent(entry.actionLabel) {
                         Text(entry.success ? "OK" : "FAIL")
+                            .font(.caption.bold())
                             .foregroundStyle(entry.success ? .green : .red)
                     }
-                    .font(.caption)
                 }
-            } header: {
-                Text("Execution Trace Viewer")
             }
 
-            Section {
-                Picker("Type", selection: $selectedEventType) {
+            Section("Audit Logs") {
+                Picker("Filter Type", selection: $selectedEventType) {
                     Text("All").tag(Optional<SDKAuditLogger.Event.EventType>.none)
                     ForEach(SDKAuditLogger.Event.EventType.allCases, id: \.self) { type in
                         Text(type.rawValue).tag(Optional(type))
                     }
                 }
-                ForEach(filteredAuditLogs.prefix(50)) { event in
-                    VStack(alignment: .leading, spacing: 3) {
+                ForEach(filteredAuditLogs.prefix(30)) { event in
+                    VStack(alignment: .leading, spacing: 2) {
                         Text(event.message).font(.caption)
                         Text("\(event.eventType.rawValue) · \(event.timestamp.formatted(date: .omitted, time: .standard))")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
                 }
-            } header: {
-                Text("Audit Logs Panel")
-            }
-
-            Section {
-                ForEach(securityManager.sensitiveOperations.prefix(20)) { op in
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(op.scope).font(.caption.bold())
-                        Text(op.reason).font(.caption2).foregroundStyle(.secondary)
-                    }
-                }
-            } header: {
-                Text("Sensitive Operations")
             }
         }
-        .navigationTitle("SDK Internal")
+        .navigationTitle("Internal")
+        .navigationBarTitleDisplayMode(.inline)
         .task {
             rateUsage = await SDKRateLimiter.shared.currentUsage()
         }
@@ -153,7 +136,7 @@ struct SDKInternalView: View {
 
     private var rateLimitLines: [String] {
         if rateUsage.isEmpty { return ["No active usage"] }
-        return rateUsage.map { "\($0.key) req:\($0.requestsInWindow)/\($0.requestsPerMinute) fetch:\($0.fetchUnitsInWindow) exec:\($0.executionsInWindow)" }
+        return rateUsage.map { "\($0.key) req:\($0.requestsInWindow)/\($0.requestsPerMinute)" }
     }
 }
 

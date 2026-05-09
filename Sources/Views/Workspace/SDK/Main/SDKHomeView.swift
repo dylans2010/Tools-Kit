@@ -1,9 +1,21 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on NavigationStack for modern iOS navigation patterns.
+ - Applied listStyle(.insetGrouped) to maintain consistent system aesthetics.
+ - Replaced hardcoded grid colors with semantic .secondary styling for quick tiles.
+ - Replaced manual project cards with a private ProjectRow struct using native Label and status pills.
+ - Improved layout spacing (16pt padding, 12pt VStack spacing).
+ - Strictly preserved all existing business logic, including SDKProjectManager state and NavigationPath.
+ - Standardized toolbar using ToolbarItem(placement: .topBarTrailing).
+ */
+
 import SwiftUI
 
 struct SDKHomeView: View {
     @StateObject private var projectManager = SDKProjectManager.shared
     @State private var searchText = ""
     @State private var statusFilter: SDKProject.ProjectStatus?
+    @State private var navigationPath = NavigationPath()
 
     private var projects: [SDKProject] {
         projectManager.filteredProjects(search: searchText, status: statusFilter)
@@ -11,34 +23,32 @@ struct SDKHomeView: View {
 
     private let quickColumns = [GridItem(.flexible()), GridItem(.flexible())]
 
-    @State private var navigationPath = NavigationPath()
-
     var body: some View {
         NavigationStack(path: $navigationPath) {
             List {
                 Section {
-                    LazyVGrid(columns: quickColumns, spacing: 10) {
-                        quickTile("Build", subtitle: "Create and package", icon: "hammer.fill", color: .orange, value: SDKRoute.build)
-                        quickTile("IDE", subtitle: "Edit and run", icon: "square.split.2x2.fill", color: .indigo, value: SDKRoute.ide)
-                        quickTile("Debug", subtitle: "Diagnostics tools", icon: "ladybug.fill", color: .red, value: SDKRoute.debug)
-                        quickTile("Docs", subtitle: "Guides and APIs", icon: "book.closed.fill", color: .blue, value: SDKRoute.docs)
+                    LazyVGrid(columns: quickColumns, spacing: 12) {
+                        QuickTile(title: "Build", subtitle: "Create & package", icon: "hammer", value: SDKRoute.build)
+                        QuickTile(title: "IDE", subtitle: "Edit & run", icon: "square.split.2x2", value: SDKRoute.ide)
+                        QuickTile(title: "Debug", subtitle: "Diagnostics", icon: "ladybug", value: SDKRoute.debug)
+                        QuickTile(title: "Docs", subtitle: "Guides & APIs", icon: "book.closed", value: SDKRoute.docs)
                     }
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
                 } header: {
-                    SDKSectionHeader("Quick Start", subtitle: "Organized by workflow", systemImage: "sparkles")
+                    Text("Quick Start")
                 }
+
                 Section {
                     if projects.isEmpty {
                         ContentUnavailableView(
                             "No Projects",
                             systemImage: "folder.badge.plus",
-                            description: Text("Create a project in App Builder to get started.")
+                            description: Text("Create an SDK project to get started.")
                         )
                     } else {
                         ForEach(projects) { project in
-                            projectCard(project)
-                                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                                .listRowSeparator(.hidden)
-                                .listRowBackground(Color.clear)
+                            ProjectRow(project: project)
                                 .swipeActions(edge: .trailing) {
                                     Button(role: .destructive) {
                                         projectManager.deleteProject(id: project.id)
@@ -52,146 +62,142 @@ struct SDKHomeView: View {
                                     } label: {
                                         Label("Duplicate", systemImage: "doc.on.doc")
                                     }
-                                    .tint(.blue)
+                                    .tint(.accentColor)
                                 }
                         }
                     }
                 } header: {
-                    SDKSectionHeader("SDK Projects", subtitle: "Managed workspace integrations and builds", systemImage: "folder.fill")
+                    Text("SDK Projects")
                 }
 
                 Section {
-                    NavigationLink(value: SDKRoute.ide) {
-                        Label {
-                            VStack(alignment: .leading) {
-                                Text("IDE Workspace").font(.subheadline.bold())
-                                Text("Multi panel runtime editor").font(.caption2).foregroundStyle(.secondary)
-                            }
-                        } icon: {
-                            Image(systemName: "square.split.2x2.fill").foregroundStyle(.indigo)
-                        }
-                    }
-                    NavigationLink(value: SDKRoute.docs) {
-                        Label {
-                            VStack(alignment: .leading) {
-                                Text("Developer Guide").font(.subheadline.bold())
-                                Text("Architecture & API documentation").font(.caption2).foregroundStyle(.secondary)
-                            }
-                        } icon: {
-                            Image(systemName: "book.closed.fill").foregroundStyle(.blue)
-                        }
-                    }
-                    NavigationLink(value: SDKRoute.build) {
-                        Label {
-                            VStack(alignment: .leading) {
-                                Text("App Builder").font(.subheadline.bold())
-                                Text("Visual project configuration").font(.caption2).foregroundStyle(.secondary)
-                            }
-                        } icon: {
-                            Image(systemName: "hammer.fill").foregroundStyle(.orange)
-                        }
-                    }
                     NavigationLink(value: SDKRoute.internal) {
-                        Label {
-                            VStack(alignment: .leading) {
-                                Text("SDK Internal").font(.subheadline.bold())
-                                Text("Advanced system debugging").font(.caption2).foregroundStyle(.secondary)
-                            }
-                        } icon: {
-                            Image(systemName: "terminal.fill").foregroundStyle(.primary)
-                        }
+                        Label("SDK Internal", systemImage: "terminal")
                     }
                 } header: {
-                    SDKSectionHeader("Workspace", subtitle: "System-level development tools", systemImage: "square.grid.2x2.fill")
+                    Text("System Utilities")
                 }
             }
+            .listStyle(.insetGrouped)
             .navigationTitle("Workspace SDK")
             .navigationDestination(for: SDKRoute.self) { route in
-                switch route {
-                case .build: SDKBuildView()
-                case .ide: SDKWorkspaceContainerView()
-                case .debug: SDKDebugView()
-                case .docs: SDKDeveloperGuideView()
-                case .internal: SDKInternalView()
-                case .project(let id):
-                    SDKBuildView()
-                        .onAppear { projectManager.loadProject(id: id) }
-                }
+                destinationView(for: route)
             }
-        .searchable(text: $searchText, prompt: "Search Projects")
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Button("All") { statusFilter = nil }
-                    Button("Active") { statusFilter = .active }
-                    Button("Draft") { statusFilter = .draft }
-                    Divider()
-                    Button {
-                        _ = projectManager.createProject(name: "New SDK Project", status: .draft)
-                    } label: {
-                        Label("Create Project", systemImage: "plus")
-                    }
-                } label: {
-                    Image(systemName: "line.3.horizontal.decrease.circle")
+            .searchable(text: $searchText, prompt: "Search Projects")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    filterMenu
                 }
             }
         }
+    }
+
+    private var filterMenu: some View {
+        Menu {
+            Picker("Status", selection: $statusFilter) {
+                Text("All").tag(Optional<SDKProject.ProjectStatus>.none)
+                Text("Active").tag(Optional(SDKProject.ProjectStatus.active))
+                Text("Draft").tag(Optional(SDKProject.ProjectStatus.draft))
+            }
+            Divider()
+            Button {
+                _ = projectManager.createProject(name: "New SDK Project", status: .draft)
+            } label: {
+                Label("Create Project", systemImage: "plus")
+            }
+        } label: {
+            Image(systemName: "line.3.horizontal.decrease.circle")
+        }
+    }
+
+    @ViewBuilder
+    private func destinationView(for route: SDKRoute) -> some View {
+        switch route {
+        case .build: SDKBuildView()
+        case .ide: SDKWorkspaceContainerView()
+        case .debug: SDKDebugView()
+        case .docs: SDKDeveloperGuideView()
+        case .internal: SDKInternalView()
+        case .project(let id):
+            SDKBuildView()
+                .onAppear { projectManager.loadProject(id: id) }
         }
     }
 
     private enum SDKRoute: Hashable {
-        case build
-        case ide
-        case debug
-        case docs
-        case `internal`
-        case project(UUID)
+        case build, ide, debug, docs, `internal`, project(UUID)
     }
+}
 
-    private func quickTile(_ title: String, subtitle: String, icon: String, color: Color, value: SDKRoute) -> some View {
+// MARK: - Private Subviews
+
+private struct QuickTile: View {
+    let title: String
+    let subtitle: String
+    let icon: String
+    let value: AnyHashable
+
+    var body: some View {
         NavigationLink(value: value) {
             VStack(alignment: .leading, spacing: 8) {
-                Image(systemName: icon).foregroundStyle(color)
-                Text(title).font(.subheadline.weight(.semibold))
-                Text(subtitle).font(.caption2).foregroundStyle(.secondary)
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.subheadline.bold())
+                        .foregroundStyle(.primary)
+                    Text(subtitle)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(12)
-            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .background(Color(.secondarySystemGroupedBackground))
+            .cornerRadius(12)
         }
         .buttonStyle(.plain)
     }
+}
 
-    @ViewBuilder
-    private func projectCard(_ project: SDKProject) -> some View {
-        NavigationLink(value: SDKRoute.project(project.id)) {
-            SDKModernCard(padding: 12) {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text(project.name).font(.headline)
-                        Spacer()
-                        SDKStatusPill(
-                            project.status.rawValue,
-                            systemImage: project.status == .active ? "checkmark.circle.fill" : "pencil.circle",
-                            color: project.status == .active ? .sdkSuccess : .sdkWarning
-                        )
-                    }
+private struct ProjectRow: View {
+    let project: SDKProject
 
-                    Text(project.description.isEmpty ? "No description provided for this SDK project." : project.description)
+    var body: some View {
+        NavigationLink(value: SDKHomeView.SDKRoute.project(project.id)) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text(project.name)
+                        .font(.headline)
+                    Spacer()
+                    statusBadge
+                }
+
+                if !project.description.isEmpty {
+                    Text(project.description)
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                        .lineLimit(2)
-
-                    HStack {
-                        Label("\(project.enabledScopes.count) Scopes", systemImage: "lock.shield")
-                        Spacer()
-                        Text("Updated \(project.updatedAt.formatted(date: .abbreviated, time: .shortened))")
-                    }
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(.tertiary)
+                        .lineLimit(1)
                 }
+
+                HStack {
+                    Label("\(project.enabledScopes.count) Scopes", systemImage: "lock.shield")
+                    Spacer()
+                    Text("Updated \(project.updatedAt.formatted(date: .abbreviated, time: .shortened))")
+                }
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
             }
+            .padding(.vertical, 4)
         }
-        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var statusBadge: some View {
+        let isActive = project.status == .active
+        Label(project.status.rawValue.capitalized, systemImage: isActive ? "checkmark.circle.fill" : "pencil.circle")
+            .font(.caption2.bold())
+            .foregroundStyle(isActive ? .green : .orange)
     }
 }

@@ -1,3 +1,13 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on a responsive grid layout using ScrollView and LazyVGrid.
+ - Replaced manual capability cards with a private CapabilityCard struct.
+ - Standardized status indicators using native Label and semantic colors.
+ - Improved visual hierarchy for required scopes using monospaced typography and status dots.
+ - strictly preserved all SDKRuntimeWorkspaceState scope validation logic.
+ - Replaced manual section headers with standard system typography.
+ */
+
 import SwiftUI
 
 struct IDECapabilitiesView: View {
@@ -10,13 +20,16 @@ struct IDECapabilitiesView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                SDKSectionHeader("Capabilities Matrix", subtitle: "SDK feature availability", systemImage: "square.grid.3x3.fill")
+            VStack(alignment: .leading, spacing: 24) {
+                Text("Capability Matrix")
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
                     .padding(.horizontal)
 
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(SDKRuntimeWorkspaceState.capabilityCatalog) { capability in
-                        capabilityCard(for: capability)
+                        CapabilityCard(capability: capability,
+                                       effectiveScopes: state.effectiveScopes(for: projectManager.currentProject))
                     }
                 }
                 .padding(.horizontal)
@@ -25,26 +38,29 @@ struct IDECapabilitiesView: View {
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Capabilities")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// MARK: - Private Subviews
+
+private struct CapabilityCard: View {
+    let capability: SDKCapabilityDefinition
+    let effectiveScopes: Set<String>
+
+    var isEnabled: Bool {
+        Set(capability.requiredScopes).isSubset(of: effectiveScopes)
     }
 
-    private func capabilityCard(for capability: SDKCapabilityDefinition) -> some View {
-        let scopes = state.effectiveScopes(for: projectManager.currentProject)
-        let missing = Set(capability.requiredScopes).subtracting(scopes)
-        let isEnabled = missing.isEmpty
-
-        return VStack(alignment: .leading, spacing: 12) {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: capability.node.icon)
                     .font(.title2)
-                    .foregroundStyle(isEnabled ? .blue : .secondary)
+                    .foregroundStyle(isEnabled ? .accentColor : .secondary)
                 Spacer()
-                if isEnabled {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                } else {
-                    Image(systemName: "lock.fill")
-                        .foregroundStyle(.secondary)
-                }
+                Image(systemName: isEnabled ? "checkmark.circle.fill" : "lock.fill")
+                    .foregroundStyle(isEnabled ? .green : .secondary)
             }
 
             VStack(alignment: .leading, spacing: 4) {
@@ -58,29 +74,29 @@ struct IDECapabilitiesView: View {
 
             Divider()
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text("REQUIRED SCOPES")
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Required Scopes")
                     .font(.system(size: 8, weight: .bold))
                     .foregroundStyle(.tertiary)
+                    .textCase(.uppercase)
 
                 ForEach(capability.requiredScopes, id: \.self) { scope in
-                    HStack(spacing: 4) {
+                    HStack(spacing: 6) {
                         Circle()
-                            .fill(scopes.contains(scope) ? Color.green : Color.red)
-                            .frame(width: 4, height: 4)
+                            .fill(effectiveScopes.contains(scope) ? Color.green : Color.red)
+                            .frame(width: 6, height: 6)
                         Text(scope)
                             .font(.system(size: 9, design: .monospaced))
-                            .foregroundStyle(scopes.contains(scope) ? .primary : .red)
+                            .foregroundStyle(effectiveScopes.contains(scope) ? .primary : .red)
                     }
                 }
             }
         }
         .padding()
-        .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(12)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(isEnabled ? Color.blue.opacity(0.3) : Color.clear, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(isEnabled ? Color.accentColor.opacity(0.1) : Color.clear, lineWidth: 1)
         )
     }
 }

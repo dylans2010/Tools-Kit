@@ -1,3 +1,14 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on insetGrouped List style.
+ - Modernized permission toggles using a native Form/Section structure.
+ - Replaced manual description text with Section footers.
+ - Standardized SF Symbols usage for global permissions.
+ - strictly preserved all PluginManager security policy and permission data structures.
+ - Replaced NavigationLink placeholders with modern inline navigation destinations.
+ - Added .presentationDragIndicator and .presentationCornerRadius for sheet presentation.
+ */
+
 import SwiftUI
 
 struct PluginSecurityView: View {
@@ -25,43 +36,54 @@ struct PluginSecurityView: View {
             List {
                 Section {
                     Text("Manage global security defaults for all installed plugins. Individual overrides can be set in plugin details.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
+                .listRowBackground(Color.clear)
 
-                Section {
+                Section("Permissions") {
                     ForEach($permissions) { $perm in
                         Toggle(isOn: $perm.isEnabled) {
-                            HStack(spacing: 12) {
-                                Image(systemName: perm.icon)
-                                    .foregroundColor(.blue)
-                                    .frame(width: 24)
-
+                            Label {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(perm.name).font(.subheadline.bold())
-                                    Text(perm.description).font(.caption2).foregroundColor(.secondary)
+                                    Text(perm.description).font(.caption2).foregroundStyle(.secondary)
                                 }
+                            } icon: {
+                                Image(systemName: perm.icon).foregroundStyle(.accent)
                             }
                         }
                     }
-                } header: {
-                    Text("Permissions")
                 }
 
-                Section {
-                    NavigationLink("Sandbox Execution Mode") {
-                        Text("Sandbox Settings")
+                Section("Runtime Policy") {
+                    NavigationLink {
+                        List {
+                            Section("Isolation Level") {
+                                Text("Standard Sandbox").font(.subheadline).bold()
+                                Text("Plugins execute in an isolated JavaScriptCore environment with no direct filesystem access.").font(.caption).foregroundStyle(.secondary)
+                            }
+                        }.navigationTitle("Sandbox Settings")
+                    } label: {
+                        Label("Sandbox Execution Mode", systemImage: "square.dashed.inset.filled")
                     }
-                    NavigationLink("Security Audit Logs") {
-                        Text("Audit Logs")
+
+                    NavigationLink {
+                        List {
+                            Section("Recent Events") {
+                                ContentUnavailableView("No Logs", systemImage: "list.bullet.rectangle", description: Text("Security audit logs will appear here after plugin activity."))
+                            }
+                        }.navigationTitle("Audit Logs")
+                    } label: {
+                        Label("Security Audit Logs", systemImage: "clock.badge.checkmark")
                     }
-                } header: {
-                    Text("Advanced")
                 }
             }
-            .navigationTitle("Plugin Security")
+            .listStyle(.insetGrouped)
+            .navigationTitle("Security")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }
                 }
             }

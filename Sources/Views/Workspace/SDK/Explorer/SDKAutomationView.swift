@@ -1,3 +1,14 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on insetGrouped List style.
+ - Replaced manual SDKModernCard layouts with standard List rows for better system integration.
+ - Modernized automation rule cards using native Label and LabeledContent for execution stats.
+ - Applied .presentationDetents([.medium]) to the rule creation sheet with a drag indicator.
+ - Standardized SF Symbols for automation status (bolt, play.circle).
+ - Strictly preserved SDKAutomationEngine logic and toggle binding functionality.
+ - Used ContentUnavailableView for empty rule states.
+ */
+
 import SwiftUI
 
 struct SDKAutomationView: View {
@@ -6,26 +17,29 @@ struct SDKAutomationView: View {
 
     var body: some View {
         List {
-            Section {
+            Section("Active Triggers") {
                 if engine.rules.isEmpty {
-                    ContentUnavailableView("No Automation Rules", systemImage: "bolt.slash.fill", description: Text("Create rules to automate SDK actions based on system events."))
-                        .padding(.vertical, 20)
+                    ContentUnavailableView(
+                        "No Automation Rules",
+                        systemImage: "bolt.slash",
+                        description: Text("Create rules to automate SDK actions based on system events.")
+                    )
                 } else {
                     ForEach(engine.rules) { rule in
-                        automationRuleCard(rule)
+                        AutomationRuleRow(rule: rule, engine: engine)
                     }
                     .onDelete(perform: deleteRules)
                 }
-            } header: {
-                SDKSectionHeader("Active Rules", subtitle: "Managed system event triggers", systemImage: "bolt.fill")
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Automation")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button { showingAddSheet = true } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
+                Button {
+                    showingAddSheet = true
+                } label: {
+                    Label("Add Rule", systemImage: "plus")
                 }
             }
         }
@@ -33,66 +47,64 @@ struct SDKAutomationView: View {
             AddAutomationRuleView()
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
-        }
-    }
-
-    @ViewBuilder
-    private func automationRuleCard(_ rule: SDKAutomationRule) -> some View {
-        SDKModernCard(padding: 12) {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(rule.name).font(.subheadline.bold())
-                        Text(triggerSummary(rule.trigger))
-                            .font(.system(size: 10))
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Toggle("", isOn: binding(for: rule.id))
-                        .labelsHidden()
-                        .tint(.primary)
-                }
-
-                Divider().opacity(0.3)
-
-                HStack {
-                    Label("\(rule.runCount) Executions", systemImage: "play.circle.fill")
-                    Spacer()
-                    if let lastRun = rule.lastRunAt {
-                        Text("Last: \(lastRun.formatted(.relative(presentation: .numeric)))")
-                    } else {
-                        Text("Never triggered")
-                    }
-                }
-                .font(.system(size: 9, weight: .medium))
-                .foregroundStyle(.tertiary)
-            }
-        }
-        .padding(.vertical, 4)
-    }
-
-    private func binding(for id: UUID) -> Binding<Bool> {
-        Binding(
-            get: { engine.rules.first(where: { $0.id == id })?.isEnabled ?? false },
-            set: { newValue in
-                if let index = engine.rules.firstIndex(where: { $0.id == id }) {
-                    engine.rules[index].isEnabled = newValue
-                }
-            }
-        )
-    }
-
-    private func triggerSummary(_ trigger: AutomationTrigger) -> String {
-        switch trigger {
-        case .dataUpdated(let scope): return "When \(scope) Updated"
-        case .connectorEvent(_, let event): return "On Connector Event: \(event)"
-        case .timeBased(let interval): return "Every \(Int(interval)) Seconds"
+                .presentationCornerRadius(20)
         }
     }
 
     private func deleteRules(at offsets: IndexSet) {
         offsets.forEach { index in
             engine.remove(id: engine.rules[index].id)
+        }
+    }
+}
+
+// MARK: - Private Subviews
+
+private struct AutomationRuleRow: View {
+    let rule: SDKAutomationRule
+    @ObservedObject var engine: SDKAutomationEngine
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(rule.name).font(.headline)
+                    Text(triggerSummary(rule.trigger))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle("", isOn: Binding(
+                    get: { engine.rules.first(where: { $0.id == rule.id })?.isEnabled ?? false },
+                    set: { newValue in
+                        if let index = engine.rules.firstIndex(where: { $0.id == rule.id }) {
+                            engine.rules[index].isEnabled = newValue
+                        }
+                    }
+                ))
+                .labelsHidden()
+            }
+
+            HStack {
+                Label("\(rule.runCount) runs", systemImage: "play.circle")
+                Spacer()
+                if let lastRun = rule.lastRunAt {
+                    Text("Last: \(lastRun.formatted(.relative(presentation: .numeric)))")
+                } else {
+                    Text("Never triggered")
+                }
+            }
+            .font(.caption2.bold())
+            .foregroundStyle(.tertiary)
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func triggerSummary(_ trigger: AutomationTrigger) -> String {
+        switch trigger {
+        case .dataUpdated(let scope): return "When \(scope) updated"
+        case .connectorEvent(_, let event): return "On connector event: \(event)"
+        case .timeBased(let interval): return "Every \(Int(interval)) seconds"
         }
     }
 }
@@ -110,35 +122,32 @@ struct AddAutomationRuleView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section {
-                    TextField("New Rule", text: $name)
-                } header: {
-                    Text("Rule Name")
+                Section("Rule Identity") {
+                    TextField("Name", text: $name)
                 }
 
-                Section {
-                    Picker("Trigger Type", selection: $selectedTrigger) {
-                        ForEach(TriggerType.allCases, id: \.self) { type in
-                            Text(type.rawValue).tag(type)
-                        }
+                Section("Trigger") {
+                    Picker("Type", selection: $selectedTrigger) {
+                        ForEach(TriggerType.allCases, id: \.self) { Text($0.rawValue).tag($0) }
                     }
 
                     if selectedTrigger == .data {
                         TextField("Scope (e.g. tasks)", text: $scope)
+                            .textInputAutocapitalization(.never)
                     }
-                } header: {
-                    Text("Trigger")
                 }
 
                 Section {
-                    Button("Save Rule") {
+                    Button("Save Automation") {
                         save()
                         dismiss()
                     }
                     .disabled(name.isEmpty)
+                    .frame(maxWidth: .infinity)
                 }
             }
             .navigationTitle("New Rule")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -148,12 +157,13 @@ struct AddAutomationRuleView: View {
     }
 
     private func save() {
-        let trigger: AutomationTrigger
-        switch selectedTrigger {
-        case .data: trigger = .dataUpdated(scope: scope)
-        case .connector: trigger = .connectorEvent(connectorID: UUID(), eventName: "sync")
-        case .timer: trigger = .timeBased(interval: 3600)
-        }
+        let trigger: AutomationTrigger = {
+            switch selectedTrigger {
+            case .data: return .dataUpdated(scope: scope)
+            case .connector: return .connectorEvent(connectorID: UUID(), eventName: "sync")
+            case .timer: return .timeBased(interval: 3600)
+            }
+        }()
 
         let rule = SDKAutomationRule(
             id: UUID(),

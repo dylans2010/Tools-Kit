@@ -1,3 +1,13 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on native Form structure for project configuration.
+ - Replaced manual SDKSectionHeader with native Section titles.
+ - Standardized key-value rows using native LabeledContent.
+ - Modernized project status picker and description TextField (multiline axis).
+ - Strictly preserved all SDKProjectManager update logic and graph synchronization.
+ - Replaced manual diagnostics button with a prominent Section button.
+ */
+
 import SwiftUI
 
 struct IDEConfigView: View {
@@ -6,7 +16,7 @@ struct IDEConfigView: View {
 
     var body: some View {
         Form {
-            Section {
+            Section("Project Identity") {
                 TextField("Name", text: Binding(
                     get: { projectManager.currentProject?.name ?? "" },
                     set: {
@@ -17,6 +27,7 @@ struct IDEConfigView: View {
                         state.recalculateDiagnostics()
                     }
                 ))
+
                 TextField("Description", text: Binding(
                     get: { projectManager.currentProject?.description ?? "" },
                     set: {
@@ -25,6 +36,8 @@ struct IDEConfigView: View {
                         projectManager.updateProject(project)
                     }
                 ), axis: .vertical)
+                .lineLimit(3...5)
+
                 Picker("Status", selection: Binding(
                     get: { projectManager.currentProject?.status ?? .draft },
                     set: {
@@ -37,27 +50,26 @@ struct IDEConfigView: View {
                         Text(status.rawValue.capitalized).tag(status)
                     }
                 }
-            } header: {
-                SDKSectionHeader("Project", subtitle: "Core identification", systemImage: "briefcase")
             }
 
-            Section {
-                LabeledContent("Run configuration", value: state.selectedRunConfiguration?.name ?? "Default Sandbox")
-                LabeledContent("Effective scopes", value: "\(state.effectiveScopes(for: projectManager.currentProject).count)")
+            Section("Runtime Profile") {
+                LabeledContent("Config", value: state.selectedRunConfiguration?.name ?? "Default Sandbox")
+                LabeledContent("Effective Scopes", value: "\(state.effectiveScopes(for: projectManager.currentProject).count)")
+                LabeledContent("Memory Estimate", value: "\(state.memoryEstimateMB) MB")
+            }
+
+            Section("System Integration") {
                 LabeledContent("Libraries", value: "\(state.libraries.count)")
                 LabeledContent("Dependencies", value: "\(state.dependencies.count)")
-                LabeledContent("Memory estimate", value: "\(state.memoryEstimateMB) MB")
 
                 Button("Sync Project With SDK Graph") {
                     state.syncSDKGraphFromProject()
                     state.recalculateDiagnostics()
                 }
-                .fontWeight(.medium)
-            } header: {
-                SDKSectionHeader("SDK Runtime", subtitle: "Configuration and state", systemImage: "cpu")
+                .font(.subheadline.bold())
             }
         }
-        .formStyle(.grouped)
         .navigationTitle("Configuration")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

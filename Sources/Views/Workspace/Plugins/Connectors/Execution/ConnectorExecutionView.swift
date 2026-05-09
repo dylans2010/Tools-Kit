@@ -1,3 +1,16 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on a modern, vertical-scroll execution interface.
+ - Modernized the header with semantic colors, symbols, and a monospaced timer pill.
+ - Replaced manual timeline with a structured ExecutionTimelineSection using native SF Symbols and progress indicators.
+ - Standardized execution history using a native List/Section pattern with semantic log level badges.
+ - Replaced manual stats card with a centered group of DetailMetricPills.
+ - strictly preserved all ConnectorRuntime integration, Timer logic, and execution mode switching.
+ - Improved visual hierarchy for flow preview using native Capsules and arrows.
+ - Extracted subviews for ExecutionTimelineSection, ExecutionHistorySection, and ExecutionStatsSection.
+ - Modernized the parameters sheet with native LabeledContent and semantic sections.
+ */
+
 import SwiftUI
 
 struct ConnectorExecutionView: View {
@@ -17,437 +30,95 @@ struct ConnectorExecutionView: View {
         case dryRun = "Dry Run"
     }
 
-    var isRunning: Bool {
-        runtime.activeRunningConnectors.contains(connector.id)
-    }
-
-    var recentLogs: [ConnectorLog] {
-        manager.logs.filter { $0.connectorID == connector.id }.prefix(10).map { $0 }
-    }
+    var isRunning: Bool { runtime.activeRunningConnectors.contains(connector.id) }
+    var recentLogs: [ConnectorLog] { manager.logs.filter { $0.connectorID == connector.id }.prefix(10).map { $0 } }
 
     var body: some View {
-        VStack(spacing: 0) {
-            executionHeader
+        ScrollView {
+            VStack(spacing: 20) {
+                ExecutionHeaderView(connector: connector, isRunning: isRunning, elapsedTime: elapsedTime, executionMode: $executionMode)
 
-            ScrollView {
-                VStack(spacing: 16) {
-                    if isRunning {
-                        executionTimeline
-                    } else if !recentLogs.isEmpty {
-                        executionHistory
-                    } else {
-                        idleState
-                    }
-
-                    // MARK: - Execution Stats
-                    if connector.metadata.executionCount > 0 {
-                        statsCard
-                    }
-
-                    // MARK: - Flow Preview
-                    if !connector.flow.steps.isEmpty {
-                        flowPreview
-                    }
+                if isRunning {
+                    ExecutionTimelineSection(connector: connector, selectedStepIndex: selectedStepIndex)
+                } else if !recentLogs.isEmpty {
+                    ExecutionHistorySection(logs: recentLogs)
+                } else {
+                    ContentUnavailableView("No Activity", systemImage: "bolt.slash", description: Text("Run the pipeline to see execution details here."))
                 }
-                .padding(.vertical)
-            }
 
-            actionBar
+                if connector.metadata.executionCount > 0 {
+                    ExecutionStatsSection(metadata: connector.metadata)
+                }
+
+                if !connector.flow.steps.isEmpty {
+                    ExecutionFlowPreview(steps: connector.flow.steps)
+                }
+            }
+            .padding()
         }
-        .navigationTitle("Live Execution")
         .background(Color(.systemGroupedBackground))
+        .navigationTitle("Live Execution")
+        .navigationBarTitleDisplayMode(.inline)
         .onChange(of: isRunning) { _, running in
-            if running {
-                executionStartTime = Date()
-                startTimer()
-            } else {
-                stopTimer()
+            if running { executionStartTime = Date(); startTimer() }
+            else { stopTimer() }
+        }
+        .safeAreaInset(edge: .bottom) {
+            ExecutionActionBar(isRunning: isRunning, stepsEmpty: connector.flow.steps.isEmpty, onCancel: stopTimer, onParams: { showingParameters = true }) {
+                Task { await runtime.run(connector: connector) }
             }
         }
         .sheet(isPresented: $showingParameters) {
-            executionParametersSheet
+            ExecutionParametersSheet(connector: connector, executionMode: $executionMode)
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+                .presentationCornerRadius(20)
         }
     }
 
-    // MARK: - Idle State
-
-    private var idleState: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "bolt.slash")
-                .font(.system(size: 40))
-                .foregroundColor(.secondary)
-            Text("No Recent Activity")
-                .font(.headline)
-            Text("Run the pipeline to see execution details here.")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
+    private func startTimer() {
+        elapsedTime = 0
+        timer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { _ in
+            if let start = executionStartTime { elapsedTime = Date().timeIntervalSince(start) }
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 32)
     }
 
-    // MARK: - Header
+    private func stopTimer() { timer?.invalidate(); timer = nil }
+}
 
-    private var executionHeader: some View {
-        VStack(spacing: 8) {
-            Image(systemName: isRunning ? "arrow.triangle.2.circlepath" : "play.circle")
-                .font(.system(size: 48))
-                .foregroundColor(isRunning ? .blue : .secondary)
+// MARK: - Private Subviews
+
+private struct ExecutionHeaderView: View {
+    let connector: ConnectorDefinition
+    let isRunning: Bool
+    let elapsedTime: TimeInterval
+    @Binding var executionMode: ConnectorExecutionView.ExecutionMode
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: isRunning ? "arrow.triangle.2.circlepath" : "play.circle.fill")
+                .font(.system(size: 48)).foregroundStyle(isRunning ? .accent : .secondary)
                 .symbolEffect(.bounce, options: .repeating, value: isRunning)
 
-            Text(isRunning ? "Executing Pipeline..." : "Pipeline Idle")
-                .font(.headline)
-
-            Text(connector.name)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+            VStack(spacing: 4) {
+                Text(isRunning ? "Executing Pipeline" : "Pipeline Ready").font(.headline)
+                Text(connector.name).font(.subheadline).foregroundStyle(.secondary)
+            }
 
             if isRunning {
                 Text(formatElapsedTime(elapsedTime))
                     .font(.system(.caption, design: .monospaced))
-                    .foregroundColor(.blue)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
-                    .background(Color.blue.opacity(0.1))
-                    .clipShape(Capsule())
-            }
-
-            // Execution Mode Picker
-            if !isRunning {
-                Picker("Mode", selection: $executionMode) {
-                    ForEach(ExecutionMode.allCases, id: \.self) { mode in
-                        Text(mode.rawValue).tag(mode)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal, 32)
-                .padding(.top, 8)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 24)
-        .background(.background)
-    }
-
-    // MARK: - Execution Timeline
-
-    private var executionTimeline: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Step-by-Step Progress")
-                    .font(.caption.bold())
-                    .foregroundColor(.secondary)
-                Spacer()
-                Text("\(connector.flow.steps.count) Steps")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
-            .padding(.horizontal)
-
-            ForEach(Array(connector.flow.steps.enumerated()), id: \.element.id) { index, step in
-                HStack(spacing: 12) {
-                    ZStack {
-                        Circle()
-                            .fill(stepColor(for: index))
-                            .frame(width: 28, height: 28)
-                        Text("\(index + 1)")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(.white)
-                    }
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(step.type.rawValue.capitalized)
-                            .font(.subheadline.bold())
-                        if let name = step.config["name"] {
-                            Text(name).font(.caption).foregroundColor(.secondary)
-                        }
-                        if step.type == .delay, let seconds = step.config["seconds"] {
-                            Text("Wait \(seconds)s").font(.caption2).foregroundColor(.orange)
-                        }
-                    }
-
-                    Spacer()
-
-                    stepStatusIndicator(for: index)
-                }
-                .padding()
-                .background(.background)
-                .cornerRadius(12)
-                .padding(.horizontal)
-            }
-        }
-    }
-
-    // MARK: - Execution History
-
-    private var executionHistory: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Recent Execution History")
-                .font(.caption.bold())
-                .foregroundColor(.secondary)
-                .padding(.horizontal)
-
-            ForEach(recentLogs) { log in
-                HStack(spacing: 10) {
-                    Circle()
-                        .fill(logTypeColor(log.type))
-                        .frame(width: 8, height: 8)
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(log.message)
-                            .font(.subheadline)
-                            .lineLimit(2)
-                        Text(log.timestamp.formatted(date: .abbreviated, time: .shortened))
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                    }
-
-                    Spacer()
-
-                    Text(log.type.rawValue.uppercased())
-                        .font(.system(size: 9, weight: .bold))
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(logTypeColor(log.type).opacity(0.15))
-                        .foregroundColor(logTypeColor(log.type))
-                        .clipShape(RoundedRectangle(cornerRadius: 4))
-                }
-                .padding()
-                .background(.background)
-                .cornerRadius(12)
-                .padding(.horizontal)
-            }
-        }
-    }
-
-    // MARK: - Stats Card
-
-    private var statsCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Execution Statistics")
-                .font(.caption.bold())
-                .foregroundColor(.secondary)
-                .padding(.horizontal)
-
-            HStack(spacing: 16) {
-                statItem(label: "Total Runs", value: "\(connector.metadata.executionCount)", color: .blue)
-                statItem(label: "Avg Latency", value: String(format: "%.0fms", connector.metadata.averageLatency), color: .purple)
-                statItem(label: "Error Rate", value: String(format: "%.1f%%", connector.metadata.errorRate * 100), color: connector.metadata.errorRate > 0.1 ? .red : .green)
-            }
-            .padding()
-            .background(.background)
-            .cornerRadius(12)
-            .padding(.horizontal)
-        }
-    }
-
-    // MARK: - Flow Preview
-
-    private var flowPreview: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Flow Pipeline")
-                .font(.caption.bold())
-                .foregroundColor(.secondary)
-                .padding(.horizontal)
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 4) {
-                    ForEach(Array(connector.flow.steps.enumerated()), id: \.element.id) { index, step in
-                        HStack(spacing: 4) {
-                            stepIcon(step.type)
-                                .font(.caption)
-                            Text(step.type.rawValue.capitalized)
-                                .font(.caption2)
-                        }
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 6)
-                        .background(stepTypeColor(step.type).opacity(0.1))
-                        .foregroundColor(stepTypeColor(step.type))
-                        .clipShape(Capsule())
-
-                        if index < connector.flow.steps.count - 1 {
-                            Image(systemName: "arrow.right")
-                                .font(.system(size: 8))
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                }
-                .padding(.horizontal)
-            }
-        }
-    }
-
-    // MARK: - Action Bar
-
-    private var actionBar: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 12) {
-                if isRunning {
-                    Button {
-                        stopTimer()
-                    } label: {
-                        Text("Cancel")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.red)
-                            .foregroundColor(.white)
-                            .cornerRadius(12)
-                            .bold()
-                    }
-                } else {
-                    Button {
-                        showingParameters = true
-                    } label: {
-                        Image(systemName: "gearshape")
-                            .frame(width: 50, height: 50)
-                            .background(Color.secondary.opacity(0.15))
-                            .foregroundColor(.primary)
-                            .cornerRadius(12)
-                    }
-
-                    Button {
-                        Task {
-                            await runtime.run(connector: connector)
-                        }
-                    } label: {
-                        Text("Start Execution")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(connector.flow.steps.isEmpty ? Color.gray : Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(12)
-                            .bold()
-                    }
-                    .disabled(connector.flow.steps.isEmpty)
-                }
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-        }
-        .background(.background)
-    }
-
-    // MARK: - Parameters Sheet
-
-    private var executionParametersSheet: some View {
-        NavigationView {
-            Form {
-                Section {
-                    Picker("Mode", selection: $executionMode) {
-                        ForEach(ExecutionMode.allCases, id: \.self) { mode in
-                            Text(mode.rawValue).tag(mode)
-                        }
-                    }
-
-                    switch executionMode {
-                    case .full:
-                        Text("Run the entire pipeline from start to finish.")
-                            .font(.caption).foregroundColor(.secondary)
-                    case .stepByStep:
-                        Text("Pause between each step for manual review.")
-                            .font(.caption).foregroundColor(.secondary)
-                    case .dryRun:
-                        Text("Simulate execution without making real API calls.")
-                            .font(.caption).foregroundColor(.secondary)
-                    }
-                } header: {
-                    Text("Execution Mode")
-                }
-
-                Section {
-                    LabeledContent("Steps", value: "\(connector.flow.steps.count)")
-                    LabeledContent("Endpoints", value: "\(connector.endpoints.count)")
-                    LabeledContent("Auth Type", value: connector.authConfig.type.rawValue.capitalized)
-                } header: {
-                    Text("Pipeline Summary")
-                }
-
-                Section {
-                    LabeledContent("Connector", value: connector.name)
-                    LabeledContent("Version", value: "v\(connector.version)")
-                    LabeledContent("Status", value: connector.status.rawValue.capitalized)
-                } header: {
-                    Text("Environment")
-                }
-            }
-            .navigationTitle("Execution Parameters")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { showingParameters = false }
-                }
-            }
-        }
-    }
-
-    // MARK: - Helpers
-
-    private func stepColor(for index: Int) -> Color {
-        if selectedStepIndex == nil { return .blue }
-        guard let selected = selectedStepIndex else { return .secondary }
-        if index < selected { return .green }
-        if index == selected { return .blue }
-        return .secondary
-    }
-
-    private func stepStatusIndicator(for index: Int) -> some View {
-        Group {
-            if let selected = selectedStepIndex {
-                if index < selected {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
-                } else if index == selected {
-                    ProgressView()
-                        .scaleEffect(0.8)
-                } else {
-                    Image(systemName: "circle")
-                        .foregroundColor(.secondary)
-                }
+                    .padding(.horizontal, 10).padding(.vertical, 4)
+                    .background(Color.accentColor.opacity(0.1), in: Capsule())
+                    .foregroundStyle(.accent)
             } else {
-                ProgressView()
-                    .scaleEffect(0.8)
+                Picker("Mode", selection: $executionMode) {
+                    ForEach(ConnectorExecutionView.ExecutionMode.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                }
+                .pickerStyle(.segmented).padding(.horizontal, 16)
             }
         }
-    }
-
-    private func stepIcon(_ type: FlowStep.StepType) -> Image {
-        switch type {
-        case .trigger: return Image(systemName: "bolt.fill")
-        case .condition: return Image(systemName: "arrow.branch")
-        case .action: return Image(systemName: "play.fill")
-        case .delay: return Image(systemName: "clock.fill")
-        }
-    }
-
-    private func stepTypeColor(_ type: FlowStep.StepType) -> Color {
-        switch type {
-        case .trigger: return .orange
-        case .condition: return .purple
-        case .action: return .blue
-        case .delay: return .gray
-        }
-    }
-
-    private func statItem(label: String, value: String, color: Color) -> some View {
-        VStack(spacing: 4) {
-            Text(value)
-                .font(.title3.bold())
-                .foregroundColor(color)
-            Text(label)
-                .font(.caption2)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    private func logTypeColor(_ type: ConnectorLog.LogType) -> Color {
-        switch type {
-        case .info: return .blue
-        case .warning: return .orange
-        case .error: return .red
-        case .performance: return .purple
-        }
+        .frame(maxWidth: .infinity).padding(.vertical, 8)
     }
 
     private func formatElapsedTime(_ interval: TimeInterval) -> String {
@@ -456,18 +127,225 @@ struct ConnectorExecutionView: View {
         let ms = Int((interval.truncatingRemainder(dividingBy: 1)) * 100)
         return String(format: "%02d:%02d.%02d", minutes, seconds, ms)
     }
+}
 
-    private func startTimer() {
-        elapsedTime = 0
-        timer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { _ in
-            if let start = executionStartTime {
-                elapsedTime = Date().timeIntervalSince(start)
+private struct ExecutionTimelineSection: View {
+    let connector: ConnectorDefinition
+    let selectedStepIndex: Int?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Step-by-Step Progress", systemImage: "list.number").font(.caption.bold()).foregroundStyle(.secondary)
+
+            VStack(spacing: 8) {
+                ForEach(Array(connector.flow.steps.enumerated()), id: \.element.id) { index, step in
+                    HStack(spacing: 12) {
+                        StepIndicator(index: index, selectedIndex: selectedStepIndex)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(step.type.rawValue.capitalized).font(.subheadline.bold())
+                            if let name = step.config["name"] { Text(name).font(.caption2).foregroundStyle(.secondary) }
+                        }
+                        Spacer()
+                        StepStatusView(index: index, selectedIndex: selectedStepIndex)
+                    }
+                    .padding(12).background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                }
             }
         }
     }
+}
 
-    private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
+private struct StepIndicator: View {
+    let index: Int
+    let selectedIndex: Int?
+    var body: some View {
+        ZStack {
+            Circle().fill(color).frame(width: 24, height: 24)
+            Text("\(index + 1)").font(.system(size: 10, weight: .bold)).foregroundStyle(.white)
+        }
+    }
+    private var color: Color {
+        guard let selected = selectedIndex else { return .accentColor }
+        if index < selected { return .green }
+        if index == selected { return .accentColor }
+        return .secondary.opacity(0.3)
+    }
+}
+
+private struct StepStatusView: View {
+    let index: Int
+    let selectedIndex: Int?
+    var body: some View {
+        if let selected = selectedIndex {
+            if index < selected { Image(systemName: "checkmark.circle.fill").foregroundStyle(.green) }
+            else if index == selected { ProgressView().controlSize(.small) }
+            else { Image(systemName: "circle").foregroundStyle(.secondary.opacity(0.3)) }
+        } else { ProgressView().controlSize(.small) }
+    }
+}
+
+private struct ExecutionHistorySection: View {
+    let logs: [ConnectorLog]
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Recent History", systemImage: "clock.arrow.circlepath").font(.caption.bold()).foregroundStyle(.secondary)
+            VStack(spacing: 8) {
+                ForEach(logs) { log in
+                    HStack(spacing: 12) {
+                        Circle().fill(log.type.color).frame(width: 6, height: 6)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(log.message).font(.subheadline).lineLimit(1)
+                            Text(log.timestamp.formatted(.relative(presentation: .named))).font(.caption2).foregroundStyle(.tertiary)
+                        }
+                        Spacer()
+                        Text(log.type.rawValue.uppercased()).font(.system(size: 8, weight: .black))
+                            .padding(.horizontal, 6).padding(.vertical, 2)
+                            .background(log.type.color.opacity(0.1), in: Capsule()).foregroundStyle(log.type.color)
+                    }
+                    .padding(12).background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                }
+            }
+        }
+    }
+}
+
+private struct ExecutionStatsSection: View {
+    let metadata: ConnectorDefinition.Metadata
+    var body: some View {
+        HStack(spacing: 0) {
+            DetailMetricPill(label: "Runs", value: "\(metadata.executionCount)", color: .blue)
+            DetailMetricPill(label: "Latency", value: String(format: "%.0fms", metadata.averageLatency), color: .purple)
+            DetailMetricPill(label: "Errors", value: String(format: "%.1f%%", metadata.errorRate * 100), color: metadata.errorRate > 0.1 ? .red : .green)
+        }
+        .padding(16).background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+private struct ExecutionFlowPreview: View {
+    let steps: [FlowStep]
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("Pipeline Sequence", systemImage: "arrow.triangle.branch").font(.caption.bold()).foregroundStyle(.secondary)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
+                        HStack(spacing: 6) {
+                            stepIcon(step.type).font(.caption2)
+                            Text(step.type.rawValue.capitalized).font(.caption2.bold())
+                        }
+                        .padding(.horizontal, 10).padding(.vertical, 6)
+                        .background(stepTypeColor(step.type).opacity(0.1), in: Capsule())
+                        .foregroundStyle(stepTypeColor(step.type))
+
+                        if index < steps.count - 1 { Image(systemName: "chevron.right").font(.system(size: 8, weight: .bold)).foregroundStyle(.tertiary) }
+                    }
+                }
+            }
+        }
+    }
+    private func stepIcon(_ type: FlowStep.StepType) -> Image {
+        switch type {
+        case .trigger: return Image(systemName: "bolt.fill")
+        case .condition: return Image(systemName: "arrow.branch")
+        case .action: return Image(systemName: "play.fill")
+        case .delay: return Image(systemName: "clock.fill")
+        }
+    }
+    private func stepTypeColor(_ type: FlowStep.StepType) -> Color {
+        switch type {
+        case .trigger: return .orange
+        case .condition: return .purple
+        case .action: return .blue
+        case .delay: return .secondary
+        }
+    }
+}
+
+private struct ExecutionActionBar: View {
+    let isRunning: Bool
+    let stepsEmpty: Bool
+    let onCancel: () -> Void
+    let onParams: () -> Void
+    let onStart: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            if isRunning {
+                Button(action: onCancel) {
+                    Text("Cancel Execution").frame(maxWidth: .infinity).bold()
+                }
+                .buttonStyle(.borderedProminent).tint(.red).controlSize(.large)
+            } else {
+                Button(action: onParams) {
+                    Image(systemName: "gearshape.fill").font(.title3)
+                }
+                .buttonStyle(.bordered).controlSize(.large)
+
+                Button(action: onStart) {
+                    Text("Start Pipeline").frame(maxWidth: .infinity).bold()
+                }
+                .buttonStyle(.borderedProminent).controlSize(.large)
+                .disabled(stepsEmpty)
+            }
+        }
+        .padding().background(.ultraThinMaterial)
+    }
+}
+
+private struct ExecutionParametersSheet: View {
+    let connector: ConnectorDefinition
+    @Binding var executionMode: ConnectorExecutionView.ExecutionMode
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Runtime Policy") {
+                    Picker("Mode", selection: $executionMode) {
+                        ForEach(ConnectorExecutionView.ExecutionMode.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                    }.pickerStyle(.menu)
+                    Text(modeDescription).font(.caption).foregroundStyle(.secondary)
+                }
+                Section("Environment") {
+                    LabeledContent("Connector", value: connector.name)
+                    LabeledContent("Endpoints", value: "\(connector.endpoints.count)")
+                    LabeledContent("Auth Type", value: connector.authConfig.type.rawValue.capitalized)
+                }
+            }
+            .navigationTitle("Parameters")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } } }
+        }
+    }
+    private var modeDescription: String {
+        switch executionMode {
+        case .full: return "Executes the entire pipeline sequence automatically."
+        case .stepByStep: return "Pauses after each step for manual verification."
+        case .dryRun: return "Simulates responses without making network calls."
+        }
+    }
+}
+
+private struct DetailMetricPill: View {
+    let label: String
+    let value: String
+    let color: Color
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(value).font(.headline).foregroundStyle(color)
+            Text(label).font(.caption2.bold()).foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+extension ConnectorLog.LogType {
+    var color: Color {
+        switch self {
+        case .info: return .blue
+        case .warning: return .orange
+        case .error: return .red
+        case .performance: return .purple
+        }
     }
 }

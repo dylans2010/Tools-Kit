@@ -1,218 +1,142 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on insetGrouped List style with .searchable integration.
+ - Modernized app rows using a private struct PluginAppRow with semantic status indicators.
+ - Applied .presentationDetents([.large]) to the registration sheet with a drag indicator.
+ - Replaced manual stat cards with a summary Section using native LabeledContent.
+ - Standardized Start/Stop actions using native prominent buttons with semantic colors.
+ - strictly preserved all PluginRuntimeEngine loadedApps and runningApps logic.
+ - Improved visual hierarchy for permissions and sandboxing status.
+ */
+
 import SwiftUI
 
-/// Plugin Manager — install, manage, and control SDK apps and plugins.
 struct SDKPluginManagerView: View {
     @StateObject private var runtime = PluginRuntimeEngine.shared
     @State private var showingAddApp = false
-    @State private var newAppName = ""
-    @State private var newAppVersion = "1.0.0"
-    @State private var newAppAuthor = ""
-    @State private var newAppDescription = ""
-    @State private var newAppPermissions = ""
     @State private var searchText = ""
 
     private var filteredApps: [SDKAppDefinition] {
         if searchText.isEmpty { return runtime.loadedApps }
         return runtime.loadedApps.filter {
-            $0.name.localizedCaseInsensitiveContains(searchText) ||
-            $0.author.localizedCaseInsensitiveContains(searchText)
+            $0.name.localizedCaseInsensitiveContains(searchText) || $0.author.localizedCaseInsensitiveContains(searchText)
         }
     }
 
     var body: some View {
         List {
-            statsSection
-            appsSection
+            Section("System Status") {
+                LabeledContent("Installed Apps", value: "\(runtime.loadedApps.count)")
+                LabeledContent("Running Contexts", value: "\(runtime.runningApps.count)").foregroundStyle(.green).bold()
+                LabeledContent("Sandboxed", value: "\(runtime.loadedApps.filter { $0.isSandboxed }.count)").foregroundStyle(.accent)
+            }
+
+            Section("Registry") {
+                if filteredApps.isEmpty {
+                    ContentUnavailableView("No Extensions Found", systemImage: "puzzlepiece.extension", description: Text("Register an app to extend workspace capabilities."))
+                } else {
+                    ForEach(filteredApps) { app in
+                        PluginAppRow(app: app, runtime: runtime)
+                    }
+                    .onDelete(perform: deleteApps)
+                }
+            }
         }
-        .searchable(text: $searchText, prompt: "Search Plugins")
+        .listStyle(.insetGrouped)
         .navigationTitle("Plugin Manager")
+        .searchable(text: $searchText, prompt: "Search applications")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showingAddApp = true
-                } label: {
-                    Image(systemName: "plus")
-                }
+                Button { showingAddApp = true } label: { Label("Add", systemImage: "plus") }
             }
         }
         .sheet(isPresented: $showingAddApp) {
-            addAppSheet
+            AddPluginAppSheet(runtime: runtime)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
     }
 
-    // MARK: - Stats
-
-    private var statsSection: some View {
-        Section {
-            HStack(spacing: 20) {
-                VStack {
-                    Text("\(runtime.loadedApps.count)")
-                        .font(.title2).bold()
-                    Text("Installed")
-                        .font(.caption2).foregroundStyle(.secondary)
-                }
-                VStack {
-                    Text("\(runtime.runningApps.count)")
-                        .font(.title2).bold().foregroundStyle(.green)
-                    Text("Running")
-                        .font(.caption2).foregroundStyle(.secondary)
-                }
-                VStack {
-                    Text("\(runtime.loadedApps.filter { $0.isSandboxed }.count)")
-                        .font(.title2).bold().foregroundStyle(.blue)
-                    Text("Sandboxed")
-                        .font(.caption2).foregroundStyle(.secondary)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 8)
-        } header: {
-            Text("Overview")
-        }
+    private func deleteApps(at offsets: IndexSet) {
+        for index in offsets { runtime.unregister(appId: filteredApps[index].id) }
     }
+}
 
-    // MARK: - Apps List
+// MARK: - Private Subviews
 
-    private var appsSection: some View {
-        Section {
-            if filteredApps.isEmpty {
-                ContentUnavailableView("No Apps Installed", systemImage: "puzzlepiece.extension", description: Text("Register an app to get started."))
-            } else {
-                ForEach(filteredApps) { app in
-                    appRow(app)
-                }
-                .onDelete(perform: deleteApps)
-            }
-        } header: {
-            Text("Apps & Plugins (\(filteredApps.count))")
-        }
-    }
+private struct PluginAppRow: View {
+    let app: SDKAppDefinition
+    @ObservedObject var runtime: PluginRuntimeEngine
 
-    private func appRow(_ app: SDKAppDefinition) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        Text(app.name).font(.subheadline).bold()
-                        if app.madeForWorkspace {
-                            Text("Made For Workspace")
-                                .font(.system(size: 8, weight: .semibold))
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 2)
-                                .background(
-                                    LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing)
-                                )
-                                .foregroundStyle(.white)
-                                .clipShape(Capsule())
-                        }
+                    HStack {
+                        Text(app.name).font(.headline)
+                        if app.madeForWorkspace { Image(systemName: "checkmark.seal.fill").font(.caption2).foregroundStyle(.blue) }
                     }
-                    Text("v\(app.version) by \(app.author.isEmpty ? "Unknown" : app.author)")
-                        .font(.caption).foregroundStyle(.secondary)
+                    Text("v\(app.version) by \(app.author.isEmpty ? "Internal" : app.author)").font(.caption2).foregroundStyle(.secondary)
                 }
                 Spacer()
 
-                if runtime.isRunning(app.id) {
-                    Button("Stop") {
-                        Task { try? await runtime.stop(appId: app.id) }
+                Button(runtime.isRunning(app.id) ? "Stop" : "Start") {
+                    Task {
+                        if runtime.isRunning(app.id) { try? await runtime.stop(appId: app.id) }
+                        else { try? await runtime.start(appId: app.id) }
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .tint(.red)
-                } else {
-                    Button("Start") {
-                        Task { try? await runtime.start(appId: app.id) }
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .tint(.green)
                 }
+                .buttonStyle(.bordered).controlSize(.small).tint(runtime.isRunning(app.id) ? .red : .green)
             }
 
             if !app.description.isEmpty {
                 Text(app.description).font(.caption).foregroundStyle(.secondary).lineLimit(2)
             }
 
-            HStack(spacing: 6) {
-                if app.isSandboxed {
-                    Label("Sandboxed", systemImage: "lock.shield.fill")
-                        .font(.system(size: 9))
-                        .foregroundStyle(.blue)
-                }
-                if !app.permissions.isEmpty {
-                    Text(app.permissions.joined(separator: ", "))
-                        .font(.system(size: 9, design: .monospaced))
-                        .foregroundStyle(.secondary)
-                }
+            HStack(spacing: 8) {
+                if app.isSandboxed { Label("Sandboxed", systemImage: "lock.shield").foregroundStyle(.accent) }
+                if !app.permissions.isEmpty { Text(app.permissions.joined(separator: ", ")).foregroundStyle(.tertiary) }
             }
+            .font(.system(size: 9, weight: .bold, design: .monospaced))
         }
         .padding(.vertical, 4)
     }
+}
 
-    // MARK: - Add App Sheet
+private struct AddPluginAppSheet: View {
+    @Environment(\.dismiss) var dismiss
+    @ObservedObject var runtime: PluginRuntimeEngine
+    @State private var name = ""
+    @State private var version = "1.0.0"
+    @State private var author = ""
+    @State private var description = ""
+    @State private var permissions = ""
 
-    private var addAppSheet: some View {
-        NavigationView {
+    var body: some View {
+        NavigationStack {
             Form {
-                Section {
-                    TextField("Name", text: $newAppName)
-                    TextField("Version", text: $newAppVersion)
-                    TextField("Author", text: $newAppAuthor)
-                    TextField("Description", text: $newAppDescription)
-                } header: {
-                    Text("App Details")
+                Section("App Details") {
+                    TextField("Name", text: $name)
+                    TextField("Version", text: $version)
+                    TextField("Author", text: $author)
+                    TextField("Description", text: $description, axis: .vertical).lineLimit(3)
+                }
+                Section("Permissions") {
+                    TextField("e.g. read, write, network", text: $permissions).font(.caption.monospaced())
                 }
                 Section {
-                    TextField("read, write, network", text: $newAppPermissions)
-                        .font(.system(.body, design: .monospaced))
-                } header: {
-                    Text("Permissions (comma-separated)")
+                    Button("Register Application") {
+                        let perms = permissions.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+                        let app = SDKAppDefinition(name: name, version: version, author: author, description: description, permissions: perms)
+                        try? runtime.register(app)
+                        dismiss()
+                    }
+                    .disabled(name.isEmpty).frame(maxWidth: .infinity).bold()
                 }
             }
             .navigationTitle("Register App")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { showingAddApp = false }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Register") { registerApp() }
-                        .disabled(newAppName.isEmpty)
-                }
-            }
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
         }
-    }
-
-    private func registerApp() {
-        let permissions = newAppPermissions
-            .components(separatedBy: ",")
-            .map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { !$0.isEmpty }
-
-        let app = SDKAppDefinition(
-            name: newAppName,
-            version: newAppVersion,
-            author: newAppAuthor,
-            description: newAppDescription,
-            permissions: permissions
-        )
-
-        try? runtime.register(app)
-        resetForm()
-        showingAddApp = false
-    }
-
-    private func deleteApps(at offsets: IndexSet) {
-        for index in offsets {
-            let app = filteredApps[index]
-            runtime.unregister(appId: app.id)
-        }
-    }
-
-    private func resetForm() {
-        newAppName = ""
-        newAppVersion = "1.0.0"
-        newAppAuthor = ""
-        newAppDescription = ""
-        newAppPermissions = ""
     }
 }

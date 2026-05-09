@@ -1,3 +1,15 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on insetGrouped List style.
+ - Replaced manual status pills and headers with native Section titles and LabeledContent.
+ - Modernized scope rows using native Toggle and private struct ScopeItemRow.
+ - Applied .presentationDetents([.medium, .large]) to the review sheet with a drag indicator.
+ - Standardized risk level colors using semantic .red, .orange, and .green.
+ - strictly preserved all SDKRuntimeWorkspaceState diagnostics, scope mapping, and project update logic.
+ - Improved visual hierarchy for required approvals and linked capabilities.
+ - Replaced manual HStack layouts with standard Label components.
+ */
+
 import SwiftUI
 
 struct IDEScopesView: View {
@@ -15,144 +27,67 @@ struct IDEScopesView: View {
 
     var body: some View {
         List {
-            Section {
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Effective Scopes").font(.headline)
-                            Text("Aggregated permissions for the current workspace context.").font(.caption2).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        SDKStatusPill("\(enabledScopes.count) GRANTS", systemImage: "key.fill", color: .blue)
-                    }
-
-                    Button { showingReview = true } label: {
-                        HStack {
-                            Label("Audit Permissions", systemImage: "shield.lefthalf.filled")
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                        }
-                        .font(.subheadline.bold())
-                        .padding()
-                        .background(Color.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(.blue)
+            Section("Security Profile") {
+                LabeledContent("Active Grants") {
+                    Text("\(enabledScopes.count)").monospaced().bold().foregroundStyle(.accent)
                 }
-                .padding(.vertical, 8)
-            } header: {
-                SDKSectionHeader("Security", subtitle: "Workspace entitlement management", systemImage: "lock.shield.fill")
-            }
 
-            ForEach(categories, id: \.0) { category, items in
-                Section {
-                    ForEach(items) { item in
-                        scopeRow(item)
-                    }
-                } header: {
-                    HStack {
-                        Image(systemName: "folder.badge.lock")
-                        Text(category.uppercased())
-                    }
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(.secondary)
-                    .padding(.vertical, 8)
+                Button { showingReview = true } label: {
+                    Label("Review Effective Scopes", systemImage: "shield.lefthalf.filled")
+                        .font(.subheadline.bold())
                 }
             }
 
             if !scopeDiagnostics.isEmpty {
-                Section {
+                Section("Validation Issues") {
                     ForEach(scopeDiagnostics) { diagnostic in
-                        HStack(alignment: .top, spacing: 12) {
+                        Label {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(diagnostic.message).font(.subheadline.bold())
+                                Text(diagnostic.suggestion).font(.caption).foregroundStyle(.secondary)
+                            }
+                        } icon: {
                             Image(systemName: diagnostic.severity == .error ? "xmark.octagon.fill" : "exclamationmark.triangle.fill")
                                 .foregroundStyle(diagnostic.severity == .error ? .red : .orange)
-
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(diagnostic.message)
-                                    .font(.system(size: 13, weight: .semibold))
-                                Text(diagnostic.suggestion)
-                                    .font(.system(size: 11))
-                                    .foregroundStyle(.secondary)
-                            }
                         }
-                        .padding(.vertical, 4)
                     }
 
-                    Button {
-                        autoResolveScopeSuggestions()
-                    } label: {
-                        HStack {
-                            Image(systemName: "wand.and.stars")
-                            Text("Auto-Resolve All Issues")
-                        }
-                        .font(.subheadline.bold())
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.primary, in: RoundedRectangle(cornerRadius: 10))
-                        .foregroundStyle(Color(.systemBackground))
+                    Button(action: autoResolveScopeSuggestions) {
+                        Label("Auto-Resolve All Issues", systemImage: "wand.and.stars")
+                            .font(.subheadline.bold())
                     }
-                    .buttonStyle(.plain)
-                    .padding(.vertical, 8)
-                } header: {
-                    Text("VALIDATION ISSUES")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundStyle(.red)
+                    .buttonStyle(.borderedProminent)
+                }
+            }
+
+            ForEach(categories, id: \.0) { category, items in
+                Section(category.uppercased()) {
+                    ForEach(items) { item in
+                        ScopeItemRow(item: item, projectManager: projectManager, state: state)
+                    }
                 }
             }
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Scopes")
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingReview) {
             NavigationStack {
                 List {
-                    Section("Effective scopes") {
+                    Section("Aggregated Grants") {
                         ForEach(enabledScopes.sorted(), id: \.self) { scope in
                             Text(scope).font(.system(.caption, design: .monospaced))
                         }
                     }
                 }
-                .navigationTitle("SDK Scope Review")
+                .navigationTitle("Scope Review")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { showingReview = false } } }
             }
             .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
         }
         .onAppear { state.recalculateDiagnostics() }
-    }
-
-    private func scopeRow(_ item: SDKScopeDefinition) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(item.key)
-                        .font(.system(size: 14, weight: .bold, design: .monospaced))
-                    Text(item.description)
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-                Toggle("", isOn: Binding(
-                    get: { projectManager.currentProject?.enabledScopes.contains(item.key) == true },
-                    set: { state.setScope(item.key, enabled: $0, for: projectManager) }
-                ))
-                .labelsHidden()
-                .tint(.blue)
-            }
-
-            HStack {
-                SDKStatusPill(item.riskLevel, color: riskColor(item.riskLevel), isCapsule: false)
-
-                Spacer()
-
-                HStack(spacing: 12) {
-                    Label(item.approvals, systemImage: "person.badge.shield.checkmark")
-                    Label(item.linkedCapability.title, systemImage: item.linkedCapability.icon)
-                }
-                .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(.tertiary)
-            }
-        }
-        .padding(.vertical, 8)
     }
 
     private var scopeDiagnostics: [SDKRuntimeDiagnostic] {
@@ -171,9 +106,53 @@ struct IDEScopesView: View {
         state.syncSDKGraphFromProject(project)
         state.recalculateDiagnostics()
     }
+}
 
-    private func riskColor(_ level: String) -> Color {
-        switch level.lowercased() {
+// MARK: - Private Subviews
+
+private struct ScopeItemRow: View {
+    let item: SDKScopeDefinition
+    @ObservedObject var projectManager: SDKProjectManager
+    @ObservedObject var state: SDKRuntimeWorkspaceState
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(item.key).font(.system(.subheadline, design: .monospaced).bold())
+                    Text(item.description).font(.caption).foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle("", isOn: Binding(
+                    get: { projectManager.currentProject?.enabledScopes.contains(item.key) == true },
+                    set: { state.setScope(item.key, enabled: $0, for: projectManager) }
+                ))
+                .labelsHidden()
+            }
+
+            HStack {
+                Text(item.riskLevel.uppercased())
+                    .font(.system(size: 8, weight: .black))
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 2)
+                    .background(riskColor.opacity(0.1), in: Capsule())
+                    .foregroundStyle(riskColor)
+
+                Spacer()
+
+                HStack(spacing: 12) {
+                    Label(item.approvals, systemImage: "person.badge.shield.checkmark")
+                    Label(item.linkedCapability.title, systemImage: item.linkedCapability.icon)
+                }
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(.tertiary)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var riskColor: Color {
+        switch item.riskLevel.lowercased() {
         case "critical": return .red
         case "high": return .orange
         case "medium": return .yellow

@@ -1,3 +1,14 @@
+/*
+ REDESIGN SUMMARY:
+ - Standardized on a modern console aesthetic with a dark monospaced output area.
+ - Replaced manual filter picker with a native ToolbarItem(placement: .topBarLeading) containing a Menu/Picker.
+ - Modernized log rows using a private struct PluginLogLine with semantic color coding.
+ - Replaced manual control bar with ToolbarItem(placement: .topBarTrailing) for secondary actions and a bottom bar for primary debugging.
+ - strictly preserved all PluginManager logging subscriptions and event injection logic.
+ - Added ContentUnavailableView for empty log states.
+ - Improved auto-scrolling reliability using ScrollViewProxy.
+ */
+
 import SwiftUI
 import Combine
 
@@ -44,80 +55,62 @@ struct PluginDevConsoleView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            filterPicker
-
-            consoleOutput
-
-            controls
-        }
-        .navigationTitle("Developer Console")
-        .onAppear(perform: setupLogging)
-    }
-
-    private var filterPicker: some View {
-        Picker("Filter", selection: $selectedFilter) {
-            ForEach(LogFilter.allCases, id: \.self) { filter in
-                Text(filter.rawValue).tag(filter)
-            }
-        }
-        .pickerStyle(.segmented)
-        .padding()
-        .background(Color(.systemGroupedBackground))
-    }
-
-    private var consoleOutput: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 4) {
-                    if filteredLogs.isEmpty {
-                        Text("No logs to display")
-                            .font(.system(.caption, design: .monospaced))
-                            .foregroundColor(.secondary)
-                            .padding()
-                    } else {
-                        ForEach(filteredLogs) { log in
-                            HStack(alignment: .top, spacing: 8) {
-                                Text(log.timestamp.formatted(date: .omitted, time: .standard))
-                                    .font(.system(size: 10, design: .monospaced))
-                                    .foregroundColor(.secondary)
-
-                                Text(log.message)
-                                    .font(.system(size: 11, design: .monospaced))
-                                    .foregroundColor(log.type.color)
+            if filteredLogs.isEmpty {
+                ContentUnavailableView("No Logs", systemImage: "terminal", description: Text("Plugin activity and system events will appear here."))
+            } else {
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 2) {
+                            ForEach(filteredLogs) { log in
+                                PluginLogLine(log: log)
                             }
-                            .id(log.id)
-                            .padding(.horizontal, 8)
+                        }
+                        .padding(.vertical, 8)
+                    }
+                    .background(Color.black)
+                    .onChange(of: logs.count) { _, _ in
+                        if let last = filteredLogs.last {
+                            withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
                         }
                     }
                 }
-                .padding(.vertical, 8)
             }
-            .onChange(of: logs.count) { _, _ in
-                if let last = logs.last {
-                    proxy.scrollTo(last.id, anchor: .bottom)
+
+            // Bottom Control Bar
+            HStack {
+                Button(action: injectTestEvent) {
+                    Label("Inject Test Event", systemImage: "bolt.fill")
+                }
+                .buttonStyle(.bordered)
+
+                Spacer()
+
+                Text("\(filteredLogs.count) entries")
+                    .font(.caption2.monospaced())
+                    .foregroundStyle(.secondary)
+            }
+            .padding()
+            .background(.ultraThinMaterial)
+        }
+        .navigationTitle("Dev Console")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Menu {
+                    Picker("Filter", selection: $selectedFilter) {
+                        ForEach(LogFilter.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                    }
+                } label: {
+                    Label(selectedFilter.rawValue, systemImage: "line.3.horizontal.decrease.circle")
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(role: .destructive) { logs.removeAll() } label: {
+                    Label("Clear", systemImage: "trash")
                 }
             }
         }
-        .background(Color.black)
-    }
-
-    private var controls: some View {
-        HStack {
-            Button(action: injectTestEvent) {
-                Label("Test Event", systemImage: "bolt.fill")
-            }
-            .buttonStyle(.bordered)
-
-            Spacer()
-
-            Button("Clear") {
-                logs.removeAll()
-            }
-            .buttonStyle(.bordered)
-            .tint(.red)
-        }
-        .padding()
-        .background(Color(.systemGroupedBackground))
+        .onAppear(perform: setupLogging)
     }
 
     private func setupLogging() {
@@ -145,5 +138,23 @@ struct PluginDevConsoleView: View {
         )
         appendLog(.system, "Injecting test event...")
         PluginEventBus.shared.emit(event)
+    }
+}
+
+private struct PluginLogLine: View {
+    let log: PluginDevConsoleView.PluginLog
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Text(log.timestamp.formatted(date: .omitted, time: .standard))
+                .font(.system(size: 9, design: .monospaced))
+                .foregroundStyle(.secondary)
+
+            Text(log.message)
+                .font(.system(size: 11, design: .monospaced))
+                .foregroundStyle(log.type.color)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 1)
     }
 }
