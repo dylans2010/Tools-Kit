@@ -37,7 +37,7 @@ struct SDKDiagnosticsView: View {
                 Text("System Health")
             }
 
-            Section("Performance Analytics") {
+            Section {
                 let metrics = telemetry.getMetrics()
                 LabeledContent("Latency", value: "\(Int(metrics.averageDurationMs))ms")
                 LabeledContent("Total Traces", value: "\(metrics.totalTraces)")
@@ -45,6 +45,8 @@ struct SDKDiagnosticsView: View {
                     let rate = metrics.totalTraces > 0 ? Double(metrics.successCount) / Double(metrics.totalTraces) * 100 : 100
                     Text("\(Int(rate))%").foregroundStyle(rate > 90 ? .green : .orange).bold()
                 }
+            } header: {
+                Text("Performance Analytics")
             }
 
             Section("Data Sync State") {

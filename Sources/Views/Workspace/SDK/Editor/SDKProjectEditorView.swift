@@ -50,6 +50,8 @@ struct SDKProjectEditorView: View {
                 DiagnosticsBar(diagnostics: state.diagnostics) { node in
                     state.open(node: node)
                 }
+            } header: {
+                Text("Project Areas")
             }
         }
         .sheet(isPresented: $showingTabPicker) {
@@ -114,7 +116,6 @@ struct SDKProjectEditorView: View {
         case .connectors: IDEConnectorsView()
         case .runtimeScripts: IDERuntimeScriptsView()
         case .apiEndpoints: IDEAPIEndpointsView()
-        case .diagnostics: IDEDiagnosticsView()
         }
     }
 }
@@ -141,7 +142,7 @@ private struct EditorTabItem: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
         .background(isSelected ? Color.accentColor.opacity(0.15) : Color.primary.opacity(0.05), in: Capsule())
-        .foregroundStyle(isSelected ? .accent : .secondary)
+        .foregroundStyle(isSelected ? Color.accentColor : .secondary)
     }
 }
 
@@ -173,7 +174,7 @@ private struct TabPickerList: View {
 
     var body: some View {
         List {
-            Section("Project Areas") {
+            Section {
                 ForEach(SDKWorkspaceNode.allCases) { node in
                     Button {
                         state.open(node: node)

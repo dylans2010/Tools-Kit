@@ -150,7 +150,7 @@ struct SDKWorkspaceContainerView: View {
                 Text(title)
                     .font(.system(size: 10, weight: .bold))
             }
-            .foregroundStyle(activeSheet == sheet ? .accentColor : .secondary)
+            .foregroundStyle(activeSheet == sheet ? Color.accentColor : .secondary)
             .frame(maxWidth: .infinity)
         }
     }

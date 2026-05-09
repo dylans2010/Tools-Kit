@@ -23,12 +23,14 @@ struct SDKNavigatorView: View {
 
     var body: some View {
         List {
-            Section("Project Areas") {
+            Section {
                 ForEach(filteredNodes) { node in
                     AreaNodeRow(node: node, isSelected: state.selectedNode == node) {
                         state.open(node: node)
                     }
                 }
+            } header: {
+                Text("Project Areas")
             }
 
             Section {
@@ -67,7 +69,7 @@ private struct AreaNodeRow: View {
                     }
                 }
             } icon: {
-                Image(systemName: node.icon).foregroundStyle(isSelected ? .accent : .secondary)
+                Image(systemName: node.icon).foregroundStyle(isSelected ? Color.accentColor : .secondary)
             }
         }
         .listRowBackground(isSelected ? Color.accentColor.opacity(0.1) : nil)

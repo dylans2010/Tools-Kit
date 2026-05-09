@@ -57,7 +57,7 @@ private struct CapabilityCard: View {
             HStack {
                 Image(systemName: capability.node.icon)
                     .font(.title2)
-                    .foregroundStyle(isEnabled ? .accentColor : .secondary)
+                    .foregroundStyle(isEnabled ? Color.accentColor : .secondary)
                 Spacer()
                 Image(systemName: isEnabled ? "checkmark.circle.fill" : "lock.fill")
                     .foregroundStyle(isEnabled ? .green : .secondary)
