@@ -48,8 +48,7 @@ private struct SDKDiagnosticsSystemHealthSection: View {
             HealthStatusRow(title: "Plugin Sandbox", healthy: bgEngine.systemHealth.pluginSandboxStatus)
             HealthStatusRow(title: "Data Store Health", healthy: bgEngine.systemHealth.coreDataHealth)
 
-            let lastAuditText = "\(bgEngine.systemHealth.lastCheck, style: .relative) ago"
-            LabeledContent("Last Audit", value: lastAuditText)
+            LabeledContent("Last Audit", value: "\(bgEngine.systemHealth.lastCheck, style: .relative) ago")
                 .font(.caption2)
                 .foregroundStyle(Color.secondary)
 
