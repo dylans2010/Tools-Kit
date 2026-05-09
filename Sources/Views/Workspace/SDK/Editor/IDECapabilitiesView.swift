@@ -100,7 +100,7 @@ private struct RequiredScopesList: View {
     let effectiveScopes: Set<String>
 
     var body: some View {
-        ForEach(requiredScopes, id: \.self) { scope in
+        ForEach(requiredScopes, id: \.self) { (scope: String) in
             let isAvailable = effectiveScopes.contains(scope)
 
             HStack(spacing: 6) {
