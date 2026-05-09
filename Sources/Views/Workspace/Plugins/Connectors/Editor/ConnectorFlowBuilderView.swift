@@ -35,7 +35,7 @@ struct ConnectorFlowBuilderView: View {
         List {
             if !steps.isEmpty { FlowSummarySection(steps: steps) }
 
-            Section("Workflow Pipeline") {
+            Section {
                 if steps.isEmpty { EmptyPipelineView(onAdd: { addStep($0) }, onShowTemplates: { showingTemplates = true }) }
                 else {
                     ForEach($steps) { $step in
@@ -44,6 +44,8 @@ struct ConnectorFlowBuilderView: View {
                     .onMove { steps.move(fromOffsets: $0, toOffset: $1); hasUnsavedChanges = true }
                     .onDelete { steps.remove(atOffsets: $0); hasUnsavedChanges = true }
                 }
+            } header: {
+                Text("Workflow Pipeline")
             }
 
             Section {
@@ -164,7 +166,12 @@ private struct EmptyPipelineView: View {
     let onAdd: (FlowStep.StepType) -> Void
     let onShowTemplates: () -> Void
     var body: some View {
-        ContentUnavailableView("Empty Pipeline", systemImage: "arrow.triangle.branch", description: Text("Add a trigger to start building your automated workflow.")) {
+        VStack(spacing: 12) {
+            ContentUnavailableView(
+                "Empty Pipeline",
+                systemImage: "arrow.triangle.branch",
+                description: Text("Add a trigger to start building your automated workflow.")
+            )
             HStack {
                 Button("Add Trigger") { onAdd(.trigger) }.buttonStyle(.borderedProminent)
                 Button("Use Template") { onShowTemplates() }.buttonStyle(.bordered)
@@ -185,8 +192,10 @@ private struct AddStepMenu: View {
 private struct ValidationIssuesSection: View {
     let errors: [String]
     var body: some View {
-        Section("Validation Issues") {
+        Section {
             ForEach(errors, id: \.self) { Label($0, systemImage: "exclamationmark.triangle.fill").font(.caption).foregroundStyle(.orange) }
+        } header: {
+            Text("Validation Issues")
         }
     }
 }
