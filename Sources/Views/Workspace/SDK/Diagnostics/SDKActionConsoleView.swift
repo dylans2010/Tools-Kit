@@ -55,7 +55,7 @@ struct SDKActionConsoleView: View {
     private func executeCommand(_ cmd: String) {
         guard !cmd.isEmpty else { return }
         let result: String
-        let status: ConsoleEntry.ConsoleEntryStatus = .success
+        let status: ConsoleEntry.EntryStatus = .success
 
         // RESTORED Logic
         switch cmd.lowercased() {

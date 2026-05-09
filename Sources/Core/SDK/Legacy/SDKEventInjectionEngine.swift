@@ -17,6 +17,6 @@ public final class SDKEventInjectionEngine {
         )
 
         PluginEventBus.shared.emit(event)
-        SDKConsoleView.LogBus.shared.log("Broadcasted SDK event: \(action)", type: .info)
+        SDKLogStore.shared.log("Broadcasted SDK event: \(action)", source: "SDKEventInjectionEngine", level: .info)
     }
 }

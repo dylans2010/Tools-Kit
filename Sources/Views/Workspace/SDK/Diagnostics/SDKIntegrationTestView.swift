@@ -55,9 +55,7 @@ struct SDKIntegrationTestView: View {
                 case .idle:
                     Text("Awaiting execution trigger...").font(.caption).foregroundStyle(.secondary)
                 case .running:
-                    Label("Running: \(scenarios[selectedScenario])", systemImage: "arrow.triangle.2.circlepath")
-                        .symbolEffect(.rotate, options: .repeating)
-                        .font(.subheadline.bold())
+                    runningStatusLabel
                 case .success(let msg):
                     Label(msg, systemImage: "checkmark.circle.fill")
                         .foregroundStyle(.green)
@@ -93,6 +91,18 @@ struct SDKIntegrationTestView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
+
+    @ViewBuilder
+    private var runningStatusLabel: some View {
+        if #available(iOS 18.0, *) {
+            Label("Running: \(scenarios[selectedScenario])", systemImage: "arrow.triangle.2.circlepath")
+                .symbolEffect(.rotate, options: .repeating)
+                .font(.subheadline.bold())
+        } else {
+            Label("Running: \(scenarios[selectedScenario])", systemImage: "arrow.triangle.2.circlepath")
+                .font(.subheadline.bold())
+        }
+    }
     private func runTest() {
         testStatus = .running
         Task {

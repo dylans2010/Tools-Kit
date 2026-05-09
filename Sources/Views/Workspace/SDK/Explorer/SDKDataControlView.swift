@@ -23,12 +23,14 @@ struct SDKDataControlView: View {
                 warningSection
             }
 
-            Section("System Maintenance") {
+            Section {
                 Button("Reindex All Notes") { runMaintenanceTask("Reindexed all notes") { WorkspaceAPI.shared.notes.listNotes() } }
                 Button("Cleanup Completed Tasks") { cleanupTasks() }
                 Button("Rebuild Intelligence Graph") { runMaintenanceTask("Intelligence graph rebuilt") { WorkspaceAPI.shared.intelligence.getGraph() } }
                 Button("Invalidate SDK Cache") { SDKDataEngine.shared.invalidateCache(); statusMessage = "Cache cleared" }
                 Button("Create Workspace Snapshot") { WorkspaceAPI.shared.timeTravel.createSnapshot(message: "Manual snapshot"); statusMessage = "Snapshot created" }
+            } header: {
+                Text("System Maintenance")
             } footer: {
                 Text("Direct manipulation of data structures can lead to permanent loss.")
             }
