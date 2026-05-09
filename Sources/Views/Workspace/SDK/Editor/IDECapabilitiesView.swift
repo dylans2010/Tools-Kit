@@ -80,7 +80,7 @@ private struct CapabilityCard: View {
                     .foregroundStyle(.tertiary)
                     .textCase(.uppercase)
 
-                ForEach(capability.requiredScopes, id: \.self) { scope in
+                ForEach(Array(capability.requiredScopes), id: \.self) { (scope: String) in
                     HStack(spacing: 6) {
                         Circle()
                             .fill(effectiveScopes.contains(scope) ? Color.green : Color.red)
