@@ -11,6 +11,7 @@ struct AIChatSettingsView: View {
     @StateObject private var musicMode = MusicModeManager.shared
     @StateObject private var workoutsMode = WorkoutsModeManager.shared
     @StateObject private var workspaceMode = WorkspaceModeManager.shared
+    @StateObject private var cloudKitSettings = CloudKitSettingsViewModel()
     @State private var isUploadingToCloud = false
     @State private var cloudStatusMessage: String?
     @State private var isSigningOut = false
@@ -51,6 +52,7 @@ struct AIChatSettingsView: View {
                 supportSection
                 developerToolsSection
                 internalSection
+                cloudKitSyncSection
                 cloudDataSection
                 accountSection
             }
@@ -616,6 +618,62 @@ struct AIChatSettingsView: View {
         }
     }
 
+    private var cloudKitSyncSection: some View {
+        Section {
+            Toggle("Enable Cloud Sync", isOn: $cloudKitSettings.isCloudSyncEnabled)
+
+            HStack {
+                Text("iCloud Status")
+                Spacer()
+                Text(accountStatusString)
+                    .foregroundColor(.secondary)
+            }
+
+            HStack {
+                Text("Sync Status")
+                Spacer()
+                if cloudKitSettings.isSyncing {
+                    ProgressView()
+                } else {
+                    Text("Idle")
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            HStack {
+                Text("Last Sync")
+                Spacer()
+                Text(cloudKitSettings.lastSyncTime)
+                    .foregroundColor(.secondary)
+            }
+
+            Button("Force Sync Now") {
+                cloudKitSettings.forceSync()
+            }
+            .disabled(!cloudKitSettings.isCloudSyncEnabled || cloudKitSettings.isSyncing)
+
+            Button("Reset Cloud Data", role: .destructive) {
+                cloudKitSettings.resetCloudData()
+            }
+            .disabled(!cloudKitSettings.isCloudSyncEnabled)
+        } header: {
+            Text("CloudKit Sync")
+        } footer: {
+            Text("Keep your notes, tasks, and workspaces in sync across all your devices using your private iCloud account.")
+        }
+    }
+
+    private var accountStatusString: String {
+        switch cloudKitSettings.accountStatus {
+        case .available: return "Available"
+        case .noAccount: return "No Account"
+        case .restricted: return "Restricted"
+        case .couldNotDetermine: return "Unknown"
+        case .temporarilyUnavailable: return "Unavailable"
+        @unknown default: return "Unknown"
+        }
+    }
+
     private var cloudDataSection: some View {
         Section {
             Button {
@@ -636,7 +694,7 @@ struct AIChatSettingsView: View {
                     .foregroundColor(.secondary)
             }
         } header: {
-            Text("Cloud Sync")
+            Text("Legacy Cloud Sync")
         }
     }
 

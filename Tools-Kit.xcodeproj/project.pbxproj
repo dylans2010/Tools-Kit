@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CK0200000000000000000001 /* CloudKitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = CK0100000000000000000001 /* CloudKitError.swift */; };
+		CK0200000000000000000002 /* CloudKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CK0100000000000000000002 /* CloudKitManager.swift */; };
+		CK0200000000000000000003 /* CloudKitSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = CK0100000000000000000003 /* CloudKitSchema.swift */; };
+		CK0200000000000000000004 /* CloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CK0100000000000000000004 /* CloudKitService.swift */; };
+		CK0200000000000000000005 /* CloudKitSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CK0100000000000000000005 /* CloudKitSettingsViewModel.swift */; };
+		CK0200000000000000000006 /* CloudKitSubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CK0100000000000000000006 /* CloudKitSubscriptionManager.swift */; };
+		CK0200000000000000000007 /* CloudKitSyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CK0100000000000000000007 /* CloudKitSyncEngine.swift */; };
+		CK0200000000000000000008 /* CKNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = CK0100000000000000000008 /* CKNote.swift */; };
+		CK0200000000000000000009 /* CKTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = CK0100000000000000000009 /* CKTask.swift */; };
+		CK0200000000000000000010 /* CKWorkspace.swift in Sources */ = {isa = PBXBuildFile; fileRef = CK0100000000000000000010 /* CKWorkspace.swift */; };
 		MS028A4E8FF9A0449D039277 /* JSONCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS018A4E8FF9A0449D039277 /* JSONCoder.swift */; };
 		MS026A2894802C56D5AB5FC3 /* SegmentSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */; };
 		MS028F0C9AC0045039A23CD0 /* MessageBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS018F0C9AC0045039A23CD0 /* MessageBubbleView.swift */; };
@@ -1276,6 +1286,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CK0100000000000000000001 /* CloudKitError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitError.swift; sourceTree = "<group>"; };
+		CK0100000000000000000002 /* CloudKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitManager.swift; sourceTree = "<group>"; };
+		CK0100000000000000000003 /* CloudKitSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSchema.swift; sourceTree = "<group>"; };
+		CK0100000000000000000004 /* CloudKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitService.swift; sourceTree = "<group>"; };
+		CK0100000000000000000005 /* CloudKitSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSettingsViewModel.swift; sourceTree = "<group>"; };
+		CK0100000000000000000006 /* CloudKitSubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSubscriptionManager.swift; sourceTree = "<group>"; };
+		CK0100000000000000000007 /* CloudKitSyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncEngine.swift; sourceTree = "<group>"; };
+		CK0100000000000000000008 /* CKNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKNote.swift; sourceTree = "<group>"; };
+		CK0100000000000000000009 /* CKTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKTask.swift; sourceTree = "<group>"; };
+		CK0100000000000000000010 /* CKWorkspace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKWorkspace.swift; sourceTree = "<group>"; };
 		MS018A4E8FF9A0449D039277 /* JSONCoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONCoder.swift; sourceTree = "<group>"; };
 		MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentSwitcher.swift; sourceTree = "<group>"; };
 		MS018F0C9AC0045039A23CD0 /* MessageBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubbleView.swift; sourceTree = "<group>"; };
@@ -2902,6 +2922,31 @@
 			path = MetadataViewer;
 			sourceTree = "<group>";
 		};
+		CK0000000000000000000001 /* CloudKit */ = {
+			isa = PBXGroup;
+			children = (
+				CK0100000000000000000001 /* CloudKitError.swift */,
+				CK0100000000000000000002 /* CloudKitManager.swift */,
+				CK0100000000000000000003 /* CloudKitSchema.swift */,
+				CK0100000000000000000004 /* CloudKitService.swift */,
+				CK0100000000000000000005 /* CloudKitSettingsViewModel.swift */,
+				CK0100000000000000000006 /* CloudKitSubscriptionManager.swift */,
+				CK0100000000000000000007 /* CloudKitSyncEngine.swift */,
+				CK0000000000000000000002 /* Models */,
+			);
+			path = CloudKit;
+			sourceTree = "<group>";
+		};
+		CK0000000000000000000002 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				CK0100000000000000000008 /* CKNote.swift */,
+				CK0100000000000000000009 /* CKTask.swift */,
+				CK0100000000000000000010 /* CKWorkspace.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		12B4BF323FCC4B958B938E81 /* Core */ = {
 			isa = PBXGroup;
 			children = (
@@ -2909,6 +2954,7 @@
 				74B75DADFF2E4C73AFCFCC0F /* Data */,
 				7C0A3202F90F4064B52AC392 /* SDK */,
 				E09BD8427CCE4E3BB77F34C0 /* AI */,
+				CK0000000000000000000001 /* CloudKit */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -9090,6 +9136,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CK0200000000000000000001 /* CloudKitError.swift in Sources */,
+				CK0200000000000000000002 /* CloudKitManager.swift in Sources */,
+				CK0200000000000000000003 /* CloudKitSchema.swift in Sources */,
+				CK0200000000000000000004 /* CloudKitService.swift in Sources */,
+				CK0200000000000000000005 /* CloudKitSettingsViewModel.swift in Sources */,
+				CK0200000000000000000006 /* CloudKitSubscriptionManager.swift in Sources */,
+				CK0200000000000000000007 /* CloudKitSyncEngine.swift in Sources */,
+				CK0200000000000000000008 /* CKNote.swift in Sources */,
+				CK0200000000000000000009 /* CKTask.swift in Sources */,
+				CK0200000000000000000010 /* CKWorkspace.swift in Sources */,
 				WK02AICONTEXT0000000001 /* AIContextEngine.swift in Sources */,
 				WK02VERSIONCTRL00000001 /* VersionControlManager.swift in Sources */,
 				SDK25D57A9783E6597D2D336 /* WorkspaceSDKKernel.swift in Sources */,
