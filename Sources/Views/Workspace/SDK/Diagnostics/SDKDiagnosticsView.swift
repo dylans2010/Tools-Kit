@@ -66,12 +66,13 @@ private struct SDKDiagnosticsPerformanceSection: View {
     let telemetry: SDKTelemetryEngine
 
     var body: some View {
-        Section {
-            let metrics = telemetry.getMetrics()
+        let metrics = telemetry.getMetrics()
+        let rate = metrics.totalTraces > 0 ? Double(metrics.successCount) / Double(metrics.totalTraces) * 100 : 100
+
+        return Section {
             LabeledContent("Latency", value: "\(Int(metrics.averageDurationMs))ms")
             LabeledContent("Total Traces", value: "\(metrics.totalTraces)")
             LabeledContent("Execution Health") {
-                let rate = metrics.totalTraces > 0 ? Double(metrics.successCount) / Double(metrics.totalTraces) * 100 : 100
                 Text("\(Int(rate))%")
                     .foregroundStyle(rate > 90 ? .green : .orange)
                     .bold()
@@ -89,10 +90,9 @@ private struct SDKDiagnosticsDataSyncSection: View {
         Section {
             ForEach(SDKScope.allCases, id: \.self) { scope in
                 LabeledContent(String(describing: scope).capitalized) {
-                    let count = cachedItemCount(scope)
-                    Text(count > 0 ? "\(count) Items" : "Empty")
+                    Text(cachedItemCount(scope) > 0 ? "\(cachedItemCount(scope)) Items" : "Empty")
                         .font(.caption2.bold())
-                        .foregroundStyle(count > 0 ? Color.green : Color.secondary)
+                        .foregroundStyle(cachedItemCount(scope) > 0 ? Color.green : Color.secondary)
                 }
             }
         } header: {
