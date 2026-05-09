@@ -45,10 +45,10 @@ struct SecurityScopeApplicationView: View {
                         .padding(4)
                         .background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 8))
                 }
-            } footer: {
-                Text("Justification for accessing sensitive data.")
             } header: {
                 Text("Credentials & Identification")
+            } footer: {
+                Text("Justification for accessing sensitive data.")
             }
 
             Section("Data Governance") {

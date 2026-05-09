@@ -18,6 +18,8 @@ public final class SDKMutationEngine {
         let systemAction = try SDKSystemRouter.shared.route(action: action)
         try await dispatcher.dispatch(systemAction, context: context)
 
-        SDKLogStore.shared.log("Mutation executed: \(action)", source: "SDKMutationEngine", level: .info)
+        Task { @MainActor in
+            await SDKLogStore.shared.log("Mutation executed: \(action)", source: "SDKMutationEngine", level: .info)
+        }
     }
 }

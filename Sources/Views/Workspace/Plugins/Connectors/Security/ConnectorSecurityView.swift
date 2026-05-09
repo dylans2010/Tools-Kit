@@ -61,7 +61,7 @@ struct ConnectorSecurityView: View {
             Section("Webhook Integrity") {
                 Toggle("Sign Payloads", isOn: $enableWebhookSignatures)
                 if enableWebhookSignatures {
-                    HStack { SecureField("Signing Secret", text: $webhookSecret).font(.caption.monospaced()); Button { webhookSecret = (0..<32).map { _ in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".randomElement()! }.joined() } label: { Image(systemName: "arrow.clockwise") } }
+                    HStack { SecureField("Signing Secret", text: $webhookSecret).font(.caption.monospaced()); Button { webhookSecret = (0..<32).map { _ in String("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".randomElement()!) }.joined() } label: { Image(systemName: "arrow.clockwise") } }
                 }
             }
 

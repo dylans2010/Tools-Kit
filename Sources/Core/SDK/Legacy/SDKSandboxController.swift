@@ -8,7 +8,9 @@ public final class SDKSandboxController {
 
     public func execute(_ sourceCode: String, context: SDKExecutionContext) async throws {
         // Enforces sandbox constraints: restricted API access, no direct filesystem, etc.
-        SDKLogStore.shared.log("SandboxController: Executing in restricted mode.", source: "SDKSandboxController", level: .info)
+        Task { @MainActor in
+            await SDKLogStore.shared.log("SandboxController: Executing in restricted mode.", source: "SDKSandboxController", level: .info)
+        }
 
         // Use SDKExecutionKernel for coordinated execution
         // In a real implementation, the JS source would be parsed into SDKActions

@@ -97,7 +97,7 @@ private struct ExecutionHeaderView: View {
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: isRunning ? "arrow.triangle.2.circlepath" : "play.circle.fill")
-                .font(.system(size: 48)).foregroundStyle(isRunning ? .accent : .secondary)
+                .font(.system(size: 48)).foregroundStyle(isRunning ? Color.accentColor : .secondary)
                 .symbolEffect(.bounce, options: .repeating, value: isRunning)
 
             VStack(spacing: 4) {
@@ -165,9 +165,9 @@ private struct StepIndicator: View {
         }
     }
     private var color: Color {
-        guard let selected = selectedIndex else { return .accentColor }
+        guard let selected = selectedIndex else { return Color.accentColor }
         if index < selected { return .green }
-        if index == selected { return .accentColor }
+        if index == selected { return Color.accentColor }
         return .secondary.opacity(0.3)
     }
 }

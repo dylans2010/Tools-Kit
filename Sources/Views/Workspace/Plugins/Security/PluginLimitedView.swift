@@ -69,7 +69,7 @@ struct PluginLimitedView: View {
                 }
             }
 
-            Section("Developer Context") {
+            Section {
                 Text(detail)
                     .font(.system(.caption, design: .monospaced))
                     .padding(12)
