@@ -80,16 +80,10 @@ private struct CapabilityCard: View {
                     .foregroundStyle(.tertiary)
                     .textCase(.uppercase)
 
-                ForEach(Array(capability.requiredScopes), id: \.self) { (scope: String) in
-                    HStack(spacing: 6) {
-                        Circle()
-                            .fill(effectiveScopes.contains(scope) ? Color.green : Color.red)
-                            .frame(width: 6, height: 6)
-                        Text(scope)
-                            .font(.system(size: 9, design: .monospaced))
-                            .foregroundStyle(effectiveScopes.contains(scope) ? .primary : .red)
-                    }
-                }
+                RequiredScopesList(
+                    requiredScopes: Array(capability.requiredScopes),
+                    effectiveScopes: effectiveScopes
+                )
             }
         }
         .padding()
@@ -98,5 +92,23 @@ private struct CapabilityCard: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(isEnabled ? Color.accentColor.opacity(0.1) : Color.clear, lineWidth: 1)
         )
+    }
+}
+
+private struct RequiredScopesList: View {
+    let requiredScopes: [String]
+    let effectiveScopes: Set<String>
+
+    var body: some View {
+        ForEach(requiredScopes, id: \.self) { scope in
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(effectiveScopes.contains(scope) ? Color.green : Color.red)
+                    .frame(width: 6, height: 6)
+                Text(scope)
+                    .font(.system(size: 9, design: .monospaced))
+                    .foregroundStyle(effectiveScopes.contains(scope) ? .primary : .red)
+            }
+        }
     }
 }
