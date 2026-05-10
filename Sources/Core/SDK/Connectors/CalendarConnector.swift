@@ -6,6 +6,7 @@ public final class CalendarConnector: BaseConnector {
     public let id = UUID()
     public let name = "Calendar"
     public let type: ConnectorType = .calendar
+    public let requiredScopes: [String] = ["workspace.calendar.read"]
     @Published public var status: ConnectorStatus = .disconnected
 
     public var authFields: [AuthField] { [] }

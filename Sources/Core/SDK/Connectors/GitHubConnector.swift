@@ -5,6 +5,7 @@ public final class GitHubConnector: BaseConnector {
     public let id = UUID()
     public let name = "GitHub"
     public let type: ConnectorType = .github
+    public let requiredScopes: [String] = ["external.api.unrestricted", "workspace.repos.read"]
     @Published public var status: ConnectorStatus = .disconnected
 
     public var authFields: [AuthField] {

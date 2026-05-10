@@ -4,6 +4,7 @@ import SwiftUI
 
 struct SDKWorkspaceContainerView: View {
     @StateObject private var state = SDKRuntimeWorkspaceState.shared
+    @StateObject private var authorizationManager = AuthorizationManager.shared
     #if os(iOS)
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
@@ -51,6 +52,9 @@ struct SDKWorkspaceContainerView: View {
             }
             .background(Color(.systemGroupedBackground))
             .onDisappear { state.saveSnapshot() }
+            .onChange(of: authorizationManager.authState) { _, _ in
+                state.recalculateDiagnostics()
+            }
             .sheet(item: $activeSheet) { sheet in
                 NavigationStack {
                     sheetContent(sheet)

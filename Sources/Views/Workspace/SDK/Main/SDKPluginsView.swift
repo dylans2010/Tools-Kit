@@ -4,6 +4,7 @@ import SwiftUI
 
 struct SDKPluginsView: View {
     @StateObject private var manager = SDKPluginManager.shared
+    @StateObject private var authorizationManager = AuthorizationManager.shared
     @State private var showingCatalog = false
 
     var body: some View {
@@ -15,7 +16,7 @@ struct SDKPluginsView: View {
                         .font(.subheadline)
                 } else {
                     ForEach(manager.plugins) { plugin in
-                        PluginRow(plugin: plugin, manager: manager)
+                        PluginRow(plugin: plugin, manager: manager, authorizationManager: authorizationManager)
                             .swipeActions(edge: .trailing) {
                                 Button(role: .destructive) {
                                     manager.remove(id: plugin.id)
@@ -71,6 +72,7 @@ struct SDKPluginsView: View {
 private struct PluginRow: View {
     let plugin: SDKPlugin
     @ObservedObject var manager: SDKPluginManager
+    @ObservedObject var authorizationManager: AuthorizationManager
 
     var body: some View {
         HStack {
@@ -92,6 +94,7 @@ private struct PluginRow: View {
                 set: { $0 ? manager.enable(id: plugin.id) : manager.disable(id: plugin.id) }
             ))
             .labelsHidden()
+            .disabled(!authorizationManager.canUsePlugin(id: plugin.id))
         }
         .padding(.vertical, 4)
     }
