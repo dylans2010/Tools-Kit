@@ -17,7 +17,7 @@ struct GitHubCommandCenterView: View {
                 HStack {
                     Label("Ahead", systemImage: "arrow.up.circle")
                     Spacer()
-                    Text("\(gitEngine.commitQueue.count) commits").foregroundStyle(.blue)
+                    Text("\(gitEngine.commitQueue.count) commits").foregroundStyle(.primary)
                 }
 
                 HStack {
@@ -52,7 +52,7 @@ struct GitHubCommandCenterView: View {
                     ForEach(gitEngine.commitQueue, id: \.self) { commitID in
                         if let commit = gitEngine.localCommits.first(where: { $0.id == commitID }) {
                             HStack {
-                                Image(systemName: "clock.fill").foregroundStyle(.orange)
+                                Image(systemName: "clock.fill").foregroundStyle(.secondary)
                                 Text(commit.message).font(.caption)
                                 Spacer()
                                 Text("Pending").font(.caption2).foregroundStyle(.secondary)

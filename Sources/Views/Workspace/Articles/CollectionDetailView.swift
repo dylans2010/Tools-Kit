@@ -11,13 +11,11 @@ struct CollectionDetailView: View {
     var body: some View {
         Group {
             if liveCollection.articles.isEmpty {
-                EmptyStateView(
-                    icon: collection.icon,
-                    title: "No Articles",
-                    message: "Save articles from the search view to add them here.",
-                    action: nil,
-                    actionLabel: ""
-                )
+                ContentUnavailableView {
+                    Label("No Articles", systemImage: collection.icon)
+                } description: {
+                    Text("Save articles from the search view to add them here.")
+                }
             } else {
                 List {
                     ForEach(liveCollection.articles) { article in
@@ -28,7 +26,7 @@ struct CollectionDetailView: View {
                                 Text(article.title).font(.headline)
                                 Text(article.summary)
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                     .lineLimit(2)
                             }
                             .padding(.vertical, 4)
@@ -40,7 +38,6 @@ struct CollectionDetailView: View {
                         }
                     }
                 }
-                .listStyle(.plain)
             }
         }
         .navigationTitle(liveCollection.name)

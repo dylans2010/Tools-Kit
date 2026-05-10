@@ -18,7 +18,7 @@ struct WorkspaceAutomationView: View {
                 HStack {
                     Label("Active", systemImage: "checkmark.circle.fill")
                     Spacer()
-                    Text("\(engine.automations.filter { $0.isEnabled }.count)").foregroundStyle(.green)
+                    Text("\(engine.automations.filter { $0.isEnabled }.count)").foregroundStyle(.primary)
                 }
             } header: {
                 Text("Overview")
@@ -238,7 +238,7 @@ struct AutomationDetailView: View {
                     Button("Test Fire Now") {
                         engine.fire(trigger: automation.triggerType, context: ["taskTitle": "Test Task"])
                     }
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(.primary)
                 }
             }
             .navigationTitle(automation.name)

@@ -807,25 +807,12 @@ struct WelcomePersonaView: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 30) {
                     Image(systemName: "sparkles")
                         .font(.system(size: 80))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [.blue, .purple, .mint, .indigo, .cyan],
-                                startPoint: gradientStart,
-                                endPoint: gradientEnd
-                            )
-                        )
                         .symbolEffect(.pulse.byLayer, options: .nonRepeating)
-                        .onAppear {
-                            withAnimation(.linear(duration: 3).repeatForever(autoreverses: true)) {
-                                gradientStart = .bottomTrailing
-                                gradientEnd = .topLeading
-                            }
-                        }
                         .padding(.top, 40)
 
                     VStack(spacing: 8) {
@@ -850,17 +837,19 @@ struct WelcomePersonaView: View {
                     } label: {
                         Text("Get Started")
                             .font(.headline)
-                            .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing))
-                            .cornerRadius(14)
                     }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
                     .padding(.horizontal, 30)
                     .padding(.bottom, 20)
                 }
             }
-            .navigationBarItems(trailing: Button("Done") { dismiss() })
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
         }
     }
 }
@@ -870,7 +859,7 @@ struct TuningSheetView: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section(header: Text("Persona Identity")) {
                     TextField("Name", text: $manager.config.name)
@@ -902,10 +891,14 @@ struct TuningSheetView: View {
                 }
             }
             .navigationTitle("Tuning")
-            .navigationBarItems(trailing: Button("Done") {
-                manager.saveConfig()
-                dismiss()
-            })
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        manager.saveConfig()
+                        dismiss()
+                    }
+                }
+            }
         }
     }
 }

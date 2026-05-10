@@ -7,7 +7,7 @@ struct GitHubDependencyDebuggerView: View {
         List {
             Section(header: Text("Circular Dependencies"), footer: Text("Circular dependencies can cause memory leaks and unexpected behavior.")) {
                 if analyzer.circularDependencies.isEmpty {
-                    Label("No circular dependencies detected", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+                    Label("No circular dependencies detected", systemImage: "checkmark.circle.fill").foregroundStyle(.secondary)
                 } else {
                     ForEach(analyzer.circularDependencies, id: \.self) { dep in
                         Label(dep, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.red).font(.caption)

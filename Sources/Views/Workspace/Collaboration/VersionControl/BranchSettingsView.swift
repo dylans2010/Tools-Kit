@@ -16,13 +16,13 @@ struct BranchSettingsView: View {
                             if rule.requireApprovals {
                                 Text("Requires \(rule.requiredApprovalCount) Approvals")
                                     .font(.caption)
-                                    .foregroundColor(.orange)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     }
                 } else {
                     Text("No Protection Rules Defined")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
             } header: {
                 Text("Protection Rules")

@@ -28,7 +28,7 @@ struct CommitComposerView: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section {
                     TextField("Update \(path)", text: $message)

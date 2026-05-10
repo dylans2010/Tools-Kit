@@ -20,13 +20,14 @@ struct CalendarTodayView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     if todayEvents.isEmpty {
-                        EmptyStateView(
-                            icon: "calendar.badge.plus",
-                            title: "No Events",
-                            message: "Tap the + button to add an event for \(shortDate(selectedDate)).",
-                            action: { showingCreate = true },
-                            actionLabel: "Add Event"
-                        )
+                        ContentUnavailableView {
+                            Label("No Events", systemImage: "calendar.badge.plus")
+                        } description: {
+                            Text("Tap + to add an event for \(shortDate(selectedDate)).")
+                        } actions: {
+                            Button("Add Event") { showingCreate = true }
+                                .buttonStyle(.borderedProminent)
+                        }
                         .padding()
                     } else {
                         timelineView
@@ -49,7 +50,7 @@ struct CalendarTodayView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(dayName(selectedDate))
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .textCase(.uppercase)
                 Text(shortDate(selectedDate))
                     .font(.headline)
@@ -114,10 +115,10 @@ struct EventTimelineRow: View {
             VStack(alignment: .trailing, spacing: 2) {
                 Text(timeString(event.startTime))
                     .font(.caption.bold())
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 Text(timeString(event.endTime))
                     .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
             .frame(width: 52)
 
@@ -132,13 +133,13 @@ struct EventTimelineRow: View {
                 if !event.description.isEmpty {
                     Text(event.description)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .lineLimit(2)
                 }
                 if !event.location.isEmpty {
                     Label(event.location, systemImage: "location")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
             }
             Spacer()

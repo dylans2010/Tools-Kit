@@ -42,7 +42,7 @@ struct YearMiniMonthView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(date.formatted(.dateTime.month(.abbreviated)))
                 .font(.caption.bold())
-                .foregroundStyle(.blue)
+                .foregroundStyle(.primary)
 
             LazyVGrid(columns: columns, spacing: 4) {
                 ForEach(daysInMonth(), id: \.self) { day in
@@ -57,7 +57,7 @@ struct YearMiniMonthView: View {
             }
         }
         .padding(10)
-        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
         .onTapGesture(perform: onTap)
     }
 

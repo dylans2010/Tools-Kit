@@ -11,7 +11,7 @@ struct SpacePublishingView: View {
         VStack(spacing: 20) {
             Image(systemName: "globe")
                 .font(.system(size: 60))
-                .foregroundColor(.blue)
+                .foregroundStyle(.primary)
 
             Text("Publish Space")
                 .font(.title)

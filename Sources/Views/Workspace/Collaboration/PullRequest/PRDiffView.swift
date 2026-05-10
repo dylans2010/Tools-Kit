@@ -69,7 +69,7 @@ struct CommentThreadView: View {
                     .bold()
                 Text("2 hours ago")
                     .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
             Text("Should we reconsider the layout of this section for better accessibility?")
                 .font(.subheadline)

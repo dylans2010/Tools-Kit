@@ -7,34 +7,32 @@ struct TaskCategoryView: View {
     @State private var newName = ""
     @State private var newColorHex = "#007AFF"
 
-    private let presetColors: [(String, Color)] = [
-        ("#007AFF", .blue), ("#34C759", .green), ("#FF3B30", .red),
-        ("#FF9500", .orange), ("#AF52DE", .purple), ("#FF2D55", .pink),
-        ("#5AC8FA", .cyan), ("#FFCC00", .yellow)
+    private let presetColors: [String] = [
+        "#007AFF", "#34C759", "#FF3B30",
+        "#FF9500", "#AF52DE", "#FF2D55",
+        "#5AC8FA", "#FFCC00"
     ]
 
     var body: some View {
         List {
             ForEach(manager.categories) { cat in
                 HStack(spacing: 12) {
-                    Circle()
-                        .fill(Color(hex: cat.colorHex) ?? .blue)
-                        .frame(width: 14, height: 14)
+                    Image(systemName: "folder")
                     Text(cat.name)
                     Spacer()
                     let count = manager.tasks.filter { $0.categoryID == cat.id }.count
                     Text("\(count)")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     Button {
                         editingCategory = cat
                         newName = cat.name
                         newColorHex = cat.colorHex
                     } label: {
                         Image(systemName: "pencil")
-                            .foregroundColor(.secondary)
                     }
                     .buttonStyle(.plain)
+                    .foregroundStyle(.secondary)
                 }
                 .swipeActions(edge: .trailing) {
                     Button(role: .destructive) {
@@ -47,7 +45,7 @@ struct TaskCategoryView: View {
         }
         .navigationTitle("Categories")
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItem(placement: .primaryAction) {
                 Button {
                     newName = ""
                     newColorHex = "#007AFF"
@@ -68,16 +66,14 @@ struct TaskCategoryView: View {
     private func categoryFormSheet(isEdit: Bool) -> some View {
         NavigationStack {
             Form {
-                Section {
+                Section("Category Name") {
                     TextField("Name", text: $newName)
-                } header: {
-                    Text("Category Name")
                 }
-                Section {
+                Section("Color") {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8), spacing: 12) {
-                        ForEach(presetColors, id: \.0) { hex, color in
+                        ForEach(presetColors, id: \.self) { hex in
                             Circle()
-                                .fill(color)
+                                .fill(Color(hex: hex) ?? .accentColor)
                                 .frame(width: 32, height: 32)
                                 .overlay(
                                     Circle()
@@ -88,8 +84,6 @@ struct TaskCategoryView: View {
                         }
                     }
                     .padding(.vertical, 4)
-                } header: {
-                    Text("Color")
                 }
                 Section {
                     Button(action: {
@@ -115,7 +109,7 @@ struct TaskCategoryView: View {
             .navigationTitle(isEdit ? "Edit Category" : "New Category")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
                         if isEdit { editingCategory = nil }
                         else { showingCreate = false }

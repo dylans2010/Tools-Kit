@@ -18,23 +18,21 @@ struct CreateTaskView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section {
+                Section("Task Details") {
                     TextField("Task title", text: $title)
                     ZStack(alignment: .topLeading) {
                         if description.isEmpty {
                             Text("Notes (Optional)")
-                                .foregroundColor(Color(.placeholderText))
+                                .foregroundStyle(.placeholder)
                                 .padding(.top, 8)
                                 .padding(.leading, 4)
                         }
                         TextEditor(text: $description)
                             .frame(minHeight: 80)
                     }
-                } header: {
-                    Text("Task Details")
                 }
 
-                Section {
+                Section("Priority") {
                     Picker("Priority", selection: $priority) {
                         ForEach(WorkspaceTask.TaskPriority.allCases, id: \.self) { p in
                             Label(p.rawValue, systemImage: p.icon)
@@ -42,30 +40,24 @@ struct CreateTaskView: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                } header: {
-                    Text("Priority")
                 }
 
-                Section {
+                Section("Due Date") {
                     Toggle("Set Due Date", isOn: $hasDueDate)
                     if hasDueDate {
                         DatePicker("Due Date", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
                             .datePickerStyle(.compact)
                     }
-                } header: {
-                    Text("Due Date")
                 }
 
-                Section {
+                Section("Category") {
                     Picker("Category", selection: $categoryID) {
                         Text("None").tag(Optional<UUID>.none)
                         ForEach(manager.categories) { cat in
-                            Label(cat.name, systemImage: "folder.fill")
+                            Label(cat.name, systemImage: "folder")
                                 .tag(Optional(cat.id))
                         }
                     }
-                } header: {
-                    Text("Category")
                 }
 
                 Section {
@@ -80,7 +72,7 @@ struct CreateTaskView: View {
             .navigationTitle(isEditing ? "Edit Task" : "New Task")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
             }

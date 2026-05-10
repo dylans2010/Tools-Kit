@@ -14,7 +14,7 @@ struct CalendarWeekView: View {
 
     var body: some View {
         ZStack {
-            Color.workspaceBackground.ignoresSafeArea()
+            Color(.systemBackground).ignoresSafeArea()
 
             VStack(spacing: 0) {
                 weekPicker
@@ -45,7 +45,7 @@ struct CalendarWeekView: View {
             }
         }
         .padding()
-        .background(Color.workspaceSurface, in: Capsule())
+        .background(Color(.secondarySystemBackground), in: Capsule())
     }
 
     private var weekRangeLabel: String {
