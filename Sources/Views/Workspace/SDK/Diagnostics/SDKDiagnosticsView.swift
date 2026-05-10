@@ -1,14 +1,3 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Replaced manual card-based health reporting with native Section and LabeledContent.
- - Modernized status pills and metrics using semantic colors (.green, .yellow, .red) and bold monospaced fonts.
- - Replaced manual health row logic with a private HealthStatusRow struct.
- - strictly preserved all SDKBackgroundEngine, SDKTelemetryEngine, and SDKPluginManager data sources.
- - Improved visual hierarchy for storage utilization and connectivity status.
- - Standardized the 'Audit' action button with a prominent prominent style.
- */
-
 import SwiftUI
 
 struct SDKDiagnosticsView: View {
@@ -32,15 +21,20 @@ struct SDKDiagnosticsView: View {
         .onAppear { bgEngine.startHealthCheckLoop() }
     }
 
-    private func cachedItemCount(for scope: SDKScope) -> Int {
-        SDKDataEngine.shared.cacheSnapshot()[scope] ?? 0
-    }
-
     private var systemHealthSection: some View {
         Section("System Health") {
-            HealthStatusRow(title: "Connector Reachability", healthy: bgEngine.systemHealth.connectorReachability)
-            HealthStatusRow(title: "Plugin Sandbox", healthy: bgEngine.systemHealth.pluginSandboxStatus)
-            HealthStatusRow(title: "Data Store Health", healthy: bgEngine.systemHealth.coreDataHealth)
+            LabeledContent("Connector Reachability") {
+                Image(systemName: bgEngine.systemHealth.connectorReachability ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                    .foregroundStyle(bgEngine.systemHealth.connectorReachability ? Color.green : Color.red)
+            }
+            LabeledContent("Plugin Sandbox") {
+                Image(systemName: bgEngine.systemHealth.pluginSandboxStatus ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                    .foregroundStyle(bgEngine.systemHealth.pluginSandboxStatus ? Color.green : Color.red)
+            }
+            LabeledContent("Data Store Health") {
+                Image(systemName: bgEngine.systemHealth.coreDataHealth ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                    .foregroundStyle(bgEngine.systemHealth.coreDataHealth ? Color.green : Color.red)
+            }
             LabeledContent("Last Audit", value: "\(bgEngine.systemHealth.lastCheck, style: .relative) ago")
             Button(action: { bgEngine.startHealthCheckLoop() }) {
                 Label("Run System Audit", systemImage: "arrow.clockwise.circle").bold()
@@ -66,7 +60,12 @@ struct SDKDiagnosticsView: View {
     private var syncStateSection: some View {
         Section("Data Sync State") {
             ForEach(SDKScope.allCases, id: \.self) { scope in
-                SyncScopeRow(scope: scope, itemCount: cachedItemCount(for: scope))
+                let count = SDKDataEngine.shared.cacheSnapshot()[scope] ?? 0
+                LabeledContent(String(describing: scope).capitalized) {
+                    Text(count > 0 ? "\(count) Items" : "Empty")
+                        .font(.caption2.bold())
+                        .foregroundStyle(count > 0 ? Color.green : Color.secondary)
+                }
             }
         }
     }
@@ -77,7 +76,11 @@ struct SDKDiagnosticsView: View {
                 Text("No plugins loaded").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach(pluginManager.plugins) { plugin in
-                    PluginStatusRow(name: plugin.name, isEnabled: plugin.isEnabled)
+                    LabeledContent(plugin.name) {
+                        Text(plugin.isEnabled ? "Active" : "Disabled")
+                            .font(.caption2.bold())
+                            .foregroundStyle(plugin.isEnabled ? Color.green : Color.secondary)
+                    }
                 }
             }
         }
@@ -89,61 +92,13 @@ struct SDKDiagnosticsView: View {
                 Text("No connectors registered").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach(connectorManager.connectors, id: \.id) { connector in
-                    ConnectorStatusRow(name: connector.name, statusText: connector.status.rawValue.capitalized, isConnected: connector.status == .connected)
+                    LabeledContent(connector.name) {
+                        Text(connector.status.rawValue.capitalized)
+                            .font(.caption2.bold())
+                            .foregroundStyle(connector.status == .connected ? Color.green : Color.orange)
+                    }
                 }
             }
-        }
-    }
-}
-
-// MARK: - Private Subviews
-
-private struct HealthStatusRow: View {
-    let title: String, healthy: Bool
-    var body: some View {
-        LabeledContent(title) {
-            Image(systemName: healthy ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                .foregroundStyle(healthy ? Color.green : Color.red)
-        }
-    }
-}
-
-private struct SyncScopeRow: View {
-    let scope: SDKScope
-    let itemCount: Int
-
-    var body: some View {
-        LabeledContent(String(describing: scope).capitalized) {
-            Text(itemCount > 0 ? "\(itemCount) Items" : "Empty")
-                .font(.caption2.bold())
-                .foregroundStyle(itemCount > 0 ? Color.green : Color.secondary)
-        }
-    }
-}
-
-private struct PluginStatusRow: View {
-    let name: String
-    let isEnabled: Bool
-
-    var body: some View {
-        LabeledContent(name) {
-            Text(isEnabled ? "Active" : "Disabled")
-                .font(.caption2.bold())
-                .foregroundStyle(isEnabled ? Color.green : Color.secondary)
-        }
-    }
-}
-
-private struct ConnectorStatusRow: View {
-    let name: String
-    let statusText: String
-    let isConnected: Bool
-
-    var body: some View {
-        LabeledContent(name) {
-            Text(statusText)
-                .font(.caption2.bold())
-                .foregroundStyle(isConnected ? Color.green : Color.orange)
         }
     }
 }
