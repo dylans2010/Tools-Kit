@@ -2615,17 +2615,17 @@
 		B7B52BC0EA0C427E21CC8DE9 /* SDKFeatureFlagService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKFeatureFlagService.swift; sourceTree = "<group>"; };
 		3DA55F0F933FAA68626FF7D3 /* SDKNotificationDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKNotificationDispatcher.swift; sourceTree = "<group>"; };
 		79E9EC74C78EF3E548EA53BD /* SDKMigrationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKMigrationManager.swift; sourceTree = "<group>"; };
-		7D3E7FC509497E5291566A29 /* SDKPluginProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plugins/SDKPluginProtocol.swift; sourceTree = "<group>"; };
-		14B7B365068269664F884E1A /* SDKPluginRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plugins/SDKPluginRegistry.swift; sourceTree = "<group>"; };
-		053415F80C21633DE63D27A4 /* AnalyticsPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plugins/AnalyticsPlugin.swift; sourceTree = "<group>"; };
-		297ED8337F88D3013A35BA2B /* SDKConnectorHealthMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connectors/SDKConnectorHealthMonitor.swift; sourceTree = "<group>"; };
-		F96FA2B7F364102FBBE349CF /* SDKConnectorMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connectors/SDKConnectorMetrics.swift; sourceTree = "<group>"; };
-		19BFC903EA40BEB967C6EAD4 /* SlackConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connectors/SlackConnector.swift; sourceTree = "<group>"; };
-		E7E58D0ABCB167C9BFE71C25 /* RESTAPIConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connectors/RESTAPIConnector.swift; sourceTree = "<group>"; };
-		259D21BC137064812FF7A60A /* SDKHealthDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Monitoring/SDKHealthDashboardView.swift; sourceTree = "<group>"; };
-		E24BDB43DE6EC32B3554B2E0 /* SDKFeatureFlagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Monitoring/SDKFeatureFlagView.swift; sourceTree = "<group>"; };
-		85BB77A19E8F433771D16821 /* SDKCacheInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Monitoring/SDKCacheInspectorView.swift; sourceTree = "<group>"; };
-		34D8408D9C2850642D724302 /* SDKMetricsDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Monitoring/SDKMetricsDashboardView.swift; sourceTree = "<group>"; };
+		7D3E7FC509497E5291566A29 /* SDKPluginProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginProtocol.swift; sourceTree = "<group>"; };
+		14B7B365068269664F884E1A /* SDKPluginRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginRegistry.swift; sourceTree = "<group>"; };
+		053415F80C21633DE63D27A4 /* AnalyticsPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsPlugin.swift; sourceTree = "<group>"; };
+		297ED8337F88D3013A35BA2B /* SDKConnectorHealthMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConnectorHealthMonitor.swift; sourceTree = "<group>"; };
+		F96FA2B7F364102FBBE349CF /* SDKConnectorMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConnectorMetrics.swift; sourceTree = "<group>"; };
+		19BFC903EA40BEB967C6EAD4 /* SlackConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackConnector.swift; sourceTree = "<group>"; };
+		E7E58D0ABCB167C9BFE71C25 /* RESTAPIConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RESTAPIConnector.swift; sourceTree = "<group>"; };
+		259D21BC137064812FF7A60A /* SDKHealthDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKHealthDashboardView.swift; sourceTree = "<group>"; };
+		E24BDB43DE6EC32B3554B2E0 /* SDKFeatureFlagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKFeatureFlagView.swift; sourceTree = "<group>"; };
+		85BB77A19E8F433771D16821 /* SDKCacheInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKCacheInspectorView.swift; sourceTree = "<group>"; };
+		34D8408D9C2850642D724302 /* SDKMetricsDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKMetricsDashboardView.swift; sourceTree = "<group>"; };
 		B50EFFE203FD72D5A94F15EC /* SDKPluginRegistryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginRegistryView.swift; sourceTree = "<group>"; };
 		4FE8A040DBFF25CBA01701F3 /* SDKConnectorHealthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConnectorHealthView.swift; sourceTree = "<group>"; };
 		3D5A471B59E29485B1D61A66 /* SDKConnectorMetricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConnectorMetricsView.swift; sourceTree = "<group>"; };
@@ -3288,6 +3288,8 @@
 			isa = PBXGroup;
 			children = (
 				5851B51F6765499BABAC81DE /* SDKConnectorsView.swift */,
+				4FE8A040DBFF25CBA01701F3 /* SDKConnectorHealthView.swift */,
+				3D5A471B59E29485B1D61A66 /* SDKConnectorMetricsView.swift */,
 				PL010000000000000000000101 /* ConnectorsMainView.swift */,
 				PL010000000000000000000102 /* ConnectorBuilderView.swift */,
 				ABCD1234567890ABCDEF0100 /* PresetConnectorsView.swift */,
@@ -4847,8 +4849,6 @@
 		6D9B782B23364B0B8BCC0B0F /* Connectors */ = {
 			isa = PBXGroup;
 			children = (
-				4FE8A040DBFF25CBA01701F3 /* SDKConnectorHealthView.swift */,
-				3D5A471B59E29485B1D61A66 /* SDKConnectorMetricsView.swift */,
 			);
 			path = Connectors;
 			sourceTree = "<group>";
@@ -5906,6 +5906,8 @@
 				7C8B3D77A06A46AC8C9F338D /* SDKPluginManager.swift */,
 				EXP100000000000000000004 /* SDKPluginLifecycle.swift */,
 				7D3E7FC509497E5291566A29 /* SDKPluginProtocol.swift */,
+				14B7B365068269664F884E1A /* SDKPluginRegistry.swift */,
+				053415F80C21633DE63D27A4 /* AnalyticsPlugin.swift */,
 			);
 			path = Plugins;
 			sourceTree = "<group>";
@@ -6307,6 +6309,7 @@
 			isa = PBXGroup;
 			children = (
 				20617EB855034B87BB25DB22 /* Connectors */,
+				B50EFFE203FD72D5A94F15EC /* SDKPluginRegistryView.swift */,
 				PL010000000000000000000004 /* PluginSecurityView.swift */,
 				PL010000000000000000000005 /* PluginLimitedView.swift */,
 				PL010000000000000000000006 /* SecurityScopeApplicationView.swift */,
@@ -6683,7 +6686,6 @@
 			isa = PBXGroup;
 			children = (
 				6D9B782B23364B0B8BCC0B0F /* Connectors */,
-				B50EFFE203FD72D5A94F15EC /* SDKPluginRegistryView.swift */,
 			);
 			path = Plugins;
 			sourceTree = "<group>";
@@ -8429,6 +8431,9 @@
 				C03232FF64E642A897463C54 /* GmailConnector.swift */,
 				EXP100000000000000000005 /* SDKConnectorRuntime.swift */,
 				297ED8337F88D3013A35BA2B /* SDKConnectorHealthMonitor.swift */,
+				F96FA2B7F364102FBBE349CF /* SDKConnectorMetrics.swift */,
+				19BFC903EA40BEB967C6EAD4 /* SlackConnector.swift */,
+				E7E58D0ABCB167C9BFE71C25 /* RESTAPIConnector.swift */,
 			);
 			path = Connectors;
 			sourceTree = "<group>";
