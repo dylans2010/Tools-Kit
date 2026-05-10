@@ -89,7 +89,7 @@ struct WorkspaceHomeView: View {
                 }
 
                 Section("Settings") {
-                    if hasMailAccounts, let account = mailStore.activeAccount ?? mailStore.accounts.first {
+                    if hasMailAccounts {
                         NavigationLink {
                             UniversalInboxView()
                         } label: {
