@@ -67,7 +67,9 @@ struct SDKFlowNode: Identifiable {
 struct NodeView: View {
     let node: SDKFlowNode
     var body: some View {
-        VStack {
+        VStack(spacing: 4) {
+            Image(systemName: node.type == .trigger ? "bolt.circle.fill" : node.type == .condition ? "questionmark.diamond.fill" : "gearshape.fill")
+                .font(.title3)
             Text(node.name).font(.caption).bold()
         }
         .padding()

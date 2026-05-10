@@ -68,6 +68,7 @@ struct CollaborationSpace: Codable, Identifiable {
     var activityFeed: [ActivityLog]
     var messages: [SpaceMessage] = []
     var sharedFiles: [SpaceFile] = []
+    var activeUsers: [String] = []
 
     // IDs of objects linked to this space
     var notebookIDs: [UUID]

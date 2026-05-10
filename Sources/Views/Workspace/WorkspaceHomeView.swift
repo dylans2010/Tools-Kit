@@ -1,6 +1,12 @@
 import SwiftUI
 
 struct WorkspaceHomeView: View {
+    @StateObject private var mailStore = MailStore.shared
+
+    private var hasMailAccounts: Bool {
+        !mailStore.accounts.isEmpty
+    }
+
     var body: some View {
         NavigationStack {
             List {
@@ -74,7 +80,7 @@ struct WorkspaceHomeView: View {
                     NavigationLink { SecurityHomeView() } label: {
                         Label("Security", systemImage: "lock.shield")
                     }
-                    NavigationLink { SecurityOnboardingView() } label: {
+                    NavigationLink { SecurityOnboardingView(authService: AuthService.shared) } label: {
                         Label("Security Setup", systemImage: "shield.checkered")
                     }
                     NavigationLink { GitHubRouterView() } label: {
@@ -83,8 +89,16 @@ struct WorkspaceHomeView: View {
                 }
 
                 Section("Settings") {
-                    NavigationLink { ManageAccountsView() } label: {
-                        Label("Accounts", systemImage: "person.crop.circle")
+                    if hasMailAccounts {
+                        NavigationLink {
+                            UniversalInboxView()
+                        } label: {
+                            Label("Accounts", systemImage: "person.crop.circle")
+                        }
+                    } else {
+                        NavigationLink { ManageAccountsView() } label: {
+                            Label("Accounts", systemImage: "person.crop.circle")
+                        }
                     }
                     NavigationLink { AIChatSettingsRouter() } label: {
                         Label("AI Chat Settings", systemImage: "gearshape")
@@ -92,8 +106,47 @@ struct WorkspaceHomeView: View {
                 }
             }
             .navigationTitle("Workspace")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink {
+                        WorkspaceSettingsView()
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                }
+            }
         }
         .withPluginOverlay()
+    }
+}
+
+struct WorkspaceSettingsView: View {
+    var body: some View {
+        List {
+            Section("Account") {
+                NavigationLink { ManageAccountsView() } label: {
+                    Label("Mail Accounts", systemImage: "envelope")
+                }
+                NavigationLink { AIChatSettingsRouter() } label: {
+                    Label("AI Chat Settings", systemImage: "sparkles")
+                }
+            }
+
+            Section("Preferences") {
+                NavigationLink { SecurityHomeView() } label: {
+                    Label("Security", systemImage: "lock.shield")
+                }
+                NavigationLink { SecurityOnboardingView(authService: AuthService.shared) } label: {
+                    Label("Security Setup", systemImage: "shield.checkered")
+                }
+            }
+
+            Section("About") {
+                LabeledContent("Version", value: "1.0.0")
+                LabeledContent("Build", value: "2026.5")
+            }
+        }
+        .navigationTitle("Settings")
     }
 }
 

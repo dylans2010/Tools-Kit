@@ -12,7 +12,7 @@ struct SecurityScopeApplicationView: View {
                 Text("High-risk permissions and sensitive workspace access require additional security information and justification.")
                     .font(.subheadline).foregroundStyle(.secondary)
             } header: {
-                Text("Security Scope Gate")
+                Label("Security Scope Gate", systemImage: "lock.trianglebadge.exclamationmark")
             }
             .listRowBackground(Color.clear)
 
@@ -36,7 +36,7 @@ struct SecurityScopeApplicationView: View {
                         .background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 8))
                 }
             } header: {
-                Text("Credentials & Identification")
+                Label("Credentials & Identification", systemImage: "key.fill")
             } footer: {
                 Text("Justification for accessing sensitive data.")
             }
@@ -51,7 +51,7 @@ struct SecurityScopeApplicationView: View {
                     TextField("How long is data stored?", text: Binding(get: { plugin.retentionPolicy ?? "" }, set: { plugin.retentionPolicy = $0.isEmpty ? nil : $0 }))
                 }
             } header: {
-                Text("Data Governance")
+                Label("Data Governance", systemImage: "hand.raised.fill")
             }
 
             Section {
@@ -72,7 +72,7 @@ struct SecurityScopeApplicationView: View {
                     }
                 }
             } header: {
-                Text("Requested High-Risk Scopes")
+                Label("Requested High-Risk Scopes", systemImage: "exclamationmark.shield.fill")
             } footer: {
                 Text("Changes are applied to the plugin definition. High-risk plugins without an API Key or Privacy Note will be blocked during installation or execution.")
             }

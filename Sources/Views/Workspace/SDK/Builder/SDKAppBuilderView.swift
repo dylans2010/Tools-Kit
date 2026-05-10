@@ -69,32 +69,56 @@ struct SDKAppBuilderView: View {
                 TextEditor(text: $viewModel.description)
                     .frame(height: 100)
             } header: {
-                Text("Project Identity")
+                Label("Project Identity", systemImage: "doc.text.fill")
             }
         }
     }
 
     private var step2: some View {
-        List(SDKScope.allCases, id: \.self) { scope in
-            Toggle(String(describing: scope).capitalized, isOn: binding(for: scope))
+        List {
+            Section {
+                ForEach(SDKScope.allCases, id: \.self) { scope in
+                    Toggle(String(describing: scope).capitalized, isOn: binding(for: scope))
+                }
+            } header: {
+                Label("Scopes", systemImage: "lock.shield")
+            }
         }
     }
 
     private var step3: some View {
-        List(SDKPluginManager.shared.plugins) { plugin in
-            Toggle(plugin.name, isOn: binding(for: plugin.id, in: \.selectedPlugins))
+        List {
+            Section {
+                ForEach(SDKPluginManager.shared.plugins) { plugin in
+                    Toggle(plugin.name, isOn: binding(for: plugin.id, in: \.selectedPlugins))
+                }
+            } header: {
+                Label("Plugins", systemImage: "puzzlepiece.extension")
+            }
         }
     }
 
     private var step4: some View {
-        List(SDKToolManager.shared.tools) { tool in
-            Toggle(tool.name, isOn: binding(for: tool.id, in: \.selectedTools))
+        List {
+            Section {
+                ForEach(SDKToolManager.shared.tools) { tool in
+                    Toggle(tool.name, isOn: binding(for: tool.id, in: \.selectedTools))
+                }
+            } header: {
+                Label("Tools", systemImage: "wrench.and.screwdriver")
+            }
         }
     }
 
     private var step5: some View {
-        List(SDKConnectorManager.shared.connectors, id: \.id) { connector in
-            Toggle(connector.name, isOn: binding(for: connector.id, in: \.selectedConnectors))
+        List {
+            Section {
+                ForEach(SDKConnectorManager.shared.connectors, id: \.id) { connector in
+                    Toggle(connector.name, isOn: binding(for: connector.id, in: \.selectedConnectors))
+                }
+            } header: {
+                Label("Connectors", systemImage: "cable.connector")
+            }
         }
     }
 
@@ -123,11 +147,15 @@ struct SDKAppBuilderView: View {
     private var navigationButtons: some View {
         HStack {
             if currentStep > 0 {
-                Button("Previous") { currentStep -= 1 }
+                Button { currentStep -= 1 } label: {
+                    Label("Previous", systemImage: "chevron.left")
+                }
             }
             Spacer()
             if currentStep < 5 {
-                Button("Next") { currentStep += 1 }
+                Button { currentStep += 1 } label: {
+                    Label("Next", systemImage: "chevron.right")
+                }
                     .disabled(currentStep == 0 && viewModel.name.isEmpty)
             }
         }

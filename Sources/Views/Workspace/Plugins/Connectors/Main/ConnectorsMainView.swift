@@ -98,10 +98,18 @@ struct ConnectorsMainView: View {
             }
 
             Section("Platform Tools") {
-                NavigationLink("Connector Builder", destination: ConnectorBuilderView())
-                NavigationLink("SDK Connectors", destination: SDKConnectorsView())
-                NavigationLink("Execution Logs", destination: ConnectorLogsView())
-                NavigationLink("Security & Scopes", destination: ConnectorSecurityView())
+                NavigationLink(destination: ConnectorBuilderView()) {
+                    Label("Connector Builder", systemImage: "hammer")
+                }
+                NavigationLink(destination: SDKConnectorsView()) {
+                    Label("SDK Connectors", systemImage: "puzzlepiece.extension")
+                }
+                NavigationLink(destination: ConnectorLogsView()) {
+                    Label("Execution Logs", systemImage: "doc.text.magnifyingglass")
+                }
+                NavigationLink(destination: ConnectorSecurityView()) {
+                    Label("Security & Scopes", systemImage: "lock.shield")
+                }
             }
 
             Section {
@@ -134,10 +142,10 @@ struct ConnectorsMainView: View {
 
     private func connectorStatusColor(_ status: ConnectorDefinition.ConnectorStatus) -> Color {
         switch status {
-        case .active: return .green
+        case .active: return .primary
         case .inactive: return .secondary
-        case .error: return .red
-        case .connecting: return .blue
+        case .error: return .primary
+        case .connecting: return .secondary
         }
     }
 }

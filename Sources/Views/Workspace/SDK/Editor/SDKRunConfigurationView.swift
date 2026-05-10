@@ -7,7 +7,7 @@ struct SDKRunConfigurationView: View {
 
     var body: some View {
         List {
-            Section("Available Profiles") {
+            Section {
                 ForEach($state.runConfigurations) { $config in
                     RunConfigRow(config: $config, isActive: state.selectedRunConfigurationID == config.id) {
                         state.selectedRunConfigurationID = config.id
@@ -20,6 +20,8 @@ struct SDKRunConfigurationView: View {
                     if state.selectedRunConfigurationID == nil { state.selectedRunConfigurationID = state.runConfigurations.first?.id }
                     state.saveSnapshot()
                 }
+            } header: {
+                Label("Available Profiles", systemImage: "list.bullet.rectangle.portrait")
             }
 
             Section {

@@ -52,20 +52,36 @@ struct PluginsMainView: View {
                 }
 
                 Section("Plugin Development") {
-                    NavigationLink("Plugin Builder", destination: PluginBuildView())
-                    NavigationLink("Developer Console", destination: PluginDevConsoleView())
-                    NavigationLink("Marketplace", destination: MarketplaceView())
+                    NavigationLink(destination: PluginBuildView()) {
+                        Label("Plugin Builder", systemImage: "wrench.and.screwdriver")
+                    }
+                    NavigationLink(destination: PluginDevConsoleView()) {
+                        Label("Developer Console", systemImage: "terminal")
+                    }
+                    NavigationLink(destination: MarketplaceView()) {
+                        Label("Marketplace", systemImage: "storefront")
+                    }
                 }
 
                 Section("Plugin Management") {
-                    NavigationLink("Installed Plugins", destination: PluginsInstalledView())
-                    NavigationLink("Plugin Connectors", destination: ConnectorsMainView())
-                    NavigationLink("SDK Workspace", destination: SDKHomeView())
-                    NavigationLink("SDK Build", destination: SDKBuildView())
+                    NavigationLink(destination: PluginsInstalledView()) {
+                        Label("Installed Plugins", systemImage: "square.stack.3d.up")
+                    }
+                    NavigationLink(destination: ConnectorsMainView()) {
+                        Label("Plugin Connectors", systemImage: "cable.connector")
+                    }
+                    NavigationLink(destination: SDKHomeView()) {
+                        Label("SDK Workspace", systemImage: "hammer")
+                    }
+                    NavigationLink(destination: SDKBuildView()) {
+                        Label("SDK Build", systemImage: "shippingbox")
+                    }
                 }
 
                 Section("Security") {
-                    NavigationLink("Plugin Security", destination: PluginSecurityView())
+                    NavigationLink(destination: PluginSecurityView()) {
+                        Label("Plugin Security", systemImage: "lock.shield")
+                    }
                 }
 
                 if !recentEvents.isEmpty {

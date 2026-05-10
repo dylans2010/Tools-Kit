@@ -29,7 +29,7 @@ struct SDKAPIExplorerView: View {
 
     var body: some View {
         List {
-            Section("Endpoints (\(filteredRoutes.count))") {
+            Section {
                 ForEach(filteredRoutes) { route in
                     Button {
                         testPath = route.path
@@ -45,9 +45,11 @@ struct SDKAPIExplorerView: View {
                     }
                     .buttonStyle(.plain)
                 }
+            } header: {
+                Label("Endpoints (\(filteredRoutes.count))", systemImage: "point.3.connected.trianglepath.dotted")
             }
 
-            Section("Test Console") {
+            Section {
                 HStack {
                     Picker("Method", selection: $testMethod) {
                         ForEach(SDKRoute.Method.allCases, id: \.self) { Text($0.rawValue).tag($0) }
@@ -66,16 +68,19 @@ struct SDKAPIExplorerView: View {
                 Button(action: executeRequest) {
                     HStack {
                         if isTesting { ProgressView().controlSize(.small) }
-                        Text("Execute Request").bold()
+                        Label("Execute Request", systemImage: "play.circle.fill")
+                            .bold()
                     }
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(testPath.isEmpty || isTesting)
+            } header: {
+                Label("Test Console", systemImage: "terminal.fill")
             }
 
             if let result = testResult {
-                Section("Response") {
+                Section {
                     LabeledContent("Status") {
                         Text(result.status.rawValue)
                             .foregroundStyle(result.isSuccess ? Color.green : Color.red).bold()
@@ -92,8 +97,11 @@ struct SDKAPIExplorerView: View {
                     }
 
                     if let error = result.error {
-                        Text(error).font(.caption).foregroundStyle(.red)
+                        Label(error, systemImage: "exclamationmark.triangle.fill")
+                            .font(.caption).foregroundStyle(.red)
                     }
+                } header: {
+                    Label("Response", systemImage: "arrow.down.doc.fill")
                 }
             }
         }

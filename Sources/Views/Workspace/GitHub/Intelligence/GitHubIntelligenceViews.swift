@@ -296,7 +296,7 @@ struct SimulationLogView: View {
                     ForEach(log, id: \.self) { line in
                         Text(line)
                             .font(.system(.caption, design: .monospaced))
-                            .foregroundStyle(line.contains("✅") ? Color.green : line.contains("▶") ? .primary : Color.primary)
+                            .foregroundStyle(.primary)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }

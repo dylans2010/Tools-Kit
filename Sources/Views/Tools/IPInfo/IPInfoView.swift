@@ -78,32 +78,6 @@ struct IPInfoRow: View {
     }
 }
 
-// Fallback for ContentUnavailableView if iOS < 17
-#if !compiler(>=5.9) || !canImport(SwiftUI, _version: "17.0")
-struct ContentUnavailableView<Label: View, Description: View>: View {
-    let label: Label
-    let description: Description
-    let systemImage: String
-
-    init(_ title: String, systemImage: String, description: Description) where Label == Text {
-        self.label = Text(title)
-        self.systemImage = systemImage
-        self.description = description
-    }
-
-    var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: systemImage)
-                .font(.system(size: 48))
-                .foregroundColor(.secondary)
-            label.font(.headline)
-            description.font(.subheadline).foregroundColor(.secondary)
-        }
-        .padding()
-    }
-}
-#endif
-
 struct IPInfoTool: Tool {
     let name = "IP Info"
     let icon = "network"

@@ -10,7 +10,7 @@ struct SDKDebugView: View {
 
     var body: some View {
         List {
-            Section("Runtime Profile") {
+            Section {
                 LabeledContent("Execution Mode") {
                     Text(runtime.isNoSandboxModeEnabled ? "Unrestricted" : "Sandboxed")
                         .foregroundStyle(runtime.isNoSandboxModeEnabled ? Color.red : Color.green)
@@ -22,9 +22,11 @@ struct SDKDebugView: View {
                         .foregroundStyle(telemetry.activeTraces.count > 0 ? Color.orange : Color.secondary)
                         .bold()
                 }
+            } header: {
+                Label("Runtime Profile", systemImage: "cpu")
             }
 
-            Section("Performance Analytics") {
+            Section {
                 let metrics = telemetry.getMetrics()
                 LabeledContent("Total Executions", value: "\(metrics.totalTraces)")
                 LabeledContent("Average Latency", value: "\(Int(metrics.averageDurationMs))ms")
@@ -32,15 +34,19 @@ struct SDKDebugView: View {
                     .foregroundStyle(.green)
                 LabeledContent("Failure Count", value: "\(metrics.failureCount)")
                     .foregroundStyle(metrics.failureCount > 0 ? Color.red : Color.secondary)
+            } header: {
+                Label("Performance Analytics", systemImage: "chart.bar.fill")
             }
 
-            Section("Host Environment") {
+            Section {
                 LabeledContent("Physical Memory", value: "\(ProcessInfo.processInfo.physicalMemory / 1024 / 1024 / 1024) GB")
                 LabeledContent("Active Processors", value: "\(ProcessInfo.processInfo.activeProcessorCount)")
                 LabeledContent("System Uptime", value: "\(Int(ProcessInfo.processInfo.systemUptime / 3600))h \(Int(ProcessInfo.processInfo.systemUptime.truncatingRemainder(dividingBy: 3600) / 60))m")
+            } header: {
+                Label("Host Environment", systemImage: "desktopcomputer")
             }
 
-            Section("Incident Log") {
+            Section {
                 let errors = logStore.entries.filter { $0.level == .error }.prefix(5)
                 if errors.isEmpty {
                     Text("No system errors reported").font(.caption).foregroundStyle(.secondary)
@@ -59,6 +65,8 @@ struct SDKDebugView: View {
                         .padding(.vertical, 2)
                     }
                 }
+            } header: {
+                Label("Incident Log", systemImage: "exclamationmark.triangle.fill")
             }
 
             Section {

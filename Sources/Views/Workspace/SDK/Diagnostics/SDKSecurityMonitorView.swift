@@ -37,10 +37,10 @@ struct SDKSecurityMonitorView: View {
                     }
                 }
             } header: {
-                Text("Access History")
+                Label("Access History", systemImage: "clock.badge.checkmark")
             }
 
-            Section("Security Summary") {
+            Section {
                 LabeledContent("Kernel Policy", value: runtime.isNoSandboxModeEnabled ? "Unrestricted" : "Sandboxed")
                     .foregroundStyle(runtime.isNoSandboxModeEnabled ? Color.red : Color.green).bold()
 
@@ -52,9 +52,11 @@ struct SDKSecurityMonitorView: View {
 
                 let grantedCount = scopeManager.scopeAuditLog.filter { $0.granted }.count
                 LabeledContent("Granted Access", value: "\(grantedCount)")
+            } header: {
+                Label("Security Summary", systemImage: "shield.checkered")
             }
 
-            Section("Authorized Scopes") {
+            Section {
                 if scopeManager.authorizedScopes.isEmpty {
                     Text("No scope restrictions defined").font(.caption).foregroundStyle(.secondary)
                 } else {
@@ -66,6 +68,8 @@ struct SDKSecurityMonitorView: View {
                         }
                     }
                 }
+            } header: {
+                Label("Authorized Scopes", systemImage: "lock.open.fill")
             }
         }
         .listStyle(.insetGrouped)
