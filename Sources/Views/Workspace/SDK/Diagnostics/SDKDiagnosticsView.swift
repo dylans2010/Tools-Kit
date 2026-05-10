@@ -58,7 +58,7 @@ struct SDKDiagnosticsView: View {
 
     private func makeSnapshot() -> DiagnosticsSnapshot {
         let health = bgEngine.systemHealth
-        let telemetryMetrics: TelemetryMetrics = telemetry.getMetrics()
+        let telemetryMetrics = telemetry.getMetrics()
         let successRate = successRateValue(for: telemetryMetrics)
         let successRateText = percentageText(from: successRate)
         let successRateColor = successRate >= successRateHealthyThreshold ? Color.green : Color.orange
@@ -362,13 +362,13 @@ private struct MetricsSummaryView: View {
                             if let primaryItem = metric(at: rowIndex * 2) {
                                 summaryCell(primaryItem)
                             } else {
-                                Color.clear
+                                EmptyView()
                             }
 
                             if let secondaryItem = metric(at: (rowIndex * 2) + 1) {
                                 summaryCell(secondaryItem)
                             } else {
-                                Color.clear
+                                EmptyView()
                             }
                         }
                     }
