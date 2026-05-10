@@ -1273,6 +1273,18 @@
 		SDK2A00000000000000000013 /* SDKDependencyManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDK1A00000000000000000013 /* SDKDependencyManagerView.swift */; };
 		WK02AICONTEXT0000000001 /* AIContextEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK01AICONTEXT0000000001 /* AIContextEngine.swift */; };
 		WK02VERSIONCTRL00000001 /* VersionControlManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WK01VERSIONCTRL00000001 /* VersionControlManager.swift */; };
+		EXP200000000000000000001 /* SDKModuleRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000001 /* SDKModuleRegistry.swift */; };
+		EXP200000000000000000002 /* SDKDependencyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000002 /* SDKDependencyGraph.swift */; };
+		EXP200000000000000000003 /* SDKFeatureExposure.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000003 /* SDKFeatureExposure.swift */; };
+		EXP200000000000000000004 /* SDKPluginLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000004 /* SDKPluginLifecycle.swift */; };
+		EXP200000000000000000005 /* SDKConnectorRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000005 /* SDKConnectorRuntime.swift */; };
+		EXP200000000000000000006 /* SDKDownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000006 /* SDKDownloadView.swift */; };
+		EXP200000000000000000007 /* CustomAppSDKView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000007 /* CustomAppSDKView.swift */; };
+		EXP200000000000000000008 /* SDKHelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000008 /* SDKHelpView.swift */; };
+		EXP200000000000000000009 /* SDKSupportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000009 /* SDKSupportView.swift */; };
+		EXP20000000000000000000A /* SDKModuleRegistryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP10000000000000000000A /* SDKModuleRegistryView.swift */; };
+		EXP20000000000000000000B /* SDKPluginLifecycleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP10000000000000000000B /* SDKPluginLifecycleView.swift */; };
+		EXP20000000000000000000C /* SDKConnectorBindingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP10000000000000000000C /* SDKConnectorBindingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2539,6 +2551,18 @@
 		PL010000000000000000000026 /* SDKInternalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKInternalView.swift; sourceTree = "<group>"; };
 		WK01AICONTEXT0000000001 /* AIContextEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Workspace/AIContextEngine.swift; sourceTree = SOURCE_ROOT; };
 		WK01VERSIONCTRL00000001 /* VersionControlManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Workspace/VersionControlManager.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000001 /* SDKModuleRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Core/SDK/Modules/SDKModuleRegistry.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000002 /* SDKDependencyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Core/SDK/Modules/SDKDependencyGraph.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000003 /* SDKFeatureExposure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Core/SDK/Modules/SDKFeatureExposure.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000004 /* SDKPluginLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Core/SDK/Plugins/SDKPluginLifecycle.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000005 /* SDKConnectorRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Core/SDK/Connectors/SDKConnectorRuntime.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000006 /* SDKDownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Builder/SDKDownloadView.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000007 /* CustomAppSDKView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Builder/CustomAppSDKView.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000008 /* SDKHelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Docs/SDKHelpView.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000009 /* SDKSupportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Docs/SDKSupportView.swift; sourceTree = SOURCE_ROOT; };
+		EXP10000000000000000000A /* SDKModuleRegistryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Management/SDKModuleRegistryView.swift; sourceTree = SOURCE_ROOT; };
+		EXP10000000000000000000B /* SDKPluginLifecycleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Main/SDKPluginLifecycleView.swift; sourceTree = SOURCE_ROOT; };
+		EXP10000000000000000000C /* SDKConnectorBindingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Connectors/Main/SDKConnectorBindingView.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -3200,6 +3224,7 @@
 				PL01000000000000000000010A /* ConnectorSecurityView.swift */,
 				PL01000000000000000000010B /* ConnectorVersioningView.swift */,
 				PL01000000000000000000010C /* ConnectorScopeView.swift */,
+				EXP10000000000000000000C /* SDKConnectorBindingView.swift */,
 			);
 			path = Connectors;
 			sourceTree = "<group>";
@@ -5141,6 +5166,7 @@
 				SD3000000000000000000007 /* Security */,
 				SD300000000000000000000C /* Features */,
 				SDK15DBFE25CCC42CE7BDF3A /* WorkspaceSDK.swift */,
+				EXP1G0000000000000000001 /* Modules */,
 			);
 			path = SDK;
 			sourceTree = "<group>";
@@ -5773,10 +5799,21 @@
 			path = Notebooks;
 			sourceTree = "<group>";
 		};
+		EXP1G0000000000000000001 /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				EXP100000000000000000001 /* SDKModuleRegistry.swift */,
+				EXP100000000000000000002 /* SDKDependencyGraph.swift */,
+				EXP100000000000000000003 /* SDKFeatureExposure.swift */,
+			);
+			path = Modules;
+			sourceTree = "<group>";
+		};
 		99CAE2FBEFE24A3FBD4310BE /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
 				7C8B3D77A06A46AC8C9F338D /* SDKPluginManager.swift */,
+				EXP100000000000000000004 /* SDKPluginLifecycle.swift */,
 			);
 			path = Plugins;
 			sourceTree = "<group>";
@@ -6188,6 +6225,7 @@
 				TKRF0000000000000000000010 /* PluginsInstalledView.swift */,
 				TKRF0000000000000000000011 /* MarketplaceView.swift */,
 				TKRF0000000000000000000012 /* PluginDevConsoleView.swift */,
+				EXP10000000000000000000B /* SDKPluginLifecycleView.swift */,
 			);
 			path = Plugins;
 			sourceTree = "<group>";
@@ -6969,6 +7007,11 @@
 				SDK1A00000000000000000011 /* SDKRunConfigurationView.swift */,
 				SDK1A00000000000000000012 /* SDKLibraryManagerView.swift */,
 				SDK1A00000000000000000013 /* SDKDependencyManagerView.swift */,
+				EXP100000000000000000006 /* SDKDownloadView.swift */,
+				EXP100000000000000000007 /* CustomAppSDKView.swift */,
+				EXP100000000000000000008 /* SDKHelpView.swift */,
+				EXP100000000000000000009 /* SDKSupportView.swift */,
+				EXP10000000000000000000A /* SDKModuleRegistryView.swift */,
 			);
 			path = SDK;
 			sourceTree = "<group>";
@@ -8283,6 +8326,7 @@
 				9B0A6E9DC700472B88DD7AC1 /* SDKConnectorManager.swift */,
 				AABEAE48E3D14202BF990AB8 /* LocalFileConnector.swift */,
 				C03232FF64E642A897463C54 /* GmailConnector.swift */,
+				EXP100000000000000000005 /* SDKConnectorRuntime.swift */,
 			);
 			path = Connectors;
 			sourceTree = "<group>";
@@ -10364,6 +10408,18 @@
 				MS028F0C9AC0045039A23CD0 /* MessageBubbleView.swift in Sources */,
 				MS026A2894802C56D5AB5FC3 /* SegmentSwitcher.swift in Sources */,
 				MS028A4E8FF9A0449D039277 /* JSONCoder.swift in Sources */,
+				EXP200000000000000000001 /* SDKModuleRegistry.swift in Sources */,
+				EXP200000000000000000002 /* SDKDependencyGraph.swift in Sources */,
+				EXP200000000000000000003 /* SDKFeatureExposure.swift in Sources */,
+				EXP200000000000000000004 /* SDKPluginLifecycle.swift in Sources */,
+				EXP200000000000000000005 /* SDKConnectorRuntime.swift in Sources */,
+				EXP200000000000000000006 /* SDKDownloadView.swift in Sources */,
+				EXP200000000000000000007 /* CustomAppSDKView.swift in Sources */,
+				EXP200000000000000000008 /* SDKHelpView.swift in Sources */,
+				EXP200000000000000000009 /* SDKSupportView.swift in Sources */,
+				EXP20000000000000000000A /* SDKModuleRegistryView.swift in Sources */,
+				EXP20000000000000000000B /* SDKPluginLifecycleView.swift in Sources */,
+				EXP20000000000000000000C /* SDKConnectorBindingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
