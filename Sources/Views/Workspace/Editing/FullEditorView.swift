@@ -1094,7 +1094,7 @@ struct AssetLibraryView: View {
     }
 
     private func applyEffect(_ asset: AssetItem) {
-        guard state.selectedLayerID != nil else {
+        if state.selectedLayerID == nil {
             if let firstLayer = state.project.layers.first {
                 state.selectedLayerID = firstLayer.id
             } else {
