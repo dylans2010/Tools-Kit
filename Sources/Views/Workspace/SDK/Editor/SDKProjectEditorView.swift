@@ -1,5 +1,3 @@
-
-
 import SwiftUI
 
 struct SDKProjectEditorView: View {
@@ -17,7 +15,10 @@ struct SDKProjectEditorView: View {
         return false
         #endif
     }
-    private var activeTab: SDKEditorTab? { state.openTabs.first(where: { $0.id == state.selectedTabID }) ?? state.openTabs.first }
+
+    private var activeTab: SDKEditorTab? {
+        state.openTabs.first(where: { $0.id == state.selectedTabID }) ?? state.openTabs.first
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -39,14 +40,12 @@ struct SDKProjectEditorView: View {
 
             if !state.diagnostics.isEmpty {
                 Divider()
-                DiagnosticsBar(diagnostics: state.diagnostics) { node in
-                    state.open(node: node)
-                }
+                diagnosticsBar
             }
         }
         .sheet(isPresented: $showingTabPicker) {
             NavigationStack {
-                TabPickerList(state: state) { showingTabPicker = false }
+                tabPickerList
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button("Done") { showingTabPicker = false }
@@ -55,7 +54,6 @@ struct SDKProjectEditorView: View {
             }
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
-            .presentationCornerRadius(20)
         }
         .onChange(of: projectManager.currentProject?.id) { _, _ in
             state.syncSDKGraphFromProject()
@@ -63,12 +61,17 @@ struct SDKProjectEditorView: View {
         }
     }
 
+    // MARK: - Tab Header
+
     private var tabHeader: some View {
         HStack {
             if isCompact {
                 Button { showingTabPicker = true } label: {
-                    Label(activeTab?.title ?? "Select Area", systemImage: activeTab?.node.icon ?? "chevron.down")
-                        .font(.subheadline.bold())
+                    Label(
+                        activeTab?.title ?? "Select Area",
+                        systemImage: activeTab?.node.icon ?? "chevron.down"
+                    )
+                    .font(.subheadline.bold())
                 }
                 Spacer()
                 if !state.diagnostics.isEmpty {
@@ -80,11 +83,12 @@ struct SDKProjectEditorView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         ForEach(state.openTabs) { tab in
-                            EditorTabItem(tab: tab, isSelected: state.selectedTabID == tab.id) {
-                                state.setSelected(tabID: tab.id)
-                            } onClose: {
-                                state.close(tabID: tab.id)
-                            }
+                            EditorTabButton(
+                                tab: tab,
+                                isSelected: state.selectedTabID == tab.id,
+                                onSelect: { state.setSelected(tabID: tab.id) },
+                                onClose: { state.close(tabID: tab.id) }
+                            )
                         }
                     }
                     .padding(.horizontal, 12)
@@ -94,6 +98,8 @@ struct SDKProjectEditorView: View {
         .padding(.vertical, 8)
         .background(.ultraThinMaterial)
     }
+
+    // MARK: - Active Tab Router
 
     @ViewBuilder
     private func activeTabView(for node: SDKWorkspaceNode) -> some View {
@@ -108,19 +114,58 @@ struct SDKProjectEditorView: View {
         case .apiEndpoints: IDEAPIEndpointsView()
         }
     }
+
+    // MARK: - Diagnostics Bar
+
+    private var diagnosticsBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(state.diagnostics.prefix(5)) { diag in
+                    Button { state.open(node: diag.node) } label: {
+                        Label(diag.message, systemImage: diag.severity == .error ? "exclamationmark.octagon" : "exclamationmark.triangle")
+                            .font(.caption2.bold())
+                            .foregroundStyle(diag.severity == .error ? Color.red : Color.orange)
+                    }
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+        }
+        .background(.bar)
+    }
+
+    // MARK: - Tab Picker
+
+    private var tabPickerList: some View {
+        List {
+            Section {
+                ForEach(SDKWorkspaceNode.allCases) { node in
+                    Button {
+                        state.open(node: node)
+                        showingTabPicker = false
+                    } label: {
+                        Label(node.title, systemImage: node.icon)
+                    }
+                }
+            }
+        }
+        .listStyle(.insetGrouped)
+        .navigationTitle("Open Area")
+        .navigationBarTitleDisplayMode(.inline)
+    }
 }
 
-// MARK: - Private Subviews
+// MARK: - Tab Button
 
-private struct EditorTabItem: View {
+private struct EditorTabButton: View {
     let tab: SDKEditorTab
     let isSelected: Bool
-    let action: () -> Void
+    let onSelect: () -> Void
     let onClose: () -> Void
 
     var body: some View {
         HStack(spacing: 6) {
-            Button(tab.title, action: action)
+            Button(tab.title, action: onSelect)
                 .font(.caption.bold())
 
             Button(action: onClose) {
@@ -133,50 +178,5 @@ private struct EditorTabItem: View {
         .padding(.vertical, 6)
         .background(isSelected ? Color.accentColor.opacity(0.15) : Color.primary.opacity(0.05), in: Capsule())
         .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
-    }
-}
-
-private struct DiagnosticsBar: View {
-    let diagnostics: [SDKRuntimeDiagnostic]
-    let onSelect: (SDKWorkspaceNode) -> Void
-
-    var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                ForEach(diagnostics.prefix(5)) { diag in
-                    Button { onSelect(diag.node) } label: {
-                        Label(diag.message, systemImage: diag.severity == .error ? "exclamationmark.octagon" : "exclamationmark.triangle")
-                            .font(.caption2.bold())
-                            .foregroundStyle(diag.severity == .error ? Color.red : Color.orange)
-                    }
-                }
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-        }
-        .background(.bar)
-    }
-}
-
-private struct TabPickerList: View {
-    let state: SDKRuntimeWorkspaceState
-    let onSelect: () -> Void
-
-    var body: some View {
-        List {
-            Section {
-                ForEach(SDKWorkspaceNode.allCases) { node in
-                    Button {
-                        state.open(node: node)
-                        onSelect()
-                    } label: {
-                        Label(node.title, systemImage: node.icon)
-                    }
-                }
-            }
-        }
-        .listStyle(.insetGrouped)
-        .navigationTitle("Open Area")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }

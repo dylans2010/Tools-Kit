@@ -33,7 +33,6 @@ struct IDELibrariesView: View {
                 } label: {
                     Label("Install Library", systemImage: "plus")
                 }
-
                 Button {
                     updateAllLibraries()
                 } label: {
@@ -54,7 +53,7 @@ struct IDELibrariesView: View {
                         Button {
                             editingLibrary = library
                         } label: {
-                            LibraryItemRow(library: library, allLibraries: state.libraries)
+                            LibraryRow(library: library, allLibraries: state.libraries)
                         }
                         .buttonStyle(.plain)
                     }
@@ -103,7 +102,7 @@ struct IDELibrariesView: View {
     }
 }
 
-private struct LibraryItemRow: View {
+private struct LibraryRow: View {
     let library: SDKLibraryDefinition
     let allLibraries: [SDKLibraryDefinition]
 
@@ -112,13 +111,14 @@ private struct LibraryItemRow: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Label(library.name, systemImage: "books.vertical")
-                    .font(.headline)
+                    .font(.subheadline.bold())
                 Spacer()
                 Text("v\(library.version)")
                     .font(.caption.monospaced())
+                    .foregroundStyle(.secondary)
             }
 
             LabeledContent("Exports", value: "\(library.exportedFunctions.count)")
@@ -129,12 +129,14 @@ private struct LibraryItemRow: View {
             if linkedLibraries.isEmpty {
                 Text("No linked module dependencies")
                     .font(.caption2)
+                    .foregroundStyle(.secondary)
             } else {
-                Text("Module Relationships: \(linkedLibraries.map(\.name).joined(separator: ", "))")
+                Text("Module Links: \(linkedLibraries.map(\.name).joined(separator: ", "))")
                     .font(.caption2)
+                    .foregroundStyle(.secondary)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
     }
 }
 

@@ -1,5 +1,3 @@
-
-
 import SwiftUI
 
 struct ConnectorsMainView: View {
@@ -21,7 +19,13 @@ struct ConnectorsMainView: View {
 
     var filteredConnectors: [ConnectorDefinition] {
         var result = manager.connectors
-        if !searchText.isEmpty { result = result.filter { $0.name.localizedCaseInsensitiveContains(searchText) || $0.identifier.localizedCaseInsensitiveContains(searchText) || $0.description.localizedCaseInsensitiveContains(searchText) } }
+        if !searchText.isEmpty {
+            result = result.filter {
+                $0.name.localizedCaseInsensitiveContains(searchText) ||
+                $0.identifier.localizedCaseInsensitiveContains(searchText) ||
+                $0.description.localizedCaseInsensitiveContains(searchText)
+            }
+        }
         switch selectedFilter {
         case .all: break
         case .active: result = result.filter { $0.status == .active }
@@ -38,29 +42,107 @@ struct ConnectorsMainView: View {
 
     var body: some View {
         List {
-            Section { ConnectorStatHeader(manager: manager) }.listRowBackground(Color.clear).listRowInsets(EdgeInsets()).listRowSeparator(.hidden)
-            Section { ConnectorFilterSection(selectedFilter: $selectedFilter, sortOrder: $sortOrder) }
+            Section("Overview") {
+                let conn = manager.connectors
+                LabeledContent("Active", value: "\(conn.filter { $0.status == .active }.count)")
+                LabeledContent("Errors", value: "\(conn.filter { $0.status == .error }.count)")
+                LabeledContent("Endpoints", value: "\(conn.reduce(0) { $0 + $1.endpoints.count })")
+            }
+
+            Section("Filters") {
+                Picker("Filter", selection: $selectedFilter) {
+                    ForEach(ConnectorFilter.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                }
+                .pickerStyle(.segmented)
+
+                Picker("Sort", selection: $sortOrder) {
+                    ForEach(SortOrder.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                }
+                .pickerStyle(.menu)
+            }
+
             Section("Your Connectors") {
-                if manager.connectors.isEmpty { ContentUnavailableView("No Connectors", systemImage: "cable.connector", description: Text("Create your first connector to integrate external services.")) }
-                else if filteredConnectors.isEmpty { ContentUnavailableView("No Results", systemImage: "magnifyingglass", description: Text("Try a different search or filter.")) }
-                else { ForEach(filteredConnectors) { connector in NavigationLink { ConnectorDefinitionDetailView(connector: connector) } label: { ConnectorRow(connector: connector) } } }
+                if manager.connectors.isEmpty {
+                    ContentUnavailableView(
+                        "No Connectors",
+                        systemImage: "cable.connector",
+                        description: Text("Create your first connector to integrate external services.")
+                    )
+                } else if filteredConnectors.isEmpty {
+                    ContentUnavailableView(
+                        "No Results",
+                        systemImage: "magnifyingglass",
+                        description: Text("Try a different search or filter.")
+                    )
+                } else {
+                    ForEach(filteredConnectors) { connector in
+                        NavigationLink {
+                            ConnectorDefinitionDetailView(connector: connector)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack {
+                                    Text(connector.name).font(.subheadline.bold())
+                                    Spacer()
+                                    Text(connector.status.rawValue.uppercased())
+                                        .font(.system(size: 8, weight: .black))
+                                        .foregroundStyle(connectorStatusColor(connector.status))
+                                }
+                                Text(connector.identifier)
+                                    .font(.caption2.monospaced())
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.vertical, 2)
+                        }
+                    }
+                }
             }
+
             Section("Platform Tools") {
-                NavTile(title: "Connector Builder", icon: "hammer.fill", color: .blue, destination: ConnectorBuilderView())
-                NavTile(title: "SDK Connectors", icon: "arrow.triangle.2.circlepath", color: .orange, destination: SDKConnectorsView())
-                NavTile(title: "Execution Logs", icon: "waveform.path.ecg", color: .purple, destination: ConnectorLogsView())
-                NavTile(title: "Security & Scopes", icon: "lock.shield.fill", color: .red, destination: ConnectorSecurityView())
+                NavigationLink("Connector Builder", destination: ConnectorBuilderView())
+                NavigationLink("SDK Connectors", destination: SDKConnectorsView())
+                NavigationLink("Execution Logs", destination: ConnectorLogsView())
+                NavigationLink("Security & Scopes", destination: ConnectorSecurityView())
             }
-            Section { Button { showingDocs = true } label: { Label("View Documentation", systemImage: "book.closed").font(.subheadline.bold()) } }
+
+            Section {
+                Button {
+                    showingDocs = true
+                } label: {
+                    Label("View Documentation", systemImage: "book.closed")
+                }
+            }
         }
-        .listStyle(.insetGrouped).navigationTitle("Connectors").searchable(text: $searchText, prompt: "Search connectors...")
-        .toolbar { ToolbarItem(placement: .primaryAction) { Button { showingBuilder = true } label: { Label("New", systemImage: "plus") } } }
-        .sheet(isPresented: $showingBuilder) { NavigationStack { ConnectorBuilderView() }.presentationDetents([.large]) }
-        .sheet(isPresented: $showingDocs) { ConnectorDocumentationView().presentationDetents([.large]) }
+        .listStyle(.insetGrouped)
+        .navigationTitle("Connectors")
+        .searchable(text: $searchText, prompt: "Search connectors...")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button { showingBuilder = true } label: {
+                    Label("New", systemImage: "plus")
+                }
+            }
+        }
+        .sheet(isPresented: $showingBuilder) {
+            NavigationStack { ConnectorBuilderView() }
+                .presentationDetents([.large])
+        }
+        .sheet(isPresented: $showingDocs) {
+            ConnectorDocumentationView()
+                .presentationDetents([.large])
+        }
+    }
+
+    private func connectorStatusColor(_ status: ConnectorDefinition.ConnectorStatus) -> Color {
+        switch status {
+        case .active: return .green
+        case .inactive: return .secondary
+        case .error: return .red
+        case .connecting: return .blue
+        }
     }
 }
 
-// MARK: - Subviews
+// MARK: - Detail View
 
 struct ConnectorDefinitionDetailView: View {
     @State var connector: ConnectorDefinition
@@ -78,110 +160,212 @@ struct ConnectorDefinitionDetailView: View {
     var body: some View {
         List {
             Section("Status & Health") {
-                HStack { VStack(alignment: .leading, spacing: 4) { Text(connector.name).font(.headline); Text(connector.identifier).font(.caption.monospaced()).foregroundStyle(.secondary) }; Spacer(); ConnectorStatusBadge(status: connector.status) }
+                LabeledContent("Name", value: connector.name)
+                LabeledContent("Identifier") {
+                    Text(connector.identifier)
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+                }
+                LabeledContent("Status") {
+                    Text(connector.status.rawValue.capitalized)
+                        .foregroundStyle(statusColor)
+                }
                 LabeledContent("Version", value: "v\(connector.version)")
                 LabeledContent("Created", value: connector.createdAt.formatted(date: .abbreviated, time: .shortened))
-                if connector.metadata.executionCount > 0 { LabeledContent("Executions", value: "\(connector.metadata.executionCount)"); LabeledContent("Avg Latency", value: String(format: "%.0fms", connector.metadata.averageLatency)) }
+                if connector.metadata.executionCount > 0 {
+                    LabeledContent("Executions", value: "\(connector.metadata.executionCount)")
+                    LabeledContent("Avg Latency", value: String(format: "%.0fms", connector.metadata.averageLatency))
+                }
             }
-            if !connector.description.isEmpty { Section("Description") { Text(connector.description).font(.subheadline).foregroundStyle(.secondary) } }
+
+            if !connector.description.isEmpty {
+                Section("Description") {
+                    Text(connector.description)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             Section("Quick Actions") {
-                Button { Task { await runtime.run(connector: connector) } } label: { Label(isRunning ? "Running..." : "Execute Pipeline", systemImage: isRunning ? "arrow.triangle.2.circlepath" : "play.fill").foregroundStyle(isRunning ? Color.secondary : Color.green) }.disabled(isRunning)
-                Button { showingTestConsole = true } label: { Label("Open Test Console", systemImage: "terminal") }
-                Button { toggleStatus() } label: { Label(connector.status == .active ? "Deactivate" : "Activate", systemImage: connector.status == .active ? "pause.circle" : "checkmark.circle").foregroundStyle(connector.status == .active ? Color.orange : Color.green) }
+                Button {
+                    Task { await runtime.run(connector: connector) }
+                } label: {
+                    Label(isRunning ? "Running..." : "Execute Pipeline", systemImage: isRunning ? "arrow.triangle.2.circlepath" : "play.fill")
+                }
+                .disabled(isRunning)
+
+                Button { showingTestConsole = true } label: {
+                    Label("Open Test Console", systemImage: "terminal")
+                }
+
+                Button { toggleStatus() } label: {
+                    Label(
+                        connector.status == .active ? "Deactivate" : "Activate",
+                        systemImage: connector.status == .active ? "pause.circle" : "checkmark.circle"
+                    )
+                }
             }
+
             Section("Endpoints (\(connector.endpoints.count))") {
-                if connector.endpoints.isEmpty { Text("No endpoints configured.").font(.caption).foregroundStyle(.secondary) }
-                else { ForEach(connector.endpoints) { ep in HStack { Text(ep.method).font(.system(size: 8, weight: .black, design: .monospaced)).padding(4).background(Color.accentColor.opacity(0.1), in: Capsule()).foregroundStyle(Color.accentColor); Text(ep.path).font(.caption2.monospaced()).lineLimit(1) } }.onDelete { connector.endpoints.remove(atOffsets: $0); manager.updateConnector(connector) } }
-                Button { showingEndpointEditor = true } label: { Label("Add Endpoint", systemImage: "plus.circle") }
+                if connector.endpoints.isEmpty {
+                    Text("No endpoints configured.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(connector.endpoints) { ep in
+                        HStack {
+                            Text(ep.method)
+                                .font(.system(size: 8, weight: .black, design: .monospaced))
+                                .padding(4)
+                                .background(.tint.opacity(0.1), in: Capsule())
+                            Text(ep.path)
+                                .font(.caption2.monospaced())
+                                .lineLimit(1)
+                        }
+                    }
+                    .onDelete {
+                        connector.endpoints.remove(atOffsets: $0)
+                        manager.updateConnector(connector)
+                    }
+                }
+                Button { showingEndpointEditor = true } label: {
+                    Label("Add Endpoint", systemImage: "plus.circle")
+                }
             }
+
             Section("Configuration") {
-                NavigationLink("Edit Identity", destination: ConnectorBuilderView(connector: connector))
+                NavigationLink("Edit Identity", destination: ConnectorBuilderView())
                 NavigationLink("Flow Builder", destination: ConnectorFlowBuilderView(connector: connector))
                 NavigationLink("Schema Builder", destination: ConnectorSchemaBuilderView(connector: connector))
                 NavigationLink("Security & Scopes", destination: ConnectorSecurityView(connector: connector))
             }
+
             Section("Operations") {
                 NavigationLink("Live Execution", destination: ConnectorExecutionView(connector: connector))
                 NavigationLink("Execution Logs", destination: ConnectorLogsView(connectorID: connector.id))
                 NavigationLink("Versioning", destination: ConnectorVersioningView(connector: connector))
             }
-            Section { Button(role: .destructive) { showingDeleteAlert = true } label: { Label("Delete Connector", systemImage: "trash").foregroundStyle(.red) } }
+
+            Section {
+                Button(role: .destructive) {
+                    showingDeleteAlert = true
+                } label: {
+                    Label("Delete Connector", systemImage: "trash")
+                }
+            }
         }
-        .listStyle(.insetGrouped).navigationTitle(connector.name).navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showingEditSheet) { NavigationStack { ConnectorBuilderView(connector: connector) } }
-        .sheet(isPresented: $showingTestConsole) { NavigationStack { ConnectorTestConsoleView(connector: connector) } }
-        .sheet(isPresented: $showingEndpointEditor) { NavigationStack { EndpointEditorSheet(path: $newEndpointPath, method: $newEndpointMethod) { let ep = ConnectorEndpoint(path: newEndpointPath, method: newEndpointMethod, headers: [:], queryParams: [:]); connector.endpoints.append(ep); manager.updateConnector(connector); showingEndpointEditor = false } } }
-        .alert("Delete?", isPresented: $showingDeleteAlert) { Button("Cancel", role: .cancel) {}; Button("Delete", role: .destructive) { manager.deleteConnector(id: connector.id) } } message: { Text("Permanently remove \(connector.name)?") }
+        .listStyle(.insetGrouped)
+        .navigationTitle(connector.name)
+        .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showingEditSheet) {
+            NavigationStack { ConnectorBuilderView(connector: connector) }
+        }
+        .sheet(isPresented: $showingTestConsole) {
+            NavigationStack { ConnectorTestConsoleView(connector: connector) }
+        }
+        .sheet(isPresented: $showingEndpointEditor) {
+            NavigationStack {
+                EndpointEditorSheet(path: $newEndpointPath, method: $newEndpointMethod) {
+                    let ep = ConnectorEndpoint(path: newEndpointPath, method: newEndpointMethod, headers: [:], queryParams: [:])
+                    connector.endpoints.append(ep)
+                    manager.updateConnector(connector)
+                    showingEndpointEditor = false
+                }
+            }
+        }
+        .alert("Delete?", isPresented: $showingDeleteAlert) {
+            Button("Cancel", role: .cancel) {}
+            Button("Delete", role: .destructive) { manager.deleteConnector(id: connector.id) }
+        } message: {
+            Text("Permanently remove \(connector.name)?")
+        }
     }
-    private func toggleStatus() { connector.status = (connector.status == .active ? .inactive : .active); connector.updatedAt = Date(); manager.updateConnector(connector) }
+
+    private var statusColor: Color {
+        switch connector.status {
+        case .active: return .green
+        case .inactive: return .secondary
+        case .error: return .red
+        case .connecting: return .blue
+        }
+    }
+
+    private func toggleStatus() {
+        connector.status = (connector.status == .active ? .inactive : .active)
+        connector.updatedAt = Date()
+        manager.updateConnector(connector)
+    }
 }
 
 struct EndpointEditorSheet: View {
-    @Binding var path: String; @Binding var method: String; let onAdd: () -> Void; @Environment(\.dismiss) var dismiss
+    @Binding var path: String
+    @Binding var method: String
+    let onAdd: () -> Void
+    @Environment(\.dismiss) var dismiss
+
     var body: some View {
         Form {
-            Section("New Endpoint") { TextField("Path", text: $path).textInputAutocapitalization(.never).autocorrectionDisabled(); Picker("Method", selection: $method) { ForEach(["GET", "POST", "PUT", "DELETE"], id: \.self) { Text($0).tag($0) } }.pickerStyle(.menu) }
-            Section { Button("Add Endpoint") { onAdd() }.frame(maxWidth: .infinity).bold().buttonStyle(.borderedProminent).disabled(path.isEmpty) }.listRowBackground(Color.clear)
+            Section("New Endpoint") {
+                TextField("Path", text: $path)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                Picker("Method", selection: $method) {
+                    ForEach(["GET", "POST", "PUT", "DELETE"], id: \.self) {
+                        Text($0).tag($0)
+                    }
+                }
+                .pickerStyle(.menu)
+            }
+
+            Section {
+                Button("Add Endpoint") { onAdd() }
+                    .frame(maxWidth: .infinity)
+                    .bold()
+                    .buttonStyle(.borderedProminent)
+                    .disabled(path.isEmpty)
+            }
+            .listRowBackground(Color.clear)
         }
-        .navigationTitle("Add Endpoint").navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .topBarLeading) { Button("Cancel") { dismiss() } } }
+        .navigationTitle("Add Endpoint")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button("Cancel") { dismiss() }
+            }
+        }
     }
 }
 
 struct ConnectorDocumentationView: View {
     @Environment(\.dismiss) var dismiss
+
     var body: some View {
         NavigationStack {
             List {
-                Section("Architecture") { Text("Connectors bridge ToolsKit with external REST APIs, supporting complex auth and multi-step flows.").font(.subheadline).foregroundStyle(.secondary) }
-                Section("Lifecycle") { Text("Connectors go through Inactive, Connecting, and Active states.").font(.subheadline).foregroundStyle(.secondary) }
-                Section("Security") { Text("All credentials are encrypted and stored securely using the system Keychain.").font(.subheadline).foregroundStyle(.secondary) }
+                Section("Architecture") {
+                    Text("Connectors bridge ToolsKit with external REST APIs, supporting complex auth and multi-step flows.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Section("Lifecycle") {
+                    Text("Connectors go through Inactive, Connecting, and Active states.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Section("Security") {
+                    Text("All credentials are encrypted and stored securely using the system Keychain.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
             }
-            .listStyle(.insetGrouped).navigationTitle("Documentation").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } } }
+            .listStyle(.insetGrouped)
+            .navigationTitle("Documentation")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
+                }
+            }
         }
     }
-}
-
-private struct ConnectorStatusBadge: View {
-    let status: ConnectorDefinition.ConnectorStatus
-    var body: some View {
-        Text(status.rawValue.uppercased()).font(.system(size: 8, weight: .black)).padding(.horizontal, 8).padding(.vertical, 4).background(color.opacity(0.1), in: Capsule()).foregroundStyle(color)
-    }
-    private var color: Color { switch status { case .active: return .green; case .inactive: return Color.secondary; case .error: return .red; case .connecting: return .blue } }
-}
-
-private struct ConnectorStatHeader: View {
-    @ObservedObject var manager: ConnectorManager
-    var body: some View {
-        let conn = manager.connectors
-        HStack(spacing: 0) {
-            SDKStatPill(label: "Active", value: "\(conn.filter { $0.status == .active }.count)", color: .sdkSuccess)
-            SDKStatPill(label: "Errors", value: "\(conn.filter { $0.status == .error }.count)", color: .red)
-            SDKStatPill(label: "Endpoints", value: "\(conn.reduce(0) { $0 + $1.endpoints.count })", color: .purple)
-        }.padding(.horizontal, 16).padding(.vertical, 8)
-    }
-}
-
-private struct ConnectorFilterSection: View {
-    @Binding var selectedFilter: ConnectorsMainView.ConnectorFilter; @Binding var sortOrder: ConnectorsMainView.SortOrder
-    var body: some View {
-        Picker("Filter", selection: $selectedFilter) { ForEach(ConnectorsMainView.ConnectorFilter.allCases, id: \.self) { Text($0.rawValue).tag($0) } }.pickerStyle(.segmented).padding(.vertical, 4)
-        Picker("Sort", selection: $sortOrder) { ForEach(ConnectorsMainView.SortOrder.allCases, id: \.self) { Text($0.rawValue).tag($0) } }.pickerStyle(.menu)
-    }
-}
-
-private struct ConnectorRow: View {
-    let connector: ConnectorDefinition
-    var body: some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 2) { Text(connector.name).font(.subheadline.bold()); Text(connector.identifier).font(.caption2.monospaced()).foregroundStyle(.secondary) }
-            Spacer(); ConnectorStatusBadge(status: connector.status)
-        }.padding(.vertical, 2)
-    }
-}
-
-private struct NavTile<Destination: View>: View {
-    let title: String; let icon: String; let color: Color; let destination: Destination
-    var body: some View { NavigationLink(destination: destination) { Label(title, systemImage: icon).foregroundStyle(color).font(.subheadline.bold()) } }
 }
