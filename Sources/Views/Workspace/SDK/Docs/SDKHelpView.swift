@@ -161,15 +161,22 @@ struct SDKHelpView: View {
                                     .padding(.top, 4)
                             }
                             VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
-                                Text(message.content)
-                                    .font(.subheadline)
-                                    .padding(10)
-                                    .background(
-                                        message.role == .user
-                                        ? Color.accentColor.opacity(0.1)
-                                        : Color.primary.opacity(0.04),
-                                        in: RoundedRectangle(cornerRadius: 12)
-                                    )
+                                if message.role == .assistant {
+                                    SDKMarkdownView(text: message.content)
+                                        .padding(10)
+                                        .background(
+                                            Color.primary.opacity(0.04),
+                                            in: RoundedRectangle(cornerRadius: 12)
+                                        )
+                                } else {
+                                    Text(message.content)
+                                        .font(.subheadline)
+                                        .padding(10)
+                                        .background(
+                                            Color.accentColor.opacity(0.1),
+                                            in: RoundedRectangle(cornerRadius: 12)
+                                        )
+                                }
                                 Text(message.timestamp.formatted(date: .omitted, time: .shortened))
                                     .font(.system(size: 9)).foregroundStyle(.tertiary)
                             }
@@ -224,18 +231,8 @@ struct SDKHelpView: View {
 
         Task {
             do {
-                let systemPrompt = """
-                You are the ToolsKit SDK Help Assistant. You have deep knowledge of:
-                - SDK Module Registry (dynamic registration, dependency resolution, capability exposure)
-                - Plugin Lifecycle (phases, capability injection, manifest system)
-                - Connector System (authentication, runtime binding, live streaming, templates)
-                - Data Store (SDKModel, offline-first persistence, indexing)
-                - Event Bus (pub/sub, channels, history)
-                - Security (permissions, policies, sandboxing, audit logging)
-                - Router (on-device API, endpoint management)
-                - DI Container (ServiceRegistry, scoped resolution)
-                Answer concisely and practically for mobile iOS developers using SwiftUI.
-                """
+                let contextDocument = SDKAIContextProvider.loadContext()
+                let systemPrompt = SDKAIContextProvider.helpSystemPrompt(context: contextDocument)
                 let response = try await AIService.shared.processText(
                     prompt: trimmed,
                     systemPrompt: systemPrompt
