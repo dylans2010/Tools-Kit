@@ -6,6 +6,7 @@ struct SDKHelpView: View {
     @State private var isLoading = false
     @State private var selectedTopic: QuickTopic?
     @State private var showingTopicPicker = false
+    @State private var activeTask: Task<Void, Never>?
 
     struct HelpMessage: Identifiable {
         let id = UUID()
@@ -65,6 +66,7 @@ struct SDKHelpView: View {
             inputBar
         }
         .navigationTitle("SDK Help")
+        .toolbarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
@@ -76,10 +78,10 @@ struct SDKHelpView: View {
                     Button {
                         showingTopicPicker = true
                     } label: {
-                        Label("Quick Topics", systemImage: "list.bullet")
+                        Label("Quick Topics", systemImage: "sparkles.rectangle.stack")
                     }
                 } label: {
-                    Image(systemName: "ellipsis.circle")
+                    Image(systemName: "ellipsis.circle.fill")
                 }
             }
         }
@@ -106,6 +108,7 @@ struct SDKHelpView: View {
             }
             .presentationDetents([.medium])
         }
+        .onDisappear { activeTask?.cancel() }
     }
 
     private var emptyState: some View {
@@ -196,8 +199,11 @@ struct SDKHelpView: View {
                 .padding(16)
             }
             .onChange(of: conversation.count) { _, _ in
-                if let last = conversation.last {
-                    withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
+                guard let last = conversation.last else { return }
+                DispatchQueue.main.async {
+                    withAnimation(.easeOut(duration: 0.2)) {
+                        proxy.scrollTo(last.id, anchor: .bottom)
+                    }
                 }
             }
         }
@@ -225,22 +231,29 @@ struct SDKHelpView: View {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
+        activeTask?.cancel()
         conversation.append(HelpMessage(role: .user, content: trimmed, timestamp: Date()))
         query = ""
         isLoading = true
 
-        Task {
+        activeTask = Task {
             do {
-                let contextDocument = SDKAIContextProvider.loadContext()
+                let contextDocument = try await Task.detached(priority: .userInitiated) {
+                    SDKAIContextProvider.loadContext()
+                }.value
                 let systemPrompt = SDKAIContextProvider.helpSystemPrompt(context: contextDocument)
+                try Task.checkCancellation()
                 let response = try await AIService.shared.processText(
                     prompt: trimmed,
                     systemPrompt: systemPrompt
                 )
+                try Task.checkCancellation()
                 await MainActor.run {
                     conversation.append(HelpMessage(role: .assistant, content: response, timestamp: Date()))
                     isLoading = false
                 }
+            } catch is CancellationError {
+                await MainActor.run { isLoading = false }
             } catch {
                 await MainActor.run {
                     conversation.append(HelpMessage(

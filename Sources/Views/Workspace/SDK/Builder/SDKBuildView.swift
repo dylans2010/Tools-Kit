@@ -62,6 +62,12 @@ struct SDKBuildView: View {
             }
         }
         .navigationTitle("Build")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Image(systemName: "shippingbox.fill")
+                    .foregroundStyle(.accent)
+            }
+        }
         .sheet(isPresented: $showingConsole) {
             NavigationStack { SDKConsoleView() }
         }
@@ -133,6 +139,10 @@ struct SDKBuildView: View {
 
     private var buildConfigurationSection: some View {
         Section {
+            Label("Compilation", systemImage: "gearshape.2.fill")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
             Picker("Mode", selection: $buildMode) {
                 ForEach(BuildMode.allCases, id: \.self) { mode in
                     Text(mode.rawValue).tag(mode)
@@ -145,12 +155,12 @@ struct SDKBuildView: View {
                 }
             }
 
-            Toggle("Clean Build", isOn: $cleanBuildEnabled)
-            Toggle("Include Tests", isOn: $includeTests)
-            Toggle("Verbose Logging", isOn: $verboseLogging)
-            Toggle("Code Signing", isOn: $codeSigningEnabled)
-            Toggle("Optimize Assets", isOn: $optimizeAssets)
-            Toggle("Parallel Build", isOn: $parallelBuild)
+            Toggle(isOn: $cleanBuildEnabled) { Label("Clean Build", systemImage: "trash.slash") }
+            Toggle(isOn: $includeTests) { Label("Include Tests", systemImage: "checkmark.shield") }
+            Toggle(isOn: $verboseLogging) { Label("Verbose Logging", systemImage: "text.bubble") }
+            Toggle(isOn: $codeSigningEnabled) { Label("Code Signing", systemImage: "signature") }
+            Toggle(isOn: $optimizeAssets) { Label("Optimize Assets", systemImage: "speedometer") }
+            Toggle(isOn: $parallelBuild) { Label("Parallel Build", systemImage: "square.split.2x2") }
                 } header: {
             Text("Configuration")
         }
@@ -238,12 +248,12 @@ struct SDKBuildView: View {
 
     private var developmentSection: some View {
         Section {
-            NavigationLink("IDE Workspace", destination: SDKWorkspaceContainerView())
-            NavigationLink("Action Console", destination: SDKActionConsoleView())
-            Button("Console Output") { showingConsole = true }
-            NavigationLink("Debug Inspector", destination: SDKDebugView())
-            NavigationLink("System Logs", destination: SDKLogsView())
-            NavigationLink("Event Stream", destination: SDKEventStreamView())
+            NavigationLink(destination: SDKWorkspaceContainerView()) { Label("IDE Workspace", systemImage: "macwindow.on.rectangle") }
+            NavigationLink(destination: SDKActionConsoleView()) { Label("Action Console", systemImage: "terminal") }
+            Button { showingConsole = true } label: { Label("Console Output", systemImage: "list.bullet.rectangle.portrait") }
+            NavigationLink(destination: SDKDebugView()) { Label("Debug Inspector", systemImage: "ladybug.fill") }
+            NavigationLink(destination: SDKLogsView()) { Label("System Logs", systemImage: "doc.text.magnifyingglass") }
+            NavigationLink(destination: SDKEventStreamView()) { Label("Event Stream", systemImage: "waveform.path.ecg.rectangle") }
                 } header: {
             Text("Development")
         }
