@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Modernized library cards using a private struct LibraryItemRow with native Label and semantic status pills.
- - Replaced manual stat cards with structured metadata sections.
- - Standardized version analysis visuals using semantic blue pills and monospaced diff text.
- - strictly preserved all SDKLibraryVersionResolver logic and library upsert functionality.
- - Improved visual hierarchy for pipeline stages and linked scopes.
- - Extracted subviews for LibraryItemRow and SDKLibraryEditorSheet.
- */
+
 
 import SwiftUI
 

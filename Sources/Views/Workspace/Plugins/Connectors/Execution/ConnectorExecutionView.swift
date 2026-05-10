@@ -1,15 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on a modern, vertical-scroll execution interface.
- - Modernized the header with semantic colors, symbols, and a monospaced timer pill.
- - Replaced manual timeline with a structured ExecutionTimelineSection using native SF Symbols and progress indicators.
- - Standardized execution history using a native List/Section pattern with semantic log level badges.
- - Replaced manual stats card with a centered group of DetailMetricPills.
- - strictly preserved all ConnectorRuntime integration, Timer logic, and execution mode switching.
- - Improved visual hierarchy for flow preview using native Capsules and arrows.
- - Extracted subviews for ExecutionTimelineSection, ExecutionHistorySection, and ExecutionStatsSection.
- - Modernized the parameters sheet with native LabeledContent and semantic sections.
- */
+
 
 import SwiftUI
 

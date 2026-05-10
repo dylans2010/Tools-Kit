@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Modernized the Connector header using native Section formatting and improved typography.
- - Standardized Scope Assignment using native Toggle components with hierarchical labeling.
- - Modernized risk level indicators using semantic colors (red for high/critical, secondary for others).
- - strictly preserved all SDKPolicyEngine integration, scope mapping, and update logic.
- - Improved visual hierarchy for scope names and risk descriptions.
- - Standardized on prominent bordered styles for the "Save" action.
- */
+
 
 import SwiftUI
 

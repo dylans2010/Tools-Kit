@@ -1,14 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on native Form architecture with a segmented tab selector.
- - Modernized Endpoint Selection using a native Picker with monospaced method badges.
- - Standardized Request Body and Headers management using monospaced typography and native row editing.
- - Modernized the Response Console with semantic status badges, response timers, and dark monospaced output area.
- - strictly preserved all ConnectorExecutionService integration, request history, and cURL generation logic.
- - Improved visual hierarchy for history entries using semantic color coding and progress indicators.
- - Extracted sub-structs for RequestBodySection, HeadersSection, and ResponseConsoleSection to meet line-count limits.
- - Modernized sheets (cURL Export) with appropriate detents and copy actions.
- */
+
 
 import SwiftUI
 

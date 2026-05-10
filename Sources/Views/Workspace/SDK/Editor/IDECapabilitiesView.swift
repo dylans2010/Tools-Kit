@@ -1,12 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on a responsive grid layout using ScrollView and LazyVGrid.
- - Replaced manual capability cards with a private CapabilityCard struct.
- - Standardized status indicators using native Label and semantic colors.
- - Improved visual hierarchy for required scopes using monospaced typography and status dots.
- - strictly preserved all SDKRuntimeWorkspaceState scope validation logic.
- - Replaced manual section headers with standard system typography.
- */
+
 
 import SwiftUI
 

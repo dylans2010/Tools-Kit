@@ -1,16 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style as the root navigation container.
- - Replaced manual metric cards with a centered StatHeader section using SDKStatPill.
- - Modernized the action row using a native ToolbarItem(placement: .topBarTrailing) and secondary inline actions.
- - Replaced manual filter picker with a native Picker within a List section.
- - Standardized connector rows using a private struct ConnectorRow with native status badges.
- - strictly preserved all ConnectorManager, SDKConnectorManager, and ConnectorRuntime logic.
- - Improved visual hierarchy for platform tools using native NavigationLink groupings.
- - Extracted subviews for ConnectorStatHeader, ConnectorFilterSection, and ConnectorRow.
- - Modernized sheets (Builder, Documentation) with appropriate detents.
- - RESTORED: ConnectorDefinitionDetailView and ConnectorDocumentationView that were mistakenly removed.
- */
+
 
 import SwiftUI
 

@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style for modern data exploration.
- - Replaced manual HStack layouts with native Label and monospaced typography for endpoints.
- - Standardized API method badges using semantic colors and monospaced fonts.
- - Modernized the Test Console as a prominent Section with native Picker and monospaced TextField.
- - Replaced manual progress indicators with standard ProgressView.
- - Strictly preserved all SDKRouter integration and async execution logic.
- - Standardized response display using LabeledContent and monospaced data keys.
- */
+
 
 import SwiftUI
 

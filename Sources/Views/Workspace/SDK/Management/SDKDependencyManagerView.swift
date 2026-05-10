@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Modernized dependency node rows using a private struct DependencyTreeNodeRow with native TextField and Picker.
- - Replaced manual drag-and-drop labels with structured metadata rows.
- - Standardized conflict alerts using semantic orange Labels and monospaced typography.
- - strictly preserved all SDKRuntimeWorkspaceState and NSItemProvider drag-drop logic.
- - Improved visual hierarchy for lazy loading, hooks, and link counts.
- - Standardized the 'Add Node' and 'Assistant' action buttons.
- */
+
 
 import SwiftUI
 import UniformTypeIdentifiers

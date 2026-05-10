@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Transitioned to standard Form layout for system-level data operations.
- - Standardized high-risk warning using a prominent Section with semantic red coloring.
- - Replaced manual SDKModernCard and button styles with native Form components.
- - Standardized operation feedback using a status section with semantic colors.
- - strictly preserved all WorkspaceAPI, SDKLogStore, and SDKRuntimeEngine integration logic.
- - Improved visual hierarchy for 'No-Sandbox' mode using a native Toggle with descriptive text.
- - Replaced manual navigation links with standard List Section links.
- */
+
 
 import SwiftUI
 

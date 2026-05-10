@@ -1,14 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on a modern console aesthetic with dark backgrounds for logs.
- - Modernized the stats bar using centered DetailMetricPills with semantic colors.
- - Replaced manual filter controls with a native Picker/Menu toolbar and segmented filter.
- - Standardized log rows using a private struct ConnectorLogLine with semantic type badges.
- - strictly preserved all ConnectorManager log filtering, searching, and clearing logic.
- - Added expandable log details with metadata (ID, detailed timestamp) and copy functionality.
- - Improved visual hierarchy for empty states using ContentUnavailableView.
- - Standardized on insetGrouped List style for the main log area.
- */
+
 
 import SwiftUI
 

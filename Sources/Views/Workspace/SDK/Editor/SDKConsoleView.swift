@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized console layout with a clean header, plain list, and material footer.
- - Replaced manual filter buttons with a native segmented level picker and Menu-based filters.
- - Modernized log entries with semantic badges, monospaced typography, and relative timing.
- - Replaced manual timeline toggles with native button-style toggles.
- - Strictly preserved SDKLogStore integration and performance metrics logic.
- - Standardized trace display with conditional expansion and diagnostic hints.
- - Extracted subviews for ConsoleLogRow and FilterMenu.
- */
+
 
 import SwiftUI
 

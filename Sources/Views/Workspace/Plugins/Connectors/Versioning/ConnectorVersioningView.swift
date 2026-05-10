@@ -1,14 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Modernized the Version Overview using centered DetailMetricPills with semantic colors.
- - Replaced manual active version list with a structured CurrentReleaseSection using native LabeledContent.
- - Standardized Version History using a private VersionHistoryRow sub-struct with native timeline visuals.
- - strictly preserved all Versioning logic, incrementing rules, and rollback functionality.
- - Improved visual hierarchy for release notes and configuration changelogs.
- - Extracted sub-structs for CurrentReleaseSection, VersionHistoryRow, and ReleaseChecklist.
- - Modernized sheets (Release, Compare) with appropriate detents and drag indicators.
- */
+
 
 import SwiftUI
 

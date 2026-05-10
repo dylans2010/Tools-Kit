@@ -1,8 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized as a navigation wrapper for SDKAPIExplorerView.
- - Applied inline navigation title display mode.
- */
+
 
 import SwiftUI
 

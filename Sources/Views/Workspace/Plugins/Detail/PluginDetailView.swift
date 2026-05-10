@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Modernized header section using a private struct PluginProfileHeader with native background styling.
- - Replaced manual HStack layouts with LabeledContent for identifier and metadata.
- - Standardized capability and trigger rows using semantic SF Symbols and colors.
- - strictly preserved all PluginManager installation and removal logic.
- - Improved visual hierarchy for enabled/disabled status and destructive actions.
- - Standardized on prominent bordered styles for installation buttons.
- */
+
 
 import SwiftUI
 

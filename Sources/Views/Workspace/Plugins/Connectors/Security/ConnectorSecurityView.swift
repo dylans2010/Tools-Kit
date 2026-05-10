@@ -1,15 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on native Form architecture.
- - Modernized Security Overview using centered DetailMetricPills with semantic colors.
- - Standardized Access Control using native Toggle and Stepper components with warning callouts.
- - Modernized IP Whitelist and CORS Origins management with inline list rows and semantic minus buttons.
- - Standardized Webhook Security using SecureField and a native rotation button.
- - strictly preserved all Security settings, scope management, and defaults logic.
- - Improved visual hierarchy for Token Management and Compliance metadata.
- - Extracted sub-structs for AccessControlSection, IPWhitelistSection, and ScopeManagementSection.
- - Standardized on prominent destructive styles for resetting defaults.
- */
+
 
 import SwiftUI
 

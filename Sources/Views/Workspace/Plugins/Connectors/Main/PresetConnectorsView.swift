@@ -1,15 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on native Form architecture.
- - Modernized the provider picker using a native Picker with SF Symbols.
- - Replaced manual provider summary with a native Section footer for description and monospaced baseURL.
- - Standardized credentials input using native TextField/SecureField and improved descriptive text.
- - Replaced manual endpoint rows with a native Section using semantic SF Symbols and colors.
- - strictly preserved all PresetConnectorProvider, ConnectorManager, and ConnectorAuthManager logic.
- - Improved visual hierarchy for endpoints (monospaced paths, semantic method badges).
- - Standardized on prominent bordered styles for the "Add" button.
- - RESTORED: PresetConnectorProvider enum and supporting logic.
- */
+
 
 import SwiftUI
 

@@ -1,15 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Replaced manual section switcher with a modern List/Form architecture using native Section headers.
- - Standardized all input fields using native Form components (TextField, Toggle, Picker).
- - Modernized Logic Editor with a monospaced TextEditor and improved visual hierarchy.
- - Replaced manual status indicators with semantic SF Symbols (checkmark/exclamation).
- - Standardized on insetGrouped list style for the entire builder workflow.
- - strictly preserved all PluginManager integration, validation logic, and JS simulation code.
- - Extracted every section into its own private sub-struct (e.g., BuildIdentitySection, BuildCapabilitiesSection) to improve maintainability and meet line-count constraints.
- - Modernized sheets (AddEndpoint, EditEndpoint, Documentation) with appropriate detents and drag indicators.
- - Added ContentUnavailableView for empty endpoints and toolkit selections.
- */
+
 
 import SwiftUI
 

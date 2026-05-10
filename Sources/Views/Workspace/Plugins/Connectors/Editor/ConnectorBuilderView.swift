@@ -1,14 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Replaced manual identity layout with a structured BuildIdentitySection using native Form components.
- - Modernized Authentication with a dedicated AuthStrategySection including conditional fields and monospaced typography.
- - Standardized Endpoint management using a private EndpointsConfigSection with native row styling and swipe actions.
- - Replaced manual capability list with a native Section using semantic SF Symbols.
- - strictly preserved all ConnectorManager integration, validation logic, and auth building code.
- - Extracted sub-structs for Identity, Auth, Endpoints, and Stats to maintain readability and meet line-count limits.
- - Modernized sheets (Presets) with appropriate detents.
- - Added SDKStatPill group for saved connector data.
- */
+
 
 import SwiftUI
 

@@ -1,15 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on native Form architecture with a segmented tab selector.
- - Modernized Schema Stats using centered DetailMetricPills with semantic colors.
- - Standardized the JSON Schema Editor with a monospaced TextEditor and improved focus styling.
- - Modernized Mappings Editor using structured rows with native Picker and monospaced typography.
- - Standardized the Preview section with semantic color coding for source and target fields.
- - strictly preserved all Schema validation, JSON formatting, and reset logic.
- - Improved visual hierarchy for transform types (Direct, Uppercase, Date Format).
- - Extracted sub-structs for SchemaEditorSection, MappingsEditorSection, and PreviewSection to meet line-count limits.
- - Modernized sheets (Import) with appropriate detents and drag indicators.
- */
+
 
 import SwiftUI
 

@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on a modern console aesthetic with a dark monospaced output area.
- - Replaced manual filter picker with a native ToolbarItem(placement: .topBarLeading) containing a Menu/Picker.
- - Modernized log rows using a private struct PluginLogLine with semantic color coding.
- - Replaced manual control bar with ToolbarItem(placement: .topBarTrailing) for secondary actions and a bottom bar for primary debugging.
- - strictly preserved all PluginManager logging subscriptions and event injection logic.
- - Added ContentUnavailableView for empty log states.
- - Improved auto-scrolling reliability using ScrollViewProxy.
- */
+
 
 import SwiftUI
 import Combine
