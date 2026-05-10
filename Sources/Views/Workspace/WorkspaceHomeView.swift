@@ -5,83 +5,88 @@ struct WorkspaceHomeView: View {
         NavigationStack {
             List {
                 Section("Workspace") {
-                    NavigationLink {
-                        NotesView()
-                    } label: {
+                    NavigationLink { NotesView() } label: {
                         Label("Notes", systemImage: "note.text")
                     }
-                    NavigationLink {
-                        TasksHomeView()
-                    } label: {
+                    NavigationLink { TasksHomeView() } label: {
                         Label("Tasks", systemImage: "checklist")
                     }
-                    NavigationLink {
-                        FileManagementView()
-                    } label: {
+                    NavigationLink { FileManagementView() } label: {
                         Label("Files", systemImage: "folder")
                     }
-                    NavigationLink {
-                        CalendarHomeView()
-                    } label: {
+                    NavigationLink { CalendarHomeView() } label: {
                         Label("Calendar", systemImage: "calendar")
+                    }
+                    NavigationLink { SpreadsheetsHomeView() } label: {
+                        Label("Spreadsheets", systemImage: "tablecells")
+                    }
+                    NavigationLink { WorkspaceHabitTrackerView() } label: {
+                        Label("Habits", systemImage: "flame")
                     }
                 }
 
                 Section("Creation") {
-                    NavigationLink {
-                        NotebooksHomeView()
-                    } label: {
+                    NavigationLink { NotebooksHomeView() } label: {
                         Label("Notebooks", systemImage: "book.closed")
                     }
-                    NavigationLink {
-                        ArticlesHomeView()
-                    } label: {
+                    NavigationLink { ArticlesHomeView() } label: {
                         Label("Articles", systemImage: "newspaper")
                     }
-                    NavigationLink {
-                        EditingHomeView()
-                    } label: {
+                    NavigationLink { EditingHomeView() } label: {
                         Label("Media Editing", systemImage: "photo.stack")
                     }
-                    NavigationLink {
-                        SlidesHomeView()
-                    } label: {
+                    NavigationLink { SlidesHomeView() } label: {
                         Label("Slides", systemImage: "rectangle.on.rectangle")
                     }
                 }
 
-                Section("System Entry") {
-                    NavigationLink {
-                        SDKHomeView()
-                    } label: {
+                Section("Collaboration") {
+                    NavigationLink { PersonaHomeView() } label: {
+                        Label("Persona", systemImage: "brain.head.profile")
+                    }
+                    NavigationLink { CollaborationHomeView() } label: {
+                        Label("Collaboration", systemImage: "person.2")
+                    }
+                    NavigationLink { JoinMeetingView() } label: {
+                        Label("Meetings", systemImage: "video")
+                    }
+                    NavigationLink { AutomationHomeView() } label: {
+                        Label("Automations", systemImage: "bolt")
+                    }
+                    NavigationLink { IntegrationsHomeView() } label: {
+                        Label("Integrations", systemImage: "square.grid.3x3")
+                    }
+                    NavigationLink { TimeTravelHomeView() } label: {
+                        Label("Time Travel", systemImage: "clock.arrow.circlepath")
+                    }
+                }
+
+                Section("System") {
+                    NavigationLink { SDKHomeView() } label: {
                         Label("SDK", systemImage: "hammer")
                     }
-                    NavigationLink {
-                        PluginsMainView()
-                    } label: {
+                    NavigationLink { PluginsMainView() } label: {
                         Label("Plugins", systemImage: "puzzlepiece.extension")
                     }
-                    NavigationLink {
-                        ConnectorsMainView()
-                    } label: {
+                    NavigationLink { ConnectorsMainView() } label: {
                         Label("Connectors", systemImage: "cable.connector")
                     }
-                    NavigationLink {
-                        SecurityHomeView()
-                    } label: {
+                    NavigationLink { SecurityHomeView() } label: {
                         Label("Security", systemImage: "lock.shield")
                     }
-                    NavigationLink {
-                        GitHubRouterView()
-                    } label: {
+                    NavigationLink { SecurityOnboardingView() } label: {
+                        Label("Security Setup", systemImage: "shield.checkered")
+                    }
+                    NavigationLink { GitHubRouterView() } label: {
                         Label("GitHub", systemImage: "terminal")
                     }
                 }
 
                 Section("Settings") {
-                    NavigationLink {
-                        AIChatSettingsRouter()
-                    } label: {
+                    NavigationLink { ManageAccountsView() } label: {
+                        Label("Accounts", systemImage: "person.crop.circle")
+                    }
+                    NavigationLink { AIChatSettingsRouter() } label: {
                         Label("AI Chat Settings", systemImage: "gearshape")
                     }
                 }

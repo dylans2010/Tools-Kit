@@ -15,7 +15,7 @@ struct WorkspaceSnapshotView: View {
                 Button(action: { showingSave = true }) {
                     Label("Save Current Snapshot", systemImage: "camera.fill")
                 }
-                .foregroundStyle(.blue)
+                .foregroundStyle(.primary)
             }
 
             if service.snapshots.count >= 2 {
@@ -82,7 +82,7 @@ struct SnapshotRow: View {
             }
             Button("Restore") { showingRestore = true }
                 .font(.caption.bold())
-                .foregroundStyle(.orange)
+                .foregroundStyle(.secondary)
         }
         .padding(.vertical, 4)
         .confirmationDialog("Restore '\(snapshot.label)'?", isPresented: $showingRestore, titleVisibility: .visible) {
@@ -154,7 +154,7 @@ struct SnapshotDiffView: View {
                         Image(systemName: "arrow.right").foregroundStyle(.secondary)
                         Spacer()
                         VStack(alignment: .trailing) {
-                            Text("After").font(.caption.bold()).foregroundStyle(.green)
+                            Text("After").font(.caption.bold()).foregroundStyle(.primary)
                             Text(snapshotB.label).font(.subheadline)
                             Text(snapshotB.createdAt.formatted(date: .abbreviated, time: .shortened)).font(.caption2).foregroundStyle(.secondary)
                         }
@@ -175,7 +175,7 @@ struct SnapshotDiffView: View {
                                         .foregroundStyle(diff.before != diff.after ? Color.red : Color.primary)
                                     if diff.before != diff.after {
                                         Image(systemName: "arrow.right").font(.caption).foregroundStyle(.secondary)
-                                        Text(diff.after).font(.subheadline).foregroundStyle(.green)
+                                        Text(diff.after).font(.subheadline).foregroundStyle(.primary)
                                     }
                                 }
                             }

@@ -54,7 +54,7 @@ struct GitHubCodeEditorWorkspaceView: View {
             if hasUnsavedChanges {
                 Text("Unsaved Changes")
                     .font(.caption2.bold())
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(.secondary)
             }
         }
         .padding(.horizontal)

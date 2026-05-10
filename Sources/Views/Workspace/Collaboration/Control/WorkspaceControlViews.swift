@@ -23,7 +23,7 @@ struct WorkspaceCommandCenterView: View {
             Section {
                 if auditLogs.isEmpty {
                     Text("No Issues Found")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 } else {
                     ForEach(auditLogs, id: \.self) { log in
                         Label(log, systemImage: "exclamationmark.triangle")
@@ -59,7 +59,7 @@ struct DependencyInspectorView: View {
 
             Text("Object ID: \(objectID.uuidString)")
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
 
             Divider()
 

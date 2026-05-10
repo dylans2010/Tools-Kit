@@ -79,7 +79,7 @@ struct HabitAnalyticsView: View {
 
                 Text("Based on last \(days) days")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
             .padding()
         }
@@ -110,7 +110,7 @@ struct HabitAnalyticsView: View {
                 if manager.habits.isEmpty {
                     Text("No habits tracked yet.")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
             }
             .padding()
@@ -188,7 +188,7 @@ struct HabitAnalyticsView: View {
                             Spacer()
                             Text("\(Int(rate * 100))%")
                                 .font(.caption.bold())
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
                         ProgressView(value: rate)
                             .tint(Color(hex: habit.colorHex) ?? .blue)

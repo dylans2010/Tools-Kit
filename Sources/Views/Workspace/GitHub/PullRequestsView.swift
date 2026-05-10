@@ -26,13 +26,13 @@ struct PullRequestsView: View {
                                 .font(.headline)
                             HStack {
                                 Label("#\(pr.number)", systemImage: "circle.circle")
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                 Text("by \(pr.user.login)")
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                 Spacer()
                                 Text(pr.createdAt, style: .date)
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             }
                             .font(.caption)
                         }

@@ -33,7 +33,7 @@ struct WorkflowListView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
                                 Text(summary.workflow.name).font(.headline)
-                                if summary.isFavorite { Image(systemName: "pin.fill").foregroundStyle(.orange) }
+                                if summary.isFavorite { Image(systemName: "pin.fill").foregroundStyle(.secondary) }
                             }
                             Text(summary.workflow.path).font(.caption).foregroundStyle(.secondary)
                             Text("State: \(summary.workflow.state) • Trigger: \(summary.triggerDescription)").font(.caption2)
@@ -49,7 +49,7 @@ struct WorkflowListView: View {
                         } label: {
                             Label(summary.isFavorite ? "Unpin" : "Pin", systemImage: summary.isFavorite ? "pin.slash" : "pin")
                         }
-                        .tint(.orange)
+                        .tint(.secondary)
                     }
                 }
             } header: {

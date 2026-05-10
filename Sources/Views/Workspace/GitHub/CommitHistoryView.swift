@@ -36,13 +36,13 @@ struct CommitHistoryView: View {
                         Text("•")
                         Text(commit.sha.prefix(7))
                             .font(.system(.caption, design: .monospaced))
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
 
                         Spacer()
 
                         Text(commit.commit.author.date, style: .date)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 .padding(.vertical, 4)
@@ -52,7 +52,7 @@ struct CommitHistoryView: View {
                     } label: {
                         Label("Revert", systemImage: "arrow.uturn.backward")
                     }
-                    .tint(.orange)
+                    .tint(.secondary)
                 }
             }
         }

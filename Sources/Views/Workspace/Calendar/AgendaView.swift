@@ -20,7 +20,7 @@ struct CalendarAgendaView: View {
 
     var body: some View {
         ZStack {
-            Color.workspaceBackground.ignoresSafeArea()
+            Color(.systemBackground).ignoresSafeArea()
 
             ScrollView {
                 if manager.events.isEmpty {
@@ -48,11 +48,11 @@ struct CalendarAgendaView: View {
         HStack {
             Text(date.formatted(.dateTime.weekday().day().month()))
                 .font(.subheadline.bold())
-                .foregroundStyle(.blue)
+                .foregroundStyle(.primary)
             Spacer()
         }
         .padding(.vertical, 8)
-        .background(Color.workspaceBackground)
+        .background(Color(.systemBackground))
     }
 
     private var emptyState: some View {
@@ -104,6 +104,6 @@ struct EventAgendaRow: View {
                 .frame(width: 8, height: 8)
         }
         .padding()
-        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 16))
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
     }
 }

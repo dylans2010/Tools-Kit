@@ -11,116 +11,74 @@ struct SlidesHomeView: View {
     @State private var deckToDelete: SlideDeck?
     @State private var showDeleteConfirm = false
 
-    private let columns = [GridItem(.adaptive(minimum: 160), spacing: 12)]
-
     var body: some View {
-        ScrollView {
-            VStack(spacing: 14) {
-                summaryCard
-                heroCard
-                if manager.decks.isEmpty {
-                    EmptyStateView(
-                        icon: "rectangle.on.rectangle.angled",
-                        title: "No Presentations",
-                        message: "Create a deck manually or generate one from AI.",
-                        action: { showingCreate = true },
-                        actionLabel: "Create Deck"
-                    )
-                } else {
-                    LazyVGrid(columns: columns, spacing: 12) {
-                        ForEach(manager.decks) { deck in
-                            NavigationLink {
-                                SlideEditorView(deck: deck, manager: manager)
-                            } label: {
-                                DeckCard(deck: deck) {
-                                    deckToDelete = deck
-                                    showDeleteConfirm = true
+        List {
+            Section("Overview") {
+                HStack(spacing: 12) {
+                    SlideStatLabel(label: "Decks", value: "\(manager.decks.count)")
+                    SlideStatLabel(label: "Slides", value: "\(manager.decks.reduce(0) { $0 + $1.slideCount })")
+                    SlideStatLabel(label: "Status", value: manager.decks.isEmpty ? "Create" : "Ready")
+                }
+            }
+
+            if manager.decks.isEmpty {
+                ContentUnavailableView {
+                    Label("No Presentations", systemImage: "rectangle.on.rectangle.angled")
+                } description: {
+                    Text("Create a deck manually or generate one with AI.")
+                } actions: {
+                    Button("Create Deck") { showingCreate = true }
+                        .buttonStyle(.borderedProminent)
+                }
+            } else {
+                Section("Your Decks") {
+                    ForEach(manager.decks) { deck in
+                        NavigationLink {
+                            SlideEditorView(deck: deck, manager: manager)
+                        } label: {
+                            Label {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(deck.title)
+                                        .font(.body.weight(.semibold))
+                                    Text("\(deck.slideCount) slides")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
                                 }
+                            } icon: {
+                                Image(systemName: "rectangle.on.rectangle")
                             }
-                            .buttonStyle(.plain)
+                        }
+                        .swipeActions(edge: .trailing) {
+                            Button(role: .destructive) {
+                                manager.deleteDeck(deck)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
                         }
                     }
                 }
             }
-            .padding(16)
         }
         .navigationTitle("Slides")
+        .toolbar {
+            ToolbarItemGroup(placement: .primaryAction) {
+                Button { showingAIGenerate = true } label: {
+                    Image(systemName: "sparkles")
+                }
+                Button { showingCreate = true } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
         .sheet(isPresented: $showingCreate) { createDeckSheet }
         .sheet(isPresented: $showingAIGenerate) { aiGenerateSheet }
-        .confirmationDialog("Delete \"\(deckToDelete?.title ?? "")\"?", isPresented: $showDeleteConfirm) {
-            Button("Delete", role: .destructive) {
-                if let deckToDelete { manager.deleteDeck(deckToDelete) }
-            }
-            Button("Cancel", role: .cancel) {}
-        }
-    }
-
-    private var summaryCard: some View {
-        WorkspaceSurfaceCard {
-            HStack(spacing: 10) {
-                summaryStat("Decks", value: "\(manager.decks.count)", icon: "rectangle.stack.fill", tint: .blue)
-                summaryStat("Slides", value: "\(manager.decks.reduce(0) { $0 + $1.slideCount })", icon: "square.on.square", tint: .indigo)
-                summaryStat("Ready", value: manager.decks.isEmpty ? "Create" : "Edit", icon: "sparkles", tint: .purple)
-            }
-        }
-    }
-
-    private var heroCard: some View {
-        WorkspaceSurfaceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Slides")
-                        .font(.title3.bold())
-                    Text("iOS-first editor with natural-language AI generation.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                HStack(spacing: 10) {
-                    quickHeroButton("Generate", icon: "sparkles", tint: .purple) { showingAIGenerate = true }
-                    quickHeroButton("New Deck", icon: "plus", tint: .blue) { showingCreate = true }
-                    quickHeroButton("Present", icon: "play.fill", tint: .indigo) { showingCreate = true }
-                    Spacer(minLength: 0)
-                }
-            }
-        }
-    }
-
-    private func summaryStat(_ title: String, value: String, icon: String, tint: Color) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Label(title, systemImage: icon)
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(.secondary)
-            Text(value)
-                .font(.headline.bold())
-                .foregroundStyle(tint)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-    }
-
-    private func quickHeroButton(_ title: String, icon: String, tint: Color, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            HStack(spacing: 8) {
-                Image(systemName: icon)
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 10)
-            .background(tint.opacity(0.16), in: Capsule())
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(tint)
     }
 
     private var createDeckSheet: some View {
         NavigationStack {
             Form {
-                Section {
+                Section("Deck Title") {
                     TextField("e.g. Q4 Business Review", text: $newDeckTitle)
-                } header: {
-                    Text("Deck Title")
                 }
             }
             .navigationTitle("New Presentation")
@@ -139,6 +97,7 @@ struct SlidesHomeView: View {
                         newDeckTitle = ""
                         showingCreate = false
                     }
+                    .bold()
                 }
             }
         }
@@ -147,51 +106,58 @@ struct SlidesHomeView: View {
 
     private var aiGenerateSheet: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Describe your presentation in plain language")
-                    .font(.headline)
-                Text("No need for rigid structure; short requests are supported.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                TextEditor(text: $aiPrompt)
-                    .frame(minHeight: 120)
-                    .padding(8)
-                    .background(Color(.secondarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-
-                HStack(spacing: 8) {
-                    aiPresetButton("Pitch", icon: "briefcase.fill", prompt: "Create a startup investor deck from my idea.")
-                    aiPresetButton("Launch", icon: "megaphone.fill", prompt: "Create a product launch presentation.")
-                    aiPresetButton("Class", icon: "graduationcap.fill", prompt: "Create a teaching deck for beginners.")
-                    aiPresetButton("Workshop", icon: "person.2.fill", prompt: "Create a workshop deck with exercises and discussion prompts.")
-                    aiPresetButton("Review", icon: "chart.bar.fill", prompt: "Create a quarterly business review presentation.")
+            Form {
+                Section {
+                    TextField("Describe your presentation in plain language…", text: $aiPrompt, axis: .vertical)
+                        .lineLimit(5...10)
+                } header: {
+                    Text("AI Presentation")
+                } footer: {
+                    Text("Short requests are fine — AI will infer structure, content, and design.")
                 }
 
-                if aiLoading {
-                    WorkspaceSkeletonLine()
-                    WorkspaceSkeletonLine(widthRatio: 0.7)
-                } else if let aiError {
-                    Text(aiError)
-                        .font(.caption)
-                        .foregroundStyle(.red)
+                Section("Quick Presets") {
+                    HStack(spacing: 8) {
+                        Button("Pitch") { aiPrompt = "Create a startup investor deck from my idea." }
+                            .buttonStyle(.bordered)
+                        Button("Launch") { aiPrompt = "Create a product launch presentation." }
+                            .buttonStyle(.bordered)
+                        Button("Class") { aiPrompt = "Create a teaching deck for beginners." }
+                            .buttonStyle(.bordered)
+                    }
+                    HStack(spacing: 8) {
+                        Button("Workshop") { aiPrompt = "Create a workshop deck with exercises and discussion prompts." }
+                            .buttonStyle(.bordered)
+                        Button("Review") { aiPrompt = "Create a quarterly business review presentation." }
+                            .buttonStyle(.bordered)
+                    }
                 }
-                HStack {
+
+                Section {
+                    if aiLoading {
+                        ProgressView("Generating presentation…")
+                    } else if let aiError {
+                        Label(aiError, systemImage: "exclamationmark.triangle")
+                            .foregroundStyle(.red)
+                            .font(.caption)
+                    }
+
                     Button("Generate", action: generateFromAI)
                         .buttonStyle(.borderedProminent)
                         .disabled(aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || aiLoading)
-                    Spacer()
+                }
+            }
+            .navigationTitle("AI Presentation")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
                         showingAIGenerate = false
                         aiPrompt = ""
                         aiError = nil
                     }
-                    .buttonStyle(.bordered)
                 }
-                Spacer(minLength: 0)
             }
-            .padding(16)
-            .navigationTitle("AI Presentation")
-            .navigationBarTitleDisplayMode(.inline)
         }
         .presentationDetents([.medium, .large])
     }
@@ -239,50 +205,20 @@ struct SlidesHomeView: View {
             }
         }
     }
-
-    private func aiPresetButton(_ title: String, icon: String, prompt: String) -> some View {
-        Button {
-            aiPrompt = prompt
-            showingAIGenerate = true
-        } label: {
-            Image(systemName: icon)
-                .font(.caption.weight(.semibold))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-        }
-        .buttonStyle(.bordered)
-        .accessibilityLabel(title)
-    }
 }
 
-private struct DeckCard: View {
-    let deck: SlideDeck
-    let onDelete: () -> Void
+private struct SlideStatLabel: View {
+    let label: String
+    let value: String
 
     var body: some View {
-        WorkspaceSurfaceCard {
-            VStack(alignment: .leading, spacing: 10) {
-                if let first = deck.slides.first {
-                    SlideThumbnailView(slide: first)
-                        .frame(height: 90)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                }
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(deck.title)
-                            .font(.headline)
-                            .lineLimit(1)
-                        Text("\(deck.slideCount) slides")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Button(role: .destructive, action: onDelete) {
-                        Image(systemName: "trash")
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.headline)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
+        .frame(maxWidth: .infinity)
     }
 }

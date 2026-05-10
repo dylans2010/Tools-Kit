@@ -70,7 +70,7 @@ struct QuickFixRow: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .font(.subheadline.bold())
-                        .foregroundColor(.primary)
+                        .foregroundStyle(.primary)
                     Text(description)
                         .font(.caption2)
                         .foregroundStyle(.secondary)

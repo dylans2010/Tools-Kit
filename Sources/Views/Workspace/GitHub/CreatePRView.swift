@@ -15,7 +15,7 @@ struct CreatePRView: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section {
                     TextField("Title", text: $title)

@@ -18,7 +18,7 @@ struct CreateEventView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.workspaceBackground.ignoresSafeArea()
+                Color(.systemBackground).ignoresSafeArea()
 
                 Form {
                     Section {
@@ -27,19 +27,19 @@ struct CreateEventView: View {
 
                         TextField("Location", text: $location)
                     }
-                    .listRowBackground(Color.workspaceSurface)
+                    .listRowBackground(Color(.secondarySystemBackground))
 
                     Section {
                         DatePicker("Date", selection: $date, displayedComponents: .date)
                         DatePicker("Start", selection: $startTime, displayedComponents: .hourAndMinute)
                         DatePicker("End", selection: $endTime, displayedComponents: .hourAndMinute)
                     }
-                    .listRowBackground(Color.workspaceSurface)
+                    .listRowBackground(Color(.secondarySystemBackground))
 
                     Section {
                         Button { showingAISummarySheet = true } label: {
                             Label("Generate AI Agenda", systemImage: "sparkles")
-                                .foregroundStyle(.purple)
+                                .foregroundStyle(.secondary)
                         }
 
                         ZStack(alignment: .topLeading) {
@@ -52,7 +52,7 @@ struct CreateEventView: View {
                     } header: {
                         Text("Intelligence")
                     }
-                    .listRowBackground(Color.workspaceSurface)
+                    .listRowBackground(Color(.secondarySystemBackground))
 
                     Section {
                         Picker("Priority", selection: $priority) {
@@ -61,7 +61,7 @@ struct CreateEventView: View {
                             }
                         }
                     }
-                    .listRowBackground(Color.workspaceSurface)
+                    .listRowBackground(Color(.secondarySystemBackground))
                 }
                 .scrollContentBackground(.hidden)
             }

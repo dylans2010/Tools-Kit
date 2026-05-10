@@ -14,16 +14,74 @@ struct TasksHomeView: View {
     @State private var aiLoading = false
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 14) {
-                compactHeader
-                summaryCards
-                contentSections
+        List {
+            Section {
+                categoryFilterRow
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
+
+            Section("Summary") {
+                HStack(spacing: 12) {
+                    StatLabel(label: "Today", value: "\(manager.todayTasks.count)")
+                    StatLabel(label: "Upcoming", value: "\(manager.upcomingTasks.count)")
+                    StatLabel(label: "Done", value: "\(manager.completedTasks.count)")
+                }
+            }
+
+            if manager.tasks.isEmpty {
+                ContentUnavailableView {
+                    Label("No Tasks Yet", systemImage: "checklist")
+                } description: {
+                    Text("Create tasks or ask AI to generate a complete task plan.")
+                } actions: {
+                    Button("Create Task") { showingCreate = true }
+                        .buttonStyle(.borderedProminent)
+                }
+            } else {
+                if !manager.todayTasks.isEmpty {
+                    Section("Today") {
+                        ForEach(filterAndSort(manager.todayTasks)) { task in
+                            TaskRow(task: task, manager: manager) { selectedTask = task }
+                        }
+                    }
+                }
+                if !manager.upcomingTasks.isEmpty {
+                    Section("Upcoming") {
+                        ForEach(filterAndSort(manager.upcomingTasks)) { task in
+                            TaskRow(task: task, manager: manager) { selectedTask = task }
+                        }
+                    }
+                }
+                if !manager.completedTasks.isEmpty {
+                    Section("Completed") {
+                        ForEach(Array(manager.completedTasks.prefix(8))) { task in
+                            TaskRow(task: task, manager: manager) { selectedTask = task }
+                        }
+                    }
+                }
+            }
         }
         .navigationTitle("Tasks")
+        .toolbar {
+            ToolbarItemGroup(placement: .primaryAction) {
+                Menu {
+                    Button { showingBoard = true } label: {
+                        Label("Board View", systemImage: "square.grid.2x2")
+                    }
+                    Button { showingCategories = true } label: {
+                        Label("Categories", systemImage: "folder")
+                    }
+                    Button { showingAISheet = true } label: {
+                        Label("AI Assistant", systemImage: "sparkles")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+
+                Button { showingCreate = true } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
         .sheet(isPresented: $showingCreate) {
             CreateTaskView { manager.addTask($0) }
         }
@@ -41,54 +99,15 @@ struct TasksHomeView: View {
         }
     }
 
-    private var compactHeader: some View {
-        let categories: [TaskCategory] = manager.categories
-        let selectedCategoryID: UUID? = filterCategory?.id
-        return WorkspaceSurfaceCard {
-            VStack(spacing: 10) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Tasks")
-                            .font(.title3.bold())
-                        Text("Simpler planning with compact controls.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
+    // MARK: - Subviews
 
-                    Menu {
-                        Button { showingBoard = true } label: {
-                            Label("Board View", systemImage: "square.grid.2x2")
-                        }
-                        Button { showingCategories = true } label: {
-                            Label("Categories", systemImage: "folder")
-                        }
-                        Button { showingAISheet = true } label: {
-                            Label("AI Assistant", systemImage: "sparkles")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                            .font(.headline)
-                            .frame(width: 36, height: 36)
-                    }
-                    .buttonStyle(.bordered)
-
-                    Button { showingCreate = true } label: {
-                        Image(systemName: "plus")
-                            .font(.headline)
-                            .frame(width: 36, height: 36)
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        FilterChip(title: "All", isSelected: filterCategory == nil) { filterCategory = nil }
-                        ForEach(categories) { cat in
-                            FilterChip(title: cat.name, color: Color(hex: cat.colorHex) ?? .blue, isSelected: selectedCategoryID == cat.id) {
-                                filterCategory = (selectedCategoryID == cat.id) ? nil : cat
-                            }
-                        }
+    private var categoryFilterRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                FilterChip(title: "All", isSelected: filterCategory == nil) { filterCategory = nil }
+                ForEach(manager.categories) { cat in
+                    FilterChip(title: cat.name, isSelected: filterCategory?.id == cat.id) {
+                        filterCategory = (filterCategory?.id == cat.id) ? nil : cat
                     }
                 }
             }
@@ -97,35 +116,33 @@ struct TasksHomeView: View {
 
     private var aiToolsSheet: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("AI Task Tools")
-                        .font(.headline)
-                    Text("Type naturally, even rough notes. AI will infer timeline, priority, and subtasks.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-
+            Form {
+                Section {
                     TextField("e.g. I need a lightweight product launch plan", text: $aiPrompt, axis: .vertical)
-                        .textFieldStyle(.roundedBorder)
+                } header: {
+                    Text("Describe your plan")
+                } footer: {
+                    Text("Type naturally, even rough notes. AI will infer timeline, priority, and subtasks.")
+                }
 
+                Section {
                     HStack(spacing: 8) {
-                        aiQuickAction("Sprint", icon: "calendar.badge.plus") {
-                            runAIPlanner(with: "Plan next week from this input with realistic milestones.")
-                        }
-                        aiQuickAction("Triage", icon: "line.3.horizontal.decrease.circle") {
-                            runAIPlanner(with: "Prioritize this backlog and suggest execution order.")
-                        }
-                        aiQuickAction("Risks", icon: "exclamationmark.triangle") {
-                            runAIPlanner(with: "Identify blockers and add mitigation tasks.")
-                        }
+                        Button("Sprint") { runAIPlanner(with: "Plan next week from this input with realistic milestones.") }
+                            .buttonStyle(.bordered)
+                        Button("Triage") { runAIPlanner(with: "Prioritize this backlog and suggest execution order.") }
+                            .buttonStyle(.bordered)
+                        Button("Risks") { runAIPlanner(with: "Identify blockers and add mitigation tasks.") }
+                            .buttonStyle(.bordered)
                     }
+                } header: {
+                    Text("Quick Actions")
+                }
 
+                Section {
                     if aiLoading {
-                        WorkspaceSkeletonLine()
-                        WorkspaceSkeletonLine(widthRatio: 0.7)
+                        ProgressView("Generating plan…")
                     } else if let aiError {
-                        Text(aiError)
-                            .font(.caption)
+                        Label(aiError, systemImage: "exclamationmark.triangle")
                             .foregroundStyle(.red)
                     } else if !aiSummary.isEmpty {
                         Text(aiSummary)
@@ -133,21 +150,17 @@ struct TasksHomeView: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    HStack {
-                        Button("Generate Plan", action: runAIPlanner)
-                            .buttonStyle(.borderedProminent)
-                            .disabled(aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || aiLoading)
-                        Spacer()
-                        if !aiSummary.isEmpty {
-                            Button("Clear") {
-                                aiSummary = ""
-                                aiError = nil
-                            }
-                            .buttonStyle(.bordered)
+                    Button("Generate Plan", action: runAIPlanner)
+                        .buttonStyle(.borderedProminent)
+                        .disabled(aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || aiLoading)
+
+                    if !aiSummary.isEmpty {
+                        Button("Clear") {
+                            aiSummary = ""
+                            aiError = nil
                         }
                     }
                 }
-                .padding(16)
             }
             .navigationTitle("AI Assistant")
             .navigationBarTitleDisplayMode(.inline)
@@ -160,47 +173,7 @@ struct TasksHomeView: View {
         .presentationDetents([.medium, .large])
     }
 
-    private var summaryCards: some View {
-        HStack(spacing: 8) {
-            SDKStatPill(label: "Today", value: "\(manager.todayTasks.count)", color: .blue)
-            SDKStatPill(label: "Upcoming", value: "\(manager.upcomingTasks.count)", color: .orange)
-            SDKStatPill(label: "Completed", value: "\(manager.completedTasks.count)", color: .green)
-        }
-    }
-
-    @ViewBuilder
-    private var contentSections: some View {
-        if manager.tasks.isEmpty {
-            EmptyStateView(
-                icon: "checklist",
-                title: "No Tasks Yet",
-                message: "Create tasks or ask AI to generate a complete task plan.",
-                action: { showingCreate = true },
-                actionLabel: "Create Task"
-            )
-        } else {
-            if !manager.todayTasks.isEmpty {
-                WorkspaceSectionHeader(title: "Today")
-                taskList(filterAndSort(manager.todayTasks))
-            }
-            if !manager.upcomingTasks.isEmpty {
-                WorkspaceSectionHeader(title: "Upcoming")
-                taskList(filterAndSort(manager.upcomingTasks))
-            }
-            if !manager.completedTasks.isEmpty {
-                WorkspaceSectionHeader(title: "Completed")
-                taskList(Array(manager.completedTasks.prefix(8)))
-            }
-        }
-    }
-
-    private func taskList(_ tasks: [WorkspaceTask]) -> some View {
-        VStack(spacing: 8) {
-            ForEach(tasks) { task in
-                TaskRowCard(task: task, manager: manager) { selectedTask = task }
-            }
-        }
-    }
+    // MARK: - Logic
 
     private func runAIPlanner() {
         runAIPlanner(with: aiPrompt)
@@ -234,7 +207,7 @@ struct TasksHomeView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiError = "Couldn’t convert this yet. Natural language is supported, so short plain requests are fine."
+                    aiError = "Couldn't convert this yet. Natural language is supported, so short plain requests are fine."
                     aiLoading = false
                 }
             }
@@ -263,25 +236,15 @@ struct TasksHomeView: View {
         guard !subtasks.isEmpty else { return details }
         return details + "\n" + subtasks.map { "• \($0)" }.joined(separator: "\n")
     }
-
-    private func aiQuickAction(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: icon)
-                .font(.caption.weight(.semibold))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-        }
-        .buttonStyle(.bordered)
-        .accessibilityLabel(title)
-    }
 }
 
-struct TaskRowCard: View {
+// MARK: - Supporting Views
+
+private struct TaskRow: View {
     let task: WorkspaceTask
     @ObservedObject var manager: TasksManager
     let onTap: () -> Void
 
-    private var priorityColor: Color { Color(hex: task.priority.color) ?? .blue }
     private static let shortDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
@@ -289,29 +252,30 @@ struct TaskRowCard: View {
     }()
 
     var body: some View {
-        WorkspaceSurfaceCard {
+        Button(action: onTap) {
             HStack(spacing: 12) {
                 Button { manager.toggleComplete(task) } label: {
                     Image(systemName: task.completed ? "checkmark.circle.fill" : "circle")
                         .font(.title3)
-                        .foregroundStyle(task.completed ? Color.green : Color.secondary)
                 }
                 .buttonStyle(.plain)
-                VStack(alignment: .leading, spacing: 6) {
+
+                VStack(alignment: .leading, spacing: 4) {
                     Text(task.title)
                         .font(.body.weight(.semibold))
                         .strikethrough(task.completed)
-                        .onTapGesture(perform: onTap)
-                    HStack(spacing: 8) {
-                        WorkspaceStatusBadge(title: task.priority.rawValue, color: priorityColor)
+                    HStack(spacing: 6) {
+                        Label(task.priority.rawValue, systemImage: task.priority.icon)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                         if let due = task.dueDate {
-                            WorkspaceStatusBadge(title: shortDate(due), color: task.isOverdue ? .red : .secondary)
+                            Label(Self.shortDateFormatter.string(from: due), systemImage: "calendar")
+                                .font(.caption)
+                                .foregroundStyle(task.isOverdue ? .red : .secondary)
                         }
                     }
                 }
                 Spacer()
-                Button("Open", action: onTap)
-                    .buttonStyle(.bordered)
             }
         }
         .swipeActions(edge: .trailing) {
@@ -320,12 +284,23 @@ struct TaskRowCard: View {
             }
         }
     }
-
-    private func shortDate(_ date: Date) -> String {
-        Self.shortDateFormatter.string(from: date)
-    }
 }
 
+private struct StatLabel: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.headline)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
 
 struct WorkspaceSectionHeader: View {
     let title: String

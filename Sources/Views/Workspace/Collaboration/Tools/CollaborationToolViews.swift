@@ -15,7 +15,7 @@ struct DecisionEngineView: View {
             Section {
                 if filteredDecisions.isEmpty {
                     Text("No Decisions In This Space")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 } else {
                     ForEach(filteredDecisions) { decision in
                         NavigationLink(destination: DecisionDetailView(decision: decision)) {
@@ -135,7 +135,7 @@ struct BoardColumn: View {
                     if !task.dependencyIDs.isEmpty {
                         Text("Has Dependencies")
                             .font(.caption2)
-                            .foregroundColor(.orange)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 .padding()
