@@ -48,13 +48,13 @@ struct SDKFeatureFlagView: View {
         Section("Filter") {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    FilterChip(label: "All", isSelected: selectedCategory == nil) {
+                    FilterChip(title: "All", isSelected: selectedCategory == nil, action: {
                         selectedCategory = nil
-                    }
+                    })
                     ForEach(flagService.categories, id: \.self) { category in
-                        FilterChip(label: category.capitalized, isSelected: selectedCategory == category) {
+                        FilterChip(title: category.capitalized, isSelected: selectedCategory == category, action: {
                             selectedCategory = category
-                        }
+                        })
                     }
                 }
                 .padding(.vertical, 4)
@@ -128,24 +128,6 @@ private struct FlagRow: View {
             }
         }
         .padding(.vertical, 2)
-    }
-}
-
-private struct FilterChip: View {
-    let label: String
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(label)
-                .font(.caption.bold())
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(isSelected ? Color.accentColor : Color.secondary.opacity(0.15), in: Capsule())
-                .foregroundStyle(isSelected ? .white : .primary)
-        }
-        .buttonStyle(.plain)
     }
 }
 
