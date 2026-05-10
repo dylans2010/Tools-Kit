@@ -114,8 +114,8 @@ struct SDKPluginRegistryView: View {
 
             if !plugin.capabilities.isEmpty {
                 Section("Capabilities") {
-                    ForEach(plugin.capabilities, id: \.self) { capability in
-                        Label(capability.rawValue, systemImage: "checkmark.circle")
+                    ForEach(plugin.capabilities) { capability in
+                        Label(capability.name, systemImage: "checkmark.circle")
                             .font(.caption)
                     }
                 }

@@ -13,7 +13,7 @@ public final class AnalyticsPlugin: SDKPluginConformable, ObservableObject {
     public let pluginVersion = "1.0.0"
     public let pluginDescription = "Tracks SDK usage patterns and provides analytics insights"
     public let pluginCategory: SDKPluginCategory = .analytics
-    public let requiredCapabilities: [SDKPluginCapability] = [.analytics, .eventPublishing]
+    public let requiredCapabilities: [SDKPluginCapability] = [SDKPluginCapability(name: "analytics"), SDKPluginCapability(name: "eventPublishing")]
     public let requiredScopes: [String] = ["workspace.analytics.read"]
 
     @Published public private(set) var eventCount: Int = 0

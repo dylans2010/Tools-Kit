@@ -125,7 +125,7 @@ struct SDKSupportView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Image(systemName: "wand.and.stars.inverse")
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(Color.accentColor)
             }
         }
         .sheet(isPresented: $showingPlanDetail) {

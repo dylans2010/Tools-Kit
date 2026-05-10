@@ -126,7 +126,7 @@ public final class RESTAPIConnector: BaseConnector {
             latency: latency
         )
 
-        SDKConnectorMetricsTracker.shared.recordRequest(
+        await SDKConnectorMetricsTracker.shared.recordRequest(
             connectorID: id,
             duration: latency,
             success: apiResponse.isSuccess

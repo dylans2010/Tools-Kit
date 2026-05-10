@@ -66,7 +66,7 @@ struct SDKBuildView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Image(systemName: "shippingbox.fill")
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(Color.accentColor)
             }
         }
         .sheet(isPresented: $showingConsole) {

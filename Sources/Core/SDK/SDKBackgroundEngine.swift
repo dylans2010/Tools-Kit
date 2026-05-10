@@ -2,7 +2,7 @@ import Foundation
 import Combine
 import BackgroundTasks
 
-public struct SDKHealthReport {
+public struct SDKBackgroundHealthReport {
     public var connectorReachability: Bool
     public var pluginSandboxStatus: Bool
     public var coreDataHealth: Bool
@@ -14,7 +14,7 @@ public struct SDKHealthReport {
 public final class SDKBackgroundEngine: ObservableObject {
     public static let shared = SDKBackgroundEngine()
 
-    @Published public var systemHealth = SDKHealthReport(connectorReachability: true, pluginSandboxStatus: true, coreDataHealth: true, lastCheck: Date(), details: [:])
+    @Published public var systemHealth = SDKBackgroundHealthReport(connectorReachability: true, pluginSandboxStatus: true, coreDataHealth: true, lastCheck: Date(), details: [:])
 
     private let syncQueue = DispatchQueue(label: "com.toolskit.sdk.sync", attributes: .concurrent)
     private var healthTimer: AnyCancellable?
@@ -54,7 +54,7 @@ public final class SDKBackgroundEngine: ObservableObject {
                 details["connector.\(connector.name)"] = reachable
             }
 
-            systemHealth = SDKHealthReport(
+            systemHealth = SDKBackgroundHealthReport(
                 connectorReachability: connectorsHealthy,
                 pluginSandboxStatus: pluginsHealthy,
                 coreDataHealth: storageHealthy,
