@@ -76,7 +76,7 @@ struct SDKConnectorBindingView: View {
                                     .font(.system(size: 8, weight: .medium))
                                     .padding(.horizontal, 6).padding(.vertical, 2)
                                     .background(Color.accentColor.opacity(0.1), in: Capsule())
-                                    .foregroundStyle(.accent)
+                                    .foregroundStyle(Color.accentColor)
                                 Text(binding.createdAt.formatted(date: .abbreviated, time: .omitted))
                                     .font(.caption2).foregroundStyle(.tertiary)
                             }
@@ -103,7 +103,7 @@ struct SDKConnectorBindingView: View {
             ForEach(binder.templates.prefix(3)) { template in
                 HStack {
                     Image(systemName: template.iconName)
-                        .font(.title3).foregroundStyle(.accent)
+                        .font(.title3).foregroundStyle(Color.accentColor)
                         .frame(width: 28)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(template.name).font(.subheadline.bold())
@@ -210,7 +210,7 @@ struct SDKConnectorBindingView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Image(systemName: template.iconName)
-                            .font(.title2).foregroundStyle(.accent)
+                            .font(.title2).foregroundStyle(Color.accentColor)
                         VStack(alignment: .leading) {
                             Text(template.name).font(.subheadline.bold())
                             Text(template.description).font(.caption).foregroundStyle(.secondary)

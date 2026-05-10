@@ -135,7 +135,7 @@ struct SDKSupportView: View {
         Section {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Image(systemName: "sparkles").font(.title2).foregroundStyle(.accent)
+                    Image(systemName: "sparkles").font(.title2).foregroundStyle(Color.accentColor)
                     VStack(alignment: .leading) {
                         Text("AI App Generation").font(.headline)
                         Text("Describe your app in natural language").font(.caption).foregroundStyle(.secondary)
@@ -175,11 +175,11 @@ struct SDKSupportView: View {
                             }
                         } icon: {
                             Image(systemName: template.icon)
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(Color.accentColor)
                         }
                         Spacer()
                         if selectedTemplate == template {
-                            Image(systemName: "checkmark.circle.fill").foregroundStyle(.accent)
+                            Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.accentColor)
                         }
                     }
                 }
@@ -283,7 +283,7 @@ struct SDKSupportView: View {
                             Text(conn.purpose).font(.caption).foregroundStyle(.secondary)
                         }
                         Spacer()
-                        Text(conn.type).font(.caption.monospaced()).foregroundStyle(.accent)
+                        Text(conn.type).font(.caption.monospaced()).foregroundStyle(Color.accentColor)
                     }
                 }
             }

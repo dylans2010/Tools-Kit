@@ -114,7 +114,7 @@ struct SDKHelpView: View {
                 VStack(spacing: 8) {
                     Image(systemName: "questionmark.bubble.fill")
                         .font(.system(size: 48))
-                        .foregroundStyle(.accent.opacity(0.6))
+                        .foregroundStyle(Color.accentColor.opacity(0.6))
                     Text("SDK Help Assistant")
                         .font(.title3.bold())
                     Text("Ask about modules, plugins, connectors, dependencies, or any SDK feature.")
@@ -157,7 +157,7 @@ struct SDKHelpView: View {
                             if message.role == .assistant {
                                 Image(systemName: "cpu")
                                     .font(.caption)
-                                    .foregroundStyle(.accent)
+                                    .foregroundStyle(Color.accentColor)
                                     .padding(.top, 4)
                             }
                             VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
@@ -205,7 +205,7 @@ struct SDKHelpView: View {
             Button(action: { submitQuery(query) }) {
                 Image(systemName: "arrow.up.circle.fill")
                     .font(.title2)
-                    .foregroundStyle(query.trimmingCharacters(in: .whitespaces).isEmpty ? .secondary : .accent)
+                    .foregroundStyle(query.trimmingCharacters(in: .whitespaces).isEmpty ? Color.secondary : Color.accentColor)
             }
             .disabled(query.trimmingCharacters(in: .whitespaces).isEmpty || isLoading)
         }

@@ -10341,7 +10341,20 @@
 				PL02000000000000000000000E /* SDKFlowBuilderView.swift in Sources */,
 				PL02000000000000000000000F /* SDKDataControlView.swift in Sources */,
 				PL020000000000000000000010 /* SDKPermissionControlView.swift in Sources */,
-				DV0200000000000000000015 /* SDKUIComponents.swift in Sources */,);
+				DV0200000000000000000015 /* SDKUIComponents.swift in Sources */,
+				EXP200000000000000000001 /* SDKModuleRegistry.swift in Sources */,
+				EXP200000000000000000002 /* SDKDependencyGraph.swift in Sources */,
+				EXP200000000000000000003 /* SDKFeatureExposure.swift in Sources */,
+				EXP200000000000000000004 /* SDKPluginLifecycle.swift in Sources */,
+				EXP200000000000000000005 /* SDKConnectorRuntime.swift in Sources */,
+				EXP200000000000000000006 /* SDKDownloadView.swift in Sources */,
+				EXP200000000000000000007 /* CustomAppSDKView.swift in Sources */,
+				EXP200000000000000000008 /* SDKHelpView.swift in Sources */,
+				EXP200000000000000000009 /* SDKSupportView.swift in Sources */,
+				EXP20000000000000000000A /* SDKModuleRegistryView.swift in Sources */,
+				EXP20000000000000000000B /* SDKPluginLifecycleView.swift in Sources */,
+				EXP20000000000000000000C /* SDKConnectorBindingView.swift in Sources */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		KB0400000000000000000201 /* Sources */ = {
@@ -10408,18 +10421,6 @@
 				MS028F0C9AC0045039A23CD0 /* MessageBubbleView.swift in Sources */,
 				MS026A2894802C56D5AB5FC3 /* SegmentSwitcher.swift in Sources */,
 				MS028A4E8FF9A0449D039277 /* JSONCoder.swift in Sources */,
-				EXP200000000000000000001 /* SDKModuleRegistry.swift in Sources */,
-				EXP200000000000000000002 /* SDKDependencyGraph.swift in Sources */,
-				EXP200000000000000000003 /* SDKFeatureExposure.swift in Sources */,
-				EXP200000000000000000004 /* SDKPluginLifecycle.swift in Sources */,
-				EXP200000000000000000005 /* SDKConnectorRuntime.swift in Sources */,
-				EXP200000000000000000006 /* SDKDownloadView.swift in Sources */,
-				EXP200000000000000000007 /* CustomAppSDKView.swift in Sources */,
-				EXP200000000000000000008 /* SDKHelpView.swift in Sources */,
-				EXP200000000000000000009 /* SDKSupportView.swift in Sources */,
-				EXP20000000000000000000A /* SDKModuleRegistryView.swift in Sources */,
-				EXP20000000000000000000B /* SDKPluginLifecycleView.swift in Sources */,
-				EXP20000000000000000000C /* SDKConnectorBindingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
