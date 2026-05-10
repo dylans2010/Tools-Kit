@@ -12,11 +12,8 @@ final class EditorState: ObservableObject {
     @Published var playheadPosition: Double = 0.0
     @Published var timelineDuration: Double = 30.0
     @Published var activePanel: EditorPanel = .tools
+    @Published var isQuickEditMode: Bool
 
-    @Published var brightness: Double = 0.0
-    @Published var contrast: Double = 1.0
-    @Published var saturation: Double = 1.0
-    @Published var temperature: Double = 0.0
     @Published var selectedFilterName: String?
 
     @Published var showingAssetLibrary = false
@@ -39,8 +36,16 @@ final class EditorState: ObservableObject {
         project.layers.first { $0.id == selectedLayerID }
     }
 
-    init(project: EditingProject) {
+    var selectedLayerIndex: Int? {
+        project.layers.firstIndex { $0.id == selectedLayerID }
+    }
+
+    init(project: EditingProject, quickEdit: Bool = false) {
         self.project = project
+        self.isQuickEditMode = quickEdit
+        if let first = project.layers.first {
+            self.selectedLayerID = first.id
+        }
     }
 
     func addLayer(type: LayerType, name: String) {
@@ -59,7 +64,7 @@ final class EditorState: ObservableObject {
 
     func removeLayer(id: UUID) {
         project.layers.removeAll { $0.id == id }
-        if selectedLayerID == id { selectedLayerID = nil }
+        if selectedLayerID == id { selectedLayerID = project.layers.first?.id }
         project.timelineTracks = project.timelineTracks.map { track in
             var t = track
             t.layerIDs.removeAll { $0 == id }
@@ -73,6 +78,12 @@ final class EditorState: ObservableObject {
         save()
     }
 
+    func toggleLayerVisibility(id: UUID) {
+        guard let idx = project.layers.firstIndex(where: { $0.id == id }) else { return }
+        project.layers[idx].isVisible.toggle()
+        save()
+    }
+
     func applyFilter(name: String, intensity: Double) {
         guard let idx = project.layers.firstIndex(where: { $0.id == selectedLayerID }) else { return }
         let filter = MediaFilter(id: UUID(), name: name, intensity: intensity)
@@ -83,6 +94,12 @@ final class EditorState: ObservableObject {
     func removeFilter(filterID: UUID) {
         guard let layerIdx = project.layers.firstIndex(where: { $0.id == selectedLayerID }) else { return }
         project.layers[layerIdx].filters.removeAll { $0.id == filterID }
+        save()
+    }
+
+    func updateAdjustment(keyPath: WritableKeyPath<LayerAdjustments, Double>, value: Double) {
+        guard let idx = selectedLayerIndex else { return }
+        project.layers[idx].adjustments[keyPath: keyPath] = value
         save()
     }
 
@@ -152,14 +169,15 @@ final class EditorState: ObservableObject {
 enum EditorTool: String, CaseIterable, Identifiable {
     case select = "Select"
     case crop = "Crop"
-    case trim = "Trim"
-    case split = "Split"
     case brush = "Brush"
+    case eraser = "Eraser"
     case text = "Text"
-    case shape = "Shape"
+    case transform = "Transform"
     case filter = "Filter"
     case adjust = "Adjust"
-    case transform = "Transform"
+    case trim = "Trim"
+    case split = "Split"
+    case shape = "Shape"
     case transition = "Transition"
     case keyframe = "Keyframe"
 
@@ -169,17 +187,22 @@ enum EditorTool: String, CaseIterable, Identifiable {
         switch self {
         case .select: return "cursorarrow"
         case .crop: return "crop"
-        case .trim: return "timeline.selection"
-        case .split: return "scissors"
         case .brush: return "paintbrush"
+        case .eraser: return "eraser"
         case .text: return "textformat"
-        case .shape: return "square.on.circle"
+        case .transform: return "arrow.up.left.and.arrow.down.right"
         case .filter: return "camera.filters"
         case .adjust: return "slider.horizontal.3"
-        case .transform: return "arrow.up.left.and.arrow.down.right"
+        case .trim: return "timeline.selection"
+        case .split: return "scissors"
+        case .shape: return "square.on.circle"
         case .transition: return "rectangle.connected.to.line.below"
         case .keyframe: return "diamond"
         }
+    }
+
+    static var quickEditTools: [EditorTool] {
+        [.select, .crop, .filter, .adjust, .text]
     }
 }
 
@@ -209,12 +232,14 @@ enum EditorPanel: String, CaseIterable, Identifiable {
 
 struct FullEditorView: View {
     let projectID: UUID
+    let initialQuickEdit: Bool
     @StateObject private var manager = EditingManager.shared
     @StateObject private var state: EditorState
     @Environment(\.dismiss) var dismiss
 
-    init(projectID: UUID) {
+    init(projectID: UUID, initialQuickEdit: Bool = false) {
         self.projectID = projectID
+        self.initialQuickEdit = initialQuickEdit
         let project = EditingManager.shared.projects.first { $0.id == projectID }
             ?? EditingProject(
                 id: projectID,
@@ -226,7 +251,7 @@ struct FullEditorView: View {
                 createdAt: Date(),
                 updatedAt: Date()
             )
-        _state = StateObject(wrappedValue: EditorState(project: project))
+        _state = StateObject(wrappedValue: EditorState(project: project, quickEdit: initialQuickEdit))
     }
 
     var body: some View {
@@ -234,6 +259,88 @@ struct FullEditorView: View {
             editorToolbar
             Divider()
 
+            if state.isQuickEditMode {
+                quickEditLayout
+            } else {
+                fullEditorLayout
+            }
+        }
+        .navigationBarHidden(true)
+        .sheet(isPresented: $state.showingAssetLibrary) {
+            NavigationStack { AssetLibraryView(state: state) }
+                .presentationDetents([.large])
+        }
+        .sheet(isPresented: $state.showingExportSheet) {
+            NavigationStack { ExportView(state: state) }
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $state.showingTextOverlay) {
+            NavigationStack { TextOverlaySheet(state: state) }
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+        }
+    }
+
+    private var hasVideoContent: Bool {
+        state.project.layers.contains { $0.type == .video } || !state.project.timelineTracks.isEmpty
+    }
+
+    // MARK: - Toolbar
+
+    private var editorToolbar: some View {
+        HStack(spacing: 12) {
+            Button { dismiss() } label: {
+                Image(systemName: "chevron.left")
+                    .font(.body.bold())
+            }
+
+            Text(state.project.name)
+                .font(.headline)
+                .lineLimit(1)
+
+            Spacer()
+
+            modeToggle
+
+            Spacer()
+
+            HStack(spacing: 14) {
+                Button { state.undo() } label: {
+                    Image(systemName: "arrow.uturn.backward")
+                }
+                Button { state.redo() } label: {
+                    Image(systemName: "arrow.uturn.forward")
+                }
+                if !state.isQuickEditMode {
+                    Button { state.showingAssetLibrary = true } label: {
+                        Image(systemName: "photo.on.rectangle.angled")
+                    }
+                }
+                Button { state.showingExportSheet = true } label: {
+                    Label("Export", systemImage: "square.and.arrow.up")
+                        .font(.subheadline.bold())
+                }
+            }
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(.ultraThinMaterial)
+    }
+
+    private var modeToggle: some View {
+        Picker("Mode", selection: $state.isQuickEditMode) {
+            Label("Quick", systemImage: "bolt.fill").tag(true)
+            Label("Full", systemImage: "slider.horizontal.below.square.and.square.filled").tag(false)
+        }
+        .pickerStyle(.segmented)
+        .frame(width: 180)
+    }
+
+    // MARK: - Full Editor Layout
+
+    private var fullEditorLayout: some View {
+        VStack(spacing: 0) {
             GeometryReader { geo in
                 if geo.size.width > 700 {
                     HStack(spacing: 0) {
@@ -258,58 +365,192 @@ struct FullEditorView: View {
                 timelinePanel
             }
         }
-        .sheet(isPresented: $state.showingAssetLibrary) {
-            NavigationStack { AssetLibraryView(state: state) }
-                .presentationDetents([.large])
-        }
-        .sheet(isPresented: $state.showingExportSheet) {
-            NavigationStack { ExportView(state: state) }
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
-        }
-        .sheet(isPresented: $state.showingTextOverlay) {
-            NavigationStack { TextOverlaySheet(state: state) }
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
+    }
+
+    // MARK: - Quick Edit Layout
+
+    private var quickEditLayout: some View {
+        VStack(spacing: 0) {
+            canvasArea
+            Divider()
+            quickEditControls
         }
     }
 
-    private var hasVideoContent: Bool {
-        state.project.layers.contains { $0.type == .video } || !state.project.timelineTracks.isEmpty
-    }
-
-    // MARK: - Toolbar
-
-    private var editorToolbar: some View {
-        HStack {
-            Button { dismiss() } label: {
-                Image(systemName: "chevron.left")
+    private var quickEditControls: some View {
+        VStack(spacing: 0) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    ForEach(EditorTool.quickEditTools) { tool in
+                        Button {
+                            state.selectedTool = tool
+                            if tool == .text { state.showingTextOverlay = true }
+                        } label: {
+                            VStack(spacing: 4) {
+                                Image(systemName: tool.icon)
+                                    .font(.title3)
+                                Text(tool.rawValue)
+                                    .font(.system(size: 10))
+                            }
+                            .foregroundStyle(state.selectedTool == tool ? Color.accentColor : .secondary)
+                            .frame(width: 56, height: 52)
+                            .background(
+                                state.selectedTool == tool
+                                    ? Color.accentColor.opacity(0.12)
+                                    : Color.clear,
+                                in: RoundedRectangle(cornerRadius: 10)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
             }
 
-            Text(state.project.name)
-                .font(.headline)
+            Divider()
 
-            Spacer()
-
-            HStack(spacing: 16) {
-                Button { state.undo() } label: {
-                    Image(systemName: "arrow.uturn.backward")
-                }
-                Button { state.redo() } label: {
-                    Image(systemName: "arrow.uturn.forward")
-                }
-                Button { state.showingAssetLibrary = true } label: {
-                    Image(systemName: "photo.on.rectangle.angled")
-                }
-                Button { state.showingExportSheet = true } label: {
-                    Label("Export", systemImage: "square.and.arrow.up")
-                        .font(.subheadline.bold())
-                }
-            }
+            quickEditParameterPanel
+                .frame(height: 160)
         }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
         .background(.ultraThinMaterial)
+    }
+
+    @ViewBuilder
+    private var quickEditParameterPanel: some View {
+        switch state.selectedTool {
+        case .filter:
+            quickFilterGrid
+        case .adjust:
+            quickAdjustmentSliders
+        case .crop:
+            quickCropPresets
+        default:
+            quickAdjustmentSliders
+        }
+    }
+
+    private var quickFilterGrid: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(EditorFilterLibrary.filters, id: \.name) { preset in
+                    Button {
+                        state.applyFilter(name: preset.name, intensity: preset.defaultIntensity)
+                    } label: {
+                        VStack(spacing: 6) {
+                            Image(systemName: preset.icon)
+                                .font(.title2)
+                                .frame(width: 56, height: 56)
+                                .background(Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+                            Text(preset.name)
+                                .font(.caption2)
+                        }
+                        .foregroundStyle(.primary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding()
+        }
+    }
+
+    private var quickAdjustmentSliders: some View {
+        ScrollView {
+            VStack(spacing: 10) {
+                if let idx = state.selectedLayerIndex {
+                    adjustmentRow(
+                        label: "Brightness",
+                        icon: "sun.max",
+                        value: Binding(
+                            get: { state.project.layers[idx].adjustments.brightness },
+                            set: { state.updateAdjustment(keyPath: \.brightness, value: $0) }
+                        ),
+                        range: -1...1
+                    )
+                    adjustmentRow(
+                        label: "Contrast",
+                        icon: "circle.lefthalf.filled",
+                        value: Binding(
+                            get: { state.project.layers[idx].adjustments.contrast },
+                            set: { state.updateAdjustment(keyPath: \.contrast, value: $0) }
+                        ),
+                        range: 0...2
+                    )
+                    adjustmentRow(
+                        label: "Saturation",
+                        icon: "paintpalette",
+                        value: Binding(
+                            get: { state.project.layers[idx].adjustments.saturation },
+                            set: { state.updateAdjustment(keyPath: \.saturation, value: $0) }
+                        ),
+                        range: 0...2
+                    )
+                    adjustmentRow(
+                        label: "Temperature",
+                        icon: "thermometer.medium",
+                        value: Binding(
+                            get: { state.project.layers[idx].adjustments.temperature },
+                            set: { state.updateAdjustment(keyPath: \.temperature, value: $0) }
+                        ),
+                        range: -1...1
+                    )
+                } else {
+                    Text("Select a layer to adjust")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+        }
+    }
+
+    private var quickCropPresets: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(CanvasPreset.allCases, id: \.name) { preset in
+                    Button {
+                        state.project.canvasSize = preset.size
+                        state.save()
+                    } label: {
+                        VStack(spacing: 6) {
+                            Image(systemName: "aspectratio")
+                                .font(.title2)
+                                .frame(width: 56, height: 56)
+                                .background(
+                                    state.project.canvasSize == preset.size
+                                        ? Color.accentColor.opacity(0.15)
+                                        : Color.secondary.opacity(0.1),
+                                    in: RoundedRectangle(cornerRadius: 12)
+                                )
+                            Text(preset.name)
+                                .font(.caption2)
+                                .lineLimit(1)
+                        }
+                        .foregroundStyle(.primary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding()
+        }
+    }
+
+    private func adjustmentRow(label: String, icon: String, value: Binding<Double>, range: ClosedRange<Double>) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .frame(width: 20)
+                .foregroundStyle(.secondary)
+            Text(label)
+                .font(.caption)
+                .frame(width: 72, alignment: .leading)
+            Slider(value: value, in: range)
+            Text(String(format: "%.2f", value.wrappedValue))
+                .font(.caption.monospaced())
+                .frame(width: 40, alignment: .trailing)
+                .foregroundStyle(.secondary)
+        }
     }
 
     // MARK: - Tool Rail
@@ -323,9 +564,15 @@ struct FullEditorView: View {
                 } label: {
                     Image(systemName: tool.icon)
                         .frame(width: 36, height: 36)
-                        .background(state.selectedTool == tool ? Color.accentColor.opacity(0.15) : Color.clear, in: RoundedRectangle(cornerRadius: 6))
+                        .background(
+                            state.selectedTool == tool
+                                ? Color.accentColor.opacity(0.15)
+                                : Color.clear,
+                            in: RoundedRectangle(cornerRadius: 6)
+                        )
                 }
                 .buttonStyle(.plain)
+                .help(tool.rawValue)
             }
             Spacer()
         }
@@ -337,34 +584,57 @@ struct FullEditorView: View {
     // MARK: - Canvas
 
     private var canvasArea: some View {
-        ZStack {
-            Color(.systemGroupedBackground)
-                .ignoresSafeArea()
+        GeometryReader { geo in
+            let canvasW = state.project.canvasSize.width
+            let canvasH = state.project.canvasSize.height
+            let fitScale = min(
+                (geo.size.width - 32) / canvasW,
+                (geo.size.height - 32) / canvasH,
+                1.0
+            )
 
-            canvasContent
-                .scaleEffect(state.canvasZoom)
-                .offset(state.canvasOffset)
-                .gesture(canvasGestures)
+            ZStack {
+                Color(.systemGroupedBackground)
+
+                canvasBoard(fitScale: fitScale)
+                    .scaleEffect(state.canvasZoom)
+                    .offset(state.canvasOffset)
+                    .gesture(canvasGestures)
+            }
+            .clipped()
         }
     }
 
-    private var canvasContent: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 4)
-                .fill(.background)
-                .frame(
-                    width: state.project.canvasSize.width * 0.2,
-                    height: state.project.canvasSize.height * 0.2
-                )
-                .shadow(radius: 4)
+    private func canvasBoard(fitScale: CGFloat) -> some View {
+        let canvasW = state.project.canvasSize.width * fitScale
+        let canvasH = state.project.canvasSize.height * fitScale
 
-            ForEach(state.project.layers.filter(\.isVisible)) { layer in
-                CanvasLayerView(
-                    layer: layer,
-                    isSelected: layer.id == state.selectedLayerID,
-                    onSelect: { state.selectedLayerID = layer.id }
-                )
+        return ZStack {
+            RoundedRectangle(cornerRadius: 4)
+                .fill(Color(.systemBackground))
+                .frame(width: canvasW, height: canvasH)
+                .shadow(color: .black.opacity(0.15), radius: 8, y: 2)
+
+            ZStack {
+                ForEach(state.project.layers.filter(\.isVisible)) { layer in
+                    CanvasLayerView(
+                        layer: layer,
+                        isSelected: layer.id == state.selectedLayerID,
+                        fitScale: fitScale,
+                        canvasSize: state.project.canvasSize,
+                        activeTool: state.selectedTool,
+                        onSelect: { state.selectedLayerID = layer.id },
+                        onDrag: { offset in
+                            guard state.selectedTool == .select,
+                                  let idx = state.project.layers.firstIndex(where: { $0.id == layer.id }) else { return }
+                            state.project.layers[idx].position.x += offset.width / fitScale
+                            state.project.layers[idx].position.y += offset.height / fitScale
+                        }
+                    )
+                }
             }
+            .frame(width: canvasW, height: canvasH)
+            .clipped()
         }
     }
 
@@ -372,7 +642,7 @@ struct FullEditorView: View {
         SimultaneousGesture(
             MagnificationGesture()
                 .onChanged { value in
-                    state.canvasZoom = max(0.25, min(4.0, value))
+                    state.canvasZoom = max(0.25, min(5.0, value))
                 },
             DragGesture()
                 .onChanged { value in
@@ -387,38 +657,37 @@ struct FullEditorView: View {
         List {
             Section("Layers") {
                 ForEach(state.project.layers) { layer in
-                    HStack {
+                    HStack(spacing: 8) {
                         Image(systemName: iconFor(layer.type))
-                            .foregroundStyle(layer.id == state.selectedLayerID ? Color.accentColor : Color.secondary)
+                            .foregroundStyle(
+                                layer.id == state.selectedLayerID
+                                    ? Color.accentColor
+                                    : Color.secondary
+                            )
+                            .frame(width: 20)
                         VStack(alignment: .leading, spacing: 1) {
                             Text(layer.name).font(.caption.bold())
-                            if let resourceID = layer.resourceID, !resourceID.isEmpty {
-                                if let url = URL(string: resourceID) {
-                                    Text(url.lastPathComponent)
-                                        .font(.system(size: 8, design: .monospaced))
-                                        .foregroundStyle(.blue)
-                                } else {
-                                    Text(String(resourceID.prefix(16)))
-                                        .font(.system(size: 8, design: .monospaced))
-                                        .foregroundStyle(.blue)
-                                }
-                            } else {
-                                Text(layer.type.rawValue.capitalized).font(.caption2).foregroundStyle(.secondary)
-                            }
+                            Text(layer.type.rawValue.capitalized)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
                         }
                         Spacer()
-                        if layer.resourceID != nil && !layer.resourceID!.isEmpty {
-                            Image(systemName: "link.circle.fill")
+                        Button {
+                            state.toggleLayerVisibility(id: layer.id)
+                        } label: {
+                            Image(systemName: layer.isVisible ? "eye.fill" : "eye.slash.fill")
                                 .font(.caption2)
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(.secondary)
                         }
-                        Image(systemName: layer.isVisible ? "eye.fill" : "eye.slash.fill")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                        .buttonStyle(.plain)
                     }
                     .contentShape(Rectangle())
                     .onTapGesture { state.selectedLayerID = layer.id }
-                    .listRowBackground(layer.id == state.selectedLayerID ? Color.accentColor.opacity(0.08) : nil)
+                    .listRowBackground(
+                        layer.id == state.selectedLayerID
+                            ? Color.accentColor.opacity(0.08)
+                            : nil
+                    )
                 }
                 .onMove(perform: state.moveLayer)
                 .onDelete { offsets in
@@ -439,6 +708,7 @@ struct FullEditorView: View {
 
             if let layer = state.selectedLayer {
                 layerPropertiesSection(layer)
+                layerAdjustmentsSection(layer)
             }
 
             toolSpecificSection
@@ -491,6 +761,52 @@ struct FullEditorView: View {
         }
     }
 
+    // MARK: - Layer Adjustments (Inspector)
+
+    @ViewBuilder
+    private func layerAdjustmentsSection(_ layer: EditingLayer) -> some View {
+        if let idx = state.project.layers.firstIndex(where: { $0.id == layer.id }) {
+            Section("Adjustments") {
+                adjustmentRow(
+                    label: "Brightness",
+                    icon: "sun.max",
+                    value: Binding(
+                        get: { state.project.layers[idx].adjustments.brightness },
+                        set: { state.project.layers[idx].adjustments.brightness = $0; state.save() }
+                    ),
+                    range: -1...1
+                )
+                adjustmentRow(
+                    label: "Contrast",
+                    icon: "circle.lefthalf.filled",
+                    value: Binding(
+                        get: { state.project.layers[idx].adjustments.contrast },
+                        set: { state.project.layers[idx].adjustments.contrast = $0; state.save() }
+                    ),
+                    range: 0...2
+                )
+                adjustmentRow(
+                    label: "Saturation",
+                    icon: "paintpalette",
+                    value: Binding(
+                        get: { state.project.layers[idx].adjustments.saturation },
+                        set: { state.project.layers[idx].adjustments.saturation = $0; state.save() }
+                    ),
+                    range: 0...2
+                )
+                adjustmentRow(
+                    label: "Temperature",
+                    icon: "thermometer.medium",
+                    value: Binding(
+                        get: { state.project.layers[idx].adjustments.temperature },
+                        set: { state.project.layers[idx].adjustments.temperature = $0; state.save() }
+                    ),
+                    range: -1...1
+                )
+            }
+        }
+    }
+
     // MARK: - Tool-Specific Section
 
     @ViewBuilder
@@ -510,27 +826,7 @@ struct FullEditorView: View {
                 }
             }
         case .adjust:
-            Section("Adjustments") {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Brightness").font(.caption2)
-                    Slider(value: $state.brightness, in: -1...1)
-                }
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Contrast").font(.caption2)
-                    Slider(value: $state.contrast, in: 0...2)
-                }
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Saturation").font(.caption2)
-                    Slider(value: $state.saturation, in: 0...2)
-                }
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Temperature").font(.caption2)
-                    Slider(value: $state.temperature, in: -1...1)
-                }
-                Button("Apply Adjustments") {
-                    state.applyFilter(name: "Adjustments", intensity: 1.0)
-                }
-            }
+            EmptyView()
         case .transform:
             Section("Transform") {
                 if let layerIdx = state.project.layers.firstIndex(where: { $0.id == state.selectedLayerID }) {
@@ -643,18 +939,10 @@ struct FullEditorView: View {
                 LabeledContent("Time", value: formattedTime(state.playheadPosition))
                 if let layer = state.selectedLayer {
                     LabeledContent("Layer", value: layer.name)
-                    Button("Add Position Keyframe") {
-                        state.save()
-                    }
-                    Button("Add Scale Keyframe") {
-                        state.save()
-                    }
-                    Button("Add Opacity Keyframe") {
-                        state.save()
-                    }
-                    Button("Add Rotation Keyframe") {
-                        state.save()
-                    }
+                    Button("Add Position Keyframe") { state.save() }
+                    Button("Add Scale Keyframe") { state.save() }
+                    Button("Add Opacity Keyframe") { state.save() }
+                    Button("Add Rotation Keyframe") { state.save() }
                 } else {
                     Text("Select a layer to add keyframes")
                         .font(.caption)
@@ -715,7 +1003,12 @@ struct FullEditorView: View {
                                 .font(.system(size: 9))
                         }
                         .frame(width: 50, height: 50)
-                        .background(state.selectedTool == tool ? Color.accentColor.opacity(0.15) : Color.clear, in: RoundedRectangle(cornerRadius: 8))
+                        .background(
+                            state.selectedTool == tool
+                                ? Color.accentColor.opacity(0.15)
+                                : Color.clear,
+                            in: RoundedRectangle(cornerRadius: 8)
+                        )
                     }
                     .buttonStyle(.plain)
                 }
@@ -737,7 +1030,9 @@ struct FullEditorView: View {
                     }
                     .frame(width: 56, height: 56)
                     .background(
-                        layer.id == state.selectedLayerID ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.1),
+                        layer.id == state.selectedLayerID
+                            ? Color.accentColor.opacity(0.15)
+                            : Color.secondary.opacity(0.1),
                         in: RoundedRectangle(cornerRadius: 8)
                     )
                     .onTapGesture { state.selectedLayerID = layer.id }
@@ -770,6 +1065,8 @@ struct FullEditorView: View {
                 LabeledContent("Name", value: layer.name)
                 LabeledContent("Opacity", value: String(format: "%.0f%%", layer.opacity * 100))
                 LabeledContent("Filters", value: "\(layer.filters.count)")
+                LabeledContent("Brightness", value: String(format: "%.2f", layer.adjustments.brightness))
+                LabeledContent("Contrast", value: String(format: "%.2f", layer.adjustments.contrast))
             } else {
                 Text("Select a layer").font(.caption).foregroundStyle(.secondary)
             }
@@ -892,96 +1189,135 @@ struct FullEditorView: View {
     }
 }
 
-// MARK: - Canvas Layer
+// MARK: - Canvas Layer View
 
 private struct CanvasLayerView: View {
     let layer: EditingLayer
     let isSelected: Bool
+    let fitScale: CGFloat
+    let canvasSize: CGSize
+    let activeTool: EditorTool
     let onSelect: () -> Void
+    let onDrag: (CGSize) -> Void
 
-    private var hasImportedResource: Bool {
-        layer.resourceID != nil && !layer.resourceID!.isEmpty
-    }
+    @State private var dragOffset: CGSize = .zero
 
-    private var resourceLabel: String {
-        guard let resourceID = layer.resourceID else { return layer.name }
-        if let url = URL(string: resourceID) {
-            return url.lastPathComponent
-        }
-        return String(resourceID.prefix(12))
+    private var scaledPosition: CGPoint {
+        CGPoint(
+            x: layer.position.x * fitScale,
+            y: layer.position.y * fitScale
+        )
     }
 
     var body: some View {
-        Group {
-            switch layer.type {
-            case .text:
-                Text(layer.textContent ?? "Text")
-                    .font(.title3)
-            case .shape:
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.secondary.opacity(0.3))
-                    .frame(width: 80, height: 60)
-            case .image:
-                if hasImportedResource {
-                    VStack(spacing: 4) {
-                        Image(systemName: "photo.fill")
-                            .font(.system(size: 30))
-                            .foregroundStyle(.blue)
-                        Text(resourceLabel)
-                            .font(.system(size: 7))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
-                    .frame(width: 80, height: 60)
-                    .background(Color.blue.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
-                } else {
-                    Image(systemName: "photo")
-                        .font(.system(size: 40))
-                        .foregroundStyle(.secondary)
+        layerContent
+            .opacity(layer.opacity)
+            .brightness(layer.adjustments.brightness)
+            .contrast(layer.adjustments.contrast)
+            .saturation(layer.adjustments.saturation)
+            .scaleEffect(layer.scale)
+            .rotationEffect(.radians(layer.rotation))
+            .position(
+                x: scaledPosition.x + dragOffset.width,
+                y: scaledPosition.y + dragOffset.height
+            )
+            .overlay {
+                if isSelected {
+                    selectionBorder
                 }
-            case .video:
-                if hasImportedResource {
-                    VStack(spacing: 4) {
-                        Image(systemName: "video.fill")
-                            .font(.system(size: 30))
-                            .foregroundStyle(.purple)
-                        Text(resourceLabel)
-                            .font(.system(size: 7))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
+            }
+            .onTapGesture(perform: onSelect)
+            .gesture(
+                DragGesture()
+                    .onChanged { value in
+                        guard activeTool == .select else { return }
+                        dragOffset = value.translation
                     }
-                    .frame(width: 80, height: 60)
-                    .background(Color.purple.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
-                } else {
-                    Image(systemName: "video")
-                        .font(.system(size: 40))
+                    .onEnded { value in
+                        guard activeTool == .select else { return }
+                        onDrag(value.translation)
+                        dragOffset = .zero
+                    }
+            )
+    }
+
+    @ViewBuilder
+    private var layerContent: some View {
+        switch layer.type {
+        case .text:
+            Text(layer.textContent ?? "Text")
+                .font(.title3)
+        case .shape:
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.secondary.opacity(0.3))
+                .frame(width: 80 * fitScale, height: 60 * fitScale)
+        case .image:
+            imageLayerContent
+        case .video:
+            videoLayerContent
+        case .brush:
+            Image(systemName: "scribble")
+                .font(.system(size: 40 * fitScale))
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    @ViewBuilder
+    private var imageLayerContent: some View {
+        let hasResource = layer.resourceID != nil && !layer.resourceID!.isEmpty
+        if hasResource {
+            VStack(spacing: 4) {
+                Image(systemName: "photo.fill")
+                    .font(.system(size: 30 * fitScale))
+                    .foregroundStyle(.blue)
+                if let resourceID = layer.resourceID, let url = URL(string: resourceID) {
+                    Text(url.lastPathComponent)
+                        .font(.system(size: max(7, 9 * fitScale)))
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
                 }
-            case .brush:
-                Image(systemName: "scribble")
-                    .font(.system(size: 40))
-                    .foregroundStyle(.secondary)
             }
+            .frame(width: 100 * fitScale, height: 80 * fitScale)
+            .background(Color.blue.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
+        } else {
+            Image(systemName: "photo")
+                .font(.system(size: 40 * fitScale))
+                .foregroundStyle(.secondary)
         }
-        .opacity(layer.opacity)
-        .scaleEffect(layer.scale)
-        .rotationEffect(.radians(layer.rotation))
-        .position(
-            x: layer.position.x * 0.2,
-            y: layer.position.y * 0.2
-        )
-        .overlay {
-            if isSelected {
-                Rectangle()
-                    .stroke(Color.accentColor, lineWidth: 2)
-                    .frame(width: 80, height: 60)
-                    .position(
-                        x: layer.position.x * 0.2,
-                        y: layer.position.y * 0.2
-                    )
+    }
+
+    @ViewBuilder
+    private var videoLayerContent: some View {
+        let hasResource = layer.resourceID != nil && !layer.resourceID!.isEmpty
+        if hasResource {
+            VStack(spacing: 4) {
+                Image(systemName: "video.fill")
+                    .font(.system(size: 30 * fitScale))
+                    .foregroundStyle(.purple)
+                if let resourceID = layer.resourceID, let url = URL(string: resourceID) {
+                    Text(url.lastPathComponent)
+                        .font(.system(size: max(7, 9 * fitScale)))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
             }
+            .frame(width: 100 * fitScale, height: 80 * fitScale)
+            .background(Color.purple.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
+        } else {
+            Image(systemName: "video")
+                .font(.system(size: 40 * fitScale))
+                .foregroundStyle(.secondary)
         }
-        .onTapGesture(perform: onSelect)
+    }
+
+    private var selectionBorder: some View {
+        Rectangle()
+            .stroke(Color.accentColor, style: StrokeStyle(lineWidth: 2, dash: [6, 3]))
+            .frame(width: 100 * fitScale + 8, height: 80 * fitScale + 8)
+            .position(
+                x: scaledPosition.x + dragOffset.width,
+                y: scaledPosition.y + dragOffset.height
+            )
     }
 }
 
@@ -1030,7 +1366,7 @@ private struct TimelineTrackRow: View {
                     }
 
                     Rectangle()
-                        .fill(Color(.systemRed))
+                        .fill(Color.red)
                         .frame(width: 2)
                         .offset(x: geo.size.width * (playheadPosition / max(1, duration)))
                 }
@@ -1042,11 +1378,11 @@ private struct TimelineTrackRow: View {
 
     private func clipColor(for type: LayerType) -> Color {
         switch type {
-        case .video: return .secondary
-        case .image: return .secondary
-        case .text: return .secondary
-        case .shape: return .secondary
-        case .brush: return .secondary
+        case .video: return .purple
+        case .image: return .blue
+        case .text: return .green
+        case .shape: return .orange
+        case .brush: return .pink
         }
     }
 }
