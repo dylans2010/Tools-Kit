@@ -19,12 +19,14 @@ struct TasksHomeView: View {
                 categoryFilterRow
             }
 
-            Section("Summary") {
+            Section {
                 HStack(spacing: 12) {
                     StatLabel(label: "Today", value: "\(manager.todayTasks.count)")
                     StatLabel(label: "Upcoming", value: "\(manager.upcomingTasks.count)")
                     StatLabel(label: "Done", value: "\(manager.completedTasks.count)")
                 }
+            } header: {
+                Text("Summary")
             }
 
             if manager.tasks.isEmpty {
@@ -38,24 +40,30 @@ struct TasksHomeView: View {
                 }
             } else {
                 if !manager.todayTasks.isEmpty {
-                    Section("Today") {
+                    Section {
                         ForEach(filterAndSort(manager.todayTasks)) { task in
                             TaskRow(task: task, manager: manager) { selectedTask = task }
                         }
+                    } header: {
+                        Text("Today")
                     }
                 }
                 if !manager.upcomingTasks.isEmpty {
-                    Section("Upcoming") {
+                    Section {
                         ForEach(filterAndSort(manager.upcomingTasks)) { task in
                             TaskRow(task: task, manager: manager) { selectedTask = task }
                         }
+                    } header: {
+                        Text("Upcoming")
                     }
                 }
                 if !manager.completedTasks.isEmpty {
-                    Section("Completed") {
+                    Section {
                         ForEach(Array(manager.completedTasks.prefix(8))) { task in
                             TaskRow(task: task, manager: manager) { selectedTask = task }
                         }
+                    } header: {
+                        Text("Completed")
                     }
                 }
             }
