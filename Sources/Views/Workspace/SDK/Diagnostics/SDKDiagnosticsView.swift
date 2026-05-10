@@ -217,8 +217,6 @@ private struct SummaryMetric: Identifiable {
     let id: String
     let title: String
     let value: String
-
-    static let empty = SummaryMetric(id: "summary.empty", title: "Unavailable", value: "—")
 }
 
 private struct DiagnosticsHeaderView: View {
@@ -346,17 +344,28 @@ private struct MetricsSummaryView: View {
     let items: [SummaryMetric]
 
     var body: some View {
-        let rowCount = max(1, (items.count + 1) / 2)
+        let rowCount = (items.count + 1) / 2
 
         VStack(alignment: .leading, spacing: 10) {
             Text("Metrics Summary")
                 .font(.headline)
 
-            Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 8) {
-                ForEach(0..<rowCount, id: \.self) { rowIndex in
-                    GridRow {
-                        summaryCell(metric(at: rowIndex * 2))
-                        summaryCell(metric(at: (rowIndex * 2) + 1))
+            if items.isEmpty {
+                Text("No summary metrics available")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 8) {
+                    ForEach(0..<rowCount, id: \.self) { rowIndex in
+                        GridRow {
+                            summaryCell(items[rowIndex * 2])
+
+                            if let secondaryItem = metric(at: (rowIndex * 2) + 1) {
+                                summaryCell(secondaryItem)
+                            } else {
+                                Color.clear
+                            }
+                        }
                     }
                 }
             }
@@ -366,8 +375,8 @@ private struct MetricsSummaryView: View {
         .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
-    private func metric(at index: Int) -> SummaryMetric {
-        guard items.indices.contains(index) else { return .empty }
+    private func metric(at index: Int) -> SummaryMetric? {
+        guard items.indices.contains(index) else { return nil }
         return items[index]
     }
 
