@@ -354,6 +354,10 @@ struct PluginEvent: Codable, Identifiable {
     let action: String
     let payload: [String: String]
     let timestamp: Date
+
+    var description: String {
+        "\(capability.rawValue): \(action)"
+    }
 }
 
 // MARK: - Advanced Models

@@ -115,8 +115,6 @@ struct CreateHabitView: View {
             habit.id = existingHabit.id
             habit.createdAt = existingHabit.createdAt
             habit.completionHistory = existingHabit.completionHistory
-            habit.currentStreak = existingHabit.currentStreak
-            habit.longestStreak = existingHabit.longestStreak
         }
         onSave(habit)
         dismiss()
