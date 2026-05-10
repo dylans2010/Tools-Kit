@@ -18,61 +18,82 @@ struct SDKInternalView: View {
 
     var body: some View {
         Form {
-            Section("Rate Limit Monitor") {
+            Section {
                 ForEach(rateLimitLines, id: \.self) { line in
                     Text(line).font(.system(.caption, design: .monospaced))
                 }
-                Button("Reset Counters", role: .destructive) {
+                Button(role: .destructive) {
                     Task {
                         await SDKRateLimiter.shared.resetAllCounters()
                         rateUsage = await SDKRateLimiter.shared.currentUsage()
                     }
+                } label: {
+                    Label("Reset Counters", systemImage: "arrow.counterclockwise")
                 }
+            } header: {
+                Label("Rate Limit Monitor", systemImage: "gauge.with.needle")
             }
 
-            Section("Scope Inspector") {
+            Section {
                 ForEach(policyEngine.availableScopes(), id: \.name) { scope in
-                    LabeledContent(scope.name) {
-                        Text(scope.riskLevel.rawValue.capitalized)
-                            .font(.caption2.bold())
+                    HStack {
+                        Image(systemName: "shield.lefthalf.filled")
                             .foregroundStyle(scope.riskLevel == .critical || scope.riskLevel == .high ? Color.red : Color.secondary)
+                        LabeledContent(scope.name) {
+                            Text(scope.riskLevel.rawValue.capitalized)
+                                .font(.caption2.bold())
+                                .foregroundStyle(scope.riskLevel == .critical || scope.riskLevel == .high ? Color.red : Color.secondary)
+                        }
                     }
                 }
+            } header: {
+                Label("Scope Inspector", systemImage: "lock.shield")
             }
 
-            Section("Privacy Logs") {
+            Section {
                 ForEach(privacyManager.exposureLogs.prefix(15)) { log in
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(log.scope).font(.caption.bold())
-                        Text("Redacted: \(log.redactedFields.joined(separator: ", "))")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                    HStack(spacing: 8) {
+                        Image(systemName: "hand.raised.fill")
+                            .foregroundStyle(.orange)
+                            .font(.caption)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(log.scope).font(.caption.bold())
+                            Text("Redacted: \(log.redactedFields.joined(separator: ", "))")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
+            } header: {
+                Label("Privacy Logs", systemImage: "eye.slash.fill")
             }
 
-            Section("Raw Data Explorer") {
+            Section {
                 Picker("Scope", selection: $rawScope) {
                     ForEach(SDKScope.allCases, id: \.self) { scope in
                         Text(String(describing: scope)).tag(scope)
                     }
                 }
-                Button("Fetch Data") {
+                Button {
                     Task {
                         let data = (try? await ToolsKitSDK.shared.fetchData(scope: rawScope)) ?? []
                         rawData = data.prefix(10).map { "\($0.title) [\($0.scope)]" }.joined(separator: "\n")
                     }
+                } label: {
+                    Label("Fetch Data", systemImage: "arrow.down.circle")
                 }
                 if !rawData.isEmpty {
                     Text(rawData).font(.system(.caption, design: .monospaced))
                         .foregroundStyle(.secondary)
                 }
+            } header: {
+                Label("Raw Data Explorer", systemImage: "cylinder.split.1x2")
             }
 
-            Section("Endpoint Tester") {
+            Section {
                 TextField("URL", text: $endpointURL)
                     .textInputAutocapitalization(.never)
-                Button("Execute Request") {
+                Button {
                     Task {
                         do {
                             let data = try await ToolsKitSDK.shared.externalFetch(url: endpointURL)
@@ -81,24 +102,34 @@ struct SDKInternalView: View {
                             endpointResult = error.localizedDescription
                         }
                     }
+                } label: {
+                    Label("Execute Request", systemImage: "play.circle.fill")
                 }
                 if !endpointResult.isEmpty {
                     Text(endpointResult).font(.system(.caption, design: .monospaced))
                         .foregroundStyle(.secondary)
                 }
+            } header: {
+                Label("Endpoint Tester", systemImage: "network")
             }
 
-            Section("Execution Traces") {
+            Section {
                 ForEach(SDKExecutionEngine.shared.executionHistory.prefix(15)) { entry in
-                    LabeledContent(entry.actionLabel) {
-                        Text(entry.success ? "OK" : "FAIL")
-                            .font(.caption.bold())
+                    HStack {
+                        Image(systemName: entry.success ? "checkmark.circle.fill" : "xmark.circle.fill")
                             .foregroundStyle(entry.success ? Color.green : Color.red)
+                        LabeledContent(entry.actionLabel) {
+                            Text(entry.success ? "OK" : "FAIL")
+                                .font(.caption.bold())
+                                .foregroundStyle(entry.success ? Color.green : Color.red)
+                        }
                     }
                 }
+            } header: {
+                Label("Execution Traces", systemImage: "waveform.path")
             }
 
-            Section("Audit Logs") {
+            Section {
                 Picker("Filter Type", selection: $selectedEventType) {
                     Text("All").tag(Optional<SDKAuditLogger.Event.EventType>.none)
                     ForEach(SDKAuditLogger.Event.EventType.allCases, id: \.self) { type in
@@ -106,13 +137,20 @@ struct SDKInternalView: View {
                     }
                 }
                 ForEach(filteredAuditLogs.prefix(30)) { event in
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(event.message).font(.caption)
-                        Text("\(event.eventType.rawValue) · \(event.timestamp.formatted(date: .omitted, time: .standard))")
-                            .font(.caption2)
+                    HStack(spacing: 8) {
+                        Image(systemName: "doc.text.magnifyingglass")
                             .foregroundStyle(.secondary)
+                            .font(.caption)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(event.message).font(.caption)
+                            Text("\(event.eventType.rawValue) · \(event.timestamp.formatted(date: .omitted, time: .standard))")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
+            } header: {
+                Label("Audit Logs", systemImage: "list.bullet.clipboard")
             }
         }
         .navigationTitle("Internal")

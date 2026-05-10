@@ -204,26 +204,54 @@ struct CreateSpaceView: View {
     @State private var name = ""
     @State private var description = ""
     @State private var visibility: SpaceVisibility = .privateSpace
+    @State private var selectedTemplate: SpaceTemplate?
+    @State private var showingTemplates = true
 
     var body: some View {
         NavigationStack {
             Form {
                 Section {
+                    if showingTemplates {
+                        SpaceTemplatePickerView(selectedTemplate: $selectedTemplate)
+                            .listRowInsets(EdgeInsets())
+                            .listRowBackground(Color.clear)
+                            .onChange(of: selectedTemplate?.name) { _, _ in
+                                if let template = selectedTemplate {
+                                    if name.isEmpty { name = template.name }
+                                    if description.isEmpty { description = template.description }
+                                    visibility = template.suggestedVisibility
+                                }
+                            }
+                    }
+                    Button {
+                        withAnimation { showingTemplates.toggle() }
+                    } label: {
+                        Label(
+                            showingTemplates ? "Hide Templates" : "Choose a Template",
+                            systemImage: showingTemplates ? "chevron.up" : "rectangle.grid.2x2"
+                        )
+                    }
+                } header: {
+                    Label("Start From Template", systemImage: "doc.on.doc.fill")
+                }
+
+                Section {
                     TextField("Name", text: $name)
-                    TextField("Description", text: $description)
+                    TextField("Description", text: $description, axis: .vertical)
+                        .lineLimit(2...4)
                 } header: {
                     Label("Information", systemImage: "info.circle")
                 }
 
                 Section {
                     Picker("Visibility", selection: $visibility) {
-                        Text("Private").tag(SpaceVisibility.privateSpace)
-                        Text("Shared").tag(SpaceVisibility.shared)
-                        Text("Public").tag(SpaceVisibility.publicSpace)
+                        Label("Private", systemImage: "lock.fill").tag(SpaceVisibility.privateSpace)
+                        Label("Shared", systemImage: "person.2.fill").tag(SpaceVisibility.shared)
+                        Label("Public", systemImage: "globe").tag(SpaceVisibility.publicSpace)
                     }
                     .pickerStyle(.segmented)
                 } header: {
-                    Label("Privacy", systemImage: "lock")
+                    Label("Privacy", systemImage: "lock.shield")
                 }
             }
             .navigationTitle("New Space")
@@ -233,10 +261,11 @@ struct CreateSpaceView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Create") {
+                        let icon = selectedTemplate?.icon ?? "folder.fill.badge.person.crop"
                         let _ = CollaborationManager.shared.createSpace(
                             name: name,
                             description: description,
-                            icon: "folder.fill.badge.person.crop",
+                            icon: icon,
                             visibility: visibility
                         )
                         dismiss()

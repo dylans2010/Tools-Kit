@@ -392,9 +392,26 @@ struct FullEditorView: View {
                             .foregroundStyle(layer.id == state.selectedLayerID ? Color.accentColor : Color.secondary)
                         VStack(alignment: .leading, spacing: 1) {
                             Text(layer.name).font(.caption.bold())
-                            Text(layer.type.rawValue.capitalized).font(.caption2).foregroundStyle(.secondary)
+                            if let resourceID = layer.resourceID, !resourceID.isEmpty {
+                                if let url = URL(string: resourceID) {
+                                    Text(url.lastPathComponent)
+                                        .font(.system(size: 8, design: .monospaced))
+                                        .foregroundStyle(.blue)
+                                } else {
+                                    Text(String(resourceID.prefix(16)))
+                                        .font(.system(size: 8, design: .monospaced))
+                                        .foregroundStyle(.blue)
+                                }
+                            } else {
+                                Text(layer.type.rawValue.capitalized).font(.caption2).foregroundStyle(.secondary)
+                            }
                         }
                         Spacer()
+                        if layer.resourceID != nil && !layer.resourceID!.isEmpty {
+                            Image(systemName: "link.circle.fill")
+                                .font(.caption2)
+                                .foregroundStyle(.blue)
+                        }
                         Image(systemName: layer.isVisible ? "eye.fill" : "eye.slash.fill")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
@@ -436,6 +453,19 @@ struct FullEditorView: View {
         Section("Properties") {
             LabeledContent("Name", value: layer.name)
             LabeledContent("Type", value: layer.type.rawValue.capitalized)
+            if let resourceID = layer.resourceID, !resourceID.isEmpty {
+                LabeledContent("Source") {
+                    if let url = URL(string: resourceID) {
+                        Text(url.lastPathComponent)
+                            .font(.caption.monospaced())
+                            .foregroundStyle(.blue)
+                    } else {
+                        Text(String(resourceID.prefix(20)))
+                            .font(.caption.monospaced())
+                            .foregroundStyle(.blue)
+                    }
+                }
+            }
             LabeledContent("Position", value: "\(Int(layer.position.x)), \(Int(layer.position.y))")
             LabeledContent("Scale", value: String(format: "%.2f", layer.scale))
             LabeledContent("Rotation", value: "\(Int(layer.rotation * 180 / .pi))°")
@@ -592,20 +622,20 @@ struct FullEditorView: View {
         case .transition:
             Section("Transition") {
                 Picker("Type", selection: $state.selectedTransition) {
-                    Text("None").tag("None")
-                    Text("Cross Dissolve").tag("CrossDissolve")
-                    Text("Wipe").tag("Wipe")
-                    Text("Slide").tag("Slide")
-                    Text("Fade").tag("Fade")
-                    Text("Zoom").tag("Zoom")
+                    ForEach(EditorTransitionLibrary.transitions, id: \.name) { transition in
+                        Label(transition.displayName, systemImage: transition.icon)
+                            .tag(transition.name)
+                    }
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Duration").font(.caption2)
                     Slider(value: $state.transitionDuration, in: 0.1...3.0, step: 0.1)
                     Text("\(String(format: "%.1f", state.transitionDuration))s").font(.caption.monospaced())
                 }
-                Button("Apply Transition") {
+                Button {
                     state.save()
+                } label: {
+                    Label("Apply Transition", systemImage: "arrow.triangle.swap")
                 }
             }
         case .keyframe:
@@ -763,19 +793,19 @@ struct FullEditorView: View {
     private var compactTransitions: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-                ForEach(["None", "Cross Dissolve", "Wipe", "Slide", "Fade", "Zoom"], id: \.self) { name in
+                ForEach(EditorTransitionLibrary.transitions, id: \.name) { transition in
                     Button {
-                        state.selectedTransition = name.replacingOccurrences(of: " ", with: "")
+                        state.selectedTransition = transition.name
                     } label: {
                         VStack(spacing: 4) {
-                            Image(systemName: "rectangle.connected.to.line.below")
+                            Image(systemName: transition.icon)
                                 .font(.title3)
-                            Text(name)
+                            Text(transition.displayName)
                                 .font(.system(size: 9))
                         }
                         .frame(width: 70, height: 50)
                         .background(
-                            state.selectedTransition == name.replacingOccurrences(of: " ", with: "")
+                            state.selectedTransition == transition.name
                                 ? Color.accentColor.opacity(0.15)
                                 : Color.secondary.opacity(0.1),
                             in: RoundedRectangle(cornerRadius: 8)
@@ -869,6 +899,18 @@ private struct CanvasLayerView: View {
     let isSelected: Bool
     let onSelect: () -> Void
 
+    private var hasImportedResource: Bool {
+        layer.resourceID != nil && !layer.resourceID!.isEmpty
+    }
+
+    private var resourceLabel: String {
+        guard let resourceID = layer.resourceID else { return layer.name }
+        if let url = URL(string: resourceID) {
+            return url.lastPathComponent
+        }
+        return String(resourceID.prefix(12))
+    }
+
     var body: some View {
         Group {
             switch layer.type {
@@ -880,13 +922,41 @@ private struct CanvasLayerView: View {
                     .fill(Color.secondary.opacity(0.3))
                     .frame(width: 80, height: 60)
             case .image:
-                Image(systemName: "photo")
-                    .font(.system(size: 40))
-                    .foregroundStyle(.secondary)
+                if hasImportedResource {
+                    VStack(spacing: 4) {
+                        Image(systemName: "photo.fill")
+                            .font(.system(size: 30))
+                            .foregroundStyle(.blue)
+                        Text(resourceLabel)
+                            .font(.system(size: 7))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                    .frame(width: 80, height: 60)
+                    .background(Color.blue.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
+                } else {
+                    Image(systemName: "photo")
+                        .font(.system(size: 40))
+                        .foregroundStyle(.secondary)
+                }
             case .video:
-                Image(systemName: "video")
-                    .font(.system(size: 40))
-                    .foregroundStyle(.secondary)
+                if hasImportedResource {
+                    VStack(spacing: 4) {
+                        Image(systemName: "video.fill")
+                            .font(.system(size: 30))
+                            .foregroundStyle(.purple)
+                        Text(resourceLabel)
+                            .font(.system(size: 7))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                    .frame(width: 80, height: 60)
+                    .background(Color.purple.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
+                } else {
+                    Image(systemName: "video")
+                        .font(.system(size: 40))
+                        .foregroundStyle(.secondary)
+                }
             case .brush:
                 Image(systemName: "scribble")
                     .font(.system(size: 40))
@@ -982,6 +1052,23 @@ private struct TimelineTrackRow: View {
 }
 
 // MARK: - Filter Library
+
+enum EditorTransitionLibrary {
+    struct TransitionPreset {
+        let name: String
+        let displayName: String
+        let icon: String
+    }
+
+    static let transitions: [TransitionPreset] = [
+        TransitionPreset(name: "None", displayName: "None", icon: "rectangle.connected.to.line.below"),
+        TransitionPreset(name: "CrossDissolve", displayName: "Cross Dissolve", icon: "rectangle.2.swap"),
+        TransitionPreset(name: "Wipe", displayName: "Wipe", icon: "rectangle.lefthalf.inset.filled.arrow.left"),
+        TransitionPreset(name: "Slide", displayName: "Slide", icon: "rectangle.leadinghalf.inset.filled"),
+        TransitionPreset(name: "Fade", displayName: "Fade", icon: "circle.lefthalf.filled"),
+        TransitionPreset(name: "Zoom", displayName: "Zoom", icon: "arrow.up.left.and.arrow.down.right"),
+    ]
+}
 
 enum EditorFilterLibrary {
     struct FilterPreset {
@@ -1119,9 +1206,46 @@ struct AssetLibraryView: View {
     @ObservedObject var state: EditorState
     @Environment(\.dismiss) var dismiss
 
+    private var importedLayers: [EditingLayer] {
+        state.project.layers.filter { $0.resourceID != nil && !$0.resourceID!.isEmpty }
+    }
+
     var body: some View {
         List {
-            Section("Templates") {
+            if !importedLayers.isEmpty {
+                Section {
+                    ForEach(importedLayers) { layer in
+                        HStack(spacing: 10) {
+                            Image(systemName: layer.type == .video ? "video.fill" : layer.type == .image ? "photo.fill" : "doc.fill")
+                                .foregroundStyle(layer.type == .video ? .purple : .blue)
+                                .frame(width: 36, height: 36)
+                                .background(
+                                    (layer.type == .video ? Color.purple : Color.blue).opacity(0.1),
+                                    in: RoundedRectangle(cornerRadius: 6)
+                                )
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(layer.name).font(.subheadline.bold())
+                                if let resourceID = layer.resourceID, let url = URL(string: resourceID) {
+                                    Text(url.lastPathComponent)
+                                        .font(.caption2.monospaced())
+                                        .foregroundStyle(.secondary)
+                                } else {
+                                    Text(layer.type.rawValue.capitalized)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            Spacer()
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(.green)
+                        }
+                    }
+                } header: {
+                    Label("Imported Media (\(importedLayers.count))", systemImage: "square.and.arrow.down.fill")
+                }
+            }
+
+            Section {
                 ForEach(AssetCatalog.templates) { asset in
                     Button {
                         applyTemplate(asset)
@@ -1138,9 +1262,11 @@ struct AssetLibraryView: View {
                     }
                     .buttonStyle(.plain)
                 }
+            } header: {
+                Label("Templates", systemImage: "rectangle.stack.fill")
             }
 
-            Section("Effects") {
+            Section {
                 ForEach(AssetCatalog.effects) { asset in
                     Button {
                         applyEffect(asset)
@@ -1157,9 +1283,11 @@ struct AssetLibraryView: View {
                     }
                     .buttonStyle(.plain)
                 }
+            } header: {
+                Label("Effects", systemImage: "wand.and.stars")
             }
 
-            Section("Media") {
+            Section {
                 ForEach(AssetCatalog.media) { asset in
                     Button {
                         applyMedia(asset)
@@ -1176,6 +1304,8 @@ struct AssetLibraryView: View {
                     }
                     .buttonStyle(.plain)
                 }
+            } header: {
+                Label("Media", systemImage: "photo.on.rectangle.angled")
             }
         }
         .navigationTitle("Asset Library")

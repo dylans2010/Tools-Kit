@@ -10,14 +10,16 @@ struct ConnectorScopeView: View {
 
     var body: some View {
         List {
-            Section("Connector Identity") {
+            Section {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(connector.name).font(.headline)
                     Text(connector.identifier).font(.caption.monospaced()).foregroundStyle(.secondary)
                 }
+            } header: {
+                Label("Connector Identity", systemImage: "person.text.rectangle")
             }
 
-            Section("Assign SDK Scopes") {
+            Section {
                 if policyEngine.availableScopes().isEmpty {
                     ContentUnavailableView("No Scopes Available", systemImage: "shield.slash", description: Text("The policy engine has no registered scopes."))
                 } else {
@@ -38,11 +40,13 @@ struct ConnectorScopeView: View {
                         }
                     }
                 }
+            } header: {
+                Label("Assign SDK Scopes", systemImage: "lock.shield")
             }
 
             Section {
                 Button(action: saveScopes) {
-                    Text("Save Scope Assignments")
+                    Label("Save Scope Assignments", systemImage: "checkmark.circle.fill")
                         .frame(maxWidth: .infinity).bold()
                 }
                 .buttonStyle(.borderedProminent)
