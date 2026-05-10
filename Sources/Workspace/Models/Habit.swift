@@ -3,6 +3,7 @@ import Foundation
 struct Habit: Identifiable, Codable {
     var id: UUID
     var name: String
+    var description: String
     var icon: String
     var colorHex: String
     var frequency: HabitFrequency
@@ -10,8 +11,13 @@ struct Habit: Identifiable, Codable {
     var completionHistory: [String: Int]
     var createdAt: Date
 
+    private enum CodingKeys: String, CodingKey {
+        case id, name, description, icon, colorHex, frequency, targetCount, completionHistory, createdAt
+    }
+
     init(id: UUID = UUID(),
          name: String,
+         description: String = "",
          icon: String = "checkmark.circle",
          colorHex: String = "#007AFF",
          frequency: HabitFrequency = .daily,
@@ -20,12 +26,26 @@ struct Habit: Identifiable, Codable {
          createdAt: Date = Date()) {
         self.id = id
         self.name = name
+        self.description = description
         self.icon = icon
         self.colorHex = colorHex
         self.frequency = frequency
         self.targetCount = targetCount
         self.completionHistory = completionHistory
         self.createdAt = createdAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        name = try container.decode(String.self, forKey: .name)
+        description = try container.decodeIfPresent(String.self, forKey: .description) ?? ""
+        icon = try container.decodeIfPresent(String.self, forKey: .icon) ?? "checkmark.circle"
+        colorHex = try container.decodeIfPresent(String.self, forKey: .colorHex) ?? "#007AFF"
+        frequency = try container.decodeIfPresent(HabitFrequency.self, forKey: .frequency) ?? .daily
+        targetCount = try container.decodeIfPresent(Int.self, forKey: .targetCount) ?? 1
+        completionHistory = try container.decodeIfPresent([String: Int].self, forKey: .completionHistory) ?? [:]
+        createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date()
     }
 
     var currentStreak: Int {
