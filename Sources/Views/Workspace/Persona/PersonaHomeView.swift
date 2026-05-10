@@ -4,9 +4,7 @@ struct PersonaHomeView: View {
     @ObservedObject private var manager = PersonaManager.shared
     @State private var query = ""
     @AppStorage("persona.welcome_shown") private var hasShownWelcome = false
-    @State private var showWelcome = false
-    @State private var showTuning = false
-    @State private var showDiscovery = false
+    @State private var activeModal: PersonaHomeModal?
     @State private var shuffledPrompts: [String] = []
 
     // Expanded Preset Prompts (500+)
@@ -307,61 +305,74 @@ struct PersonaHomeView: View {
         "What are the habits in 'Design' category?", "How many slides in 'Design' deck?", "Summarize 'Design' space"
     ]
 
-    var body: some View {
-        VStack(spacing: 0) {
-            PersonaChatTimelineView(
-                chatHistory: manager.chatHistory,
-                isThinking: manager.isThinking,
-                onDiscoverPrompts: { showDiscovery = true },
-                onNeedScroll: scrollToBottom
-            )
+    enum PersonaHomeModal: String, Identifiable {
+        case welcome
+        case tuning
+        case discovery
 
-            PersonaComposerView(
-                query: $query,
-                isThinking: manager.isThinking,
-                shuffledPrompts: shuffledPrompts,
-                lastAssistantContent: manager.chatHistory.last?.role == "assistant" ? manager.chatHistory.last?.content : nil,
-                onTapPrompt: { prompt in query = prompt; sendMessage() },
-                onSend: sendMessage,
-                onOpenDiscovery: { showDiscovery = true },
-                followUpsProvider: suggestedFollowUps(for:)
-            )
+        var id: String { rawValue }
+    }
+
+    private var lastAssistantContent: String? {
+        guard let message = manager.chatHistory.last, message.role == "assistant" else {
+            return nil
         }
+        return message.content
+    }
+
+    private var followUpSuggestions: [String] {
+        guard let content = lastAssistantContent else {
+            return []
+        }
+        return suggestedFollowUps(for: content)
+    }
+
+    var body: some View {
+        PersonaHomeNavigationContent(
+            chatHistory: manager.chatHistory,
+            isThinking: manager.isThinking,
+            query: $query,
+            shuffledPrompts: shuffledPrompts,
+            followUpSuggestions: followUpSuggestions,
+            onPromptSelection: selectPromptAndSend(_:),
+            onSend: sendMessage,
+            onOpenDiscovery: openDiscovery,
+            onNeedScroll: scrollToBottom
+        )
         .navigationTitle("AI Persona")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button { showTuning = true } label: {
-                    Image(systemName: "slider.horizontal.3")
-                }
-            }
-            ToolbarItem(placement: .topBarLeading) {
-                Button { showWelcome = true } label: {
-                    Image(systemName: "info.circle")
-                }
-            }
+            PersonaHomeToolbar(
+                onShowWelcome: { activeModal = .welcome },
+                onShowTuning: { activeModal = .tuning }
+            )
         }
-        .onAppear {
-            if manager.chatHistory.isEmpty && !hasShownWelcome {
-                showWelcome = true
-                hasShownWelcome = true
-            }
-            shufflePrompts()
+        .onAppear(perform: handleOnAppear)
+        .sheet(item: $activeModal) { modal in
+            PersonaHomeModalContent(
+                modal: modal,
+                manager: manager,
+                allPrompts: allPrompts,
+                onPromptSelection: selectPromptAndSend(_:)
+            )
         }
-        .sheet(isPresented: $showWelcome) {
-            WelcomePersonaView()
+    }
+
+    private func handleOnAppear() {
+        if manager.chatHistory.isEmpty && !hasShownWelcome {
+            activeModal = .welcome
+            hasShownWelcome = true
         }
-        .sheet(isPresented: $showTuning) {
-            TuningSheetView(manager: manager)
-                .presentationDetents([.medium])
-        }
-        .sheet(isPresented: $showDiscovery) {
-            PromptDiscoveryView(allPrompts: allPrompts) { selected in
-                query = selected
-                sendMessage()
-            }
-            .presentationDetents([.medium])
-        }
+        shufflePrompts()
+    }
+
+    private func openDiscovery() {
+        activeModal = .discovery
+    }
+
+    private func selectPromptAndSend(_ prompt: String) {
+        query = prompt
+        sendMessage()
     }
 
     private func sendMessage() {
@@ -403,6 +414,80 @@ struct PersonaHomeView: View {
     }
 }
 
+private struct PersonaHomeNavigationContent: View {
+    let chatHistory: [PersonaMessage]
+    let isThinking: Bool
+    @Binding var query: String
+    let shuffledPrompts: [String]
+    let followUpSuggestions: [String]
+    let onPromptSelection: (String) -> Void
+    let onSend: () -> Void
+    let onOpenDiscovery: () -> Void
+    let onNeedScroll: (ScrollViewProxy) -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            PersonaChatTimelineView(
+                chatHistory: chatHistory,
+                isThinking: isThinking,
+                onDiscoverPrompts: onOpenDiscovery,
+                onNeedScroll: onNeedScroll
+            )
+
+            PersonaComposerView(
+                query: $query,
+                isThinking: isThinking,
+                shuffledPrompts: shuffledPrompts,
+                followUpSuggestions: followUpSuggestions,
+                onTapPrompt: onPromptSelection,
+                onSend: onSend,
+                onOpenDiscovery: onOpenDiscovery
+            )
+        }
+    }
+}
+
+private struct PersonaHomeToolbar: ToolbarContent {
+    let onShowWelcome: () -> Void
+    let onShowTuning: () -> Void
+
+    var body: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Button(action: onShowTuning) {
+                Image(systemName: "slider.horizontal.3")
+            }
+        }
+
+        ToolbarItem(placement: .topBarLeading) {
+            Button(action: onShowWelcome) {
+                Image(systemName: "info.circle")
+            }
+        }
+    }
+}
+
+private struct PersonaHomeModalContent: View {
+    let modal: PersonaHomeView.PersonaHomeModal
+    @ObservedObject var manager: PersonaManager
+    let allPrompts: [String]
+    let onPromptSelection: (String) -> Void
+
+    var body: some View {
+        Group {
+            switch modal {
+            case .welcome:
+                WelcomePersonaView()
+            case .tuning:
+                TuningSheetView(manager: manager)
+                    .presentationDetents([.medium])
+            case .discovery:
+                PromptDiscoveryView(allPrompts: allPrompts, onSelect: onPromptSelection)
+                    .presentationDetents([.medium])
+            }
+        }
+    }
+}
+
 private struct PersonaChatTimelineView: View {
     let chatHistory: [PersonaMessage]
     let isThinking: Bool
@@ -434,17 +519,16 @@ private struct PersonaComposerView: View {
     @Binding var query: String
     let isThinking: Bool
     let shuffledPrompts: [String]
-    let lastAssistantContent: String?
+    let followUpSuggestions: [String]
     let onTapPrompt: (String) -> Void
     let onSend: () -> Void
     let onOpenDiscovery: () -> Void
-    let followUpsProvider: (String) -> [String]
 
     var body: some View {
         VStack(spacing: 0) {
             Divider()
-            if let content = lastAssistantContent {
-                PersonaFollowUpsView(suggestions: followUpsProvider(content), onSelect: onTapPrompt)
+            if !followUpSuggestions.isEmpty {
+                PersonaFollowUpsView(suggestions: followUpSuggestions, onSelect: onTapPrompt)
             }
             PersonaInputPanelView(query: $query, isThinking: isThinking, shuffledPrompts: shuffledPrompts, onTapPrompt: onTapPrompt, onSend: onSend, onOpenDiscovery: onOpenDiscovery)
         }
@@ -470,21 +554,17 @@ private struct PersonaEmptyStateView: View {
 
 private struct PersonaChatBubble: View {
     let message: PersonaMessage
+    private var isUser: Bool { message.role == "user" }
 
     var body: some View {
         HStack {
-            if message.role == "user" { Spacer() }
+            if isUser { Spacer() }
 
-            VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 4) {
-                PersonaMarkdownBubbleText(markdown: message.content, isUser: message.role == "user")
+            VStack(alignment: isUser ? .trailing : .leading, spacing: 4) {
+                PersonaMarkdownBubbleText(markdown: message.content, isUser: isUser)
                     .padding(12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 18)
-                            .fill(message.role == "user" ?
-                                  AnyShapeStyle(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing)) :
-                                  AnyShapeStyle(Color.secondary.opacity(0.15)))
-                    )
-                    .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
+                    .background(PersonaMessageBubbleBackground(isUser: isUser))
+                    .foregroundStyle(isUser ? Color.white : Color.primary)
                     .contextMenu {
                         Button {
                             UIPasteboard.general.string = message.content
@@ -499,9 +579,28 @@ private struct PersonaChatBubble: View {
                     .padding(.horizontal, 4)
             }
 
-            if message.role == "assistant" { Spacer() }
+            if !isUser { Spacer() }
         }
-        .transition(.asymmetric(insertion: .move(edge: message.role == "user" ? .trailing : .leading).combined(with: .opacity), removal: .opacity))
+        .transition(
+            .asymmetric(
+                insertion: .move(edge: isUser ? .trailing : .leading).combined(with: .opacity),
+                removal: .opacity
+            )
+        )
+    }
+}
+
+private struct PersonaMessageBubbleBackground: View {
+    let isUser: Bool
+
+    var body: some View {
+        if isUser {
+            RoundedRectangle(cornerRadius: 18)
+                .fill(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+        } else {
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color.secondary.opacity(0.15))
+        }
     }
 }
 
@@ -553,18 +652,40 @@ private struct PersonaInputPanelView: View {
                     .background(Color.secondary.opacity(0.1))
                     .cornerRadius(20)
                     .lineLimit(1...5)
-                Button(action: onSend) {
-                    Image(systemName: "arrow.up.circle.fill")
-                        .font(.system(size: 32))
-                        .foregroundStyle((query.isEmpty || isThinking) ? AnyShapeStyle(.secondary) : AnyShapeStyle(LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom)))
-                }
-                .disabled(query.isEmpty || isThinking)
+                PersonaSendButton(
+                    isDisabled: query.isEmpty || isThinking,
+                    onSend: onSend
+                )
             }
             .padding(.horizontal)
             .padding(.bottom, 10)
         }
         .padding(.top, 8)
         .background(.ultraThinMaterial)
+    }
+}
+
+private struct PersonaSendButton: View {
+    let isDisabled: Bool
+    let onSend: () -> Void
+
+    var body: some View {
+        Button(action: onSend) {
+            ZStack {
+                Image(systemName: "arrow.up.circle.fill")
+                    .font(.system(size: 32))
+                    .foregroundStyle(.secondary)
+                    .opacity(isDisabled ? 1 : 0)
+
+                Image(systemName: "arrow.up.circle.fill")
+                    .font(.system(size: 32))
+                    .foregroundStyle(
+                        LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom)
+                    )
+                    .opacity(isDisabled ? 0 : 1)
+            }
+        }
+        .disabled(isDisabled)
     }
 }
 
