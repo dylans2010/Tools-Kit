@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style with .searchable integration.
- - Modernized app rows using a private struct PluginAppRow with semantic status indicators.
- - Applied .presentationDetents([.large]) to the registration sheet with a drag indicator.
- - Replaced manual stat cards with a summary Section using native LabeledContent.
- - Standardized Start/Stop actions using native prominent buttons with semantic colors.
- - strictly preserved all PluginRuntimeEngine loadedApps and runningApps logic.
- - Improved visual hierarchy for permissions and sandboxing status.
- */
+
 
 import SwiftUI
 

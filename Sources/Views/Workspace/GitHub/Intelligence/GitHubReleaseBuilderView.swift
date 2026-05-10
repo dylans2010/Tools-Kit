@@ -34,9 +34,9 @@ struct GitHubReleaseBuilderView: View {
             }
 
             Section {
-                Label("No Merge Conflicts", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
-                Label("All Changes Reviewed", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
-                Label("Tests Passing", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+                Label("No Merge Conflicts", systemImage: "checkmark.circle.fill").foregroundStyle(.secondary)
+                Label("All Changes Reviewed", systemImage: "checkmark.circle.fill").foregroundStyle(.secondary)
+                Label("Tests Passing", systemImage: "checkmark.circle.fill").foregroundStyle(.secondary)
             } header: {
                 Text("Validation Checklist")
             }
@@ -47,7 +47,7 @@ struct GitHubReleaseBuilderView: View {
                 } label: {
                     Text("Publish Release \(version)")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(changelog.isEmpty ? Color.gray : Color.green)

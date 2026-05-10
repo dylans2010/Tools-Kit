@@ -10,35 +10,31 @@ struct CalendarHomeView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                Color.workspaceBackground.ignoresSafeArea()
+            VStack(spacing: 0) {
+                calendarMetricsHeader
+                    .padding()
 
-                VStack(spacing: 0) {
-                    calendarMetricsHeader
-                        .padding()
+                CalendarModeSelector(selectedMode: $selectedView)
+                    .padding(.horizontal)
+                    .padding(.bottom, 8)
 
-                    CalendarModeSelector(selectedMode: $selectedView)
-                        .padding(.horizontal)
-                        .padding(.bottom, 8)
+                Divider()
 
-                    Divider().opacity(0.1)
-
-                    Group {
-                        switch selectedView {
-                        case .month:
-                            CalendarMonthView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
-                        case .week:
-                            CalendarWeekView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
-                        case .year:
-                            CalendarYearView(selectedDate: $selectedDate, selectedView: $selectedView)
-                        case .agenda:
-                            CalendarAgendaView(selectedEvent: $selectedEvent)
-                        case .today:
-                            CalendarTodayView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
-                        }
+                Group {
+                    switch selectedView {
+                    case .month:
+                        CalendarMonthView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
+                    case .week:
+                        CalendarWeekView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
+                    case .year:
+                        CalendarYearView(selectedDate: $selectedDate, selectedView: $selectedView)
+                    case .agenda:
+                        CalendarAgendaView(selectedEvent: $selectedEvent)
+                    case .today:
+                        CalendarTodayView(selectedDate: $selectedDate, selectedEvent: $selectedEvent)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .navigationTitle(selectedDate.formatted(.dateTime.month().year()))
             .navigationBarTitleDisplayMode(.inline)
@@ -46,7 +42,6 @@ struct CalendarHomeView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button { showingAISheet = true } label: {
                         Image(systemName: "sparkles")
-                            .foregroundStyle(LinearGradient(colors: [.aiGradientStart, .aiGradientEnd], startPoint: .top, endPoint: .bottom))
                     }
                 }
 
@@ -56,8 +51,7 @@ struct CalendarHomeView: View {
                     }
 
                     Button { showingCreate = true } label: {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.title3)
+                        Image(systemName: "plus")
                     }
                 }
             }
@@ -75,23 +69,30 @@ struct CalendarHomeView: View {
 
     private var calendarMetricsHeader: some View {
         HStack(spacing: 12) {
-            metricCard(title: "Today", value: "\(manager.events(on: Date()).count)", icon: "sun.max.fill", color: .orange)
-            metricCard(title: "Conflicts", value: String(format: "%.0f%%", manager.conflictProbability(for: selectedDate) * 100), icon: "exclamationmark.triangle.fill", color: .red)
-            metricCard(title: "Upcoming", value: "\(manager.upcomingEvents().count)", icon: "clock.fill", color: .blue)
+            CalendarMetricLabel(title: "Today", value: "\(manager.events(on: Date()).count)", icon: "sun.max")
+            CalendarMetricLabel(title: "Conflicts", value: String(format: "%.0f%%", manager.conflictProbability(for: selectedDate) * 100), icon: "exclamationmark.triangle")
+            CalendarMetricLabel(title: "Upcoming", value: "\(manager.upcomingEvents().count)", icon: "clock")
         }
     }
+}
 
-    private func metricCard(title: String, value: String, icon: String, color: Color) -> some View {
+private struct CalendarMetricLabel: View {
+    let title: String
+    let value: String
+    let icon: String
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Image(systemName: icon).foregroundStyle(color)
-                Text(title).font(.caption.bold()).foregroundStyle(.secondary)
+                Image(systemName: icon)
+                Text(title).font(.caption.bold())
             }
-            Text(value).font(.title3.bold()).foregroundStyle(.white)
+            .foregroundStyle(.secondary)
+            Text(value).font(.title3.bold())
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 16))
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -114,7 +115,7 @@ struct CalendarModeSelector: View {
                             .font(.subheadline.bold())
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
-                            .background(selectedMode == mode ? Color.blue : Color.white.opacity(0.1), in: Capsule())
+                            .background(selectedMode == mode ? Color.accentColor : Color(.secondarySystemBackground), in: Capsule())
                             .foregroundStyle(selectedMode == mode ? Color.white : Color.secondary)
                     }
                 }
@@ -130,41 +131,37 @@ struct CalendarAIPlannerView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                Color.workspaceBackground.ignoresSafeArea()
-
-                VStack(spacing: 20) {
+            Form {
+                Section {
                     VStack(spacing: 8) {
                         Image(systemName: "sparkles")
                             .font(.largeTitle)
-                            .foregroundStyle(.purple)
                         Text("Predictive Scheduling")
                             .font(.headline)
                         Text("Describe your plans and I'll find the optimal time.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                    .padding(.top)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical)
+                }
 
-                    TextEditor(text: $prompt)
-                        .frame(height: 150)
-                        .padding(8)
-                        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))
+                Section {
+                    TextField("Describe your plans…", text: $prompt, axis: .vertical)
+                        .lineLimit(5...10)
+                }
 
+                Section {
                     Button {
-                        // AI Logic call
+                        isProcessing = true
                     } label: {
                         Text("Optimize My Schedule")
-                            .fontWeight(.bold)
                             .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.blue, in: Capsule())
-                            .foregroundStyle(.white)
+                            .bold()
                     }
-
-                    Spacer()
+                    .buttonStyle(.borderedProminent)
+                    .disabled(prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
-                .padding(20)
             }
             .navigationTitle("AI Assistant")
             .navigationBarTitleDisplayMode(.inline)

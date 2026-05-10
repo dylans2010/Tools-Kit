@@ -10,7 +10,7 @@ struct CollaborationHomeView: View {
             Section {
                 if manager.spaces.isEmpty {
                     Text("No Collaboration Spaces Yet")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 } else {
                     ForEach(manager.spaces) { space in
                         NavigationLink(destination: SpaceDashboardView(spaceID: space.id)) {
@@ -29,19 +29,19 @@ struct CollaborationHomeView: View {
                     }
                 } else {
                     Label("Pull Requests", systemImage: "arrow.triangle.pull")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 NavigationLink(destination: ActivityTimelineView(spaceID: manager.spaces.first?.id ?? UUID())) {
                     Label("Activity Timeline", systemImage: "clock.arrow.2.circlepath")
                 }
                 NavigationLink(destination: SpacePublishingView(spaceID: manager.spaces.first?.id ?? UUID())) {
-                    Label("Distribution & Publishing", systemImage: "paperplane.fill")
+                    Label("Distribution & Publishing", systemImage: "paperplane")
                 }
                 NavigationLink(destination: WorkspaceCommandCenterView()) {
-                    Label("Command Center", systemImage: "terminal.fill")
+                    Label("Command Center", systemImage: "terminal")
                 }
                 NavigationLink(destination: SpaceVersionHistoryView()) {
-                    Label("Version History", systemImage: "clock.fill")
+                    Label("Version History", systemImage: "clock")
                 }
             } header: {
                 Text("Tools & Management")
@@ -52,16 +52,16 @@ struct CollaborationHomeView: View {
                     Label("Advanced Workspace", systemImage: "square.3.layers.3d")
                 }
                 NavigationLink(destination: AdvancedCollaborationView()) {
-                    Label("Advanced Collaboration", systemImage: "person.2.wave.2.fill")
+                    Label("Advanced Collaboration", systemImage: "person.2.wave.2")
                 }
                 NavigationLink(destination: AutomationHomeView()) {
-                    Label("Automations", systemImage: "bolt.fill")
+                    Label("Automations", systemImage: "bolt")
                 }
                 NavigationLink(destination: ContentGraphView()) {
-                    Label("Content Graph", systemImage: "circle.hexagongrid.fill")
+                    Label("Content Graph", systemImage: "circle.hexagongrid")
                 }
                 NavigationLink(destination: WorkspaceSnapshotView()) {
-                    Label("Snapshots", systemImage: "camera.fill")
+                    Label("Snapshots", systemImage: "camera")
                 }
                 NavigationLink(destination: WorkspaceGlobalSearchView()) {
                     Label("Global Search", systemImage: "magnifyingglass")
@@ -72,13 +72,13 @@ struct CollaborationHomeView: View {
 
             Section {
                 NavigationLink(destination: WorkspaceToolsPanelView(spaceID: manager.spaces.first?.id)) {
-                    Label("Workspace Tools", systemImage: "wrench.and.screwdriver.fill")
+                    Label("Workspace Tools", systemImage: "wrench.and.screwdriver")
                 }
                 NavigationLink(destination: CommandHistoryView()) {
                     Label("Command History", systemImage: "clock.arrow.circlepath")
                 }
                 NavigationLink(destination: PluginsMainView()) {
-                    Label("Workspace Extensions", systemImage: "puzzlepiece.extension.fill")
+                    Label("Workspace Extensions", systemImage: "puzzlepiece.extension")
                 }
             } header: {
                 Text("Analytics & Tools")
@@ -89,7 +89,7 @@ struct CollaborationHomeView: View {
                 if recentActivity.isEmpty {
                     Text("No Recent Activity")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 } else {
                     ForEach(recentActivity) { log in
                         VStack(alignment: .leading) {
@@ -97,7 +97,7 @@ struct CollaborationHomeView: View {
                                 .font(.caption)
                             Text("\(log.userName) • \(log.timestamp, style: .relative)")
                                 .font(.caption2)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }

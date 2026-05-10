@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Modernized configuration rows using a private struct RunConfigRow with semantic status badges.
- - Standardized profile selection using native Buttons and capsule status indicators.
- - Replaced manual TextField layouts with native Form components within the List.
- - strictly preserved all SDKRuntimeWorkspaceState management and profile persistence.
- - Improved visual hierarchy for simulation settings and scoped execution lists.
- - Standardized the 'Add Profile' action button style.
- */
+
 
 import SwiftUI
 

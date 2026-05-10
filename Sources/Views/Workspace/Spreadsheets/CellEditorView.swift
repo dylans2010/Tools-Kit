@@ -23,13 +23,13 @@ struct CellEditorView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.workspaceBackground.ignoresSafeArea()
+                Color(.systemBackground).ignoresSafeArea()
 
                 Form {
                     Section {
                         Toggle("Formula Mode", isOn: $isFormulaMode)
                     }
-                    .listRowBackground(Color.workspaceSurface)
+                    .listRowBackground(Color(.secondarySystemBackground))
 
                     if isFormulaMode {
                         Section {
@@ -38,14 +38,14 @@ struct CellEditorView: View {
                         } header: {
                             Text("Formula")
                         }
-                        .listRowBackground(Color.workspaceSurface)
+                        .listRowBackground(Color(.secondarySystemBackground))
                     } else {
                         Section {
                             TextField("Cell value", text: $rawValue)
                         } header: {
                             Text("Value")
                         }
-                        .listRowBackground(Color.workspaceSurface)
+                        .listRowBackground(Color(.secondarySystemBackground))
                     }
                 }
                 .scrollContentBackground(.hidden)

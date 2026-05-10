@@ -18,7 +18,7 @@ struct BranchListView: View {
         List {
             if branches.isEmpty && !isLoading {
                 Text("No branches found.")
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             } else {
                 ForEach(branches, id: \.name) { branch in
                     Button {
@@ -26,18 +26,18 @@ struct BranchListView: View {
                     } label: {
                         HStack {
                             Image(systemName: "arrow.triangle.branch")
-                                .foregroundColor(branch.name == selectedBranch ? .green : .blue)
+                                .foregroundStyle(branch.name == selectedBranch ? .primary : .secondary)
                             Text(branch.name)
                                 .fontWeight(branch.name == selectedBranch ? .bold : .regular)
                             Spacer()
                             if branch.protected {
                                 Image(systemName: "shield.fill")
-                                    .foregroundColor(.orange)
+                                    .foregroundStyle(.secondary)
                                     .font(.caption)
                             }
                             if branch.name == selectedBranch {
                                 Image(systemName: "checkmark")
-                                    .foregroundColor(.blue)
+                                    .foregroundStyle(.primary)
                             }
                         }
                     }
@@ -66,7 +66,7 @@ struct BranchListView: View {
             }
         }
         .sheet(isPresented: $showingCreateBranch) {
-            NavigationView {
+            NavigationStack {
                 Form {
                     Section {
                         TextField("New Branch Name", text: $newBranchName)

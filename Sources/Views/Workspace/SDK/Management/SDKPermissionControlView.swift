@@ -1,12 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Modernized capability toggles using native Label and semantic status icons.
- - Replaced manual Section headers with native system headers.
- - Standardized 'No-Sandbox' permission warning using semantic red coloring and descriptive footer.
- - strictly preserved all project scope binding and permission manager logic.
- - Improved visual consistency with other permission management screens.
- */
+
 
 import SwiftUI
 

@@ -1,14 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on a dark monospaced console aesthetic.
- - Modernized the action grid using native LazyVGrid and semantic SF Symbols.
- - Replaced manual command list with a dedicated CommandGridSection with native button styling.
- - Standardized the execution history using monospaced typography and semantic status indicators.
- - strictly preserved all command execution logic, parameter handling, and history persistence.
- - Improved visual hierarchy for active status and recent output.
- - Extracted subviews for ConsoleHeader, CommandGrid, and ExecutionHistory.
- - RESTORED: All functional commands (task, deck, persona, snapshot, bridge) that were mistakenly simplified.
- */
+
 
 import SwiftUI
 

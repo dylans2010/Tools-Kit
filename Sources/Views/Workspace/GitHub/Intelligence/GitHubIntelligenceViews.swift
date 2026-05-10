@@ -84,7 +84,7 @@ struct CodeIntelligenceView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
                             Image(systemName: smellIcon(smell.type))
-                                .foregroundStyle(.orange)
+                                .foregroundStyle(.secondary)
                             Text(smell.type.rawValue).font(.subheadline.bold())
                         }
                         Text(smell.description).font(.caption).foregroundStyle(.secondary)
@@ -122,7 +122,7 @@ struct WorkflowBuilderView: View {
                 Button(action: { showingCreate = true }) {
                     Label("New Workflow", systemImage: "plus.rectangle.on.rectangle")
                 }
-                .foregroundStyle(.blue)
+                .foregroundStyle(.primary)
             }
 
             Section {
@@ -174,9 +174,9 @@ struct WorkflowBuilderRow: View {
             }
             HStack(spacing: 12) {
                 Button("Edit", action: onSelect)
-                    .font(.caption.bold()).foregroundStyle(.blue)
+                    .font(.caption.bold()).foregroundStyle(.primary)
                 Button("Dry Run", action: onSimulate)
-                    .font(.caption.bold()).foregroundStyle(.orange)
+                    .font(.caption.bold()).foregroundStyle(.secondary)
             }
         }
         .padding(.vertical, 4)
@@ -260,7 +260,7 @@ struct WorkflowEditorView: View {
                         Button("Generate YAML Preview") {
                             yamlOutput = builder.exportYAML(workflowID: workflowID)
                         }
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(.primary)
                         if !yamlOutput.isEmpty {
                             ScrollView {
                                 Text(yamlOutput)
@@ -296,7 +296,7 @@ struct SimulationLogView: View {
                     ForEach(log, id: \.self) { line in
                         Text(line)
                             .font(.system(.caption, design: .monospaced))
-                            .foregroundStyle(line.contains("✅") ? Color.green : line.contains("▶") ? Color.blue : Color.primary)
+                            .foregroundStyle(line.contains("✅") ? Color.green : line.contains("▶") ? .primary : Color.primary)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }

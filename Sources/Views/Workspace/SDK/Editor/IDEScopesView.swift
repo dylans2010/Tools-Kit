@@ -1,14 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Replaced manual status pills and headers with native Section titles and LabeledContent.
- - Modernized scope rows using native Toggle and private struct ScopeItemRow.
- - Applied .presentationDetents([.medium, .large]) to the review sheet with a drag indicator.
- - Standardized risk level colors using semantic .red, .orange, and .green.
- - strictly preserved all SDKRuntimeWorkspaceState diagnostics, scope mapping, and project update logic.
- - Improved visual hierarchy for required approvals and linked capabilities.
- - Replaced manual HStack layouts with standard Label components.
- */
+
 
 import SwiftUI
 

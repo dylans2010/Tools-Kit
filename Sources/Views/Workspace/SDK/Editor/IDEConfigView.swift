@@ -1,12 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on native Form structure for project configuration.
- - Replaced manual SDKSectionHeader with native Section titles.
- - Standardized key-value rows using native LabeledContent.
- - Modernized project status picker and description TextField (multiline axis).
- - Strictly preserved all SDKProjectManager update logic and graph synchronization.
- - Replaced manual diagnostics button with a prominent Section button.
- */
+
 
 import SwiftUI
 

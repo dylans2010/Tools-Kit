@@ -4,38 +4,41 @@ struct CollectionsView: View {
     @StateObject private var manager = ArticlesManager.shared
     @State private var showingCreate = false
 
-    private let columns = [GridItem(.adaptive(minimum: 160), spacing: 14)]
-
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                if manager.collections.isEmpty {
-                    EmptyStateView(
-                        icon: "folder",
-                        title: "No Collections",
-                        message: "Create a collection to organize your saved articles.",
-                        action: { showingCreate = true },
-                        actionLabel: "Create Collection"
-                    )
-                } else {
-                    LazyVGrid(columns: columns, spacing: 14) {
-                        ForEach(manager.collections) { collection in
-                            NavigationLink {
-                                CollectionDetailView(collection: collection)
-                            } label: {
-                                CollectionCard(collection: collection)
+        List {
+            if manager.collections.isEmpty {
+                ContentUnavailableView {
+                    Label("No Collections", systemImage: "folder")
+                } description: {
+                    Text("Create a collection to organize your saved articles.")
+                } actions: {
+                    Button("Create Collection") { showingCreate = true }
+                        .buttonStyle(.borderedProminent)
+                }
+            } else {
+                ForEach(manager.collections) { collection in
+                    NavigationLink {
+                        CollectionDetailView(collection: collection)
+                    } label: {
+                        Label {
+                            HStack {
+                                Text(collection.name)
+                                    .font(.subheadline.bold())
+                                Spacer()
+                                Text("\(collection.articles.count) Articles")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
                             }
-                            .buttonStyle(.plain)
+                        } icon: {
+                            Image(systemName: collection.icon)
                         }
                     }
-                    .padding(.horizontal)
                 }
             }
-            .padding(.vertical, 8)
         }
         .navigationTitle("Collections")
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItem(placement: .primaryAction) {
                 Button { showingCreate = true } label: {
                     Image(systemName: "plus")
                 }
@@ -44,31 +47,5 @@ struct CollectionsView: View {
         .sheet(isPresented: $showingCreate) {
             CreateCollectionView()
         }
-    }
-}
-
-private struct CollectionCard: View {
-    let collection: ArticleCollection
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Image(systemName: collection.icon)
-                .font(.title2)
-                .foregroundColor(.white)
-                .frame(width: 44, height: 44)
-                .background(Color(hex: collection.colorHex) ?? .blue)
-                .cornerRadius(10)
-
-            Text(collection.name)
-                .font(.subheadline.bold())
-                .lineLimit(1)
-
-            Text("\(collection.articles.count) Articles")
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(14)
     }
 }

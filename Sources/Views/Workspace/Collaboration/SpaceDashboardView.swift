@@ -124,14 +124,14 @@ struct SpaceMessagesTab: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(message.senderName)
                                         .font(.caption.bold())
-                                        .foregroundColor(.blue)
+                                        .foregroundStyle(.primary)
                                     Text(message.content)
                                         .padding(10)
                                         .background(Color.secondary.opacity(0.1))
                                         .cornerRadius(12)
                                     Text(message.timestamp, style: .time)
                                         .font(.caption2)
-                                        .foregroundColor(.secondary)
+                                        .foregroundStyle(.secondary)
                                 }
                                 .id(message.id)
                             }
@@ -176,19 +176,19 @@ struct SpaceFilesTab: View {
                 ForEach(files) { file in
                     HStack {
                         Image(systemName: "doc.fill")
-                            .foregroundColor(.blue)
+                            .foregroundStyle(.primary)
                         VStack(alignment: .leading) {
                             Text(file.name)
                                 .font(.subheadline.bold())
                             Text("\(file.size / 1024) KB • \(file.timestamp, style: .date)")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
             } else {
                 Text("No files shared yet.")
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
         }
     }
@@ -214,7 +214,7 @@ struct SpaceSettingsTab: View {
                                     .font(.subheadline.bold())
                                 Text(member.email)
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             }
                             Spacer()
                             Text(member.role.rawValue)
@@ -244,7 +244,7 @@ struct SpaceOverviewTab: View {
                 if space.description.isEmpty {
                     Text("No description provided.")
                         .italic()
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .padding(.horizontal)
                 } else {
                     Text(space.description)
@@ -259,7 +259,7 @@ struct SpaceOverviewTab: View {
 
                 if space.activityFeed.isEmpty {
                     Text("No Activity Yet")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .padding(.horizontal)
                 } else {
                     ForEach(space.activityFeed) { log in
@@ -269,7 +269,7 @@ struct SpaceOverviewTab: View {
                                     .font(.subheadline)
                                 Text("\(log.userName) • \(log.timestamp, style: .relative)")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             }
                             Spacer()
                         }
@@ -291,7 +291,7 @@ struct SpaceObjectsList: View {
         List {
             if ids.isEmpty {
                 Text("No \(title.lowercased()) added to this space.")
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             } else {
                 ForEach(ids, id: \.self) { id in
                     Label("Object \(id.uuidString.prefix(8))", systemImage: icon)

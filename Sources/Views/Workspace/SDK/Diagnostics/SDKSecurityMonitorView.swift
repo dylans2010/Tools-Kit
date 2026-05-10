@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Modernized access log rows with semantic status icons and monospaced typography.
- - Replaced manual filter picker with a native segmented picker inside a Section.
- - Standardized security summary using native LabeledContent and semantic colors.
- - strictly preserved all SDKScopeManager authorized scope data and audit log filtering.
- - Improved visual hierarchy for blocked vs granted access attempts.
- - Standardized authorized scope list using native Label with checkmark icons.
- */
+
 
 import SwiftUI
 

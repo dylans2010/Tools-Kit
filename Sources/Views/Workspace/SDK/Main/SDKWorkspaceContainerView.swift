@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized navigation using NavigationStack and inline display mode.
- - Replaced manual toolbar buttons with native ToolbarItem placements.
- - Standardized the 'Run' button using a prominent capsule style and SF Symbol effects.
- - Modernized the IDE layout with semantic background colors and thin material toolbars.
- - Replaced manual sheet presentation with native .presentationDetents([.medium, .large]).
- - Standardized compact IDE navigation with a bottom bar using SF Symbols and Labels.
- - Strictly preserved all SDKRuntimeWorkspaceState management and IDE layout logic.
- */
+
 
 import SwiftUI
 

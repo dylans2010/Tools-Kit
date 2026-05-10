@@ -1,5 +1,4 @@
 import SwiftUI
-import Combine
 
 struct ArticleSearchView: View {
     var initialQuery: String = ""
@@ -17,40 +16,23 @@ struct ArticleSearchView: View {
     ]
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Language picker
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
+        List {
+            Section {
+                Picker("Language", selection: $selectedLanguage) {
                     ForEach(languages, id: \.0) { code, name in
-                        Button {
-                            selectedLanguage = code
-                        } label: {
-                            Text(name)
-                                .font(.subheadline.bold())
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 8)
-                                .background(selectedLanguage == code ? Color.blue : Color(.secondarySystemBackground))
-                                .foregroundColor(selectedLanguage == code ? .white : .primary)
-                                .cornerRadius(20)
-                        }
-                        .buttonStyle(.plain)
+                        Text(name).tag(code)
                     }
                 }
-                .padding()
             }
 
-            List {
+            Section {
                 if isLoading {
-                    HStack {
-                        Spacer()
-                        ProgressView("Searching…")
-                        Spacer()
-                    }
-                    .listRowSeparator(.hidden)
+                    ProgressView("Searching…")
                 } else if let error = errorMessage {
-                    Text(error).foregroundColor(.red).listRowSeparator(.hidden)
+                    Label(error, systemImage: "exclamationmark.triangle")
+                        .foregroundStyle(.red)
                 } else if results.isEmpty && !searchText.isEmpty {
-                    Text("No Results Found").foregroundColor(.secondary).listRowSeparator(.hidden)
+                    ContentUnavailableView.search(text: searchText)
                 } else {
                     ForEach(results) { article in
                         NavigationLink {
@@ -61,7 +43,7 @@ struct ArticleSearchView: View {
                                 Text(article.title).font(.headline)
                                 Text(article.summary)
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                     .lineLimit(2)
                             }
                             .padding(.vertical, 4)
@@ -69,7 +51,6 @@ struct ArticleSearchView: View {
                     }
                 }
             }
-            .listStyle(.plain)
         }
         .searchable(text: $searchText, prompt: "Search Wikipedia…")
         .navigationTitle("Search Articles")

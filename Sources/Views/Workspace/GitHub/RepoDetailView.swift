@@ -252,7 +252,7 @@ private struct ActionCardContent: View {
                     .clipShape(Circle())
                 Text(title)
                     .font(.subheadline.bold())
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
             }
             .frame(maxWidth: .infinity)
         }

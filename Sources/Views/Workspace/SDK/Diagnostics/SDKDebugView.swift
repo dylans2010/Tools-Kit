@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style for modern system diagnostics.
- - Replaced manual card-based metrics with standard List sections and native LabeledContent.
- - Modernized the incident log using monospaced typography and semantic red coloring for errors.
- - Standardized status indicators using native Label and prominent status pills.
- - strictly preserved all SDKRuntimeEngine, SDKTelemetryEngine, and SDKLogStore integration logic.
- - Improved visual hierarchy for system resources (Memory, Processors, Uptime) using semantic labels.
- - Standardized the 'Trace' action button with a prominent prominent style and role-based coloring.
- */
+
 
 import SwiftUI
 

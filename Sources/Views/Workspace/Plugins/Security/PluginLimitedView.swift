@@ -1,14 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on a modern, center-aligned status layout.
- - Replaced manual panels with native SwiftUI containers (Form/List) where appropriate.
- - Modernized the restriction summary using a prominent background panel with semantic colors.
- - Standardized requirement rows using Label with semantic SF Symbols.
- - Replaced manual resolution buttons with a native List/Section for actions.
- - strictly preserved all PluginDefinition and ValidationFailureReason logic.
- - Improved visual hierarchy for developer context (monospaced logs).
- - Added ContentUnavailableView-inspired header for consistency.
- */
+
 
 import SwiftUI
 

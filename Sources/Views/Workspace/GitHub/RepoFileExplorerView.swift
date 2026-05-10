@@ -14,7 +14,7 @@ struct RepoFileExplorerView: View {
         List {
             if contents.isEmpty && !isLoading {
                 Text("Empty Directory")
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             } else {
                 ForEach(contents, id: \.sha) { item in
                     ZStack {
@@ -25,7 +25,7 @@ struct RepoFileExplorerView: View {
                             .opacity(0)
 
                             Label(item.name, systemImage: "folder.fill")
-                                .foregroundColor(.blue)
+                                .foregroundStyle(.primary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         } else {
                             NavigationLink(destination: FileEditorView(owner: owner, repo: repo, path: item.path, branch: branch)) {

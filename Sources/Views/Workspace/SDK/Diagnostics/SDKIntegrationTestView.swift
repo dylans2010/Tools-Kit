@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Replaced manual card-based scenario configuration with native Section and Picker.
- - Modernized the execution button using a prominent prominent style and ProgressView.
- - Standardized execution status feedback using semantic Labels and status indicators.
- - strictly preserved all SDKExecutionKernel and SDKRuntimeEngine state management logic.
- - Standardized runtime parameter toggles using native SwiftUI components and semantic colors.
- - Improved visual hierarchy for scenario-specific success/failure reporting.
- */
+
 
 import SwiftUI
 

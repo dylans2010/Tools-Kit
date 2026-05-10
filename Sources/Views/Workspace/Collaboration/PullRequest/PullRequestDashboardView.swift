@@ -25,13 +25,13 @@ struct PullRequestDashboardView: View {
                                     .clipShape(Capsule())
                             }
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         }
                     }
                 }
             } else {
                 Text("No pull requests for this space.")
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
         }
         .navigationTitle("Pull Requests")
@@ -92,7 +92,7 @@ struct PullRequestDetailView: View {
 
                 if pr.reviews.isEmpty {
                     Text("No reviews yet.")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 } else {
                     ForEach(pr.reviews) { review in
                         VStack(alignment: .leading) {

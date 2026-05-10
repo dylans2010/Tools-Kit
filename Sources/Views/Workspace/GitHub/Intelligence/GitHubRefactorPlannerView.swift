@@ -26,7 +26,7 @@ struct GitHubRefactorPlannerView: View {
                             Text(step.description).font(.caption).foregroundStyle(.secondary)
 
                             ProgressView(value: step.progress)
-                                .tint(.purple)
+                                .tint(.secondary)
                         }
                         .padding(.vertical, 4)
                     }

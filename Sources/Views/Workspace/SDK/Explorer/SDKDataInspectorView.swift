@@ -1,12 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Replaced manual HStack layouts with native Label and LabeledContent for storage stats.
- - Modernized collection rows using monospaced typography and semantic SF Symbols.
- - Replaced manual record item layouts with a private struct using monospaced IDs and relative dates.
- - Strictly preserved all SDKDataStore fetching and collection statistic logic.
- - Implemented ContentUnavailableView for empty collection states.
- */
+
 
 import SwiftUI
 

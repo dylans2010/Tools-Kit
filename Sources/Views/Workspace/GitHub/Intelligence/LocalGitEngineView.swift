@@ -28,7 +28,7 @@ struct LocalGitEngineView: View {
                 Button(action: { showingStageFile = true }) {
                     Label("Stage a Change", systemImage: "plus.circle")
                 }
-                .foregroundStyle(.blue)
+                .foregroundStyle(.primary)
             } header: {
                 HStack {
                     Text("Staging Area")
@@ -45,14 +45,14 @@ struct LocalGitEngineView: View {
                     Button("Auto-Generate Message") {
                         newMessage = gitEngine.autoGenerateMessage(for: gitEngine.stagedChanges)
                     }
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(.primary)
                     Button("Build & Stage Commit") {
                         guard !newMessage.isEmpty else { return }
                         let _ = gitEngine.buildCommit(message: newMessage, branch: newBranch)
                         newMessage = ""
                     }
                     .disabled(newMessage.isEmpty)
-                    .foregroundStyle(.green)
+                    .foregroundStyle(.secondary)
                 } header: {
                     Text("Build Commit")
                 }
@@ -80,7 +80,7 @@ struct LocalGitEngineView: View {
                                 Text(commit.message).font(.caption)
                                 Spacer()
                                 Button("Dequeue") { gitEngine.dequeueCommit(id: id) }
-                                    .font(.caption).foregroundStyle(.orange)
+                                    .font(.caption).foregroundStyle(.secondary)
                             }
                         }
                     }
@@ -145,7 +145,7 @@ struct LocalCommitRow: View {
                 Spacer()
                 Text(commit.category.rawValue).font(.caption2)
                     .padding(.horizontal, 6).padding(.vertical, 2)
-                    .background(Color.blue.opacity(0.12))
+                    .background(.primary.opacity(0.12))
                     .clipShape(Capsule())
             }
             HStack {
@@ -157,7 +157,7 @@ struct LocalCommitRow: View {
             }
             if commit.status == .staged {
                 Button("Add to Push Queue") { engine.enqueueCommit(id: commit.id) }
-                    .font(.caption.bold()).foregroundStyle(.blue)
+                    .font(.caption.bold()).foregroundStyle(.primary)
             }
         }
         .padding(.vertical, 2)

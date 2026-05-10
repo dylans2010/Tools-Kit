@@ -29,9 +29,9 @@ struct RepoToolsPanelView: View {
                     NavigationLink(destination: CodeIntelligenceView()) {
                         HStack {
                             Label("View Issues", systemImage: "exclamationmark.triangle.fill")
-                                .foregroundStyle(.orange)
+                                .foregroundStyle(.secondary)
                             Spacer()
-                            Text("\(intelligence.securityIssues.count + intelligence.codeSmells.count)").font(.caption.bold()).foregroundStyle(.orange)
+                            Text("\(intelligence.securityIssues.count + intelligence.codeSmells.count)").font(.caption.bold()).foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -45,7 +45,7 @@ struct RepoToolsPanelView: View {
                 } label: {
                     Label("Clear Staging Area", systemImage: "trash")
                 }
-                .foregroundStyle(.orange)
+                .foregroundStyle(.secondary)
 
                 NavigationLink(destination: LocalGitEngineView()) {
                     Label("Manage Local Git", systemImage: "externaldrive.connected.to.line.below")
@@ -61,7 +61,7 @@ struct RepoToolsPanelView: View {
                 } label: {
                     Label("Generate Repo Report", systemImage: "doc.text.fill")
                 }
-                .foregroundStyle(.blue)
+                .foregroundStyle(.primary)
             } header: {
                 Text("Reports")
             }
@@ -133,7 +133,7 @@ struct ReleaseManagerView: View {
                     generatedNotes = generateNotes()
                     releaseBody = generatedNotes
                 }
-                .foregroundStyle(.blue)
+                .foregroundStyle(.primary)
             } header: {
                 Text("Release Notes")
             }
@@ -152,7 +152,7 @@ struct ReleaseManagerView: View {
                             .font(.headline)
                         HStack {
                             if isDraft { Label("Draft", systemImage: "pencil").font(.caption) }
-                            if isPrerelease { Label("Pre-release", systemImage: "exclamationmark.circle").font(.caption).foregroundStyle(.orange) }
+                            if isPrerelease { Label("Pre-release", systemImage: "exclamationmark.circle").font(.caption).foregroundStyle(.secondary) }
                         }
                         Text(releaseBody.isEmpty ? "No description." : String(releaseBody.prefix(200)))
                             .font(.caption).foregroundStyle(.secondary)
@@ -230,7 +230,7 @@ struct SecurityToolsView: View {
                 } label: {
                     Label("Scan for Exposed Secrets", systemImage: "eye.slash.fill")
                 }
-                .foregroundStyle(.blue)
+                .foregroundStyle(.primary)
 
                 if intelligence.isScanning {
                     HStack { ProgressView(); Text("Scanning staged files…").font(.caption) }
@@ -255,13 +255,13 @@ struct SecurityToolsView: View {
                                 }
                                 .font(.caption.bold()).foregroundStyle(.red).buttonStyle(.bordered).controlSize(.mini)
                             } else {
-                                Text("Blocked").font(.caption2).foregroundStyle(.orange)
+                                Text("Blocked").font(.caption2).foregroundStyle(.secondary)
                             }
                         }
                     }
                 } else if !intelligence.isScanning {
                     HStack {
-                        Image(systemName: "checkmark.shield.fill").foregroundStyle(.green)
+                        Image(systemName: "checkmark.shield.fill").foregroundStyle(.secondary)
                         Text("No secrets detected.").font(.caption).foregroundStyle(.secondary)
                     }
                 }
@@ -295,7 +295,7 @@ struct SecurityToolsView: View {
                             .font(.caption).foregroundStyle(.red)
                     }
                     Button("Clear Block List") { blockedFiles = [] }
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(.secondary)
                 } header: {
                     Text("Blocked Files (\(blockedFiles.count))")
                 }
@@ -338,7 +338,7 @@ struct BranchIntelligenceView: View {
                             Button("Preview Merge") {
                                 conflictPreviewText = simulateMerge(a: a, b: b)
                             }
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(.primary)
                         }
                         if !conflictPreviewText.isEmpty {
                             Text(conflictPreviewText)
@@ -359,7 +359,7 @@ struct BranchIntelligenceView: View {
                 let grouped = Dictionary(grouping: gitEngine.localCommits, by: { $0.branch })
                 ForEach(Array(grouped.keys.sorted()), id: \.self) { branch in
                     HStack {
-                        Image(systemName: "arrow.branch").foregroundStyle(.blue)
+                        Image(systemName: "arrow.branch").foregroundStyle(.primary)
                         Text(branch).font(.subheadline)
                         Spacer()
                         Text("\(grouped[branch]?.count ?? 0) commits").font(.caption2).foregroundStyle(.secondary)

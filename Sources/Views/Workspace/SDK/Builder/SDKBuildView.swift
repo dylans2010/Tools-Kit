@@ -46,60 +46,16 @@ struct SDKBuildView: View {
     var body: some View {
         List {
             if let project = projectManager.currentProject {
-                Section {
-                    projectOverviewSection(project)
-                } header: {
-                    SDKSectionHeader("Project Overview", subtitle: "Managed workspace integrations and builds", systemImage: "folder.fill")
-                }
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
-
-                Section {
-                    projectMetadataEditorSection(project)
-                    buildConfigSection
-                } header: {
-                    SDKSectionHeader("Configuration", subtitle: "Build parameters and identity", systemImage: "gearshape.fill")
-                }
-
-                Section {
-                    buildActionsSection
-                } header: {
-                    SDKSectionHeader("Build Pipeline", subtitle: "Execute and validate build stages", systemImage: "hammer.fill")
-                }
-
+                projectOverviewSection(project)
+                buildConfigurationSection
+                buildPipelineSection
                 buildOutputSection
                 buildMetricsSection
-
-                Section {
-                    developmentToolsSection
-                } header: {
-                    SDKSectionHeader("Development", subtitle: "Runtime and system analysis tools", systemImage: "terminal.fill")
-                }
-
-                Section {
-                    projectConfigSection(project)
-                } header: {
-                    SDKSectionHeader("Architecture", subtitle: "Define capabilities and permissions", systemImage: "square.stack.3d.up.fill")
-                }
-
-                Section {
-                    monitoringSection
-                } header: {
-                    SDKSectionHeader("Stability", subtitle: "Health and diagnostic monitoring", systemImage: "heart.text.square.fill")
-                }
-
-                Section {
-                    exploreSection
-                } header: {
-                    SDKSectionHeader("Exploration", subtitle: "Browse system nodes and APIs", systemImage: "magnifyingglass")
-                }
-
-                Section {
-                    deploySection(project)
-                } header: {
-                    SDKSectionHeader("Deployment", subtitle: "Finalize and distribute builds", systemImage: "icloud.and.arrow.up.fill")
-                }
+                developmentSection
+                architectureSection(project)
+                stabilitySection
+                explorationSection
+                deploymentSection(project)
             } else {
                 emptyProjectSection
             }
@@ -129,160 +85,53 @@ struct SDKBuildView: View {
 
     @ViewBuilder
     private func projectOverviewSection(_ project: SDKProject) -> some View {
-        SDKModernCard {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(project.name).font(.headline)
-                        Text("Version \(project.version)").font(.caption2.monospaced()).foregroundStyle(.tertiary)
-                    }
-                    Spacer()
-                    healthBadge(project.healthStatus)
-                }
-
-                HStack(spacing: 10) {
-                    SDKStatPill(label: "Scopes", value: "\(project.enabledScopes.count)")
-                    SDKStatPill(label: "Plugins", value: "\(project.enabledPluginIDs.count)")
-                    SDKStatPill(label: "Tools", value: "\(project.enabledToolIDs.count)")
-                    SDKStatPill(label: "Links", value: "\(project.enabledConnectorIDs.count)")
-                }
-
-                if isBuilding {
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack {
-                            Text("Building...").font(.caption.bold())
-                            Spacer()
-                            Text("\(Int(buildProgress * 100))%").font(.caption.monospaced())
-                        }
-                        ProgressView(value: buildProgress)
-                            .tint(.primary)
-                    }
-                    .padding(10)
-                    .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
-                }
-
-                HStack {
-                    Label(project.createdAt.formatted(date: .abbreviated, time: .omitted), systemImage: "calendar")
-                    Spacer()
-                    if let lastBuild = project.lastBuiltAt {
-                        Label(lastBuild.formatted(.relative(presentation: .numeric)), systemImage: "hammer.fill")
-                    } else {
-                        Label("Never Built", systemImage: "hammer")
-                    }
-                }
-                .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(.secondary)
-            }
-        }
-    }
-
-    // MARK: - Build Configuration
-
-    @ViewBuilder
-    private func projectMetadataEditorSection(_ project: SDKProject) -> some View {
         Section {
+            LabeledContent("Project", value: project.name)
+            LabeledContent("Version", value: "v\(project.version)")
+            LabeledContent("Health") {
+                Text(project.healthStatus.rawValue.capitalized)
+                    .foregroundStyle(healthColor(project.healthStatus))
+            }
+
+            HStack {
+                LabeledContent("Scopes", value: "\(project.enabledScopes.count)")
+                LabeledContent("Plugins", value: "\(project.enabledPluginIDs.count)")
+            }
+            HStack {
+                LabeledContent("Tools", value: "\(project.enabledToolIDs.count)")
+                LabeledContent("Links", value: "\(project.enabledConnectorIDs.count)")
+            }
+
+            if isBuilding {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("Building...")
+                            .font(.caption.bold())
+                        Spacer()
+                        Text("\(Int(buildProgress * 100))%")
+                            .font(.caption.monospaced())
+                    }
+                    ProgressView(value: buildProgress)
+                }
+            }
+
             Button {
                 metadataName = project.name
                 metadataDescription = project.description
                 metadataStatus = project.status
                 showingMetadataSheet = true
             } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: "slider.horizontal.3")
-                        .foregroundStyle(.secondary)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Edit Metadata")
-                            .font(.headline)
-                            .foregroundStyle(.primary)
-                        Text("Name, description, status, scopes, connectors, and tools")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Image(systemName: "chevron.up.forward.app")
-                        .foregroundStyle(.tertiary)
-                }
+                Label("Edit Metadata", systemImage: "slider.horizontal.3")
             }
-            .buttonStyle(.plain)
         } header: {
-            Text("Project Metadata")
+            Text("Project Overview")
         }
     }
 
-    private var metadataSheetContent: some View {
-        Form {
-            Section {
-                TextField("Project Name", text: $metadataName)
-                TextField("Description", text: $metadataDescription, axis: .vertical)
-                    .lineLimit(3...5)
-                Picker("Status", selection: $metadataStatus) {
-                    ForEach(SDKProject.ProjectStatus.allCases, id: \.self) { status in
-                        Text(status.rawValue.capitalized).tag(status)
-                    }
-                }
-            } header: {
-                Text("Details")
-            }
+    // MARK: - Build Configuration
 
-            Section {
-                scopeSelector
-            } header: {
-                Text("Access")
-            }
-
-            Section {
-                connectorAndToolAssignment
-            } header: {
-                Text("Assignments")
-            }
-        }
-        .navigationTitle("Project Metadata")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel") { showingMetadataSheet = false }
-            }
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Save") {
-                    saveBuild()
-                    showingMetadataSheet = false
-                }
-            }
-        }
-    }
-
-    private var emptyProjectSection: some View {
-        Section {
-            VStack(spacing: 14) {
-                Image(systemName: "hammer.circle")
-                    .font(.system(size: 42))
-                    .foregroundStyle(.secondary)
-                Text("No Project")
-                    .font(.title3.bold())
-                Text("Create a clean SDK project to configure scopes, connectors, tools, and builds.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                Button {
-                    let project = projectManager.createProject(name: "New SDK Project", status: .draft)
-                    metadataName = project.name
-                    metadataDescription = project.description
-                    metadataStatus = project.status
-                    showingMetadataSheet = true
-                } label: {
-                    Label("Create Project", systemImage: "plus")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 28)
-        }
-        .listRowBackground(Color.clear)
-    }
-
-    private var buildConfigSection: some View {
-        Section {
+    private var buildConfigurationSection: some View {
+        Section("Configuration") {
             Picker("Mode", selection: $buildMode) {
                 ForEach(BuildMode.allCases, id: \.self) { mode in
                     Text(mode.rawValue).tag(mode)
@@ -301,22 +150,18 @@ struct SDKBuildView: View {
             Toggle("Code Signing", isOn: $codeSigningEnabled)
             Toggle("Optimize Assets", isOn: $optimizeAssets)
             Toggle("Parallel Build", isOn: $parallelBuild)
-        } header: {
-            Text("Build Configuration")
         }
     }
 
-    // MARK: - Build Actions
+    // MARK: - Build Pipeline
 
-    private var buildActionsSection: some View {
-        Group {
+    private var buildPipelineSection: some View {
+        Section("Build Pipeline") {
             Button(action: startBuild) {
                 HStack {
                     Label("Execute Pipeline", systemImage: "hammer.fill")
                     Spacer()
-                    if isBuilding {
-                        ProgressView().controlSize(.small)
-                    }
+                    if isBuilding { ProgressView().controlSize(.small) }
                 }
             }
             .disabled(isBuilding)
@@ -330,7 +175,6 @@ struct SDKBuildView: View {
                 Label("Clean Artifacts", systemImage: "trash.fill")
             }
             .disabled(isBuilding)
-            .foregroundStyle(.sdkWarning)
         }
     }
 
@@ -339,39 +183,27 @@ struct SDKBuildView: View {
     @ViewBuilder
     private var buildOutputSection: some View {
         if let url = exportedURL {
-            Section {
-                SDKNotificationBanner(message: "Build successful: \(url.lastPathComponent)", type: .success)
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
-
+            Section("Build Result") {
+                Label("Build successful", systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
                 HStack {
                     Image(systemName: "doc.zipper")
-                        .font(.title2)
-                        .foregroundStyle(.blue)
                     VStack(alignment: .leading) {
                         Text(url.lastPathComponent).font(.subheadline.bold())
-                        Text("Total Size: \(fileSizeString(url))").font(.caption2).foregroundStyle(.secondary)
+                        Text("Size: \(fileSizeString(url))").font(.caption2).foregroundStyle(.secondary)
                     }
                     Spacer()
                     ShareLink(item: url) {
                         Image(systemName: "square.and.arrow.up")
-                            .font(.subheadline.bold())
-                            .padding(8)
-                            .background(Color.primary.opacity(0.05), in: Circle())
                     }
                 }
-            } header: {
-                SDKSectionHeader("Build Result", subtitle: "Exported project package", alignment: .leading)
             }
         }
 
         if let error = errorMessage {
-            Section {
-                SDKNotificationBanner(message: error, type: .error)
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
-            } header: {
-                SDKSectionHeader("Pipeline Failure", subtitle: "Build engine reported errors", alignment: .leading)
+            Section("Pipeline Failure") {
+                Label(error, systemImage: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.red)
             }
         }
     }
@@ -379,205 +211,146 @@ struct SDKBuildView: View {
     // MARK: - Build Metrics
 
     private var buildMetricsSection: some View {
-        Section {
+        Section("Build Metrics") {
             let metrics = telemetry.getMetrics()
-            HStack {
-                Text("Total Executions")
-                Spacer()
-                Text("\(metrics.totalTraces)")
-                    .font(.system(.body, design: .monospaced))
-                    .foregroundStyle(.secondary)
-            }
-            HStack {
-                Text("Success / Failure")
-                Spacer()
+            LabeledContent("Total Executions", value: "\(metrics.totalTraces)")
+            LabeledContent("Success / Failure") {
                 Text("\(metrics.successCount) / \(metrics.failureCount)")
-                    .font(.system(.body, design: .monospaced))
                     .foregroundStyle(metrics.failureCount > 0 ? Color.orange : Color.green)
             }
-            HStack {
-                Text("Avg Latency")
-                Spacer()
-                Text("\(String(format: "%.1f", metrics.averageDurationMs))ms")
-                    .font(.system(.body, design: .monospaced))
-                    .foregroundStyle(.secondary)
-            }
-            HStack {
-                Text("Log Entries")
-                Spacer()
-                Text("\(logStore.entries.count)")
-                    .font(.system(.body, design: .monospaced))
-                    .foregroundStyle(.secondary)
-            }
-        } header: {
-            Text("Build Metrics")
+            LabeledContent("Avg Latency", value: "\(String(format: "%.1f", metrics.averageDurationMs))ms")
+            LabeledContent("Log Entries", value: "\(logStore.entries.count)")
         }
     }
 
-    // MARK: - Development Tools
+    // MARK: - Development
 
-    private var developmentToolsSection: some View {
-        Section {
-            NavigationLink { SDKWorkspaceContainerView() } label: {
-                toolkitRow(icon: "square.split.2x2.fill", color: .indigo, title: "IDE Workspace", subtitle: "Navigator, editor, inspector, console")
-            }
-
-            NavigationLink { SDKActionConsoleView() } label: {
-                toolkitRow(icon: "terminal", color: .teal, title: "Action Console", subtitle: "Execute SDK commands")
-            }
-
-            Button { showingConsole = true } label: {
-                toolkitRow(icon: "terminal.fill", color: .blue, title: "Console Output", subtitle: "Runtime output & logs")
-            }
-
-            NavigationLink { SDKDebugView() } label: {
-                toolkitRow(icon: "ladybug", color: .red, title: "Debug Inspector", subtitle: "Runtime debug & traces")
-            }
-
-            NavigationLink { SDKLogsView() } label: {
-                toolkitRow(icon: "doc.text.magnifyingglass", color: .gray, title: "System Logs", subtitle: "Filter & search logs")
-            }
-
-            NavigationLink { SDKEventStreamView() } label: {
-                toolkitRow(icon: "waveform.path.ecg", color: .purple, title: "Event Stream", subtitle: "Live system events")
-            }
-        } header: {
-            Text("Development")
+    private var developmentSection: some View {
+        Section("Development") {
+            NavigationLink("IDE Workspace", destination: SDKWorkspaceContainerView())
+            NavigationLink("Action Console", destination: SDKActionConsoleView())
+            Button("Console Output") { showingConsole = true }
+            NavigationLink("Debug Inspector", destination: SDKDebugView())
+            NavigationLink("System Logs", destination: SDKLogsView())
+            NavigationLink("Event Stream", destination: SDKEventStreamView())
         }
     }
 
-    // MARK: - Project Configuration
+    // MARK: - Architecture
 
     @ViewBuilder
-    private func projectConfigSection(_ project: SDKProject) -> some View {
-        Section {
-            NavigationLink {
+    private func architectureSection(_ project: SDKProject) -> some View {
+        Section("Architecture") {
+            NavigationLink("Permissions") {
                 SDKPermissionControlView(project: Binding(
                     get: { projectManager.currentProject ?? project },
                     set: { projectManager.currentProject = $0 }
                 ))
-            } label: {
-                toolkitRow(icon: "lock.shield", color: .blue, title: "Permissions", subtitle: "API scope control")
             }
-
-            NavigationLink { SDKAutomationView() } label: {
-                toolkitRow(icon: "bolt.fill", color: .orange, title: "Automation", subtitle: "Automation rules")
-            }
-
-            NavigationLink {
+            NavigationLink("Automation", destination: SDKAutomationView())
+            NavigationLink("Flow Builder") {
                 SDKFlowBuilderView(project: Binding(
                     get: { projectManager.currentProject ?? project },
                     set: { projectManager.currentProject = $0 }
                 ))
-            } label: {
-                toolkitRow(icon: "arrow.triangle.branch", color: .indigo, title: "Flow Builder", subtitle: "Visual flow editor")
             }
-
-            NavigationLink { SDKPluginsView() } label: {
-                toolkitRow(icon: "puzzlepiece.fill", color: .purple, title: "Plugins", subtitle: "Extend capabilities")
-            }
-
-            NavigationLink { SDKToolsView() } label: {
-                toolkitRow(icon: "wrench.and.screwdriver.fill", color: .gray, title: "Tools", subtitle: "Data utilities")
-            }
-        } header: {
-            Text("Configuration")
+            NavigationLink("Plugins", destination: SDKPluginsView())
+            NavigationLink("Tools", destination: SDKToolsView())
         }
     }
 
-    // MARK: - Monitoring & Security
+    // MARK: - Stability
 
-    private var monitoringSection: some View {
-        Section {
-            NavigationLink { SDKDiagnosticsView() } label: {
-                toolkitRow(icon: "heart.text.square.fill", color: .red, title: "Diagnostics", subtitle: "System health check")
-            }
-
-            NavigationLink { SDKSecurityMonitorView() } label: {
-                toolkitRow(icon: "shield.lefthalf.filled", color: .blue, title: "Security Monitor", subtitle: "Access & scope audit")
-            }
-
-            NavigationLink { SDKControlCenterView() } label: {
-                toolkitRow(icon: "slider.horizontal.3", color: .gray, title: "Control Center", subtitle: "SDK control panel")
-            }
-
-            NavigationLink { SDKDataControlView() } label: {
-                toolkitRow(icon: "externaldrive.fill", color: .orange, title: "Data Control", subtitle: "Data operations")
-            }
-        } header: {
-            Text("Monitoring & Security")
+    private var stabilitySection: some View {
+        Section("Stability") {
+            NavigationLink("Diagnostics", destination: SDKDiagnosticsView())
+            NavigationLink("Security Monitor", destination: SDKSecurityMonitorView())
+            NavigationLink("Control Center", destination: SDKControlCenterView())
+            NavigationLink("Data Control", destination: SDKDataControlView())
         }
     }
 
-    // MARK: - Explore
+    // MARK: - Exploration
 
-    private var exploreSection: some View {
-        Section {
-            Button { showingSystemExplorer = true } label: {
-                toolkitRow(icon: "cpu", color: .teal, title: "System Explorer", subtitle: "Workspace API graph")
-            }
-
-            NavigationLink { SDKWorkspaceExplorerView() } label: {
-                toolkitRow(icon: "rectangle.3.group", color: .blue, title: "Workspace Explorer", subtitle: "Nodes & relationships")
-            }
-
-            NavigationLink { SDKAPIBrowserView() } label: {
-                toolkitRow(icon: "book.closed.fill", color: .indigo, title: "API Browser", subtitle: "Browse SDK methods")
-            }
-        } header: {
-            Text("Explore")
+    private var explorationSection: some View {
+        Section("Exploration") {
+            Button("System Explorer") { showingSystemExplorer = true }
+            NavigationLink("Workspace Explorer", destination: SDKWorkspaceExplorerView())
+            NavigationLink("API Browser", destination: SDKAPIBrowserView())
         }
     }
 
-    // MARK: - Build & Deploy
+    // MARK: - Deployment
 
     @ViewBuilder
-    private func deploySection(_ project: SDKProject) -> some View {
+    private func deploymentSection(_ project: SDKProject) -> some View {
+        Section("Build & Deploy") {
+            NavigationLink("Integration Tests", destination: SDKIntegrationTestView())
+            NavigationLink("App Builder", destination: SDKAppBuilderView())
+            NavigationLink("Deployment", destination: SDKDeploymentView(project: project))
+        }
+    }
+
+    // MARK: - Empty State
+
+    private var emptyProjectSection: some View {
         Section {
-            NavigationLink { SDKIntegrationTestView() } label: {
-                toolkitRow(icon: "testtube.2", color: .green, title: "Integration Tests", subtitle: "Run test scenarios")
+            ContentUnavailableView {
+                Label("No Project", systemImage: "hammer.circle")
+            } description: {
+                Text("Create an SDK project to configure scopes, connectors, tools, and builds.")
+            } actions: {
+                Button("Create Project") {
+                    let project = projectManager.createProject(name: "New SDK Project", status: .draft)
+                    metadataName = project.name
+                    metadataDescription = project.description
+                    metadataStatus = project.status
+                    showingMetadataSheet = true
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+    }
+
+    // MARK: - Metadata Sheet
+
+    private var metadataSheetContent: some View {
+        Form {
+            Section("Details") {
+                TextField("Project Name", text: $metadataName)
+                TextField("Description", text: $metadataDescription, axis: .vertical)
+                    .lineLimit(3...5)
+                Picker("Status", selection: $metadataStatus) {
+                    ForEach(SDKProject.ProjectStatus.allCases, id: \.self) { status in
+                        Text(status.rawValue.capitalized).tag(status)
+                    }
+                }
             }
 
-            NavigationLink { SDKAppBuilderView() } label: {
-                toolkitRow(icon: "wand.and.stars", color: .indigo, title: "App Builder", subtitle: "Visual app editor")
+            Section("Access") {
+                scopeSelector
             }
 
-            NavigationLink { SDKDeploymentView(project: project) } label: {
-                toolkitRow(icon: "icloud.and.arrow.up", color: .blue, title: "Deployment", subtitle: "Deploy project")
+            Section("Assignments") {
+                connectorAndToolAssignment
             }
-        } header: {
-            Text("Build & Deploy")
+        }
+        .navigationTitle("Project Metadata")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") { showingMetadataSheet = false }
+            }
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Save") {
+                    saveBuild()
+                    showingMetadataSheet = false
+                }
+            }
         }
     }
 
     // MARK: - Helpers
-
-    private func toolkitRow(icon: String, color: Color, title: String, subtitle: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .foregroundStyle(.white)
-                .font(.system(size: 14))
-                .frame(width: 30, height: 30)
-                .background(color, in: RoundedRectangle(cornerRadius: 7))
-            VStack(alignment: .leading, spacing: 1) {
-                Text(title).font(.subheadline).fontWeight(.medium)
-                Text(subtitle).font(.caption2).foregroundStyle(.secondary)
-            }
-            Spacer()
-        }
-        .padding(.vertical, 2)
-    }
-
-
-    @ViewBuilder
-    private func healthBadge(_ status: HealthStatus) -> some View {
-        Text(status.rawValue.uppercased())
-            .font(.system(size: 10, weight: .bold))
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(healthColor(status).opacity(0.2), in: Capsule())
-            .foregroundStyle(healthColor(status))
-    }
 
     private func healthColor(_ status: HealthStatus) -> Color {
         switch status {
@@ -724,7 +497,6 @@ struct SDKBuildView: View {
 
     private var scopeSelector: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Scopes").font(.caption).foregroundStyle(.secondary)
             ForEach(policyEngine.availableScopes(), id: \.name) { definition in
                 Toggle(isOn: Binding(
                     get: { projectManager.currentProject?.enabledScopes.contains(definition.name) ?? false },

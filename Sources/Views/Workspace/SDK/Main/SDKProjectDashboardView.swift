@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on NavigationStack and insetGrouped List style.
- - Replaced manual metadata cards with a structured MetadataHeader private struct.
- - Standardized Control Hub navigation using native Label and semantic colors.
- - Standardized project status and health badges with SF Symbols and prominent pills.
- - strictly preserved all SDKDashboardRoute definitions and state objects.
- - Replaced manual button groups with standard List rows for better accessibility.
- - Used ContentUnavailableView for empty project states.
- */
+
 
 import SwiftUI
 

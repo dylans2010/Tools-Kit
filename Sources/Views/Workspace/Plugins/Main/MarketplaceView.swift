@@ -1,14 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Modernized the header stats using a centered SDKStatPill group with semantic colors.
- - Replaced manual category switcher with a modern horizontal ScrollView of FilterChips.
- - Modernized MarketplacePluginRow and MarketplaceSDKAppRow with improved spacing, better SF Symbol usage, and semantic typography.
- - strictly preserved all PluginManager and PluginRuntimeEngine search/filter logic.
- - Added ContentUnavailableView for empty search results and category filters.
- - Standardized "Made For Workspace" badge with a dynamic gradient and native styling.
- - Extracted subviews for MarketplaceStatHeader, FilterCategorySection, and result rows.
- */
+
 
 import SwiftUI
 

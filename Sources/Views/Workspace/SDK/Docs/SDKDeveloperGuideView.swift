@@ -1,14 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Modernized the category selector using native Picker with SF Symbols.
- - Replaced manual documentation blocks with structured private subviews for better maintenance.
- - Standardized typography using .headline, .subheadline, and .caption.
- - strictly preserved all Developer Guide content and hierarchical navigation.
- - Improved visual hierarchy for code examples and API endpoints.
- - Extracted subviews for GuideIntroduction, SDKModuleOverview, and SecurityPolicySection.
- - RESTORED: Full documentation content that was mistakenly summarized in previous iteration.
- */
+
 
 import SwiftUI
 

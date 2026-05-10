@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Modernized permission toggles using a native Form/Section structure.
- - Replaced manual description text with Section footers.
- - Standardized SF Symbols usage for global permissions.
- - strictly preserved all PluginManager security policy and permission data structures.
- - Replaced NavigationLink placeholders with modern inline navigation destinations.
- - Added .presentationDragIndicator and .presentationCornerRadius for sheet presentation.
- */
+
 
 import SwiftUI
 

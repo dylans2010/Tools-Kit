@@ -12,7 +12,7 @@ struct AddDataCollabView: View {
                 Section {
                     if framework.indexedObjects.isEmpty {
                         Text("No compatible data found.")
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     } else {
                         ForEach(Array(framework.indexedObjects.keys), id: \.self) { id in
                             let type = framework.indexedObjects[id]!

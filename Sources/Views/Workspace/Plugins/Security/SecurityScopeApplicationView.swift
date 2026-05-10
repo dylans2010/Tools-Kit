@@ -1,14 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on native Form architecture.
- - Modernized the header using a native Section footer for descriptive text.
- - Replaced manual API key generator with a structured LabeledContent row.
- - Standardized the Privacy Note editor with native TextEditor and improved focus styling.
- - Replaced manual high-risk scope list with a native Section using semantic SF Symbols and colors.
- - strictly preserved all PluginDefinition binding and API key generation logic.
- - Improved visual hierarchy for credentials and data governance.
- - Standardized the toolbar actions.
- */
+
 
 import SwiftUI
 

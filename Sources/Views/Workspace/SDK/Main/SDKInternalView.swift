@@ -1,12 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Transitioned to native Form structure for cleaner system debugging.
- - Standardized on monospaced typography for all technical and raw data outputs.
- - Replaced manual HStack layouts with LabeledContent and native Pickers.
- - Standardized risk level colors using semantic .red and .secondary.
- - strictly preserved all AuditLogger, PrivacyManager, and PolicyEngine logic.
- - Replaced manual trace lists with standard List rows.
- */
+
 
 import SwiftUI
 

@@ -1,14 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Modernized the status header using a centered detailStat group with SDKStatPill-like metrics.
- - Replaced manual connection details with native LabeledContent rows and semantic status badges.
- - Modernized the Action section with standardized Label components and progress indicators.
- - Standardized the Activity Log with a segmented filter and improved row hierarchy.
- - strictly preserved all BaseConnector testing, syncing, and log filtering logic.
- - Added expandable log entries for detailed timestamp viewing.
- - Applied modern sheet detents for authentication configuration.
- */
+
 
 import SwiftUI
 

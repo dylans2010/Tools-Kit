@@ -181,7 +181,7 @@ struct WorkspaceToolsPanelView: View {
                     integrity.runScan()
                 } label: {
                     Label("Run Integrity Scan", systemImage: "stethoscope")
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(.primary)
                 }
 
                 if integrity.isScanning {
@@ -210,7 +210,7 @@ struct WorkspaceToolsPanelView: View {
                     notif.post(title: "Workspace Cleaned", body: "Removed \(emptyTaskIDs.count) empty task(s) and cleaned orphaned references.", category: .update)
                 } label: {
                     Label("Clean Unused Data", systemImage: "trash")
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(.secondary)
                 }
             } header: {
                 Text("Reports")
@@ -225,7 +225,7 @@ struct WorkspaceToolsPanelView: View {
                 }
                 if !notif.notifications.isEmpty {
                     Button("Mark All Read") { notif.markAllRead() }
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(.primary)
                 }
             } header: {
                 Text("Notifications (\(notif.unreadCount) unread)")
@@ -274,7 +274,7 @@ struct IntegrityIssueRow: View {
                 .foregroundStyle(issue.severity == .error ? Color.red : issue.severity == .warning ? Color.orange : Color.blue)
             VStack(alignment: .leading, spacing: 2) {
                 Text(issue.description).font(.caption)
-                if issue.isFixed { Text("✓ Fixed").font(.caption2).foregroundStyle(.green) }
+                if issue.isFixed { Text("✓ Fixed").font(.caption2).foregroundStyle(.primary) }
             }
             Spacer()
             if issue.autoFixable && !issue.isFixed {

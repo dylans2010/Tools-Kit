@@ -48,7 +48,7 @@ struct TimelineActivityRow: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: iconForAction(log.action))
-                .foregroundColor(.blue)
+                .foregroundStyle(.primary)
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 4) {
@@ -62,7 +62,7 @@ struct TimelineActivityRow: View {
                     Text(log.timestamp, style: .relative)
                 }
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
             }
         }
         .padding(.vertical, 4)

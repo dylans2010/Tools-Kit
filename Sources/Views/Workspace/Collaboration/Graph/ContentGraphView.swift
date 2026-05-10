@@ -94,7 +94,7 @@ struct NodeRow: View {
                 }
                 Spacer()
                 VStack(alignment: .trailing) {
-                    Text("\(edgeCount)").font(.caption).bold().foregroundStyle(.blue)
+                    Text("\(edgeCount)").font(.caption).bold().foregroundStyle(.primary)
                     Text("Links").font(.caption2).foregroundStyle(.secondary)
                 }
             }
@@ -160,7 +160,7 @@ struct NodeDetailView: View {
                             HStack {
                                 Image(systemName: "circle.fill")
                                     .font(.caption2)
-                                    .foregroundStyle(.blue)
+                                    .foregroundStyle(.primary)
                                 VStack(alignment: .leading) {
                                     Text(neighbor.label).font(.subheadline)
                                     if let edge = edges.first(where: { ($0.sourceID == nodeID && $0.targetID == neighbor.id) || ($0.targetID == nodeID && $0.sourceID == neighbor.id) }) {
@@ -171,7 +171,7 @@ struct NodeDetailView: View {
                         }
                     }
                     Button("Link To Node…") { showingLinkPicker = true }
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(.primary)
                 } header: {
                     Text("Connections (\(neighbors.count))")
                 }
