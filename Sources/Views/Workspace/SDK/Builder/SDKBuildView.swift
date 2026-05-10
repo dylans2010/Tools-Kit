@@ -131,7 +131,7 @@ struct SDKBuildView: View {
     // MARK: - Build Configuration
 
     private var buildConfigurationSection: some View {
-        Section("Configuration") {
+        Section {
             Picker("Mode", selection: $buildMode) {
                 ForEach(BuildMode.allCases, id: \.self) { mode in
                     Text(mode.rawValue).tag(mode)
@@ -150,13 +150,15 @@ struct SDKBuildView: View {
             Toggle("Code Signing", isOn: $codeSigningEnabled)
             Toggle("Optimize Assets", isOn: $optimizeAssets)
             Toggle("Parallel Build", isOn: $parallelBuild)
+                } header: {
+            Text("Configuration")
         }
     }
 
     // MARK: - Build Pipeline
 
     private var buildPipelineSection: some View {
-        Section("Build Pipeline") {
+        Section {
             Button(action: startBuild) {
                 HStack {
                     Label("Execute Pipeline", systemImage: "hammer.fill")
@@ -175,6 +177,8 @@ struct SDKBuildView: View {
                 Label("Clean Artifacts", systemImage: "trash.fill")
             }
             .disabled(isBuilding)
+                } header: {
+            Text("Build Pipeline")
         }
     }
 
@@ -183,7 +187,7 @@ struct SDKBuildView: View {
     @ViewBuilder
     private var buildOutputSection: some View {
         if let url = exportedURL {
-            Section("Build Result") {
+            Section {
                 Label("Build successful", systemImage: "checkmark.circle.fill")
                     .foregroundStyle(.green)
                 HStack {
@@ -197,13 +201,17 @@ struct SDKBuildView: View {
                         Image(systemName: "square.and.arrow.up")
                     }
                 }
+            } header: {
+                Text("Build Result")
             }
         }
 
         if let error = errorMessage {
-            Section("Pipeline Failure") {
+            Section {
                 Label(error, systemImage: "exclamationmark.triangle.fill")
                     .foregroundStyle(.red)
+            } header: {
+                Text("Pipeline Failure")
             }
         }
     }
@@ -211,7 +219,7 @@ struct SDKBuildView: View {
     // MARK: - Build Metrics
 
     private var buildMetricsSection: some View {
-        Section("Build Metrics") {
+        Section {
             let metrics = telemetry.getMetrics()
             LabeledContent("Total Executions", value: "\(metrics.totalTraces)")
             LabeledContent("Success / Failure") {
@@ -220,19 +228,23 @@ struct SDKBuildView: View {
             }
             LabeledContent("Avg Latency", value: "\(String(format: "%.1f", metrics.averageDurationMs))ms")
             LabeledContent("Log Entries", value: "\(logStore.entries.count)")
+                } header: {
+            Text("Build Metrics")
         }
     }
 
     // MARK: - Development
 
     private var developmentSection: some View {
-        Section("Development") {
+        Section {
             NavigationLink("IDE Workspace", destination: SDKWorkspaceContainerView())
             NavigationLink("Action Console", destination: SDKActionConsoleView())
             Button("Console Output") { showingConsole = true }
             NavigationLink("Debug Inspector", destination: SDKDebugView())
             NavigationLink("System Logs", destination: SDKLogsView())
             NavigationLink("Event Stream", destination: SDKEventStreamView())
+                } header: {
+            Text("Development")
         }
     }
 
@@ -240,7 +252,7 @@ struct SDKBuildView: View {
 
     @ViewBuilder
     private func architectureSection(_ project: SDKProject) -> some View {
-        Section("Architecture") {
+        Section {
             NavigationLink("Permissions") {
                 SDKPermissionControlView(project: Binding(
                     get: { projectManager.currentProject ?? project },
@@ -256,27 +268,33 @@ struct SDKBuildView: View {
             }
             NavigationLink("Plugins", destination: SDKPluginsView())
             NavigationLink("Tools", destination: SDKToolsView())
+                } header: {
+            Text("Architecture")
         }
     }
 
     // MARK: - Stability
 
     private var stabilitySection: some View {
-        Section("Stability") {
+        Section {
             NavigationLink("Diagnostics", destination: SDKDiagnosticsView())
             NavigationLink("Security Monitor", destination: SDKSecurityMonitorView())
             NavigationLink("Control Center", destination: SDKControlCenterView())
             NavigationLink("Data Control", destination: SDKDataControlView())
+                } header: {
+            Text("Stability")
         }
     }
 
     // MARK: - Exploration
 
     private var explorationSection: some View {
-        Section("Exploration") {
+        Section {
             Button("System Explorer") { showingSystemExplorer = true }
             NavigationLink("Workspace Explorer", destination: SDKWorkspaceExplorerView())
             NavigationLink("API Browser", destination: SDKAPIBrowserView())
+                } header: {
+            Text("Exploration")
         }
     }
 
@@ -284,10 +302,12 @@ struct SDKBuildView: View {
 
     @ViewBuilder
     private func deploymentSection(_ project: SDKProject) -> some View {
-        Section("Build & Deploy") {
+        Section {
             NavigationLink("Integration Tests", destination: SDKIntegrationTestView())
             NavigationLink("App Builder", destination: SDKAppBuilderView())
             NavigationLink("Deployment", destination: SDKDeploymentView(project: project))
+                } header: {
+            Text("Build & Deploy")
         }
     }
 
@@ -316,7 +336,7 @@ struct SDKBuildView: View {
 
     private var metadataSheetContent: some View {
         Form {
-            Section("Details") {
+            Section {
                 TextField("Project Name", text: $metadataName)
                 TextField("Description", text: $metadataDescription, axis: .vertical)
                     .lineLimit(3...5)
