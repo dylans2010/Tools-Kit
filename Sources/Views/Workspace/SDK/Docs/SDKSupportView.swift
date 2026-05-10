@@ -122,6 +122,12 @@ struct SDKSupportView: View {
         }
         .listStyle(.insetGrouped)
         .navigationTitle("AI App Builder")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Image(systemName: "wand.and.stars.inverse")
+                    .foregroundStyle(.accent)
+            }
+        }
         .sheet(isPresented: $showingPlanDetail) {
             if let plan = generatedPlan {
                 NavigationStack { planDetailSheet(plan) }
@@ -332,11 +338,17 @@ struct SDKSupportView: View {
                     try await Task.sleep(nanoseconds: 400_000_000)
                 }
 
-                let contextDocument = SDKAIContextProvider.loadContext()
+                let contextDocument = try await Task.detached(priority: .userInitiated) {
+                    SDKAIContextProvider.loadContext()
+                }.value
                 let systemPrompt = SDKAIContextProvider.supportSystemPrompt(context: contextDocument)
 
                 let response = try await AIService.shared.processText(
-                    prompt: "Generate an SDK app plan for: \(appDescription)",
+                    prompt: """
+                    You are generating a production-ready SDK app plan that will be implemented in JavaScript with the SDK.
+                    Fully analyze and follow the system training prompt context. Return strict JSON only.
+                    User requirements: \(appDescription)
+                    """,
                     systemPrompt: systemPrompt
                 )
 
