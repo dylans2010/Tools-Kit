@@ -6,6 +6,7 @@ struct SDKDiagnosticsView: View {
     @StateObject private var connectorManager = SDKConnectorManager.shared
     @StateObject private var pluginManager = SDKPluginManager.shared
     @StateObject private var telemetry = SDKTelemetryEngine.shared
+    private let successRateHealthyThreshold: Double = 90
 
     var body: some View {
         let snapshot = makeSnapshot()
@@ -60,7 +61,7 @@ struct SDKDiagnosticsView: View {
         let telemetryMetrics: TelemetryMetrics = telemetry.getMetrics()
         let successRate = successRateValue(for: telemetryMetrics)
         let successRateText = percentageText(from: successRate)
-        let successRateColor = successRate >= 90 ? Color.green : Color.orange
+        let successRateColor = successRate >= successRateHealthyThreshold ? Color.green : Color.orange
 
         let healthRows: [HealthMetricDisplay] = [
             HealthMetricDisplay(
@@ -147,7 +148,7 @@ struct SDKDiagnosticsView: View {
             SummaryMetric(id: "summary.enabledPlugins", title: "Enabled Plugins", value: "\(enabledPlugins)"),
             SummaryMetric(id: "summary.connectedConnectors", title: "Connected", value: "\(connectedConnectors)"),
             SummaryMetric(id: "summary.activeTraces", title: "Active Traces", value: "\(telemetryMetrics.activeTraces)"),
-            SummaryMetric(id: "summary.projectLoaded", title: "Project Loaded", value: projectManager.currentProject == nil ? "No" : "Yes")
+            SummaryMetric(id: "summary.projectLoaded", title: "Project Loaded", value: projectManager.currentProject == nil ? "None" : "Loaded")
         ]
 
         return DiagnosticsSnapshot(
