@@ -136,7 +136,7 @@ private struct TestHistorySection: View {
     var body: some View {
         Section("Request History") {
             if history.isEmpty { Text("No requests made.").font(.caption).foregroundStyle(.secondary) }
-            else { ForEach(history) { req in Button { onSelect(req) } label: { HStack { Text(req.method).font(.system(size: 7, weight: .black)).padding(4).background(Color.accentColor.opacity(0.1), in: Capsule()); Text(req.endpoint).font(.system(size: 8, design: .monospaced)).lineLimit(1); Spacer(); if let code = req.statusCode { Text("\(code)").font(.system(size: 8, weight: .bold)).foregroundStyle(code < 300 ? .green : .red) } } } } }
+            else { ForEach(history) { req in Button { onSelect(req) } label: { HStack { Text(req.method).font(.system(size: 7, weight: .black)).padding(4).background(Color.accentColor.opacity(0.1), in: Capsule()); Text(req.endpoint).font(.system(size: 8, design: .monospaced)).lineLimit(1); Spacer(); if let code = req.statusCode { Text("\(code)").font(.system(size: 8, weight: .bold)).foregroundStyle(code < 300 ? Color.green : Color.red) } } } } }
         }
     }
 }
@@ -146,7 +146,7 @@ private struct ResponseMetricsHeader: View {
     var body: some View {
         if code != nil {
             HStack(spacing: 12) {
-                if let c = code { Text("HTTP \(c)").font(.system(size: 8, weight: .black)).padding(.horizontal, 6).padding(.vertical, 2).background((c < 300 ? Color.green : .red).opacity(0.1), in: Capsule()).foregroundStyle(c < 300 ? .green : .red) }
+                if let c = code { Text("HTTP \(c)").font(.system(size: 8, weight: .black)).padding(.horizontal, 6).padding(.vertical, 2).background((c < 300 ? Color.green : .red).opacity(0.1), in: Capsule()).foregroundStyle(c < 300 ? Color.green : Color.red) }
                 if let t = time { Label(String(format: "%.0fms", t * 1000), systemImage: "timer").font(.system(size: 8)).foregroundStyle(.secondary) }
                 Spacer(); if !type.isEmpty { Text(type).font(.system(size: 8)).foregroundStyle(.tertiary) }
             }.padding(.vertical, 4)

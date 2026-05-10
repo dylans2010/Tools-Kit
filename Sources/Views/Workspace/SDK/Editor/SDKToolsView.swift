@@ -38,7 +38,7 @@ struct SDKToolsView: View {
                             Label(record.toolID.uuidString.prefix(8).description,
                                   systemImage: record.success ? "checkmark.circle.fill" : "xmark.circle.fill")
                                 .font(.caption.monospaced())
-                                .foregroundStyle(record.success ? .green : .red)
+                                .foregroundStyle(record.success ? Color.green : Color.red)
                         }
                     }
                 }
@@ -91,7 +91,7 @@ struct ToolRunner: View {
                 Section("Environment") {
                     LabeledContent("Sandbox Mode") {
                         Text(runtime.isNoSandboxModeEnabled ? "Unrestricted" : "Sandboxed")
-                            .foregroundStyle(runtime.isNoSandboxModeEnabled ? .red : .green).bold()
+                            .foregroundStyle(runtime.isNoSandboxModeEnabled ? Color.red : Color.green).bold()
                     }
                 }
 

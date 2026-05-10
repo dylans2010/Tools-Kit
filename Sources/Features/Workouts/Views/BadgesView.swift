@@ -16,13 +16,13 @@ struct BadgesView: View {
                         VStack(spacing: 8) {
                             Image(systemName: badge.id.icon)
                                 .font(.title2)
-                                .foregroundStyle(badge.isUnlocked ? .yellow : .secondary)
+                                .foregroundStyle(badge.isUnlocked ? Color.yellow : Color.secondary)
                             Text(badge.name)
                                 .font(.footnote.bold())
                                 .multilineTextAlignment(.center)
                             Text(badge.isUnlocked ? "Unlocked" : "Locked")
                                 .font(.caption2)
-                                .foregroundStyle(badge.isUnlocked ? .green : .secondary)
+                                .foregroundStyle(badge.isUnlocked ? Color.green : Color.secondary)
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -47,7 +47,7 @@ struct BadgesView: View {
                             .foregroundStyle(.secondary)
                         Text(badge.isUnlocked ? "Status: Unlocked" : "Status: Locked")
                             .font(.caption)
-                            .foregroundStyle(badge.isUnlocked ? .green : .secondary)
+                            .foregroundStyle(badge.isUnlocked ? Color.green : Color.secondary)
                     }
                 }
                 .navigationTitle("Badge Info")

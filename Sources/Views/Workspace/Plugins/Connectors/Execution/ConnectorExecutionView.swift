@@ -97,7 +97,7 @@ private struct ExecutionHeaderView: View {
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: isRunning ? "arrow.triangle.2.circlepath" : "play.circle.fill")
-                .font(.system(size: 48)).foregroundStyle(isRunning ? Color.accentColor : .secondary)
+                .font(.system(size: 48)).foregroundStyle(isRunning ? Color.accentColor : Color.secondary)
                 .symbolEffect(.bounce, options: .repeating, value: isRunning)
 
             VStack(spacing: 4) {

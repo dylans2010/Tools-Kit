@@ -39,7 +39,7 @@ struct SDKControlCenterView: View {
                 let healthPercent = computeHealthPercent()
                 Text("\(healthPercent)%")
                     .font(.headline.monospaced())
-                    .foregroundStyle(healthPercent > 90 ? .green : .orange)
+                    .foregroundStyle(healthPercent > 90 ? Color.green : Color.orange)
             } label: {
                 Label("System Health", systemImage: "heart.text.square")
             }
@@ -100,7 +100,7 @@ struct SDKControlCenterView: View {
             LabeledContent("Status") {
                 Label(realtimeSync.isConnected ? "Connected" : "Idle",
                       systemImage: realtimeSync.isConnected ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash")
-                    .foregroundStyle(realtimeSync.isConnected ? .green : .secondary)
+                    .foregroundStyle(realtimeSync.isConnected ? Color.green : Color.secondary)
             }
 
             if !realtimeSync.activeChannels.isEmpty {
@@ -123,7 +123,7 @@ struct SDKControlCenterView: View {
                 ForEach(connectorManager.connectors, id: \.id) { connector in
                     LabeledContent(connector.name) {
                         Text(connector.status.rawValue.capitalized)
-                            .foregroundStyle(connector.status == .connected ? .green : .secondary)
+                            .foregroundStyle(connector.status == .connected ? Color.green : Color.secondary)
                     }
                 }
             }
@@ -144,7 +144,7 @@ struct SDKControlCenterView: View {
                     }
                 } icon: {
                     Image(systemName: "shield.slash")
-                        .foregroundStyle(runtime.isNoSandboxModeEnabled ? .red : .secondary)
+                        .foregroundStyle(runtime.isNoSandboxModeEnabled ? Color.red : Color.secondary)
                 }
             }
             .tint(.red)
@@ -174,7 +174,7 @@ private struct HealthRow: View {
     var body: some View {
         LabeledContent(label) {
             Image(systemName: healthy ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                .foregroundStyle(healthy ? .green : .red)
+                .foregroundStyle(healthy ? Color.green : Color.red)
         }
     }
 }

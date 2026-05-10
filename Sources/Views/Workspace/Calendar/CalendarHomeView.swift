@@ -115,7 +115,7 @@ struct CalendarModeSelector: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                             .background(selectedMode == mode ? Color.blue : Color.white.opacity(0.1), in: Capsule())
-                            .foregroundStyle(selectedMode == mode ? .white : .secondary)
+                            .foregroundStyle(selectedMode == mode ? Color.white : Color.secondary)
                     }
                 }
             }

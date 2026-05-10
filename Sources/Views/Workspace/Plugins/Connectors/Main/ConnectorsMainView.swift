@@ -97,9 +97,9 @@ struct ConnectorDefinitionDetailView: View {
             }
             if !connector.description.isEmpty { Section("Description") { Text(connector.description).font(.subheadline).foregroundStyle(.secondary) } }
             Section("Quick Actions") {
-                Button { Task { await runtime.run(connector: connector) } } label: { Label(isRunning ? "Running..." : "Execute Pipeline", systemImage: isRunning ? "arrow.triangle.2.circlepath" : "play.fill").foregroundStyle(isRunning ? Color.secondary : .green) }.disabled(isRunning)
+                Button { Task { await runtime.run(connector: connector) } } label: { Label(isRunning ? "Running..." : "Execute Pipeline", systemImage: isRunning ? "arrow.triangle.2.circlepath" : "play.fill").foregroundStyle(isRunning ? Color.secondary : Color.green) }.disabled(isRunning)
                 Button { showingTestConsole = true } label: { Label("Open Test Console", systemImage: "terminal") }
-                Button { toggleStatus() } label: { Label(connector.status == .active ? "Deactivate" : "Activate", systemImage: connector.status == .active ? "pause.circle" : "checkmark.circle").foregroundStyle(connector.status == .active ? .orange : .green) }
+                Button { toggleStatus() } label: { Label(connector.status == .active ? "Deactivate" : "Activate", systemImage: connector.status == .active ? "pause.circle" : "checkmark.circle").foregroundStyle(connector.status == .active ? Color.orange : Color.green) }
             }
             Section("Endpoints (\(connector.endpoints.count))") {
                 if connector.endpoints.isEmpty { Text("No endpoints configured.").font(.caption).foregroundStyle(.secondary) }

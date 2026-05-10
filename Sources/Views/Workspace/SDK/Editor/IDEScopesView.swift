@@ -48,7 +48,7 @@ struct IDEScopesView: View {
                             }
                         } icon: {
                             Image(systemName: diagnostic.severity == .error ? "xmark.octagon.fill" : "exclamationmark.triangle.fill")
-                                .foregroundStyle(diagnostic.severity == .error ? .red : .orange)
+                                .foregroundStyle(diagnostic.severity == .error ? Color.red : Color.orange)
                         }
                     }
 

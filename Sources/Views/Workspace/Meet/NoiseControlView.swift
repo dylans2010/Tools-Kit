@@ -12,7 +12,7 @@ struct NoiseControlView: View {
             Toggle("Enable Filtering", isOn: Binding(get: { isEnabled }, set: onToggle))
             Label(processingState, systemImage: isEnabled ? "checkmark.circle.fill" : "mic.slash")
                 .font(.caption)
-                .foregroundStyle(isEnabled ? .green : .secondary)
+                .foregroundStyle(isEnabled ? Color.green : Color.secondary)
         }
     }
 }

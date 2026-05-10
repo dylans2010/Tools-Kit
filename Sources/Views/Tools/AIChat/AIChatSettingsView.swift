@@ -821,11 +821,11 @@ struct ProviderChip: View {
             VStack(spacing: 6) {
                 Image(systemName: provider.icon)
                     .font(.title3)
-                    .foregroundStyle(isSelected ? .white : .blue)
+                    .foregroundStyle(isSelected ? Color.white : Color.blue)
                 Text(provider.name)
                     .font(.caption2)
                     .fontWeight(.medium)
-                    .foregroundStyle(isSelected ? .white : .primary)
+                    .foregroundStyle(isSelected ? Color.white : Color.primary)
                     .lineLimit(1)
             }
             .frame(width: 80, height: 64)

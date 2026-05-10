@@ -30,7 +30,7 @@ struct PluginDetailView: View {
                         LabeledContent("Identifier") { Text(plugin.identifier).font(.caption.monospaced()) }
                         if let installed = plugin.installedAt { LabeledContent("Date Added", value: installed.formatted(date: .abbreviated, time: .omitted)) }
                         if let lastExec = plugin.lastExecutedAt { LabeledContent("Last Run", value: lastExec.formatted(.relative(presentation: .named))) }
-                        LabeledContent("System Errors", value: "\(plugin.errorCount)").foregroundStyle(plugin.errorCount > 0 ? .red : .secondary)
+                        LabeledContent("System Errors", value: "\(plugin.errorCount)").foregroundStyle(plugin.errorCount > 0 ? Color.red : Color.secondary)
                     }
 
                     Section("Capabilities") {

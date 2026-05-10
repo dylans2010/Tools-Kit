@@ -58,7 +58,7 @@ struct SDKLogsView: View {
             }
         } label: {
             Image(systemName: "line.3.horizontal.decrease.circle")
-                .foregroundStyle(selectedLevel == nil ? .secondary : Color.accentColor)
+                .foregroundStyle(selectedLevel == nil ? Color.secondary : Color.accentColor)
         }
     }
 }

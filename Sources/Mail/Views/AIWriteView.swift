@@ -192,7 +192,7 @@ struct AIWriteView: View {
                             RoundedRectangle(cornerRadius: 16)
                                 .stroke(selectedTool == tool ? Color.blue.opacity(0.5) : Color.white.opacity(0.1), lineWidth: 1.5)
                         )
-                        .foregroundStyle(selectedTool == tool ? .blue : .primary)
+                        .foregroundStyle(selectedTool == tool ? Color.blue : Color.primary)
                     }
                 }
             }

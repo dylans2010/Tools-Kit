@@ -72,7 +72,7 @@ struct SessionRow: View {
         HStack {
             Image(systemName: session.isCurrent ? "iphone.badge.play" : "iphone")
                 .font(.title2)
-                .foregroundStyle(session.isCurrent ? .blue : .secondary)
+                .foregroundStyle(session.isCurrent ? Color.blue : Color.secondary)
                 .frame(width: 40)
 
             VStack(alignment: .leading, spacing: 2) {

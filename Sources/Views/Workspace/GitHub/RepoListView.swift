@@ -109,7 +109,7 @@ private struct RepoRow: View {
             HStack(spacing: 14) {
                 Image(systemName: repository.private ? "lock.fill" : "book.closed.fill")
                     .font(.title3)
-                    .foregroundStyle(repository.private ? .orange : .blue)
+                    .foregroundStyle(repository.private ? Color.orange : Color.blue)
                     .frame(width: 40, height: 40)
                     .background((repository.private ? Color.orange : Color.blue).opacity(0.12))
                     .clipShape(Circle())

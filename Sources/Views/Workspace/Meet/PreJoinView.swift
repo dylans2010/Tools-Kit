@@ -55,7 +55,7 @@ struct PreJoinView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
                 .background(isOn ? Color.blue.opacity(0.1) : Color.red.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
-                .foregroundStyle(isOn ? .blue : .red)
+                .foregroundStyle(isOn ? Color.blue : Color.red)
         }
     }
 

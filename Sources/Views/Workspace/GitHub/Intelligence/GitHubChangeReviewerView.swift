@@ -24,7 +24,7 @@ struct GitHubChangeReviewerView: View {
                             } label: {
                                 HStack {
                                     Image(systemName: approvedFiles.contains(change.id) ? "checkmark.circle.fill" : "circle")
-                                        .foregroundStyle(approvedFiles.contains(change.id) ? .green : .secondary)
+                                        .foregroundStyle(approvedFiles.contains(change.id) ? Color.green : Color.secondary)
                                     VStack(alignment: .leading) {
                                         Text(URL(fileURLWithPath: change.filePath).lastPathComponent).font(.subheadline.bold())
                                         if isRisky(change) {

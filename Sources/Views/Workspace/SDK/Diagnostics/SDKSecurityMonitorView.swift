@@ -51,13 +51,13 @@ struct SDKSecurityMonitorView: View {
 
             Section("Security Summary") {
                 LabeledContent("Kernel Policy", value: runtime.isNoSandboxModeEnabled ? "Unrestricted" : "Sandboxed")
-                    .foregroundStyle(runtime.isNoSandboxModeEnabled ? .red : .green).bold()
+                    .foregroundStyle(runtime.isNoSandboxModeEnabled ? Color.red : Color.green).bold()
 
                 LabeledContent("Active Scopes", value: "\(scopeManager.authorizedScopes.count)")
 
                 let blockedCount = scopeManager.scopeAuditLog.filter { !$0.granted }.count
                 LabeledContent("Blocked Attempts", value: "\(blockedCount)")
-                    .foregroundStyle(blockedCount > 0 ? .orange : .secondary)
+                    .foregroundStyle(blockedCount > 0 ? Color.orange : Color.secondary)
 
                 let grantedCount = scopeManager.scopeAuditLog.filter { $0.granted }.count
                 LabeledContent("Granted Access", value: "\(grantedCount)")
@@ -90,7 +90,7 @@ private struct AccessEventRow: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: entry.granted ? "checkmark.shield.fill" : "lock.shield.fill")
-                .foregroundStyle(entry.granted ? .green : .red)
+                .foregroundStyle(entry.granted ? Color.green : Color.red)
                 .font(.subheadline)
 
             VStack(alignment: .leading, spacing: 2) {

@@ -138,7 +138,7 @@ private struct CompareVersionsSheet: View {
 
 private struct ReleaseCheckItem: View {
     let title: String; let met: Bool
-    var body: some View { Label { Text(title).font(.subheadline) } icon: { Image(systemName: met ? "checkmark.circle.fill" : "circle").foregroundStyle(met ? .green : .secondary) } }
+    var body: some View { Label { Text(title).font(.subheadline) } icon: { Image(systemName: met ? "checkmark.circle.fill" : "circle").foregroundStyle(met ? Color.green : Color.secondary) } }
 }
 
 private struct DiffItem: View {

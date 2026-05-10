@@ -294,7 +294,7 @@ struct TaskRowCard: View {
                 Button { manager.toggleComplete(task) } label: {
                     Image(systemName: task.completed ? "checkmark.circle.fill" : "circle")
                         .font(.title3)
-                        .foregroundStyle(task.completed ? .green : .secondary)
+                        .foregroundStyle(task.completed ? Color.green : Color.secondary)
                 }
                 .buttonStyle(.plain)
                 VStack(alignment: .leading, spacing: 6) {

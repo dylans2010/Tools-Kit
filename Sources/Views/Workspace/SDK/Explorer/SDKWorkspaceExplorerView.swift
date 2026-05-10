@@ -79,7 +79,7 @@ private struct EntityNodeRow: View {
                     Text(node.type).font(.caption2).foregroundStyle(.secondary)
                 }
             } icon: {
-                Image(systemName: iconForType(node.type)).foregroundStyle(isSelected ? Color.accentColor : .secondary)
+                Image(systemName: iconForType(node.type)).foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
             }
         }
         .listRowBackground(isSelected ? Color.accentColor.opacity(0.1) : nil)

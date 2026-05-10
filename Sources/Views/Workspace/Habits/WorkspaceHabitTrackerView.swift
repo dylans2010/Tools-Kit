@@ -221,7 +221,7 @@ struct HabitRowCard: View {
                 } label: {
                     Image(systemName: completedToday ? "checkmark.circle.fill" : "plus.circle")
                         .font(.title2)
-                        .foregroundStyle(completedToday ? habitColor : .secondary)
+                        .foregroundStyle(completedToday ? habitColor : Color.secondary)
                 }
                 .buttonStyle(.plain)
             }

@@ -22,7 +22,7 @@ struct MeetingChatView: View {
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 8)
                                         .background(selectedThreadID == thread.id ? Color.blue : Color.white.opacity(0.1), in: Capsule())
-                                        .foregroundStyle(selectedThreadID == thread.id ? .white : .secondary)
+                                        .foregroundStyle(selectedThreadID == thread.id ? Color.white : Color.secondary)
                                 }
                             }
                         }

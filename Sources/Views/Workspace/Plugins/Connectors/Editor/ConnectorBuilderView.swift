@@ -240,7 +240,7 @@ private struct CapabilityRow: View {
     let met: Bool
     var body: some View {
         Label {
-            HStack { Text(title).font(.caption); Spacer(); Image(systemName: met ? "checkmark.circle.fill" : "circle").foregroundStyle(met ? .green : .secondary) }
+            HStack { Text(title).font(.caption); Spacer(); Image(systemName: met ? "checkmark.circle.fill" : "circle").foregroundStyle(met ? Color.green : Color.secondary) }
         } icon: { Image(systemName: icon).foregroundStyle(Color.accentColor) }.font(.caption)
     }
 }

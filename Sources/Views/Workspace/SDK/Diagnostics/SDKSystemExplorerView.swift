@@ -125,7 +125,7 @@ struct EntityExplorerView: View {
             Section("Tasks") {
                 ForEach(WorkspaceAPI.shared.tasks.listTasks()) { task in
                     Label(task.title, systemImage: task.completed ? "checkmark.circle.fill" : "circle")
-                        .foregroundStyle(task.completed ? .green : .secondary)
+                        .foregroundStyle(task.completed ? Color.green : Color.secondary)
                 }
             }
             Section("Snapshots") {

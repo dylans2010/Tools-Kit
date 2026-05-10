@@ -172,7 +172,7 @@ struct SnapshotDiffView: View {
                                     Text(diff.before)
                                         .font(.subheadline)
                                         .strikethrough(diff.before != diff.after, color: .red)
-                                        .foregroundStyle(diff.before != diff.after ? .red : .primary)
+                                        .foregroundStyle(diff.before != diff.after ? Color.red : Color.primary)
                                     if diff.before != diff.after {
                                         Image(systemName: "arrow.right").font(.caption).foregroundStyle(.secondary)
                                         Text(diff.after).font(.subheadline).foregroundStyle(.green)

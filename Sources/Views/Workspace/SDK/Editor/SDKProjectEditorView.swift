@@ -82,7 +82,7 @@ struct SDKProjectEditorView: View {
                 if !state.diagnostics.isEmpty {
                     Text("\(state.diagnostics.count) issues")
                         .font(.caption2.bold())
-                        .foregroundStyle(state.diagnostics.contains { $0.severity == .error } ? .red : .orange)
+                        .foregroundStyle(state.diagnostics.contains { $0.severity == .error } ? Color.red : Color.orange)
                 }
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -140,7 +140,7 @@ private struct EditorTabItem: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
         .background(isSelected ? Color.accentColor.opacity(0.15) : Color.primary.opacity(0.05), in: Capsule())
-        .foregroundStyle(isSelected ? Color.accentColor : .secondary)
+        .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
     }
 }
 
@@ -155,7 +155,7 @@ private struct DiagnosticsBar: View {
                     Button { onSelect(diag.node) } label: {
                         Label(diag.message, systemImage: diag.severity == .error ? "exclamationmark.octagon" : "exclamationmark.triangle")
                             .font(.caption2.bold())
-                            .foregroundStyle(diag.severity == .error ? .red : .orange)
+                            .foregroundStyle(diag.severity == .error ? Color.red : Color.orange)
                     }
                 }
             }

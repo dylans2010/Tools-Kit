@@ -582,7 +582,7 @@ private struct BuildTestingSection: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Execution Logs").font(.caption2.bold()).foregroundStyle(.secondary)
                         ForEach(simulatedBuildOutput, id: \.self) { line in
-                            Text(line).font(.system(size: 9, design: .monospaced)).foregroundStyle(line.contains("ERROR") ? .red : .secondary)
+                            Text(line).font(.system(size: 9, design: .monospaced)).foregroundStyle(line.contains("ERROR") ? Color.red : Color.secondary)
                         }
                     }
                     .padding(8).background(Color.black, in: RoundedRectangle(cornerRadius: 8))

@@ -272,7 +272,7 @@ struct InboxView: View {
 
                 Text(relativeTimestamp(message.date))
                     .font(.caption2)
-                    .foregroundStyle(Color(hex: "#8888AA") ?? .gray)
+                    .foregroundStyle(Color(hex: "#8888AA") ?? Color.gray)
             }
 
             HStack {

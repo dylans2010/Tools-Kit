@@ -80,7 +80,7 @@ struct SDKIntegrationTestView: View {
                         }
                     } icon: {
                         Image(systemName: "shield.slash")
-                            .foregroundStyle(runtime.isNoSandboxModeEnabled ? .red : .secondary)
+                            .foregroundStyle(runtime.isNoSandboxModeEnabled ? Color.red : Color.secondary)
                     }
                 }
                 .tint(.red)
