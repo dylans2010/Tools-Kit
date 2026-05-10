@@ -10,7 +10,11 @@ struct EmailComposingView: View {
     var replyTo: MailMessage? = nil
 
     @State private var toRecipients: [String] = []
+    @State private var ccRecipients: [String] = []
+    @State private var bccRecipients: [String] = []
     @State private var newRecipient = ""
+    @State private var newCCRecipient = ""
+    @State private var newBCCRecipient = ""
     @State private var subject = ""
     @State private var messageBody = ""
     @State private var draftAttachments: [MailMessage.MailAttachment] = []
@@ -19,7 +23,6 @@ struct EmailComposingView: View {
     @State private var sendError: String?
     @State private var showingAIPanel = false
     @State private var showingAttachmentPicker = false
-    @State private var showingAudioPicker = false
     @State private var showingTranslateSheet = false
     @State private var showingLinkSheet = false
     @State private var showingScheduleSheet = false
@@ -28,6 +31,8 @@ struct EmailComposingView: View {
     @State private var showingDocumentScanner = false
     @State private var showingTableBuilder = false
     @State private var showingAIWrite = false
+    @State private var showingCCBCC = false
+    @State private var showingFormattingBar = true
 
     @State private var scheduleDate: Date?
     @State private var selectedFromAccountID: String = ""
@@ -41,55 +46,58 @@ struct EmailComposingView: View {
     @AppStorage("mail.settings.undoSendEnabled") private var undoSendEnabled = true
     @AppStorage("mail.settings.undoSendDelay") private var undoSendDelay = 10
 
-    @FocusState private var bodyFocused: Bool
+    @FocusState private var focusedField: ComposeField?
 
-    private struct MarkdownFormatAction: Identifiable {
-        let id = UUID()
-        let title: String
-        let icon: String
-        let insertion: String
+    private enum ComposeField: Hashable {
+        case to, cc, bcc, subject, body
     }
-
-    private let formattingActions: [MarkdownFormatAction] = [
-        MarkdownFormatAction(title: "Bold", icon: "bold", insertion: "**bold text**"),
-        MarkdownFormatAction(title: "Italic", icon: "italic", insertion: "_italic text_"),
-        MarkdownFormatAction(title: "Heading", icon: "textformat.size", insertion: "## Heading"),
-        MarkdownFormatAction(title: "Bullet List", icon: "list.bullet", insertion: "- First item\n- Second item"),
-        MarkdownFormatAction(title: "Checklist", icon: "checklist", insertion: "- [ ] Todo item"),
-        MarkdownFormatAction(title: "Code Block", icon: "terminal", insertion: "```\ncode block\n```"),
-        MarkdownFormatAction(title: "Divider", icon: "minus", insertion: "---")
-    ]
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                Color.workspaceBackground.ignoresSafeArea()
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        fromRow
+                        Divider().padding(.leading, 16)
+                        toRow
+                        Divider().padding(.leading, 16)
 
-                Form {
-                    Section {
-                        fromSection
-                        recipientsSection
-                        subjectSection
-                    }
-                    .listRowBackground(Color.workspaceSurface)
+                        if showingCCBCC {
+                            ccRow
+                            Divider().padding(.leading, 16)
+                            bccRow
+                            Divider().padding(.leading, 16)
+                        }
 
-                    Section {
-                        bodySection
-                        attachmentsSection
-                    }
-                    .listRowBackground(Color.workspaceSurface)
+                        subjectRow
+                        Divider().padding(.leading, 16)
 
-                    Section {
-                        compactToolsGrid
-                    }
-                    .listRowBackground(Color.workspaceSurface)
+                        bodyEditor
+                            .padding(.top, 8)
 
-                    if scheduleDate != nil {
-                        scheduleSection
+                        if !draftAttachments.isEmpty {
+                            attachmentsSection
+                                .padding(.horizontal, 16)
+                                .padding(.top, 12)
+                        }
+
+                        if !messageBody.isEmpty && showingPreviewSheet == false {
+                            livePreview
+                                .padding(.horizontal, 16)
+                                .padding(.top, 16)
+                        }
                     }
                 }
-                .scrollContentBackground(.hidden)
+
+                Divider()
+
+                if showingFormattingBar {
+                    formattingBar
+                }
+
+                composeToolbar
             }
+            .background(Color(.systemGroupedBackground))
             .navigationTitle(replyTo == nil ? "Compose" : "Reply")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -116,8 +124,8 @@ struct EmailComposingView: View {
                         if isSending {
                             ProgressView()
                         } else {
-                            Text(scheduleDate != nil ? "Schedule" : "Send")
-                                .fontWeight(.bold)
+                            Image(systemName: scheduleDate != nil ? "calendar.badge.clock" : "paperplane.fill")
+                                .font(.body.bold())
                         }
                     }
                     .disabled(cannotSend)
@@ -126,6 +134,7 @@ struct EmailComposingView: View {
             .onAppear(perform: prefillReply)
             .onAppear {
                 selectedFromAccountID = resolvedDefaultAccountID()
+                focusedField = replyTo == nil ? .to : .body
             }
             .onDisappear {
                 pendingUndoSendTask?.cancel()
@@ -134,6 +143,7 @@ struct EmailComposingView: View {
             .overlay(alignment: .bottom) {
                 if showUndoSendBanner {
                     undoSendBannerView
+                        .padding(.bottom, 80)
                 }
             }
             .sheet(isPresented: $showingAIPanel) {
@@ -183,14 +193,21 @@ struct EmailComposingView: View {
                     handleImportedAttachments(urls)
                 }
             }
+            .sheet(isPresented: $showingPreviewSheet) {
+                emailPreviewSheet
+                .presentationDetents([.large])
+            }
         }
     }
 
-    private var fromSection: some View {
-        HStack {
-            Text("From:")
-                .font(.subheadline.bold())
+    // MARK: - From Row
+
+    private var fromRow: some View {
+        HStack(spacing: 8) {
+            Text("From")
+                .font(.subheadline)
                 .foregroundStyle(.secondary)
+                .frame(width: 50, alignment: .leading)
 
             Picker("", selection: $selectedFromAccountID) {
                 ForEach(availableAccounts) { account in
@@ -200,185 +217,413 @@ struct EmailComposingView: View {
             .pickerStyle(.menu)
             .labelsHidden()
         }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
     }
 
-    private var recipientsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("To:")
-                    .font(.subheadline.bold())
-                    .foregroundStyle(.secondary)
+    // MARK: - To Row
 
-                TextField("Recipients", text: $newRecipient)
-                    .textInputAutocapitalization(.never)
-                    .onSubmit { commitRecipient() }
-            }
-
-            if !toRecipients.isEmpty {
-                WrappingFlowLayout(spacing: 8) {
-                    ForEach(toRecipients, id: \.self) { recipient in
-                        recipientChip(recipient)
-                    }
-                }
-            }
-        }
-    }
-
-    private var subjectSection: some View {
-        HStack {
-            Text("Subject:")
-                .font(.subheadline.bold())
+    private var toRow: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Text("To")
+                .font(.subheadline)
                 .foregroundStyle(.secondary)
+                .frame(width: 50, alignment: .leading)
+                .padding(.top, 10)
 
-            TextField("", text: $subject)
-        }
-    }
-
-    private var bodySection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ZStack(alignment: .topLeading) {
-                TextEditor(text: $messageBody)
-                    .focused($bodyFocused)
-                    .frame(minHeight: 250)
-                    .opacity(messageBody.isEmpty ? 0.25 : 1.0)
-
-                if messageBody.isEmpty && !bodyFocused {
-                    Text("Compose Email")
-                        .font(.body)
-                        .foregroundStyle(.secondary)
-                        .padding(.top, 8)
-                        .padding(.leading, 4)
-                        .allowsHitTesting(false)
-                }
-            }
-
-            if !messageBody.isEmpty {
-                Divider()
-                Label("Markdown Rendering", systemImage: "eye.fill")
-                    .font(.caption2.bold())
-                    .foregroundStyle(.blue)
-
-                MarkdownPreview(text: messageBody)
-                    .font(.subheadline)
-                    .padding(12)
-                    .background(Color.white.opacity(0.03), in: RoundedRectangle(cornerRadius: 12))
-            }
-        }
-        .padding(.vertical, 8)
-    }
-
-    private var compactToolsGrid: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 14) {
-                    toolButton(icon: "sparkles", color: .purple, action: { showingAIWrite = true })
-                    toolButton(icon: "paperclip", color: .blue, action: { showingAttachmentPicker = true })
-                    toolButton(icon: "doc.viewfinder", color: .orange, action: { showingDocumentScanner = true })
-                    toolButton(icon: "calendar.badge.clock", color: .green, action: { showingScheduleSheet = true })
-                    toolButton(icon: "globe", color: .cyan, action: { showingTranslateSheet = true })
-                    toolButton(icon: "tablecells", color: .indigo, action: { showingTableBuilder = true })
-                    toolButton(icon: "link", color: .blue, action: { showingLinkSheet = true })
-                    toolButton(icon: "pencil.and.outline", color: .pink, action: { showingDrawingSheet = true })
-                }
-                .padding(.horizontal, 2)
-            }
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
-                    ForEach(formattingActions) { action in
-                        Button {
-                            insertMarkdown(action.insertion)
-                        } label: {
-                            Image(systemName: action.icon)
-                                .font(.system(size: 14, weight: .bold))
-                                .frame(width: 40, height: 40)
-                                .background(.ultraThinMaterial)
-                                .clipShape(Circle())
-                                .overlay(Circle().stroke(Color.white.opacity(0.1), lineWidth: 1))
+            VStack(alignment: .leading, spacing: 6) {
+                if !toRecipients.isEmpty {
+                    WrappingFlowLayout(spacing: 6) {
+                        ForEach(toRecipients, id: \.self) { recipient in
+                            recipientChip(recipient) {
+                                toRecipients.removeAll { $0 == recipient }
+                            }
                         }
                     }
                 }
-                .padding(.horizontal, 2)
+
+                TextField("Add recipient", text: $newRecipient)
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.emailAddress)
+                    .focused($focusedField, equals: .to)
+                    .onSubmit { commitRecipient() }
             }
+
+            Spacer()
+
+            Button {
+                withAnimation { showingCCBCC.toggle() }
+            } label: {
+                Text(showingCCBCC ? "Hide" : "Cc/Bcc")
+                    .font(.caption)
+                    .foregroundStyle(.blue)
+            }
+            .padding(.top, 10)
         }
-        .padding(.vertical, 14)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 6)
     }
 
-    private func toolButton(icon: String, color: Color, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            VStack {
-                Image(systemName: icon)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(color)
+    // MARK: - CC Row
+
+    private var ccRow: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Text("Cc")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .frame(width: 50, alignment: .leading)
+                .padding(.top, 10)
+
+            VStack(alignment: .leading, spacing: 6) {
+                if !ccRecipients.isEmpty {
+                    WrappingFlowLayout(spacing: 6) {
+                        ForEach(ccRecipients, id: \.self) { recipient in
+                            recipientChip(recipient) {
+                                ccRecipients.removeAll { $0 == recipient }
+                            }
+                        }
+                    }
+                }
+
+                TextField("Add Cc", text: $newCCRecipient)
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.emailAddress)
+                    .focused($focusedField, equals: .cc)
+                    .onSubmit {
+                        let trimmed = newCCRecipient.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !trimmed.isEmpty { ccRecipients.append(trimmed); newCCRecipient = "" }
+                    }
             }
-            .frame(width: 48, height: 48)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
-            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.1), lineWidth: 1))
-            .shadow(color: color.opacity(0.1), radius: 4)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 6)
+    }
+
+    // MARK: - BCC Row
+
+    private var bccRow: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Text("Bcc")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .frame(width: 50, alignment: .leading)
+                .padding(.top, 10)
+
+            VStack(alignment: .leading, spacing: 6) {
+                if !bccRecipients.isEmpty {
+                    WrappingFlowLayout(spacing: 6) {
+                        ForEach(bccRecipients, id: \.self) { recipient in
+                            recipientChip(recipient) {
+                                bccRecipients.removeAll { $0 == recipient }
+                            }
+                        }
+                    }
+                }
+
+                TextField("Add Bcc", text: $newBCCRecipient)
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.emailAddress)
+                    .focused($focusedField, equals: .bcc)
+                    .onSubmit {
+                        let trimmed = newBCCRecipient.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !trimmed.isEmpty { bccRecipients.append(trimmed); newBCCRecipient = "" }
+                    }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 6)
+    }
+
+    // MARK: - Subject Row
+
+    private var subjectRow: some View {
+        HStack(spacing: 8) {
+            Text("Subject")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .frame(width: 50, alignment: .leading)
+
+            TextField("Subject", text: $subject)
+                .focused($focusedField, equals: .subject)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+    }
+
+    // MARK: - Body Editor
+
+    private var bodyEditor: some View {
+        ZStack(alignment: .topLeading) {
+            TextEditor(text: $messageBody)
+                .focused($focusedField, equals: .body)
+                .frame(minHeight: 300)
+                .scrollContentBackground(.hidden)
+                .padding(.horizontal, 12)
+
+            if messageBody.isEmpty {
+                Text("Compose your message…")
+                    .font(.body)
+                    .foregroundStyle(.tertiary)
+                    .padding(.top, 8)
+                    .padding(.leading, 16)
+                    .allowsHitTesting(false)
+            }
+        }
+    }
+
+    // MARK: - Live Preview
+
+    private var livePreview: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Label("Preview", systemImage: "eye.fill")
+                    .font(.caption2.bold())
+                    .foregroundStyle(.blue)
+                Spacer()
+                Button {
+                    showingPreviewSheet = true
+                } label: {
+                    Text("Full Preview")
+                        .font(.caption2.bold())
+                        .foregroundStyle(.blue)
+                }
+            }
+
+            MarkdownPreview(text: messageBody)
+                .font(.subheadline)
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+        }
+    }
+
+    // MARK: - Formatting Bar
+
+    private var formattingBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 4) {
+                formatButton("bold", "**bold**")
+                formatButton("italic", "_italic_")
+                formatButton("textformat.size", "## ")
+                formatButton("list.bullet", "- ")
+                formatButton("checklist", "- [ ] ")
+                formatButton("chevron.left.forwardslash.chevron.right", "```\ncode\n```")
+                formatButton("minus", "---")
+                formatButton("link", "[text](url)")
+
+                Divider()
+                    .frame(height: 24)
+                    .padding(.horizontal, 4)
+
+                Button { showingLinkSheet = true } label: {
+                    Image(systemName: "link.badge.plus")
+                        .font(.system(size: 15, weight: .medium))
+                        .frame(width: 36, height: 36)
+                }
+                Button { showingTableBuilder = true } label: {
+                    Image(systemName: "tablecells")
+                        .font(.system(size: 15, weight: .medium))
+                        .frame(width: 36, height: 36)
+                }
+            }
+            .padding(.horizontal, 12)
+        }
+        .padding(.vertical, 4)
+        .background(.ultraThinMaterial)
+    }
+
+    private func formatButton(_ icon: String, _ insertion: String) -> some View {
+        Button {
+            insertMarkdown(insertion)
+        } label: {
+            Image(systemName: icon)
+                .font(.system(size: 15, weight: .medium))
+                .frame(width: 36, height: 36)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
 
-    private var attachmentsSection: some View {
-        Group {
-            if !draftAttachments.isEmpty {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Attachments (\(draftAttachments.count))")
-                        .font(.caption.bold())
-                        .foregroundStyle(.secondary)
+    // MARK: - Compose Toolbar
 
-                    ForEach(draftAttachments) { attachment in
-                        HStack {
-                            Image(systemName: "doc.fill")
-                                .foregroundStyle(.blue)
-                            Text(attachment.fileName)
-                                .font(.subheadline)
-                            Spacer()
-                            Button {
-                                draftAttachments.removeAll { $0.id == attachment.id }
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        .padding(10)
-                        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 10))
+    private var composeToolbar: some View {
+        HStack(spacing: 0) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    toolbarButton("paperclip", .blue) { showingAttachmentPicker = true }
+                    toolbarButton("doc.viewfinder", .orange) { showingDocumentScanner = true }
+                    toolbarButton("pencil.and.outline", .pink) { showingDrawingSheet = true }
+                    toolbarButton("sparkles", .purple) { showingAIWrite = true }
+                    toolbarButton("globe", .cyan) { showingTranslateSheet = true }
+                    toolbarButton("calendar.badge.clock", .green) { showingScheduleSheet = true }
+                    toolbarButton("textformat", .indigo) {
+                        withAnimation { showingFormattingBar.toggle() }
                     }
+                }
+                .padding(.horizontal, 12)
+            }
+        }
+        .padding(.vertical, 8)
+        .background(.ultraThinMaterial)
+    }
+
+    private func toolbarButton(_ icon: String, _ color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .medium))
+                .foregroundStyle(color)
+        }
+    }
+
+    // MARK: - Attachments
+
+    private var attachmentsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Attachments (\(draftAttachments.count))")
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+
+            ForEach(draftAttachments) { attachment in
+                HStack(spacing: 10) {
+                    Image(systemName: attachmentIcon(attachment.contentType))
+                        .foregroundStyle(.blue)
+                        .frame(width: 28)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(attachment.fileName)
+                            .font(.subheadline)
+                            .lineLimit(1)
+                        if attachment.size > 0 {
+                            Text(ByteCountFormatter.string(fromByteCount: attachment.size, countStyle: .file))
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                        }
+                    }
+                    Spacer()
+                    Button {
+                        draftAttachments.removeAll { $0.id == attachment.id }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(10)
+                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
+            }
+        }
+    }
+
+    private func attachmentIcon(_ contentType: String) -> String {
+        if contentType.hasPrefix("image/") { return "photo.fill" }
+        if contentType.hasPrefix("video/") { return "film.fill" }
+        if contentType.contains("pdf") { return "doc.richtext" }
+        return "doc.fill"
+    }
+
+    // MARK: - Schedule Section
+
+    private var scheduleIndicator: some View {
+        Group {
+            if let date = scheduleDate {
+                HStack {
+                    Label("Scheduled: \(date.formatted())", systemImage: "clock.fill")
+                        .font(.caption.bold())
+                        .foregroundStyle(.orange)
+                    Spacer()
+                    Button("Clear") { scheduleDate = nil }
+                        .font(.caption2.bold())
+                        .foregroundStyle(.red)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color.orange.opacity(0.1))
+            }
+        }
+    }
+
+    // MARK: - Undo Send Banner
+
+    private var undoSendBannerView: some View {
+        HStack {
+            Text("Sending in \(undoCountdown)s…")
+                .font(.subheadline.bold())
+            Spacer()
+            Button("Undo") { cancelPendingUndoSend() }
+                .font(.subheadline.bold())
+                .foregroundStyle(.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 6)
+                .background(Color.blue, in: Capsule())
+        }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .shadow(radius: 8)
+        .padding(.horizontal)
+    }
+
+    // MARK: - Email Preview Sheet
+
+    private var emailPreviewSheet: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Group {
+                        HStack {
+                            Text("From:")
+                                .font(.caption.bold())
+                                .foregroundStyle(.secondary)
+                            Text(availableAccounts.first { $0.id == selectedFromAccountID }?.emailAddress ?? account.emailAddress)
+                                .font(.caption)
+                        }
+                        HStack {
+                            Text("To:")
+                                .font(.caption.bold())
+                                .foregroundStyle(.secondary)
+                            Text(toRecipients.joined(separator: ", "))
+                                .font(.caption)
+                        }
+                        if !subject.isEmpty {
+                            Text(subject)
+                                .font(.title3.bold())
+                        }
+                    }
+
+                    Divider()
+
+                    MarkdownPreview(text: messageBody)
+                        .font(.body)
+                        .textSelection(.enabled)
+                }
+                .padding()
+            }
+            .navigationTitle("Email Preview")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showingPreviewSheet = false }.bold()
                 }
             }
         }
     }
 
-    private var scheduleSection: some View {
-        Section {
-            HStack {
-                Label("Scheduled for \(scheduleDate?.formatted() ?? "")", systemImage: "clock.fill")
-                    .font(.subheadline.bold())
-                    .foregroundStyle(.orange)
-                Spacer()
-                Button("Cancel") { scheduleDate = nil }
-                    .font(.caption.bold())
-                    .foregroundStyle(.red)
+    // MARK: - Recipient Chip
+
+    private func recipientChip(_ recipient: String, onRemove: @escaping () -> Void) -> some View {
+        HStack(spacing: 4) {
+            Text(recipient)
+                .font(.caption)
+                .lineLimit(1)
+            Button(action: onRemove) {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.caption2)
             }
         }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(Color.blue.opacity(0.15), in: Capsule())
+        .foregroundStyle(.blue)
     }
 
-    private var undoSendBannerView: some View {
-        HStack {
-            Text("Sending In \(undoCountdown)s...")
-                .font(.subheadline.bold())
-            Spacer()
-            Button("Undo") { cancelPendingUndoSend() }
-                .font(.subheadline.bold())
-                .foregroundStyle(.blue)
-        }
-        .padding()
-        .background(.ultraThinMaterial, in: Capsule())
-        .padding()
-    }
-
-    // Logic and Helpers
+    // MARK: - Logic
 
     private func applyAIDraft(_ result: DraftingEmailResult) {
         if !result.recipient.isEmpty { toRecipients.append(result.recipient) }
@@ -392,7 +637,7 @@ struct EmailComposingView: View {
         } else {
             messageBody += "\n\n" + text
         }
-        bodyFocused = true
+        focusedField = .body
     }
 
     private func addAttachment(from export: DrawingExport) {
@@ -413,28 +658,13 @@ struct EmailComposingView: View {
         }
     }
 
-    private func recipientChip(_ recipient: String) -> some View {
-        HStack(spacing: 6) {
-            Text(recipient)
-                .font(.caption.bold())
-            Button { toRecipients.removeAll { $0 == recipient } } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.caption2)
-            }
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
-        .background(Color.blue.opacity(0.2), in: Capsule())
-        .foregroundStyle(.blue)
-    }
-
     private func prefillReply() {
         guard let reply = replyTo else { return }
         toRecipients = [reply.from]
         subject = "Re: \(reply.subject)"
         messageBody = "\n\n\n--- On \(reply.date.formatted()), \(reply.from) wrote: ---\n\(reply.body)"
     }
-    
+
     private var cannotSend: Bool {
         toRecipients.isEmpty || subject.isEmpty || isSending
     }
@@ -450,7 +680,6 @@ struct EmailComposingView: View {
     private func executeSend() {
         isSending = true
         Task {
-            // Mocking send for simulation
             try? await Task.sleep(nanoseconds: 1_000_000_000)
             await MainActor.run {
                 isSending = false
@@ -508,16 +737,25 @@ struct EmailComposingView: View {
     private var linkComposerSheet: some View {
         NavigationStack {
             Form {
-                TextField("Text", text: $pendingLinkText)
-                TextField("URL", text: $pendingLinkURL)
+                Section {
+                    TextField("Display Text", text: $pendingLinkText)
+                    TextField("URL", text: $pendingLinkURL)
+                        .textInputAutocapitalization(.never)
+                        .keyboardType(.URL)
+                }
             }
             .navigationTitle("Insert Link")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { showingLinkSheet = false }
+                }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Insert") {
                         insertMarkdown("[\(pendingLinkText)](\(pendingLinkURL))")
                         showingLinkSheet = false
                     }
+                    .bold()
                 }
             }
         }
@@ -530,7 +768,7 @@ struct EmailComposingView: View {
                 .navigationTitle("Schedule Send")
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("Done") { showingScheduleSheet = false }
+                        Button("Done") { showingScheduleSheet = false }.bold()
                     }
                 }
         }

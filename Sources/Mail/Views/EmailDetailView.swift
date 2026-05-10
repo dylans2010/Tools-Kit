@@ -17,7 +17,13 @@ struct EmailDetailView: View {
     @State private var draftReply = ""
     @State private var isRunningAIFeature = false
     @State private var actionError: String?
+
+    // Sheet states
     @State private var showingInspector = false
+    @State private var showingAIPanel = false
+    @State private var showingInsights = false
+    @State private var showingRelationship = false
+    @State private var selectedContentTab: ContentTab = .body
 
     init(viewModel: MailViewModel, email: EmailMessage, account: MailAccount? = nil) {
         self.viewModel = viewModel
@@ -25,170 +31,318 @@ struct EmailDetailView: View {
         self.account = account
     }
 
+    private enum ContentTab: String, CaseIterable {
+        case body = "Content"
+        case ai = "AI Tools"
+    }
+
     var body: some View {
         GeometryReader { geo in
-            ZStack(alignment: .top) {
-                Color.workspaceBackground.ignoresSafeArea()
+            VStack(spacing: 0) {
+                headerBar
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 0) {
-                        headerSection
-                            .padding(18)
-
-                        VStack(alignment: .leading, spacing: 18) {
-                            aiActionsBar
-
-                            if isSummarizing || isRunningAIFeature {
-                                loadingIndicator
-                            }
-
-                            if !summary.isEmpty {
-                                aiResultCard(title: "AI Summary", icon: "sparkles", content: summary)
-                            }
-
-                            if !actionItems.isEmpty {
-                                aiResultCard(title: "Action Items", icon: "checklist", content: actionItems)
-                            }
-
-                            if !toneAnalysis.isEmpty {
-                                aiResultCard(title: "Tone Insights", icon: "waveform.and.magnifyingglass", content: toneAnalysis)
-                            }
-
-                            if !draftReply.isEmpty {
-                                aiResultCard(title: "Reply Draft", icon: "arrowshape.turn.up.left.2", content: draftReply)
-                            }
-
-                            // Advanced Intelligence Panels
-                            intelligencePanels
-                        }
-                        .padding(.horizontal, 18)
-                        .padding(.bottom, 18)
-
-                        contentView(minHeight: max(geo.size.height - 200, 400))
+                Picker("Tab", selection: $selectedContentTab) {
+                    ForEach(ContentTab.allCases, id: \.self) { tab in
+                        Text(tab.rawValue).tag(tab)
                     }
                 }
+                .pickerStyle(.segmented)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+
+                switch selectedContentTab {
+                case .body:
+                    emailBodyContent(geo: geo)
+                case .ai:
+                    aiToolsContent
+                }
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    HStack(spacing: 16) {
+            .background(Color.workspaceBackground.ignoresSafeArea())
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                HStack(spacing: 12) {
+                    Button { showingInspector = true } label: {
+                        Image(systemName: "info.circle")
+                    }
+
+                    Menu {
+                        Button { showReplyComposer = true } label: {
+                            Label("Reply", systemImage: "arrowshape.turn.up.left")
+                        }
+                        .disabled(account == nil)
+
+                        Button { showingRelationship = true } label: {
+                            Label("Relationship Intel", systemImage: "person.text.rectangle")
+                        }
+
+                        Button { showingInsights = true } label: {
+                            Label("AI Insights", systemImage: "brain.head.profile")
+                        }
+
+                        Divider()
+
                         Button {
-                            showingInspector = true
+                            Task { await archiveEmail() }
                         } label: {
-                            Image(systemName: "info.circle")
+                            Label("Archive", systemImage: "archivebox")
                         }
 
-                        Menu {
-                            Button {
-                                showReplyComposer = true
-                            } label: {
-                                Label("Reply", systemImage: "arrowshape.turn.up.left")
-                            }
-                            .disabled(account == nil)
-
-                            NavigationLink(destination: RelationshipInsightsPanel(email: email.sender)) {
-                                Label("Relationship Intel", systemImage: "person.text.rectangle")
-                            }
-
-                            Button {
-                                Task { await archiveEmail() }
-                            } label: {
-                                Label("Archive", systemImage: "archivebox")
-                            }
-
-                            Button(role: .destructive) {
-                                Task { await deleteEmail() }
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
+                        Button(role: .destructive) {
+                            Task { await deleteEmail() }
                         } label: {
-                            Image(systemName: "ellipsis.circle")
+                            Label("Delete", systemImage: "trash")
                         }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
                     }
                 }
             }
-            .sheet(isPresented: $showingInspector) {
-                MetadataInspectorView(email: email)
-                    .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showingInspector) {
+            MetadataInspectorView(email: email)
+                .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showingAIPanel) {
+            aiResultsSheet
+                .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showingInsights) {
+            insightsSheet
+                .presentationDetents([.large])
+        }
+        .sheet(isPresented: $showingRelationship) {
+            NavigationStack {
+                RelationshipInsightsPanel(email: email.sender)
             }
-            .fullScreenCover(isPresented: $showReplyComposer) {
-                if let account {
-                    EmailComposingView(
-                        account: account,
-                        replyTo: MailMessage(
-                            id: String(resolvedEmail.uid),
-                            threadId: String(resolvedEmail.uid),
-                            from: resolvedEmail.sender,
-                            to: [],
-                            cc: [],
-                            bcc: [],
-                            subject: resolvedEmail.subject,
-                            body: resolvedEmail.body ?? resolvedEmail.preview,
-                            htmlBody: resolvedEmail.htmlBody,
-                            date: resolvedEmail.date,
-                            isRead: resolvedEmail.isRead,
-                            isStarred: false,
-                            attachments: []
-                        )
+            .presentationDetents([.large])
+        }
+        .fullScreenCover(isPresented: $showReplyComposer) {
+            if let account {
+                EmailComposingView(
+                    account: account,
+                    replyTo: MailMessage(
+                        id: String(resolvedEmail.uid),
+                        threadId: String(resolvedEmail.uid),
+                        from: resolvedEmail.sender,
+                        to: [],
+                        cc: [],
+                        bcc: [],
+                        subject: resolvedEmail.subject,
+                        body: resolvedEmail.body ?? resolvedEmail.preview,
+                        htmlBody: resolvedEmail.htmlBody,
+                        date: resolvedEmail.date,
+                        isRead: resolvedEmail.isRead,
+                        isStarred: false,
+                        attachments: []
                     )
-                }
+                )
             }
-            .task {
-                if resolvedEmail.body == nil && resolvedEmail.htmlBody == nil {
-                    viewModel.loadBody(for: email)
-                }
+        }
+        .task {
+            if resolvedEmail.body == nil && resolvedEmail.htmlBody == nil {
+                viewModel.loadBody(for: email)
             }
         }
     }
 
-    private var headerSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(resolvedEmail.subject)
-                .font(.title2.bold())
-                .foregroundStyle(.white)
+    // MARK: - Header Bar
 
-            HStack {
+    private var headerBar: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(resolvedEmail.subject)
+                .font(.title3.bold())
+                .foregroundStyle(.primary)
+                .lineLimit(3)
+
+            HStack(spacing: 10) {
                 Circle()
                     .fill(Color.blue.opacity(0.2))
-                    .frame(width: 32, height: 32)
+                    .frame(width: 36, height: 36)
                     .overlay(Text(resolvedEmail.sender.prefix(1).uppercased()).font(.caption.bold()))
 
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 1) {
                     Text(resolvedEmail.sender)
                         .font(.subheadline.bold())
-                        .foregroundStyle(.white)
-                    Text(resolvedEmail.date.formatted(date: .long, time: .shortened))
+                    Text(resolvedEmail.date.formatted(date: .abbreviated, time: .shortened))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+
+                Spacer()
+
+                if account != nil {
+                    Button {
+                        showReplyComposer = true
+                    } label: {
+                        Image(systemName: "arrowshape.turn.up.left.fill")
+                            .font(.body)
+                            .padding(8)
+                            .background(Color.accentColor.opacity(0.15), in: Circle())
+                    }
+                }
             }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(.ultraThinMaterial)
+    }
+
+    // MARK: - Email Body Content (full-screen rendering)
+
+    @ViewBuilder
+    private func emailBodyContent(geo: GeometryProxy) -> some View {
+        if let content = renderContent(from: resolvedEmail) {
+            if content.hasHTML, let html = content.htmlBody {
+                MailWebView(htmlString: html, dynamicHeight: $bodyWebViewHeight)
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: geo.size.height - 160)
+                    .background(Color.white)
+                    .ignoresSafeArea(.container, edges: .bottom)
+            } else if let plain = content.plainBody {
+                ScrollView {
+                    Text(plain)
+                        .font(.body)
+                        .padding(16)
+                        .frame(maxWidth: .infinity, alignment: .topLeading)
+                        .textSelection(.enabled)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        } else {
+            VStack {
+                ProgressView("Loading…")
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 
-    private var aiActionsBar: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                aiActionButton(title: "Summarize", icon: "text.justify.leading", action: { runAIFeature(.summary) })
-                aiActionButton(title: "Action Items", icon: "checklist", action: { runAIFeature(.actionItems) })
-                aiActionButton(title: "Tone", icon: "waveform", action: { runAIFeature(.tone) })
-                aiActionButton(title: "Draft Reply", icon: "pencil.and.outline", action: { runAIFeature(.replyDraft) })
+    // MARK: - AI Tools Content
+
+    private var aiToolsContent: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                aiActionsGrid
+
+                if isSummarizing || isRunningAIFeature {
+                    loadingIndicator
+                }
+
+                if !summary.isEmpty {
+                    aiResultCard(title: "AI Summary", icon: "sparkles", content: summary)
+                }
+
+                if !actionItems.isEmpty {
+                    aiResultCard(title: "Action Items", icon: "checklist", content: actionItems)
+                }
+
+                if !toneAnalysis.isEmpty {
+                    aiResultCard(title: "Tone Insights", icon: "waveform.and.magnifyingglass", content: toneAnalysis)
+                }
+
+                if !draftReply.isEmpty {
+                    aiResultCard(title: "Reply Draft", icon: "arrowshape.turn.up.left.2", content: draftReply)
+                }
+
+                if let error = actionError {
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.orange)
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+                }
             }
+            .padding(16)
         }
     }
 
-    private func aiActionButton(title: String, icon: String, action: @escaping () -> Void) -> some View {
+    // MARK: - AI Actions Grid
+
+    private var aiActionsGrid: some View {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+            aiActionTile(title: "Summarize", icon: "text.justify.leading", color: .blue) { runAIFeature(.summary) }
+            aiActionTile(title: "Action Items", icon: "checklist", color: .green) { runAIFeature(.actionItems) }
+            aiActionTile(title: "Tone Analysis", icon: "waveform", color: .purple) { runAIFeature(.tone) }
+            aiActionTile(title: "Draft Reply", icon: "pencil.and.outline", color: .orange) { runAIFeature(.replyDraft) }
+        }
+    }
+
+    private func aiActionTile(title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            HStack {
+            VStack(spacing: 8) {
                 Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundStyle(color)
                 Text(title)
+                    .font(.caption.bold())
+                    .foregroundStyle(.primary)
             }
-            .font(.caption.bold())
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .background(Color.white.opacity(0.1), in: Capsule())
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(color.opacity(0.1), in: RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
+        .disabled(isSummarizing)
     }
+
+    // MARK: - AI Results Sheet
+
+    private var aiResultsSheet: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 16) {
+                    if !summary.isEmpty {
+                        aiResultCard(title: "AI Summary", icon: "sparkles", content: summary)
+                    }
+                    if !actionItems.isEmpty {
+                        aiResultCard(title: "Action Items", icon: "checklist", content: actionItems)
+                    }
+                    if !toneAnalysis.isEmpty {
+                        aiResultCard(title: "Tone Insights", icon: "waveform.and.magnifyingglass", content: toneAnalysis)
+                    }
+                    if !draftReply.isEmpty {
+                        aiResultCard(title: "Reply Draft", icon: "arrowshape.turn.up.left.2", content: draftReply)
+                    }
+                }
+                .padding()
+            }
+            .navigationTitle("AI Results")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showingAIPanel = false }.bold()
+                }
+            }
+        }
+    }
+
+    // MARK: - Insights Sheet
+
+    private var insightsSheet: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 16) {
+                    intelligencePanels
+                }
+                .padding()
+            }
+            .navigationTitle("AI Insights")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showingInsights = false }.bold()
+                }
+            }
+        }
+    }
+
+    // MARK: - Loading
 
     private var loadingIndicator: some View {
         HStack {
@@ -202,6 +356,8 @@ struct EmailDetailView: View {
         .frame(maxWidth: .infinity)
         .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 12))
     }
+
+    // MARK: - Intelligence Panels
 
     @ViewBuilder
     private var intelligencePanels: some View {
@@ -236,33 +392,8 @@ struct EmailDetailView: View {
         KnowledgeExtractionPanel(thread: thread)
     }
 
-    private func contentView(minHeight: CGFloat) -> some View {
-        Group {
-            if let content = renderContent(from: resolvedEmail) {
-                if content.hasHTML, let html = content.htmlBody {
-                    MailWebView(htmlString: html, dynamicHeight: $bodyWebViewHeight)
-                        .frame(maxWidth: .infinity)
-                        .frame(minHeight: minHeight)
-                        .background(Color.white) // Typical email background
-                } else if let plain = content.plainBody {
-                    VStack(alignment: .leading, spacing: 0) {
-                        Divider().background(Color.white.opacity(0.1))
-                        Text(plain)
-                            .font(.body)
-                            .padding(20)
-                            .frame(maxWidth: .infinity, alignment: .topLeading)
-                            .textSelection(.enabled)
-                    }
-                    .frame(minHeight: minHeight, alignment: .topLeading)
-                }
-            } else {
-                ProgressView("Loading Body...")
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.top, 40)
-            }
-        }
-    }
-    
+    // MARK: - Helpers
+
     @ViewBuilder
     private func markdownText(_ source: String, font: Font = .body) -> some View {
         if let attributed = try? AttributedString(
@@ -341,27 +472,24 @@ struct EmailDetailView: View {
 
     private func aiResultCard(title: String, icon: String, content: String) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Label(title, systemImage: icon)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.92))
+            HStack {
+                Label(title, systemImage: icon)
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                Button {
+                    UIPasteboard.general.string = content
+                } label: {
+                    Image(systemName: "doc.on.doc")
+                        .font(.caption)
+                }
+            }
 
             markdownText(content, font: .subheadline)
-                .foregroundStyle(.white.opacity(0.96))
+                .textSelection(.enabled)
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            LinearGradient(
-                colors: [Color.blue.opacity(0.4), Color.purple.opacity(0.35)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            ),
-            in: RoundedRectangle(cornerRadius: 16, style: .continuous)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
-        )
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private func deleteEmail() async {
