@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct WhiteboardCanvasView: View {
+struct SpatialWhiteboardCanvasView: View {
     @StateObject private var engine: CanvasEngine
     @State private var scale: CGFloat = 1.0
     @State private var offset: CGSize = .zero

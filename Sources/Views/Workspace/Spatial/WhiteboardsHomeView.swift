@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct WhiteboardsHomeView: View {
+struct SpatialWhiteboardsHomeView: View {
     @StateObject private var dataStore = UnifiedDataStore.shared
     @State private var showingCreate = false
     @State private var newCanvasName = ""
@@ -13,7 +13,7 @@ struct WhiteboardsHomeView: View {
                         .foregroundColor(.secondary)
                 } else {
                     ForEach(dataStore.spatialCanvases) { canvas in
-                        NavigationLink(destination: WhiteboardCanvasView(canvas: canvas)) {
+                        NavigationLink(destination: SpatialWhiteboardCanvasView(canvas: canvas)) {
                             Label(canvas.name, systemImage: "square.3.layers.3d")
                         }
                     }
