@@ -16,7 +16,7 @@ struct AssetManagerView: View {
                                     .font(.caption2)
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
-                                    .background(Color.blue.opacity(0.1))
+                                    .background(.secondary.opacity(0.1))
                                     .clipShape(Capsule())
                             }
                         }

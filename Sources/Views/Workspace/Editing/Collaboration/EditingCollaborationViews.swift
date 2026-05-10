@@ -16,12 +16,12 @@ struct SharedEditingView: View {
             ForEach(sessionManager.activeParticipants) { participant in
                 VStack(spacing: 2) {
                     Image(systemName: "mouse")
-                        .foregroundColor(.blue)
+                        .foregroundStyle(.secondary)
                     Text(participant.userName)
                         .font(.caption2)
                         .padding(2)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
+                        .background(Color.accentColor)
+                        .foregroundStyle(.white)
                         .cornerRadius(4)
                 }
                 .position(participant.position)

@@ -76,25 +76,24 @@ struct NotebooksHomeView: View {
     private var summaryCard: some View {
         WorkspaceSurfaceCard {
             HStack(spacing: 10) {
-                summaryStat("Notebooks", value: "\(manager.notebooks.count)", icon: "book.closed.fill", tint: .indigo)
-                summaryStat("Folders", value: "\(manager.notebooks.reduce(0) { $0 + $1.folders.count })", icon: "folder.fill", tint: .blue)
-                summaryStat("Pages", value: "\(manager.notebooks.reduce(0) { $0 + $1.folders.flatMap(\ .pages).count })", icon: "doc.richtext", tint: .teal)
+                summaryStat("Notebooks", value: "\(manager.notebooks.count)", icon: "book.closed.fill")
+                summaryStat("Folders", value: "\(manager.notebooks.reduce(0) { $0 + $1.folders.count })", icon: "folder.fill")
+                summaryStat("Pages", value: "\(manager.notebooks.reduce(0) { $0 + $1.folders.flatMap(\ .pages).count })", icon: "doc.richtext")
             }
         }
     }
 
-    private func summaryStat(_ title: String, value: String, icon: String, tint: Color) -> some View {
+    private func summaryStat(_ title: String, value: String, icon: String) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Label(title, systemImage: icon)
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(.secondary)
             Text(value)
                 .font(.headline.bold())
-                .foregroundStyle(tint)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
-        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private func quickAction(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
@@ -106,7 +105,7 @@ struct NotebooksHomeView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(Color.white.opacity(0.08), in: Capsule())
+            .background(.regularMaterial, in: Capsule())
         }
         .buttonStyle(.plain)
         .foregroundStyle(.primary)
