@@ -2551,18 +2551,18 @@
 		PL010000000000000000000026 /* SDKInternalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKInternalView.swift; sourceTree = "<group>"; };
 		WK01AICONTEXT0000000001 /* AIContextEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Workspace/AIContextEngine.swift; sourceTree = SOURCE_ROOT; };
 		WK01VERSIONCTRL00000001 /* VersionControlManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Backend/Workspace/VersionControlManager.swift; sourceTree = SOURCE_ROOT; };
-		EXP100000000000000000001 /* SDKModuleRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKModuleRegistry.swift; sourceTree = "<group>"; };
-		EXP100000000000000000002 /* SDKDependencyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKDependencyGraph.swift; sourceTree = "<group>"; };
-		EXP100000000000000000003 /* SDKFeatureExposure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKFeatureExposure.swift; sourceTree = "<group>"; };
-		EXP100000000000000000004 /* SDKPluginLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginLifecycle.swift; sourceTree = "<group>"; };
-		EXP100000000000000000005 /* SDKConnectorRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConnectorRuntime.swift; sourceTree = "<group>"; };
-		EXP100000000000000000006 /* SDKDownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKDownloadView.swift; sourceTree = "<group>"; };
-		EXP100000000000000000007 /* CustomAppSDKView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/CustomAppSDKView.swift; sourceTree = "<group>"; };
-		EXP100000000000000000008 /* SDKHelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Docs/SDKHelpView.swift; sourceTree = "<group>"; };
-		EXP100000000000000000009 /* SDKSupportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Docs/SDKSupportView.swift; sourceTree = "<group>"; };
-		EXP10000000000000000000A /* SDKModuleRegistryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/SDKModuleRegistryView.swift; sourceTree = "<group>"; };
-		EXP10000000000000000000B /* SDKPluginLifecycleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKPluginLifecycleView.swift; sourceTree = "<group>"; };
-		EXP10000000000000000000C /* SDKConnectorBindingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKConnectorBindingView.swift; sourceTree = "<group>"; };
+		EXP100000000000000000001 /* SDKModuleRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Core/SDK/Modules/SDKModuleRegistry.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000002 /* SDKDependencyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Core/SDK/Modules/SDKDependencyGraph.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000003 /* SDKFeatureExposure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Core/SDK/Modules/SDKFeatureExposure.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000004 /* SDKPluginLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Core/SDK/Plugins/SDKPluginLifecycle.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000005 /* SDKConnectorRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Core/SDK/Connectors/SDKConnectorRuntime.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000006 /* SDKDownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Builder/SDKDownloadView.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000007 /* CustomAppSDKView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Builder/CustomAppSDKView.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000008 /* SDKHelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Docs/SDKHelpView.swift; sourceTree = SOURCE_ROOT; };
+		EXP100000000000000000009 /* SDKSupportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Docs/SDKSupportView.swift; sourceTree = SOURCE_ROOT; };
+		EXP10000000000000000000A /* SDKModuleRegistryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Management/SDKModuleRegistryView.swift; sourceTree = SOURCE_ROOT; };
+		EXP10000000000000000000B /* SDKPluginLifecycleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Main/SDKPluginLifecycleView.swift; sourceTree = SOURCE_ROOT; };
+		EXP10000000000000000000C /* SDKConnectorBindingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Connectors/Main/SDKConnectorBindingView.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
