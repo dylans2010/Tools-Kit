@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct CreateHabitView: View {
+    var existingHabit: Habit?
     var onSave: (Habit) -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -10,6 +11,17 @@ struct CreateHabitView: View {
     @State private var selectedColor = "#007AFF"
     @State private var frequency: HabitFrequency = .daily
     @State private var targetCount = 1
+
+    init(existingHabit: Habit? = nil, onSave: @escaping (Habit) -> Void) {
+        self.existingHabit = existingHabit
+        self.onSave = onSave
+        _name = State(initialValue: existingHabit?.name ?? "")
+        _description = State(initialValue: existingHabit?.description ?? "")
+        _selectedIcon = State(initialValue: existingHabit?.icon ?? "star")
+        _selectedColor = State(initialValue: existingHabit?.colorHex ?? "#007AFF")
+        _frequency = State(initialValue: existingHabit?.frequency ?? .daily)
+        _targetCount = State(initialValue: existingHabit?.targetCount ?? 1)
+    }
 
     private let presetIcons = [
         "star", "flame", "heart", "bolt",
@@ -71,14 +83,14 @@ struct CreateHabitView: View {
 
                 Section {
                     Button(action: save) {
-                        Text("Create Habit")
+                        Text(existingHabit == nil ? "Create Habit" : "Save Changes")
                             .frame(maxWidth: .infinity)
                             .bold()
                     }
                     .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
-            .navigationTitle("New Habit")
+            .navigationTitle(existingHabit == nil ? "New Habit" : "Edit Habit")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -91,7 +103,7 @@ struct CreateHabitView: View {
     private func save() {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
-        let habit = Habit(
+        var habit = Habit(
             name: trimmed,
             description: description,
             icon: selectedIcon,
@@ -99,6 +111,13 @@ struct CreateHabitView: View {
             frequency: frequency,
             targetCount: targetCount
         )
+        if let existingHabit {
+            habit.id = existingHabit.id
+            habit.createdAt = existingHabit.createdAt
+            habit.completionHistory = existingHabit.completionHistory
+            habit.currentStreak = existingHabit.currentStreak
+            habit.longestStreak = existingHabit.longestStreak
+        }
         onSave(habit)
         dismiss()
     }

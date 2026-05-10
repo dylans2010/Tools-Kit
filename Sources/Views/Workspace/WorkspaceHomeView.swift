@@ -116,11 +116,11 @@ struct GitHubRouterView: View {
             } else if isAuthenticated {
                 RepoListView()
             } else {
-                ContentUnavailableView(
-                    "GitHub Not Connected",
-                    systemImage: "terminal",
-                    description: Text("Connect your GitHub account using a Personal Access Token to manage your repositories.")
-                )
+                ContentUnavailableView {
+                    Label("GitHub Not Connected", systemImage: "terminal")
+                } description: {
+                    Text("Connect your GitHub account using a Personal Access Token to manage your repositories.")
+                }
                 .toolbar {
                     ToolbarItem(placement: .primaryAction) {
                         Button("Connect") {
