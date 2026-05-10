@@ -28,7 +28,9 @@ public final class SDKExecutionCoordinator {
         let selectedConfig = workspaceState.selectedRunConfiguration
         let plannedDependencies = workspaceState.dependencies.filter { node in
             guard let config = selectedConfig, !config.scopedExecution.isEmpty else { return true }
-            return Set(node.requiredScopes).isSubset(of: grantedScopes) || node.requiredScopes.isEmpty
+            let configAllowsNode = Set(node.requiredScopes).isSubset(of: grantedScopes) || node.requiredScopes.isEmpty
+            guard configAllowsNode else { return false }
+            return node.requiredScopes.allSatisfy { AuthorizationManager.shared.validateScope($0) }
         }
 
         try scopeValidator.validate(dependencies: plannedDependencies, grantedScopes: grantedScopes)

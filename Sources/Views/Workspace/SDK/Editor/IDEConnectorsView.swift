@@ -3,6 +3,7 @@ import SwiftUI
 struct IDEConnectorsView: View {
     @StateObject private var state = SDKRuntimeWorkspaceState.shared
     @StateObject private var connectorManager = SDKConnectorManager.shared
+    @StateObject private var authorizationManager = AuthorizationManager.shared
     @State private var selectedConnectorID: UUID?
 
     var body: some View {
@@ -25,7 +26,8 @@ struct IDEConnectorsView: View {
                         ConnectorRegistryRow(
                             connector: connector,
                             linkedDependencyNames: linkedDependencyNames(for: connector),
-                            isSelected: selectedConnectorID == connector.id
+                            isSelected: selectedConnectorID == connector.id,
+                            isAuthorized: authorizationManager.canUseConnector(id: connector.id)
                         )
                         .contentShape(Rectangle())
                         .onTapGesture { selectedConnectorID = connector.id }
@@ -62,6 +64,7 @@ private struct ConnectorRegistryRow: View {
     let connector: any BaseConnector
     let linkedDependencyNames: [String]
     let isSelected: Bool
+    let isAuthorized: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -76,8 +79,13 @@ private struct ConnectorRegistryRow: View {
             Text("Type: \(connector.type.rawValue.capitalized)")
                 .font(.caption)
 
-            Text("Module Links: \(linkedDependencyNames.isEmpty ? "None" : linkedDependencyNames.joined(separator: ", "))")
-                .font(.caption2)
+                Text("Module Links: \(linkedDependencyNames.isEmpty ? "None" : linkedDependencyNames.joined(separator: ", "))")
+                    .font(.caption2)
+                if !isAuthorized {
+                    Text("Blocked by authorization")
+                        .font(.caption2.bold())
+                        .foregroundStyle(.red)
+                }
         }
         .padding(.vertical, 4)
         .overlay(alignment: .leading) {

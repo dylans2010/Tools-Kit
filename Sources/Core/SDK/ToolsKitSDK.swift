@@ -177,6 +177,7 @@ public final class ToolsKitSDK: ObservableObject {
     private let policyEngine = SDKPolicyEngine.shared
     private let auditLogger = SDKAuditLogger.shared
     private let projectManager = SDKProjectManager.shared
+    private let authorizationManager = AuthorizationManager.shared
 
     private init() {
         initialize()
@@ -612,6 +613,10 @@ extension ToolsKitSDK {
             justification: project?.description,
             privacyNote: project?.description
         )
+
+        guard authorizationManager.validateScope(scopeName) else {
+            throw SDKError.permissionDenied(scope: scopeName)
+        }
 
         do {
             let decision = try policyEngine.evaluate(request)

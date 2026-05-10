@@ -29,6 +29,10 @@ public final class SDKConnectorEngine: ObservableObject {
 
     public func connect(connector: any BaseConnector, credentials: [String: String]) async throws {
         try validateConnectorConfiguration(connector)
+        guard AuthorizationManager.shared.canUseScopes(connector.requiredScopes) || connector.requiredScopes.isEmpty else {
+            connector.disconnect()
+            throw SDKError.permissionDenied(scope: connector.requiredScopes.joined(separator: ","))
+        }
         SDKLogStore.shared.log("Connecting \(connector.name)...", source: "SDKConnectorEngine", level: LogLevel.info)
 
         do {
@@ -132,6 +136,11 @@ public final class SDKConnectorEngine: ObservableObject {
     // MARK: - Private
 
     private func syncWithRetry(connector: any BaseConnector) async throws {
+        guard AuthorizationManager.shared.canUseScopes(connector.requiredScopes) || connector.requiredScopes.isEmpty else {
+            connector.disconnect()
+            throw SDKError.permissionDenied(scope: connector.requiredScopes.joined(separator: ","))
+        }
+
         var lastError: Error?
 
         for attempt in 0..<maxSyncRetries {

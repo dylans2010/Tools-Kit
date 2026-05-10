@@ -44,6 +44,10 @@ public final class PluginRuntimeEngine: PluginRuntimeProtocol, ObservableObject 
             throw SDKError.validationError(reason: "App '\(app.name)' is already registered")
         }
 
+        guard AuthorizationManager.shared.canUseScopes(app.requiredScopes) || app.requiredScopes.isEmpty else {
+            throw SDKError.permissionDenied(scope: app.requiredScopes.joined(separator: ","))
+        }
+
         // Validate permissions
         for permission in app.permissions {
             guard SDKPermissionManager.shared.isScopeAuthorized(permission) else {
@@ -72,6 +76,12 @@ public final class PluginRuntimeEngine: PluginRuntimeProtocol, ObservableObject 
             throw SDKError.executionFailed(reason: "App not found")
         }
         guard !runningApps.contains(appId) else { return }
+
+        guard AuthorizationManager.shared.canUseScopes(loadedApps[index].requiredScopes) || loadedApps[index].requiredScopes.isEmpty else {
+            loadedApps[index].isEnabled = false
+            saveApps()
+            throw SDKError.permissionDenied(scope: loadedApps[index].requiredScopes.joined(separator: ","))
+        }
 
         // Check sandbox permissions
         if loadedApps[index].isSandboxed {
