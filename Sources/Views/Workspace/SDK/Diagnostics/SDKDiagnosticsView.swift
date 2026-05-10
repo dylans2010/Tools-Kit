@@ -275,7 +275,7 @@ private struct TelemetryCard: View {
             HealthMetricDisplay(
                 id: "telemetry.latency",
                 title: "Average Latency",
-                value: "\(Int(metrics.averageDurationMs.rounded()))ms",
+                value: "\(Int(metrics.averageDurationMs))ms",
                 indicator: HealthIndicator(text: "Latency", tint: .secondary, systemImage: "clock.fill")
             ),
             HealthMetricDisplay(
@@ -358,7 +358,11 @@ private struct MetricsSummaryView: View {
                 Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 8) {
                     ForEach(0..<rowCount, id: \.self) { rowIndex in
                         GridRow {
-                            summaryCell(items[rowIndex * 2])
+                            if let primaryItem = metric(at: rowIndex * 2) {
+                                summaryCell(primaryItem)
+                            } else {
+                                Color.clear
+                            }
 
                             if let secondaryItem = metric(at: (rowIndex * 2) + 1) {
                                 summaryCell(secondaryItem)
