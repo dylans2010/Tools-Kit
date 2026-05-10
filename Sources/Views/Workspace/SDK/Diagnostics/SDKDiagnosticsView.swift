@@ -53,9 +53,6 @@ struct SDKDiagnosticsView: View {
         }
         .navigationTitle("Diagnostics")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            bgEngine.startHealthCheckLoop()
-        }
     }
 
     private func makeSnapshot() -> DiagnosticsSnapshot {
@@ -221,7 +218,7 @@ private struct SummaryMetric: Identifiable {
     let title: String
     let value: String
 
-    static let empty = SummaryMetric(id: "summary.empty", title: "", value: "")
+    static let empty = SummaryMetric(id: "summary.empty", title: "Unavailable", value: "—")
 }
 
 private struct DiagnosticsHeaderView: View {
@@ -349,21 +346,19 @@ private struct MetricsSummaryView: View {
     let items: [SummaryMetric]
 
     var body: some View {
-        let first = metric(at: 0)
-        let second = metric(at: 1)
-        let third = metric(at: 2)
-        let fourth = metric(at: 3)
-        let fifth = metric(at: 4)
-        let sixth = metric(at: 5)
+        let rowCount = max(1, (items.count + 1) / 2)
 
         VStack(alignment: .leading, spacing: 10) {
             Text("Metrics Summary")
                 .font(.headline)
 
             Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 8) {
-                GridRow { summaryCell(first); summaryCell(second) }
-                GridRow { summaryCell(third); summaryCell(fourth) }
-                GridRow { summaryCell(fifth); summaryCell(sixth) }
+                ForEach(0..<rowCount, id: \.self) { rowIndex in
+                    GridRow {
+                        summaryCell(metric(at: rowIndex * 2))
+                        summaryCell(metric(at: (rowIndex * 2) + 1))
+                    }
+                }
             }
         }
         .padding(12)
