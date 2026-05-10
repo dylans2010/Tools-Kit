@@ -72,7 +72,7 @@ struct WeekDayRow: View {
             HStack {
                 VStack(alignment: .center, spacing: 2) {
                     Text(day.formatted(.dateTime.weekday(.abbreviated))).font(.caption2.bold()).foregroundStyle(.secondary)
-                    Text(day.formatted(.dateTime.day())).font(.title3.bold()).foregroundStyle(isToday ? .blue : .white)
+                    Text(day.formatted(.dateTime.day())).font(.title3.bold()).foregroundStyle(isToday ? Color.blue : Color.white)
                 }
                 .frame(width: 45)
                 .padding(8)
@@ -90,7 +90,7 @@ struct WeekDayRow: View {
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
                                         .background(Color(hex: event.priority.color)?.opacity(0.2) ?? Color.blue.opacity(0.2), in: Capsule())
-                                        .foregroundStyle(Color(hex: event.priority.color) ?? .blue)
+                                        .foregroundStyle(Color(hex: event.priority.color) ?? Color.blue)
                                 }
                             }
                         }

@@ -38,7 +38,7 @@ struct SDKNavigatorView: View {
                 LabeledContent("Dependencies") { Text("\(state.dependencies.count)").monospaced() }
                 LabeledContent("Diagnostics") {
                     Text("\(state.diagnostics.count)").monospaced()
-                        .foregroundStyle(state.diagnostics.isEmpty ? .secondary : .orange)
+                        .foregroundStyle(state.diagnostics.isEmpty ? Color.secondary : Color.orange)
                 }
             } header: {
                 Text("System Status")
@@ -69,7 +69,7 @@ private struct AreaNodeRow: View {
                     }
                 }
             } icon: {
-                Image(systemName: node.icon).foregroundStyle(isSelected ? Color.accentColor : .secondary)
+                Image(systemName: node.icon).foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
             }
         }
         .listRowBackground(isSelected ? Color.accentColor.opacity(0.1) : nil)

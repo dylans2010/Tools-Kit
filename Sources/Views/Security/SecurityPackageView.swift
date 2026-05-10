@@ -28,7 +28,7 @@ struct SecurityPackageView: View {
                 } header: {
                     Text("Restore")
                 }
-                if let statusMessage { Label(statusMessage, systemImage: isError ? "xmark.circle.fill" : "checkmark.circle.fill").foregroundStyle(isError ? .red : .green) }
+                if let statusMessage { Label(statusMessage, systemImage: isError ? "xmark.circle.fill" : "checkmark.circle.fill").foregroundStyle(isError ? Color.red : Color.green) }
             }
             .navigationTitle("Security Package")
             .overlay { if isWorking { ProgressView("Processing…") } }

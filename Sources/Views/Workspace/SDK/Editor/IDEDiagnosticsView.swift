@@ -20,7 +20,7 @@ struct IDEDiagnosticsView: View {
                 LabeledContent("Active Issues") {
                     Text("\(state.diagnostics.count)")
                         .monospaced().bold()
-                        .foregroundStyle(state.diagnostics.contains { $0.severity == .error } ? .red : .orange)
+                        .foregroundStyle(state.diagnostics.contains { $0.severity == .error } ? Color.red : Color.orange)
                 }
 
                 if !state.diagnostics.isEmpty {
@@ -65,7 +65,7 @@ private struct DiagnosticItemRow: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: diagnostic.severity == .error ? "xmark.octagon.fill" : "exclamationmark.triangle.fill")
-                    .foregroundStyle(diagnostic.severity == .error ? .red : .orange)
+                    .foregroundStyle(diagnostic.severity == .error ? Color.red : Color.orange)
                     .font(.title3)
 
                 VStack(alignment: .leading, spacing: 4) {

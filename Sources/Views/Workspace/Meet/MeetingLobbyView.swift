@@ -68,7 +68,7 @@ struct MeetingLobbyView: View {
             Text(title)
             Spacer()
             Text(state.rawValue.capitalized)
-                .foregroundStyle(state == .granted ? .green : (state == .denied ? .red : .secondary))
+                .foregroundStyle(state == .granted ? Color.green : (state == .denied ? Color.red : Color.secondary))
         }
     }
 

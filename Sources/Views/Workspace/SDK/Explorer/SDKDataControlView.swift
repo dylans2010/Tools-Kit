@@ -39,7 +39,7 @@ struct SDKDataControlView: View {
                 Section {
                     Text(statusMessage)
                         .font(.subheadline.bold())
-                        .foregroundStyle(isProcessing ? .secondary : .green)
+                        .foregroundStyle(isProcessing ? Color.secondary : Color.green)
                 } header: {
                     Text("Status")
                 }
@@ -56,7 +56,7 @@ struct SDKDataControlView: View {
                         }
                     } icon: {
                         Image(systemName: "shield.slash")
-                            .foregroundStyle(runtime.isNoSandboxModeEnabled ? .red : Color.secondary)
+                            .foregroundStyle(runtime.isNoSandboxModeEnabled ? Color.red : Color.secondary)
                     }
                 }
                 .tint(.red)

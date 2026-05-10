@@ -22,13 +22,13 @@ struct SDKDebugView: View {
             Section("Runtime Profile") {
                 LabeledContent("Execution Mode") {
                     Text(runtime.isNoSandboxModeEnabled ? "Unrestricted" : "Sandboxed")
-                        .foregroundStyle(runtime.isNoSandboxModeEnabled ? .red : .green)
+                        .foregroundStyle(runtime.isNoSandboxModeEnabled ? Color.red : Color.green)
                         .bold()
                 }
                 LabeledContent("Active Projects", value: "\(runtime.activeProjects.count)")
                 LabeledContent("Active Traces") {
                     Text("\(telemetry.activeTraces.count)")
-                        .foregroundStyle(telemetry.activeTraces.count > 0 ? .orange : .secondary)
+                        .foregroundStyle(telemetry.activeTraces.count > 0 ? Color.orange : Color.secondary)
                         .bold()
                 }
             }
@@ -40,7 +40,7 @@ struct SDKDebugView: View {
                 LabeledContent("Success Count", value: "\(metrics.successCount)")
                     .foregroundStyle(.green)
                 LabeledContent("Failure Count", value: "\(metrics.failureCount)")
-                    .foregroundStyle(metrics.failureCount > 0 ? .red : .secondary)
+                    .foregroundStyle(metrics.failureCount > 0 ? Color.red : Color.secondary)
             }
 
             Section("Host Environment") {

@@ -251,7 +251,7 @@ struct AutomationDetailView: View {
                         engine.toggleAutomation(id: automation.id)
                         dismiss()
                     }
-                    .foregroundStyle(automation.isEnabled ? .red : .green)
+                    .foregroundStyle(automation.isEnabled ? Color.red : Color.green)
                 }
             }
         }

@@ -24,7 +24,7 @@ struct SecurityAuditDashboardView: View {
                                 .font(.system(size: 40, weight: .bold, design: .rounded))
                             Text(healthScore > 0.8 ? "Excellent" : "Needs Attention")
                                 .font(.caption.bold())
-                                .foregroundStyle(healthScore > 0.8 ? .green : .orange)
+                                .foregroundStyle(healthScore > 0.8 ? Color.green : Color.orange)
                         }
                     }
                     .frame(width: 180, height: 180)

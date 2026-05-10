@@ -198,6 +198,6 @@ private struct ProjectRow: View {
         let isActive = project.status == .active
         Label(project.status.rawValue.capitalized, systemImage: isActive ? "checkmark.circle.fill" : "pencil.circle")
             .font(.caption2.bold())
-            .foregroundStyle(isActive ? .green : .orange)
+            .foregroundStyle(isActive ? Color.green : Color.orange)
     }
 }

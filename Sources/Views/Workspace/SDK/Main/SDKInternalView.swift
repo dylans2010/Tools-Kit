@@ -43,7 +43,7 @@ struct SDKInternalView: View {
                     LabeledContent(scope.name) {
                         Text(scope.riskLevel.rawValue.capitalized)
                             .font(.caption2.bold())
-                            .foregroundStyle(scope.riskLevel == .critical || scope.riskLevel == .high ? .red : .secondary)
+                            .foregroundStyle(scope.riskLevel == .critical || scope.riskLevel == .high ? Color.red : Color.secondary)
                     }
                 }
             }
@@ -101,7 +101,7 @@ struct SDKInternalView: View {
                     LabeledContent(entry.actionLabel) {
                         Text(entry.success ? "OK" : "FAIL")
                             .font(.caption.bold())
-                            .foregroundStyle(entry.success ? .green : .red)
+                            .foregroundStyle(entry.success ? Color.green : Color.red)
                     }
                 }
             }

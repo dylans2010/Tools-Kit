@@ -151,7 +151,7 @@ struct LocalCommitRow: View {
             HStack {
                 Text("Branch: \(commit.branch)").font(.caption2).foregroundStyle(.secondary)
                 Text("·").foregroundStyle(.secondary).font(.caption2)
-                Text("Risk: \(String(format: "%.1f", commit.riskScore))").font(.caption2).foregroundStyle(commit.riskScore > 5 ? .red : .secondary)
+                Text("Risk: \(String(format: "%.1f", commit.riskScore))").font(.caption2).foregroundStyle(commit.riskScore > 5 ? Color.red : Color.secondary)
                 Text("·").foregroundStyle(.secondary).font(.caption2)
                 Text(commit.createdAt.formatted(date: .abbreviated, time: .shortened)).font(.caption2).foregroundStyle(.secondary)
             }

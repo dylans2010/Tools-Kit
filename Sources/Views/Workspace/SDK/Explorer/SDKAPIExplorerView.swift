@@ -87,7 +87,7 @@ struct SDKAPIExplorerView: View {
                 Section("Response") {
                     LabeledContent("Status") {
                         Text(result.status.rawValue)
-                            .foregroundStyle(result.isSuccess ? .green : .red).bold()
+                            .foregroundStyle(result.isSuccess ? Color.green : Color.red).bold()
                     }
                     LabeledContent("Latency", value: "\(Int(result.latency * 1000))ms")
 

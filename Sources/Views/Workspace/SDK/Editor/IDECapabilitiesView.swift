@@ -57,10 +57,10 @@ private struct CapabilityCard: View {
             HStack {
                 Image(systemName: capability.node.icon)
                     .font(.title2)
-                    .foregroundStyle(isEnabled ? Color.accentColor : .secondary)
+                    .foregroundStyle(isEnabled ? Color.accentColor : Color.secondary)
                 Spacer()
                 Image(systemName: isEnabled ? "checkmark.circle.fill" : "lock.fill")
-                    .foregroundStyle(isEnabled ? .green : .secondary)
+                    .foregroundStyle(isEnabled ? Color.green : Color.secondary)
             }
 
             VStack(alignment: .leading, spacing: 4) {
@@ -87,7 +87,7 @@ private struct CapabilityCard: View {
                             .frame(width: 6, height: 6)
                         Text(scope)
                             .font(.system(size: 9, design: .monospaced))
-                            .foregroundStyle(effectiveScopes.contains(scope) ? .primary : .red)
+                            .foregroundStyle(effectiveScopes.contains(scope) ? Color.primary : Color.red)
                     }
                 }
             }

@@ -21,7 +21,7 @@ struct SDKDataInspectorView: View {
             Section("Storage Overview") {
                 LabeledContent("Initialization") {
                     Image(systemName: dataStore.isInitialized ? "checkmark.circle.fill" : "xmark.circle.fill")
-                        .foregroundStyle(dataStore.isInitialized ? .green : .red)
+                        .foregroundStyle(dataStore.isInitialized ? Color.green : Color.red)
                 }
                 LabeledContent("Total Records") {
                     Text("\(dataStore.totalRecords)")

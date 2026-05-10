@@ -277,7 +277,7 @@ struct SecurityToolsView: View {
                     ForEach(staged) { change in
                         HStack {
                             Image(systemName: blockedFiles.contains(change.filePath) ? "xmark.circle.fill" : "checkmark.circle.fill")
-                                .foregroundStyle(blockedFiles.contains(change.filePath) ? .red : .green)
+                                .foregroundStyle(blockedFiles.contains(change.filePath) ? Color.red : Color.green)
                             Text(URL(fileURLWithPath: change.filePath).lastPathComponent).font(.caption)
                             Spacer()
                             Text(change.changeType.rawValue).font(.caption2).foregroundStyle(.secondary)

@@ -393,7 +393,7 @@ struct SDKBuildView: View {
                 Spacer()
                 Text("\(metrics.successCount) / \(metrics.failureCount)")
                     .font(.system(.body, design: .monospaced))
-                    .foregroundStyle(metrics.failureCount > 0 ? .orange : .green)
+                    .foregroundStyle(metrics.failureCount > 0 ? Color.orange : Color.green)
             }
             HStack {
                 Text("Avg Latency")

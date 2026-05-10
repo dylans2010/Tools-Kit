@@ -422,7 +422,7 @@ struct PersonaHomeView: View {
                         Button(action: sendMessage) {
                             Image(systemName: "arrow.up.circle.fill")
                                 .font(.system(size: 32))
-                                .foregroundStyle(query.isEmpty || manager.isThinking ? AnyShapeStyle(.secondary) : AnyShapeStyle(LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom)))
+                                .foregroundStyle(query.isEmpty || manager.isThinking ? AnyShapeStyle(.secondary) : AnyShapeStyle(LinearGradient(colors: [.blue, .purple], startPoint: Color.top, endPoint: Color.bottom)))
                         }
                         .disabled(query.isEmpty || manager.isThinking)
                     }
@@ -525,7 +525,7 @@ private struct PersonaChatBubble: View {
                                   AnyShapeStyle(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing)) :
                                   AnyShapeStyle(Color.secondary.opacity(0.15)))
                     )
-                    .foregroundStyle(message.role == "user" ? .white : .primary)
+                    .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                     .contextMenu {
                         Button {
                             UIPasteboard.general.string = message.content

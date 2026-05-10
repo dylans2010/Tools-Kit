@@ -97,7 +97,7 @@ private struct CapabilityRow: View {
                         .font(.headline)
                     Spacer()
                     Image(systemName: isEnabled ? "checkmark.seal.fill" : "lock.fill")
-                        .foregroundStyle(isEnabled ? .green : .secondary)
+                        .foregroundStyle(isEnabled ? Color.green : Color.secondary)
                 }
 
                 Text(capability.description)
@@ -157,7 +157,7 @@ private struct CapabilityDetail: View {
                 ForEach(capability.requiredScopes, id: \.self) { scope in
                     LabeledContent {
                         Image(systemName: effectiveScopes.contains(scope) ? "checkmark.circle.fill" : "lock.fill")
-                            .foregroundStyle(effectiveScopes.contains(scope) ? .green : .orange)
+                            .foregroundStyle(effectiveScopes.contains(scope) ? Color.green : Color.orange)
                     } label: {
                         Text(scope).font(.caption.monospaced())
                     }
@@ -171,7 +171,7 @@ private struct CapabilityDetail: View {
                 let diagnosticCount = state.diagnostics.filter { $0.node == capability.node }.count
                 LabeledContent("Current Issues") {
                     Text("\(diagnosticCount)")
-                        .foregroundStyle(diagnosticCount > 0 ? .red : .green)
+                        .foregroundStyle(diagnosticCount > 0 ? Color.red : Color.green)
                         .bold()
                 }
             }

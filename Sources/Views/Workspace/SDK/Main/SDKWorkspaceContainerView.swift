@@ -150,7 +150,7 @@ struct SDKWorkspaceContainerView: View {
                 Text(title)
                     .font(.system(size: 10, weight: .bold))
             }
-            .foregroundStyle(activeSheet == sheet ? Color.accentColor : .secondary)
+            .foregroundStyle(activeSheet == sheet ? Color.accentColor : Color.secondary)
             .frame(maxWidth: .infinity)
         }
     }
@@ -221,7 +221,7 @@ struct SDKWorkspaceContainerView: View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(active ? Color.accentColor : .secondary)
+                .foregroundStyle(active ? Color.accentColor : Color.secondary)
                 .frame(width: 32, height: 32)
                 .background(active ? Color.accentColor.opacity(0.1) : Color.clear, in: RoundedRectangle(cornerRadius: 6))
         }

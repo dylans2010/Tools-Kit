@@ -70,7 +70,7 @@ struct SDKEventStreamView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button { isListening.toggle(); if isListening { setupSubscription() } else { eventSubscription?.cancel() } } label: {
-                    Image(systemName: isListening ? "pause.circle.fill" : "play.circle.fill").foregroundStyle(isListening ? .orange : .green)
+                    Image(systemName: isListening ? "pause.circle.fill" : "play.circle.fill").foregroundStyle(isListening ? Color.orange : Color.green)
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {

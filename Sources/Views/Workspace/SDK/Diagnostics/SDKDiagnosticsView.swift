@@ -43,7 +43,7 @@ struct SDKDiagnosticsView: View {
                 LabeledContent("Total Traces", value: "\(metrics.totalTraces)")
                 LabeledContent("Execution Health") {
                     let rate = metrics.totalTraces > 0 ? Double(metrics.successCount) / Double(metrics.totalTraces) * 100 : 100
-                    Text("\(Int(rate))%").foregroundStyle(rate > 90 ? .green : .orange).bold()
+                    Text("\(Int(rate))%").foregroundStyle(rate > 90 ? Color.green : Color.orange).bold()
                 }
             } header: {
                 Text("Performance Analytics")
@@ -55,7 +55,7 @@ struct SDKDiagnosticsView: View {
                         let count = cachedItemCount(for: scope)
                         Text(count > 0 ? "\(count) Items" : "Empty")
                             .font(.caption2.bold())
-                            .foregroundStyle(count > 0 ? .green : .secondary)
+                            .foregroundStyle(count > 0 ? Color.green : Color.secondary)
                     }
                 }
             } header: {
@@ -70,7 +70,7 @@ struct SDKDiagnosticsView: View {
                         LabeledContent(plugin.name) {
                             Text(plugin.isEnabled ? "Active" : "Disabled")
                                 .font(.caption2.bold())
-                                .foregroundStyle(plugin.isEnabled ? .green : .secondary)
+                                .foregroundStyle(plugin.isEnabled ? Color.green : Color.secondary)
                         }
                     }
                 }
@@ -86,7 +86,7 @@ struct SDKDiagnosticsView: View {
                         LabeledContent(connector.name) {
                             Text(connector.status.rawValue.capitalized)
                                 .font(.caption2.bold())
-                                .foregroundStyle(connector.status == .connected ? .green : .orange)
+                                .foregroundStyle(connector.status == .connected ? Color.green : Color.orange)
                         }
                     }
                 }
@@ -112,7 +112,7 @@ private struct HealthStatusRow: View {
     var body: some View {
         LabeledContent(title) {
             Image(systemName: healthy ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                .foregroundStyle(healthy ? .green : .red)
+                .foregroundStyle(healthy ? Color.green : Color.red)
         }
     }
 }

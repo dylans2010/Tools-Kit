@@ -176,7 +176,7 @@ private struct SDKConnectorRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon(for: connector.type))
-                .font(.headline).foregroundStyle(connector.status == .connected ? Color.accentColor : .secondary)
+                .font(.headline).foregroundStyle(connector.status == .connected ? Color.accentColor : Color.secondary)
                 .frame(width: 32, height: 32).background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
 
             VStack(alignment: .leading, spacing: 2) {

@@ -41,7 +41,7 @@ struct WorkoutPlanView: View {
                                     Label(exercise.name, systemImage: "figure.mixed.cardio")
                                     Spacer()
                                     Image(systemName: exercise.isCompleted ? "checkmark.circle.fill" : "circle")
-                                        .foregroundStyle(exercise.isCompleted ? .green : .secondary)
+                                        .foregroundStyle(exercise.isCompleted ? Color.green : Color.secondary)
                                 }
                                 Text("\(exercise.sets)x\(exercise.reps) • \(exercise.muscleGroup) • Rest \(exercise.restSeconds)s • ~\(exercise.durationMinutes)m")
                                     .font(.caption)

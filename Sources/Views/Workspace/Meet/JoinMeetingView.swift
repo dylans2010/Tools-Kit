@@ -106,7 +106,7 @@ struct JoinMeetingView: View {
                 .foregroundStyle(.secondary)
             Text(scheduled.activationState == .active ? "Active" : "Scheduled")
                 .font(.caption2)
-                .foregroundStyle(scheduled.activationState == .active ? .green : .orange)
+                .foregroundStyle(scheduled.activationState == .active ? Color.green : Color.orange)
 
             Button("Join This Meeting") {
                 Task { await manager.joinScheduledMeeting(scheduled) }

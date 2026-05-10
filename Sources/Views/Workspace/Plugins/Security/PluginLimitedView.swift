@@ -102,7 +102,7 @@ private struct RequirementRow: View {
             }
         } icon: {
             Image(systemName: met ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .foregroundStyle(met ? .green : .red)
+                .foregroundStyle(met ? Color.green : Color.red)
         }
     }
 }

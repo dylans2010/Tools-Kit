@@ -271,7 +271,7 @@ struct IntegrityIssueRow: View {
     var body: some View {
         HStack {
             Image(systemName: issue.severity == .error ? "xmark.circle.fill" : issue.severity == .warning ? "exclamationmark.triangle.fill" : "info.circle.fill")
-                .foregroundStyle(issue.severity == .error ? .red : issue.severity == .warning ? .orange : .blue)
+                .foregroundStyle(issue.severity == .error ? Color.red : issue.severity == .warning ? Color.orange : Color.blue)
             VStack(alignment: .leading, spacing: 2) {
                 Text(issue.description).font(.caption)
                 if issue.isFixed { Text("✓ Fixed").font(.caption2).foregroundStyle(.green) }

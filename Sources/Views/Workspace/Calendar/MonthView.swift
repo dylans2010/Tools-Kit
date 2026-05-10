@@ -85,7 +85,7 @@ struct MonthDayCell: View {
             VStack(spacing: 4) {
                 Text("\(Calendar.current.component(.day, from: date))")
                     .font(.system(.subheadline, design: .rounded).bold())
-                    .foregroundStyle(isSelected ? .white : (isToday ? .blue : (isCurrentMonth ? .white : .secondary.opacity(0.3))))
+                    .foregroundStyle(isSelected ? Color.white : (isToday ? Color.blue : (isCurrentMonth ? Color.white : Color.secondary.opacity(0.3))))
                     .frame(width: 32, height: 32)
                     .background(isSelected ? Color.blue : Color.clear, in: Circle())
 
