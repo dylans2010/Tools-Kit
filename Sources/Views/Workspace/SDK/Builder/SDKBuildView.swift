@@ -52,6 +52,7 @@ struct SDKBuildView: View {
                 buildOutputSection
                 buildMetricsSection
                 developmentSection
+                sdkSystemsSection
                 architectureSection(project)
                 stabilitySection
                 explorationSection
@@ -245,6 +246,23 @@ struct SDKBuildView: View {
             NavigationLink("Event Stream", destination: SDKEventStreamView())
                 } header: {
             Text("Development")
+        }
+    }
+
+    // MARK: - SDK Systems
+
+    private var sdkSystemsSection: some View {
+        Section {
+            NavigationLink("SDK Download & Export", destination: SDKDownloadView())
+            NavigationLink("Import Custom App", destination: CustomAppSDKView())
+            NavigationLink("AI Help Assistant", destination: SDKHelpView())
+            NavigationLink("AI App Builder", destination: SDKSupportView())
+            NavigationLink("Developer Guide", destination: SDKDeveloperGuideView())
+            NavigationLink("Module Registry", destination: SDKModuleRegistryView())
+            NavigationLink("Plugin Lifecycle", destination: SDKPluginLifecycleView())
+            NavigationLink("Connector Bindings", destination: SDKConnectorBindingView())
+        } header: {
+            Text("SDK Systems")
         }
     }
 
