@@ -83,16 +83,14 @@ private struct CalendarMetricLabel: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: icon)
-                Text(title).font(.caption.bold())
-            }
-            .foregroundStyle(.secondary)
+            Label(title, systemImage: icon)
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
             Text(value).font(.title3.bold())
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -116,7 +114,7 @@ struct CalendarModeSelector: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                             .background(selectedMode == mode ? Color.accentColor : Color(.secondarySystemBackground), in: Capsule())
-                            .foregroundStyle(selectedMode == mode ? Color.white : Color.secondary)
+                            .foregroundStyle(selectedMode == mode ? .white : .secondary)
                     }
                 }
             }

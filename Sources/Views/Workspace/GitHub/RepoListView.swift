@@ -134,7 +134,7 @@ private struct RepoRow: View {
                         .font(.system(size: 10, weight: .semibold))
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(Color.gray.opacity(0.12))
+                        .background(.secondary.opacity(0.12))
                         .clipShape(Capsule())
                 }
             }

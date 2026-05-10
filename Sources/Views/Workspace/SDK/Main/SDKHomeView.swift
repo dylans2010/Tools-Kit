@@ -13,11 +13,21 @@ struct SDKHomeView: View {
         NavigationStack {
             List {
                 Section("Navigation") {
-                    NavigationLink("Build", destination: SDKBuildView())
-                    NavigationLink("Editor", destination: SDKWorkspaceContainerView())
-                    NavigationLink("Diagnostics", destination: SDKDebugView())
-                    NavigationLink("Developer Guide", destination: SDKDeveloperGuideView())
-                    NavigationLink("Internal", destination: SDKInternalView())
+                    NavigationLink(destination: SDKBuildView()) {
+                        Label("Build", systemImage: "hammer")
+                    }
+                    NavigationLink(destination: SDKWorkspaceContainerView()) {
+                        Label("Editor", systemImage: "pencil.and.list.clipboard")
+                    }
+                    NavigationLink(destination: SDKDebugView()) {
+                        Label("Diagnostics", systemImage: "stethoscope")
+                    }
+                    NavigationLink(destination: SDKDeveloperGuideView()) {
+                        Label("Developer Guide", systemImage: "book")
+                    }
+                    NavigationLink(destination: SDKInternalView()) {
+                        Label("Internal", systemImage: "gearshape.2")
+                    }
                 }
 
                 Section("Projects") {

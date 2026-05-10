@@ -50,3 +50,10 @@ struct IntegrationConnection: Codable, Identifiable {
     var isAuthorized: Bool
     var authData: [String: String] = [:]
 }
+
+struct IntegrationHistoryEntry: Identifiable {
+    let id = UUID()
+    let name: String
+    let status: String
+    let time: String
+}

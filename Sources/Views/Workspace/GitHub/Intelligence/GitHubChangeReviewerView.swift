@@ -24,7 +24,7 @@ struct GitHubChangeReviewerView: View {
                             } label: {
                                 HStack {
                                     Image(systemName: approvedFiles.contains(change.id) ? "checkmark.circle.fill" : "circle")
-                                        .foregroundStyle(approvedFiles.contains(change.id) ? Color.green : Color.secondary)
+                                        .foregroundStyle(approvedFiles.contains(change.id) ? .primary : .secondary)
                                     VStack(alignment: .leading) {
                                         Text(URL(fileURLWithPath: change.filePath).lastPathComponent).font(.subheadline.bold())
                                         if isRisky(change) {
@@ -47,7 +47,7 @@ struct GitHubChangeReviewerView: View {
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(approvedFiles.count == gitEngine.stagedChanges.count && !gitEngine.stagedChanges.isEmpty ? .primary : Color.gray)
+                        .background(approvedFiles.count == gitEngine.stagedChanges.count && !gitEngine.stagedChanges.isEmpty ? .primary : Color(.systemGray))
                         .cornerRadius(12)
                 }
                 .disabled(approvedFiles.count != gitEngine.stagedChanges.count || gitEngine.stagedChanges.isEmpty)
@@ -82,7 +82,7 @@ struct ReviewFileDetailView: View {
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(isApproved ? Color.green : .primary)
+                        .background(isApproved ? Color.accentColor : .primary)
                         .cornerRadius(12)
                 }
                 .padding(.horizontal)

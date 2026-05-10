@@ -23,9 +23,15 @@ final class EditorState: ObservableObject {
     @Published var showingExportSheet = false
     @Published var showingKeyframeEditor = false
     @Published var showingTextOverlay = false
+    @Published var showingTransitionPicker = false
     @Published var overlayText = ""
     @Published var exportProgress: Double?
     @Published var exportError: String?
+
+    @Published var trimStart: Double = 0.0
+    @Published var trimEnd: Double = 30.0
+    @Published var selectedTransition: String = "None"
+    @Published var transitionDuration: Double = 0.5
 
     let manager = EditingManager.shared
 
@@ -146,12 +152,16 @@ final class EditorState: ObservableObject {
 enum EditorTool: String, CaseIterable, Identifiable {
     case select = "Select"
     case crop = "Crop"
+    case trim = "Trim"
+    case split = "Split"
     case brush = "Brush"
     case text = "Text"
     case shape = "Shape"
     case filter = "Filter"
     case adjust = "Adjust"
     case transform = "Transform"
+    case transition = "Transition"
+    case keyframe = "Keyframe"
 
     var id: String { rawValue }
 
@@ -159,12 +169,16 @@ enum EditorTool: String, CaseIterable, Identifiable {
         switch self {
         case .select: return "cursorarrow"
         case .crop: return "crop"
+        case .trim: return "timeline.selection"
+        case .split: return "scissors"
         case .brush: return "paintbrush"
         case .text: return "textformat"
         case .shape: return "square.on.circle"
         case .filter: return "camera.filters"
         case .adjust: return "slider.horizontal.3"
         case .transform: return "arrow.up.left.and.arrow.down.right"
+        case .transition: return "rectangle.connected.to.line.below"
+        case .keyframe: return "diamond"
         }
     }
 }
@@ -175,6 +189,7 @@ enum EditorPanel: String, CaseIterable, Identifiable {
     case timeline = "Timeline"
     case properties = "Properties"
     case assets = "Assets"
+    case transitions = "Transitions"
 
     var id: String { rawValue }
 
@@ -185,6 +200,7 @@ enum EditorPanel: String, CaseIterable, Identifiable {
         case .timeline: return "timeline.selection"
         case .properties: return "slider.horizontal.3"
         case .assets: return "photo.on.rectangle"
+        case .transitions: return "rectangle.connected.to.line.below"
         }
     }
 }
@@ -546,6 +562,75 @@ struct FullEditorView: View {
                     .font(.caption)
                 }
             }
+        case .trim:
+            Section("Trim") {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Start Time").font(.caption2)
+                    Slider(value: $state.trimStart, in: 0...state.timelineDuration)
+                    Text(formattedTime(state.trimStart)).font(.caption.monospaced())
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("End Time").font(.caption2)
+                    Slider(value: $state.trimEnd, in: 0...state.timelineDuration)
+                    Text(formattedTime(state.trimEnd)).font(.caption.monospaced())
+                }
+                Button("Apply Trim") {
+                    state.playheadPosition = state.trimStart
+                    state.timelineDuration = state.trimEnd - state.trimStart
+                    state.save()
+                }
+            }
+        case .split:
+            Section("Split at Playhead") {
+                LabeledContent("Current Position", value: formattedTime(state.playheadPosition))
+                Button("Split Here") {
+                    state.addTimelineTrack(name: "Split @ \(formattedTime(state.playheadPosition))")
+                    state.save()
+                }
+                .disabled(state.project.timelineTracks.isEmpty)
+            }
+        case .transition:
+            Section("Transition") {
+                Picker("Type", selection: $state.selectedTransition) {
+                    Text("None").tag("None")
+                    Text("Cross Dissolve").tag("CrossDissolve")
+                    Text("Wipe").tag("Wipe")
+                    Text("Slide").tag("Slide")
+                    Text("Fade").tag("Fade")
+                    Text("Zoom").tag("Zoom")
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Duration").font(.caption2)
+                    Slider(value: $state.transitionDuration, in: 0.1...3.0, step: 0.1)
+                    Text("\(String(format: "%.1f", state.transitionDuration))s").font(.caption.monospaced())
+                }
+                Button("Apply Transition") {
+                    state.save()
+                }
+            }
+        case .keyframe:
+            Section("Keyframe Controls") {
+                LabeledContent("Time", value: formattedTime(state.playheadPosition))
+                if let layer = state.selectedLayer {
+                    LabeledContent("Layer", value: layer.name)
+                    Button("Add Position Keyframe") {
+                        state.save()
+                    }
+                    Button("Add Scale Keyframe") {
+                        state.save()
+                    }
+                    Button("Add Opacity Keyframe") {
+                        state.save()
+                    }
+                    Button("Add Rotation Keyframe") {
+                        state.save()
+                    }
+                } else {
+                    Text("Select a layer to add keyframes")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
         default:
             EmptyView()
         }
@@ -576,6 +661,8 @@ struct FullEditorView: View {
                     compactProperties
                 case .assets:
                     compactAssets
+                case .transitions:
+                    compactTransitions
                 }
             }
             .frame(height: 160)
@@ -669,6 +756,34 @@ struct FullEditorView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .padding()
+        }
+    }
+
+    private var compactTransitions: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(["None", "Cross Dissolve", "Wipe", "Slide", "Fade", "Zoom"], id: \.self) { name in
+                    Button {
+                        state.selectedTransition = name.replacingOccurrences(of: " ", with: "")
+                    } label: {
+                        VStack(spacing: 4) {
+                            Image(systemName: "rectangle.connected.to.line.below")
+                                .font(.title3)
+                            Text(name)
+                                .font(.system(size: 9))
+                        }
+                        .frame(width: 70, height: 50)
+                        .background(
+                            state.selectedTransition == name.replacingOccurrences(of: " ", with: "")
+                                ? Color.accentColor.opacity(0.15)
+                                : Color.secondary.opacity(0.1),
+                            in: RoundedRectangle(cornerRadius: 8)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
             .padding()
         }
     }
@@ -845,7 +960,7 @@ private struct TimelineTrackRow: View {
                     }
 
                     Rectangle()
-                        .fill(Color.red)
+                        .fill(Color(.systemRed))
                         .frame(width: 2)
                         .offset(x: geo.size.width * (playheadPosition / max(1, duration)))
                 }
@@ -857,11 +972,11 @@ private struct TimelineTrackRow: View {
 
     private func clipColor(for type: LayerType) -> Color {
         switch type {
-        case .video: return .blue
-        case .image: return .green
-        case .text: return .orange
-        case .shape: return .purple
-        case .brush: return .pink
+        case .video: return .secondary
+        case .image: return .secondary
+        case .text: return .secondary
+        case .shape: return .secondary
+        case .brush: return .secondary
         }
     }
 }

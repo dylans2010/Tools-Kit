@@ -50,7 +50,7 @@ struct GitHubReleaseBuilderView: View {
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(changelog.isEmpty ? Color.gray : Color.green)
+                        .background(changelog.isEmpty ? Color(.systemGray) : Color.accentColor)
                         .cornerRadius(12)
                 }
                 .disabled(changelog.isEmpty)

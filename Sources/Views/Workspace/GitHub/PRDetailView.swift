@@ -21,7 +21,7 @@ struct PRDetailView: View {
 
                     HStack {
                         Capsule()
-                            .fill(pullRequest.state == "open" ? Color.green : .secondary)
+                            .fill(pullRequest.state == "open" ? Color.accentColor : .secondary)
                             .overlay(Text(pullRequest.state.capitalized).font(.caption.bold()).foregroundStyle(.white))
                             .frame(width: 60, height: 24)
 
@@ -66,7 +66,7 @@ struct PRDetailView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.green)
+                        .background(Color.accentColor)
                         .foregroundStyle(.white)
                         .cornerRadius(12)
                         .disabled(isMerging)
@@ -79,7 +79,7 @@ struct PRDetailView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.red)
+                        .background(Color(.systemRed))
                         .foregroundStyle(.white)
                         .cornerRadius(12)
                         .disabled(isMerging)

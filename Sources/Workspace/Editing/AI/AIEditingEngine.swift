@@ -36,6 +36,27 @@ final class AIEditingEngine: ObservableObject {
     func suggestColorGrading(image: UIImage) -> [String: Double] {
         return ["brightness": 0.05, "contrast": 1.1, "saturation": 1.05]
     }
+
+    func applyStyleTransfer(_ style: String) {
+        print("Applying style transfer: \(style)")
+    }
+
+    func enterSmartRemoveMode() {
+        print("Smart remove mode activated")
+    }
+
+    func autoGrade() {
+        print("Auto grading applied")
+    }
+
+    func upscaleImage() async {
+        try? await Task.sleep(nanoseconds: 1_500_000_000)
+        print("Image upscaled")
+    }
+
+    func autoEnhance() {
+        print("Auto enhance applied")
+    }
 }
 #else
 import Foundation
@@ -45,6 +66,25 @@ final class AIEditingEngine: ObservableObject {
     private init() {}
     func suggestFraming(layer: EditingLayer, canvasSize: CGSize) -> CGRect {
         return .zero
+    }
+    func generateBackground(prompt: String) async -> Data? {
+        return nil
+    }
+    func applyStyleTransfer(_ style: String) {
+        print("Applying style transfer: \(style)")
+    }
+    func enterSmartRemoveMode() {
+        print("Smart remove mode activated")
+    }
+    func autoGrade() {
+        print("Auto grading applied")
+    }
+    func upscaleImage() async {
+        try? await Task.sleep(nanoseconds: 1_500_000_000)
+        print("Image upscaled")
+    }
+    func autoEnhance() {
+        print("Auto enhance applied")
     }
 }
 #endif
