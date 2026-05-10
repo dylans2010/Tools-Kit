@@ -92,6 +92,10 @@ struct GitHubRouterView: View {
     @State private var authErrorMessage: String?
     @State private var isSavingToken = false
 
+    private var isSaveDisabled: Bool {
+        isSavingToken || token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     var body: some View {
         Group {
             if isLoading {
@@ -135,9 +139,7 @@ struct GitHubRouterView: View {
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Cancel") {
-                            token = ""
-                            authErrorMessage = nil
-                            showingAuth = false
+                            resetAuthSheet()
                         }
                     }
                     ToolbarItem(placement: .confirmationAction) {
@@ -146,7 +148,7 @@ struct GitHubRouterView: View {
                                 await saveAndValidateToken()
                             }
                         }
-                        .disabled(isSavingToken)
+                        .disabled(isSaveDisabled)
                     }
                 }
             }
@@ -157,24 +159,21 @@ struct GitHubRouterView: View {
     @MainActor
     private func refreshAuthState() async {
         isLoading = true
-        token = ""
-        authErrorMessage = nil
+        defer { isLoading = false }
+        resetAuthSheet()
 
         guard let storedToken = GitHubAuthManager.shared.getToken(),
               !storedToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             isAuthenticated = false
-            isLoading = false
             return
         }
 
         let valid = await GitHubAuthManager.shared.validateToken()
         if valid {
             isAuthenticated = true
-            isLoading = false
         } else {
             GitHubAuthManager.shared.deleteToken()
             isAuthenticated = false
-            isLoading = false
         }
     }
 
@@ -206,7 +205,12 @@ struct GitHubRouterView: View {
         }
 
         isAuthenticated = true
-        showingAuth = false
+        resetAuthSheet()
+    }
+
+    private func resetAuthSheet() {
         token = ""
+        authErrorMessage = nil
+        showingAuth = false
     }
 }
