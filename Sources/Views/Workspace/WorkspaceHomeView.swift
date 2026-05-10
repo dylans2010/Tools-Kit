@@ -74,7 +74,7 @@ struct WorkspaceHomeView: View {
                     NavigationLink { SecurityHomeView() } label: {
                         Label("Security", systemImage: "lock.shield")
                     }
-                    NavigationLink { SecurityOnboardingView() } label: {
+                    NavigationLink { SecurityOnboardingView(authService: AuthService.shared) } label: {
                         Label("Security Setup", systemImage: "shield.checkered")
                     }
                     NavigationLink { GitHubRouterView() } label: {
