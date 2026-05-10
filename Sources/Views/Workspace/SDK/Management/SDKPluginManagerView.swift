@@ -4,6 +4,7 @@ import SwiftUI
 
 struct SDKPluginManagerView: View {
     @StateObject private var runtime = PluginRuntimeEngine.shared
+    @StateObject private var authorizationManager = AuthorizationManager.shared
     @State private var showingAddApp = false
     @State private var searchText = ""
 
@@ -29,7 +30,7 @@ struct SDKPluginManagerView: View {
                     ContentUnavailableView("No Extensions Found", systemImage: "puzzlepiece.extension", description: Text("Register an app to extend workspace capabilities."))
                 } else {
                     ForEach(filteredApps) { app in
-                        PluginAppRow(app: app, runtime: runtime)
+                        PluginAppRow(app: app, runtime: runtime, authorizationManager: authorizationManager)
                     }
                     .onDelete(perform: deleteApps)
                 }
@@ -60,6 +61,7 @@ struct SDKPluginManagerView: View {
 private struct PluginAppRow: View {
     let app: SDKAppDefinition
     @ObservedObject var runtime: PluginRuntimeEngine
+    @ObservedObject var authorizationManager: AuthorizationManager
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -80,6 +82,7 @@ private struct PluginAppRow: View {
                     }
                 }
                 .buttonStyle(.bordered).controlSize(.small).tint(runtime.isRunning(app.id) ? .red : .green)
+                .disabled(!authorizationManager.canUseScopes(app.requiredScopes))
             }
 
             if !app.description.isEmpty {

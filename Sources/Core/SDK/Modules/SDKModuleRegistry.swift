@@ -85,7 +85,17 @@ public final class SDKModuleRegistry: ObservableObject {
             throw SDKError.validationError(reason: "Unmet dependencies: \(unmet.joined(separator: ", "))")
         }
 
-        modules.append(descriptor)
+        var resolvedDescriptor = descriptor
+        if !AuthorizationManager.shared.canAccessModule(id: descriptor.identifier) {
+            resolvedDescriptor.isEnabled = false
+            SDKLogStore.shared.log(
+                "Module '\(descriptor.identifier)' registered in blocked state (insufficient authorization)",
+                source: "SDKModuleRegistry",
+                level: .warning
+            )
+        }
+
+        modules.append(resolvedDescriptor)
         if let provider = provider {
             providers[descriptor.identifier] = provider
         }
@@ -112,6 +122,10 @@ public final class SDKModuleRegistry: ObservableObject {
     public func activate(identifier: String) async throws {
         guard let index = modules.firstIndex(where: { $0.identifier == identifier }) else {
             throw SDKError.executionFailed(reason: "Module '\(identifier)' not found")
+        }
+
+        guard AuthorizationManager.shared.canAccessModule(id: identifier) else {
+            throw SDKError.permissionDenied(scope: modules[index].requiredScopes.joined(separator: ","))
         }
 
         for dep in modules[index].dependencies {

@@ -6,6 +6,7 @@ public final class LocalFileConnector: BaseConnector {
     public let id = UUID()
     public let name = "Local Files"
     public let type: ConnectorType = .localFileSystem
+    public let requiredScopes: [String] = ["workspace.files.read"]
     @Published public var status: ConnectorStatus = .connected
 
     public var authFields: [AuthField] { [] }

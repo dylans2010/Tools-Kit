@@ -1288,6 +1288,13 @@
 		EXP20000000000000000000A /* SDKModuleRegistryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP10000000000000000000A /* SDKModuleRegistryView.swift */; };
 		EXP20000000000000000000B /* SDKPluginLifecycleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP10000000000000000000B /* SDKPluginLifecycleView.swift */; };
 		EXP20000000000000000000C /* SDKConnectorBindingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP10000000000000000000C /* SDKConnectorBindingView.swift */; };
+		AU2000000000000000000001 /* SDKAuthorizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU1000000000000000000001 /* SDKAuthorizationManager.swift */; };
+		AU2000000000000000000002 /* SDKAuthorizationScopes.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU1000000000000000000002 /* SDKAuthorizationScopes.swift */; };
+		AU2000000000000000000011 /* AuthRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU1000000000000000000011 /* AuthRootView.swift */; };
+		AU2000000000000000000012 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU1000000000000000000012 /* SignInView.swift */; };
+		AU2000000000000000000013 /* SessionStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU1000000000000000000013 /* SessionStatusView.swift */; };
+		AU2000000000000000000014 /* ScopeInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU1000000000000000000014 /* ScopeInspectorView.swift */; };
+		AU2000000000000000000015 /* AccessControlOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AU1000000000000000000015 /* AccessControlOverviewView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2569,6 +2576,13 @@
 		EXP10000000000000000000A /* SDKModuleRegistryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Management/SDKModuleRegistryView.swift; sourceTree = SOURCE_ROOT; };
 		EXP10000000000000000000B /* SDKPluginLifecycleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Main/SDKPluginLifecycleView.swift; sourceTree = SOURCE_ROOT; };
 		EXP10000000000000000000C /* SDKConnectorBindingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/Plugins/Connectors/Main/SDKConnectorBindingView.swift; sourceTree = SOURCE_ROOT; };
+		AU1000000000000000000001 /* SDKAuthorizationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAuthorizationManager.swift; sourceTree = "<group>"; };
+		AU1000000000000000000002 /* SDKAuthorizationScopes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAuthorizationScopes.swift; sourceTree = "<group>"; };
+		AU1000000000000000000011 /* AuthRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authorization/AuthRootView.swift; sourceTree = "<group>"; };
+		AU1000000000000000000012 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authorization/SignInView.swift; sourceTree = "<group>"; };
+		AU1000000000000000000013 /* SessionStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authorization/SessionStatusView.swift; sourceTree = "<group>"; };
+		AU1000000000000000000014 /* ScopeInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authorization/ScopeInspectorView.swift; sourceTree = "<group>"; };
+		AU1000000000000000000015 /* AccessControlOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authorization/AccessControlOverviewView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -5150,6 +5164,8 @@
 				671209AE670E45C08441CFFB /* SDKEventBridge.swift */,
 				7CD45F7AF64649DBADB0741C /* Legacy */,
 				99B36AA1809E413797A8201E /* SDKScopeManager.swift */,
+				AU1000000000000000000001 /* SDKAuthorizationManager.swift */,
+				AU1000000000000000000002 /* SDKAuthorizationScopes.swift */,
 				99CAE2FBEFE24A3FBD4310BE /* Plugins */,
 				99F4C9203BC64DCD816A2F89 /* SDKBackgroundEngine.swift */,
 				A64A76CF976C45DCB6E06EA8 /* SDKRealtimeSync.swift */,
@@ -6984,6 +7000,11 @@
 				PL01000000000000000000000E /* SDKFlowBuilderView.swift */,
 				PL01000000000000000000000F /* SDKDataControlView.swift */,
 				PL010000000000000000000010 /* SDKPermissionControlView.swift */,
+				AU1000000000000000000011 /* AuthRootView.swift */,
+				AU1000000000000000000012 /* SignInView.swift */,
+				AU1000000000000000000013 /* SessionStatusView.swift */,
+				AU1000000000000000000014 /* ScopeInspectorView.swift */,
+				AU1000000000000000000015 /* AccessControlOverviewView.swift */,
 				PL010000000000000000000020 /* SDKControlCenterView.swift */,
 				PL010000000000000000000021 /* SDKWorkspaceExplorerView.swift */,
 				PL010000000000000000000022 /* SDKActionConsoleView.swift */,
@@ -10366,6 +10387,13 @@
 				EXP20000000000000000000A /* SDKModuleRegistryView.swift in Sources */,
 				EXP20000000000000000000B /* SDKPluginLifecycleView.swift in Sources */,
 				EXP20000000000000000000C /* SDKConnectorBindingView.swift in Sources */,
+				AU2000000000000000000001 /* SDKAuthorizationManager.swift in Sources */,
+				AU2000000000000000000002 /* SDKAuthorizationScopes.swift in Sources */,
+				AU2000000000000000000011 /* AuthRootView.swift in Sources */,
+				AU2000000000000000000012 /* SignInView.swift in Sources */,
+				AU2000000000000000000013 /* SessionStatusView.swift in Sources */,
+				AU2000000000000000000014 /* ScopeInspectorView.swift in Sources */,
+				AU2000000000000000000015 /* AccessControlOverviewView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

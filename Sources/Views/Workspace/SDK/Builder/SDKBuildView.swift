@@ -8,6 +8,7 @@ struct SDKBuildView: View {
     @StateObject private var connectorManager = SDKConnectorManager.shared
     @StateObject private var toolManager = SDKToolManager.shared
     @StateObject private var policyEngine = SDKPolicyEngine.shared
+    @StateObject private var authorizationManager = AuthorizationManager.shared
     @State private var isBuilding = false
     @State private var buildProgress: Double = 0.0
     @State private var exportedURL: URL?
@@ -102,6 +103,7 @@ struct SDKBuildView: View {
                 LabeledContent("Tools", value: "\(project.enabledToolIDs.count)")
                 LabeledContent("Links", value: "\(project.enabledConnectorIDs.count)")
             }
+            LabeledContent("Authorization", value: authorizationManager.authState.rawValue)
 
             if isBuilding {
                 VStack(alignment: .leading, spacing: 4) {
@@ -277,6 +279,7 @@ struct SDKBuildView: View {
                     set: { projectManager.currentProject = $0 }
                 ))
             }
+            NavigationLink("Authorization", destination: AuthRootView())
             NavigationLink("Automation", destination: SDKAutomationView())
             NavigationLink("Flow Builder") {
                 SDKFlowBuilderView(project: Binding(

@@ -5,6 +5,7 @@ public final class WebhookConnector: BaseConnector {
     public let id = UUID()
     public let name = "Webhook"
     public let type: ConnectorType = .webhook
+    public let requiredScopes: [String] = ["external.api.unrestricted"]
     @Published public var status: ConnectorStatus = .disconnected
 
     public var authFields: [AuthField] {

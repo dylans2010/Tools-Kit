@@ -6,6 +6,7 @@ public protocol BaseConnector: AnyObject, ObservableObject, Identifiable {
     var name: String { get }
     var type: ConnectorType { get }
     var status: ConnectorStatus { get set }
+    var requiredScopes: [String] { get }
     var authFields: [AuthField] { get }
     var activityLog: [ConnectorEvent] { get }
 
@@ -13,6 +14,10 @@ public protocol BaseConnector: AnyObject, ObservableObject, Identifiable {
     func sync() async throws
     func testConnection() async throws -> Bool
     func disconnect()
+}
+
+public extension BaseConnector {
+    var requiredScopes: [String] { [] }
 }
 
 public enum ConnectorType: String, CaseIterable, Codable {

@@ -15,6 +15,11 @@ public final class SDKConnectorManager: ObservableObject {
 
     public func register(_ connector: any BaseConnector) {
         guard !connectors.contains(where: { $0.id == connector.id }) else { return }
+        guard AuthorizationManager.shared.canUseScopes(connector.requiredScopes) || connector.requiredScopes.isEmpty else {
+            connector.disconnect()
+            SDKLogStore.shared.log("Connector blocked by authorization: \(connector.name)", source: "SDKConnectorManager", level: LogLevel.warning)
+            return
+        }
         connectors.append(connector)
         saveConnectors()
         SDKLogStore.shared.log("Connector registered: \(connector.name)", source: "SDKConnectorManager", level: LogLevel.info)
@@ -36,6 +41,10 @@ public final class SDKConnectorManager: ObservableObject {
 
         try await withThrowingTaskGroup(of: Void.self) { group in
             for connector in connectors where connector.status == .connected {
+                guard AuthorizationManager.shared.canUseScopes(connector.requiredScopes) || connector.requiredScopes.isEmpty else {
+                    connector.disconnect()
+                    continue
+                }
                 group.addTask {
                     try await connector.sync()
                 }

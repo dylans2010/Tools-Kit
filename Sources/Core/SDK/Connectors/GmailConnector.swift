@@ -6,6 +6,7 @@ public final class GmailConnector: BaseConnector {
     public let id = UUID()
     public let name = "Gmail"
     public let type: ConnectorType = .gmail
+    public let requiredScopes: [String] = ["external.api.unrestricted", "workspace.mail.read"]
     @Published public var status: ConnectorStatus = .disconnected
 
     public var authFields: [AuthField] {

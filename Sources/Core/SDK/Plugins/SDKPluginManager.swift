@@ -33,6 +33,10 @@ public final class SDKPluginManager: ObservableObject {
             throw SDKError.validationError(reason: "Plugin \(plugin.name) is already installed")
         }
 
+        guard AuthorizationManager.shared.canUseScopes(plugin.requiredScopes) || plugin.requiredScopes.isEmpty else {
+            throw SDKError.permissionDenied(scope: plugin.requiredScopes.joined(separator: ","))
+        }
+
         for permission in plugin.permissions {
             guard isPermissionGrantable(permission) else {
                 throw SDKError.permissionDenied(scope: "plugin.\(permission.rawValue)")
@@ -46,6 +50,12 @@ public final class SDKPluginManager: ObservableObject {
 
     public func enable(id: UUID) {
         if let index = plugins.firstIndex(where: { $0.id == id }) {
+            guard AuthorizationManager.shared.canUsePlugin(id: id) else {
+                plugins[index].isEnabled = false
+                savePlugins()
+                SDKLogStore.shared.log("Plugin blocked by authorization: \(plugins[index].name)", source: "SDKPluginManager", level: LogLevel.warning)
+                return
+            }
             plugins[index].isEnabled = true
             savePlugins()
             SDKLogStore.shared.log("Plugin enabled: \(plugins[index].name)", source: "SDKPluginManager", level: LogLevel.info)
@@ -69,7 +79,11 @@ public final class SDKPluginManager: ObservableObject {
     }
 
     public func executeHook(_ event: String, context: [String: Any]) async {
-        let applicablePlugins = plugins.filter { $0.isEnabled && $0.automationHooks.contains(event) }
+        let applicablePlugins = plugins.filter {
+            $0.isEnabled &&
+            $0.automationHooks.contains(event) &&
+            AuthorizationManager.shared.canUsePlugin(id: $0.id)
+        }
 
         for plugin in applicablePlugins {
             SDKLogStore.shared.log("Executing hook '\(event)' for plugin \(plugin.name)", source: "SDKPluginManager", level: LogLevel.info)
