@@ -332,10 +332,8 @@ struct SDKSupportView: View {
                     try await Task.sleep(nanoseconds: 400_000_000)
                 }
 
-                let systemPrompt = """
-                You are an SDK app architect. Given a natural language description, output ONLY a JSON object with this structure (no markdown, no explanation):
-                {"appName":"string","description":"string","modules":[{"name":"string","capabilities":["string"],"description":"string"}],"connectors":[{"name":"string","type":"string","purpose":"string"}],"plugins":[{"name":"string","category":"string","hooks":["string"]}],"automationRules":["string"],"complexity":"Low|Medium|High"}
-                """
+                let contextDocument = SDKAIContextProvider.loadContext()
+                let systemPrompt = SDKAIContextProvider.supportSystemPrompt(context: contextDocument)
 
                 let response = try await AIService.shared.processText(
                     prompt: "Generate an SDK app plan for: \(appDescription)",
