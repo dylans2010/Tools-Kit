@@ -671,9 +671,19 @@ private struct PersonaSendButton: View {
 
     var body: some View {
         Button(action: onSend) {
-            Image(systemName: "arrow.up.circle.fill")
-                .font(.system(size: 32))
-                .foregroundStyle(isDisabled ? .secondary : .blue)
+            ZStack {
+                Image(systemName: "arrow.up.circle.fill")
+                    .font(.system(size: 32))
+                    .foregroundStyle(.secondary)
+                    .opacity(isDisabled ? 1 : 0)
+
+                Image(systemName: "arrow.up.circle.fill")
+                    .font(.system(size: 32))
+                    .foregroundStyle(
+                        LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom)
+                    )
+                    .opacity(isDisabled ? 0 : 1)
+            }
         }
         .disabled(isDisabled)
     }
