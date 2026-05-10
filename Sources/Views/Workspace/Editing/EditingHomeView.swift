@@ -1,6 +1,7 @@
 import SwiftUI
 import PhotosUI
 import UniformTypeIdentifiers
+import UIKit
 
 // MARK: - Imported Media Item
 
@@ -11,6 +12,7 @@ struct ImportedMediaItem: Identifiable {
     let fileSize: Int64
     let thumbnailSystemName: String
     let resourceIdentifier: String
+    var thumbnailImage: UIImage?
 
     enum MediaImportType: String {
         case photo, video, document, audio
@@ -22,6 +24,171 @@ struct ImportedMediaItem: Identifiable {
             case .document: return .image
             case .audio: return .video
             }
+        }
+    }
+}
+
+// MARK: - UIKit Image Loader
+
+final class ImageLoader: ObservableObject {
+    @Published var image: UIImage?
+    @Published var isLoading = false
+
+    func loadImage(from url: URL) {
+        isLoading = true
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard url.startAccessingSecurityScopedResource() else {
+                DispatchQueue.main.async { self?.isLoading = false }
+                return
+            }
+            defer { url.stopAccessingSecurityScopedResource() }
+
+            if let data = try? Data(contentsOf: url),
+               let uiImage = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    self?.image = uiImage
+                    self?.isLoading = false
+                }
+            } else {
+                DispatchQueue.main.async { self?.isLoading = false }
+            }
+        }
+    }
+
+    func loadImage(from data: Data) {
+        isLoading = true
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let uiImage = UIImage(data: data)
+            DispatchQueue.main.async {
+                self?.image = uiImage
+                self?.isLoading = false
+            }
+        }
+    }
+}
+
+// MARK: - UIKit Image View Wrapper
+
+struct UIKitImageView: UIViewRepresentable {
+    let image: UIImage
+    var contentMode: UIView.ContentMode = .scaleAspectFit
+
+    func makeUIView(context: Context) -> UIImageView {
+        let imageView = UIImageView(image: image)
+        imageView.contentMode = contentMode
+        imageView.clipsToBounds = true
+        imageView.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        imageView.setContentHuggingPriority(.defaultLow, for: .vertical)
+        imageView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        imageView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        return imageView
+    }
+
+    func updateUIView(_ uiView: UIImageView, context: Context) {
+        uiView.image = image
+        uiView.contentMode = contentMode
+    }
+}
+
+// MARK: - UIKit Photo Picker Bridge
+
+struct PhotoPickerBridge: UIViewControllerRepresentable {
+    let onPicked: ([UIImage]) -> Void
+
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var config = PHPickerConfiguration()
+        config.selectionLimit = 0
+        config.filter = .any(of: [.images, .livePhotos])
+        config.preferredAssetRepresentationMode = .current
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator { Coordinator(onPicked: onPicked) }
+
+    class Coordinator: NSObject, PHPickerViewControllerDelegate {
+        let onPicked: ([UIImage]) -> Void
+        init(onPicked: @escaping ([UIImage]) -> Void) { self.onPicked = onPicked }
+
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            picker.dismiss(animated: true)
+            var images: [UIImage] = []
+            let group = DispatchGroup()
+            for result in results {
+                guard result.itemProvider.canLoadObject(ofClass: UIImage.self) else { continue }
+                group.enter()
+                result.itemProvider.loadObject(ofClass: UIImage.self) { object, _ in
+                    if let image = object as? UIImage {
+                        images.append(image)
+                    }
+                    group.leave()
+                }
+            }
+            group.notify(queue: .main) { [weak self] in
+                self?.onPicked(images)
+            }
+        }
+    }
+}
+
+// MARK: - UIKit Camera Capture
+
+struct CameraCaptureView: UIViewControllerRepresentable {
+    let onCaptured: (UIImage) -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.sourceType = .camera
+        picker.allowsEditing = true
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator { Coordinator(onCaptured: onCaptured) }
+
+    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+        let onCaptured: (UIImage) -> Void
+        init(onCaptured: @escaping (UIImage) -> Void) { self.onCaptured = onCaptured }
+
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+            picker.dismiss(animated: true)
+            if let image = info[.editedImage] as? UIImage ?? info[.originalImage] as? UIImage {
+                onCaptured(image)
+            }
+        }
+
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            picker.dismiss(animated: true)
+        }
+    }
+}
+
+// MARK: - Image Thumbnail Generator
+
+struct ThumbnailGenerator {
+    static func generateThumbnail(from url: URL, size: CGSize = CGSize(width: 200, height: 200)) -> UIImage? {
+        guard url.startAccessingSecurityScopedResource() else { return nil }
+        defer { url.stopAccessingSecurityScopedResource() }
+
+        guard let data = try? Data(contentsOf: url),
+              let original = UIImage(data: data) else { return nil }
+
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { _ in
+            original.draw(in: CGRect(origin: .zero, size: size))
+        }
+    }
+
+    static func generateThumbnail(from image: UIImage, size: CGSize = CGSize(width: 200, height: 200)) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: size))
         }
     }
 }
@@ -62,6 +229,8 @@ struct EditingHomeView: View {
     @StateObject private var manager = EditingManager.shared
     @State private var showingImporter = false
     @State private var showingCreateProject = false
+    @State private var showingPhotosPicker = false
+    @State private var showingCamera = false
     @State private var pendingMode: EditingEntryMode = .fullEditor
     @State private var navigateToQuickEdit: EditingProject?
     @State private var navigateToFullEditor: EditingProject?
@@ -74,6 +243,7 @@ struct EditingHomeView: View {
         ScrollView {
             VStack(spacing: 24) {
                 modeEntryCards
+                quickImportSection
                 recentProjectsSection
                 workflowSection
             }
@@ -93,7 +263,19 @@ struct EditingHomeView: View {
                         pendingMode = .fullEditor
                         showingImporter = true
                     } label: {
-                        Label("Import Media", systemImage: "square.and.arrow.down")
+                        Label("Import from Files", systemImage: "square.and.arrow.down")
+                    }
+                    Button {
+                        showingPhotosPicker = true
+                    } label: {
+                        Label("Import from Photos", systemImage: "photo.on.rectangle")
+                    }
+                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                        Button {
+                            showingCamera = true
+                        } label: {
+                            Label("Take Photo", systemImage: "camera")
+                        }
                     }
                 } label: {
                     Image(systemName: "plus")
@@ -118,6 +300,18 @@ struct EditingHomeView: View {
                         Button("Cancel") { showingImporter = false }
                     }
                 }
+            }
+        }
+        .sheet(isPresented: $showingPhotosPicker) {
+            PhotoPickerBridge { images in
+                handlePickedImages(images)
+                showingPhotosPicker = false
+            }
+        }
+        .fullScreenCover(isPresented: $showingCamera) {
+            CameraCaptureView { image in
+                handleCapturedImage(image)
+                showingCamera = false
             }
         }
         .navigationDestination(item: $navigateToQuickEdit) { project in
@@ -167,6 +361,48 @@ struct EditingHomeView: View {
         }
     }
 
+    // MARK: - Quick Import Section
+
+    private var quickImportSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Quick Import", systemImage: "square.and.arrow.down")
+                .font(.title3.bold())
+
+            HStack(spacing: 12) {
+                quickImportTile(title: "Photos", icon: "photo.on.rectangle", tint: .blue) {
+                    showingPhotosPicker = true
+                }
+                quickImportTile(title: "Files", icon: "folder", tint: .orange) {
+                    showingImporter = true
+                }
+                if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                    quickImportTile(title: "Camera", icon: "camera", tint: .green) {
+                        showingCamera = true
+                    }
+                }
+                quickImportTile(title: "Clipboard", icon: "clipboard", tint: .purple) {
+                    importFromClipboard()
+                }
+            }
+        }
+    }
+
+    private func quickImportTile(title: String, icon: String, tint: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundStyle(tint)
+                Text(title)
+                    .font(.caption.bold())
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+    }
+
     // MARK: - Recent Projects
 
     private var recentProjectsSection: some View {
@@ -206,6 +442,17 @@ struct EditingHomeView: View {
                         }
                         .buttonStyle(.plain)
                         .contextMenu {
+                            Button {
+                                navigateToQuickEdit = project
+                            } label: {
+                                Label("Quick Edit", systemImage: "bolt.fill")
+                            }
+                            Button {
+                                navigateToFullEditor = project
+                            } label: {
+                                Label("Full Editor", systemImage: "slider.horizontal.below.square.and.square.filled")
+                            }
+                            Divider()
                             Button(role: .destructive) {
                                 manager.deleteProject(id: project.id)
                             } label: {
@@ -342,6 +589,68 @@ struct EditingHomeView: View {
             navigateToFullEditor = updatedProject
         }
     }
+
+    private func handlePickedImages(_ images: [UIImage]) {
+        guard !images.isEmpty else { return }
+
+        let project = manager.createProject(
+            name: "Photos \(Date().formatted(date: .abbreviated, time: .shortened))",
+            canvasSize: CGSize(width: 1920, height: 1080)
+        )
+        var updatedProject = project
+        for (idx, image) in images.enumerated() {
+            let fileName = "photo_\(idx + 1).jpg"
+            if let data = image.jpegData(compressionQuality: 0.9) {
+                let docURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                let fileURL = docURL.appendingPathComponent("\(project.id.uuidString)_\(fileName)")
+                try? data.write(to: fileURL)
+
+                let layer = EditingLayer(
+                    id: UUID(),
+                    name: fileName,
+                    type: .image,
+                    position: CGPoint(x: 960, y: 540),
+                    scale: 1.0,
+                    rotation: 0,
+                    resourceID: fileURL.absoluteString
+                )
+                updatedProject.layers.append(layer)
+            }
+        }
+        manager.saveProject(updatedProject)
+        navigateToFullEditor = updatedProject
+    }
+
+    private func handleCapturedImage(_ image: UIImage) {
+        let project = manager.createProject(
+            name: "Capture \(Date().formatted(date: .abbreviated, time: .shortened))",
+            canvasSize: CGSize(width: image.size.width, height: image.size.height)
+        )
+        var updatedProject = project
+        if let data = image.jpegData(compressionQuality: 0.9) {
+            let docURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let fileURL = docURL.appendingPathComponent("\(project.id.uuidString)_capture.jpg")
+            try? data.write(to: fileURL)
+
+            let layer = EditingLayer(
+                id: UUID(),
+                name: "Captured Photo",
+                type: .image,
+                position: CGPoint(x: image.size.width / 2, y: image.size.height / 2),
+                scale: 1.0,
+                rotation: 0,
+                resourceID: fileURL.absoluteString
+            )
+            updatedProject.layers.append(layer)
+        }
+        manager.saveProject(updatedProject)
+        navigateToFullEditor = updatedProject
+    }
+
+    private func importFromClipboard() {
+        guard let image = UIPasteboard.general.image else { return }
+        handleCapturedImage(image)
+    }
 }
 
 // MARK: - Hashable conformance for navigation
@@ -363,6 +672,7 @@ struct CreateProjectView: View {
     @State private var name = ""
     @State private var selectedCanvasPreset: CanvasPreset = .hd1080
     @State private var showingFilePicker = false
+    @State private var showingPhotosPicker = false
     @State private var importedItems: [ImportedMediaItem] = []
 
     var body: some View {
@@ -393,15 +703,28 @@ struct CreateProjectView: View {
                         Label("Import from Files", systemImage: "doc.badge.plus")
                     }
 
+                    Button {
+                        showingPhotosPicker = true
+                    } label: {
+                        Label("Import from Photos", systemImage: "photo.on.rectangle")
+                    }
+
                     if !importedItems.isEmpty {
                         ForEach(importedItems) { item in
                             HStack(spacing: 10) {
-                                Image(systemName: item.thumbnailSystemName)
-                                    .foregroundStyle(.blue)
-                                    .frame(width: 28)
+                                if let thumbnail = item.thumbnailImage {
+                                    UIKitImageView(image: thumbnail, contentMode: .scaleAspectFill)
+                                        .frame(width: 40, height: 40)
+                                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                                } else {
+                                    Image(systemName: item.thumbnailSystemName)
+                                        .foregroundStyle(.blue)
+                                        .frame(width: 40, height: 40)
+                                }
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(item.name)
                                         .font(.subheadline)
+                                        .lineLimit(1)
                                     Text(item.type.rawValue.capitalized)
                                         .font(.caption2)
                                         .foregroundStyle(.secondary)
@@ -453,6 +776,23 @@ struct CreateProjectView: View {
                     showingFilePicker = false
                 }
             }
+            .sheet(isPresented: $showingPhotosPicker) {
+                PhotoPickerBridge { images in
+                    for (idx, image) in images.enumerated() {
+                        let thumbnail = ThumbnailGenerator.generateThumbnail(from: image)
+                        var item = ImportedMediaItem(
+                            name: "Photo \(importedItems.count + idx + 1).jpg",
+                            type: .photo,
+                            fileSize: Int64(image.jpegData(compressionQuality: 0.8)?.count ?? 0),
+                            thumbnailSystemName: "photo.fill",
+                            resourceIdentifier: UUID().uuidString
+                        )
+                        item.thumbnailImage = thumbnail
+                        importedItems.append(item)
+                    }
+                    showingPhotosPicker = false
+                }
+            }
         }
     }
 
@@ -495,12 +835,17 @@ struct CreateProjectView: View {
         default:
             type = .document; icon = "doc.fill"
         }
-        return ImportedMediaItem(
+
+        let thumbnail = (type == .photo) ? ThumbnailGenerator.generateThumbnail(from: url) : nil
+
+        var item = ImportedMediaItem(
             name: url.lastPathComponent,
             type: type,
             fileSize: (try? FileManager.default.attributesOfItem(atPath: url.path)[.size] as? Int64) ?? 0,
             thumbnailSystemName: icon,
             resourceIdentifier: url.absoluteString
         )
+        item.thumbnailImage = thumbnail
+        return item
     }
 }
