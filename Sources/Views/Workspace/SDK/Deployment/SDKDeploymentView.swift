@@ -16,23 +16,28 @@ struct SDKDeploymentView: View {
 
     var body: some View {
         List {
-            Section("Project Metadata") {
+            Section {
                 LabeledContent("Name", value: project.name)
                 LabeledContent("Health", value: project.healthStatus.rawValue.capitalized)
                 LabeledContent("Scopes", value: "\(project.enabledScopes.count)")
+            } header: {
+                Label("Project Metadata", systemImage: "doc.text.fill")
             }
 
-            Section("Deployment Configuration") {
+            Section {
                 Picker("Target Platform", selection: $deploymentTarget) {
                     ForEach(DeploymentTarget.allCases, id: \.self) { Text($0.rawValue).tag($0) }
                 }
+            } header: {
+                Label("Deployment Configuration", systemImage: "shippingbox.fill")
             }
 
             Section {
                 Button(action: deploy) {
                     HStack {
                         if isDeploying { ProgressView().controlSize(.small) }
-                        Text("Deploy to Workspace").bold()
+                        Label("Deploy to Workspace", systemImage: "arrow.up.doc.fill")
+                            .bold()
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -41,20 +46,24 @@ struct SDKDeploymentView: View {
             }
 
             if let plugin = deployedPlugin {
-                Section("Active Deployment") {
+                Section {
                     Label("Successfully deployed", systemImage: "checkmark.circle.fill")
                         .foregroundStyle(.green)
                     LabeledContent("Identifier") {
                         Text(plugin.identifier).font(.caption.monospaced())
                     }
+                } header: {
+                    Label("Active Deployment", systemImage: "antenna.radiowaves.left.and.right")
                 }
             }
 
             if let error = errorMessage {
-                Section("Error") {
+                Section {
                     Label(error, systemImage: "exclamationmark.octagon.fill")
                         .font(.caption)
                         .foregroundStyle(.red)
+                } header: {
+                    Label("Error", systemImage: "xmark.circle.fill")
                 }
             }
         }

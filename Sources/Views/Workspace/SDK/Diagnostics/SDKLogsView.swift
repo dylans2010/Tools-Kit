@@ -22,7 +22,7 @@ struct SDKLogsView: View {
                 }
             } header: {
                 HStack {
-                    Text("System Activity")
+                    Label("System Activity", systemImage: "list.bullet.rectangle")
                     Spacer()
                     Text("\(filteredEntries.count) events").font(.caption2.monospaced())
                 }
@@ -37,7 +37,9 @@ struct SDKLogsView: View {
                 levelFilterMenu
             }
             ToolbarItem(placement: .destructiveAction) {
-                Button("Clear", role: .destructive) { logStore.clear() }
+                Button(role: .destructive) { logStore.clear() } label: {
+                    Label("Clear", systemImage: "trash")
+                }
             }
         }
     }

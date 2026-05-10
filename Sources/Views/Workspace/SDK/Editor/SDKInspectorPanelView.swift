@@ -43,20 +43,26 @@ private struct FormInspector: View {
 
     var body: some View {
         Form {
-            Section("Active Context") {
+            Section {
                 LabeledContent("Area", value: state.selectedNode.title)
                 LabeledContent("Tabs", value: "\(state.openTabs.count)")
+            } header: {
+                Label("Active Context", systemImage: "scope")
             }
 
-            Section("Runtime Profile") {
+            Section {
                 LabeledContent("Config Count", value: "\(state.runConfigurations.count)")
                 LabeledContent("Memory", value: "\(state.memoryEstimateMB) MB")
+            } header: {
+                Label("Runtime Profile", systemImage: "cpu")
             }
 
-            Section("Security & Modules") {
+            Section {
                 LabeledContent("Scopes", value: "\(SDKProjectManager.shared.currentProject?.enabledScopes.count ?? 0)")
                 LabeledContent("Libraries", value: "\(state.libraries.count)")
                 LabeledContent("Dependencies", value: "\(state.dependencies.count)")
+            } header: {
+                Label("Security & Modules", systemImage: "lock.shield")
             }
         }
     }
@@ -83,9 +89,15 @@ private struct JSONEditor: View {
             }
 
             HStack {
-                Button("Validate") { validate() }.buttonStyle(.bordered)
+                Button { validate() } label: {
+                    Label("Validate", systemImage: "checkmark.circle")
+                }
+                .buttonStyle(.bordered)
                 Spacer()
-                Button("Apply Changes") { apply() }.buttonStyle(.borderedProminent)
+                Button { apply() } label: {
+                    Label("Apply Changes", systemImage: "square.and.arrow.down")
+                }
+                .buttonStyle(.borderedProminent)
             }
         }
         .padding(12)

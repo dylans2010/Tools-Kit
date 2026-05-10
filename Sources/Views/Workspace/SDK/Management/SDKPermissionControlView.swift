@@ -7,7 +7,7 @@ struct SDKPermissionControlView: View {
 
     var body: some View {
         List {
-            Section("Workspace Capabilities") {
+            Section {
                 ForEach(PluginCapability.allCases) { cap in
                     Toggle(isOn: Binding(
                         get: { project.requiredScopes.contains(cap.rawValue) },
@@ -22,6 +22,8 @@ struct SDKPermissionControlView: View {
                         Label(cap.displayName, systemImage: cap.icon)
                     }
                 }
+            } header: {
+                Label("Workspace Capabilities", systemImage: "checklist")
             }
 
             Section {
@@ -44,7 +46,7 @@ struct SDKPermissionControlView: View {
                 }
                 .tint(.red)
             } header: {
-                Text("Elevated Privileges")
+                Label("Elevated Privileges", systemImage: "exclamationmark.shield.fill")
             } footer: {
                 Text("Enable only for internal system tools. This bypasses the default execution sandbox.")
             }
