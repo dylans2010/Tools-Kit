@@ -23,7 +23,7 @@ public enum ConnectorStatus: String, Codable {
     case disconnected, connecting, connected, error
 }
 
-public struct AuthField {
+public struct AuthField: Codable, Hashable {
     public var label: String
     public var placeholder: String
     public var isSecure: Bool

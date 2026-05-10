@@ -57,7 +57,7 @@ struct SDKModuleRegistryView: View {
 
             if let cap = filterCapability {
                 HStack {
-                    Text("Filtering: \(cap.rawValue)").font(.caption).foregroundStyle(.accent)
+                    Text("Filtering: \(cap.rawValue)").font(.caption).foregroundStyle(Color.accentColor)
                     Spacer()
                     Button("Clear") { filterCapability = nil }.font(.caption)
                 }
@@ -86,7 +86,7 @@ struct SDKModuleRegistryView: View {
                                         .font(.system(size: 8, weight: .medium))
                                         .padding(.horizontal, 6).padding(.vertical, 2)
                                         .background(Color.accentColor.opacity(0.1), in: Capsule())
-                                        .foregroundStyle(.accent)
+                                        .foregroundStyle(Color.accentColor)
                                 }
                                 if mod.capabilities.count > 3 {
                                     Text("+\(mod.capabilities.count - 3)")

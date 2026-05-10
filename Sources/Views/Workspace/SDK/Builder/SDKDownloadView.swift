@@ -71,7 +71,7 @@ struct SDKDownloadView: View {
                 HStack {
                     Image(systemName: "shippingbox.fill")
                         .font(.title2)
-                        .foregroundStyle(.accent)
+                        .foregroundStyle(Color.accentColor)
                     VStack(alignment: .leading) {
                         Text("ToolsKit SDK").font(.headline)
                         Text("Versioned SDK distribution").font(.caption).foregroundStyle(.secondary)
@@ -124,7 +124,7 @@ struct SDKDownloadView: View {
                         Spacer()
                         if selectedVersion?.version == version.version {
                             Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(Color.accentColor)
                         }
                     }
                 }

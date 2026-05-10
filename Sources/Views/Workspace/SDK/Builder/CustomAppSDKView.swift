@@ -71,7 +71,7 @@ struct CustomAppSDKView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Image(systemName: "arrow.down.doc.fill")
-                        .font(.title2).foregroundStyle(.accent)
+                        .font(.title2).foregroundStyle(Color.accentColor)
                     VStack(alignment: .leading) {
                         Text("Import SDK Application").font(.headline)
                         Text("Import .zip bundles built with ToolsKit SDK").font(.caption).foregroundStyle(.secondary)

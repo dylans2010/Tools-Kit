@@ -52,7 +52,7 @@ struct SDKPluginLifecycleView: View {
 
             if let phase = filterPhase {
                 HStack {
-                    Text("Filtering: \(phase.rawValue)").font(.caption).foregroundStyle(.accent)
+                    Text("Filtering: \(phase.rawValue)").font(.caption).foregroundStyle(Color.accentColor)
                     Spacer()
                     Button("Clear") { filterPhase = nil }.font(.caption)
                 }
@@ -68,7 +68,7 @@ struct SDKPluginLifecycleView: View {
                 Button { selectedManifest = manifest } label: {
                     HStack {
                         Image(systemName: manifest.iconName)
-                            .font(.title3).foregroundStyle(.accent)
+                            .font(.title3).foregroundStyle(Color.accentColor)
                             .frame(width: 32)
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
@@ -83,7 +83,7 @@ struct SDKPluginLifecycleView: View {
                                     .font(.system(size: 8, weight: .medium))
                                     .padding(.horizontal, 6).padding(.vertical, 2)
                                     .background(Color.accentColor.opacity(0.1), in: Capsule())
-                                    .foregroundStyle(.accent)
+                                    .foregroundStyle(Color.accentColor)
                                 Text("\(manifest.capabilities.count) capabilities")
                                     .font(.caption2).foregroundStyle(.tertiary)
                             }
