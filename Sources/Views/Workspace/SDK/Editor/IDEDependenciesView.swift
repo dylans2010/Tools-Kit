@@ -26,22 +26,14 @@ struct IDEDependenciesView: View {
             }
 
             Section("Dependency Operations") {
-                Button {
-                    installDependency()
-                } label: {
+                Button { installDependency() } label: {
                     Label("Install Node", systemImage: "plus")
                 }
-
-                Button {
-                    updateSelectedNode()
-                } label: {
+                Button { updateSelectedNode() } label: {
                     Label("Update Selected", systemImage: "square.and.arrow.down")
                 }
                 .disabled(selectedNodeID == nil)
-
-                Button(role: .destructive) {
-                    removeSelectedNode()
-                } label: {
+                Button(role: .destructive) { removeSelectedNode() } label: {
                     Label("Remove Selected", systemImage: "trash")
                 }
                 .disabled(selectedNodeID == nil)
@@ -52,10 +44,10 @@ struct IDEDependenciesView: View {
                 Section("Conflict Alerts") {
                     ForEach(conflicts, id: \.self) { conflict in
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(conflict)
-                                .font(.subheadline)
+                            Text(conflict).font(.subheadline)
                             Text(conflictResolver.suggestion(for: conflict))
                                 .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -70,7 +62,7 @@ struct IDEDependenciesView: View {
                     )
                 } else {
                     ForEach(state.dependencies) { node in
-                        DependencyGraphRow(
+                        DependencyNodeRow(
                             node: node,
                             linkedNames: linkedNames(for: node),
                             isSelected: selectedNodeID == node.id
@@ -79,6 +71,18 @@ struct IDEDependenciesView: View {
                         .onTapGesture { selectedNodeID = node.id }
                     }
                     .onDelete(perform: deleteDependencies)
+                }
+            }
+
+            if let selected = state.dependencies.first(where: { $0.id == selectedNodeID }) {
+                Section("Selected Node") {
+                    LabeledContent("Name", value: selected.name)
+                    LabeledContent("Kind", value: selected.kind.rawValue)
+                    LabeledContent("Version", value: "v\(selected.version)")
+                    LabeledContent("Lazy Loaded", value: selected.lazyLoaded ? "Yes" : "No")
+                    if !selected.requiredScopes.isEmpty {
+                        LabeledContent("Scopes", value: selected.requiredScopes.joined(separator: ", "))
+                    }
                 }
             }
         }
@@ -150,40 +154,35 @@ struct IDEDependenciesView: View {
     }
 }
 
-private struct DependencyGraphRow: View {
+private struct DependencyNodeRow: View {
     let node: SDKDependencyNode
     let linkedNames: String
     let isSelected: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Label(node.name, systemImage: icon)
-                    .font(.headline)
+                    .font(.subheadline.bold())
                 Spacer()
                 Text("v\(node.version)")
                     .font(.caption.monospaced())
+                    .foregroundStyle(.secondary)
             }
 
-            Text("Kind: \(node.kind.rawValue)")
+            LabeledContent("Kind", value: node.kind.rawValue)
                 .font(.caption)
-            Text("Linked Modules: \(linkedNames)")
+            LabeledContent("Links", value: linkedNames)
                 .font(.caption)
-            Text("Required Scopes: \(node.requiredScopes.isEmpty ? "None" : node.requiredScopes.joined(separator: ", "))")
-                .font(.caption2)
 
-            if node.lazyLoaded || node.preRunHook != nil || node.postRunHook != nil {
-                Text("Runtime: \(node.lazyLoaded ? "lazy" : "eager") · pre: \(node.preRunHook ?? "none") · post: \(node.postRunHook ?? "none")")
+            if !node.requiredScopes.isEmpty {
+                Text("Scopes: \(node.requiredScopes.joined(separator: ", "))")
                     .font(.caption2)
+                    .foregroundStyle(.secondary)
             }
         }
-        .padding(.vertical, 4)
-        .overlay(alignment: .leading) {
-            if isSelected {
-                Rectangle()
-                    .frame(width: 2)
-            }
-        }
+        .padding(.vertical, 2)
+        .listRowBackground(isSelected ? Color.accentColor.opacity(0.08) : nil)
     }
 
     private var icon: String {

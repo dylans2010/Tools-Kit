@@ -136,6 +136,31 @@ struct SDKConnectorsView: View {
             }
 
             if !manager.connectors.isEmpty {
+                Section("Diagnostics") {
+                    let connectedCount = manager.connectors.filter { lifecycleState(for: $0) == .connected }.count
+                    let errorCount = manager.connectors.filter { lifecycleState(for: $0) == .error }.count
+                    let totalRetries = reconnectAttempts.values.reduce(0, +)
+
+                    LabeledContent("Health") {
+                        Text(errorCount == 0 ? "Healthy" : "Degraded")
+                            .foregroundStyle(errorCount == 0 ? Color.green : Color.orange)
+                    }
+                    LabeledContent("Connection Rate", value: "\(connectedCount)/\(manager.connectors.count)")
+                    LabeledContent("Total Retries", value: "\(totalRetries)")
+                    LabeledContent("Active Errors", value: "\(lastErrors.count)")
+
+                    if !lastErrors.isEmpty {
+                        ForEach(Array(lastErrors.keys), id: \.self) { id in
+                            if let connector = manager.connector(for: id), let error = lastErrors[id] {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(connector.name).font(.caption.bold())
+                                    Text(error).font(.caption2).foregroundStyle(.red)
+                                }
+                            }
+                        }
+                    }
+                }
+
                 Section("Operations") {
                     Button {
                         refreshStatuses()
@@ -161,6 +186,13 @@ struct SDKConnectorsView: View {
                         }
                     } label: {
                         Label("Sync All Connectors", systemImage: "arrow.trianglehead.2.clockwise")
+                    }
+
+                    Button {
+                        reconnectAttempts.removeAll()
+                        lastErrors.removeAll()
+                    } label: {
+                        Label("Clear Diagnostics", systemImage: "xmark.circle")
                     }
                 }
             }

@@ -77,6 +77,14 @@ struct WorkspaceHomeView: View {
                         Label("GitHub", systemImage: "terminal")
                     }
                 }
+
+                Section("Settings") {
+                    NavigationLink {
+                        AIChatSettingsRouter()
+                    } label: {
+                        Label("AI Chat Settings", systemImage: "gearshape")
+                    }
+                }
             }
             .navigationTitle("Workspace")
         }
@@ -212,5 +220,13 @@ struct GitHubRouterView: View {
         token = ""
         authErrorMessage = nil
         showingAuth = false
+    }
+}
+
+struct AIChatSettingsRouter: View {
+    @StateObject private var settingsManager = AIChatSettingsManager.shared
+
+    var body: some View {
+        AIChatSettingsView(settings: $settingsManager.settings)
     }
 }
