@@ -31,7 +31,7 @@ struct SlidesHomeView: View {
                         .buttonStyle(.borderedProminent)
                 }
             } else {
-                Section("Your Decks") {
+                Section {
                     ForEach(manager.decks) { deck in
                         NavigationLink {
                             SlideEditorView(deck: deck, manager: manager)
@@ -56,6 +56,8 @@ struct SlidesHomeView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Your Decks")
                 }
             }
         }
@@ -77,8 +79,10 @@ struct SlidesHomeView: View {
     private var createDeckSheet: some View {
         NavigationStack {
             Form {
-                Section("Deck Title") {
+                Section {
                     TextField("e.g. Q4 Business Review", text: $newDeckTitle)
+                } header: {
+                    Text("Deck Title")
                 }
             }
             .navigationTitle("New Presentation")
@@ -116,7 +120,7 @@ struct SlidesHomeView: View {
                     Text("Short requests are fine — AI will infer structure, content, and design.")
                 }
 
-                Section("Quick Presets") {
+                Section {
                     HStack(spacing: 8) {
                         Button("Pitch") { aiPrompt = "Create a startup investor deck from my idea." }
                             .buttonStyle(.bordered)
@@ -131,6 +135,8 @@ struct SlidesHomeView: View {
                         Button("Review") { aiPrompt = "Create a quarterly business review presentation." }
                             .buttonStyle(.bordered)
                     }
+                } header: {
+                    Text("Quick Presets")
                 }
 
                 Section {

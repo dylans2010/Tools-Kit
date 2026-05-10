@@ -13,7 +13,7 @@ struct WorkspaceHabitTrackerView: View {
 
     var body: some View {
         List {
-            Section("Summary") {
+            Section {
                 HStack(spacing: 12) {
                     let completed = manager.habits.filter { $0.isCompletedToday() }.count
                     let habitCount = manager.habits.count
@@ -22,9 +22,11 @@ struct WorkspaceHabitTrackerView: View {
                     HabitStatLabel(label: "Rate", value: "\(Int((Double(completed) / Double(safeTotal)) * 100))%")
                     HabitStatLabel(label: "Streaking", value: "\(manager.habits.filter { $0.currentStreak > 0 }.count)")
                 }
+            } header: {
+                Text("Summary")
             }
 
-            Section("AI Coach") {
+            Section {
                 TextField("Describe your goals to get habit recommendations…", text: $aiPrompt, axis: .vertical)
 
                 HStack(spacing: 8) {
@@ -50,6 +52,8 @@ struct WorkspaceHabitTrackerView: View {
                     insightList("Suggested Habits", aiInsights.suggestedHabits)
                     insightList("Optimization", aiInsights.optimizationTips)
                 }
+            } header: {
+                Text("AI Coach")
             }
 
             if manager.habits.isEmpty {
@@ -62,7 +66,7 @@ struct WorkspaceHabitTrackerView: View {
                         .buttonStyle(.borderedProminent)
                 }
             } else {
-                Section("Your Habits") {
+                Section {
                     ForEach(manager.habits) { habit in
                         HabitRow(habit: habit, manager: manager) { selectedHabit = habit }
                             .swipeActions(edge: .trailing) {
@@ -71,6 +75,8 @@ struct WorkspaceHabitTrackerView: View {
                                 }
                             }
                     }
+                } header: {
+                    Text("Your Habits")
                 }
             }
         }

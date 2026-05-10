@@ -42,25 +42,31 @@ struct ArticleDetailView: View {
                     ProgressView("Loading article…")
                 }
             } else if let err = errorMessage {
-                Section("Error") {
+                Section {
                     Label(err, systemImage: "exclamationmark.triangle")
                         .foregroundStyle(.red)
+                } header: {
+                    Text("Error")
                 }
             } else {
-                Section("Article") {
+                Section {
                     renderedArticleText(displayArticle.content.isEmpty ? displayArticle.summary : displayArticle.content)
                         .textSelection(.enabled)
+                } header: {
+                    Text("Article")
                 }
             }
 
             if !aiResult.isEmpty {
-                Section(aiTask) {
+                Section {
                     if aiLoading {
                         ProgressView()
                     } else {
                         renderedArticleText(aiResult)
                             .textSelection(.enabled)
                     }
+                } header: {
+                    Text(aiTask)
                 }
             }
 

@@ -67,8 +67,10 @@ struct SpreadsheetsHomeView: View {
     private var createSheet: some View {
         NavigationStack {
             Form {
-                Section("Sheet Name") {
+                Section {
                     TextField("Name", text: $newName)
+                } header: {
+                    Text("Sheet Name")
                 }
             }
             .navigationTitle("New Sheet")
