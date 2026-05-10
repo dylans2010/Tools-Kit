@@ -309,129 +309,23 @@ struct PersonaHomeView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Chat History
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(spacing: 16) {
-                        if manager.chatHistory.isEmpty {
-                            VStack(spacing: 20) {
-                                Image(systemName: "sparkles")
-                                    .font(.system(size: 50))
-                                    .foregroundStyle(LinearGradient(colors: [.blue, .purple, .mint], startPoint: .topLeading, endPoint: .bottomTrailing))
-                                    .padding(.top, 100)
-                                Text("Your Workspace Intelligence")
-                                    .font(.title2.bold())
-                                Text("Ask anything about your Mail, Tasks, Files, and Habits.")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 40)
+            PersonaChatTimelineView(
+                chatHistory: manager.chatHistory,
+                isThinking: manager.isThinking,
+                onDiscoverPrompts: { showDiscovery = true },
+                onNeedScroll: scrollToBottom
+            )
 
-                                Button {
-                                    showDiscovery = true
-                                } label: {
-                                    Label("Discover Prompts", systemImage: "lightbulb.fill")
-                                        .font(.headline)
-                                        .padding()
-                                        .background(Color.accentColor.opacity(0.1), in: Capsule())
-                                }
-                                .padding(.top, 20)
-                            }
-                        } else {
-                            ForEach(manager.chatHistory) { message in
-                                PersonaChatBubble(message: message)
-                                    .id(message.id)
-                            }
-                        }
-
-                        if manager.isThinking {
-                            ThinkingIndicator()
-                                .id("thinking")
-                        }
-                    }
-                    .padding()
-                }
-                .onChange(of: manager.chatHistory.count) { _ in
-                    scrollToBottom(proxy)
-                }
-                .onChange(of: manager.isThinking) { thinking in
-                    if thinking {
-                        scrollToBottom(proxy)
-                    }
-                }
-            }
-
-            // Bottom UI Area
-            VStack(spacing: 0) {
-                Divider()
-
-                // Suggested Actions (Follow-ups)
-                if let lastMessage = manager.chatHistory.last, lastMessage.role == "assistant" {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
-                            ForEach(suggestedFollowUps(for: lastMessage.content), id: \.self) { suggestion in
-                                Button(suggestion) {
-                                    query = suggestion
-                                    sendMessage()
-                                }
-                                .font(.caption.bold())
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(.ultraThinMaterial, in: Capsule())
-                                .overlay(Capsule().stroke(Color.primary.opacity(0.1), lineWidth: 0.5))
-                            }
-                        }
-                        .padding(.horizontal)
-                        .padding(.vertical, 8)
-                    }
-                }
-
-                // Presets and Input
-                VStack(spacing: 12) {
-                    HStack(spacing: 8) {
-                        ForEach(shuffledPrompts, id: \.self) { prompt in
-                            Button(action: {
-                                query = prompt
-                                sendMessage()
-                            }) {
-                                Text(prompt)
-                                    .font(.caption2)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 6)
-                                    .background(Color.secondary.opacity(0.1))
-                                    .cornerRadius(12)
-                                    .lineLimit(1)
-                            }
-                        }
-
-                        Button(action: { showDiscovery = true }) {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.system(size: 20))
-                                .foregroundStyle(.blue)
-                        }
-                    }
-                    .padding(.horizontal)
-
-                    HStack(spacing: 12) {
-                        TextField("Message Persona...", text: $query, axis: .vertical)
-                            .padding(10)
-                            .background(Color.secondary.opacity(0.1))
-                            .cornerRadius(20)
-                            .lineLimit(1...5)
-
-                        Button(action: sendMessage) {
-                            Image(systemName: "arrow.up.circle.fill")
-                                .font(.system(size: 32))
-                                .foregroundStyle(query.isEmpty || manager.isThinking ? AnyShapeStyle(.secondary) : AnyShapeStyle(LinearGradient(colors: [.blue, .purple], startPoint: Color.top, endPoint: Color.bottom)))
-                        }
-                        .disabled(query.isEmpty || manager.isThinking)
-                    }
-                    .padding(.horizontal)
-                    .padding(.bottom, 10)
-                }
-                .padding(.top, 8)
-                .background(.ultraThinMaterial)
-            }
+            PersonaComposerView(
+                query: $query,
+                isThinking: manager.isThinking,
+                shuffledPrompts: shuffledPrompts,
+                lastAssistantContent: manager.chatHistory.last?.role == "assistant" ? manager.chatHistory.last?.content : nil,
+                onTapPrompt: { prompt in query = prompt; sendMessage() },
+                onSend: sendMessage,
+                onOpenDiscovery: { showDiscovery = true },
+                followUpsProvider: suggestedFollowUps(for:)
+            )
         }
         .navigationTitle("AI Persona")
         .navigationBarTitleDisplayMode(.inline)
@@ -509,6 +403,71 @@ struct PersonaHomeView: View {
     }
 }
 
+private struct PersonaChatTimelineView: View {
+    let chatHistory: [PersonaMessage]
+    let isThinking: Bool
+    let onDiscoverPrompts: () -> Void
+    let onNeedScroll: (ScrollViewProxy) -> Void
+
+    var body: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(spacing: 16) {
+                    if chatHistory.isEmpty {
+                        PersonaEmptyStateView(onDiscoverPrompts: onDiscoverPrompts)
+                    } else {
+                        ForEach(chatHistory) { message in
+                            PersonaChatBubble(message: message).id(message.id)
+                        }
+                    }
+                    if isThinking { ThinkingIndicator().id("thinking") }
+                }
+                .padding()
+            }
+            .onChange(of: chatHistory.count) { _ in onNeedScroll(proxy) }
+            .onChange(of: isThinking) { thinking in if thinking { onNeedScroll(proxy) } }
+        }
+    }
+}
+
+private struct PersonaComposerView: View {
+    @Binding var query: String
+    let isThinking: Bool
+    let shuffledPrompts: [String]
+    let lastAssistantContent: String?
+    let onTapPrompt: (String) -> Void
+    let onSend: () -> Void
+    let onOpenDiscovery: () -> Void
+    let followUpsProvider: (String) -> [String]
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Divider()
+            if let content = lastAssistantContent {
+                PersonaFollowUpsView(suggestions: followUpsProvider(content), onSelect: onTapPrompt)
+            }
+            PersonaInputPanelView(query: $query, isThinking: isThinking, shuffledPrompts: shuffledPrompts, onTapPrompt: onTapPrompt, onSend: onSend, onOpenDiscovery: onOpenDiscovery)
+        }
+    }
+}
+
+private struct PersonaEmptyStateView: View {
+    let onDiscoverPrompts: () -> Void
+    var body: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "sparkles")
+                .font(.system(size: 50))
+                .foregroundStyle(LinearGradient(colors: [.blue, .purple, .mint], startPoint: .topLeading, endPoint: .bottomTrailing))
+                .padding(.top, 100)
+            Text("Your Workspace Intelligence").font(.title2.bold())
+            Text("Ask anything about your Mail, Tasks, Files, and Habits.")
+                .font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center).padding(.horizontal, 40)
+            Button(action: onDiscoverPrompts) { Label("Discover Prompts", systemImage: "lightbulb.fill").font(.headline).padding().background(Color.accentColor.opacity(0.1), in: Capsule()) }
+                .padding(.top, 20)
+        }
+    }
+}
+
 private struct PersonaChatBubble: View {
     let message: PersonaMessage
 
@@ -543,6 +502,69 @@ private struct PersonaChatBubble: View {
             if message.role == "assistant" { Spacer() }
         }
         .transition(.asymmetric(insertion: .move(edge: message.role == "user" ? .trailing : .leading).combined(with: .opacity), removal: .opacity))
+    }
+}
+
+private struct PersonaFollowUpsView: View {
+    let suggestions: [String]
+    let onSelect: (String) -> Void
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(suggestions, id: \.self) { suggestion in
+                    Button(suggestion) { onSelect(suggestion) }
+                        .font(.caption.bold())
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(.ultraThinMaterial, in: Capsule())
+                        .overlay(Capsule().stroke(Color.primary.opacity(0.1), lineWidth: 0.5))
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+        }
+    }
+}
+
+private struct PersonaInputPanelView: View {
+    @Binding var query: String
+    let isThinking: Bool
+    let shuffledPrompts: [String]
+    let onTapPrompt: (String) -> Void
+    let onSend: () -> Void
+    let onOpenDiscovery: () -> Void
+
+    var body: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 8) {
+                ForEach(shuffledPrompts, id: \.self) { prompt in
+                    Button(action: { onTapPrompt(prompt) }) {
+                        Text(prompt).font(.caption2).padding(.horizontal, 10).padding(.vertical, 6).background(Color.secondary.opacity(0.1)).cornerRadius(12).lineLimit(1)
+                    }
+                }
+                Button(action: onOpenDiscovery) { Image(systemName: "plus.circle.fill").font(.system(size: 20)).foregroundStyle(.blue) }
+            }
+            .padding(.horizontal)
+
+            HStack(spacing: 12) {
+                TextField("Message Persona...", text: $query, axis: .vertical)
+                    .padding(10)
+                    .background(Color.secondary.opacity(0.1))
+                    .cornerRadius(20)
+                    .lineLimit(1...5)
+                Button(action: onSend) {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.system(size: 32))
+                        .foregroundStyle((query.isEmpty || isThinking) ? AnyShapeStyle(.secondary) : AnyShapeStyle(LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom)))
+                }
+                .disabled(query.isEmpty || isThinking)
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 10)
+        }
+        .padding(.top, 8)
+        .background(.ultraThinMaterial)
     }
 }
 
