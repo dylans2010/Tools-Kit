@@ -1,14 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Modernized tool rows using a private struct ToolRegistryRow with native Label.
- - Applied .presentationDetents([.large]) to the tool runner sheet.
- - Standardized execution history using semantic status icons and LabeledContent.
- - Replaced manual badge and button layouts with semantic components.
- - strictly preserved all SDKToolManager execution and history tracking logic.
- - Improved visual hierarchy for input schema and execution results.
- - Extracted subviews for ToolRunner and OutputSection.
- */
+
 
 import SwiftUI
 

@@ -1,14 +1,3 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on a multi-panel layout using a Sidebar List and an inspector detail view.
- - Modernized the search experience with .searchable integration.
- - Replaced manual HStack node layouts with native Label and semantic icons.
- - Standardized edge/relationship display with arrow symbols and monospaced typography.
- - strictly preserved all SDKWorkspaceGraphEngine and WorkspaceAPI data fetching logic.
- - Implemented NodeInspectorView as a structured detail panel with monospaced JSON display.
- - Extracted subviews for EdgeRow and EntityNodeRow.
- */
-
 import SwiftUI
 
 struct SDKWorkspaceExplorerView: View {
@@ -28,105 +17,147 @@ struct SDKWorkspaceExplorerView: View {
 
     private var filteredNodes: [SDKNode] {
         guard !searchText.isEmpty else { return workspaceNodes }
-        return workspaceNodes.filter { $0.label.localizedCaseInsensitiveContains(searchText) || $0.type.localizedCaseInsensitiveContains(searchText) }
+        return workspaceNodes.filter {
+            $0.label.localizedCaseInsensitiveContains(searchText) ||
+            $0.type.localizedCaseInsensitiveContains(searchText)
+        }
     }
 
     var body: some View {
-        HStack(spacing: 0) {
-            List {
-                Section("Entities (\(filteredNodes.count))") {
-                    ForEach(filteredNodes) { node in
-                        EntityNodeRow(node: node, isSelected: selectedNode?.id == node.id) { selectedNode = node }
-                    }
-                }
+        GeometryReader { geometry in
+            let compactLayout = geometry.size.width < 700
 
-                Section("Relationships (\(graph.edges.count))") {
-                    if graph.edges.isEmpty {
-                        Text("No connections detected").font(.caption).foregroundStyle(.secondary)
-                    } else {
-                        ForEach(graph.edges) { edge in
-                            EdgeRow(edge: edge, nodes: workspaceNodes)
+            Group {
+                if compactLayout {
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            nodeListSection
+
+                            if let node = selectedNode {
+                                NodeInspectorDetail(node: node)
+                            } else {
+                                ContentUnavailableView(
+                                    "No Node Selected",
+                                    systemImage: "sidebar.right",
+                                    description: Text("Select an entity to inspect details.")
+                                )
+                            }
                         }
+                        .padding(.horizontal)
+                        .padding(.vertical, 12)
+                    }
+                } else {
+                    HStack(spacing: 0) {
+                        nodeListSection
+                            .frame(width: min(max(320, geometry.size.width * 0.45), 520))
+                        Divider()
+                        Group {
+                            if let node = selectedNode {
+                                NodeInspectorDetail(node: node)
+                            } else {
+                                ContentUnavailableView(
+                                    "No Node Selected",
+                                    systemImage: "sidebar.right",
+                                    description: Text("Select an entity to inspect details.")
+                                )
+                            }
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 }
             }
-            .listStyle(.sidebar)
-            .searchable(text: $searchText, prompt: "Search entities")
-
-            if let node = selectedNode {
-                Divider()
-                NodeInspectorDetail(node: node)
-                    .frame(width: 320)
-            }
+            .frame(width: geometry.size.width, height: geometry.size.height)
+            .safeAreaInset(edge: .bottom) { EmptyView().frame(height: 0) }
         }
         .navigationTitle("Workspace Graph")
+        .searchable(text: $searchText, prompt: "Search entities")
         .refreshable { graph = SDKWorkspaceGraphEngine.shared.fetchGraph() }
     }
-}
 
-// MARK: - Private Subviews
-
-private struct EntityNodeRow: View {
-    let node: SDKNode
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Label {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(node.label).font(.subheadline.bold())
-                    Text(node.type).font(.caption2).foregroundStyle(.secondary)
+    private var nodeListSection: some View {
+        List {
+            Section("Entities (\(filteredNodes.count))") {
+                ForEach(filteredNodes) { node in
+                    Button {
+                        selectedNode = node
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(node.label)
+                                Text(node.type)
+                                    .font(.caption)
+                            }
+                            Spacer()
+                            if selectedNode?.id == node.id {
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
                 }
-            } icon: {
-                Image(systemName: iconForType(node.type)).foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
+            }
+
+            Section("Relationships (\(graph.edges.count))") {
+                if graph.edges.isEmpty {
+                    Text("No connections detected")
+                        .font(.caption)
+                } else {
+                    ForEach(graph.edges) { edge in
+                        EdgeRow(edge: edge, nodes: workspaceNodes)
+                    }
+                }
             }
         }
-        .listRowBackground(isSelected ? Color.accentColor.opacity(0.1) : nil)
-    }
-
-    private func iconForType(_ type: String) -> String {
-        switch type.lowercased() {
-        case "note": return "note.text"
-        case "task": return "checkmark.circle"
-        case "mail": return "envelope"
-        case "event": return "calendar"
-        case "slide": return "rectangle.on.rectangle"
-        default: return "circle"
-        }
+        .listStyle(.insetGrouped)
     }
 }
 
 private struct EdgeRow: View {
-    let edge: SDKEdge, nodes: [SDKNode]
+    let edge: SDKEdge
+    let nodes: [SDKNode]
+
     var body: some View {
         HStack {
-            Text(label(for: edge.source)).font(.caption.bold())
-            Image(systemName: "arrow.right").font(.caption2).foregroundStyle(.secondary)
-            Text(label(for: edge.target)).font(.caption.bold())
+            Text(label(for: edge.source))
+                .font(.caption)
+            Image(systemName: "arrow.right")
+                .font(.caption)
+            Text(label(for: edge.target))
+                .font(.caption)
             Spacer()
-            Text(edge.label).font(.system(size: 8, weight: .black)).padding(.horizontal, 4).padding(.vertical, 2).background(Color.accentColor.opacity(0.1), in: Capsule())
+            Text(edge.label)
+                .font(.caption2)
         }
     }
-    private func label(for id: UUID) -> String { nodes.first { $0.id == id }?.label ?? id.uuidString.prefix(6).description }
+
+    private func label(for id: UUID) -> String {
+        nodes.first { $0.id == id }?.label ?? id.uuidString.prefix(6).description
+    }
 }
 
 private struct NodeInspectorDetail: View {
     let node: SDKNode
+
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                Text("Inspector").font(.headline)
-                VStack(alignment: .leading, spacing: 12) {
-                    LabeledContent("ID", value: node.id.uuidString).font(.caption.monospaced())
-                    LabeledContent("Type", value: node.type)
-                    LabeledContent("Label", value: node.label)
-                }
-                Divider()
-                Text("Raw Data").font(.subheadline.bold())
-                Text(buildJSON()).font(.system(size: 10, design: .monospaced)).padding(12).background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
-            }.padding()
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Inspector")
+                    .font(.headline)
+                LabeledContent("ID", value: node.id.uuidString)
+                LabeledContent("Type", value: node.type)
+                LabeledContent("Label", value: node.label)
+
+                Text("Raw Data")
+                    .font(.subheadline)
+                Text(buildJSON())
+                    .font(.system(.caption, design: .monospaced))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
         }
     }
-    private func buildJSON() -> String { "{\n  \"id\": \"\(node.id.uuidString)\",\n  \"type\": \"\(node.type)\"\n}" }
+
+    private func buildJSON() -> String {
+        "{\n  \"id\": \"\(node.id.uuidString)\",\n  \"type\": \"\(node.type)\"\n}"
+    }
 }

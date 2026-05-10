@@ -1,12 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style with .searchable integration.
- - Modernized log entries with semantic badges, monospaced typography, and clear source labels.
- - Replaced manual filter and stat bar layouts with native List sections and ToolbarItems.
- - Standardized log level filtering using a native Menu/Picker interface.
- - strictly preserved all SDKLogStore data integration and clearing logic.
- - Improved visual hierarchy for timestamps and multi-line message content.
- */
+
 
 import SwiftUI
 

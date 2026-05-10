@@ -1,15 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Modernized the Flow Summary using centered DetailMetricPills and a horizontal sequence preview.
- - Replaced manual empty state with ContentUnavailableView featuring primary template actions.
- - Standardized Step Rows using native SF Symbols, monospaced typography, and semantic status indicators.
- - strictly preserved all FlowStep configuration logic, template application, and validation rules.
- - Improved visual hierarchy for trigger, action, condition, and delay steps.
- - Extracted sub-structs for FlowSummarySection, StepConfigurationView, and EmptyPipelineView to meet line-count limits.
- - Modernized the toolbar with a native Menu and EditButton integration.
- - Standardized sheets (Templates, Export) with appropriate detents and drag indicators.
- */
+
 
 import SwiftUI
 

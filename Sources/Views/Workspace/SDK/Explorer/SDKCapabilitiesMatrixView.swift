@@ -1,14 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Replaced manual card-based capability rows with standard List rows and semantic status badges.
- - Modernized the capability detail sheet with .presentationDetents([.medium, .large]) and a drag indicator.
- - Standardized status display using native Label and LabeledContent.
- - Strictly preserved all SDKRuntimeWorkspaceState diagnostics, usage stats, and scope validation logic.
- - Re-implemented usage intensity calculation and diagnostic count reporting.
- - Improved visual hierarchy for required scopes using monospaced typography.
- - Extracted subviews for CapabilityRow and CapabilityDetail.
- */
+
 
 import SwiftUI
 

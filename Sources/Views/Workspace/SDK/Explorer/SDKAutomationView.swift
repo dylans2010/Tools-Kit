@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Replaced manual SDKModernCard layouts with standard List rows for better system integration.
- - Modernized automation rule cards using native Label and LabeledContent for execution stats.
- - Applied .presentationDetents([.medium]) to the rule creation sheet with a drag indicator.
- - Standardized SF Symbols for automation status (bolt, play.circle).
- - Strictly preserved SDKAutomationEngine logic and toggle binding functionality.
- - Used ContentUnavailableView for empty rule states.
- */
+
 
 import SwiftUI
 

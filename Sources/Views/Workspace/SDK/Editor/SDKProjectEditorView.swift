@@ -1,12 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized the tab bar using a horizontal ScrollView with Capsule-styled buttons.
- - Replaced manual diagnostics banner with a private DiagnosticsBar struct using semantic colors.
- - Modernized the tab picker sheet with .presentationDetents([.medium, .large]) and a drag indicator.
- - Replaced manual HStack layouts with native Label and semantic SF Symbols.
- - Strictly preserved all activeTab switching logic and diagnostic navigation pathways.
- - Standardized on insetGrouped List style for the tab picker.
- */
+
 
 import SwiftUI
 

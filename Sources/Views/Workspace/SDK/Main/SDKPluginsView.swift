@@ -1,12 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style for consistent system aesthetics.
- - Modernized the catalog sheet with .presentationDetents([.medium, .large]) and a drag indicator.
- - Replaced manual HStack badge layouts with native Label and semantic colors.
- - Standardized permission indicators using SF Symbols (eye, pencil, globe, etc.).
- - Strictly preserved SDKPluginManager state management and functional logic.
- - Implemented ContentUnavailableView for empty catalog states.
- */
+
 
 import SwiftUI
 

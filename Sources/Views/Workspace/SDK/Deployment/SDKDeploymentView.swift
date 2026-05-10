@@ -1,12 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Replaced manual HStack metadata layouts with native LabeledContent.
- - Modernized deployment target picker using native Picker within a Section.
- - Standardized action buttons using prominent prominent styles and native ProgressView.
- - Replaced manual error/success text with semantic status Labels.
- - strictly preserved all PluginManager and SDKExecutionBridge deployment logic.
- */
+
 
 import SwiftUI
 

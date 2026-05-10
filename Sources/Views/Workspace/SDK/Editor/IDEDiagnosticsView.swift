@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Replaced manual pills and headers with native Section titles and LabeledContent.
- - Modernized diagnostic rows using a private struct DiagnosticItemRow with semantic severity icons.
- - Standardized status coloring using semantic .red, .orange, and .green.
- - strictly preserved all SDKRuntimeWorkspaceState diagnostics, recalculation, and navigation logic.
- - Implemented ContentUnavailableView for 'All Systems Go' states.
- - Standardized the 'Resolve All' button with a prominent prominent style.
- */
+
 
 import SwiftUI
 

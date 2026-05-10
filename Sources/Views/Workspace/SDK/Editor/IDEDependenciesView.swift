@@ -1,100 +1,197 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Replaced manual stat pills and headers with native Section titles and LabeledContent.
- - Modernized dependency rows using a private struct DependencyGraphRow with semantic icons.
- - Standardized conflict alerts using semantic Label and monospaced typography.
- - strictly preserved all SDKRuntimeWorkspaceState dependency management and conflict resolution logic.
- - Improved visual hierarchy for lazy loading status and hook indicators.
- - Implemented ContentUnavailableView for empty graph states.
- */
-
 import SwiftUI
 
 struct IDEDependenciesView: View {
     @StateObject private var state = SDKRuntimeWorkspaceState.shared
     private let conflictResolver = SDKDependencyConflictResolver()
+    @State private var selectedNodeID: UUID?
+    @State private var resolutionState: ResolutionState = .idle
+
+    enum ResolutionState: String {
+        case idle = "Idle"
+        case resolving = "Resolving"
+        case resolved = "Resolved"
+        case failed = "Failed"
+    }
 
     var body: some View {
         List {
-            Section("Execution Tree") {
-                LabeledContent("Graph Nodes") {
-                    Text("\(state.dependencies.count)").monospaced().bold().foregroundStyle(Color.accentColor)
+            Section("Resolution") {
+                LabeledContent("State", value: resolutionState.rawValue)
+                LabeledContent("Nodes", value: "\(state.dependencies.count)")
+                Button {
+                    runResolution()
+                } label: {
+                    Label("Resolve Graph", systemImage: "arrow.triangle.2.circlepath")
                 }
+            }
+
+            Section("Dependency Operations") {
+                Button {
+                    installDependency()
+                } label: {
+                    Label("Install Node", systemImage: "plus")
+                }
+
+                Button {
+                    updateSelectedNode()
+                } label: {
+                    Label("Update Selected", systemImage: "square.and.arrow.down")
+                }
+                .disabled(selectedNodeID == nil)
+
+                Button(role: .destructive) {
+                    removeSelectedNode()
+                } label: {
+                    Label("Remove Selected", systemImage: "trash")
+                }
+                .disabled(selectedNodeID == nil)
             }
 
             let conflicts = conflictResolver.conflicts(in: state.dependencies)
             if !conflicts.isEmpty {
                 Section("Conflict Alerts") {
                     ForEach(conflicts, id: \.self) { conflict in
-                        Label {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(conflict).font(.subheadline.bold())
-                                Text(conflictResolver.suggestion(for: conflict)).font(.caption).foregroundStyle(.secondary)
-                            }
-                        } icon: {
-                            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(conflict)
+                                .font(.subheadline)
+                            Text(conflictResolver.suggestion(for: conflict))
+                                .font(.caption)
                         }
                     }
                 }
             }
 
-            Section("Project Graph") {
+            Section("Dependency Graph") {
                 if state.dependencies.isEmpty {
                     ContentUnavailableView(
                         "No Dependencies",
                         systemImage: "point.3.connected.trianglepath.dotted",
-                        description: Text("Register libraries or configure project nodes to build the graph.")
+                        description: Text("Install dependencies to build graph relationships.")
                     )
                 } else {
                     ForEach(state.dependencies) { node in
-                        DependencyGraphRow(node: node)
+                        DependencyGraphRow(
+                            node: node,
+                            linkedNames: linkedNames(for: node),
+                            isSelected: selectedNodeID == node.id
+                        )
+                        .contentShape(Rectangle())
+                        .onTapGesture { selectedNodeID = node.id }
                     }
                     .onDelete(perform: deleteDependencies)
                 }
             }
         }
-        .listStyle(.insetGrouped)
         .navigationTitle("Dependencies")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func linkedNames(for node: SDKDependencyNode) -> String {
+        let names = state.dependencies
+            .filter { node.linkedTo.contains($0.id) }
+            .map(\.name)
+        return names.isEmpty ? "None" : names.joined(separator: ", ")
     }
 
     private func deleteDependencies(at offsets: IndexSet) {
         state.dependencies.remove(atOffsets: offsets)
         state.recalculateDiagnostics()
     }
-}
 
-// MARK: - Private Subviews
+    private func installDependency() {
+        let newNode = SDKDependencyNode(
+            name: "Module\(state.dependencies.count + 1)",
+            kind: .library,
+            version: "1.0.0",
+            linkedTo: state.dependencies.last.map { [$0.id] } ?? [],
+            requiredScopes: ["workspace.files.read"],
+            lazyLoaded: false
+        )
+        state.dependencies.append(newNode)
+        selectedNodeID = newNode.id
+        state.recalculateDiagnostics()
+    }
+
+    private func updateSelectedNode() {
+        guard let selectedNodeID,
+              let idx = state.dependencies.firstIndex(where: { $0.id == selectedNodeID }) else {
+            return
+        }
+        state.dependencies[idx].version = bumpPatch(state.dependencies[idx].version)
+        state.recalculateDiagnostics()
+    }
+
+    private func removeSelectedNode() {
+        guard let selectedNodeID else { return }
+        state.dependencies.removeAll { $0.id == selectedNodeID }
+        state.dependencies = state.dependencies.map { node in
+            var updated = node
+            updated.linkedTo.removeAll { $0 == selectedNodeID }
+            return updated
+        }
+        self.selectedNodeID = nil
+        state.recalculateDiagnostics()
+    }
+
+    private func runResolution() {
+        resolutionState = .resolving
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 350_000_000)
+            resolutionState = state.dependencies.isEmpty ? .failed : .resolved
+        }
+    }
+
+    private func bumpPatch(_ version: String) -> String {
+        let parts = version.split(separator: ".").map { Int($0) ?? 0 }
+        let major = parts.indices.contains(0) ? parts[0] : 1
+        let minor = parts.indices.contains(1) ? parts[1] : 0
+        let patch = (parts.indices.contains(2) ? parts[2] : 0) + 1
+        return "\(major).\(minor).\(patch)"
+    }
+}
 
 private struct DependencyGraphRow: View {
     let node: SDKDependencyNode
+    let linkedNames: String
+    let isSelected: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(node.name).font(.headline)
-                    Text(node.kind.rawValue.uppercased()).font(.system(size: 8, weight: .black)).foregroundStyle(.secondary)
-                }
+                Label(node.name, systemImage: icon)
+                    .font(.headline)
                 Spacer()
-                Text("v\(node.version)").font(.system(.caption, design: .monospaced)).foregroundStyle(.secondary)
+                Text("v\(node.version)")
+                    .font(.caption.monospaced())
             }
 
-            if !node.requiredScopes.isEmpty {
-                Text(node.requiredScopes.joined(separator: ", "))
-                    .font(.system(size: 9, design: .monospaced))
-                    .foregroundStyle(.tertiary)
-                    .lineLimit(1)
-            }
+            Text("Kind: \(node.kind.rawValue)")
+                .font(.caption)
+            Text("Linked Modules: \(linkedNames)")
+                .font(.caption)
+            Text("Required Scopes: \(node.requiredScopes.isEmpty ? "None" : node.requiredScopes.joined(separator: ", "))")
+                .font(.caption2)
 
-            HStack(spacing: 12) {
-                if node.lazyLoaded { Label("Lazy", systemImage: "clock.arrow.circlepath").font(.caption2) }
-                if node.preRunHook != nil { Label("Hook", systemImage: "terminal").font(.caption2) }
-                Spacer()
-                Text("\(node.linkedTo.count) links").font(.system(size: 9, weight: .bold)).foregroundStyle(.tertiary)
+            if node.lazyLoaded || node.preRunHook != nil || node.postRunHook != nil {
+                Text("Runtime: \(node.lazyLoaded ? "lazy" : "eager") · pre: \(node.preRunHook ?? "none") · post: \(node.postRunHook ?? "none")")
+                    .font(.caption2)
             }
         }
         .padding(.vertical, 4)
+        .overlay(alignment: .leading) {
+            if isSelected {
+                Rectangle()
+                    .frame(width: 2)
+            }
+        }
+    }
+
+    private var icon: String {
+        switch node.kind {
+        case .library: return "books.vertical"
+        case .connector: return "link"
+        case .plugin: return "puzzlepiece.extension"
+        case .sdkApp: return "hammer"
+        }
     }
 }

@@ -1,12 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on sidebar List style for navigation and root area exploration.
- - Modernized search integration using .searchable with Placement.sidebar.
- - Replaced manual button layouts with standard List rows and native Label components.
- - Standardized status rows using monospaced LabeledContent.
- - Replaced manual error/dependency highlighting with semantic SF Symbols and orange tints.
- - strictly preserved all SDKRuntimeWorkspaceState filtering and navigation logic.
- */
+
 
 import SwiftUI
 

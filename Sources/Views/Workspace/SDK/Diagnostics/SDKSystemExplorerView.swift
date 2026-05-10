@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Modernized interface exploration links using native Label and semantic icons.
- - Replaced manual internal metrics with structured Sections and native LabeledContent.
- - Standardized developer mode toggle using semantic red coloring and descriptive footer.
- - strictly preserved all SDKRuntimeEngine, SDKTelemetryEngine, and SDKRealtimeSync logic.
- - Improved visual hierarchy for module-specific explorers (Notes, Tasks, etc.).
- - Standardized navigation dismiss action using @Environment(\.dismiss).
- */
+
 
 import SwiftUI
 

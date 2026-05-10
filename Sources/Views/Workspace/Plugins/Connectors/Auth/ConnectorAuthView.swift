@@ -1,14 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on native Form architecture.
- - Modernized the status header using a centered SDKStatPill group.
- - Replaced manual connector data list with native LabeledContent rows.
- - Modernized the Auth Fields section using monospaced typography and native SecureField toggle.
- - Standardized the error panel using a semantic red Label.
- - strictly preserved all BaseConnector authentication, Task logic, and credential binding.
- - Replaced manual disclosure groups with native Section headers/footers for help.
- - Standardized on prominent bordered styles for the "Connect" button.
- */
+
 
 import SwiftUI
 

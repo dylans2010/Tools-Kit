@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Transitioned to native Form structure for cleaner metadata inspection.
- - Standardized key-value rows using native LabeledContent and monospaced typography.
- - Modernized the JSON editor using a native TextEditor within a Section.
- - Replaced manual badge and error layouts with semantic status indicators.
- - Strictly preserved all SDKRuntimeWorkspaceState bindings and JSON validation logic.
- - Standardized action buttons using prominent bordered styles.
- - Extracted subviews for FormInspector and JSONEditor.
- */
+
 
 import SwiftUI
 

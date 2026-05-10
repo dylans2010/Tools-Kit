@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Transitioned from manual ScrollView cards to a standardized Form structure.
- - Replaced custom health row implementations with a private HealthRow struct using native Label and LabeledContent.
- - Standardized system health display with prominent monospaced percentage text and semantic colors.
- - Standardized active project rows with SF Symbol effects and prominent action buttons.
- - Replaced manual runtime metrics with LabeledContent for improved visual consistency.
- - Strictly preserved all existing @StateObject references and background health logic.
- - Applied native Form section headers for clear information hierarchy.
- */
+
 
 import SwiftUI
 

@@ -1,13 +1,4 @@
-/*
- REDESIGN SUMMARY:
- - Standardized on insetGrouped List style.
- - Replaced manual empty state with ContentUnavailableView including a primary action button.
- - Modernized plugin rows using standard icon styling and Label components.
- - Replaced manual toggle placement with a leading-aligned metadata layout and trailing toggle.
- - strictly preserved all PluginManager toggle and uninstall logic.
- - Standardized swipe actions for uninstallation.
- - Extracted subview PluginInstalledRow for better maintainability.
- */
+
 
 import SwiftUI
 
