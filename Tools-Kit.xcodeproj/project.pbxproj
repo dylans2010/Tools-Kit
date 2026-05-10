@@ -1182,9 +1182,9 @@
 		PL020000000000000000000010 /* SDKPermissionControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000010 /* SDKPermissionControlView.swift */; };
 		A5F7D48ADA8B4BF8BF3E570D /* ToolsKitSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A185A33DEA747ABB81E5845 /* ToolsKitSDK.swift */; };
 		50B8F220745A4AC3BA164240 /* SDKLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 402EA872FE4B42E9919BB931 /* SDKLogStore.swift */; };
-		AI020000000000000000000A /* SDKAIContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI010000000000000000000A /* SDKAIContextProvider.swift */; };
-		AI020000000000000000000B /* SDKMarkdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI010000000000000000000B /* SDKMarkdownView.swift */; };
-		AI020000000000000000000C /* SDK_AI_System.md in Resources */ = {isa = PBXBuildFile; fileRef = AI010000000000000000000C /* SDK_AI_System.md */; };
+		SDKD2000000000000000001 /* SDKAIContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDKD1000000000000000001 /* SDKAIContextProvider.swift */; };
+		SDKD2000000000000000002 /* SDKMarkdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SDKD1000000000000000002 /* SDKMarkdownView.swift */; };
+		SDKD2000000000000000003 /* SDK_AI_System.md in Resources */ = {isa = PBXBuildFile; fileRef = SDKD1000000000000000003 /* SDK_AI_System.md */; };
 		93FD31B2B54D4C338A601E5E /* SDKProjectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AAB3375BCD4B6BAC538FDC /* SDKProjectManager.swift */; };
 		6F002D3D99544A26AAE23201 /* SDKBackgroundEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99F4C9203BC64DCD816A2F89 /* SDKBackgroundEngine.swift */; };
 		24E74F98F4B740F99C551BDE /* SDKExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8BD36B371A04D52BFEA0DA8 /* SDKExportService.swift */; };
@@ -2462,9 +2462,9 @@
 		PL010000000000000000000010 /* SDKPermissionControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/SDKPermissionControlView.swift; sourceTree = "<group>"; };
 		2A185A33DEA747ABB81E5845 /* ToolsKitSDK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsKitSDK.swift; sourceTree = "<group>"; };
 		402EA872FE4B42E9919BB931 /* SDKLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLogStore.swift; sourceTree = "<group>"; };
-		AI010000000000000000000A /* SDKAIContextProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Docs/SDKAIContextProvider.swift; sourceTree = "<group>"; };
-		AI010000000000000000000B /* SDKMarkdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Docs/SDKMarkdownView.swift; sourceTree = "<group>"; };
-		AI010000000000000000000C /* SDK_AI_System.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SDK_AI_System.md; sourceTree = "<group>"; };
+		SDKD1000000000000000001 /* SDKAIContextProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Docs/SDKAIContextProvider.swift; sourceTree = "<group>"; };
+		SDKD1000000000000000002 /* SDKMarkdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Docs/SDKMarkdownView.swift; sourceTree = "<group>"; };
+		SDKD1000000000000000003 /* SDK_AI_System.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SDK_AI_System.md; sourceTree = "<group>"; };
 		E4AAB3375BCD4B6BAC538FDC /* SDKProjectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKProjectManager.swift; sourceTree = "<group>"; };
 		99F4C9203BC64DCD816A2F89 /* SDKBackgroundEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKBackgroundEngine.swift; sourceTree = "<group>"; };
 		A8BD36B371A04D52BFEA0DA8 /* SDKExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKExportService.swift; sourceTree = "<group>"; };
@@ -5146,7 +5146,7 @@
 				SDK1A00000000000000000009 /* SDKDependencyScopeValidator.swift */,
 				SDK1A0000000000000000000A /* SDKStructureValidator.swift */,
 				402EA872FE4B42E9919BB931 /* SDKLogStore.swift */,
-				AI010000000000000000000C /* SDK_AI_System.md */,
+				SDKD1000000000000000003 /* SDK_AI_System.md */,
 				671209AE670E45C08441CFFB /* SDKEventBridge.swift */,
 				7CD45F7AF64649DBADB0741C /* Legacy */,
 				99B36AA1809E413797A8201E /* SDKScopeManager.swift */,
@@ -7018,8 +7018,8 @@
 				EXP100000000000000000007 /* CustomAppSDKView.swift */,
 				EXP100000000000000000008 /* SDKHelpView.swift */,
 				EXP100000000000000000009 /* SDKSupportView.swift */,
-				AI010000000000000000000A /* SDKAIContextProvider.swift */,
-				AI010000000000000000000B /* SDKMarkdownView.swift */,
+				SDKD1000000000000000001 /* SDKAIContextProvider.swift */,
+				SDKD1000000000000000002 /* SDKMarkdownView.swift */,
 				EXP10000000000000000000A /* SDKModuleRegistryView.swift */,
 			);
 			path = SDK;
@@ -9104,7 +9104,7 @@
 				buildActionMask = 2147483647;
 				files = (
 					B1C2D3E4F5A60708090A0D05 /* Config.plist in Resources */,
-					AI020000000000000000000C /* SDK_AI_System.md in Resources */,
+					SDKD2000000000000000003 /* SDK_AI_System.md in Resources */,
 				);
 				runOnlyForDeploymentPostprocessing = 0;
 			};
@@ -9224,8 +9224,8 @@
 				6F002D3D99544A26AAE23201 /* SDKBackgroundEngine.swift in Sources */,
 				93FD31B2B54D4C338A601E5E /* SDKProjectManager.swift in Sources */,
 				50B8F220745A4AC3BA164240 /* SDKLogStore.swift in Sources */,
-				AI020000000000000000000A /* SDKAIContextProvider.swift in Sources */,
-				AI020000000000000000000B /* SDKMarkdownView.swift in Sources */,
+				SDKD2000000000000000001 /* SDKAIContextProvider.swift in Sources */,
+				SDKD2000000000000000002 /* SDKMarkdownView.swift in Sources */,
 				A5F7D48ADA8B4BF8BF3E570D /* ToolsKitSDK.swift in Sources */,
 				1E8F9980F2C346C58906F055 /* SDKDataEngine.swift in Sources */,
 				3BEED8D4CE29494D805D8A8F /* SDKExecutionEngine.swift in Sources */,
