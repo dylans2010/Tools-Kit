@@ -21,7 +21,7 @@ struct SDKDiagnosticsView: View {
         .onAppear { bgEngine.startHealthCheckLoop() }
     }
 
-    private var systemHealthSection: some View {
+    @ViewBuilder private var systemHealthSection: some View {
         Section("System Health") {
             LabeledContent("Connector Reachability") {
                 Image(systemName: bgEngine.systemHealth.connectorReachability ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
@@ -43,10 +43,10 @@ struct SDKDiagnosticsView: View {
         }
     }
 
-    private var performanceSection: some View {
+    @ViewBuilder private var performanceSection: some View {
         let metrics: SDKTelemetryEngine.Metrics = telemetry.getMetrics()
         let successRate: Double = metrics.totalTraces > 0 ? Double(metrics.successCount) / Double(metrics.totalTraces) * 100 : 100
-        return Section("Performance Analytics") {
+        Section("Performance Analytics") {
             LabeledContent("Latency", value: "\(Int(metrics.averageDurationMs))ms")
             LabeledContent("Total Traces", value: "\(metrics.totalTraces)")
             LabeledContent("Execution Health") {
@@ -57,7 +57,7 @@ struct SDKDiagnosticsView: View {
         }
     }
 
-    private var syncStateSection: some View {
+    @ViewBuilder private var syncStateSection: some View {
         Section("Data Sync State") {
             ForEach(SDKScope.allCases, id: \.self) { scope in
                 let count = SDKDataEngine.shared.cacheSnapshot()[scope] ?? 0
@@ -70,7 +70,7 @@ struct SDKDiagnosticsView: View {
         }
     }
 
-    private var moduleIntegritySection: some View {
+    @ViewBuilder private var moduleIntegritySection: some View {
         Section("Module Integrity") {
             if pluginManager.plugins.isEmpty {
                 Text("No plugins loaded").font(.caption).foregroundStyle(.secondary)
@@ -86,7 +86,7 @@ struct SDKDiagnosticsView: View {
         }
     }
 
-    private var connectivitySection: some View {
+    @ViewBuilder private var connectivitySection: some View {
         Section("External Connectivity") {
             if connectorManager.connectors.isEmpty {
                 Text("No connectors registered").font(.caption).foregroundStyle(.secondary)
