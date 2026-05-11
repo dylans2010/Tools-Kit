@@ -5,6 +5,7 @@ public struct AIGenerateSlides: View {
     private let fallbackThemeGradient: [Color] = [.blue, .purple]
     @StateObject private var manager = AISlidesManager.shared
     @StateObject private var whiteboardStore = WhiteboardStore.shared
+    @StateObject private var keyboardObserver = KeyboardObserver()
 
     @State private var rawText = ""
     @State private var notes = ""
@@ -32,12 +33,7 @@ public struct AIGenerateSlides: View {
     public init() {}
 
     public var body: some View {
-        let topColor: Color = .indigo.opacity(0.25)
-        let bottomColor: Color = .cyan.opacity(0.15)
-        let backgroundColors: [Color] = [topColor, .purple.opacity(0.12), bottomColor]
-        let backgroundGradient = LinearGradient(colors: backgroundColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-
-        return ScrollView {
+        ScrollView {
             VStack(alignment: .leading, spacing: 16) {
 
                 // Input Sources
@@ -226,10 +222,7 @@ public struct AIGenerateSlides: View {
             }
             .padding()
         }
-        .background(
-            backgroundGradient
-                .ignoresSafeArea()
-        )
+        .keyboardGlow(keyboard: keyboardObserver)
         .navigationTitle("AI Slides")
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
@@ -237,6 +230,16 @@ public struct AIGenerateSlides: View {
                     modernKeyboardExtension
                 }
             }
+        }
+        .safeAreaInset(edge: .bottom) {
+            DualKeyboardInputView(
+                promptText: $rawText,
+                tone: $tone,
+                slideCount: $slideCount,
+                selectedStyleID: $selectedStyleID,
+                onSubmit: generate,
+                keyboard: keyboardObserver
+            )
         }
         .alert("Generation Error", isPresented: $showErrorAlert) {
             Button("OK", role: .cancel) {}
