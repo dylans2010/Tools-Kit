@@ -7,7 +7,7 @@ protocol AISlidesImageProvider {
 struct AISlidesImageService {
     private let cache = AISlidesCache.shared
     private let providers: [AISlidesImageProvider] = [
-        UnsplashProvider(),
+        UnsplashProvider.shared,
         PexelsProvider(),
         AIImageFallbackProvider()
     ]

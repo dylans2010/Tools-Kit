@@ -6,6 +6,7 @@ struct WhiteboardCanvasView: View {
     @State private var activeTool: WhiteboardViewTools.ToolEntry
     @State private var selectedElementID: UUID?
     @State private var showingAddElement = false
+    @State private var showingUnsplash = false
 
     @State private var scale: CGFloat = 1.0
     @State private var offset: CGSize = .zero
@@ -53,6 +54,11 @@ struct WhiteboardCanvasView: View {
         .navigationTitle(board.title)
         .toolbar { toolbarContent }
         .sheet(isPresented: $showingAddElement) { addElementSheet }
+        .sheet(isPresented: $showingUnsplash) {
+            UnsplashImagesView { photo in
+                insertUnsplashImage(photo)
+            }
+        }
         .onDisappear { persistState() }
         .safeAreaInset(edge: .bottom) { toolPalette }
     }
@@ -403,6 +409,29 @@ struct WhiteboardCanvasView: View {
         }
     }
 
+    // MARK: - Unsplash Image Insertion
+
+    private func insertUnsplashImage(_ photo: UnsplashPhoto) {
+        let centerX = canvasWidth / 2
+        let centerY = canvasHeight / 2
+        let aspectRatio = Double(photo.width) / max(Double(photo.height), 1)
+        let elementWidth: Double = 280
+        let elementHeight = elementWidth / aspectRatio
+
+        let element = CanvasElement(
+            kind: .image,
+            positionX: centerX - elementWidth / 2,
+            positionY: centerY - elementHeight / 2,
+            width: elementWidth,
+            height: elementHeight,
+            content: photo.urls.regular,
+            colorHex: "6B7280",
+            zIndex: (canvasState.elements.map(\.zIndex).max() ?? 0) + 1
+        )
+        canvasState.elements.append(element)
+        selectedElementID = element.id
+    }
+
     // MARK: - State Persistence
 
     private func persistState() {
@@ -458,6 +487,14 @@ struct WhiteboardCanvasView: View {
                 }
                 Section("Media") {
                     addElementButton(label: "Media Placeholder", icon: "photo", toolID: "media-placeholder")
+                    Button {
+                        showingAddElement = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            showingUnsplash = true
+                        }
+                    } label: {
+                        Label("Unsplash Image", systemImage: "photo.on.rectangle.angled")
+                    }
                 }
                 Section("Nodes") {
                     addNodeButton()
@@ -601,6 +638,32 @@ struct CanvasElementView: View {
     }
 
     private var mediaElement: some View {
+        Group {
+            if let url = URL(string: element.content), !element.content.isEmpty {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    case .failure:
+                        placeholderMedia
+                    case .empty:
+                        Color.gray.opacity(0.1)
+                            .overlay { ProgressView() }
+                    @unknown default:
+                        placeholderMedia
+                    }
+                }
+            } else {
+                placeholderMedia
+            }
+        }
+        .frame(width: element.width, height: element.height)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private var placeholderMedia: some View {
         VStack(spacing: 8) {
             Image(systemName: "photo.on.rectangle")
                 .font(.system(size: 28))
@@ -616,7 +679,6 @@ struct CanvasElementView: View {
                 .stroke(style: StrokeStyle(lineWidth: 1, dash: [6]))
                 .foregroundStyle(.secondary)
         )
-        .cornerRadius(8)
     }
 
     @ViewBuilder

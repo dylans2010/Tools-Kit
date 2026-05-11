@@ -22,6 +22,7 @@ struct SlideEditorView: View {
     @State private var showingSlideToolsSheet = false
     @State private var showingImagePlayground = false
     @State private var showingGrid = false
+    @State private var showingUnsplash = false
     @State private var snapToGrid = true
     @State private var aiPrompt = ""
     @State private var aiLoading = false
@@ -88,6 +89,7 @@ struct SlideEditorView: View {
             Button("Text") { addElement(kind: .text) }
             Button("Shape") { showingAddShape = true }
             Button("Image Placeholder") { addElement(kind: .image) }
+            Button("Unsplash Image") { showingUnsplash = true }
             Button("Cancel", role: .cancel) {}
         }
         .confirmationDialog("Add Shape", isPresented: $showingAddShape) {
@@ -103,6 +105,11 @@ struct SlideEditorView: View {
         .sheet(isPresented: $showingAIToolsSheet) { aiToolsSheet.presentationDetents([.medium, .large]) }
         .sheet(isPresented: $showingTransitionSheet) { transitionSheet.presentationDetents([.medium]) }
         .sheet(isPresented: $showingSlideToolsSheet) { slideToolsSheet.presentationDetents([.medium]) }
+        .sheet(isPresented: $showingUnsplash) {
+            UnsplashImagesView { photo in
+                insertUnsplashImage(photo)
+            }
+        }
         .modifier(ImagePlaygroundSlideModifier(
             isPresented: $showingImagePlayground,
             concept: imagePlaygroundConcept,
@@ -837,6 +844,31 @@ struct SlideEditorView: View {
         saveDeck()
     }
 
+    private func insertUnsplashImage(_ photo: UnsplashPhoto) {
+        guard selectedSlideIndex < deck.slides.count else { return }
+        Task {
+            let result = await UnsplashProvider.shared.downloadImageData(from: photo, quality: .regular)
+            await MainActor.run {
+                switch result {
+                case .success(let data):
+                    var el = SlideElement(kind: .image)
+                    el.imageData = data
+                    el.imageURL = URL(string: photo.urls.regular)
+                    el.caption = "Photo by \(photo.user.name) on Unsplash"
+                    el.x = 200; el.y = 200
+                    let aspectRatio = Double(photo.width) / max(Double(photo.height), 1)
+                    el.width = 300
+                    el.height = 300 / aspectRatio
+                    deck.slides[selectedSlideIndex].elements.append(el)
+                    selectedElementID = el.id
+                    saveDeck()
+                case .failure:
+                    break
+                }
+            }
+        }
+    }
+
     private func setBackgroundImageData(_ data: Data) {
         guard selectedSlideIndex < deck.slides.count else { return }
         deck.slides[selectedSlideIndex].backgroundImageData = data
@@ -971,6 +1003,30 @@ private struct CanvasElementView: View {
                     .scaledToFill()
                     .frame(width: element.width, height: element.height)
                     .clipped()
+            } else if let imageURL = element.imageURL {
+                AsyncImage(url: imageURL) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    case .failure:
+                        ZStack {
+                            Color.gray.opacity(0.3)
+                            Image(systemName: "photo")
+                                .font(.largeTitle)
+                                .foregroundColor(.white.opacity(0.7))
+                        }
+                    case .empty:
+                        Color.gray.opacity(0.1)
+                            .overlay { ProgressView() }
+                    @unknown default:
+                        Color.gray.opacity(0.3)
+                    }
+                }
+                .frame(width: element.width, height: element.height)
+                .clipped()
+                .cornerRadius(8)
             } else {
                 ZStack {
                     Color.gray.opacity(0.3)

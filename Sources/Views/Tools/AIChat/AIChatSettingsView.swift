@@ -34,6 +34,7 @@ struct AIChatSettingsView: View {
                 providerSection
                 aiUsageSection
                 apiKeySection
+                unsplashAPIKeySection
                 modelSection
                 systemPromptSection
                 personalitySection
@@ -210,6 +211,20 @@ struct AIChatSettingsView: View {
             }
         } header: {
             Text("API Key")
+        }
+    }
+
+    private var unsplashAPIKeySection: some View {
+        Section {
+            APIKeyRowView(
+                providerID: UnsplashProvider.providerID,
+                providerName: "Unsplash",
+                placeholder: "Unsplash Access Key"
+            )
+        } header: {
+            Text("Unsplash API Key")
+        } footer: {
+            Text("Required for Unsplash image search in whiteboards, notebooks, and slides. Get a free key at unsplash.com/developers.")
         }
     }
 
