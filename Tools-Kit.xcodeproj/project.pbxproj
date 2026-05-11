@@ -1150,7 +1150,7 @@
 		WS02D40B22F4139B409888E5 /* TimeTravelFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0161A7E91002E24E99B7C7 /* TimeTravelFramework.swift */; };
 		ML029184825062ED4B74ADF9 /* TimeTravelHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0115541435D32B402F925F /* TimeTravelHomeView.swift */; };
 		WS026DD1EFCF1CD045FCB81D /* CanvasEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010B325BD96A9C411CA501 /* CanvasEngine.swift */; };
-		ML02B06DC3006D57495DB2DC /* WhiteboardsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML01742CECDC03174132BEBE /* WhiteboardsHomeView.swift */; };
+		ML02B06DC3006D57495DB2DC /* SpatialWhiteboardsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML01742CECDC03174132BEBE /* SpatialWhiteboardsHomeView.swift */; };
 		ML028FFC6949369149FA8496 /* WhiteboardCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML01A8B623046E0549E89D14 /* WhiteboardCanvasView.swift */; };
 		ML022F1EBBD1C64D48F4A5F8 /* CitationFormatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML012C87341CFA2C46D9A708 /* CitationFormatsView.swift */; };
 		ML02B9C001F45A2E4FCA868D /* NotebookVersionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */; };
@@ -2505,7 +2505,7 @@
 		WS0161A7E91002E24E99B7C7 /* TimeTravelFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTravelFramework.swift; sourceTree = "<group>"; };
 		ML0115541435D32B402F925F /* TimeTravelHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTravelHomeView.swift; sourceTree = "<group>"; };
 		WS010B325BD96A9C411CA501 /* CanvasEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasEngine.swift; sourceTree = "<group>"; };
-		ML01742CECDC03174132BEBE /* WhiteboardsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardsHomeView.swift; sourceTree = "<group>"; };
+		ML01742CECDC03174132BEBE /* SpatialWhiteboardsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpatialWhiteboardsHomeView.swift; sourceTree = "<group>"; };
 		ML01A8B623046E0549E89D14 /* WhiteboardCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardCanvasView.swift; sourceTree = "<group>"; };
 		ML012C87341CFA2C46D9A708 /* CitationFormatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CitationFormatsView.swift; sourceTree = "<group>"; };
 		ML0130D0F9E841DE468381A7 /* NotebookVersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookVersionHistoryView.swift; sourceTree = "<group>"; };
@@ -4466,7 +4466,7 @@
 		597C4A4DEC2042E58024840D /* Spatial */ = {
 			isa = PBXGroup;
 			children = (
-				ML01742CECDC03174132BEBE /* WhiteboardsHomeView.swift */,
+				ML01742CECDC03174132BEBE /* SpatialWhiteboardsHomeView.swift */,
 				ML01A8B623046E0549E89D14 /* WhiteboardCanvasView.swift */,
 				TKRF000000000000000000000D /* SpatialWorkspaceHomeView.swift */,
 			);
@@ -9518,7 +9518,7 @@
 				WS02D40B22F4139B409888E5 /* TimeTravelFramework.swift in Sources */,
 				ML029184825062ED4B74ADF9 /* TimeTravelHomeView.swift in Sources */,
 				WS026DD1EFCF1CD045FCB81D /* CanvasEngine.swift in Sources */,
-				ML02B06DC3006D57495DB2DC /* WhiteboardsHomeView.swift in Sources */,
+				ML02B06DC3006D57495DB2DC /* SpatialWhiteboardsHomeView.swift in Sources */,
 				ML028FFC6949369149FA8496 /* WhiteboardCanvasView.swift in Sources */,
 				ML022F1EBBD1C64D48F4A5F8 /* CitationFormatsView.swift in Sources */,
 				ML02B9C001F45A2E4FCA868D /* NotebookVersionHistoryView.swift in Sources */,
