@@ -341,6 +341,9 @@
 		WS0200000000000000000009 /* SlideThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000009 /* SlideThumbnailView.swift */; };
 		WS020000000000000000000A /* SlideDecksManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000A /* SlideDecksManager.swift */; };
 		AS0200000000000000000001 /* AIGenerateSlides.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000001 /* AIGenerateSlides.swift */; };
+		AS0200000000000000000027 /* KeyboardObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000027 /* KeyboardObserver.swift */; };
+		AS0200000000000000000028 /* KeyboardGlowModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000028 /* KeyboardGlowModifier.swift */; };
+		AS0200000000000000000029 /* DualKeyboardInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000029 /* DualKeyboardInputView.swift */; };
 		AS0200000000000000000002 /* SlideCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000002 /* SlideCanvasView.swift */; };
 		AS0200000000000000000003 /* WhiteboardsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000003 /* WhiteboardsHomeView.swift */; };
 		AS0200000000000000000004 /* WhiteboardCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000004 /* WhiteboardCanvasView.swift */; };
@@ -1986,6 +1989,9 @@
 		WS0100000000000000000009 /* SlideThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideThumbnailView.swift; sourceTree = "<group>"; };
 		WS010000000000000000000A /* SlideDecksManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideDecksManager.swift; sourceTree = "<group>"; };
 		AS0100000000000000000001 /* AIGenerateSlides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIGenerateSlides.swift; sourceTree = "<group>"; };
+		AS0100000000000000000027 /* KeyboardObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardObserver.swift; sourceTree = "<group>"; };
+		AS0100000000000000000028 /* KeyboardGlowModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardGlowModifier.swift; sourceTree = "<group>"; };
+		AS0100000000000000000029 /* DualKeyboardInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DualKeyboardInputView.swift; sourceTree = "<group>"; };
 		AS0100000000000000000002 /* SlideCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideCanvasView.swift; sourceTree = "<group>"; };
 		AS0100000000000000000003 /* WhiteboardsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardsHomeView.swift; sourceTree = "<group>"; };
 		AS0100000000000000000004 /* WhiteboardCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardCanvasView.swift; sourceTree = "<group>"; };
@@ -3525,6 +3531,9 @@
 				WS010000000000000000000A /* SlideDecksManager.swift */,
 				AS0100000000000000000024 /* SlideRenderer.swift */,
 				AS0100000000000000000026 /* SlideContentView.swift */,
+				AS0100000000000000000027 /* KeyboardObserver.swift */,
+				AS0100000000000000000028 /* KeyboardGlowModifier.swift */,
+				AS0100000000000000000029 /* DualKeyboardInputView.swift */,
 			);
 			path = Slides;
 			sourceTree = "<group>";
@@ -10339,6 +10348,9 @@
 				WS0200000000000000000004 /* Slide.swift in Sources */,
 				WS0200000000000000000005 /* SlideElement.swift in Sources */,
 				AS0200000000000000000001 /* AIGenerateSlides.swift in Sources */,
+				AS0200000000000000000027 /* KeyboardObserver.swift in Sources */,
+				AS0200000000000000000028 /* KeyboardGlowModifier.swift in Sources */,
+				AS0200000000000000000029 /* DualKeyboardInputView.swift in Sources */,
 				WS0200000000000000000006 /* SlidesHomeView.swift in Sources */,
 				WS0200000000000000000007 /* SlideEditorView.swift in Sources */,
 				AS0200000000000000000002 /* SlideCanvasView.swift in Sources */,
