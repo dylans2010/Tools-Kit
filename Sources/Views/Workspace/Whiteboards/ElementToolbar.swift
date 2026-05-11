@@ -281,7 +281,7 @@ struct ElementToolbar: View {
         HStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.accentColor)
+                .foregroundStyle(Color.accentColor)
             Text(title)
                 .font(.headline)
         }
