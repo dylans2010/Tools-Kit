@@ -8,6 +8,7 @@ struct UnsplashImagesView: View {
     @State private var currentPage = 1
     @State private var totalPages = 0
     @State private var isLoading = false
+    @State private var isBackgroundRefreshing = false
     @State private var errorMessage: String?
     @Environment(\.dismiss) private var dismiss
 
@@ -17,6 +18,26 @@ struct UnsplashImagesView: View {
         GridItem(.flexible(), spacing: 8),
         GridItem(.flexible(), spacing: 8)
     ]
+
+    private enum ViewState {
+        case empty
+        case loading
+        case loaded
+        case error(String)
+    }
+
+    private var viewState: ViewState {
+        if let errorMessage, photos.isEmpty {
+            return .error(errorMessage)
+        }
+        if isLoading && photos.isEmpty {
+            return .loading
+        }
+        if photos.isEmpty {
+            return .empty
+        }
+        return .loaded
+    }
 
     var body: some View {
         NavigationStack {
@@ -67,13 +88,27 @@ struct UnsplashImagesView: View {
 
     @ViewBuilder
     private var contentArea: some View {
-        if let errorMessage {
-            errorView(errorMessage)
-        } else if photos.isEmpty && !isLoading {
+        switch viewState {
+        case .empty:
             emptyState
-        } else {
+        case .loading:
+            loadingState
+        case .loaded:
             photoGrid
+        case .error(let message):
+            errorView(message)
         }
+    }
+
+    private var loadingState: some View {
+        VStack(spacing: 12) {
+            ProgressView()
+                .controlSize(.large)
+            Text("Searching Unsplash…")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var emptyState: some View {
@@ -109,6 +144,17 @@ struct UnsplashImagesView: View {
 
     private var photoGrid: some View {
         ScrollView {
+            if isBackgroundRefreshing {
+                HStack(spacing: 6) {
+                    ProgressView()
+                        .controlSize(.mini)
+                    Text("Refreshing…")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.top, 6)
+            }
+
             LazyVGrid(columns: columns, spacing: 8) {
                 ForEach(photos) { photo in
                     photoCell(photo)
@@ -180,11 +226,9 @@ struct UnsplashImagesView: View {
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return }
 
-        photos = []
-        currentPage = 1
-        totalPages = 0
         errorMessage = nil
         isLoading = true
+        isBackgroundRefreshing = false
 
         Task {
             let result = await provider.search(query: query, page: 1, perPage: 30)
@@ -196,7 +240,9 @@ struct UnsplashImagesView: View {
                     totalPages = response.totalPages
                     currentPage = 1
                 case .failure(let error):
-                    errorMessage = error.errorDescription
+                    if photos.isEmpty {
+                        errorMessage = error.errorDescription
+                    }
                 }
             }
         }

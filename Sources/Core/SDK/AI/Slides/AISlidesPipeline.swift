@@ -33,6 +33,7 @@ struct AISlidesPipeline {
     private let themeEngine = AISlidesThemeEngine()
     private let assetResolver = AISlidesAssetResolver()
     private let schemaEnforcer = AISlidesSchemaEnforcer()
+    private let modelConfig = ModelConfigManager.shared
 
     func run(input: SlideInput, progress: @escaping (String, Double) -> Void) async throws -> SlideDeck {
         progress("Extracting context", 0.1)
@@ -90,7 +91,7 @@ struct AISlidesPipeline {
             json = try await requestProviderJSON(
                 prompt: prompt,
                 schema: Self.planningSchema,
-                model: "openrouter/reasoning",
+                model: modelConfig.effectiveReasoningModel(),
                 stage: "planning"
             )
             await cache.storeJSON(json, for: key)
@@ -108,7 +109,7 @@ struct AISlidesPipeline {
             json = try await requestProviderJSON(
                 prompt: prompt,
                 schema: Self.visualSchema,
-                model: "openrouter/vision",
+                model: modelConfig.effectiveVisionModel(),
                 stage: "visuals"
             )
             await cache.storeJSON(json, for: key)
@@ -126,7 +127,7 @@ struct AISlidesPipeline {
             json = try await requestProviderJSON(
                 prompt: prompt,
                 schema: Self.contentSchema,
-                model: "openrouter/language",
+                model: modelConfig.effectiveLanguageModel(),
                 stage: "content"
             )
             await cache.storeJSON(json, for: key)

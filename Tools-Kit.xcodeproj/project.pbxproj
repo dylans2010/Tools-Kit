@@ -689,6 +689,7 @@
 		B1C2D3E4F5A60708090A0B06 /* WeatherMiniCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60708090A0B06 /* WeatherMiniCard.swift */; };
 		B1C2D3E4F5A60708090A0B07 /* WeatherComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60708090A0B07 /* WeatherComponents.swift */; };
 		AB11BC22CD33DE44EF55FA11 /* APIKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA01 /* APIKeyManager.swift */; };
+		MC01000000000000000000B1 /* ModelConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MC01000000000000000000A1 /* ModelConfigManager.swift */; };
 		AB11BC22CD33DE44EF55FA12 /* OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */; };
 		AB11BC22CD33DE44EF55FA13 /* MapsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA03 /* MapsService.swift */; };
 		AA11BB22CC33DD44EE55FF04 /* FileImporterRepresentableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */; };
@@ -1775,6 +1776,7 @@
 		E7F486EF5ED54F9B9D7B0876 /* FocusSessionBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionBackend.swift; sourceTree = "<group>"; };
 		6662160AA2024E9FBEA29A4C /* AIChatToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatToolView.swift; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA01 /* APIKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKeyManager.swift; sourceTree = "<group>"; };
+		MC01000000000000000000A1 /* ModelConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelConfigManager.swift; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterService.swift; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA03 /* MapsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsService.swift; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileImporterRepresentableView.swift; sourceTree = "<group>"; };
@@ -8090,6 +8092,7 @@
 			children = (
 				4D7EF938890D4F8AA5D57456 /* AIModelCatalog.swift */,
 				AB11BC22CD33DE44EF55FA01 /* APIKeyManager.swift */,
+				MC01000000000000000000A1 /* ModelConfigManager.swift */,
 				AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */,
 				AB11BC22CD33DE44EF55FA06 /* AIChatMemoryStore.swift */,
 				B4B0B52F727678316A6551CB /* AIChatSettings.swift */,
@@ -10136,6 +10139,7 @@
 				AA11BB22CC33DD44EE55FF05 /* AIChatViewModel.swift in Sources */,
 				AA11BB22CC33DD44EE55FF06 /* AIChatMemoryStore.swift in Sources */,
 				AB11BC22CD33DE44EF55FA11 /* APIKeyManager.swift in Sources */,
+				MC01000000000000000000B1 /* ModelConfigManager.swift in Sources */,
 				AB11BC22CD33DE44EF55FA12 /* OpenRouterService.swift in Sources */,
 				CC11DD22EE33FF44AA55BB01 /* AIProviderProtocol.swift in Sources */,
 				CC11DD22EE33FF44AA55BB02 /* AIProviderRegistry.swift in Sources */,

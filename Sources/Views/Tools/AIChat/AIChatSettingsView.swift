@@ -18,6 +18,11 @@ struct AIChatSettingsView: View {
     @State private var showFreeOpenRouterSheet = false
     @State private var showFileImporter = false
     @State private var importedFileNames: [String] = []
+    @State private var showModelConfigSheet = false
+    @State private var unsplashAccessKey = APIKeyManager.shared.unsplashAccessKey ?? ""
+    @State private var unsplashSecretKey = APIKeyManager.shared.unsplashSecretKey ?? ""
+    @State private var unsplashAppID = APIKeyManager.shared.unsplashApplicationID ?? ""
+    @StateObject private var modelConfig = ModelConfigManager.shared
     @AppStorage("agentEnabled") private var agentEnabled = false
     @AppStorage("agentDebugModeEnabled") private var debugModeEnabled = false
     @AppStorage("selectedAgentType") private var selectedAgentType = AgentType.jules.rawValue
@@ -104,6 +109,15 @@ struct AIChatSettingsView: View {
     private var internalSection: some View {
         Section {
             Button {
+                showModelConfigSheet = true
+            } label: {
+                Label("Model Configuration", systemImage: "cpu")
+            }
+            .sheet(isPresented: $showModelConfigSheet) {
+                modelConfigSheet
+            }
+
+            Button {
                 showFileImporter = true
             } label: {
                 Label("Test File Importer", systemImage: "doc.badge.plus")
@@ -123,6 +137,58 @@ struct AIChatSettingsView: View {
             }
         } header: {
             Text("Internal (Debug)")
+        }
+    }
+
+    private var modelConfigSheet: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    TextField("Reasoning Model", text: $modelConfig.reasoningModel)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                    TextField("Vision Model", text: $modelConfig.visionModel)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                    TextField("Language Model", text: $modelConfig.languageModel)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                } header: {
+                    Text("AI Models")
+                } footer: {
+                    Text("Configure the models used for slide generation and other AI pipelines. Leave empty to use defaults.")
+                }
+
+                Section {
+                    if modelConfig.hasReasoningModel {
+                        Label("Reasoning: \(modelConfig.reasoningModel)", systemImage: "brain")
+                            .font(.caption)
+                    }
+                    if modelConfig.hasVisionModel {
+                        Label("Vision: \(modelConfig.visionModel)", systemImage: "eye")
+                            .font(.caption)
+                    }
+                    if modelConfig.hasLanguageModel {
+                        Label("Language: \(modelConfig.languageModel)", systemImage: "text.bubble")
+                            .font(.caption)
+                    }
+                    if !modelConfig.hasReasoningModel && !modelConfig.hasVisionModel && !modelConfig.hasLanguageModel {
+                        Text("All models using defaults.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                } header: {
+                    Text("Active Configuration")
+                }
+            }
+            .navigationTitle("Model Configuration")
+            .navigationBarTitleDisplayMode(.inline)
+            .presentationDetents([.medium])
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showModelConfigSheet = false }
+                }
+            }
         }
     }
 
@@ -216,13 +282,35 @@ struct AIChatSettingsView: View {
 
     private var unsplashAPIKeySection: some View {
         Section {
-            APIKeyRowView(
-                providerID: UnsplashProvider.providerID,
-                providerName: "Unsplash",
-                placeholder: "Unsplash Access Key"
-            )
+            SecureField("Access Key", text: $unsplashAccessKey)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+                .onChange(of: unsplashAccessKey) { _, newValue in
+                    APIKeyManager.shared.unsplashAccessKey = newValue.isEmpty ? nil : newValue
+                }
+            SecureField("Secret Key", text: $unsplashSecretKey)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+                .onChange(of: unsplashSecretKey) { _, newValue in
+                    APIKeyManager.shared.unsplashSecretKey = newValue.isEmpty ? nil : newValue
+                }
+            TextField("Application ID", text: $unsplashAppID)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+                .onChange(of: unsplashAppID) { _, newValue in
+                    APIKeyManager.shared.unsplashApplicationID = newValue.isEmpty ? nil : newValue
+                }
+            if !unsplashAccessKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                Label("Access Key configured", systemImage: "checkmark.circle.fill")
+                    .font(.caption)
+                    .foregroundColor(.green)
+            } else {
+                Label("Access Key required", systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption)
+                    .foregroundColor(.orange)
+            }
         } header: {
-            Text("Unsplash API Key")
+            Text("Unsplash API Keys")
         } footer: {
             Text("Required for Unsplash image search in whiteboards, notebooks, and slides. Get a free key at unsplash.com/developers.")
         }
