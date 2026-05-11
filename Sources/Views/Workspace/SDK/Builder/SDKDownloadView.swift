@@ -24,13 +24,7 @@ struct SDKDownloadView: View {
         let isLatest: Bool
     }
 
-    private var availableVersions: [SDKBundleVersion] {
-        [
-            SDKBundleVersion(version: "2.1.0", releaseDate: Date(), size: "4.2 MB", changelog: "Module registry, plugin lifecycle, connector runtime bindings", isLatest: true),
-            SDKBundleVersion(version: "2.0.0", releaseDate: Date().addingTimeInterval(-86400 * 30), size: "3.8 MB", changelog: "Kernel rewrite, unified event bus, data store v2", isLatest: false),
-            SDKBundleVersion(version: "1.5.0", releaseDate: Date().addingTimeInterval(-86400 * 90), size: "2.9 MB", changelog: "Legacy SDK with basic plugin support", isLatest: false),
-        ]
-    }
+    @State private var availableVersions: [SDKBundleVersion] = []
 
     var body: some View {
         List {

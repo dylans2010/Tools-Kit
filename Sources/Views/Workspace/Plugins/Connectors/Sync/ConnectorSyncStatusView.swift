@@ -91,12 +91,7 @@ struct ConnectorSyncStatusView: View {
     }
 
     private func loadSyncJobs() {
-        syncJobs = [
-            SyncJob(connectorName: "GitHub", status: .running, progress: 0.65, recordsSynced: 234, lastUpdated: Date()),
-            SyncJob(connectorName: "Gmail", status: .completed, progress: 1.0, recordsSynced: 1520, lastUpdated: Date().addingTimeInterval(-3600)),
-            SyncJob(connectorName: "Calendar", status: .completed, progress: 1.0, recordsSynced: 89, lastUpdated: Date().addingTimeInterval(-7200)),
-            SyncJob(connectorName: "Slack", status: .failed, progress: 0.3, recordsSynced: 45, lastUpdated: Date().addingTimeInterval(-1800)),
-        ]
+        // Sync jobs are populated from active connector sync operations; start empty.
     }
 }
 

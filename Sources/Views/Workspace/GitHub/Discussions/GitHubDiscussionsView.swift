@@ -70,13 +70,7 @@ struct GitHubDiscussionsView: View {
     }
 
     private func loadDiscussions() {
-        discussions = [
-            Discussion(title: "Best practices for SDK plugin development", category: .general, author: "dev_user", preview: "What are the recommended patterns for building SDK plugins?", replyCount: 12, upvotes: 8, isAnswered: true),
-            Discussion(title: "Feature request: Real-time collaboration", category: .ideas, author: "collab_fan", preview: "It would be great to have real-time editing support in the workspace.", replyCount: 23, upvotes: 45, isAnswered: false),
-            Discussion(title: "How to configure custom connectors?", category: .qAndA, author: "new_dev", preview: "I'm trying to set up a custom REST connector but having trouble with auth.", replyCount: 5, upvotes: 3, isAnswered: true),
-            Discussion(title: "Showcase: My AI-powered workflow", category: .showAndTell, author: "ai_builder", preview: "Built an automated workflow using the SDK that generates reports.", replyCount: 8, upvotes: 15, isAnswered: false),
-            Discussion(title: "Performance improvements in v2.0", category: .announcements, author: "team_lead", preview: "Highlights of performance improvements in the latest release.", replyCount: 4, upvotes: 32, isAnswered: false),
-        ]
+        // Discussions are fetched from the repository; start empty until connected to a GitHub repo.
     }
 }
 

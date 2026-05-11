@@ -116,7 +116,7 @@ struct PluginReviewsView: View {
                 }
             }
         }
-        .task { loadSampleReviews() }
+        .task { loadReviews() }
     }
 
     private var averageRating: Double {
@@ -139,12 +139,8 @@ struct PluginReviewsView: View {
         newComment = ""
     }
 
-    private func loadSampleReviews() {
-        reviews = [
-            PluginReview(author: "Developer A", rating: 5, comment: "Excellent plugin, works flawlessly with the SDK.", date: Date().addingTimeInterval(-86400)),
-            PluginReview(author: "Developer B", rating: 4, comment: "Good functionality but could use better documentation.", date: Date().addingTimeInterval(-172800)),
-            PluginReview(author: "Developer C", rating: 5, comment: "Essential for my workflow. Highly recommended.", date: Date().addingTimeInterval(-259200)),
-        ]
+    private func loadReviews() {
+        // Reviews are user-submitted; start empty until users write their own.
     }
 }
 

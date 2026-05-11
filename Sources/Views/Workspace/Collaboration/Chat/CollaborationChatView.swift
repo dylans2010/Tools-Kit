@@ -110,13 +110,7 @@ struct CollaborationChatView: View {
     }
 
     private func loadMessages() {
-        messages = [
-            ChatMessage(author: "Alice", text: "Has anyone tested the new connector API?", channel: .general, timestamp: Date().addingTimeInterval(-3600)),
-            ChatMessage(author: "Bob", text: "Yes, it works great. The health monitoring is really useful.", channel: .general, timestamp: Date().addingTimeInterval(-3200), reactions: ["thumbsup"]),
-            ChatMessage(author: "Charlie", text: "Found a small bug in the plugin sandbox. Filing an issue.", channel: .general, timestamp: Date().addingTimeInterval(-2800)),
-            ChatMessage(author: "Alice", text: "The deploy pipeline passed all checks.", channel: .deployments, timestamp: Date().addingTimeInterval(-1800)),
-            ChatMessage(author: "Bob", text: "PR #42 ready for review.", channel: .reviews, timestamp: Date().addingTimeInterval(-900)),
-        ]
+        // Messages are user-generated; start empty until participants send messages.
     }
 }
 

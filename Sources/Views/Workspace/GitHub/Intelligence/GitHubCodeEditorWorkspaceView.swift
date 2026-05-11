@@ -100,15 +100,13 @@ struct GitHubCodeEditorWorkspaceView: View {
                 self.errorMessage = "Failed to read file: \(error.localizedDescription)"
             }
         } else {
-            // Fallback for demo if path is not a real path but a mock path
-            self.content = "// New file: \(filePath)\nimport Foundation\n"
-            self.originalContent = self.content
+            self.errorMessage = "File not found at path: \(filePath)"
+            self.content = ""
+            self.originalContent = ""
         }
     }
 
     private func saveAndStage() {
-        // In a real iOS app, we would write back to the app's document directory or a synced folder
-        // For the purpose of this simulation, we'll stage it in the gitEngine
         gitEngine.stageChange(filePath: filePath, original: originalContent, modified: content)
         originalContent = content
         hasUnsavedChanges = false

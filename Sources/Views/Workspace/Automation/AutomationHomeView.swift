@@ -119,13 +119,7 @@ struct AutomationHomeView: View {
             WorkflowBuilderView()
         }
         .onAppear {
-            if executionLog.isEmpty {
-                executionLog = [
-                    AutomationExecution(workflowName: "Daily Sync", status: "Success", timestamp: Date().addingTimeInterval(-7200)),
-                    AutomationExecution(workflowName: "Slack Notify", status: "Failed", timestamp: Date().addingTimeInterval(-18000)),
-                    AutomationExecution(workflowName: "GitHub Issue Creator", status: "Success", timestamp: Date().addingTimeInterval(-86400)),
-                ]
-            }
+            // Execution log is populated from real automation runs.
         }
     }
 

@@ -5,6 +5,7 @@ struct PluginUpdateView: View {
     @State private var isChecking = false
     @State private var availableUpdates: [PluginUpdate] = []
     @State private var isUpdatingAll = false
+    @State private var updateHistory: [UpdateHistoryRecord] = []
 
     var body: some View {
         List {
@@ -84,19 +85,25 @@ struct PluginUpdateView: View {
             }
 
             Section("Update History") {
-                ForEach(0..<3, id: \.self) { _ in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text("Plugin Updated")
-                                .font(.caption)
-                            Text("Updated successfully")
+                if updateHistory.isEmpty {
+                    Text("No update history")
+                        .foregroundStyle(.secondary)
+                        .font(.caption)
+                } else {
+                    ForEach(updateHistory) { record in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(record.pluginName)
+                                    .font(.caption)
+                                Text("\(record.fromVersion) -> \(record.toVersion)")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Text(record.date.formatted(date: .abbreviated, time: .shortened))
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
                         }
-                        Spacer()
-                        Text(Date().formatted(date: .abbreviated, time: .shortened))
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
                     }
                 }
             }
@@ -107,16 +114,9 @@ struct PluginUpdateView: View {
 
     private func checkForUpdates() async {
         isChecking = true
-        try? await Task.sleep(nanoseconds: 500_000_000)
-        availableUpdates = manager.installedPlugins.prefix(2).enumerated().map { index, plugin in
-            PluginUpdate(
-                pluginID: plugin.id,
-                pluginName: plugin.name,
-                currentVersion: "1.\(index).0",
-                newVersion: "1.\(index + 1).0",
-                changelog: "Bug fixes and performance improvements"
-            )
-        }
+        // Real update checking would query a remote registry.
+        // For now, no updates are fabricated; the list stays empty until a real update source is configured.
+        availableUpdates = []
         isChecking = false
     }
 
@@ -143,4 +143,12 @@ private struct PluginUpdate: Identifiable {
     let currentVersion: String
     let newVersion: String
     let changelog: String
+}
+
+private struct UpdateHistoryRecord: Identifiable {
+    let id = UUID()
+    let pluginName: String
+    let fromVersion: String
+    let toVersion: String
+    let date: Date
 }

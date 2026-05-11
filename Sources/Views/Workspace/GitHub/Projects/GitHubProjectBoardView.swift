@@ -113,22 +113,10 @@ struct GitHubProjectBoardView: View {
 
     private func loadBoard() {
         columns = [
-            ProjectColumn(name: "To Do", cards: [
-                ProjectCard(title: "Implement user notifications", description: "Add push notification support for workspace events", assignee: "dev1", priority: "High"),
-                ProjectCard(title: "Update API documentation", description: "Document new SDK endpoints", assignee: nil, priority: "Medium"),
-                ProjectCard(title: "Design review for settings page", description: "", assignee: "designer", priority: "Low"),
-            ]),
-            ProjectColumn(name: "In Progress", cards: [
-                ProjectCard(title: "Connector health dashboard", description: "Real-time monitoring for active connectors", assignee: "dev2", priority: "High"),
-                ProjectCard(title: "Refactor plugin sandbox", description: "Improve memory management in plugin runtime", assignee: "dev3", priority: "Medium"),
-            ]),
-            ProjectColumn(name: "In Review", cards: [
-                ProjectCard(title: "Fix dark mode colors", description: "Adjust theme colors for better contrast", assignee: "dev1", priority: "Medium"),
-            ]),
-            ProjectColumn(name: "Done", cards: [
-                ProjectCard(title: "SDK v2.0 release", description: "Published new SDK version with unified API", assignee: "team", priority: nil),
-                ProjectCard(title: "CI pipeline optimization", description: "Reduced build time by 40%", assignee: "devops", priority: nil),
-            ]),
+            ProjectColumn(name: "To Do", cards: []),
+            ProjectColumn(name: "In Progress", cards: []),
+            ProjectColumn(name: "In Review", cards: []),
+            ProjectColumn(name: "Done", cards: []),
         ]
     }
 }

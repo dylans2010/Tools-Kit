@@ -30,18 +30,7 @@ struct CodeIntelligenceView: View {
         .navigationTitle("Code Intelligence")
         .toolbar {
             Button {
-                // In a real scenario, provide repo files.
-                // Demo scan with placeholder files.
-                service.scanContent(files: [
-                    (path: "Config.swift", content: "let api_key = \"sk-12345678\""),
-                    (path: "Networking.swift", content: """
-                    import Foundation
-                    // Large file simulation
-                    \(Array(repeating: "// line", count: 600).joined(separator: "\n"))
-                    let password = \"hardcoded123\"
-                    """),
-                    (path: "Models.swift", content: "struct User { let id: UUID }"),
-                ])
+                service.scanRepository()
             } label: {
                 Label("Scan", systemImage: "magnifyingglass")
             }

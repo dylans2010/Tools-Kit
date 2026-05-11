@@ -92,12 +92,7 @@ struct GitHubSecurityView: View {
     }
 
     private func loadAlerts() {
-        alerts = [
-            SecurityAlert(title: "Remote Code Execution in dependency", severity: .critical, description: "A critical vulnerability was found in a transitive dependency allowing arbitrary code execution.", affectedPackage: "libxml2 2.9.10", fixAvailable: "Update to 2.9.14", detectedAt: Date().addingTimeInterval(-86400)),
-            SecurityAlert(title: "Cross-site scripting in web view", severity: .high, description: "WebView component does not properly sanitize HTML input from untrusted sources.", affectedPackage: nil, fixAvailable: "Apply input sanitization", detectedAt: Date().addingTimeInterval(-172800)),
-            SecurityAlert(title: "Insecure TLS configuration", severity: .medium, description: "Network client allows TLS 1.0 connections which are considered insecure.", affectedPackage: "URLSession", fixAvailable: "Set minimum TLS to 1.2", detectedAt: Date().addingTimeInterval(-259200)),
-            SecurityAlert(title: "Deprecated hash algorithm", severity: .low, description: "SHA-1 is used for non-critical checksums. Consider upgrading to SHA-256.", affectedPackage: nil, fixAvailable: nil, detectedAt: Date().addingTimeInterval(-345600)),
-        ]
+        // Security alerts are fetched from repository scanning; start empty until a scan is performed.
     }
 }
 

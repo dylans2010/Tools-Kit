@@ -79,14 +79,7 @@ struct CollabTemplatesView: View {
     }
 
     private func loadTemplates() {
-        templates = [
-            WorkspaceTemplate(name: "Sprint Planning", description: "Template for agile sprint planning with backlog and board views", icon: "list.bullet.clipboard", category: .project, usageCount: 245),
-            WorkspaceTemplate(name: "Design Review", description: "Structured design review with feedback and approval workflows", icon: "paintbrush.pointed", category: .design, usageCount: 128),
-            WorkspaceTemplate(name: "Research Document", description: "Research documentation with sections for methodology and findings", icon: "doc.text.magnifyingglass", category: .documentation, usageCount: 89),
-            WorkspaceTemplate(name: "Retrospective", description: "Team retrospective with what went well, improvements, and action items", icon: "arrow.counterclockwise", category: .meeting, usageCount: 312),
-            WorkspaceTemplate(name: "Onboarding Guide", description: "New team member onboarding with checklists and resources", icon: "person.badge.plus", category: .documentation, usageCount: 156),
-            WorkspaceTemplate(name: "Feature Spec", description: "Feature specification with requirements, design, and acceptance criteria", icon: "doc.plaintext", category: .project, usageCount: 203),
-        ]
+        // Templates are user-created or loaded from a registry; start empty.
     }
 }
 

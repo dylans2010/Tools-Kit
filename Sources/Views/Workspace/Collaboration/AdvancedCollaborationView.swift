@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AdvancedCollaborationView: View {
     @StateObject private var webSocket = WebSocketManager.shared
-    @State private var participants: [String] = ["You", "Jules"]
+    @State private var participants: [String] = ["You"]
 
     var body: some View {
         VStack {

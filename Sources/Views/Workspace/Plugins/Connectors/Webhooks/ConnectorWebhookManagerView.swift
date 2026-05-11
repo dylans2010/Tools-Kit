@@ -5,6 +5,7 @@ struct ConnectorWebhookManagerView: View {
     @State private var showingCreateSheet = false
     @State private var newURL = ""
     @State private var newEvent = ""
+    @State private var deliveryLogs: [WebhookDeliveryLog] = []
 
     var body: some View {
         List {
@@ -26,21 +27,27 @@ struct ConnectorWebhookManagerView: View {
             }
 
             Section("Delivery Log") {
-                ForEach(0..<5, id: \.self) { index in
-                    HStack {
-                        Image(systemName: index % 4 == 3 ? "xmark.circle.fill" : "checkmark.circle.fill")
-                            .foregroundStyle(index % 4 == 3 ? .red : .green)
-                        VStack(alignment: .leading) {
-                            Text("Event delivered")
-                                .font(.caption)
-                            Text(Date().addingTimeInterval(Double(-index) * 3600).formatted(date: .abbreviated, time: .shortened))
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
+                if deliveryLogs.isEmpty {
+                    Text("No deliveries yet")
+                        .foregroundStyle(.secondary)
+                        .font(.caption)
+                } else {
+                    ForEach(deliveryLogs) { log in
+                        HStack {
+                            Image(systemName: log.success ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                .foregroundStyle(log.success ? .green : .red)
+                            VStack(alignment: .leading) {
+                                Text(log.event)
+                                    .font(.caption)
+                                Text(log.timestamp.formatted(date: .abbreviated, time: .shortened))
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Text("\(log.statusCode)")
+                                .font(.caption.monospaced())
+                                .foregroundStyle(log.success ? .green : .red)
                         }
-                        Spacer()
-                        Text(index % 4 == 3 ? "500" : "200")
-                            .font(.caption.monospaced())
-                            .foregroundStyle(index % 4 == 3 ? .red : .green)
                     }
                 }
             }
@@ -107,11 +114,7 @@ struct ConnectorWebhookManagerView: View {
     }
 
     private func loadWebhooks() {
-        webhooks = [
-            WebhookConfig(url: "https://api.example.com/webhooks/push", event: "repository.push", isActive: true, deliveryCount: 142),
-            WebhookConfig(url: "https://api.example.com/webhooks/pr", event: "pull_request.opened", isActive: true, deliveryCount: 67),
-            WebhookConfig(url: "https://api.example.com/webhooks/deploy", event: "deployment.completed", isActive: false, deliveryCount: 23),
-        ]
+        // Webhooks are user-configured; start empty until the user creates their own.
     }
 }
 
@@ -130,4 +133,12 @@ private struct WebhookConfig: Identifiable {
         self.deliveryCount = deliveryCount
         self.createdAt = Date()
     }
+}
+
+private struct WebhookDeliveryLog: Identifiable {
+    let id = UUID()
+    let event: String
+    let timestamp: Date
+    let statusCode: Int
+    let success: Bool
 }
