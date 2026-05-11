@@ -65,7 +65,70 @@ public struct WhiteboardBoard: Identifiable, Codable, Hashable {
     }
 }
 
-// MARK: - Canvas State
+// MARK: - Canvas Element System
+
+public struct CanvasElement: Identifiable, Codable, Hashable {
+    public var id: UUID
+    public var kind: ElementKind
+    public var positionX: Double
+    public var positionY: Double
+    public var width: Double
+    public var height: Double
+    public var rotation: Double
+    public var content: String
+    public var colorHex: String
+    public var strokeColorHex: String
+    public var strokeWidth: Double
+    public var fontSize: Double
+    public var zIndex: Int
+    public var isLocked: Bool
+
+    public init(
+        id: UUID = UUID(),
+        kind: ElementKind = .text,
+        positionX: Double = 100,
+        positionY: Double = 100,
+        width: Double = 180,
+        height: Double = 80,
+        rotation: Double = 0,
+        content: String = "",
+        colorHex: String = "3B82F6",
+        strokeColorHex: String = "FFFFFF",
+        strokeWidth: Double = 1,
+        fontSize: Double = 16,
+        zIndex: Int = 0,
+        isLocked: Bool = false
+    ) {
+        self.id = id
+        self.kind = kind
+        self.positionX = positionX
+        self.positionY = positionY
+        self.width = width
+        self.height = height
+        self.rotation = rotation
+        self.content = content
+        self.colorHex = colorHex
+        self.strokeColorHex = strokeColorHex
+        self.strokeWidth = strokeWidth
+        self.fontSize = fontSize
+        self.zIndex = zIndex
+        self.isLocked = isLocked
+    }
+
+    public enum ElementKind: String, Codable, CaseIterable {
+        case text
+        case stickyNote
+        case rectangle
+        case circle
+        case arrow
+        case connector
+        case image
+        case drawing
+        case mediaPlaceholder
+    }
+}
+
+// MARK: - Legacy CanvasItem (retained for migration)
 
 public struct CanvasItem: Identifiable, Codable, Hashable {
     public var id: UUID
@@ -151,6 +214,7 @@ public struct DrawingPoint: Codable, Hashable {
 }
 
 public struct CanvasState: Codable, Equatable {
+    public var elements: [CanvasElement]
     public var items: [CanvasItem]
     public var connections: [CanvasConnection]
     public var drawings: [DrawingPath]
@@ -159,6 +223,7 @@ public struct CanvasState: Codable, Equatable {
     public var panY: Double
 
     public init(
+        elements: [CanvasElement] = [],
         items: [CanvasItem] = [],
         connections: [CanvasConnection] = [],
         drawings: [DrawingPath] = [],
@@ -166,6 +231,7 @@ public struct CanvasState: Codable, Equatable {
         panX: Double = 0,
         panY: Double = 0
     ) {
+        self.elements = elements
         self.items = items
         self.connections = connections
         self.drawings = drawings
@@ -175,7 +241,7 @@ public struct CanvasState: Codable, Equatable {
     }
 
     public static func == (lhs: CanvasState, rhs: CanvasState) -> Bool {
-        lhs.items == rhs.items && lhs.connections == rhs.connections && lhs.drawings == rhs.drawings
+        lhs.elements == rhs.elements && lhs.items == rhs.items && lhs.connections == rhs.connections && lhs.drawings == rhs.drawings
     }
 }
 
@@ -245,6 +311,7 @@ final class WhiteboardStore: ObservableObject {
         boards = files
             .filter { $0.pathExtension == "json" }
             .compactMap { url -> WhiteboardBoard? in
+                guard url.lastPathComponent.hasPrefix("canvas_") == false else { return nil }
                 guard let data = try? Data(contentsOf: url) else { return nil }
                 return try? JSONDecoder().decode(WhiteboardBoard.self, from: data)
             }

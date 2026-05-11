@@ -375,12 +375,18 @@
 		AS0200000000000000000021 /* GenerationModelsSlidesFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000021 /* GenerationModelsSlidesFramework.swift */; };
 		AS0200000000000000000022 /* AISlidesSchemeDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000022 /* AISlidesSchemeDecoder.swift */; };
 		AS0200000000000000000023 /* AISlidesSchemeValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000023 /* AISlidesSchemeValidator.swift */; };
+		FX0200000000000000000001 /* AISlidesStrictDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FX0100000000000000000001 /* AISlidesStrictDecoder.swift */; };
+		FX0200000000000000000002 /* AISlidesSchemaEnforcer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FX0100000000000000000002 /* AISlidesSchemaEnforcer.swift */; };
+		FX0200000000000000000003 /* RESTConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FX0100000000000000000003 /* RESTConnector.swift */; };
+		FX0200000000000000000004 /* MQTTConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FX0100000000000000000004 /* MQTTConnector.swift */; };
+		FX0200000000000000000005 /* WhiteboardViewTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = FX0100000000000000000005 /* WhiteboardViewTools.swift */; };
 		AS0200000000000000000024 /* SlideRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000024 /* SlideRenderer.swift */; };
 		AS0200000000000000000025 /* GenSlidesScheme+SlideDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000025 /* GenSlidesScheme+SlideDeck.swift */; };
 		AS0200000000000000000026 /* SlideContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000026 /* SlideContentView.swift */; };
 		WS020000000000000000000B /* ToolHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000B /* ToolHeaderView.swift */; };
 		WS020000000000000000000C /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000C /* CardView.swift */; };
 		WS020000000000000000000D /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000D /* EmptyStateView.swift */; };
+		US020000000000000000000A /* UnsplashImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = US010000000000000000000A /* UnsplashImagesView.swift */; };
 		WS020000000000000000000E /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000E /* Article.swift */; };
 		WS020000000000000000000F /* ArticleCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000F /* ArticleCollection.swift */; };
 		WS0200000000000000000010 /* Spreadsheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000010 /* Spreadsheet.swift */; };
@@ -683,6 +689,7 @@
 		B1C2D3E4F5A60708090A0B06 /* WeatherMiniCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60708090A0B06 /* WeatherMiniCard.swift */; };
 		B1C2D3E4F5A60708090A0B07 /* WeatherComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60708090A0B07 /* WeatherComponents.swift */; };
 		AB11BC22CD33DE44EF55FA11 /* APIKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA01 /* APIKeyManager.swift */; };
+		MC01000000000000000000B1 /* ModelConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MC01000000000000000000A1 /* ModelConfigManager.swift */; };
 		AB11BC22CD33DE44EF55FA12 /* OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */; };
 		AB11BC22CD33DE44EF55FA13 /* MapsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA03 /* MapsService.swift */; };
 		AA11BB22CC33DD44EE55FF04 /* FileImporterRepresentableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */; };
@@ -1769,6 +1776,7 @@
 		E7F486EF5ED54F9B9D7B0876 /* FocusSessionBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionBackend.swift; sourceTree = "<group>"; };
 		6662160AA2024E9FBEA29A4C /* AIChatToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatToolView.swift; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA01 /* APIKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKeyManager.swift; sourceTree = "<group>"; };
+		MC01000000000000000000A1 /* ModelConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelConfigManager.swift; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterService.swift; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA03 /* MapsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsService.swift; sourceTree = "<group>"; };
 		AB11BC22CD33DE44EF55FA04 /* FileImporterRepresentableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileImporterRepresentableView.swift; sourceTree = "<group>"; };
@@ -2010,12 +2018,18 @@
 		AS0100000000000000000021 /* GenerationModelsSlidesFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerationModelsSlidesFramework.swift; sourceTree = "<group>"; };
 		AS0100000000000000000022 /* AISlidesSchemeDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesSchemeDecoder.swift; sourceTree = "<group>"; };
 		AS0100000000000000000023 /* AISlidesSchemeValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesSchemeValidator.swift; sourceTree = "<group>"; };
+		FX0100000000000000000001 /* AISlidesStrictDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesStrictDecoder.swift; sourceTree = "<group>"; };
+		FX0100000000000000000002 /* AISlidesSchemaEnforcer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesSchemaEnforcer.swift; sourceTree = "<group>"; };
+		FX0100000000000000000003 /* RESTConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RESTConnector.swift; sourceTree = "<group>"; };
+		FX0100000000000000000004 /* MQTTConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTConnector.swift; sourceTree = "<group>"; };
+		FX0100000000000000000005 /* WhiteboardViewTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardViewTools.swift; sourceTree = "<group>"; };
 		AS0100000000000000000024 /* SlideRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideRenderer.swift; sourceTree = "<group>"; };
 		AS0100000000000000000025 /* GenSlidesScheme+SlideDeck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GenSlidesScheme+SlideDeck.swift"; sourceTree = "<group>"; };
 		AS0100000000000000000026 /* SlideContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideContentView.swift; sourceTree = "<group>"; };
 		WS010000000000000000000B /* ToolHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolHeaderView.swift; sourceTree = "<group>"; };
 		WS010000000000000000000C /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		WS010000000000000000000D /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
+		US010000000000000000000A /* UnsplashImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnsplashImagesView.swift; sourceTree = "<group>"; };
 		WS010000000000000000000E /* Article.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Article.swift; sourceTree = "<group>"; };
 		WS010000000000000000000F /* ArticleCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleCollection.swift; sourceTree = "<group>"; };
 		WS0100000000000000000010 /* Spreadsheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spreadsheet.swift; sourceTree = "<group>"; };
@@ -3520,6 +3534,7 @@
 				AS0100000000000000000006 /* WhiteboardModels.swift */,
 				AS0100000000000000000007 /* WhiteboardAIEngine.swift */,
 				AS0100000000000000000008 /* WhiteboardGraphProcessor.swift */,
+				FX0100000000000000000005 /* WhiteboardViewTools.swift */,
 			);
 			path = Whiteboards;
 			sourceTree = "<group>";
@@ -4015,6 +4030,7 @@
 				WS010000000000000000000B /* ToolHeaderView.swift */,
 				WS010000000000000000000C /* CardView.swift */,
 				WS010000000000000000000D /* EmptyStateView.swift */,
+				US010000000000000000000A /* UnsplashImagesView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -5384,6 +5400,8 @@
 				AS0100000000000000000021 /* GenerationModelsSlidesFramework.swift */,
 				AS0100000000000000000022 /* AISlidesSchemeDecoder.swift */,
 				AS0100000000000000000023 /* AISlidesSchemeValidator.swift */,
+				FX0100000000000000000001 /* AISlidesStrictDecoder.swift */,
+				FX0100000000000000000002 /* AISlidesSchemaEnforcer.swift */,
 				AS0300000000000000000006 /* AISlidesImageProviders */,
 				AS0300000000000000000004 /* Models */,
 				AS0300000000000000000005 /* Extensions */,
@@ -8074,6 +8092,7 @@
 			children = (
 				4D7EF938890D4F8AA5D57456 /* AIModelCatalog.swift */,
 				AB11BC22CD33DE44EF55FA01 /* APIKeyManager.swift */,
+				MC01000000000000000000A1 /* ModelConfigManager.swift */,
 				AB11BC22CD33DE44EF55FA02 /* OpenRouterService.swift */,
 				AB11BC22CD33DE44EF55FA06 /* AIChatMemoryStore.swift */,
 				B4B0B52F727678316A6551CB /* AIChatSettings.swift */,
@@ -8596,6 +8615,8 @@
 				F96FA2B7F364102FBBE349CF /* SDKConnectorMetrics.swift */,
 				19BFC903EA40BEB967C6EAD4 /* SlackConnector.swift */,
 				E7E58D0ABCB167C9BFE71C25 /* RESTAPIConnector.swift */,
+				FX0100000000000000000003 /* RESTConnector.swift */,
+				FX0100000000000000000004 /* MQTTConnector.swift */,
 			);
 			path = Connectors;
 			sourceTree = "<group>";
@@ -9455,6 +9476,8 @@
 				AS0200000000000000000021 /* GenerationModelsSlidesFramework.swift in Sources */,
 				AS0200000000000000000022 /* AISlidesSchemeDecoder.swift in Sources */,
 				AS0200000000000000000023 /* AISlidesSchemeValidator.swift in Sources */,
+				FX0200000000000000000001 /* AISlidesStrictDecoder.swift in Sources */,
+				FX0200000000000000000002 /* AISlidesSchemaEnforcer.swift in Sources */,
 				AS0200000000000000000024 /* SlideRenderer.swift in Sources */,
 				AS0200000000000000000025 /* GenSlidesScheme+SlideDeck.swift in Sources */,
 				AS0200000000000000000026 /* SlideContentView.swift in Sources */,
@@ -10116,6 +10139,7 @@
 				AA11BB22CC33DD44EE55FF05 /* AIChatViewModel.swift in Sources */,
 				AA11BB22CC33DD44EE55FF06 /* AIChatMemoryStore.swift in Sources */,
 				AB11BC22CD33DE44EF55FA11 /* APIKeyManager.swift in Sources */,
+				MC01000000000000000000B1 /* ModelConfigManager.swift in Sources */,
 				AB11BC22CD33DE44EF55FA12 /* OpenRouterService.swift in Sources */,
 				CC11DD22EE33FF44AA55BB01 /* AIProviderProtocol.swift in Sources */,
 				CC11DD22EE33FF44AA55BB02 /* AIProviderRegistry.swift in Sources */,
@@ -10321,9 +10345,11 @@
 				AS0200000000000000000006 /* WhiteboardModels.swift in Sources */,
 				AS0200000000000000000007 /* WhiteboardAIEngine.swift in Sources */,
 				AS0200000000000000000008 /* WhiteboardGraphProcessor.swift in Sources */,
+				FX0200000000000000000005 /* WhiteboardViewTools.swift in Sources */,
 				WS020000000000000000000B /* ToolHeaderView.swift in Sources */,
 				WS020000000000000000000C /* CardView.swift in Sources */,
 				WS020000000000000000000D /* EmptyStateView.swift in Sources */,
+				US020000000000000000000A /* UnsplashImagesView.swift in Sources */,
 				FC0200000000000000000001 /* FilterChip.swift in Sources */,
 				FI0200000000000000000001 /* FileImporterView.swift in Sources */,
 				WS020000000000000000000E /* Article.swift in Sources */,
@@ -10687,6 +10713,8 @@
 				3508CFF0CFE1C150E5B91D05 /* SDKConnectorMetrics.swift in Sources */,
 				CC6797644A548C56A24F3533 /* SlackConnector.swift in Sources */,
 				0991C2DF78DB0AB9EDE8A659 /* RESTAPIConnector.swift in Sources */,
+				FX0200000000000000000003 /* RESTConnector.swift in Sources */,
+				FX0200000000000000000004 /* MQTTConnector.swift in Sources */,
 				D14D8CA404CF0A7335BBBBC0 /* SDKHealthDashboardView.swift in Sources */,
 				B3963E9011FBB230DD13EA71 /* SDKFeatureFlagView.swift in Sources */,
 				527378959F579219629095A7 /* SDKCacheInspectorView.swift in Sources */,

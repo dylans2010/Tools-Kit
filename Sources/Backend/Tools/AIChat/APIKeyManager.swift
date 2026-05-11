@@ -65,6 +65,46 @@ class APIKeyManager {
         deleteKey(for: "openrouter")
     }
 
+    // MARK: - Unsplash Credentials
+
+    var unsplashAccessKey: String? {
+        get { getKey(for: "unsplash") }
+        set {
+            if let value = newValue, !value.isEmpty {
+                _ = saveKey(value, for: "unsplash")
+            } else {
+                deleteKey(for: "unsplash")
+            }
+        }
+    }
+
+    var unsplashSecretKey: String? {
+        get { getKey(for: "unsplash-secret") }
+        set {
+            if let value = newValue, !value.isEmpty {
+                _ = saveKey(value, for: "unsplash-secret")
+            } else {
+                deleteKey(for: "unsplash-secret")
+            }
+        }
+    }
+
+    var unsplashApplicationID: String? {
+        get { getKey(for: "unsplash-app-id") }
+        set {
+            if let value = newValue, !value.isEmpty {
+                _ = saveKey(value, for: "unsplash-app-id")
+            } else {
+                deleteKey(for: "unsplash-app-id")
+            }
+        }
+    }
+
+    var hasUnsplashCredentials: Bool {
+        guard let key = unsplashAccessKey else { return false }
+        return !key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     // MARK: - Private
 
     private func accountName(for providerID: String) -> String {

@@ -397,7 +397,11 @@ public struct AIGenerateSlides: View {
         }
 
         Task {
-            generatedDeck = await manager.generate(input: input)
+            do {
+                generatedDeck = try await manager.generate(input: input)
+            } catch {
+                generatedDeck = nil
+            }
         }
     }
 }

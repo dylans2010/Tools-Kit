@@ -10,22 +10,22 @@ final class AISlidesManager: ObservableObject {
     @Published private(set) var latestDeck: SlideDeck?
     @Published private(set) var latestScheme: GenSlidesScheme?
     @Published private(set) var lastError: String?
+    @Published private(set) var lastPipelineError: AISlidesPipelineError?
 
-    private let orchestrator = AISlidesOrchestrator()
     private let framework = GenerationModelsSlidesFramework()
 
     private init() {}
 
-    func generate(input: SlideInput) async -> SlideDeck {
+    func generate(input: SlideInput) async throws -> SlideDeck {
         isGenerating = true
         lastError = nil
+        lastPipelineError = nil
         latestScheme = nil
-        progressMessage = "Starting controlled generation"
+        progressMessage = "Starting generation"
         progressValue = 0.1
 
-        print("[AISlidesManager] Starting generation for: \(input.rawText.prefix(60))")
+        defer { isGenerating = false }
 
-        // Primary path: GenSlidesScheme-based pipeline
         do {
             progressMessage = "Generating structured JSON"
             progressValue = 0.3
@@ -36,35 +36,23 @@ final class AISlidesManager: ObservableObject {
             let deck = scheme.toSlideDeck()
             progressMessage = "Complete"
             progressValue = 1.0
-            print("[AISlidesManager] GenSlidesScheme success: \(deck.slides.count) slides")
             latestDeck = deck
             SlideDecksManager.shared.addDeck(deck)
-            isGenerating = false
             return deck
+        } catch let error as AISlidesPipelineError {
+            lastPipelineError = error
+            lastError = error.localizedDescription
+            throw error
+        } catch let error as SlideValidationError {
+            lastError = error.localizedDescription
+            throw error
         } catch {
-            print("[AISlidesManager] GenSlidesScheme pipeline failed: \(error.localizedDescription), falling back to orchestrator")
-            progressMessage = "Retrying with multi-stage pipeline"
-            progressValue = 0.4
+            lastError = error.localizedDescription
+            throw AISlidesPipelineError.providerFailure(
+                code: (error as NSError).code,
+                message: error.localizedDescription
+            )
         }
-
-        // Fallback: multi-stage orchestrator pipeline
-        let deck = await orchestrator.run(input: input) { [weak self] message, value in
-            guard let self else { return }
-            self.progressMessage = message
-            self.progressValue = value
-        }
-
-        if deck.slides.contains(where: { $0.metadata["source"] == "recovery_fallback" }) {
-            lastError = "Pipeline failed after retries; recovery fallback was used."
-            print("[AISlidesManager] Warning: fallback deck returned")
-        } else {
-            print("[AISlidesManager] Success: \(deck.slides.count) slides generated")
-        }
-
-        latestDeck = deck
-        SlideDecksManager.shared.addDeck(deck)
-        isGenerating = false
-        return deck
     }
 }
 
@@ -90,7 +78,7 @@ public struct WorkspaceSDKAI {
     }
 
     @MainActor
-    public func generateSlides(input: SlideInput) async -> SlideDeck {
-        await AISlidesManager.shared.generate(input: input)
+    public func generateSlides(input: SlideInput) async throws -> SlideDeck {
+        try await AISlidesManager.shared.generate(input: input)
     }
 }

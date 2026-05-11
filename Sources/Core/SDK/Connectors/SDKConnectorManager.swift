@@ -89,6 +89,8 @@ public final class SDKConnectorManager: ObservableObject {
             case .webhook: connector = WebhookConnector()
             case .calendar: connector = CalendarConnector()
             case .localFileSystem: connector = LocalFileConnector()
+            case .rest: connector = RESTConnector()
+            case .mqtt: connector = MQTTConnector()
             }
             if let connector = connector {
                 connectors.append(connector)

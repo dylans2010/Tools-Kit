@@ -1,72 +1,84 @@
 import Foundation
 
+public enum AISlidesPipelineError: LocalizedError {
+    case providerFailure(code: Int, message: String)
+    case schemaValidationFailed(violations: [String])
+    case emptyProviderResponse
+    case contextExtractionFailed(reason: String)
+    case decodingRejected(stage: String, rawLength: Int, underlying: Error)
+
+    public var errorDescription: String? {
+        switch self {
+        case .providerFailure(let code, let message):
+            return "AI provider error [\(code)]: \(message)"
+        case .schemaValidationFailed(let violations):
+            return "Schema validation failed: \(violations.joined(separator: "; "))"
+        case .emptyProviderResponse:
+            return "AI provider returned an empty response"
+        case .contextExtractionFailed(let reason):
+            return "Context extraction failed: \(reason)"
+        case .decodingRejected(let stage, let rawLength, let underlying):
+            return "Decoding rejected at \(stage) (\(rawLength) chars): \(underlying.localizedDescription)"
+        }
+    }
+}
+
 @MainActor
 struct AISlidesPipeline {
-    private let defaultBackgroundHex = "0F172A"
     private let promptBuilder = AISlidesPromptBuilder()
-    private let decoder = AISlidesDecoder()
-    private let validator = AISlidesValidator()
+    private let decoder = AISlidesStrictDecoder()
     private let mapper = AISlidesRendererMapper()
     private let imageService = AISlidesImageService()
     private let cache = AISlidesCache.shared
-    private let router: AISlidesModelRouter = AISlidesMultiModelRouter()
     private let themeEngine = AISlidesThemeEngine()
     private let assetResolver = AISlidesAssetResolver()
+    private let schemaEnforcer = AISlidesSchemaEnforcer()
+    private let modelConfig = ModelConfigManager.shared
 
     func run(input: SlideInput, progress: @escaping (String, Double) -> Void) async throws -> SlideDeck {
-        print("[SlidesPipeline] Step: Context Extraction")
         progress("Extracting context", 0.1)
-        let context = try await extractContext(input: input)
-        print("[SlidesPipeline] Context extracted (\(context.count) chars)")
+        let context = try extractContext(input: input)
 
-        print("[SlidesPipeline] Step: Planning")
         progress("Generating slide plan", 0.24)
         let plan = try await generateSlidePlan(context: context, input: input)
-        print("[SlidesPipeline] Plan generated: \(plan.slides.count) planned slides")
 
-        print("[SlidesPipeline] Step: Visual Enrichment")
         progress("Enriching visuals", 0.38)
         let visuals = try await enrichWithVisuals(plan: plan, context: context, input: input)
-        print("[SlidesPipeline] Visuals enriched: \(visuals.slides.count) visual specs")
 
-        print("[SlidesPipeline] Step: Content Generation")
         progress("Generating content", 0.55)
         let content = try await generateContent(plan: plan, visuals: visuals, context: context, input: input)
-        print("[SlidesPipeline] Content generated: \(content.slides.count) content slides")
 
-        print("[SlidesPipeline] Step: Validation")
-        progress("Validating output", 0.70)
-        let validated = validator.validate(content: content, input: input)
-        print("[SlidesPipeline] Validated: \(validated.slides.count) slides passed")
+        progress("Validating schema", 0.70)
+        let validated = try schemaEnforcer.enforce(content: content, input: input)
 
-        print("[SlidesPipeline] Step: Asset Resolution")
         progress("Resolving assets", 0.84)
         let resolved = await resolveAssets(content: validated, visuals: visuals, input: input)
-        let draftDeck = buildDraftDeck(content: resolved, visuals: visuals, input: input)
+        let draftDeck = try buildDraftDeck(content: resolved, visuals: visuals, input: input)
         let preloadedDeck = await assetResolver.resolveAssets(for: draftDeck)
-        print("[SlidesPipeline] Assets resolved for \(preloadedDeck.slides.count) slides")
 
-        print("[SlidesPipeline] Step: Finalization")
         progress("Finalizing deck", 0.95)
         let deck = finalizeDeck(deck: preloadedDeck, input: input)
 
-        print("[SlidesPipeline] Step: Optimization")
-        progress("Optimizing", 1.0)
-        let optimized = (try? await router.optimize(deck)) ?? deck
-        print("[SlidesPipeline] Complete: \(optimized.slides.count) final slides")
-        return optimized
+        progress("Complete", 1.0)
+        return deck
     }
 
-    func extractContext(input: SlideInput) async throws -> String {
+    func extractContext(input: SlideInput) throws -> String {
         let whiteboardSummary = input.sections.map { "\($0.title): \($0.summary)" }.joined(separator: "\n")
         let nodesSummary = input.whiteboardNodes.map { "[\($0.type.rawValue)] \($0.title): \($0.content)" }.joined(separator: "\n")
         let notesSummary = input.notes.joined(separator: "\n")
         let docsSummary = input.documents.joined(separator: "\n")
         let imageSummary = input.uploadedImages.map(\.fileName).joined(separator: ", ")
 
-        return [input.rawText, notesSummary, whiteboardSummary, nodesSummary, docsSummary, imageSummary]
+        let context = [input.rawText, notesSummary, whiteboardSummary, nodesSummary, docsSummary, imageSummary]
             .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
             .joined(separator: "\n\n")
+
+        guard !context.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw AISlidesPipelineError.contextExtractionFailed(reason: "All input fields are empty")
+        }
+
+        return context
     }
 
     func generateSlidePlan(context: String, input: SlideInput) async throws -> SlidePlan {
@@ -76,21 +88,15 @@ struct AISlidesPipeline {
         if let cached = await cache.cachedJSON(for: key) {
             json = cached
         } else {
-            json = try await AIService.shared.generateStructuredJSON(
+            json = try await requestProviderJSON(
                 prompt: prompt,
-                jsonSchema: Self.planningSchema,
-                preferredModel: "openrouter/reasoning",
-                systemPrompt: "Return strict JSON only. No markdown."
+                schema: Self.planningSchema,
+                model: modelConfig.effectiveReasoningModel(),
+                stage: "planning"
             )
             await cache.storeJSON(json, for: key)
         }
-
-        do {
-            return try decoder.decodePlan(json)
-        } catch {
-            print("AISlidesPipeline decodePlan fallback: \(error)")
-            return try await router.plan(input)
-        }
+        return try strictDecodePlan(json)
     }
 
     func enrichWithVisuals(plan: SlidePlan, context: String, input: SlideInput) async throws -> VisualPlan {
@@ -100,15 +106,15 @@ struct AISlidesPipeline {
         if let cached = await cache.cachedJSON(for: key) {
             json = cached
         } else {
-            json = try await AIService.shared.generateStructuredJSON(
+            json = try await requestProviderJSON(
                 prompt: prompt,
-                jsonSchema: Self.visualSchema,
-                preferredModel: "openrouter/vision",
-                systemPrompt: "Return strict JSON only."
+                schema: Self.visualSchema,
+                model: modelConfig.effectiveVisionModel(),
+                stage: "visuals"
             )
             await cache.storeJSON(json, for: key)
         }
-        return try decoder.decodeVisuals(json)
+        return try strictDecodeVisuals(json)
     }
 
     func generateContent(plan: SlidePlan, visuals: VisualPlan, context: String, input: SlideInput) async throws -> SlideContentPayload {
@@ -118,15 +124,75 @@ struct AISlidesPipeline {
         if let cached = await cache.cachedJSON(for: key) {
             json = cached
         } else {
-            json = try await AIService.shared.generateStructuredJSON(
+            json = try await requestProviderJSON(
                 prompt: prompt,
-                jsonSchema: Self.contentSchema,
-                preferredModel: "openrouter/language",
-                systemPrompt: "Return strict JSON only."
+                schema: Self.contentSchema,
+                model: modelConfig.effectiveLanguageModel(),
+                stage: "content"
             )
             await cache.storeJSON(json, for: key)
         }
-        return try decoder.decodeContent(json)
+        return try strictDecodeContent(json)
+    }
+
+    private func requestProviderJSON(prompt: String, schema: String, model: String, stage: String) async throws -> String {
+        let json: String
+        do {
+            json = try await AIService.shared.generateStructuredJSON(
+                prompt: prompt,
+                jsonSchema: schema,
+                preferredModel: model,
+                systemPrompt: "Return strict JSON only. No markdown."
+            )
+        } catch {
+            let nsError = error as NSError
+            throw AISlidesPipelineError.providerFailure(
+                code: nsError.code,
+                message: nsError.localizedDescription
+            )
+        }
+
+        guard !json.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw AISlidesPipelineError.emptyProviderResponse
+        }
+
+        return json
+    }
+
+    private func strictDecodePlan(_ json: String) throws -> SlidePlan {
+        do {
+            return try decoder.decodePlan(json)
+        } catch {
+            throw AISlidesPipelineError.decodingRejected(
+                stage: "planning",
+                rawLength: json.count,
+                underlying: error
+            )
+        }
+    }
+
+    private func strictDecodeVisuals(_ json: String) throws -> VisualPlan {
+        do {
+            return try decoder.decodeVisuals(json)
+        } catch {
+            throw AISlidesPipelineError.decodingRejected(
+                stage: "visuals",
+                rawLength: json.count,
+                underlying: error
+            )
+        }
+    }
+
+    private func strictDecodeContent(_ json: String) throws -> SlideContentPayload {
+        do {
+            return try decoder.decodeContent(json)
+        } catch {
+            throw AISlidesPipelineError.decodingRejected(
+                stage: "content",
+                rawLength: json.count,
+                underlying: error
+            )
+        }
     }
 
     func resolveAssets(content: SlideContentPayload, visuals: VisualPlan, input: SlideInput) async -> SlideContentPayload {
@@ -156,23 +222,25 @@ struct AISlidesPipeline {
         return resolved
     }
 
-    private func buildDraftDeck(content: SlideContentPayload, visuals: VisualPlan, input: SlideInput) -> SlideDeck {
+    private func buildDraftDeck(content: SlideContentPayload, visuals: VisualPlan, input: SlideInput) throws -> SlideDeck {
         let slides = content.slides.map { slide -> Slide in
-            var model = Slide(
+            Slide(
                 type: slide.type,
                 title: slide.title,
                 layout: mapper.mapLayout(for: slide.type),
                 elements: mapper.mapElements(slide.elements, visuals: visuals.slides.first(where: { $0.index == slide.index })),
                 metadata: slide.metadata
             )
-            model.backgroundColorHex = defaultBackgroundHex
-            return model
+        }
+
+        guard !slides.isEmpty else {
+            throw AISlidesPipelineError.schemaValidationFailed(violations: ["Provider returned zero slides"])
         }
 
         var deck = SlideDeck(
             title: content.title,
             theme: content.theme,
-            slides: slides.isEmpty ? [Slide.blank(title: "Overview")] : slides,
+            slides: slides,
             createdAt: Date(),
             updatedAt: Date()
         )
@@ -192,7 +260,7 @@ struct AISlidesPipeline {
         themed.theme = themeSelection.theme.id
         themed.slides = themed.slides.map { slide in
             var copy = slide
-            copy.backgroundColorHex = themeSelection.theme.gradient.first?.replacingOccurrences(of: "#", with: "") ?? defaultBackgroundHex
+            copy.backgroundColorHex = themeSelection.theme.gradient.first?.replacingOccurrences(of: "#", with: "") ?? "0F172A"
             return copy
         }
         return themed
