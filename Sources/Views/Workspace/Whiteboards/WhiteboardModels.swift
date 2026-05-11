@@ -194,12 +194,23 @@ public struct DrawingPath: Identifiable, Codable, Hashable {
     public var points: [DrawingPoint]
     public var colorHex: String
     public var lineWidth: Double
+    public var opacity: Double
+    public var drawingStyleRaw: String
 
-    public init(id: UUID = UUID(), points: [DrawingPoint] = [], colorHex: String = "FFFFFF", lineWidth: Double = 2) {
+    public init(
+        id: UUID = UUID(),
+        points: [DrawingPoint] = [],
+        colorHex: String = "FFFFFF",
+        lineWidth: Double = 2,
+        opacity: Double = 1.0,
+        drawingStyleRaw: String = "solid"
+    ) {
         self.id = id
         self.points = points
         self.colorHex = colorHex
         self.lineWidth = lineWidth
+        self.opacity = opacity
+        self.drawingStyleRaw = drawingStyleRaw
     }
 }
 
