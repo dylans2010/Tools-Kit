@@ -8,6 +8,7 @@ struct DualKeyboardInputView: View {
     @Binding var tone: SlideTone
     @Binding var slideCount: Int
     @Binding var selectedStyleID: String
+    @Binding var selectedThemeID: String
     var onSubmit: () -> Void
 
     @ObservedObject var keyboard: KeyboardObserver
@@ -34,21 +35,24 @@ struct DualKeyboardInputView: View {
         .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(.ultraThinMaterial)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(.systemIndigo).opacity(0.30),
+                            Color(.systemPurple).opacity(0.24),
+                            Color(.systemCyan).opacity(0.20)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .overlay(
                     RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color(.systemIndigo).opacity(0.3),
-                                    Color(.systemPurple).opacity(0.2),
-                                    Color(.systemCyan).opacity(0.15)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
+                        .fill(.ultraThinMaterial.opacity(0.6))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
                 )
         )
         .padding(.horizontal, 8)
@@ -94,6 +98,7 @@ struct DualKeyboardInputView: View {
             HStack(spacing: 8) {
                 toneChip
                 slideCountChip
+                themePresetChips
                 stylePresetChips
             }
             .padding(.horizontal, 4)
@@ -117,6 +122,24 @@ struct DualKeyboardInputView: View {
             }
         } label: {
             chipLabel(icon: "square.stack", text: "\(slideCount) slides")
+        }
+    }
+
+
+    private var themePresetChips: some View {
+        ForEach(AIGenSlideCatalog.themes.prefix(4)) { theme in
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                    selectedThemeID = theme.id
+                }
+            } label: {
+                chipLabel(
+                    icon: "paintpalette",
+                    text: theme.name,
+                    isActive: selectedThemeID == theme.id
+                )
+            }
+            .buttonStyle(.plain)
         }
     }
 
