@@ -51,4 +51,10 @@ final class ModelConfigManager: ObservableObject {
     func effectiveLanguageModel(fallback: String = "openrouter/language") -> String {
         hasLanguageModel ? languageModel : fallback
     }
+
+    func isEndpoint(_ value: String) -> Bool {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return trimmed.hasPrefix("http://") || trimmed.hasPrefix("https://")
+    }
 }
+

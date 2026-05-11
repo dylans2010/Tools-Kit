@@ -44,11 +44,8 @@ struct WorkspaceHomeView: View {
                     NavigationLink { SlidesHomeView() } label: {
                         Label("Slides", systemImage: "rectangle.on.rectangle")
                     }
-                    NavigationLink("Whiteboards") {
-                        WhiteboardsHomeView()
-                    }
-                    NavigationLink("AI Slides") {
-                        AIGenerateSlides()
+                    NavigationLink { WhiteboardsHomeView() } label: {
+                        Label("Whiteboards", systemImage: "scribble.variable")
                     }
                 }
 
@@ -99,23 +96,20 @@ struct WorkspaceHomeView: View {
                         NavigationLink {
                             UniversalInboxView()
                         } label: {
-                            Label("Accounts", systemImage: "person.crop.circle")
+                            Label("Mail", systemImage: "envelope")
                         }
                     } else {
                         NavigationLink { ManageAccountsView() } label: {
-                            Label("Accounts", systemImage: "person.crop.circle")
+                            Label("Mail", systemImage: "envelope")
                         }
                     }
-                    NavigationLink { AIChatSettingsRouter() } label: {
-                        Label("AI Chat Settings", systemImage: "gearshape")
-                    }
-                }
+                                    }
             }
             .navigationTitle("Workspace")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink {
-                        WorkspaceSettingsView()
+                        AIChatSettingsRouter()
                     } label: {
                         Image(systemName: "gearshape")
                     }
@@ -132,9 +126,6 @@ struct WorkspaceSettingsView: View {
             Section("Account") {
                 NavigationLink { ManageAccountsView() } label: {
                     Label("Mail Accounts", systemImage: "envelope")
-                }
-                NavigationLink { AIChatSettingsRouter() } label: {
-                    Label("AI Chat Settings", systemImage: "sparkles")
                 }
             }
 

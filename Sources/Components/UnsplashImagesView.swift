@@ -52,6 +52,17 @@ struct UnsplashImagesView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Refresh") {
+                        loadRandomPhotos()
+                    }
+                    .disabled(isLoading)
+                }
+            }
+            .task {
+                if photos.isEmpty {
+                    loadRandomPhotos()
+                }
             }
         }
     }
@@ -116,7 +127,7 @@ struct UnsplashImagesView: View {
             Image(systemName: "photo.on.rectangle.angled")
                 .font(.system(size: 40))
                 .foregroundStyle(.secondary)
-            Text("Search Unsplash for photos")
+            Text("Browse random Unsplash photos")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -133,7 +144,13 @@ struct UnsplashImagesView: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 24)
-            Button("Retry") { performSearch() }
+            Button("Retry") {
+                if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    loadRandomPhotos()
+                } else {
+                    performSearch()
+                }
+            }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
         }
@@ -266,6 +283,32 @@ struct UnsplashImagesView: View {
                     totalPages = response.totalPages
                 case .failure(let error):
                     errorMessage = error.errorDescription
+                }
+            }
+        }
+    }
+}
+
+
+extension UnsplashImagesView {
+    private func loadRandomPhotos() {
+        errorMessage = nil
+        isLoading = true
+        isBackgroundRefreshing = false
+
+        Task {
+            let result = await provider.randomPhotos(count: 50)
+            await MainActor.run {
+                isLoading = false
+                switch result {
+                case .success(let response):
+                    photos = response.results
+                    totalPages = 1
+                    currentPage = 1
+                case .failure(let error):
+                    if photos.isEmpty {
+                        errorMessage = error.errorDescription
+                    }
                 }
             }
         }

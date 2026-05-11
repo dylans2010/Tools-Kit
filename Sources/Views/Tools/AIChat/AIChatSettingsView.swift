@@ -144,19 +144,19 @@ struct AIChatSettingsView: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Reasoning Model", text: $modelConfig.reasoningModel)
+                    TextField("Reasoning Model or Endpoint", text: $modelConfig.reasoningModel)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
-                    TextField("Vision Model", text: $modelConfig.visionModel)
+                    TextField("Vision Model or Endpoint", text: $modelConfig.visionModel)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
-                    TextField("Language Model", text: $modelConfig.languageModel)
+                    TextField("Language Model or Endpoint", text: $modelConfig.languageModel)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                 } header: {
                     Text("AI Models")
                 } footer: {
-                    Text("Configure the models used for slide generation and other AI pipelines. Leave empty to use defaults.")
+                    Text("Configure model IDs and/or full API endpoints used for slide generation and other AI pipelines. Leave empty to use defaults.")
                 }
 
                 Section {
