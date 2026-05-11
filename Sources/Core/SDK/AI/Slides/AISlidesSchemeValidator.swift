@@ -13,7 +13,7 @@ struct AISlidesSchemeValidator {
 
             let wordCount = slide.title.split(separator: " ").count
             if wordCount > 8 {
-                throw SlideValidationError.titleTooLong(index: slideIdx, title: slide.title)
+                throw SlideValidationError.titleTooLong(slideIndex: slideIdx, title: slide.title)
             }
 
             for element in slide.elements {
@@ -25,12 +25,12 @@ struct AISlidesSchemeValidator {
 
                 case .bullets(let bullets):
                     if bullets.count > 6 {
-                        throw SlideValidationError.tooManyBullets(index: slideIdx, count: bullets.count)
+                        throw SlideValidationError.tooManyBullets(slideIndex: slideIdx, count: bullets.count)
                     }
                     for (bIdx, bullet) in bullets.enumerated() {
                         let bulletWords = bullet.split(separator: " ").count
                         if bulletWords > 12 {
-                            throw SlideValidationError.bulletTooLong(index: slideIdx, bulletIndex: bIdx)
+                            throw SlideValidationError.bulletTooLong(slideIndex: slideIdx, bulletIndex: bIdx)
                         }
                     }
 
