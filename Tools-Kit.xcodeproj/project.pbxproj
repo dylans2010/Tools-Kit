@@ -3499,7 +3499,6 @@
 			isa = PBXGroup;
 			children = (
 				AS0100000000000000000003 /* WhiteboardsHomeView.swift */,
-				AS0100000000000000000004 /* WhiteboardCanvasView.swift */,
 				AS0100000000000000000005 /* WhiteboardNodeView.swift */,
 				AS0100000000000000000006 /* WhiteboardModels.swift */,
 				AS0100000000000000000007 /* WhiteboardAIEngine.swift */,
@@ -4467,6 +4466,7 @@
 			isa = PBXGroup;
 			children = (
 				ML01742CECDC03174132BEBE /* SpatialWhiteboardsHomeView.swift */,
+				AS0100000000000000000004 /* WhiteboardCanvasView.swift */,
 				ML01A8B623046E0549E89D14 /* SpatialWhiteboardCanvasView.swift */,
 				TKRF000000000000000000000D /* SpatialWorkspaceHomeView.swift */,
 			);
