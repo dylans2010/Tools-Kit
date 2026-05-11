@@ -184,7 +184,7 @@ struct WhiteboardCanvasView: View {
             } label: {
                 Image(systemName: "slider.horizontal.3")
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(.accentColor)
+                    .foregroundStyle(Color.accentColor)
                     .padding(6)
                     .background(Circle().fill(.ultraThinMaterial))
             }
