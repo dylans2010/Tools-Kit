@@ -228,7 +228,7 @@ struct SlideEditorView: View {
                 }
 
                 ForEach(slide.elements) { element in
-                    CanvasElementView(
+                    SlideCanvasElementView(
                         element: element,
                         isSelected: selectedElementID == element.id,
                         onSelect: { selectedElementID = element.id },
@@ -955,7 +955,7 @@ struct SlideEditorView: View {
     }
 }
 
-private struct CanvasElementView: View {
+private struct SlideCanvasElementView: View {
     let element: SlideElement
     let isSelected: Bool
     let onSelect: () -> Void

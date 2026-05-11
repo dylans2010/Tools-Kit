@@ -375,6 +375,11 @@
 		AS0200000000000000000021 /* GenerationModelsSlidesFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000021 /* GenerationModelsSlidesFramework.swift */; };
 		AS0200000000000000000022 /* AISlidesSchemeDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000022 /* AISlidesSchemeDecoder.swift */; };
 		AS0200000000000000000023 /* AISlidesSchemeValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000023 /* AISlidesSchemeValidator.swift */; };
+		FX0200000000000000000001 /* AISlidesStrictDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FX0100000000000000000001 /* AISlidesStrictDecoder.swift */; };
+		FX0200000000000000000002 /* AISlidesSchemaEnforcer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FX0100000000000000000002 /* AISlidesSchemaEnforcer.swift */; };
+		FX0200000000000000000003 /* RESTConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FX0100000000000000000003 /* RESTConnector.swift */; };
+		FX0200000000000000000004 /* MQTTConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FX0100000000000000000004 /* MQTTConnector.swift */; };
+		FX0200000000000000000005 /* WhiteboardViewTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = FX0100000000000000000005 /* WhiteboardViewTools.swift */; };
 		AS0200000000000000000024 /* SlideRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000024 /* SlideRenderer.swift */; };
 		AS0200000000000000000025 /* GenSlidesScheme+SlideDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000025 /* GenSlidesScheme+SlideDeck.swift */; };
 		AS0200000000000000000026 /* SlideContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000026 /* SlideContentView.swift */; };
@@ -2011,6 +2016,11 @@
 		AS0100000000000000000021 /* GenerationModelsSlidesFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerationModelsSlidesFramework.swift; sourceTree = "<group>"; };
 		AS0100000000000000000022 /* AISlidesSchemeDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesSchemeDecoder.swift; sourceTree = "<group>"; };
 		AS0100000000000000000023 /* AISlidesSchemeValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesSchemeValidator.swift; sourceTree = "<group>"; };
+		FX0100000000000000000001 /* AISlidesStrictDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesStrictDecoder.swift; sourceTree = "<group>"; };
+		FX0100000000000000000002 /* AISlidesSchemaEnforcer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesSchemaEnforcer.swift; sourceTree = "<group>"; };
+		FX0100000000000000000003 /* RESTConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RESTConnector.swift; sourceTree = "<group>"; };
+		FX0100000000000000000004 /* MQTTConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTConnector.swift; sourceTree = "<group>"; };
+		FX0100000000000000000005 /* WhiteboardViewTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardViewTools.swift; sourceTree = "<group>"; };
 		AS0100000000000000000024 /* SlideRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideRenderer.swift; sourceTree = "<group>"; };
 		AS0100000000000000000025 /* GenSlidesScheme+SlideDeck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GenSlidesScheme+SlideDeck.swift"; sourceTree = "<group>"; };
 		AS0100000000000000000026 /* SlideContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideContentView.swift; sourceTree = "<group>"; };
@@ -3522,6 +3532,7 @@
 				AS0100000000000000000006 /* WhiteboardModels.swift */,
 				AS0100000000000000000007 /* WhiteboardAIEngine.swift */,
 				AS0100000000000000000008 /* WhiteboardGraphProcessor.swift */,
+				FX0100000000000000000005 /* WhiteboardViewTools.swift */,
 			);
 			path = Whiteboards;
 			sourceTree = "<group>";
@@ -5387,6 +5398,8 @@
 				AS0100000000000000000021 /* GenerationModelsSlidesFramework.swift */,
 				AS0100000000000000000022 /* AISlidesSchemeDecoder.swift */,
 				AS0100000000000000000023 /* AISlidesSchemeValidator.swift */,
+				FX0100000000000000000001 /* AISlidesStrictDecoder.swift */,
+				FX0100000000000000000002 /* AISlidesSchemaEnforcer.swift */,
 				AS0300000000000000000006 /* AISlidesImageProviders */,
 				AS0300000000000000000004 /* Models */,
 				AS0300000000000000000005 /* Extensions */,
@@ -8599,6 +8612,8 @@
 				F96FA2B7F364102FBBE349CF /* SDKConnectorMetrics.swift */,
 				19BFC903EA40BEB967C6EAD4 /* SlackConnector.swift */,
 				E7E58D0ABCB167C9BFE71C25 /* RESTAPIConnector.swift */,
+				FX0100000000000000000003 /* RESTConnector.swift */,
+				FX0100000000000000000004 /* MQTTConnector.swift */,
 			);
 			path = Connectors;
 			sourceTree = "<group>";
@@ -9458,6 +9473,8 @@
 				AS0200000000000000000021 /* GenerationModelsSlidesFramework.swift in Sources */,
 				AS0200000000000000000022 /* AISlidesSchemeDecoder.swift in Sources */,
 				AS0200000000000000000023 /* AISlidesSchemeValidator.swift in Sources */,
+				FX0200000000000000000001 /* AISlidesStrictDecoder.swift in Sources */,
+				FX0200000000000000000002 /* AISlidesSchemaEnforcer.swift in Sources */,
 				AS0200000000000000000024 /* SlideRenderer.swift in Sources */,
 				AS0200000000000000000025 /* GenSlidesScheme+SlideDeck.swift in Sources */,
 				AS0200000000000000000026 /* SlideContentView.swift in Sources */,
@@ -10324,6 +10341,7 @@
 				AS0200000000000000000006 /* WhiteboardModels.swift in Sources */,
 				AS0200000000000000000007 /* WhiteboardAIEngine.swift in Sources */,
 				AS0200000000000000000008 /* WhiteboardGraphProcessor.swift in Sources */,
+				FX0200000000000000000005 /* WhiteboardViewTools.swift in Sources */,
 				WS020000000000000000000B /* ToolHeaderView.swift in Sources */,
 				WS020000000000000000000C /* CardView.swift in Sources */,
 				WS020000000000000000000D /* EmptyStateView.swift in Sources */,
@@ -10691,6 +10709,8 @@
 				3508CFF0CFE1C150E5B91D05 /* SDKConnectorMetrics.swift in Sources */,
 				CC6797644A548C56A24F3533 /* SlackConnector.swift in Sources */,
 				0991C2DF78DB0AB9EDE8A659 /* RESTAPIConnector.swift in Sources */,
+				FX0200000000000000000003 /* RESTConnector.swift in Sources */,
+				FX0200000000000000000004 /* MQTTConnector.swift in Sources */,
 				D14D8CA404CF0A7335BBBBC0 /* SDKHealthDashboardView.swift in Sources */,
 				B3963E9011FBB230DD13EA71 /* SDKFeatureFlagView.swift in Sources */,
 				527378959F579219629095A7 /* SDKCacheInspectorView.swift in Sources */,
