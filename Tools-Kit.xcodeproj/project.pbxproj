@@ -343,6 +343,7 @@
 		AS0200000000000000000001 /* AIGenerateSlides.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000001 /* AIGenerateSlides.swift */; };
 		AS0200000000000000000002 /* SlideCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000002 /* SlideCanvasView.swift */; };
 		AS0200000000000000000003 /* WhiteboardsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000003 /* WhiteboardsHomeView.swift */; };
+		AS0200000000000000000004 /* WhiteboardCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000004 /* WhiteboardCanvasView.swift */; };
 		AS0200000000000000000005 /* WhiteboardNodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000005 /* WhiteboardNodeView.swift */; };
 		AS0200000000000000000006 /* WhiteboardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000006 /* WhiteboardModels.swift */; };
 		AS0200000000000000000007 /* WhiteboardAIEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000007 /* WhiteboardAIEngine.swift */; };
@@ -1970,6 +1971,7 @@
 		AS0100000000000000000001 /* AIGenerateSlides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIGenerateSlides.swift; sourceTree = "<group>"; };
 		AS0100000000000000000002 /* SlideCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideCanvasView.swift; sourceTree = "<group>"; };
 		AS0100000000000000000003 /* WhiteboardsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardsHomeView.swift; sourceTree = "<group>"; };
+		AS0100000000000000000004 /* WhiteboardCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardCanvasView.swift; sourceTree = "<group>"; };
 		AS0100000000000000000005 /* WhiteboardNodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardNodeView.swift; sourceTree = "<group>"; };
 		AS0100000000000000000006 /* WhiteboardModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardModels.swift; sourceTree = "<group>"; };
 		AS0100000000000000000007 /* WhiteboardAIEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardAIEngine.swift; sourceTree = "<group>"; };
@@ -3497,6 +3499,7 @@
 			isa = PBXGroup;
 			children = (
 				AS0100000000000000000003 /* WhiteboardsHomeView.swift */,
+				AS0100000000000000000004 /* WhiteboardCanvasView.swift */,
 				AS0100000000000000000005 /* WhiteboardNodeView.swift */,
 				AS0100000000000000000006 /* WhiteboardModels.swift */,
 				AS0100000000000000000007 /* WhiteboardAIEngine.swift */,
@@ -10285,6 +10288,7 @@
 				WS0200000000000000000009 /* SlideThumbnailView.swift in Sources */,
 				WS020000000000000000000A /* SlideDecksManager.swift in Sources */,
 				AS0200000000000000000003 /* WhiteboardsHomeView.swift in Sources */,
+				AS0200000000000000000004 /* WhiteboardCanvasView.swift in Sources */,
 				AS0200000000000000000005 /* WhiteboardNodeView.swift in Sources */,
 				AS0200000000000000000006 /* WhiteboardModels.swift in Sources */,
 				AS0200000000000000000007 /* WhiteboardAIEngine.swift in Sources */,

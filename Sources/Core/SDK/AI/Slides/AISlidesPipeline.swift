@@ -14,31 +14,47 @@ struct AISlidesPipeline {
     private let assetResolver = AISlidesAssetResolver()
 
     func run(input: SlideInput, progress: @escaping (String, Double) -> Void) async throws -> SlideDeck {
+        print("[SlidesPipeline] Step: Context Extraction")
         progress("Extracting context", 0.1)
         let context = try await extractContext(input: input)
+        print("[SlidesPipeline] Context extracted (\(context.count) chars)")
 
+        print("[SlidesPipeline] Step: Planning")
         progress("Generating slide plan", 0.24)
         let plan = try await generateSlidePlan(context: context, input: input)
+        print("[SlidesPipeline] Plan generated: \(plan.slides.count) planned slides")
 
+        print("[SlidesPipeline] Step: Visual Enrichment")
         progress("Enriching visuals", 0.38)
         let visuals = try await enrichWithVisuals(plan: plan, context: context, input: input)
+        print("[SlidesPipeline] Visuals enriched: \(visuals.slides.count) visual specs")
 
+        print("[SlidesPipeline] Step: Content Generation")
         progress("Generating content", 0.55)
         let content = try await generateContent(plan: plan, visuals: visuals, context: context, input: input)
+        print("[SlidesPipeline] Content generated: \(content.slides.count) content slides")
 
+        print("[SlidesPipeline] Step: Validation")
         progress("Validating output", 0.70)
         let validated = validator.validate(content: content, input: input)
+        print("[SlidesPipeline] Validated: \(validated.slides.count) slides passed")
 
+        print("[SlidesPipeline] Step: Asset Resolution")
         progress("Resolving assets", 0.84)
         let resolved = await resolveAssets(content: validated, visuals: visuals, input: input)
         let draftDeck = buildDraftDeck(content: resolved, visuals: visuals, input: input)
         let preloadedDeck = await assetResolver.resolveAssets(for: draftDeck)
+        print("[SlidesPipeline] Assets resolved for \(preloadedDeck.slides.count) slides")
 
+        print("[SlidesPipeline] Step: Finalization")
         progress("Finalizing deck", 0.95)
         let deck = finalizeDeck(deck: preloadedDeck, input: input)
 
+        print("[SlidesPipeline] Step: Optimization")
         progress("Optimizing", 1.0)
-        return (try? await router.optimize(deck)) ?? deck
+        let optimized = (try? await router.optimize(deck)) ?? deck
+        print("[SlidesPipeline] Complete: \(optimized.slides.count) final slides")
+        return optimized
     }
 
     func extractContext(input: SlideInput) async throws -> String {
