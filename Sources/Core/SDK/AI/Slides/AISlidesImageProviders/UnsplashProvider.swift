@@ -112,13 +112,71 @@ final class UnsplashProvider: AISlidesImageProvider {
     // MARK: - AISlidesImageProvider conformance
 
     func imageURL(for query: String) async -> URL? {
-        let result = await search(query: query, page: 1, perPage: 1)
+        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        let result: Result<UnsplashSearchResponse, UnsplashProviderError>
+
+        if trimmedQuery.isEmpty {
+            result = await randomPhotos(count: 1)
+        } else {
+            result = await search(query: trimmedQuery, page: 1, perPage: 1)
+        }
         switch result {
         case .success(let response):
             guard let photo = response.results.first else { return nil }
             return URL(string: photo.urls.regular)
         case .failure:
             return nil
+        }
+    }
+
+
+    func randomPhotos(count: Int = 30) async -> Result<UnsplashSearchResponse, UnsplashProviderError> {
+        let safeCount = max(1, min(50, count))
+
+        guard let accessKey = resolveAccessKey() else {
+            return .failure(.missingAPIKey)
+        }
+
+        guard var components = URLComponents(string: "\(baseURL)/photos/random") else {
+            return .failure(.networkError("Invalid base URL."))
+        }
+
+        components.queryItems = [
+            URLQueryItem(name: "count", value: "\(safeCount)")
+        ]
+
+        guard let requestURL = components.url else {
+            return .failure(.networkError("Failed to construct request URL."))
+        }
+
+        var request = buildRequest(url: requestURL, accessKey: accessKey)
+        request.timeoutInterval = 15
+
+        do {
+            let (data, response) = try await session.data(for: request)
+
+            guard let httpResponse = response as? HTTPURLResponse else {
+                return .failure(.networkError("Invalid response type."))
+            }
+
+            if let error = mapHTTPError(httpResponse.statusCode) {
+                return .failure(error)
+            }
+
+            let decoder = JSONDecoder()
+            let photos = try decoder.decode([UnsplashPhoto].self, from: data)
+
+            if photos.isEmpty {
+                return .failure(.noResults)
+            }
+
+            return .success(UnsplashSearchResponse(total: photos.count, totalPages: 1, results: photos))
+        } catch is DecodingError {
+            return .failure(.decodingError("Response did not match expected Unsplash schema."))
+        } catch let urlError as URLError {
+            return .failure(.networkError(urlError.localizedDescription))
+        } catch {
+            return .failure(.networkError(error.localizedDescription))
         }
     }
 

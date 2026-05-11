@@ -1,4 +1,4 @@
-import Foundation
+import SwiftUI
 
 @MainActor
 final class WhiteboardViewTools: ObservableObject {
@@ -298,5 +298,23 @@ final class WhiteboardViewTools: ObservableObject {
                 gestureBinding: .tap
             ),
         ]
+    }
+}
+
+
+struct WhiteboardDrawingToolsSection: View {
+    let tools: [WhiteboardViewTools.ToolEntry]
+    let onSelect: (WhiteboardViewTools.ToolEntry) -> Void
+
+    var body: some View {
+        Section("Drawing Tools") {
+            ForEach(tools) { tool in
+                Button {
+                    onSelect(tool)
+                } label: {
+                    Label(tool.displayName, systemImage: tool.iconName)
+                }
+            }
+        }
     }
 }

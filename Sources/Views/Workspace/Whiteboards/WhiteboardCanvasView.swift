@@ -476,6 +476,12 @@ struct WhiteboardCanvasView: View {
     private var addElementSheet: some View {
         NavigationStack {
             List {
+                WhiteboardDrawingToolsSection(tools: tools.tools(for: .drawing)) { tool in
+                    activeTool = tool
+                    drawingColor = tool.configuration.defaultColorHex
+                    drawingLineWidth = tool.configuration.defaultStrokeWidth
+                    showingAddElement = false
+                }
                 Section("Shapes") {
                     addElementButton(label: "Rectangle", icon: "rectangle", toolID: "rectangle")
                     addElementButton(label: "Circle", icon: "circle", toolID: "circle")

@@ -25,7 +25,7 @@ public struct AIGenerateSlides: View {
     @State private var inputExpanded = true
     @State private var themesExpanded = false
     @State private var stylesExpanded = false
-    @State private var advancedExpanded = false
+    @State private var showErrorAlert = false
     @State private var imagesExpanded = false
 
     private var themesEnabled: Bool { WorkspaceSDKAI().isThemeScopeEnabled }
@@ -57,6 +57,27 @@ public struct AIGenerateSlides: View {
                                 ForEach(whiteboardStore.boards) { board in
                                     Text(board.title).tag(UUID?.some(board.id))
                                 }
+                            }
+
+
+                            Divider().padding(.vertical, 4)
+                            Text("Advanced Settings")
+                                .font(.subheadline.weight(.semibold))
+                            HStack {
+                                Text("Slide Count")
+                                Spacer()
+                                Text("\(slideCount)")
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: Binding(get: { Double(slideCount) }, set: { slideCount = Int($0) }), in: 5...15, step: 1)
+                            Picker("Tone", selection: $tone) {
+                                ForEach(SlideTone.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
+                            }
+                            Picker("Audience", selection: $audience) {
+                                ForEach(SlideAudience.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
+                            }
+                            Picker("Visual Density", selection: $density) {
+                                ForEach(SlideVisualDensity.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
                             }
                         }
                         .padding(.top, 8)
@@ -116,33 +137,6 @@ public struct AIGenerateSlides: View {
                     .font(.headline)
                 }
 
-                // Advanced Settings
-                glassCard {
-                    DisclosureGroup("Advanced Settings", isExpanded: $advancedExpanded) {
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack {
-                                Text("Slide Count")
-                                Spacer()
-                                Text("\(slideCount)")
-                                    .foregroundStyle(.secondary)
-                            }
-                            Slider(value: Binding(get: { Double(slideCount) }, set: { slideCount = Int($0) }), in: 5...15, step: 1)
-
-                            Picker("Tone", selection: $tone) {
-                                ForEach(SlideTone.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
-                            }
-                            Picker("Audience", selection: $audience) {
-                                ForEach(SlideAudience.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
-                            }
-                            Picker("Visual Density", selection: $density) {
-                                ForEach(SlideVisualDensity.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
-                            }
-                        }
-                        .padding(.top, 8)
-                    }
-                    .font(.headline)
-                }
-
                 // Generate Button with neon glow
                 Button(action: generate) {
                     HStack {
@@ -165,18 +159,6 @@ public struct AIGenerateSlides: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                }
-
-                if let errorMsg = manager.lastError {
-                    HStack(spacing: 8) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.orange)
-                        Text(errorMsg)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(10)
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
                 }
 
                 if let scheme = manager.latestScheme {
@@ -267,6 +249,24 @@ public struct AIGenerateSlides: View {
                 .ignoresSafeArea()
         )
         .navigationTitle("AI Slides")
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                if themesEnabled {
+                    Text("Theme")
+                        .font(.caption)
+                    themeAccessoryRow
+                    Divider()
+                    Text("Style")
+                        .font(.caption)
+                    styleAccessoryRow
+                }
+            }
+        }
+        .alert("Generation Error", isPresented: $showErrorAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(manager.lastError ?? "Something went wrong.")
+        }
     }
 
     private var themeGrid: some View {
@@ -324,6 +324,36 @@ public struct AIGenerateSlides: View {
                     .shadow(color: selectedStyleID == style.id ? .cyan.opacity(0.3) : .clear, radius: 4, x: 0, y: 2)
                 }
                 .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private var themeAccessoryRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(AIGenSlideCatalog.themes) { theme in
+                    Circle()
+                        .fill(LinearGradient(colors: gradientColors(for: theme), startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(width: 28, height: 28)
+                        .overlay(Circle().stroke(selectedThemeID == theme.id ? Color.white : .clear, lineWidth: 2))
+                        .shadow(color: .purple.opacity(selectedThemeID == theme.id ? 0.7 : 0.25), radius: 6)
+                        .onTapGesture { selectedThemeID = theme.id }
+                }
+            }
+        }
+    }
+
+    private var styleAccessoryRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(AIGenSlideCatalog.styles) { style in
+                    Circle()
+                        .fill(selectedStyleID == style.id ? Color.cyan : Color.white.opacity(0.2))
+                        .frame(width: 24, height: 24)
+                        .overlay(Circle().stroke(Color.cyan.opacity(0.6), lineWidth: 1))
+                        .shadow(color: .cyan.opacity(selectedStyleID == style.id ? 0.7 : 0.25), radius: 6)
+                        .onTapGesture { selectedStyleID = style.id }
+                }
             }
         }
     }
@@ -401,6 +431,9 @@ public struct AIGenerateSlides: View {
                 generatedDeck = try await manager.generate(input: input)
             } catch {
                 generatedDeck = nil
+                await MainActor.run {
+                    showErrorAlert = true
+                }
             }
         }
     }
