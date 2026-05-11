@@ -93,10 +93,7 @@ struct IssueDetailView: View {
     }
 
     private func loadComments() {
-        comments = [
-            IssueComment(author: "contributor-1", body: "I can reproduce this issue on iOS 17.4.", createdAt: Date().addingTimeInterval(-7200)),
-            IssueComment(author: "maintainer", body: "Thanks for reporting. Looking into this now.", createdAt: Date().addingTimeInterval(-3600)),
-        ]
+        // Issue comments are fetched from the GitHub API; start empty until connected.
     }
 }
 

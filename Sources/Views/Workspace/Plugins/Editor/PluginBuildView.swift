@@ -9,7 +9,7 @@ struct PluginBuildView: View {
     // Identity
     @State private var name = ""
     @State private var description = ""
-    @State private var author = "Developer"
+    @State private var author = ""
     @State private var version = "1.0.0"
     @State private var icon = "puzzlepiece"
     @State private var identifier = ""
@@ -28,10 +28,7 @@ struct PluginBuildView: View {
     // Logic
     @State private var sourceCode = """
 export async function onEvent(event, ctx) {
-  if (event.type === "note.created") {
-    const summary = await ctx.ai.summarize(event.payload.content)
-    await ctx.notes.updateNote(event.payload.id, summary)
-  }
+  // Handle events here
 }
 """
 
@@ -57,7 +54,7 @@ export async function onEvent(event, ctx) {
 
     // Testing
     @State private var testEventPayload = """
-{"type":"note.created","payload":{"id":"sample-id","content":"Draft note text"}}
+{"type":"","payload":{}}
 """
     @State private var simulatedBuildOutput: [String] = []
 
@@ -100,7 +97,7 @@ export async function onEvent(event, ctx) {
             case .capabilities:
                 BuildCapabilitiesSection(selectedCapabilities: $selectedCapabilities, selectedActions: $selectedActions)
             case .security:
-                BuildSecuritySection(selectedCapabilities: selectedCapabilities, apiKey: apiKey, privacyNote: privacyNote, plugin: dummyPluginForSecurity) { updated in
+                BuildSecuritySection(selectedCapabilities: selectedCapabilities, apiKey: apiKey, privacyNote: privacyNote, plugin: currentPluginSnapshot) { updated in
                     self.apiKey = updated.apiKey
                     self.privacyNote = updated.privacyNote
                     self.dataUsageExplanation = updated.dataUsageExplanation
@@ -121,7 +118,7 @@ export async function onEvent(event, ctx) {
             case .testing:
                 BuildTestingSection(testEventPayload: $testEventPayload, simulatedBuildOutput: simulatedBuildOutput) { runLocalValidation() }
             case .release:
-                BuildReleaseSection(version: $version, releaseNotes: $releaseNotes, endpointsCount: endpoints.count, uiExtensionsCount: uiExtensions.count, plugin: dummyPluginForSecurity)
+                BuildReleaseSection(version: $version, releaseNotes: $releaseNotes, endpointsCount: endpoints.count, uiExtensionsCount: uiExtensions.count, plugin: currentPluginSnapshot)
             }
 
             BuildSubmitSection(errors: performStrictValidation(), errorMessage: errorMessage) { buildAndInstall() }
@@ -226,14 +223,12 @@ export async function onEvent(event, ctx) {
             output.append("  ERROR: 'await' used outside of 'async' function")
         }
         if errors.isEmpty && output.count == 2 {
-            output.append("✓ Validation successful. Execution preview started.")
-            output.append("• ctx.ai.summarize called with payload...")
-            output.append("• ctx.notes.updateNote success.")
+            output.append("✓ Validation successful.")
         }
         simulatedBuildOutput = output
     }
 
-    private var dummyPluginForSecurity: PluginDefinition {
+    private var currentPluginSnapshot: PluginDefinition {
         PluginDefinition(
             id: UUID(), name: name, description: description, author: author, version: version, icon: icon,
             identifier: "com.toolskit.\(identifier)", capabilities: Array(selectedCapabilities),
@@ -650,8 +645,8 @@ struct AddEndpointView: View {
     @Environment(\.dismiss) var dismiss
     var onAdd: (ExternalAPIEndpoint) -> Void
     @State private var name = ""
-    @State private var baseURL = "https://api.example.com"
-    @State private var path = "/v1/resource"
+    @State private var baseURL = ""
+    @State private var path = ""
     @State private var method: HTTPMethod = .get
     @State private var authType: AuthType = .none
 

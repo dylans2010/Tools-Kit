@@ -82,14 +82,8 @@ struct IssueListView: View {
 
     private func loadIssues() async {
         isLoading = true
-        try? await Task.sleep(nanoseconds: 300_000_000)
-        issues = [
-            GitHubIssue(number: 42, title: "Fix navigation bar color on dark mode", state: .open, labels: ["bug", "UI"], createdAt: Date().addingTimeInterval(-86400)),
-            GitHubIssue(number: 41, title: "Add unit tests for SDK connector", state: .open, labels: ["enhancement", "testing"], createdAt: Date().addingTimeInterval(-172800)),
-            GitHubIssue(number: 40, title: "Update documentation for new API endpoints", state: .open, labels: ["documentation"], createdAt: Date().addingTimeInterval(-259200)),
-            GitHubIssue(number: 39, title: "Memory leak in WebSocket handler", state: .closed, labels: ["bug", "critical"], createdAt: Date().addingTimeInterval(-345600)),
-            GitHubIssue(number: 38, title: "Support for custom themes", state: .closed, labels: ["feature"], createdAt: Date().addingTimeInterval(-432000)),
-        ]
+        // Issues are fetched from the GitHub API; start empty until connected to a repository.
+        issues = []
         isLoading = false
     }
 }

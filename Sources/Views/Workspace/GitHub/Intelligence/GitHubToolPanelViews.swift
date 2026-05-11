@@ -14,11 +14,7 @@ struct RepoToolsPanelView: View {
         List {
             Section {
                 Button {
-                    // Demo scan
-                    intelligence.scanContent(files: [
-                        (path: "Sources/App.swift", content: "import SwiftUI\n@main struct App: App { var body: some Scene { WindowGroup { ContentView() } } }"),
-                        (path: "Config.json", content: "{ \"token\": \"ghp_abc123456789\" }"),
-                    ])
+                    intelligence.scanRepository()
                 } label: {
                     Label("Analyze Repo Health", systemImage: "stethoscope")
                 }

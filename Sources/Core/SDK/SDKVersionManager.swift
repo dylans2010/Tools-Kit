@@ -83,29 +83,15 @@ public final class SDKVersionManager: ObservableObject {
     // MARK: - Defaults
 
     private func loadDefaultChangelog() {
-        changelog = [
-            VersionEntry(version: SemanticVersion(major: 2, minor: 0, patch: 0), date: Date(), changes: [
-                ChangeItem(type: .feature, description: "Unified WorkspaceSDK interface"),
-                ChangeItem(type: .feature, description: "Kernel-based lifecycle management"),
-                ChangeItem(type: .feature, description: "Service container dependency injection"),
-                ChangeItem(type: .breaking, description: "Replaced ToolsKitSDK with WorkspaceSDK")
-            ]),
-            VersionEntry(version: SemanticVersion(major: 1, minor: 5, patch: 0), date: Date().addingTimeInterval(-86400 * 30), changes: [
-                ChangeItem(type: .feature, description: "AI Slides generation pipeline"),
-                ChangeItem(type: .improvement, description: "Enhanced connector health monitoring"),
-                ChangeItem(type: .fix, description: "Fixed event bus memory leak")
-            ])
-        ]
+        // Changelog entries are added via addEntry(_:) as versions are released.
     }
 
     private func loadDefaultCompatibility() {
-        compatibilityMatrix = [
-            "Plugins": VersionRange(minimum: SemanticVersion(major: 1, minor: 5, patch: 0)),
-            "Connectors": VersionRange(minimum: SemanticVersion(major: 1, minor: 5, patch: 0)),
-            "AISlides": VersionRange(minimum: SemanticVersion(major: 1, minor: 5, patch: 0)),
-            "Workflows": VersionRange(minimum: SemanticVersion(major: 2, minor: 0, patch: 0)),
-            "Analytics": VersionRange(minimum: SemanticVersion(major: 2, minor: 0, patch: 0))
-        ]
+        // Compatibility entries are registered by each module at initialization.
+    }
+
+    public func registerCompatibility(component: String, minimum: SemanticVersion) {
+        compatibilityMatrix[component] = VersionRange(minimum: minimum)
     }
 }
 

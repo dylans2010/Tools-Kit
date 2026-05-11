@@ -68,12 +68,8 @@ struct GitHubReleasesView: View {
 
     private func loadReleases() async {
         isLoading = true
-        try? await Task.sleep(nanoseconds: 300_000_000)
-        releases = [
-            GitHubRelease(tagName: "v2.0.0", name: "SDK 2.0 — Unified Platform", body: "Major release with unified WorkspaceSDK interface, kernel-based lifecycle management, service container DI, and enhanced connector system.", author: "maintainer", publishedAt: Date().addingTimeInterval(-86400), isLatest: true, isPrerelease: false, assets: ["ToolsKit-2.0.0.zip"], totalDownloads: 1250),
-            GitHubRelease(tagName: "v2.0.0-rc.1", name: "SDK 2.0 Release Candidate", body: "Release candidate for testing. Includes all v2.0 features.", author: "maintainer", publishedAt: Date().addingTimeInterval(-604800), isLatest: false, isPrerelease: true, assets: ["ToolsKit-2.0.0-rc1.zip"], totalDownloads: 89),
-            GitHubRelease(tagName: "v1.5.0", name: "AI Slides & Connector Improvements", body: "Added AI slide generation pipeline, enhanced connector health monitoring, fixed event bus memory leak.", author: "maintainer", publishedAt: Date().addingTimeInterval(-2592000), isLatest: false, isPrerelease: false, assets: ["ToolsKit-1.5.0.zip"], totalDownloads: 3400),
-        ]
+        // Releases are fetched from the GitHub API; start empty until connected to a repository.
+        releases = []
         isLoading = false
     }
 }

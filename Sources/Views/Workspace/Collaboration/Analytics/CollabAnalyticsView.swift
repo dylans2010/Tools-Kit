@@ -24,32 +24,38 @@ struct CollabAnalyticsView: View {
             }
 
             Section("Activity Heatmap") {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Edits per day")
+                if stats.dailyEditCounts.isEmpty {
+                    Text("No activity data yet")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    HStack(spacing: 3) {
-                        ForEach(0..<14, id: \.self) { day in
-                            RoundedRectangle(cornerRadius: 2)
-                                .fill(heatmapColor(for: Int.random(in: 0...20)))
-                                .frame(width: 18, height: 18)
-                        }
-                    }
-                    HStack {
-                        Text("Less")
-                        HStack(spacing: 2) {
-                            ForEach([0, 5, 10, 15, 20], id: \.self) { level in
-                                RoundedRectangle(cornerRadius: 1)
-                                    .fill(heatmapColor(for: level))
-                                    .frame(width: 10, height: 10)
+                } else {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Edits per day")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        HStack(spacing: 3) {
+                            ForEach(Array(stats.dailyEditCounts.suffix(14).enumerated()), id: \.offset) { _, count in
+                                RoundedRectangle(cornerRadius: 2)
+                                    .fill(heatmapColor(for: count))
+                                    .frame(width: 18, height: 18)
                             }
                         }
-                        Text("More")
+                        HStack {
+                            Text("Less")
+                            HStack(spacing: 2) {
+                                ForEach([0, 5, 10, 15, 20], id: \.self) { level in
+                                    RoundedRectangle(cornerRadius: 1)
+                                        .fill(heatmapColor(for: level))
+                                        .frame(width: 10, height: 10)
+                                }
+                            }
+                            Text("More")
+                        }
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
                     }
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 4)
                 }
-                .padding(.vertical, 4)
             }
 
             Section("Top Contributors") {
@@ -98,22 +104,7 @@ struct CollabAnalyticsView: View {
     }
 
     private func loadStats() {
-        stats = CollabStats(
-            activeUsers: 12,
-            totalEdits: 347,
-            totalComments: 89,
-            totalDocuments: 45,
-            sharedWorkspaces: 8,
-            activeReviews: 5,
-            avgResponseMinutes: 23,
-            topContributors: [
-                Contributor(name: "Alice", contributions: 89),
-                Contributor(name: "Bob", contributions: 67),
-                Contributor(name: "Charlie", contributions: 54),
-                Contributor(name: "Diana", contributions: 38),
-                Contributor(name: "Eve", contributions: 25),
-            ]
-        )
+        // Stats are populated from real collaboration data; start empty.
     }
 }
 
@@ -126,6 +117,7 @@ private struct CollabStats {
     var activeReviews: Int = 0
     var avgResponseMinutes: Int = 0
     var topContributors: [Contributor] = []
+    var dailyEditCounts: [Int] = []
 }
 
 private struct Contributor: Identifiable {

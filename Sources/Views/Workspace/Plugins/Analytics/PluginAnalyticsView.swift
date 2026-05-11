@@ -49,20 +49,33 @@ struct PluginAnalyticsView: View {
             }
 
             Section("Execution Trends") {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Plugin executions over time")
+                let totalExecutions = manager.installedPlugins.reduce(0) { $0 + $1.executionCount }
+                if totalExecutions == 0 {
+                    Text("No execution data yet. Run plugins to see trends.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    HStack(alignment: .bottom, spacing: 4) {
-                        ForEach(0..<7, id: \.self) { day in
-                            RoundedRectangle(cornerRadius: 3)
-                                .fill(.blue.opacity(0.7))
-                                .frame(height: CGFloat.random(in: 20...100))
+                } else {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Plugin executions by plugin")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        HStack(alignment: .bottom, spacing: 4) {
+                            let maxCount = max(manager.installedPlugins.map(\.executionCount).max() ?? 1, 1)
+                            ForEach(manager.installedPlugins.prefix(10)) { plugin in
+                                VStack(spacing: 2) {
+                                    RoundedRectangle(cornerRadius: 3)
+                                        .fill(.blue.opacity(0.7))
+                                        .frame(height: max(4, CGFloat(plugin.executionCount) / CGFloat(maxCount) * 100))
+                                    Text(String(plugin.name.prefix(3)))
+                                        .font(.system(size: 8))
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
                         }
+                        .frame(height: 120)
                     }
-                    .frame(height: 100)
+                    .padding(.vertical, 8)
                 }
-                .padding(.vertical, 8)
             }
         }
         .navigationTitle("Plugin Analytics")

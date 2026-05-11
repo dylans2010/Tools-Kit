@@ -113,14 +113,7 @@ struct SDKMarketplaceView: View {
     }
 
     private func loadExtensions() {
-        extensions = [
-            SDKExtension(name: "AI Code Assistant", description: "Intelligent code completion and suggestions powered by AI", icon: "brain", category: .ai, author: "ToolsKit", rating: 4.8, reviewCount: 245, isFeatured: true, isVerified: true),
-            SDKExtension(name: "Theme Studio", description: "Create and customize themes for your workspace", icon: "paintpalette", category: .themes, author: "DesignCo", rating: 4.6, reviewCount: 128, isFeatured: true, isVerified: true),
-            SDKExtension(name: "Data Visualizer", description: "Interactive charts and graphs for your data", icon: "chart.bar", category: .data, author: "DataViz", rating: 4.5, reviewCount: 89, isFeatured: true, isVerified: false),
-            SDKExtension(name: "Git Manager Pro", description: "Advanced Git operations and repository management", icon: "arrow.triangle.branch", category: .development, author: "GitPro", rating: 4.7, reviewCount: 312, isVerified: true),
-            SDKExtension(name: "Markdown Plus", description: "Enhanced markdown editing with live preview", icon: "doc.richtext", category: .productivity, author: "TextTools", rating: 4.4, reviewCount: 156, isVerified: false),
-            SDKExtension(name: "API Tester", description: "Test and debug REST and GraphQL APIs", icon: "network", category: .development, author: "DevTools", rating: 4.3, reviewCount: 203, isVerified: true, isInstalled: true),
-        ]
+        // Extensions are fetched from the marketplace registry; start empty until connected.
     }
 }
 

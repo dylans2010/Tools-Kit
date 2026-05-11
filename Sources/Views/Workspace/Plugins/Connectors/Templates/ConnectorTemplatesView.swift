@@ -74,16 +74,7 @@ struct ConnectorTemplatesView: View {
     }
 
     private func loadTemplates() {
-        templates = [
-            ConnectorTemplate(name: "REST API", description: "Generic REST API connector with OAuth2 support", icon: "globe", category: .api, complexity: .medium),
-            ConnectorTemplate(name: "GraphQL", description: "Query GraphQL endpoints with schema introspection", icon: "circle.grid.cross", category: .api, complexity: .advanced),
-            ConnectorTemplate(name: "Webhook Receiver", description: "Receive and process incoming webhook events", icon: "antenna.radiowaves.left.and.right", category: .events, complexity: .simple),
-            ConnectorTemplate(name: "Database", description: "Connect to SQL databases with query builder", icon: "cylinder", category: .data, complexity: .advanced),
-            ConnectorTemplate(name: "File Storage", description: "Read and write files from cloud storage providers", icon: "folder.fill", category: .storage, complexity: .medium),
-            ConnectorTemplate(name: "Email SMTP", description: "Send emails through SMTP servers", icon: "envelope", category: .messaging, complexity: .simple),
-            ConnectorTemplate(name: "WebSocket", description: "Real-time bidirectional communication", icon: "bolt.horizontal", category: .events, complexity: .medium),
-            ConnectorTemplate(name: "OAuth2 Provider", description: "Authenticate with OAuth2 identity providers", icon: "key", category: .auth, complexity: .medium),
-        ]
+        // Templates are loaded from a registry or user-created; start empty.
     }
 }
 

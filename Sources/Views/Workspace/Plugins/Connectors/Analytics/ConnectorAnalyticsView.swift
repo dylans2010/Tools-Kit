@@ -79,13 +79,7 @@ struct ConnectorAnalyticsView: View {
     }
 
     private func loadStats() {
-        connectorStats = [
-            ConnectorStat(name: "GitHub", totalCalls: 1245, errorCount: 12, avgLatencyMs: 180, successRate: 0.99),
-            ConnectorStat(name: "Gmail", totalCalls: 890, errorCount: 5, avgLatencyMs: 220, successRate: 0.994),
-            ConnectorStat(name: "REST API", totalCalls: 3500, errorCount: 45, avgLatencyMs: 150, successRate: 0.987),
-            ConnectorStat(name: "Slack", totalCalls: 456, errorCount: 3, avgLatencyMs: 95, successRate: 0.993),
-            ConnectorStat(name: "Calendar", totalCalls: 234, errorCount: 1, avgLatencyMs: 130, successRate: 0.996),
-        ]
+        // Stats are populated from real connector usage data; start empty.
     }
 }
 

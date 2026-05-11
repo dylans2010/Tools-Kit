@@ -111,13 +111,7 @@ struct CollabPermissionsView: View {
     }
 
     private func loadMembers() {
-        members = [
-            TeamMember(name: "Alice Johnson", email: "alice@team.com", role: .admin),
-            TeamMember(name: "Bob Smith", email: "bob@team.com", role: .editor),
-            TeamMember(name: "Charlie Brown", email: "charlie@team.com", role: .editor),
-            TeamMember(name: "Diana Prince", email: "diana@team.com", role: .viewer),
-            TeamMember(name: "Eve Wilson", email: "eve@team.com", role: .viewer),
-        ]
+        // Team members are managed by the workspace owner; start empty until members are added.
     }
 }
 
