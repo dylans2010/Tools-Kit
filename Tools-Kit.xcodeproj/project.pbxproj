@@ -340,6 +340,37 @@
 		WS0200000000000000000008 /* PresentationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000008 /* PresentationView.swift */; };
 		WS0200000000000000000009 /* SlideThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS0100000000000000000009 /* SlideThumbnailView.swift */; };
 		WS020000000000000000000A /* SlideDecksManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000A /* SlideDecksManager.swift */; };
+		AS0200000000000000000001 /* AIGenerateSlides.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000001 /* AIGenerateSlides.swift */; };
+		AS0200000000000000000002 /* SlideCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000002 /* SlideCanvasView.swift */; };
+		AS0200000000000000000003 /* WhiteboardsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000003 /* WhiteboardsHomeView.swift */; };
+		AS0200000000000000000004 /* WhiteboardCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000004 /* WhiteboardCanvasView.swift */; };
+		AS0200000000000000000005 /* WhiteboardNodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000005 /* WhiteboardNodeView.swift */; };
+		AS0200000000000000000006 /* WhiteboardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000006 /* WhiteboardModels.swift */; };
+		AS0200000000000000000007 /* WhiteboardAIEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000007 /* WhiteboardAIEngine.swift */; };
+		AS0200000000000000000008 /* WhiteboardGraphProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000008 /* WhiteboardGraphProcessor.swift */; };
+		AS0200000000000000000009 /* AISlidesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000009 /* AISlidesManager.swift */; };
+		AS020000000000000000000A /* AISlidesPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000000A /* AISlidesPipeline.swift */; };
+		AS020000000000000000000B /* AISlidesPromptBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000000B /* AISlidesPromptBuilder.swift */; };
+		AS020000000000000000000C /* AISlidesDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000000C /* AISlidesDecoder.swift */; };
+		AS020000000000000000000D /* AISlidesValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000000D /* AISlidesValidator.swift */; };
+		AS020000000000000000000E /* AISlidesRendererMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000000E /* AISlidesRendererMapper.swift */; };
+		AS020000000000000000000F /* AISlidesImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000000F /* AISlidesImageService.swift */; };
+		AS0200000000000000000010 /* AISlidesCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000010 /* AISlidesCache.swift */; };
+		AS0200000000000000000011 /* AISlidesModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000011 /* AISlidesModels.swift */; };
+		AS0200000000000000000012 /* WorkspaceSDK+AISlides.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000012 /* WorkspaceSDK+AISlides.swift */; };
+		AS0200000000000000000013 /* AISlidesOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000013 /* AISlidesOrchestrator.swift */; };
+		AS0200000000000000000014 /* AISlidesMultiModelRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000014 /* AISlidesMultiModelRouter.swift */; };
+		AS0200000000000000000015 /* AISlidesThemeEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000015 /* AISlidesThemeEngine.swift */; };
+		AS0200000000000000000016 /* AISlidesAssetResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000016 /* AISlidesAssetResolver.swift */; };
+		AS0200000000000000000017 /* AIGenSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000017 /* AIGenSlide.swift */; };
+		AS0200000000000000000018 /* UnsplashProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000018 /* UnsplashProvider.swift */; };
+		AS0200000000000000000019 /* PexelsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000019 /* PexelsProvider.swift */; };
+		AS020000000000000000001A /* AIImageFallbackProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000001A /* AIImageFallbackProvider.swift */; };
+		AS020000000000000000001B /* SlideModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000001B /* SlideModels.swift */; };
+		AS020000000000000000001C /* SlideThemeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000001C /* SlideThemeModels.swift */; };
+		AS020000000000000000001D /* SlideStyleModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000001D /* SlideStyleModels.swift */; };
+		AS020000000000000000001E /* SlideDeck+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000001E /* SlideDeck+Extensions.swift */; };
+		AS020000000000000000001F /* JSON+SlideParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000001F /* JSON+SlideParsing.swift */; };
 		WS020000000000000000000B /* ToolHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000B /* ToolHeaderView.swift */; };
 		WS020000000000000000000C /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000C /* CardView.swift */; };
 		WS020000000000000000000D /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000D /* EmptyStateView.swift */; };
@@ -1937,6 +1968,37 @@
 		WS0100000000000000000008 /* PresentationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationView.swift; sourceTree = "<group>"; };
 		WS0100000000000000000009 /* SlideThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideThumbnailView.swift; sourceTree = "<group>"; };
 		WS010000000000000000000A /* SlideDecksManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideDecksManager.swift; sourceTree = "<group>"; };
+		AS0100000000000000000001 /* AIGenerateSlides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIGenerateSlides.swift; sourceTree = "<group>"; };
+		AS0100000000000000000002 /* SlideCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideCanvasView.swift; sourceTree = "<group>"; };
+		AS0100000000000000000003 /* WhiteboardsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardsHomeView.swift; sourceTree = "<group>"; };
+		AS0100000000000000000004 /* WhiteboardCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardCanvasView.swift; sourceTree = "<group>"; };
+		AS0100000000000000000005 /* WhiteboardNodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardNodeView.swift; sourceTree = "<group>"; };
+		AS0100000000000000000006 /* WhiteboardModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardModels.swift; sourceTree = "<group>"; };
+		AS0100000000000000000007 /* WhiteboardAIEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardAIEngine.swift; sourceTree = "<group>"; };
+		AS0100000000000000000008 /* WhiteboardGraphProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardGraphProcessor.swift; sourceTree = "<group>"; };
+		AS0100000000000000000009 /* AISlidesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesManager.swift; sourceTree = "<group>"; };
+		AS010000000000000000000A /* AISlidesPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesPipeline.swift; sourceTree = "<group>"; };
+		AS010000000000000000000B /* AISlidesPromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesPromptBuilder.swift; sourceTree = "<group>"; };
+		AS010000000000000000000C /* AISlidesDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesDecoder.swift; sourceTree = "<group>"; };
+		AS010000000000000000000D /* AISlidesValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesValidator.swift; sourceTree = "<group>"; };
+		AS010000000000000000000E /* AISlidesRendererMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesRendererMapper.swift; sourceTree = "<group>"; };
+		AS010000000000000000000F /* AISlidesImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesImageService.swift; sourceTree = "<group>"; };
+		AS0100000000000000000010 /* AISlidesCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesCache.swift; sourceTree = "<group>"; };
+		AS0100000000000000000011 /* AISlidesModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesModels.swift; sourceTree = "<group>"; };
+		AS0100000000000000000012 /* WorkspaceSDK+AISlides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSDK+AISlides.swift; sourceTree = "<group>"; };
+		AS0100000000000000000013 /* AISlidesOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesOrchestrator.swift; sourceTree = "<group>"; };
+		AS0100000000000000000014 /* AISlidesMultiModelRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesMultiModelRouter.swift; sourceTree = "<group>"; };
+		AS0100000000000000000015 /* AISlidesThemeEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesThemeEngine.swift; sourceTree = "<group>"; };
+		AS0100000000000000000016 /* AISlidesAssetResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesAssetResolver.swift; sourceTree = "<group>"; };
+		AS0100000000000000000017 /* AIGenSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIGenSlide.swift; sourceTree = "<group>"; };
+		AS0100000000000000000018 /* UnsplashProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnsplashProvider.swift; sourceTree = "<group>"; };
+		AS0100000000000000000019 /* PexelsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PexelsProvider.swift; sourceTree = "<group>"; };
+		AS010000000000000000001A /* AIImageFallbackProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIImageFallbackProvider.swift; sourceTree = "<group>"; };
+		AS010000000000000000001B /* SlideModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideModels.swift; sourceTree = "<group>"; };
+		AS010000000000000000001C /* SlideThemeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideThemeModels.swift; sourceTree = "<group>"; };
+		AS010000000000000000001D /* SlideStyleModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideStyleModels.swift; sourceTree = "<group>"; };
+		AS010000000000000000001E /* SlideDeck+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SlideDeck+Extensions.swift"; sourceTree = "<group>"; };
+		AS010000000000000000001F /* JSON+SlideParsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSON+SlideParsing.swift"; sourceTree = "<group>"; };
 		WS010000000000000000000B /* ToolHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolHeaderView.swift; sourceTree = "<group>"; };
 		WS010000000000000000000C /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		WS010000000000000000000D /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
@@ -3134,6 +3196,7 @@
 			children = (
 				1F52E52BA0DF497BA662A7C8 /* Persona */,
 				262075D3C56B452A99252079 /* Slides */,
+				AS0300000000000000000001 /* Whiteboards */,
 				597C4A4DEC2042E58024840D /* Spatial */,
 				5AA1439AFB6E4B3A86508DF8 /* Notebooks */,
 				6591AE4B815141418A027C77 /* Habits */,
@@ -3421,13 +3484,28 @@
 		262075D3C56B452A99252079 /* Slides */ = {
 			isa = PBXGroup;
 			children = (
+				AS0100000000000000000001 /* AIGenerateSlides.swift */,
 				WS0100000000000000000006 /* SlidesHomeView.swift */,
 				WS0100000000000000000007 /* SlideEditorView.swift */,
+				AS0100000000000000000002 /* SlideCanvasView.swift */,
 				WS0100000000000000000008 /* PresentationView.swift */,
 				WS0100000000000000000009 /* SlideThumbnailView.swift */,
 				WS010000000000000000000A /* SlideDecksManager.swift */,
 			);
 			path = Slides;
+			sourceTree = "<group>";
+		};
+		AS0300000000000000000001 /* Whiteboards */ = {
+			isa = PBXGroup;
+			children = (
+				AS0100000000000000000003 /* WhiteboardsHomeView.swift */,
+				AS0100000000000000000004 /* WhiteboardCanvasView.swift */,
+				AS0100000000000000000005 /* WhiteboardNodeView.swift */,
+				AS0100000000000000000006 /* WhiteboardModels.swift */,
+				AS0100000000000000000007 /* WhiteboardAIEngine.swift */,
+				AS0100000000000000000008 /* WhiteboardGraphProcessor.swift */,
+			);
+			path = Whiteboards;
 			sourceTree = "<group>";
 		};
 		26E197F7EF4742DDAF0CB092 /* AI */ = {
@@ -5247,6 +5325,7 @@
 				SD3000000000000000000006 /* Runtime */,
 				SD3000000000000000000007 /* Security */,
 				SD300000000000000000000C /* Features */,
+				AS0300000000000000000002 /* AI */,
 				SDK15DBFE25CCC42CE7BDF3A /* WorkspaceSDK.swift */,
 				44B84A01994C285F6F9FB6E3 /* SDKErrorDomains.swift */,
 				B00175F6922510F79BFDE2CE /* SDKCancellationManager.swift */,
@@ -5260,6 +5339,68 @@
 				EXP1G0000000000000000001 /* Modules */,
 			);
 			path = SDK;
+			sourceTree = "<group>";
+		};
+		AS0300000000000000000002 /* AI */ = {
+			isa = PBXGroup;
+			children = (
+				AS0300000000000000000003 /* Slides */,
+			);
+			path = AI;
+			sourceTree = "<group>";
+		};
+		AS0300000000000000000003 /* Slides */ = {
+			isa = PBXGroup;
+			children = (
+				AS0100000000000000000009 /* AISlidesManager.swift */,
+				AS010000000000000000000A /* AISlidesPipeline.swift */,
+				AS0100000000000000000013 /* AISlidesOrchestrator.swift */,
+				AS0100000000000000000014 /* AISlidesMultiModelRouter.swift */,
+				AS010000000000000000000B /* AISlidesPromptBuilder.swift */,
+				AS0100000000000000000015 /* AISlidesThemeEngine.swift */,
+				AS010000000000000000000C /* AISlidesDecoder.swift */,
+				AS010000000000000000000D /* AISlidesValidator.swift */,
+				AS010000000000000000000E /* AISlidesRendererMapper.swift */,
+				AS010000000000000000000F /* AISlidesImageService.swift */,
+				AS0100000000000000000010 /* AISlidesCache.swift */,
+				AS0100000000000000000016 /* AISlidesAssetResolver.swift */,
+				AS0100000000000000000017 /* AIGenSlide.swift */,
+				AS0300000000000000000006 /* AISlidesImageProviders */,
+				AS0300000000000000000004 /* Models */,
+				AS0300000000000000000005 /* Extensions */,
+			);
+			path = Slides;
+			sourceTree = "<group>";
+		};
+		AS0300000000000000000004 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				AS0100000000000000000011 /* AISlidesModels.swift */,
+				AS010000000000000000001B /* SlideModels.swift */,
+				AS010000000000000000001C /* SlideThemeModels.swift */,
+				AS010000000000000000001D /* SlideStyleModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AS0300000000000000000005 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				AS010000000000000000001E /* SlideDeck+Extensions.swift */,
+				AS010000000000000000001F /* JSON+SlideParsing.swift */,
+				AS0100000000000000000012 /* WorkspaceSDK+AISlides.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		AS0300000000000000000006 /* AISlidesImageProviders */ = {
+			isa = PBXGroup;
+			children = (
+				AS0100000000000000000018 /* UnsplashProvider.swift */,
+				AS0100000000000000000019 /* PexelsProvider.swift */,
+				AS010000000000000000001A /* AIImageFallbackProvider.swift */,
+			);
+			path = AISlidesImageProviders;
 			sourceTree = "<group>";
 		};
 		7C5DF82798754B3BB783A1A2 /* SchemaGenerator */ = {
@@ -9267,6 +9408,29 @@
 				SDK277F284C03A68F2B2572E /* SDKMeetService.swift in Sources */,
 				SDK287F5BD6E67941BA3F524 /* SDKArticleService.swift in Sources */,
 				SDK2BCBC6A79D8395B441E95 /* WorkspaceSDK.swift in Sources */,
+				AS0200000000000000000009 /* AISlidesManager.swift in Sources */,
+				AS020000000000000000000A /* AISlidesPipeline.swift in Sources */,
+				AS0200000000000000000013 /* AISlidesOrchestrator.swift in Sources */,
+				AS0200000000000000000014 /* AISlidesMultiModelRouter.swift in Sources */,
+				AS020000000000000000000B /* AISlidesPromptBuilder.swift in Sources */,
+				AS0200000000000000000015 /* AISlidesThemeEngine.swift in Sources */,
+				AS020000000000000000000C /* AISlidesDecoder.swift in Sources */,
+				AS020000000000000000000D /* AISlidesValidator.swift in Sources */,
+				AS020000000000000000000E /* AISlidesRendererMapper.swift in Sources */,
+				AS020000000000000000000F /* AISlidesImageService.swift in Sources */,
+				AS0200000000000000000010 /* AISlidesCache.swift in Sources */,
+				AS0200000000000000000016 /* AISlidesAssetResolver.swift in Sources */,
+				AS0200000000000000000017 /* AIGenSlide.swift in Sources */,
+				AS0200000000000000000018 /* UnsplashProvider.swift in Sources */,
+				AS0200000000000000000019 /* PexelsProvider.swift in Sources */,
+				AS020000000000000000001A /* AIImageFallbackProvider.swift in Sources */,
+				AS0200000000000000000011 /* AISlidesModels.swift in Sources */,
+				AS020000000000000000001B /* SlideModels.swift in Sources */,
+				AS020000000000000000001C /* SlideThemeModels.swift in Sources */,
+				AS020000000000000000001D /* SlideStyleModels.swift in Sources */,
+				AS020000000000000000001E /* SlideDeck+Extensions.swift in Sources */,
+				AS020000000000000000001F /* JSON+SlideParsing.swift in Sources */,
+				AS0200000000000000000012 /* WorkspaceSDK+AISlides.swift in Sources */,
 				SDK2A5F819C6A67BDEA76CFF /* SDKHomeView.swift in Sources */,
 				SDK2CA3D485CF82F8AE6A768 /* SDKAPIExplorerView.swift in Sources */,
 				SDK2BA0988D1EE1A43E76AA8 /* SDKDataInspectorView.swift in Sources */,
@@ -10116,11 +10280,19 @@
 				WS0200000000000000000003 /* SlideDeck.swift in Sources */,
 				WS0200000000000000000004 /* Slide.swift in Sources */,
 				WS0200000000000000000005 /* SlideElement.swift in Sources */,
+				AS0200000000000000000001 /* AIGenerateSlides.swift in Sources */,
 				WS0200000000000000000006 /* SlidesHomeView.swift in Sources */,
 				WS0200000000000000000007 /* SlideEditorView.swift in Sources */,
+				AS0200000000000000000002 /* SlideCanvasView.swift in Sources */,
 				WS0200000000000000000008 /* PresentationView.swift in Sources */,
 				WS0200000000000000000009 /* SlideThumbnailView.swift in Sources */,
 				WS020000000000000000000A /* SlideDecksManager.swift in Sources */,
+				AS0200000000000000000003 /* WhiteboardsHomeView.swift in Sources */,
+				AS0200000000000000000004 /* WhiteboardCanvasView.swift in Sources */,
+				AS0200000000000000000005 /* WhiteboardNodeView.swift in Sources */,
+				AS0200000000000000000006 /* WhiteboardModels.swift in Sources */,
+				AS0200000000000000000007 /* WhiteboardAIEngine.swift in Sources */,
+				AS0200000000000000000008 /* WhiteboardGraphProcessor.swift in Sources */,
 				WS020000000000000000000B /* ToolHeaderView.swift in Sources */,
 				WS020000000000000000000C /* CardView.swift in Sources */,
 				WS020000000000000000000D /* EmptyStateView.swift in Sources */,

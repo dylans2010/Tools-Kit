@@ -44,6 +44,12 @@ struct WorkspaceHomeView: View {
                     NavigationLink { SlidesHomeView() } label: {
                         Label("Slides", systemImage: "rectangle.on.rectangle")
                     }
+                    NavigationLink("Whiteboards") {
+                        WhiteboardsHomeView()
+                    }
+                    NavigationLink("AI Slides") {
+                        AIGenerateSlides()
+                    }
                 }
 
                 Section("Collaboration") {
