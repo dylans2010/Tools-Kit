@@ -344,6 +344,7 @@
 		AS0200000000000000000027 /* KeyboardObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000027 /* KeyboardObserver.swift */; };
 		AS0200000000000000000028 /* KeyboardGlowModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000028 /* KeyboardGlowModifier.swift */; };
 		AS0200000000000000000029 /* DualKeyboardInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000029 /* DualKeyboardInputView.swift */; };
+		AS0200000000000000000030 /* KeyboardBackdropManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000030 /* KeyboardBackdropManager.swift */; };
 		AS0200000000000000000002 /* SlideCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000002 /* SlideCanvasView.swift */; };
 		AS0200000000000000000003 /* WhiteboardsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000003 /* WhiteboardsHomeView.swift */; };
 		AS0200000000000000000004 /* WhiteboardCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000004 /* WhiteboardCanvasView.swift */; };
@@ -1992,6 +1993,7 @@
 		AS0100000000000000000027 /* KeyboardObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardObserver.swift; sourceTree = "<group>"; };
 		AS0100000000000000000028 /* KeyboardGlowModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardGlowModifier.swift; sourceTree = "<group>"; };
 		AS0100000000000000000029 /* DualKeyboardInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DualKeyboardInputView.swift; sourceTree = "<group>"; };
+		AS0100000000000000000030 /* KeyboardBackdropManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardBackdropManager.swift; sourceTree = "<group>"; };
 		AS0100000000000000000002 /* SlideCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideCanvasView.swift; sourceTree = "<group>"; };
 		AS0100000000000000000003 /* WhiteboardsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardsHomeView.swift; sourceTree = "<group>"; };
 		AS0100000000000000000004 /* WhiteboardCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardCanvasView.swift; sourceTree = "<group>"; };
@@ -3534,6 +3536,7 @@
 				AS0100000000000000000027 /* KeyboardObserver.swift */,
 				AS0100000000000000000028 /* KeyboardGlowModifier.swift */,
 				AS0100000000000000000029 /* DualKeyboardInputView.swift */,
+				AS0100000000000000000030 /* KeyboardBackdropManager.swift */,
 			);
 			path = Slides;
 			sourceTree = "<group>";
@@ -10351,6 +10354,7 @@
 				AS0200000000000000000027 /* KeyboardObserver.swift in Sources */,
 				AS0200000000000000000028 /* KeyboardGlowModifier.swift in Sources */,
 				AS0200000000000000000029 /* DualKeyboardInputView.swift in Sources */,
+				AS0200000000000000000030 /* KeyboardBackdropManager.swift in Sources */,
 				WS0200000000000000000006 /* SlidesHomeView.swift in Sources */,
 				WS0200000000000000000007 /* SlideEditorView.swift in Sources */,
 				AS0200000000000000000002 /* SlideCanvasView.swift in Sources */,

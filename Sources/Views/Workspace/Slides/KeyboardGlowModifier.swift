@@ -1,7 +1,9 @@
 import SwiftUI
 
-/// A view modifier that renders a dynamic, fluid gradient background behind content.
+/// A view modifier that renders a dynamic, fluid gradient glow background behind content.
 /// Intensity and motion increase when the keyboard is visible.
+/// Works in concert with ``KeyboardBackdropManager`` which places a separate UIWindow
+/// behind the system keyboard to show the gradient glow beneath the keys.
 struct KeyboardGlowModifier: ViewModifier {
     @ObservedObject var keyboard: KeyboardObserver
 
@@ -21,16 +23,17 @@ struct KeyboardGlowModifier: ViewModifier {
 
     private var activeColors: [Color] {
         [
-            Color(.systemIndigo).opacity(0.38),
-            Color(.systemPurple).opacity(0.30),
-            Color(.systemCyan).opacity(0.26)
+            Color(.systemIndigo).opacity(0.42),
+            Color(.systemPurple).opacity(0.34),
+            Color(.systemCyan).opacity(0.28),
+            Color(.systemBlue).opacity(0.20)
         ]
     }
 
     private var colors: [Color] { isActive ? activeColors : idleColors }
 
-    private var motionRange: CGFloat { isActive ? 30 : 10 }
-    private var animationDuration: Double { isActive ? 2.5 : 4.0 }
+    private var motionRange: CGFloat { isActive ? 35 : 10 }
+    private var animationDuration: Double { isActive ? 2.2 : 4.0 }
 
     func body(content: Content) -> some View {
         content
@@ -62,6 +65,22 @@ struct KeyboardGlowModifier: ViewModifier {
             )
             .scaleEffect(scale * 0.9)
             .offset(x: -offsetX * 0.7, y: -offsetY * 0.5)
+
+            // Extra glow pulse when keyboard is active
+            if isActive {
+                RadialGradient(
+                    colors: [
+                        Color(.systemCyan).opacity(0.18),
+                        Color(.systemIndigo).opacity(0.10),
+                        Color.clear
+                    ],
+                    center: .bottom,
+                    startRadius: 10,
+                    endRadius: 300
+                )
+                .scaleEffect(scale * 1.1)
+                .offset(y: offsetY * 0.3)
+            }
         }
         .drawingGroup()
     }
@@ -73,7 +92,7 @@ struct KeyboardGlowModifier: ViewModifier {
         ) {
             offsetX = motionRange
             offsetY = motionRange * 0.6
-            scale = isActive ? 1.15 : 1.05
+            scale = isActive ? 1.18 : 1.05
         }
     }
 }
