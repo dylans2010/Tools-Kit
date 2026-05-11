@@ -3353,12 +3353,6 @@
 		1B0E9A9CB64B92D613533BDF /* CodeFormatter */ = {
 			isa = PBXGroup;
 			children = (
-				NG0500000000000000000006 /* Changelog */,
-				NG0500000000000000000005 /* Testing */,
-				NG0500000000000000000004 /* Versioning */,
-				NG0500000000000000000003 /* Marketplace */,
-				NG0500000000000000000002 /* Templates */,
-				NG0500000000000000000001 /* Analytics */,
 			);
 			path = CodeFormatter;
 			sourceTree = "<group>";
@@ -7435,6 +7429,12 @@
 				SDKD1000000000000000002 /* SDKMarkdownView.swift */,
 				EXP10000000000000000000A /* SDKModuleRegistryView.swift */,
 				MON100000000000000000001 /* Monitoring */,
+				NG0500000000000000000001 /* Analytics */,
+				NG0500000000000000000002 /* Templates */,
+				NG0500000000000000000003 /* Marketplace */,
+				NG0500000000000000000004 /* Versioning */,
+				NG0500000000000000000005 /* Testing */,
+				NG0500000000000000000006 /* Changelog */,
 			);
 			path = SDK;
 			sourceTree = "<group>";
