@@ -1,10 +1,17 @@
 import SwiftUI
 
 /// A unified dual-layer keyboard extension that visually appears as a single component.
-/// Layer 1: Primary text input for prompt entry.
-/// Layer 2: Secondary controls (tone, slide count, style presets).
+/// Layer 1: Primary text input for the active field (prompt / notes / documents).
+/// Layer 2: Secondary controls (field switcher, tone, slide count, style & theme presets).
+///
+/// This view is the **sole** input mechanism for AIGenerateSlides – all text editing is
+/// routed through the TextField here so the system keyboard renders behind the gradient
+/// glow backdrop managed by ``KeyboardBackdropManager``.
 struct DualKeyboardInputView: View {
     @Binding var promptText: String
+    @Binding var notesText: String
+    @Binding var documentsText: String
+    @Binding var activeField: SlideInputField
     @Binding var tone: SlideTone
     @Binding var slideCount: Int
     @Binding var selectedStyleID: String
@@ -12,19 +19,50 @@ struct DualKeyboardInputView: View {
     var onSubmit: () -> Void
 
     @ObservedObject var keyboard: KeyboardObserver
+    @FocusState private var isTextFieldFocused: Bool
     @State private var animateIn = false
 
-    var body: some View {
-        if keyboard.isVisible {
-            unifiedContainer
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-                .animation(.spring(response: 0.35, dampingFraction: 0.8), value: keyboard.isVisible)
-                .onAppear {
-                    withAnimation(.easeOut(duration: 0.3)) { animateIn = true }
-                }
-                .onDisappear { animateIn = false }
+    // Binding to the currently-active text field
+    private var activeTextBinding: Binding<String> {
+        switch activeField {
+        case .prompt: return $promptText
+        case .notes: return $notesText
+        case .documents: return $documentsText
         }
     }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            if keyboard.isVisible {
+                unifiedContainer
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .animation(.spring(response: 0.35, dampingFraction: 0.8), value: keyboard.isVisible)
+                    .onAppear {
+                        withAnimation(.easeOut(duration: 0.3)) { animateIn = true }
+                    }
+                    .onDisappear { animateIn = false }
+            }
+
+            // Hidden focus-holder: always present so the keyboard can be summoned
+            focusTriggerField
+        }
+    }
+
+    // MARK: - Focus Trigger
+
+    /// A minimal, invisible TextField that holds first-responder status.
+    /// Tapping the field-selector chips or the container refocuses here.
+    private var focusTriggerField: some View {
+        TextField("", text: activeTextBinding, axis: .vertical)
+            .focused($isTextFieldFocused)
+            .lineLimit(1...4)
+            .font(.subheadline)
+            .frame(height: 0)
+            .opacity(0)
+            .allowsHitTesting(false)
+    }
+
+    // MARK: - Unified Container
 
     private var unifiedContainer: some View {
         VStack(spacing: 0) {
@@ -64,29 +102,42 @@ struct DualKeyboardInputView: View {
     // MARK: - Primary Input Layer
 
     private var primaryInputLayer: some View {
-        HStack(spacing: 8) {
-            TextField("Describe your slides...", text: $promptText, axis: .vertical)
-                .lineLimit(1...3)
-                .font(.subheadline)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(Color(.systemBackground).opacity(0.6))
-                )
-
-            Button(action: onSubmit) {
-                Image(systemName: "arrow.up.circle.fill")
-                    .font(.title2)
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [Color(.systemIndigo), Color(.systemPurple)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+        VStack(spacing: 6) {
+            // Active-field label
+            HStack {
+                Image(systemName: activeField.icon)
+                    .font(.system(size: 10, weight: .semibold))
+                Text(activeField.label)
+                    .font(.system(size: 11, weight: .semibold))
+                Spacer()
             }
-            .disabled(promptText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            .foregroundStyle(.secondary)
+
+            HStack(spacing: 8) {
+                TextField(activeField.placeholder, text: activeTextBinding, axis: .vertical)
+                    .lineLimit(1...4)
+                    .font(.subheadline)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(Color(.systemBackground).opacity(0.6))
+                    )
+                    .focused($isTextFieldFocused)
+
+                Button(action: onSubmit) {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Color(.systemIndigo), Color(.systemPurple)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                }
+                .disabled(promptText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
         }
         .padding(.bottom, 10)
     }
@@ -96,12 +147,33 @@ struct DualKeyboardInputView: View {
     private var secondaryControlLayer: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
+                fieldSwitcherChips
                 toneChip
                 slideCountChip
                 themePresetChips
                 stylePresetChips
             }
             .padding(.horizontal, 4)
+        }
+    }
+
+    // MARK: - Field Switcher Chips
+
+    private var fieldSwitcherChips: some View {
+        ForEach(SlideInputField.allCases, id: \.self) { field in
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                    activeField = field
+                }
+                isTextFieldFocused = true
+            } label: {
+                chipLabel(
+                    icon: field.icon,
+                    text: field.label,
+                    isActive: activeField == field
+                )
+            }
+            .buttonStyle(.plain)
         }
     }
 
@@ -124,7 +196,6 @@ struct DualKeyboardInputView: View {
             chipLabel(icon: "square.stack", text: "\(slideCount) slides")
         }
     }
-
 
     private var themePresetChips: some View {
         ForEach(AIGenSlideCatalog.themes.prefix(4)) { theme in
