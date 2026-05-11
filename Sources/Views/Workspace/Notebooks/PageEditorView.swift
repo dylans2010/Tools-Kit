@@ -43,6 +43,7 @@ struct PageEditorView: View {
     @State private var showingBlockPicker = false
     @State private var showingVersionHistory = false
     @State private var showingCitations = false
+    @State private var showingUnsplash = false
 
     private let autosaveDelayNanoseconds: UInt64 = 1_500_000_000
     private let defaultNoteSpawn = CGPoint(x: 320, y: 320)
@@ -143,6 +144,11 @@ struct PageEditorView: View {
             CitationFormatsView()
                 .presentationDetents([.medium, .large])
         }
+        .sheet(isPresented: $showingUnsplash) {
+            UnsplashImagesView { photo in
+                insertUnsplashImage(photo)
+            }
+        }
         .sheet(isPresented: $showingCanvasSettings) {
             canvasSettingsSheet
                 .presentationDetents([.medium])
@@ -191,6 +197,9 @@ struct PageEditorView: View {
                 Section("Insert") {
                     PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
                         Label("Photo", systemImage: "photo")
+                    }
+                    Button { showingUnsplash = true } label: {
+                        Label("Unsplash Image", systemImage: "photo.on.rectangle.angled")
                     }
                     Button { showingFilePicker = true } label: {
                         Label("File", systemImage: "paperclip")
@@ -769,6 +778,13 @@ struct PageEditorView: View {
             CanvasNote(text: "Key Idea", position: bootstrapFirstNote),
             CanvasNote(text: "Details", position: bootstrapSecondNote)
         ]
+    }
+
+    private func insertUnsplashImage(_ photo: UnsplashPhoto) {
+        let imageURL = photo.urls.regular
+        let credit = "Photo by \(photo.user.name) on Unsplash"
+        content += "\n\n![\(photo.altDescription ?? "Unsplash image")](\(imageURL))\n*\(credit)*"
+        scheduleAutosave()
     }
 
     private func importPhoto(_ item: PhotosPickerItem?) async {
