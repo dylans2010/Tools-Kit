@@ -1369,6 +1369,48 @@
 		D2493764F3B55CB73F0BCC14 /* SDKPluginRegistryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50EFFE203FD72D5A94F15EC /* SDKPluginRegistryView.swift */; };
 		A635DCE822B6300B2142EE01 /* SDKConnectorHealthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FE8A040DBFF25CBA01701F3 /* SDKConnectorHealthView.swift */; };
 		04494BFF858161E110044905 /* SDKConnectorMetricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5A471B59E29485B1D61A66 /* SDKConnectorMetricsView.swift */; };
+		NB0100000000000000000001 /* SDKAnalyticsEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0100000000000000000001 /* SDKAnalyticsEngine.swift */; };
+		NB0100000000000000000002 /* SDKWorkflowEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0100000000000000000002 /* SDKWorkflowEngine.swift */; };
+		NB0100000000000000000003 /* SDKTestHarness.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0100000000000000000003 /* SDKTestHarness.swift */; };
+		NB0100000000000000000004 /* SDKLocalizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0100000000000000000004 /* SDKLocalizationManager.swift */; };
+		NB0100000000000000000005 /* SDKAccessibilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0100000000000000000005 /* SDKAccessibilityService.swift */; };
+		NB0100000000000000000006 /* SDKConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0100000000000000000006 /* SDKConfigManager.swift */; };
+		NB0100000000000000000007 /* SDKVersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0100000000000000000007 /* SDKVersionManager.swift */; };
+		NB0200000000000000000001 /* AISlidesCollaborationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0200000000000000000001 /* AISlidesCollaborationEngine.swift */; };
+		NB0200000000000000000002 /* AISlidesExportEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0200000000000000000002 /* AISlidesExportEngine.swift */; };
+		NB0200000000000000000003 /* AISlidesAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0200000000000000000003 /* AISlidesAnalytics.swift */; };
+		NB0200000000000000000004 /* AISlidesTemplateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0200000000000000000004 /* AISlidesTemplateManager.swift */; };
+		NB0200000000000000000005 /* AISlidesNarrationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0200000000000000000005 /* AISlidesNarrationEngine.swift */; };
+		NB0200000000000000000006 /* AISlidesAccessibilityEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0200000000000000000006 /* AISlidesAccessibilityEngine.swift */; };
+		NB0300000000000000000001 /* PluginAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0300000000000000000001 /* PluginAnalyticsView.swift */; };
+		NB0300000000000000000002 /* PluginSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0300000000000000000002 /* PluginSettingsView.swift */; };
+		NB0300000000000000000003 /* PluginUpdateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0300000000000000000003 /* PluginUpdateView.swift */; };
+		NB0300000000000000000004 /* PluginDependenciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0300000000000000000004 /* PluginDependenciesView.swift */; };
+		NB0300000000000000000005 /* PluginReviewsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0300000000000000000005 /* PluginReviewsView.swift */; };
+		NB0400000000000000000001 /* ConnectorAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0400000000000000000001 /* ConnectorAnalyticsView.swift */; };
+		NB0400000000000000000002 /* ConnectorDataMappingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0400000000000000000002 /* ConnectorDataMappingView.swift */; };
+		NB0400000000000000000003 /* ConnectorSyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0400000000000000000003 /* ConnectorSyncStatusView.swift */; };
+		NB0400000000000000000004 /* ConnectorTemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0400000000000000000004 /* ConnectorTemplatesView.swift */; };
+		NB0400000000000000000005 /* ConnectorWebhookManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0400000000000000000005 /* ConnectorWebhookManagerView.swift */; };
+		NB0500000000000000000001 /* IssueListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0500000000000000000001 /* IssueListView.swift */; };
+		NB0500000000000000000002 /* IssueDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0500000000000000000002 /* IssueDetailView.swift */; };
+		NB0500000000000000000003 /* CreateIssueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0500000000000000000003 /* CreateIssueView.swift */; };
+		NB0500000000000000000004 /* GitHubDiscussionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0500000000000000000004 /* GitHubDiscussionsView.swift */; };
+		NB0500000000000000000005 /* GitHubProjectBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0500000000000000000005 /* GitHubProjectBoardView.swift */; };
+		NB0500000000000000000006 /* GitHubReleasesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0500000000000000000006 /* GitHubReleasesView.swift */; };
+		NB0500000000000000000007 /* GitHubSecurityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0500000000000000000007 /* GitHubSecurityView.swift */; };
+		NB0600000000000000000001 /* CollabWhiteboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0600000000000000000001 /* CollabWhiteboardView.swift */; };
+		NB0600000000000000000002 /* CollaborationChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0600000000000000000002 /* CollaborationChatView.swift */; };
+		NB0600000000000000000003 /* CollabPermissionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0600000000000000000003 /* CollabPermissionsView.swift */; };
+		NB0600000000000000000004 /* CollabTemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0600000000000000000004 /* CollabTemplatesView.swift */; };
+		NB0600000000000000000005 /* CollabNotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0600000000000000000005 /* CollabNotificationsView.swift */; };
+		NB0600000000000000000006 /* CollabAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0600000000000000000006 /* CollabAnalyticsView.swift */; };
+		NB0700000000000000000001 /* SDKAnalyticsDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0700000000000000000001 /* SDKAnalyticsDashboardView.swift */; };
+		NB0700000000000000000002 /* SDKTemplateGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0700000000000000000002 /* SDKTemplateGalleryView.swift */; };
+		NB0700000000000000000003 /* SDKMarketplaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0700000000000000000003 /* SDKMarketplaceView.swift */; };
+		NB0700000000000000000004 /* SDKVersionManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0700000000000000000004 /* SDKVersionManagerView.swift */; };
+		NB0700000000000000000005 /* SDKTestRunnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0700000000000000000005 /* SDKTestRunnerView.swift */; };
+		NB0700000000000000000006 /* SDKChangelogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0700000000000000000006 /* SDKChangelogView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2731,6 +2773,48 @@
 		B50EFFE203FD72D5A94F15EC /* SDKPluginRegistryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPluginRegistryView.swift; sourceTree = "<group>"; };
 		4FE8A040DBFF25CBA01701F3 /* SDKConnectorHealthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConnectorHealthView.swift; sourceTree = "<group>"; };
 		3D5A471B59E29485B1D61A66 /* SDKConnectorMetricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConnectorMetricsView.swift; sourceTree = "<group>"; };
+		NF0100000000000000000001 /* SDKAnalyticsEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAnalyticsEngine.swift; sourceTree = "<group>"; };
+		NF0100000000000000000002 /* SDKWorkflowEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKWorkflowEngine.swift; sourceTree = "<group>"; };
+		NF0100000000000000000003 /* SDKTestHarness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKTestHarness.swift; sourceTree = "<group>"; };
+		NF0100000000000000000004 /* SDKLocalizationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLocalizationManager.swift; sourceTree = "<group>"; };
+		NF0100000000000000000005 /* SDKAccessibilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAccessibilityService.swift; sourceTree = "<group>"; };
+		NF0100000000000000000006 /* SDKConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConfigManager.swift; sourceTree = "<group>"; };
+		NF0100000000000000000007 /* SDKVersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKVersionManager.swift; sourceTree = "<group>"; };
+		NF0200000000000000000001 /* AISlidesCollaborationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesCollaborationEngine.swift; sourceTree = "<group>"; };
+		NF0200000000000000000002 /* AISlidesExportEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesExportEngine.swift; sourceTree = "<group>"; };
+		NF0200000000000000000003 /* AISlidesAnalytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesAnalytics.swift; sourceTree = "<group>"; };
+		NF0200000000000000000004 /* AISlidesTemplateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesTemplateManager.swift; sourceTree = "<group>"; };
+		NF0200000000000000000005 /* AISlidesNarrationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesNarrationEngine.swift; sourceTree = "<group>"; };
+		NF0200000000000000000006 /* AISlidesAccessibilityEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesAccessibilityEngine.swift; sourceTree = "<group>"; };
+		NF0300000000000000000001 /* PluginAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginAnalyticsView.swift; sourceTree = "<group>"; };
+		NF0300000000000000000002 /* PluginSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginSettingsView.swift; sourceTree = "<group>"; };
+		NF0300000000000000000003 /* PluginUpdateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginUpdateView.swift; sourceTree = "<group>"; };
+		NF0300000000000000000004 /* PluginDependenciesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginDependenciesView.swift; sourceTree = "<group>"; };
+		NF0300000000000000000005 /* PluginReviewsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginReviewsView.swift; sourceTree = "<group>"; };
+		NF0400000000000000000001 /* ConnectorAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorAnalyticsView.swift; sourceTree = "<group>"; };
+		NF0400000000000000000002 /* ConnectorDataMappingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorDataMappingView.swift; sourceTree = "<group>"; };
+		NF0400000000000000000003 /* ConnectorSyncStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorSyncStatusView.swift; sourceTree = "<group>"; };
+		NF0400000000000000000004 /* ConnectorTemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorTemplatesView.swift; sourceTree = "<group>"; };
+		NF0400000000000000000005 /* ConnectorWebhookManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectorWebhookManagerView.swift; sourceTree = "<group>"; };
+		NF0500000000000000000001 /* IssueListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IssueListView.swift; sourceTree = "<group>"; };
+		NF0500000000000000000002 /* IssueDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IssueDetailView.swift; sourceTree = "<group>"; };
+		NF0500000000000000000003 /* CreateIssueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateIssueView.swift; sourceTree = "<group>"; };
+		NF0500000000000000000004 /* GitHubDiscussionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubDiscussionsView.swift; sourceTree = "<group>"; };
+		NF0500000000000000000005 /* GitHubProjectBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubProjectBoardView.swift; sourceTree = "<group>"; };
+		NF0500000000000000000006 /* GitHubReleasesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubReleasesView.swift; sourceTree = "<group>"; };
+		NF0500000000000000000007 /* GitHubSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubSecurityView.swift; sourceTree = "<group>"; };
+		NF0600000000000000000001 /* CollabWhiteboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollabWhiteboardView.swift; sourceTree = "<group>"; };
+		NF0600000000000000000002 /* CollaborationChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaborationChatView.swift; sourceTree = "<group>"; };
+		NF0600000000000000000003 /* CollabPermissionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollabPermissionsView.swift; sourceTree = "<group>"; };
+		NF0600000000000000000004 /* CollabTemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollabTemplatesView.swift; sourceTree = "<group>"; };
+		NF0600000000000000000005 /* CollabNotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollabNotificationsView.swift; sourceTree = "<group>"; };
+		NF0600000000000000000006 /* CollabAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollabAnalyticsView.swift; sourceTree = "<group>"; };
+		NF0700000000000000000001 /* SDKAnalyticsDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKAnalyticsDashboardView.swift; sourceTree = "<group>"; };
+		NF0700000000000000000002 /* SDKTemplateGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKTemplateGalleryView.swift; sourceTree = "<group>"; };
+		NF0700000000000000000003 /* SDKMarketplaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKMarketplaceView.swift; sourceTree = "<group>"; };
+		NF0700000000000000000004 /* SDKVersionManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKVersionManagerView.swift; sourceTree = "<group>"; };
+		NF0700000000000000000005 /* SDKTestRunnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKTestRunnerView.swift; sourceTree = "<group>"; };
+		NF0700000000000000000006 /* SDKChangelogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKChangelogView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -3119,6 +3203,13 @@
 		143416B0E758E7A64AAE61DD /* LinkPreview */ = {
 			isa = PBXGroup;
 			children = (
+				NF0100000000000000000007 /* SDKVersionManager.swift */,
+				NF0100000000000000000006 /* SDKConfigManager.swift */,
+				NF0100000000000000000005 /* SDKAccessibilityService.swift */,
+				NF0100000000000000000004 /* SDKLocalizationManager.swift */,
+				NF0100000000000000000003 /* SDKTestHarness.swift */,
+				NF0100000000000000000002 /* SDKWorkflowEngine.swift */,
+				NF0100000000000000000001 /* SDKAnalyticsEngine.swift */,
 			);
 			path = LinkPreview;
 			sourceTree = "<group>";
@@ -3262,6 +3353,12 @@
 		1B0E9A9CB64B92D613533BDF /* CodeFormatter */ = {
 			isa = PBXGroup;
 			children = (
+				NG0500000000000000000006 /* Changelog */,
+				NG0500000000000000000005 /* Testing */,
+				NG0500000000000000000004 /* Versioning */,
+				NG0500000000000000000003 /* Marketplace */,
+				NG0500000000000000000002 /* Templates */,
+				NG0500000000000000000001 /* Analytics */,
 			);
 			path = CodeFormatter;
 			sourceTree = "<group>";
@@ -3390,6 +3487,11 @@
 		20617EB855034B87BB25DB22 /* Connectors */ = {
 			isa = PBXGroup;
 			children = (
+				NG0200000000000000000005 /* Webhooks */,
+				NG0200000000000000000004 /* Templates */,
+				NG0200000000000000000003 /* Sync */,
+				NG0200000000000000000002 /* Mapping */,
+				NG0200000000000000000001 /* Analytics */,
 				5851B51F6765499BABAC81DE /* SDKConnectorsView.swift */,
 				4FE8A040DBFF25CBA01701F3 /* SDKConnectorHealthView.swift */,
 				3D5A471B59E29485B1D61A66 /* SDKConnectorMetricsView.swift */,
@@ -5402,6 +5504,12 @@
 		AS0300000000000000000003 /* Slides */ = {
 			isa = PBXGroup;
 			children = (
+				NF0200000000000000000006 /* AISlidesAccessibilityEngine.swift */,
+				NF0200000000000000000005 /* AISlidesNarrationEngine.swift */,
+				NF0200000000000000000004 /* AISlidesTemplateManager.swift */,
+				NF0200000000000000000003 /* AISlidesAnalytics.swift */,
+				NF0200000000000000000002 /* AISlidesExportEngine.swift */,
+				NF0200000000000000000001 /* AISlidesCollaborationEngine.swift */,
 				AS0100000000000000000009 /* AISlidesManager.swift */,
 				AS010000000000000000000A /* AISlidesPipeline.swift */,
 				AS0100000000000000000013 /* AISlidesOrchestrator.swift */,
@@ -6451,6 +6559,12 @@
 		AA1000000000000000000001 /* Collaboration */ = {
 			isa = PBXGroup;
 			children = (
+				NG0400000000000000000006 /* Analytics */,
+				NG0400000000000000000005 /* Notifications */,
+				NG0400000000000000000004 /* Templates */,
+				NG0400000000000000000003 /* Permissions */,
+				NG0400000000000000000002 /* Chat */,
+				NG0400000000000000000001 /* Whiteboard */,
 				3540E9F5E32049C7BF7D9A3A /* PullRequest */,
 				440CABA4F904463BBB136C0D /* Distribution */,
 				4A6ADD60AA0E4809939AAE1A /* Insights */,
@@ -6506,6 +6620,9 @@
 		AA1000000000000000000006 /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
+				NG0100000000000000000003 /* Detail */,
+				NG0100000000000000000002 /* Settings */,
+				NG0100000000000000000001 /* Analytics */,
 				20617EB855034B87BB25DB22 /* Connectors */,
 				B50EFFE203FD72D5A94F15EC /* SDKPluginRegistryView.swift */,
 				PL010000000000000000000004 /* PluginSecurityView.swift */,
@@ -6526,6 +6643,11 @@
 		AA1000000000000000000007 /* GitHub */ = {
 			isa = PBXGroup;
 			children = (
+				NG0300000000000000000005 /* Security */,
+				NG0300000000000000000004 /* Releases */,
+				NG0300000000000000000003 /* Projects */,
+				NG0300000000000000000002 /* Discussions */,
+				NG0300000000000000000001 /* Issues */,
 				AA1000000000000000000008 /* Intelligence */,
 				B9FEEEB44D734DF78319B955 /* Actions */,
 				GH0100000000000000000007 /* BranchListView.swift */,
@@ -9286,6 +9408,210 @@
 			path = Features;
 			sourceTree = "<group>";
 		};
+		NG0100000000000000000001 /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				NF0300000000000000000001 /* PluginAnalyticsView.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
+		NG0100000000000000000002 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				NF0300000000000000000002 /* PluginSettingsView.swift */,
+				NF0300000000000000000003 /* PluginUpdateView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		NG0100000000000000000003 /* Detail */ = {
+			isa = PBXGroup;
+			children = (
+				NF0300000000000000000004 /* PluginDependenciesView.swift */,
+				NF0300000000000000000005 /* PluginReviewsView.swift */,
+			);
+			path = Detail;
+			sourceTree = "<group>";
+		};
+		NG0200000000000000000001 /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				NF0400000000000000000001 /* ConnectorAnalyticsView.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
+		NG0200000000000000000002 /* Mapping */ = {
+			isa = PBXGroup;
+			children = (
+				NF0400000000000000000002 /* ConnectorDataMappingView.swift */,
+			);
+			path = Mapping;
+			sourceTree = "<group>";
+		};
+		NG0200000000000000000003 /* Sync */ = {
+			isa = PBXGroup;
+			children = (
+				NF0400000000000000000003 /* ConnectorSyncStatusView.swift */,
+			);
+			path = Sync;
+			sourceTree = "<group>";
+		};
+		NG0200000000000000000004 /* Templates */ = {
+			isa = PBXGroup;
+			children = (
+				NF0400000000000000000004 /* ConnectorTemplatesView.swift */,
+			);
+			path = Templates;
+			sourceTree = "<group>";
+		};
+		NG0200000000000000000005 /* Webhooks */ = {
+			isa = PBXGroup;
+			children = (
+				NF0400000000000000000005 /* ConnectorWebhookManagerView.swift */,
+			);
+			path = Webhooks;
+			sourceTree = "<group>";
+		};
+		NG0300000000000000000001 /* Issues */ = {
+			isa = PBXGroup;
+			children = (
+				NF0500000000000000000001 /* IssueListView.swift */,
+				NF0500000000000000000002 /* IssueDetailView.swift */,
+				NF0500000000000000000003 /* CreateIssueView.swift */,
+			);
+			path = Issues;
+			sourceTree = "<group>";
+		};
+		NG0300000000000000000002 /* Discussions */ = {
+			isa = PBXGroup;
+			children = (
+				NF0500000000000000000004 /* GitHubDiscussionsView.swift */,
+			);
+			path = Discussions;
+			sourceTree = "<group>";
+		};
+		NG0300000000000000000003 /* Projects */ = {
+			isa = PBXGroup;
+			children = (
+				NF0500000000000000000005 /* GitHubProjectBoardView.swift */,
+			);
+			path = Projects;
+			sourceTree = "<group>";
+		};
+		NG0300000000000000000004 /* Releases */ = {
+			isa = PBXGroup;
+			children = (
+				NF0500000000000000000006 /* GitHubReleasesView.swift */,
+			);
+			path = Releases;
+			sourceTree = "<group>";
+		};
+		NG0300000000000000000005 /* Security */ = {
+			isa = PBXGroup;
+			children = (
+				NF0500000000000000000007 /* GitHubSecurityView.swift */,
+			);
+			path = Security;
+			sourceTree = "<group>";
+		};
+		NG0400000000000000000001 /* Whiteboard */ = {
+			isa = PBXGroup;
+			children = (
+				NF0600000000000000000001 /* CollabWhiteboardView.swift */,
+			);
+			path = Whiteboard;
+			sourceTree = "<group>";
+		};
+		NG0400000000000000000002 /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				NF0600000000000000000002 /* CollaborationChatView.swift */,
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
+		NG0400000000000000000003 /* Permissions */ = {
+			isa = PBXGroup;
+			children = (
+				NF0600000000000000000003 /* CollabPermissionsView.swift */,
+			);
+			path = Permissions;
+			sourceTree = "<group>";
+		};
+		NG0400000000000000000004 /* Templates */ = {
+			isa = PBXGroup;
+			children = (
+				NF0600000000000000000004 /* CollabTemplatesView.swift */,
+			);
+			path = Templates;
+			sourceTree = "<group>";
+		};
+		NG0400000000000000000005 /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				NF0600000000000000000005 /* CollabNotificationsView.swift */,
+			);
+			path = Notifications;
+			sourceTree = "<group>";
+		};
+		NG0400000000000000000006 /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				NF0600000000000000000006 /* CollabAnalyticsView.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
+		NG0500000000000000000001 /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				NF0700000000000000000001 /* SDKAnalyticsDashboardView.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
+		NG0500000000000000000002 /* Templates */ = {
+			isa = PBXGroup;
+			children = (
+				NF0700000000000000000002 /* SDKTemplateGalleryView.swift */,
+			);
+			path = Templates;
+			sourceTree = "<group>";
+		};
+		NG0500000000000000000003 /* Marketplace */ = {
+			isa = PBXGroup;
+			children = (
+				NF0700000000000000000003 /* SDKMarketplaceView.swift */,
+			);
+			path = Marketplace;
+			sourceTree = "<group>";
+		};
+		NG0500000000000000000004 /* Versioning */ = {
+			isa = PBXGroup;
+			children = (
+				NF0700000000000000000004 /* SDKVersionManagerView.swift */,
+			);
+			path = Versioning;
+			sourceTree = "<group>";
+		};
+		NG0500000000000000000005 /* Testing */ = {
+			isa = PBXGroup;
+			children = (
+				NF0700000000000000000005 /* SDKTestRunnerView.swift */,
+			);
+			path = Testing;
+			sourceTree = "<group>";
+		};
+		NG0500000000000000000006 /* Changelog */ = {
+			isa = PBXGroup;
+			children = (
+				NF0700000000000000000006 /* SDKChangelogView.swift */,
+			);
+			path = Changelog;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -9443,6 +9769,48 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				NB0100000000000000000001 /* SDKAnalyticsEngine.swift in Sources */,
+				NB0100000000000000000002 /* SDKWorkflowEngine.swift in Sources */,
+				NB0100000000000000000003 /* SDKTestHarness.swift in Sources */,
+				NB0100000000000000000004 /* SDKLocalizationManager.swift in Sources */,
+				NB0100000000000000000005 /* SDKAccessibilityService.swift in Sources */,
+				NB0100000000000000000006 /* SDKConfigManager.swift in Sources */,
+				NB0100000000000000000007 /* SDKVersionManager.swift in Sources */,
+				NB0200000000000000000001 /* AISlidesCollaborationEngine.swift in Sources */,
+				NB0200000000000000000002 /* AISlidesExportEngine.swift in Sources */,
+				NB0200000000000000000003 /* AISlidesAnalytics.swift in Sources */,
+				NB0200000000000000000004 /* AISlidesTemplateManager.swift in Sources */,
+				NB0200000000000000000005 /* AISlidesNarrationEngine.swift in Sources */,
+				NB0200000000000000000006 /* AISlidesAccessibilityEngine.swift in Sources */,
+				NB0300000000000000000001 /* PluginAnalyticsView.swift in Sources */,
+				NB0300000000000000000002 /* PluginSettingsView.swift in Sources */,
+				NB0300000000000000000003 /* PluginUpdateView.swift in Sources */,
+				NB0300000000000000000004 /* PluginDependenciesView.swift in Sources */,
+				NB0300000000000000000005 /* PluginReviewsView.swift in Sources */,
+				NB0400000000000000000001 /* ConnectorAnalyticsView.swift in Sources */,
+				NB0400000000000000000002 /* ConnectorDataMappingView.swift in Sources */,
+				NB0400000000000000000003 /* ConnectorSyncStatusView.swift in Sources */,
+				NB0400000000000000000004 /* ConnectorTemplatesView.swift in Sources */,
+				NB0400000000000000000005 /* ConnectorWebhookManagerView.swift in Sources */,
+				NB0500000000000000000001 /* IssueListView.swift in Sources */,
+				NB0500000000000000000002 /* IssueDetailView.swift in Sources */,
+				NB0500000000000000000003 /* CreateIssueView.swift in Sources */,
+				NB0500000000000000000004 /* GitHubDiscussionsView.swift in Sources */,
+				NB0500000000000000000005 /* GitHubProjectBoardView.swift in Sources */,
+				NB0500000000000000000006 /* GitHubReleasesView.swift in Sources */,
+				NB0500000000000000000007 /* GitHubSecurityView.swift in Sources */,
+				NB0600000000000000000001 /* CollabWhiteboardView.swift in Sources */,
+				NB0600000000000000000002 /* CollaborationChatView.swift in Sources */,
+				NB0600000000000000000003 /* CollabPermissionsView.swift in Sources */,
+				NB0600000000000000000004 /* CollabTemplatesView.swift in Sources */,
+				NB0600000000000000000005 /* CollabNotificationsView.swift in Sources */,
+				NB0600000000000000000006 /* CollabAnalyticsView.swift in Sources */,
+				NB0700000000000000000001 /* SDKAnalyticsDashboardView.swift in Sources */,
+				NB0700000000000000000002 /* SDKTemplateGalleryView.swift in Sources */,
+				NB0700000000000000000003 /* SDKMarketplaceView.swift in Sources */,
+				NB0700000000000000000004 /* SDKVersionManagerView.swift in Sources */,
+				NB0700000000000000000005 /* SDKTestRunnerView.swift in Sources */,
+				NB0700000000000000000006 /* SDKChangelogView.swift in Sources */,
 				WK02AICONTEXT0000000001 /* AIContextEngine.swift in Sources */,
 				WK02VERSIONCTRL00000001 /* VersionControlManager.swift in Sources */,
 				SDK25D57A9783E6597D2D336 /* WorkspaceSDKKernel.swift in Sources */,
