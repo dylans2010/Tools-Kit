@@ -16,6 +16,9 @@ struct WhiteboardCanvasView: View {
     @State private var currentDrawingPath: DrawingPath?
     @State private var drawingColor: String = "FFFFFF"
     @State private var drawingLineWidth: Double = 2
+    @State private var drawingOpacity: Double = 1.0
+    @State private var showDrawingCustomizer = false
+    @State private var showElementToolbar = false
 
     @State private var edgeSourceID: UUID?
 
@@ -53,43 +56,143 @@ struct WhiteboardCanvasView: View {
         }
         .navigationTitle(board.title)
         .toolbar { toolbarContent }
-        .sheet(isPresented: $showingAddElement) { addElementSheet }
+        .sheet(isPresented: $showingAddElement) {
+            addElementSheet
+                .presentationDetents([.medium])
+        }
         .sheet(isPresented: $showingUnsplash) {
             UnsplashImagesView { photo in
                 insertUnsplashImage(photo)
             }
         }
         .onDisappear { persistState() }
+        .sheet(isPresented: $showDrawingCustomizer) {
+            DrawingToolCustomizer(
+                tool: activeTool,
+                colorHex: $drawingColor,
+                lineWidth: $drawingLineWidth,
+                opacity: $drawingOpacity
+            )
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showElementToolbar) {
+            if let idx = selectedElementIndex {
+                ElementToolbar(
+                    element: $canvasState.elements[idx],
+                    onDelete: {
+                        deleteElement(id: canvasState.elements[idx].id)
+                        showElementToolbar = false
+                    },
+                    onDuplicate: {
+                        duplicateElement(id: canvasState.elements[idx].id)
+                        showElementToolbar = false
+                    },
+                    onBringToFront: { bringToFront(id: canvasState.elements[idx].id) },
+                    onSendToBack: { sendToBack(id: canvasState.elements[idx].id) }
+                )
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+            }
+        }
         .safeAreaInset(edge: .bottom) { toolPalette }
+    }
+
+    private var selectedElementIndex: Int? {
+        guard let id = selectedElementID else { return nil }
+        return canvasState.elements.firstIndex(where: { $0.id == id })
     }
 
     // MARK: - Tool Palette
 
     private var toolPalette: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(tools.allTools) { tool in
-                    Button {
-                        activeTool = tool
-                        selectedElementID = nil
-                    } label: {
-                        VStack(spacing: 2) {
-                            Image(systemName: tool.iconName)
-                                .font(.system(size: 18))
-                            Text(tool.displayName)
-                                .font(.system(size: 9))
-                        }
-                        .frame(width: 52, height: 44)
-                        .background(activeTool.id == tool.id ? Color.accentColor.opacity(0.2) : Color.clear)
-                        .cornerRadius(8)
-                    }
-                    .buttonStyle(.plain)
-                }
+        VStack(spacing: 0) {
+            if activeTool.category == .drawing && activeTool.id != "eraser" {
+                drawingQuickBar
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(WhiteboardViewTools.ToolCategory.allCases, id: \.self) { category in
+                        let categoryTools = tools.tools(for: category)
+                        if !categoryTools.isEmpty {
+                            toolCategorySection(category: category, tools: categoryTools)
+                        }
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+            }
+            .background(.ultraThinMaterial)
         }
-        .background(.ultraThinMaterial)
+    }
+
+    private func toolCategorySection(category: WhiteboardViewTools.ToolCategory, tools: [WhiteboardViewTools.ToolEntry]) -> some View {
+        HStack(spacing: 4) {
+            ForEach(tools) { tool in
+                Button {
+                    let wasSameTool = activeTool.id == tool.id
+                    activeTool = tool
+                    if tool.category == .drawing && tool.id != "eraser" {
+                        drawingColor = tool.configuration.defaultColorHex
+                        drawingLineWidth = tool.configuration.defaultStrokeWidth
+                        drawingOpacity = tool.configuration.defaultOpacity
+                        if wasSameTool {
+                            showDrawingCustomizer = true
+                        }
+                    }
+                    selectedElementID = nil
+                } label: {
+                    VStack(spacing: 2) {
+                        Image(systemName: tool.iconName)
+                            .font(.system(size: 16))
+                        Text(tool.displayName)
+                            .font(.system(size: 8))
+                            .lineLimit(1)
+                    }
+                    .frame(width: 48, height: 42)
+                    .background(activeTool.id == tool.id ? Color.accentColor.opacity(0.25) : Color.clear)
+                    .cornerRadius(8)
+                }
+                .buttonStyle(.plain)
+            }
+            if category != WhiteboardViewTools.ToolCategory.allCases.last {
+                Divider()
+                    .frame(height: 28)
+                    .padding(.horizontal, 2)
+            }
+        }
+    }
+
+    private var drawingQuickBar: some View {
+        HStack(spacing: 12) {
+            Circle()
+                .fill(Color(hex: drawingColor) ?? .white)
+                .opacity(drawingOpacity)
+                .frame(width: 20, height: 20)
+                .overlay(Circle().stroke(.white.opacity(0.3), lineWidth: 1))
+
+            Text(String(format: "%.0f", drawingLineWidth))
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.secondary)
+
+            Slider(value: $drawingLineWidth, in: activeTool.configuration.minStrokeWidth...activeTool.configuration.maxStrokeWidth, step: 0.5)
+                .frame(maxWidth: 140)
+                .tint(Color(hex: drawingColor) ?? .accentColor)
+
+            Button {
+                showDrawingCustomizer = true
+            } label: {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.accentColor)
+                    .padding(6)
+                    .background(Circle().fill(.ultraThinMaterial))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 6)
+        .background(.ultraThinMaterial.opacity(0.8))
     }
 
     // MARK: - Canvas Content
@@ -128,34 +231,45 @@ struct WhiteboardCanvasView: View {
 
     private var drawingsLayer: some View {
         ForEach(canvasState.drawings) { drawing in
-            Path { path in
-                guard let first = drawing.points.first else { return }
-                path.move(to: CGPoint(x: first.x, y: first.y))
-                for point in drawing.points.dropFirst() {
-                    path.addLine(to: CGPoint(x: point.x, y: point.y))
-                }
+            drawingPathView(for: drawing)
+        }
+    }
+
+    private func drawingPathView(for drawing: DrawingPath) -> some View {
+        Path { path in
+            guard let first = drawing.points.first else { return }
+            path.move(to: CGPoint(x: first.x, y: first.y))
+            for point in drawing.points.dropFirst() {
+                path.addLine(to: CGPoint(x: point.x, y: point.y))
             }
-            .stroke(
-                Color(hex: drawing.colorHex) ?? .white,
-                style: StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .round, lineJoin: .round)
-            )
+        }
+        .stroke(
+            Color(hex: drawing.colorHex) ?? .white,
+            style: drawingStrokeStyle(for: drawing)
+        )
+        .opacity(drawing.opacity)
+    }
+
+    private func drawingStrokeStyle(for drawing: DrawingPath) -> StrokeStyle {
+        let style = WhiteboardViewTools.DrawingStyle(rawValue: drawing.drawingStyleRaw) ?? .solid
+        switch style {
+        case .dashed:
+            return StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .round, lineJoin: .round, dash: [drawing.lineWidth * 3, drawing.lineWidth * 2])
+        case .dotted:
+            return StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .round, lineJoin: .round, dash: [1, drawing.lineWidth * 2])
+        case .calligraphy:
+            return StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .butt, lineJoin: .miter)
+        case .chiselTip:
+            return StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .butt, lineJoin: .bevel)
+        default:
+            return StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .round, lineJoin: .round)
         }
     }
 
     @ViewBuilder
     private var activeDrawingLayer: some View {
         if let active = currentDrawingPath {
-            Path { path in
-                guard let first = active.points.first else { return }
-                path.move(to: CGPoint(x: first.x, y: first.y))
-                for point in active.points.dropFirst() {
-                    path.addLine(to: CGPoint(x: point.x, y: point.y))
-                }
-            }
-            .stroke(
-                Color(hex: active.colorHex) ?? .white,
-                style: StrokeStyle(lineWidth: active.lineWidth, lineCap: .round, lineJoin: .round)
-            )
+            drawingPathView(for: active)
         }
     }
 
@@ -184,7 +298,12 @@ struct WhiteboardCanvasView: View {
                 .gesture(elementDragGesture(for: element))
                 .onTapGesture {
                     if activeTool.interactionMode == .select {
-                        selectedElementID = selectedElementID == element.id ? nil : element.id
+                        if selectedElementID == element.id {
+                            showElementToolbar = true
+                        } else {
+                            selectedElementID = element.id
+                            showElementToolbar = true
+                        }
                     }
                 }
                 .contextMenu { elementContextMenu(for: element) }
@@ -263,7 +382,9 @@ struct WhiteboardCanvasView: View {
                     currentDrawingPath = DrawingPath(
                         points: [point],
                         colorHex: drawingColor,
-                        lineWidth: drawingLineWidth
+                        lineWidth: drawingLineWidth,
+                        opacity: drawingOpacity,
+                        drawingStyleRaw: activeTool.configuration.drawingStyle.rawValue
                     )
                 } else {
                     currentDrawingPath?.points.append(point)
@@ -396,6 +517,18 @@ struct WhiteboardCanvasView: View {
         canvasState.elements[index].zIndex = minZ - 1
     }
 
+    private func duplicateElement(id: UUID) {
+        guard let index = canvasState.elements.firstIndex(where: { $0.id == id }) else { return }
+        let source = canvasState.elements[index]
+        var copy = source
+        copy.id = UUID()
+        copy.positionX += 20
+        copy.positionY += 20
+        copy.zIndex = (canvasState.elements.map(\.zIndex).max() ?? 0) + 1
+        canvasState.elements.append(copy)
+        selectedElementID = copy.id
+    }
+
     private func eraseAtPath(_ path: DrawingPath) {
         let eraseThreshold: Double = 20
         canvasState.drawings.removeAll { drawing in
@@ -480,7 +613,11 @@ struct WhiteboardCanvasView: View {
                     activeTool = tool
                     drawingColor = tool.configuration.defaultColorHex
                     drawingLineWidth = tool.configuration.defaultStrokeWidth
+                    drawingOpacity = tool.configuration.defaultOpacity
                     showingAddElement = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showDrawingCustomizer = true
+                    }
                 }
                 Section("Shapes") {
                     addElementButton(label: "Rectangle", icon: "rectangle", toolID: "rectangle")

@@ -380,6 +380,8 @@
 		FX0200000000000000000003 /* RESTConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FX0100000000000000000003 /* RESTConnector.swift */; };
 		FX0200000000000000000004 /* MQTTConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FX0100000000000000000004 /* MQTTConnector.swift */; };
 		FX0200000000000000000005 /* WhiteboardViewTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = FX0100000000000000000005 /* WhiteboardViewTools.swift */; };
+		DV0200000000000000000001 /* DrawingToolCustomizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000001 /* DrawingToolCustomizer.swift */; };
+		DV0200000000000000000002 /* ElementToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000002 /* ElementToolbar.swift */; };
 		AS0200000000000000000024 /* SlideRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000024 /* SlideRenderer.swift */; };
 		AS0200000000000000000025 /* GenSlidesScheme+SlideDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000025 /* GenSlidesScheme+SlideDeck.swift */; };
 		AS0200000000000000000026 /* SlideContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000026 /* SlideContentView.swift */; };
@@ -2023,6 +2025,8 @@
 		FX0100000000000000000003 /* RESTConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RESTConnector.swift; sourceTree = "<group>"; };
 		FX0100000000000000000004 /* MQTTConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTConnector.swift; sourceTree = "<group>"; };
 		FX0100000000000000000005 /* WhiteboardViewTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardViewTools.swift; sourceTree = "<group>"; };
+		DV0100000000000000000001 /* DrawingToolCustomizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingToolCustomizer.swift; sourceTree = "<group>"; };
+		DV0100000000000000000002 /* ElementToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElementToolbar.swift; sourceTree = "<group>"; };
 		AS0100000000000000000024 /* SlideRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideRenderer.swift; sourceTree = "<group>"; };
 		AS0100000000000000000025 /* GenSlidesScheme+SlideDeck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GenSlidesScheme+SlideDeck.swift"; sourceTree = "<group>"; };
 		AS0100000000000000000026 /* SlideContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideContentView.swift; sourceTree = "<group>"; };
@@ -3535,6 +3539,8 @@
 				AS0100000000000000000007 /* WhiteboardAIEngine.swift */,
 				AS0100000000000000000008 /* WhiteboardGraphProcessor.swift */,
 				FX0100000000000000000005 /* WhiteboardViewTools.swift */,
+				DV0100000000000000000001 /* DrawingToolCustomizer.swift */,
+				DV0100000000000000000002 /* ElementToolbar.swift */,
 			);
 			path = Whiteboards;
 			sourceTree = "<group>";
@@ -10346,6 +10352,8 @@
 				AS0200000000000000000007 /* WhiteboardAIEngine.swift in Sources */,
 				AS0200000000000000000008 /* WhiteboardGraphProcessor.swift in Sources */,
 				FX0200000000000000000005 /* WhiteboardViewTools.swift in Sources */,
+				DV0200000000000000000001 /* DrawingToolCustomizer.swift in Sources */,
+				DV0200000000000000000002 /* ElementToolbar.swift in Sources */,
 				WS020000000000000000000B /* ToolHeaderView.swift in Sources */,
 				WS020000000000000000000C /* CardView.swift in Sources */,
 				WS020000000000000000000D /* EmptyStateView.swift in Sources */,

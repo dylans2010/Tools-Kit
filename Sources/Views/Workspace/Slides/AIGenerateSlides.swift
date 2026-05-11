@@ -23,10 +23,9 @@ public struct AIGenerateSlides: View {
     @State private var generatedDeck: SlideDeck?
 
     @State private var inputExpanded = true
-    @State private var themesExpanded = false
-    @State private var stylesExpanded = false
     @State private var showErrorAlert = false
     @State private var imagesExpanded = false
+    @State private var keyboardThemeTab: Int = 0
 
     private var themesEnabled: Bool { WorkspaceSDKAI().isThemeScopeEnabled }
 
@@ -85,24 +84,7 @@ public struct AIGenerateSlides: View {
                     .font(.headline)
                 }
 
-                // Theme Selection
-                if themesEnabled {
-                    glassCard {
-                        DisclosureGroup("Themes", isExpanded: $themesExpanded) {
-                            themeGrid
-                                .padding(.top, 8)
-                        }
-                        .font(.headline)
-                    }
-
-                    glassCard {
-                        DisclosureGroup("Styles", isExpanded: $stylesExpanded) {
-                            styleGrid
-                                .padding(.top, 8)
-                        }
-                        .font(.headline)
-                    }
-                }
+                // Themes & Styles are on the keyboard extension
 
                 // Image Upload
                 glassCard {
@@ -252,13 +234,7 @@ public struct AIGenerateSlides: View {
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 if themesEnabled {
-                    Text("Theme")
-                        .font(.caption)
-                    themeAccessoryRow
-                    Divider()
-                    Text("Style")
-                        .font(.caption)
-                    styleAccessoryRow
+                    modernKeyboardExtension
                 }
             }
         }
@@ -328,33 +304,141 @@ public struct AIGenerateSlides: View {
         }
     }
 
-    private var themeAccessoryRow: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(AIGenSlideCatalog.themes) { theme in
-                    Circle()
-                        .fill(LinearGradient(colors: gradientColors(for: theme), startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .frame(width: 28, height: 28)
-                        .overlay(Circle().stroke(selectedThemeID == theme.id ? Color.white : .clear, lineWidth: 2))
-                        .shadow(color: .purple.opacity(selectedThemeID == theme.id ? 0.7 : 0.25), radius: 6)
-                        .onTapGesture { selectedThemeID = theme.id }
+    private var modernKeyboardExtension: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                keyboardTabButton(title: "Themes", icon: "paintpalette.fill", index: 0)
+                keyboardTabButton(title: "Styles", icon: "slider.horizontal.3", index: 1)
+            }
+            .padding(.horizontal, 4)
+            .padding(.top, 2)
+
+            Divider().opacity(0.3).padding(.vertical, 2)
+
+            Group {
+                if keyboardThemeTab == 0 {
+                    keyboardThemeStrip
+                } else {
+                    keyboardStyleStrip
                 }
             }
+            .transition(.opacity.combined(with: .move(edge: .trailing)))
+            .animation(.easeInOut(duration: 0.2), value: keyboardThemeTab)
         }
     }
 
-    private var styleAccessoryRow: some View {
+    private func keyboardTabButton(title: String, icon: String, index: Int) -> some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.2)) { keyboardThemeTab = index }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.system(size: 11, weight: .semibold))
+                Text(title)
+                    .font(.system(size: 12, weight: .semibold))
+            }
+            .foregroundStyle(keyboardThemeTab == index ? .white : .secondary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(
+                Capsule()
+                    .fill(keyboardThemeTab == index ? Color.indigo.opacity(0.7) : Color.clear)
+            )
+            .overlay(
+                Capsule()
+                    .stroke(keyboardThemeTab == index ? Color.indigo : Color.gray.opacity(0.3), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var keyboardThemeStrip: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(AIGenSlideCatalog.themes) { theme in
+                    let isActive = selectedThemeID == theme.id
+                    Button {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            selectedThemeID = theme.id
+                        }
+                    } label: {
+                        HStack(spacing: 6) {
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(LinearGradient(colors: gradientColors(for: theme), startPoint: .topLeading, endPoint: .bottomTrailing))
+                                .frame(width: 20, height: 20)
+                            Text(theme.name)
+                                .font(.system(size: 11, weight: isActive ? .bold : .medium))
+                                .lineLimit(1)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(isActive ? .ultraThinMaterial : .regularMaterial)
+                        )
+                        .overlay(
+                            Capsule()
+                                .stroke(
+                                    isActive ? LinearGradient(colors: gradientColors(for: theme), startPoint: .leading, endPoint: .trailing) : LinearGradient(colors: [.clear], startPoint: .leading, endPoint: .trailing),
+                                    lineWidth: isActive ? 2 : 0
+                                )
+                        )
+                        .shadow(color: isActive ? .purple.opacity(0.4) : .clear, radius: 6, x: 0, y: 2)
+                        .scaleEffect(isActive ? 1.05 : 1.0)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 4)
+        }
+    }
+
+    private var keyboardStyleStrip: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(AIGenSlideCatalog.styles) { style in
-                    Circle()
-                        .fill(selectedStyleID == style.id ? Color.cyan : Color.white.opacity(0.2))
-                        .frame(width: 24, height: 24)
-                        .overlay(Circle().stroke(Color.cyan.opacity(0.6), lineWidth: 1))
-                        .shadow(color: .cyan.opacity(selectedStyleID == style.id ? 0.7 : 0.25), radius: 6)
-                        .onTapGesture { selectedStyleID = style.id }
+                    let isActive = selectedStyleID == style.id
+                    Button {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            selectedStyleID = style.id
+                        }
+                    } label: {
+                        HStack(spacing: 6) {
+                            Circle()
+                                .fill(isActive ? Color.cyan : Color.gray.opacity(0.4))
+                                .frame(width: 16, height: 16)
+                                .overlay(
+                                    Image(systemName: "checkmark")
+                                        .font(.system(size: 8, weight: .bold))
+                                        .foregroundStyle(.white)
+                                        .opacity(isActive ? 1 : 0)
+                                )
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(style.name)
+                                    .font(.system(size: 11, weight: isActive ? .bold : .medium))
+                                    .lineLimit(1)
+                                Text(style.visualDensity.rawValue.capitalized)
+                                    .font(.system(size: 9))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(isActive ? .ultraThinMaterial : .regularMaterial)
+                        )
+                        .overlay(
+                            Capsule()
+                                .stroke(isActive ? Color.cyan : Color.clear, lineWidth: isActive ? 2 : 0)
+                        )
+                        .shadow(color: isActive ? .cyan.opacity(0.4) : .clear, radius: 6, x: 0, y: 2)
+                        .scaleEffect(isActive ? 1.05 : 1.0)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
+            .padding(.horizontal, 4)
         }
     }
 
