@@ -5,7 +5,7 @@ public enum SlideTone: String, CaseIterable, Codable {
 }
 
 public enum SlideAudience: String, CaseIterable, Codable {
-    case investor, internal, academic
+    case investor, internalTeam, academic
 }
 
 public enum SlideVisualDensity: String, CaseIterable, Codable {
@@ -58,7 +58,7 @@ public struct SlideInput: Codable, Equatable {
         documents: [String] = [],
         uploadedImages: [SlidePhotoAsset] = [],
         tone: SlideTone = .formal,
-        audience: SlideAudience = .internal,
+        audience: SlideAudience = .internalTeam,
         slideCount: Int = 8,
         includeImages: Bool = true,
         visualDensity: SlideVisualDensity = .medium,

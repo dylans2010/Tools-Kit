@@ -1,7 +1,7 @@
 import Foundation
 
 public struct SlideDeck: Codable, Identifiable, Equatable {
-    var id: UUID = UUID()
+    public var id: UUID = UUID()
     var title: String = "Untitled Deck"
     var theme: String = "default"
     var slides: [Slide] = []

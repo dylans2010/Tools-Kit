@@ -63,7 +63,7 @@ private struct FullSlideView: View {
         let h = el.height * scaleY
 
         switch el.kind {
-        case .text:
+        case .text, .bullets:
             Text(el.text)
                 .font(.system(size: el.fontSize * scaleX))
                 .foregroundColor(Color(hex: el.textColor) ?? .white)
@@ -83,6 +83,20 @@ private struct FullSlideView: View {
                     .foregroundColor(.white.opacity(0.5))
                     .frame(width: w, height: h)
             }
+
+        case .chart:
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.white.opacity(0.16))
+                VStack(spacing: 6) {
+                    Image(systemName: "chart.bar.fill")
+                        .foregroundStyle(.white)
+                    Text(el.chartData?.title ?? "Chart")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white)
+                }
+            }
+            .frame(width: w, height: h)
 
         case .shape:
             shapeView(el, width: w, height: h)

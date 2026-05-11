@@ -1,7 +1,7 @@
 import Foundation
 
 public struct Slide: Codable, Identifiable, Equatable {
-    var id: UUID = UUID()
+    public var id: UUID = UUID()
     var type: String = "title"
     var title: String = "New Slide"
     var layout: String = "title"

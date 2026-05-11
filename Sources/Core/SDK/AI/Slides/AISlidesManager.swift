@@ -37,6 +37,7 @@ public struct WorkspaceSDKAI {
 
     public init() {}
 
+    @MainActor
     public var isThemeScopeEnabled: Bool {
         let scopes = SDKScopeManager.shared.authorizedScopes
         if scopes.isEmpty || scopes.contains("*") {
