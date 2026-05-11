@@ -13,7 +13,7 @@ struct AISlidesRendererMapper {
     }
 
     func mapElements(_ source: [SlideContentPayload.ContentSlide.ContentElement], visuals: VisualPlan.VisualSlide?) -> [SlideElement] {
-        var output = source.map { item -> SlideElement in
+        let output = source.map { item -> SlideElement in
             let kind = SlideElement.ElementKind(rawValue: item.kind.lowercased()) ?? .text
             var model = SlideElement(kind: kind)
             model.text = scaledText(item.text ?? "")
@@ -24,7 +24,7 @@ struct AISlidesRendererMapper {
 
             if let textURL = item.text, kind == .image, !textURL.hasPrefix("upload://"), let url = URL(string: textURL), url.scheme != nil {
                 model.imageURL = url
-                model.caption = item.caption ?? "Image"
+                model.caption = item.caption ?? ""
             }
 
             if let title = item.chartTitle,
@@ -37,24 +37,6 @@ struct AISlidesRendererMapper {
             }
 
             return model
-        }
-
-        if let visuals, visuals.requiresVisual, output.allSatisfy({ $0.kind != .image && $0.kind != .chart }) {
-            if visuals.chartSpec != nil {
-                var chart = SlideElement(kind: .chart)
-                chart.chartData = .init(title: "Pending Data", labels: ["Metric 1", "Metric 2", "Metric 3"], values: [1, 1, 1])
-                output.append(chart)
-            } else if let query = visuals.imageQuery {
-                var image = SlideElement(kind: .image)
-                image.caption = query
-                output.append(image)
-            }
-        }
-
-        if output.isEmpty {
-            var fallback = SlideElement(kind: .text)
-            fallback.text = "Content unavailable"
-            output = [fallback]
         }
 
         return output

@@ -10,29 +10,39 @@ struct AISlidesValidator {
         "two_column": ["splitHStack"]
     ]
 
-    func validate(content: SlideContentPayload, input: SlideInput) -> SlideContentPayload {
-        var sanitized = content
-        print("[Validator] Validating \(content.slides.count) slides")
+    func validate(content: SlideContentPayload, input: SlideInput) throws -> SlideContentPayload {
+        var violations: [String] = []
 
-        if AIGenSlideCatalog.themes.first(where: { $0.id == sanitized.theme }) == nil {
-            sanitized.theme = AIGenSlideCatalog.defaultThemeID
+        if content.slides.isEmpty {
+            violations.append("No slides present in provider response")
         }
 
-        sanitized.slides = sanitized.slides
-            .prefix(max(input.slideCount, 5))
+        for (offset, slide) in content.slides.enumerated() {
+            if slide.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                violations.append("Slide \(offset) has an empty title")
+            }
+            if slide.elements.isEmpty {
+                violations.append("Slide \(offset) has no elements")
+            }
+            for (elemIdx, elem) in slide.elements.enumerated() {
+                if elem.kind.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    violations.append("Slide \(offset), element \(elemIdx) has empty kind")
+                }
+            }
+        }
+
+        if !violations.isEmpty {
+            throw AISlidesPipelineError.schemaValidationFailed(violations: violations)
+        }
+
+        var sanitized = content
+        sanitized.slides = content.slides
+            .prefix(max(input.slideCount, content.slides.count))
             .enumerated()
             .map { offset, slide in
                 var fixed = slide
                 fixed.index = offset
-                fixed.title = slide.title.isEmpty ? "Slide \(offset + 1)" : String(slide.title.prefix(80))
-
-                fixed.elements = repairElements(slide.elements)
-
-                if fixed.elements.isEmpty {
-                    fixed.elements = [
-                        .init(kind: "text", text: "Generated content unavailable", bullets: nil, caption: nil, chartTitle: nil, chartLabels: nil, chartValues: nil)
-                    ]
-                }
+                fixed.title = String(slide.title.prefix(80))
 
                 let validLayouts = validLayoutsByType[slide.type.lowercased()] ?? Set(["verticalList", "titleAndBody", "centered", "splitHStack"])
                 if !validLayouts.contains(slide.layout) {
@@ -42,46 +52,6 @@ struct AISlidesValidator {
                 return fixed
             }
 
-        if sanitized.slides.count < 5 {
-            print("[Validator] Padding from \(sanitized.slides.count) to 5 slides")
-            while sanitized.slides.count < 5 {
-                let idx = sanitized.slides.count
-                sanitized.slides.append(
-                    .init(index: idx, title: "Section \(idx + 1)", type: "bullet", layout: "verticalList", elements: [
-                        .init(kind: "text", text: "Generated content unavailable", bullets: nil, caption: nil, chartTitle: nil, chartLabels: nil, chartValues: nil)
-                    ], metadata: [:])
-                )
-            }
-        }
-
-        print("[Validator] Output: \(sanitized.slides.count) validated slides")
         return sanitized
-    }
-
-    private func repairElements(_ elements: [SlideContentPayload.ContentSlide.ContentElement]) -> [SlideContentPayload.ContentSlide.ContentElement] {
-        elements.compactMap { element in
-            var output = element
-            let kind = element.kind.lowercased()
-
-            if kind == "image", (element.text?.isEmpty ?? true), (element.caption?.isEmpty ?? true) {
-                output.caption = "Image"
-            }
-
-            if let bullets = element.bullets {
-                output.bullets = bullets
-                    .prefix(8)
-                    .map { bullet in
-                        let trimmed = bullet.trimmingCharacters(in: .whitespacesAndNewlines)
-                        return trimmed.isEmpty ? "Content point" : String(trimmed.prefix(120))
-                    }
-            }
-
-            if let text = element.text {
-                let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-                output.text = trimmed.isEmpty ? "Generated content" : trimmed
-            }
-
-            return output
-        }
     }
 }

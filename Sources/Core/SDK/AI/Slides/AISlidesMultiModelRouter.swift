@@ -3,33 +3,33 @@ import Foundation
 protocol AISlidesModelRouter {
     func plan(_ input: SlideInput) async throws -> SlidePlan
     func generateContent(_ plan: SlidePlan) async throws -> SlideDeck
-    func optimize(_ deck: SlideDeck) async throws -> SlideDeck
 }
 
 struct AISlidesMultiModelRouter: AISlidesModelRouter {
     private let promptBuilder = AISlidesPromptBuilder()
-    private let decoder = AISlidesDecoder()
+    private let decoder = AISlidesStrictDecoder()
 
     func plan(_ input: SlideInput) async throws -> SlidePlan {
-        print("[MultiModelRouter] plan: building prompt")
         let context = [input.rawText, input.notes.joined(separator: "\n"), input.documents.joined(separator: "\n")]
             .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
             .joined(separator: "\n\n")
 
         let prompt = promptBuilder.planningPrompt(context: context, input: input)
-        print("[MultiModelRouter] plan: calling generateJSON")
         let json = try await AIService.shared.generateStructuredJSON(
             prompt: prompt,
             jsonSchema: AISlidesPipeline.planningSchema,
             preferredModel: "openrouter/reasoning",
             systemPrompt: "Return strict JSON only. Deterministic structure."
         )
-        print("[MultiModelRouter] plan: decoding response (\(json.count) chars)")
+
+        guard !json.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw AISlidesPipelineError.emptyProviderResponse
+        }
+
         return try decoder.decodePlan(json)
     }
 
     func generateContent(_ plan: SlidePlan) async throws -> SlideDeck {
-        print("[MultiModelRouter] generateContent: building slides from plan")
         let prompt = """
         Generate detailed slide content for the following plan:
         Title: \(plan.title)
@@ -45,7 +45,10 @@ struct AISlidesMultiModelRouter: AISlidesModelRouter {
             preferredModel: "openrouter/language",
             systemPrompt: "Return strict JSON only."
         )
-        print("[MultiModelRouter] generateContent: received response (\(json.count) chars)")
+
+        guard !json.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw AISlidesPipelineError.emptyProviderResponse
+        }
 
         let content = try decoder.decodeContent(json)
         let slides = content.slides.map { contentSlide in
@@ -72,12 +75,16 @@ struct AISlidesMultiModelRouter: AISlidesModelRouter {
                         )
                     default:
                         el = SlideElement(kind: .text)
-                        el.text = element.text ?? "Content"
+                        el.text = element.text ?? ""
                     }
                     return el
                 },
                 metadata: contentSlide.metadata
             )
+        }
+
+        guard !slides.isEmpty else {
+            throw AISlidesPipelineError.schemaValidationFailed(violations: ["Provider returned zero slides"])
         }
 
         return SlideDeck(
@@ -87,22 +94,5 @@ struct AISlidesMultiModelRouter: AISlidesModelRouter {
             createdAt: Date(),
             updatedAt: Date()
         )
-    }
-
-    func optimize(_ deck: SlideDeck) async throws -> SlideDeck {
-        print("[MultiModelRouter] optimize: refining \(deck.slides.count) slides")
-        var optimized = deck
-        optimized.updatedAt = Date()
-        optimized.slides = optimized.slides.map { slide in
-            var copy = slide
-            if copy.elements.isEmpty {
-                var el = SlideElement(kind: .text)
-                el.text = "Generated content unavailable"
-                copy.elements = [el]
-            }
-            return copy
-        }
-        print("[MultiModelRouter] optimize: complete")
-        return optimized
     }
 }

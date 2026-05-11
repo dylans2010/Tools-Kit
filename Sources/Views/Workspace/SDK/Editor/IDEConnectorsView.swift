@@ -107,6 +107,10 @@ private struct ConnectorRegistryRow: View {
             return "folder"
         case .calendar:
             return "calendar"
+        case .rest:
+            return "globe"
+        case .mqtt:
+            return "antenna.radiowaves.left.and.right"
         }
     }
 }

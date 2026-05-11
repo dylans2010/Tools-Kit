@@ -21,7 +21,7 @@ public extension BaseConnector {
 }
 
 public enum ConnectorType: String, CaseIterable, Codable {
-    case gmail, webhook, github, localFileSystem, calendar
+    case gmail, webhook, github, localFileSystem, calendar, rest, mqtt
 }
 
 public enum ConnectorStatus: String, Codable {
