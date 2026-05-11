@@ -42,11 +42,11 @@ final class AIInboxDashboardViewModel: ObservableObject {
 @MainActor
 final class AutomationBuilderViewModel: ObservableObject {
     @Published var workflowName: String = ""
-    @Published var steps: [WorkflowStep] = []
+    @Published var steps: [MailWorkflowStep] = []
     @Published var isCompiling = false
 
     func addStep() {
-        let newStep = WorkflowStep(id: UUID(), title: "New Step", description: "Define action details...", actionType: "manual", isCompleted: false)
+        let newStep = MailWorkflowStep(id: UUID(), title: "New Step", description: "Define action details...", actionType: "manual", isCompleted: false)
         steps.append(newStep)
     }
 

@@ -4,7 +4,7 @@ struct CreateIssueView: View {
     let repository: GitHubRepository
     @Environment(\.dismiss) private var dismiss
     @State private var title = ""
-    @State private var body = ""
+    @State private var issueBody = ""
     @State private var selectedLabels: Set<String> = []
     @State private var assignee = ""
     @State private var isSubmitting = false
@@ -15,7 +15,7 @@ struct CreateIssueView: View {
         Form {
             Section("Issue Details") {
                 TextField("Title", text: $title)
-                TextEditor(text: $body)
+                TextEditor(text: $issueBody)
                     .frame(minHeight: 120)
             }
 

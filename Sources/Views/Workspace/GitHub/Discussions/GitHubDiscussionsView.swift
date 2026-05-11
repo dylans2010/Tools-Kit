@@ -5,7 +5,7 @@ struct GitHubDiscussionsView: View {
     @State private var searchText = ""
     @State private var selectedCategory: DiscussionCategory = .general
 
-    var filteredDiscussions: [Discussion] {
+    fileprivate var filteredDiscussions: [Discussion] {
         discussions.filter { d in
             let matchesSearch = searchText.isEmpty || d.title.localizedCaseInsensitiveContains(searchText)
             let matchesCategory = selectedCategory == .general || d.category == selectedCategory

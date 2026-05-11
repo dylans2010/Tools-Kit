@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct ConnectorTemplatesView: View {
-    @State private var templates: [ConnectorTemplate] = []
+    @State private var templates: [ConnectorTemplateItem] = []
     @State private var searchText = ""
     @State private var selectedCategory: ConnectorCategory?
 
-    var filteredTemplates: [ConnectorTemplate] {
+    fileprivate var filteredTemplates: [ConnectorTemplateItem] {
         templates.filter { template in
             let matchesSearch = searchText.isEmpty || template.name.localizedCaseInsensitiveContains(searchText)
             let matchesCategory = selectedCategory == nil || template.category == selectedCategory
@@ -78,7 +78,7 @@ struct ConnectorTemplatesView: View {
     }
 }
 
-private struct ConnectorTemplate: Identifiable {
+private struct ConnectorTemplateItem: Identifiable {
     let id = UUID()
     let name: String
     let description: String

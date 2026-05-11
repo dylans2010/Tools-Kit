@@ -5,7 +5,7 @@ struct SDKMarketplaceView: View {
     @State private var searchText = ""
     @State private var selectedCategory: ExtCategory?
 
-    var filteredExtensions: [SDKExtension] {
+    fileprivate var filteredExtensions: [SDKExtension] {
         extensions.filter { ext in
             let matchesSearch = searchText.isEmpty || ext.name.localizedCaseInsensitiveContains(searchText)
             let matchesCategory = selectedCategory == nil || ext.category == selectedCategory
