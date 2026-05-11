@@ -12,7 +12,7 @@ public struct AIGenerateSlides: View {
     @State private var selectedBoardID: UUID?
     @State private var slideCount = 8
     @State private var tone: SlideTone = .formal
-    @State private var audience: SlideAudience = .internal
+    @State private var audience: SlideAudience = .internalTeam
     @State private var density: SlideVisualDensity = .medium
     @State private var includeImages = true
     @State private var selectedThemeID = AIGenSlideCatalog.defaultThemeID
@@ -27,7 +27,12 @@ public struct AIGenerateSlides: View {
     public init() {}
 
     public var body: some View {
-        ScrollView {
+        let topColor: Color = .indigo.opacity(0.20)
+        let bottomColor: Color = .cyan.opacity(0.12)
+        let backgroundColors: [Color] = [topColor, bottomColor]
+        let backgroundGradient: LinearGradient = LinearGradient(colors: backgroundColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+
+        return ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 card {
                     VStack(alignment: .leading, spacing: 12) {
@@ -159,7 +164,7 @@ public struct AIGenerateSlides: View {
             .padding()
         }
         .background(
-            LinearGradient(colors: [.indigo.opacity(0.20), .cyan.opacity(0.12)], startPoint: .topLeading, endPoint: .bottomTrailing)
+            backgroundGradient
                 .ignoresSafeArea()
         )
         .navigationTitle("AI Slides")
