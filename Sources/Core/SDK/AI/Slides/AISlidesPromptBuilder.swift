@@ -1,6 +1,90 @@
 import Foundation
 
 struct AISlidesPromptBuilder {
+
+    // MARK: - Full GenSlidesScheme prompt
+
+    func buildFullPrompt(_ input: SlideInput) -> String {
+        let context = buildContext(input)
+        return """
+        You are a slide generation engine.
+        Your task is to generate a presentation using STRICT JSON.
+        Follow this schema EXACTLY:
+        GenSlidesScheme:
+        {
+          "meta": {
+            "title": string,
+            "description": string,
+            "accentColor": string (HEX)
+          },
+          "theme": {
+            "gradient": [string],
+            "font": string,
+            "glass": boolean,
+            "contrast": string
+          },
+          "slides": [
+            {
+              "id": UUID,
+              "type": "title | bullet | image | twoColumn | chart | gallery",
+              "title": string,
+              "layout": { "alignment": string, "spacing": number },
+              "elements": [
+                { "text": string } OR
+                { "bullets": [string] } OR
+                { "image": { "url": "", "query": string } }
+              ]
+            }
+          ]
+        }
+        Rules:
+        - Minimum 5 slides
+        - Maximum 12 slides
+        - Titles under 8 words
+        - Max 6 bullets per slide
+        - Max 12 words per bullet
+        - Include image queries for visual slides
+        - No empty elements
+        - No duplicate slides
+        - Use concise, professional language
+
+        Tone: \(input.tone.rawValue)
+        Audience: \(input.audience.rawValue)
+        Slide count: \(input.slideCount)
+
+        Context:
+        \(context)
+
+        Return ONLY JSON. No markdown. No explanation.
+        """
+    }
+
+    private func buildContext(_ input: SlideInput) -> String {
+        var parts: [String] = []
+
+        if !input.rawText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            parts.append("Topics: \(input.rawText)")
+        }
+        if !input.notes.isEmpty {
+            parts.append("Key points: \(input.notes.joined(separator: "; "))")
+        }
+        if !input.sections.isEmpty {
+            let sectionDesc = input.sections.map { "\($0.title): \($0.summary)" }.joined(separator: "\n")
+            parts.append("Sections:\n\(sectionDesc)")
+        }
+        if !input.whiteboardNodes.isEmpty {
+            let nodeSummary = input.whiteboardNodes.map { "[\($0.type.rawValue)] \($0.title): \($0.content)" }.joined(separator: "\n")
+            parts.append("Whiteboard nodes:\n\(nodeSummary)")
+        }
+        if !input.documents.isEmpty {
+            parts.append("Documents:\n\(input.documents.joined(separator: "\n"))")
+        }
+
+        return parts.isEmpty ? "General presentation" : parts.joined(separator: "\n\n")
+    }
+
+    // MARK: - Multi-stage prompts (legacy pipeline)
+
     func planningPrompt(context: String, input: SlideInput) -> String {
         """
         Build only a slide plan as strict JSON.

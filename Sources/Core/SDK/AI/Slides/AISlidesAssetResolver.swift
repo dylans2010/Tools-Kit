@@ -4,6 +4,26 @@ struct AISlidesAssetResolver {
     private let imageService = AISlidesImageService()
     private let cache = AISlidesCache.shared
 
+    // MARK: - GenSlidesScheme resolution
+
+    func resolveSchemeAssets(for scheme: GenSlidesScheme) async -> GenSlidesScheme {
+        var resolved = scheme
+        for slideIdx in resolved.slides.indices {
+            for elemIdx in resolved.slides[slideIdx].elements.indices {
+                if case .image(var ref) = resolved.slides[slideIdx].elements[elemIdx], ref.url.isEmpty {
+                    if let url = await imageService.resolveImage(for: ref.query) {
+                        ref.url = url.absoluteString
+                        resolved.slides[slideIdx].elements[elemIdx] = .image(ref)
+                        print("[AssetResolver] Resolved image for query: \(ref.query.prefix(40))")
+                    }
+                }
+            }
+        }
+        return resolved
+    }
+
+    // MARK: - SlideDeck resolution
+
     func resolveAssets(for deck: SlideDeck) async -> SlideDeck {
         var resolved = deck
 
