@@ -22,116 +22,161 @@ public struct AIGenerateSlides: View {
 
     @State private var generatedDeck: SlideDeck?
 
+    @State private var inputExpanded = true
+    @State private var themesExpanded = false
+    @State private var stylesExpanded = false
+    @State private var advancedExpanded = false
+    @State private var imagesExpanded = false
+
     private var themesEnabled: Bool { WorkspaceSDKAI().isThemeScopeEnabled }
 
     public init() {}
 
     public var body: some View {
-        let topColor: Color = .indigo.opacity(0.20)
-        let bottomColor: Color = .cyan.opacity(0.12)
-        let backgroundColors: [Color] = [topColor, bottomColor]
-        let backgroundGradient: LinearGradient = LinearGradient(colors: backgroundColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+        let topColor: Color = .indigo.opacity(0.25)
+        let bottomColor: Color = .cyan.opacity(0.15)
+        let backgroundColors: [Color] = [topColor, .purple.opacity(0.12), bottomColor]
+        let backgroundGradient = LinearGradient(colors: backgroundColors, startPoint: .topLeading, endPoint: .bottomTrailing)
 
         return ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                card {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Input")
-                            .font(.headline)
-                        TextField("Topic or presentation goal", text: $rawText, axis: .vertical)
-                            .lineLimit(2...5)
-                        TextField("Notes (one per line)", text: $notes, axis: .vertical)
-                            .lineLimit(2...5)
-                        TextField("Document snippets", text: $documents, axis: .vertical)
-                            .lineLimit(2...5)
 
-                        Picker("Whiteboard", selection: $selectedBoardID) {
-                            Text("None").tag(UUID?.none)
-                            ForEach(whiteboardStore.boards) { board in
-                                Text(board.title).tag(UUID?.some(board.id))
-                            }
-                        }
-
-                        PhotosPicker(selection: $selectedImages, matching: .images) {
-                            Label("Import Photos", systemImage: "photo.on.rectangle.angled")
-                                .font(.subheadline.weight(.semibold))
-                        }
-                        .onChange(of: selectedImages) { _, newItems in
-                            Task {
-                                var assets: [SlidePhotoAsset] = []
-                                for (index, item) in newItems.enumerated() {
-                                    if let data = try? await item.loadTransferable(type: Data.self) {
-                                        assets.append(SlidePhotoAsset(fileName: "photo_\(index + 1).jpg", dataBase64: data.base64EncodedString()))
-                                    }
-                                }
-                                uploadedImages = assets
-                            }
-                        }
-
-                        if !uploadedImages.isEmpty {
-                            Text("\(uploadedImages.count) image(s) ready")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }
-
-                card {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Configuration")
-                            .font(.headline)
-
-                        HStack {
-                            Text("Slide Count")
-                            Spacer()
-                            Text("\(slideCount)")
-                                .foregroundStyle(.secondary)
-                        }
-                        Slider(value: Binding(get: { Double(slideCount) }, set: { slideCount = Int($0) }), in: 5...15, step: 1)
-
-                        Picker("Tone", selection: $tone) {
-                            ForEach(SlideTone.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
-                        }
-                        Picker("Audience", selection: $audience) {
-                            ForEach(SlideAudience.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
-                        }
-                        Picker("Visual Density", selection: $density) {
-                            ForEach(SlideVisualDensity.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
-                        }
-                        Toggle("Include Images", isOn: $includeImages)
-                    }
-                }
-
-                if themesEnabled {
-                    card {
+                // Input Sources
+                glassCard {
+                    DisclosureGroup("Input Sources", isExpanded: $inputExpanded) {
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Themes")
-                                .font(.headline)
-                            themeGrid
-                            Text("Styles")
-                                .font(.headline)
-                            styleGrid
+                            TextField("Topic or presentation goal", text: $rawText, axis: .vertical)
+                                .lineLimit(2...5)
+                            TextField("Notes (one per line)", text: $notes, axis: .vertical)
+                                .lineLimit(2...5)
+                            TextField("Document snippets", text: $documents, axis: .vertical)
+                                .lineLimit(2...5)
+
+                            Picker("Whiteboard", selection: $selectedBoardID) {
+                                Text("None").tag(UUID?.none)
+                                ForEach(whiteboardStore.boards) { board in
+                                    Text(board.title).tag(UUID?.some(board.id))
+                                }
+                            }
                         }
+                        .padding(.top, 8)
+                    }
+                    .font(.headline)
+                }
+
+                // Theme Selection
+                if themesEnabled {
+                    glassCard {
+                        DisclosureGroup("Themes", isExpanded: $themesExpanded) {
+                            themeGrid
+                                .padding(.top, 8)
+                        }
+                        .font(.headline)
+                    }
+
+                    glassCard {
+                        DisclosureGroup("Styles", isExpanded: $stylesExpanded) {
+                            styleGrid
+                                .padding(.top, 8)
+                        }
+                        .font(.headline)
                     }
                 }
 
+                // Image Upload
+                glassCard {
+                    DisclosureGroup("Image Upload", isExpanded: $imagesExpanded) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            PhotosPicker(selection: $selectedImages, matching: .images) {
+                                Label("Import Photos", systemImage: "photo.on.rectangle.angled")
+                                    .font(.subheadline.weight(.semibold))
+                            }
+                            .onChange(of: selectedImages) { _, newItems in
+                                Task {
+                                    var assets: [SlidePhotoAsset] = []
+                                    for (index, item) in newItems.enumerated() {
+                                        if let data = try? await item.loadTransferable(type: Data.self) {
+                                            assets.append(SlidePhotoAsset(fileName: "photo_\(index + 1).jpg", dataBase64: data.base64EncodedString()))
+                                        }
+                                    }
+                                    uploadedImages = assets
+                                }
+                            }
+
+                            if !uploadedImages.isEmpty {
+                                Text("\(uploadedImages.count) image(s) ready")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Toggle("Include AI Images", isOn: $includeImages)
+                        }
+                        .padding(.top, 8)
+                    }
+                    .font(.headline)
+                }
+
+                // Advanced Settings
+                glassCard {
+                    DisclosureGroup("Advanced Settings", isExpanded: $advancedExpanded) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Text("Slide Count")
+                                Spacer()
+                                Text("\(slideCount)")
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: Binding(get: { Double(slideCount) }, set: { slideCount = Int($0) }), in: 5...15, step: 1)
+
+                            Picker("Tone", selection: $tone) {
+                                ForEach(SlideTone.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
+                            }
+                            Picker("Audience", selection: $audience) {
+                                ForEach(SlideAudience.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
+                            }
+                            Picker("Visual Density", selection: $density) {
+                                ForEach(SlideVisualDensity.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
+                            }
+                        }
+                        .padding(.top, 8)
+                    }
+                    .font(.headline)
+                }
+
+                // Generate Button with neon glow
                 Button(action: generate) {
                     HStack {
                         Image(systemName: "sparkles")
                         Text(manager.isGenerating ? "Generating..." : "Generate Slides")
                     }
                     .frame(maxWidth: .infinity)
+                    .padding(.vertical, 4)
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(.indigo)
                 .disabled(manager.isGenerating)
+                .shadow(color: .purple.opacity(0.5), radius: 8, x: 0, y: 4)
 
                 if manager.isGenerating {
                     VStack(alignment: .leading, spacing: 6) {
                         ProgressView(value: manager.progressValue)
+                            .tint(.cyan)
                         Text(manager.progressMessage)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
+                }
+
+                if let errorMsg = manager.lastError {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.orange)
+                        Text(errorMsg)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(10)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
                 }
 
                 if let deck = generatedDeck ?? manager.latestDeck {
@@ -153,7 +198,18 @@ public struct AIGenerateSlides: View {
                                     }
                                     .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading)
                                     .padding(10)
-                                    .background(RoundedRectangle(cornerRadius: 12).fill(.ultraThinMaterial))
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(.ultraThinMaterial)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .stroke(
+                                                        LinearGradient(colors: [.purple.opacity(0.4), .cyan.opacity(0.3)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                                                        lineWidth: 1
+                                                    )
+                                            )
+                                    )
+                                    .shadow(color: .purple.opacity(0.15), radius: 4, x: 0, y: 2)
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -194,6 +250,7 @@ public struct AIGenerateSlides: View {
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(selectedThemeID == theme.id ? Color.white : Color.white.opacity(0.22), lineWidth: selectedThemeID == theme.id ? 2 : 1)
                     )
+                    .shadow(color: selectedThemeID == theme.id ? .purple.opacity(0.4) : .clear, radius: 6, x: 0, y: 2)
                 }
                 .buttonStyle(.plain)
             }
@@ -219,18 +276,31 @@ public struct AIGenerateSlides: View {
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(selectedStyleID == style.id ? Color.blue : Color.gray.opacity(0.35), lineWidth: selectedStyleID == style.id ? 2 : 1)
+                            .stroke(selectedStyleID == style.id ? Color.cyan : Color.gray.opacity(0.35), lineWidth: selectedStyleID == style.id ? 2 : 1)
                     )
+                    .shadow(color: selectedStyleID == style.id ? .cyan.opacity(0.3) : .clear, radius: 4, x: 0, y: 2)
                 }
                 .buttonStyle(.plain)
             }
         }
     }
 
-    private func card<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+    @ViewBuilder
+    private func glassCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 8) { content() }
             .padding(14)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(
+                                LinearGradient(colors: [.white.opacity(0.2), .white.opacity(0.05)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                                lineWidth: 1
+                            )
+                    )
+            )
+            .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
     }
 
     private func gradientColors(for theme: SlideTheme) -> [Color] {
