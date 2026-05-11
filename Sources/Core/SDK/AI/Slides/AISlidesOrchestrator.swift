@@ -15,7 +15,7 @@ struct AISlidesOrchestrator {
                 if attempt > maxAttempts {
                     break
                 }
-                progress("Retrying stage \(attempt + 1)", min(0.95, 0.35 + (Double(attempt) * 0.2)))
+                progress("Retrying stage \(attempt)", min(0.95, 0.35 + (Double(attempt) * 0.2)))
             }
         }
 

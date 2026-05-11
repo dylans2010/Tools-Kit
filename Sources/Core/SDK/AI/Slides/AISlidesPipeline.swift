@@ -68,7 +68,12 @@ struct AISlidesPipeline {
             await cache.storeJSON(json, for: key)
         }
 
-        return (try? decoder.decodePlan(json)) ?? (try await router.plan(input))
+        do {
+            return try decoder.decodePlan(json)
+        } catch {
+            print("AISlidesPipeline decodePlan fallback: \(error)")
+            return try await router.plan(input)
+        }
     }
 
     func enrichWithVisuals(plan: SlidePlan, context: String, input: SlideInput) async throws -> VisualPlan {

@@ -42,7 +42,7 @@ struct AISlidesRendererMapper {
         if let visuals, visuals.requiresVisual, output.allSatisfy({ $0.kind != .image && $0.kind != .chart }) {
             if visuals.chartSpec != nil {
                 var chart = SlideElement(kind: .chart)
-                chart.chartData = .init(title: "Chart", labels: ["A", "B", "C"], values: [34, 43, 23])
+                chart.chartData = .init(title: "Pending Data", labels: ["Metric 1", "Metric 2", "Metric 3"], values: [1, 1, 1])
                 output.append(chart)
             } else if let query = visuals.imageQuery {
                 var image = SlideElement(kind: .image)

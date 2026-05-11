@@ -180,7 +180,7 @@ public struct AIGenerateSlides: View {
                     .padding(10)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(
-                        LinearGradient(colors: theme.gradient.compactMap(Color.init(hex:)).ifEmpty([.blue, .purple]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                        LinearGradient(colors: gradientColors(for: theme), startPoint: .topLeading, endPoint: .bottomTrailing)
                             .opacity(0.82)
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -225,6 +225,11 @@ public struct AIGenerateSlides: View {
         VStack(alignment: .leading, spacing: 8) { content() }
             .padding(14)
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private func gradientColors(for theme: SlideTheme) -> [Color] {
+        let mapped = theme.gradient.compactMap { Color(hex: $0) }
+        return mapped.ifEmpty([.blue, .purple])
     }
 
     private func generate() {
