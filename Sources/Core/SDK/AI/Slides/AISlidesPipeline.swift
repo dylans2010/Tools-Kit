@@ -2,6 +2,7 @@ import Foundation
 
 @MainActor
 struct AISlidesPipeline {
+    private let defaultBackgroundHex = "0F172A"
     private let promptBuilder = AISlidesPromptBuilder()
     private let decoder = AISlidesDecoder()
     private let validator = AISlidesValidator()
@@ -132,7 +133,7 @@ struct AISlidesPipeline {
 
         for (idx, image) in input.uploadedImages.enumerated() where idx < resolved.slides.count {
             var element = SlideContentPayload.ContentSlide.ContentElement(kind: "image", text: nil, bullets: nil, caption: image.fileName, chartTitle: nil, chartLabels: nil, chartValues: nil)
-            element.text = "data://\(image.fileName)"
+            element.text = "upload://\(image.fileName)"
             resolved.slides[idx].elements.insert(element, at: 0)
         }
 
@@ -148,7 +149,7 @@ struct AISlidesPipeline {
                 elements: mapper.mapElements(slide.elements, visuals: visuals.slides.first(where: { $0.index == slide.index })),
                 metadata: slide.metadata
             )
-            model.backgroundColorHex = "0F172A"
+            model.backgroundColorHex = defaultBackgroundHex
             return model
         }
 
@@ -175,7 +176,7 @@ struct AISlidesPipeline {
         themed.theme = themeSelection.theme.id
         themed.slides = themed.slides.map { slide in
             var copy = slide
-            copy.backgroundColorHex = themeSelection.theme.gradient.first?.replacingOccurrences(of: "#", with: "") ?? "0F172A"
+            copy.backgroundColorHex = themeSelection.theme.gradient.first?.replacingOccurrences(of: "#", with: "") ?? defaultBackgroundHex
             return copy
         }
         return themed

@@ -55,7 +55,7 @@ struct AISlidesValidator {
             var output = element
             let kind = element.kind.lowercased()
             if kind == "image", (element.text?.isEmpty ?? true), (element.caption?.isEmpty ?? true) {
-                return nil
+                output.caption = "Image"
             }
             if let bullets = element.bullets {
                 output.bullets = bullets

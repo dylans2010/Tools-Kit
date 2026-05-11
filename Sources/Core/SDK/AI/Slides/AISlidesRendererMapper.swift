@@ -22,7 +22,7 @@ struct AISlidesRendererMapper {
             model.width = max(160, min(760, model.width))
             model.height = max(40, min(300, model.height))
 
-            if let textURL = item.text, kind == .image, !textURL.hasPrefix("data://"), let url = URL(string: textURL), url.scheme != nil {
+            if let textURL = item.text, kind == .image, !textURL.hasPrefix("upload://"), let url = URL(string: textURL), url.scheme != nil {
                 model.imageURL = url
                 model.caption = item.caption ?? "Image"
             }

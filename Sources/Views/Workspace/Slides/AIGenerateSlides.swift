@@ -2,6 +2,7 @@ import SwiftUI
 import PhotosUI
 
 public struct AIGenerateSlides: View {
+    private let fallbackThemeGradient: [Color] = [.blue, .purple]
     @StateObject private var manager = AISlidesManager.shared
     @StateObject private var whiteboardStore = WhiteboardStore.shared
 
@@ -229,7 +230,7 @@ public struct AIGenerateSlides: View {
 
     private func gradientColors(for theme: SlideTheme) -> [Color] {
         let mapped = theme.gradient.compactMap { Color(hex: $0) }
-        return mapped.ifEmpty([.blue, .purple])
+        return mapped.ifEmpty(fallbackThemeGradient)
     }
 
     private func generate() {

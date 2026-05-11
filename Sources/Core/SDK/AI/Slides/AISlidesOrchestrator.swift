@@ -3,6 +3,8 @@ import Foundation
 @MainActor
 struct AISlidesOrchestrator {
     private let pipeline = AISlidesPipeline()
+    private let retryProgressBase = 0.35
+    private let retryProgressStep = 0.2
 
     func run(input: SlideInput, progress: @escaping (String, Double) -> Void) async -> SlideDeck {
         let maxAttempts = 2
@@ -15,7 +17,7 @@ struct AISlidesOrchestrator {
                 if attempt > maxAttempts {
                     break
                 }
-                progress("Retrying stage \(attempt)", min(0.95, 0.35 + (Double(attempt) * 0.2)))
+                progress("Retrying stage \(attempt)", min(0.95, retryProgressBase + (Double(attempt) * retryProgressStep)))
             }
         }
 

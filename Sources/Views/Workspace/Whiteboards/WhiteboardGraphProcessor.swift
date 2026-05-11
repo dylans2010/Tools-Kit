@@ -19,7 +19,7 @@ struct WhiteboardGraphProcessor {
         for node in board.nodes {
             guard !visited.contains(node.id) else { continue }
             let bfsNodes = bfs(start: node.id, adjacency: adjacency, visited: &visited)
-            let dfsNodes = dfs(start: node.id, adjacency: adjacency, excluding: visited)
+            let dfsNodes = dfs(start: node.id, adjacency: adjacency, excluding: [])
             let connected = bfsNodes.union(dfsNodes)
             let clusterNodes = board.nodes.filter { connected.contains($0.id) }
             let clusterEdges = board.edges.filter { connected.contains($0.fromNodeID) && connected.contains($0.toNodeID) }
