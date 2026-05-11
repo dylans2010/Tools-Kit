@@ -18,9 +18,13 @@ struct WhiteboardGraphProcessor {
 
         for node in board.nodes {
             guard !visited.contains(node.id) else { continue }
-            let bfsNodes = bfs(start: node.id, adjacency: adjacency, visited: &visited)
-            let dfsNodes = dfs(start: node.id, adjacency: adjacency, excluding: [])
-            let connected = bfsNodes.union(dfsNodes)
+            let connected: Set<UUID>
+            if node.type == .group {
+                connected = dfs(start: node.id, adjacency: adjacency, initialVisited: visited)
+                visited.formUnion(connected)
+            } else {
+                connected = bfs(start: node.id, adjacency: adjacency, visited: &visited)
+            }
             let clusterNodes = board.nodes.filter { connected.contains($0.id) }
             let clusterEdges = board.edges.filter { connected.contains($0.fromNodeID) && connected.contains($0.toNodeID) }
             let density = densityScore(nodeCount: clusterNodes.count, edgeCount: clusterEdges.count)
@@ -89,9 +93,9 @@ struct WhiteboardGraphProcessor {
         return group
     }
 
-    private func dfs(start: UUID, adjacency: [UUID: Set<UUID>], excluding visitedNodes: Set<UUID>) -> Set<UUID> {
+    private func dfs(start: UUID, adjacency: [UUID: Set<UUID>], initialVisited: Set<UUID>) -> Set<UUID> {
         var stack = [start]
-        var visited: Set<UUID> = visitedNodes
+        var visited: Set<UUID> = initialVisited
 
         while let current = stack.popLast() {
             if visited.contains(current) { continue }

@@ -229,8 +229,19 @@ public struct AIGenerateSlides: View {
     }
 
     private func gradientColors(for theme: SlideTheme) -> [Color] {
-        let mapped = theme.gradient.compactMap { Color(hex: $0) }
+        let mapped = theme.gradient.compactMap(colorFromHex)
         return mapped.ifEmpty(fallbackThemeGradient)
+    }
+
+    private func colorFromHex(_ hex: String) -> Color? {
+        var value = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        if value.hasPrefix("#") { value.removeFirst() }
+        guard value.count == 6, let intValue = Int(value, radix: 16) else { return nil }
+
+        let red = Double((intValue >> 16) & 0xFF) / 255.0
+        let green = Double((intValue >> 8) & 0xFF) / 255.0
+        let blue = Double(intValue & 0xFF) / 255.0
+        return Color(red: red, green: green, blue: blue)
     }
 
     private func generate() {

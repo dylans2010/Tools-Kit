@@ -41,9 +41,9 @@ struct AISlidesAssetResolver {
         for index in resolved.slides.indices {
             for eidx in resolved.slides[index].elements.indices where resolved.slides[index].elements[eidx].kind == .image {
                 var element = resolved.slides[index].elements[eidx]
+                let query = element.caption.isEmpty ? resolved.slides[index].title : element.caption
                 if element.imageURL == nil,
-                   let caption = element.caption.isEmpty ? nil : element.caption,
-                   let url = await imageService.resolveImage(for: caption ?? resolved.slides[index].title) {
+                   let url = await imageService.resolveImage(for: query) {
                     element.imageURL = url
                     resolved.slides[index].elements[eidx].imageURL = url
                 }
