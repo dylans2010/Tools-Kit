@@ -1985,7 +1985,7 @@
 		AS010000000000000000000F /* AISlidesImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesImageService.swift; sourceTree = "<group>"; };
 		AS0100000000000000000010 /* AISlidesCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesCache.swift; sourceTree = "<group>"; };
 		AS0100000000000000000011 /* AISlidesModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesModels.swift; sourceTree = "<group>"; };
-		AS0100000000000000000012 /* WorkspaceSDK+AISlides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSDK+AISlides.swift; sourceTree = "<group>"; };
+		AS0100000000000000000012 /* WorkspaceSDK+AISlides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WorkspaceSDK+AISlides.swift"; sourceTree = "<group>"; };
 		AS0100000000000000000013 /* AISlidesOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesOrchestrator.swift; sourceTree = "<group>"; };
 		AS0100000000000000000014 /* AISlidesMultiModelRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesMultiModelRouter.swift; sourceTree = "<group>"; };
 		AS0100000000000000000015 /* AISlidesThemeEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesThemeEngine.swift; sourceTree = "<group>"; };
