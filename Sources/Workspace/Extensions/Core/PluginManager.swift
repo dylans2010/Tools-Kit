@@ -139,6 +139,15 @@ final class PluginManager: ObservableObject {
         saveInstalled()
     }
 
+    func clearCache() {
+        for index in installedPlugins.indices {
+            installedPlugins[index].errorCount = 0
+            installedPlugins[index].executionCount = 0
+            installedPlugins[index].lastExecutedAt = nil
+        }
+        saveInstalled()
+    }
+
     // MARK: - Validation
 
     private func validatePluginForInstall(_ plugin: PluginDefinition) -> Bool {

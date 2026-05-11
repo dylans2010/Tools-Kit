@@ -53,7 +53,9 @@ public final class SDKWorkflowEngine: ObservableObject {
             runningWorkflows[workflowID]?.status = .running
 
             do {
-                try await executeStep(step, context: &runningWorkflows[workflowID]!)
+                var execution = runningWorkflows[workflowID]!
+                try await executeStep(step, context: &execution)
+                runningWorkflows[workflowID] = execution
                 runningWorkflows[workflowID]?.completedSteps.append(step.id)
             } catch {
                 runningWorkflows[workflowID]?.status = .failed

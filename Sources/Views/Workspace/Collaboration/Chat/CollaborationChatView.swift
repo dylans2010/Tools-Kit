@@ -62,7 +62,7 @@ struct CollaborationChatView: View {
                 } label: {
                     Image(systemName: "arrow.up.circle.fill")
                         .font(.title2)
-                        .foregroundStyle(newMessage.isEmpty ? .secondary : .blue)
+                        .foregroundStyle(newMessage.isEmpty ? Color.secondary : Color.blue)
                 }
                 .disabled(newMessage.isEmpty)
             }
