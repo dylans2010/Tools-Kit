@@ -8,6 +8,8 @@ struct GenerationModelsSlidesFramework {
     private let assetResolver = AISlidesAssetResolver()
     private let imageService = AISlidesImageService()
 
+    private let modelConfig = ModelConfigManager.shared
+
     init(aiService: AIService = .shared) {
         self.aiService = aiService
     }
@@ -18,7 +20,7 @@ struct GenerationModelsSlidesFramework {
         let rawJSON = try await aiService.generateStructuredJSON(
             prompt: prompt,
             jsonSchema: Self.genSlidesSchema,
-            preferredModel: "openrouter/reasoning",
+            preferredModel: modelConfig.effectiveReasoningModel(),
             systemPrompt: "You are a slide generation engine. Return ONLY JSON. No markdown. No explanation."
         )
         let decoded = try schemeDecoder.decode(rawJSON)

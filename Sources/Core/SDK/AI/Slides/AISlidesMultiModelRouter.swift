@@ -8,6 +8,7 @@ protocol AISlidesModelRouter {
 struct AISlidesMultiModelRouter: AISlidesModelRouter {
     private let promptBuilder = AISlidesPromptBuilder()
     private let decoder = AISlidesStrictDecoder()
+    private let modelConfig = ModelConfigManager.shared
 
     func plan(_ input: SlideInput) async throws -> SlidePlan {
         let context = [input.rawText, input.notes.joined(separator: "\n"), input.documents.joined(separator: "\n")]
@@ -18,7 +19,7 @@ struct AISlidesMultiModelRouter: AISlidesModelRouter {
         let json = try await AIService.shared.generateStructuredJSON(
             prompt: prompt,
             jsonSchema: AISlidesPipeline.planningSchema,
-            preferredModel: "openrouter/reasoning",
+            preferredModel: modelConfig.effectiveReasoningModel(),
             systemPrompt: "Return strict JSON only. Deterministic structure."
         )
 
@@ -42,7 +43,7 @@ struct AISlidesMultiModelRouter: AISlidesModelRouter {
         let json = try await AIService.shared.generateStructuredJSON(
             prompt: prompt,
             jsonSchema: AISlidesPipeline.contentSchema,
-            preferredModel: "openrouter/language",
+            preferredModel: modelConfig.effectiveLanguageModel(),
             systemPrompt: "Return strict JSON only."
         )
 
