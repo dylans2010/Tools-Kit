@@ -10,7 +10,9 @@ struct WhiteboardsHomeView: View {
             Section("Whiteboards") {
                 ForEach(store.boards) { board in
                     NavigationLink {
-                        WhiteboardCanvasView(board: board)
+                        Text("Whiteboard canvas is currently unavailable in this build.")
+                            .foregroundStyle(.secondary)
+                            .padding()
                     } label: {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(board.title)

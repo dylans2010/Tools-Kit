@@ -771,10 +771,13 @@ struct SlideEditorView: View {
         var el = SlideElement(kind: kind)
         el.x = 200; el.y = 200
         switch kind {
-        case .text:
+        case .text, .bullets:
             el.width = 280; el.height = 80; el.text = "New Text"; el.textColor = "FFFFFF"; el.fontSize = 28
         case .image:
             el.width = 260; el.height = 180
+        case .chart:
+            el.width = 320; el.height = 220
+            el.chartData = SlideElement.ChartData(title: "Chart", labels: ["A", "B", "C"], values: [40, 30, 20])
         case .shape:
             el.width = 140; el.height = 100; el.fillColor = "3B82F6"
         }
@@ -955,7 +958,7 @@ private struct CanvasElementView: View {
     @ViewBuilder
     private var elementContent: some View {
         switch element.kind {
-        case .text:
+        case .text, .bullets:
             Text(element.text)
                 .font(.system(size: element.fontSize, weight: element.fontWeight == "bold" ? .bold : .regular))
                 .foregroundColor(Color(hex: element.textColor) ?? .white)
@@ -978,6 +981,19 @@ private struct CanvasElementView: View {
                 .frame(width: element.width, height: element.height)
                 .cornerRadius(8)
             }
+        case .chart:
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.white.opacity(0.16))
+                VStack(spacing: 6) {
+                    Image(systemName: "chart.bar.fill")
+                        .foregroundStyle(.white)
+                    Text(element.chartData?.title ?? "Chart")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white)
+                }
+            }
+            .frame(width: element.width, height: element.height)
         case .shape:
             shapeView
         }

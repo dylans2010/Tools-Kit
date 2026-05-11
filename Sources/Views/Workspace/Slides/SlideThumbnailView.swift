@@ -33,7 +33,7 @@ struct SlideThumbnailView: View {
     @ViewBuilder
     private func elementPreview(_ el: SlideElement) -> some View {
         switch el.kind {
-        case .text:
+        case .text, .bullets:
             Text(el.text)
                 .font(.system(size: el.fontSize * 0.3))
                 .foregroundColor(Color(hex: el.textColor) ?? .white)
@@ -50,6 +50,15 @@ struct SlideThumbnailView: View {
                     .foregroundColor(.white.opacity(0.5))
                     .frame(width: el.width * 0.3, height: el.height * 0.3)
             }
+        case .chart:
+            ZStack {
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color.white.opacity(0.18))
+                Image(systemName: "chart.bar.fill")
+                    .font(.caption)
+                    .foregroundStyle(.white)
+            }
+            .frame(width: el.width * 0.3, height: el.height * 0.3)
         case .shape:
             shapePreview(el)
         }

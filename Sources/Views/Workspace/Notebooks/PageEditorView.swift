@@ -134,7 +134,9 @@ struct PageEditorView: View {
                 .presentationDetents([.medium])
         }
         .sheet(isPresented: $showingVersionHistory) {
-            NotebookVersionHistoryView()
+            Text("Version history is currently unavailable in this build.")
+                .foregroundStyle(.secondary)
+                .padding()
                 .presentationDetents([.large])
         }
         .sheet(isPresented: $showingCitations) {

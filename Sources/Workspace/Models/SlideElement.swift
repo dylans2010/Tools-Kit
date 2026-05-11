@@ -13,7 +13,7 @@ public struct SlideElement: Codable, Identifiable, Equatable {
         }
     }
 
-    var id: UUID = UUID()
+    public var id: UUID = UUID()
     var kind: ElementKind
     var x: Double = 100
     var y: Double = 100
