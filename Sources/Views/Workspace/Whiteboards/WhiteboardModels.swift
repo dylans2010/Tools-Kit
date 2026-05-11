@@ -2,17 +2,19 @@ import Foundation
 import CoreGraphics
 
 public enum WhiteboardNodeType: String, Codable, CaseIterable {
-    case concept
-    case evidence
-    case action
-    case risk
+    case text
+    case idea
+    case task
+    case image
+    case group
 
     var importanceWeight: Double {
         switch self {
-        case .concept: return 1.0
-        case .evidence: return 1.2
-        case .action: return 1.5
-        case .risk: return 1.4
+        case .text: return 1.0
+        case .idea: return 1.35
+        case .task: return 1.45
+        case .image: return 1.1
+        case .group: return 1.25
         }
     }
 }
@@ -25,7 +27,7 @@ public struct WhiteboardNode: Identifiable, Codable, Hashable {
     public var positionX: Double
     public var positionY: Double
 
-    public init(id: UUID = UUID(), title: String, content: String, type: WhiteboardNodeType = .concept, positionX: Double = 120, positionY: Double = 120) {
+    public init(id: UUID = UUID(), title: String, content: String, type: WhiteboardNodeType = .idea, positionX: Double = 120, positionY: Double = 120) {
         self.id = id
         self.title = title
         self.content = content
@@ -75,9 +77,9 @@ final class WhiteboardStore: ObservableObject {
                 WhiteboardBoard(
                     title: "New Strategy Board",
                     nodes: [
-                        WhiteboardNode(title: "Vision", content: "One sentence product vision", type: .concept, positionX: 140, positionY: 120),
-                        WhiteboardNode(title: "Evidence", content: "Customer interviews and support tickets", type: .evidence, positionX: 320, positionY: 240),
-                        WhiteboardNode(title: "Action", content: "Prioritize onboarding improvements", type: .action, positionX: 520, positionY: 120)
+                        WhiteboardNode(title: "Vision", content: "One sentence product vision", type: .idea, positionX: 140, positionY: 120),
+                        WhiteboardNode(title: "Evidence", content: "Customer interviews and support tickets", type: .text, positionX: 320, positionY: 240),
+                        WhiteboardNode(title: "Action", content: "Prioritize onboarding improvements", type: .task, positionX: 520, positionY: 120)
                     ],
                     edges: []
                 )

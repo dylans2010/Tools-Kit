@@ -3,6 +3,7 @@ import SwiftUI
 struct SlidesHomeView: View {
     @StateObject private var manager = SlideDecksManager.shared
     @State private var showingCreate = false
+    @State private var showingAIGenerateSheet = false
     @State private var deckTitle = ""
 
     var body: some View {
@@ -35,17 +36,24 @@ struct SlidesHomeView: View {
         .navigationTitle("Slides")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
-                NavigationLink {
-                    AIGenerateSlides()
+                Button {
+                    showingAIGenerateSheet = true
                 } label: {
-                    Label("AI Generate", systemImage: "sparkles")
+                    Label("Create AI Slides", systemImage: "sparkles")
                 }
+
                 Button {
                     showingCreate = true
                 } label: {
                     Image(systemName: "plus")
                 }
             }
+        }
+        .sheet(isPresented: $showingAIGenerateSheet) {
+            NavigationStack {
+                AIGenerateSlides()
+            }
+            .presentationDetents([.large])
         }
         .alert("Create Deck", isPresented: $showingCreate) {
             TextField("Deck title", text: $deckTitle)

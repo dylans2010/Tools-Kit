@@ -4,13 +4,15 @@ struct AISlidesPromptBuilder {
     func planningPrompt(context: String, input: SlideInput) -> String {
         """
         Build only a slide plan as strict JSON.
-        No slide content text and no paragraphs.
+        No slide body text, no markdown, no prose.
         Provide exactly \(input.slideCount) slides.
         Include `type`, `intent`, and `layout` for each slide.
 
         Tone: \(input.tone.rawValue)
         Audience: \(input.audience.rawValue)
         Visual density: \(input.visualDensity.rawValue)
+        Preferred theme: \(input.preferredThemeID ?? "auto")
+        Preferred style: \(input.preferredStyleID ?? "auto")
 
         Context:
         \(context)
@@ -20,8 +22,7 @@ struct AISlidesPromptBuilder {
     func visualPrompt(plan: SlidePlan, context: String, includeImages: Bool) -> String {
         """
         Enrich the slide plan with visuals as strict JSON.
-        For each slide decide if a visual is needed.
-        Must output `requires_visual` and either `image_query` or `chart_spec` when visual is required.
+        For each slide output `requires_visual` and either `image_query` or `chart_spec`.
         includeImages: \(includeImages)
 
         Slide plan:
@@ -39,8 +40,7 @@ struct AISlidesPromptBuilder {
         - max 6 bullets per slide
         - max 12 words per bullet
         - titles max 8 words
-        - no paragraphs
-        - no repetition
+        - avoid repetition
 
         Tone: \(input.tone.rawValue)
         Audience: \(input.audience.rawValue)

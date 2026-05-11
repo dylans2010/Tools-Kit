@@ -63,7 +63,7 @@ struct WhiteboardCanvasView: View {
             WhiteboardNode(
                 title: nodeTitle,
                 content: nodeContent,
-                type: .concept,
+                type: .idea,
                 positionX: 120 + (base * 80).truncatingRemainder(dividingBy: 600),
                 positionY: 120 + (base * 60).truncatingRemainder(dividingBy: 400)
             )

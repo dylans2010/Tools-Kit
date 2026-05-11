@@ -2,38 +2,43 @@ import Foundation
 
 @MainActor
 struct AISlidesPipeline {
+    private let defaultBackgroundHex = "0F172A"
     private let promptBuilder = AISlidesPromptBuilder()
     private let decoder = AISlidesDecoder()
     private let validator = AISlidesValidator()
     private let mapper = AISlidesRendererMapper()
     private let imageService = AISlidesImageService()
     private let cache = AISlidesCache.shared
+    private let router: AISlidesModelRouter = AISlidesMultiModelRouter()
+    private let themeEngine = AISlidesThemeEngine()
+    private let assetResolver = AISlidesAssetResolver()
 
-    func run(input: SlideInput, progress: @escaping (String, Double) -> Void) async -> SlideDeck {
-        do {
-            progress("Extracting context", 0.1)
-            let context = try await extractContext(input: input)
+    func run(input: SlideInput, progress: @escaping (String, Double) -> Void) async throws -> SlideDeck {
+        progress("Extracting context", 0.1)
+        let context = try await extractContext(input: input)
 
-            progress("Generating plan", 0.25)
-            let plan = try await generateSlidePlan(context: context, input: input)
+        progress("Generating slide plan", 0.24)
+        let plan = try await generateSlidePlan(context: context, input: input)
 
-            progress("Adding visuals", 0.4)
-            let visuals = try await enrichWithVisuals(plan: plan, context: context, input: input)
+        progress("Enriching visuals", 0.38)
+        let visuals = try await enrichWithVisuals(plan: plan, context: context, input: input)
 
-            progress("Generating content", 0.6)
-            let content = try await generateContent(plan: plan, visuals: visuals, context: context, input: input)
+        progress("Generating content", 0.55)
+        let content = try await generateContent(plan: plan, visuals: visuals, context: context, input: input)
 
-            progress("Validating", 0.75)
-            let validated = validate(content: content)
+        progress("Validating output", 0.70)
+        let validated = validator.validate(content: content, input: input)
 
-            progress("Resolving assets", 0.9)
-            let resolved = await resolveAssets(content: validated, visuals: visuals)
+        progress("Resolving assets", 0.84)
+        let resolved = await resolveAssets(content: validated, visuals: visuals, input: input)
+        let draftDeck = buildDraftDeck(content: resolved, visuals: visuals, input: input)
+        let preloadedDeck = await assetResolver.resolveAssets(for: draftDeck)
 
-            progress("Building deck", 1.0)
-            return buildSlideDeck(content: resolved, visuals: visuals)
-        } catch {
-            return fallbackDeck(from: input)
-        }
+        progress("Finalizing deck", 0.95)
+        let deck = finalizeDeck(deck: preloadedDeck, input: input)
+
+        progress("Optimizing", 1.0)
+        return (try? await router.optimize(deck)) ?? deck
     }
 
     func extractContext(input: SlideInput) async throws -> String {
@@ -41,8 +46,9 @@ struct AISlidesPipeline {
         let nodesSummary = input.whiteboardNodes.map { "[\($0.type.rawValue)] \($0.title): \($0.content)" }.joined(separator: "\n")
         let notesSummary = input.notes.joined(separator: "\n")
         let docsSummary = input.documents.joined(separator: "\n")
+        let imageSummary = input.uploadedImages.map(\.fileName).joined(separator: ", ")
 
-        return [input.rawText, notesSummary, whiteboardSummary, nodesSummary, docsSummary]
+        return [input.rawText, notesSummary, whiteboardSummary, nodesSummary, docsSummary, imageSummary]
             .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
             .joined(separator: "\n\n")
     }
@@ -56,13 +62,19 @@ struct AISlidesPipeline {
         } else {
             json = try await AIService.shared.generateStructuredJSON(
                 prompt: prompt,
-                jsonSchema: planningSchema,
-                preferredModel: "openrouter/free",
-                systemPrompt: "Return strict JSON only. No markdown. No prose."
+                jsonSchema: Self.planningSchema,
+                preferredModel: "openrouter/reasoning",
+                systemPrompt: "Return strict JSON only. No markdown."
             )
             await cache.storeJSON(json, for: key)
         }
-        return try decoder.decodePlan(json)
+
+        do {
+            return try decoder.decodePlan(json)
+        } catch {
+            print("AISlidesPipeline decodePlan fallback: \(error)")
+            return try await router.plan(input)
+        }
     }
 
     func enrichWithVisuals(plan: SlidePlan, context: String, input: SlideInput) async throws -> VisualPlan {
@@ -74,8 +86,8 @@ struct AISlidesPipeline {
         } else {
             json = try await AIService.shared.generateStructuredJSON(
                 prompt: prompt,
-                jsonSchema: visualSchema,
-                preferredModel: "openrouter/free",
+                jsonSchema: Self.visualSchema,
+                preferredModel: "openrouter/vision",
                 systemPrompt: "Return strict JSON only."
             )
             await cache.storeJSON(json, for: key)
@@ -92,8 +104,8 @@ struct AISlidesPipeline {
         } else {
             json = try await AIService.shared.generateStructuredJSON(
                 prompt: prompt,
-                jsonSchema: contentSchema,
-                preferredModel: "openrouter/free",
+                jsonSchema: Self.contentSchema,
+                preferredModel: "openrouter/language",
                 systemPrompt: "Return strict JSON only."
             )
             await cache.storeJSON(json, for: key)
@@ -101,11 +113,7 @@ struct AISlidesPipeline {
         return try decoder.decodeContent(json)
     }
 
-    func validate(content: SlideContentPayload) -> SlideContentPayload {
-        validator.validate(content)
-    }
-
-    func resolveAssets(content: SlideContentPayload, visuals: VisualPlan) async -> SlideContentPayload {
+    func resolveAssets(content: SlideContentPayload, visuals: VisualPlan, input: SlideInput) async -> SlideContentPayload {
         var resolved = content
 
         for slideIndex in resolved.slides.indices {
@@ -123,10 +131,16 @@ struct AISlidesPipeline {
             }
         }
 
+        for (idx, image) in input.uploadedImages.enumerated() where idx < resolved.slides.count {
+            var element = SlideContentPayload.ContentSlide.ContentElement(kind: "image", text: nil, bullets: nil, caption: image.fileName, chartTitle: nil, chartLabels: nil, chartValues: nil)
+            element.text = "upload://\(image.fileName)"
+            resolved.slides[idx].elements.insert(element, at: 0)
+        }
+
         return resolved
     }
 
-    func buildSlideDeck(content: SlideContentPayload, visuals: VisualPlan) -> SlideDeck {
+    private func buildDraftDeck(content: SlideContentPayload, visuals: VisualPlan, input: SlideInput) -> SlideDeck {
         let slides = content.slides.map { slide -> Slide in
             var model = Slide(
                 type: slide.type,
@@ -135,129 +149,126 @@ struct AISlidesPipeline {
                 elements: mapper.mapElements(slide.elements, visuals: visuals.slides.first(where: { $0.index == slide.index })),
                 metadata: slide.metadata
             )
-            model.backgroundColorHex = "0F172A"
+            model.backgroundColorHex = defaultBackgroundHex
             return model
         }
 
-        return SlideDeck(
+        var deck = SlideDeck(
             title: content.title,
             theme: content.theme,
-            slides: slides.isEmpty ? [bulletFallbackSlide(title: content.title)] : slides,
+            slides: slides.isEmpty ? [Slide.blank(title: "Overview")] : slides,
             createdAt: Date(),
             updatedAt: Date()
         )
-    }
 
-    private func fallbackDeck(from input: SlideInput) -> SlideDeck {
-        var deck = SlideDeck(title: input.rawText.isEmpty ? "AI Slides" : input.rawText)
-        deck.theme = "fallback"
-        deck.slides = [bulletFallbackSlide(title: deck.title)]
+        for (idx, image) in input.uploadedImages.enumerated() where idx < deck.slides.count {
+            if let data = Data(base64Encoded: image.dataBase64) {
+                deck.slides[idx].backgroundImageData = data
+            }
+        }
+
         return deck
     }
 
-    private func bulletFallbackSlide(title: String) -> Slide {
-        var bullets = SlideElement(kind: .bullets)
-        bullets.bullets = [
-            "Goal: \(String(title.split(separator: " ").prefix(6).joined(separator: " ")))",
-            "AI fallback mode enabled",
-            "Review source notes and whiteboards"
-        ]
-        return Slide(type: "bullet", title: "Overview", layout: "verticalList", elements: [bullets], metadata: ["fallback": "true"])
+    func finalizeDeck(deck: SlideDeck, input: SlideInput) -> SlideDeck {
+        let themeSelection = themeEngine.resolveSelection(input: input, isThemeScopeEnabled: WorkspaceSDKAI().isThemeScopeEnabled)
+        var themed = deck.withTheme(themeSelection.theme, style: themeSelection.style)
+        themed.theme = themeSelection.theme.id
+        themed.slides = themed.slides.map { slide in
+            var copy = slide
+            copy.backgroundColorHex = themeSelection.theme.gradient.first?.replacingOccurrences(of: "#", with: "") ?? defaultBackgroundHex
+            return copy
+        }
+        return themed
     }
 
-    private var planningSchema: String {
-        """
-        {
-          "type": "object",
-          "required": ["title", "theme", "slides"],
-          "properties": {
-            "title": { "type": "string" },
-            "theme": { "type": "string" },
-            "slides": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": ["index", "type", "intent", "layout"],
-                "properties": {
-                  "index": { "type": "integer" },
-                  "type": { "type": "string" },
-                  "intent": { "type": "string" },
-                  "layout": { "type": "string" }
-                }
-              }
+    static let planningSchema = """
+    {
+      "type": "object",
+      "required": ["title", "theme", "slides"],
+      "properties": {
+        "title": { "type": "string" },
+        "theme": { "type": "string" },
+        "slides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["index", "type", "intent", "layout"],
+            "properties": {
+              "index": { "type": "integer" },
+              "type": { "type": "string" },
+              "intent": { "type": "string" },
+              "layout": { "type": "string" }
             }
           }
         }
-        """
+      }
     }
+    """
 
-    private var visualSchema: String {
-        """
-        {
-          "type": "object",
-          "required": ["slides"],
-          "properties": {
-            "slides": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": ["index", "requires_visual"],
-                "properties": {
-                  "index": { "type": "integer" },
-                  "requires_visual": { "type": "boolean" },
-                  "image_query": { "type": ["string", "null"] },
-                  "chart_spec": { "type": ["string", "null"] }
-                }
-              }
+    static let visualSchema = """
+    {
+      "type": "object",
+      "required": ["slides"],
+      "properties": {
+        "slides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["index", "requires_visual"],
+            "properties": {
+              "index": { "type": "integer" },
+              "requires_visual": { "type": "boolean" },
+              "image_query": { "type": ["string", "null"] },
+              "chart_spec": { "type": ["string", "null"] }
             }
           }
         }
-        """
+      }
     }
+    """
 
-    private var contentSchema: String {
-        """
-        {
-          "type": "object",
-          "required": ["title", "theme", "slides"],
-          "properties": {
-            "title": { "type": "string" },
-            "theme": { "type": "string" },
-            "slides": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": ["index", "title", "type", "layout", "elements", "metadata"],
-                "properties": {
-                  "index": { "type": "integer" },
-                  "title": { "type": "string" },
-                  "type": { "type": "string" },
-                  "layout": { "type": "string" },
-                  "elements": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "required": ["kind"],
-                      "properties": {
-                        "kind": { "type": "string" },
-                        "text": { "type": ["string", "null"] },
-                        "bullets": { "type": ["array", "null"], "items": { "type": "string" } },
-                        "caption": { "type": ["string", "null"] },
-                        "chart_title": { "type": ["string", "null"] },
-                        "chart_labels": { "type": ["array", "null"], "items": { "type": "string" } },
-                        "chart_values": { "type": ["array", "null"], "items": { "type": "number" } }
-                      }
-                    }
-                  },
-                  "metadata": {
-                    "type": "object",
-                    "additionalProperties": { "type": "string" }
+    static let contentSchema = """
+    {
+      "type": "object",
+      "required": ["title", "theme", "slides"],
+      "properties": {
+        "title": { "type": "string" },
+        "theme": { "type": "string" },
+        "slides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["index", "title", "type", "layout", "elements", "metadata"],
+            "properties": {
+              "index": { "type": "integer" },
+              "title": { "type": "string" },
+              "type": { "type": "string" },
+              "layout": { "type": "string" },
+              "elements": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["kind"],
+                  "properties": {
+                    "kind": { "type": "string" },
+                    "text": { "type": ["string", "null"] },
+                    "bullets": { "type": ["array", "null"], "items": { "type": "string" } },
+                    "caption": { "type": ["string", "null"] },
+                    "chart_title": { "type": ["string", "null"] },
+                    "chart_labels": { "type": ["array", "null"], "items": { "type": "string" } },
+                    "chart_values": { "type": ["array", "null"], "items": { "type": "number" } }
                   }
                 }
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": { "type": "string" }
               }
             }
           }
         }
-        """
+      }
     }
+    """
 }

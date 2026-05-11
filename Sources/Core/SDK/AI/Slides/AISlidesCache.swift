@@ -5,6 +5,7 @@ actor AISlidesCache {
 
     private var textCache: [String: String] = [:]
     private var imageCache: [String: URL] = [:]
+    private var imageDataCache: [String: Data] = [:]
 
     private init() {}
 
@@ -22,6 +23,14 @@ actor AISlidesCache {
 
     func storeImageURL(_ value: URL, for key: String) {
         imageCache[key] = value
+    }
+
+    func cachedImageData(for key: String) -> Data? {
+        imageDataCache[key]
+    }
+
+    func storeImageData(_ value: Data, for key: String) {
+        imageDataCache[key] = value
     }
 
     static func hash(_ value: String) -> String {

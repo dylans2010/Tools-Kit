@@ -9,7 +9,7 @@ final class AISlidesManager: ObservableObject {
     @Published private(set) var progressValue: Double = 0
     @Published private(set) var latestDeck: SlideDeck?
 
-    private let pipeline = AISlidesPipeline()
+    private let orchestrator = AISlidesOrchestrator()
 
     private init() {}
 
@@ -18,7 +18,7 @@ final class AISlidesManager: ObservableObject {
         progressMessage = "Starting"
         progressValue = 0
 
-        let deck = await pipeline.run(input: input) { [weak self] message, value in
+        let deck = await orchestrator.run(input: input) { [weak self] message, value in
             guard let self else { return }
             self.progressMessage = message
             self.progressValue = value
@@ -33,8 +33,23 @@ final class AISlidesManager: ObservableObject {
 
 public struct WorkspaceSDKAI {
     public let slidesScope = AISlidesScope()
+    public let slidesThemeScope = AISlidesThemeScope()
 
     public init() {}
+
+    public var isThemeScopeEnabled: Bool {
+        let scopes = SDKScopeManager.shared.authorizedScopes
+        if scopes.isEmpty || scopes.contains("*") {
+            return true
+        }
+        if scopes.contains(slidesThemeScope.identifier) {
+            return true
+        }
+        if scopes.contains("sdk.AI.generateSlides.*") {
+            return true
+        }
+        return false
+    }
 
     @MainActor
     public func generateSlides(input: SlideInput) async -> SlideDeck {
