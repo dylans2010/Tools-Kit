@@ -1193,8 +1193,8 @@
 		PL02000000000000000000010C /* ConnectorScopeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000010C /* ConnectorScopeView.swift */; };
 		PL020000000000000000000005 /* PluginLimitedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000005 /* PluginLimitedView.swift */; };
 		PL020000000000000000000006 /* SecurityScopeApplicationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000006 /* SecurityScopeApplicationView.swift */; };
-		DV0200000000000000000001 /* WorkspaceAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000001 /* WorkspaceAPI.swift */; };
-		DV0200000000000000000002 /* SDKRuntimeEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000002 /* SDKRuntimeEngine.swift */; };
+		DV0200000000000000000101 /* WorkspaceAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000101 /* WorkspaceAPI.swift */; };
+		DV0200000000000000000102 /* SDKRuntimeEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000102 /* SDKRuntimeEngine.swift */; };
 		DV0200000000000000000003 /* SDKExecutionBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000003 /* SDKExecutionBridge.swift */; };
 		DV0200000000000000000004 /* SDKPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000004 /* SDKPermissionManager.swift */; };
 		DV0200000000000000000005 /* SDKSandboxEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000005 /* SDKSandboxEngine.swift */; };
@@ -2554,8 +2554,8 @@
 		PL010000000000000000000004 /* PluginSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/PluginSecurityView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000005 /* PluginLimitedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/PluginLimitedView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000006 /* SecurityScopeApplicationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security/SecurityScopeApplicationView.swift; sourceTree = "<group>"; };
-		DV0100000000000000000001 /* WorkspaceAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAPI.swift; sourceTree = "<group>"; };
-		DV0100000000000000000002 /* SDKRuntimeEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKRuntimeEngine.swift; sourceTree = "<group>"; };
+		DV0100000000000000000101 /* WorkspaceAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAPI.swift; sourceTree = "<group>"; };
+		DV0100000000000000000102 /* SDKRuntimeEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKRuntimeEngine.swift; sourceTree = "<group>"; };
 		DV0100000000000000000003 /* SDKExecutionBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKExecutionBridge.swift; sourceTree = "<group>"; };
 		DV0100000000000000000004 /* SDKPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPermissionManager.swift; sourceTree = "<group>"; };
 		DV0100000000000000000005 /* SDKSandboxEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKSandboxEngine.swift; sourceTree = "<group>"; };
@@ -5468,8 +5468,8 @@
 		7CD45F7AF64649DBADB0741C /* Legacy */ = {
 			isa = PBXGroup;
 			children = (
-				DV0100000000000000000001 /* WorkspaceAPI.swift */,
-				DV0100000000000000000002 /* SDKRuntimeEngine.swift */,
+				DV0100000000000000000101 /* WorkspaceAPI.swift */,
+				DV0100000000000000000102 /* SDKRuntimeEngine.swift */,
 				DV0100000000000000000003 /* SDKExecutionBridge.swift */,
 				DV0100000000000000000004 /* SDKPermissionManager.swift */,
 				DV0100000000000000000005 /* SDKSandboxEngine.swift */,
@@ -10661,8 +10661,8 @@
 				MS02A1B2C3D4E5F600000007 /* AppLockSessionView.swift in Sources */,
 				MS02A1B2C3D4E5F600000008 /* AppLockView.swift in Sources */,
 				MS02A1B2C3D4E5F600000009 /* SecureFolderItemPicker.swift in Sources */,
-				DV0200000000000000000001 /* WorkspaceAPI.swift in Sources */,
-				DV0200000000000000000002 /* SDKRuntimeEngine.swift in Sources */,
+				DV0200000000000000000101 /* WorkspaceAPI.swift in Sources */,
+				DV0200000000000000000102 /* SDKRuntimeEngine.swift in Sources */,
 				DV0200000000000000000003 /* SDKExecutionBridge.swift in Sources */,
 				DV0200000000000000000004 /* SDKPermissionManager.swift in Sources */,
 				DV0200000000000000000005 /* SDKSandboxEngine.swift in Sources */,
