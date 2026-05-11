@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 public struct AIGenerateSlides: View {
     @StateObject private var manager = AISlidesManager.shared
@@ -13,16 +14,24 @@ public struct AIGenerateSlides: View {
     @State private var audience: SlideAudience = .internal
     @State private var density: SlideVisualDensity = .medium
     @State private var includeImages = true
+    @State private var selectedThemeID = AIGenSlideCatalog.defaultThemeID
+    @State private var selectedStyleID = AIGenSlideCatalog.defaultStyleID
+    @State private var selectedImages: [PhotosPickerItem] = []
+    @State private var uploadedImages: [SlidePhotoAsset] = []
 
     @State private var generatedDeck: SlideDeck?
+
+    private var themesEnabled: Bool { WorkspaceSDKAI().isThemeScopeEnabled }
 
     public init() {}
 
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                GroupBox("Input") {
-                    VStack(spacing: 10) {
+                card {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Input")
+                            .font(.headline)
                         TextField("Topic or presentation goal", text: $rawText, axis: .vertical)
                             .lineLimit(2...5)
                         TextField("Notes (one per line)", text: $notes, axis: .vertical)
@@ -36,11 +45,36 @@ public struct AIGenerateSlides: View {
                                 Text(board.title).tag(UUID?.some(board.id))
                             }
                         }
+
+                        PhotosPicker(selection: $selectedImages, matching: .images) {
+                            Label("Import Photos", systemImage: "photo.on.rectangle.angled")
+                                .font(.subheadline.weight(.semibold))
+                        }
+                        .onChange(of: selectedImages) { _, newItems in
+                            Task {
+                                var assets: [SlidePhotoAsset] = []
+                                for (index, item) in newItems.enumerated() {
+                                    if let data = try? await item.loadTransferable(type: Data.self) {
+                                        assets.append(SlidePhotoAsset(fileName: "photo_\(index + 1).jpg", dataBase64: data.base64EncodedString()))
+                                    }
+                                }
+                                uploadedImages = assets
+                            }
+                        }
+
+                        if !uploadedImages.isEmpty {
+                            Text("\(uploadedImages.count) image(s) ready")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
 
-                GroupBox("Configuration") {
-                    VStack(spacing: 12) {
+                card {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Configuration")
+                            .font(.headline)
+
                         HStack {
                             Text("Slide Count")
                             Spacer()
@@ -62,10 +96,23 @@ public struct AIGenerateSlides: View {
                     }
                 }
 
+                if themesEnabled {
+                    card {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Themes")
+                                .font(.headline)
+                            themeGrid
+                            Text("Styles")
+                                .font(.headline)
+                            styleGrid
+                        }
+                    }
+                }
+
                 Button(action: generate) {
                     HStack {
                         Image(systemName: "sparkles")
-                        Text(manager.isGenerating ? "Generating..." : "Generate")
+                        Text(manager.isGenerating ? "Generating..." : "Generate Slides")
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -100,7 +147,7 @@ public struct AIGenerateSlides: View {
                                     }
                                     .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading)
                                     .padding(10)
-                                    .background(RoundedRectangle(cornerRadius: 10).fill(Color(.secondarySystemBackground)))
+                                    .background(RoundedRectangle(cornerRadius: 12).fill(.ultraThinMaterial))
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -110,7 +157,74 @@ public struct AIGenerateSlides: View {
             }
             .padding()
         }
+        .background(
+            LinearGradient(colors: [.indigo.opacity(0.20), .cyan.opacity(0.12)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                .ignoresSafeArea()
+        )
         .navigationTitle("AI Slides")
+    }
+
+    private var themeGrid: some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
+            ForEach(AIGenSlideCatalog.themes) { theme in
+                Button {
+                    selectedThemeID = theme.id
+                } label: {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(theme.name)
+                            .font(.subheadline.weight(.semibold))
+                        Text(theme.font)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(10)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        LinearGradient(colors: theme.gradient.compactMap(Color.init(hex:)).ifEmpty([.blue, .purple]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                            .opacity(0.82)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(selectedThemeID == theme.id ? Color.white : Color.white.opacity(0.22), lineWidth: selectedThemeID == theme.id ? 2 : 1)
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private var styleGrid: some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
+            ForEach(AIGenSlideCatalog.styles) { style in
+                Button {
+                    selectedStyleID = style.id
+                } label: {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(style.name)
+                            .font(.subheadline.weight(.semibold))
+                        Text(style.visualDensity.rawValue.capitalized)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(10)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(selectedStyleID == style.id ? Color.blue : Color.gray.opacity(0.35), lineWidth: selectedStyleID == style.id ? 2 : 1)
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private func card<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 8) { content() }
+            .padding(14)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private func generate() {
@@ -125,7 +239,10 @@ public struct AIGenerateSlides: View {
                 audience: audience,
                 slideCount: slideCount,
                 includeImages: includeImages,
-                density: density
+                density: density,
+                uploadedImages: uploadedImages,
+                preferredThemeID: themesEnabled ? selectedThemeID : nil,
+                preferredStyleID: themesEnabled ? selectedStyleID : nil
             )
         } else {
             input = SlideInput(
@@ -133,16 +250,25 @@ public struct AIGenerateSlides: View {
                 notes: notes.split(separator: "\n").map(String.init),
                 whiteboardNodes: [],
                 documents: documents.split(separator: "\n").map(String.init),
+                uploadedImages: uploadedImages,
                 tone: tone,
                 audience: audience,
                 slideCount: slideCount,
                 includeImages: includeImages,
-                visualDensity: density
+                visualDensity: density,
+                preferredThemeID: themesEnabled ? selectedThemeID : nil,
+                preferredStyleID: themesEnabled ? selectedStyleID : nil
             )
         }
 
         Task {
             generatedDeck = await manager.generate(input: input)
         }
+    }
+}
+
+private extension Array {
+    func ifEmpty(_ fallback: [Element]) -> [Element] {
+        isEmpty ? fallback : self
     }
 }

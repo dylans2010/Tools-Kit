@@ -18,7 +18,9 @@ struct WhiteboardGraphProcessor {
 
         for node in board.nodes {
             guard !visited.contains(node.id) else { continue }
-            let connected = bfs(start: node.id, adjacency: adjacency, visited: &visited)
+            let bfsNodes = bfs(start: node.id, adjacency: adjacency, visited: &visited)
+            let dfsNodes = dfs(start: node.id, adjacency: adjacency)
+            let connected = bfsNodes.union(dfsNodes)
             let clusterNodes = board.nodes.filter { connected.contains($0.id) }
             let clusterEdges = board.edges.filter { connected.contains($0.fromNodeID) && connected.contains($0.toNodeID) }
             let density = densityScore(nodeCount: clusterNodes.count, edgeCount: clusterEdges.count)
@@ -38,14 +40,27 @@ struct WhiteboardGraphProcessor {
 
     func buildSections(from board: WhiteboardBoard) -> [WhiteboardSlideSection] {
         cluster(board: board).map { cluster in
-            let titles = cluster.nodes.map(\.title).prefix(3).joined(separator: ", ")
+            let topic = extractTopic(from: cluster)
             let summary = cluster.nodes.map { $0.content }.prefix(4).joined(separator: " • ")
             return WhiteboardSlideSection(
-                title: titles.isEmpty ? "Topic" : titles,
+                title: topic,
                 summary: summary,
                 nodeIDs: cluster.nodes.map(\.id)
             )
         }
+    }
+
+    private func extractTopic(from cluster: WhiteboardGraphCluster) -> String {
+        let titleTokens = cluster.nodes
+            .map(\.title)
+            .flatMap { $0.split(separator: " ") }
+            .map(String.init)
+            .filter { $0.count > 2 }
+
+        guard !titleTokens.isEmpty else { return "Topic" }
+        let frequencies = Dictionary(grouping: titleTokens.map { $0.lowercased() }, by: { $0 }).mapValues(\.count)
+        let ranked = frequencies.sorted { $0.value > $1.value }.prefix(3).map(\.key)
+        return ranked.map { $0.capitalized }.joined(separator: " ")
     }
 
     private func adjacencyMap(edges: [WhiteboardEdge]) -> [UUID: Set<UUID>] {
@@ -72,6 +87,23 @@ struct WhiteboardGraphProcessor {
         }
 
         return group
+    }
+
+    private func dfs(start: UUID, adjacency: [UUID: Set<UUID>]) -> Set<UUID> {
+        var stack = [start]
+        var visited: Set<UUID> = []
+
+        while let current = stack.popLast() {
+            if visited.contains(current) { continue }
+            visited.insert(current)
+            for neighbor in adjacency[current] ?? [] {
+                if !visited.contains(neighbor) {
+                    stack.append(neighbor)
+                }
+            }
+        }
+
+        return visited
     }
 
     private func densityScore(nodeCount: Int, edgeCount: Int) -> Double {

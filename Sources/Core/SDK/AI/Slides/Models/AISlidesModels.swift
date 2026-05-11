@@ -12,6 +12,18 @@ public enum SlideVisualDensity: String, CaseIterable, Codable {
     case low, medium, high
 }
 
+public struct SlidePhotoAsset: Codable, Equatable, Identifiable {
+    public var id: UUID
+    public var fileName: String
+    public var dataBase64: String
+
+    public init(id: UUID = UUID(), fileName: String, dataBase64: String) {
+        self.id = id
+        self.fileName = fileName
+        self.dataBase64 = dataBase64
+    }
+}
+
 public struct WhiteboardSlideSection: Codable, Equatable {
     public var title: String
     public var summary: String
@@ -29,35 +41,44 @@ public struct SlideInput: Codable, Equatable {
     public var notes: [String]
     public var whiteboardNodes: [WhiteboardNode]
     public var documents: [String]
+    public var uploadedImages: [SlidePhotoAsset]
     public var tone: SlideTone
     public var audience: SlideAudience
     public var slideCount: Int
     public var includeImages: Bool
     public var visualDensity: SlideVisualDensity
     public var sections: [WhiteboardSlideSection]
+    public var preferredThemeID: String?
+    public var preferredStyleID: String?
 
     public init(
         rawText: String,
         notes: [String] = [],
         whiteboardNodes: [WhiteboardNode] = [],
         documents: [String] = [],
+        uploadedImages: [SlidePhotoAsset] = [],
         tone: SlideTone = .formal,
         audience: SlideAudience = .internal,
         slideCount: Int = 8,
         includeImages: Bool = true,
         visualDensity: SlideVisualDensity = .medium,
-        sections: [WhiteboardSlideSection] = []
+        sections: [WhiteboardSlideSection] = [],
+        preferredThemeID: String? = nil,
+        preferredStyleID: String? = nil
     ) {
         self.rawText = rawText
         self.notes = notes
         self.whiteboardNodes = whiteboardNodes
         self.documents = documents
+        self.uploadedImages = uploadedImages
         self.tone = tone
         self.audience = audience
         self.slideCount = max(5, min(15, slideCount))
         self.includeImages = includeImages
         self.visualDensity = visualDensity
         self.sections = sections
+        self.preferredThemeID = preferredThemeID
+        self.preferredStyleID = preferredStyleID
     }
 }
 
@@ -148,11 +169,4 @@ struct SlideContentPayload: Codable {
     var title: String
     var theme: String
     var slides: [ContentSlide]
-}
-
-struct PipelineContext {
-    var extractedContext: String
-    var plan: SlidePlan
-    var visualPlan: VisualPlan
-    var content: SlideContentPayload
 }

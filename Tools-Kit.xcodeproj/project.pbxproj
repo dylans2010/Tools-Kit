@@ -358,6 +358,19 @@
 		AS0200000000000000000010 /* AISlidesCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000010 /* AISlidesCache.swift */; };
 		AS0200000000000000000011 /* AISlidesModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000011 /* AISlidesModels.swift */; };
 		AS0200000000000000000012 /* WorkspaceSDK+AISlides.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000012 /* WorkspaceSDK+AISlides.swift */; };
+		AS0200000000000000000013 /* AISlidesOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000013 /* AISlidesOrchestrator.swift */; };
+		AS0200000000000000000014 /* AISlidesMultiModelRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000014 /* AISlidesMultiModelRouter.swift */; };
+		AS0200000000000000000015 /* AISlidesThemeEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000015 /* AISlidesThemeEngine.swift */; };
+		AS0200000000000000000016 /* AISlidesAssetResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000016 /* AISlidesAssetResolver.swift */; };
+		AS0200000000000000000017 /* AIGenSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000017 /* AIGenSlide.swift */; };
+		AS0200000000000000000018 /* UnsplashProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000018 /* UnsplashProvider.swift */; };
+		AS0200000000000000000019 /* PexelsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000019 /* PexelsProvider.swift */; };
+		AS020000000000000000001A /* AIImageFallbackProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000001A /* AIImageFallbackProvider.swift */; };
+		AS020000000000000000001B /* SlideModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000001B /* SlideModels.swift */; };
+		AS020000000000000000001C /* SlideThemeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000001C /* SlideThemeModels.swift */; };
+		AS020000000000000000001D /* SlideStyleModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000001D /* SlideStyleModels.swift */; };
+		AS020000000000000000001E /* SlideDeck+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000001E /* SlideDeck+Extensions.swift */; };
+		AS020000000000000000001F /* JSON+SlideParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000001F /* JSON+SlideParsing.swift */; };
 		WS020000000000000000000B /* ToolHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000B /* ToolHeaderView.swift */; };
 		WS020000000000000000000C /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000C /* CardView.swift */; };
 		WS020000000000000000000D /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000D /* EmptyStateView.swift */; };
@@ -1973,6 +1986,19 @@
 		AS0100000000000000000010 /* AISlidesCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesCache.swift; sourceTree = "<group>"; };
 		AS0100000000000000000011 /* AISlidesModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesModels.swift; sourceTree = "<group>"; };
 		AS0100000000000000000012 /* WorkspaceSDK+AISlides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSDK+AISlides.swift; sourceTree = "<group>"; };
+		AS0100000000000000000013 /* AISlidesOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesOrchestrator.swift; sourceTree = "<group>"; };
+		AS0100000000000000000014 /* AISlidesMultiModelRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesMultiModelRouter.swift; sourceTree = "<group>"; };
+		AS0100000000000000000015 /* AISlidesThemeEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesThemeEngine.swift; sourceTree = "<group>"; };
+		AS0100000000000000000016 /* AISlidesAssetResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesAssetResolver.swift; sourceTree = "<group>"; };
+		AS0100000000000000000017 /* AIGenSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIGenSlide.swift; sourceTree = "<group>"; };
+		AS0100000000000000000018 /* UnsplashProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnsplashProvider.swift; sourceTree = "<group>"; };
+		AS0100000000000000000019 /* PexelsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PexelsProvider.swift; sourceTree = "<group>"; };
+		AS010000000000000000001A /* AIImageFallbackProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIImageFallbackProvider.swift; sourceTree = "<group>"; };
+		AS010000000000000000001B /* SlideModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideModels.swift; sourceTree = "<group>"; };
+		AS010000000000000000001C /* SlideThemeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideThemeModels.swift; sourceTree = "<group>"; };
+		AS010000000000000000001D /* SlideStyleModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideStyleModels.swift; sourceTree = "<group>"; };
+		AS010000000000000000001E /* SlideDeck+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SlideDeck+Extensions.swift"; sourceTree = "<group>"; };
+		AS010000000000000000001F /* JSON+SlideParsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSON+SlideParsing.swift"; sourceTree = "<group>"; };
 		WS010000000000000000000B /* ToolHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolHeaderView.swift; sourceTree = "<group>"; };
 		WS010000000000000000000C /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		WS010000000000000000000D /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
@@ -5328,12 +5354,18 @@
 			children = (
 				AS0100000000000000000009 /* AISlidesManager.swift */,
 				AS010000000000000000000A /* AISlidesPipeline.swift */,
+				AS0100000000000000000013 /* AISlidesOrchestrator.swift */,
+				AS0100000000000000000014 /* AISlidesMultiModelRouter.swift */,
 				AS010000000000000000000B /* AISlidesPromptBuilder.swift */,
+				AS0100000000000000000015 /* AISlidesThemeEngine.swift */,
 				AS010000000000000000000C /* AISlidesDecoder.swift */,
 				AS010000000000000000000D /* AISlidesValidator.swift */,
 				AS010000000000000000000E /* AISlidesRendererMapper.swift */,
 				AS010000000000000000000F /* AISlidesImageService.swift */,
 				AS0100000000000000000010 /* AISlidesCache.swift */,
+				AS0100000000000000000016 /* AISlidesAssetResolver.swift */,
+				AS0100000000000000000017 /* AIGenSlide.swift */,
+				AS0300000000000000000006 /* AISlidesImageProviders */,
 				AS0300000000000000000004 /* Models */,
 				AS0300000000000000000005 /* Extensions */,
 			);
@@ -5344,6 +5376,9 @@
 			isa = PBXGroup;
 			children = (
 				AS0100000000000000000011 /* AISlidesModels.swift */,
+				AS010000000000000000001B /* SlideModels.swift */,
+				AS010000000000000000001C /* SlideThemeModels.swift */,
+				AS010000000000000000001D /* SlideStyleModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -5351,9 +5386,21 @@
 		AS0300000000000000000005 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				AS010000000000000000001E /* SlideDeck+Extensions.swift */,
+				AS010000000000000000001F /* JSON+SlideParsing.swift */,
 				AS0100000000000000000012 /* WorkspaceSDK+AISlides.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		AS0300000000000000000006 /* AISlidesImageProviders */ = {
+			isa = PBXGroup;
+			children = (
+				AS0100000000000000000018 /* UnsplashProvider.swift */,
+				AS0100000000000000000019 /* PexelsProvider.swift */,
+				AS010000000000000000001A /* AIImageFallbackProvider.swift */,
+			);
+			path = AISlidesImageProviders;
 			sourceTree = "<group>";
 		};
 		7C5DF82798754B3BB783A1A2 /* SchemaGenerator */ = {
@@ -9363,13 +9410,26 @@
 				SDK2BCBC6A79D8395B441E95 /* WorkspaceSDK.swift in Sources */,
 				AS0200000000000000000009 /* AISlidesManager.swift in Sources */,
 				AS020000000000000000000A /* AISlidesPipeline.swift in Sources */,
+				AS0200000000000000000013 /* AISlidesOrchestrator.swift in Sources */,
+				AS0200000000000000000014 /* AISlidesMultiModelRouter.swift in Sources */,
 				AS020000000000000000000B /* AISlidesPromptBuilder.swift in Sources */,
+				AS0200000000000000000015 /* AISlidesThemeEngine.swift in Sources */,
 				AS020000000000000000000C /* AISlidesDecoder.swift in Sources */,
 				AS020000000000000000000D /* AISlidesValidator.swift in Sources */,
 				AS020000000000000000000E /* AISlidesRendererMapper.swift in Sources */,
 				AS020000000000000000000F /* AISlidesImageService.swift in Sources */,
 				AS0200000000000000000010 /* AISlidesCache.swift in Sources */,
+				AS0200000000000000000016 /* AISlidesAssetResolver.swift in Sources */,
+				AS0200000000000000000017 /* AIGenSlide.swift in Sources */,
+				AS0200000000000000000018 /* UnsplashProvider.swift in Sources */,
+				AS0200000000000000000019 /* PexelsProvider.swift in Sources */,
+				AS020000000000000000001A /* AIImageFallbackProvider.swift in Sources */,
 				AS0200000000000000000011 /* AISlidesModels.swift in Sources */,
+				AS020000000000000000001B /* SlideModels.swift in Sources */,
+				AS020000000000000000001C /* SlideThemeModels.swift in Sources */,
+				AS020000000000000000001D /* SlideStyleModels.swift in Sources */,
+				AS020000000000000000001E /* SlideDeck+Extensions.swift in Sources */,
+				AS020000000000000000001F /* JSON+SlideParsing.swift in Sources */,
 				AS0200000000000000000012 /* WorkspaceSDK+AISlides.swift in Sources */,
 				SDK2A5F819C6A67BDEA76CFF /* SDKHomeView.swift in Sources */,
 				SDK2CA3D485CF82F8AE6A768 /* SDKAPIExplorerView.swift in Sources */,

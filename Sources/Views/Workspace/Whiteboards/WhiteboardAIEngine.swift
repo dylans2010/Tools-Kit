@@ -18,7 +18,18 @@ struct WhiteboardAIEngine {
         processor.buildSections(from: board)
     }
 
-    func slideInput(from board: WhiteboardBoard, rawText: String, tone: SlideTone, audience: SlideAudience, slideCount: Int, includeImages: Bool, density: SlideVisualDensity) -> SlideInput {
+    func slideInput(
+        from board: WhiteboardBoard,
+        rawText: String,
+        tone: SlideTone,
+        audience: SlideAudience,
+        slideCount: Int,
+        includeImages: Bool,
+        density: SlideVisualDensity,
+        uploadedImages: [SlidePhotoAsset] = [],
+        preferredThemeID: String? = nil,
+        preferredStyleID: String? = nil
+    ) -> SlideInput {
         let expandedNodes = expandNodes(board.nodes)
         let sectionBoard = WhiteboardBoard(id: board.id, title: board.title, nodes: expandedNodes, edges: board.edges, updatedAt: board.updatedAt)
         let sections = summarizeClusters(board: sectionBoard)
@@ -28,12 +39,15 @@ struct WhiteboardAIEngine {
             notes: sections.map(\.summary),
             whiteboardNodes: expandedNodes,
             documents: [],
+            uploadedImages: uploadedImages,
             tone: tone,
             audience: audience,
             slideCount: slideCount,
             includeImages: includeImages,
             visualDensity: density,
-            sections: sections
+            sections: sections,
+            preferredThemeID: preferredThemeID,
+            preferredStyleID: preferredStyleID
         )
     }
 }

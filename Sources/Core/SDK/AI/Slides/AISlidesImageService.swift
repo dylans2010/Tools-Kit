@@ -1,36 +1,38 @@
 import Foundation
 
+protocol AISlidesImageProvider {
+    func imageURL(for query: String) async -> URL?
+}
+
 struct AISlidesImageService {
     private let cache = AISlidesCache.shared
+    private let providers: [AISlidesImageProvider] = [
+        UnsplashProvider(),
+        PexelsProvider(),
+        AIImageFallbackProvider()
+    ]
 
     func resolveImage(for query: String) async -> URL? {
-        let key = AISlidesCache.hash(query)
+        let normalizedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalizedQuery.isEmpty else { return nil }
+
+        let key = AISlidesCache.hash(normalizedQuery)
         if let cached = await cache.cachedImageURL(for: key) {
             return cached
         }
 
-        if let searched = await searchAPIImage(query: query) {
-            await cache.storeImageURL(searched, for: key)
-            return searched
+        for provider in providers {
+            if let candidate = await provider.imageURL(for: normalizedQuery) {
+                await cache.storeImageURL(candidate, for: key)
+                await cache.storeImageURL(candidate, for: "fallback_\(key)")
+                return candidate
+            }
         }
 
-        if let fallback = await generateAIImage(query: query) {
-            await cache.storeImageURL(fallback, for: key)
-            return fallback
+        if let cachedFallback = await cache.cachedImageURL(for: "fallback_\(key)") {
+            return cachedFallback
         }
 
         return nil
-    }
-
-    private func searchAPIImage(query: String) async -> URL? {
-        var components = URLComponents(string: "https://source.unsplash.com/featured")
-        components?.queryItems = [URLQueryItem(name: "query", value: query)]
-        guard let url = components?.url else { return nil }
-        return url
-    }
-
-    private func generateAIImage(query: String) async -> URL? {
-        let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "presentation"
-        return URL(string: "https://dummyimage.com/1280x720/0f172a/ffffff.png&text=\(encoded)")
     }
 }
