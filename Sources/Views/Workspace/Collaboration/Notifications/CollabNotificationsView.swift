@@ -5,7 +5,7 @@ struct CollabNotificationsView: View {
     @State private var filterType: NotificationType?
     @State private var showUnreadOnly = false
 
-    var filteredNotifications: [CollabNotification] {
+    fileprivate var filteredNotifications: [CollabNotification] {
         notifications.filter { n in
             let matchesType = filterType == nil || n.type == filterType
             let matchesRead = !showUnreadOnly || !n.isRead

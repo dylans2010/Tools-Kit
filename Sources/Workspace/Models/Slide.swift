@@ -9,6 +9,8 @@ public struct Slide: Codable, Identifiable, Equatable {
     var backgroundImageData: Data?
     var elements: [SlideElement] = []
     var metadata: [String: String] = [:]
+    var bullets: [String] = []
+    var speakerNotes: String?
 
     static func blank(title: String = "New Slide") -> Slide {
         Slide(title: title)
@@ -23,6 +25,8 @@ public struct Slide: Codable, Identifiable, Equatable {
         case backgroundImageData
         case elements
         case metadata
+        case bullets
+        case speakerNotes
     }
 
     public init(
@@ -33,7 +37,9 @@ public struct Slide: Codable, Identifiable, Equatable {
         backgroundColorHex: String = "1E3A5F",
         backgroundImageData: Data? = nil,
         elements: [SlideElement] = [],
-        metadata: [String: String] = [:]
+        metadata: [String: String] = [:],
+        bullets: [String] = [],
+        speakerNotes: String? = nil
     ) {
         self.id = id
         self.type = type
@@ -43,6 +49,8 @@ public struct Slide: Codable, Identifiable, Equatable {
         self.backgroundImageData = backgroundImageData
         self.elements = elements
         self.metadata = metadata
+        self.bullets = bullets
+        self.speakerNotes = speakerNotes
     }
 
     public init(from decoder: Decoder) throws {
@@ -55,5 +63,7 @@ public struct Slide: Codable, Identifiable, Equatable {
         backgroundImageData = try container.decodeIfPresent(Data.self, forKey: .backgroundImageData)
         elements = try container.decodeIfPresent([SlideElement].self, forKey: .elements) ?? []
         metadata = try container.decodeIfPresent([String: String].self, forKey: .metadata) ?? [:]
+        bullets = try container.decodeIfPresent([String].self, forKey: .bullets) ?? []
+        speakerNotes = try container.decodeIfPresent(String.self, forKey: .speakerNotes)
     }
 }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CollaborationChatView: View {
-    @State private var messages: [ChatMessage] = []
+    @State private var messages: [CollabChatMessage] = []
     @State private var newMessage = ""
     @State private var selectedChannel: ChatChannel = .general
 
@@ -72,7 +72,7 @@ struct CollaborationChatView: View {
         .task { loadMessages() }
     }
 
-    private func messageView(_ message: ChatMessage) -> some View {
+    private func messageView(_ message: CollabChatMessage) -> some View {
         HStack(alignment: .top, spacing: 8) {
             Image(systemName: "person.circle.fill")
                 .font(.title2)
@@ -105,7 +105,7 @@ struct CollaborationChatView: View {
     }
 
     private func sendMessage() {
-        messages.append(ChatMessage(author: "You", text: newMessage, channel: selectedChannel, timestamp: Date()))
+        messages.append(CollabChatMessage(author: "You", text: newMessage, channel: selectedChannel, timestamp: Date()))
         newMessage = ""
     }
 
@@ -114,7 +114,7 @@ struct CollaborationChatView: View {
     }
 }
 
-private struct ChatMessage: Identifiable {
+private struct CollabChatMessage: Identifiable {
     let id = UUID()
     let author: String
     let text: String

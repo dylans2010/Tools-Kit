@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ConnectorDataMappingView: View {
-    @State private var mappings: [DataMapping] = []
+    @State private var mappings: [ConnectorFieldMapping] = []
     @State private var showingCreateMapping = false
     @State private var sourceField = ""
     @State private var targetField = ""
@@ -92,7 +92,7 @@ struct ConnectorDataMappingView: View {
                     ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showingCreateMapping = false } }
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Add") {
-                            mappings.append(DataMapping(sourceField: sourceField, targetField: targetField, transform: transformType))
+                            mappings.append(ConnectorFieldMapping(sourceField: sourceField, targetField: targetField, transform: transformType))
                             sourceField = ""
                             targetField = ""
                             showingCreateMapping = false
@@ -105,7 +105,7 @@ struct ConnectorDataMappingView: View {
     }
 }
 
-private struct DataMapping: Identifiable {
+private struct ConnectorFieldMapping: Identifiable {
     let id = UUID()
     let sourceField: String
     let targetField: String

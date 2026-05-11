@@ -5,7 +5,7 @@ struct CollabPermissionsView: View {
     @State private var showingAddMember = false
     @State private var searchText = ""
 
-    var filteredMembers: [TeamMember] {
+    fileprivate var filteredMembers: [TeamMember] {
         if searchText.isEmpty { return members }
         return members.filter { $0.name.localizedCaseInsensitiveContains(searchText) || $0.email.localizedCaseInsensitiveContains(searchText) }
     }

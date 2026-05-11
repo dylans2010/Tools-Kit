@@ -55,7 +55,7 @@ struct MemoryGraphEdge: Identifiable, Codable {
 struct WorkflowState: Identifiable, Codable {
     let id: UUID
     var name: String
-    var steps: [WorkflowStep]
+    var steps: [MailWorkflowStep]
     var currentStepIndex: Int
     var status: WorkflowStatus
     var threadID: String
@@ -66,7 +66,7 @@ struct WorkflowState: Identifiable, Codable {
 }
 
 /// A single step in an automation workflow.
-struct WorkflowStep: Identifiable, Codable {
+struct MailWorkflowStep: Identifiable, Codable {
     let id: UUID
     var title: String
     var description: String

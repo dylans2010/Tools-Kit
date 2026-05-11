@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CollabWhiteboardView: View {
-    @State private var canvasItems: [CanvasItem] = []
+    @State private var canvasItems: [WhiteboardCanvasItem] = []
     @State private var selectedTool: WhiteboardTool = .select
     @State private var selectedColor: Color = .blue
     @State private var showingToolbar = true
@@ -96,7 +96,7 @@ struct CollabWhiteboardView: View {
         .background(Color(.systemBackground))
     }
 
-    private func canvasItemView(_ item: CanvasItem) -> some View {
+    private func canvasItemView(_ item: WhiteboardCanvasItem) -> some View {
         VStack {
             if item.type == .stickyNote {
                 VStack {
@@ -121,7 +121,7 @@ struct CollabWhiteboardView: View {
     }
 
     private func addItem() {
-        let item = CanvasItem(
+        let item = WhiteboardCanvasItem(
             type: selectedTool == .stickyNote ? .stickyNote : selectedTool == .text ? .text : .shape,
             text: selectedTool == .stickyNote ? "Note" : selectedTool == .text ? "Text" : "",
             color: selectedColor,
@@ -132,7 +132,7 @@ struct CollabWhiteboardView: View {
     }
 }
 
-private struct CanvasItem: Identifiable {
+private struct WhiteboardCanvasItem: Identifiable {
     let id = UUID()
     let type: CanvasItemType
     let text: String

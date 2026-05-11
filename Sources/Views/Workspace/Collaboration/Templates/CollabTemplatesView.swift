@@ -5,7 +5,7 @@ struct CollabTemplatesView: View {
     @State private var searchText = ""
     @State private var selectedCategory: WTemplateCategory?
 
-    var filteredTemplates: [WorkspaceTemplate] {
+    fileprivate var filteredTemplates: [WorkspaceTemplate] {
         templates.filter { t in
             let matchesSearch = searchText.isEmpty || t.name.localizedCaseInsensitiveContains(searchText)
             let matchesCategory = selectedCategory == nil || t.category == selectedCategory

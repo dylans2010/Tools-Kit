@@ -5,7 +5,7 @@ struct PluginSettingsView: View {
     @State private var autoUpdateEnabled = true
     @State private var sandboxMode = true
     @State private var maxConcurrent = 5
-    @State private var logLevel: LogLevel = .info
+    @State private var logLevel: PluginLogLevel = .info
     @State private var showConfirmReset = false
 
     var body: some View {
@@ -18,7 +18,7 @@ struct PluginSettingsView: View {
 
             Section("Logging") {
                 Picker("Log Level", selection: $logLevel) {
-                    ForEach(LogLevel.allCases, id: \.self) { level in
+                    ForEach(PluginLogLevel.allCases, id: \.self) { level in
                         Text(level.rawValue.capitalized).tag(level)
                     }
                 }
@@ -65,6 +65,6 @@ struct PluginSettingsView: View {
     }
 }
 
-private enum LogLevel: String, CaseIterable {
+private enum PluginLogLevel: String, CaseIterable {
     case verbose, debug, info, warning, error
 }

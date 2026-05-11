@@ -106,7 +106,7 @@ struct AutomationBuilderView: View {
 }
 
 struct StepRow: View {
-    @Binding var step: WorkflowStep
+    @Binding var step: MailWorkflowStep
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {

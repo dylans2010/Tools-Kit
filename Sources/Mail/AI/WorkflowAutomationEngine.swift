@@ -47,7 +47,7 @@ actor WorkflowAutomationEngine {
 
         let decoded = try JSONDecoder().decode(WorkflowResponse.self, from: Data(json.utf8))
         let steps = decoded.steps.map {
-            WorkflowStep(id: UUID(), title: $0.title, description: $0.description, actionType: $0.actionType, isCompleted: false)
+            MailWorkflowStep(id: UUID(), title: $0.title, description: $0.description, actionType: $0.actionType, isCompleted: false)
         }
 
         let state = WorkflowState(id: UUID(), name: decoded.name, steps: steps, currentStepIndex: 0, status: .pending, threadID: thread.id)

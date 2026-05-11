@@ -4,7 +4,7 @@ struct GitHubSecurityView: View {
     @State private var alerts: [SecurityAlert] = []
     @State private var selectedSeverity: AlertSeverity?
 
-    var filteredAlerts: [SecurityAlert] {
+    fileprivate var filteredAlerts: [SecurityAlert] {
         if let severity = selectedSeverity {
             return alerts.filter { $0.severity == severity }
         }
