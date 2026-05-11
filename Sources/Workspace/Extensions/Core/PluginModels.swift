@@ -15,6 +15,7 @@ struct PluginDefinition: Codable, Identifiable {
     var installedAt: Date? = nil
     var lastExecutedAt: Date? = nil
     var errorCount: Int = 0
+    var executionCount: Int = 0
 
     var capabilities: [PluginCapability]
     var actions: [PluginAction]
