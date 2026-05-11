@@ -179,7 +179,50 @@ public struct AIGenerateSlides: View {
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
                 }
 
-                if let deck = generatedDeck ?? manager.latestDeck {
+                if let scheme = manager.latestScheme {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Slide Preview (GenSlidesScheme)")
+                            .font(.headline)
+                        Text(scheme.meta.description)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        NavigationLink("View Full Presentation") {
+                            SchemeSlideCanvasView(scheme: scheme)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.cyan)
+
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 180), spacing: 12)], spacing: 12) {
+                            ForEach(scheme.slides) { slide in
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text(slide.title)
+                                        .font(.headline)
+                                        .lineLimit(2)
+                                    Text(slide.type.rawValue.capitalized)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    Text("\(slide.elements.count) elements")
+                                        .font(.caption2)
+                                        .foregroundStyle(.tertiary)
+                                }
+                                .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading)
+                                .padding(10)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(.ultraThinMaterial)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .stroke(
+                                                    LinearGradient(colors: [.cyan.opacity(0.4), .purple.opacity(0.3)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                                                    lineWidth: 1
+                                                )
+                                        )
+                                )
+                                .shadow(color: .cyan.opacity(0.15), radius: 4, x: 0, y: 2)
+                            }
+                        }
+                    }
+                } else if let deck = generatedDeck ?? manager.latestDeck {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Slide Preview")
                             .font(.headline)

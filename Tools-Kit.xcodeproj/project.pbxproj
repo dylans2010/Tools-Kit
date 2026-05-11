@@ -371,6 +371,13 @@
 		AS020000000000000000001D /* SlideStyleModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000001D /* SlideStyleModels.swift */; };
 		AS020000000000000000001E /* SlideDeck+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000001E /* SlideDeck+Extensions.swift */; };
 		AS020000000000000000001F /* JSON+SlideParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS010000000000000000001F /* JSON+SlideParsing.swift */; };
+		AS0200000000000000000020 /* GenSlidesScheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000020 /* GenSlidesScheme.swift */; };
+		AS0200000000000000000021 /* GenerationModelsSlidesFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000021 /* GenerationModelsSlidesFramework.swift */; };
+		AS0200000000000000000022 /* AISlidesSchemeDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000022 /* AISlidesSchemeDecoder.swift */; };
+		AS0200000000000000000023 /* AISlidesSchemeValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000023 /* AISlidesSchemeValidator.swift */; };
+		AS0200000000000000000024 /* SlideRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000024 /* SlideRenderer.swift */; };
+		AS0200000000000000000025 /* GenSlidesScheme+SlideDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000025 /* GenSlidesScheme+SlideDeck.swift */; };
+		AS0200000000000000000026 /* SlideContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AS0100000000000000000026 /* SlideContentView.swift */; };
 		WS020000000000000000000B /* ToolHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000B /* ToolHeaderView.swift */; };
 		WS020000000000000000000C /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000C /* CardView.swift */; };
 		WS020000000000000000000D /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS010000000000000000000D /* EmptyStateView.swift */; };
@@ -1999,6 +2006,13 @@
 		AS010000000000000000001D /* SlideStyleModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideStyleModels.swift; sourceTree = "<group>"; };
 		AS010000000000000000001E /* SlideDeck+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SlideDeck+Extensions.swift"; sourceTree = "<group>"; };
 		AS010000000000000000001F /* JSON+SlideParsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSON+SlideParsing.swift"; sourceTree = "<group>"; };
+		AS0100000000000000000020 /* GenSlidesScheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenSlidesScheme.swift; sourceTree = "<group>"; };
+		AS0100000000000000000021 /* GenerationModelsSlidesFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerationModelsSlidesFramework.swift; sourceTree = "<group>"; };
+		AS0100000000000000000022 /* AISlidesSchemeDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesSchemeDecoder.swift; sourceTree = "<group>"; };
+		AS0100000000000000000023 /* AISlidesSchemeValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISlidesSchemeValidator.swift; sourceTree = "<group>"; };
+		AS0100000000000000000024 /* SlideRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideRenderer.swift; sourceTree = "<group>"; };
+		AS0100000000000000000025 /* GenSlidesScheme+SlideDeck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GenSlidesScheme+SlideDeck.swift"; sourceTree = "<group>"; };
+		AS0100000000000000000026 /* SlideContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideContentView.swift; sourceTree = "<group>"; };
 		WS010000000000000000000B /* ToolHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolHeaderView.swift; sourceTree = "<group>"; };
 		WS010000000000000000000C /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		WS010000000000000000000D /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
@@ -3491,6 +3505,8 @@
 				WS0100000000000000000008 /* PresentationView.swift */,
 				WS0100000000000000000009 /* SlideThumbnailView.swift */,
 				WS010000000000000000000A /* SlideDecksManager.swift */,
+				AS0100000000000000000024 /* SlideRenderer.swift */,
+				AS0100000000000000000026 /* SlideContentView.swift */,
 			);
 			path = Slides;
 			sourceTree = "<group>";
@@ -5365,6 +5381,9 @@
 				AS0100000000000000000010 /* AISlidesCache.swift */,
 				AS0100000000000000000016 /* AISlidesAssetResolver.swift */,
 				AS0100000000000000000017 /* AIGenSlide.swift */,
+				AS0100000000000000000021 /* GenerationModelsSlidesFramework.swift */,
+				AS0100000000000000000022 /* AISlidesSchemeDecoder.swift */,
+				AS0100000000000000000023 /* AISlidesSchemeValidator.swift */,
 				AS0300000000000000000006 /* AISlidesImageProviders */,
 				AS0300000000000000000004 /* Models */,
 				AS0300000000000000000005 /* Extensions */,
@@ -5379,6 +5398,7 @@
 				AS010000000000000000001B /* SlideModels.swift */,
 				AS010000000000000000001C /* SlideThemeModels.swift */,
 				AS010000000000000000001D /* SlideStyleModels.swift */,
+				AS0100000000000000000020 /* GenSlidesScheme.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -5389,6 +5409,7 @@
 				AS010000000000000000001E /* SlideDeck+Extensions.swift */,
 				AS010000000000000000001F /* JSON+SlideParsing.swift */,
 				AS0100000000000000000012 /* WorkspaceSDK+AISlides.swift */,
+				AS0100000000000000000025 /* GenSlidesScheme+SlideDeck.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -9430,6 +9451,13 @@
 				AS020000000000000000001D /* SlideStyleModels.swift in Sources */,
 				AS020000000000000000001E /* SlideDeck+Extensions.swift in Sources */,
 				AS020000000000000000001F /* JSON+SlideParsing.swift in Sources */,
+				AS0200000000000000000020 /* GenSlidesScheme.swift in Sources */,
+				AS0200000000000000000021 /* GenerationModelsSlidesFramework.swift in Sources */,
+				AS0200000000000000000022 /* AISlidesSchemeDecoder.swift in Sources */,
+				AS0200000000000000000023 /* AISlidesSchemeValidator.swift in Sources */,
+				AS0200000000000000000024 /* SlideRenderer.swift in Sources */,
+				AS0200000000000000000025 /* GenSlidesScheme+SlideDeck.swift in Sources */,
+				AS0200000000000000000026 /* SlideContentView.swift in Sources */,
 				AS0200000000000000000012 /* WorkspaceSDK+AISlides.swift in Sources */,
 				SDK2A5F819C6A67BDEA76CFF /* SDKHomeView.swift in Sources */,
 				SDK2CA3D485CF82F8AE6A768 /* SDKAPIExplorerView.swift in Sources */,

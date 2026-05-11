@@ -2,6 +2,7 @@ import SwiftUI
 
 struct WhiteboardCanvasView: View {
     @State private var board: WhiteboardBoard
+    @State private var canvasState: CanvasState
     @State private var showingAddNode = false
     @State private var nodeTitle = ""
     @State private var nodeContent = ""
@@ -14,12 +15,18 @@ struct WhiteboardCanvasView: View {
     @State private var draggedNodeID: UUID?
     @State private var edgeSourceID: UUID?
     @State private var isLinkingMode = false
+    @State private var isDrawingMode = false
+    @State private var currentDrawingPath: DrawingPath?
+    @State private var drawingColor: String = "FFFFFF"
+    @State private var drawingLineWidth: Double = 2
 
     private let canvasWidth: CGFloat = 3000
     private let canvasHeight: CGFloat = 2000
 
     init(board: WhiteboardBoard) {
         _board = State(initialValue: board)
+        let loaded = WhiteboardStore.shared.loadCanvasState(for: board.id)
+        _canvasState = State(initialValue: loaded ?? CanvasState())
     }
 
     var body: some View {
@@ -29,17 +36,29 @@ struct WhiteboardCanvasView: View {
             canvasContent
                 .scaleEffect(scale)
                 .offset(offset)
-                .gesture(panGesture)
+                .gesture(isDrawingMode ? nil : panGesture)
                 .gesture(magnificationGesture)
+                .gesture(isDrawingMode ? drawingGesture : nil)
                 .onTapGesture(count: 2) { location in
-                    addNodeAtPosition(location)
+                    if !isDrawingMode {
+                        addNodeAtPosition(location)
+                    }
                 }
         }
         .navigationTitle(board.title)
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button {
+                    isDrawingMode.toggle()
+                    if isDrawingMode { isLinkingMode = false }
+                } label: {
+                    Image(systemName: isDrawingMode ? "pencil.circle.fill" : "pencil.circle")
+                }
+                .help(isDrawingMode ? "Drawing mode ON" : "Draw on canvas")
+
+                Button {
                     isLinkingMode.toggle()
+                    if isLinkingMode { isDrawingMode = false }
                 } label: {
                     Image(systemName: isLinkingMode ? "link.circle.fill" : "link.circle")
                 }
@@ -63,6 +82,10 @@ struct WhiteboardCanvasView: View {
         }
         .onDisappear {
             WhiteboardStore.shared.updateBoard(board)
+            canvasState.zoom = Double(scale)
+            canvasState.panX = Double(offset.width)
+            canvasState.panY = Double(offset.height)
+            WhiteboardStore.shared.saveCanvasState(canvasState, for: board.id)
         }
     }
 
@@ -86,6 +109,35 @@ struct WhiteboardCanvasView: View {
                 }
             }
             .frame(width: canvasWidth, height: canvasHeight)
+
+            // Drawing Layer
+            ForEach(canvasState.drawings) { drawing in
+                Path { path in
+                    guard let first = drawing.points.first else { return }
+                    path.move(to: CGPoint(x: first.x, y: first.y))
+                    for point in drawing.points.dropFirst() {
+                        path.addLine(to: CGPoint(x: point.x, y: point.y))
+                    }
+                }
+                .stroke(
+                    Color(hex: drawing.colorHex) ?? .white,
+                    style: StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .round, lineJoin: .round)
+                )
+            }
+
+            if let active = currentDrawingPath {
+                Path { path in
+                    guard let first = active.points.first else { return }
+                    path.move(to: CGPoint(x: first.x, y: first.y))
+                    for point in active.points.dropFirst() {
+                        path.addLine(to: CGPoint(x: point.x, y: point.y))
+                    }
+                }
+                .stroke(
+                    Color(hex: active.colorHex) ?? .white,
+                    style: StrokeStyle(lineWidth: active.lineWidth, lineCap: .round, lineJoin: .round)
+                )
+            }
 
             // Edges
             ForEach(board.edges) { edge in
@@ -239,5 +291,32 @@ struct WhiteboardCanvasView: View {
                 positionY: adjustedY
             )
         )
+    }
+
+    // MARK: - Drawing Gesture
+
+    private var drawingGesture: some Gesture {
+        DragGesture(minimumDistance: 1)
+            .onChanged { value in
+                let adjustedX = (value.location.x - offset.width) / scale
+                let adjustedY = (value.location.y - offset.height) / scale
+                let point = DrawingPoint(x: adjustedX, y: adjustedY)
+
+                if currentDrawingPath == nil {
+                    currentDrawingPath = DrawingPath(
+                        points: [point],
+                        colorHex: drawingColor,
+                        lineWidth: drawingLineWidth
+                    )
+                } else {
+                    currentDrawingPath?.points.append(point)
+                }
+            }
+            .onEnded { _ in
+                if let path = currentDrawingPath, path.points.count > 1 {
+                    canvasState.drawings.append(path)
+                }
+                currentDrawingPath = nil
+            }
     }
 }
