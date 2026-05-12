@@ -9,11 +9,11 @@ struct ConnectorsMainView: View {
     @State private var selectedFilter: ConnectorFilter = .all
     @State private var sortOrder: SortOrder = .name
 
-    enum ConnectorFilter: String, CaseIterable {
+    enum ConnectorFilter: String, CaseIterable, Sendable {
         case all = "All", active = "Active", inactive = "Inactive", error = "Errors"
     }
 
-    enum SortOrder: String, CaseIterable {
+    enum SortOrder: String, CaseIterable, Sendable {
         case name = "Name", recent = "Recent", status = "Status"
     }
 

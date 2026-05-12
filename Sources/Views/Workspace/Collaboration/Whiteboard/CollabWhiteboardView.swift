@@ -132,7 +132,7 @@ struct CollabWhiteboardView: View {
     }
 }
 
-private struct WhiteboardCanvasItem: Identifiable {
+private struct WhiteboardCanvasItem: Identifiable, Sendable {
     let id = UUID()
     let type: CanvasItemType
     let text: String
@@ -141,9 +141,9 @@ private struct WhiteboardCanvasItem: Identifiable {
     let y: CGFloat
 }
 
-private enum CanvasItemType { case stickyNote, text, shape }
+private enum CanvasItemType: Sendable { case stickyNote, text, shape }
 
-private enum WhiteboardTool: String, CaseIterable {
+private enum WhiteboardTool: String, CaseIterable, Sendable {
     case select, pen, shape, text, stickyNote = "sticky", eraser
 
     var icon: String {

@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolTaskDelete: AgenticToolProtocol {
+struct AgenticToolTaskDelete: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "task_delete",
         description: "Delete a task by ID",

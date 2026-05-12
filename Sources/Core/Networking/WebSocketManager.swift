@@ -2,7 +2,7 @@ import Foundation
 
 /// Manages real-time WebSocket connections for live updates and collaboration.
 final class WebSocketManager: ObservableObject {
-    static let shared = WebSocketManager()
+    nonisolated(unsafe) static let shared = WebSocketManager()
 
     private var socket: URLSessionWebSocketTask?
     private let session = URLSession(configuration: .default)

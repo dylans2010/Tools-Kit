@@ -1,7 +1,7 @@
 import SwiftUI
 import PhotosUI
 
-public struct AIGenerateSlides: View {
+public struct AIGenerateSlides: View, Sendable {
     private let fallbackThemeGradient: [Color] = [.blue, .purple]
     @StateObject private var manager = AISlidesManager.shared
     @StateObject private var whiteboardStore = WhiteboardStore.shared
@@ -511,7 +511,7 @@ public struct AIGenerateSlides: View {
 
 // MARK: - Input Field Enum
 
-enum SlideInputField: String, CaseIterable {
+enum SlideInputField: String, CaseIterable, Sendable {
     case prompt
     case notes
     case documents

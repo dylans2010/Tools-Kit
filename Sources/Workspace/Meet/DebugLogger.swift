@@ -2,14 +2,14 @@ import Foundation
 import Combine
 import Daily
 
-enum DebugLogLevel: String, Codable {
+enum DebugLogLevel: String, Codable, Sendable {
     case info
     case warning
     case error
     case debug
 }
 
-struct DebugLogEntry: Identifiable, Codable {
+struct DebugLogEntry: Identifiable, Codable, Sendable {
     let id: UUID
     let timestamp: Date
     let level: DebugLogLevel
@@ -19,7 +19,7 @@ struct DebugLogEntry: Identifiable, Codable {
 
 @MainActor
 final class DebugLogger: ObservableObject {
-    static let shared = DebugLogger()
+    nonisolated(unsafe) static let shared = DebugLogger()
 
     @Published private(set) var entries: [DebugLogEntry] = []
     private let maxEntries = 800

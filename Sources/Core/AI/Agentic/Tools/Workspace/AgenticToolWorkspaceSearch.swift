@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolWorkspaceSearch: AgenticToolProtocol {
+struct AgenticToolWorkspaceSearch: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "workspace_search",
         description: "Search across entire workspace",

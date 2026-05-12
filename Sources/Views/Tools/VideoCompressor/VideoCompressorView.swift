@@ -45,7 +45,7 @@ struct VideoCompressorView: View {
     }
 }
 
-struct VideoCompressorTool: Tool {
+struct VideoCompressorTool: Tool, Sendable {
     let name = "Video Compressor"
     let icon = "video.circle"
     let category = ToolCategory.utility

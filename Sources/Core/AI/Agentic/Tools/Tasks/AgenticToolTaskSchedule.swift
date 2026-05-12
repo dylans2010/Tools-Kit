@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolTaskSchedule: AgenticToolProtocol {
+struct AgenticToolTaskSchedule: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "task_schedule",
         description: "Schedule a task for a specific time slot",

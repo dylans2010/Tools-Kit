@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentCodeBlockParser {
+struct AgentCodeBlockParser: Sendable {
     init() {}
 
     func parse(text: String) -> [AgentCodeBlock] {

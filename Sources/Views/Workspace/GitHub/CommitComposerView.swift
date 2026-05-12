@@ -70,7 +70,7 @@ struct CommitComposerView: View {
 
         let base64Content = content.data(using: .utf8)?.base64EncodedString() ?? ""
 
-        struct CommitPayload: Encodable {
+        struct CommitPayload: Encodable, Sendable {
             let message: String
             let content: String
             let sha: String?

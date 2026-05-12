@@ -1,13 +1,13 @@
 import Foundation
 import Combine
 
-public enum SDKModuleCapability: String, Codable, CaseIterable {
+public enum SDKModuleCapability: String, Codable, CaseIterable, Sendable {
     case dataAccess, networking, storage, rendering, automation
     case authentication, analytics, messaging, fileSystem, aiProcessing
     case connectorBinding, pluginHosting, eventPublishing, backgroundExecution
 }
 
-public struct SDKModuleDescriptor: Identifiable, Codable, Hashable {
+public struct SDKModuleDescriptor: Identifiable, Codable, Hashable, Sendable {
     public let id: UUID
     public var identifier: String
     public var displayName: String
@@ -55,7 +55,7 @@ public protocol SDKModuleProvider {
 
 @MainActor
 public final class SDKModuleRegistry: ObservableObject {
-    public static let shared = SDKModuleRegistry()
+    nonisolated(unsafe) public static let shared = SDKModuleRegistry()
 
     @Published public var modules: [SDKModuleDescriptor] = []
     @Published public var activeModuleIDs: Set<UUID> = []
@@ -64,7 +64,7 @@ public final class SDKModuleRegistry: ObservableObject {
     private var providers: [String: SDKModuleProvider] = [:]
     private let persistenceKey = "sdk_module_registry"
 
-    public struct ModuleRegistrationEvent: Identifiable, Codable {
+    public struct ModuleRegistrationEvent: Identifiable, Codable, Sendable {
         public let id: UUID
         public let moduleIdentifier: String
         public let action: String

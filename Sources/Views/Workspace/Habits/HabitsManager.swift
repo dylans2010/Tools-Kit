@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class HabitsManager: ObservableObject {
-    static let shared = HabitsManager()
+    nonisolated(unsafe) static let shared = HabitsManager()
 
     @Published var habits: [Habit] = []
     private let aiService = AIService.shared
@@ -108,7 +108,7 @@ final class HabitsManager: ObservableObject {
 
     // MARK: - AI Habit Coaching
 
-    struct AIHabitInsights: Codable {
+    struct AIHabitInsights: Codable, Sendable {
         let suggestedHabits: [String]
         let behaviorPatterns: [String]
         let optimizationTips: [String]

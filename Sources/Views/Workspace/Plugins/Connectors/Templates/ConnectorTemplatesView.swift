@@ -78,7 +78,7 @@ struct ConnectorTemplatesView: View {
     }
 }
 
-private struct ConnectorTemplateItem: Identifiable {
+private struct ConnectorTemplateItem: Identifiable, Sendable {
     let id = UUID()
     let name: String
     let description: String
@@ -87,5 +87,5 @@ private struct ConnectorTemplateItem: Identifiable {
     let complexity: Complexity
 }
 
-private enum ConnectorCategory: String, CaseIterable { case api, events, data, storage, messaging, auth }
-private enum Complexity: String { case simple, medium, advanced }
+private enum ConnectorCategory: String, CaseIterable, Sendable { case api, events, data, storage, messaging, auth }
+private enum Complexity: String, Sendable { case simple, medium, advanced }

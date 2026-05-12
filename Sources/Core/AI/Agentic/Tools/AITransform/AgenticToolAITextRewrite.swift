@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolAITextRewrite: AgenticToolProtocol {
+struct AgenticToolAITextRewrite: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "ai_text_rewrite",
         description: "Rewrite text in a different tone or style",

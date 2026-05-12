@@ -15,10 +15,10 @@ struct ConnectorSchemaBuilderView: View {
     @State private var showingImportSheet = false
     @State private var importJSON = ""
 
-    struct MappingEntry: Identifiable {
+    struct MappingEntry: Identifiable, Sendable {
         let id = UUID()
         var source: String; var target: String; var transformType: TransformType = .direct
-        enum TransformType: String, CaseIterable { case direct = "Direct", uppercase = "Uppercase", lowercase = "Lowercase", dateFormat = "Date Format", jsonPath = "JSON Path" }
+        enum TransformType: String, CaseIterable, Sendable { case direct = "Direct", uppercase = "Uppercase", lowercase = "Lowercase", dateFormat = "Date Format", jsonPath = "JSON Path" }
     }
 
     init(connector: ConnectorDefinition) {

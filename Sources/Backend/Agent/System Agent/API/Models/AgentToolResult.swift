@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentToolResult: Codable {
+struct AgentToolResult: Codable, Sendable {
     let toolCallId: String
     let result: String
     let isError: Bool

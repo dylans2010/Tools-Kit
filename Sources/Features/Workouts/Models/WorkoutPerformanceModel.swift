@@ -1,6 +1,6 @@
 import Foundation
 
-struct WorkoutPerformanceModel: Identifiable, Codable {
+struct WorkoutPerformanceModel: Identifiable, Codable, Sendable {
     var id: UUID
     var date: Date
     var strengthScore: Double

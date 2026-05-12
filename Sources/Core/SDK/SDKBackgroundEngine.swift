@@ -2,7 +2,7 @@ import Foundation
 import Combine
 import BackgroundTasks
 
-public struct SDKBackgroundHealthReport {
+public struct SDKBackgroundHealthReport: Sendable {
     public var connectorReachability: Bool
     public var pluginSandboxStatus: Bool
     public var coreDataHealth: Bool
@@ -12,7 +12,7 @@ public struct SDKBackgroundHealthReport {
 
 @MainActor
 public final class SDKBackgroundEngine: ObservableObject {
-    public static let shared = SDKBackgroundEngine()
+    nonisolated(unsafe) public static let shared = SDKBackgroundEngine()
 
     @Published public var systemHealth = SDKBackgroundHealthReport(connectorReachability: true, pluginSandboxStatus: true, coreDataHealth: true, lastCheck: Date(), details: [:])
 

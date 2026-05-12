@@ -1,6 +1,6 @@
 import Foundation
 
-struct CoachingGuidance {
+struct CoachingGuidance: Sendable {
     var recovery: RecoveryScoreModel
     var recommendedDurationDelta: Int
     var note: String

@@ -1,6 +1,6 @@
 import Foundation
 
-enum MeetSessionPhase: String {
+enum MeetSessionPhase: String, Sendable {
     case idle
     case lobby
     case inMeeting
@@ -8,13 +8,13 @@ enum MeetSessionPhase: String {
     case failed
 }
 
-enum MeetPermissionState: String {
+enum MeetPermissionState: String, Sendable {
     case unknown
     case granted
     case denied
 }
 
-enum MeetingParticipantRole: String, CaseIterable, Identifiable, Codable {
+enum MeetingParticipantRole: String, CaseIterable, Identifiable, Codable, Sendable {
     case host
     case admin
     case participant
@@ -30,7 +30,7 @@ enum MeetingParticipantRole: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-struct MeetingParticipant: Identifiable, Equatable {
+struct MeetingParticipant: Identifiable, Equatable, Sendable {
     let id: String
     let displayName: String
     let joinedAt: Date
@@ -44,12 +44,12 @@ struct MeetingParticipant: Identifiable, Equatable {
     var networkQuality: MeetingNetworkQuality
 }
 
-enum MeetingMessageDeliveryState: String, Equatable {
+enum MeetingMessageDeliveryState: String, Equatable, Sendable {
     case sent
     case delivered
 }
 
-struct MeetingMessage: Identifiable, Equatable {
+struct MeetingMessage: Identifiable, Equatable, Sendable {
     let id: String
     let threadId: String
     let senderName: String
@@ -60,12 +60,12 @@ struct MeetingMessage: Identifiable, Equatable {
     var reactions: [String: Int]
 }
 
-struct MeetingChatThread: Identifiable, Equatable {
+struct MeetingChatThread: Identifiable, Equatable, Sendable {
     let id: String
     let title: String
 }
 
-struct ScheduledMeeting: Identifiable, Equatable {
+struct ScheduledMeeting: Identifiable, Equatable, Sendable {
     let id: String
     let name: String
     var meetingId: String?
@@ -73,18 +73,18 @@ struct ScheduledMeeting: Identifiable, Equatable {
     var activationState: ScheduledMeetingActivationState
 }
 
-enum ScheduledMeetingActivationState: String, Equatable, Codable {
+enum ScheduledMeetingActivationState: String, Equatable, Codable, Sendable {
     case pending
     case active
 }
 
-struct MeetingBreakoutRoom: Identifiable, Equatable, Codable {
+struct MeetingBreakoutRoom: Identifiable, Equatable, Codable, Sendable {
     let id: String
     var name: String
     var participantIds: [String]
 }
 
-enum MeetingLayoutPreference: String, CaseIterable, Identifiable {
+enum MeetingLayoutPreference: String, CaseIterable, Identifiable, Sendable {
     case grid = "Grid"
     case speaker = "Speaker"
     case sidebar = "Sidebar"
@@ -92,7 +92,7 @@ enum MeetingLayoutPreference: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-enum MeetingQualitySetting: String, CaseIterable, Identifiable {
+enum MeetingQualitySetting: String, CaseIterable, Identifiable, Sendable {
     case auto = "Auto"
     case standard = "Standard"
     case high = "High"
@@ -100,7 +100,7 @@ enum MeetingQualitySetting: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-struct MeetingSettingsState {
+struct MeetingSettingsState: Sendable {
     var selectedAudioDevice = ""
     var selectedVideoDevice = ""
     var layoutPreference: MeetingLayoutPreference = .grid
@@ -108,27 +108,27 @@ struct MeetingSettingsState {
     var outputVolume: Double = 0.75
 }
 
-struct MeetingSummaryState {
+struct MeetingSummaryState: Sendable {
     var recap = ""
     var actionItems: [String] = []
     var transcriptPreview = ""
 }
 
-struct MeetingLobbyState {
+struct MeetingLobbyState: Sendable {
     var isLoadingParticipants = true
     var isCheckingDevices = true
     var microphonePermission: MeetPermissionState = .unknown
     var cameraPermission: MeetPermissionState = .unknown
 }
 
-struct MeetingDiagnosticsState {
+struct MeetingDiagnosticsState: Sendable {
     var connectionState = "Unknown"
     var networkQuality = "Unknown"
     var latencyMs: Int = 0
     var packetLossPercent: Double = 0
 }
 
-enum MeetingNetworkQuality: Int, CaseIterable, Codable, Equatable {
+enum MeetingNetworkQuality: Int, CaseIterable, Codable, Equatable, Sendable {
     case poor = 1
     case fair = 2
     case good = 3
@@ -144,7 +144,7 @@ enum MeetingNetworkQuality: Int, CaseIterable, Codable, Equatable {
     }
 }
 
-enum MeetingBackgroundEffect: String, CaseIterable, Codable, Equatable, Identifiable {
+enum MeetingBackgroundEffect: String, CaseIterable, Codable, Equatable, Identifiable, Sendable {
     case off
     case blur
     case studio
@@ -164,14 +164,14 @@ enum MeetingBackgroundEffect: String, CaseIterable, Codable, Equatable, Identifi
     }
 }
 
-struct MeetingCaptionLine: Identifiable, Equatable {
+struct MeetingCaptionLine: Identifiable, Equatable, Sendable {
     let id: String
     let speaker: String
     let text: String
     let timestamp: Date
 }
 
-struct MeetingReactionEvent: Identifiable, Equatable {
+struct MeetingReactionEvent: Identifiable, Equatable, Sendable {
     let id: String
     let participantID: String
     let participantName: String
@@ -179,14 +179,14 @@ struct MeetingReactionEvent: Identifiable, Equatable {
     let createdAt: Date
 }
 
-struct MeetingCPUWarning: Identifiable, Equatable {
+struct MeetingCPUWarning: Identifiable, Equatable, Sendable {
     let id: String
     let message: String
     let suggestedAction: String
     let createdAt: Date
 }
 
-enum MeetingAdminAction: Equatable {
+enum MeetingAdminAction: Equatable, Sendable {
     case muteAll
     case setParticipantMuted(participantId: String, muted: Bool)
     case setParticipantVideoEnabled(participantId: String, enabled: Bool)
@@ -202,7 +202,7 @@ enum MeetingAdminAction: Equatable {
     case assignParticipantToBreakout(participantId: String, roomId: String?)
 }
 
-struct DailyDebugMapping: Identifiable {
+struct DailyDebugMapping: Identifiable, Sendable {
     let id: String
     let meetingId: String
     let roomName: String
@@ -211,7 +211,7 @@ struct DailyDebugMapping: Identifiable {
     let debugTraceId: String
 }
 
-struct DailyDebugSnapshot {
+struct DailyDebugSnapshot: Sendable {
     let mappings: [DailyDebugMapping]
     let activeSessions: [MeetingSession]
 

@@ -3,20 +3,20 @@ import Combine
 
 @MainActor
 public final class SDKTimeTravelBridge: ObservableObject {
-    public static let shared = SDKTimeTravelBridge()
+    nonisolated(unsafe) public static let shared = SDKTimeTravelBridge()
 
     @Published public var snapshotHistory: [TimeTravelRecord] = []
 
     private let maxHistorySize = 100
 
-    public struct TimeTravelRecord: Identifiable {
+    public struct TimeTravelRecord: Identifiable, Sendable {
         public let id: UUID
         public let snapshotID: UUID
         public let action: TimeTravelAction
         public let timestamp: Date
         public let details: String
 
-        public enum TimeTravelAction: String {
+        public enum TimeTravelAction: String, Sendable {
             case snapshot, restore, diff
         }
     }

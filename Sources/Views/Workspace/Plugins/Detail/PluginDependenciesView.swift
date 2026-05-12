@@ -97,7 +97,7 @@ struct PluginDependenciesView: View {
     }
 }
 
-private struct PluginDependency: Identifiable {
+private struct PluginDependency: Identifiable, Sendable {
     let id = UUID()
     let name: String
     let versionRange: String

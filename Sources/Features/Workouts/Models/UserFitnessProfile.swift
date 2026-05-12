@@ -1,7 +1,7 @@
 import Foundation
 
-struct UserFitnessProfile: Codable {
-    enum FitnessGoal: String, Codable, CaseIterable, Identifiable {
+struct UserFitnessProfile: Codable, Sendable {
+    enum FitnessGoal: String, Codable, CaseIterable, Identifiable, Sendable {
         case gainMuscle = "Gain muscle"
         case loseWeight = "Lose weight"
         case maintain = "Maintain"
@@ -10,7 +10,7 @@ struct UserFitnessProfile: Codable {
         var id: String { rawValue }
     }
 
-    enum ActivityLevel: String, Codable, CaseIterable, Identifiable {
+    enum ActivityLevel: String, Codable, CaseIterable, Identifiable, Sendable {
         case sedentary = "Sedentary"
         case lightlyActive = "Lightly active"
         case moderatelyActive = "Moderately active"

@@ -12,7 +12,7 @@ struct SDKSupportView: View {
     @State private var includeConnectors = true
     @State private var includeAutomation = true
 
-    enum GenerationPhase: String {
+    enum GenerationPhase: String, Sendable {
         case idle, analyzing, scaffolding, modules, connectors, plugins, finalizing, complete
         var displayName: String {
             switch self {
@@ -28,7 +28,7 @@ struct SDKSupportView: View {
         }
     }
 
-    struct GenerationPlan: Identifiable {
+    struct GenerationPlan: Identifiable, Sendable {
         let id = UUID()
         var appName: String
         var description: String
@@ -40,28 +40,28 @@ struct SDKSupportView: View {
         var generatedAt: Date
     }
 
-    struct PlannedModule: Identifiable {
+    struct PlannedModule: Identifiable, Sendable {
         let id = UUID()
         var name: String
         var capabilities: [String]
         var description: String
     }
 
-    struct PlannedConnector: Identifiable {
+    struct PlannedConnector: Identifiable, Sendable {
         let id = UUID()
         var name: String
         var type: String
         var purpose: String
     }
 
-    struct PlannedPlugin: Identifiable {
+    struct PlannedPlugin: Identifiable, Sendable {
         let id = UUID()
         var name: String
         var category: String
         var hooks: [String]
     }
 
-    enum AppTemplate: String, CaseIterable, Identifiable {
+    enum AppTemplate: String, CaseIterable, Identifiable, Sendable {
         case taskManager = "Task Manager"
         case chatApp = "Chat Application"
         case dashboard = "Analytics Dashboard"

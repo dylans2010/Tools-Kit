@@ -1,6 +1,6 @@
 import Foundation
 
-struct WhiteboardGraphCluster: Identifiable, Codable {
+struct WhiteboardGraphCluster: Identifiable, Codable, Sendable {
     var id: UUID = UUID()
     var nodes: [WhiteboardNode]
     var edges: [WhiteboardEdge]
@@ -10,7 +10,7 @@ struct WhiteboardGraphCluster: Identifiable, Codable {
     var rankScore: Double { densityScore + importanceScore }
 }
 
-struct WhiteboardGraphProcessor {
+struct WhiteboardGraphProcessor: Sendable {
     func cluster(board: WhiteboardBoard) -> [WhiteboardGraphCluster] {
         let adjacency = adjacencyMap(edges: board.edges)
         var visited = Set<UUID>()

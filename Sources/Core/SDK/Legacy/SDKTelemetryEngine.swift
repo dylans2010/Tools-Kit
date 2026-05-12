@@ -1,7 +1,7 @@
 import Foundation
 
 public final class SDKTelemetryEngine: ObservableObject {
-    public static let shared = SDKTelemetryEngine()
+    nonisolated(unsafe) public static let shared = SDKTelemetryEngine()
 
     @Published public private(set) var activeTraces: [UUID: SDKTrace] = [:]
     @Published public private(set) var completedTraces: [SDKTrace] = []
@@ -68,7 +68,7 @@ public final class SDKTelemetryEngine: ObservableObject {
         queue.async { [weak self] in
             guard let self = self else { return }
 
-            struct TraceRecord: Codable {
+            struct TraceRecord: Codable, Sendable {
                 let id: UUID
                 let actionDescription: String
                 let startTime: Date
@@ -90,7 +90,7 @@ public final class SDKTelemetryEngine: ObservableObject {
     }
 }
 
-public struct SDKTrace {
+public struct SDKTrace: Sendable {
     public let id: UUID
     public let action: SDKAction
     public let startTime: Date
@@ -98,13 +98,13 @@ public struct SDKTrace {
     public var status: TraceStatus = .pending
 }
 
-public enum TraceStatus {
+public enum TraceStatus: Sendable {
     case pending
     case success
     case failure(Error)
 }
 
-public struct TelemetryMetrics {
+public struct TelemetryMetrics: Sendable {
     public let totalTraces: Int
     public let successCount: Int
     public let failureCount: Int

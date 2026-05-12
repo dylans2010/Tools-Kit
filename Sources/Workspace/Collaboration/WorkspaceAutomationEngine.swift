@@ -3,11 +3,11 @@ import Combine
 
 /// Trigger → Condition → Action automation engine for collaboration workspaces.
 final class WorkspaceAutomationEngine: ObservableObject {
-    static let shared = WorkspaceAutomationEngine()
+    nonisolated(unsafe) static let shared = WorkspaceAutomationEngine()
 
     // MARK: - Models
 
-    enum TriggerType: String, Codable, CaseIterable {
+    enum TriggerType: String, Codable, CaseIterable, Sendable {
         case taskOverdue = "Task Overdue"
         case fileUpdated = "File Updated"
         case workspaceInactive = "Workspace Inactive"
@@ -16,21 +16,21 @@ final class WorkspaceAutomationEngine: ObservableObject {
         case spaceCreated = "Space Created"
     }
 
-    enum ConditionOperator: String, Codable, CaseIterable {
+    enum ConditionOperator: String, Codable, CaseIterable, Sendable {
         case always = "Always"
         case contains = "Contains"
         case equals = "Equals"
         case greaterThan = "Greater Than"
     }
 
-    struct AutomationCondition: Codable, Identifiable {
+    struct AutomationCondition: Codable, Identifiable, Sendable {
         let id: UUID
         var field: String
         var conditionOperator: ConditionOperator
         var value: String
     }
 
-    enum ActionType: String, Codable, CaseIterable {
+    enum ActionType: String, Codable, CaseIterable, Sendable {
         case increasePriority = "Increase Priority"
         case logActivity = "Log Activity"
         case sendNotification = "Send Notification"
@@ -39,13 +39,13 @@ final class WorkspaceAutomationEngine: ObservableObject {
         case updateStatus = "Update Status"
     }
 
-    struct AutomationAction: Codable, Identifiable {
+    struct AutomationAction: Codable, Identifiable, Sendable {
         let id: UUID
         var actionType: ActionType
         var parameters: [String: String]
     }
 
-    struct Automation: Codable, Identifiable {
+    struct Automation: Codable, Identifiable, Sendable {
         let id: UUID
         var name: String
         var triggerType: TriggerType

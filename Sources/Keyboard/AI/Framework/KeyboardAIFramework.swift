@@ -126,7 +126,7 @@ class KeyboardAIFramework: KeyboardAIFrameworkProtocol {
 }
 
 private final class KeyboardAIGateway {
-    private enum Keys {
+    private enum Keys: Sendable {
         static let openRouterKey = "openrouter_api_key"
         static let openAIKey = "openai_api_key"
         static let provider = "keyboard_ai_provider"
@@ -203,7 +203,7 @@ private protocol AIProviderClient {
     func send(prompt: String, session: URLSession) async throws -> String
 }
 
-private struct OpenRouterClient: AIProviderClient {
+private struct OpenRouterClient: AIProviderClient, Sendable {
     let apiKey: String
 
     func send(prompt: String, session: URLSession) async throws -> String {
@@ -231,7 +231,7 @@ private struct OpenRouterClient: AIProviderClient {
     }
 }
 
-private struct OpenAIClient: AIProviderClient {
+private struct OpenAIClient: AIProviderClient, Sendable {
     let apiKey: String
 
     func send(prompt: String, session: URLSession) async throws -> String {
@@ -260,7 +260,7 @@ private struct OpenAIClient: AIProviderClient {
     }
 }
 
-private struct SuggestionPayload: Codable {
+private struct SuggestionPayload: Codable, Sendable {
     let suggestedText: String
     let category: String
     let score: Double

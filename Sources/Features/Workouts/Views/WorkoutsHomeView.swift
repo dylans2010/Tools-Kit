@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct WorkoutsHomeView: View {
-    enum Tab: String, CaseIterable, Identifiable {
+    enum Tab: String, CaseIterable, Identifiable, Sendable {
         case dashboard
         case plan
         case nutrition

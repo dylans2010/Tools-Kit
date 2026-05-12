@@ -129,14 +129,14 @@ struct AutomationHomeView: View {
     }
 }
 
-struct AutomationWorkflow: Identifiable {
+struct AutomationWorkflow: Identifiable, Sendable {
     let id = UUID()
     var name: String
     var icon: String
     var isEnabled: Bool
 }
 
-struct AutomationExecution: Identifiable {
+struct AutomationExecution: Identifiable, Sendable {
     let id = UUID()
     let workflowName: String
     let status: String

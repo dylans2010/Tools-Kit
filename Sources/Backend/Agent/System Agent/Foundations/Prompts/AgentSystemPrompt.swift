@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentSystemPrompt {
+struct AgentSystemPrompt: Sendable {
     var text: String
 
     init(_ text: String) { self.text = text }

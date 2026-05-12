@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolNoteSearch: AgenticToolProtocol {
+struct AgenticToolNoteSearch: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "note_search",
         description: "Search notes by query string",

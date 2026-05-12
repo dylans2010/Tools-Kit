@@ -1,7 +1,7 @@
 import Foundation
 import LocalAuthentication
 
-struct SecureNote: Identifiable, Codable {
+struct SecureNote: Identifiable, Codable, Sendable {
     let id: UUID
     var title: String
     var content: String

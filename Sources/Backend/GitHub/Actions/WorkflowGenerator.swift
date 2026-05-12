@@ -1,7 +1,7 @@
 import Foundation
 
 actor WorkflowGenerator {
-    enum GeneratorError: LocalizedError {
+    enum GeneratorError: LocalizedError, Sendable {
         case invalidWorkflowName
 
         var errorDescription: String? {

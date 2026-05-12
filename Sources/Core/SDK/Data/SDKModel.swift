@@ -16,7 +16,7 @@ extension SDKModel {
 // MARK: - Feature-Specific Models
 
 /// Mail message model for SDK persistence.
-public struct SDKMailMessage: SDKModel {
+public struct SDKMailMessage: SDKModel, Sendable {
     public let id: UUID
     public var from: String
     public var to: [String]
@@ -55,7 +55,7 @@ public struct SDKMailMessage: SDKModel {
 }
 
 /// Notebook model for SDK persistence.
-public struct SDKNotebook: SDKModel {
+public struct SDKNotebook: SDKModel, Sendable {
     public let id: UUID
     public var title: String
     public var pages: [SDKNotebookPage]
@@ -76,7 +76,7 @@ public struct SDKNotebook: SDKModel {
 }
 
 /// Notebook page model.
-public struct SDKNotebookPage: Codable, Identifiable {
+public struct SDKNotebookPage: Codable, Identifiable, Sendable {
     public let id: UUID
     public var title: String
     public var content: String
@@ -95,7 +95,7 @@ public struct SDKNotebookPage: Codable, Identifiable {
 }
 
 /// Page version for version history tracking.
-public struct SDKPageVersion: Codable, Identifiable {
+public struct SDKPageVersion: Codable, Identifiable, Sendable {
     public let id: UUID
     public let content: String
     public let savedAt: Date
@@ -110,7 +110,7 @@ public struct SDKPageVersion: Codable, Identifiable {
 }
 
 /// Meet session model for SDK persistence.
-public struct SDKMeetSession: SDKModel {
+public struct SDKMeetSession: SDKModel, Sendable {
     public let id: UUID
     public var title: String
     public var participants: [String]
@@ -122,7 +122,7 @@ public struct SDKMeetSession: SDKModel {
     public let createdAt: Date
     public var updatedAt: Date
 
-    public enum SessionStatus: String, Codable, CaseIterable {
+    public enum SessionStatus: String, Codable, CaseIterable, Sendable {
         case scheduled, active, ended, cancelled
     }
 
@@ -138,7 +138,7 @@ public struct SDKMeetSession: SDKModel {
 }
 
 /// Article model for SDK persistence.
-public struct SDKArticle: SDKModel {
+public struct SDKArticle: SDKModel, Sendable {
     public let id: UUID
     public var title: String
     public var content: String
@@ -163,7 +163,7 @@ public struct SDKArticle: SDKModel {
 }
 
 /// SDK App model for plugin/app registration.
-public struct SDKAppDefinition: SDKModel {
+public struct SDKAppDefinition: SDKModel, Sendable {
     public let id: UUID
     public var name: String
     public var version: String

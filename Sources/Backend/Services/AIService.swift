@@ -1,6 +1,6 @@
 import Foundation
 
-enum AIError: Error {
+enum AIError: Error, Sendable {
     case missingAPIKey
     case networkError(String)
     case invalidResponse
@@ -8,7 +8,7 @@ enum AIError: Error {
 }
 
 class AIService {
-    static let shared = AIService()
+    nonisolated(unsafe) static let shared = AIService()
 
     private let registry = AIProviderRegistry.shared
     private let settingsManager = AIChatSettingsManager.shared

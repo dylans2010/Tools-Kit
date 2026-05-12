@@ -37,7 +37,7 @@ struct IDClassifierView: View {
     }
 }
 
-struct IDClassifierTool: Tool {
+struct IDClassifierTool: Tool, Sendable {
     let name = "ID Classifier"
     let icon = "person.text.rectangle"
     let category = ToolCategory.utility

@@ -85,7 +85,7 @@ struct FileSizeView: View {
     }
 }
 
-struct FileSizeTool: Tool {
+struct FileSizeTool: Tool, Sendable {
     let name = "File Size Converter"
     let icon = "externaldrive"
     let category = ToolCategory.conversion

@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentLogEntry: Codable {
+struct AgentLogEntry: Codable, Sendable {
     let id: UUID
     let timestamp: Date
     let level: AgentLogLevel

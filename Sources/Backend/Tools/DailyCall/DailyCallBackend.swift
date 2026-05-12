@@ -4,7 +4,7 @@ import Foundation
 import Daily
 #endif
 
-struct DailyCallParticipant: Identifiable, Equatable {
+struct DailyCallParticipant: Identifiable, Equatable, Sendable {
     let id: String
     let name: String
     let isLocal: Bool

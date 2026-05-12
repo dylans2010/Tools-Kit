@@ -2,7 +2,7 @@ import Foundation
 import Combine
 import SwiftUI
 
-enum FileFormat: String, CaseIterable, Identifiable {
+enum FileFormat: String, CaseIterable, Identifiable, Sendable {
     case pdf = "PDF"
     case docx = "DOCX"
     case txt = "TXT"

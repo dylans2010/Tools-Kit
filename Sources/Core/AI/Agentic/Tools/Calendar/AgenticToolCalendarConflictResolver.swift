@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolCalendarConflictResolver: AgenticToolProtocol {
+struct AgenticToolCalendarConflictResolver: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "calendar_conflict_resolver",
         description: "Detect and resolve scheduling conflicts",

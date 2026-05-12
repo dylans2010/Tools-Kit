@@ -1,6 +1,6 @@
 import Foundation
 
-enum CourseEvaluationFormTemplate {
+enum CourseEvaluationFormTemplate: Sendable {
     static func build() -> FormDocument {
         let questions = [
             FormQuestion(title: "Course Name", type: .textInput, required: true),

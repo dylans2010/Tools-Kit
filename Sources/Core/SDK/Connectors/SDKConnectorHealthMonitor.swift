@@ -43,7 +43,7 @@ public struct SDKConnectorHealthStatus: Identifiable, Sendable {
 /// Monitors health of all registered connectors.
 @MainActor
 public final class SDKConnectorHealthMonitor: SDKConnectorHealthMonitorProtocol, ObservableObject {
-    public static let shared = SDKConnectorHealthMonitor()
+    nonisolated(unsafe) public static let shared = SDKConnectorHealthMonitor()
 
     @Published public private(set) var healthStatuses: [SDKConnectorHealthStatus] = []
     @Published public private(set) var lastFullCheck: Date?

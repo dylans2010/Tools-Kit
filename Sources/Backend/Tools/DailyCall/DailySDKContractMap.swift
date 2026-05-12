@@ -3,7 +3,7 @@ import Foundation
 import Daily
 #endif
 
-enum DailySDKContractMap {
+enum DailySDKContractMap: Sendable {
     static let importNamespace = "Daily"
     static let delegateProtocol = "CallClientDelegate"
     static let primaryCallObject = "CallClient"

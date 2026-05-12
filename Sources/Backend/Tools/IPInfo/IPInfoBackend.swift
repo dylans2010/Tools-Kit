@@ -1,6 +1,6 @@
 import Foundation
 
-struct IPInfoData: Codable {
+struct IPInfoData: Codable, Sendable {
     let ip: String?
     let city: String?
     let region: String?

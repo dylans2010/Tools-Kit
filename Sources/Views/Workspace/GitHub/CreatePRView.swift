@@ -54,7 +54,7 @@ struct CreatePRView: View {
     private func createPR() {
         isSubmitting = true
 
-        struct PRPayload: Encodable {
+        struct PRPayload: Encodable, Sendable {
             let title: String
             let body: String
             let head: String

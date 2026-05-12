@@ -1,6 +1,6 @@
 import Foundation
 
-enum TextCaseStyle: String, CaseIterable {
+enum TextCaseStyle: String, CaseIterable, Sendable {
     case uppercase = "UPPERCASE"
     case lowercase = "lowercase"
     case capitalized = "Capitalized"

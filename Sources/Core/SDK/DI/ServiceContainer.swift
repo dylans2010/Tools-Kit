@@ -4,7 +4,7 @@ import Foundation
 /// Provides convenient registration and resolution of all SDK services.
 @MainActor
 public final class ServiceContainer {
-    public static let shared = ServiceContainer()
+    nonisolated(unsafe) public static let shared = ServiceContainer()
 
     private let registry = ServiceRegistry.shared
 

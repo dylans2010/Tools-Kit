@@ -1,6 +1,6 @@
 import Foundation
 
-struct JSONCoder {
+struct JSONCoder: Sendable {
     private static let encoder = JSONEncoder()
     private static let decoder = JSONDecoder()
 

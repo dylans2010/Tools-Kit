@@ -1,12 +1,12 @@
 import Foundation
 
-enum MatchSourceType: String, Codable {
+enum MatchSourceType: String, Codable, Sendable {
     case local
     case external
     case none
 }
 
-enum MatchStatus: String, Codable {
+enum MatchStatus: String, Codable, Sendable {
     case queued
     case searching
     case matched
@@ -14,14 +14,14 @@ enum MatchStatus: String, Codable {
     case downloaded
 }
 
-enum MatchReason: String, Codable {
+enum MatchReason: String, Codable, Sendable {
     case exact
     case fuzzy
     case fallback
     case none
 }
 
-struct SpotifyTrack: Identifiable, Codable, Equatable {
+struct SpotifyTrack: Identifiable, Codable, Equatable, Sendable {
     let id: String
     let title: String
     let artist: String
@@ -30,7 +30,7 @@ struct SpotifyTrack: Identifiable, Codable, Equatable {
     let artworkURL: String?
 }
 
-struct MatchedTrack: Identifiable, Codable, Equatable {
+struct MatchedTrack: Identifiable, Codable, Equatable, Sendable {
     var id: String { original.id }
     let original: SpotifyTrack
     var matchedTitle: String?

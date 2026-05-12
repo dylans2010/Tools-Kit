@@ -78,7 +78,7 @@ struct IPInfoRow: View {
     }
 }
 
-struct IPInfoTool: Tool {
+struct IPInfoTool: Tool, Sendable {
     let name = "IP Info"
     let icon = "network"
     let category = ToolCategory.utility

@@ -6,7 +6,7 @@ struct NotebookSearchPageView: View {
     @State private var searchText = ""
     @State private var searchResults: [SearchResult] = []
 
-    struct SearchResult: Identifiable {
+    struct SearchResult: Identifiable, Sendable {
         let id = UUID()
         let page: NotebookPage
         let folderID: UUID

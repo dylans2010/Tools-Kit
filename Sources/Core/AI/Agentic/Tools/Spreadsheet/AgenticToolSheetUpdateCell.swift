@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolSheetUpdateCell: AgenticToolProtocol {
+struct AgenticToolSheetUpdateCell: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "sheet_update_cell",
         description: "Update a cell value",

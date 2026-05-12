@@ -8,7 +8,7 @@ final class NetworkSpeedBackend: ObservableObject {
     @Published var isTesting = false
     @Published var history: [SpeedResult] = []
 
-    struct SpeedResult: Identifiable, Codable {
+    struct SpeedResult: Identifiable, Codable, Sendable {
         let id = UUID()
         let download: Double
         let upload: Double

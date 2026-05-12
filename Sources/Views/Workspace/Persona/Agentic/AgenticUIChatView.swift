@@ -175,7 +175,7 @@ struct AgenticUIChatView: View {
 
 // MARK: - Chat Message Model
 
-struct AgenticChatMessage: Identifiable {
+struct AgenticChatMessage: Identifiable, Sendable {
     let id = UUID()
     let timestamp = Date()
     let role: AgenticChatRole
@@ -186,7 +186,7 @@ struct AgenticChatMessage: Identifiable {
     var generatedCode: String?
 }
 
-enum AgenticChatRole {
+enum AgenticChatRole: Sendable {
     case user, assistant, system, tool
 }
 

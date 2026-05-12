@@ -61,7 +61,7 @@ struct TextRewriterView: View {
     }
 }
 
-struct TextRewriterTool: Tool {
+struct TextRewriterTool: Tool, Sendable {
     let name = "Text Rewriter"
     let icon = "pencil.tip.crop.circle.badge.plus"
     let category = ToolCategory.ai

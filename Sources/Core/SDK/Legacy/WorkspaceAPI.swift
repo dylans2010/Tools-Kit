@@ -1,12 +1,12 @@
 import Foundation
 
 public final class WorkspaceAPI {
-    public static let shared = WorkspaceAPI()
+    nonisolated(unsafe) public static let shared = WorkspaceAPI()
 
     private init() {}
 
     // MARK: - Notes
-    struct NotesAPI {
+    struct NotesAPI: Sendable {
         func listNotes() -> [Note] {
             return NotebooksManager.shared.notebooks.flatMap { $0.folders }.flatMap { $0.pages }.map { page in
                 Note(id: page.id, title: page.title, content: page.content, createdAt: page.createdAt, updatedAt: page.updatedAt)
@@ -30,7 +30,7 @@ public final class WorkspaceAPI {
     let notes = NotesAPI()
 
     // MARK: - Tasks
-    struct TasksAPI {
+    struct TasksAPI: Sendable {
         func listTasks() -> [WorkspaceTask] {
             return TasksManager.shared.tasks
         }
@@ -47,7 +47,7 @@ public final class WorkspaceAPI {
     let tasks = TasksAPI()
 
     // MARK: - Mail
-    struct MailAPI {
+    struct MailAPI: Sendable {
         func listMessages() -> [MailMessage] {
             return MailStorageService.shared.threads.flatMap { $0.messages }
         }
@@ -74,7 +74,7 @@ public final class WorkspaceAPI {
     let mail = MailAPI()
 
     // MARK: - Calendar
-    struct CalendarAPI {
+    struct CalendarAPI: Sendable {
         @MainActor
         func listEvents() -> [CalendarEvent] {
             return CalendarManager.shared.events
@@ -92,7 +92,7 @@ public final class WorkspaceAPI {
     let calendar = CalendarAPI()
 
     // MARK: - Files
-    struct FilesAPI {
+    struct FilesAPI: Sendable {
         func listFiles() -> [ManagedFileItem] {
             let manager = FileWorkspaceManager()
             return ManagedFileMetadataService().listItems(in: manager.rootURL)
@@ -115,7 +115,7 @@ public final class WorkspaceAPI {
     let files = FilesAPI()
 
     // MARK: - Slides
-    struct SlidesAPI {
+    struct SlidesAPI: Sendable {
         func listDecks() -> [SlideDeck] {
             return SlideDecksManager.shared.decks
         }
@@ -140,7 +140,7 @@ public final class WorkspaceAPI {
     let slides = SlidesAPI()
 
     // MARK: - Meet
-    struct MeetAPI {
+    struct MeetAPI: Sendable {
         func startMeeting(title: String) async throws -> String {
             let session = try await DailyService.shared.createRoom(for: title)
             if let roomURL = await DailyService.shared.internalRoomURL(for: session) {
@@ -154,7 +154,7 @@ public final class WorkspaceAPI {
     let meet = MeetAPI()
 
     // MARK: - Time Travel
-    struct TimeTravelAPI {
+    struct TimeTravelAPI: Sendable {
         func listSnapshots() -> [WorkspaceSnapshot] {
             return TimeTravelManager.shared.snapshots
         }
@@ -179,7 +179,7 @@ public final class WorkspaceAPI {
     let timeTravel = TimeTravelAPI()
 
     // MARK: - Persona
-    struct PersonaAPI {
+    struct PersonaAPI: Sendable {
         func queryPersona(prompt: String) async throws -> String {
             let response = try await PersonaManager.shared.queryPersona(query: prompt)
             await SDKLogStore.shared.log("Persona query via WorkspaceAPI", source: "WorkspaceAPI.Persona", level: .info)
@@ -203,7 +203,7 @@ public final class WorkspaceAPI {
     let persona = PersonaAPI()
 
     // MARK: - Integrations
-    struct IntegrationsAPI {
+    struct IntegrationsAPI: Sendable {
         func executeWorkflow(workflowID: UUID) async throws {
             if let workflow = UnifiedDataStore.shared.integrationWorkflows.first(where: { $0.id == workflowID }) {
                 await IntegrationEngine.shared.processWorkflow(workflow, triggerData: [:])
@@ -223,7 +223,7 @@ public final class WorkspaceAPI {
     let integrations = IntegrationsAPI()
 
     // MARK: - Intelligence
-    struct IntelligenceAPI {
+    struct IntelligenceAPI: Sendable {
         func getGraph() -> SDKGraph {
             return SDKWorkspaceGraphEngine.shared.fetchGraph()
         }

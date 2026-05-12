@@ -64,7 +64,7 @@ export async function onEvent(event, ctx) {
 
     @State private var selectedSection: BuildSection = .identity
 
-    enum BuildSection: String, CaseIterable {
+    enum BuildSection: String, CaseIterable, Sendable {
         case identity = "Identity"
         case capabilities = "Capabilities"
         case security = "Security"

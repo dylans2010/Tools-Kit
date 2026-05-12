@@ -11,7 +11,7 @@ public protocol SDKMeetServiceProtocol {
 /// Full SDK Meet module — handles session management, presence, and local signaling.
 @MainActor
 public final class SDKMeetService: SDKMeetServiceProtocol, ObservableObject {
-    public static let shared = SDKMeetService()
+    nonisolated(unsafe) public static let shared = SDKMeetService()
 
     @Published public private(set) var sessions: [SDKMeetSession] = []
     @Published public private(set) var activeSession: SDKMeetSession?

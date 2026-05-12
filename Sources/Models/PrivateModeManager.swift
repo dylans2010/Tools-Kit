@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class PrivateModeManager: ObservableObject {
-    static let shared = PrivateModeManager()
+    nonisolated(unsafe) static let shared = PrivateModeManager()
 
     @Published var isEnabled: Bool {
         didSet {

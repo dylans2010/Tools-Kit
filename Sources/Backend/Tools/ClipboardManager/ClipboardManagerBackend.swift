@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct ClipboardEntry: Identifiable, Codable, Equatable {
+struct ClipboardEntry: Identifiable, Codable, Equatable, Sendable {
     let id: UUID
     let content: String
     let timestamp: Date

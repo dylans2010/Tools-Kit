@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolMediaCompositionEngine: AgenticToolProtocol {
+struct AgenticToolMediaCompositionEngine: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "media_composition_engine",
         description: "Compose multiple media elements into a layout",

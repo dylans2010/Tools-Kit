@@ -62,7 +62,7 @@ struct HashGeneratorView: View {
     }
 }
 
-struct HashGeneratorTool: Tool {
+struct HashGeneratorTool: Tool, Sendable {
     let name = "Hash Generator"
     let icon = "number.square"
     let category = ToolCategory.development

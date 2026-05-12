@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolCodeArchitectureGenerator: AgenticToolProtocol {
+struct AgenticToolCodeArchitectureGenerator: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "code_architecture_generator",
         description: "Generate architectural scaffolding for a system",

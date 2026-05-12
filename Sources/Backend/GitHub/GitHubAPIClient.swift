@@ -2,7 +2,7 @@ import Foundation
 
 /// A reusable API client for GitHub.
 final class GitHubAPIClient {
-    static let shared = GitHubAPIClient()
+    nonisolated(unsafe) static let shared = GitHubAPIClient()
 
     private let session: URLSession
     private let decoder: JSONDecoder
@@ -15,7 +15,7 @@ final class GitHubAPIClient {
     }
 
     /// Errors specific to GitHub API.
-    enum APIError: LocalizedError {
+    enum APIError: LocalizedError, Sendable {
         case unauthorized
         case forbidden(String) // Often rate limit
         case notFound

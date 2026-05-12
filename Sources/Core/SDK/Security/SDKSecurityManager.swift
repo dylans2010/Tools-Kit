@@ -11,9 +11,9 @@ extension SDKPermissionManager: SDKPermissionManagerProtocol {}
 
 @MainActor
 public final class SDKSecurityManager: ObservableObject {
-    public static let shared = SDKSecurityManager()
+    nonisolated(unsafe) public static let shared = SDKSecurityManager()
 
-    public struct SensitiveOperation: Identifiable, Codable {
+    public struct SensitiveOperation: Identifiable, Codable, Sendable {
         public let id: UUID
         public let timestamp: Date
         public let projectID: UUID?
@@ -125,7 +125,7 @@ public final class SDKSecurityManager: ObservableObject {
 
 @MainActor
 public final class SDKSecurityPolicy {
-    public static let shared = SDKSecurityPolicy()
+    nonisolated(unsafe) public static let shared = SDKSecurityPolicy()
 
     private let securityManager = SDKSecurityManager.shared
 
@@ -171,7 +171,7 @@ public final class SDKSecurityPolicy {
     }
 }
 
-public struct SecurityAuditReport: Codable {
+public struct SecurityAuditReport: Codable, Sendable {
     public let totalAppsWithPermissions: Int
     public let globalPermissions: [String]
     public let deniedScopes: [String]

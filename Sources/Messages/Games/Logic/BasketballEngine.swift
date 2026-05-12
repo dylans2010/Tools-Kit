@@ -1,6 +1,6 @@
 import Foundation
 
-struct BasketballEngine: GameProtocol {
+struct BasketballEngine: GameProtocol, Sendable {
     typealias StateType = BasketballState
     var state: BasketballState
 

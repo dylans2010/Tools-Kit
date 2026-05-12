@@ -1,6 +1,6 @@
 import Foundation
 
-struct FocusPreset: Identifiable, Hashable {
+struct FocusPreset: Identifiable, Hashable, Sendable {
     let id = UUID()
     let name: String
     let workSeconds: Int
@@ -15,7 +15,7 @@ struct FocusPreset: Identifiable, Hashable {
     ]
 }
 
-enum FocusPhase: String {
+enum FocusPhase: String, Sendable {
     case work = "Work"
     case shortBreak = "Short Break"
     case longBreak = "Long Break"

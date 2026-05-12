@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolCalendarEventDelete: AgenticToolProtocol {
+struct AgenticToolCalendarEventDelete: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "calendar_event_delete",
         description: "Delete a calendar event",

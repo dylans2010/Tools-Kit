@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKAnalyticsEngine: ObservableObject {
-    public static let shared = SDKAnalyticsEngine()
+    nonisolated(unsafe) public static let shared = SDKAnalyticsEngine()
 
     @Published public private(set) var events: [AnalyticsEvent] = []
     @Published public private(set) var sessionMetrics: SessionMetrics = .empty

@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolNoteAutoTag: AgenticToolProtocol {
+struct AgenticToolNoteAutoTag: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "note_auto_tag",
         description: "Automatically tag notes based on content analysis",

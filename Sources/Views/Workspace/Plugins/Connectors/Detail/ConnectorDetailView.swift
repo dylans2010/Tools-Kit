@@ -11,7 +11,7 @@ struct ConnectorDetailView<T: BaseConnector>: View {
     @State private var expandedLogID: UUID?
     @State private var logFilter: LogFilterType = .all
 
-    enum LogFilterType: String, CaseIterable {
+    enum LogFilterType: String, CaseIterable, Sendable {
         case all = "All"
         case errors = "Errors"
         case warnings = "Warnings"

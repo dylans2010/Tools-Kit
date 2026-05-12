@@ -58,7 +58,7 @@ struct EmailGeneratorView: View {
     }
 }
 
-struct EmailGeneratorTool: Tool {
+struct EmailGeneratorTool: Tool, Sendable {
     let name = "Email Assistant"
     let icon = "envelope.open.fill"
     let category = ToolCategory.ai

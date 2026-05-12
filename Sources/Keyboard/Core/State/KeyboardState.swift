@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct KeyboardState {
+struct KeyboardState: Sendable {
     var currentText: String = ""
     var suggestions: [Suggestion] = []
     var toneMode: RewriteStyle = .standard
@@ -12,7 +12,7 @@ struct KeyboardState {
     var bestRewrite: String? = nil
 }
 
-enum AccessMode: String, Codable {
+enum AccessMode: String, Codable, Sendable {
     case local = "Local Mode"
     case ai = "AI Mode"
 }

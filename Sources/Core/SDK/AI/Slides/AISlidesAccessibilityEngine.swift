@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class AISlidesAccessibilityEngine: ObservableObject {
-    public static let shared = AISlidesAccessibilityEngine()
+    nonisolated(unsafe) public static let shared = AISlidesAccessibilityEngine()
 
     @Published public private(set) var lastAudit: SlideAccessibilityReport?
     @Published public private(set) var auditHistory: [SlideAccessibilityReport] = []
@@ -171,7 +171,7 @@ public final class AISlidesAccessibilityEngine: ObservableObject {
 
 // MARK: - Models
 
-public struct SlideAccessibilityReport: Identifiable {
+public struct SlideAccessibilityReport: Identifiable, Sendable {
     public let id: UUID
     public let deckID: UUID
     public let deckTitle: String
@@ -200,7 +200,7 @@ public struct SlideAccessibilityReport: Identifiable {
     }
 }
 
-public struct SlideAccessibilityIssue: Identifiable {
+public struct SlideAccessibilityIssue: Identifiable, Sendable {
     public let id = UUID()
     public let slideIndex: Int
     public let rule: AccessibilityRule
@@ -226,7 +226,7 @@ public enum SlideIssueSeverity: String, Codable, Sendable {
     case critical, warning, info
 }
 
-public struct AccessibilityFix: Identifiable {
+public struct AccessibilityFix: Identifiable, Sendable {
     public let id = UUID()
     public let issueID: UUID
     public let slideIndex: Int

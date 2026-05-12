@@ -31,7 +31,7 @@ struct EmailDetailView: View {
         self.account = account
     }
 
-    private enum ContentTab: String, CaseIterable {
+    private enum ContentTab: String, CaseIterable, Sendable {
         case body = "Content"
         case ai = "AI Tools"
     }
@@ -415,7 +415,7 @@ struct EmailDetailView: View {
         viewModel.emails.first(where: { $0.uid == email.uid }) ?? email
     }
 
-    private enum EmailAIFeature {
+    private enum EmailAIFeature: Sendable {
         case summary, actionItems, tone, replyDraft
     }
 

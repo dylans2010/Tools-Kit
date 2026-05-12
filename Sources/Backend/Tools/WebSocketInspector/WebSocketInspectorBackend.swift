@@ -1,12 +1,12 @@
 import Foundation
 
-struct WebSocketMessage: Identifiable {
+struct WebSocketMessage: Identifiable, Sendable {
     let id = UUID()
     let timestamp: Date
     let direction: Direction
     let content: String
 
-    enum Direction { case sent, received, system }
+    enum Direction: Sendable { case sent, received, system }
 }
 
 @MainActor

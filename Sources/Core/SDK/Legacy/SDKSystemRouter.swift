@@ -2,7 +2,7 @@ import Foundation
 
 /// Routes SDK actions to their respective Workspace modules.
 public final class SDKSystemRouter {
-    public static let shared = SDKSystemRouter()
+    nonisolated(unsafe) public static let shared = SDKSystemRouter()
 
     private init() {}
 
@@ -38,7 +38,7 @@ public final class SDKSystemRouter {
     }
 }
 
-public enum SystemAction {
+public enum SystemAction: Sendable {
     case notes(NotesAction)
     case tasks(TasksAction)
     case mail(MailAction)
@@ -51,15 +51,15 @@ public enum SystemAction {
     case automation(AutomationAction)
     case intelligence(IntelligenceAction)
 
-    public enum NotesAction { case create(title: String, content: String) }
-    public enum TasksAction { case create(title: String, dueDate: Date?) }
-    public enum MailAction { case send(to: String, subject: String, body: String) }
-    public enum CalendarAction { case create(title: String, start: Date, end: Date) }
-    public enum FilesAction { case delete(id: String) }
-    public enum SlidesAction { case createDeck(title: String); case generateContent(id: UUID, prompt: String) }
-    public enum MeetAction { case start(title: String) }
-    public enum TimeTravelAction { case restore(id: UUID) }
-    public enum PersonaAction { case query(prompt: String); case injectMemory(id: UUID, content: String) }
-    public enum AutomationAction { case execute(id: UUID) }
-    public enum IntelligenceAction { case updateLink(source: UUID, target: UUID, relation: String) }
+    public enum NotesAction: Sendable { case create(title: String, content: String) }
+    public enum TasksAction: Sendable { case create(title: String, dueDate: Date?) }
+    public enum MailAction: Sendable { case send(to: String, subject: String, body: String) }
+    public enum CalendarAction: Sendable { case create(title: String, start: Date, end: Date) }
+    public enum FilesAction: Sendable { case delete(id: String) }
+    public enum SlidesAction: Sendable { case createDeck(title: String); case generateContent(id: UUID, prompt: String) }
+    public enum MeetAction: Sendable { case start(title: String) }
+    public enum TimeTravelAction: Sendable { case restore(id: UUID) }
+    public enum PersonaAction: Sendable { case query(prompt: String); case injectMemory(id: UUID, content: String) }
+    public enum AutomationAction: Sendable { case execute(id: UUID) }
+    public enum IntelligenceAction: Sendable { case updateLink(source: UUID, target: UUID, relation: String) }
 }

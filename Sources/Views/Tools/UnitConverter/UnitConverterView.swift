@@ -81,7 +81,7 @@ struct UnitConverterView: View {
         .navigationTitle("Unit Converter")
     }
 
-    enum PickerType { case from, to }
+    enum PickerType: Sendable { case from, to }
 
     @ViewBuilder
     private func unitPicker(for type: PickerType) -> some View {
@@ -139,7 +139,7 @@ struct UnitConverterView: View {
     }
 }
 
-struct UnitConverterTool: Tool {
+struct UnitConverterTool: Tool, Sendable {
     let name = "Unit Converter"
     let icon = "ruler"
     let category = ToolCategory.conversion

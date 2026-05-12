@@ -3,7 +3,7 @@ import Combine
 
 /// Core logic for workspace management, dependency tracking, and optimization.
 final class WorkspaceControlCenter: ObservableObject {
-    static let shared = WorkspaceControlCenter()
+    nonisolated(unsafe) static let shared = WorkspaceControlCenter()
 
     private init() {}
 
@@ -20,7 +20,7 @@ final class WorkspaceControlCenter: ObservableObject {
 
 /// Inspects relationships between workspace objects to prevent broken dependencies.
 final class DependencyInspector: ObservableObject {
-    static let shared = DependencyInspector()
+    nonisolated(unsafe) static let shared = DependencyInspector()
 
     private init() {}
 
@@ -43,7 +43,7 @@ final class DependencyInspector: ObservableObject {
 
 /// AI-powered organizer that suggests workspace restructures.
 final class SmartWorkspaceOrganizer: ObservableObject {
-    static let shared = SmartWorkspaceOrganizer()
+    nonisolated(unsafe) static let shared = SmartWorkspaceOrganizer()
 
     private init() {}
 

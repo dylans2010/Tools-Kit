@@ -56,7 +56,7 @@ struct IdeaGeneratorView: View {
     }
 }
 
-struct IdeaGeneratorTool: Tool {
+struct IdeaGeneratorTool: Tool, Sendable {
     let name = "Idea Generator"
     let icon = "lightbulb.fill"
     let category = ToolCategory.ai

@@ -2,7 +2,7 @@ import Foundation
 import AVFoundation
 import Combine
 
-enum RadioPlaybackState: Equatable {
+enum RadioPlaybackState: Equatable, Sendable {
     case idle
     case loading
     case playing
@@ -12,7 +12,7 @@ enum RadioPlaybackState: Equatable {
 
 @MainActor
 final class RadioPlayerManager: ObservableObject {
-    static let shared = RadioPlayerManager()
+    nonisolated(unsafe) static let shared = RadioPlayerManager()
 
     @Published var currentStation: RadioStation?
     @Published var playbackState: RadioPlaybackState = .idle

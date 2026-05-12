@@ -1,7 +1,7 @@
 import Foundation
 
 /// Structured request object for the SDK internal API system.
-public struct SDKRequest: Identifiable {
+public struct SDKRequest: Identifiable, @unchecked Sendable {
     public let id: UUID
     public let path: String
     public let method: SDKRoute.Method

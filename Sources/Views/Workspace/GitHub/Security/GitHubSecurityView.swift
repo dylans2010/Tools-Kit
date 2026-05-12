@@ -96,7 +96,7 @@ struct GitHubSecurityView: View {
     }
 }
 
-private struct SecurityAlert: Identifiable {
+private struct SecurityAlert: Identifiable, Sendable {
     let id = UUID()
     let title: String
     let severity: AlertSeverity
@@ -106,7 +106,7 @@ private struct SecurityAlert: Identifiable {
     let detectedAt: Date
 }
 
-private enum AlertSeverity: String, CaseIterable {
+private enum AlertSeverity: String, CaseIterable, Sendable {
     case critical, high, medium, low
 
     var color: Color {

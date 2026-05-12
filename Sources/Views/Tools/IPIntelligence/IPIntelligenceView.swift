@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct IPIntelligenceTool: Tool {
+struct IPIntelligenceTool: Tool, Sendable {
     let name = "IP Intelligence"
     let icon = "antenna.radiowaves.left.and.right"
     let category = ToolCategory.network

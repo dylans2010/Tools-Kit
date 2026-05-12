@@ -4,7 +4,7 @@ import ManagedSettings
 import DeviceActivity
 import Combine
 
-struct AppLockProfile: Identifiable, Codable, Equatable {
+struct AppLockProfile: Identifiable, Codable, Equatable, Sendable {
     let id: String
     var name: String
     var selection: FamilyActivitySelection
@@ -20,7 +20,7 @@ struct AppLockProfile: Identifiable, Codable, Equatable {
 
 @MainActor
 class AppLockManager: ObservableObject {
-    static let shared = AppLockManager()
+    nonisolated(unsafe) static let shared = AppLockManager()
 
     private let store = ManagedSettingsStore()
     private let center = DeviceActivityCenter()

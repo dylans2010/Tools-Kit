@@ -1,13 +1,13 @@
 import Foundation
 
-enum LyricsSourceType: String, Codable, CaseIterable {
+enum LyricsSourceType: String, Codable, CaseIterable, Sendable {
     case manual
     case imported
     case synced
     case lrclib = "LRCLIB"
 }
 
-struct LyricsDocument: Identifiable, Codable {
+struct LyricsDocument: Identifiable, Codable, Sendable {
     var id: UUID = UUID()
     var songID: String
     var lines: [LyricLine]

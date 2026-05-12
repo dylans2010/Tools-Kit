@@ -78,7 +78,7 @@ struct SongsView: View {
     @State private var renameTargetSongID: UUID?
     @State private var pendingSongName = ""
 
-    enum SortOption: String, CaseIterable {
+    enum SortOption: String, CaseIterable, Sendable {
         case dateAdded = "Recently Added"
         case title     = "Title"
         case artist    = "Artist"

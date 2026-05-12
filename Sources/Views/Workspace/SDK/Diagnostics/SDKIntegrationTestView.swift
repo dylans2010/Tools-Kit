@@ -116,7 +116,7 @@ struct SDKIntegrationTestView: View {
         }
     }
 
-    enum TestStatus: Equatable {
+    enum TestStatus: Equatable, Sendable {
         case idle, running
         case success(message: String)
         case failure(error: String)

@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKPersonaBridge: ObservableObject {
-    public static let shared = SDKPersonaBridge()
+    nonisolated(unsafe) public static let shared = SDKPersonaBridge()
 
     @Published public var queryHistory: [PersonaQueryRecord] = []
 
@@ -11,14 +11,14 @@ public final class SDKPersonaBridge: ObservableObject {
     private let persistenceURL: URL
     private let queue = DispatchQueue(label: "com.toolskit.sdk.persona", qos: .utility)
 
-    public struct PersonaQueryRecord: Identifiable, Codable {
+    public struct PersonaQueryRecord: Identifiable, Codable, Sendable {
         public let id: UUID
         public let prompt: String
         public let response: String
         public let timestamp: Date
         public let queryType: QueryType
 
-        public enum QueryType: String, Codable {
+        public enum QueryType: String, Codable, Sendable {
             case query, generate, analyze, summarize, memoryWrite
         }
     }

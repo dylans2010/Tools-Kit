@@ -4,7 +4,7 @@ import ZIPFoundation
 
 // MARK: - Logging
 
-enum FetchLogLevel: String {
+enum FetchLogLevel: String, Sendable {
     case debug = "DEBUG"
     case info  = "INFO"
     case warning = "WARN"
@@ -20,7 +20,7 @@ enum FetchLogLevel: String {
     }
 }
 
-enum PipelineStage: String {
+enum PipelineStage: String, Sendable {
     case ui       = "UI"
     case parsing  = "PARSING"
     case youtube  = "YOUTUBE"
@@ -32,7 +32,7 @@ enum PipelineStage: String {
     case system   = "SYSTEM"
 }
 
-struct LogEntry: Identifiable {
+struct LogEntry: Identifiable, Sendable {
     let id: UUID = UUID()
     let timestamp: Date
     let level: FetchLogLevel
@@ -49,7 +49,7 @@ struct LogEntry: Identifiable {
 
 @MainActor
 final class LogManager: ObservableObject {
-    static let shared = LogManager()
+    nonisolated(unsafe) static let shared = LogManager()
     private init() {}
 
     @Published private(set) var entries: [LogEntry] = []
@@ -81,7 +81,7 @@ final class LogManager: ObservableObject {
 
 // MARK: - Errors
 
-enum FetchError: LocalizedError {
+enum FetchError: LocalizedError, Sendable {
     case urlEncoding(query: String)
     case invalidURL(String)
     case invalidResponse
@@ -117,7 +117,7 @@ enum FetchError: LocalizedError {
 
 // MARK: - Models
 
-enum FetchStatus: Equatable {
+enum FetchStatus: Equatable, Sendable {
     case idle
     case searching
     case ranking
@@ -127,7 +127,7 @@ enum FetchStatus: Equatable {
     case failed(String)
 }
 
-struct SongFetchItem: Identifiable, Equatable {
+struct SongFetchItem: Identifiable, Equatable, Sendable {
     let id = UUID()
     let title: String
     let artist: String
@@ -141,8 +141,8 @@ struct SongFetchItem: Identifiable, Equatable {
     }
 }
 
-struct SongResult {
-    enum Status {
+struct SongResult: Sendable {
+    enum Status: Sendable {
         case success
         case failed
     }
@@ -1062,7 +1062,7 @@ final class FallbackFetchViewModel: ObservableObject {
 
 // MARK: - Config
 
-private enum ZylaConfig {
+private enum ZylaConfig: Sendable {
     static let convertEndpoint = "https://zylalabs.com/api/381/youtube+to+audio+api/351/get+audio"
     static let statusEndpoint  = "https://zylalabs.com/api/381/youtube+to+audio+api/351/status"
 }

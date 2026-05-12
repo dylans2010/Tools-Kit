@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolSlidesEdit: AgenticToolProtocol {
+struct AgenticToolSlidesEdit: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "slides_edit",
         description: "Edit a specific slide's title, bullets, speaker notes, or layout",

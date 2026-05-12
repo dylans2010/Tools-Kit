@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKToolRuntime: ObservableObject {
-    public static let shared = SDKToolRuntime()
+    nonisolated(unsafe) public static let shared = SDKToolRuntime()
 
     @Published public var executionHistory: [ToolExecutionRecord] = []
     @Published public var activeExecutions: Set<UUID> = []
@@ -11,7 +11,7 @@ public final class SDKToolRuntime: ObservableObject {
     private let maxHistorySize = 200
     private let executionQueue = DispatchQueue(label: "com.toolskit.sdk.toolruntime", attributes: .concurrent)
 
-    public struct ToolExecutionRecord: Identifiable {
+    public struct ToolExecutionRecord: Identifiable, Sendable {
         public let id: UUID
         public let toolID: UUID
         public let toolName: String
@@ -128,7 +128,7 @@ public final class SDKToolRuntime: ObservableObject {
     }
 }
 
-public struct ToolRuntimeMetrics {
+public struct ToolRuntimeMetrics: Sendable {
     public let totalExecutions: Int
     public let successCount: Int
     public let failureCount: Int

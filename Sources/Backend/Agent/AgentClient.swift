@@ -2,7 +2,7 @@ import Foundation
 
 /// Handles API communication with Jules.
 final class AgentClient {
-    static let shared = AgentClient()
+    nonisolated(unsafe) static let shared = AgentClient()
 
     private let requestManager: JulesRequestManager
     private let maxRetries = 3
@@ -11,7 +11,7 @@ final class AgentClient {
         self.requestManager = requestManager
     }
 
-    private enum RetryDisposition {
+    private enum RetryDisposition: Sendable {
         case retry
         case noRetry
     }
@@ -209,16 +209,16 @@ final class AgentClient {
 }
 
 
-private struct AgentCreateSessionRequest: Encodable, JulesPayloadValidating {
+private struct AgentCreateSessionRequest: Encodable, JulesPayloadValidating, Sendable {
     let prompt: String
     let sourceContext: SourceContext
     let automationMode: String
 
-    struct SourceContext: Encodable {
+    struct SourceContext: Encodable, Sendable {
         let source: String
         let githubRepoContext: GitHubRepoContext
 
-        struct GitHubRepoContext: Encodable {
+        struct GitHubRepoContext: Encodable, Sendable {
             let startingBranch: String
         }
     }
@@ -253,7 +253,7 @@ private struct AgentCreateSessionRequest: Encodable, JulesPayloadValidating {
     }
 }
 
-enum AgentError: Error, LocalizedError {
+enum AgentError: Error, LocalizedError, Sendable {
     case missingApiKey
     case invalidResponse
     case invalidPayload([String])

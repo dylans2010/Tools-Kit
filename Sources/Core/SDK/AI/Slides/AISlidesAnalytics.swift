@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class AISlidesAnalytics: ObservableObject {
-    public static let shared = AISlidesAnalytics()
+    nonisolated(unsafe) public static let shared = AISlidesAnalytics()
 
     @Published public private(set) var presentationStats: [UUID: PresentationStats] = [:]
     @Published public private(set) var generationMetrics: [GenerationMetric] = []
@@ -115,7 +115,7 @@ public final class AISlidesAnalytics: ObservableObject {
 
 // MARK: - Models
 
-public struct PresentationStats: Identifiable {
+public struct PresentationStats: Identifiable, Sendable {
     public let id: UUID
     public let deckID: UUID
     public let totalSlides: Int
@@ -148,7 +148,7 @@ public struct PresentationStats: Identifiable {
     }
 }
 
-public struct SlideView: Identifiable {
+public struct SlideView: Identifiable, Sendable {
     public let id = UUID()
     public let slideIndex: Int
     public let duration: TimeInterval
@@ -161,7 +161,7 @@ public struct SlideView: Identifiable {
     }
 }
 
-public struct GenerationMetric: Identifiable {
+public struct GenerationMetric: Identifiable, Sendable {
     public let id = UUID()
     public let prompt: String
     public let slideCount: Int
@@ -180,7 +180,7 @@ public struct GenerationMetric: Identifiable {
     }
 }
 
-public struct SlideEngagementData: Identifiable {
+public struct SlideEngagementData: Identifiable, Sendable {
     public let id = UUID()
     public let slideIndex: Int
     public var viewCount: Int

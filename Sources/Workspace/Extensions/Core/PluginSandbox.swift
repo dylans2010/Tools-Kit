@@ -4,7 +4,7 @@ import JavaScriptCore
 /// Sandboxed execution environment for plugins.
 /// Implements ScopeValidator, PluginPrerequisiteEngine, and PluginSecurityService logic.
 final class PluginSandbox {
-    static let shared = PluginSandbox()
+    nonisolated(unsafe) static let shared = PluginSandbox()
 
     private let context: JSContext?
 
@@ -197,12 +197,12 @@ final class PluginSandbox {
 
 // MARK: - Helper Types
 
-enum ValidationResult {
+enum ValidationResult: Sendable {
     case success
     case failure(reason: ValidationFailureReason, detail: String)
 }
 
-enum ValidationFailureReason: String {
+enum ValidationFailureReason: String, Sendable {
     case capabilityMismatch = "Capability Mismatch"
     case actionMismatch = "Action Mismatch"
     case scopeInvalid = "Scope Invalid"

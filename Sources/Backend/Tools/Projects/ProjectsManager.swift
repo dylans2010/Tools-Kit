@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 class ProjectsManager: ObservableObject {
-    static let shared = ProjectsManager()
+    nonisolated(unsafe) static let shared = ProjectsManager()
 
     @Published var projects: [Project] = []
 

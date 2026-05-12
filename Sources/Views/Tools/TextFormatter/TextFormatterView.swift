@@ -61,7 +61,7 @@ struct TextFormatterView: View {
     }
 }
 
-struct TextFormatterTool: Tool {
+struct TextFormatterTool: Tool, Sendable {
     let name = "Text Formatter"
     let icon = "text.badge.plus"
     let category = ToolCategory.utility

@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class NotebooksManager: ObservableObject {
-    static let shared = NotebooksManager()
+    nonisolated(unsafe) static let shared = NotebooksManager()
 
     @Published var notebooks: [Notebook] = []
     @Published var integrations: [IntegrationTool] = []
@@ -178,7 +178,7 @@ final class NotebooksManager: ObservableObject {
 
     // MARK: - AI Note Intelligence
 
-    struct AINotebookInsights: Codable {
+    struct AINotebookInsights: Codable, Sendable {
         let summary: String
         let expandedIdeas: [String]
         let tags: [String]

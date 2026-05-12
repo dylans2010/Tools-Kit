@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentConfigurationMigrator {
+struct AgentConfigurationMigrator: Sendable {
     init() {}
 
     func migrate(_ data: [String: Any]) -> AgentConfiguration {

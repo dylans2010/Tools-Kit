@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentTaskPlanner {
+struct AgentTaskPlanner: Sendable {
     func orderedTasks(from graph: AgentTaskGraph) -> [String] {
         var inDegree: [String: Int] = [:]
         for (task, deps) in graph.edges {

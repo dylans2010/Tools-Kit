@@ -1,12 +1,12 @@
 import Foundation
 
-struct AIRequest: Codable {
+struct AIRequest: Codable, Sendable {
     let text: String
     let style: RewriteStyle?
     let type: ConversionType?
 }
 
-enum RewriteStyle: String, Codable, CaseIterable {
+enum RewriteStyle: String, Codable, CaseIterable, Sendable {
     case formal = "Formal"
     case casual = "Casual"
     case friendly = "Friendly"
@@ -16,7 +16,7 @@ enum RewriteStyle: String, Codable, CaseIterable {
     case standard = "Standard"
 }
 
-enum ConversionType: String, Codable, CaseIterable {
+enum ConversionType: String, Codable, CaseIterable, Sendable {
     case email = "Email Response"
     case message = "Message Reply"
     case task = "Task Item"

@@ -3,13 +3,13 @@ import os.log
 
 @MainActor
 final class ExecutionBridge {
-    static let shared = ExecutionBridge()
+    nonisolated(unsafe) static let shared = ExecutionBridge()
 
     private let calendarManager = CalendarManager.shared
     private let tasksManager = TasksManager.shared
     private let mailAIService = MailAIService.shared
 
-    struct TimeExtraction: Codable {
+    struct TimeExtraction: Codable, Sendable {
         let startISO8601: String
         let endISO8601: String
     }
@@ -67,7 +67,7 @@ final class ExecutionBridge {
     }
 }
 
-struct WorkspaceLogger {
+struct WorkspaceLogger: Sendable {
     static let general = Logger(subsystem: "com.workspace", category: "General")
     static let db = Logger(subsystem: "com.workspace", category: "Database")
     static let ai = Logger(subsystem: "com.workspace", category: "AI")

@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentAPIRouter {
+struct AgentAPIRouter: Sendable {
     let baseURL: URL
 
     func endpoint(path: String) -> URL {

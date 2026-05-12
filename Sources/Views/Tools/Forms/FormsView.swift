@@ -275,7 +275,7 @@ private struct FormCard: View {
     }
 }
 
-struct FormsTool: Tool {
+struct FormsTool: Tool, Sendable {
     let name = "Forms"
     let icon = "list.bullet.rectangle.portrait"
     let category = ToolCategory.utility

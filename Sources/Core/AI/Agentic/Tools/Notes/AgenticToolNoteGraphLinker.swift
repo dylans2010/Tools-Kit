@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolNoteGraphLinker: AgenticToolProtocol {
+struct AgenticToolNoteGraphLinker: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "note_graph_linker",
         description: "Link related notes into a knowledge graph",

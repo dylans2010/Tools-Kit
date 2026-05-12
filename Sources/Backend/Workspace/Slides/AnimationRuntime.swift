@@ -3,12 +3,12 @@ import Combine
 
 /// Animation runtime for Slides, handling physics-based motion and timeline sequencing.
 final class AnimationRuntime: ObservableObject {
-    static let shared = AnimationRuntime()
+    nonisolated(unsafe) static let shared = AnimationRuntime()
 
     @Published var currentTime: Double = 0
     @Published var isPlaying: Bool = false
 
-    struct Keyframe: Codable, Identifiable {
+    struct Keyframe: Codable, Identifiable, Sendable {
         let id: UUID
         let nodeID: UUID
         let property: String
@@ -17,7 +17,7 @@ final class AnimationRuntime: ObservableObject {
         let easing: EasingType
     }
 
-    enum EasingType: String, Codable {
+    enum EasingType: String, Codable, Sendable {
         case linear, spring, easeInOut, bounce
     }
 

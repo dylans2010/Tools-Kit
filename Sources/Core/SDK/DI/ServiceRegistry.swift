@@ -3,14 +3,14 @@ import Foundation
 /// Protocol-based service registry for the SDK dependency injection system.
 /// Services are registered by protocol type and resolved lazily.
 public final class ServiceRegistry {
-    public static let shared = ServiceRegistry()
+    nonisolated(unsafe) public static let shared = ServiceRegistry()
 
     private var factories: [String: () -> Any] = [:]
     private var singletons: [String: Any] = [:]
     private var scopes: [String: ServiceScope] = [:]
     private let lock = NSRecursiveLock()
 
-    public enum ServiceScope: String {
+    public enum ServiceScope: String, Sendable {
         case singleton, transient, scoped
     }
 

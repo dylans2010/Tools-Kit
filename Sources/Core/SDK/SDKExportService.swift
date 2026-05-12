@@ -1,7 +1,7 @@
 import Foundation
 import Compression
 
-public struct SDKExportConfig: Codable {
+public struct SDKExportConfig: Codable, Sendable {
     public var projectName: String
     public var scopes: [SDKScope]
     public var pluginIDs: [UUID]

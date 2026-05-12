@@ -6,7 +6,7 @@ struct IDELibrariesView: View {
     @State private var editingLibrary: SDKLibraryDefinition?
     @State private var resolutionState: ResolutionState = .idle
 
-    enum ResolutionState: String {
+    enum ResolutionState: String, Sendable {
         case idle = "Idle"
         case resolving = "Resolving"
         case resolved = "Resolved"

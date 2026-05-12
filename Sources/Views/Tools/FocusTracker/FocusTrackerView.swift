@@ -125,7 +125,7 @@ struct FocusTrackerView: View {
     }
 }
 
-struct FocusTrackerTool: Tool {
+struct FocusTrackerTool: Tool, Sendable {
     let name = "Focus Session"
     let icon = "timer"
     let category = ToolCategory.utility

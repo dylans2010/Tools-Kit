@@ -7,7 +7,7 @@ final class IMAPProvider: MailProvider {
     var iconAssetName: String { "server.rack" }
     var primaryColor: Color { Color(red: 0.47, green: 0.52, blue: 0.61) }
 
-    private struct IMAPConnectionContext {
+    private struct IMAPConnectionContext: Sendable {
         let connection: NWConnection
         var tagCounter: Int
     }
@@ -254,7 +254,7 @@ final class IMAPProvider: MailProvider {
     }
 
     private func parseFetchMessages(_ response: String) -> [MailMessage] {
-        enum ParserState {
+        enum ParserState: Sendable {
             case idle
             case inFetch
         }

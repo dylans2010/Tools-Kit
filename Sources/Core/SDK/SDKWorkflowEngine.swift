@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKWorkflowEngine: ObservableObject {
-    public static let shared = SDKWorkflowEngine()
+    nonisolated(unsafe) public static let shared = SDKWorkflowEngine()
 
     @Published public private(set) var workflows: [SDKWorkflow] = []
     @Published public private(set) var runningWorkflows: [UUID: WorkflowExecution] = [:]
@@ -99,7 +99,7 @@ public final class SDKWorkflowEngine: ObservableObject {
 
 // MARK: - Models
 
-public struct SDKWorkflow: Identifiable, Codable {
+public struct SDKWorkflow: Identifiable, Codable, Sendable {
     public let id: UUID
     public var name: String
     public var description: String
@@ -119,7 +119,7 @@ public struct SDKWorkflow: Identifiable, Codable {
     }
 }
 
-public struct WorkflowStep: Identifiable, Codable {
+public struct WorkflowStep: Identifiable, Codable, Sendable {
     public let id: UUID
     public let name: String
     public let action: WorkflowAction
@@ -133,7 +133,7 @@ public struct WorkflowStep: Identifiable, Codable {
     }
 }
 
-public enum WorkflowAction: Codable {
+public enum WorkflowAction: Codable, Sendable {
     case delay(seconds: Double)
     case publishEvent(channel: String, name: String, data: [String: String])
     case condition(key: String, expected: String)
@@ -142,7 +142,7 @@ public enum WorkflowAction: Codable {
     case apiCall(path: String, method: String)
 }
 
-public struct WorkflowExecution: Identifiable, Codable {
+public struct WorkflowExecution: Identifiable, Codable, Sendable {
     public let id: UUID
     public let workflowID: UUID
     public let workflowName: String
@@ -172,7 +172,7 @@ public enum WorkflowStatus: String, Codable, CaseIterable, Sendable {
     case pending, running, completed, failed, cancelled
 }
 
-public struct WorkflowLog: Identifiable, Codable {
+public struct WorkflowLog: Identifiable, Codable, Sendable {
     public let id: UUID
     public let step: String
     public let message: String
@@ -186,7 +186,7 @@ public struct WorkflowLog: Identifiable, Codable {
     }
 }
 
-public enum WorkflowError: LocalizedError {
+public enum WorkflowError: LocalizedError, Sendable {
     case notFound
     case stepFailed(step: String, underlying: Error)
     case conditionNotMet(key: String, expected: String)

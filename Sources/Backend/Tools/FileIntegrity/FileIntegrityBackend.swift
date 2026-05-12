@@ -2,7 +2,7 @@ import Foundation
 import CommonCrypto
 import CryptoKit
 
-struct FileHashRecord: Identifiable, Codable {
+struct FileHashRecord: Identifiable, Codable, Sendable {
     let id: UUID
     let fileName: String
     let filePath: String

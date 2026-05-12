@@ -1,6 +1,6 @@
 import Foundation
 
-struct SecureFolder: Identifiable, Codable, Equatable {
+struct SecureFolder: Identifiable, Codable, Equatable, Sendable {
     let id: String
     var name: String
     var items: [SecureFolderItem]
@@ -14,7 +14,7 @@ struct SecureFolder: Identifiable, Codable, Equatable {
     }
 }
 
-enum SecureFolderItem: Codable, Equatable {
+enum SecureFolderItem: Codable, Equatable, Sendable {
     case password(id: String)
     case file(id: String)
     case photo(id: String)

@@ -72,7 +72,7 @@ struct BatteryAnalyticsView: View {
     }
 }
 
-struct BatteryAnalyticsTool: Tool {
+struct BatteryAnalyticsTool: Tool, Sendable {
     let name = "Battery Analytics"
     let icon = "battery.100"
     let category = ToolCategory.utility

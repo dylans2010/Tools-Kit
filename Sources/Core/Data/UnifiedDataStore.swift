@@ -4,7 +4,7 @@ import Combine
 /// The central source of truth for all ToolsKit data.
 /// Handles persistent storage, in-memory caching, and change notifications.
 final class UnifiedDataStore: ObservableObject {
-    static let shared = UnifiedDataStore()
+    nonisolated(unsafe) static let shared = UnifiedDataStore()
 
     @Published private(set) var workflows: [String] = []
     @Published private(set) var integrationWorkflows: [IntegrationWorkflow] = []

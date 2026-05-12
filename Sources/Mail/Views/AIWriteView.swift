@@ -3,17 +3,17 @@ import SwiftUI
 struct AIWriteView: View {
     @Environment(\.dismiss) private var dismiss
 
-    enum EmailType: String, CaseIterable, Identifiable {
+    enum EmailType: String, CaseIterable, Identifiable, Sendable {
         case general = "General", followup = "Follow Up", request = "Request", apology = "Apology", update = "Update"
         var id: String { rawValue }
     }
 
-    enum Tone: String, CaseIterable, Identifiable {
+    enum Tone: String, CaseIterable, Identifiable, Sendable {
         case professional = "Professional", friendly = "Friendly", concise = "Concise", urgent = "Urgent", academic = "Academic"
         var id: String { rawValue }
     }
 
-    enum AITool: String, CaseIterable, Identifiable {
+    enum AITool: String, CaseIterable, Identifiable, Sendable {
         case write = "Write", rewrite = "Rewrite", shorten = "Shorten", expand = "Expand", formalize = "Formalize", proofread = "Proofread", suggestSubject = "Suggest Subject"
         var id: String { rawValue }
 

@@ -2,19 +2,19 @@ import Foundation
 
 // MARK: - Unsplash API Response Models
 
-struct UnsplashSearchResponse: Codable {
+struct UnsplashSearchResponse: Codable, Sendable {
     let total: Int
     let totalPages: Int
     let results: [UnsplashPhoto]
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case total
         case totalPages = "total_pages"
         case results
     }
 }
 
-struct UnsplashPhoto: Codable, Identifiable, Equatable {
+struct UnsplashPhoto: Codable, Identifiable, Equatable, Sendable {
     let id: String
     let width: Int
     let height: Int
@@ -24,7 +24,7 @@ struct UnsplashPhoto: Codable, Identifiable, Equatable {
     let user: UnsplashUser
     let links: UnsplashPhotoLinks
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case id, width, height, description
         case altDescription = "alt_description"
         case urls, user, links
@@ -35,7 +35,7 @@ struct UnsplashPhoto: Codable, Identifiable, Equatable {
     }
 }
 
-struct UnsplashPhotoURLs: Codable {
+struct UnsplashPhotoURLs: Codable, Sendable {
     let raw: String
     let full: String
     let regular: String
@@ -43,18 +43,18 @@ struct UnsplashPhotoURLs: Codable {
     let thumb: String
 }
 
-struct UnsplashUser: Codable {
+struct UnsplashUser: Codable, Sendable {
     let id: String
     let name: String
     let username: String
 }
 
-struct UnsplashPhotoLinks: Codable {
+struct UnsplashPhotoLinks: Codable, Sendable {
     let html: String
     let download: String
     let downloadLocation: String
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case html, download
         case downloadLocation = "download_location"
     }
@@ -62,7 +62,7 @@ struct UnsplashPhotoLinks: Codable {
 
 // MARK: - Unsplash Provider Error
 
-enum UnsplashProviderError: LocalizedError, Equatable {
+enum UnsplashProviderError: LocalizedError, Equatable, Sendable {
     case missingAPIKey
     case invalidAPIKey
     case networkError(String)
@@ -94,7 +94,7 @@ enum UnsplashProviderError: LocalizedError, Equatable {
 // MARK: - UnsplashProvider
 
 final class UnsplashProvider: AISlidesImageProvider {
-    static let shared = UnsplashProvider()
+    nonisolated(unsafe) static let shared = UnsplashProvider()
     static let providerID = "unsplash"
 
     private let baseURL = "https://api.unsplash.com"
@@ -273,7 +273,7 @@ final class UnsplashProvider: AISlidesImageProvider {
         }
     }
 
-    enum ImageQuality {
+    enum ImageQuality: Sendable {
         case thumb, small, regular, full
     }
 
@@ -413,12 +413,12 @@ final class UnsplashProvider: AISlidesImageProvider {
 
 // MARK: - Cache Types
 
-struct UnsplashCacheKey: Hashable {
+struct UnsplashCacheKey: Hashable, Sendable {
     let query: String
     let page: Int
 }
 
-struct UnsplashCacheEntry: Codable {
+struct UnsplashCacheEntry: Codable, Sendable {
     let response: UnsplashSearchResponse
     let timestamp: Date
 

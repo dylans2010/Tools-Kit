@@ -2,7 +2,7 @@ import Foundation
 import Appwrite
 import OSLog
 
-enum AppwriteService {
+enum AppwriteService: Sendable {
     private static let defaultEndpoint = "https://fra.cloud.appwrite.io/v1"
     private static let defaultProjectID = "69e24c32003548ff0e2e"
     private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "ToolsKit", category: "AppwriteService")

@@ -7,7 +7,7 @@ struct InboxView: View {
     let folder: MailFolder
     @State private var filter: InboxFilter = .all
 
-    enum InboxFilter: String, CaseIterable, Identifiable {
+    enum InboxFilter: String, CaseIterable, Identifiable, Sendable {
         case all = "All"
         case unread = "Unread"
         case attention = "Attention"

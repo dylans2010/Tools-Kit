@@ -1,6 +1,6 @@
 import Foundation
 
-struct Note: Identifiable, Codable, Equatable {
+struct Note: Identifiable, Codable, Equatable, Sendable {
     var id: UUID
     var title: String
     var content: String
@@ -23,7 +23,7 @@ struct Note: Identifiable, Codable, Equatable {
     }
 }
 
-struct NoteVersion: Identifiable, Codable, Equatable {
+struct NoteVersion: Identifiable, Codable, Equatable, Sendable {
     var id: UUID
     var content: String
     var timestamp: Date

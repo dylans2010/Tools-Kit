@@ -1,6 +1,6 @@
 import Foundation
 
-enum OrderIntakeFormTemplate {
+enum OrderIntakeFormTemplate: Sendable {
     static func build() -> FormDocument {
         let questions = [
             FormQuestion(title: "Customer Name", type: .textInput, required: true),

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct NetworkProfilerTool: Tool {
+struct NetworkProfilerTool: Tool, Sendable {
     let name = "Network Profiler"
     let icon = "waveform.path.ecg"
     let category = ToolCategory.network

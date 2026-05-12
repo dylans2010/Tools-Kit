@@ -1,6 +1,6 @@
 import Foundation
 
-enum ProviderModelFetchSupport {
+enum ProviderModelFetchSupport: Sendable {
     static func authRequest(url: URL, bearerKey: String) -> URLRequest {
         var request = URLRequest(url: url)
         request.addValue("Bearer \(bearerKey)", forHTTPHeaderField: "Authorization")

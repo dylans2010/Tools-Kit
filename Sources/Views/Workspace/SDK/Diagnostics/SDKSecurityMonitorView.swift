@@ -7,7 +7,7 @@ struct SDKSecurityMonitorView: View {
     @StateObject private var runtime = SDKRuntimeEngine.shared
     @State private var selectedFilter: SecurityFilter = .all
 
-    enum SecurityFilter: String, CaseIterable {
+    enum SecurityFilter: String, CaseIterable, Sendable {
         case all = "All", granted = "Granted", blocked = "Blocked"
     }
 

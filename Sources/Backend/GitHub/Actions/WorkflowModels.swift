@@ -9,7 +9,7 @@ struct GitHubWorkflow: Codable, Identifiable, Hashable, Sendable {
     let updatedAt: Date
     let htmlURL: URL
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case id, name, path, state
         case createdAt = "created_at"
         case updatedAt = "updated_at"
@@ -21,7 +21,7 @@ struct WorkflowListResponse: Codable, Sendable {
     let totalCount: Int
     let workflows: [GitHubWorkflow]
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case totalCount = "total_count"
         case workflows
     }
@@ -41,7 +41,7 @@ struct GitHubWorkflowRun: Codable, Identifiable, Hashable, Sendable {
     let createdAt: Date
     let updatedAt: Date
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case id, name, event, status, conclusion
         case headBranch = "head_branch"
         case headSHA = "head_sha"
@@ -57,7 +57,7 @@ struct WorkflowRunListResponse: Codable, Sendable {
     let totalCount: Int
     let workflowRuns: [GitHubWorkflowRun]
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case totalCount = "total_count"
         case workflowRuns = "workflow_runs"
     }
@@ -71,7 +71,7 @@ struct WorkflowArtifact: Codable, Identifiable, Hashable, Sendable {
     let expired: Bool
     let createdAt: Date
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case id, name, expired
         case sizeInBytes = "size_in_bytes"
         case archiveDownloadURL = "archive_download_url"
@@ -83,7 +83,7 @@ struct WorkflowArtifactListResponse: Codable, Sendable {
     let totalCount: Int
     let artifacts: [WorkflowArtifact]
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case totalCount = "total_count"
         case artifacts
     }
@@ -97,7 +97,7 @@ struct WorkflowJob: Codable, Identifiable, Hashable, Sendable {
     let startedAt: Date?
     let completedAt: Date?
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case id, name, status, conclusion
         case startedAt = "started_at"
         case completedAt = "completed_at"
@@ -108,7 +108,7 @@ struct WorkflowJobsResponse: Codable, Sendable {
     let totalCount: Int
     let jobs: [WorkflowJob]
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case totalCount = "total_count"
         case jobs
     }

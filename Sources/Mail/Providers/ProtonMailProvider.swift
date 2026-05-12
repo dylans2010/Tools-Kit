@@ -153,7 +153,7 @@ final class ProtonMailProvider: MailProvider {
         }
     }
 
-    private struct Context {
+    private struct Context: Sendable {
         let connection: NWConnection
         var tag: Int
     }

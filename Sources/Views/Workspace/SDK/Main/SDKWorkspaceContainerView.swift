@@ -11,7 +11,7 @@ struct SDKWorkspaceContainerView: View {
     @State private var isRunning = false
     @State private var activeSheet: WorkspaceSheet?
 
-    private enum WorkspaceSheet: Identifiable, Equatable {
+    private enum WorkspaceSheet: Identifiable, Equatable, Sendable {
         case navigator, inspector, console, runConfiguration
         var id: String {
             switch self {

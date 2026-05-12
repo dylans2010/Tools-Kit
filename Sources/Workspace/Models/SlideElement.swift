@@ -1,7 +1,7 @@
 import Foundation
 
-public struct SlideElement: Codable, Identifiable, Equatable {
-    public struct ChartData: Codable, Equatable {
+public struct SlideElement: Codable, Identifiable, Equatable, Sendable {
+    public struct ChartData: Codable, Equatable, Sendable {
         var title: String = ""
         var labels: [String] = []
         var values: [Double] = []
@@ -44,11 +44,11 @@ public struct SlideElement: Codable, Identifiable, Equatable {
     var strokeWidth: Double = 0
     var cornerRadius: Double = 8
 
-    public enum ElementKind: String, Codable, CaseIterable {
+    public enum ElementKind: String, Codable, CaseIterable, Sendable {
         case text, bullets, image, chart, shape
     }
 
-    public enum ShapeKind: String, Codable, CaseIterable {
+    public enum ShapeKind: String, Codable, CaseIterable, Sendable {
         case rectangle, circle, triangle
         var displayName: String {
             switch self {
@@ -59,7 +59,7 @@ public struct SlideElement: Codable, Identifiable, Equatable {
         }
     }
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case id
         case kind
         case x

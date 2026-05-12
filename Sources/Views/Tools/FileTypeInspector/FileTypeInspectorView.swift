@@ -52,7 +52,7 @@ struct FileTypeInspectorView: View {
     }
 }
 
-struct FileTypeInspectorTool: Tool {
+struct FileTypeInspectorTool: Tool, Sendable {
     let name = "Type Inspector"
     let icon = "doc.questionmark"
     let category = ToolCategory.utility

@@ -1,7 +1,7 @@
 import Foundation
 import CoreGraphics
 
-public enum WhiteboardNodeType: String, Codable, CaseIterable {
+public enum WhiteboardNodeType: String, Codable, CaseIterable, Sendable {
     case text
     case idea
     case task
@@ -19,7 +19,7 @@ public enum WhiteboardNodeType: String, Codable, CaseIterable {
     }
 }
 
-public struct WhiteboardNode: Identifiable, Codable, Hashable {
+public struct WhiteboardNode: Identifiable, Codable, Hashable, Sendable {
     public var id: UUID
     public var title: String
     public var content: String
@@ -37,7 +37,7 @@ public struct WhiteboardNode: Identifiable, Codable, Hashable {
     }
 }
 
-public struct WhiteboardEdge: Identifiable, Codable, Hashable {
+public struct WhiteboardEdge: Identifiable, Codable, Hashable, Sendable {
     public var id: UUID
     public var fromNodeID: UUID
     public var toNodeID: UUID
@@ -49,7 +49,7 @@ public struct WhiteboardEdge: Identifiable, Codable, Hashable {
     }
 }
 
-public struct WhiteboardBoard: Identifiable, Codable, Hashable {
+public struct WhiteboardBoard: Identifiable, Codable, Hashable, Sendable {
     public var id: UUID
     public var title: String
     public var nodes: [WhiteboardNode]
@@ -67,7 +67,7 @@ public struct WhiteboardBoard: Identifiable, Codable, Hashable {
 
 // MARK: - Canvas Element System
 
-public struct CanvasElement: Identifiable, Codable, Hashable {
+public struct CanvasElement: Identifiable, Codable, Hashable, Sendable {
     public var id: UUID
     public var kind: ElementKind
     public var positionX: Double
@@ -115,7 +115,7 @@ public struct CanvasElement: Identifiable, Codable, Hashable {
         self.isLocked = isLocked
     }
 
-    public enum ElementKind: String, Codable, CaseIterable {
+    public enum ElementKind: String, Codable, CaseIterable, Sendable {
         case text
         case stickyNote
         case rectangle
@@ -130,7 +130,7 @@ public struct CanvasElement: Identifiable, Codable, Hashable {
 
 // MARK: - Legacy CanvasItem (retained for migration)
 
-public struct CanvasItem: Identifiable, Codable, Hashable {
+public struct CanvasItem: Identifiable, Codable, Hashable, Sendable {
     public var id: UUID
     public var kind: CanvasItemKind
     public var positionX: Double
@@ -166,12 +166,12 @@ public struct CanvasItem: Identifiable, Codable, Hashable {
         self.zIndex = zIndex
     }
 
-    public enum CanvasItemKind: String, Codable, CaseIterable {
+    public enum CanvasItemKind: String, Codable, CaseIterable, Sendable {
         case text, shape, image, drawing
     }
 }
 
-public struct CanvasConnection: Identifiable, Codable, Hashable {
+public struct CanvasConnection: Identifiable, Codable, Hashable, Sendable {
     public var id: UUID
     public var fromItemID: UUID
     public var toItemID: UUID
@@ -184,12 +184,12 @@ public struct CanvasConnection: Identifiable, Codable, Hashable {
         self.style = style
     }
 
-    public enum ConnectionStyle: String, Codable, CaseIterable {
+    public enum ConnectionStyle: String, Codable, CaseIterable, Sendable {
         case line, arrow, dashed
     }
 }
 
-public struct DrawingPath: Identifiable, Codable, Hashable {
+public struct DrawingPath: Identifiable, Codable, Hashable, Sendable {
     public var id: UUID
     public var points: [DrawingPoint]
     public var colorHex: String
@@ -214,7 +214,7 @@ public struct DrawingPath: Identifiable, Codable, Hashable {
     }
 }
 
-public struct DrawingPoint: Codable, Hashable {
+public struct DrawingPoint: Codable, Hashable, Sendable {
     public var x: Double
     public var y: Double
 
@@ -224,7 +224,7 @@ public struct DrawingPoint: Codable, Hashable {
     }
 }
 
-public struct CanvasState: Codable, Equatable {
+public struct CanvasState: Codable, Equatable, Sendable {
     public var elements: [CanvasElement]
     public var items: [CanvasItem]
     public var connections: [CanvasConnection]
@@ -260,7 +260,7 @@ public struct CanvasState: Codable, Equatable {
 
 @MainActor
 final class WhiteboardStore: ObservableObject {
-    static let shared = WhiteboardStore()
+    nonisolated(unsafe) static let shared = WhiteboardStore()
 
     @Published var boards: [WhiteboardBoard] = []
 

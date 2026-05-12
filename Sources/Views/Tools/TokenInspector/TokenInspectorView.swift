@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct TokenInspectorTool: Tool {
+struct TokenInspectorTool: Tool, Sendable {
     let name = "Token Inspector"
     let icon = "key.horizontal"
     let category = ToolCategory.network

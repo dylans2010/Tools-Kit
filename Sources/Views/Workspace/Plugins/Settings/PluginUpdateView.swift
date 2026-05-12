@@ -136,7 +136,7 @@ struct PluginUpdateView: View {
     }
 }
 
-private struct PluginUpdate: Identifiable {
+private struct PluginUpdate: Identifiable, Sendable {
     let id = UUID()
     let pluginID: UUID
     let pluginName: String
@@ -145,7 +145,7 @@ private struct PluginUpdate: Identifiable {
     let changelog: String
 }
 
-private struct UpdateHistoryRecord: Identifiable {
+private struct UpdateHistoryRecord: Identifiable, Sendable {
     let id = UUID()
     let pluginName: String
     let fromVersion: String

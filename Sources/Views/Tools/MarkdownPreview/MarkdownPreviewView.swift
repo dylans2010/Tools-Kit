@@ -35,7 +35,7 @@ struct HTMLView: UIViewRepresentable {
     }
 }
 
-struct MarkdownPreviewTool: Tool {
+struct MarkdownPreviewTool: Tool, Sendable {
     let name = "Markdown Preview"
     let icon = "text.justify.left"
     let category = ToolCategory.development

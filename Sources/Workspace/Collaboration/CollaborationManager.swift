@@ -3,7 +3,7 @@ import Combine
 
 /// Manages collaboration spaces, members, and version control operations.
 final class CollaborationManager: ObservableObject {
-    static let shared = CollaborationManager()
+    nonisolated(unsafe) static let shared = CollaborationManager()
 
     @Published var spaces: [CollaborationSpace] = []
     @Published var commits: [UUID: CollaborationCommit] = [:]

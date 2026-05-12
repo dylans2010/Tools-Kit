@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-struct WorkoutsPreferences: Codable, Equatable {
+struct WorkoutsPreferences: Codable, Equatable, Sendable {
     var preferredDurationMinutes: Int = 45
     var calorieGoal: Int = 2200
     var proteinGoal: Double = 150
@@ -10,7 +10,7 @@ struct WorkoutsPreferences: Codable, Equatable {
     var syncAppleHealth: Bool = true
 }
 
-struct WorkoutsSnapshot: Codable {
+struct WorkoutsSnapshot: Codable, Sendable {
     var profile: UserFitnessProfile?
     var todayWorkout: WorkoutModel?
     var nutrition: NutritionModel
@@ -25,7 +25,7 @@ struct WorkoutsSnapshot: Codable {
     var mealPlans: [MealPlanModel]
     var recentGeneratedWorkouts: [WorkoutModel]
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case profile, todayWorkout, nutrition, streak, badges, progress, preferences, healthData, mentorMessages, workoutSessions, performance, mealPlans, recentGeneratedWorkouts
     }
 
@@ -78,7 +78,7 @@ struct WorkoutsSnapshot: Codable {
 }
 
 final class WorkoutsManager: ObservableObject {
-    static let shared = WorkoutsManager()
+    nonisolated(unsafe) static let shared = WorkoutsManager()
 
     @Published var profile: UserFitnessProfile?
     @Published var todayWorkout: WorkoutModel?

@@ -1,6 +1,6 @@
 import Foundation
 
-struct HTTPHeader: Identifiable, Equatable {
+struct HTTPHeader: Identifiable, Equatable, Sendable {
     let id = UUID()
     var key: String
     var value: String

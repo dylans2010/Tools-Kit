@@ -40,7 +40,7 @@ struct XMLFormatterView: View {
     }
 }
 
-struct XMLFormatterTool: Tool {
+struct XMLFormatterTool: Tool, Sendable {
     let name = "XML Formatter"
     let icon = "chevron.left.slash.chevron.right"
     let category = ToolCategory.development

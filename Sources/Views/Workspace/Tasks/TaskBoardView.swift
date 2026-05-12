@@ -4,7 +4,7 @@ struct TaskBoardView: View {
     @StateObject private var manager = TasksManager.shared
     @State private var showingCreate = false
 
-    enum BoardColumn: String, CaseIterable {
+    enum BoardColumn: String, CaseIterable, Sendable {
         case todo = "To Do"
         case inProgress = "In Progress"
         case done = "Done"

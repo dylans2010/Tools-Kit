@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class AISlidesNarrationEngine: ObservableObject {
-    public static let shared = AISlidesNarrationEngine()
+    nonisolated(unsafe) public static let shared = AISlidesNarrationEngine()
 
     @Published public private(set) var isGenerating = false
     @Published public private(set) var generatedNotes: [UUID: String] = [:]
@@ -179,7 +179,7 @@ public final class AISlidesNarrationEngine: ObservableObject {
 
 // MARK: - Models
 
-public struct SlideNarration: Identifiable {
+public struct SlideNarration: Identifiable, Sendable {
     public let id = UUID()
     public let slideIndex: Int
     public let slideTitle: String
@@ -187,7 +187,7 @@ public struct SlideNarration: Identifiable {
     public let estimatedDuration: TimeInterval
 }
 
-public struct NarrationScript: Identifiable {
+public struct NarrationScript: Identifiable, Sendable {
     public let id = UUID()
     public let deckID: UUID
     public let deckTitle: String
@@ -216,7 +216,7 @@ public enum NarrationStyle: String, Codable, CaseIterable, Sendable, Identifiabl
     public var displayName: String { rawValue.capitalized }
 }
 
-public struct SlideTiming: Identifiable {
+public struct SlideTiming: Identifiable, Sendable {
     public let id = UUID()
     public let slideIndex: Int
     public let slideTitle: String

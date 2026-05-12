@@ -4,7 +4,7 @@ protocol AISlidesImageProvider {
     func imageURL(for query: String) async -> URL?
 }
 
-struct AISlidesImageService {
+struct AISlidesImageService: @unchecked Sendable {
     private let cache = AISlidesCache.shared
     private let providers: [AISlidesImageProvider] = [
         UnsplashProvider.shared,

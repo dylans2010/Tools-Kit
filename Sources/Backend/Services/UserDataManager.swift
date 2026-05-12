@@ -2,7 +2,7 @@ import Foundation
 import Appwrite
 
 final class UserDataManager {
-    static let shared = UserDataManager()
+    nonisolated(unsafe) static let shared = UserDataManager()
 
     private let databases = Databases(AppwriteService.client)
     private let appwriteAccount = AppwriteService.account
@@ -165,14 +165,14 @@ final class UserDataManager {
     }
 }
 
-private struct UserDataSnapshot: Codable {
+private struct UserDataSnapshot: Codable, Sendable {
     let version: Int
     let capturedAt: Date
     let files: [CloudWorkspaceFile]
     let aiSettingsBase64: String?
 }
 
-private struct CloudWorkspaceFile: Codable {
+private struct CloudWorkspaceFile: Codable, Sendable {
     let relativePath: String
     let base64Data: String
 }

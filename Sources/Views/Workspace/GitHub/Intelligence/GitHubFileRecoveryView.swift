@@ -75,7 +75,7 @@ struct GitHubFileRecoveryView: View {
     }
 }
 
-struct FileSnapshot: Identifiable {
+struct FileSnapshot: Identifiable, Sendable {
     let id: UUID
     let fileName: String
     let version: String

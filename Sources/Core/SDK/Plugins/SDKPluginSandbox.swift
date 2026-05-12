@@ -2,28 +2,28 @@ import Foundation
 
 @MainActor
 public final class SDKPluginSandbox {
-    public static let shared = SDKPluginSandbox()
+    nonisolated(unsafe) public static let shared = SDKPluginSandbox()
 
     @Published public var executionLog: [SandboxEvent] = []
     @Published public var activeExecutions: [UUID: SandboxContext] = [:]
 
     private init() {}
 
-    public struct SandboxContext {
+    public struct SandboxContext: Sendable {
         public let pluginID: UUID
         public let pluginName: String
         public let grantedPermissions: Set<PluginPermission>
         public let startedAt: Date
         public var resourceUsage: ResourceUsage
 
-        public struct ResourceUsage {
+        public struct ResourceUsage: Sendable {
             public var networkRequestCount: Int = 0
             public var dataReadBytes: Int = 0
             public var dataWriteBytes: Int = 0
         }
     }
 
-    public struct SandboxEvent: Identifiable {
+    public struct SandboxEvent: Identifiable, Sendable {
         public let id: UUID
         public let pluginID: UUID
         public let action: String

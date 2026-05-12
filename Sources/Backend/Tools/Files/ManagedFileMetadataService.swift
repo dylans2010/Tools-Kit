@@ -1,6 +1,6 @@
 import Foundation
 
-struct ManagedFileMetadataService {
+struct ManagedFileMetadataService: Sendable {
     func listItems(in directory: URL) -> [ManagedFileItem] {
         let urls = (try? FileManager.default.contentsOfDirectory(
             at: directory,

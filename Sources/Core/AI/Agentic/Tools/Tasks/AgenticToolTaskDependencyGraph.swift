@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolTaskDependencyGraph: AgenticToolProtocol {
+struct AgenticToolTaskDependencyGraph: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "task_dependency_graph",
         description: "Build and return a dependency graph for tasks",

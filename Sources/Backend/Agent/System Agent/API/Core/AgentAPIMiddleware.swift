@@ -5,7 +5,7 @@ protocol AgentAPIMiddleware {
     func process(data: Data, response: URLResponse) async throws -> (Data, URLResponse)
 }
 
-struct LoggingMiddleware: AgentAPIMiddleware {
+struct LoggingMiddleware: AgentAPIMiddleware, Sendable {
     init() {}
     func process(request: URLRequest) async throws -> URLRequest {
         AgentAPILogger.shared.log(.info, "Request: \(request.url?.absoluteString ?? "unknown")")

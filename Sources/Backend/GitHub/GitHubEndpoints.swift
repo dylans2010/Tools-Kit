@@ -1,7 +1,7 @@
 import Foundation
 
 /// Defines all supported GitHub API endpoints.
-enum GitHubEndpoints {
+enum GitHubEndpoints: Sendable {
     private static let baseURL = "https://api.github.com"
 
     case userRepos

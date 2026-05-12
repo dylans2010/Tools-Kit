@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentAPIRequestBuilder {
+struct AgentAPIRequestBuilder: Sendable {
     init() {}
 
     func build(endpoint: URL, method: String = "POST", body: Encodable? = nil, headers: [String: String] = [:]) throws -> URLRequest {

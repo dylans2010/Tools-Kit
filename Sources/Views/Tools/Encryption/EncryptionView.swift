@@ -66,7 +66,7 @@ struct EncryptionView: View {
     }
 }
 
-struct EncryptionTool: Tool {
+struct EncryptionTool: Tool, Sendable {
     let name = "Text Encryption"
     let icon = "lock.doc"
     let category = ToolCategory.utility

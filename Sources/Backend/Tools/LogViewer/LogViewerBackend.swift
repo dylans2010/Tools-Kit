@@ -1,6 +1,6 @@
 import Foundation
 
-enum LogViewerLevel: String, CaseIterable, Identifiable {
+enum LogViewerLevel: String, CaseIterable, Identifiable, Sendable {
     case info = "Info"
     case warning = "Warning"
     case error = "Error"
@@ -18,7 +18,7 @@ enum LogViewerLevel: String, CaseIterable, Identifiable {
     }
 }
 
-struct LogViewerEntry: Identifiable {
+struct LogViewerEntry: Identifiable, Sendable {
     let id = UUID()
     let timestamp: Date
     let level: LogViewerLevel

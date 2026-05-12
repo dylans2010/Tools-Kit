@@ -117,7 +117,7 @@ struct SDKMarketplaceView: View {
     }
 }
 
-private struct SDKExtension: Identifiable {
+private struct SDKExtension: Identifiable, Sendable {
     let id = UUID()
     let name: String
     let description: String
@@ -131,6 +131,6 @@ private struct SDKExtension: Identifiable {
     var isInstalled: Bool = false
 }
 
-private enum ExtCategory: String, CaseIterable {
+private enum ExtCategory: String, CaseIterable, Sendable {
     case ai, themes, data, development, productivity
 }

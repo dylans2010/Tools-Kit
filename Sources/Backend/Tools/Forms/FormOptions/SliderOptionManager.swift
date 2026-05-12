@@ -1,6 +1,6 @@
 import Foundation
 
-struct SliderOptionManager: FormOptionManager {
+struct SliderOptionManager: FormOptionManager, Sendable {
     let type: FormQuestionType = .slider
     func defaultQuestion() -> FormQuestion {
         FormQuestion(title: "Select a value", type: .slider, options: [], required: false)

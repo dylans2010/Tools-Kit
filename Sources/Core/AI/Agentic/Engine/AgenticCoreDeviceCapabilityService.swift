@@ -4,7 +4,7 @@ import SwiftUI
 
 @MainActor
 final class AgenticCoreDeviceCapabilityService: ObservableObject {
-    static let shared = AgenticCoreDeviceCapabilityService()
+    nonisolated(unsafe) static let shared = AgenticCoreDeviceCapabilityService()
 
     @Published private(set) var capability: AgenticDeviceCapability = AgenticDeviceCapability(
         isSupported: false,

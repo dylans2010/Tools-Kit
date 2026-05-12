@@ -3,7 +3,7 @@ import Foundation
 /// Parses raw .lrc text into an array of LyricLine objects.
 /// Supports [mm:ss.xx] format, multiple timestamps per line,
 /// and silently skips invalid or malformed lines.
-struct LRCParserService {
+struct LRCParserService: Sendable {
 
     /// Parse a full .lrc string into sorted LyricLine array.
     func parse(_ lrc: String) -> [LyricLine] {

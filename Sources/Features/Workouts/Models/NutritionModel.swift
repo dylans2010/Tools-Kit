@@ -1,6 +1,6 @@
 import Foundation
 
-enum MealSourceType: String, Codable, CaseIterable, Identifiable {
+enum MealSourceType: String, Codable, CaseIterable, Identifiable, Sendable {
     case voice
     case image
     case manual
@@ -8,7 +8,7 @@ enum MealSourceType: String, Codable, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-enum FoodCategory: String, Codable, CaseIterable, Identifiable {
+enum FoodCategory: String, Codable, CaseIterable, Identifiable, Sendable {
     case protein
     case carbs
     case vegetables
@@ -19,7 +19,7 @@ enum FoodCategory: String, Codable, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-struct DetectedFoodItem: Identifiable, Codable {
+struct DetectedFoodItem: Identifiable, Codable, Sendable {
     var id: UUID
     var name: String
     var category: FoodCategory
@@ -40,7 +40,7 @@ struct DetectedFoodItem: Identifiable, Codable {
         self.estimatedCalories = estimatedCalories
     }
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case id, name, category, portionDescription, estimatedCalories
     }
 
@@ -54,7 +54,7 @@ struct DetectedFoodItem: Identifiable, Codable {
     }
 }
 
-struct MealRecord: Identifiable, Codable {
+struct MealRecord: Identifiable, Codable, Sendable {
     var id: UUID
     var mealType: MealType
     var name: String
@@ -105,7 +105,7 @@ struct MealRecord: Identifiable, Codable {
         self.imagePreviewData = imagePreviewData
     }
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case id, mealType, name, calories, proteinGrams, carbsGrams, fatsGrams, summary, insights, consumedAt, sourceType, rawInput, detectedItems, timestamp, imagePreviewData
     }
 
@@ -129,7 +129,7 @@ struct MealRecord: Identifiable, Codable {
     }
 }
 
-struct NutritionModel: Codable {
+struct NutritionModel: Codable, Sendable {
     var date: Date
     var calorieGoal: Int
     var proteinGoal: Double

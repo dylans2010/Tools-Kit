@@ -1,6 +1,6 @@
 import Foundation
 
-struct Song: Identifiable, Codable, Equatable {
+struct Song: Identifiable, Codable, Equatable, Sendable {
     var id: UUID
     var title: String
     var artist: String
@@ -25,7 +25,7 @@ struct Song: Identifiable, Codable, Equatable {
         self.playlistName = playlistName
     }
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case id, title, artist, duration, fileURL, artworkData, dateAdded, playCount, playlistName
     }
 

@@ -36,7 +36,7 @@ struct RegexTesterView: View {
     }
 }
 
-struct RegexTesterTool: Tool {
+struct RegexTesterTool: Tool, Sendable {
     let name = "Regex Tester"
     let icon = "text.magnifyingglass"
     let category = ToolCategory.development

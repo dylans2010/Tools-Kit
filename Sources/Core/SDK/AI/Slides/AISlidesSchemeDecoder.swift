@@ -1,6 +1,6 @@
 import Foundation
 
-struct AISlidesSchemeDecoder {
+struct AISlidesSchemeDecoder: Sendable {
     func decode(_ raw: String) throws -> GenSlidesScheme {
         var cleaned = raw.trimmingCharacters(in: .whitespacesAndNewlines)
 

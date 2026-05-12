@@ -1,7 +1,7 @@
 import Foundation
 import Appwrite
 
-enum AuthDatabaseError: LocalizedError {
+enum AuthDatabaseError: LocalizedError, Sendable {
     case missingConfig
 
     var errorDescription: String? {
@@ -13,7 +13,7 @@ enum AuthDatabaseError: LocalizedError {
 }
 
 final class AuthDatabaseService {
-    static let shared = AuthDatabaseService()
+    nonisolated(unsafe) static let shared = AuthDatabaseService()
 
     private let tables = TablesDB(AppwriteService.client)
     private let databaseId: String?

@@ -94,7 +94,7 @@ struct MetadataRemoverView: View {
     }
 }
 
-struct MetadataRemoverTool: Tool {
+struct MetadataRemoverTool: Tool, Sendable {
     let name = "Metadata Remover"
     let icon = "minus.square.fill"
     let category = ToolCategory.utility

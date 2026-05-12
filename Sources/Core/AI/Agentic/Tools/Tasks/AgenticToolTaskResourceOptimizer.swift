@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolTaskResourceOptimizer: AgenticToolProtocol {
+struct AgenticToolTaskResourceOptimizer: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "task_resource_optimizer",
         description: "Optimize resource allocation across tasks",

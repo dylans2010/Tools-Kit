@@ -174,7 +174,7 @@ struct WeatherView: View {
     }
 }
 
-struct WeatherTool: Tool {
+struct WeatherTool: Tool, Sendable {
     let name = "Weather"
     let icon = "cloud.sun.fill"
     let category = ToolCategory.general

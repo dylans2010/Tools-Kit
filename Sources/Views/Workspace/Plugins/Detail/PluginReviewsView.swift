@@ -144,7 +144,7 @@ struct PluginReviewsView: View {
     }
 }
 
-private struct PluginReview: Identifiable {
+private struct PluginReview: Identifiable, Sendable {
     let id = UUID()
     let author: String
     let rating: Int

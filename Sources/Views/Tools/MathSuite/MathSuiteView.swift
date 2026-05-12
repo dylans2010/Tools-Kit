@@ -38,7 +38,7 @@ struct MathSuiteView: View {
     }
 }
 
-struct MathSuiteTool: Tool {
+struct MathSuiteTool: Tool, Sendable {
     let name = "Math: GCD & LCM"
     let icon = "function"
     let category = ToolCategory.utility

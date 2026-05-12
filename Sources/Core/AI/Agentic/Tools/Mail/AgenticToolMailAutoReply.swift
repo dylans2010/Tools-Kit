@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolMailAutoReply: AgenticToolProtocol {
+struct AgenticToolMailAutoReply: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "mail_auto_reply",
         description: "Generate an AI auto-reply for an email",

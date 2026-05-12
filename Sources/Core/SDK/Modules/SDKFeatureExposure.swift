@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-public struct SDKExposedFeature: Identifiable, Codable, Hashable {
+public struct SDKExposedFeature: Identifiable, Codable, Hashable, Sendable {
     public let id: UUID
     public var moduleIdentifier: String
     public var featureName: String
@@ -34,7 +34,7 @@ public struct SDKExposedFeature: Identifiable, Codable, Hashable {
     }
 }
 
-public struct SDKFeatureParameter: Codable, Hashable {
+public struct SDKFeatureParameter: Codable, Hashable, Sendable {
     public var name: String
     public var type: String
     public var isRequired: Bool
@@ -50,7 +50,7 @@ public struct SDKFeatureParameter: Codable, Hashable {
 
 @MainActor
 public final class SDKFeatureExposureManager: ObservableObject {
-    public static let shared = SDKFeatureExposureManager()
+    nonisolated(unsafe) public static let shared = SDKFeatureExposureManager()
 
     @Published public var exposedFeatures: [SDKExposedFeature] = []
     private var executionHandlers: [UUID: ([String: Any]) async throws -> Any] = [:]

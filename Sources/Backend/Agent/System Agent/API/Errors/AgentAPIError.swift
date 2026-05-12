@@ -1,6 +1,6 @@
 import Foundation
 
-enum AgentAPIError: Error, LocalizedError {
+enum AgentAPIError: Error, LocalizedError, Sendable {
     case invalidURL
     case unexpectedResponse
     case decodingError(Error)

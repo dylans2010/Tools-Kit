@@ -118,7 +118,7 @@ struct ConnectorWebhookManagerView: View {
     }
 }
 
-private struct WebhookConfig: Identifiable {
+private struct WebhookConfig: Identifiable, Sendable {
     let id = UUID()
     let url: String
     let event: String
@@ -135,7 +135,7 @@ private struct WebhookConfig: Identifiable {
     }
 }
 
-private struct WebhookDeliveryLog: Identifiable {
+private struct WebhookDeliveryLog: Identifiable, Sendable {
     let id = UUID()
     let event: String
     let timestamp: Date

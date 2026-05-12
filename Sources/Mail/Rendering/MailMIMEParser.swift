@@ -3,7 +3,7 @@ import Foundation
 // MARK: - Data Types
 
 /// Represents a single decoded MIME part with its content type and raw decoded body.
-struct MIMEPart {
+struct MIMEPart: Sendable {
     let contentType: String
     let charset: String
     let transferEncoding: String
@@ -11,7 +11,7 @@ struct MIMEPart {
 }
 
 /// The result of parsing a MIME message: the best HTML part and the best plain-text part.
-struct ParsedMIMEMessage {
+struct ParsedMIMEMessage: Sendable {
     let htmlPart: MIMEPart?
     let textPart: MIMEPart?
 
@@ -25,7 +25,7 @@ struct ParsedMIMEMessage {
 
 /// Parses raw IMAP email body responses into structured MIME parts.
 /// Supports multipart/alternative, multipart/mixed, and nested multipart structures.
-struct MailMIMEParser {
+struct MailMIMEParser: Sendable {
 
     // MARK: - Public API
 

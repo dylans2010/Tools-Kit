@@ -1,6 +1,6 @@
 import Foundation
 
-struct Article: Codable, Identifiable, Equatable {
+struct Article: Codable, Identifiable, Equatable, Sendable {
     var id: UUID = UUID()
     var title: String = ""
     var summary: String = ""

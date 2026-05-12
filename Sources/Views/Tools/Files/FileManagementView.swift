@@ -53,7 +53,7 @@ struct FileManagementView: View {
     }
 }
 
-struct FileManagementTool: Tool {
+struct FileManagementTool: Tool, Sendable {
     let name = "File Management"
     let icon = "folder.badge.gearshape"
     let category = ToolCategory.utility

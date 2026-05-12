@@ -106,7 +106,7 @@ struct AddAutomationRuleView: View {
     @State private var selectedTrigger: TriggerType = .data
     @State private var scope = "tasks"
 
-    enum TriggerType: String, CaseIterable {
+    enum TriggerType: String, CaseIterable, Sendable {
         case data = "Data Updated", connector = "Connector Event", timer = "Timer"
     }
 

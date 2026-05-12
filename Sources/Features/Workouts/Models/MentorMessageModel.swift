@@ -1,12 +1,12 @@
 import Foundation
 
-enum MentorMessageRole: String, Codable {
+enum MentorMessageRole: String, Codable, Sendable {
     case user
     case assistant
     case system
 }
 
-struct MentorMessageModel: Identifiable, Codable {
+struct MentorMessageModel: Identifiable, Codable, Sendable {
     var id: UUID
     var role: MentorMessageRole
     var text: String
@@ -33,7 +33,7 @@ struct MentorMessageModel: Identifiable, Codable {
         self.recommendations = recommendations
     }
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case id, role, text, createdAt, imageHint, insights, recommendations
     }
 

@@ -1,6 +1,6 @@
 import Foundation
 
-struct HabitLog: Identifiable, Codable {
+struct HabitLog: Identifiable, Codable, Sendable {
     var id: UUID
     var habitID: UUID
     var date: Date

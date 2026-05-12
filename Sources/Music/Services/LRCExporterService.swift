@@ -2,7 +2,7 @@ import Foundation
 
 /// Converts LyricLine arrays into .lrc formatted strings
 /// and writes them to the file system.
-struct LRCExporterService {
+struct LRCExporterService: Sendable {
 
     // MARK: - String Conversion
 

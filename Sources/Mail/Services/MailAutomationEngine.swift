@@ -2,9 +2,9 @@ import Foundation
 
 /// Handles automated email workflows based on user-defined rules.
 final class MailAutomationEngine {
-    static let shared = MailAutomationEngine()
+    nonisolated(unsafe) static let shared = MailAutomationEngine()
 
-    struct AutomationRule: Codable, Identifiable {
+    struct AutomationRule: Codable, Identifiable, Sendable {
         let id: UUID
         var name: String
         var triggers: [Trigger]
@@ -13,13 +13,13 @@ final class MailAutomationEngine {
         var isEnabled: Bool
     }
 
-    enum Trigger: Codable, Equatable {
+    enum Trigger: Codable, Equatable, Sendable {
         case onNewEmail
         case onThreadUpdate
         case scheduled(TimeInterval)
     }
 
-    enum Condition: Codable {
+    enum Condition: Codable, Sendable {
         case senderContains(String)
         case subjectContains(String)
         case bodyContains(String)
@@ -27,7 +27,7 @@ final class MailAutomationEngine {
         case priorityAbove(Double)
     }
 
-    enum AutomationAction: Codable {
+    enum AutomationAction: Codable, Sendable {
         case archive
         case markAsRead
         case moveToFolder(String)

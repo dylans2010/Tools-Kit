@@ -114,7 +114,7 @@ struct CollaborationChatView: View {
     }
 }
 
-private struct CollabChatMessage: Identifiable {
+private struct CollabChatMessage: Identifiable, Sendable {
     let id = UUID()
     let author: String
     let text: String
@@ -123,7 +123,7 @@ private struct CollabChatMessage: Identifiable {
     var reactions: [String] = []
 }
 
-private enum ChatChannel: String, CaseIterable {
+private enum ChatChannel: String, CaseIterable, Sendable {
     case general, reviews, deployments, alerts
 
     var icon: String {

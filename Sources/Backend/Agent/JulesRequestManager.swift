@@ -5,15 +5,15 @@ protocol JulesPayloadValidating {
 }
 
 final class JulesRequestManager {
-    static let shared = JulesRequestManager()
+    nonisolated(unsafe) static let shared = JulesRequestManager()
 
-    struct FieldValidationError: Error {
+    struct FieldValidationError: Error, Sendable {
         let field: String
         let reason: String
     }
 
-    struct APIErrorEnvelope: Decodable {
-        struct APIError: Decodable {
+    struct APIErrorEnvelope: Decodable, Sendable {
+        struct APIError: Decodable, Sendable {
             let code: Int?
             let status: String?
             let message: String?
@@ -22,7 +22,7 @@ final class JulesRequestManager {
         let error: APIError?
     }
 
-    enum JulesRequestError: Error, LocalizedError {
+    enum JulesRequestError: Error, LocalizedError, Sendable {
         case missingOrInvalidAPIKey
         case invalidRepositoryURL(String)
         case invalidPayload([FieldValidationError])
@@ -239,6 +239,6 @@ final class JulesRequestManager {
     }
 }
 
-struct JulesNoBody: Encodable, JulesPayloadValidating {
+struct JulesNoBody: Encodable, JulesPayloadValidating, Sendable {
     func validationErrors() -> [JulesRequestManager.FieldValidationError] { [] }
 }

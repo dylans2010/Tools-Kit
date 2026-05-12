@@ -1,7 +1,7 @@
 import Foundation
 
-struct SystemAgentMessage: Codable, Identifiable {
-    enum Role: Equatable, Codable {
+struct SystemAgentMessage: Codable, Identifiable, Sendable {
+    enum Role: Equatable, Codable, Sendable {
         case system
         case user
         case assistant
@@ -9,7 +9,7 @@ struct SystemAgentMessage: Codable, Identifiable {
         case toolResult(toolName: String, result: String)
         case failed(message: String)
 
-        private enum CodingKeys: String, CodingKey {
+        private enum CodingKeys: String, CodingKey, Sendable {
             case type
             case name
             case input
@@ -17,7 +17,7 @@ struct SystemAgentMessage: Codable, Identifiable {
             case message
         }
 
-        private enum Kind: String, Codable {
+        private enum Kind: String, Codable, Sendable {
             case system
             case user
             case assistant

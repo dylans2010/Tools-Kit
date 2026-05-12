@@ -3,11 +3,11 @@ import Combine
 
 /// Graph-based content structure: nodes are notes/tasks/files, edges are relationships.
 final class ContentGraphService: ObservableObject {
-    static let shared = ContentGraphService()
+    nonisolated(unsafe) static let shared = ContentGraphService()
 
     // MARK: - Models
 
-    enum NodeType: String, Codable, CaseIterable {
+    enum NodeType: String, Codable, CaseIterable, Sendable {
         case note = "Note"
         case task = "Task"
         case file = "File"
@@ -15,7 +15,7 @@ final class ContentGraphService: ObservableObject {
         case member = "Member"
     }
 
-    enum EdgeType: String, Codable, CaseIterable {
+    enum EdgeType: String, Codable, CaseIterable, Sendable {
         case reference = "References"
         case dependency = "Depends On"
         case relatedTo = "Related To"
@@ -23,7 +23,7 @@ final class ContentGraphService: ObservableObject {
         case assignedTo = "Assigned To"
     }
 
-    struct ContentNode: Codable, Identifiable {
+    struct ContentNode: Codable, Identifiable, Sendable {
         let id: UUID
         var label: String
         var nodeType: NodeType
@@ -32,7 +32,7 @@ final class ContentGraphService: ObservableObject {
         var createdAt: Date
     }
 
-    struct ContentEdge: Codable, Identifiable {
+    struct ContentEdge: Codable, Identifiable, Sendable {
         let id: UUID
         var sourceID: UUID
         var targetID: UUID

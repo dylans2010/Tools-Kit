@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentTokenUsage: Codable {
+struct AgentTokenUsage: Codable, Sendable {
     let promptTokens: Int
     let completionTokens: Int
     let totalTokens: Int

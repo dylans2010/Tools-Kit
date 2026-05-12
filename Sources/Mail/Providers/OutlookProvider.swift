@@ -476,33 +476,33 @@ final class OutlookProvider: NSObject, MailProvider, ASWebAuthenticationPresenta
     }
 }
 
-private struct GraphToken: Decodable {
+private struct GraphToken: Decodable, Sendable {
     let accessToken: String
     let refreshToken: String?
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
     }
 }
 
-private struct GraphProfile: Decodable {
+private struct GraphProfile: Decodable, Sendable {
     let displayName: String?
     let userPrincipalName: String?
     let mail: String?
 }
 
-private struct GraphMessagesResponse: Decodable {
+private struct GraphMessagesResponse: Decodable, Sendable {
     let value: [GraphMessage]
     let nextLink: String?
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case value
         case nextLink = "@odata.nextLink"
     }
 }
 
-private struct GraphMessage: Decodable {
+private struct GraphMessage: Decodable, Sendable {
     let id: String
     let conversationId: String
     let subject: String?
@@ -515,25 +515,25 @@ private struct GraphMessage: Decodable {
     let flag: GraphFlag?
 }
 
-private struct GraphFlag: Decodable {
+private struct GraphFlag: Decodable, Sendable {
     let flagStatus: String?
 }
 
-private struct GraphBody: Codable {
+private struct GraphBody: Codable, Sendable {
     let contentType: String
     let content: String
 }
 
-private struct GraphRecipient: Codable {
+private struct GraphRecipient: Codable, Sendable {
     let emailAddress: GraphEmail
 }
 
-private struct GraphEmail: Codable {
+private struct GraphEmail: Codable, Sendable {
     let address: String
 }
 
-private struct GraphSendMailBody: Encodable {
-    struct Message: Encodable {
+private struct GraphSendMailBody: Encodable, Sendable {
+    struct Message: Encodable, Sendable {
         let subject: String
         let body: GraphBody
         let toRecipients: [GraphRecipient]
@@ -544,7 +544,7 @@ private struct GraphSendMailBody: Encodable {
     let saveToSentItems: Bool
 }
 
-private struct GraphDraftBody: Encodable {
+private struct GraphDraftBody: Encodable, Sendable {
     let subject: String
     let body: GraphBody
     let toRecipients: [GraphRecipient]

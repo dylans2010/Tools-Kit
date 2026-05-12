@@ -4,7 +4,7 @@ import Combine
 /// Central media processing engine for the Editing module.
 /// Coordinates complex rendering tasks, AI operations, and export pipelines.
 final class EditingFramework: ObservableObject {
-    static let shared = EditingFramework()
+    nonisolated(unsafe) static let shared = EditingFramework()
 
     @Published var activeEngines: [UUID: EditingEngine] = [:]
 

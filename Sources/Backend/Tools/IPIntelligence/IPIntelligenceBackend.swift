@@ -1,6 +1,6 @@
 import Foundation
 
-struct IPIntelligenceData {
+struct IPIntelligenceData: Sendable {
     let ip: String
     let country: String
     let region: String
@@ -17,7 +17,7 @@ struct IPIntelligenceData {
     let isMobile: Bool
 }
 
-private struct FreeIPAPIResponse: Codable {
+private struct FreeIPAPIResponse: Codable, Sendable {
     let ipVersion: Int?
     let ipAddress: String?
     let latitude: Double?

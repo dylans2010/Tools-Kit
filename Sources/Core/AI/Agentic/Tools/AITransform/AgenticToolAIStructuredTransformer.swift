@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolAIStructuredTransformer: AgenticToolProtocol {
+struct AgenticToolAIStructuredTransformer: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "ai_structured_transformer",
         description: "Transform text into a structured format",

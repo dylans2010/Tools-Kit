@@ -1,7 +1,7 @@
 import Foundation
 import Appwrite
 
-enum AuthServiceError: LocalizedError {
+enum AuthServiceError: LocalizedError, Sendable {
     case unsupportedOAuthProvider(String)
 
     var errorDescription: String? {
@@ -14,7 +14,7 @@ enum AuthServiceError: LocalizedError {
 
 @MainActor
 final class AccountAuthService: ObservableObject {
-    static let shared = AccountAuthService()
+    nonisolated(unsafe) static let shared = AccountAuthService()
 
     @Published var isBusy = false
     @Published var lastErrorMessage: String?

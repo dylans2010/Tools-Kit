@@ -79,7 +79,7 @@ struct NotesFormatterView: View {
     }
 }
 
-struct NotesFormatterTool: Tool {
+struct NotesFormatterTool: Tool, Sendable {
     let name = "Notes Formatter"
     let icon = "text.badge.plus"
     let category = ToolCategory.utility

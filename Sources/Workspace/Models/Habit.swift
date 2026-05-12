@@ -1,6 +1,6 @@
 import Foundation
 
-struct Habit: Identifiable, Codable {
+struct Habit: Identifiable, Codable, Sendable {
     var id: UUID
     var name: String
     var description: String
@@ -11,7 +11,7 @@ struct Habit: Identifiable, Codable {
     var completionHistory: [String: Int]
     var createdAt: Date
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case id, name, description, icon, colorHex, frequency, targetCount, completionHistory, createdAt
     }
 
@@ -137,7 +137,7 @@ struct Habit: Identifiable, Codable {
     }
 }
 
-enum HabitFrequency: String, Codable, CaseIterable {
+enum HabitFrequency: String, Codable, CaseIterable, Sendable {
     case daily = "Daily"
     case weekly = "Weekly"
     case custom = "Custom"

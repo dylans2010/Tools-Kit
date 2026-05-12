@@ -13,7 +13,7 @@ public protocol SDKDataStoreProtocol {
 /// Unified offline-first data persistence layer for the SDK.
 /// Supports file-based JSON storage with indexing and versioning.
 public final class SDKDataStore: SDKDataStoreProtocol, ObservableObject {
-    public static let shared = SDKDataStore()
+    nonisolated(unsafe) public static let shared = SDKDataStore()
 
     @Published public private(set) var isInitialized = false
     @Published public private(set) var totalRecords = 0

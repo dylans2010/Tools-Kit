@@ -7,13 +7,13 @@ class CalculatorBackend: ObservableObject {
     private var pendingOperation: Operation? = nil
     private var isEnteringNumber = false
 
-    struct CalculationEntry: Identifiable, Codable {
+    struct CalculationEntry: Identifiable, Codable, Sendable {
         let id = UUID()
         let expression: String
         let result: String
     }
 
-    enum Operation: String {
+    enum Operation: String, Sendable {
         case add = "+", subtract = "-", multiply = "×", divide = "÷"
     }
 

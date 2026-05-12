@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolSheetVisualizationGenerator: AgenticToolProtocol {
+struct AgenticToolSheetVisualizationGenerator: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "sheet_visualization_generator",
         description: "Generate chart/visualization from sheet data",

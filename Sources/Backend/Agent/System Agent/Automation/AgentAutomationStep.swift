@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentAutomationStep: Codable, Identifiable {
+struct AgentAutomationStep: Codable, Identifiable, Sendable {
     let id: UUID
     let action: String
     let parameters: [String: AnyCodable]

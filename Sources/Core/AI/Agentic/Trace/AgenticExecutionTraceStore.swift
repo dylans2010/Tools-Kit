@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 final class AgenticExecutionTraceStore: ObservableObject {
-    static let shared = AgenticExecutionTraceStore()
+    nonisolated(unsafe) static let shared = AgenticExecutionTraceStore()
 
     @Published private(set) var entries: [AgenticTraceEntry] = []
     @Published private(set) var activeToolName: String?

@@ -2,7 +2,7 @@ import Foundation
 
 /// Manages sandboxed execution mode for SDK projects.
 public final class SDKSandboxController {
-    public static let shared = SDKSandboxController()
+    nonisolated(unsafe) public static let shared = SDKSandboxController()
 
     private init() {}
 

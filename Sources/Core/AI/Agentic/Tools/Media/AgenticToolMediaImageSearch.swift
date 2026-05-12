@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolMediaImageSearch: AgenticToolProtocol {
+struct AgenticToolMediaImageSearch: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "media_image_search",
         description: "Search for images and media across the workspace",

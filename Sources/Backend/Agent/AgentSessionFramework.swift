@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class AgentEventBus {
-    static let shared = AgentEventBus()
+    nonisolated(unsafe) static let shared = AgentEventBus()
 
     private let subject = PassthroughSubject<AgentExecutionEvent, Never>()
 
@@ -16,7 +16,7 @@ final class AgentEventBus {
 }
 
 final class AgentExecutionEngine {
-    static let shared = AgentExecutionEngine()
+    nonisolated(unsafe) static let shared = AgentExecutionEngine()
 
     func convert(session: AgentSession, activities: [AgentActivity], previousActivityIds: Set<String>) -> [AgentExecutionEvent] {
         var events: [AgentExecutionEvent] = []
@@ -237,7 +237,7 @@ final class AgentExecutionEngine {
 }
 
 final class AgentSessionStore: ObservableObject {
-    static let shared = AgentSessionStore()
+    nonisolated(unsafe) static let shared = AgentSessionStore()
 
     @Published private(set) var states: [String: AgentSessionState] = [:]
     @Published private(set) var orderedSessionIDs: [String] = []
@@ -284,7 +284,7 @@ final class AgentSessionStore: ObservableObject {
         persist()
     }
 
-    private struct Persisted: Codable {
+    private struct Persisted: Codable, Sendable {
         let orderedSessionIDs: [String]
         let states: [String: AgentSessionState.PersistenceModel]
     }
@@ -308,7 +308,7 @@ final class AgentSessionStore: ObservableObject {
 }
 
 final class AgentSessionFramework {
-    enum LifecycleStatus: String {
+    enum LifecycleStatus: String, Sendable {
         case created
         case queued
         case running
@@ -317,7 +317,7 @@ final class AgentSessionFramework {
         case unknown
     }
 
-    struct SessionTrackingRecord {
+    struct SessionTrackingRecord: Sendable {
         let sessionId: String
         let taskId: String?
         let repositoryURL: String
@@ -331,7 +331,7 @@ final class AgentSessionFramework {
         var isExpired: Bool { Date() > expiresAt }
     }
 
-    static let shared = AgentSessionFramework()
+    nonisolated(unsafe) static let shared = AgentSessionFramework()
 
     private let client: AgentClient
     private let engine: AgentExecutionEngine

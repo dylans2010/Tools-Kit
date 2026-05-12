@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolSlidesLayoutOptimizer: AgenticToolProtocol {
+struct AgenticToolSlidesLayoutOptimizer: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "slides_layout_optimizer",
         description: "Optimize slide layouts using AI",

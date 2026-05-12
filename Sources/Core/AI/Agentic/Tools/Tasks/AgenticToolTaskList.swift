@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolTaskList: AgenticToolProtocol {
+struct AgenticToolTaskList: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "task_list",
         description: "List all tasks with optional filters",

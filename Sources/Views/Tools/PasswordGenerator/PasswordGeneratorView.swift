@@ -71,7 +71,7 @@ struct PasswordGeneratorView: View {
     }
 }
 
-struct PasswordGeneratorTool: Tool {
+struct PasswordGeneratorTool: Tool, Sendable {
     let name = "Password Generator"
     let icon = "key"
     let category = ToolCategory.utility

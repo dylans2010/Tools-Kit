@@ -51,7 +51,7 @@ public struct SDKFeatureFlag: Identifiable, Codable, Sendable {
 /// Centralized feature flag management with persistence and event publishing.
 @MainActor
 public final class SDKFeatureFlagService: SDKFeatureFlagServiceProtocol, ObservableObject {
-    public static let shared = SDKFeatureFlagService()
+    nonisolated(unsafe) public static let shared = SDKFeatureFlagService()
 
     @Published public private(set) var flags: [String: SDKFeatureFlag] = [:]
 

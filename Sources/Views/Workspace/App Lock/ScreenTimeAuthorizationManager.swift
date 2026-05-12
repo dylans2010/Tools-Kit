@@ -3,7 +3,7 @@ import FamilyControls
 
 /// Manages Screen Time authorization.
 class ScreenTimeAuthorizationManager: ObservableObject {
-    static let shared = ScreenTimeAuthorizationManager()
+    nonisolated(unsafe) static let shared = ScreenTimeAuthorizationManager()
 
     @Published var isAuthorized: Bool = false
 

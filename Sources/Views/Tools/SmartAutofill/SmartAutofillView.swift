@@ -27,7 +27,7 @@ struct SmartAutofillView: View {
     }
 }
 
-struct SmartAutofillTool: Tool {
+struct SmartAutofillTool: Tool, Sendable {
     let name = "Smart Autofill"
     let icon = "square.and.pencil"
     let category = ToolCategory.utility

@@ -1,12 +1,12 @@
 import Foundation
 import MapKit
 
-struct MapLocation: Identifiable, Codable {
+struct MapLocation: Identifiable, Codable, Sendable {
     let id: UUID
     let name: String
     let coordinate: CLLocationCoordinate2D
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case id, name, latitude, longitude
     }
 
@@ -34,7 +34,7 @@ struct MapLocation: Identifiable, Codable {
     }
 }
 
-struct IdentifiableMapItem: Identifiable {
+struct IdentifiableMapItem: Identifiable, Sendable {
     let id = UUID()
     let mapItem: MKMapItem
 }

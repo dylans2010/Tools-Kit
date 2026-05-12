@@ -2,7 +2,7 @@ import Foundation
 import JavaScriptCore
 
 public final class SDKSandboxEngine {
-    public static let shared = SDKSandboxEngine()
+    nonisolated(unsafe) public static let shared = SDKSandboxEngine()
 
     private init() {}
 

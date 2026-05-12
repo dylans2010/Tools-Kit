@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - AIModel
 
-struct AIModel: Identifiable, Hashable, Codable {
+struct AIModel: Identifiable, Hashable, Codable, Sendable {
     let id: String
     let name: String
     let supportsVision: Bool
@@ -35,7 +35,7 @@ protocol AIProvider: Identifiable {
 
 // MARK: - AIProviderError
 
-enum AIProviderError: LocalizedError {
+enum AIProviderError: LocalizedError, Sendable {
     case missingAPIKey
     case invalidAPIKey
     case networkError(String)

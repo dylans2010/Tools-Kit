@@ -1,7 +1,7 @@
 import Foundation
 
 actor SpotifyFetchService {
-    enum Error: LocalizedError {
+    enum Error: LocalizedError, Sendable {
         case invalidURL
         case invalidPlaylistURL
         case requestFailed
@@ -24,7 +24,7 @@ actor SpotifyFetchService {
         }
     }
 
-    private struct CachedPlaylist: Codable {
+    private struct CachedPlaylist: Codable, Sendable {
         let playlistID: String
         let tracks: [SpotifyTrack]
         let savedAt: Date

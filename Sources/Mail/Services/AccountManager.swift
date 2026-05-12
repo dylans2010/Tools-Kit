@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 final class AccountManager: ObservableObject {
-    static let shared = AccountManager()
+    nonisolated(unsafe) static let shared = AccountManager()
 
     @Published private(set) var accounts: [MailAccount] = []
     @Published private(set) var activeAccount: MailAccount?

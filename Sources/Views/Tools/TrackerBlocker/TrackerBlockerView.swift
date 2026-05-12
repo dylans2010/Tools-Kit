@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct TrackerBlockerTool: Tool {
+struct TrackerBlockerTool: Tool, Sendable {
     let name = "Tracker Blocker"
     let icon = "hand.raised.fill"
     let category = ToolCategory.privacy

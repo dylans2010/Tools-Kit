@@ -2,11 +2,11 @@ import Foundation
 import CryptoKit
 
 class TOTPService {
-    static let shared = TOTPService()
+    nonisolated(unsafe) static let shared = TOTPService()
 
     private init() {}
 
-    enum HashAlgorithm: String {
+    enum HashAlgorithm: String, Sendable {
         case sha1, sha256, sha512
     }
 

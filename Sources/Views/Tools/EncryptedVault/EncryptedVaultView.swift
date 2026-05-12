@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct EncryptedVaultTool: Tool {
+struct EncryptedVaultTool: Tool, Sendable {
     let name = "Encrypted Vault"
     let icon = "key.viewfinder"
     let category = ToolCategory.privacy

@@ -3,7 +3,7 @@ import Foundation
 /// Handles the execution of plugin logic within the system.
 /// Orchestrates the execution pipeline: capture, evaluate, and execute or block.
 final class PluginRuntime {
-    static let shared = PluginRuntime()
+    nonisolated(unsafe) static let shared = PluginRuntime()
 
     private let sandbox = PluginSandbox.shared
     private let eventBus = PluginEventBus.shared

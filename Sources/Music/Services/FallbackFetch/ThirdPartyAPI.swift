@@ -1,13 +1,13 @@
 import Foundation
 
-struct MP3Result {
+struct MP3Result: Sendable {
     let title: String
     let url: String
     let bitrate: Int
     let size: String
 }
 
-struct ThirdPartyAPI {
+struct ThirdPartyAPI: Sendable {
     /// Accepts a full YouTube URL, extracts the video ID, calls the
     /// download-lagu-mp3 API, and returns the highest-bitrate download link.
     static func getMP3Links(videoUrl: String) async throws -> MP3Result {
@@ -50,7 +50,7 @@ struct ThirdPartyAPI {
         }
 
         // Collect entries
-        struct Entry {
+        struct Entry: Sendable {
             let dloadUrl: String
             let bitrate: Int
             let mp3size: String
@@ -103,7 +103,7 @@ struct ThirdPartyAPI {
     }
 }
 
-enum ThirdPartyAPIError: LocalizedError {
+enum ThirdPartyAPIError: LocalizedError, Sendable {
     case invalidURL(String)
     case fetchFailed(String)
     case noResults(String)

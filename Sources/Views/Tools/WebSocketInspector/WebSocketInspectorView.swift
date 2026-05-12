@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct WebSocketInspectorTool: Tool {
+struct WebSocketInspectorTool: Tool, Sendable {
     let name = "WebSocket Inspector"
     let icon = "antenna.radiowaves.left.and.right"
     let category = ToolCategory.network

@@ -129,7 +129,7 @@ struct APITesterView: View {
     }
 }
 
-struct APITesterTool: Tool {
+struct APITesterTool: Tool, Sendable {
     let name = "API Tester"
     let icon = "network"
     let category = ToolCategory.development

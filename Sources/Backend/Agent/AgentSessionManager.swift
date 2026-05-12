@@ -12,7 +12,7 @@ final class AgentSessionManager: ObservableObject {
     private let store = AgentSessionStore.shared
     private var cancellables = Set<AnyCancellable>()
 
-    static let shared = AgentSessionManager()
+    nonisolated(unsafe) static let shared = AgentSessionManager()
 
     private init() {
         store.$states

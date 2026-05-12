@@ -1,8 +1,8 @@
 import Foundation
 import Combine
 
-public struct SDKProject: Identifiable, Codable {
-    public enum ProjectStatus: String, Codable, CaseIterable {
+public struct SDKProject: Identifiable, Codable, Sendable {
+    public enum ProjectStatus: String, Codable, CaseIterable, Sendable {
         case active
         case draft
     }
@@ -24,7 +24,7 @@ public struct SDKProject: Identifiable, Codable {
     public var sourceCode: String
     public var requiredScopes: [String]
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case id, name, description, createdAt, updatedAt, lastBuiltAt, version, status
         case enabledScopes, enabledPluginIDs, enabledToolIDs, enabledConnectorIDs
         case automationRules, healthStatus, sourceCode, requiredScopes
@@ -87,13 +87,13 @@ public struct SDKProject: Identifiable, Codable {
     }
 }
 
-public enum HealthStatus: String, Codable {
+public enum HealthStatus: String, Codable, Sendable {
     case healthy, degraded, critical, unknown
 }
 
 @MainActor
 public final class SDKProjectManager: ObservableObject {
-    public static let shared = SDKProjectManager()
+    nonisolated(unsafe) public static let shared = SDKProjectManager()
 
     @Published public var currentProject: SDKProject?
     @Published public var projects: [SDKProject] = []

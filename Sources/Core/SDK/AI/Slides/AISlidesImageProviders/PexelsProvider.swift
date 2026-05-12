@@ -1,6 +1,6 @@
 import Foundation
 
-struct PexelsProvider: AISlidesImageProvider {
+struct PexelsProvider: AISlidesImageProvider, Sendable {
     private let baseURL = "https://api.pexels.com/v1/search"
 
     func imageURL(for query: String) async -> URL? {

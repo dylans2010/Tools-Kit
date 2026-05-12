@@ -3,7 +3,7 @@ import Foundation
 /// Single-source-of-truth context provider for all AI-driven SDK features.
 /// Loads SDK_AI_System.md and constructs constrained system prompts from it.
 /// No external knowledge, hardcoded prompts, or fallback sources are permitted.
-enum SDKAIContextProvider {
+enum SDKAIContextProvider: Sendable {
 
     /// Load the SDK_AI_System.md document from the app bundle.
     /// Returns the full document content or an error notice if unavailable.

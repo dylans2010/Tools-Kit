@@ -17,11 +17,11 @@ public protocol SDKCancellationManagerProtocol: AnyObject {
 /// Centralized manager for tracking and cancelling async operations across the SDK.
 @MainActor
 public final class SDKCancellationManager: SDKCancellationManagerProtocol, ObservableObject {
-    public static let shared = SDKCancellationManager()
+    nonisolated(unsafe) public static let shared = SDKCancellationManager()
 
     @Published public private(set) var activeTasks: [String: TaskRecord] = [:]
 
-    public struct TaskRecord: Identifiable {
+    public struct TaskRecord: Identifiable, Sendable {
         public let id: String
         public let registeredAt: Date
         public let label: String

@@ -1,7 +1,7 @@
 import Foundation
 
 actor MeetingResolver {
-    static let shared = MeetingResolver()
+    nonisolated(unsafe) static let shared = MeetingResolver()
 
     private let dailyService: DailyService
 

@@ -1,6 +1,6 @@
 import Foundation
 
-enum VaultCategory: String, Codable, CaseIterable, Identifiable {
+enum VaultCategory: String, Codable, CaseIterable, Identifiable, Sendable {
     case credentials = "Credentials"
     case documents = "Documents"
     case photos = "Photos"
@@ -20,7 +20,7 @@ enum VaultCategory: String, Codable, CaseIterable, Identifiable {
     }
 }
 
-struct VaultItem: Identifiable, Codable {
+struct VaultItem: Identifiable, Codable, Sendable {
     let id: UUID
     var category: VaultCategory
     var title: String
@@ -46,18 +46,18 @@ struct VaultItem: Identifiable, Codable {
     }
 }
 
-struct CredentialData: Codable {
+struct CredentialData: Codable, Sendable {
     var username: String
     var password: String
     var website: String
 }
 
-struct DocumentData: Codable {
+struct DocumentData: Codable, Sendable {
     var documentType: String // ID, Passport, etc.
     var expirationDate: Date?
 }
 
-struct TOTPData: Codable {
+struct TOTPData: Codable, Sendable {
     var secret: String
     var issuer: String
     var account: String
@@ -65,13 +65,13 @@ struct TOTPData: Codable {
     var period: Int = 30
 }
 
-struct SecurityLogEvent: Codable, Identifiable {
+struct SecurityLogEvent: Codable, Identifiable, Sendable {
     let id: UUID
     let type: LogType
     let message: String
     let timestamp: Date
 
-    enum LogType: String, Codable {
+    enum LogType: String, Codable, Sendable {
         case login, failedLogin, settingsChange, vaultAccess, threat
     }
 }

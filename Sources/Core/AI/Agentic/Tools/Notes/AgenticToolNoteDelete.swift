@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolNoteDelete: AgenticToolProtocol {
+struct AgenticToolNoteDelete: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "note_delete",
         description: "Delete a note by ID",

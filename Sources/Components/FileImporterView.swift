@@ -3,7 +3,7 @@ import UniformTypeIdentifiers
 
 /// A reusable file importer component that wraps UIDocumentPickerViewController.
 /// This component provides a full UIKit-backed document picker that can be used within SwiftUI sheets.
-public struct FileImporterView: View {
+public struct FileImporterView: View, @unchecked Sendable {
     public var allowedContentTypes: [UTType]
     public var allowsMultipleSelection: Bool
     public var onDocumentsPicked: ([URL]) -> Void

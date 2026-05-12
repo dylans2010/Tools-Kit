@@ -1,13 +1,13 @@
 import SwiftUI
 import WebKit
 
-struct RenderedMailContent {
+struct RenderedMailContent: Sendable {
     let htmlBody: String?
     let plainBody: String?
     let hasHTML: Bool
 }
 
-enum MailContentRenderer {
+enum MailContentRenderer: Sendable {
     static func render(htmlBody: String?, plainBody: String?) -> RenderedMailContent {
         let sanitizedHTML = htmlBody?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
             .map { sanitizeHTML($0) }

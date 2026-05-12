@@ -32,7 +32,7 @@ final class AIWorkoutPlanner {
     }
 }
 
-private struct WorkoutPlannerContext {
+private struct WorkoutPlannerContext: Sendable {
     let profile: UserFitnessProfile
     let progress: [ProgressModel]
     let streak: StreakModel

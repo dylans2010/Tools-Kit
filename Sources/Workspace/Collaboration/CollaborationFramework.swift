@@ -4,11 +4,11 @@ import Combine
 /// Central system that connects ALL workspace data.
 /// Indexes workspace objects and manages relationships between them.
 final class CollaborationFramework: ObservableObject {
-    static let shared = CollaborationFramework()
+    nonisolated(unsafe) static let shared = CollaborationFramework()
 
     @Published var indexedObjects: [UUID: WorkspaceObjectType] = [:]
 
-    enum WorkspaceObjectType: String, Codable {
+    enum WorkspaceObjectType: String, Codable, Sendable {
         case notebook
         case slideDeck
         case meeting

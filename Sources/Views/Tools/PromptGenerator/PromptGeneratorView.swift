@@ -58,7 +58,7 @@ struct PromptGeneratorView: View {
     }
 }
 
-struct PromptGeneratorTool: Tool {
+struct PromptGeneratorTool: Tool, Sendable {
     let name = "Prompt Generator"
     let icon = "bolt.badge.a"
     let category = ToolCategory.ai

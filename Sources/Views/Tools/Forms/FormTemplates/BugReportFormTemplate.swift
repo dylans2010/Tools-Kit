@@ -1,6 +1,6 @@
 import Foundation
 
-enum BugReportFormTemplate {
+enum BugReportFormTemplate: Sendable {
     static func build() -> FormDocument {
         let questions = [
             FormQuestion(title: "Bug title", type: .textInput, required: true),

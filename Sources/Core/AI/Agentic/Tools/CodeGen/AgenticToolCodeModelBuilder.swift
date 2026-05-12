@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolCodeModelBuilder: AgenticToolProtocol {
+struct AgenticToolCodeModelBuilder: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "code_model_builder",
         description: "Generate Swift data models from a schema",

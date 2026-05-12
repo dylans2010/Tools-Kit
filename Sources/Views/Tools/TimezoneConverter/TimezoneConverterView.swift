@@ -125,7 +125,7 @@ struct TimezoneConverterView: View {
     }
 }
 
-struct TimezoneConverterTool: Tool {
+struct TimezoneConverterTool: Tool, Sendable {
     let name = "Timezone Converter"
     let icon = "clock"
     let category = ToolCategory.conversion

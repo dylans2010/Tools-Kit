@@ -1,6 +1,6 @@
 import Foundation
 
-struct RadioStation: Identifiable, Codable, Equatable {
+struct RadioStation: Identifiable, Codable, Equatable, Sendable {
     var id: String { stationuuid }
 
     let stationuuid: String
@@ -27,7 +27,7 @@ struct RadioStation: Identifiable, Codable, Equatable {
         codec = (try? container.decode(String.self, forKey: .codec)) ?? ""
     }
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case stationuuid, name, url_resolved, favicon, tags, country, language, bitrate, codec
     }
 

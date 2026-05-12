@@ -1,6 +1,6 @@
 import Foundation
 
-struct TapRaceState: Codable {
+struct TapRaceState: Codable, Sendable {
     let base: GameState
     let player1Taps: Int
     let player2Taps: Int

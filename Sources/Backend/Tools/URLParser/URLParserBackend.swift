@@ -3,7 +3,7 @@ import Foundation
 final class URLParserBackend: ObservableObject {
     @Published var components: [URLComponentItem] = []
 
-    struct URLComponentItem: Identifiable {
+    struct URLComponentItem: Identifiable, Sendable {
         let id = UUID()
         let key: String
         let value: String

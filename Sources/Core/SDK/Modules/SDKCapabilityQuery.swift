@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 public final class SDKCapabilityQuery {
-    public static let shared = SDKCapabilityQuery()
+    nonisolated(unsafe) public static let shared = SDKCapabilityQuery()
 
     private init() {}
 
@@ -44,7 +44,7 @@ public final class SDKCapabilityQuery {
         return CapabilityResolution(satisfied: satisfied, missing: missing)
     }
 
-    public struct CapabilityResolution {
+    public struct CapabilityResolution: Sendable {
         public let satisfied: [SDKModuleCapability]
         public let missing: [SDKModuleCapability]
 

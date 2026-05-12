@@ -45,7 +45,7 @@ struct ColorPickerView: View {
     }
 }
 
-struct ColorPickerTool: Tool {
+struct ColorPickerTool: Tool, Sendable {
     let name = "Color Picker"
     let icon = "eyedropper"
     let category = ToolCategory.utility

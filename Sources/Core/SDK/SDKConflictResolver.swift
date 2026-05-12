@@ -3,14 +3,14 @@ import Combine
 
 @MainActor
 public final class SDKConflictResolver: ObservableObject {
-    public static let shared = SDKConflictResolver()
+    nonisolated(unsafe) public static let shared = SDKConflictResolver()
 
     @Published public var unresolvedConflicts: [ConflictRecord] = []
     @Published public var resolvedCount: Int = 0
 
     private init() {}
 
-    public struct ConflictRecord: Identifiable {
+    public struct ConflictRecord: Identifiable, @unchecked Sendable {
         public let id: UUID
         public let channel: String
         public let localTimestamp: Date
@@ -20,13 +20,13 @@ public final class SDKConflictResolver: ObservableObject {
         public let resolution: Resolution?
     }
 
-    public enum Resolution: String {
+    public enum Resolution: String, Sendable {
         case localWins
         case remoteWins
         case merged
     }
 
-    public enum Strategy {
+    public enum Strategy: Sendable {
         case lastWriterWins
         case localPriority
         case remotePriority

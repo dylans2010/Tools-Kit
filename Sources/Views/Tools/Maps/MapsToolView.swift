@@ -98,7 +98,7 @@ struct MapsToolView: View {
     }
 }
 
-struct MapsTool: Tool {
+struct MapsTool: Tool, Sendable {
     let name = "Maps Tool"
     let icon = "map.fill"
     let category = ToolCategory.utility

@@ -1,6 +1,6 @@
 import Foundation
 
-struct JulesAgentToolManifest {
+struct JulesAgentToolManifest: Sendable {
     static let tools = [
         "read_file",
         "write_file",

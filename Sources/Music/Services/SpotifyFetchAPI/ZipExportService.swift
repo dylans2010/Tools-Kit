@@ -1,8 +1,8 @@
 import Foundation
 import ZIPFoundation
 
-struct ZipExportService {
-    enum Error: LocalizedError {
+struct ZipExportService: Sendable {
+    enum Error: LocalizedError, Sendable {
         case noFiles
         case creationFailed
 

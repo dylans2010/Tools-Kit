@@ -148,7 +148,7 @@ struct BranchListView: View {
     private func createBranch() {
         guard let baseSha = branches.first(where: { $0.name == baseBranch })?.commit.sha else { return }
 
-        struct CreateRefPayload: Encodable {
+        struct CreateRefPayload: Encodable, Sendable {
             let ref: String
             let sha: String
         }

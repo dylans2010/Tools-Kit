@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentResponseValidator {
+struct AgentResponseValidator: Sendable {
     init() {}
 
     func validate(_ text: String) -> Bool {

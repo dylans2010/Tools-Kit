@@ -1,13 +1,13 @@
 import Foundation
 
-enum AgentStreamEvent {
+enum AgentStreamEvent: Sendable {
     case token(String)
     case toolCallStart(String)
     case toolCallEnd(String, String)
     case complete(String)
 }
 
-struct AgentStreamEventParser {
+struct AgentStreamEventParser: Sendable {
     init() {}
 
     func parse(chunk: String) -> [AgentStreamEvent] {

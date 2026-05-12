@@ -6,7 +6,7 @@ struct IDEDependenciesView: View {
     @State private var selectedNodeID: UUID?
     @State private var resolutionState: ResolutionState = .idle
 
-    enum ResolutionState: String {
+    enum ResolutionState: String, Sendable {
         case idle = "Idle"
         case resolving = "Resolving"
         case resolved = "Resolved"

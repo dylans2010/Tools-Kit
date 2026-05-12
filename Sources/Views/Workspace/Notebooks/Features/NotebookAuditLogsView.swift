@@ -7,7 +7,7 @@ struct NotebookAuditLogsView: View {
 
     @State private var logs: [AuditEntry] = []
 
-    struct AuditEntry: Identifiable {
+    struct AuditEntry: Identifiable, Sendable {
         let id = UUID()
         let action: String
         let details: String

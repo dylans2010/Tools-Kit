@@ -1,7 +1,7 @@
 import Foundation
 
 /// Defines the Persona Workspace configuration and indexing logic.
-struct PersonaWorkspace {
+struct PersonaWorkspace: @unchecked Sendable {
     var config: PersonaConfig
 
     func indexWorkspace() async {

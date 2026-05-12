@@ -157,7 +157,7 @@ struct HabitDetailView: View {
         }
     }
 
-    private struct DayEntry {
+    private struct DayEntry: Sendable {
         let count: Int
         let inRange: Bool
     }

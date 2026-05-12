@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKVersionManager: ObservableObject {
-    public static let shared = SDKVersionManager()
+    nonisolated(unsafe) public static let shared = SDKVersionManager()
 
     @Published public private(set) var currentVersion: SemanticVersion = SemanticVersion(major: 2, minor: 0, patch: 0)
     @Published public private(set) var changelog: [VersionEntry] = []
@@ -117,7 +117,7 @@ public struct SemanticVersion: Codable, Comparable, Hashable, CustomStringConver
     }
 }
 
-public struct VersionRange: CustomStringConvertible {
+public struct VersionRange: CustomStringConvertible, Sendable {
     public let minimum: SemanticVersion
     public let maximum: SemanticVersion?
 
@@ -150,14 +150,14 @@ public struct VersionRange: CustomStringConvertible {
     }
 }
 
-public struct VersionEntry: Identifiable {
+public struct VersionEntry: Identifiable, Sendable {
     public let id = UUID()
     public let version: SemanticVersion
     public let date: Date
     public let changes: [ChangeItem]
 }
 
-public struct ChangeItem: Identifiable {
+public struct ChangeItem: Identifiable, Sendable {
     public let id = UUID()
     public let type: ChangeType
     public let description: String
@@ -167,7 +167,7 @@ public enum ChangeType: String, Codable, CaseIterable, Sendable {
     case feature, improvement, fix, breaking, deprecation
 }
 
-public struct DeprecationNotice: Identifiable {
+public struct DeprecationNotice: Identifiable, Sendable {
     public let id = UUID()
     public let api: String
     public let message: String
@@ -176,7 +176,7 @@ public struct DeprecationNotice: Identifiable {
     public let removedInVersion: SemanticVersion?
 }
 
-public struct CompatibilityResult {
+public struct CompatibilityResult: Sendable {
     public let component: String
     public let status: CompatibilityStatus
     public let message: String
@@ -186,7 +186,7 @@ public enum CompatibilityStatus: String, Sendable {
     case compatible, incompatible, unknown
 }
 
-public struct MigrationRecord: Identifiable {
+public struct MigrationRecord: Identifiable, Sendable {
     public let id = UUID()
     public let fromVersion: SemanticVersion
     public let toVersion: SemanticVersion
