@@ -34,9 +34,13 @@ struct AgenticToolSlidesGenerate: AgenticToolProtocol {
         let manager = SlideDecksManager.shared
         var slides: [Slide] = []
         for i in 0..<slideCount {
-            slides.append(Slide(title: "\(topic) - Slide \(i + 1)", content: ""))
+            slides.append(Slide(
+                type: i == 0 ? "title" : "content",
+                title: "\(topic) - Slide \(i + 1)",
+                layout: i == 0 ? "title" : "bullets"
+            ))
         }
-        let deck = SlideDeck(title: topic, slides: slides)
+        let deck = SlideDeck(title: topic, theme: style, slides: slides)
         manager.addDeck(deck)
 
         return AgenticToolOutput(

@@ -31,7 +31,15 @@ struct AgenticToolTaskUpdate: AgenticToolProtocol {
             switch value.lowercased() {
             case "high": task.priority = .high
             case "low": task.priority = .low
+            case "critical": task.priority = .critical
             default: task.priority = .medium
+            }
+        case "duedate":
+            if value.isEmpty {
+                task.dueDate = nil
+            } else {
+                let formatter = ISO8601DateFormatter()
+                task.dueDate = formatter.date(from: value)
             }
         default: break
         }

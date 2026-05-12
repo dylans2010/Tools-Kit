@@ -9,6 +9,7 @@ struct AgenticToolAIStructuredTransformer: AgenticToolProtocol {
         inputSchema: ["text": "String", "outputFormat": "String"]
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let text = parameters["text"] ?? ""
         let outputFormat = parameters["outputFormat"] ?? "json"

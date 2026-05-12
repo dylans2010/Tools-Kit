@@ -10,6 +10,7 @@ struct AgenticToolCodeFeatureScaffolder: AgenticToolProtocol {
         producesCode: true
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let featureName = parameters["featureName"] ?? "NewFeature"
         let components = parameters["components"] ?? "view,model,viewmodel"

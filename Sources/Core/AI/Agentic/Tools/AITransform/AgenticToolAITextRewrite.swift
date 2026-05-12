@@ -9,6 +9,7 @@ struct AgenticToolAITextRewrite: AgenticToolProtocol {
         inputSchema: ["text": "String", "style": "String"]
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let text = parameters["text"] ?? ""
         let style = parameters["style"] ?? "professional"

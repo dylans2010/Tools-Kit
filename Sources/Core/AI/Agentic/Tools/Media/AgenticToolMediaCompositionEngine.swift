@@ -10,6 +10,7 @@ struct AgenticToolMediaCompositionEngine: AgenticToolProtocol {
         producesCode: true
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let elements = parameters["elements"] ?? ""
         let canvasSize = parameters["canvasSize"] ?? "1920x1080"

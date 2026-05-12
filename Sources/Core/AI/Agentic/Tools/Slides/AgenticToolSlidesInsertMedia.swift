@@ -22,13 +22,16 @@ struct AgenticToolSlidesInsertMedia: AgenticToolProtocol {
         let slideIndex = Int(slideIndexStr) ?? 0
         let manager = SlideDecksManager.shared
 
-        guard let deck = manager.decks.first(where: { $0.id == deckId }) else {
+        guard var deck = manager.decks.first(where: { $0.id == deckId }) else {
             throw AgenticToolExecutionError.executionFailed("slides_insert_media", NSError(domain: "AgenticTools", code: 2, userInfo: [NSLocalizedDescriptionKey: "Deck not found"]))
         }
 
         guard slideIndex >= 0 && slideIndex < deck.slides.count else {
             throw AgenticToolExecutionError.executionFailed("slides_insert_media", NSError(domain: "AgenticTools", code: 3, userInfo: [NSLocalizedDescriptionKey: "Slide index out of range"]))
         }
+
+        deck.slides[slideIndex].metadata["media_\(mediaType)"] = source
+        manager.updateDeck(deck)
 
         return AgenticToolOutput(
             summary: "Inserted \(mediaType) into slide \(slideIndex) of '\(deck.title)'",

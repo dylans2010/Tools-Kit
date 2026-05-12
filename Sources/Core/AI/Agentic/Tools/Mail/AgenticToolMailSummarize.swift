@@ -16,10 +16,19 @@ struct AgenticToolMailSummarize: AgenticToolProtocol {
         let count = Int(countStr) ?? 10
 
         let accounts = AccountManager.shared.accounts
+        let threads = MailStore.shared.threads
         var emailSummaries: [String] = []
 
         for account in accounts {
             emailSummaries.append("Account: \(account.emailAddress) (\(account.providerType.rawValue))")
+        }
+
+        let recentThreads = threads.prefix(count)
+        var threadDescriptions: [String] = []
+        for thread in recentThreads {
+            if let lastMessage = thread.messages.last {
+                threadDescriptions.append("- Subject: \(lastMessage.subject) | From: \(lastMessage.from) | Date: \(lastMessage.date)")
+            }
         }
 
         let session = LanguageModelSession(instructions: "You are an email summarization AI. Produce concise summaries of email activity.")
@@ -27,6 +36,9 @@ struct AgenticToolMailSummarize: AgenticToolProtocol {
         Summarize the email activity for scope '\(scope)' (last \(count) items).
         Connected accounts:
         \(emailSummaries.joined(separator: "\n"))
+
+        Recent threads:
+        \(threadDescriptions.joined(separator: "\n"))
 
         Provide a structured summary of important emails, action items, and trends.
         """

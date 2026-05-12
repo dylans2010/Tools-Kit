@@ -25,10 +25,10 @@ struct AgenticToolTaskSchedule: AgenticToolProtocol {
 
         let event = CalendarEvent(
             title: "Task: \(task.title)",
+            description: task.description,
             date: date,
             startTime: date,
-            endTime: date.addingTimeInterval(TimeInterval(durationMinutes * 60)),
-            description: task.description
+            endTime: date.addingTimeInterval(TimeInterval(durationMinutes * 60))
         )
         CalendarManager.shared.addEvent(event)
 

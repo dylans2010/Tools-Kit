@@ -10,6 +10,7 @@ struct AgenticToolCodeModuleAssembler: AgenticToolProtocol {
         producesCode: true
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let moduleName = parameters["moduleName"] ?? "AssembledModule"
         let componentIdsStr = parameters["componentIds"] ?? ""

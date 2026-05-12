@@ -10,6 +10,7 @@ struct AgenticToolCodeArchitectureGenerator: AgenticToolProtocol {
         producesCode: true
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let systemName = parameters["systemName"] ?? "System"
         let pattern = parameters["pattern"] ?? "MVVM"

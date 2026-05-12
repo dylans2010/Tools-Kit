@@ -9,6 +9,7 @@ struct AgenticToolAIContentExtractor: AgenticToolProtocol {
         inputSchema: ["text": "String", "extractionType": "String"]
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let text = parameters["text"] ?? ""
         let extractionType = parameters["extractionType"] ?? "entities"

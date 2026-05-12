@@ -9,6 +9,7 @@ struct AgenticToolAIClassifier: AgenticToolProtocol {
         inputSchema: ["text": "String", "categories": "String"]
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let text = parameters["text"] ?? ""
         let categoriesStr = parameters["categories"] ?? "general,work,personal,urgent"
