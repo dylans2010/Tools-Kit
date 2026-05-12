@@ -6,6 +6,7 @@ struct PersonaHomeView: View {
     @AppStorage("persona.welcome_shown") private var hasShownWelcome = false
     @State private var activeModal: PersonaHomeModal?
     @State private var shuffledPrompts: [String] = []
+    @State private var showAgenticRuntime = false
 
     // Expanded Preset Prompts (500+)
     private let allPrompts = [
@@ -346,6 +347,14 @@ struct PersonaHomeView: View {
                 onShowWelcome: { activeModal = .welcome },
                 onShowTuning: { activeModal = .tuning }
             )
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showAgenticRuntime = true
+                } label: {
+                    Image(systemName: "cpu")
+                }
+                .accessibilityLabel("Agentic Runtime")
+            }
         }
         .onAppear(perform: handleOnAppear)
         .sheet(item: $activeModal) { modal in
@@ -355,6 +364,9 @@ struct PersonaHomeView: View {
                 allPrompts: allPrompts,
                 onPromptSelection: selectPromptAndSend(_:)
             )
+        }
+        .sheet(isPresented: $showAgenticRuntime) {
+            AgenticUIHomeView()
         }
     }
 
