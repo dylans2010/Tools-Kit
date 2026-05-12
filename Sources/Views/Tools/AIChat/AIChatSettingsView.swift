@@ -691,6 +691,9 @@ struct AIChatSettingsView: View {
 
     private var developerToolsSection: some View {
         Section {
+            NavigationLink("Siri Core UI") {
+                SiriCoreUIView()
+            }
             NavigationLink("Developer Tools") {
                 MeetDeveloperToolsView(manager: .shared)
             }
