@@ -9645,6 +9645,7 @@
 				AW0200000000000000000001 /* Appwrite */,
 				DY0200000000000000000001 /* Daily */,
 				ZF0000000000000000000002 /* ZIPFoundation */,
+				AU0200000000000000000001 /* Aurora */,
 			);
 			productName = Tools-Kit;
 			productReference = 732E3165BFBB323BD8081B3F /* Tools-Kit.app */;
@@ -9663,6 +9664,9 @@
 			dependencies = (
 			);
 			name = KeyboardExtension;
+			packageProductDependencies = (
+				AU0200000000000000000001 /* Aurora */,
+			);
 			productName = KeyboardExtension;
 			productReference = KB0100000000000000000099 /* KeyboardExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -9680,6 +9684,9 @@
 			dependencies = (
 			);
 			name = MessagesExtension;
+			packageProductDependencies = (
+				AU0200000000000000000001 /* Aurora */,
+			);
 			productName = MessagesExtension;
 			productReference = MS0100000000000000000099 /* MessagesExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -9725,6 +9732,7 @@
 				AW0100000000000000000001 /* XCRemoteSwiftPackageReference "sdk-for-apple" */,
 				DY0100000000000000000001 /* XCRemoteSwiftPackageReference "daily-client-ios" */,
 				ZF0000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+				AU0100000000000000000001 /* XCRemoteSwiftPackageReference "Aurora" */,
 			);
 			targets = (
 				F3353FBEDEEBF7704E1E6451 /* Tools-Kit */,
@@ -11537,6 +11545,14 @@
 				kind = branch;
 			};
 		};
+		AU0100000000000000000001 /* XCRemoteSwiftPackageReference "Aurora" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tornikegomareli/Aurora.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.0;
+			};
+		};
 		ZF0000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
@@ -11562,6 +11578,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = MC0100000000000000000001 /* XCRemoteSwiftPackageReference "mailcore2" */;
 			productName = MailCore2;
+		};
+		AU0200000000000000000001 /* Aurora */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AU0100000000000000000001 /* XCRemoteSwiftPackageReference "Aurora" */;
+			productName = Aurora;
 		};
 		ZF0000000000000000000002 /* ZIPFoundation */ = {
 			isa = XCSwiftPackageProductDependency;
