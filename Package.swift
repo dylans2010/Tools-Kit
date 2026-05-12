@@ -11,7 +11,7 @@ let package = Package(
 .package(url: "https://github.com/MailCore/mailcore2", branch: "master"),
 .package(url: "https://github.com/appwrite/sdk-for-apple", from: "16.1.0"),
 .package(url: "https://github.com/daily-co/daily-client-ios.git", from: "0.37.0"),
-.package(url: "https://github.com/tornikegomareli/Aurora.git", revision: "f660efe80c98b2973ee7a70e96f3c5c843c855fd"),
+.package(url: "https://github.com/dylans2010/Aurora.git", branch: "main"),
 .package(url: "https://github.com/weichsel/ZIPFoundation.git", from: "0.9.19")
 
     ],
