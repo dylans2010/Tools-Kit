@@ -11547,10 +11547,10 @@
 		};
 		AU0100000000000000000001 /* XCRemoteSwiftPackageReference "Aurora" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/tornikegomareli/Aurora.git";
+			repositoryURL = "https://github.com/dylans2010/Aurora.git";
 			requirement = {
-				kind = revision;
-				revision = f660efe80c98b2973ee7a70e96f3c5c843c855fd;
+				branch = main;
+				kind = branch;
 			};
 		};
 		ZF0000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
