@@ -5,7 +5,7 @@ import Combine
 /// Initializes all services, manages lifecycle, and provides the global access point.
 @MainActor
 public final class WorkspaceSDKKernel: ObservableObject {
-    nonisolated(unsafe) public static let shared = WorkspaceSDKKernel()
+    public static let shared = WorkspaceSDKKernel()
 
     @Published public private(set) var state: KernelState = .idle
     @Published public private(set) var bootTime: Date?

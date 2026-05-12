@@ -12,7 +12,7 @@ enum RadioPlaybackState: Equatable, Sendable {
 
 @MainActor
 final class RadioPlayerManager: ObservableObject {
-    nonisolated(unsafe) static let shared = RadioPlayerManager()
+    static let shared = RadioPlayerManager()
 
     @Published var currentStation: RadioStation?
     @Published var playbackState: RadioPlaybackState = .idle

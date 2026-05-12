@@ -3,7 +3,7 @@ import Foundation
 /// SDK-wide configuration and environment settings.
 /// Manages build configuration, feature flags, and runtime parameters.
 public final class SDKEnvironment: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKEnvironment()
+    public static let shared = SDKEnvironment()
 
     @Published public private(set) var configuration: SDKConfiguration
     @Published public private(set) var featureFlags: [String: Bool] = [:]

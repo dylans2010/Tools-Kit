@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 public final class SDKEventBridge: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKEventBridge()
+    public static let shared = SDKEventBridge()
 
     private let eventSubject = PassthroughSubject<SDKEvent, Never>()
     @Published public var eventHistory: [SDKEvent] = []

@@ -2,7 +2,7 @@ import Foundation
 
 /// Handles automated email workflows based on user-defined rules.
 final class MailAutomationEngine {
-    nonisolated(unsafe) static let shared = MailAutomationEngine()
+    static let shared = MailAutomationEngine()
 
     struct AutomationRule: Codable, Identifiable, Sendable {
         let id: UUID

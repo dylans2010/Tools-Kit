@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class TasksManager: ObservableObject {
-    nonisolated(unsafe) static let shared = TasksManager()
+    static let shared = TasksManager()
 
     @Published var tasks: [WorkspaceTask] = []
     @Published var categories: [TaskCategory] = []

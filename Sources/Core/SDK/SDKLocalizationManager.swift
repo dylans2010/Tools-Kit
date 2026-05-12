@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKLocalizationManager: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKLocalizationManager()
+    public static let shared = SDKLocalizationManager()
 
     @Published public private(set) var currentLocale: SDKLocale = .english
     @Published public private(set) var availableLocales: [SDKLocale] = SDKLocale.allCases

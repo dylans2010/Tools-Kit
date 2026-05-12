@@ -2,7 +2,7 @@ import Foundation
 import JavaScriptCore
 
 public final class SDKSandboxEngine {
-    nonisolated(unsafe) public static let shared = SDKSandboxEngine()
+    public static let shared = SDKSandboxEngine()
 
     private init() {}
 
@@ -70,9 +70,7 @@ public final class SDKSandboxEngine {
         let calendar = JSValue(object: [:], in: context)
         let listEvents: @convention(block) () -> [[String: Any]] = {
             guard Thread.isMainThread else { return [] }
-            return MainActor.assumeIsolated {
-                WorkspaceAPI.shared.calendar.listEvents().map { ["id": $0.id.uuidString, "title": $0.title] }
-            }
+            return WorkspaceAPI.shared.calendar.listEvents().map { ["id": $0.id.uuidString, "title": $0.title] }
         }
         let createEvent: @convention(block) (String, Double, Double) -> Void = { title, start, end in
             Task { @MainActor in
@@ -199,9 +197,7 @@ public final class SDKSandboxEngine {
 
         let bridge = JSValue(object: [:], in: context)
         let getLiveState: @convention(block) () -> [String: Any] = {
-            return MainActor.assumeIsolated {
-                SDKWorkspaceBridge.shared.getLiveSystemState()
-            }
+            return SDKWorkspaceBridge.shared.getLiveSystemState()
         }
         bridge?.setObject(getLiveState, forKeyedSubscript: "getLiveState" as NSString)
         context.setObject(bridge, forKeyedSubscript: "sdk_bridge" as NSString)

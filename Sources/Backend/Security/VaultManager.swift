@@ -4,7 +4,7 @@ import CryptoKit
 
 @MainActor
 class VaultManager: ObservableObject {
-    nonisolated(unsafe) static let shared = VaultManager()
+    static let shared = VaultManager()
 
     @Published var items: [VaultItem] = []
     @Published var isLoading = false

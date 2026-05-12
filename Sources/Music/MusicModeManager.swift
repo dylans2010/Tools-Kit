@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class MusicModeManager: ObservableObject {
-    nonisolated(unsafe) static let shared = MusicModeManager()
+    static let shared = MusicModeManager()
 
     private let key = "app.musicModeEnabled"
     private let forcedByBundle: Bool

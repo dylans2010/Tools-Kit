@@ -2,7 +2,7 @@ import Foundation
 
 /// Analyzes the structure of a GitHub repository for modular extraction.
 final class CodeAuditEngine {
-    nonisolated(unsafe) static let shared = CodeAuditEngine()
+    static let shared = CodeAuditEngine()
 
     private let github = GitHubAPIClient.shared
 

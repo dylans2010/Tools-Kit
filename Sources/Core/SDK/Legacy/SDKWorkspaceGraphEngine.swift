@@ -1,7 +1,7 @@
 import Foundation
 
 public final class SDKWorkspaceGraphEngine {
-    nonisolated(unsafe) public static let shared = SDKWorkspaceGraphEngine()
+    public static let shared = SDKWorkspaceGraphEngine()
 
     private let persistenceURL: URL
     private var nodes: [SDKNode] = []

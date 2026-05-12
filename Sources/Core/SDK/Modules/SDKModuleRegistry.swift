@@ -55,7 +55,7 @@ public protocol SDKModuleProvider {
 
 @MainActor
 public final class SDKModuleRegistry: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKModuleRegistry()
+    public static let shared = SDKModuleRegistry()
 
     @Published public var modules: [SDKModuleDescriptor] = []
     @Published public var activeModuleIDs: Set<UUID> = []

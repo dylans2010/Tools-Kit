@@ -2,7 +2,7 @@ import Foundation
 
 /// Registry and dispatcher for system tools.
 final class AgentSystemTools {
-    nonisolated(unsafe) static let shared = AgentSystemTools()
+    static let shared = AgentSystemTools()
 
     internal var tools: [String: SystemTool] = [:]
 

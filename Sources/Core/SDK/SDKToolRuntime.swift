@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKToolRuntime: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKToolRuntime()
+    public static let shared = SDKToolRuntime()
 
     @Published public var executionHistory: [ToolExecutionRecord] = []
     @Published public var activeExecutions: Set<UUID> = []

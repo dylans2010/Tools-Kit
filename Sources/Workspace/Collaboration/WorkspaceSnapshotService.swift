@@ -13,7 +13,7 @@ struct WorkspaceSnapshot: Codable, Identifiable, Sendable {
 
 /// Saves, restores, and compares full workspace snapshots.
 final class WorkspaceSnapshotService: ObservableObject {
-    nonisolated(unsafe) static let shared = WorkspaceSnapshotService()
+    static let shared = WorkspaceSnapshotService()
 
     struct Snapshot: Codable, Identifiable, Sendable {
         let id: UUID

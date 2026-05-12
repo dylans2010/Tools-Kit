@@ -14,7 +14,7 @@ enum AuthServiceError: LocalizedError, Sendable {
 
 @MainActor
 final class AccountAuthService: ObservableObject {
-    nonisolated(unsafe) static let shared = AccountAuthService()
+    static let shared = AccountAuthService()
 
     @Published var isBusy = false
     @Published var lastErrorMessage: String?

@@ -2,7 +2,7 @@ import Foundation
 
 /// Real framework for workspace intelligence.
 final class IntelligenceFramework {
-    nonisolated(unsafe) static let shared = IntelligenceFramework()
+    static let shared = IntelligenceFramework()
 
     private let dataStore = UnifiedDataStore.shared
     private let notebookManager = NotebooksManager.shared

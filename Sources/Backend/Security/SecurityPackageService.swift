@@ -11,7 +11,7 @@ struct SecurityPackageMetadata: Codable, Sendable {
 }
 
 class SecurityPackageService {
-    nonisolated(unsafe) static let shared = SecurityPackageService()
+    static let shared = SecurityPackageService()
 
     private let fileManager = FileManager.default
 

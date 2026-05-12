@@ -2,7 +2,7 @@ import Foundation
 
 /// Engine managing a persistent graph of communication history, relationships, and context recall.
 actor MemoryGraphEngine {
-    nonisolated(unsafe) static let shared = MemoryGraphEngine()
+    static let shared = MemoryGraphEngine()
     private var nodes: [UUID: MemoryGraphNode] = [:]
     private var edges: [MemoryGraphEdge] = []
 

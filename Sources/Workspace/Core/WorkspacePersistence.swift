@@ -3,7 +3,7 @@ import Foundation
 /// High-fidelity, JSON-based persistence engine for Workspace modules.
 /// Manages storage in the application's document directory.
 final class WorkspacePersistence {
-    nonisolated(unsafe) static let shared = WorkspacePersistence()
+    static let shared = WorkspacePersistence()
 
     private let fileManager = FileManager.default
 
@@ -134,7 +134,7 @@ struct ConnectorLog: Codable, Identifiable, Sendable {
 // MARK: - Connector Manager
 
 final class ConnectorManager: ObservableObject {
-    nonisolated(unsafe) static let shared = ConnectorManager()
+    static let shared = ConnectorManager()
 
     @Published var connectors: [ConnectorDefinition] = []
     @Published var logs: [ConnectorLog] = []
@@ -198,7 +198,7 @@ final class ConnectorManager: ObservableObject {
 // MARK: - Connector Execution Service
 
 final class ConnectorExecutionService {
-    nonisolated(unsafe) static let shared = ConnectorExecutionService()
+    static let shared = ConnectorExecutionService()
 
     private init() {}
 
@@ -251,7 +251,7 @@ final class ConnectorExecutionService {
 // MARK: - Plugin Toolkit Logic
 
 final class PluginToolkitEngine {
-    nonisolated(unsafe) static let shared = PluginToolkitEngine()
+    static let shared = PluginToolkitEngine()
 
     private init() {}
 

@@ -2,7 +2,7 @@ import Foundation
 
 /// Routes SDK actions to their respective Workspace modules.
 public final class SDKSystemRouter {
-    nonisolated(unsafe) public static let shared = SDKSystemRouter()
+    public static let shared = SDKSystemRouter()
 
     private init() {}
 

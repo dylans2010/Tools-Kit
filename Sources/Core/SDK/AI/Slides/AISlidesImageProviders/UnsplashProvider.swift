@@ -94,7 +94,7 @@ enum UnsplashProviderError: LocalizedError, Equatable, Sendable {
 // MARK: - UnsplashProvider
 
 final class UnsplashProvider: AISlidesImageProvider {
-    nonisolated(unsafe) static let shared = UnsplashProvider()
+    static let shared = UnsplashProvider()
     static let providerID = "unsplash"
 
     private let baseURL = "https://api.unsplash.com"

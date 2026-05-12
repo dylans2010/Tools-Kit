@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class HabitsManager: ObservableObject {
-    nonisolated(unsafe) static let shared = HabitsManager()
+    static let shared = HabitsManager()
 
     @Published var habits: [Habit] = []
     private let aiService = AIService.shared

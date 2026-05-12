@@ -3,7 +3,7 @@ import Combine
 
 /// Manages multi-user editing sessions and PR-style reviews for media projects.
 final class SharedEditingSessionManager: ObservableObject {
-    nonisolated(unsafe) static let shared = SharedEditingSessionManager()
+    static let shared = SharedEditingSessionManager()
 
     struct UserCursor: Identifiable, Sendable {
         let id: UUID

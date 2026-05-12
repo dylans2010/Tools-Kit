@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKExecutionEngine: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKExecutionEngine()
+    public static let shared = SDKExecutionEngine()
 
     @Published public var activeExecutions: [UUID: ExecutionState] = [:]
     @Published public var executionHistory: [ExecutionRecord] = []

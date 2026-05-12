@@ -2,7 +2,7 @@ import Foundation
 
 /// Persistent state management for SDK projects.
 public final class SDKStateManager: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKStateManager()
+    public static let shared = SDKStateManager()
 
     @Published public var savedProjects: [SDKProjectLegacy] = []
 

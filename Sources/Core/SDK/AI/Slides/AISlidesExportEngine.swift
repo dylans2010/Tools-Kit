@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class AISlidesExportEngine: ObservableObject {
-    nonisolated(unsafe) public static let shared = AISlidesExportEngine()
+    public static let shared = AISlidesExportEngine()
 
     @Published public private(set) var isExporting = false
     @Published public private(set) var exportProgress: Double = 0

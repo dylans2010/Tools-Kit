@@ -84,7 +84,7 @@ public struct SDKPluginManifest: Identifiable, Codable, Sendable {
 
 @MainActor
 public final class SDKPluginLifecycleManager: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKPluginLifecycleManager()
+    public static let shared = SDKPluginLifecycleManager()
 
     @Published public var manifests: [SDKPluginManifest] = []
     @Published public var phases: [UUID: SDKPluginPhase] = [:]

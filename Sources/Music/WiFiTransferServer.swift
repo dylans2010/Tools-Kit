@@ -4,7 +4,7 @@ import Network
 /// Lightweight HTTP server for WiFi music transfer.
 @MainActor
 final class WiFiTransferServer: ObservableObject {
-    nonisolated(unsafe) static let shared = WiFiTransferServer()
+    static let shared = WiFiTransferServer()
 
     @Published var isRunning = false
     @Published var ipAddress: String = ""

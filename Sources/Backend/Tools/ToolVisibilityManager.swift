@@ -4,7 +4,7 @@ import Combine
 /// Manages which tools are visible on the Dashboard.
 /// Preferences are stored persistently in UserDefaults.
 final class ToolVisibilityManager: ObservableObject {
-    nonisolated(unsafe) static let shared = ToolVisibilityManager()
+    static let shared = ToolVisibilityManager()
 
     private let key = "hiddenToolIDs"
 

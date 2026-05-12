@@ -3,7 +3,7 @@ import Combine
 
 /// Local Git engine: stage changes, build commits, and maintain an offline commit queue.
 final class GitEngineService: ObservableObject {
-    nonisolated(unsafe) static let shared = GitEngineService()
+    static let shared = GitEngineService()
 
     // MARK: - Models
 
@@ -211,7 +211,7 @@ final class GitEngineService: ObservableObject {
 
 /// Scans repository files for security issues, duplicate code, and unused items.
 final class RepoIntelligenceService: ObservableObject {
-    nonisolated(unsafe) static let shared = RepoIntelligenceService()
+    static let shared = RepoIntelligenceService()
 
     struct SecurityIssue: Identifiable, Sendable {
         let id = UUID()
@@ -353,7 +353,7 @@ final class RepoIntelligenceService: ObservableObject {
 
 /// Builds and manages visual GitHub workflow definitions locally.
 final class WorkflowBuilderService: ObservableObject {
-    nonisolated(unsafe) static let shared = WorkflowBuilderService()
+    static let shared = WorkflowBuilderService()
 
     struct WorkflowStep: Codable, Identifiable, Sendable {
         let id: UUID
@@ -471,7 +471,7 @@ final class WorkflowBuilderService: ObservableObject {
 // MARK: - Repo Analyzer
 
 final class RepoAnalyzerService: ObservableObject {
-    nonisolated(unsafe) static let shared = RepoAnalyzerService()
+    static let shared = RepoAnalyzerService()
 
     struct Hotspot: Identifiable, Sendable {
         let id = UUID()

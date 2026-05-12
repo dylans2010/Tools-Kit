@@ -1,7 +1,7 @@
 import Foundation
 
 public final class SDKActionDispatcher {
-    nonisolated(unsafe) public static let shared = SDKActionDispatcher()
+    public static let shared = SDKActionDispatcher()
 
     private let api = WorkspaceAPI.shared
 

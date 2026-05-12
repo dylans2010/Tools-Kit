@@ -5,7 +5,7 @@ import CallKit
 
 @MainActor
 final class CallKitManager: NSObject, ObservableObject {
-    nonisolated(unsafe) static let shared = CallKitManager()
+    static let shared = CallKitManager()
 
     var onAnswer: (() -> Void)?
     var onEnd: (() -> Void)?
@@ -99,7 +99,7 @@ extension CallKitManager: CXProviderDelegate {
 #else
 @MainActor
 final class CallKitManager: ObservableObject {
-    nonisolated(unsafe) static let shared = CallKitManager()
+    static let shared = CallKitManager()
 
     var onAnswer: (() -> Void)?
     var onEnd: (() -> Void)?

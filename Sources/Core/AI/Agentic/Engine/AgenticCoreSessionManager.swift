@@ -4,7 +4,7 @@ import Combine
 
 @MainActor
 final class AgenticCoreSessionManager: ObservableObject {
-    nonisolated(unsafe) static let shared = AgenticCoreSessionManager()
+    static let shared = AgenticCoreSessionManager()
 
     @Published var streamedTokens: [AgenticStreamToken] = []
     @Published var currentResponse: String = ""

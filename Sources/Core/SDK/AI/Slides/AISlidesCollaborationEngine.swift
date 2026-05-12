@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class AISlidesCollaborationEngine: ObservableObject {
-    nonisolated(unsafe) public static let shared = AISlidesCollaborationEngine()
+    public static let shared = AISlidesCollaborationEngine()
 
     @Published public private(set) var activeSessions: [SlideCollabSession] = []
     @Published public private(set) var connectedPeers: [CollabPeer] = []

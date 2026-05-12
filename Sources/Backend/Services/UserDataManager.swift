@@ -2,7 +2,7 @@ import Foundation
 import Appwrite
 
 final class UserDataManager {
-    nonisolated(unsafe) static let shared = UserDataManager()
+    static let shared = UserDataManager()
 
     private let databases = Databases(AppwriteService.client)
     private let appwriteAccount = AppwriteService.account

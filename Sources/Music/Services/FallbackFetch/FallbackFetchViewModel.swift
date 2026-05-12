@@ -49,7 +49,7 @@ struct LogEntry: Identifiable, Sendable {
 
 @MainActor
 final class LogManager: ObservableObject {
-    nonisolated(unsafe) static let shared = LogManager()
+    static let shared = LogManager()
     private init() {}
 
     @Published private(set) var entries: [LogEntry] = []

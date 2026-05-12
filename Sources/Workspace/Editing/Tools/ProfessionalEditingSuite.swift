@@ -9,7 +9,7 @@ import AVFoundation
 
 /// Logic for professional media production tools.
 final class ProfessionalEditingSuite: ObservableObject {
-    nonisolated(unsafe) static let shared = ProfessionalEditingSuite()
+    static let shared = ProfessionalEditingSuite()
 
     @Published var detectedScenes: Int = 0
     @Published var isMotionTracking: Bool = false
@@ -110,7 +110,7 @@ final class ProfessionalEditingSuite: ObservableObject {
 
 /// Manages reusable templates for editing projects.
 final class EditingTemplateStudio: ObservableObject {
-    nonisolated(unsafe) static let shared = EditingTemplateStudio()
+    static let shared = EditingTemplateStudio()
 
     @Published var templates: [EditingProject] = []
 

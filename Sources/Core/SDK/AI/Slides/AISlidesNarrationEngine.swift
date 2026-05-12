@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class AISlidesNarrationEngine: ObservableObject {
-    nonisolated(unsafe) public static let shared = AISlidesNarrationEngine()
+    public static let shared = AISlidesNarrationEngine()
 
     @Published public private(set) var isGenerating = false
     @Published public private(set) var generatedNotes: [UUID: String] = [:]

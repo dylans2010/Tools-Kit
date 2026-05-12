@@ -2,7 +2,7 @@ import Foundation
 
 /// Engine responsible for deep semantic parsing and classification of communication content.
 actor CommunicationIntelligenceEngine {
-    nonisolated(unsafe) static let shared = CommunicationIntelligenceEngine()
+    static let shared = CommunicationIntelligenceEngine()
     private let aiService = AIService.shared
 
     private init() {}

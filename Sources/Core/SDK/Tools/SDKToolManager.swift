@@ -29,7 +29,7 @@ public struct SDKToolResult: @unchecked Sendable {
 
 @MainActor
 public final class SDKToolManager: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKToolManager()
+    public static let shared = SDKToolManager()
 
     @Published public var tools: [SDKTool] = []
 

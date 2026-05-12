@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class WorkspaceModeManager: ObservableObject {
-    nonisolated(unsafe) static let shared = WorkspaceModeManager()
+    static let shared = WorkspaceModeManager()
 
     private let key = "workspaceModeEnabled"
 

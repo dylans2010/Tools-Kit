@@ -1,7 +1,7 @@
 import Foundation
 
 public final class SDKNetworkManager {
-    nonisolated(unsafe) public static let shared = SDKNetworkManager()
+    public static let shared = SDKNetworkManager()
 
     private let session: URLSession
     private let rateLimiter = RateLimiter()

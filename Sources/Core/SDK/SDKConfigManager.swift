@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKConfigManager: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKConfigManager()
+    public static let shared = SDKConfigManager()
 
     @Published public private(set) var configurations: [String: SDKConfigEntry] = [:]
     @Published public private(set) var profiles: [SDKConfigProfile] = []

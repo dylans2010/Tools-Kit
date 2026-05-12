@@ -3,7 +3,7 @@ import Combine
 
 /// Centralized event bus for both core systems and plugins.
 final class PluginEventBus {
-    nonisolated(unsafe) static let shared = PluginEventBus()
+    static let shared = PluginEventBus()
 
     private let subject = PassthroughSubject<PluginEvent, Never>()
     private let queue = DispatchQueue(label: "io.toolskit.eventbus")

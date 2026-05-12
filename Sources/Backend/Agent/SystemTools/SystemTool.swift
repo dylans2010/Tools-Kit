@@ -121,7 +121,7 @@ extension SystemTool {
         }
 
         var files: [URL] = []
-        for case let fileURL as URL in enumerator {
+        while let fileURL = enumerator.nextObject() as? URL {
             guard (try? fileURL.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true else { continue }
             if let allowedExtensions {
                 let ext = fileURL.pathExtension.lowercased()

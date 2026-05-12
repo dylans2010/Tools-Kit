@@ -2,7 +2,7 @@ import Foundation
 import Security
 
 class APIKeyManager {
-    nonisolated(unsafe) static let shared = APIKeyManager()
+    static let shared = APIKeyManager()
     private let service = "com.tools-kit.keys"
 
     // MARK: - Per-provider key storage

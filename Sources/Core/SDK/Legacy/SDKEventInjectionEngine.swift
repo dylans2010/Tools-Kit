@@ -3,7 +3,7 @@ import Foundation
 /// Injects SDK events into the global EventBus.
 /// Ensures plugins and connectors can react to SDK actions in real-time.
 public final class SDKEventInjectionEngine {
-    nonisolated(unsafe) public static let shared = SDKEventInjectionEngine()
+    public static let shared = SDKEventInjectionEngine()
 
     private init() {}
 

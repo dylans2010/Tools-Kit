@@ -2,7 +2,7 @@ import SwiftUI
 
 @MainActor
 final class WhiteboardViewTools: ObservableObject {
-    nonisolated(unsafe) static let shared = WhiteboardViewTools()
+    static let shared = WhiteboardViewTools()
 
     // MARK: - Tool Entry
 

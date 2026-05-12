@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKConflictResolver: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKConflictResolver()
+    public static let shared = SDKConflictResolver()
 
     @Published public var unresolvedConflicts: [ConflictRecord] = []
     @Published public var resolvedCount: Int = 0

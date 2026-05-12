@@ -3,7 +3,7 @@ import Combine
 
 /// In-memory local notification service for workspace alerts.
 final class WorkspaceNotificationService: ObservableObject {
-    nonisolated(unsafe) static let shared = WorkspaceNotificationService()
+    static let shared = WorkspaceNotificationService()
 
     struct WorkspaceNotification: Identifiable, Sendable {
         let id: UUID
@@ -60,7 +60,7 @@ final class WorkspaceNotificationService: ObservableObject {
 
 /// Indexed global search across all workspace objects.
 final class GlobalSearchService: ObservableObject {
-    nonisolated(unsafe) static let shared = GlobalSearchService()
+    static let shared = GlobalSearchService()
 
     struct SearchResult: Identifiable, Sendable {
         let id = UUID()
@@ -143,7 +143,7 @@ final class GlobalSearchService: ObservableObject {
 
 /// Detects and repairs workspace data integrity issues.
 final class DataIntegrityService: ObservableObject {
-    nonisolated(unsafe) static let shared = DataIntegrityService()
+    static let shared = DataIntegrityService()
 
     struct IntegrityIssue: Identifiable, Sendable {
         let id = UUID()

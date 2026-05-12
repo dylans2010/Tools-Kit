@@ -2,7 +2,7 @@ import Vision
 import UIKit
 
 class VisionService {
-    nonisolated(unsafe) static let shared = VisionService()
+    static let shared = VisionService()
 
     func performOCR(on image: UIImage) async throws -> String {
         guard let cgImage = image.cgImage else {

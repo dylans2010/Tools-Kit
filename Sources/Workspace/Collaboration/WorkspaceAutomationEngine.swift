@@ -3,7 +3,7 @@ import Combine
 
 /// Trigger → Condition → Action automation engine for collaboration workspaces.
 final class WorkspaceAutomationEngine: ObservableObject {
-    nonisolated(unsafe) static let shared = WorkspaceAutomationEngine()
+    static let shared = WorkspaceAutomationEngine()
 
     // MARK: - Models
 

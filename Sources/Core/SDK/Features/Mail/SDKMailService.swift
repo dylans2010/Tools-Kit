@@ -14,7 +14,7 @@ public protocol SDKMailServiceProtocol {
 /// All business logic lives here; views only consume this service.
 @MainActor
 public final class SDKMailService: SDKMailServiceProtocol, ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKMailService()
+    public static let shared = SDKMailService()
 
     @Published public private(set) var messages: [SDKMailMessage] = []
     @Published public private(set) var threads: [String: [SDKMailMessage]] = [:]

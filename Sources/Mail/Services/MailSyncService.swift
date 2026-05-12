@@ -1,7 +1,7 @@
 import Foundation
 
 class MailSyncService: ObservableObject, @unchecked Sendable {
-    nonisolated(unsafe) static let shared = MailSyncService()
+    static let shared = MailSyncService()
 
     @Published var isSyncing = false
     @Published var lastSyncDate: Date?

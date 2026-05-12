@@ -64,7 +64,7 @@ public struct SDKMetricsSnapshot: Sendable {
 /// Collects and aggregates SDK performance metrics.
 @MainActor
 public final class SDKMetricsCollector: SDKMetricsCollectorProtocol, ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKMetricsCollector()
+    public static let shared = SDKMetricsCollector()
 
     @Published public private(set) var recentPoints: [SDKMetricPoint] = []
     @Published public private(set) var totalPointsRecorded: Int = 0

@@ -36,7 +36,7 @@ import Combine
 /// ```
 @MainActor
 public final class WorkspaceSDK: ObservableObject {
-    nonisolated(unsafe) public static let shared = WorkspaceSDK()
+    public static let shared = WorkspaceSDK()
 
     // MARK: - Public Module Access
 

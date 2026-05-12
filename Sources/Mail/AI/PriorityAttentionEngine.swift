@@ -2,7 +2,7 @@ import Foundation
 
 /// Multi-factor scoring system for urgency, importance, and historical behavior.
 actor PriorityAttentionEngine {
-    nonisolated(unsafe) static let shared = PriorityAttentionEngine()
+    static let shared = PriorityAttentionEngine()
     private let aiService = AIService.shared
 
     private init() {}

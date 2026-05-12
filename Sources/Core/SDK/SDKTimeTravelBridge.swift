@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKTimeTravelBridge: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKTimeTravelBridge()
+    public static let shared = SDKTimeTravelBridge()
 
     @Published public var snapshotHistory: [TimeTravelRecord] = []
 

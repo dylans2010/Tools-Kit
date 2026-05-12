@@ -65,7 +65,7 @@ struct CommandResult: Identifiable, Sendable {
 
 /// Central command routing and execution system.
 final class CommandEngine: ObservableObject {
-    nonisolated(unsafe) static let shared = CommandEngine()
+    static let shared = CommandEngine()
 
     @Published private(set) var history: [CommandResult] = []
     @Published private(set) var pluginCommands: [(command: PluginCommand, pluginName: String)] = []

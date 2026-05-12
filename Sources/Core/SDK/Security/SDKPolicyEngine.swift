@@ -53,7 +53,7 @@ public struct SDKPolicyDecision: Sendable {
 
 @MainActor
 public final class SDKPolicyEngine: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKPolicyEngine()
+    public static let shared = SDKPolicyEngine()
 
     @Published public private(set) var scopeDefinitions: [String: SDKSecurityScopeDefinition] = [:]
 

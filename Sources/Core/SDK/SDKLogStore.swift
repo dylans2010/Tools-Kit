@@ -15,7 +15,7 @@ public enum LogLevel: String, Codable, CaseIterable, Sendable {
 
 @MainActor
 public final class SDKLogStore: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKLogStore()
+    public static let shared = SDKLogStore()
 
     @Published public var entries: [SDKLogEntry] = []
 

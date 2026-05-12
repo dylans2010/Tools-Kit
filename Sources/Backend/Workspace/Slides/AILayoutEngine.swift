@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Layout intelligence engine for Slides, automatically optimizing element arrangement.
 final class AILayoutEngine: ObservableObject {
-    nonisolated(unsafe) static let shared = AILayoutEngine()
+    static let shared = AILayoutEngine()
 
     struct LayoutRule: Codable, Sendable {
         var minSpacing: Double

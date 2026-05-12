@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKConnectorManager: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKConnectorManager()
+    public static let shared = SDKConnectorManager()
 
     @Published public var connectors: [any BaseConnector] = []
 

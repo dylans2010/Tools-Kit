@@ -8,7 +8,7 @@ import UIKit
 
 @MainActor
 class AuthService: ObservableObject {
-    nonisolated(unsafe) static let shared = AuthService()
+    static let shared = AuthService()
 
     @Published var isAuthenticated = false
     @Published var isSetup = false

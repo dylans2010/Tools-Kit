@@ -2,7 +2,7 @@ import Foundation
 
 /// Syncs SDK state with the live workspace graph.
 public final class SDKStateSynchronizer {
-    nonisolated(unsafe) public static let shared = SDKStateSynchronizer()
+    public static let shared = SDKStateSynchronizer()
 
     private init() {}
 

@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 public final class SDKEventSystem {
-    nonisolated(unsafe) public static let shared = SDKEventSystem()
+    public static let shared = SDKEventSystem()
 
     private let eventSubject = PassthroughSubject<SDKEvent, Never>()
     public var events: AnyPublisher<SDKEvent, Never> { eventSubject.eraseToAnyPublisher() }

@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class SlideDecksManager: ObservableObject {
-    nonisolated(unsafe) static let shared = SlideDecksManager()
+    static let shared = SlideDecksManager()
 
     @Published var decks: [SlideDeck] = []
     private let aiService = AIService.shared

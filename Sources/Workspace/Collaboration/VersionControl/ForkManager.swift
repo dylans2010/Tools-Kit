@@ -3,7 +3,7 @@ import Combine
 
 /// Manages forking of Collaboration Spaces.
 final class ForkManager: ObservableObject {
-    nonisolated(unsafe) static let shared = ForkManager()
+    static let shared = ForkManager()
 
     @Published var forks: [UUID: UUID] = [:] // forkID: parentID
 

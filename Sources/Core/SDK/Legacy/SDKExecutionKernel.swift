@@ -3,7 +3,7 @@ import Foundation
 /// Central execution orchestrator for the SDK.
 /// Routes all SDK calls into Workspace Core systems.
 public final class SDKExecutionKernel {
-    nonisolated(unsafe) public static let shared = SDKExecutionKernel()
+    public static let shared = SDKExecutionKernel()
 
     private let router = SDKSystemRouter.shared
     private let dispatcher = SDKActionDispatcher.shared

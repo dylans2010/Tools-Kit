@@ -40,7 +40,7 @@ public struct AuthSession: Codable, Hashable, Sendable {
 
 @MainActor
 public final class AuthorizationManager: ObservableObject {
-    nonisolated(unsafe) public static let shared = AuthorizationManager()
+    public static let shared = AuthorizationManager()
 
     @Published public private(set) var authState: AuthState = .unauthenticated
     @Published public private(set) var authSession: AuthSession?

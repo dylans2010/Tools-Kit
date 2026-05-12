@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKRealtimeSync: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKRealtimeSync()
+    public static let shared = SDKRealtimeSync()
 
     @Published public var activeChannels: Set<String> = []
     @Published public var isConnected = false

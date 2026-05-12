@@ -10,7 +10,7 @@ protocol NetworkMiddleware {
 }
 
 final class NetworkClient {
-    nonisolated(unsafe) static let shared = NetworkClient()
+    static let shared = NetworkClient()
 
     private var middlewares: [NetworkMiddleware] = []
     private let session: URLSession

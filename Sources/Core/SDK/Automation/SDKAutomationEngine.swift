@@ -33,7 +33,7 @@ public enum AutomationAction: Codable, Sendable {
 
 @MainActor
 public final class SDKAutomationEngine: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKAutomationEngine()
+    public static let shared = SDKAutomationEngine()
 
     @Published public var rules: [SDKAutomationRule] = []
 

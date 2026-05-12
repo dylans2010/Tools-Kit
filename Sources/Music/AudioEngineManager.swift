@@ -39,7 +39,7 @@ enum AudioOutputMode: String, CaseIterable, Codable, Sendable {
 // MARK: - AudioEngineManager
 
 final class AudioEngineManager: ObservableObject {
-    nonisolated(unsafe) static let shared = AudioEngineManager()
+    static let shared = AudioEngineManager()
 
     // MARK: Published settings
     @Published var gains: [Float] = Array(repeating: 0, count: 8)

@@ -1,7 +1,7 @@
 import Foundation
 
 class MailAIService {
-    nonisolated(unsafe) static let shared = MailAIService()
+    static let shared = MailAIService()
     private let aiService = AIService.shared
     private let settingsManager = AIChatSettingsManager.shared
     private let aiDecoder = AIResponseDecoder()

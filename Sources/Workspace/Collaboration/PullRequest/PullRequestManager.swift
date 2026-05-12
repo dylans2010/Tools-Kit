@@ -39,7 +39,7 @@ struct PullRequest: Codable, Identifiable, Sendable {
 
 /// Manages the lifecycle of Pull Requests in a Collaboration Space.
 final class PullRequestManager: ObservableObject {
-    nonisolated(unsafe) static let shared = PullRequestManager()
+    static let shared = PullRequestManager()
 
     @Published var pullRequests: [UUID: [PullRequest]] = [:] // spaceID: [PRs]
 

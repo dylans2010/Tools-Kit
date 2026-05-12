@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 public final class SDKPluginSandbox {
-    nonisolated(unsafe) public static let shared = SDKPluginSandbox()
+    public static let shared = SDKPluginSandbox()
 
     @Published public var executionLog: [SandboxEvent] = []
     @Published public var activeExecutions: [UUID: SandboxContext] = [:]

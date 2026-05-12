@@ -4,7 +4,7 @@ import Combine
 /// Manages AI context across notes and slides, enabling semantic search and relationship mapping.
 @MainActor
 final class AIContextEngine: ObservableObject {
-    nonisolated(unsafe) static let shared = AIContextEngine()
+    static let shared = AIContextEngine()
 
     struct SemanticEntry: Codable, Identifiable, Sendable {
         let id: UUID

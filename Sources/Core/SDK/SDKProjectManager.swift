@@ -93,7 +93,7 @@ public enum HealthStatus: String, Codable, Sendable {
 
 @MainActor
 public final class SDKProjectManager: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKProjectManager()
+    public static let shared = SDKProjectManager()
 
     @Published public var currentProject: SDKProject?
     @Published public var projects: [SDKProject] = []

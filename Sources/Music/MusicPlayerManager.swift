@@ -9,7 +9,7 @@ enum RepeatMode: String, CaseIterable, Sendable {
 }
 
 final class MusicPlayerManager: ObservableObject {
-    nonisolated(unsafe) static let shared = MusicPlayerManager()
+    static let shared = MusicPlayerManager()
 
     // MARK: - Published state
     @Published var currentSong: Song?

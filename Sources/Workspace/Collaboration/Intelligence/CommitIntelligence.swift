@@ -2,7 +2,7 @@ import Foundation
 
 /// AI-powered system for generating commit summaries and explaining changes.
 final class CommitIntelligence {
-    nonisolated(unsafe) static let shared = CommitIntelligence()
+    static let shared = CommitIntelligence()
 
     private init() {}
 

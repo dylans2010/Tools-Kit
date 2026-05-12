@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class AISlidesAccessibilityEngine: ObservableObject {
-    nonisolated(unsafe) public static let shared = AISlidesAccessibilityEngine()
+    public static let shared = AISlidesAccessibilityEngine()
 
     @Published public private(set) var lastAudit: SlideAccessibilityReport?
     @Published public private(set) var auditHistory: [SlideAccessibilityReport] = []

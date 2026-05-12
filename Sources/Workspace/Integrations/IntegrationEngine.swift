@@ -2,7 +2,7 @@ import Foundation
 
 /// Real engine for processing integration workflows.
 final class IntegrationEngine {
-    nonisolated(unsafe) static let shared = IntegrationEngine()
+    static let shared = IntegrationEngine()
 
     private let dataStore = UnifiedDataStore.shared
     private let processor = TriggerProcessor.shared
@@ -45,12 +45,12 @@ final class IntegrationEngine {
 }
 
 final class TriggerProcessor {
-    nonisolated(unsafe) static let shared = TriggerProcessor()
+    static let shared = TriggerProcessor()
     private init() {}
 }
 
 final class ActionRouter {
-    nonisolated(unsafe) static let shared = ActionRouter()
+    static let shared = ActionRouter()
     private init() {}
 
     func execute(_ action: IntegrationAction, with data: [String: String]) async throws {

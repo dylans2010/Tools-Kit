@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKConnectorEngine: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKConnectorEngine()
+    public static let shared = SDKConnectorEngine()
 
     @Published public var connectorHealth: [UUID: ConnectorHealthInfo] = [:]
     @Published public var syncInProgress = false

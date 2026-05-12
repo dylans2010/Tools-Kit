@@ -19,7 +19,7 @@ struct DebugLogEntry: Identifiable, Codable, Sendable {
 
 @MainActor
 final class DebugLogger: ObservableObject {
-    nonisolated(unsafe) static let shared = DebugLogger()
+    static let shared = DebugLogger()
 
     @Published private(set) var entries: [DebugLogEntry] = []
     private let maxEntries = 800

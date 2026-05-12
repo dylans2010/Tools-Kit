@@ -1,7 +1,7 @@
 import Foundation
 
 final class AgentMetricsCollector {
-    nonisolated(unsafe) static let shared = AgentMetricsCollector()
+    static let shared = AgentMetricsCollector()
     private var metrics: [String: Int] = [:]
     private let queue = DispatchQueue(label: "com.tools-kit.agent.metrics")
 

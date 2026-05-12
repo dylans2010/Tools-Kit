@@ -11,7 +11,7 @@ extension SDKPermissionManager: SDKPermissionManagerProtocol {}
 
 @MainActor
 public final class SDKSecurityManager: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKSecurityManager()
+    public static let shared = SDKSecurityManager()
 
     public struct SensitiveOperation: Identifiable, Codable, Sendable {
         public let id: UUID
@@ -125,7 +125,7 @@ public final class SDKSecurityManager: ObservableObject {
 
 @MainActor
 public final class SDKSecurityPolicy {
-    nonisolated(unsafe) public static let shared = SDKSecurityPolicy()
+    public static let shared = SDKSecurityPolicy()
 
     private let securityManager = SDKSecurityManager.shared
 

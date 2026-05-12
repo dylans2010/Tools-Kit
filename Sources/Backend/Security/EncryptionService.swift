@@ -2,7 +2,7 @@ import Foundation
 import CryptoKit
 
 class EncryptionService {
-    nonisolated(unsafe) static let shared = EncryptionService()
+    static let shared = EncryptionService()
 
     private let saltKey = "com.toolskit.security.salt"
     private let iterations = 100_000

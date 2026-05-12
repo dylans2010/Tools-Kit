@@ -1,7 +1,7 @@
 import Foundation
 
 public final class SDKPermissionManager {
-    nonisolated(unsafe) public static let shared = SDKPermissionManager()
+    public static let shared = SDKPermissionManager()
 
     public static let noSandboxScope = "sdk.developer.noSandbox"
 

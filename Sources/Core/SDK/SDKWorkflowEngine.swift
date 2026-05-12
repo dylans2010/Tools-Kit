@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKWorkflowEngine: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKWorkflowEngine()
+    public static let shared = SDKWorkflowEngine()
 
     @Published public private(set) var workflows: [SDKWorkflow] = []
     @Published public private(set) var runningWorkflows: [UUID: WorkflowExecution] = [:]

@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 public final class SDKCapabilityQuery {
-    nonisolated(unsafe) public static let shared = SDKCapabilityQuery()
+    public static let shared = SDKCapabilityQuery()
 
     private init() {}
 

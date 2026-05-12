@@ -1,7 +1,7 @@
 import Foundation
 
 public final class SDKTelemetryEngine: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKTelemetryEngine()
+    public static let shared = SDKTelemetryEngine()
 
     @Published public private(set) var activeTraces: [UUID: SDKTrace] = [:]
     @Published public private(set) var completedTraces: [SDKTrace] = []

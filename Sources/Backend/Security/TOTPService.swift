@@ -2,7 +2,7 @@ import Foundation
 import CryptoKit
 
 class TOTPService {
-    nonisolated(unsafe) static let shared = TOTPService()
+    static let shared = TOTPService()
 
     private init() {}
 

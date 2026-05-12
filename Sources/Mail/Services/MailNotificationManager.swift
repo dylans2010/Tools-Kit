@@ -3,7 +3,7 @@ import UserNotifications
 
 @MainActor
 final class MailNotificationManager {
-    nonisolated(unsafe) static let shared = MailNotificationManager()
+    static let shared = MailNotificationManager()
 
     private init() {}
 

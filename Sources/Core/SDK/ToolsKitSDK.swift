@@ -155,7 +155,7 @@ public struct SDKWriteResult: Sendable {
 
 @MainActor
 public final class ToolsKitSDK: ObservableObject {
-    nonisolated(unsafe) public static let shared = ToolsKitSDK()
+    public static let shared = ToolsKitSDK()
 
     @Published public var isSyncing = false
     @Published public var isInitialized = false

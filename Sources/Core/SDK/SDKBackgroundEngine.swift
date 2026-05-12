@@ -12,7 +12,7 @@ public struct SDKBackgroundHealthReport: Sendable {
 
 @MainActor
 public final class SDKBackgroundEngine: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKBackgroundEngine()
+    public static let shared = SDKBackgroundEngine()
 
     @Published public var systemHealth = SDKBackgroundHealthReport(connectorReachability: true, pluginSandboxStatus: true, coreDataHealth: true, lastCheck: Date(), details: [:])
 

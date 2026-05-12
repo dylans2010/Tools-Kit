@@ -1,7 +1,7 @@
 import Foundation
 
 actor RadioService {
-    nonisolated(unsafe) static let shared = RadioService()
+    static let shared = RadioService()
 
     private let baseURL = "https://de1.api.radio-browser.info/json"
     private let session: URLSession

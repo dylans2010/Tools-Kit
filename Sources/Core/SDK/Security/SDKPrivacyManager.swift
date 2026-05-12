@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 public final class SDKPrivacyManager: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKPrivacyManager()
+    public static let shared = SDKPrivacyManager()
 
     public struct ExposureLog: Identifiable, Codable, Sendable {
         public let id: UUID
