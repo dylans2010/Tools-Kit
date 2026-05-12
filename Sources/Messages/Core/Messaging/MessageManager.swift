@@ -3,7 +3,7 @@ import Messages
 
 @MainActor
 class MessageManager {
-    nonisolated(unsafe) static let shared = MessageManager()
+    static let shared = MessageManager()
 
     private init() {}
 
