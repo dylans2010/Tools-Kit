@@ -339,6 +339,11 @@ struct PersonaHomeView: View {
             onOpenDiscovery: openDiscovery,
             onNeedScroll: scrollToBottom
         )
+        .navigationDestination(for: String.self) { destination in
+            if destination == "agentic_home" {
+                AgenticUIHomeView()
+            }
+        }
         .navigationTitle("AI Persona")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -453,8 +458,15 @@ private struct PersonaHomeToolbar: ToolbarContent {
 
     var body: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            Button(action: onShowTuning) {
-                Image(systemName: "slider.horizontal.3")
+            HStack {
+                NavigationLink(value: "agentic_home") {
+                    Image(systemName: "bolt.circle.fill")
+                        .foregroundStyle(.orange)
+                }
+
+                Button(action: onShowTuning) {
+                    Image(systemName: "slider.horizontal.3")
+                }
             }
         }
 
