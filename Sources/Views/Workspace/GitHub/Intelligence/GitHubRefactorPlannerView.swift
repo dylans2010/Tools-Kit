@@ -61,7 +61,7 @@ struct GitHubRefactorPlannerView: View {
     }
 }
 
-struct RefactorStep: Identifiable {
+struct RefactorStep: Identifiable, Sendable {
     let id = UUID()
     let title: String
     let description: String

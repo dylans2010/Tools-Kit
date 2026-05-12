@@ -106,7 +106,7 @@ struct CollabNotificationsView: View {
     }
 }
 
-private struct CollabNotification: Identifiable {
+private struct CollabNotification: Identifiable, Sendable {
     let id = UUID()
     let title: String
     let message: String
@@ -115,7 +115,7 @@ private struct CollabNotification: Identifiable {
     var isRead: Bool = false
 }
 
-private enum NotificationType: String, CaseIterable {
+private enum NotificationType: String, CaseIterable, Sendable {
     case comment, share, build, review, mention
 
     var icon: String {

@@ -37,7 +37,7 @@ struct AspectRatioView: View {
     }
 }
 
-struct AspectRatioTool: Tool {
+struct AspectRatioTool: Tool, Sendable {
     let name = "Aspect Ratio"
     let icon = "aspectratio"
     let category = ToolCategory.utility

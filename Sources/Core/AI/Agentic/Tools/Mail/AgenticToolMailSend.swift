@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolMailSend: AgenticToolProtocol {
+struct AgenticToolMailSend: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "mail_send",
         description: "Send a drafted email",

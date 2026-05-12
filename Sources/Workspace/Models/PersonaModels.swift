@@ -1,6 +1,6 @@
 import Foundation
 
-struct PersonaConfig: Codable {
+struct PersonaConfig: Codable, Sendable {
     var name: String
     var instructions: String
     var baseModel: String
@@ -9,7 +9,7 @@ struct PersonaConfig: Codable {
     var trainingPrompt: String = ""
 }
 
-struct PersonaInteraction: Codable, Identifiable {
+struct PersonaInteraction: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var query: String
     var response: String
@@ -17,14 +17,14 @@ struct PersonaInteraction: Codable, Identifiable {
     var timestamp: Date = Date()
 }
 
-struct PersonaMessage: Codable, Identifiable {
+struct PersonaMessage: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var role: String // "user" or "assistant"
     var content: String
     var timestamp: Date = Date()
 }
 
-struct PersonaModelTraining: Codable, Identifiable {
+struct PersonaModelTraining: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var userQuery: String
     var aiResponse: String

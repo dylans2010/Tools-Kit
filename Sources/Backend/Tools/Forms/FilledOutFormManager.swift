@@ -1,6 +1,6 @@
 import Foundation
 
-enum FilledOutFormManager {
+enum FilledOutFormManager: Sendable {
     static func exportAnswers(_ answers: FilledOutFormDocument, to url: URL) throws {
         let data = try JSONEncoder().encode(answers)
         try data.write(to: url)

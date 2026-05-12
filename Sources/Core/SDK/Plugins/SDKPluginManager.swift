@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-public struct SDKPlugin: Identifiable, Codable {
+public struct SDKPlugin: Identifiable, Codable, Sendable {
     public var id: UUID
     public var name: String
     public var version: String
@@ -12,13 +12,13 @@ public struct SDKPlugin: Identifiable, Codable {
     public var automationHooks: [String]
 }
 
-public enum PluginPermission: String, Codable {
+public enum PluginPermission: String, Codable, Sendable {
     case readData, writeData, network, notifications, fileAccess
 }
 
 @MainActor
 public final class SDKPluginManager: ObservableObject {
-    public static let shared = SDKPluginManager()
+    nonisolated(unsafe) public static let shared = SDKPluginManager()
 
     @Published public var plugins: [SDKPlugin] = []
 

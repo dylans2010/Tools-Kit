@@ -3,7 +3,7 @@ import Combine
 
 // MARK: - SDK Data Types
 
-public struct SDKDataItem: Identifiable, Codable {
+public struct SDKDataItem: Identifiable, Codable, Sendable {
     public let id: UUID
     public let scope: SDKScope
     public let title: String
@@ -21,7 +21,7 @@ public struct SDKDataItem: Identifiable, Codable {
     }
 }
 
-public enum SDKScope: Hashable, CaseIterable, Codable {
+public enum SDKScope: Hashable, CaseIterable, Codable, Sendable {
     case all, tasks, notes, calendar, files, emails, whiteboards, plugins
     case slides, media, meet, repos, automations, intelligence, persona
     case custom(query: String)
@@ -32,7 +32,7 @@ public enum SDKScope: Hashable, CaseIterable, Codable {
                 .intelligence, .persona]
     }
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case type, query
     }
 
@@ -97,7 +97,7 @@ public enum SDKScope: Hashable, CaseIterable, Codable {
 
 // MARK: - SDK Query Types
 
-public struct SDKQuery {
+public struct SDKQuery: Sendable {
     public var scope: SDKScope
     public var filters: [SDKFilter]
     public var pagination: SDKPagination?
@@ -113,8 +113,8 @@ public struct SDKQuery {
     }
 }
 
-public struct SDKFilter {
-    public enum FilterType {
+public struct SDKFilter: Sendable {
+    public enum FilterType: Sendable {
         case date(from: Date?, to: Date?)
         case tags([String])
         case ownership(String)
@@ -129,7 +129,7 @@ public struct SDKFilter {
     }
 }
 
-public struct SDKPagination {
+public struct SDKPagination: Sendable {
     public var page: Int
     public var pageSize: Int
 
@@ -139,13 +139,13 @@ public struct SDKPagination {
     }
 }
 
-public struct SDKBatchResult {
+public struct SDKBatchResult: Sendable {
     public let succeeded: Int
     public let failed: Int
     public let errors: [Error]
 }
 
-public struct SDKWriteResult {
+public struct SDKWriteResult: Sendable {
     public let id: UUID
     public let scope: SDKScope
     public let success: Bool
@@ -155,7 +155,7 @@ public struct SDKWriteResult {
 
 @MainActor
 public final class ToolsKitSDK: ObservableObject {
-    public static let shared = ToolsKitSDK()
+    nonisolated(unsafe) public static let shared = ToolsKitSDK()
 
     @Published public var isSyncing = false
     @Published public var isInitialized = false
@@ -567,10 +567,10 @@ public final class ToolsKitSDK: ObservableObject {
 
     public var developer: SDKDeveloperAPI { SDKDeveloperAPI() }
 
-    public struct SDKDeveloperAPI {
+    public struct SDKDeveloperAPI: Sendable {
         public var noSandbox: SDKNoSandboxAPI { SDKNoSandboxAPI() }
 
-        public struct SDKNoSandboxAPI {
+        public struct SDKNoSandboxAPI: Sendable {
             public var isEnabled: Bool {
                 SDKRuntimeEngine.shared.isNoSandboxModeEnabled
             }
@@ -655,7 +655,7 @@ extension ToolsKitSDK {
 // MARK: - Workspace Data Models
 
 
-public struct SDKCacheInfo {
+public struct SDKCacheInfo: Sendable {
     public let scope: SDKScope
     public let itemCount: Int
     public let lastRefreshed: Date?

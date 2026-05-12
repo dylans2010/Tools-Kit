@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolMailPriorityClassifier: AgenticToolProtocol {
+struct AgenticToolMailPriorityClassifier: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "mail_priority_classifier",
         description: "Classify email priority using AI",

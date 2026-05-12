@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct LinkSanitizerTool: Tool {
+struct LinkSanitizerTool: Tool, Sendable {
     let name = "Link Sanitizer"
     let icon = "link.badge.plus"
     let category = ToolCategory.privacy

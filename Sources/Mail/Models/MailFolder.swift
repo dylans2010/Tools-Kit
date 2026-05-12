@@ -1,11 +1,11 @@
 import Foundation
 
-struct MailFolder: Identifiable, Codable, Hashable {
+struct MailFolder: Identifiable, Codable, Hashable, Sendable {
     let id: String
     let name: String
     let type: FolderType
 
-    enum FolderType: String, Codable {
+    enum FolderType: String, Codable, Sendable {
         case inbox
         case sent
         case drafts

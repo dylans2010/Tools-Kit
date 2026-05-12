@@ -3,9 +3,9 @@ import Combine
 
 /// In-memory local notification service for workspace alerts.
 final class WorkspaceNotificationService: ObservableObject {
-    static let shared = WorkspaceNotificationService()
+    nonisolated(unsafe) static let shared = WorkspaceNotificationService()
 
-    struct WorkspaceNotification: Identifiable {
+    struct WorkspaceNotification: Identifiable, Sendable {
         let id: UUID
         let title: String
         let body: String
@@ -14,7 +14,7 @@ final class WorkspaceNotificationService: ObservableObject {
         var category: NotificationCategory
     }
 
-    enum NotificationCategory: String, CaseIterable {
+    enum NotificationCategory: String, CaseIterable, Sendable {
         case deadline = "Deadline"
         case inactivity = "Inactivity"
         case update = "Update"
@@ -60,9 +60,9 @@ final class WorkspaceNotificationService: ObservableObject {
 
 /// Indexed global search across all workspace objects.
 final class GlobalSearchService: ObservableObject {
-    static let shared = GlobalSearchService()
+    nonisolated(unsafe) static let shared = GlobalSearchService()
 
-    struct SearchResult: Identifiable {
+    struct SearchResult: Identifiable, Sendable {
         let id = UUID()
         let title: String
         let subtitle: String
@@ -143,9 +143,9 @@ final class GlobalSearchService: ObservableObject {
 
 /// Detects and repairs workspace data integrity issues.
 final class DataIntegrityService: ObservableObject {
-    static let shared = DataIntegrityService()
+    nonisolated(unsafe) static let shared = DataIntegrityService()
 
-    struct IntegrityIssue: Identifiable {
+    struct IntegrityIssue: Identifiable, Sendable {
         let id = UUID()
         let severity: Severity
         let description: String
@@ -153,7 +153,7 @@ final class DataIntegrityService: ObservableObject {
         var isFixed: Bool = false
     }
 
-    enum Severity: String, CaseIterable {
+    enum Severity: String, CaseIterable, Sendable {
         case info = "Info"
         case warning = "Warning"
         case error = "Error"

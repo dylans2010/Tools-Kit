@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolCalendarEventCreate: AgenticToolProtocol {
+struct AgenticToolCalendarEventCreate: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "calendar_event_create",
         description: "Create a new calendar event",

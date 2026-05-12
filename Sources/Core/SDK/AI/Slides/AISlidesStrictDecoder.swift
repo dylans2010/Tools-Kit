@@ -1,6 +1,6 @@
 import Foundation
 
-struct AISlidesStrictDecoder {
+struct AISlidesStrictDecoder: Sendable {
     private let decoder = AIResponseDecoder()
 
     func decodePlan(_ json: String) throws -> SlidePlan {

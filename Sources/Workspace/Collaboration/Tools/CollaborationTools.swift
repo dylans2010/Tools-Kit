@@ -3,14 +3,14 @@ import Combine
 
 /// Specialized tool for group decision making and weighted voting.
 final class DecisionEngineTool: ObservableObject {
-    struct DecisionOption: Identifiable, Codable {
+    struct DecisionOption: Identifiable, Codable, Sendable {
         let id: UUID
         var title: String
         var votes: Int
         var weight: Double
     }
 
-    struct Decision: Identifiable, Codable {
+    struct Decision: Identifiable, Codable, Sendable {
         let id: UUID
         var title: String
         var options: [DecisionOption]
@@ -19,7 +19,7 @@ final class DecisionEngineTool: ObservableObject {
     @Published var decisions: [Decision] = []
     private let decisionsFile = "collaboration_decisions.json"
 
-    static let shared = DecisionEngineTool()
+    nonisolated(unsafe) static let shared = DecisionEngineTool()
 
     private init() {
         loadDecisions()
@@ -66,11 +66,11 @@ final class DecisionEngineTool: ObservableObject {
 
 /// Project board with dependency tracking and Kanban-style execution.
 final class ProjectExecutionBoardTool: ObservableObject {
-    enum TaskStatus: String, Codable {
+    enum TaskStatus: String, Codable, Sendable {
         case todo, inProgress, blocked, done
     }
 
-    struct BoardTask: Identifiable, Codable {
+    struct BoardTask: Identifiable, Codable, Sendable {
         let id: UUID
         var title: String
         var status: TaskStatus
@@ -80,7 +80,7 @@ final class ProjectExecutionBoardTool: ObservableObject {
     @Published var tasks: [BoardTask] = []
     private let tasksFile = "collaboration_tasks.json"
 
-    static let shared = ProjectExecutionBoardTool()
+    nonisolated(unsafe) static let shared = ProjectExecutionBoardTool()
 
     private init() {
         loadTasks()
@@ -118,13 +118,13 @@ final class ProjectExecutionBoardTool: ObservableObject {
 
 /// Interactive graph of workspace object relationships.
 final class KnowledgeGraphTool: ObservableObject {
-    struct GraphNode: Identifiable {
+    struct GraphNode: Identifiable, Sendable {
         let id: UUID
         let label: String
         let type: String
     }
 
-    struct GraphEdge: Identifiable {
+    struct GraphEdge: Identifiable, Sendable {
         let id: UUID
         let sourceID: UUID
         let targetID: UUID

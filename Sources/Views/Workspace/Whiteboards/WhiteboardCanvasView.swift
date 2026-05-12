@@ -29,7 +29,7 @@ struct WhiteboardCanvasView: View {
     private let canvasHeight: CGFloat = 2000
     private let tools = WhiteboardViewTools.shared
 
-    enum ResizeAnchor {
+    enum ResizeAnchor: Sendable {
         case bottomRight
     }
 

@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolWorkspaceSemanticIndex: AgenticToolProtocol {
+struct AgenticToolWorkspaceSemanticIndex: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "workspace_semantic_index",
         description: "Build semantic embeddings index for workspace items",

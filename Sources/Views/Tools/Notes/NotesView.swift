@@ -277,7 +277,7 @@ struct FolderChip: View {
     }
 }
 
-struct NotesTool: Tool {
+struct NotesTool: Tool, Sendable {
     let name = "Notes"
     let icon = "note.text"
     let category = ToolCategory.utility

@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolWorkspaceLinkGraph: AgenticToolProtocol {
+struct AgenticToolWorkspaceLinkGraph: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "workspace_link_graph",
         description: "Build a link graph between workspace items",

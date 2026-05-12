@@ -2,11 +2,11 @@ import SwiftUI
 
 @MainActor
 final class WhiteboardViewTools: ObservableObject {
-    static let shared = WhiteboardViewTools()
+    nonisolated(unsafe) static let shared = WhiteboardViewTools()
 
     // MARK: - Tool Entry
 
-    struct ToolEntry: Identifiable, Hashable {
+    struct ToolEntry: Identifiable, Hashable, Sendable {
         let id: String
         let displayName: String
         let iconName: String
@@ -25,7 +25,7 @@ final class WhiteboardViewTools: ObservableObject {
         }
     }
 
-    enum ToolCategory: String, CaseIterable {
+    enum ToolCategory: String, CaseIterable, Sendable {
         case drawing
         case shapes
         case annotation
@@ -36,14 +36,14 @@ final class WhiteboardViewTools: ObservableObject {
         case selection
     }
 
-    enum InteractionMode: String {
+    enum InteractionMode: String, Sendable {
         case draw
         case select
         case insert
         case transform
     }
 
-    struct ToolConfiguration: Hashable {
+    struct ToolConfiguration: Hashable, Sendable {
         var defaultColorHex: String
         var defaultStrokeWidth: Double
         var defaultFontSize: Double
@@ -77,7 +77,7 @@ final class WhiteboardViewTools: ObservableObject {
         }
     }
 
-    enum DrawingStyle: String, Hashable, CaseIterable {
+    enum DrawingStyle: String, Hashable, CaseIterable, Sendable {
         case solid
         case dashed
         case dotted
@@ -100,7 +100,7 @@ final class WhiteboardViewTools: ObservableObject {
         case blur
     }
 
-    enum GestureBinding: String, Hashable {
+    enum GestureBinding: String, Hashable, Sendable {
         case drag
         case tap
         case longPress

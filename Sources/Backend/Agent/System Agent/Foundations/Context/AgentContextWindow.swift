@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentContextWindow {
+struct AgentContextWindow: Sendable {
     let maxTokens: Int
     private(set) var currentTokens: Int = 0
 

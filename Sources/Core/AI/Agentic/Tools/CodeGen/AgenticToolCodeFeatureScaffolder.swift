@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolCodeFeatureScaffolder: AgenticToolProtocol {
+struct AgenticToolCodeFeatureScaffolder: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "code_feature_scaffolder",
         description: "Scaffold a complete feature module",

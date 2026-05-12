@@ -97,7 +97,7 @@ struct IssueDetailView: View {
     }
 }
 
-private struct IssueComment: Identifiable {
+private struct IssueComment: Identifiable, Sendable {
     let id = UUID()
     let author: String
     let body: String

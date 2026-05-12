@@ -51,7 +51,7 @@ struct MeetingNotesView: View {
     }
 }
 
-struct MeetingNotesTool: Tool {
+struct MeetingNotesTool: Tool, Sendable {
     let name = "Meeting Notes"
     let icon = "calendar.badge.clock"
     let category = ToolCategory.ai

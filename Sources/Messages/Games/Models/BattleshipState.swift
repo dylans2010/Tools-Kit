@@ -1,6 +1,6 @@
 import Foundation
 
-struct BattleshipState: Codable {
+struct BattleshipState: Codable, Sendable {
     let base: GameState
     let player1Board: [Int] // 0: empty, 1: ship, 2: hit, 3: miss
     let player2Board: [Int]

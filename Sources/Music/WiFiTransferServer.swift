@@ -4,7 +4,7 @@ import Network
 /// Lightweight HTTP server for WiFi music transfer.
 @MainActor
 final class WiFiTransferServer: ObservableObject {
-    static let shared = WiFiTransferServer()
+    nonisolated(unsafe) static let shared = WiFiTransferServer()
 
     @Published var isRunning = false
     @Published var ipAddress: String = ""
@@ -138,7 +138,7 @@ final class WiFiTransferServer: ObservableObject {
     // MARK: - Endpoint Handlers
 
     private func handleValidateCode(body: Data, connection: NWConnection) {
-        struct CodeRequest: Decodable { let code: String }
+        struct CodeRequest: Decodable, Sendable { let code: String }
         if let req = try? JSONDecoder().decode(CodeRequest.self, from: body),
            req.code == pairingCode {
             let sessionID = UUID().uuidString
@@ -179,7 +179,7 @@ final class WiFiTransferServer: ObservableObject {
     }
 
     private func handleFinalizeUpload(body: Data, connection: NWConnection) {
-        struct FinalizeRequest: Decodable { let session: String; let filename: String; let totalChunks: Int }
+        struct FinalizeRequest: Decodable, Sendable { let session: String; let filename: String; let totalChunks: Int }
         guard let req = try? JSONDecoder().decode(FinalizeRequest.self, from: body),
               validatedSessions.contains(req.session) else {
             sendJSON("{\"success\":false,\"error\":\"Unauthorized\"}", connection: connection, status: 401)

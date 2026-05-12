@@ -77,7 +77,7 @@ struct CurrencyConverterView: View {
     }
 }
 
-struct CurrencyConverterTool: Tool {
+struct CurrencyConverterTool: Tool, Sendable {
     let name = "Currency Converter"
     let icon = "dollarsign.circle"
     let category = ToolCategory.conversion

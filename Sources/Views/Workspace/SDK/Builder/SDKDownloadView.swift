@@ -15,7 +15,7 @@ struct SDKDownloadView: View {
     @State private var exportConnectors = true
     @State private var exportRuntime = true
 
-    struct SDKBundleVersion: Identifiable, Hashable {
+    struct SDKBundleVersion: Identifiable, Hashable, Sendable {
         let id = UUID()
         let version: String
         let releaseDate: Date

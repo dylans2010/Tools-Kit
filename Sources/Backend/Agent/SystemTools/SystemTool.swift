@@ -7,12 +7,12 @@ protocol SystemTool {
 }
 
 /// Standard context for tool execution.
-struct SystemToolContext: Codable {
+struct SystemToolContext: Codable, Sendable {
     let workspaceId: String
     let sessionId: String
     let timestamp: String
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case workspaceId = "workspace_id"
         case sessionId = "session_id"
         case timestamp
@@ -20,7 +20,7 @@ struct SystemToolContext: Codable {
 }
 
 /// Standard response structure for all system tools.
-struct SystemToolResponse: Codable {
+struct SystemToolResponse: Codable, Sendable {
     let tool: String
     let status: String
     let requestId: String
@@ -29,7 +29,7 @@ struct SystemToolResponse: Codable {
     let error: SystemToolError?
     let context: SystemToolContext
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case tool
         case status
         case requestId = "request_id"
@@ -40,7 +40,7 @@ struct SystemToolResponse: Codable {
     }
 }
 
-struct SystemToolError: Error, Codable {
+struct SystemToolError: Error, Codable, Sendable {
     let message: String
     let code: String
 
@@ -157,7 +157,7 @@ extension SystemTool {
 }
 
 /// Type-erased Codable for handling dynamic JSON objects.
-struct AnyCodable: Codable {
+struct AnyCodable: Codable, @unchecked Sendable {
     let value: Any
 
     init(_ value: Any) {

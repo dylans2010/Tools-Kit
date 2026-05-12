@@ -7,7 +7,7 @@ struct SDKEventStreamView: View {
     @State private var isListening = true
     @State private var eventSubscription: AnyCancellable?
 
-    enum SDKEventCategory: String, CaseIterable, Identifiable {
+    enum SDKEventCategory: String, CaseIterable, Identifiable, Sendable {
         case all = "All", system = "System", data = "Data", security = "Security", network = "Network", other = "Other"
         var id: String { rawValue }
         var icon: String {

@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentJSONSchemaParser {
+struct AgentJSONSchemaParser: Sendable {
     init() {}
 
     func parse(schema: [String: Any]) -> [String: String] {

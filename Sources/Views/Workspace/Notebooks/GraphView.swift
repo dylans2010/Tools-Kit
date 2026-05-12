@@ -5,13 +5,13 @@ struct GraphView: View {
     @State private var dragOffset: CGSize = .zero
     @State private var zoomScale: CGFloat = 1.0
 
-    struct Node: Identifiable {
+    struct Node: Identifiable, Sendable {
         let id: UUID
         let title: String
         var position: CGPoint
     }
 
-    struct Link: Identifiable {
+    struct Link: Identifiable, Sendable {
         let id = UUID()
         let source: UUID
         let target: UUID

@@ -1,7 +1,7 @@
 import Foundation
 
-struct AgentModelRegistry {
-    struct ModelInfo: Codable, Identifiable {
+struct AgentModelRegistry: Sendable {
+    struct ModelInfo: Codable, Identifiable, Sendable {
         let id: String
         let name: String
         let contextWindow: Int

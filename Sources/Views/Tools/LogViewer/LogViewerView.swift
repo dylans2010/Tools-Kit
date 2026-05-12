@@ -112,7 +112,7 @@ struct LogViewerView: View {
     }
 }
 
-struct LogViewerTool: Tool {
+struct LogViewerTool: Tool, Sendable {
     let name = "Log Viewer"
     let icon = "list.bullet.rectangle"
     let category = ToolCategory.development

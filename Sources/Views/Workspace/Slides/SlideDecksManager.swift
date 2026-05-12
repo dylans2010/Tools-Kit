@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class SlideDecksManager: ObservableObject {
-    static let shared = SlideDecksManager()
+    nonisolated(unsafe) static let shared = SlideDecksManager()
 
     @Published var decks: [SlideDeck] = []
     private let aiService = AIService.shared
@@ -76,7 +76,7 @@ final class SlideDecksManager: ObservableObject {
 
     // MARK: - AI Deck Generation
 
-    struct AIDeckElement: Codable {
+    struct AIDeckElement: Codable, Sendable {
         let kind: String
         let text: String
         let x: Double
@@ -88,13 +88,13 @@ final class SlideDecksManager: ObservableObject {
         let fillColor: String
     }
 
-    struct AIDeckSlide: Codable {
+    struct AIDeckSlide: Codable, Sendable {
         let title: String
         let background: String
         let elements: [AIDeckElement]
     }
 
-    struct AIDeckPayload: Codable {
+    struct AIDeckPayload: Codable, Sendable {
         let title: String
         let slides: [AIDeckSlide]
         let speakerNotes: [String]

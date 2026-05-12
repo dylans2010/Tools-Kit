@@ -2,7 +2,7 @@ import Foundation
 
 /// Engine for detecting negotiation patterns, tracking concessions, and suggesting strategies.
 actor NegotiationIntelligenceEngine {
-    static let shared = NegotiationIntelligenceEngine()
+    nonisolated(unsafe) static let shared = NegotiationIntelligenceEngine()
     private let aiService = AIService.shared
 
     private init() {}
@@ -31,7 +31,7 @@ actor NegotiationIntelligenceEngine {
 
 /// Engine for automatic extraction and tracking of deadlines and commitments.
 actor DeadlineCommitmentEngine {
-    static let shared = DeadlineCommitmentEngine()
+    nonisolated(unsafe) static let shared = DeadlineCommitmentEngine()
     private let aiService = AIService.shared
 
     private init() {}
@@ -62,9 +62,9 @@ actor DeadlineCommitmentEngine {
         """
         let json = try await aiService.generateStructuredJSON(prompt: prompt + "\n\nContent:\n" + content, jsonSchema: schema)
 
-        struct Response: Codable {
+        struct Response: Codable, Sendable {
             let entries: [EntryResponse]
-            struct EntryResponse: Codable {
+            struct EntryResponse: Codable, Sendable {
                 let title: String
                 let summary: String
                 let timestamp: String
@@ -81,7 +81,7 @@ actor DeadlineCommitmentEngine {
 
 /// Engine for building dynamic profiles and tracking relationship health.
 actor RelationshipIntelligenceEngine {
-    static let shared = RelationshipIntelligenceEngine()
+    nonisolated(unsafe) static let shared = RelationshipIntelligenceEngine()
     private let aiService = AIService.shared
 
     private init() {}
@@ -105,7 +105,7 @@ actor RelationshipIntelligenceEngine {
         """
         let json = try await aiService.generateStructuredJSON(prompt: prompt, jsonSchema: schema)
 
-        struct ProfileResponse: Codable {
+        struct ProfileResponse: Codable, Sendable {
             var displayName: String?
             var sentimentTrend: [Double]
             var healthScore: Double
@@ -132,7 +132,7 @@ actor RelationshipIntelligenceEngine {
 
 /// Engine for converting email threads into structured knowledge entries.
 actor KnowledgeExtractionEngine {
-    static let shared = KnowledgeExtractionEngine()
+    nonisolated(unsafe) static let shared = KnowledgeExtractionEngine()
     private let aiService = AIService.shared
 
     private init() {}
@@ -164,9 +164,9 @@ actor KnowledgeExtractionEngine {
         """
         let json = try await aiService.generateStructuredJSON(prompt: prompt + "\n\nContent:\n" + content, jsonSchema: schema)
 
-        struct Response: Codable {
+        struct Response: Codable, Sendable {
             let insights: [InsightResponse]
-            struct InsightResponse: Codable {
+            struct InsightResponse: Codable, Sendable {
                 let title: String
                 let content: String
                 let category: String
@@ -183,7 +183,7 @@ actor KnowledgeExtractionEngine {
 
 /// Engine for correlating context across multiple related threads.
 actor MultiThreadCorrelationEngine {
-    static let shared = MultiThreadCorrelationEngine()
+    nonisolated(unsafe) static let shared = MultiThreadCorrelationEngine()
     private let aiService = AIService.shared
 
     private init() {}
@@ -202,7 +202,7 @@ actor MultiThreadCorrelationEngine {
         }
         """
         let json = try await aiService.generateStructuredJSON(prompt: prompt, jsonSchema: schema)
-        struct Response: Codable { let groups: [[String]] }
+        struct Response: Codable, Sendable { let groups: [[String]] }
         let decoded = try JSONDecoder().decode(Response.self, from: Data(json.utf8))
         return decoded.groups
     }
@@ -210,7 +210,7 @@ actor MultiThreadCorrelationEngine {
 
 /// Engine for identifying decisions made and building decision timelines.
 actor DecisionIntelligenceEngine {
-    static let shared = DecisionIntelligenceEngine()
+    nonisolated(unsafe) static let shared = DecisionIntelligenceEngine()
     private let aiService = AIService.shared
 
     private init() {}
@@ -241,9 +241,9 @@ actor DecisionIntelligenceEngine {
         """
         let json = try await aiService.generateStructuredJSON(prompt: prompt + "\n\nContent:\n" + content, jsonSchema: schema)
 
-        struct Response: Codable {
+        struct Response: Codable, Sendable {
             let decisions: [DecisionResponse]
-            struct DecisionResponse: Codable {
+            struct DecisionResponse: Codable, Sendable {
                 let title: String
                 let summary: String
                 let timestamp: String
@@ -260,7 +260,7 @@ actor DecisionIntelligenceEngine {
 
 /// Engine for parsing and executing natural language commands inside emails.
 actor EmailCommandEngine {
-    static let shared = EmailCommandEngine()
+    nonisolated(unsafe) static let shared = EmailCommandEngine()
     private let aiService = AIService.shared
 
     private init() {}
@@ -289,11 +289,11 @@ actor EmailCommandEngine {
         """
         let json = try await aiService.generateStructuredJSON(prompt: prompt, jsonSchema: schema)
 
-        struct Command: Codable {
+        struct Command: Codable, Sendable {
             let action: String
             let detail: String
         }
-        struct Response: Codable { let commands: [Command] }
+        struct Response: Codable, Sendable { let commands: [Command] }
 
         let decoded = try JSONDecoder().decode(Response.self, from: Data(json.utf8))
         var executed: [String] = []
@@ -321,7 +321,7 @@ actor EmailCommandEngine {
 
 /// Engine for learning user patterns and refining AI outputs over time.
 actor BehavioralLearningEngine {
-    static let shared = BehavioralLearningEngine()
+    nonisolated(unsafe) static let shared = BehavioralLearningEngine()
     private var interactions: [String: Int] = [:]
 
     private init() {}

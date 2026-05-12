@@ -28,7 +28,7 @@ struct PrimeFactorView: View {
     }
 }
 
-struct PrimeFactorTool: Tool {
+struct PrimeFactorTool: Tool, Sendable {
     let name = "Prime Factorization"
     let icon = "numbersign"
     let category = ToolCategory.utility

@@ -1,6 +1,6 @@
 import Foundation
 
-enum AgentNetworkError: Error, LocalizedError {
+enum AgentNetworkError: Error, LocalizedError, Sendable {
     case noConnection
     case timeout
     case cancelled

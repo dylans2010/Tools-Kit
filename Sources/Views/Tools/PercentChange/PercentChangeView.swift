@@ -35,7 +35,7 @@ struct PercentChangeView: View {
     }
 }
 
-struct PercentChangeTool: Tool {
+struct PercentChangeTool: Tool, Sendable {
     let name = "Percent Change"
     let icon = "percent"
     let category = ToolCategory.utility

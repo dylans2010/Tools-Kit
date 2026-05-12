@@ -115,14 +115,14 @@ struct CollabPermissionsView: View {
     }
 }
 
-private struct TeamMember: Identifiable {
+private struct TeamMember: Identifiable, Sendable {
     let id = UUID()
     let name: String
     let email: String
     var role: MemberRole
 }
 
-private enum MemberRole: String, CaseIterable {
+private enum MemberRole: String, CaseIterable, Sendable {
     case admin, editor, viewer
 
     var color: Color {

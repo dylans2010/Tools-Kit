@@ -1,6 +1,6 @@
 import Foundation
 
-struct BasketballState: Codable {
+struct BasketballState: Codable, Sendable {
     let base: GameState
     let player1Score: Int
     let player2Score: Int

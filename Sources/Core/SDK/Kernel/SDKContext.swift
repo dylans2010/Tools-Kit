@@ -10,7 +10,7 @@ public final class SDKContext {
     public private(set) var permissions: Set<String>
     public let parentContext: SDKContext?
 
-    public enum ContextScope: String, Codable {
+    public enum ContextScope: String, Codable, Sendable {
         case global, workspace, feature, plugin, request
     }
 

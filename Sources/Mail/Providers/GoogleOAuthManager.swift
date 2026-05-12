@@ -4,7 +4,7 @@ import Foundation
 import SwiftUI
 
 final class GoogleOAuthManager: NSObject, ASWebAuthenticationPresentationContextProviding {
-    static let shared = GoogleOAuthManager()
+    nonisolated(unsafe) static let shared = GoogleOAuthManager()
 
     private var authSession: ASWebAuthenticationSession?
 
@@ -406,14 +406,14 @@ final class GoogleOAuthManager: NSObject, ASWebAuthenticationPresentationContext
     }
 }
 
-private struct OAuthTokenResponse: Decodable {
+private struct OAuthTokenResponse: Decodable, Sendable {
     let accessToken: String
     let refreshToken: String?
     let tokenType: String?
     let expiresIn: Int?
     let scope: String?
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
         case tokenType = "token_type"
@@ -422,7 +422,7 @@ private struct OAuthTokenResponse: Decodable {
     }
 }
 
-private struct GoogleProfile: Decodable {
+private struct GoogleProfile: Decodable, Sendable {
     let email: String
     let name: String?
 }

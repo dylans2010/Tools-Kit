@@ -1,6 +1,6 @@
 import Foundation
 
-enum BadgeType: String, Codable, CaseIterable, Identifiable {
+enum BadgeType: String, Codable, CaseIterable, Identifiable, Sendable {
     case firstWorkout = "First Workout"
     case sevenDayStreak = "7 Day Streak"
     case thirtyDayStreak = "30 Day Streak"
@@ -35,7 +35,7 @@ enum BadgeType: String, Codable, CaseIterable, Identifiable {
     }
 }
 
-struct BadgeModel: Identifiable, Codable {
+struct BadgeModel: Identifiable, Codable, Sendable {
     var id: BadgeType
     var name: String
     var description: String
@@ -53,7 +53,7 @@ struct BadgeModel: Identifiable, Codable {
 
     var isUnlocked: Bool { unlockedAt != nil }
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case id, name, description, criteria, unlockedAt
     }
 

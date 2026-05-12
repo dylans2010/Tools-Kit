@@ -115,7 +115,7 @@ struct ClipboardEntryRow: View {
     }
 }
 
-struct ClipboardManagerTool: Tool {
+struct ClipboardManagerTool: Tool, Sendable {
     let name = "Clipboard Manager"
     let icon = "paperclip"
     let category = ToolCategory.utility

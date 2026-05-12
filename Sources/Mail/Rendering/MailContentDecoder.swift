@@ -1,7 +1,7 @@
 import Foundation
 
 /// Decodes MIME content transfer encodings (quoted-printable, base64) and normalises UTF-8.
-struct MailContentDecoder {
+struct MailContentDecoder: Sendable {
 
     // MARK: - Public API
 

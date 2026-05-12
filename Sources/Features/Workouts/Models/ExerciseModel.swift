@@ -1,6 +1,6 @@
 import Foundation
 
-struct ExerciseModel: Identifiable, Codable {
+struct ExerciseModel: Identifiable, Codable, Sendable {
     var id: UUID
     var name: String
     var sets: Int
@@ -30,7 +30,7 @@ struct ExerciseModel: Identifiable, Codable {
         self.isCompleted = isCompleted
     }
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case id, name, sets, reps, durationMinutes, restSeconds, muscleGroup, isCompleted
     }
 

@@ -26,7 +26,7 @@ struct HTMLEntityView: View {
     }
 }
 
-struct HTMLEntityTool: Tool {
+struct HTMLEntityTool: Tool, Sendable {
     let name = "HTML Entities"
     let icon = "chevron.left.forwardslash.chevron.right"
     let category = ToolCategory.development

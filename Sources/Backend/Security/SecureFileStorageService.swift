@@ -2,7 +2,7 @@ import Foundation
 import CryptoKit
 
 class SecureFileStorageService {
-    static let shared = SecureFileStorageService()
+    nonisolated(unsafe) static let shared = SecureFileStorageService()
 
     private let fileManager = FileManager.default
     private let vaultDirectoryName = "SecurityVault"
@@ -24,7 +24,7 @@ class SecureFileStorageService {
 
     private let shardSize = 256 * 1024 // 256KB shards
 
-    struct ShardIndex: Codable {
+    struct ShardIndex: Codable, Sendable {
         let originalFilename: String
         let shardFilenames: [String]
         let shardHashes: [String]

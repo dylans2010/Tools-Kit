@@ -1,6 +1,6 @@
 import Foundation
 
-private struct WorkoutAIExerciseResponse: Codable, Identifiable {
+private struct WorkoutAIExerciseResponse: Codable, Identifiable, Sendable {
     let id: UUID
     let name: String
     let sets: Int
@@ -25,7 +25,7 @@ private struct WorkoutAIExerciseResponse: Codable, Identifiable {
     }
 }
 
-private struct WorkoutAIResponse: Codable {
+private struct WorkoutAIResponse: Codable, Sendable {
     let workoutName: String
     let duration: Int
     let difficulty: String

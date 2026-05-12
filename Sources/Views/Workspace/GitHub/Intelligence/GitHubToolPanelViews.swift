@@ -390,14 +390,14 @@ struct LogsIntelligenceView: View {
     @State private var rawLog = ""
     @State private var parsedLines: [ParsedLogLine] = []
 
-    struct ParsedLogLine: Identifiable {
+    struct ParsedLogLine: Identifiable, Sendable {
         let id = UUID()
         let text: String
         let level: LogLevel
         let lineNumber: Int
     }
 
-    enum LogLevel: String {
+    enum LogLevel: String, Sendable {
         case error = "ERROR"
         case warning = "WARNING"
         case info = "INFO"

@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 final class CalendarManager: ObservableObject {
-    static let shared = CalendarManager()
+    nonisolated(unsafe) static let shared = CalendarManager()
 
     @Published var events: [CalendarEvent] = []
     private let aiService = AIService.shared
@@ -101,7 +101,7 @@ final class CalendarManager: ObservableObject {
 
     // MARK: - AI Scheduling
 
-    struct AICalendarEventDraft: Codable {
+    struct AICalendarEventDraft: Codable, Sendable {
         let title: String
         let details: String
         let startISO8601: String
@@ -109,7 +109,7 @@ final class CalendarManager: ObservableObject {
         let location: String
     }
 
-    struct AICalendarInsights: Codable {
+    struct AICalendarInsights: Codable, Sendable {
         let parsedEvents: [AICalendarEventDraft]
         let autoScheduledTasks: [String]
         let conflicts: [String]

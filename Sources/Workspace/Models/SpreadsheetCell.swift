@@ -1,6 +1,6 @@
 import Foundation
 
-struct SpreadsheetCell: Codable, Identifiable, Equatable {
+struct SpreadsheetCell: Codable, Identifiable, Equatable, Sendable {
     var id: UUID = UUID()
     var value: String = ""
     var computedValue: String = ""
@@ -16,13 +16,13 @@ struct SpreadsheetCell: Codable, Identifiable, Equatable {
         formula != nil ? computedValue : value
     }
 
-    enum CellAlignment: String, Codable, CaseIterable {
+    enum CellAlignment: String, Codable, CaseIterable, Sendable {
         case leading = "Leading"
         case center = "Center"
         case trailing = "Trailing"
     }
 
-    enum CellNumberFormat: String, Codable, CaseIterable {
+    enum CellNumberFormat: String, Codable, CaseIterable, Sendable {
         case plain = "Plain"
         case number = "Number"
         case currency = "Currency"

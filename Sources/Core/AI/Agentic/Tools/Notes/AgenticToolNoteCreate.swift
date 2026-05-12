@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolNoteCreate: AgenticToolProtocol {
+struct AgenticToolNoteCreate: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "note_create",
         description: "Create a new note in a notebook",

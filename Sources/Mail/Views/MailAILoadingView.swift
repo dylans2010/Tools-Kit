@@ -303,7 +303,7 @@ private final class MailAILoadingRootView: UIView {
     }
 }
 
-private struct MailParticle {
+private struct MailParticle: Sendable {
     var position: SIMD2<Float>
     var velocity: SIMD2<Float>
     var baseAlpha: Float
@@ -311,13 +311,13 @@ private struct MailParticle {
     var life: Float
 }
 
-private struct GPUParticle {
+private struct GPUParticle: Sendable {
     var position: SIMD2<Float>
     var size: Float
     var alpha: Float
 }
 
-private struct SceneUniforms {
+private struct SceneUniforms: Sendable {
     var resolution: SIMD2<Float>
     var time: Float
     var tilt: SIMD2<Float>
@@ -640,19 +640,19 @@ private final class MailAILoadingRenderer: NSObject, MTKViewDelegate {
         #include <metal_stdlib>
         using namespace metal;
 
-        struct SceneUniforms {
+        struct SceneUniforms: Sendable {
             float2 resolution;
             float time;
             float2 tilt;
             float glowBias;
         };
 
-        struct RasterOut {
+        struct RasterOut: Sendable {
             float4 position [[position]];
             float2 uv;
         };
 
-        struct GPUParticle {
+        struct GPUParticle: Sendable {
             float2 position;
             float size;
             float alpha;
@@ -692,7 +692,7 @@ private final class MailAILoadingRenderer: NSObject, MTKViewDelegate {
             return float4(color, 1.0);
         }
 
-        struct ParticleOut {
+        struct ParticleOut: Sendable {
             float4 position [[position]];
             float pointSize [[point_size]];
             float alpha;

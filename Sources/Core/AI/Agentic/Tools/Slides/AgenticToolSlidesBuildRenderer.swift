@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolSlidesBuildRenderer: AgenticToolProtocol {
+struct AgenticToolSlidesBuildRenderer: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "slides_build_renderer",
         description: "Build a renderer for slide content",

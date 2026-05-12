@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct DoHTool: Tool {
+struct DoHTool: Tool, Sendable {
     let name = "DNS over HTTPS"
     let icon = "lock.shield.fill"
     let category = ToolCategory.network

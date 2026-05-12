@@ -28,7 +28,7 @@ struct DeviceInfoView: View {
     }
 }
 
-struct DeviceInfoTool: Tool {
+struct DeviceInfoTool: Tool, Sendable {
     let name = "Device Info"
     let icon = "info.circle"
     let category = ToolCategory.utility

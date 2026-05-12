@@ -4,12 +4,12 @@ import MediaPlayer
 import Combine
 import UIKit
 
-enum RepeatMode: String, CaseIterable {
+enum RepeatMode: String, CaseIterable, Sendable {
     case off, one, all
 }
 
 final class MusicPlayerManager: ObservableObject {
-    static let shared = MusicPlayerManager()
+    nonisolated(unsafe) static let shared = MusicPlayerManager()
 
     // MARK: - Published state
     @Published var currentSong: Song?

@@ -27,7 +27,7 @@ struct CURLConverterView: View {
     }
 }
 
-struct CURLConverterTool: Tool {
+struct CURLConverterTool: Tool, Sendable {
     let name = "cURL to Code"
     let icon = "terminal"
     let category = ToolCategory.development

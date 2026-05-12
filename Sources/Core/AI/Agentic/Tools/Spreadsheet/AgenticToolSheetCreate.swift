@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolSheetCreate: AgenticToolProtocol {
+struct AgenticToolSheetCreate: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "sheet_create",
         description: "Create a new spreadsheet",

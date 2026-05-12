@@ -1,6 +1,6 @@
 import Foundation
 
-struct HealthImportedData: Codable {
+struct HealthImportedData: Codable, Sendable {
     var importedAt: Date
     var steps: Int
     var caloriesBurned: Double

@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-struct RouterRegion: Identifiable, Hashable {
+struct RouterRegion: Identifiable, Hashable, Sendable {
     let id: String
     let name: String
     let endpoint: String

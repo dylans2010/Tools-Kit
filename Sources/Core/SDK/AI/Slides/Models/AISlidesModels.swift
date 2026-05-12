@@ -1,18 +1,18 @@
 import Foundation
 
-public enum SlideTone: String, CaseIterable, Codable {
+public enum SlideTone: String, CaseIterable, Codable, Sendable {
     case formal, casual, pitch, educational
 }
 
-public enum SlideAudience: String, CaseIterable, Codable {
+public enum SlideAudience: String, CaseIterable, Codable, Sendable {
     case investor, internalTeam, academic
 }
 
-public enum SlideVisualDensity: String, CaseIterable, Codable {
+public enum SlideVisualDensity: String, CaseIterable, Codable, Sendable {
     case low, medium, high
 }
 
-public struct SlidePhotoAsset: Codable, Equatable, Identifiable {
+public struct SlidePhotoAsset: Codable, Equatable, Identifiable, Sendable {
     public var id: UUID
     public var fileName: String
     public var dataBase64: String
@@ -24,7 +24,7 @@ public struct SlidePhotoAsset: Codable, Equatable, Identifiable {
     }
 }
 
-public struct WhiteboardSlideSection: Codable, Equatable {
+public struct WhiteboardSlideSection: Codable, Equatable, Sendable {
     public var title: String
     public var summary: String
     public var nodeIDs: [UUID]
@@ -36,7 +36,7 @@ public struct WhiteboardSlideSection: Codable, Equatable {
     }
 }
 
-public struct SlideInput: Codable, Equatable {
+public struct SlideInput: Codable, Equatable, Sendable {
     public var rawText: String
     public var notes: [String]
     public var whiteboardNodes: [WhiteboardNode]
@@ -82,7 +82,7 @@ public struct SlideInput: Codable, Equatable {
     }
 }
 
-public enum SDKPermission: String, Codable, CaseIterable {
+public enum SDKPermission: String, Codable, CaseIterable, Sendable {
     case readNotes
     case readWhiteboards
     case readDocuments
@@ -91,7 +91,7 @@ public enum SDKPermission: String, Codable, CaseIterable {
     case networkAccess
 }
 
-public struct AISlidesScope: Codable, Equatable {
+public struct AISlidesScope: Codable, Equatable, Sendable {
     public let identifier: String = "sdk.AI.generateSlides"
     public let permissions: [SDKPermission] = [
         .readNotes,
@@ -105,8 +105,8 @@ public struct AISlidesScope: Codable, Equatable {
     public init() {}
 }
 
-struct SlidePlan: Codable {
-    struct PlannedSlide: Codable {
+struct SlidePlan: Codable, Sendable {
+    struct PlannedSlide: Codable, Sendable {
         var index: Int
         var type: String
         var intent: String
@@ -118,14 +118,14 @@ struct SlidePlan: Codable {
     var slides: [PlannedSlide]
 }
 
-struct VisualPlan: Codable {
-    struct VisualSlide: Codable {
+struct VisualPlan: Codable, Sendable {
+    struct VisualSlide: Codable, Sendable {
         var index: Int
         var imageQuery: String?
         var chartSpec: String?
         var requiresVisual: Bool
 
-        enum CodingKeys: String, CodingKey {
+        enum CodingKeys: String, CodingKey, Sendable {
             case index
             case imageQuery = "image_query"
             case chartSpec = "chart_spec"
@@ -136,9 +136,9 @@ struct VisualPlan: Codable {
     var slides: [VisualSlide]
 }
 
-struct SlideContentPayload: Codable {
-    struct ContentSlide: Codable {
-        struct ContentElement: Codable {
+struct SlideContentPayload: Codable, Sendable {
+    struct ContentSlide: Codable, Sendable {
+        struct ContentElement: Codable, Sendable {
             var kind: String
             var text: String?
             var bullets: [String]?
@@ -147,7 +147,7 @@ struct SlideContentPayload: Codable {
             var chartLabels: [String]?
             var chartValues: [Double]?
 
-            enum CodingKeys: String, CodingKey {
+            enum CodingKeys: String, CodingKey, Sendable {
                 case kind
                 case text
                 case bullets

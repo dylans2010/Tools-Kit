@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentAutomationResult: Codable {
+struct AgentAutomationResult: Codable, Sendable {
     let scriptId: UUID
     let success: Bool
     let output: String

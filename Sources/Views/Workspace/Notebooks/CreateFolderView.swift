@@ -7,7 +7,7 @@ struct CreateFolderView: View {
     @State private var name = ""
     @State private var selectedTemplate: FolderTemplate?
 
-    enum FolderTemplate: String, CaseIterable, Identifiable {
+    enum FolderTemplate: String, CaseIterable, Identifiable, Sendable {
         case project = "Project Workspace"
         case meeting = "Meeting Notes"
         case research = "Research Hub"

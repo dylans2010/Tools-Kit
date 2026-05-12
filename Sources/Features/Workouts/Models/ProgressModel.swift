@@ -1,6 +1,6 @@
 import Foundation
 
-struct ProgressModel: Identifiable, Codable {
+struct ProgressModel: Identifiable, Codable, Sendable {
     var id: UUID
     var date: Date
     var weightKg: Double?
@@ -36,7 +36,7 @@ struct ProgressModel: Identifiable, Codable {
         self.steps = steps
     }
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case id, date, weightKg, workoutsCompleted, caloriesBurned, caloriesConsumed, proteinConsumed, carbsConsumed, fatsConsumed, steps
     }
 

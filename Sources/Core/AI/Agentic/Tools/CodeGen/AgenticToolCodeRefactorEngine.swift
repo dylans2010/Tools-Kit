@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolCodeRefactorEngine: AgenticToolProtocol {
+struct AgenticToolCodeRefactorEngine: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "code_refactor_engine",
         description: "Refactor existing Swift code using AI",

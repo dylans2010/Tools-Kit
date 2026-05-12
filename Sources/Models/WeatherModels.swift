@@ -1,7 +1,7 @@
 import Foundation
 import WeatherKit
 
-struct CurrentWeatherModel: Codable {
+struct CurrentWeatherModel: Codable, Sendable {
     let temperature: Double
     let condition: String
     let conditionIcon: String
@@ -15,7 +15,7 @@ struct CurrentWeatherModel: Codable {
     let pressure: Double
 }
 
-struct HourlyForecastModel: Codable, Identifiable {
+struct HourlyForecastModel: Codable, Identifiable, Sendable {
     let id = UUID()
     let date: Date
     let temperature: Double
@@ -23,7 +23,7 @@ struct HourlyForecastModel: Codable, Identifiable {
     let precipitationProbability: Double
 }
 
-struct DailyForecastModel: Codable, Identifiable {
+struct DailyForecastModel: Codable, Identifiable, Sendable {
     let id = UUID()
     let date: Date
     let highTemperature: Double
@@ -31,21 +31,21 @@ struct DailyForecastModel: Codable, Identifiable {
     let conditionIcon: String
 }
 
-struct WeatherInsight: Codable, Identifiable {
+struct WeatherInsight: Codable, Identifiable, Sendable {
     var id = UUID()
     let title: String
     let description: String
     let type: WeatherInsightType
 }
 
-enum WeatherInsightType: String, Codable {
+enum WeatherInsightType: String, Codable, Sendable {
     case rain
     case temperature
     case uv
     case generic
 }
 
-struct FullWeatherData: Codable {
+struct FullWeatherData: Codable, Sendable {
     let current: CurrentWeatherModel
     let hourly: [HourlyForecastModel]
     let daily: [DailyForecastModel]

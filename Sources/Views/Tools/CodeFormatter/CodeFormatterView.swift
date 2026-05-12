@@ -43,7 +43,7 @@ struct CodeFormatterView: View {
     }
 }
 
-struct CodeFormatterTool: Tool {
+struct CodeFormatterTool: Tool, Sendable {
     let name = "Code Formatter"
     let icon = "chevron.left.slash.chevron.right"
     let category = ToolCategory.development

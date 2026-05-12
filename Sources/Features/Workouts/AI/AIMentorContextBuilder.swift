@@ -1,6 +1,6 @@
 import Foundation
 
-struct AIMentorContext {
+struct AIMentorContext: Sendable {
     var profileSummary: String
     var workoutSummary: String
     var nutritionSummary: String

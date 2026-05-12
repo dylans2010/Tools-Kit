@@ -1,6 +1,6 @@
 import Foundation
 
-struct GmailAuthSupport {
+struct GmailAuthSupport: Sendable {
     private init() {}
 
     private static let bearerScheme = "Bearer"

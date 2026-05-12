@@ -9,7 +9,7 @@ struct MarketplaceView: View {
     @State private var selectedCategory: PluginCapability?
     @State private var selectedTab: MarketplaceTab = .plugins
 
-    enum MarketplaceTab: String, CaseIterable {
+    enum MarketplaceTab: String, CaseIterable, Sendable {
         case plugins = "Plugins"
         case projects = "Projects"
     }

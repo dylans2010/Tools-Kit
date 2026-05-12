@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-struct LatencySample: Identifiable {
+struct LatencySample: Identifiable, Sendable {
     let id = UUID()
     let timestamp: Date
     let latencyMs: Double

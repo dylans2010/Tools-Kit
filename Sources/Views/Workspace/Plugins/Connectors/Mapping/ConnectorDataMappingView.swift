@@ -105,14 +105,14 @@ struct ConnectorDataMappingView: View {
     }
 }
 
-private struct ConnectorFieldMapping: Identifiable {
+private struct ConnectorFieldMapping: Identifiable, Sendable {
     let id = UUID()
     let sourceField: String
     let targetField: String
     let transform: TransformType
 }
 
-private enum TransformType: String, CaseIterable {
+private enum TransformType: String, CaseIterable, Sendable {
     case direct, uppercase, lowercase, trim, dateFormat, jsonParse, numberFormat
 
     var icon: String {

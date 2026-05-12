@@ -40,7 +40,7 @@ struct JSONFormatterView: View {
     }
 }
 
-struct JSONFormatterTool: Tool {
+struct JSONFormatterTool: Tool, Sendable {
     let name = "JSON Formatter"
     let icon = "chevron.left.forwardslash.chevron.right"
     let category = ToolCategory.development

@@ -3,7 +3,7 @@ import Messages
 
 @MainActor
 class GameEngine {
-    static let shared = GameEngine()
+    nonisolated(unsafe) static let shared = GameEngine()
 
     private init() {}
 

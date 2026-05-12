@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentToolCall: Codable, Identifiable {
+struct AgentToolCall: Codable, Identifiable, Sendable {
     let id: String
     let name: String
     let input: [String: AnyCodable]

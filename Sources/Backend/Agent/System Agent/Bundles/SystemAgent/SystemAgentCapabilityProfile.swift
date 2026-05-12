@@ -1,5 +1,5 @@
 import Foundation
 
-struct SystemAgentCapabilityProfile {
+struct SystemAgentCapabilityProfile: Sendable {
     static let capabilities = AgentCapabilities.all
 }

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct NetworkSpeedTool: Tool {
+struct NetworkSpeedTool: Tool, Sendable {
     let name = "Network Speed"
     let icon = "wifi"
     let category = ToolCategory.utility

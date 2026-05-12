@@ -95,7 +95,7 @@ struct ConnectorSyncStatusView: View {
     }
 }
 
-private struct SyncJob: Identifiable {
+private struct SyncJob: Identifiable, Sendable {
     let id = UUID()
     let connectorName: String
     let status: SyncStatus
@@ -104,7 +104,7 @@ private struct SyncJob: Identifiable {
     let lastUpdated: Date
 }
 
-private enum SyncStatus: String {
+private enum SyncStatus: String, Sendable {
     case running, completed, failed, pending
 
     var icon: String {

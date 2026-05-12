@@ -4,7 +4,7 @@ import Combine
 /// Manages the 'Review Mode' for workspace objects.
 /// In review mode, objects are locked for editing and only suggestions/comments are allowed.
 final class ReviewManager: ObservableObject {
-    static let shared = ReviewManager()
+    nonisolated(unsafe) static let shared = ReviewManager()
 
     @Published var lockedObjects: Set<UUID> = []
 

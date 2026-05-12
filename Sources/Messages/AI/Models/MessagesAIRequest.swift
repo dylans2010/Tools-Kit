@@ -1,6 +1,6 @@
 import Foundation
 
-struct MessagesAIRequest: Codable {
+struct MessagesAIRequest: Codable, Sendable {
     let input: String
     let subtype: PayloadSubtype
     let parameters: [String: String]

@@ -1,7 +1,7 @@
 import Foundation
 
 final class AgentHealthMonitor {
-    enum Status {
+    enum Status: Sendable {
         case healthy, degraded, unhealthy
     }
 

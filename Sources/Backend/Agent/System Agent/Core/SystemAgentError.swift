@@ -1,6 +1,6 @@
 import Foundation
 
-enum SystemAgentError: Error, LocalizedError {
+enum SystemAgentError: Error, LocalizedError, Sendable {
     case unknownTool(name: String)
     case aiServiceFailure(underlying: Error)
     case toolExecutionFailure(tool: String, underlying: Error)

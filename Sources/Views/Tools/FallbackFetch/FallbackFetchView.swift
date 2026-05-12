@@ -190,7 +190,7 @@ struct FallbackFetchView: View {
     }
 }
 
-struct FallbackFetchTool: Tool {
+struct FallbackFetchTool: Tool, Sendable {
     let name = "Fallback Fetch"
     let icon = "arrow.down.doc.fill"
     let category = ToolCategory.utility
@@ -200,7 +200,7 @@ struct FallbackFetchTool: Tool {
     var view: AnyView { AnyView(FallbackFetchView()) }
 }
 
-struct FallbackFetchView_Previews: PreviewProvider {
+struct FallbackFetchView_Previews: PreviewProvider, Sendable {
     static var previews: some View {
         FallbackFetchView()
     }

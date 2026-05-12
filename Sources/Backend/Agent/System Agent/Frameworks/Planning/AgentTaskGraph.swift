@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentTaskGraph {
+struct AgentTaskGraph: Sendable {
     private(set) var edges: [String: Set<String>] = [:]
 
     mutating func add(task: String, dependsOn: [String] = []) {

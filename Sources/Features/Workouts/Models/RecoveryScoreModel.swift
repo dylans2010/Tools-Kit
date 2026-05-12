@@ -1,6 +1,6 @@
 import Foundation
 
-enum WorkoutIntensityGuidance: String, Codable, CaseIterable, Identifiable {
+enum WorkoutIntensityGuidance: String, Codable, CaseIterable, Identifiable, Sendable {
     case recovery = "Recovery"
     case moderate = "Moderate"
     case intense = "Intense"
@@ -8,7 +8,7 @@ enum WorkoutIntensityGuidance: String, Codable, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-struct RecoveryScoreModel: Codable {
+struct RecoveryScoreModel: Codable, Sendable {
     var score: Int
     var guidance: WorkoutIntensityGuidance
     var reasons: [String]

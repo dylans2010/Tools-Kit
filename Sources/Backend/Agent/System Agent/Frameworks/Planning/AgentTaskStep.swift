@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentTaskStep: Codable, Identifiable {
+struct AgentTaskStep: Codable, Identifiable, Sendable {
     let id: UUID
     let description: String
     var isCompleted: Bool

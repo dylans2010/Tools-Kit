@@ -1,7 +1,7 @@
 import Foundation
 
-struct WorkoutUserPlan: Codable {
-    struct PlanExercise: Codable, Identifiable {
+struct WorkoutUserPlan: Codable, Sendable {
+    struct PlanExercise: Codable, Identifiable, Sendable {
         let id: UUID
         let name: String
         let sets: Int

@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentAPIResponseHandler {
+struct AgentAPIResponseHandler: Sendable {
     init() {}
 
     func handle<T: Decodable>(_ data: Data, response: HTTPURLResponse) throws -> T {

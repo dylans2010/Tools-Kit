@@ -2,7 +2,7 @@ import Foundation
 
 /// Resolves cross-system dependencies and ensures execution order correctness.
 public final class SDKDependencyResolver {
-    public static let shared = SDKDependencyResolver()
+    nonisolated(unsafe) public static let shared = SDKDependencyResolver()
 
     private init() {}
 
@@ -27,7 +27,7 @@ public final class SDKDependencyResolver {
     }
 }
 
-public enum DependencyError: Error, LocalizedError {
+public enum DependencyError: Error, LocalizedError, Sendable {
     case missingRequirement(String)
 
     public var errorDescription: String? {

@@ -3,7 +3,7 @@ import Foundation
 /// Bridges SDK projects to Plugin/Connector runtimes.
 /// Injects WorkspaceAPI and enforces permissions.
 public final class SDKExecutionBridge {
-    public static let shared = SDKExecutionBridge()
+    nonisolated(unsafe) public static let shared = SDKExecutionBridge()
 
     private let sandboxEngine = SDKSandboxEngine.shared
 

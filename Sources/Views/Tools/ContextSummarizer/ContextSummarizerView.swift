@@ -41,7 +41,7 @@ struct ContextSummarizerView: View {
     }
 }
 
-struct ContextSummarizerTool: Tool {
+struct ContextSummarizerTool: Tool, Sendable {
     let name = "Context Summarizer"
     let icon = "text.badge.star"
     let category = ToolCategory.ai

@@ -1,10 +1,10 @@
 import Foundation
 
 final class ModelConfigManager: ObservableObject {
-    static let shared = ModelConfigManager()
+    nonisolated(unsafe) static let shared = ModelConfigManager()
 
     private let defaults = UserDefaults.standard
-    private enum Keys {
+    private enum Keys: Sendable {
         static let reasoning = "ModelConfig_reasoningModel"
         static let vision = "ModelConfig_visionModel"
         static let language = "ModelConfig_languageModel"

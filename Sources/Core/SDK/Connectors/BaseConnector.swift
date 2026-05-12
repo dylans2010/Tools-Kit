@@ -20,22 +20,22 @@ public extension BaseConnector {
     var requiredScopes: [String] { [] }
 }
 
-public enum ConnectorType: String, CaseIterable, Codable {
+public enum ConnectorType: String, CaseIterable, Codable, Sendable {
     case gmail, webhook, github, localFileSystem, calendar, rest, mqtt
 }
 
-public enum ConnectorStatus: String, Codable {
+public enum ConnectorStatus: String, Codable, Sendable {
     case disconnected, connecting, connected, error
 }
 
-public struct AuthField: Codable, Hashable {
+public struct AuthField: Codable, Hashable, Sendable {
     public var label: String
     public var placeholder: String
     public var isSecure: Bool
     public var key: String
 }
 
-public struct ConnectorEvent: Identifiable, Codable {
+public struct ConnectorEvent: Identifiable, Codable, Sendable {
     public var id: UUID
     public var timestamp: Date
     public var message: String

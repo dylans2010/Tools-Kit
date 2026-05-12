@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentAPIValidator {
+struct AgentAPIValidator: Sendable {
     init() {}
 
     func validateResponse(_ response: AgentAPIResponse) throws {

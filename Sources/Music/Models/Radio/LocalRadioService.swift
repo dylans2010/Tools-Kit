@@ -4,7 +4,7 @@ import CoreLocation
 /// Discovers local radio stations using CoreLocation + Radio Browser API.
 @MainActor
 final class LocalRadioService: NSObject, ObservableObject, CLLocationManagerDelegate {
-    static let shared = LocalRadioService()
+    nonisolated(unsafe) static let shared = LocalRadioService()
 
     @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
     @Published var countryCode: String? = nil

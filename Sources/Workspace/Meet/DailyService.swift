@@ -5,9 +5,9 @@ actor DailyService {
     static let apiRequestTimeoutInterval: TimeInterval = 20
     static let dailyTokenParameterName = "t"
     static let persistedAPIKeyStorageKey = "daily_api_key"
-    static let shared = DailyService()
+    nonisolated(unsafe) static let shared = DailyService()
 
-    enum ServiceError: LocalizedError {
+    enum ServiceError: LocalizedError, Sendable {
         case invalidMeetingID
         case missingAPIKey
         case notFound
@@ -36,22 +36,22 @@ actor DailyService {
         }
     }
 
-    private struct RoomRecord {
+    private struct RoomRecord: Sendable {
         let session: MeetingSession
         let roomURL: URL
     }
 
-    private struct RoomResponse: Decodable {
+    private struct RoomResponse: Decodable, Sendable {
         let name: String
         let url: String
         let privacy: String?
     }
 
-    private struct MeetingTokenResponse: Decodable {
+    private struct MeetingTokenResponse: Decodable, Sendable {
         let token: String
     }
 
-    private struct ErrorResponse: Decodable {
+    private struct ErrorResponse: Decodable, Sendable {
         let info: String?
         let error: String?
     }

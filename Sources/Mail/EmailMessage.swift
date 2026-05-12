@@ -1,6 +1,6 @@
 import Foundation
 
-struct EmailMessage: Identifiable, Hashable {
+struct EmailMessage: Identifiable, Hashable, Sendable {
     let id = UUID()
     var uid: Int
     var subject: String
@@ -13,7 +13,7 @@ struct EmailMessage: Identifiable, Hashable {
     var attachments: [EmailAttachment] = []
 }
 
-struct EmailAttachment: Identifiable, Hashable {
+struct EmailAttachment: Identifiable, Hashable, Sendable {
     let id = UUID()
     var filename: String
     var mimeType: String

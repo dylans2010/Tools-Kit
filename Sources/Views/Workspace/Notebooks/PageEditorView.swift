@@ -60,7 +60,7 @@ struct PageEditorView: View {
         _attachments = State(initialValue: page.attachments)
     }
 
-    private enum EditorMode: String, CaseIterable {
+    private enum EditorMode: String, CaseIterable, Sendable {
         case notes = "Notes"
         case canvas = "Canvas"
 
@@ -843,7 +843,7 @@ struct PageEditorView: View {
     }
 }
 
-private struct CanvasNote: Identifiable {
+private struct CanvasNote: Identifiable, Sendable {
     let id = UUID()
     var text: String
     var position: CGPoint

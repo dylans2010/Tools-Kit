@@ -1,7 +1,7 @@
 import Foundation
 
-struct AgentConfigurationValidator {
-    enum ValidationError: Error, LocalizedError {
+struct AgentConfigurationValidator: Sendable {
+    enum ValidationError: Error, LocalizedError, Sendable {
         case invalidTemperature(Double)
         case invalidMaxTokens(Int)
         case missingModelId

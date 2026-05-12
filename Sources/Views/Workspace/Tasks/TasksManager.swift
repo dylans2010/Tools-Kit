@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class TasksManager: ObservableObject {
-    static let shared = TasksManager()
+    nonisolated(unsafe) static let shared = TasksManager()
 
     @Published var tasks: [WorkspaceTask] = []
     @Published var categories: [TaskCategory] = []
@@ -126,7 +126,7 @@ final class TasksManager: ObservableObject {
 
     // MARK: - AI Planning
 
-    struct AITaskPlan: Codable {
+    struct AITaskPlan: Codable, Sendable {
         let title: String
         let details: String
         let priority: String
@@ -134,7 +134,7 @@ final class TasksManager: ObservableObject {
         let subtasks: [String]
     }
 
-    struct AITasksResponse: Codable {
+    struct AITasksResponse: Codable, Sendable {
         let tasks: [AITaskPlan]
         let workloadSummary: String
     }

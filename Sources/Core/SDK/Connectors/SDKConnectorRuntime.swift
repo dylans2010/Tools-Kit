@@ -1,11 +1,11 @@
 import Foundation
 import Combine
 
-public enum ConnectorAuthMethod: String, Codable, CaseIterable {
+public enum ConnectorAuthMethod: String, Codable, CaseIterable, Sendable {
     case none, apiKey, oauth2, bearer, basic, certificate, webhook
 }
 
-public struct ConnectorBinding: Identifiable, Codable {
+public struct ConnectorBinding: Identifiable, Codable, Sendable {
     public let id: UUID
     public var connectorID: UUID
     public var moduleIdentifier: String
@@ -14,7 +14,7 @@ public struct ConnectorBinding: Identifiable, Codable {
     public var isActive: Bool
     public var createdAt: Date
 
-    public enum BindingType: String, Codable, CaseIterable {
+    public enum BindingType: String, Codable, CaseIterable, Sendable {
         case dataSource, dataSink, eventTrigger, authProvider, configSource
     }
 
@@ -36,7 +36,7 @@ public struct ConnectorBinding: Identifiable, Codable {
     }
 }
 
-public struct ConnectorTemplate: Identifiable, Codable {
+public struct ConnectorTemplate: Identifiable, Codable, Sendable {
     public let id: UUID
     public var name: String
     public var description: String
@@ -47,7 +47,7 @@ public struct ConnectorTemplate: Identifiable, Codable {
     public var iconName: String
     public var category: String
 
-    public struct ConnectorEndpointTemplate: Codable {
+    public struct ConnectorEndpointTemplate: Codable, Sendable {
         public var path: String
         public var method: String
         public var description: String
@@ -78,7 +78,7 @@ public struct ConnectorTemplate: Identifiable, Codable {
 
 @MainActor
 public final class SDKConnectorRuntimeBinder: ObservableObject {
-    public static let shared = SDKConnectorRuntimeBinder()
+    nonisolated(unsafe) public static let shared = SDKConnectorRuntimeBinder()
 
     @Published public var bindings: [ConnectorBinding] = []
     @Published public var templates: [ConnectorTemplate] = []

@@ -68,7 +68,7 @@ struct SecurityDeviceTrustView: View {
     }
 }
 
-struct TrustedDevice: Identifiable, Codable {
+struct TrustedDevice: Identifiable, Codable, Sendable {
     let id: UUID
     let name: String
     let fingerprint: String

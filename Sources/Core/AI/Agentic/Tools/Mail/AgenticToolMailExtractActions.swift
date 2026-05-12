@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolMailExtractActions: AgenticToolProtocol {
+struct AgenticToolMailExtractActions: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "mail_extract_actions",
         description: "Extract action items from emails",

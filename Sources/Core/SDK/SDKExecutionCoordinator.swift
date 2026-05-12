@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 public final class SDKExecutionCoordinator {
-    public static let shared = SDKExecutionCoordinator()
+    nonisolated(unsafe) public static let shared = SDKExecutionCoordinator()
 
     private let workspaceState = SDKRuntimeWorkspaceState.shared
     private let dependencyPlanner = SDKDependencyExecutionPlanner()
@@ -11,7 +11,7 @@ public final class SDKExecutionCoordinator {
 
     private init() {}
 
-    public struct ExecutionReport {
+    public struct ExecutionReport: Sendable {
         public let startedAt: Date
         public let finishedAt: Date
         public let orderedNodes: [SDKDependencyNode]

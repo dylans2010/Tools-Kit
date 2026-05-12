@@ -114,7 +114,7 @@ struct RealTimeTranslationView: View {
     }
 }
 
-struct RealTimeTranslationTool: Tool {
+struct RealTimeTranslationTool: Tool, Sendable {
     let name = "Real-time Translation"
     let icon = "character.book.closed"
     let category = ToolCategory.general

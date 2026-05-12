@@ -36,13 +36,13 @@ struct SpatialWorkspaceHomeView: View {
     }
 }
 
-struct SpatialNode: Identifiable {
+struct SpatialNode: Identifiable, Sendable {
     let id: UUID
     var title: String
     var type: NodeType
     var position: CGPoint
 
-    enum NodeType {
+    enum NodeType: Sendable {
         case note, task, file, meeting
 
         var icon: String {

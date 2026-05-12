@@ -35,7 +35,7 @@ struct ReasoningToolView: View {
     }
 }
 
-struct ReasoningTool: Tool {
+struct ReasoningTool: Tool, Sendable {
     let name = "Reasoning Engine"
     let icon = "brain"
     let category = ToolCategory.ai

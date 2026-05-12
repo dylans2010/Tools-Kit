@@ -1,7 +1,7 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-public struct FileImporterRepresentableView: UIViewControllerRepresentable {
+public struct FileImporterRepresentableView: UIViewControllerRepresentable, @unchecked Sendable {
     public var allowedContentTypes: [UTType]
     public var allowsMultipleSelection: Bool = false
     public var onDocumentsPicked: ([URL]) -> Void

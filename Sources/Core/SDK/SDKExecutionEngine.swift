@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKExecutionEngine: ObservableObject {
-    public static let shared = SDKExecutionEngine()
+    nonisolated(unsafe) public static let shared = SDKExecutionEngine()
 
     @Published public var activeExecutions: [UUID: ExecutionState] = [:]
     @Published public var executionHistory: [ExecutionRecord] = []
@@ -12,18 +12,18 @@ public final class SDKExecutionEngine: ObservableObject {
     private let maxConcurrentExecutions = 10
     private let maxHistorySize = 500
 
-    public struct ExecutionState {
+    public struct ExecutionState: Sendable {
         public let id: UUID
         public let action: SDKAction
         public let startTime: Date
         public var status: Status
 
-        public enum Status {
+        public enum Status: Sendable {
             case running, completed, failed(Error)
         }
     }
 
-    public struct ExecutionRecord: Identifiable {
+    public struct ExecutionRecord: Identifiable, Sendable {
         public let id: UUID
         public let action: SDKAction
         public let startTime: Date
@@ -153,7 +153,7 @@ public final class SDKExecutionEngine: ObservableObject {
     }
 }
 
-public struct ExecutionMetrics {
+public struct ExecutionMetrics: Sendable {
     public let totalExecutions: Int
     public let successCount: Int
     public let failureCount: Int

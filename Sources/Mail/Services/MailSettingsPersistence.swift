@@ -1,6 +1,6 @@
 import Foundation
 
-enum MailSettingsPersistence {
+enum MailSettingsPersistence: Sendable {
     static func loadDictionary(forKey key: String) -> [String: String] {
         UserDefaults.standard.dictionary(forKey: key) as? [String: String] ?? [:]
     }

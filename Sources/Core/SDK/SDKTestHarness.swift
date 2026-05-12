@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKTestHarness: ObservableObject {
-    public static let shared = SDKTestHarness()
+    nonisolated(unsafe) public static let shared = SDKTestHarness()
 
     @Published public private(set) var testSuites: [SDKTestSuite] = []
     @Published public private(set) var isRunning = false
@@ -121,7 +121,7 @@ public final class SDKTestHarness: ObservableObject {
 
 // MARK: - Models
 
-public struct SDKTestSuite: Identifiable {
+public struct SDKTestSuite: Identifiable, Sendable {
     public let id: UUID
     public let name: String
     public var cases: [SDKTestCase]
@@ -133,7 +133,7 @@ public struct SDKTestSuite: Identifiable {
     }
 }
 
-public struct SDKTestCase: Identifiable {
+public struct SDKTestCase: Identifiable, @unchecked Sendable {
     public let id: UUID
     public let name: String
     public let body: () async throws -> Void
@@ -188,7 +188,7 @@ public enum TestStatus: String, Codable, Sendable {
     case passed, failed, skipped, running
 }
 
-public struct TestAssertionError: LocalizedError {
+public struct TestAssertionError: LocalizedError, Sendable {
     public let message: String
     public var errorDescription: String? { message }
 

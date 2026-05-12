@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolTaskPrioritize: AgenticToolProtocol {
+struct AgenticToolTaskPrioritize: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "task_prioritize",
         description: "Auto-prioritize tasks based on deadlines and importance",

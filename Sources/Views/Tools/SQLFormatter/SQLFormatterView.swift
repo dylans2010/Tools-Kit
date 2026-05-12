@@ -40,7 +40,7 @@ struct SQLFormatterView: View {
     }
 }
 
-struct SQLFormatterTool: Tool {
+struct SQLFormatterTool: Tool, Sendable {
     let name = "SQL Formatter"
     let icon = "tablecells.fill"
     let category = ToolCategory.development

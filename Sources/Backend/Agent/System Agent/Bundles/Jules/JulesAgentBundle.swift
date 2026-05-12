@@ -1,6 +1,6 @@
 import Foundation
 
-struct JulesAgentBundle {
+struct JulesAgentBundle: Sendable {
     static let bundle = AgentBundle(
         id: "com.jules.agent",
         name: "Jules AI Agent",

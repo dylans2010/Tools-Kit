@@ -1,6 +1,6 @@
 import Foundation
 
-enum ITServiceRequestFormTemplate {
+enum ITServiceRequestFormTemplate: Sendable {
     static func build() -> FormDocument {
         let questions = [
             FormQuestion(title: "Requester Name", type: .textInput, required: true),

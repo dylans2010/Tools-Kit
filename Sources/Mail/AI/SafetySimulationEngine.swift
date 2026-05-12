@@ -2,7 +2,7 @@ import Foundation
 
 /// Engine for tone analysis, risk detection, and response simulation.
 actor SafetySimulationEngine {
-    static let shared = SafetySimulationEngine()
+    nonisolated(unsafe) static let shared = SafetySimulationEngine()
     private let aiService = AIService.shared
 
     private init() {}

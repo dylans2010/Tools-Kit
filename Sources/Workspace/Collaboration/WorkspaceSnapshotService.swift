@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-struct WorkspaceSnapshot: Codable, Identifiable {
+struct WorkspaceSnapshot: Codable, Identifiable, Sendable {
     let id: UUID
     var name: String
     var branch: String
@@ -13,9 +13,9 @@ struct WorkspaceSnapshot: Codable, Identifiable {
 
 /// Saves, restores, and compares full workspace snapshots.
 final class WorkspaceSnapshotService: ObservableObject {
-    static let shared = WorkspaceSnapshotService()
+    nonisolated(unsafe) static let shared = WorkspaceSnapshotService()
 
-    struct Snapshot: Codable, Identifiable {
+    struct Snapshot: Codable, Identifiable, Sendable {
         let id: UUID
         var label: String
         let createdAt: Date
@@ -25,7 +25,7 @@ final class WorkspaceSnapshotService: ObservableObject {
         var notes: String
     }
 
-    struct SnapshotDiff: Identifiable {
+    struct SnapshotDiff: Identifiable, Sendable {
         let id = UUID()
         let field: String
         let before: String

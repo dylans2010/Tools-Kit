@@ -1,6 +1,6 @@
 import Foundation
 
-struct ArticleCollection: Codable, Identifiable, Equatable {
+struct ArticleCollection: Codable, Identifiable, Equatable, Sendable {
     var id: UUID = UUID()
     var name: String = ""
     var icon: String = "folder"

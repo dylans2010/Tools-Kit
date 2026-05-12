@@ -70,7 +70,7 @@ struct ContentView: View {
 struct MusicTabView: View {
     @State private var selectedTab: MusicAppTab = .home
 
-    enum MusicAppTab: String, CaseIterable {
+    enum MusicAppTab: String, CaseIterable, Sendable {
         case home    = "Home"
         case library = "Library"
         case radio   = "Radio"

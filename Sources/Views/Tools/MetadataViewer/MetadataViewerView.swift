@@ -73,7 +73,7 @@ struct MetadataViewerView: View {
     }
 }
 
-struct MetadataViewerTool: Tool {
+struct MetadataViewerTool: Tool, Sendable {
     let name = "Metadata Viewer"
     let icon = "info.square"
     let category = ToolCategory.utility

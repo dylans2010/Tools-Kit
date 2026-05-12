@@ -1,6 +1,6 @@
 import Foundation
 
-struct AISlidesSchemeValidator {
+struct AISlidesSchemeValidator: Sendable {
     func validate(_ scheme: GenSlidesScheme) throws -> GenSlidesScheme {
         if scheme.slides.count < 5 {
             throw SlideValidationError.insufficientSlides(count: scheme.slides.count)

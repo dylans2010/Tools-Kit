@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKConnectorEngine: ObservableObject {
-    public static let shared = SDKConnectorEngine()
+    nonisolated(unsafe) public static let shared = SDKConnectorEngine()
 
     @Published public var connectorHealth: [UUID: ConnectorHealthInfo] = [:]
     @Published public var syncInProgress = false
@@ -14,7 +14,7 @@ public final class SDKConnectorEngine: ObservableObject {
     private let securityManager = SDKSecurityManager.shared
     private let auditLogger = SDKAuditLogger.shared
 
-    public struct ConnectorHealthInfo {
+    public struct ConnectorHealthInfo: Sendable {
         public let connectorID: UUID
         public let name: String
         public let status: ConnectorStatus

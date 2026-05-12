@@ -156,11 +156,11 @@ struct SideBySideDiffView: View {
     }
 }
 
-enum DiffLineType {
+enum DiffLineType: Sendable {
     case addition, deletion, context, header
 }
 
-struct DiffLine: Identifiable {
+struct DiffLine: Identifiable, Sendable {
     let id: Int
     let content: String
     let type: DiffLineType

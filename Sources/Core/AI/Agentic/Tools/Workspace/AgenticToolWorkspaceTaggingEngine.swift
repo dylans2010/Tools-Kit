@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolWorkspaceTaggingEngine: AgenticToolProtocol {
+struct AgenticToolWorkspaceTaggingEngine: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "workspace_tagging_engine",
         description: "Tag workspace items using AI classification",

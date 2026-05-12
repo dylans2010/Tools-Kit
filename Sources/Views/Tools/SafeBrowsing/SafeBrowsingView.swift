@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct SafeBrowsingTool: Tool {
+struct SafeBrowsingTool: Tool, Sendable {
     let name = "Safe Browsing"
     let icon = "shield.lefthalf.filled"
     let category = ToolCategory.network

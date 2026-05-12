@@ -1,6 +1,6 @@
 import Foundation
 
-enum UnitCategory: String, CaseIterable {
+enum UnitCategory: String, CaseIterable, Sendable {
     case length = "Length"
     case mass = "Mass"
     case temperature = "Temp"

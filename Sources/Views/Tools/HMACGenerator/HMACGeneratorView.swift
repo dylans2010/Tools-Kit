@@ -33,7 +33,7 @@ struct HMACGeneratorView: View {
     }
 }
 
-struct HMACGeneratorTool: Tool {
+struct HMACGeneratorTool: Tool, Sendable {
     let name = "HMAC Generator"
     let icon = "lock.shield"
     let category = ToolCategory.development

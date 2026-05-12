@@ -1,7 +1,7 @@
 import Foundation
 
 @MainActor
-struct AISlidesOrchestrator {
+struct AISlidesOrchestrator: Sendable {
     private let pipeline = AISlidesPipeline()
 
     func run(input: SlideInput, progress: @escaping (String, Double) -> Void) async throws -> SlideDeck {

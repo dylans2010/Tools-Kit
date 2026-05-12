@@ -46,7 +46,7 @@ struct DNSLookupView: View {
     }
 }
 
-struct DNSLookupTool: Tool {
+struct DNSLookupTool: Tool, Sendable {
     let name = "DNS Lookup"
     let icon = "magnifyingglass.circle"
     let category = ToolCategory.utility

@@ -2,13 +2,13 @@ import Foundation
 import Network
 import os
 
-struct PortResult: Identifiable {
+struct PortResult: Identifiable, Sendable {
     let id = UUID()
     let port: UInt16
     let service: String
     var status: Status = .pending
 
-    enum Status { case pending, open, closed, timeout }
+    enum Status: Sendable { case pending, open, closed, timeout }
 }
 
 @MainActor

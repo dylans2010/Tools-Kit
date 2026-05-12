@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolSheetAnalyzer: AgenticToolProtocol {
+struct AgenticToolSheetAnalyzer: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "sheet_analyzer",
         description: "Analyze spreadsheet data for patterns and statistics",

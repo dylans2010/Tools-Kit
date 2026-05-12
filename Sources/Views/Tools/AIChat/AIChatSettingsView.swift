@@ -820,7 +820,7 @@ struct AIChatSettingsView: View {
 }
 
 private extension AIChatSettingsView {
-    enum AppMode: String, CaseIterable, Identifiable {
+    enum AppMode: String, CaseIterable, Identifiable, Sendable {
         case dashboard
         case music
         case workouts

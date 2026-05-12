@@ -166,7 +166,7 @@ final class EditorState: ObservableObject {
 
 // MARK: - Enums
 
-enum EditorTool: String, CaseIterable, Identifiable {
+enum EditorTool: String, CaseIterable, Identifiable, Sendable {
     case select = "Select"
     case crop = "Crop"
     case brush = "Brush"
@@ -206,7 +206,7 @@ enum EditorTool: String, CaseIterable, Identifiable {
     }
 }
 
-enum EditorPanel: String, CaseIterable, Identifiable {
+enum EditorPanel: String, CaseIterable, Identifiable, Sendable {
     case tools = "Tools"
     case layers = "Layers"
     case timeline = "Timeline"
@@ -1389,8 +1389,8 @@ private struct TimelineTrackRow: View {
 
 // MARK: - Filter Library
 
-enum EditorTransitionLibrary {
-    struct TransitionPreset {
+enum EditorTransitionLibrary: Sendable {
+    struct TransitionPreset: Sendable {
         let name: String
         let displayName: String
         let icon: String
@@ -1406,8 +1406,8 @@ enum EditorTransitionLibrary {
     ]
 }
 
-enum EditorFilterLibrary {
-    struct FilterPreset {
+enum EditorFilterLibrary: Sendable {
+    struct FilterPreset: Sendable {
         let name: String
         let icon: String
         let defaultIntensity: Double
@@ -1427,7 +1427,7 @@ enum EditorFilterLibrary {
 
 // MARK: - Canvas Presets
 
-enum CanvasPreset: CaseIterable {
+enum CanvasPreset: CaseIterable, Sendable {
     case hd1080
     case hd720
     case square
@@ -1693,12 +1693,12 @@ struct AssetLibraryView: View {
 
 // MARK: - Asset Catalog
 
-struct AssetLayerConfig {
+struct AssetLayerConfig: Sendable {
     let type: LayerType
     let name: String
 }
 
-struct AssetItem: Identifiable {
+struct AssetItem: Identifiable, Sendable {
     let id = UUID()
     let name: String
     let description: String
@@ -1710,12 +1710,12 @@ struct AssetItem: Identifiable {
     var effectIntensity: Double = 0.7
     var mediaType: LayerType = .image
 
-    enum AssetCategory {
+    enum AssetCategory: Sendable {
         case template, effect, media
     }
 }
 
-enum AssetCatalog {
+enum AssetCatalog: Sendable {
     static let templates: [AssetItem] = [
         AssetItem(
             name: "Cinematic Intro",

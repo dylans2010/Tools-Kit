@@ -4,7 +4,7 @@ protocol AgentAPIInterceptor {
     func intercept(_ request: URLRequest) -> URLRequest
 }
 
-struct AgentAuthInterceptor: AgentAPIInterceptor {
+struct AgentAuthInterceptor: AgentAPIInterceptor, Sendable {
     let apiKey: String
 
     init(apiKey: String) {

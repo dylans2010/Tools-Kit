@@ -1,6 +1,6 @@
 import Foundation
 
-enum GmailServerConfiguration {
+enum GmailServerConfiguration: Sendable {
     static let imapHost = "imap.gmail.com"
     static let imapPort: UInt16 = 993
     static let smtpHost = "smtp.gmail.com"

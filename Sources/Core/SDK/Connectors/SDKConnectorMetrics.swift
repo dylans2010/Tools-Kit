@@ -61,14 +61,14 @@ public struct SDKConnectorMetricsSummary: Identifiable, Sendable {
 /// Tracks performance metrics for all connectors.
 @MainActor
 public final class SDKConnectorMetricsTracker: SDKConnectorMetricsProtocol, ObservableObject {
-    public static let shared = SDKConnectorMetricsTracker()
+    nonisolated(unsafe) public static let shared = SDKConnectorMetricsTracker()
 
     @Published public private(set) var allMetrics: [SDKConnectorMetricsSummary] = []
     @Published public private(set) var totalRequests: Int = 0
 
     private var connectorData: [UUID: ConnectorMetricsData] = [:]
 
-    private struct ConnectorMetricsData {
+    private struct ConnectorMetricsData: Sendable {
         var connectorName: String
         var latencies: [TimeInterval] = []
         var successCount: Int = 0

@@ -1,6 +1,6 @@
 import Foundation
 
-struct AISlidesSchemaEnforcer {
+struct AISlidesSchemaEnforcer: Sendable {
     private let validLayoutsByType: [String: Set<String>] = [
         "title": ["centered", "title"],
         "bullet": ["verticalList", "titleAndBody"],

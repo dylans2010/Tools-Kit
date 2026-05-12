@@ -1,6 +1,6 @@
 import Foundation
 
-public struct SDKDependencyScopeValidator {
+public struct SDKDependencyScopeValidator: Sendable {
     public init() {}
 
     public func validate(dependencies: [SDKDependencyNode], grantedScopes: Set<String>) throws {

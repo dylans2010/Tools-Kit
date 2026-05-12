@@ -98,7 +98,7 @@ final class LyricsService {
 
 // MARK: - LRCLIB Response
 
-private struct LRCLIBResponse: Codable {
+private struct LRCLIBResponse: Codable, Sendable {
     let id: Int?
     let trackName: String?
     let artistName: String?

@@ -5,7 +5,7 @@ import Combine
 /// Initializes all services, manages lifecycle, and provides the global access point.
 @MainActor
 public final class WorkspaceSDKKernel: ObservableObject {
-    public static let shared = WorkspaceSDKKernel()
+    nonisolated(unsafe) public static let shared = WorkspaceSDKKernel()
 
     @Published public private(set) var state: KernelState = .idle
     @Published public private(set) var bootTime: Date?
@@ -14,7 +14,7 @@ public final class WorkspaceSDKKernel: ObservableObject {
     private var uptimeTimer: Timer?
     private var cancellables = Set<AnyCancellable>()
 
-    public enum KernelState: String, CaseIterable {
+    public enum KernelState: String, CaseIterable, Sendable {
         case idle, booting, ready, error, shuttingDown
     }
 
@@ -124,7 +124,7 @@ public final class WorkspaceSDKKernel: ObservableObject {
 
 // MARK: - Kernel Health
 
-public struct KernelHealth: Codable {
+public struct KernelHealth: Codable, Sendable {
     public let state: WorkspaceSDKKernel.KernelState
     public let uptime: TimeInterval
     public let registeredServices: Int

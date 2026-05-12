@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolMailSummarize: AgenticToolProtocol {
+struct AgenticToolMailSummarize: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "mail_summarize",
         description: "Summarize email threads or inbox",

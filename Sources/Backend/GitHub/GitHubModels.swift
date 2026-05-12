@@ -1,7 +1,7 @@
 import Foundation
 
 /// Represents a GitHub repository.
-struct GitHubRepository: Codable, Identifiable, Hashable {
+struct GitHubRepository: Codable, Identifiable, Hashable, Sendable {
     let id: Int
     let name: String
     let fullName: String
@@ -16,7 +16,7 @@ struct GitHubRepository: Codable, Identifiable, Hashable {
     let `private`: Bool
     let updatedAt: Date
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case id, name, description, owner
         case fullName = "full_name"
         case htmlUrl = "html_url"
@@ -31,13 +31,13 @@ struct GitHubRepository: Codable, Identifiable, Hashable {
 }
 
 /// Represents a GitHub user.
-struct GitHubUser: Codable, Identifiable, Hashable {
+struct GitHubUser: Codable, Identifiable, Hashable, Sendable {
     let id: Int
     let login: String
     let avatarUrl: String
     let htmlUrl: String
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case id, login
         case avatarUrl = "avatar_url"
         case htmlUrl = "html_url"
@@ -45,44 +45,44 @@ struct GitHubUser: Codable, Identifiable, Hashable {
 }
 
 /// Represents a Git branch.
-struct GitHubBranch: Codable, Hashable {
+struct GitHubBranch: Codable, Hashable, Sendable {
     let name: String
     let commit: GitHubCommitInfo
     let `protected`: Bool
 }
 
-struct GitHubCommitInfo: Codable, Hashable {
+struct GitHubCommitInfo: Codable, Hashable, Sendable {
     let sha: String
     let url: String
 }
 
 /// Represents a Git commit in history.
-struct GitHubCommit: Codable, Identifiable, Hashable {
+struct GitHubCommit: Codable, Identifiable, Hashable, Sendable {
     var id: String { sha }
     let sha: String
     let commit: GitHubCommitDetail
     let author: GitHubUser?
     let htmlUrl: String
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case sha, commit, author
         case htmlUrl = "html_url"
     }
 }
 
-struct GitHubCommitDetail: Codable, Hashable {
+struct GitHubCommitDetail: Codable, Hashable, Sendable {
     let author: GitHubCommitAuthor
     let message: String
 }
 
-struct GitHubCommitAuthor: Codable, Hashable {
+struct GitHubCommitAuthor: Codable, Hashable, Sendable {
     let name: String
     let email: String
     let date: Date
 }
 
 /// Represents a Pull Request.
-struct GitHubPullRequest: Codable, Identifiable, Hashable {
+struct GitHubPullRequest: Codable, Identifiable, Hashable, Sendable {
     let id: Int
     let number: Int
     let title: String
@@ -96,7 +96,7 @@ struct GitHubPullRequest: Codable, Identifiable, Hashable {
     let draft: Bool?
     let mergedAt: Date?
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case id, number, title, body, state, user, draft
         case htmlUrl = "html_url"
         case createdAt = "created_at"
@@ -105,7 +105,7 @@ struct GitHubPullRequest: Codable, Identifiable, Hashable {
     }
 }
 
-struct GitHubPRBranch: Codable, Hashable {
+struct GitHubPRBranch: Codable, Hashable, Sendable {
     let label: String
     let ref: String
     let sha: String
@@ -113,7 +113,7 @@ struct GitHubPRBranch: Codable, Hashable {
 }
 
 /// Represents file/directory content in a repo.
-struct GitHubContent: Codable, Hashable {
+struct GitHubContent: Codable, Hashable, Sendable {
     let name: String
     let path: String
     let sha: String
@@ -123,28 +123,28 @@ struct GitHubContent: Codable, Hashable {
     let encoding: String?
     let downloadUrl: String?
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case name, path, sha, size, type, content, encoding
         case downloadUrl = "download_url"
     }
 }
 
 /// Represents comparison between two commits/branches.
-struct GitHubComparison: Codable {
+struct GitHubComparison: Codable, Sendable {
     let status: String
     let aheadBy: Int
     let behindBy: Int
     let commits: [GitHubCommit]
     let files: [GitHubFileDiff]
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case status, commits, files
         case aheadBy = "ahead_by"
         case behindBy = "behind_by"
     }
 }
 
-struct GitHubFileDiff: Codable, Hashable {
+struct GitHubFileDiff: Codable, Hashable, Sendable {
     let sha: String
     let filename: String
     let status: String // "added", "removed", "modified", "renamed", "copied"

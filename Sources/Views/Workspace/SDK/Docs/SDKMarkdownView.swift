@@ -15,7 +15,7 @@ struct SDKMarkdownView: View {
 
     // MARK: - Block Types
 
-    private enum MarkdownBlock {
+    private enum MarkdownBlock: Sendable {
         case heading(level: Int, text: String)
         case codeBlock(language: String, code: String)
         case unorderedListItem(depth: Int, text: String)
@@ -262,8 +262,8 @@ struct SDKMarkdownView: View {
 
 // MARK: - Inline Scanner
 
-private struct InlineScanner {
-    enum Segment {
+private struct InlineScanner: Sendable {
+    enum Segment: Sendable {
         case plain(String)
         case bold(String)
         case italic(String)

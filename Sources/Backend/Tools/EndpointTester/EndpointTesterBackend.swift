@@ -1,12 +1,12 @@
 import Foundation
 
-struct EndpointHeader: Identifiable, Equatable {
+struct EndpointHeader: Identifiable, Equatable, Sendable {
     let id = UUID()
     var key: String
     var value: String
 }
 
-struct EndpointResponse {
+struct EndpointResponse: Sendable {
     let statusCode: Int
     let headers: [String: String]
     let body: String

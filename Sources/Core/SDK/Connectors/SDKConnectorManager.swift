@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKConnectorManager: ObservableObject {
-    public static let shared = SDKConnectorManager()
+    nonisolated(unsafe) public static let shared = SDKConnectorManager()
 
     @Published public var connectors: [any BaseConnector] = []
 
@@ -99,7 +99,7 @@ public final class SDKConnectorManager: ObservableObject {
     }
 }
 
-private struct ConnectorConfig: Codable {
+private struct ConnectorConfig: Codable, Sendable {
     let id: UUID
     let name: String
     let type: ConnectorType

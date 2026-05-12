@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentDebugExporter {
+struct AgentDebugExporter: Sendable {
     init() {}
 
     func export(session: AgentDebugSession) throws -> Data {

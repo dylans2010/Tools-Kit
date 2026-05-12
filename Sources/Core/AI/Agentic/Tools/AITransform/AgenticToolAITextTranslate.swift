@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolAITextTranslate: AgenticToolProtocol {
+struct AgenticToolAITextTranslate: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "ai_text_translate",
         description: "Translate text to another language",

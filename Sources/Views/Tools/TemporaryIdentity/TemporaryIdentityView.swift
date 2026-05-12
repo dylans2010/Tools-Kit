@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct TemporaryIdentityTool: Tool {
+struct TemporaryIdentityTool: Tool, Sendable {
     let name = "Identity Generator"
     let icon = "person.crop.circle.badge.questionmark"
     let category = ToolCategory.privacy

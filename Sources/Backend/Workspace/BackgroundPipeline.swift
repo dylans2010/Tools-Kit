@@ -3,18 +3,18 @@ import os.log
 
 /// Orchestrates background tasks for AI processing, indexing, and rendering with priority support and retries.
 final class BackgroundPipeline {
-    static let shared = BackgroundPipeline()
+    nonisolated(unsafe) static let shared = BackgroundPipeline()
     private let queue = DispatchQueue(label: "com.workspace.pipeline", qos: .utility, attributes: .concurrent)
     private let logger = Logger(subsystem: "com.workspace", category: "Pipeline")
 
-    enum TaskPriority: Int {
+    enum TaskPriority: Int, Sendable {
         case low = 0
         case medium = 1
         case high = 2
         case critical = 3
     }
 
-    struct PipelineTask {
+    struct PipelineTask: @unchecked Sendable {
         let id: UUID = UUID()
         let name: String
         let priority: TaskPriority

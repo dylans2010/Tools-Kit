@@ -1,6 +1,6 @@
 import Foundation
 
-public struct SDKDependencyResolution: Identifiable {
+public struct SDKDependencyResolution: Identifiable, Sendable {
     public let id = UUID()
     public let orderedModules: [SDKModuleDescriptor]
     public let conflicts: [DependencyConflict]
@@ -10,14 +10,14 @@ public struct SDKDependencyResolution: Identifiable {
     public var isClean: Bool { conflicts.isEmpty }
 }
 
-public struct DependencyConflict: Identifiable {
+public struct DependencyConflict: Identifiable, Sendable {
     public let id = UUID()
     public let moduleA: String
     public let moduleB: String
     public let conflictType: ConflictType
     public let description: String
 
-    public enum ConflictType: String {
+    public enum ConflictType: String, Sendable {
         case versionMismatch, circularDependency, capabilityCollision, missingDependency
     }
 }

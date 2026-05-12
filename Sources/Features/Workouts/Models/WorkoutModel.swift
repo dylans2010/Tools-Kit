@@ -1,6 +1,6 @@
 import Foundation
 
-struct WorkoutModel: Identifiable, Codable {
+struct WorkoutModel: Identifiable, Codable, Sendable {
     var id: UUID
     var date: Date
     var title: String
@@ -40,7 +40,7 @@ struct WorkoutModel: Identifiable, Codable {
         exercises.allSatisfy(\.isCompleted)
     }
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case id, date, title, difficulty, estimatedDurationMinutes, exercises, notes, completedAt
     }
 

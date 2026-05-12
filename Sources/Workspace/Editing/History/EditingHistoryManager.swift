@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 /// Represents a single change state in the editing history.
-struct EditingState: Codable, Identifiable {
+struct EditingState: Codable, Identifiable, Sendable {
     let id: UUID
     let timestamp: Date
     let projectSnapshot: EditingProject

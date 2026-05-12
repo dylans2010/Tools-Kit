@@ -6,7 +6,7 @@ struct CalculatorView: View {
     @StateObject private var backend = CalculatorBackend()
     @State private var mode: CalcMode = .standard
 
-    enum CalcMode {
+    enum CalcMode: Sendable {
         case standard, scientific, graphing, geometry, history
     }
 
@@ -272,7 +272,7 @@ private struct CalcButton: View {
     }
 }
 
-struct CalculatorTool: Tool {
+struct CalculatorTool: Tool, Sendable {
     let name = "Calculator"
     let icon = "plus.forwardslash.minus"
     let category = ToolCategory.general

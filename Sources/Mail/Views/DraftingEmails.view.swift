@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct DraftingEmailResult {
+struct DraftingEmailResult: Sendable {
     let recipient: String
     let subject: String
     let body: String
@@ -9,12 +9,12 @@ struct DraftingEmailResult {
 struct DraftingEmailsView: View {
     @Environment(\.dismiss) private var dismiss
 
-    enum MailGoal: String, CaseIterable, Identifiable {
+    enum MailGoal: String, CaseIterable, Identifiable, Sendable {
         case statusUpdate = "Status Update", followUp = "Follow Up", request = "Request", apology = "Apology", introduction = "Introduction", pitch = "Pitch"
         var id: String { rawValue }
     }
 
-    enum MailStyle: String, CaseIterable, Identifiable {
+    enum MailStyle: String, CaseIterable, Identifiable, Sendable {
         case professional = "Professional", friendly = "Friendly", executive = "Executive", concise = "Concise", persuasive = "Persuasive"
         var id: String { rawValue }
     }

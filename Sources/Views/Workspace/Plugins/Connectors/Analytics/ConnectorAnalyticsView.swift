@@ -83,11 +83,11 @@ struct ConnectorAnalyticsView: View {
     }
 }
 
-private enum AnalyticsPeriod: String, CaseIterable {
+private enum AnalyticsPeriod: String, CaseIterable, Sendable {
     case day, week, month, quarter
 }
 
-private struct ConnectorStat: Identifiable {
+private struct ConnectorStat: Identifiable, Sendable {
     let id = UUID()
     let name: String
     let totalCalls: Int

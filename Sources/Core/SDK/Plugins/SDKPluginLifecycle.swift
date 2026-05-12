@@ -1,11 +1,11 @@
 import Foundation
 import Combine
 
-public enum SDKPluginPhase: String, Codable, CaseIterable {
+public enum SDKPluginPhase: String, Codable, CaseIterable, Sendable {
     case unloaded, loading, active, paused, updating, migrating, errored, disabled
 }
 
-public struct SDKPluginCapability: Identifiable, Codable, Hashable {
+public struct SDKPluginCapability: Identifiable, Codable, Hashable, Sendable {
     public let id: UUID
     public var name: String
     public var description: String
@@ -27,7 +27,7 @@ public struct SDKPluginCapability: Identifiable, Codable, Hashable {
     }
 }
 
-public struct SDKPluginManifest: Identifiable, Codable {
+public struct SDKPluginManifest: Identifiable, Codable, Sendable {
     public let id: UUID
     public var identifier: String
     public var displayName: String
@@ -44,7 +44,7 @@ public struct SDKPluginManifest: Identifiable, Codable {
     public var installedAt: Date
     public var updatedAt: Date
 
-    public enum PluginCategory: String, Codable, CaseIterable {
+    public enum PluginCategory: String, Codable, CaseIterable, Sendable {
         case productivity, communication, development, analytics
         case automation, integration, utility, ai
     }
@@ -84,13 +84,13 @@ public struct SDKPluginManifest: Identifiable, Codable {
 
 @MainActor
 public final class SDKPluginLifecycleManager: ObservableObject {
-    public static let shared = SDKPluginLifecycleManager()
+    nonisolated(unsafe) public static let shared = SDKPluginLifecycleManager()
 
     @Published public var manifests: [SDKPluginManifest] = []
     @Published public var phases: [UUID: SDKPluginPhase] = [:]
     @Published public var lifecycleLog: [PluginLifecycleEvent] = []
 
-    public struct PluginLifecycleEvent: Identifiable, Codable {
+    public struct PluginLifecycleEvent: Identifiable, Codable, Sendable {
         public let id: UUID
         public let pluginIdentifier: String
         public let fromPhase: String

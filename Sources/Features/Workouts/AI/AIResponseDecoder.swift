@@ -1,6 +1,6 @@
 import Foundation
 
-enum AIResponseDecoderError: LocalizedError {
+enum AIResponseDecoderError: LocalizedError, Sendable {
     case invalidJSON
     case missingRequiredKeys([String])
     case typeMismatch(path: String, expected: String, actual: String)
@@ -29,7 +29,7 @@ indirect enum AIJSONType {
     case object([String: AIJSONType])
 }
 
-struct AIResponseDecoder {
+struct AIResponseDecoder: @unchecked Sendable {
     private let jsonDecoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601

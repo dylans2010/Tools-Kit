@@ -21,7 +21,7 @@ struct NATOView: View {
     }
 }
 
-struct NATOTool: Tool {
+struct NATOTool: Tool, Sendable {
     let name = "NATO Alphabet"
     let icon = "text.bubble"
     let category = ToolCategory.utility

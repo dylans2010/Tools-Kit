@@ -1,13 +1,13 @@
 import Foundation
 
-struct PingResult: Identifiable {
+struct PingResult: Identifiable, Sendable {
     let id = UUID()
     let host: String
     let latencyMs: Double
     let success: Bool
 }
 
-struct TimingDiagnostic: Identifiable {
+struct TimingDiagnostic: Identifiable, Sendable {
     let id = UUID()
     let label: String
     let durationMs: Double

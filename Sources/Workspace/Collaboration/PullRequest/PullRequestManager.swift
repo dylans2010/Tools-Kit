@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 /// Status of a Pull Request.
-enum PullRequestStatus: String, Codable {
+enum PullRequestStatus: String, Codable, Sendable {
     case open
     case merged
     case closed
@@ -10,7 +10,7 @@ enum PullRequestStatus: String, Codable {
 }
 
 /// Represents a review for a Pull Request.
-struct PRReview: Codable, Identifiable {
+struct PRReview: Codable, Identifiable, Sendable {
     let id: UUID
     let reviewerID: UUID
     let reviewerName: String
@@ -20,7 +20,7 @@ struct PRReview: Codable, Identifiable {
 }
 
 /// Represents a Pull Request for a workspace object or space.
-struct PullRequest: Codable, Identifiable {
+struct PullRequest: Codable, Identifiable, Sendable {
     let id: UUID
     let spaceID: UUID
     var title: String
@@ -39,7 +39,7 @@ struct PullRequest: Codable, Identifiable {
 
 /// Manages the lifecycle of Pull Requests in a Collaboration Space.
 final class PullRequestManager: ObservableObject {
-    static let shared = PullRequestManager()
+    nonisolated(unsafe) static let shared = PullRequestManager()
 
     @Published var pullRequests: [UUID: [PullRequest]] = [:] // spaceID: [PRs]
 

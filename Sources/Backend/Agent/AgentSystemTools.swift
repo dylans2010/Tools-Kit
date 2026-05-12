@@ -2,7 +2,7 @@ import Foundation
 
 /// Registry and dispatcher for system tools.
 final class AgentSystemTools {
-    static let shared = AgentSystemTools()
+    nonisolated(unsafe) static let shared = AgentSystemTools()
 
     internal var tools: [String: SystemTool] = [:]
 
@@ -137,7 +137,7 @@ final class AgentSystemTools {
     }
 }
 
-enum AgentSystemToolsError: Error, LocalizedError {
+enum AgentSystemToolsError: Error, LocalizedError, Sendable {
     case unknownTool(String)
     case toolFailedAudit(String)
 

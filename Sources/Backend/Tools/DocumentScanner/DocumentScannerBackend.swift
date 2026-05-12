@@ -4,7 +4,7 @@ import VisionKit
 import PDFKit
 import PencilKit
 
-struct ScannedDocument: Identifiable, Codable {
+struct ScannedDocument: Identifiable, Codable, Sendable {
     let id: UUID
     var title: String
     var pageImageData: [Data]

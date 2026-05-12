@@ -78,7 +78,7 @@ struct CodeExplainerView: View {
     }
 }
 
-struct CodeExplainerTool: Tool {
+struct CodeExplainerTool: Tool, Sendable {
     let name = "Code Explainer"
     let icon = "curlybraces.square.fill"
     let category = ToolCategory.ai

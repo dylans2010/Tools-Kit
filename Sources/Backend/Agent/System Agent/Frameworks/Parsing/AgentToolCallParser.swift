@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentToolCallParser {
+struct AgentToolCallParser: Sendable {
     init() {}
 
     func parse(_ jsonString: String) throws -> AgentToolCall {

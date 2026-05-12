@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolNoteSummarize: AgenticToolProtocol {
+struct AgenticToolNoteSummarize: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "note_summarize",
         description: "Summarize a note or set of notes using AI",

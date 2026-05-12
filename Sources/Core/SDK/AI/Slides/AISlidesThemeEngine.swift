@@ -1,12 +1,12 @@
 import Foundation
 
-struct AISlidesThemeSelection {
+struct AISlidesThemeSelection: Sendable {
     var theme: SlideTheme
     var style: SlideStyle
     var isThemeScopeEnabled: Bool
 }
 
-struct AISlidesThemeEngine {
+struct AISlidesThemeEngine: Sendable {
     func availableThemes() -> [SlideTheme] {
         AIGenSlideCatalog.themes
     }

@@ -22,7 +22,7 @@ struct WordCounterView: View {
     }
 }
 
-struct WordCounterTool: Tool {
+struct WordCounterTool: Tool, Sendable {
     let name = "Word Counter"
     let icon = "textformat.123"
     let category = ToolCategory.utility

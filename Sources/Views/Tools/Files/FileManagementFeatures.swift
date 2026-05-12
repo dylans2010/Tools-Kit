@@ -1,6 +1,6 @@
 import Foundation
 
-enum FileManagementFeatures {
+enum FileManagementFeatures: Sendable {
     static let supportedCreationTypes: [ManagedFileType] = [.text, .plist, .json, .xml]
     static let supportedTemplates: [FileTemplate] = FileTemplate.allCases
     static let capabilities: [String] = [

@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolMailSearch: AgenticToolProtocol {
+struct AgenticToolMailSearch: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "mail_search",
         description: "Search emails by query across threads and messages",

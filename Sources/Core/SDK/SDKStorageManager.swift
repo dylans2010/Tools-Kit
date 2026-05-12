@@ -2,7 +2,7 @@ import Foundation
 import Security
 
 public final class SDKStorageManager {
-    public static let shared = SDKStorageManager()
+    nonisolated(unsafe) public static let shared = SDKStorageManager()
 
     private let localStorageURL: URL
     private var localStorage: [String: String] = [:]

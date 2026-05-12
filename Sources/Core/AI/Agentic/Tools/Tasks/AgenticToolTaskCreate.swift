@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolTaskCreate: AgenticToolProtocol {
+struct AgenticToolTaskCreate: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "task_create",
         description: "Create a new task with title, description, priority, and due date",

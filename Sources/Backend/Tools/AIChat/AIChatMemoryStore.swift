@@ -1,7 +1,7 @@
 import Foundation
 import NaturalLanguage
 
-struct ChatMemoryItem: Identifiable, Codable {
+struct ChatMemoryItem: Identifiable, Codable, Sendable {
     let id: UUID
     let value: String
     let createdAt: Date
@@ -14,7 +14,7 @@ struct ChatMemoryItem: Identifiable, Codable {
 }
 
 final class AIChatMemoryStore: ObservableObject {
-    static let shared = AIChatMemoryStore()
+    nonisolated(unsafe) static let shared = AIChatMemoryStore()
 
     @Published private(set) var memories: [ChatMemoryItem] = []
     private let key = "ai_chat_memories"

@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class AISlidesExportEngine: ObservableObject {
-    public static let shared = AISlidesExportEngine()
+    nonisolated(unsafe) public static let shared = AISlidesExportEngine()
 
     @Published public private(set) var isExporting = false
     @Published public private(set) var exportProgress: Double = 0
@@ -208,7 +208,7 @@ public enum ExportFormat: String, Codable, CaseIterable, Sendable, Identifiable 
     }
 }
 
-public struct ExportOptions {
+public struct ExportOptions: Sendable {
     public var includeNotes: Bool
     public var includeSlideNumbers: Bool
     public var includeTheme: Bool
@@ -222,13 +222,13 @@ public struct ExportOptions {
     }
 }
 
-public struct ExportResult {
+public struct ExportResult: Sendable {
     public let url: URL
     public let format: ExportFormat
     public let fileSize: Int64
 }
 
-public struct ExportRecord: Identifiable {
+public struct ExportRecord: Identifiable, Sendable {
     public let id = UUID()
     public let deckID: UUID
     public let deckTitle: String

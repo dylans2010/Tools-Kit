@@ -3,7 +3,7 @@ import Foundation
 /// Direct interface to Workspace systems.
 /// Bypasses abstraction layers when allowed (e.g. noSandbox mode).
 public final class SDKWorkspaceBridge {
-    public static let shared = SDKWorkspaceBridge()
+    nonisolated(unsafe) public static let shared = SDKWorkspaceBridge()
 
     private let api = WorkspaceAPI.shared
 

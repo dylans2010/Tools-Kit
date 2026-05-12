@@ -2,9 +2,9 @@ import Foundation
 
 @MainActor
 public final class SDKPrivacyManager: ObservableObject {
-    public static let shared = SDKPrivacyManager()
+    nonisolated(unsafe) public static let shared = SDKPrivacyManager()
 
-    public struct ExposureLog: Identifiable, Codable {
+    public struct ExposureLog: Identifiable, Codable, Sendable {
         public let id: UUID
         public let timestamp: Date
         public let scope: String
@@ -14,7 +14,7 @@ public final class SDKPrivacyManager: ObservableObject {
         public let projectID: UUID?
     }
 
-    public struct PrivacyPolicy: Codable {
+    public struct PrivacyPolicy: Codable, Sendable {
         public let requiredNote: Bool
         public let restrictedFields: Set<String>
         public let retentionDays: Int

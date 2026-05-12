@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolAIContentExtractor: AgenticToolProtocol {
+struct AgenticToolAIContentExtractor: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "ai_content_extractor",
         description: "Extract structured data from unstructured text",

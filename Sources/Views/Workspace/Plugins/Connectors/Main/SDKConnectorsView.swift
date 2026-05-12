@@ -13,7 +13,7 @@ struct SDKConnectorsView: View {
     @State private var lastErrors: [UUID: String] = [:]
     @State private var inspectingConnectorID: UUID?
 
-    enum FilterStatus: String, CaseIterable {
+    enum FilterStatus: String, CaseIterable, Sendable {
         case all = "All"
         case connected = "Connected"
         case disconnected = "Disconnected"
@@ -21,13 +21,13 @@ struct SDKConnectorsView: View {
         case error = "Error"
     }
 
-    enum SortOrder: String, CaseIterable {
+    enum SortOrder: String, CaseIterable, Sendable {
         case name = "Name"
         case type = "Type"
         case status = "Status"
     }
 
-    enum ConnectorLifecycleState: String {
+    enum ConnectorLifecycleState: String, Sendable {
         case connected
         case disconnected
         case syncing
@@ -365,7 +365,7 @@ private struct SDKConnectorRow: View {
     }
 }
 
-private struct InspectionItem: Identifiable {
+private struct InspectionItem: Identifiable, Sendable {
     let connectorID: UUID
     let title: String
     var id: UUID { connectorID }

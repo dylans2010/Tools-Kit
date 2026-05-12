@@ -1,6 +1,6 @@
 import Foundation
 
-struct JulesAgentCapabilityProfile {
+struct JulesAgentCapabilityProfile: Sendable {
     static let capabilities = AgentCapabilities(
         canUseTools: true,
         canProcessVision: true,

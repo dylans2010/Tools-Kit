@@ -30,7 +30,7 @@ struct ObjectDetectionView: View {
     }
 }
 
-struct ObjectDetectionTool: Tool {
+struct ObjectDetectionTool: Tool, Sendable {
     let name = "Object Detection"
     let icon = "viewfinder.circle"
     let category = ToolCategory.ai

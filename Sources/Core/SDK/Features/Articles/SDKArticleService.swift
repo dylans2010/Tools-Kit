@@ -12,7 +12,7 @@ public protocol SDKArticleServiceProtocol {
 /// Full SDK Articles module — handles article creation, parsing, content storage, and search.
 @MainActor
 public final class SDKArticleService: SDKArticleServiceProtocol, ObservableObject {
-    public static let shared = SDKArticleService()
+    nonisolated(unsafe) public static let shared = SDKArticleService()
 
     @Published public private(set) var articles: [SDKArticle] = []
     @Published public private(set) var publishedCount: Int = 0
@@ -158,7 +158,7 @@ public final class SDKArticleService: SDKArticleServiceProtocol, ObservableObjec
 
 // MARK: - Parsed Content
 
-public struct ParsedArticleContent {
+public struct ParsedArticleContent: Sendable {
     public let title: String
     public let body: String
     public let wordCount: Int

@@ -1,6 +1,6 @@
 import Foundation
 
-struct FileWorkspaceManager {
+struct FileWorkspaceManager: Sendable {
     let rootURL: URL
 
     init(workspaceName: String = "FilesWorkspace") {

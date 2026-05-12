@@ -1,14 +1,14 @@
 import Foundation
 
 /// Defines the visibility of a Collaboration Space.
-enum SpaceVisibility: String, Codable {
+enum SpaceVisibility: String, Codable, Sendable {
     case privateSpace = "Private"
     case shared = "Shared"
     case publicSpace = "Public"
 }
 
 /// Defines the roles within a Collaboration Space.
-enum SpaceRole: String, Codable {
+enum SpaceRole: String, Codable, Sendable {
     case owner = "Owner"
     case admin = "Admin"
     case editor = "Editor"
@@ -17,7 +17,7 @@ enum SpaceRole: String, Codable {
 }
 
 /// Represents a member of a Collaboration Space.
-struct SpaceMember: Codable, Identifiable {
+struct SpaceMember: Codable, Identifiable, Sendable {
     let id: UUID
     let name: String
     let email: String
@@ -25,7 +25,7 @@ struct SpaceMember: Codable, Identifiable {
 }
 
 /// Represents a commit in the version control system.
-struct CollaborationCommit: Codable, Identifiable {
+struct CollaborationCommit: Codable, Identifiable, Sendable {
     let id: UUID
     let parentID: UUID?
     let message: String
@@ -36,7 +36,7 @@ struct CollaborationCommit: Codable, Identifiable {
 }
 
 /// Represents a branch in the version control system.
-struct CollaborationBranch: Codable, Identifiable {
+struct CollaborationBranch: Codable, Identifiable, Sendable {
     let id: UUID
     var name: String
     var headCommitID: UUID
@@ -44,7 +44,7 @@ struct CollaborationBranch: Codable, Identifiable {
 }
 
 /// Represents an activity entry in the space's feed.
-struct ActivityLog: Codable, Identifiable {
+struct ActivityLog: Codable, Identifiable, Sendable {
     let id: UUID
     let timestamp: Date
     let userID: UUID
@@ -55,7 +55,7 @@ struct ActivityLog: Codable, Identifiable {
 }
 
 /// The core container for a Collaboration Space.
-struct CollaborationSpace: Codable, Identifiable {
+struct CollaborationSpace: Codable, Identifiable, Sendable {
     var id: UUID
     var name: String
     var description: String
@@ -87,7 +87,7 @@ struct CollaborationSpace: Codable, Identifiable {
     var metadata: [String: String] = [:]
 }
 
-struct SpaceMessage: Codable, Identifiable {
+struct SpaceMessage: Codable, Identifiable, Sendable {
     let id: UUID
     let senderID: UUID
     let senderName: String
@@ -95,7 +95,7 @@ struct SpaceMessage: Codable, Identifiable {
     let timestamp: Date
 }
 
-struct SpaceFile: Codable, Identifiable {
+struct SpaceFile: Codable, Identifiable, Sendable {
     let id: UUID
     let name: String
     let size: Int64

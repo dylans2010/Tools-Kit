@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct PortScannerTool: Tool {
+struct PortScannerTool: Tool, Sendable {
     let name = "Port Scanner"
     let icon = "network.badge.shield.half.filled"
     let category = ToolCategory.network

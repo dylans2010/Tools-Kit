@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentConfiguration: Codable, Equatable {
+struct AgentConfiguration: Codable, Equatable, Sendable {
     var modelId: String
     var temperature: Double
     var maxTokens: Int?

@@ -1,6 +1,6 @@
 import Foundation
 
-struct NotebookPage: Codable, Identifiable, Equatable {
+struct NotebookPage: Codable, Identifiable, Equatable, Sendable {
     var id: UUID = UUID()
     var title: String = "Untitled Page"
     var content: String = ""

@@ -12,7 +12,7 @@ struct CustomAppSDKView: View {
     @State private var selectedApp: ImportedSDKApp?
     @State private var errorMessage: String?
 
-    struct ImportedSDKApp: Identifiable {
+    struct ImportedSDKApp: Identifiable, Sendable {
         let id = UUID()
         var name: String
         var bundlePath: URL?
@@ -24,12 +24,12 @@ struct CustomAppSDKView: View {
         var importedAt: Date
         var status: AppStatus
 
-        enum AppStatus: String {
+        enum AppStatus: String, Sendable {
             case pending, validated, incompatible, registered, running
         }
     }
 
-    struct ValidationResult: Identifiable {
+    struct ValidationResult: Identifiable, Sendable {
         let id = UUID()
         var appName: String
         var isCompatible: Bool

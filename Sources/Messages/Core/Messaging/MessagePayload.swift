@@ -1,11 +1,11 @@
 import Foundation
 
-enum PayloadType: String, Codable {
+enum PayloadType: String, Codable, Sendable {
     case game
     case ai
 }
 
-enum PayloadSubtype: String, Codable {
+enum PayloadSubtype: String, Codable, Sendable {
     // Game Subtypes
     case battleship
     case basketball
@@ -17,7 +17,7 @@ enum PayloadSubtype: String, Codable {
     case reply
 }
 
-struct MessagePayload: Codable {
+struct MessagePayload: Codable, Sendable {
     let type: PayloadType
     let subtype: PayloadSubtype
     let data: Data

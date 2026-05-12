@@ -1,6 +1,6 @@
 import Foundation
 
-struct WorkspaceTask: Identifiable, Codable {
+struct WorkspaceTask: Identifiable, Codable, Sendable {
     var id: UUID
     var title: String
     var description: String
@@ -38,7 +38,7 @@ struct WorkspaceTask: Identifiable, Codable {
         return Calendar.current.isDateInToday(due)
     }
 
-    enum TaskPriority: String, Codable, CaseIterable {
+    enum TaskPriority: String, Codable, CaseIterable, Sendable {
         case low = "Low"
         case medium = "Medium"
         case high = "High"

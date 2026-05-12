@@ -58,7 +58,7 @@ struct WebhookTesterView: View {
     }
 }
 
-struct WebhookTesterTool: Tool {
+struct WebhookTesterTool: Tool, Sendable {
     let name = "Webhook Tester"
     let icon = "link.badge.plus"
     let category = ToolCategory.development

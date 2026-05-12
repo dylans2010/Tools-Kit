@@ -80,7 +80,7 @@ struct PortCheckerView: View {
     }
 }
 
-struct PortCheckerTool: Tool {
+struct PortCheckerTool: Tool, Sendable {
     let name = "Port Checker"
     let icon = "server.rack"
     let category = ToolCategory.utility

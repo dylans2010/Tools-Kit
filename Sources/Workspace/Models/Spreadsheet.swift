@@ -1,6 +1,6 @@
 import Foundation
 
-struct Spreadsheet: Codable, Identifiable, Equatable {
+struct Spreadsheet: Codable, Identifiable, Equatable, Sendable {
     var id: UUID = UUID()
     var name: String = "Untitled Spreadsheet"
     var rows: Int = 20

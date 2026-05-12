@@ -16,7 +16,7 @@ struct FeedbackAdminView: View {
         self.allowDeveloperToolsAccess = allowDeveloperToolsAccess
     }
 
-    private enum SortOption: String, CaseIterable, Identifiable {
+    private enum SortOption: String, CaseIterable, Identifiable, Sendable {
         case newest
         case priority
 

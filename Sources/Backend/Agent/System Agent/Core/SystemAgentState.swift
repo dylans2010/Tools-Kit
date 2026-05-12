@@ -1,11 +1,11 @@
 import Foundation
 
-enum AgentType: String, CaseIterable, Codable {
+enum AgentType: String, CaseIterable, Codable, Sendable {
     case system
     case jules
 }
 
-enum SystemAgentState {
+enum SystemAgentState: Sendable {
     case idle
     case thinking
     case executingTool(name: String)

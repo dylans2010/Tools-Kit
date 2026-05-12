@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKConfigManager: ObservableObject {
-    public static let shared = SDKConfigManager()
+    nonisolated(unsafe) public static let shared = SDKConfigManager()
 
     @Published public private(set) var configurations: [String: SDKConfigEntry] = [:]
     @Published public private(set) var profiles: [SDKConfigProfile] = []
@@ -133,7 +133,7 @@ public final class SDKConfigManager: ObservableObject {
 
 // MARK: - Models
 
-public struct SDKConfigEntry: Identifiable, Codable {
+public struct SDKConfigEntry: Identifiable, Codable, Sendable {
     public var id: String { key }
     public let key: String
     public let value: String
@@ -152,7 +152,7 @@ public enum ConfigSource: String, Codable, CaseIterable, Sendable {
     case `default`, user, profile, environment, imported, remote
 }
 
-public struct SDKConfigProfile: Identifiable, Codable {
+public struct SDKConfigProfile: Identifiable, Codable, Sendable {
     public let id: UUID
     public var name: String
     public var values: [String: String]
@@ -166,7 +166,7 @@ public struct SDKConfigProfile: Identifiable, Codable {
     }
 }
 
-public struct ConfigChange: Identifiable, Codable {
+public struct ConfigChange: Identifiable, Codable, Sendable {
     public let id: UUID
     public let key: String
     public let oldValue: String?

@@ -1,6 +1,6 @@
 import Foundation
 
-struct SanitizedLink {
+struct SanitizedLink: Sendable {
     let original: String
     let cleaned: String
     let removedParams: [String]

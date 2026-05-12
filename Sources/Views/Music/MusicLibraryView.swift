@@ -8,7 +8,7 @@ struct MusicLibraryView: View {
     @State private var showSettings = false
     @State private var showImport = false
 
-    enum LibrarySection: String, CaseIterable {
+    enum LibrarySection: String, CaseIterable, Sendable {
         case songs = "Songs"
         case artists = "Artists"
         case albums = "Albums"

@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolAIIdeaGenerator: AgenticToolProtocol {
+struct AgenticToolAIIdeaGenerator: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "ai_idea_generator",
         description: "Generate ideas based on a topic or context",

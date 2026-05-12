@@ -123,7 +123,7 @@ struct PRDetailView: View {
 
     private func closePullRequest() {
         isMerging = true
-        struct UpdatePRPayload: Encodable {
+        struct UpdatePRPayload: Encodable, Sendable {
             let state: String
         }
         let payload = UpdatePRPayload(state: "closed")

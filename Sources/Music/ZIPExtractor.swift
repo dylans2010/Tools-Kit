@@ -2,9 +2,9 @@ import Foundation
 import ZIPFoundation
 
 /// ZIPExtractor wraps ZIPFoundation to extract audio files from a ZIP archive.
-struct ZIPExtractor {
+struct ZIPExtractor: Sendable {
 
-    struct Entry {
+    struct Entry: Sendable {
         let filename: String
         let data: Data
     }

@@ -6,14 +6,14 @@ import CoreLocation
 import UserNotifications
 import EventKit
 
-struct PermissionItem: Identifiable {
+struct PermissionItem: Identifiable, Sendable {
     let id = UUID()
     let name: String
     let icon: String
     let status: Status
     let detail: String
 
-    enum Status { case granted, denied, undetermined, restricted }
+    enum Status: Sendable { case granted, denied, undetermined, restricted }
 
     var color: String {
         switch status {

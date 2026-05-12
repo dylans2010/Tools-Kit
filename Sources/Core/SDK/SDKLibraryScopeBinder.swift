@@ -1,6 +1,6 @@
 import Foundation
 
-public struct SDKLibraryScopeBinder {
+public struct SDKLibraryScopeBinder: Sendable {
     public init() {}
 
     public func effectiveScopes(projectScopes: Set<String>, pluginScopes: Set<String>, libraryScopes: Set<String>) -> Set<String> {

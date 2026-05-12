@@ -1,6 +1,6 @@
 import Foundation
 
-struct ManagedFileItem: Identifiable, Hashable {
+struct ManagedFileItem: Identifiable, Hashable, Sendable {
     var id: String { url.path }
     var name: String { url.lastPathComponent }
     let url: URL
@@ -9,7 +9,7 @@ struct ManagedFileItem: Identifiable, Hashable {
     let modifiedAt: Date
 }
 
-enum ManagedFileType: String, CaseIterable, Identifiable {
+enum ManagedFileType: String, CaseIterable, Identifiable, Sendable {
     case text = "txt"
     case plist = "plist"
     case json = "json"
@@ -18,7 +18,7 @@ enum ManagedFileType: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-enum FileTemplate: String, CaseIterable, Identifiable {
+enum FileTemplate: String, CaseIterable, Identifiable, Sendable {
     case html = "HTML"
     case swift = "Swift"
     case python = "Python"

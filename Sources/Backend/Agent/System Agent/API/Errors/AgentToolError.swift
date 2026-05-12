@@ -1,6 +1,6 @@
 import Foundation
 
-enum AgentToolError: Error, LocalizedError {
+enum AgentToolError: Error, LocalizedError, Sendable {
     case toolNotFound(String)
     case executionFailed(String, Error)
     case invalidInput(String, String)

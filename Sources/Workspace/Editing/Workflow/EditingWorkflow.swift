@@ -3,7 +3,7 @@ import Combine
 
 /// AI-powered timeline pacing and asset management.
 final class TimelineIntelligence: ObservableObject {
-    static let shared = TimelineIntelligence()
+    nonisolated(unsafe) static let shared = TimelineIntelligence()
 
     private init() {}
 
@@ -14,9 +14,9 @@ final class TimelineIntelligence: ObservableObject {
 
 /// Central library for assets used in editing projects.
 final class AssetManager: ObservableObject {
-    static let shared = AssetManager()
+    nonisolated(unsafe) static let shared = AssetManager()
 
-    struct Asset: Identifiable, Codable {
+    struct Asset: Identifiable, Codable, Sendable {
         let id: UUID
         let name: String
         let url: URL
@@ -34,9 +34,9 @@ final class AssetManager: ObservableObject {
 
 /// Background rendering and export pipeline manager.
 final class ExportPipelineManager: ObservableObject {
-    static let shared = ExportPipelineManager()
+    nonisolated(unsafe) static let shared = ExportPipelineManager()
 
-    struct ExportJob: Identifiable {
+    struct ExportJob: Identifiable, Sendable {
         let id: UUID
         let projectName: String
         var progress: Double

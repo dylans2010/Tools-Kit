@@ -28,7 +28,7 @@ struct LiveTextView: View {
     }
 }
 
-struct LiveTextTool: Tool {
+struct LiveTextTool: Tool, Sendable {
     let name = "Live Text"
     let icon = "text.viewfinder"
     let category = ToolCategory.utility

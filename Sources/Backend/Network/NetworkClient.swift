@@ -1,6 +1,6 @@
 import Foundation
 
-enum NetworkMiddlewareDecision {
+enum NetworkMiddlewareDecision: Sendable {
     case allow
     case block(String)
 }
@@ -10,7 +10,7 @@ protocol NetworkMiddleware {
 }
 
 final class NetworkClient {
-    static let shared = NetworkClient()
+    nonisolated(unsafe) static let shared = NetworkClient()
 
     private var middlewares: [NetworkMiddleware] = []
     private let session: URLSession
@@ -60,7 +60,7 @@ final class NetworkClient {
     }
 }
 
-enum NetworkClientError: LocalizedError {
+enum NetworkClientError: LocalizedError, Sendable {
     case blocked(String)
     case unknown
 

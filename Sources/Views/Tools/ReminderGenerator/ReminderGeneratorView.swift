@@ -45,7 +45,7 @@ struct ReminderGeneratorView: View {
     }
 }
 
-struct ReminderGeneratorTool: Tool {
+struct ReminderGeneratorTool: Tool, Sendable {
     let name = "Reminder Generator"
     let icon = "bell.badge"
     let category = ToolCategory.utility

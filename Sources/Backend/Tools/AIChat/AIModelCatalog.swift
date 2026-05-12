@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 final class AIModelCatalog: ObservableObject {
-    static let shared = AIModelCatalog()
+    nonisolated(unsafe) static let shared = AIModelCatalog()
 
     @Published private(set) var modelsByProvider: [String: [AIModel]] = [:]
     @Published private(set) var loadingProviders: Set<String> = []

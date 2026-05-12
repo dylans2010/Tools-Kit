@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 /// Defines rules for branch protection.
-struct BranchProtectionRule: Codable, Identifiable {
+struct BranchProtectionRule: Codable, Identifiable, Sendable {
     let id: UUID
     var branchName: String
     var requireApprovals: Bool
@@ -13,7 +13,7 @@ struct BranchProtectionRule: Codable, Identifiable {
 
 /// Service for managing and enforcing branch protection rules.
 final class BranchProtectionService: ObservableObject {
-    static let shared = BranchProtectionService()
+    nonisolated(unsafe) static let shared = BranchProtectionService()
 
     @Published var rules: [UUID: [BranchProtectionRule]] = [:] // spaceID: rules
 

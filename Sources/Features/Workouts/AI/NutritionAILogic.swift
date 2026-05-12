@@ -1,7 +1,7 @@
 import Foundation
 
-struct NutritionSummaryInfo: Codable {
-    struct MacroRange: Codable {
+struct NutritionSummaryInfo: Codable, Sendable {
+    struct MacroRange: Codable, Sendable {
         let consumed: Double
         let goal: Double
         let qualityScore: Double
@@ -22,7 +22,7 @@ struct NutritionSummaryInfo: Codable {
 }
 
 final class NutritionAILogic {
-    enum InputMode: String {
+    enum InputMode: String, Sendable {
         case image
         case voice
         case text

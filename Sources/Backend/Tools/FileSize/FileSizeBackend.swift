@@ -5,7 +5,7 @@ class FileSizeBackend: ObservableObject {
     @Published var inputUnit: SizeUnit = .megabytes
     @Published var results: [String: String] = [:]
 
-    enum SizeUnit: String, CaseIterable, Identifiable {
+    enum SizeUnit: String, CaseIterable, Identifiable, Sendable {
         case bytes = "Bytes"
         case kilobytes = "KB"
         case megabytes = "MB"

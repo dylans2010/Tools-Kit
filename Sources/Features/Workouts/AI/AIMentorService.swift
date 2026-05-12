@@ -1,6 +1,6 @@
 import Foundation
 
-private struct AIMentorJSONResponse: Codable {
+private struct AIMentorJSONResponse: Codable, Sendable {
     let response: String
     let insights: [String]
     let recommendations: [String]

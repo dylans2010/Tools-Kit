@@ -1,7 +1,7 @@
 import AVFoundation
 import Foundation
 
-struct MeetPermissionService {
+struct MeetPermissionService: Sendable {
     static func availableAudioDevices() -> [String] {
         let session = AVAudioSession.sharedInstance()
         let routeNames = session.availableInputs?.compactMap(\.portName) ?? []

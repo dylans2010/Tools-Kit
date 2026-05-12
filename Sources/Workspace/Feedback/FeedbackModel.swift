@@ -1,6 +1,6 @@
 import Foundation
 
-enum FeedbackCategory: String, CaseIterable, Identifiable, Codable {
+enum FeedbackCategory: String, CaseIterable, Identifiable, Codable, Sendable {
     case bug
     case feature
     case general
@@ -16,7 +16,7 @@ enum FeedbackCategory: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-enum FeedbackStatus: String, CaseIterable, Identifiable, Codable {
+enum FeedbackStatus: String, CaseIterable, Identifiable, Codable, Sendable {
     case open
     case inProgress = "in_progress"
     case resolved
@@ -34,7 +34,7 @@ enum FeedbackStatus: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-enum FeedbackPriority: String, CaseIterable, Identifiable, Codable {
+enum FeedbackPriority: String, CaseIterable, Identifiable, Codable, Sendable {
     case low
     case medium
     case high
@@ -46,7 +46,7 @@ enum FeedbackPriority: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-struct Feedback: Identifiable {
+struct Feedback: Identifiable, Sendable {
     let id: String
     let userId: String?
     let userName: String

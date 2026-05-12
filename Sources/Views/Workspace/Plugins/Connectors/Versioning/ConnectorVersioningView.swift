@@ -13,9 +13,9 @@ struct ConnectorVersioningView: View {
     @State private var showingCompare = false
     @State private var deploymentStatus: DeploymentStatus = .deployed
 
-    enum DeploymentStatus: String, CaseIterable { case deployed = "Deployed", staging = "Staging", rollback = "Rolled Back", draft = "Draft" }
+    enum DeploymentStatus: String, CaseIterable, Sendable { case deployed = "Deployed", staging = "Staging", rollback = "Rolled Back", draft = "Draft" }
 
-    struct VersionEntry: Identifiable {
+    struct VersionEntry: Identifiable, Sendable {
         let id = UUID(); let version: String; let date: Date; let notes: String; let status: DeploymentStatus; let changes: Int
     }
 

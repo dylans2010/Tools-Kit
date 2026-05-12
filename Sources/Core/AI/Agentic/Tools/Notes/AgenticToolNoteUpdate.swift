@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolNoteUpdate: AgenticToolProtocol {
+struct AgenticToolNoteUpdate: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "note_update",
         description: "Update an existing note",

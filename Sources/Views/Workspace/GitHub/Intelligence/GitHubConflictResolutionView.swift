@@ -48,7 +48,7 @@ struct GitHubConflictResolutionView: View {
     }
 }
 
-struct ConflictBlock: Identifiable {
+struct ConflictBlock: Identifiable, Sendable {
     let id: UUID
     let currentContent: String
     let incomingContent: String

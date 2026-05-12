@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolMediaPromptGenerator: AgenticToolProtocol {
+struct AgenticToolMediaPromptGenerator: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "media_prompt_generator",
         description: "Generate image prompts using AI",

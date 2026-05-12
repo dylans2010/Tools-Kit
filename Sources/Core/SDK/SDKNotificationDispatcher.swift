@@ -67,7 +67,7 @@ public struct SDKNotification: Identifiable, Codable, Sendable {
 /// Centralized notification dispatcher for the SDK.
 @MainActor
 public final class SDKNotificationDispatcher: SDKNotificationDispatcherProtocol, ObservableObject {
-    public static let shared = SDKNotificationDispatcher()
+    nonisolated(unsafe) public static let shared = SDKNotificationDispatcher()
 
     @Published public private(set) var notifications: [SDKNotification] = []
     @Published public private(set) var unreadCount: Int = 0

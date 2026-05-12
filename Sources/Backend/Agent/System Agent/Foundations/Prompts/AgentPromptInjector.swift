@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentPromptInjector {
+struct AgentPromptInjector: Sendable {
     init() {}
 
     func inject(prompt: String, into systemPrompt: String) -> String {

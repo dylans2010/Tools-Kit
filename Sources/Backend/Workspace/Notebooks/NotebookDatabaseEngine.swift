@@ -2,23 +2,23 @@ import Foundation
 
 /// Enhanced database engine for Notebooks with relational views and computed properties.
 final class NotebookDatabaseEngine: ObservableObject {
-    static let shared = NotebookDatabaseEngine()
+    nonisolated(unsafe) static let shared = NotebookDatabaseEngine()
 
-    struct DatabaseSchema: Codable {
+    struct DatabaseSchema: Codable, Sendable {
         var columns: [Column]
 
-        struct Column: Codable, Identifiable {
+        struct Column: Codable, Identifiable, Sendable {
             let id: UUID
             var name: String
             var type: ColumnType
         }
 
-        enum ColumnType: String, Codable {
+        enum ColumnType: String, Codable, Sendable {
             case text, number, date, select, formula
         }
     }
 
-    struct DatabaseRow: Codable, Identifiable {
+    struct DatabaseRow: Codable, Identifiable, Sendable {
         let id: UUID
         var values: [UUID: String] // ColumnID -> Value
     }

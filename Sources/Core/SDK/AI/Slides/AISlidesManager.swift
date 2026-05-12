@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 final class AISlidesManager: ObservableObject {
-    static let shared = AISlidesManager()
+    nonisolated(unsafe) static let shared = AISlidesManager()
 
     @Published private(set) var isGenerating = false
     @Published private(set) var progressMessage = "Idle"
@@ -56,7 +56,7 @@ final class AISlidesManager: ObservableObject {
     }
 }
 
-public struct WorkspaceSDKAI {
+public struct WorkspaceSDKAI: Sendable {
     public let slidesScope = AISlidesScope()
     public let slidesThemeScope = AISlidesThemeScope()
 

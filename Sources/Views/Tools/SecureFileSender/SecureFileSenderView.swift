@@ -1,7 +1,7 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct SecureFileSenderTool: Tool {
+struct SecureFileSenderTool: Tool, Sendable {
     let name = "Secure File Sender"
     let icon = "arrow.up.doc.fill"
     let category = ToolCategory.privacy

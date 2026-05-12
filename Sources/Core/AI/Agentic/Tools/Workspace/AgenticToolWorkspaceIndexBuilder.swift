@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolWorkspaceIndexBuilder: AgenticToolProtocol {
+struct AgenticToolWorkspaceIndexBuilder: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "workspace_index_builder",
         description: "Build or rebuild the workspace search index",

@@ -1,17 +1,17 @@
 import Foundation
 
 class MailAIService {
-    static let shared = MailAIService()
+    nonisolated(unsafe) static let shared = MailAIService()
     private let aiService = AIService.shared
     private let settingsManager = AIChatSettingsManager.shared
     private let aiDecoder = AIResponseDecoder()
 
-    struct PriorityDigest {
+    struct PriorityDigest: Sendable {
         let summaryMarkdown: String
         let priorityThreadIDs: [String]
     }
 
-    private struct PriorityDigestResponse: Codable {
+    private struct PriorityDigestResponse: Codable, Sendable {
         let summary_markdown: String
         let priority_thread_ids: [String]
     }
@@ -162,7 +162,7 @@ class MailAIService {
         return try await aiService.processText(prompt: prompt, systemPrompt: "Return only the category name.")
     }
 
-    struct EntityExtraction: Codable {
+    struct EntityExtraction: Codable, Sendable {
         let entities: [String: String]
     }
 

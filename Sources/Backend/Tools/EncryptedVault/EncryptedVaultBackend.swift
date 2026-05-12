@@ -1,14 +1,14 @@
 import Foundation
 import Security
 
-struct VaultEntry: Identifiable, Codable {
+struct VaultEntry: Identifiable, Codable, Sendable {
     let id: String
     var label: String
     var category: VaultCategory
     let createdAt: Date
     var updatedAt: Date
 
-    enum VaultCategory: String, CaseIterable, Codable, Identifiable {
+    enum VaultCategory: String, CaseIterable, Codable, Identifiable, Sendable {
         case password = "Password"
         case token = "Token"
         case note = "Note"

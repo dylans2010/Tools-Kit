@@ -1,6 +1,6 @@
 import Foundation
 
-enum AgentTaskPriority: Int, Codable, Comparable {
+enum AgentTaskPriority: Int, Codable, Comparable, Sendable {
     case low = 0
     case medium = 1
     case high = 2

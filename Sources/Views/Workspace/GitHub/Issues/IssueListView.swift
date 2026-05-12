@@ -88,7 +88,7 @@ struct IssueListView: View {
     }
 }
 
-struct GitHubIssue: Identifiable {
+struct GitHubIssue: Identifiable, Sendable {
     let id = UUID()
     let number: Int
     let title: String
@@ -100,4 +100,4 @@ struct GitHubIssue: Identifiable {
     var commentCount: Int = 0
 }
 
-enum IssueState: String, Codable { case open, closed }
+enum IssueState: String, Codable, Sendable { case open, closed }

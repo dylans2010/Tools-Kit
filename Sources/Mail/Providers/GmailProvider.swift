@@ -131,7 +131,7 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
 
     // MARK: - API Request Helpers
 
-    private struct EmptyBody: Encodable {}
+    private struct EmptyBody: Encodable, Sendable {}
 
     private func request<T: Decodable>(url: URL, session: MailSession) async throws -> T {
         try await request(url: url, method: "GET", body: EmptyBody?.none, session: session)
@@ -319,14 +319,14 @@ final class GmailProvider: NSObject, MailProvider, ASWebAuthenticationPresentati
     }
 }
 
-private struct GmailListResponse: Decodable {
-    struct Item: Decodable {
+private struct GmailListResponse: Decodable, Sendable {
+    struct Item: Decodable, Sendable {
         let id: String
     }
     let messages: [Item]?
 }
 
-private struct GmailMessagePayload: Decodable {
+private struct GmailMessagePayload: Decodable, Sendable {
     let id: String
     let threadId: String
     let internalDate: String?
@@ -334,19 +334,19 @@ private struct GmailMessagePayload: Decodable {
     let payload: GmailMIMEPart?
 }
 
-private struct GmailMIMEPart: Decodable {
+private struct GmailMIMEPart: Decodable, Sendable {
     let mimeType: String?
     let headers: [GmailHeader]?
     let body: GmailBody?
     let parts: [GmailMIMEPart]?
 }
 
-private struct GmailHeader: Decodable {
+private struct GmailHeader: Decodable, Sendable {
     let name: String
     let value: String
 }
 
-private struct GmailBody: Decodable {
+private struct GmailBody: Decodable, Sendable {
     let data: String?
 
     var decodedData: Data? {
@@ -359,15 +359,15 @@ private struct GmailBody: Decodable {
     }
 }
 
-private struct GmailSendBody: Encodable {
+private struct GmailSendBody: Encodable, Sendable {
     let raw: String
 }
 
-private struct GmailDraftBody: Encodable {
+private struct GmailDraftBody: Encodable, Sendable {
     let message: GmailSendBody
 }
 
-private struct GmailModifyBody: Encodable {
+private struct GmailModifyBody: Encodable, Sendable {
     let addLabelIds: [String]
     let removeLabelIds: [String]
 }

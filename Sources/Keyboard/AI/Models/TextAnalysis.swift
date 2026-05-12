@@ -1,6 +1,6 @@
 import Foundation
 
-struct TextAnalysis: Codable {
+struct TextAnalysis: Codable, Sendable {
     let intent: String
     let sentiment: String
     let urgency: String

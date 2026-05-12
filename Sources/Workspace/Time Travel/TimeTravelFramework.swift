@@ -2,7 +2,7 @@ import Foundation
 
 /// Framework for global versioning and state restoration.
 final class TimeTravelFramework {
-    static let shared = TimeTravelFramework()
+    nonisolated(unsafe) static let shared = TimeTravelFramework()
 
     private let dataStore = UnifiedDataStore.shared
 
@@ -34,7 +34,7 @@ final class TimeTravelFramework {
 }
 
 final class TimeTravelManager: ObservableObject {
-    static let shared = TimeTravelManager()
+    nonisolated(unsafe) static let shared = TimeTravelManager()
     @Published var snapshots: [WorkspaceSnapshot] = []
 
     private init() {

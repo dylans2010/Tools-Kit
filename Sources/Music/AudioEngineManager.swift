@@ -4,7 +4,7 @@ import Combine
 
 // MARK: - EQ Preset
 
-struct EQPreset: Identifiable, Codable, Equatable {
+struct EQPreset: Identifiable, Codable, Equatable, Sendable {
     var id: UUID
     var name: String
     var gains: [Float] // 8 bands, dB
@@ -31,7 +31,7 @@ struct EQPreset: Identifiable, Codable, Equatable {
 
 // MARK: - Audio Output Mode
 
-enum AudioOutputMode: String, CaseIterable, Codable {
+enum AudioOutputMode: String, CaseIterable, Codable, Sendable {
     case stereo = "Stereo"
     case mono   = "Mono"
 }
@@ -39,7 +39,7 @@ enum AudioOutputMode: String, CaseIterable, Codable {
 // MARK: - AudioEngineManager
 
 final class AudioEngineManager: ObservableObject {
-    static let shared = AudioEngineManager()
+    nonisolated(unsafe) static let shared = AudioEngineManager()
 
     // MARK: Published settings
     @Published var gains: [Float] = Array(repeating: 0, count: 8)

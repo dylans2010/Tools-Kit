@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - GenSlidesScheme
 
-public struct GenSlidesScheme: Codable, Equatable {
+public struct GenSlidesScheme: Codable, Equatable, Sendable {
     public var meta: SlideMeta
     public var theme: SlideThemeSpec
     public var slides: [SchemeSlide]
@@ -16,7 +16,7 @@ public struct GenSlidesScheme: Codable, Equatable {
 
 // MARK: - Meta
 
-public struct SlideMeta: Codable, Equatable {
+public struct SlideMeta: Codable, Equatable, Sendable {
     public var title: String
     public var description: String
     public var accentColor: String
@@ -30,7 +30,7 @@ public struct SlideMeta: Codable, Equatable {
 
 // MARK: - Theme Spec
 
-public struct SlideThemeSpec: Codable, Equatable {
+public struct SlideThemeSpec: Codable, Equatable, Sendable {
     public var gradient: [String]
     public var font: String
     public var glass: Bool
@@ -46,7 +46,7 @@ public struct SlideThemeSpec: Codable, Equatable {
 
 // MARK: - Scheme Slide
 
-public struct SchemeSlide: Codable, Equatable, Identifiable {
+public struct SchemeSlide: Codable, Equatable, Identifiable, Sendable {
     public var id: UUID
     public var type: SchemeSlideType
     public var title: String
@@ -67,7 +67,7 @@ public struct SchemeSlide: Codable, Equatable, Identifiable {
         self.elements = elements
     }
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case id, type, title, layout, elements
     }
 
@@ -89,7 +89,7 @@ public struct SchemeSlide: Codable, Equatable, Identifiable {
 
 // MARK: - Slide Type
 
-public enum SchemeSlideType: String, Codable, CaseIterable {
+public enum SchemeSlideType: String, Codable, CaseIterable, Sendable {
     case title
     case bullet
     case image
@@ -100,7 +100,7 @@ public enum SchemeSlideType: String, Codable, CaseIterable {
 
 // MARK: - Slide Layout
 
-public struct SchemeSlideLayout: Codable, Equatable {
+public struct SchemeSlideLayout: Codable, Equatable, Sendable {
     public var alignment: String
     public var spacing: Double
 
@@ -112,12 +112,12 @@ public struct SchemeSlideLayout: Codable, Equatable {
 
 // MARK: - Slide Element
 
-public enum SchemeSlideElement: Codable, Equatable {
+public enum SchemeSlideElement: Codable, Equatable, Sendable {
     case text(String)
     case bullets([String])
     case image(SchemeImageRef)
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case text, bullets, image
     }
 
@@ -151,7 +151,7 @@ public enum SchemeSlideElement: Codable, Equatable {
 
 // MARK: - Image Reference
 
-public struct SchemeImageRef: Codable, Equatable {
+public struct SchemeImageRef: Codable, Equatable, Sendable {
     public var url: String
     public var query: String
 
@@ -163,7 +163,7 @@ public struct SchemeImageRef: Codable, Equatable {
 
 // MARK: - Validation Error
 
-public enum SlideValidationError: LocalizedError {
+public enum SlideValidationError: LocalizedError, Sendable {
     case insufficientSlides(count: Int)
     case emptySlide(index: Int)
     case titleTooLong(slideIndex: Int, title: String)

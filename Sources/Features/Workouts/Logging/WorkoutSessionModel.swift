@@ -1,6 +1,6 @@
 import Foundation
 
-struct ExerciseSetLog: Identifiable, Codable {
+struct ExerciseSetLog: Identifiable, Codable, Sendable {
     var id: UUID
     var setNumber: Int
     var reps: Int
@@ -14,7 +14,7 @@ struct ExerciseSetLog: Identifiable, Codable {
     }
 }
 
-struct ExerciseSessionLog: Identifiable, Codable {
+struct ExerciseSessionLog: Identifiable, Codable, Sendable {
     var id: UUID
     var exerciseName: String
     var durationMinutes: Int
@@ -32,7 +32,7 @@ struct ExerciseSessionLog: Identifiable, Codable {
     }
 }
 
-struct WorkoutSessionModel: Identifiable, Codable {
+struct WorkoutSessionModel: Identifiable, Codable, Sendable {
     var id: UUID
     var workoutTitle: String
     var startedAt: Date

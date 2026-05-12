@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolCodeSwiftUIViewGenerator: AgenticToolProtocol {
+struct AgenticToolCodeSwiftUIViewGenerator: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "code_swiftui_view_generator",
         description: "Generate a complete SwiftUI view from a description",

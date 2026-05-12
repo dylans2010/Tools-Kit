@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentRequestValidator {
+struct AgentRequestValidator: Sendable {
     func validate(_ request: AgentAPIRequest) -> [String] {
         var errors: [String] = []
         if request.model.isEmpty { errors.append("Model is required") }

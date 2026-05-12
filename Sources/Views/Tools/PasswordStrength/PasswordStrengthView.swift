@@ -105,7 +105,7 @@ struct StrengthCriteriaRow: View {
     }
 }
 
-struct PasswordStrengthTool: Tool {
+struct PasswordStrengthTool: Tool, Sendable {
     let name = "Password Strength"
     let icon = "lock.shield"
     let category = ToolCategory.utility

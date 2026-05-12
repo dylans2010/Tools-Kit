@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolTaskUpdate: AgenticToolProtocol {
+struct AgenticToolTaskUpdate: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "task_update",
         description: "Update an existing task by ID",

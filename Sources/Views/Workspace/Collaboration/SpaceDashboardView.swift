@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Space Template
 
-struct SpaceTemplate: Identifiable {
+struct SpaceTemplate: Identifiable, Sendable {
     let id = UUID()
     let name: String
     let description: String
@@ -79,7 +79,7 @@ struct SpaceDashboardView: View {
     @State private var selectedTab = SpaceTab.overview
     @State private var showingAddData = false
 
-    enum SpaceTab: String, CaseIterable {
+    enum SpaceTab: String, CaseIterable, Sendable {
         case overview = "Overview"
         case messages = "Messages"
         case files = "Files"

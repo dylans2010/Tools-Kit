@@ -11,7 +11,7 @@ public protocol SDKEventBusProtocol {
 /// Unified publish/subscribe event bus for real-time communication across SDK modules.
 /// Replaces fragmented event systems with a single, consistent bus.
 public final class SDKEventBus: SDKEventBusProtocol, ObservableObject {
-    public static let shared = SDKEventBus()
+    nonisolated(unsafe) public static let shared = SDKEventBus()
 
     @Published public private(set) var isRunning = false
     @Published public private(set) var eventHistory: [SDKBusEvent] = []
@@ -125,7 +125,7 @@ public final class SDKEventBus: SDKEventBusProtocol, ObservableObject {
 
 // MARK: - Bus Event
 
-public struct SDKBusEvent: Identifiable, Codable {
+public struct SDKBusEvent: Identifiable, Codable, Sendable {
     public let id: UUID
     public let channel: String
     public let name: String

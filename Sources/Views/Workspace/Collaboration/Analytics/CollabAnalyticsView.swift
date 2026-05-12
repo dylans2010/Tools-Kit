@@ -108,7 +108,7 @@ struct CollabAnalyticsView: View {
     }
 }
 
-private struct CollabStats {
+private struct CollabStats: Sendable {
     var activeUsers: Int = 0
     var totalEdits: Int = 0
     var totalComments: Int = 0
@@ -120,12 +120,12 @@ private struct CollabStats {
     var dailyEditCounts: [Int] = []
 }
 
-private struct Contributor: Identifiable {
+private struct Contributor: Identifiable, Sendable {
     let id = UUID()
     let name: String
     let contributions: Int
 }
 
-private enum CollabPeriod: String, CaseIterable {
+private enum CollabPeriod: String, CaseIterable, Sendable {
     case day, week, month, quarter
 }

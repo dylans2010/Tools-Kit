@@ -5,11 +5,11 @@ import UIKit
 /// Does NOT attempt audio extraction – playback is delegated to the Spotify app.
 final class SpotifyLinkService: ObservableObject {
 
-    enum SpotifyItemType {
+    enum SpotifyItemType: Sendable {
         case track, playlist, album, artist
     }
 
-    struct SpotifyItem {
+    struct SpotifyItem: Sendable {
         let type: SpotifyItemType
         let id: String
         let displayTitle: String

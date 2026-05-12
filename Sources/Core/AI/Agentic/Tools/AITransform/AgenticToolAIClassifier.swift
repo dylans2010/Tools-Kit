@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolAIClassifier: AgenticToolProtocol {
+struct AgenticToolAIClassifier: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "ai_classifier",
         description: "Classify text into categories",

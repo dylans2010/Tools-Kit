@@ -1,7 +1,7 @@
 import Foundation
 
 public final class SDKWorkspaceGraphEngine {
-    public static let shared = SDKWorkspaceGraphEngine()
+    nonisolated(unsafe) public static let shared = SDKWorkspaceGraphEngine()
 
     private let persistenceURL: URL
     private var nodes: [SDKNode] = []
@@ -68,12 +68,12 @@ public final class SDKWorkspaceGraphEngine {
     }
 
     private func persistGraph() {
-        struct GraphData: Codable {
+        struct GraphData: Codable, Sendable {
             let nodes: [NodeData]
             let edges: [EdgeData]
 
-            struct NodeData: Codable { let id: UUID; let label: String; let type: String }
-            struct EdgeData: Codable { let source: UUID; let target: UUID; let label: String }
+            struct NodeData: Codable, Sendable { let id: UUID; let label: String; let type: String }
+            struct EdgeData: Codable, Sendable { let source: UUID; let target: UUID; let label: String }
         }
 
         let data = GraphData(
@@ -87,12 +87,12 @@ public final class SDKWorkspaceGraphEngine {
     }
 
     private func loadGraph() {
-        struct GraphData: Codable {
+        struct GraphData: Codable, Sendable {
             let nodes: [NodeData]
             let edges: [EdgeData]
 
-            struct NodeData: Codable { let id: UUID; let label: String; let type: String }
-            struct EdgeData: Codable { let source: UUID; let target: UUID; let label: String }
+            struct NodeData: Codable, Sendable { let id: UUID; let label: String; let type: String }
+            struct EdgeData: Codable, Sendable { let source: UUID; let target: UUID; let label: String }
         }
 
         guard let data = try? Data(contentsOf: persistenceURL),
@@ -103,18 +103,18 @@ public final class SDKWorkspaceGraphEngine {
     }
 }
 
-public struct SDKGraph {
+public struct SDKGraph: Sendable {
     public let nodes: [SDKNode]
     public let edges: [SDKEdge]
 }
 
-public struct SDKNode: Identifiable {
+public struct SDKNode: Identifiable, Sendable {
     public let id: UUID
     public let label: String
     public let type: String
 }
 
-public struct SDKEdge: Identifiable {
+public struct SDKEdge: Identifiable, Sendable {
     public let id = UUID()
     public let source: UUID
     public let target: UUID

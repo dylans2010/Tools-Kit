@@ -10,7 +10,7 @@ struct SDKDeploymentView: View {
     @State private var deployedPlugin: PluginDefinition?
     @State private var errorMessage: String?
 
-    enum DeploymentTarget: String, CaseIterable {
+    enum DeploymentTarget: String, CaseIterable, Sendable {
         case plugin = "Plugin", connector = "Connector"
     }
 

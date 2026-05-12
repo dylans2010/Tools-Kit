@@ -72,7 +72,7 @@ class SongGetAudio {
     }
 }
 
-enum SongGetAudioError: LocalizedError {
+enum SongGetAudioError: LocalizedError, Sendable {
     case invalidURL(String)
     case noLink(String)
 
@@ -84,7 +84,7 @@ enum SongGetAudioError: LocalizedError {
     }
 }
 
-struct AudioResponse: Decodable {
+struct AudioResponse: Decodable, Sendable {
     let link: String?
     let status: String?
     let msg: String?

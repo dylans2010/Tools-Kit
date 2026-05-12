@@ -2,7 +2,7 @@ import Foundation
 import CoreGraphics
 
 /// Hierarchical scene graph node for slides, enabling nested layers and transformations.
-struct SlideNode: Codable, Identifiable, Equatable {
+struct SlideNode: Codable, Identifiable, Equatable, Sendable {
     var id: UUID = UUID()
     var name: String = "Layer"
     var kind: NodeKind
@@ -20,7 +20,7 @@ struct SlideNode: Codable, Identifiable, Equatable {
     var backgroundColorHex: String?
     var assetID: UUID?
 
-    enum NodeKind: String, Codable {
+    enum NodeKind: String, Codable, Sendable {
         case group, text, shape, image, componentInstance
     }
 }

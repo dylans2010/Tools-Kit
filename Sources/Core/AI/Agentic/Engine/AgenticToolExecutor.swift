@@ -8,7 +8,7 @@ protocol AgenticToolProtocol {
 
 @MainActor
 final class AgenticToolExecutor: ObservableObject {
-    static let shared = AgenticToolExecutor()
+    nonisolated(unsafe) static let shared = AgenticToolExecutor()
 
     private var toolImplementations: [String: AgenticToolProtocol] = [:]
     private let registry = WorkspaceAITools.shared
@@ -152,7 +152,7 @@ final class AgenticToolExecutor: ObservableObject {
 
 // MARK: - Errors
 
-enum AgenticToolExecutionError: LocalizedError {
+enum AgenticToolExecutionError: LocalizedError, Sendable {
     case unknownTool(String)
     case noImplementation(String)
     case missingParameter(String, String)

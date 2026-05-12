@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolSlidesInsertMedia: AgenticToolProtocol {
+struct AgenticToolSlidesInsertMedia: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "slides_insert_media",
         description: "Insert media into a slide",

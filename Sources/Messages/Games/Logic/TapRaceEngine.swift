@@ -1,6 +1,6 @@
 import Foundation
 
-struct TapRaceEngine: GameProtocol {
+struct TapRaceEngine: GameProtocol, Sendable {
     typealias StateType = TapRaceState
     var state: TapRaceState
 

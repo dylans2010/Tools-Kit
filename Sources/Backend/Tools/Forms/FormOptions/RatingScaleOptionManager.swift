@@ -1,6 +1,6 @@
 import Foundation
 
-struct RatingScaleOptionManager: FormOptionManager {
+struct RatingScaleOptionManager: FormOptionManager, Sendable {
     let type: FormQuestionType = .ratingScale
     func defaultQuestion() -> FormQuestion {
         FormQuestion(title: "Rate your experience", type: .ratingScale, options: [], required: false)

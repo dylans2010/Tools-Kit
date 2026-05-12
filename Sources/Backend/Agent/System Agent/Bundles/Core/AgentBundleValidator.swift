@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentBundleValidator {
+struct AgentBundleValidator: Sendable {
     init() {}
 
     func validate(bundle: AgentBundle) -> Bool {

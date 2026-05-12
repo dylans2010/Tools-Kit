@@ -18,7 +18,7 @@ public protocol SDKPluginRegistryProtocol: AnyObject {
 /// Centralized registry for all SDK plugins with lifecycle management.
 @MainActor
 public final class SDKPluginRegistry: SDKPluginRegistryProtocol, ObservableObject {
-    public static let shared = SDKPluginRegistry()
+    nonisolated(unsafe) public static let shared = SDKPluginRegistry()
 
     @Published public private(set) var registeredPlugins: [SDKPluginInfo] = []
     @Published public private(set) var activePluginCount: Int = 0
