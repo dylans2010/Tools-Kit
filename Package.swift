@@ -1,11 +1,11 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.3
 import PackageDescription
 
 let package = Package(
     name: "ToolsKit",
     platforms: [
-        .iOS(.v17),
-        .macOS(.v12)
+        .iOS(.v26),
+        .macOS(.v26)
     ],
     dependencies: [
         .package(url: "https://github.com/MailCore/mailcore2", branch: "master"),
