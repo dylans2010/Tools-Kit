@@ -56,7 +56,7 @@ struct SiriCoreUIView: View {
             List {
                 Section("State & Style") {
                     Picker("Current State", selection: $state) {
-                        ForEach(ViewState.allCases) { state in
+                        ForEach(ViewState.allCases, id: \.self) { state in
                             Text(state.rawValue).tag(state)
                         }
                     }
