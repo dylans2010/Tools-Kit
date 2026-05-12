@@ -2,7 +2,7 @@
 import Security
 import CommonCrypto
 
-struct TLSCertificateInfo {
+struct TLSCertificateInfo: Sendable {
     var subject: String = ""
     var issuer: String = ""
     var validFrom: Date?
@@ -18,7 +18,7 @@ struct TLSCertificateInfo {
         return .valid
     }
 
-    enum ExpiryStatus { case valid, expiringSoon, expired }
+    enum ExpiryStatus: Sendable { case valid, expiringSoon, expired }
 }
 
 @MainActor
@@ -137,15 +137,15 @@ private final class TLSCaptureDelegate: NSObject, URLSessionDelegate, @unchecked
     }
 }
 
-private struct ParsedCertificateFields {
+private struct ParsedCertificateFields: Sendable {
     let issuer: String
     let validFrom: Date?
     let validTo: Date?
     let serialNumber: String
 }
 
-private enum CertificateFieldParser {
-    private struct Element {
+private enum CertificateFieldParser: Sendable {
+    private struct Element: Sendable {
         let tag: UInt8
         let valueRange: Range<Int>
         let nextOffset: Int

@@ -2,15 +2,15 @@ import SwiftUI
 
 /// Layout intelligence engine for Slides, automatically optimizing element arrangement.
 final class AILayoutEngine: ObservableObject {
-    static let shared = AILayoutEngine()
+    nonisolated(unsafe) static let shared = AILayoutEngine()
 
-    struct LayoutRule: Codable {
+    struct LayoutRule: Codable, Sendable {
         var minSpacing: Double
         var alignment: AlignmentMode
         var proportionalScaling: Bool
     }
 
-    enum AlignmentMode: String, Codable {
+    enum AlignmentMode: String, Codable, Sendable {
         case edge, center, goldenRatio
     }
 

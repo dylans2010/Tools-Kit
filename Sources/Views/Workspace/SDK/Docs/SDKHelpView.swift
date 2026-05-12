@@ -8,16 +8,16 @@ struct SDKHelpView: View {
     @State private var showingTopicPicker = false
     @State private var activeTask: Task<Void, Never>?
 
-    struct HelpMessage: Identifiable {
+    struct HelpMessage: Identifiable, Sendable {
         let id = UUID()
         let role: Role
         let content: String
         let timestamp: Date
 
-        enum Role: String { case user, assistant }
+        enum Role: String, Sendable { case user, assistant }
     }
 
-    enum QuickTopic: String, CaseIterable, Identifiable {
+    enum QuickTopic: String, CaseIterable, Identifiable, Sendable {
         case modules = "SDK Modules"
         case plugins = "Plugin System"
         case connectors = "Connectors"

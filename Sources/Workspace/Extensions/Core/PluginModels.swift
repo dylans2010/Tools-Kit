@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Plugin Definition
 
-struct PluginDefinition: Codable, Identifiable {
+struct PluginDefinition: Codable, Identifiable, Sendable {
     let id: UUID
     var name: String
     var description: String
@@ -41,14 +41,14 @@ struct PluginDefinition: Codable, Identifiable {
     }
 }
 
-struct PluginChangeLogEntry: Codable, Identifiable {
+struct PluginChangeLogEntry: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     let version: String
     let date: Date
     let notes: String
 }
 
-struct PluginCapabilityPermission: Codable, Identifiable {
+struct PluginCapabilityPermission: Codable, Identifiable, Sendable {
     var id: String { capability.technicalKey }
     let capability: PluginCapability
 
@@ -58,17 +58,17 @@ struct PluginCapabilityPermission: Codable, Identifiable {
     var accessLevel: AccessLevel { capability.accessLevel }
 }
 
-enum RiskLevel: String, Codable {
+enum RiskLevel: String, Codable, Sendable {
     case low, medium, high, critical
 }
 
-enum AccessLevel: String, Codable {
+enum AccessLevel: String, Codable, Sendable {
     case read, write, full, selective
 }
 
 // MARK: - Capabilities & Actions
 
-enum PluginCapability: String, Codable, CaseIterable, Identifiable {
+enum PluginCapability: String, Codable, CaseIterable, Identifiable, Sendable {
     // Legacy / Core
     case notes, tasks, mail, calendar, files, whiteboard, slides, media, meet, github, automation, intelligence, collaboration, ai
 
@@ -290,7 +290,7 @@ enum PluginCapability: String, Codable, CaseIterable, Identifiable {
     }
 }
 
-enum PluginAction: String, Codable, CaseIterable, Identifiable {
+enum PluginAction: String, Codable, CaseIterable, Identifiable, Sendable {
     // Notes
     case noteCreated = "note.created"
     case noteUpdated = "note.updated"
@@ -349,7 +349,7 @@ enum PluginAction: String, Codable, CaseIterable, Identifiable {
 
 // MARK: - Event Models
 
-struct PluginEvent: Codable, Identifiable {
+struct PluginEvent: Codable, Identifiable, Sendable {
     let id: UUID
     let capability: PluginCapability
     let action: String
@@ -363,7 +363,7 @@ struct PluginEvent: Codable, Identifiable {
 
 // MARK: - Advanced Models
 
-struct ExternalAPIEndpoint: Codable, Identifiable {
+struct ExternalAPIEndpoint: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var name: String
     var baseURL: String
@@ -381,38 +381,38 @@ struct ExternalAPIEndpoint: Codable, Identifiable {
     var encryptedHeaders: [String] = [] // List of header keys that are encrypted
 }
 
-enum HTTPMethod: String, Codable, CaseIterable {
+enum HTTPMethod: String, Codable, CaseIterable, Sendable {
     case get = "GET", post = "POST", put = "PUT", delete = "DELETE"
 }
 
-enum AuthType: String, Codable, CaseIterable {
+enum AuthType: String, Codable, CaseIterable, Sendable {
     case none, apiKey, bearer, oauth
 }
 
-struct RetryPolicy: Codable {
+struct RetryPolicy: Codable, Sendable {
     var maxRetries: Int = 3
     var backoff: Double = 1.5
 }
 
-struct DataMapping: Codable, Identifiable {
+struct DataMapping: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var sourceField: String // e.g. "event.note.content"
     var targetField: String // e.g. "payload.body.text"
     var transformer: String? // JS transformation logic
 }
 
-struct ExecutionRule: Codable, Identifiable {
+struct ExecutionRule: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var type: RuleType
     var condition: String // JS condition
     var limit: Int?
 }
 
-enum RuleType: String, Codable, CaseIterable {
+enum RuleType: String, Codable, CaseIterable, Sendable {
     case eventFilter, timeConstraint, frequencyLimit, conditionalLogic
 }
 
-struct UIExtension: Codable, Identifiable {
+struct UIExtension: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var type: UIExtensionType
     var component: UIComponentType
@@ -420,40 +420,40 @@ struct UIExtension: Codable, Identifiable {
     var actionBinding: String // JS function name
 }
 
-enum UIExtensionType: String, Codable, CaseIterable {
+enum UIExtensionType: String, Codable, CaseIterable, Sendable {
     case overlay, panel, commandBar, contextMenu
 }
 
-enum UIComponentType: String, Codable, CaseIterable {
+enum UIComponentType: String, Codable, CaseIterable, Sendable {
     case button, panel, modal, textInput, statusIndicator
 }
 
-struct PluginToolkitTool: Codable, Identifiable {
+struct PluginToolkitTool: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var name: String
     var category: PluginToolCategory
     var config: [String: String]
 }
 
-enum PluginToolCategory: String, Codable, CaseIterable {
+enum PluginToolCategory: String, Codable, CaseIterable, Sendable {
     case ai, data, automation, integrations, workspace, developer, security, event
 }
 
 // MARK: - Legacy Models
 
-struct PluginScope: Codable, Equatable {
+struct PluginScope: Codable, Equatable, Sendable {
     let capability: PluginCapability
     let action: String
     var isValidated: Bool = false
 }
 
-enum PluginPrerequisite: String, Codable, CaseIterable {
+enum PluginPrerequisite: String, Codable, CaseIterable, Sendable {
     case notes, repo, mail, ai, automation, calendar
 }
 
 // MARK: - Security Helpers
 
-struct PluginSecurityService {
+struct PluginSecurityService: Sendable {
     static func encryptHeader(_ value: String) -> String {
         // Simulated encryption: base64 + prefix
         return "SECURE:" + Data(value.utf8).base64EncodedString()

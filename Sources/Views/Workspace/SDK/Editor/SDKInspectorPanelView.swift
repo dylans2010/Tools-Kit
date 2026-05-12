@@ -8,7 +8,7 @@ struct SDKInspectorPanelView: View {
     @State private var jsonDraft = "{}"
     @State private var jsonError: String?
 
-    enum InspectorMode: String, CaseIterable {
+    enum InspectorMode: String, CaseIterable, Sendable {
         case form = "Details", json = "JSON"
     }
 

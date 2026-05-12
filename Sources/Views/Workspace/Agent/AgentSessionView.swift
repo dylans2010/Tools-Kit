@@ -322,7 +322,7 @@ struct AgentSessionView: View {
 
 @MainActor
 final class AgentSessionViewModel: ObservableObject {
-    enum UIStatus {
+    enum UIStatus: Sendable {
         case pending
         case running
         case completed

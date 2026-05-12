@@ -2,7 +2,7 @@ import Foundation
 import Combine
 import UserNotifications
 
-public struct SDKAutomationRule: Identifiable, Codable {
+public struct SDKAutomationRule: Identifiable, Codable, Sendable {
     public var id: UUID
     public var name: String
     public var trigger: AutomationTrigger
@@ -13,18 +13,18 @@ public struct SDKAutomationRule: Identifiable, Codable {
     public var runCount: Int
 }
 
-public enum AutomationTrigger: Codable {
+public enum AutomationTrigger: Codable, Sendable {
     case dataUpdated(scope: String)
     case connectorEvent(connectorID: UUID, eventName: String)
     case timeBased(interval: TimeInterval)
 }
 
-public enum AutomationCondition: Codable {
+public enum AutomationCondition: Codable, Sendable {
     case fieldEquals(key: String, value: String)
     case countExceeds(count: Int)
 }
 
-public enum AutomationAction: Codable {
+public enum AutomationAction: Codable, Sendable {
     case runTool(toolID: UUID, input: [String: String])
     case syncConnector(connectorID: UUID)
     case sendNotification(title: String, body: String)
@@ -33,7 +33,7 @@ public enum AutomationAction: Codable {
 
 @MainActor
 public final class SDKAutomationEngine: ObservableObject {
-    public static let shared = SDKAutomationEngine()
+    nonisolated(unsafe) public static let shared = SDKAutomationEngine()
 
     @Published public var rules: [SDKAutomationRule] = []
 

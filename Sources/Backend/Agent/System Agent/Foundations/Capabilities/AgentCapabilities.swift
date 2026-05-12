@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentCapabilities: Codable, Equatable {
+struct AgentCapabilities: Codable, Equatable, Sendable {
     var canUseTools: Bool
     var canProcessVision: Bool
     var canGenerateCode: Bool

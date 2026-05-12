@@ -1,7 +1,7 @@
 import Foundation
 
-struct AIAuthorization {
-    enum Mode {
+struct AIAuthorization: Sendable {
+    enum Mode: Sendable {
         case appModel
         case ownKey
     }
@@ -10,7 +10,7 @@ struct AIAuthorization {
     let mode: Mode
 }
 
-enum AIFeatureCheckError: LocalizedError {
+enum AIFeatureCheckError: LocalizedError, Sendable {
     case dailyLimitReached(limit: Int)
     case missingOwnAPIKey
     case missingProductionAPIKey
@@ -29,7 +29,7 @@ enum AIFeatureCheckError: LocalizedError {
 
 @MainActor
 final class AIFeatureCheck: ObservableObject {
-    static let shared = AIFeatureCheck()
+    nonisolated(unsafe) static let shared = AIFeatureCheck()
 
     @Published private(set) var requestsToday: Int = 0
 

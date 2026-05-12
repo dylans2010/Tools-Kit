@@ -9,7 +9,7 @@ import Foundation
 /// @ServiceInjected var eventBus: SDKEventBusProtocol
 /// ```
 @propertyWrapper
-public struct ServiceInjected<T> {
+public struct ServiceInjected<T>: @unchecked Sendable {
     private var service: T?
 
     public init() {}

@@ -1,6 +1,6 @@
 import Foundation
 
-enum NoteFormatStyle: String, CaseIterable {
+enum NoteFormatStyle: String, CaseIterable, Sendable {
     case bulletPoints = "• Bullet Points"
     case numberedList = "1. Numbered List"
     case dashedList = "- Dashed List"

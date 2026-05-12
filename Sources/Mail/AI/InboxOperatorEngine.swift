@@ -2,7 +2,7 @@ import Foundation
 
 /// Autonomous engine for inbox triage, cleanup, and batch execution with constraints.
 actor InboxOperatorEngine {
-    static let shared = InboxOperatorEngine()
+    nonisolated(unsafe) static let shared = InboxOperatorEngine()
     private let aiService = AIService.shared
     private let mailAIService = MailAIService.shared
 
@@ -38,10 +38,10 @@ actor InboxOperatorEngine {
         }
     }
 
-    struct BatchAction: Codable {
+    struct BatchAction: Codable, Sendable {
         let threadID: String
         let type: ActionType
-        enum ActionType: String, Codable {
+        enum ActionType: String, Codable, Sendable {
             case archive, star, label, delete, markRead
         }
     }

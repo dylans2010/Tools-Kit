@@ -263,17 +263,17 @@ class GmailMailProvider: MailProviderProtocol {
 
 }
 
-private struct GmailListResponse: Decodable {
+private struct GmailListResponse: Decodable, Sendable {
     let messages: [GmailMessageRef]?
     let nextPageToken: String?
 }
 
-private struct GmailMessageRef: Decodable {
+private struct GmailMessageRef: Decodable, Sendable {
     let id: String
     let threadId: String
 }
 
-private struct GmailMessageResponse: Decodable {
+private struct GmailMessageResponse: Decodable, Sendable {
     let id: String
     let threadId: String
     let labelIds: [String]?
@@ -282,7 +282,7 @@ private struct GmailMessageResponse: Decodable {
     let payload: GmailPayload?
 }
 
-private struct GmailPayload: Decodable {
+private struct GmailPayload: Decodable, Sendable {
     let mimeType: String?
     let body: GmailBody?
     let headers: [GmailHeader]?
@@ -309,12 +309,12 @@ private struct GmailPayload: Decodable {
     }
 }
 
-private struct GmailHeader: Decodable {
+private struct GmailHeader: Decodable, Sendable {
     let name: String
     let value: String
 }
 
-private struct GmailBody: Decodable {
+private struct GmailBody: Decodable, Sendable {
     let size: Int?
     let data: String?
 
@@ -333,11 +333,11 @@ private struct GmailBody: Decodable {
     }
 }
 
-private struct EmptyResponse: Decodable {
+private struct EmptyResponse: Decodable, Sendable {
     init() {}
 }
 
-private struct AnyEncodable: Encodable {
+private struct AnyEncodable: Encodable, @unchecked Sendable {
     private let encodeClosure: (Encoder) throws -> Void
 
     init(_ wrapped: Encodable) {

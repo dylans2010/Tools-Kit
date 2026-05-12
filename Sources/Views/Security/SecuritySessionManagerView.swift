@@ -57,7 +57,7 @@ struct SecuritySessionManagerView: View {
     }
 }
 
-struct SecuritySession: Identifiable {
+struct SecuritySession: Identifiable, Sendable {
     let id: UUID
     let deviceName: String
     let location: String

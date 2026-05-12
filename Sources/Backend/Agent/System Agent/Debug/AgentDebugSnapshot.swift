@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentDebugSnapshot: Codable {
+struct AgentDebugSnapshot: Codable, Sendable {
     let id: UUID
     let timestamp: Date
     let state: SystemAgentState
@@ -25,7 +25,7 @@ struct AgentDebugSnapshot: Codable {
         self.frameworkPhase = frameworkPhase
     }
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case id
         case timestamp
         case stateDescriptor

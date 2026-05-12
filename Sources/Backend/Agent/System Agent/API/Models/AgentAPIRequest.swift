@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentAPIRequest: Codable, Identifiable {
+struct AgentAPIRequest: Codable, Identifiable, Sendable {
     let id: UUID
     let model: String
     let messages: [AgentAPIMessage]

@@ -1,6 +1,6 @@
 import Foundation
 
-enum DiffElement: Equatable {
+enum DiffElement: Equatable, Sendable {
     case common(String)
     case added(String)
     case removed(String)

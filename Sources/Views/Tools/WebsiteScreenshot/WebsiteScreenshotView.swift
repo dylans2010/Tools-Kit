@@ -69,7 +69,7 @@ struct WebsiteScreenshotView: View {
     }
 }
 
-struct WebsiteScreenshotTool: Tool {
+struct WebsiteScreenshotTool: Tool, Sendable {
     let name = "Website Screenshot"
     let icon = "web.viewfinder"
     let category = ToolCategory.utility

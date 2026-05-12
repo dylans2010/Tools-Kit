@@ -2,7 +2,7 @@ import Foundation
 
 /// Manages synchronization of data between local storage and remote services.
 final class SyncManager {
-    static let shared = SyncManager()
+    nonisolated(unsafe) static let shared = SyncManager()
 
     private let dataStore = UnifiedDataStore.shared
     private let apiClient = APIClient.shared

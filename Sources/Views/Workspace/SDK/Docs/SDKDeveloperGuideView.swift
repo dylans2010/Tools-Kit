@@ -4,7 +4,7 @@ struct SDKDeveloperGuideView: View {
     @State private var selectedCategory: GuideCategory = .tableOfContents
     @State private var searchText = ""
 
-    enum GuideCategory: String, CaseIterable, Identifiable {
+    enum GuideCategory: String, CaseIterable, Identifiable, Sendable {
         case tableOfContents = "Table of Contents"
         case introduction = "Introduction"
         case kernelLifecycle = "Kernel & Lifecycle"
@@ -347,7 +347,7 @@ private struct PluginArchitectureSection: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Defining Plugin Capabilities").font(.caption.bold())
                 Text("""
-                struct SDKPluginCapability {
+                struct SDKPluginCapability: Sendable {
                     var name: String
                     var description: String
                     var requiredPermissions: [PluginPermission]
@@ -541,7 +541,7 @@ private struct EventSystemSection: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Event Payload").font(.caption.bold())
                 Text("""
-                struct SDKBusEvent: Identifiable, Codable {
+                struct SDKBusEvent: Identifiable, Codable, Sendable {
                     let id: UUID
                     let channel: String
                     let name: String

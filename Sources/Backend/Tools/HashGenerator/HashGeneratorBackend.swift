@@ -1,7 +1,7 @@
 import Foundation
 import CryptoKit
 
-enum HashAlgorithm: String, CaseIterable, Identifiable {
+enum HashAlgorithm: String, CaseIterable, Identifiable, Sendable {
     case md5 = "MD5"
     case sha1 = "SHA-1"
     case sha256 = "SHA-256"

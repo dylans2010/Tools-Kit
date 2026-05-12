@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class AISlidesTemplateManager: ObservableObject {
-    public static let shared = AISlidesTemplateManager()
+    nonisolated(unsafe) public static let shared = AISlidesTemplateManager()
 
     @Published public private(set) var templates: [SlideTemplate] = []
     @Published public private(set) var categories: [TemplateCategory] = TemplateCategory.allCases
@@ -170,7 +170,7 @@ public final class AISlidesTemplateManager: ObservableObject {
 
 // MARK: - Models
 
-public struct SlideTemplate: Identifiable {
+public struct SlideTemplate: Identifiable, Sendable {
     public let id: UUID
     public var name: String
     public var description: String
@@ -190,7 +190,7 @@ public struct SlideTemplate: Identifiable {
     }
 }
 
-public struct TemplateSlideLayout: Identifiable, Codable {
+public struct TemplateSlideLayout: Identifiable, Codable, Sendable {
     public let id: UUID
     public let name: String
     public let defaultTitle: String

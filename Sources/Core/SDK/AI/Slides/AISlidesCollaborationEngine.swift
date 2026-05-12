@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class AISlidesCollaborationEngine: ObservableObject {
-    public static let shared = AISlidesCollaborationEngine()
+    nonisolated(unsafe) public static let shared = AISlidesCollaborationEngine()
 
     @Published public private(set) var activeSessions: [SlideCollabSession] = []
     @Published public private(set) var connectedPeers: [CollabPeer] = []
@@ -112,7 +112,7 @@ public final class AISlidesCollaborationEngine: ObservableObject {
 
 // MARK: - Models
 
-public struct SlideCollabSession: Identifiable {
+public struct SlideCollabSession: Identifiable, Sendable {
     public let id: UUID
     public let deckID: UUID
     public let hostName: String
@@ -128,7 +128,7 @@ public struct SlideCollabSession: Identifiable {
     }
 }
 
-public struct CollabPeer: Identifiable {
+public struct CollabPeer: Identifiable, Sendable {
     public let id: UUID
     public let name: String
     public var cursorSlideIndex: Int
@@ -149,7 +149,7 @@ public struct CursorPosition: Codable, Sendable {
     public let y: Double
 }
 
-public struct CollabOperation: Identifiable {
+public struct CollabOperation: Identifiable, Sendable {
     public let id: UUID
     public let peerID: UUID
     public let type: CollabOperationType
@@ -171,7 +171,7 @@ public enum CollabOperationType: String, Codable, Sendable {
     case insertSlide, deleteSlide, editContent, reorderSlide, changeTheme, addNote
 }
 
-public struct SlideConflict: Identifiable {
+public struct SlideConflict: Identifiable, Sendable {
     public let id: UUID
     public let localOperation: CollabOperation
     public let incomingOperation: CollabOperation
@@ -185,6 +185,6 @@ public struct SlideConflict: Identifiable {
     }
 }
 
-public enum ConflictResolution {
+public enum ConflictResolution: Sendable {
     case acceptIncoming, keepLocal, merge
 }

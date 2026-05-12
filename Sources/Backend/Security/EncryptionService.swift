@@ -2,7 +2,7 @@ import Foundation
 import CryptoKit
 
 class EncryptionService {
-    static let shared = EncryptionService()
+    nonisolated(unsafe) static let shared = EncryptionService()
 
     private let saltKey = "com.toolskit.security.salt"
     private let iterations = 100_000
@@ -83,7 +83,7 @@ class EncryptionService {
     }
 }
 
-enum SecurityError: Error, LocalizedError {
+enum SecurityError: Error, LocalizedError, Sendable {
     case encodingFailed
     case decodingFailed
     case invalidBase64

@@ -6,7 +6,7 @@ struct HabitAnalyticsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selectedRange: AnalyticsRange = .week
 
-    enum AnalyticsRange: String, CaseIterable {
+    enum AnalyticsRange: String, CaseIterable, Sendable {
         case week = "7 Days"
         case month = "30 Days"
     }
@@ -153,7 +153,7 @@ struct HabitAnalyticsView: View {
         .padding(.horizontal)
     }
 
-    private struct TrendEntry {
+    private struct TrendEntry: Sendable {
         let date: Date
         let label: String
         let rate: Double

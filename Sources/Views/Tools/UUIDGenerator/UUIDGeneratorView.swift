@@ -35,7 +35,7 @@ struct UUIDGeneratorView: View {
     }
 }
 
-struct UUIDGeneratorTool: Tool {
+struct UUIDGeneratorTool: Tool, Sendable {
     let name = "UUID Generator"
     let icon = "barcode"
     let category = ToolCategory.development

@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKGraphInterface: ObservableObject {
-    public static let shared = SDKGraphInterface()
+    nonisolated(unsafe) public static let shared = SDKGraphInterface()
 
     @Published public var graph = SDKGraph(nodes: [], edges: [])
 
@@ -138,18 +138,18 @@ public final class SDKGraphInterface: ObservableObject {
 
 // MARK: - Codable Graph Types
 
-private struct CodableGraph: Codable {
+private struct CodableGraph: Codable, Sendable {
     let nodes: [CodableNode]
     let edges: [CodableEdge]
 }
 
-private struct CodableNode: Codable {
+private struct CodableNode: Codable, Sendable {
     let id: UUID
     let label: String
     let type: String
 }
 
-private struct CodableEdge: Codable {
+private struct CodableEdge: Codable, Sendable {
     let id: UUID
     let source: UUID
     let target: UUID

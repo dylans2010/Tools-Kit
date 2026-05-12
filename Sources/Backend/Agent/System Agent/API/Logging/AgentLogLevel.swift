@@ -1,3 +1,3 @@
 import Foundation
 
-enum AgentLogLevel: String, Codable, CaseIterable { case debug, info, warning, error, success }
+enum AgentLogLevel: String, Codable, CaseIterable, Sendable { case debug, info, warning, error, success }

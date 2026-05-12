@@ -1,6 +1,6 @@
 import Foundation
 
-struct Playlist: Identifiable, Codable, Equatable {
+struct Playlist: Identifiable, Codable, Equatable, Sendable {
     var id: UUID
     var name: String
     var songIDs: [UUID]
@@ -12,7 +12,7 @@ struct Playlist: Identifiable, Codable, Equatable {
     var folderURL: URL? = nil
 
     // Exclude folderURL from Codable serialisation.
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case id, name, songIDs, dateCreated, artworkSongID, customArtworkData
     }
 

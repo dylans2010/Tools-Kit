@@ -1,19 +1,19 @@
 import Foundation
 
-struct NutritionAIInput {
+struct NutritionAIInput: Sendable {
     let rawText: String
     let sourceType: MealSourceType
     let imageData: Data?
     let voiceTranscript: String?
 }
 
-struct MealAnalysisResult {
+struct MealAnalysisResult: Sendable {
     let record: MealRecord
     let rawJSON: String
 }
 
-struct NutritionInsightsModel: Codable {
-    struct Totals: Codable {
+struct NutritionInsightsModel: Codable, Sendable {
+    struct Totals: Codable, Sendable {
         let calories: Int
         let protein: Int
         let carbs: Int
@@ -26,14 +26,14 @@ struct NutritionInsightsModel: Codable {
     let recommendations: [String]
 }
 
-private struct NutritionAIResponse: Codable {
-    struct MacroBlock: Codable {
+private struct NutritionAIResponse: Codable, Sendable {
+    struct MacroBlock: Codable, Sendable {
         let protein: Double
         let carbs: Double
         let fats: Double
     }
 
-    struct Food: Codable, Identifiable {
+    struct Food: Codable, Identifiable, Sendable {
         let id: UUID
         let name: String
         let portion: String

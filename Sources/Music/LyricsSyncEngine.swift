@@ -3,7 +3,7 @@ import Combine
 import SwiftUI
 
 final class LyricsSyncEngine: ObservableObject {
-    static let shared = LyricsSyncEngine()
+    nonisolated(unsafe) static let shared = LyricsSyncEngine()
 
     @Published var lines: [LyricLine] = []
     @Published var currentIndex: Int = -1

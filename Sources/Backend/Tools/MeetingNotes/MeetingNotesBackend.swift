@@ -1,6 +1,6 @@
 import Foundation
 
-enum MeetingType: String, CaseIterable {
+enum MeetingType: String, CaseIterable, Sendable {
     case standup = "Standup"
     case brainstorming = "Brainstorming"
     case clientCall = "Client Call"

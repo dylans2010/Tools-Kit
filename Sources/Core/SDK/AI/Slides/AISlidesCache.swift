@@ -1,7 +1,7 @@
 import Foundation
 
 actor AISlidesCache {
-    static let shared = AISlidesCache()
+    nonisolated(unsafe) static let shared = AISlidesCache()
 
     private var textCache: [String: String] = [:]
     private var imageCache: [String: URL] = [:]

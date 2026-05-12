@@ -1,6 +1,6 @@
 import Foundation
 
-enum DoHProvider: String, CaseIterable, Identifiable {
+enum DoHProvider: String, CaseIterable, Identifiable, Sendable {
     case cloudflare = "Cloudflare"
     case google = "Google"
 
@@ -14,7 +14,7 @@ enum DoHProvider: String, CaseIterable, Identifiable {
     }
 }
 
-enum DoHRecordType: String, CaseIterable, Identifiable {
+enum DoHRecordType: String, CaseIterable, Identifiable, Sendable {
     case a = "A"
     case aaaa = "AAAA"
     case mx = "MX"
@@ -38,7 +38,7 @@ enum DoHRecordType: String, CaseIterable, Identifiable {
     }
 }
 
-struct DoHRecord: Identifiable {
+struct DoHRecord: Identifiable, Sendable {
     let id = UUID()
     let name: String
     let type: String
@@ -46,20 +46,20 @@ struct DoHRecord: Identifiable {
     let data: String
 }
 
-struct DoHRawResponse: Codable {
+struct DoHRawResponse: Codable, Sendable {
     let Status: Int?
     let Answer: [DoHRawRecord]?
     let Question: [DoHQuestion]?
 }
 
-struct DoHRawRecord: Codable {
+struct DoHRawRecord: Codable, Sendable {
     let name: String
     let type: Int
     let TTL: Int
     let data: String
 }
 
-struct DoHQuestion: Codable {
+struct DoHQuestion: Codable, Sendable {
     let name: String
     let type: Int
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentMemoryEntry: Codable, Identifiable {
+struct AgentMemoryEntry: Codable, Identifiable, Sendable {
     let id: UUID
     let key: String
     let category: String?

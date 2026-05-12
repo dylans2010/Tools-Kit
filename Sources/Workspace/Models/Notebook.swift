@@ -1,6 +1,6 @@
 import Foundation
 
-struct Notebook: Codable, Identifiable, Equatable {
+struct Notebook: Codable, Identifiable, Equatable, Sendable {
     var id: UUID = UUID()
     var name: String = "Untitled Notebook"
     var folders: [NotebookFolder] = []

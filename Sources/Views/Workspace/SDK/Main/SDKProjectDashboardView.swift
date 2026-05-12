@@ -138,6 +138,6 @@ private struct HubLink: View {
     }
 }
 
-enum SDKDashboardRoute: Hashable {
+enum SDKDashboardRoute: Hashable, Sendable {
     case ideWorkspace, build, connectors, automation, logs, diagnostics, plugins, tools, appBuilder
 }

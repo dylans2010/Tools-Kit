@@ -27,7 +27,7 @@ struct CSVConverterView: View {
     }
 }
 
-struct CSVConverterTool: Tool {
+struct CSVConverterTool: Tool, Sendable {
     let name = "CSV Converter"
     let icon = "tablecells"
     let category = ToolCategory.utility

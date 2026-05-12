@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentCapabilityMatrix {
+struct AgentCapabilityMatrix: Sendable {
     private var modelCapabilities: [String: AgentCapabilities] = [:]
 
     init() {

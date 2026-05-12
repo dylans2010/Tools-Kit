@@ -83,7 +83,7 @@ struct CollabTemplatesView: View {
     }
 }
 
-private struct WorkspaceTemplate: Identifiable {
+private struct WorkspaceTemplate: Identifiable, Sendable {
     let id = UUID()
     let name: String
     let description: String
@@ -92,6 +92,6 @@ private struct WorkspaceTemplate: Identifiable {
     let usageCount: Int
 }
 
-private enum WTemplateCategory: String, CaseIterable {
+private enum WTemplateCategory: String, CaseIterable, Sendable {
     case project, design, documentation, meeting, engineering
 }

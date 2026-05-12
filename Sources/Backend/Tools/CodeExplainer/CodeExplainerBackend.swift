@@ -1,6 +1,6 @@
 import Foundation
 
-struct CodeComponent {
+struct CodeComponent: Sendable {
     let type: String
     let name: String
     let description: String

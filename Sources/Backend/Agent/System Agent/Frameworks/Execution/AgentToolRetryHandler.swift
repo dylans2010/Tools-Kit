@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentToolRetryHandler {
+struct AgentToolRetryHandler: Sendable {
     let maxRetries: Int
 
     init(maxRetries: Int = 3) {

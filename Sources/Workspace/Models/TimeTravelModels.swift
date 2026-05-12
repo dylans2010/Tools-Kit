@@ -1,6 +1,6 @@
 import Foundation
 
-struct TimeTravelChange: Codable, Identifiable {
+struct TimeTravelChange: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var timestamp: Date
     var entityType: String

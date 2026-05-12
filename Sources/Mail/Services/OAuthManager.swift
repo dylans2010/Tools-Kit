@@ -3,7 +3,7 @@ import Foundation
 
 @MainActor
 final class OAuthManager {
-    static let shared = OAuthManager()
+    nonisolated(unsafe) static let shared = OAuthManager()
 
     private init() {}
 

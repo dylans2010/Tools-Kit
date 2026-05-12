@@ -1,13 +1,13 @@
 import Foundation
 import UIKit
 
-struct ClipboardFinding: Identifiable {
+struct ClipboardFinding: Identifiable, Sendable {
     let id = UUID()
     let type: FindingType
     let snippet: String
     let description: String
 
-    enum FindingType: String {
+    enum FindingType: String, Sendable {
         case jwt = "JWT Token"
         case apiKey = "API Key"
         case email = "Email Address"

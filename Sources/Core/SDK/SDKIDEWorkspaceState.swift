@@ -2,7 +2,7 @@ import Foundation
 import Combine
 import SwiftUI
 
-public enum SDKWorkspaceNode: String, CaseIterable, Codable, Hashable, Identifiable {
+public enum SDKWorkspaceNode: String, CaseIterable, Codable, Hashable, Identifiable, Sendable {
     case config
     case capabilities
     case scopes
@@ -55,7 +55,7 @@ public enum SDKWorkspaceNode: String, CaseIterable, Codable, Hashable, Identifia
 }
 
 
-public struct SDKScopeDefinition: Identifiable, Codable, Hashable {
+public struct SDKScopeDefinition: Identifiable, Codable, Hashable, Sendable {
     public var id: String { key }
     public var key: String
     public var category: String
@@ -84,7 +84,7 @@ public struct SDKScopeDefinition: Identifiable, Codable, Hashable {
     }
 }
 
-public struct SDKCapabilityDefinition: Identifiable, Codable, Hashable {
+public struct SDKCapabilityDefinition: Identifiable, Codable, Hashable, Sendable {
     public var id: SDKWorkspaceNode { node }
     public var node: SDKWorkspaceNode
     public var description: String
@@ -97,7 +97,7 @@ public struct SDKCapabilityDefinition: Identifiable, Codable, Hashable {
     }
 }
 
-public enum SDKPanelZone: String, Codable, CaseIterable {
+public enum SDKPanelZone: String, Codable, CaseIterable, Sendable {
     case left
     case center
     case right
@@ -105,7 +105,7 @@ public enum SDKPanelZone: String, Codable, CaseIterable {
     case top
 }
 
-public struct SDKWorkspaceLayout: Codable {
+public struct SDKWorkspaceLayout: Codable, Sendable {
     public var leftSidebarWidth: Double
     public var rightInspectorWidth: Double
     public var bottomPanelHeight: Double
@@ -130,7 +130,7 @@ public struct SDKWorkspaceLayout: Codable {
     }
 }
 
-public struct SDKEditorTab: Identifiable, Codable, Hashable {
+public struct SDKEditorTab: Identifiable, Codable, Hashable, Sendable {
     public let id: UUID
     public var title: String
     public var node: SDKWorkspaceNode
@@ -142,8 +142,8 @@ public struct SDKEditorTab: Identifiable, Codable, Hashable {
     }
 }
 
-public struct SDKRuntimeDiagnostic: Identifiable, Codable, Hashable {
-    public enum Severity: String, Codable {
+public struct SDKRuntimeDiagnostic: Identifiable, Codable, Hashable, Sendable {
+    public enum Severity: String, Codable, Sendable {
         case warning
         case error
     }
@@ -163,13 +163,13 @@ public struct SDKRuntimeDiagnostic: Identifiable, Codable, Hashable {
     }
 }
 
-public struct SDKLibraryFunctionExport: Identifiable, Codable, Hashable {
+public struct SDKLibraryFunctionExport: Identifiable, Codable, Hashable, Sendable {
     public var id: String { name }
     public var name: String
     public var signature: String
 }
 
-public struct SDKLibraryDefinition: Identifiable, Codable, Hashable {
+public struct SDKLibraryDefinition: Identifiable, Codable, Hashable, Sendable {
     public let id: UUID
     public var name: String
     public var version: String
@@ -200,8 +200,8 @@ public struct SDKLibraryDefinition: Identifiable, Codable, Hashable {
     }
 }
 
-public struct SDKDependencyNode: Identifiable, Codable, Hashable {
-    public enum Kind: String, Codable, CaseIterable {
+public struct SDKDependencyNode: Identifiable, Codable, Hashable, Sendable {
+    public enum Kind: String, Codable, CaseIterable, Sendable {
         case library
         case connector
         case plugin
@@ -244,8 +244,8 @@ public struct SDKDependencyNode: Identifiable, Codable, Hashable {
     }
 }
 
-public struct SDKRunConfiguration: Identifiable, Codable, Hashable {
-    public enum Mode: String, Codable, CaseIterable {
+public struct SDKRunConfiguration: Identifiable, Codable, Hashable, Sendable {
+    public enum Mode: String, Codable, CaseIterable, Sendable {
         case sandbox = "sandbox"
         case productionSafe = "production-safe"
         case noSandbox = "sdk.developer.noSandbox"
@@ -277,7 +277,7 @@ public struct SDKRunConfiguration: Identifiable, Codable, Hashable {
 
 @MainActor
 public final class SDKRuntimeWorkspaceState: ObservableObject {
-    public static let shared = SDKRuntimeWorkspaceState()
+    nonisolated(unsafe) public static let shared = SDKRuntimeWorkspaceState()
 
     @Published public var layout = SDKWorkspaceLayout()
     @Published public var selectedNode: SDKWorkspaceNode = .config
@@ -317,7 +317,7 @@ public final class SDKRuntimeWorkspaceState: ObservableObject {
 
     private let persistenceKey = "sdk_ide_workspace_state_v1"
 
-    private struct PersistedState: Codable {
+    private struct PersistedState: Codable, Sendable {
         var layout: SDKWorkspaceLayout
         var selectedNode: SDKWorkspaceNode
         var openTabs: [SDKEditorTab]

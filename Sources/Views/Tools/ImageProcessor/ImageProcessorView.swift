@@ -120,7 +120,7 @@ extension PhotosPickerItem {
     }
 }
 
-struct ImageProcessorTool: Tool {
+struct ImageProcessorTool: Tool, Sendable {
     let name = "Image Processor"
     let icon = "paintbrush"
     let category = ToolCategory.utility

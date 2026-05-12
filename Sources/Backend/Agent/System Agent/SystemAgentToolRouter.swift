@@ -1,12 +1,12 @@
 import Foundation
 
-struct SystemAgentToolDefinition: Codable {
+struct SystemAgentToolDefinition: Codable, Sendable {
     let name: String
     let description: String
     let inputSchema: [String: AnyCodable]
 }
 
-private struct ToolParameterSpec {
+private struct ToolParameterSpec: Sendable {
     let name: String
     let typeDescription: String
     let isRequired: Bool
@@ -50,7 +50,7 @@ final class SystemAgentToolRouter {
         }
     }
 
-    private struct ToolMetadata {
+    private struct ToolMetadata: Sendable {
         let name: String
         let description: String
         let inputSchema: [String: AnyCodable]

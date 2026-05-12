@@ -30,13 +30,13 @@ struct SDKBuildView: View {
     @State private var metadataDescription = ""
     @State private var metadataStatus: SDKProject.ProjectStatus = .draft
 
-    enum BuildMode: String, CaseIterable {
+    enum BuildMode: String, CaseIterable, Sendable {
         case debug = "Debug"
         case release = "Release"
         case profile = "Profile"
     }
 
-    enum TargetPlatform: String, CaseIterable {
+    enum TargetPlatform: String, CaseIterable, Sendable {
         case iOS = "iOS"
         case macOS = "macOS"
         case watchOS = "watchOS"

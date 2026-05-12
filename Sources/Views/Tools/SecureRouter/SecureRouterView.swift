@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct SecureRouterTool: Tool {
+struct SecureRouterTool: Tool, Sendable {
     let name = "Secure Router"
     let icon = "network.badge.shield.half.filled"
     let category = ToolCategory.network

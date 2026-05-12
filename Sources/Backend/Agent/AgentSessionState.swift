@@ -94,7 +94,7 @@ final class AgentSessionState: ObservableObject, Identifiable {
         }
     }
 
-    struct PersistenceModel: Codable {
+    struct PersistenceModel: Codable, Sendable {
         let id: String
         let workspaceId: String
         let selectedTab: Int
@@ -159,7 +159,7 @@ final class AgentSessionState: ObservableObject, Identifiable {
     }
 }
 
-struct AgentChecklistItem: Identifiable, Codable {
+struct AgentChecklistItem: Identifiable, Codable, Sendable {
     let id: String
     let title: String
     let status: String

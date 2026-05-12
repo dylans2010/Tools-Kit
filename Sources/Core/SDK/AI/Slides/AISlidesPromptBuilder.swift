@@ -1,6 +1,6 @@
 import Foundation
 
-struct AISlidesPromptBuilder {
+struct AISlidesPromptBuilder: Sendable {
 
     // MARK: - Full GenSlidesScheme prompt
 

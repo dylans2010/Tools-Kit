@@ -540,19 +540,19 @@ final class YahooMailProvider: NSObject, MailProvider, StandardMailProvider, ASW
     }
 }
 
-private struct YahooToken: Decodable {
+private struct YahooToken: Decodable, Sendable {
     let accessToken: String
     let refreshToken: String?
     let xoauthYahooGuid: String?
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
         case xoauthYahooGuid = "xoauth_yahoo_guid"
     }
 }
 
-private struct YahooListRequest: Encodable {
+private struct YahooListRequest: Encodable, Sendable {
     let method = "ListMessages"
     let params: [String: Int]
 
@@ -561,15 +561,15 @@ private struct YahooListRequest: Encodable {
     }
 }
 
-private struct YahooListEnvelope: Decodable {
-    struct Result: Decodable {
+private struct YahooListEnvelope: Decodable, Sendable {
+    struct Result: Decodable, Sendable {
         let messages: [YahooListMessage]
     }
 
     let result: Result
 }
 
-private struct YahooListMessage: Decodable {
+private struct YahooListMessage: Decodable, Sendable {
     let messageId: String
     let threadId: String?
     let from: String
@@ -580,7 +580,7 @@ private struct YahooListMessage: Decodable {
     let flagged: Bool
 }
 
-private struct YahooMessageRequest: Encodable {
+private struct YahooMessageRequest: Encodable, Sendable {
     let method = "GetMessage"
     let params: [String: String]
 
@@ -589,15 +589,15 @@ private struct YahooMessageRequest: Encodable {
     }
 }
 
-private struct YahooMessageEnvelope: Decodable {
-    struct Result: Decodable {
+private struct YahooMessageEnvelope: Decodable, Sendable {
+    struct Result: Decodable, Sendable {
         let message: YahooMessage
     }
 
     let result: Result
 }
 
-private struct YahooMessage: Decodable {
+private struct YahooMessage: Decodable, Sendable {
     let messageId: String
     let threadId: String?
     let from: String
@@ -612,7 +612,7 @@ private struct YahooMessage: Decodable {
     let flagged: Bool
 }
 
-private struct YahooDeleteRequest: Encodable {
+private struct YahooDeleteRequest: Encodable, Sendable {
     let method = "DeleteMessage"
     let params: [String: String]
 
@@ -621,9 +621,9 @@ private struct YahooDeleteRequest: Encodable {
     }
 }
 
-private struct YahooDeleteResponse: Decodable {}
+private struct YahooDeleteResponse: Decodable, Sendable {}
 
-private struct YahooUpdateReadRequest: Encodable {
+private struct YahooUpdateReadRequest: Encodable, Sendable {
     let method = "FlagMessage"
     let params: [String: String]
 
@@ -632,4 +632,4 @@ private struct YahooUpdateReadRequest: Encodable {
     }
 }
 
-private struct YahooUpdateResponse: Decodable {}
+private struct YahooUpdateResponse: Decodable, Sendable {}

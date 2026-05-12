@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentResponseParser {
+struct AgentResponseParser: Sendable {
     init() {}
 
     func parseEnvelope(from content: String) -> (toolCall: (name: String, input: [String: Any])?, finalText: String?) {

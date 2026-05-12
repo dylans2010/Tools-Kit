@@ -52,7 +52,7 @@ struct HTTPInspectorView: View {
     }
 }
 
-struct HTTPInspectorTool: Tool {
+struct HTTPInspectorTool: Tool, Sendable {
     let name = "HTTP Inspector"
     let icon = "network.badge.shield.half.filled"
     let category = ToolCategory.utility

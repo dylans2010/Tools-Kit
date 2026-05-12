@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 class SecureFolderManager: ObservableObject {
-    static let shared = SecureFolderManager()
+    nonisolated(unsafe) static let shared = SecureFolderManager()
 
     @Published private(set) var folders: [SecureFolder] = []
 

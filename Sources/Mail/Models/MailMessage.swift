@@ -1,6 +1,6 @@
 import Foundation
 
-struct MailMessage: Identifiable, Codable, Hashable {
+struct MailMessage: Identifiable, Codable, Hashable, Sendable {
     let id: String // IMAP UID or message ID
     let threadId: String
     let from: String
@@ -15,7 +15,7 @@ struct MailMessage: Identifiable, Codable, Hashable {
     var isStarred: Bool
     let attachments: [MailAttachment]
 
-    struct MailAttachment: Identifiable, Codable, Hashable {
+    struct MailAttachment: Identifiable, Codable, Hashable, Sendable {
         let id: String
         let fileName: String
         let contentType: String

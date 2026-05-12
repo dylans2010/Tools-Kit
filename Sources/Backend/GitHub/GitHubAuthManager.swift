@@ -3,7 +3,7 @@ import Security
 
 /// Manages GitHub authentication and secure token storage.
 final class GitHubAuthManager {
-    static let shared = GitHubAuthManager()
+    nonisolated(unsafe) static let shared = GitHubAuthManager()
 
     private let service = "com.tools-kit.github"
     private let tokenKey = "github_personal_access_token"

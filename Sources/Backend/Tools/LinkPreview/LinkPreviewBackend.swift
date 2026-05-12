@@ -2,7 +2,7 @@ import Foundation
 import LinkPresentation
 import SwiftUI
 
-struct LinkMetadata: Identifiable {
+struct LinkMetadata: Identifiable, Sendable {
     let id = UUID()
     let title: String?
     let icon: UIImage?

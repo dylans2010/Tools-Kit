@@ -6,7 +6,7 @@ import CoreImage
 /// AI-powered operations for the media editor.
 /// Handles object removal, background generation, and auto-framing.
 final class AIEditingEngine: ObservableObject {
-    static let shared = AIEditingEngine()
+    nonisolated(unsafe) static let shared = AIEditingEngine()
 
     private let ciContext = CIContext()
 
@@ -62,7 +62,7 @@ final class AIEditingEngine: ObservableObject {
 import Foundation
 
 final class AIEditingEngine: ObservableObject {
-    static let shared = AIEditingEngine()
+    nonisolated(unsafe) static let shared = AIEditingEngine()
     private init() {}
     func suggestFraming(layer: EditingLayer, canvasSize: CGSize) -> CGRect {
         return .zero

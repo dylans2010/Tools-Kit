@@ -4,7 +4,7 @@ import FoundationModels
 // MARK: - Core Generable Types
 
 @Generable
-struct AgenticModelResponse {
+struct AgenticModelResponse: Sendable {
     var message: String
     var actions: [AgenticModelAction]
     var isComplete: Bool
@@ -12,14 +12,14 @@ struct AgenticModelResponse {
 }
 
 @Generable
-struct AgenticModelAction {
+struct AgenticModelAction: Sendable {
     var toolName: String
     var parameters: [String: String]
     var expectedOutcome: String
 }
 
 @Generable
-struct AgenticToolOutput {
+struct AgenticToolOutput: Sendable {
     var summary: String
     var generatedCode: String?
     var metadata: [String: String]
@@ -27,7 +27,7 @@ struct AgenticToolOutput {
 }
 
 @Generable
-struct AgenticDeviceCapability {
+struct AgenticDeviceCapability: Sendable {
     let isSupported: Bool
     let requiredReason: String?
     let deviceClass: String
@@ -69,7 +69,7 @@ struct WorkspaceAIToolDefinition: Identifiable, Sendable {
 
 // MARK: - Trace Entry
 
-struct AgenticTraceEntry: Identifiable, Codable {
+struct AgenticTraceEntry: Identifiable, Codable, Sendable {
     let id: UUID
     let timestamp: Date
     let phase: String
@@ -93,7 +93,7 @@ struct AgenticTraceEntry: Identifiable, Codable {
 
 // MARK: - Streaming Token
 
-struct AgenticStreamToken: Identifiable {
+struct AgenticStreamToken: Identifiable, Sendable {
     let id: UUID = UUID()
     let content: String
     let timestamp: Date = Date()
@@ -102,7 +102,7 @@ struct AgenticStreamToken: Identifiable {
 
 // MARK: - Session Configuration
 
-struct AgenticSessionConfig {
+struct AgenticSessionConfig: Sendable {
     var maxIterations: Int = 10
     var streamingEnabled: Bool = true
     var traceEnabled: Bool = true

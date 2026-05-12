@@ -1,30 +1,30 @@
 import Foundation
 
-public enum ContrastMode: String, Codable, CaseIterable {
+public enum ContrastMode: String, Codable, CaseIterable, Sendable {
     case standard
     case high
 }
 
-public enum VisualDensity: String, Codable, CaseIterable {
+public enum VisualDensity: String, Codable, CaseIterable, Sendable {
     case minimal
     case balanced
     case dense
 }
 
-public enum AnimationLevel: String, Codable, CaseIterable {
+public enum AnimationLevel: String, Codable, CaseIterable, Sendable {
     case none
     case subtle
     case dynamic
 }
 
-public enum ImageStyle: String, Codable, CaseIterable {
+public enum ImageStyle: String, Codable, CaseIterable, Sendable {
     case photo
     case illustration
     case abstract
     case mixed
 }
 
-public struct SlideTheme: Codable, Equatable, Identifiable {
+public struct SlideTheme: Codable, Equatable, Identifiable, Sendable {
     public var id: String
     public var name: String
     public var gradient: [String]
@@ -58,7 +58,7 @@ public struct SlideTheme: Codable, Equatable, Identifiable {
     }
 }
 
-public struct SlideStyle: Codable, Equatable, Identifiable {
+public struct SlideStyle: Codable, Equatable, Identifiable, Sendable {
     public var id: String
     public var name: String
     public var visualDensity: VisualDensity
@@ -80,7 +80,7 @@ public struct SlideStyle: Codable, Equatable, Identifiable {
     }
 }
 
-public enum AIGenSlideCatalog {
+public enum AIGenSlideCatalog: Sendable {
     public static let defaultThemeID = "aurora-glass"
     public static let defaultStyleID = "corporate-minimal"
 

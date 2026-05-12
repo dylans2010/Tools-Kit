@@ -102,7 +102,7 @@ extension PDFToolsView {
     }
 }
 
-struct PDFTools: Tool {
+struct PDFTools: Tool, Sendable {
     let name = "PDF Tools"
     let icon = "doc.text.below.ecg"
     let category = ToolCategory.utility

@@ -101,7 +101,7 @@ struct SecureNotesView: View {
     }
 }
 
-struct SecureNotesTool: Tool {
+struct SecureNotesTool: Tool, Sendable {
     let name = "Secure Notes"
     let icon = "lock.rectangle"
     let category = ToolCategory.utility

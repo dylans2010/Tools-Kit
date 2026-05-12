@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolCalendarSmartSchedule: AgenticToolProtocol {
+struct AgenticToolCalendarSmartSchedule: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "calendar_smart_schedule",
         description: "AI-powered smart scheduling based on preferences and patterns",

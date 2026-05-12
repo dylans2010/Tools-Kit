@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentPromptTemplate {
+struct AgentPromptTemplate: Sendable {
     let template: String
 
     init(_ template: String) {

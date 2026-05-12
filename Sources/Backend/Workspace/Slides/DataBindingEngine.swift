@@ -3,9 +3,9 @@ import Combine
 
 /// Links Slides to Notebook databases and external APIs for dynamic data-driven content.
 final class DataBindingEngine: ObservableObject {
-    static let shared = DataBindingEngine()
+    nonisolated(unsafe) static let shared = DataBindingEngine()
 
-    struct Binding: Codable, Identifiable {
+    struct Binding: Codable, Identifiable, Sendable {
         let id: UUID
         let targetNodeID: UUID
         let targetProperty: String

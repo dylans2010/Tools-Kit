@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ClipboardMonitorTool: Tool {
+struct ClipboardMonitorTool: Tool, Sendable {
     let name = "Clipboard Monitor"
     let icon = "doc.on.clipboard.fill"
     let category = ToolCategory.privacy

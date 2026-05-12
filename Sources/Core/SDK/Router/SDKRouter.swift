@@ -10,7 +10,7 @@ public protocol SDKRouterProtocol {
 /// On-device API routing system for the SDK.
 /// Routes internal calls to the appropriate service handlers.
 public final class SDKRouter: SDKRouterProtocol {
-    public static let shared = SDKRouter()
+    nonisolated(unsafe) public static let shared = SDKRouter()
 
     private var registeredRoutes: [String: SDKRoute] = [:]
     private var handlers: [String: (SDKRequest) async throws -> SDKResponse] = [:]
@@ -141,14 +141,14 @@ public final class SDKRouter: SDKRouterProtocol {
 
 // MARK: - Route Definition
 
-public struct SDKRoute: Identifiable {
+public struct SDKRoute: Identifiable, Sendable {
     public let id: UUID
     public let path: String
     public let method: Method
     public let module: String
     public let description: String
 
-    public enum Method: String, Codable, CaseIterable {
+    public enum Method: String, Codable, CaseIterable, Sendable {
         case get = "GET"
         case post = "POST"
         case put = "PUT"

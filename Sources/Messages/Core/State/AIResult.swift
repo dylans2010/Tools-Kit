@@ -1,6 +1,6 @@
 import Foundation
 
-struct AIResult: Codable {
+struct AIResult: Codable, Sendable {
     let id: UUID
     let input: String
     let output: String

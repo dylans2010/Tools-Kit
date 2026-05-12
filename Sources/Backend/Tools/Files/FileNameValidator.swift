@@ -1,6 +1,6 @@
 import Foundation
 
-struct FileNameValidator {
+struct FileNameValidator: Sendable {
     func sanitize(_ value: String) -> String {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
         let invalidCharacters = CharacterSet(charactersIn: "/\\:*?\"<>|")

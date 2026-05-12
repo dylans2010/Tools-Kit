@@ -48,7 +48,7 @@ struct EmailComposingView: View {
 
     @FocusState private var focusedField: ComposeField?
 
-    private enum ComposeField: Hashable {
+    private enum ComposeField: Hashable, Sendable {
         case to, cc, bcc, subject, body
     }
 
@@ -808,7 +808,7 @@ struct EmailComposingView: View {
     #endif
 }
 
-struct WrappingFlowLayout: Layout {
+struct WrappingFlowLayout: Layout, Sendable {
     var spacing: CGFloat = 8
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
         let sizes = subviews.map { $0.sizeThatFits(.unspecified) }

@@ -74,7 +74,7 @@ struct GitHubReleasesView: View {
     }
 }
 
-private struct GitHubRelease: Identifiable {
+private struct GitHubRelease: Identifiable, Sendable {
     let id = UUID()
     let tagName: String
     let name: String

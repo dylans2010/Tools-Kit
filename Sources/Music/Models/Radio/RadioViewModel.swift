@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-enum RadioFilter: Equatable {
+enum RadioFilter: Equatable, Sendable {
     case none
     case tag(String)
     case country(String)

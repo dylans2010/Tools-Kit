@@ -1,13 +1,13 @@
 import Foundation
 
-struct CodeModule: Identifiable, Codable {
+struct CodeModule: Identifiable, Codable, Sendable {
     let id: String
     let name: String
     let path: String
     let type: ModuleType
     let dependencies: [String]
 
-    enum ModuleType: String, Codable {
+    enum ModuleType: String, Codable, Sendable {
         case feature
         case core
         case utility

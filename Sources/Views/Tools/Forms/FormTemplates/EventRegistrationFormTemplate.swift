@@ -1,6 +1,6 @@
 import Foundation
 
-enum EventRegistrationFormTemplate {
+enum EventRegistrationFormTemplate: Sendable {
     static func build() -> FormDocument {
         let questions = [
             FormQuestion(title: "Full Name", type: .textInput, required: true),

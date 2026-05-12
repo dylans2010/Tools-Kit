@@ -12,7 +12,7 @@ struct ConnectorLogsView: View {
     @State private var expandedLogID: UUID?
     @State private var selectedDateRange: DateRange = .all
 
-    enum LogFilter: String, CaseIterable {
+    enum LogFilter: String, CaseIterable, Sendable {
         case all = "All"
         case info = "Info"
         case warnings = "Warnings"
@@ -20,7 +20,7 @@ struct ConnectorLogsView: View {
         case performance = "Performance"
     }
 
-    enum DateRange: String, CaseIterable {
+    enum DateRange: String, CaseIterable, Sendable {
         case all = "All Time"
         case lastHour = "Last Hour"
         case today = "Today"

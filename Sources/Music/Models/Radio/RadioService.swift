@@ -1,7 +1,7 @@
 import Foundation
 
 actor RadioService {
-    static let shared = RadioService()
+    nonisolated(unsafe) static let shared = RadioService()
 
     private let baseURL = "https://de1.api.radio-browser.info/json"
     private let session: URLSession
@@ -107,7 +107,7 @@ actor RadioService {
 
 // MARK: - Errors
 
-enum RadioError: LocalizedError {
+enum RadioError: LocalizedError, Sendable {
     case invalidResponse
     case invalidURL
     case streamUnavailable

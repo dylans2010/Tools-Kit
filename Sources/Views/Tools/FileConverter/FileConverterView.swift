@@ -131,7 +131,7 @@ struct FileConverterView: View {
     }
 }
 
-struct FileConverterTool: Tool {
+struct FileConverterTool: Tool, Sendable {
     let name = "Universal Converter"
     let icon = "arrow.triangle.2.circlepath.doc"
     let category = ToolCategory.conversion

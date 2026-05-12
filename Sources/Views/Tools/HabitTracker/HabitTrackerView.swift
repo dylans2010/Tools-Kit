@@ -230,7 +230,7 @@ struct AddHabitSheet: View {
     }
 }
 
-struct HabitTrackerTool: Tool {
+struct HabitTrackerTool: Tool, Sendable {
     let name = "Habit Tracker"
     let icon = "checkmark.seal.fill"
     let category = ToolCategory.utility

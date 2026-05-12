@@ -75,7 +75,7 @@ struct DiffCheckerView: View {
     }
 }
 
-struct DiffCheckerTool: Tool {
+struct DiffCheckerTool: Tool, Sendable {
     let name = "Diff Checker"
     let icon = "arrow.left.arrow.right"
     let category = ToolCategory.development

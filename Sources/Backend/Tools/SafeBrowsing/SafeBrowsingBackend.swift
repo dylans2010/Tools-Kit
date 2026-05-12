@@ -1,6 +1,6 @@
 import Foundation
 
-struct ThreatResult {
+struct ThreatResult: Sendable {
     var url: String = ""
     var isSafe: Bool = true
     var threatType: String = ""

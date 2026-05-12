@@ -1,6 +1,6 @@
 import Foundation
 
-struct Suggestion: Codable, Identifiable, Equatable {
+struct Suggestion: Codable, Identifiable, Equatable, Sendable {
     let id: UUID
     let originalText: String
     let suggestedText: String
@@ -16,7 +16,7 @@ struct Suggestion: Codable, Identifiable, Equatable {
     }
 }
 
-enum SuggestionCategory: String, Codable {
+enum SuggestionCategory: String, Codable, Sendable {
     case grammar = "Grammar"
     case clarity = "Clarity"
     case tone = "Tone"

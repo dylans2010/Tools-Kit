@@ -14,7 +14,7 @@ struct PluginSecurityView: View {
         PluginSecurityPermission(name: "Contacts", description: "Allow access to workspace member directory.", isEnabled: false, icon: "person.2.fill")
     ]
 
-    struct PluginSecurityPermission: Identifiable {
+    struct PluginSecurityPermission: Identifiable, Sendable {
         let id = UUID()
         let name: String
         let description: String

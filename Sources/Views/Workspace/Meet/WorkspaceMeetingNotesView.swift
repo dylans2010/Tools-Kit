@@ -40,7 +40,7 @@ struct WorkspaceMeetingNotesView: View {
         manager.currentSession?.sessionId ?? ""
     }
 
-    private enum AIAction {
+    private enum AIAction: Sendable {
         case summarize
         case actionItems
         case rewrite

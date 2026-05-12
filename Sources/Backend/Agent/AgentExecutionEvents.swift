@@ -1,6 +1,6 @@
 import Foundation
 
-enum AgentExecutionEventType: String, Codable, CaseIterable {
+enum AgentExecutionEventType: String, Codable, CaseIterable, Sendable {
     case sessionStarted = "session_started"
     case stepStarted = "step_started"
     case stepProgress = "step_progress"
@@ -14,7 +14,7 @@ enum AgentExecutionEventType: String, Codable, CaseIterable {
     case sessionFailed = "session_failed"
 }
 
-struct AgentExecutionEvent: Identifiable, Codable {
+struct AgentExecutionEvent: Identifiable, Codable, Sendable {
     let id: String
     let sessionId: String
     let timestamp: Date
@@ -45,8 +45,8 @@ struct AgentExecutionEvent: Identifiable, Codable {
     }
 }
 
-struct AgentFileOperation: Identifiable, Codable {
-    enum OperationType: String, Codable {
+struct AgentFileOperation: Identifiable, Codable, Sendable {
+    enum OperationType: String, Codable, Sendable {
         case generated
         case updated
     }
@@ -59,7 +59,7 @@ struct AgentFileOperation: Identifiable, Codable {
     let timestamp: Date
 }
 
-struct AgentGitOperation: Identifiable, Codable {
+struct AgentGitOperation: Identifiable, Codable, Sendable {
     let id: String
     let action: String
     let status: String
@@ -67,7 +67,7 @@ struct AgentGitOperation: Identifiable, Codable {
     let timestamp: Date
 }
 
-struct AgentWorkflowTrigger: Identifiable, Codable {
+struct AgentWorkflowTrigger: Identifiable, Codable, Sendable {
     let id: String
     let workflowName: String
     let status: String

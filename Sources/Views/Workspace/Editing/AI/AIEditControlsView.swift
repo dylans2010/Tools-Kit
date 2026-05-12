@@ -123,7 +123,7 @@ struct AIEditControlsView: View {
     }
 }
 
-enum AIEditStyle: String, CaseIterable, Identifiable {
+enum AIEditStyle: String, CaseIterable, Identifiable, Sendable {
     case none = "None"
     case cinematic = "Cinematic"
     case vintage = "Vintage"

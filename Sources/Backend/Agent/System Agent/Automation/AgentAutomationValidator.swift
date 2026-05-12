@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentAutomationValidator {
+struct AgentAutomationValidator: Sendable {
     init() {}
 
     func validate(script: AgentAutomationScript) -> Bool {

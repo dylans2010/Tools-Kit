@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentAIService {
+struct AgentAIService: Sendable {
     let aiService: AIService
 
     init(aiService: AIService = .shared) {

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct PermissionAuditTool: Tool {
+struct PermissionAuditTool: Tool, Sendable {
     let name = "Permission Audit"
     let icon = "lock.doc.fill"
     let category = ToolCategory.privacy

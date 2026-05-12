@@ -5,7 +5,7 @@ protocol AISlidesModelRouter {
     func generateContent(_ plan: SlidePlan) async throws -> SlideDeck
 }
 
-struct AISlidesMultiModelRouter: AISlidesModelRouter {
+struct AISlidesMultiModelRouter: AISlidesModelRouter, Sendable {
     private let promptBuilder = AISlidesPromptBuilder()
     private let decoder = AISlidesStrictDecoder()
     private let modelConfig = ModelConfigManager.shared

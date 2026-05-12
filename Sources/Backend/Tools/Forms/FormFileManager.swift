@@ -1,6 +1,6 @@
 import Foundation
 
-enum FormFileManager {
+enum FormFileManager: Sendable {
     static let formExtension = "form"
 
     static func exportForm(_ form: FormDocument, to url: URL) throws {

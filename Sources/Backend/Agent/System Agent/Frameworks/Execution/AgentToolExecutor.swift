@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentToolExecutor {
+struct AgentToolExecutor: Sendable {
     typealias Handler = ([String: String]) async throws -> String
 
     private var handlers: [String: Handler] = [:]

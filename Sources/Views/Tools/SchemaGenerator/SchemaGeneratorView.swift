@@ -46,7 +46,7 @@ struct SchemaGeneratorView: View {
     }
 }
 
-struct SchemaGeneratorTool: Tool {
+struct SchemaGeneratorTool: Tool, Sendable {
     let name = "Schema Generator"
     let icon = "tablecells.badge.ellipsis"
     let category = ToolCategory.development

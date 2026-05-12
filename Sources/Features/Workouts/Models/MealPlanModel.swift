@@ -1,6 +1,6 @@
 import Foundation
 
-enum MealType: String, Codable, CaseIterable, Identifiable {
+enum MealType: String, Codable, CaseIterable, Identifiable, Sendable {
     case breakfast
     case lunch
     case dinner
@@ -9,7 +9,7 @@ enum MealType: String, Codable, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-struct MealPlanItem: Identifiable, Codable {
+struct MealPlanItem: Identifiable, Codable, Sendable {
     var id: UUID
     var name: String
     var type: MealType
@@ -40,7 +40,7 @@ struct MealPlanItem: Identifiable, Codable {
     }
 }
 
-struct MealPlanModel: Identifiable, Codable {
+struct MealPlanModel: Identifiable, Codable, Sendable {
     var id: UUID
     var date: Date
     var meals: [MealPlanItem]

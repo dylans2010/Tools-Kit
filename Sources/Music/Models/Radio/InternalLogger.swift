@@ -2,7 +2,7 @@ import Foundation
 
 /// Lightweight shared logger that integrates with LogViewerBackend levels for cross-module error reporting.
 final class InternalLogger {
-    static let shared = InternalLogger()
+    nonisolated(unsafe) static let shared = InternalLogger()
 
     private var entries: [InternalLogEntry] = []
     private let maxEntries = 500
@@ -32,7 +32,7 @@ final class InternalLogger {
     }
 }
 
-struct InternalLogEntry: Identifiable {
+struct InternalLogEntry: Identifiable, Sendable {
     let id = UUID()
     let timestamp: Date
     let level: LogViewerLevel

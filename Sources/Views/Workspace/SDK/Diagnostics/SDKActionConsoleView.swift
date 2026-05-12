@@ -8,9 +8,9 @@ struct SDKActionConsoleView: View {
     @State private var isActive = false
     @Environment(\.dismiss) private var dismiss
 
-    struct ConsoleEntry: Identifiable {
+    struct ConsoleEntry: Identifiable, Sendable {
         let id = UUID(); let timestamp = Date(); let command: String; let result: String; let status: EntryStatus
-        enum EntryStatus { case success, error, pending }
+        enum EntryStatus: Sendable { case success, error, pending }
     }
 
     var body: some View {

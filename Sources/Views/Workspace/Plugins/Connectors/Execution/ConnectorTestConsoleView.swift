@@ -19,8 +19,8 @@ struct ConnectorTestConsoleView: View {
     @State private var curlCommand = ""
     @State private var responseContentType = ""
 
-    struct TestRequest: Identifiable { let id = UUID(); let endpoint: String; let method: String; let statusCode: Int?; let responseTime: TimeInterval?; let timestamp: Date; let response: String }
-    struct HeaderEntry: Identifiable { let id = UUID(); var key: String; var value: String }
+    struct TestRequest: Identifiable, Sendable { let id = UUID(); let endpoint: String; let method: String; let statusCode: Int?; let responseTime: TimeInterval?; let timestamp: Date; let response: String }
+    struct HeaderEntry: Identifiable, Sendable { let id = UUID(); var key: String; var value: String }
 
     var selectedEndpoint: ConnectorEndpoint? { guard let id = selectedEndpointID else { return nil }; return connector.endpoints.first(where: { $0.id == id }) }
 

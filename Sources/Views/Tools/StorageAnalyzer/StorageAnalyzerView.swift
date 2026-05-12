@@ -56,7 +56,7 @@ struct StorageAnalyzerView: View {
     }
 }
 
-struct StorageAnalyzerTool: Tool {
+struct StorageAnalyzerTool: Tool, Sendable {
     let name = "Storage Analyzer"
     let icon = "internaldrive"
     let category = ToolCategory.utility

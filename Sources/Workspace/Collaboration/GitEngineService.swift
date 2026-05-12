@@ -3,11 +3,11 @@ import Combine
 
 /// Local Git engine: stage changes, build commits, and maintain an offline commit queue.
 final class GitEngineService: ObservableObject {
-    static let shared = GitEngineService()
+    nonisolated(unsafe) static let shared = GitEngineService()
 
     // MARK: - Models
 
-    struct StagedChange: Codable, Identifiable {
+    struct StagedChange: Codable, Identifiable, Sendable {
         let id: UUID
         let filePath: String
         let originalContent: String
@@ -16,14 +16,14 @@ final class GitEngineService: ObservableObject {
         let stagedAt: Date
     }
 
-    enum ChangeType: String, Codable, CaseIterable {
+    enum ChangeType: String, Codable, CaseIterable, Sendable {
         case added = "Added"
         case modified = "Modified"
         case deleted = "Deleted"
         case renamed = "Renamed"
     }
 
-    struct LocalCommit: Codable, Identifiable {
+    struct LocalCommit: Codable, Identifiable, Sendable {
         let id: UUID
         var message: String
         var branch: String
@@ -35,14 +35,14 @@ final class GitEngineService: ObservableObject {
         var tags: [String]
     }
 
-    enum CommitStatus: String, Codable {
+    enum CommitStatus: String, Codable, Sendable {
         case staged = "Staged"
         case queued = "Queued"
         case pushed = "Pushed"
         case failed = "Failed"
     }
 
-    enum CommitCategory: String, Codable, CaseIterable {
+    enum CommitCategory: String, Codable, CaseIterable, Sendable {
         case feature = "Feature"
         case bugfix = "Bug Fix"
         case refactor = "Refactor"
@@ -211,9 +211,9 @@ final class GitEngineService: ObservableObject {
 
 /// Scans repository files for security issues, duplicate code, and unused items.
 final class RepoIntelligenceService: ObservableObject {
-    static let shared = RepoIntelligenceService()
+    nonisolated(unsafe) static let shared = RepoIntelligenceService()
 
-    struct SecurityIssue: Identifiable {
+    struct SecurityIssue: Identifiable, Sendable {
         let id = UUID()
         let filePath: String
         let line: Int
@@ -222,21 +222,21 @@ final class RepoIntelligenceService: ObservableObject {
         let pattern: String
     }
 
-    struct CodeSmell: Identifiable {
+    struct CodeSmell: Identifiable, Sendable {
         let id = UUID()
         let type: SmellType
         let filePath: String
         let description: String
     }
 
-    enum IssueSeverity: String, CaseIterable {
+    enum IssueSeverity: String, CaseIterable, Sendable {
         case critical = "Critical"
         case high = "High"
         case medium = "Medium"
         case low = "Low"
     }
 
-    enum SmellType: String, CaseIterable {
+    enum SmellType: String, CaseIterable, Sendable {
         case duplicate = "Duplicate Code"
         case largeFile = "Large File"
         case unusedImport = "Unused Import"
@@ -353,9 +353,9 @@ final class RepoIntelligenceService: ObservableObject {
 
 /// Builds and manages visual GitHub workflow definitions locally.
 final class WorkflowBuilderService: ObservableObject {
-    static let shared = WorkflowBuilderService()
+    nonisolated(unsafe) static let shared = WorkflowBuilderService()
 
-    struct WorkflowStep: Codable, Identifiable {
+    struct WorkflowStep: Codable, Identifiable, Sendable {
         let id: UUID
         var name: String
         var uses: String
@@ -364,7 +364,7 @@ final class WorkflowBuilderService: ObservableObject {
         var `if`: String
     }
 
-    struct WorkflowJob: Codable, Identifiable {
+    struct WorkflowJob: Codable, Identifiable, Sendable {
         let id: UUID
         var name: String
         var runsOn: String
@@ -372,7 +372,7 @@ final class WorkflowBuilderService: ObservableObject {
         var needs: [String]
     }
 
-    struct WorkflowDefinition: Codable, Identifiable {
+    struct WorkflowDefinition: Codable, Identifiable, Sendable {
         let id: UUID
         var name: String
         var triggers: [String]
@@ -471,9 +471,9 @@ final class WorkflowBuilderService: ObservableObject {
 // MARK: - Repo Analyzer
 
 final class RepoAnalyzerService: ObservableObject {
-    static let shared = RepoAnalyzerService()
+    nonisolated(unsafe) static let shared = RepoAnalyzerService()
 
-    struct Hotspot: Identifiable {
+    struct Hotspot: Identifiable, Sendable {
         let id = UUID()
         let filePath: String
         let churn: Int

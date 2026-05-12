@@ -74,7 +74,7 @@ struct GitHubDiscussionsView: View {
     }
 }
 
-private struct Discussion: Identifiable {
+private struct Discussion: Identifiable, Sendable {
     let id = UUID()
     let title: String
     let category: DiscussionCategory
@@ -85,7 +85,7 @@ private struct Discussion: Identifiable {
     let isAnswered: Bool
 }
 
-private enum DiscussionCategory: String, CaseIterable {
+private enum DiscussionCategory: String, CaseIterable, Sendable {
     case general, announcements, ideas, qAndA = "Q&A", showAndTell = "Show & Tell"
 
     var icon: String {

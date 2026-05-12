@@ -22,7 +22,7 @@ struct NotebookDetailView: View {
     @State private var notebookArtwork: UIImage?
     @State private var photoPickerItem: PhotosPickerItem?
 
-    private enum FolderSort: String, CaseIterable, Identifiable {
+    private enum FolderSort: String, CaseIterable, Identifiable, Sendable {
         case recent = "Recent"
         case alphabetical = "A–Z"
         case pages = "Most Pages"

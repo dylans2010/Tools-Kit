@@ -121,7 +121,7 @@ struct OCRToolView: View {
     }
 }
 
-struct OCRTool: Tool {
+struct OCRTool: Tool, Sendable {
     let name = "OCR Tool"
     let icon = "text.viewfinder"
     let category = ToolCategory.ai

@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 /// Defines the type of a layer in the media editor.
-enum LayerType: String, Codable {
+enum LayerType: String, Codable, Sendable {
     case image
     case video
     case text
@@ -11,7 +11,7 @@ enum LayerType: String, Codable {
 }
 
 /// Represents a blend mode for a layer.
-enum BlendMode: String, Codable {
+enum BlendMode: String, Codable, Sendable {
     case normal
     case multiply
     case screen
@@ -21,14 +21,14 @@ enum BlendMode: String, Codable {
 }
 
 /// Represents a filter applied to a layer.
-struct MediaFilter: Codable, Identifiable {
+struct MediaFilter: Codable, Identifiable, Sendable {
     let id: UUID
     let name: String
     var intensity: Double // 0.0 to 1.0
 }
 
 /// Represents a single layer in an editing project.
-struct EditingLayer: Codable, Identifiable {
+struct EditingLayer: Codable, Identifiable, Sendable {
     let id: UUID
     var name: String
     var type: LayerType
@@ -56,7 +56,7 @@ struct EditingLayer: Codable, Identifiable {
 }
 
 /// Non-destructive adjustments stored as modifiers on a layer.
-struct LayerAdjustments: Codable, Equatable {
+struct LayerAdjustments: Codable, Equatable, Sendable {
     var brightness: Double = 0.0
     var contrast: Double = 1.0
     var saturation: Double = 1.0
@@ -64,7 +64,7 @@ struct LayerAdjustments: Codable, Equatable {
 }
 
 /// Represents a track in the editing timeline.
-struct TimelineTrack: Codable, Identifiable {
+struct TimelineTrack: Codable, Identifiable, Sendable {
     let id: UUID
     var name: String
     var layerIDs: [UUID]
@@ -73,7 +73,7 @@ struct TimelineTrack: Codable, Identifiable {
 }
 
 /// Represents a media editing project.
-struct EditingProject: Codable, Identifiable {
+struct EditingProject: Codable, Identifiable, Sendable {
     var id: UUID
     var name: String
     var ownerID: UUID

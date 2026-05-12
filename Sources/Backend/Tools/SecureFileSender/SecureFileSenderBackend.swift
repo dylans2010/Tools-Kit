@@ -1,6 +1,6 @@
 import Foundation
 
-struct UploadResult: Identifiable {
+struct UploadResult: Identifiable, Sendable {
     let id = UUID()
     let filename: String
     let link: String
@@ -9,7 +9,7 @@ struct UploadResult: Identifiable {
     let uploadedAt: Date
 }
 
-private struct FileIOResponse: Codable {
+private struct FileIOResponse: Codable, Sendable {
     let success: Bool?
     let key: String?
     let link: String?

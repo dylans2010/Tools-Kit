@@ -13,7 +13,7 @@ public protocol SDKNotebookServiceProtocol {
 /// Full SDK Notebooks module — handles document management, version history, and persistence.
 @MainActor
 public final class SDKNotebookService: SDKNotebookServiceProtocol, ObservableObject {
-    public static let shared = SDKNotebookService()
+    nonisolated(unsafe) public static let shared = SDKNotebookService()
 
     @Published public private(set) var notebooks: [SDKNotebook] = []
 

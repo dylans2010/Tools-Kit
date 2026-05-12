@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentContext: Codable {
+struct AgentContext: Codable, Sendable {
     var messages: [SystemAgentMessage]
     var metadata: [String: String]
 

@@ -1,7 +1,7 @@
 import Foundation
 
 actor GitHubActionsClient {
-    enum ActionsError: LocalizedError {
+    enum ActionsError: LocalizedError, Sendable {
         case missingToken
         case invalidResponse
         case unexpectedStatusCode(Int, String)
@@ -223,7 +223,7 @@ actor GitHubActionsClient {
     }
 }
 
-private struct AnyEncodable: Encodable {
+private struct AnyEncodable: Encodable, @unchecked Sendable {
     private let encoder: (Encoder) throws -> Void
 
     init(_ wrapped: some Encodable) {

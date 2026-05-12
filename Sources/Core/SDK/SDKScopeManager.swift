@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKScopeManager: ObservableObject {
-    public static let shared = SDKScopeManager()
+    nonisolated(unsafe) public static let shared = SDKScopeManager()
 
     @Published public var authorizedScopes: Set<String> = []
     @Published public var scopeAuditLog: [ScopeAuditEntry] = []
@@ -11,11 +11,11 @@ public final class SDKScopeManager: ObservableObject {
     private let persistenceKey = "sdk_authorized_scopes"
     private let maxAuditEntries = 500
 
-    public enum Operation: String {
+    public enum Operation: String, Sendable {
         case read, write, delete, execute
     }
 
-    public struct ScopeAuditEntry: Identifiable {
+    public struct ScopeAuditEntry: Identifiable, Sendable {
         public let id = UUID()
         public let timestamp = Date()
         public let scope: String

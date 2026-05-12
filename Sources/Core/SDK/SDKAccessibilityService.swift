@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKAccessibilityService: ObservableObject {
-    public static let shared = SDKAccessibilityService()
+    nonisolated(unsafe) public static let shared = SDKAccessibilityService()
 
     @Published public var isVoiceOverOptimized = true
     @Published public var preferredContentSize: ContentSizeCategory = .medium
@@ -133,7 +133,7 @@ public final class SDKAccessibilityService: ObservableObject {
 
 // MARK: - Models
 
-public struct AccessibilityComponent {
+public struct AccessibilityComponent: Sendable {
     public let name: String
     public let label: String
     public let hasImages: Bool

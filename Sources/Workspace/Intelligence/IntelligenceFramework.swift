@@ -2,7 +2,7 @@ import Foundation
 
 /// Real framework for workspace intelligence.
 final class IntelligenceFramework {
-    static let shared = IntelligenceFramework()
+    nonisolated(unsafe) static let shared = IntelligenceFramework()
 
     private let dataStore = UnifiedDataStore.shared
     private let notebookManager = NotebooksManager.shared
@@ -41,14 +41,14 @@ final class IntelligenceFramework {
     }
 }
 
-struct WorkspaceInsight: Identifiable {
+struct WorkspaceInsight: Identifiable, Sendable {
     let id = UUID()
     let title: String
     let description: String
     let type: InsightType
 }
 
-enum InsightType {
+enum InsightType: Sendable {
     case pattern
     case recommendation
     case usageAnalysis

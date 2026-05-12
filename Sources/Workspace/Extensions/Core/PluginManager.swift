@@ -4,7 +4,7 @@ import Combine
 /// Manages the plugin lifecycle: install, enable/disable, sandbox execution.
 /// Acts as the PluginRegistry and PluginLifecycleManager.
 final class PluginManager: ObservableObject {
-    static let shared = PluginManager()
+    nonisolated(unsafe) static let shared = PluginManager()
 
     @Published private(set) var installedPlugins: [PluginDefinition] = []
     @Published private(set) var availablePlugins: [PluginDefinition] = []

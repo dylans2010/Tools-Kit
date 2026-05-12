@@ -1,13 +1,13 @@
 import SwiftUI
 import UIKit
 
-struct DrawingExport {
+struct DrawingExport: Sendable {
     let imageData: Data
     let fileName: String
 }
 
 struct DrawingBoardView: View {
-    enum Tool: String, CaseIterable, Identifiable {
+    enum Tool: String, CaseIterable, Identifiable, Sendable {
         case pen = "Pen"
         case marker = "Marker"
         case highlighter = "Highlighter"
@@ -29,7 +29,7 @@ struct DrawingBoardView: View {
         var id: String { rawValue }
     }
     
-    enum CanvasBackground: String, CaseIterable, Identifiable {
+    enum CanvasBackground: String, CaseIterable, Identifiable, Sendable {
         case plain = "Plain"
         case graph = "Graph"
         case dot = "Dots"
@@ -38,7 +38,7 @@ struct DrawingBoardView: View {
         var id: String { rawValue }
     }
 
-    struct Stroke: Identifiable {
+    struct Stroke: Identifiable, Sendable {
         let id = UUID()
         var points: [CGPoint]
         var color: Color

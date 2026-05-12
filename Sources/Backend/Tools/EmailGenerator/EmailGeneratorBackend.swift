@@ -1,6 +1,6 @@
 import Foundation
 
-enum EmailType: String, CaseIterable {
+enum EmailType: String, CaseIterable, Sendable {
     case jobApplication = "Job Application"
     case meetingRequest = "Meeting Request"
     case followUp = "Follow-up"
@@ -8,7 +8,7 @@ enum EmailType: String, CaseIterable {
     case thankYou = "Thank You"
 }
 
-enum EmailTone: String, CaseIterable {
+enum EmailTone: String, CaseIterable, Sendable {
     case professional = "Professional"
     case casual = "Casual"
     case formal = "Formal"

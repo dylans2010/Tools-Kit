@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentCodeBlock: Codable {
+struct AgentCodeBlock: Codable, Sendable {
     var language: String
     var code: String
 

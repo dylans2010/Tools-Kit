@@ -1,6 +1,6 @@
 import Foundation
 
-enum RewriteTone: String, CaseIterable {
+enum RewriteTone: String, CaseIterable, Sendable {
     case professional = "Professional"
     case formal = "Formal"
     case casual = "Casual"

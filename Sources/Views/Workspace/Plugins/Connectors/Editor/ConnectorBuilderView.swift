@@ -864,7 +864,7 @@ struct ConnectorBuilderView: View {
 
 // MARK: - Key-Value Pair Helper
 
-private struct KeyValuePair: Identifiable {
+private struct KeyValuePair: Identifiable, Sendable {
     let id = UUID()
     var key: String
     var value: String

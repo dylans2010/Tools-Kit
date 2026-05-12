@@ -7,7 +7,7 @@ struct QRCodeView: View {
     @StateObject private var cameraService = CameraService()
     @State private var mode: QRMode = .generate
 
-    enum QRMode {
+    enum QRMode: Sendable {
         case generate, scan
     }
 
@@ -199,7 +199,7 @@ class QRScanner: NSObject, ObservableObject, CameraServiceDelegate {
     }
 }
 
-struct QRCodeTool: Tool {
+struct QRCodeTool: Tool, Sendable {
     let id = UUID()
     let requiresAPI = false
     let name = "QR Code Tool"

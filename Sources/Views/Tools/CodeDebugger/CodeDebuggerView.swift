@@ -36,7 +36,7 @@ struct CodeDebuggerView: View {
     }
 }
 
-struct CodeDebuggerTool: Tool {
+struct CodeDebuggerTool: Tool, Sendable {
     let name = "Code Debugger"
     let icon = "ant.circle"
     let category = ToolCategory.development

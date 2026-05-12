@@ -1,7 +1,7 @@
 import Foundation
 
 /// Represents a Jules session.
-struct AgentSession: Codable, Identifiable {
+struct AgentSession: Codable, Identifiable, Sendable {
     let id: String
     let name: String
     let title: String?
@@ -11,13 +11,13 @@ struct AgentSession: Codable, Identifiable {
     let sourceContext: AgentSourceContext
     let outputs: [AgentOutput]?
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case id, name, title, prompt, status, outputs
         case sourceContext = "sourceContext"
         case sessionURL = "session_url"
     }
 
-    private enum LegacySessionURLKeys: String, CodingKey {
+    private enum LegacySessionURLKeys: String, CodingKey, Sendable {
         case webURL = "web_url"
         case htmlURL = "html_url"
         case url
@@ -41,25 +41,25 @@ struct AgentSession: Codable, Identifiable {
     }
 }
 
-struct AgentSourceContext: Codable {
+struct AgentSourceContext: Codable, Sendable {
     let source: String
     let githubRepoContext: AgentGitHubRepoContext?
 }
 
-struct AgentGitHubRepoContext: Codable {
+struct AgentGitHubRepoContext: Codable, Sendable {
     let startingBranch: String?
 }
 
-struct AgentOutput: Codable {
+struct AgentOutput: Codable, Sendable {
     let prURL: String?
     let pullRequest: AgentPullRequest?
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case prURL = "pr_url"
         case pullRequest = "pull_request"
     }
 
-    private enum LegacyCodingKeys: String, CodingKey {
+    private enum LegacyCodingKeys: String, CodingKey, Sendable {
         case pullRequest = "pullRequest"
     }
 
@@ -72,18 +72,18 @@ struct AgentOutput: Codable {
     }
 }
 
-struct AgentPullRequest: Codable {
+struct AgentPullRequest: Codable, Sendable {
     let url: String
     let title: String?
     let description: String?
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case url
         case title
         case description
     }
 
-    private enum LegacyCodingKeys: String, CodingKey {
+    private enum LegacyCodingKeys: String, CodingKey, Sendable {
         case htmlURL = "html_url"
         case body
     }
@@ -101,7 +101,7 @@ struct AgentPullRequest: Codable {
 }
 
 /// Represents an activity within a Jules session.
-struct AgentActivity: Codable, Identifiable {
+struct AgentActivity: Codable, Identifiable, Sendable {
     let id: String
     let name: String
     let createTime: Date
@@ -115,14 +115,14 @@ struct AgentActivity: Codable, Identifiable {
     let diffGenerated: AgentDiff?
     let timelineUpdated: AgentTimelineStep?
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case id, name, createTime, originator
         case planGenerated, progressUpdated, sessionCompleted
         case toolExecuted, memoryUpdated, checkpointCreated, diffGenerated, timelineUpdated
     }
 }
 
-struct AgentToolExecution: Codable, Identifiable {
+struct AgentToolExecution: Codable, Identifiable, Sendable {
     var id: String { requestId }
     let tool: String
     let status: String
@@ -132,68 +132,68 @@ struct AgentToolExecution: Codable, Identifiable {
     let error: SystemToolError?
 }
 
-struct AgentCheckpoint: Codable, Identifiable {
+struct AgentCheckpoint: Codable, Identifiable, Sendable {
     let id: String
     let timestamp: Date
     let description: String
     let branchName: String?
 }
 
-struct AgentDiff: Codable, Identifiable {
+struct AgentDiff: Codable, Identifiable, Sendable {
     var id: String { filePath }
     let filePath: String
     let diff: String
 }
 
-struct AgentTimelineStep: Codable, Identifiable {
+struct AgentTimelineStep: Codable, Identifiable, Sendable {
     let id: String
     let step: String // PLAN, AUDIT, EXECUTE, VERIFY
     let status: String
     let timestamp: Date
 }
 
-struct AgentPlanGenerated: Codable {
+struct AgentPlanGenerated: Codable, Sendable {
     let plan: AgentPlan
 }
 
-struct AgentPlan: Codable {
+struct AgentPlan: Codable, Sendable {
     let id: String
     let steps: [AgentPlanStep]
 }
 
-struct AgentPlanStep: Codable {
+struct AgentPlanStep: Codable, Sendable {
     let id: String
     let title: String
     let index: Int?
 }
 
-struct AgentProgressUpdated: Codable {
+struct AgentProgressUpdated: Codable, Sendable {
     let title: String?
     let description: String?
 }
 
-struct AgentSessionCompleted: Codable {}
+struct AgentSessionCompleted: Codable, Sendable {}
 
 /// Represents a Jules source.
-struct AgentSource: Codable, Identifiable {
+struct AgentSource: Codable, Identifiable, Sendable {
     let id: String
     let name: String
     let githubRepo: AgentGitHubRepo?
 }
 
-struct AgentGitHubRepo: Codable {
+struct AgentGitHubRepo: Codable, Sendable {
     let owner: String
     let repo: String
 }
 
-struct AgentSourcesResponse: Codable {
+struct AgentSourcesResponse: Codable, Sendable {
     let sources: [AgentSource]?
 }
 
-struct AgentSessionsResponse: Codable {
+struct AgentSessionsResponse: Codable, Sendable {
     let sessions: [AgentSession]?
 }
 
-struct AgentActivitiesResponse: Codable {
+struct AgentActivitiesResponse: Codable, Sendable {
     let activities: [AgentActivity]?
 }

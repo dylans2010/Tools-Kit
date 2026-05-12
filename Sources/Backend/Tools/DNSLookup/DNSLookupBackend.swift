@@ -1,6 +1,6 @@
 import Foundation
 
-struct DNSRecord: Identifiable, Codable {
+struct DNSRecord: Identifiable, Codable, Sendable {
     let id = UUID()
     let name: String
     let type: Int
@@ -8,7 +8,7 @@ struct DNSRecord: Identifiable, Codable {
     let TTL: Int
 }
 
-struct DNSResponse: Codable {
+struct DNSResponse: Codable, Sendable {
     let Answer: [DNSRecord]?
 }
 

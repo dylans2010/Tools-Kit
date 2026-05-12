@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Slide: Codable, Identifiable, Equatable {
+public struct Slide: Codable, Identifiable, Equatable, Sendable {
     public var id: UUID = UUID()
     var type: String = "title"
     var title: String = "New Slide"
@@ -16,7 +16,7 @@ public struct Slide: Codable, Identifiable, Equatable {
         Slide(title: title)
     }
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case id
         case type
         case title

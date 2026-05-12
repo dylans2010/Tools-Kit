@@ -1,19 +1,19 @@
 import Foundation
 
-enum ProjectStatus: String, Codable, CaseIterable {
+enum ProjectStatus: String, Codable, CaseIterable, Sendable {
     case active = "Active"
     case paused = "Paused"
     case completed = "Completed"
     case archived = "Archived"
 }
 
-enum TaskStatus: String, Codable, CaseIterable {
+enum TaskStatus: String, Codable, CaseIterable, Sendable {
     case todo = "To Do"
     case inProgress = "In Progress"
     case done = "Done"
 }
 
-struct Project: Identifiable, Codable {
+struct Project: Identifiable, Codable, Sendable {
     var id: UUID = UUID()
     var name: String
     var description: String
@@ -30,7 +30,7 @@ struct Project: Identifiable, Codable {
     var settings: ProjectSettings = ProjectSettings()
 }
 
-struct ProjectTask: Identifiable, Codable {
+struct ProjectTask: Identifiable, Codable, Sendable {
     var id: UUID = UUID()
     var title: String
     var description: String = ""
@@ -41,14 +41,14 @@ struct ProjectTask: Identifiable, Codable {
     var createdAt: Date = Date()
     var tags: [String] = []
 
-    enum TaskPriority: String, Codable, CaseIterable {
+    enum TaskPriority: String, Codable, CaseIterable, Sendable {
         case low = "Low"
         case medium = "Medium"
         case high = "High"
     }
 }
 
-struct ProjectFile: Identifiable, Codable {
+struct ProjectFile: Identifiable, Codable, Sendable {
     var id: UUID = UUID()
     var fileName: String
     var mimeType: String
@@ -58,7 +58,7 @@ struct ProjectFile: Identifiable, Codable {
     var note: String = ""
 }
 
-struct ProjectAnnotation: Identifiable, Codable {
+struct ProjectAnnotation: Identifiable, Codable, Sendable {
     var id: UUID = UUID()
     var content: String
     var author: String = "You"
@@ -66,7 +66,7 @@ struct ProjectAnnotation: Identifiable, Codable {
     var tags: [String] = []
 }
 
-struct ProjectCollaborator: Identifiable, Codable {
+struct ProjectCollaborator: Identifiable, Codable, Sendable {
     var id: UUID = UUID()
     var name: String
     var email: String
@@ -81,14 +81,14 @@ struct ProjectCollaborator: Identifiable, Codable {
     }
 }
 
-enum CollaboratorRole: String, Codable, CaseIterable {
+enum CollaboratorRole: String, Codable, CaseIterable, Sendable {
     case owner = "Owner"
     case admin = "Admin"
     case member = "Member"
     case viewer = "Viewer"
 }
 
-struct ProjectSettings: Codable {
+struct ProjectSettings: Codable, Sendable {
     var allowFileUploads: Bool = true
     var allowAnnotations: Bool = true
     var defaultTaskPriority: ProjectTask.TaskPriority = .medium
@@ -97,7 +97,7 @@ struct ProjectSettings: Codable {
     var tags: [String] = []
 }
 
-struct LinkedChat: Identifiable, Codable {
+struct LinkedChat: Identifiable, Codable, Sendable {
     var id: UUID = UUID()
     var title: String
     var summary: String

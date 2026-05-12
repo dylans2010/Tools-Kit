@@ -71,7 +71,7 @@ public struct SDKMigrationRecord: Identifiable, Codable, Sendable {
 /// Manages data model migrations across SDK versions.
 @MainActor
 public final class SDKMigrationManager: SDKMigrationManagerProtocol, ObservableObject {
-    public static let shared = SDKMigrationManager()
+    nonisolated(unsafe) public static let shared = SDKMigrationManager()
 
     @Published public private(set) var currentVersion: Int = 0
     @Published public private(set) var migrationHistory: [SDKMigrationRecord] = []

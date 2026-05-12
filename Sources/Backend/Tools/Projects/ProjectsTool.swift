@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ProjectsTool: Tool {
+struct ProjectsTool: Tool, Sendable {
     let name = "Projects"
     let icon = "folder.badge.plus"
     let category = ToolCategory.utility

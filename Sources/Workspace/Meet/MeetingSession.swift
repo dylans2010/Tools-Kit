@@ -1,6 +1,6 @@
 import Foundation
 
-struct MeetingSession: Identifiable, Equatable, Codable {
+struct MeetingSession: Identifiable, Equatable, Codable, Sendable {
     private static let minimumOpaqueMeetingTokenLength = 24
     private static let base64URLCharacterSet = CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_")
 
@@ -38,7 +38,7 @@ struct MeetingSession: Identifiable, Equatable, Codable {
         self.debugTraceId = debugTraceId
     }
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case meetingId
         case roomName
         case isJoinable

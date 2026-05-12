@@ -1,6 +1,6 @@
 import Foundation
 
-struct HabitItem: Identifiable, Codable {
+struct HabitItem: Identifiable, Codable, Sendable {
     let id: UUID
     var name: String
     var targetPerWeek: Int

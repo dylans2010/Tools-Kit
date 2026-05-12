@@ -1,6 +1,6 @@
 import Foundation
 
-enum AgentValidationError: Error, LocalizedError {
+enum AgentValidationError: Error, LocalizedError, Sendable {
     case missingRequiredField(String)
     case invalidFormat(String)
 

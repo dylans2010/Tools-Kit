@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class ArticlesManager: ObservableObject {
-    static let shared = ArticlesManager()
+    nonisolated(unsafe) static let shared = ArticlesManager()
 
     @Published var collections: [ArticleCollection] = []
     @Published var recentArticles: [Article] = []
@@ -143,7 +143,7 @@ final class ArticlesManager: ObservableObject {
 
     // MARK: - AI Article Intelligence
 
-    struct AIArticleInsights: Codable {
+    struct AIArticleInsights: Codable, Sendable {
         let summary: String
         let keyPoints: [String]
         let rewrite: String

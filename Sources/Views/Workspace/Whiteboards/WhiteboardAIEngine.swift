@@ -1,7 +1,7 @@
 import Foundation
 
 @MainActor
-struct WhiteboardAIEngine {
+struct WhiteboardAIEngine: Sendable {
     private let processor = WhiteboardGraphProcessor()
 
     func expandNodes(_ nodes: [WhiteboardNode]) -> [WhiteboardNode] {

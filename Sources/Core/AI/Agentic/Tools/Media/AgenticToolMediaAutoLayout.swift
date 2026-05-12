@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolMediaAutoLayout: AgenticToolProtocol {
+struct AgenticToolMediaAutoLayout: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "media_auto_layout",
         description: "Auto-layout media in a document or slide",

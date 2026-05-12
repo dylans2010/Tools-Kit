@@ -3,7 +3,7 @@ import Foundation
 /// High-fidelity, JSON-based persistence engine for Workspace modules.
 /// Manages storage in the application's document directory.
 final class WorkspacePersistence {
-    static let shared = WorkspacePersistence()
+    nonisolated(unsafe) static let shared = WorkspacePersistence()
 
     private let fileManager = FileManager.default
 
@@ -45,7 +45,7 @@ final class WorkspacePersistence {
 
 // MARK: - Connector Models
 
-struct ConnectorDefinition: Codable, Identifiable {
+struct ConnectorDefinition: Codable, Identifiable, Sendable {
     let id: UUID
     var name: String
     var identifier: String // com.toolskit.<connectorName>
@@ -60,12 +60,12 @@ struct ConnectorDefinition: Codable, Identifiable {
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
 
-    enum ConnectorStatus: String, Codable {
+    enum ConnectorStatus: String, Codable, Sendable {
         case active, inactive, error, connecting
     }
 }
 
-struct ConnectorEndpoint: Codable, Identifiable {
+struct ConnectorEndpoint: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var path: String
     var method: String // GET, POST, PUT, DELETE
@@ -74,17 +74,17 @@ struct ConnectorEndpoint: Codable, Identifiable {
     var bodySchema: String?
 }
 
-struct ConnectorAuthConfig: Codable {
+struct ConnectorAuthConfig: Codable, Sendable {
     var type: AuthType
     var credentials: [String: String] = [:] // Encrypted values
     var oauthConfig: OAuthConfig?
 
-    enum AuthType: String, Codable {
+    enum AuthType: String, Codable, Sendable {
         case apiKey, oauth2, bearer, none
     }
 }
 
-struct OAuthConfig: Codable {
+struct OAuthConfig: Codable, Sendable {
     var clientID: String
     var clientSecret: String
     var authURL: String
@@ -92,33 +92,33 @@ struct OAuthConfig: Codable {
     var scopes: [String]
 }
 
-struct ConnectorSchema: Codable {
+struct ConnectorSchema: Codable, Sendable {
     var mappings: [String: String]
     var jsonSchema: String
 }
 
-struct ConnectorFlow: Codable {
+struct ConnectorFlow: Codable, Sendable {
     var steps: [FlowStep]
 }
 
-struct FlowStep: Codable, Identifiable {
+struct FlowStep: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var type: StepType
     var config: [String: String]
 
-    enum StepType: String, Codable, CaseIterable {
+    enum StepType: String, Codable, CaseIterable, Sendable {
         case trigger, condition, action, delay
     }
 }
 
-struct ConnectorMetadata: Codable {
+struct ConnectorMetadata: Codable, Sendable {
     var executionCount: Int = 0
     var lastExecutedAt: Date?
     var averageLatency: Double = 0.0
     var errorRate: Double = 0.0
 }
 
-struct ConnectorLog: Codable, Identifiable {
+struct ConnectorLog: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var connectorID: UUID
     var timestamp: Date
@@ -126,7 +126,7 @@ struct ConnectorLog: Codable, Identifiable {
     var message: String
     var details: String?
 
-    enum LogType: String, Codable {
+    enum LogType: String, Codable, Sendable {
         case info, warning, error, performance
     }
 }
@@ -134,7 +134,7 @@ struct ConnectorLog: Codable, Identifiable {
 // MARK: - Connector Manager
 
 final class ConnectorManager: ObservableObject {
-    static let shared = ConnectorManager()
+    nonisolated(unsafe) static let shared = ConnectorManager()
 
     @Published var connectors: [ConnectorDefinition] = []
     @Published var logs: [ConnectorLog] = []
@@ -198,7 +198,7 @@ final class ConnectorManager: ObservableObject {
 // MARK: - Connector Execution Service
 
 final class ConnectorExecutionService {
-    static let shared = ConnectorExecutionService()
+    nonisolated(unsafe) static let shared = ConnectorExecutionService()
 
     private init() {}
 
@@ -251,7 +251,7 @@ final class ConnectorExecutionService {
 // MARK: - Plugin Toolkit Logic
 
 final class PluginToolkitEngine {
-    static let shared = PluginToolkitEngine()
+    nonisolated(unsafe) static let shared = PluginToolkitEngine()
 
     private init() {}
 

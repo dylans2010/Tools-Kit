@@ -1,6 +1,6 @@
 import Foundation
 
-struct MessagesValidationTests {
+struct MessagesValidationTests: Sendable {
     static func run() {
         print("Testing Messages Extension Logic...")
 

@@ -5,7 +5,7 @@ struct ActivityTimelineView: View {
     @StateObject private var manager = CollaborationManager.shared
     @State private var filter: ActivityFilter = .all
 
-    enum ActivityFilter: String, CaseIterable {
+    enum ActivityFilter: String, CaseIterable, Sendable {
         case all = "All"
         case commits = "Commits"
         case merges = "Merges"

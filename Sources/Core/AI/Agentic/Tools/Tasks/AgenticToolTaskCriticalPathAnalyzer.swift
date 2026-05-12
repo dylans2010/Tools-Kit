@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolTaskCriticalPathAnalyzer: AgenticToolProtocol {
+struct AgenticToolTaskCriticalPathAnalyzer: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "task_critical_path",
         description: "Analyze the critical path through task dependencies",

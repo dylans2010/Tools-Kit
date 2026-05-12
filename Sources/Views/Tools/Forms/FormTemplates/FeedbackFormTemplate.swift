@@ -1,6 +1,6 @@
 import Foundation
 
-enum FeedbackFormTemplate {
+enum FeedbackFormTemplate: Sendable {
     static func build() -> FormDocument {
         let questions = [
             FormQuestion(title: "How satisfied are you?", type: .ratingScale, options: ["1", "5"], required: true),

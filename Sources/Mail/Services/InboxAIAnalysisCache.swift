@@ -1,7 +1,7 @@
 import Foundation
 
 actor InboxAIAnalysisCache {
-    static let shared = InboxAIAnalysisCache()
+    nonisolated(unsafe) static let shared = InboxAIAnalysisCache()
     private let defaultCacheWarmupInterval: TimeInterval = 5 * 60
 
     private var lastWarmDate: Date?

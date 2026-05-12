@@ -4,7 +4,7 @@ import Combine
 
 @MainActor
 final class AgenticCoreSessionManager: ObservableObject {
-    static let shared = AgenticCoreSessionManager()
+    nonisolated(unsafe) static let shared = AgenticCoreSessionManager()
 
     @Published var streamedTokens: [AgenticStreamToken] = []
     @Published var currentResponse: String = ""
@@ -122,7 +122,7 @@ final class AgenticCoreSessionManager: ObservableObject {
 
 // MARK: - Errors
 
-enum AgenticSessionError: LocalizedError {
+enum AgenticSessionError: LocalizedError, Sendable {
     case noActiveSession
     case interrupted
     case deviceNotSupported(String)

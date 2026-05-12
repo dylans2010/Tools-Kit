@@ -1,7 +1,7 @@
 import Foundation
 
 public final class SDKPermissionManager {
-    public static let shared = SDKPermissionManager()
+    nonisolated(unsafe) public static let shared = SDKPermissionManager()
 
     public static let noSandboxScope = "sdk.developer.noSandbox"
 
@@ -58,7 +58,7 @@ public final class SDKPermissionManager {
     }
 }
 
-public enum SDKError: Error, LocalizedError {
+public enum SDKError: Error, LocalizedError, Sendable {
     case permissionDenied(scope: String)
     case executionFailed(reason: String)
     case networkError(reason: String)

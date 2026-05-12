@@ -10,7 +10,7 @@ final class MeetingVideoTrack {}
 
 @MainActor
 final class MeetingStateManager: NSObject, ObservableObject {
-    static let shared = MeetingStateManager()
+    nonisolated(unsafe) static let shared = MeetingStateManager()
 
     @Published var phase: MeetSessionPhase = .idle
     @Published var participants: [MeetingParticipant] = []

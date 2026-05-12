@@ -1,6 +1,6 @@
 import Foundation
 
-enum AppConfig {
+enum AppConfig: Sendable {
     private static let logger = InternalLogger.shared
 
     static func string(for key: String) -> String? {

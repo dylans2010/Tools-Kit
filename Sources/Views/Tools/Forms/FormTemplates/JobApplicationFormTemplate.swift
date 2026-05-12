@@ -1,6 +1,6 @@
 import Foundation
 
-enum JobApplicationFormTemplate {
+enum JobApplicationFormTemplate: Sendable {
     static func build() -> FormDocument {
         let questions = [
             FormQuestion(title: "Candidate Name", type: .textInput, required: true),

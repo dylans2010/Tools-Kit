@@ -10,7 +10,7 @@ struct LyricsEditorView: View {
     @StateObject private var engine = LyricsSyncEngine.shared
 
     // Modes
-    enum EditorMode: String, CaseIterable {
+    enum EditorMode: String, CaseIterable, Sendable {
         case text = "Text"
         case sync = "Sync"
     }

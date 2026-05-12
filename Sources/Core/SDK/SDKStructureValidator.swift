@@ -1,6 +1,6 @@
 import Foundation
 
-public struct SDKStructureValidationResult {
+public struct SDKStructureValidationResult: Sendable {
     public var duplicateModules: [String]
     public var invalidReferences: [String]
     public var circularDependencies: [String]

@@ -1,7 +1,7 @@
 import Foundation
 
-struct AgentCapabilityValidator {
-    enum CapabilityError: Error, LocalizedError {
+struct AgentCapabilityValidator: Sendable {
+    enum CapabilityError: Error, LocalizedError, Sendable {
         case missingCapability(String)
 
         var errorDescription: String? {

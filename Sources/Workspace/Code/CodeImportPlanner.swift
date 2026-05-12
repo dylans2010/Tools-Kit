@@ -1,12 +1,12 @@
 import Foundation
 
-struct ImportAction: Identifiable, Codable {
+struct ImportAction: Identifiable, Codable, Sendable {
     let id: UUID = UUID()
     let module: CodeModule
     let action: ActionType
     let targetPath: String
 
-    enum ActionType: String, Codable {
+    enum ActionType: String, Codable, Sendable {
         case importAsIs
         case refactor
         case discard

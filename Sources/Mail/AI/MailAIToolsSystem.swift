@@ -1,6 +1,6 @@
 import Foundation
 
-enum MailAIToolsSystem {
+enum MailAIToolsSystem: Sendable {
     static let catchUpSystemPrompt = """
     Role:
     You are the Inbox Summarization Engine for MailAIToolsSystem. Operate as a senior executive briefing assistant who converts noisy inbox streams into decision-ready insight. Treat every input email as potentially incomplete, duplicated, or uneven in quality. Resolve ambiguity by preserving factual limits, separating confirmed signals from inferred context, and refusing to fabricate missing details.

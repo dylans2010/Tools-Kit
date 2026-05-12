@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolSlidesExportPDF: AgenticToolProtocol {
+struct AgenticToolSlidesExportPDF: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "slides_export_pdf",
         description: "Export slide deck to PDF",

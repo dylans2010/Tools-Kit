@@ -4,7 +4,7 @@ import SwiftUI
 
 /// High-performance export engine for rendering Slides to PDF and Video.
 final class ExportEngine: ObservableObject {
-    static let shared = ExportEngine()
+    nonisolated(unsafe) static let shared = ExportEngine()
 
     @Published var exportProgress: Double = 0
     @Published var isExporting: Bool = false

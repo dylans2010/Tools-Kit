@@ -94,7 +94,7 @@ private struct CalendarMetricLabel: View {
     }
 }
 
-enum CalendarMode: String, CaseIterable, Identifiable {
+enum CalendarMode: String, CaseIterable, Identifiable, Sendable {
     case today = "Today", agenda = "Agenda", week = "Week", month = "Month", year = "Year"
     var id: String { rawValue }
 }

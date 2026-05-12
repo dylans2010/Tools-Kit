@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct TLSInspectorTool: Tool {
+struct TLSInspectorTool: Tool, Sendable {
     let name = "TLS Inspector"
     let icon = "lock.shield"
     let category = ToolCategory.network

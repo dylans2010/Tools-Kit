@@ -73,7 +73,7 @@ struct Base64View: View {
     }
 }
 
-struct Base64Tool: Tool {
+struct Base64Tool: Tool, Sendable {
     let name = "Base64 Tool"
     let icon = "lock.open"
     let category = ToolCategory.development

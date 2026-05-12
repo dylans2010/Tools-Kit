@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class BackgroundTaskManager {
-    static let shared = BackgroundTaskManager()
+    nonisolated(unsafe) static let shared = BackgroundTaskManager()
 
     private var tasks: [String: Task<Void, Never>] = [:]
     private var timers: [String: AnyCancellable] = [:]

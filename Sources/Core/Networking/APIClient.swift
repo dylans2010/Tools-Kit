@@ -2,7 +2,7 @@ import Foundation
 
 /// Core API client for interacting with ToolsKit backend services.
 final class APIClient {
-    static let shared = APIClient()
+    nonisolated(unsafe) static let shared = APIClient()
 
     private let baseURL = URL(string: "https://api.toolskit.io/v1")!
     private let session = URLSession.shared
@@ -31,7 +31,7 @@ final class APIClient {
         return try JSONDecoder().decode(T.self, from: data)
     }
 
-    enum APIError: Error {
+    enum APIError: Error, Sendable {
         case requestFailed
         case decodingFailed
     }

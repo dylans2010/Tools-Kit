@@ -116,6 +116,6 @@ private struct InspectedItemRow: View {
     }
 }
 
-private struct InspectedItem: Identifiable {
+private struct InspectedItem: Identifiable, Sendable {
     let id: UUID, preview: String, updatedAt: Date
 }

@@ -49,7 +49,7 @@ struct AudioConverterView: View {
     }
 }
 
-struct AudioConverterTool: Tool {
+struct AudioConverterTool: Tool, Sendable {
     let name = "Audio Converter"
     let icon = "waveform"
     let category = ToolCategory.utility

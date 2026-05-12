@@ -306,7 +306,7 @@ struct PersonaHomeView: View {
         "What are the habits in 'Design' category?", "How many slides in 'Design' deck?", "Summarize 'Design' space"
     ]
 
-    enum PersonaHomeModal: String, Identifiable {
+    enum PersonaHomeModal: String, Identifiable, Sendable {
         case welcome
         case tuning
         case discovery
@@ -459,7 +459,7 @@ private struct PersonaHomeNavigationContent: View {
     }
 }
 
-private struct PersonaHomeToolbar: ToolbarContent {
+private struct PersonaHomeToolbar: ToolbarContent, @unchecked Sendable {
     let onShowWelcome: () -> Void
     let onShowTuning: () -> Void
 

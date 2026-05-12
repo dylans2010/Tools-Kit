@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct EndpointTesterTool: Tool {
+struct EndpointTesterTool: Tool, Sendable {
     let name = "Endpoint Tester"
     let icon = "arrow.triangle.2.circlepath.circle.fill"
     let category = ToolCategory.network

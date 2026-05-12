@@ -53,13 +53,13 @@ struct SDKFlowBuilderView: View {
     }
 }
 
-struct SDKFlowNode: Identifiable {
+struct SDKFlowNode: Identifiable, Sendable {
     let id = UUID()
     var name: String
     var type: NodeType
     var position: CGPoint
 
-    enum NodeType {
+    enum NodeType: Sendable {
         case trigger, condition, action
     }
 }

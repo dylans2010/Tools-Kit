@@ -1,6 +1,6 @@
 import SwiftUI
 
-enum ToolCategory: String, CaseIterable, Codable {
+enum ToolCategory: String, CaseIterable, Codable, Sendable {
     case general = "General"
     case conversion = "Conversion"
     case development = "Development"
@@ -10,7 +10,7 @@ enum ToolCategory: String, CaseIterable, Codable {
     case privacy = "Privacy"
 }
 
-enum ToolComplexity: String, CaseIterable, Codable {
+enum ToolComplexity: String, CaseIterable, Codable, Sendable {
     case basic = "Basic"
     case advanced = "Advanced"
 }

@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-public struct SDKLogEntry: Identifiable, Codable {
+public struct SDKLogEntry: Identifiable, Codable, Sendable {
     public var id: UUID
     public var timestamp: Date
     public var source: String
@@ -9,13 +9,13 @@ public struct SDKLogEntry: Identifiable, Codable {
     public var level: LogLevel
 }
 
-public enum LogLevel: String, Codable, CaseIterable {
+public enum LogLevel: String, Codable, CaseIterable, Sendable {
     case debug, info, warning, error
 }
 
 @MainActor
 public final class SDKLogStore: ObservableObject {
-    public static let shared = SDKLogStore()
+    nonisolated(unsafe) public static let shared = SDKLogStore()
 
     @Published public var entries: [SDKLogEntry] = []
 

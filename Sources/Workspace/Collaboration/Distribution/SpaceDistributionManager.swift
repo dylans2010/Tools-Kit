@@ -3,7 +3,7 @@ import Combine
 
 /// Manages publishing of Collaboration Spaces and template creation.
 final class SpaceDistributionManager: ObservableObject {
-    static let shared = SpaceDistributionManager()
+    nonisolated(unsafe) static let shared = SpaceDistributionManager()
 
     @Published var publishedSpaces: [UUID: URL] = [:] // spaceID: publicURL
     @Published var templates: [CollaborationSpace] = []
@@ -29,9 +29,9 @@ final class SpaceDistributionManager: ObservableObject {
 
 /// Manages guest access and temporary tokens for external collaboration.
 final class ExternalCollaborationManager: ObservableObject {
-    static let shared = ExternalCollaborationManager()
+    nonisolated(unsafe) static let shared = ExternalCollaborationManager()
 
-    struct GuestAccess: Codable, Identifiable {
+    struct GuestAccess: Codable, Identifiable, Sendable {
         let id: UUID
         let spaceID: UUID
         let token: String

@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolCalendarAvailabilityFinder: AgenticToolProtocol {
+struct AgenticToolCalendarAvailabilityFinder: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "calendar_availability_finder",
         description: "Find available time slots",

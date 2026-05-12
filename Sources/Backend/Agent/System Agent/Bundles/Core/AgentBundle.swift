@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentBundle: Codable, Identifiable {
+struct AgentBundle: Codable, Identifiable, Sendable {
     let id: String
     let name: String
     let version: String

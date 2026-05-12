@@ -1,7 +1,7 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct FileIntegrityTool: Tool {
+struct FileIntegrityTool: Tool, Sendable {
     let name = "File Integrity"
     let icon = "checkmark.shield.fill"
     let category = ToolCategory.network

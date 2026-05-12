@@ -1,6 +1,6 @@
 import Foundation
 
-struct AISlidesAssetResolver {
+struct AISlidesAssetResolver: Sendable {
     private let imageService = AISlidesImageService()
     private let cache = AISlidesCache.shared
 

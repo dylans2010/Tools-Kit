@@ -2,7 +2,7 @@ import Foundation
 
 /// Engine responsible for deep semantic parsing and classification of communication content.
 actor CommunicationIntelligenceEngine {
-    static let shared = CommunicationIntelligenceEngine()
+    nonisolated(unsafe) static let shared = CommunicationIntelligenceEngine()
     private let aiService = AIService.shared
 
     private init() {}
@@ -21,7 +21,7 @@ actor CommunicationIntelligenceEngine {
         }
         """
         let json = try await aiService.generateStructuredJSON(prompt: prompt, jsonSchema: schema)
-        struct Response: Codable { let intent: MailIntent }
+        struct Response: Codable, Sendable { let intent: MailIntent }
         let decoded = try JSONDecoder().decode(Response.self, from: Data(json.utf8))
         return decoded.intent
     }

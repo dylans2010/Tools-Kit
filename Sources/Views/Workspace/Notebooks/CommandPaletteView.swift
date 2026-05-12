@@ -77,7 +77,7 @@ struct CommandPaletteView: View {
     }
 }
 
-struct CommandAction: Identifiable {
+struct CommandAction: Identifiable, Sendable {
     let id = UUID()
     let title: String
     let icon: String

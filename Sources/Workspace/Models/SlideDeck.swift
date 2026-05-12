@@ -1,6 +1,6 @@
 import Foundation
 
-public struct SlideDeck: Codable, Identifiable, Equatable {
+public struct SlideDeck: Codable, Identifiable, Equatable, Sendable {
     public var id: UUID = UUID()
     var title: String = "Untitled Deck"
     var theme: String = "default"
@@ -14,7 +14,7 @@ public struct SlideDeck: Codable, Identifiable, Equatable {
         SlideDeck(title: title, slides: [Slide.blank(title: "Slide 1")])
     }
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, Sendable {
         case id
         case title
         case theme

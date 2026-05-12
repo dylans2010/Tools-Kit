@@ -1,6 +1,6 @@
 import Foundation
 
-struct TemporaryIdentity: Identifiable {
+struct TemporaryIdentity: Identifiable, Sendable {
     let id = UUID()
     let fullName: String
     let firstName: String

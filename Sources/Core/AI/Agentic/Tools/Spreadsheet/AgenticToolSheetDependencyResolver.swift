@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolSheetDependencyResolver: AgenticToolProtocol {
+struct AgenticToolSheetDependencyResolver: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "sheet_dependency_resolver",
         description: "Resolve formula dependencies in a spreadsheet",

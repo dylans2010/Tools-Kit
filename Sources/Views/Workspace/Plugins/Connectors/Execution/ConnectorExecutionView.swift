@@ -13,7 +13,7 @@ struct ConnectorExecutionView: View {
     @State private var selectedStepIndex: Int?
     @State private var executionMode: ExecutionMode = .full
 
-    enum ExecutionMode: String, CaseIterable {
+    enum ExecutionMode: String, CaseIterable, Sendable {
         case full = "Full Pipeline"
         case stepByStep = "Step-by-Step"
         case dryRun = "Dry Run"

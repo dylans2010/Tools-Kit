@@ -20,7 +20,7 @@ public extension ShapeStyle where Self == Color {
 
 // MARK: - SDK Status Pill
 
-public struct SDKStatusPill: View {
+public struct SDKStatusPill: View, Sendable {
     public let label: String
     public let systemImage: String?
     public let color: Color
@@ -59,7 +59,7 @@ public struct SDKStatusPill: View {
 
 // MARK: - SDK Section Header
 
-public struct SDKSectionHeader: View {
+public struct SDKSectionHeader: View, Sendable {
     public let title: String
     public let subtitle: String?
     public let systemImage: String?
@@ -129,7 +129,7 @@ public struct SDKModernCard<Content: View>: View {
 
 // MARK: - SDK Stat Pill
 
-public struct SDKStatPill: View {
+public struct SDKStatPill: View, Sendable {
     public let label: String
     public let value: String
     public let color: Color
@@ -167,7 +167,7 @@ public struct SDKStatPill: View {
 
 // MARK: - SDK Action Tile
 
-public struct SDKActionTile: View {
+public struct SDKActionTile: View, @unchecked Sendable {
     public let title: String
     public let subtitle: String?
     public let systemImage: String
@@ -220,7 +220,7 @@ public struct SDKActionTile: View {
 
 // MARK: - Notification Components
 
-public struct SDKNotificationBanner: View {
+public struct SDKNotificationBanner: View, Sendable {
     public let message: String
     public let type: NotificationType
 
@@ -229,7 +229,7 @@ public struct SDKNotificationBanner: View {
         self.type = type
     }
 
-    public enum NotificationType {
+    public enum NotificationType: Sendable {
         case success, warning, error, info
 
         public var color: Color {

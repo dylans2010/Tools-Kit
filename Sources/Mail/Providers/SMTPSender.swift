@@ -9,7 +9,7 @@ struct SMTPConfig: Sendable {
     let useTLS: Bool
 }
 
-enum SMTPSender {
+enum SMTPSender: Sendable {
     static func send(draft: MailDraft, config: SMTPConfig) async throws {
         let endpoint = NWEndpoint.hostPort(host: NWEndpoint.Host(config.host), port: NWEndpoint.Port(integerLiteral: config.port))
         let parameters: NWParameters = config.useTLS ? .tls : .tcp

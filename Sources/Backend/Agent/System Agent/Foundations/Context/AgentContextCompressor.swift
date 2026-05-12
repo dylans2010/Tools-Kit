@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentContextCompressor {
+struct AgentContextCompressor: Sendable {
     init() {}
 
     func compress(_ context: AgentContext, targetTokenCount: Int) -> AgentContext {

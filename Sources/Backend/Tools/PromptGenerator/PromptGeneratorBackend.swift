@@ -1,6 +1,6 @@
 import Foundation
 
-enum PromptAIModel: String, CaseIterable {
+enum PromptAIModel: String, CaseIterable, Sendable {
     case gpt4 = "GPT-4"
     case claude = "Claude 3"
     case dalle = "DALL-E 3"
@@ -8,7 +8,7 @@ enum PromptAIModel: String, CaseIterable {
     case stableDiffusion = "Stable Diffusion"
 }
 
-enum PromptType: String, CaseIterable {
+enum PromptType: String, CaseIterable, Sendable {
     case creativeWriting = "Creative Writing"
     case codeGeneration = "Code Generation"
     case imagePrompt = "Image Generation"

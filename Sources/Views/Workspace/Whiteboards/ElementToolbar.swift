@@ -9,7 +9,7 @@ struct ElementToolbar: View {
 
     @State private var activeSection: ToolbarSection = .properties
 
-    enum ToolbarSection: String, CaseIterable {
+    enum ToolbarSection: String, CaseIterable, Sendable {
         case properties = "Properties"
         case style = "Style"
         case arrange = "Arrange"

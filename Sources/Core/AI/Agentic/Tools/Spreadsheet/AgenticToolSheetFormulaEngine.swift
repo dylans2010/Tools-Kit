@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolSheetFormulaEngine: AgenticToolProtocol {
+struct AgenticToolSheetFormulaEngine: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "sheet_formula_engine",
         description: "Evaluate or create formulas",

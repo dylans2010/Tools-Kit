@@ -4,7 +4,7 @@ import ZIPFoundation
 import CryptoKit
 
 final class MusicLibraryManager: ObservableObject {
-    static let shared = MusicLibraryManager()
+    nonisolated(unsafe) static let shared = MusicLibraryManager()
 
     @Published var songs: [Song] = []
     @Published var playlists: [Playlist] = []
@@ -24,11 +24,11 @@ final class MusicLibraryManager: ObservableObject {
 
     // MARK: - Metadata JSON (per-playlist folder)
 
-    private struct PlaylistMetadata: Codable {
+    private struct PlaylistMetadata: Codable, Sendable {
         var playlistName: String
         var songs: [SongMeta]
 
-        struct SongMeta: Codable {
+        struct SongMeta: Codable, Sendable {
             var title: String
             var fileName: String
         }
@@ -36,7 +36,7 @@ final class MusicLibraryManager: ObservableObject {
 
     // MARK: - Backup helpers
 
-    private struct BackupSongRecord: Codable {
+    private struct BackupSongRecord: Codable, Sendable {
         let id: UUID
         let title: String
         let artist: String
@@ -48,7 +48,7 @@ final class MusicLibraryManager: ObservableObject {
         let playlistName: String?
     }
 
-    private struct BackupManifest: Codable {
+    private struct BackupManifest: Codable, Sendable {
         let version: Int
         let songs: [BackupSongRecord]
         let playlists: [Playlist]

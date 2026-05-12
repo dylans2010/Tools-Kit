@@ -121,13 +121,13 @@ struct GitHubProjectBoardView: View {
     }
 }
 
-private struct ProjectColumn: Identifiable {
+private struct ProjectColumn: Identifiable, Sendable {
     let id = UUID()
     let name: String
     var cards: [ProjectCard]
 }
 
-private struct ProjectCard: Identifiable {
+private struct ProjectCard: Identifiable, Sendable {
     let id = UUID()
     let title: String
     let description: String

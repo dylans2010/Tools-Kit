@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolNoteExtractInsights: AgenticToolProtocol {
+struct AgenticToolNoteExtractInsights: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "note_extract_insights",
         description: "Extract key insights and action items from notes",

@@ -189,7 +189,7 @@ struct SDKDiagnosticsView: View {
     }
 }
 
-private struct DiagnosticsSnapshot {
+private struct DiagnosticsSnapshot: Sendable {
     let healthRows: [HealthMetricDisplay]
     let telemetryMetrics: TelemetryMetrics
     let successRateText: String
@@ -201,20 +201,20 @@ private struct DiagnosticsSnapshot {
     let lastAuditText: String
 }
 
-private struct HealthMetricDisplay: Identifiable {
+private struct HealthMetricDisplay: Identifiable, Sendable {
     let id: String
     let title: String
     let value: String
     let indicator: HealthIndicator
 }
 
-private struct HealthIndicator {
+private struct HealthIndicator: Sendable {
     let text: String
     let tint: Color
     let systemImage: String
 }
 
-private struct SummaryMetric: Identifiable {
+private struct SummaryMetric: Identifiable, Sendable {
     let id: String
     let title: String
     let value: String

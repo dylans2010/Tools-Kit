@@ -5,7 +5,7 @@ import UIKit
 
 // MARK: - Imported Media Item
 
-struct ImportedMediaItem: Identifiable {
+struct ImportedMediaItem: Identifiable, Sendable {
     let id = UUID()
     let name: String
     let type: MediaImportType
@@ -14,7 +14,7 @@ struct ImportedMediaItem: Identifiable {
     let resourceIdentifier: String
     var thumbnailImage: UIImage?
 
-    enum MediaImportType: String {
+    enum MediaImportType: String, Sendable {
         case photo, video, document, audio
 
         var layerType: LayerType {
@@ -171,7 +171,7 @@ struct CameraCaptureView: UIViewControllerRepresentable {
 
 // MARK: - Image Thumbnail Generator
 
-struct ThumbnailGenerator {
+struct ThumbnailGenerator: Sendable {
     static func generateThumbnail(from url: URL, size: CGSize = CGSize(width: 200, height: 200)) -> UIImage? {
         guard url.startAccessingSecurityScopedResource() else { return nil }
         defer { url.stopAccessingSecurityScopedResource() }
@@ -195,7 +195,7 @@ struct ThumbnailGenerator {
 
 // MARK: - Editing Mode
 
-enum EditingEntryMode: String, Identifiable {
+enum EditingEntryMode: String, Identifiable, Sendable {
     case quickEdit = "Quick Edit"
     case fullEditor = "Full Editor"
 

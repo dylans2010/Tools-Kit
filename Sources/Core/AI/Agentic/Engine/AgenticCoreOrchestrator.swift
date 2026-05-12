@@ -4,7 +4,7 @@ import SwiftUI
 
 @MainActor
 final class AgenticCoreOrchestrator: ObservableObject {
-    static let shared = AgenticCoreOrchestrator()
+    nonisolated(unsafe) static let shared = AgenticCoreOrchestrator()
 
     @Published var executionState: AgenticExecutionState = .idle
     @Published var streamedText: String = ""

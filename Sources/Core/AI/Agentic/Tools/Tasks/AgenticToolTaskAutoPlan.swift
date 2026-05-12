@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolTaskAutoPlan: AgenticToolProtocol {
+struct AgenticToolTaskAutoPlan: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "task_auto_plan",
         description: "Generate an execution plan for a set of tasks",

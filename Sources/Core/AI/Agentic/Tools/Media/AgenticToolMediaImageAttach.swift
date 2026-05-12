@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolMediaImageAttach: AgenticToolProtocol {
+struct AgenticToolMediaImageAttach: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "media_image_attach",
         description: "Attach an image to a workspace item (note or slide)",

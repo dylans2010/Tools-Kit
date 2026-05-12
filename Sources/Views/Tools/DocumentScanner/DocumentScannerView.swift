@@ -3,7 +3,7 @@ import VisionKit
 import PDFKit
 import PencilKit
 
-struct DocumentScannerTool: Tool {
+struct DocumentScannerTool: Tool, Sendable {
     let name = "Document Scanner"
     let icon = "doc.text.viewfinder"
     let category = ToolCategory.utility

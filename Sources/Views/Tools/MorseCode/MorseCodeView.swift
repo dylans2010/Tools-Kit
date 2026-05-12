@@ -22,7 +22,7 @@ struct MorseCodeView: View {
     }
 }
 
-struct MorseCodeTool: Tool {
+struct MorseCodeTool: Tool, Sendable {
     let name = "Morse Code"
     let icon = "dot.radiowaves.left.and.right"
     let category = ToolCategory.utility

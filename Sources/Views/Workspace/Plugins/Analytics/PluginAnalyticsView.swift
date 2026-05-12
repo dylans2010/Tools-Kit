@@ -118,6 +118,6 @@ struct PluginAnalyticsView: View {
     }
 }
 
-private enum TimeRange: String, CaseIterable {
+private enum TimeRange: String, CaseIterable, Sendable {
     case day, week, month, year
 }

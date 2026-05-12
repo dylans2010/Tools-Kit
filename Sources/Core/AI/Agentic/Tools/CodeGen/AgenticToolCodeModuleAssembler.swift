@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolCodeModuleAssembler: AgenticToolProtocol {
+struct AgenticToolCodeModuleAssembler: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "code_module_assembler",
         description: "Assemble multiple generated components into a module",

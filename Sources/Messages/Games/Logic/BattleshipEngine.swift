@@ -1,6 +1,6 @@
 import Foundation
 
-struct BattleshipEngine: GameProtocol {
+struct BattleshipEngine: GameProtocol, Sendable {
     typealias StateType = BattleshipState
     var state: BattleshipState
 

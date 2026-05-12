@@ -3,7 +3,7 @@ import Combine
 
 // MARK: - Command Models
 
-struct ParsedCommand: Identifiable {
+struct ParsedCommand: Identifiable, Sendable {
     let id = UUID()
     let raw: String
     let intent: CommandIntent
@@ -11,7 +11,7 @@ struct ParsedCommand: Identifiable {
     let confidence: Double
 }
 
-enum CommandIntent: String, CaseIterable {
+enum CommandIntent: String, CaseIterable, Sendable {
     // Collaboration
     case summarizeWorkspace = "summarize_workspace"
     case findOverdueTasks = "find_overdue_tasks"
@@ -38,13 +38,13 @@ enum CommandIntent: String, CaseIterable {
 }
 
 
-struct PluginCommand: Identifiable {
+struct PluginCommand: Identifiable, Sendable {
     let id: UUID
     let keyword: String
     let description: String
 }
 
-struct CommandSuggestion: Identifiable {
+struct CommandSuggestion: Identifiable, Sendable {
     let id = UUID()
     let text: String
     let description: String
@@ -52,7 +52,7 @@ struct CommandSuggestion: Identifiable {
     let intent: CommandIntent
 }
 
-struct CommandResult: Identifiable {
+struct CommandResult: Identifiable, Sendable {
     let id = UUID()
     let command: String
     let output: String
@@ -65,7 +65,7 @@ struct CommandResult: Identifiable {
 
 /// Central command routing and execution system.
 final class CommandEngine: ObservableObject {
-    static let shared = CommandEngine()
+    nonisolated(unsafe) static let shared = CommandEngine()
 
     @Published private(set) var history: [CommandResult] = []
     @Published private(set) var pluginCommands: [(command: PluginCommand, pluginName: String)] = []
@@ -218,7 +218,7 @@ final class CommandEngine: ObservableObject {
 
     // MARK: - Persistence
 
-    struct StoredResult: Codable {
+    struct StoredResult: Codable, Sendable {
         let id: UUID
         let command: String
         let output: String

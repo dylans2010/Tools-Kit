@@ -1,6 +1,6 @@
 import Foundation
 
-enum FormQuestionType: String, Codable, CaseIterable, Identifiable {
+enum FormQuestionType: String, Codable, CaseIterable, Identifiable, Sendable {
     case textInput
     case multipleChoice
     case ratingScale
@@ -34,7 +34,7 @@ enum FormQuestionType: String, Codable, CaseIterable, Identifiable {
     }
 }
 
-struct FormQuestion: Identifiable, Codable, Hashable {
+struct FormQuestion: Identifiable, Codable, Hashable, Sendable {
     var id: UUID = UUID()
     /// A short creator-assigned name/label for this question (e.g. "satisfaction_rating").
     var questionName: String = ""
@@ -45,7 +45,7 @@ struct FormQuestion: Identifiable, Codable, Hashable {
     var required: Bool = false
 }
 
-struct FormManifest: Codable, Hashable {
+struct FormManifest: Codable, Hashable, Sendable {
     var createdBy: String
     var createdAt: Date
     var lastEditedAt: Date
@@ -164,7 +164,7 @@ struct FormManifest: Codable, Hashable {
     }
 }
 
-struct FormDocument: Identifiable, Codable, Hashable {
+struct FormDocument: Identifiable, Codable, Hashable, Sendable {
     var id: UUID = UUID()
     var name: String
     var description: String
@@ -211,7 +211,7 @@ struct FormDocument: Identifiable, Codable, Hashable {
     }
 }
 
-struct FilledOutFormDocument: Codable, Hashable {
+struct FilledOutFormDocument: Codable, Hashable, Sendable {
     var formID: UUID
     var formName: String
     var answeredAt: Date

@@ -77,7 +77,7 @@ struct SecurityThreatDetectionView: View {
     }
 }
 
-struct SecurityThreat: Identifiable {
+struct SecurityThreat: Identifiable, Sendable {
     let id: UUID
     let type: String
     let severity: String

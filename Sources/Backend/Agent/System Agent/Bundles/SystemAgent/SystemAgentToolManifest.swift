@@ -1,6 +1,6 @@
 import Foundation
 
-struct SystemAgentToolManifest {
+struct SystemAgentToolManifest: Sendable {
     static let tools = [
         "build_project",
         "run_tests",

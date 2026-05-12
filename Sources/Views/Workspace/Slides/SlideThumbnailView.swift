@@ -86,7 +86,7 @@ struct SlideThumbnailView: View {
     }
 }
 
-struct TriangleShape: Shape {
+struct TriangleShape: Shape, Sendable {
     func path(in rect: CGRect) -> Path {
         var p = Path()
         p.move(to: CGPoint(x: rect.midX, y: rect.minY))

@@ -1,6 +1,6 @@
 import Foundation
 
-struct AnalyticsSummary {
+struct AnalyticsSummary: Sendable {
     var weightTrend: [ProgressModel]
     var consistencyTrend: [ProgressModel]
     var strengthTrend: [WorkoutPerformanceModel]

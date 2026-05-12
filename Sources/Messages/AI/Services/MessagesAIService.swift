@@ -120,29 +120,29 @@ final class MessagesAIService {
     }
 }
 
-private struct ChatCompletionsRequest: Codable {
+private struct ChatCompletionsRequest: Codable, Sendable {
     let model: String
     let messages: [ChatMessage]
 }
 
-private struct ChatMessage: Codable {
+private struct ChatMessage: Codable, Sendable {
     let role: String
     let content: String
 }
 
-private struct ChatCompletionsResponse: Codable {
+private struct ChatCompletionsResponse: Codable, Sendable {
     let choices: [Choice]
 
-    struct Choice: Codable {
+    struct Choice: Codable, Sendable {
         let message: AssistantMessage
     }
 
-    struct AssistantMessage: Codable {
+    struct AssistantMessage: Codable, Sendable {
         let content: String
     }
 }
 
-enum MessagesAIServiceError: LocalizedError {
+enum MessagesAIServiceError: LocalizedError, Sendable {
     case missingAPIKey
     case networkError(String)
     case invalidResponse

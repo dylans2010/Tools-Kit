@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 public final class SDKEventSystem {
-    public static let shared = SDKEventSystem()
+    nonisolated(unsafe) public static let shared = SDKEventSystem()
 
     private let eventSubject = PassthroughSubject<SDKEvent, Never>()
     public var events: AnyPublisher<SDKEvent, Never> { eventSubject.eraseToAnyPublisher() }
@@ -46,7 +46,7 @@ public final class SDKEventSystem {
     }
 }
 
-public struct SDKEvent: Identifiable, Codable {
+public struct SDKEvent: Identifiable, Codable, Sendable {
     public let id: UUID
     public let type: String
     public let stringPayload: [String: String]

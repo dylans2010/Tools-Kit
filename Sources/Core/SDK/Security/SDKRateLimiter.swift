@@ -1,7 +1,7 @@
 import Foundation
 
 public actor SDKRateLimiter {
-    public static let shared = SDKRateLimiter()
+    nonisolated(unsafe) public static let shared = SDKRateLimiter()
 
     public struct Rule: Sendable {
         public let requestsPerMinute: Int
@@ -25,14 +25,14 @@ public actor SDKRateLimiter {
         public let executionFrequencyCap: Int
     }
 
-    private struct WindowCounters {
+    private struct WindowCounters: Sendable {
         var start: Date
         var requests: Int
         var fetchUnits: Int
         var executions: Int
     }
 
-    private struct TokenBucket {
+    private struct TokenBucket: Sendable {
         var tokens: Double
         var lastRefill: Date
         let capacity: Double

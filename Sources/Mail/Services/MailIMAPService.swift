@@ -2,7 +2,7 @@ import Foundation
 import Network
 
 class MailIMAPService: @unchecked Sendable {
-    static let shared = MailIMAPService()
+    nonisolated(unsafe) static let shared = MailIMAPService()
     private var host: String = "imap.mail.me.com"
     private var port: UInt16 = 993
     private var connection: NWConnection?

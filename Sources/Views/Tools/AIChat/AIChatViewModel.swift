@@ -19,7 +19,7 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
     @MainActor private let modelCatalog = AIModelCatalog.shared
     private let historyKey = "ai_chat_history"
 
-    enum KeyValidationState {
+    enum KeyValidationState: Sendable {
         case unknown, validating, valid, invalid
     }
 

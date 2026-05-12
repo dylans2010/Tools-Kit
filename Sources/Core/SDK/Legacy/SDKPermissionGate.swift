@@ -1,7 +1,7 @@
 import Foundation
 
 public final class SDKPermissionGate {
-    public static let shared = SDKPermissionGate()
+    nonisolated(unsafe) public static let shared = SDKPermissionGate()
 
     private init() {}
 

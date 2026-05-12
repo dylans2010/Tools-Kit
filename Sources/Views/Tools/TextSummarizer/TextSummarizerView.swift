@@ -61,7 +61,7 @@ struct TextSummarizerView: View {
     }
 }
 
-struct TextSummarizerTool: Tool {
+struct TextSummarizerTool: Tool, Sendable {
     let name = "Text Summarizer"
     let icon = "text.quote"
     let category = ToolCategory.ai

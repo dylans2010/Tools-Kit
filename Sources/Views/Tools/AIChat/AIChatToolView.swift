@@ -348,7 +348,7 @@ struct AttachmentChip: View {
     }
 }
 
-struct AIChatTool: Tool {
+struct AIChatTool: Tool, Sendable {
     let name = "AI Chat"
     let icon = "bubble.left.and.bubble.right.fill"
     let category = ToolCategory.ai

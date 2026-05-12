@@ -1,6 +1,6 @@
 import Foundation
 
-struct TokenAnalysis {
+struct TokenAnalysis: @unchecked Sendable {
     var tokenType: TokenType = .unknown
     var header: [String: Any] = [:]
     var payload: [String: Any] = [:]
@@ -15,7 +15,7 @@ struct TokenAnalysis {
     var warnings: [String] = []
     var signaturePresent = false
 
-    enum TokenType: String {
+    enum TokenType: String, Sendable {
         case jwt = "JSON Web Token (JWT)"
         case bearer = "Bearer Token"
         case apiKey = "API Key"

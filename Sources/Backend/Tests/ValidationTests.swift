@@ -1,7 +1,7 @@
 import Foundation
 
 /// Internal validation tests to ensure core logic is functional across refactored modules.
-struct ValidationTests {
+struct ValidationTests: Sendable {
     static func runAll() async {
         print("Starting System Validation Tests...")
 

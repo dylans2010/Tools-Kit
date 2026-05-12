@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentTelemetry: Codable {
+struct AgentTelemetry: Codable, Sendable {
     let event: String
     let properties: [String: String]
     let timestamp: Date

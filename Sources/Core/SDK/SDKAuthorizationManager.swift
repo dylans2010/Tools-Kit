@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-public enum AuthState: String, Codable, CaseIterable {
+public enum AuthState: String, Codable, CaseIterable, Sendable {
     case unauthenticated
     case authenticating
     case authenticated
@@ -9,7 +9,7 @@ public enum AuthState: String, Codable, CaseIterable {
     case revoked
 }
 
-public struct AuthSession: Codable, Hashable {
+public struct AuthSession: Codable, Hashable, Sendable {
     public let sessionId: String
     public let userId: String?
     public let issuedAt: Date
@@ -40,7 +40,7 @@ public struct AuthSession: Codable, Hashable {
 
 @MainActor
 public final class AuthorizationManager: ObservableObject {
-    public static let shared = AuthorizationManager()
+    nonisolated(unsafe) public static let shared = AuthorizationManager()
 
     @Published public private(set) var authState: AuthState = .unauthenticated
     @Published public private(set) var authSession: AuthSession?

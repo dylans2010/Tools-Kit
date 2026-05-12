@@ -86,7 +86,7 @@ struct LinkPreviewView: View {
     }
 }
 
-struct LinkPreviewTool: Tool {
+struct LinkPreviewTool: Tool, Sendable {
     let name = "Link Preview"
     let icon = "link.circle.fill"
     let category = ToolCategory.utility

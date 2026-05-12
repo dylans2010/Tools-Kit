@@ -2,7 +2,7 @@ import Foundation
 
 /// Core workflow engine that manages multi-step, branching automation pipelines.
 actor WorkflowAutomationEngine {
-    static let shared = WorkflowAutomationEngine()
+    nonisolated(unsafe) static let shared = WorkflowAutomationEngine()
     private let aiService = AIService.shared
     private var activeWorkflows: [UUID: WorkflowState] = [:]
 
@@ -35,10 +35,10 @@ actor WorkflowAutomationEngine {
         """
         let json = try await aiService.generateStructuredJSON(prompt: prompt + "\n\nContent:\n" + content, jsonSchema: schema)
 
-        struct WorkflowResponse: Codable {
+        struct WorkflowResponse: Codable, Sendable {
             let name: String
             let steps: [StepResponse]
-            struct StepResponse: Codable {
+            struct StepResponse: Codable, Sendable {
                 let title: String
                 let description: String
                 let actionType: String

@@ -2,15 +2,15 @@ import Foundation
 
 /// Analyzes the structure of a GitHub repository for modular extraction.
 final class CodeAuditEngine {
-    static let shared = CodeAuditEngine()
+    nonisolated(unsafe) static let shared = CodeAuditEngine()
 
     private let github = GitHubAPIClient.shared
 
-    struct RepoStructure: Codable {
+    struct RepoStructure: Codable, Sendable {
         let files: [RepoFile]
     }
 
-    struct RepoFile: Codable {
+    struct RepoFile: Codable, Sendable {
         let name: String
         let path: String
         let type: String // "file" or "dir"

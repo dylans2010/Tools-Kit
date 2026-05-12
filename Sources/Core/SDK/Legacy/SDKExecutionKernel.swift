@@ -3,7 +3,7 @@ import Foundation
 /// Central execution orchestrator for the SDK.
 /// Routes all SDK calls into Workspace Core systems.
 public final class SDKExecutionKernel {
-    public static let shared = SDKExecutionKernel()
+    nonisolated(unsafe) public static let shared = SDKExecutionKernel()
 
     private let router = SDKSystemRouter.shared
     private let dispatcher = SDKActionDispatcher.shared
@@ -45,7 +45,7 @@ public final class SDKExecutionKernel {
     }
 }
 
-public enum SDKAction {
+public enum SDKAction: Sendable {
     case createNote(title: String, content: String)
     case createTask(title: String, dueDate: Date?)
     case sendMail(to: String, subject: String, body: String)

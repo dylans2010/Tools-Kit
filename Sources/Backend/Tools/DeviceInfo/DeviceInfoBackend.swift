@@ -4,7 +4,7 @@ import UIKit
 final class DeviceInfoBackend: ObservableObject {
     @Published var info: [InfoItem] = []
 
-    struct InfoItem: Identifiable {
+    struct InfoItem: Identifiable, Sendable {
         let id = UUID()
         let key: String
         let value: String

@@ -29,7 +29,7 @@ struct PerspectiveCorrectorView: View {
     }
 }
 
-struct PerspectiveCorrectorTool: Tool {
+struct PerspectiveCorrectorTool: Tool, Sendable {
     let name = "Perspective Corrector"
     let icon = "skew"
     let category = ToolCategory.utility

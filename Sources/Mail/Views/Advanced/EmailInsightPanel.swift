@@ -109,7 +109,7 @@ struct FlowLayout: View {
 }
 
 /// Helper Layout for flowing elements.
-struct FlowStack: Layout {
+struct FlowStack: Layout, Sendable {
     var spacing: CGFloat
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {

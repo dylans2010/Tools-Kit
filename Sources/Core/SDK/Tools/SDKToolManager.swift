@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-public struct SDKTool: Identifiable, Codable {
+public struct SDKTool: Identifiable, Codable, Sendable {
     public var id: UUID
     public var name: String
     public var category: SDKToolCategory
@@ -10,17 +10,17 @@ public struct SDKTool: Identifiable, Codable {
     public var pluginID: UUID?
 }
 
-public struct ToolParameter: Codable {
+public struct ToolParameter: Codable, Sendable {
     public var key: String
     public var type: String
     public var required: Bool
 }
 
-public enum SDKToolCategory: String, Codable, CaseIterable {
+public enum SDKToolCategory: String, Codable, CaseIterable, Sendable {
     case dataProcessor, aiUtility, fileTransformer, workflowAction
 }
 
-public struct SDKToolResult {
+public struct SDKToolResult: @unchecked Sendable {
     public var toolID: UUID
     public var output: [String: Any]
     public var duration: TimeInterval
@@ -29,7 +29,7 @@ public struct SDKToolResult {
 
 @MainActor
 public final class SDKToolManager: ObservableObject {
-    public static let shared = SDKToolManager()
+    nonisolated(unsafe) public static let shared = SDKToolManager()
 
     @Published public var tools: [SDKTool] = []
 

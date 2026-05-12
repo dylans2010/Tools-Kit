@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-struct AgenticToolSlidesThemeSystem: AgenticToolProtocol {
+struct AgenticToolSlidesThemeSystem: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "slides_theme_system",
         description: "Apply or generate a theme for slides",

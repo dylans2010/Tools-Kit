@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentContextSnapshot: Codable {
+struct AgentContextSnapshot: Codable, Sendable {
     let id: UUID
     let timestamp: Date
     let context: AgentContext

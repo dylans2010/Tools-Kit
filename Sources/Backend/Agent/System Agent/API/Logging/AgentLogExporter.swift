@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgentLogExporter {
+struct AgentLogExporter: Sendable {
     init() {}
 
     func export(logs: [AgentLogEntry]) throws -> Data {

@@ -31,7 +31,7 @@ struct URLParserView: View {
     }
 }
 
-struct URLParserTool: Tool {
+struct URLParserTool: Tool, Sendable {
     let name = "URL Parser"
     let icon = "link.circle"
     let category = ToolCategory.development

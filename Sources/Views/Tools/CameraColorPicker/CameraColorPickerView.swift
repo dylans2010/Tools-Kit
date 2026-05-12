@@ -51,7 +51,7 @@ struct CameraColorPickerView: View {
     }
 }
 
-struct CameraColorPickerTool: Tool {
+struct CameraColorPickerTool: Tool, Sendable {
     let name = "Camera Color Picker"
     let icon = "eyedropper"
     let category = ToolCategory.utility

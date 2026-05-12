@@ -1,6 +1,6 @@
 import Foundation
 
-struct AIChatSettings: Codable {
+struct AIChatSettings: Codable, Sendable {
     var selectedProviderID: String = "openrouter"
     var aiModelSource: AIModelSource = .appModel
     var modelID: String = ""
@@ -27,25 +27,25 @@ struct AIChatSettings: Codable {
     var useSystemTools: Bool = true
 }
 
-enum AIModelSource: String, Codable, CaseIterable {
+enum AIModelSource: String, Codable, CaseIterable, Sendable {
     case appModel = "App Model"
     case ownKey = "My API Key"
 }
 
-enum ResponseTone: String, Codable, CaseIterable {
+enum ResponseTone: String, Codable, CaseIterable, Sendable {
     case professional = "Professional"
     case casual = "Casual"
     case creative = "Creative"
     case balanced = "Balanced"
 }
 
-enum ResponseLength: String, Codable, CaseIterable {
+enum ResponseLength: String, Codable, CaseIterable, Sendable {
     case concise = "Concise"
     case medium = "Medium"
     case detailed = "Detailed"
 }
 
-struct SystemPromptPreset: Identifiable, Codable {
+struct SystemPromptPreset: Identifiable, Codable, Sendable {
     let id: String
     var name: String
     var prompt: String

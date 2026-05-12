@@ -1,7 +1,7 @@
 import Foundation
 
-struct IntegrationTool: Codable, Identifiable, Equatable {
-    enum TriggerMode: String, Codable, CaseIterable, Identifiable {
+struct IntegrationTool: Codable, Identifiable, Equatable, Sendable {
+    enum TriggerMode: String, Codable, CaseIterable, Identifiable, Sendable {
         case manual = "Manual"
         case onSave = "On Save"
         case onDemand = "On Demand"
@@ -9,7 +9,7 @@ struct IntegrationTool: Codable, Identifiable, Equatable {
         var id: String { rawValue }
     }
 
-    enum InputScope: String, Codable, CaseIterable, Identifiable {
+    enum InputScope: String, Codable, CaseIterable, Identifiable, Sendable {
         case currentPage = "Current Page"
         case selectedText = "Selected Text"
         case folderPages = "Folder Pages"
@@ -17,7 +17,7 @@ struct IntegrationTool: Codable, Identifiable, Equatable {
         var id: String { rawValue }
     }
 
-    enum OutputStyle: String, Codable, CaseIterable, Identifiable {
+    enum OutputStyle: String, Codable, CaseIterable, Identifiable, Sendable {
         case markdown = "Markdown"
         case bulletList = "Bullet List"
         case checklist = "Checklist"
@@ -53,7 +53,7 @@ struct IntegrationTool: Codable, Identifiable, Equatable {
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case id, name, description, category, tags, promptTemplate, systemPrompt
         case temperature, topP, frequencyPenalty, presencePenalty, maxResponseTokens
         case aiModel, triggerMode, inputScope, outputStyle, includeAttachmentsContext

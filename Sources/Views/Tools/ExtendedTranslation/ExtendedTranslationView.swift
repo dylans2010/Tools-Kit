@@ -99,7 +99,7 @@ struct ExtendedTranslationView: View {
     }
 }
 
-struct ExtendedTranslationTool: Tool {
+struct ExtendedTranslationTool: Tool, Sendable {
     let name = "Extended Translation"
     let icon = "text.bubble"
     let category = ToolCategory.ai

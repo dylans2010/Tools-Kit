@@ -6,14 +6,14 @@ import ImagePlayground
 
 // MARK: - Gradient Type
 
-private enum GradientType: String, CaseIterable, Identifiable {
+private enum GradientType: String, CaseIterable, Identifiable, Sendable {
     case linear = "Linear"
     case radial  = "Radial"
     case angular = "Angular"
     var id: String { rawValue }
 }
 
-private enum LabelPreset: String, CaseIterable, Identifiable {
+private enum LabelPreset: String, CaseIterable, Identifiable, Sendable {
     case playlistName = "Playlist Name"
     case vibes = "Vibes"
     case favorites = "Favorites"
@@ -24,7 +24,7 @@ private enum LabelPreset: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-private enum FontDesignStyle: String, CaseIterable, Identifiable {
+private enum FontDesignStyle: String, CaseIterable, Identifiable, Sendable {
     case `default` = "Default"
     case rounded = "Rounded"
     case serif = "Serif"
@@ -42,7 +42,7 @@ private enum FontDesignStyle: String, CaseIterable, Identifiable {
     }
 }
 
-private enum LabelLayoutPreset: String, CaseIterable, Identifiable {
+private enum LabelLayoutPreset: String, CaseIterable, Identifiable, Sendable {
     case center = "Center"
     case top = "Top"
     case bottom = "Bottom"
@@ -51,7 +51,7 @@ private enum LabelLayoutPreset: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-private enum SymbolOverlayPreset: String, CaseIterable, Identifiable {
+private enum SymbolOverlayPreset: String, CaseIterable, Identifiable, Sendable {
     case none = "None"
     case headphone = "Headphones"
     case waveform = "Waveform"
@@ -73,14 +73,14 @@ private enum SymbolOverlayPreset: String, CaseIterable, Identifiable {
 
 // MARK: - Gradient Color Stop
 
-private struct GradientStop: Identifiable {
+private struct GradientStop: Identifiable, Sendable {
     var id = UUID()
     var color: Color
 }
 
 // MARK: - Sticker Model
 
-private struct ArtworkSticker: Identifiable {
+private struct ArtworkSticker: Identifiable, Sendable {
     var id = UUID()
     var emoji: String
     var position: CGPoint

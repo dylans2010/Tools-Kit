@@ -1,6 +1,6 @@
 import Foundation
 
-struct StreakModel: Codable {
+struct StreakModel: Codable, Sendable {
     var currentDays: Int
     var longestDays: Int
     var lastWorkoutDate: Date?

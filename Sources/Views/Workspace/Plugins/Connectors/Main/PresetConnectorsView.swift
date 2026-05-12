@@ -109,7 +109,7 @@ struct PresetConnectorsView: View {
 
 // MARK: - Logic Restoration
 
-enum PresetConnectorProvider: String, CaseIterable, Identifiable {
+enum PresetConnectorProvider: String, CaseIterable, Identifiable, Sendable {
     case openAI, gemini, github, anthropic, mistral, notion, slack, stripe
     var id: String { rawValue }
     var name: String {

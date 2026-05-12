@@ -1,7 +1,7 @@
 import Foundation
 import CoreGraphics
 
-struct SpatialCanvas: Codable, Identifiable {
+struct SpatialCanvas: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var name: String
     var layers: [SpatialLayer] = []
@@ -9,14 +9,14 @@ struct SpatialCanvas: Codable, Identifiable {
     var updatedAt: Date = Date()
 }
 
-struct SpatialLayer: Codable, Identifiable {
+struct SpatialLayer: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var name: String
     var isVisible: Bool = true
     var elements: [SpatialElement] = []
 }
 
-struct SpatialElement: Codable, Identifiable {
+struct SpatialElement: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var type: ElementType
     var x: Double
@@ -35,12 +35,12 @@ struct SpatialElement: Codable, Identifiable {
         set { width = Double(newValue.width); height = Double(newValue.height) }
     }
 
-    private enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey, Sendable {
         case id, type, x, y, width, height, properties
     }
 }
 
-enum ElementType: String, Codable {
+enum ElementType: String, Codable, Sendable {
     case stickyNote = "stickyNote"
     case shape = "shape"
     case text = "text"

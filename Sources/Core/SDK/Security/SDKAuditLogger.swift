@@ -2,10 +2,10 @@ import Foundation
 
 @MainActor
 public final class SDKAuditLogger: ObservableObject {
-    public static let shared = SDKAuditLogger()
+    nonisolated(unsafe) public static let shared = SDKAuditLogger()
 
-    public struct Event: Identifiable, Codable {
-        public enum EventType: String, Codable, CaseIterable {
+    public struct Event: Identifiable, Codable, Sendable {
+        public enum EventType: String, Codable, CaseIterable, Sendable {
             case dataAccess
             case scopeUsage
             case externalAPICall

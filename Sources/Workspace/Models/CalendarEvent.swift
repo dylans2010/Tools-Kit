@@ -1,6 +1,6 @@
 import Foundation
 
-struct CalendarEvent: Identifiable, Codable {
+struct CalendarEvent: Identifiable, Codable, Sendable {
     var id: UUID
     var title: String
     var description: String
@@ -50,7 +50,7 @@ struct CalendarEvent: Identifiable, Codable {
     }
 }
 
-enum EventPriority: String, Codable, CaseIterable {
+enum EventPriority: String, Codable, CaseIterable, Sendable {
     case low = "Low"
     case normal = "Normal"
     case high = "High"

@@ -1,6 +1,6 @@
 import Foundation
 
-public enum AISlidesPipelineError: LocalizedError {
+public enum AISlidesPipelineError: LocalizedError, Sendable {
     case providerFailure(code: Int, message: String)
     case schemaValidationFailed(violations: [String])
     case emptyProviderResponse
@@ -24,7 +24,7 @@ public enum AISlidesPipelineError: LocalizedError {
 }
 
 @MainActor
-struct AISlidesPipeline {
+struct AISlidesPipeline: Sendable {
     private let promptBuilder = AISlidesPromptBuilder()
     private let decoder = AISlidesStrictDecoder()
     private let mapper = AISlidesRendererMapper()

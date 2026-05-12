@@ -1,6 +1,6 @@
 import Foundation
 
-struct IntegrationWorkflow: Codable, Identifiable {
+struct IntegrationWorkflow: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var name: String
     var description: String
@@ -12,38 +12,38 @@ struct IntegrationWorkflow: Codable, Identifiable {
     var updatedAt: Date = Date()
 }
 
-struct IntegrationTrigger: Codable {
+struct IntegrationTrigger: Codable, Sendable {
     var id: UUID = UUID()
     var type: TriggerType
     var source: String // e.g. "github", "note.created"
     var parameters: [String: String] = [:]
 }
 
-enum TriggerType: String, Codable {
+enum TriggerType: String, Codable, Sendable {
     case external = "external"
     case internalApp = "internal"
     case scheduled = "scheduled"
 }
 
-struct IntegrationAction: Codable, Identifiable {
+struct IntegrationAction: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var type: ActionType
     var destination: String // e.g. "slack", "task.create"
     var parameters: [String: String] = [:]
 }
 
-enum ActionType: String, Codable {
+enum ActionType: String, Codable, Sendable {
     case external = "external"
     case internalApp = "internal"
 }
 
-struct IntegrationCondition: Codable {
+struct IntegrationCondition: Codable, Sendable {
     var field: String
     var `operator`: String // e.g. "contains", "equals"
     var value: String
 }
 
-struct IntegrationConnection: Codable, Identifiable {
+struct IntegrationConnection: Codable, Identifiable, Sendable {
     var id: UUID = UUID()
     var service: String // e.g. "Slack", "Gmail"
     var accountName: String
@@ -51,7 +51,7 @@ struct IntegrationConnection: Codable, Identifiable {
     var authData: [String: String] = [:]
 }
 
-struct IntegrationHistoryEntry: Identifiable {
+struct IntegrationHistoryEntry: Identifiable, Sendable {
     let id = UUID()
     let name: String
     let status: String

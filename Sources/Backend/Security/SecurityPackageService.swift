@@ -1,7 +1,7 @@
 import Foundation
 import CryptoKit
 
-struct SecurityPackageMetadata: Codable {
+struct SecurityPackageMetadata: Codable, Sendable {
     let version: Int
     let exportDate: Date
     let salt: Data
@@ -11,7 +11,7 @@ struct SecurityPackageMetadata: Codable {
 }
 
 class SecurityPackageService {
-    static let shared = SecurityPackageService()
+    nonisolated(unsafe) static let shared = SecurityPackageService()
 
     private let fileManager = FileManager.default
 

@@ -27,7 +27,7 @@ struct YAMLConverterView: View {
     }
 }
 
-struct YAMLConverterTool: Tool {
+struct YAMLConverterTool: Tool, Sendable {
     let name = "YAML Converter"
     let icon = "doc.text.below.ecg"
     let category = ToolCategory.development

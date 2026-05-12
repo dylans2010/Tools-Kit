@@ -3,7 +3,7 @@ import Security
 
 /// Manages the Jules API key in the Keychain.
 final class AgentKeychainManager {
-    static let shared = AgentKeychainManager()
+    nonisolated(unsafe) static let shared = AgentKeychainManager()
 
     private let service = "com.tools-kit.jules"
     private let account = "jules_api_key"

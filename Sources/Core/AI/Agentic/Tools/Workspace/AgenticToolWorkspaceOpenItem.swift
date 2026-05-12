@@ -1,6 +1,6 @@
 import Foundation
 
-struct AgenticToolWorkspaceOpenItem: AgenticToolProtocol {
+struct AgenticToolWorkspaceOpenItem: AgenticToolProtocol, Sendable {
     let definition = WorkspaceAIToolDefinition(
         name: "workspace_open_item",
         description: "Open a workspace item by ID or name",

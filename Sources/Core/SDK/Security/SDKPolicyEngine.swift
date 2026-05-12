@@ -1,7 +1,7 @@
 import Foundation
 
-public struct SDKSecurityScopeDefinition: Codable, Hashable {
-    public enum RiskLevel: String, Codable, CaseIterable {
+public struct SDKSecurityScopeDefinition: Codable, Hashable, Sendable {
+    public enum RiskLevel: String, Codable, CaseIterable, Sendable {
         case low, medium, high, critical
     }
 
@@ -12,7 +12,7 @@ public struct SDKSecurityScopeDefinition: Codable, Hashable {
     public let runtimeValidationHook: String?
 }
 
-public struct SDKPolicyRequest {
+public struct SDKPolicyRequest: Sendable {
     public let operationName: String
     public let scope: String
     public let projectID: UUID?
@@ -46,14 +46,14 @@ public struct SDKPolicyRequest {
     }
 }
 
-public struct SDKPolicyDecision {
+public struct SDKPolicyDecision: Sendable {
     public let scopeDefinition: SDKSecurityScopeDefinition
     public let rateRule: SDKRateLimiter.Rule
 }
 
 @MainActor
 public final class SDKPolicyEngine: ObservableObject {
-    public static let shared = SDKPolicyEngine()
+    nonisolated(unsafe) public static let shared = SDKPolicyEngine()
 
     @Published public private(set) var scopeDefinitions: [String: SDKSecurityScopeDefinition] = [:]
 

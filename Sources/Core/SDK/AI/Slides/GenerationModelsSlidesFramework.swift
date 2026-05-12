@@ -1,6 +1,6 @@
 import Foundation
 
-struct GenerationModelsSlidesFramework {
+struct GenerationModelsSlidesFramework: Sendable {
     let aiService: AIService
     private let promptBuilder = AISlidesPromptBuilder()
     private let schemeDecoder = AISlidesSchemeDecoder()

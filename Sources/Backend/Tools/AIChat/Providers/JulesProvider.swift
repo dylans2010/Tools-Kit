@@ -46,40 +46,40 @@ final class JulesProvider: AIProvider {
 
     func fetchModels(apiKey: String) async throws -> [AIModel] { models }
 
-    struct Source: Codable, Identifiable {
+    struct Source: Codable, Identifiable, Sendable {
         let name: String
         let id: String
         let githubRepo: GitHubRepo?
 
-        struct GitHubRepo: Codable {
+        struct GitHubRepo: Codable, Sendable {
             let owner: String
             let repo: String
         }
     }
 
-    struct Session: Codable, Identifiable {
+    struct Session: Codable, Identifiable, Sendable {
         let name: String
         let id: String
         let title: String?
         let prompt: String
         let outputs: [Output]?
 
-        struct Output: Codable { let pullRequest: PullRequest? }
-        struct PullRequest: Codable { let url: String; let title: String; let description: String }
+        struct Output: Codable, Sendable { let pullRequest: PullRequest? }
+        struct PullRequest: Codable, Sendable { let url: String; let title: String; let description: String }
     }
 
-    private struct SourceListResponse: Codable { let sources: [Source] }
+    private struct SourceListResponse: Codable, Sendable { let sources: [Source] }
 
-    private struct CreateSessionRequest: Encodable, JulesPayloadValidating {
+    private struct CreateSessionRequest: Encodable, JulesPayloadValidating, Sendable {
         let prompt: String
         let sourceContext: SourceContext?
         let automationMode: String
 
-        struct SourceContext: Encodable {
+        struct SourceContext: Encodable, Sendable {
             let source: String
             let githubRepoContext: GitHubRepoContext
 
-            struct GitHubRepoContext: Encodable {
+            struct GitHubRepoContext: Encodable, Sendable {
                 let startingBranch: String
             }
         }

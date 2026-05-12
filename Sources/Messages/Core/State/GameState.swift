@@ -1,12 +1,12 @@
 import Foundation
 
-enum GameStatus: String, Codable {
+enum GameStatus: String, Codable, Sendable {
     case waitingForOpponent
     case inProgress
     case completed
 }
 
-struct GameState: Codable {
+struct GameState: Codable, Sendable {
     let gameID: String
     let status: GameStatus
     let turnCount: Int

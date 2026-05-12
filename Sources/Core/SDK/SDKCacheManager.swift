@@ -18,7 +18,7 @@ public protocol SDKCacheManagerProtocol: AnyObject {
 /// In-memory cache with optional TTL expiration and size tracking.
 @MainActor
 public final class SDKCacheManager: SDKCacheManagerProtocol, ObservableObject {
-    public static let shared = SDKCacheManager()
+    nonisolated(unsafe) public static let shared = SDKCacheManager()
 
     @Published public private(set) var entryCount: Int = 0
     @Published public private(set) var totalSizeBytes: Int = 0
@@ -29,7 +29,7 @@ public final class SDKCacheManager: SDKCacheManagerProtocol, ObservableObject {
     private let maxEntries: Int
     private let maxSizeBytes: Int
 
-    private struct CacheEntry {
+    private struct CacheEntry: Sendable {
         let data: Data
         let createdAt: Date
         let expiresAt: Date?

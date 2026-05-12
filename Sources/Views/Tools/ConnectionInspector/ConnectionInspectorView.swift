@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ConnectionInspectorTool: Tool {
+struct ConnectionInspectorTool: Tool, Sendable {
     let name = "Connection Inspector"
     let icon = "waveform.path.ecg"
     let category = ToolCategory.network

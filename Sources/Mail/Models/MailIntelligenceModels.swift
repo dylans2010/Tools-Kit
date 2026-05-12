@@ -1,7 +1,7 @@
 import Foundation
 
 /// Defines the classification intent of an email thread.
-enum MailIntent: String, Codable, CaseIterable {
+enum MailIntent: String, Codable, CaseIterable, Sendable {
     case task = "task"
     case approval = "approval"
     case negotiation = "negotiation"
@@ -15,7 +15,7 @@ enum MailIntent: String, Codable, CaseIterable {
 }
 
 /// Extracted entities from communication content.
-struct ExtractedEntities: Codable {
+struct ExtractedEntities: Codable, Sendable {
     var people: [String] = []
     var organizations: [String] = []
     var deadlines: [Date] = []
@@ -26,14 +26,14 @@ struct ExtractedEntities: Codable {
 }
 
 /// Represents a node in the communication memory graph.
-struct MemoryGraphNode: Identifiable, Codable {
+struct MemoryGraphNode: Identifiable, Codable, Sendable {
     let id: UUID
     let type: NodeType
     let value: String
     let metadata: [String: String]
     let timestamp: Date
 
-    enum NodeType: String, Codable {
+    enum NodeType: String, Codable, Sendable {
         case person
         case organization
         case topic
@@ -43,7 +43,7 @@ struct MemoryGraphNode: Identifiable, Codable {
 }
 
 /// Represents a relationship link in the memory graph.
-struct MemoryGraphEdge: Identifiable, Codable {
+struct MemoryGraphEdge: Identifiable, Codable, Sendable {
     let id: UUID
     let sourceID: UUID
     let targetID: UUID
@@ -52,7 +52,7 @@ struct MemoryGraphEdge: Identifiable, Codable {
 }
 
 /// Workflow automation pipeline state.
-struct WorkflowState: Identifiable, Codable {
+struct WorkflowState: Identifiable, Codable, Sendable {
     let id: UUID
     var name: String
     var steps: [MailWorkflowStep]
@@ -60,13 +60,13 @@ struct WorkflowState: Identifiable, Codable {
     var status: WorkflowStatus
     var threadID: String
 
-    enum WorkflowStatus: String, Codable {
+    enum WorkflowStatus: String, Codable, Sendable {
         case pending, active, completed, failed, paused
     }
 }
 
 /// A single step in an automation workflow.
-struct MailWorkflowStep: Identifiable, Codable {
+struct MailWorkflowStep: Identifiable, Codable, Sendable {
     let id: UUID
     var title: String
     var description: String
@@ -75,7 +75,7 @@ struct MailWorkflowStep: Identifiable, Codable {
 }
 
 /// Analysis result for an attachment.
-struct AttachmentIntelligence: Identifiable, Codable {
+struct AttachmentIntelligence: Identifiable, Codable, Sendable {
     let id: String
     let fileName: String
     let fileType: AttachmentType
@@ -83,17 +83,17 @@ struct AttachmentIntelligence: Identifiable, Codable {
     var extractedData: [String: String]?
     var summary: String?
 
-    enum AttachmentType: String, Codable {
+    enum AttachmentType: String, Codable, Sendable {
         case contract, receipt, dataset, code, media, document, unknown
     }
 }
 
 /// Scoring and attention data for thread prioritization.
-struct AttentionScore: Codable {
+struct AttentionScore: Codable, Sendable {
     var totalScore: Double
     var factors: [FactorScore]
 
-    struct FactorScore: Codable {
+    struct FactorScore: Codable, Sendable {
         let name: String
         let score: Double
         let weight: Double
@@ -101,20 +101,20 @@ struct AttentionScore: Codable {
 }
 
 /// Negotiation state tracking for a thread.
-struct NegotiationState: Codable {
+struct NegotiationState: Codable, Sendable {
     var currentPhase: NegotiationPhase
     var concessions: [String]
     var commitments: [String]
     var leverageAnalysis: String
     var suggestedStrategy: String
 
-    enum NegotiationPhase: String, Codable {
+    enum NegotiationPhase: String, Codable, Sendable {
         case exploration, bidding, bargaining, closing, settled, stalled
     }
 }
 
 /// Relationship intelligence profile for a contact.
-struct RelationshipProfile: Codable {
+struct RelationshipProfile: Codable, Sendable {
     let email: String
     var displayName: String?
     var sentimentTrend: [Double]
@@ -125,7 +125,7 @@ struct RelationshipProfile: Codable {
 }
 
 /// Decision intelligence for tracking outcomes.
-struct DecisionEntry: Identifiable, Codable {
+struct DecisionEntry: Identifiable, Codable, Sendable {
     let id: UUID
     let title: String
     let summary: String
@@ -135,19 +135,19 @@ struct DecisionEntry: Identifiable, Codable {
 }
 
 /// Communication safety and simulation data.
-struct SafetyAnalysis: Codable {
+struct SafetyAnalysis: Codable, Sendable {
     let tone: String
     let riskLevel: RiskLevel
     let risks: [String]
     let suggestedToneAdjustment: String
 
-    enum RiskLevel: String, Codable {
+    enum RiskLevel: String, Codable, Sendable {
         case low, medium, high, critical
     }
 }
 
 /// Extracted knowledge from email content.
-struct KnowledgeInsight: Identifiable, Codable {
+struct KnowledgeInsight: Identifiable, Codable, Sendable {
     let id: UUID
     let title: String
     let content: String

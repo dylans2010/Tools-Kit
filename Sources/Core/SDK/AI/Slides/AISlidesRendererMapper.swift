@@ -1,6 +1,6 @@
 import Foundation
 
-struct AISlidesRendererMapper {
+struct AISlidesRendererMapper: Sendable {
     func mapLayout(for type: String) -> String {
         switch type.lowercased() {
         case "title": return "centered"

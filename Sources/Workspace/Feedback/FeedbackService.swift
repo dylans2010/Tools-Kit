@@ -3,7 +3,7 @@ import Appwrite
 import UIKit
 import OSLog
 
-enum FeedbackServiceError: LocalizedError {
+enum FeedbackServiceError: LocalizedError, Sendable {
     case missingConfig
     case invalidCurrentUser
 
@@ -18,7 +18,7 @@ enum FeedbackServiceError: LocalizedError {
 }
 
 final class FeedbackService {
-    static let shared = FeedbackService()
+    nonisolated(unsafe) static let shared = FeedbackService()
 
     private let databases = Databases(AppwriteService.client)
     private let account = AppwriteService.account
@@ -269,7 +269,7 @@ final class FeedbackService {
     }
 }
 
-private struct FeedbackDocumentData: Codable {
+private struct FeedbackDocumentData: Codable, Sendable {
     let userId: String?
     let userName: String
     let message: String

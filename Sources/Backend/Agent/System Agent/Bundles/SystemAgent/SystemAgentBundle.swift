@@ -1,6 +1,6 @@
 import Foundation
 
-struct SystemAgentBundle {
+struct SystemAgentBundle: Sendable {
     static let bundle = AgentBundle(
         id: "com.system.agent",
         name: "System Agent",

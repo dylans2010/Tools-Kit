@@ -142,7 +142,7 @@ private struct DailySDKVideoView: UIViewRepresentable {
 }
 #endif
 
-struct DailyCallTool: Tool {
+struct DailyCallTool: Tool, Sendable {
     let name = "Daily Call"
     let icon = "video.badge.waveform"
     let category = ToolCategory.ai

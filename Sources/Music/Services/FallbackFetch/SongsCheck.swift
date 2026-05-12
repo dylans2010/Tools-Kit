@@ -1,13 +1,13 @@
 import Foundation
 
-struct YouTubeSearchResult {
+struct YouTubeSearchResult: Sendable {
     let id: String
     let title: String
 
     var url: String { "https://www.youtube.com/watch?v=\(id)" }
 }
 
-enum SongsCheckError: LocalizedError {
+enum SongsCheckError: LocalizedError, Sendable {
     case invalidRequest(String)
 
     var errorDescription: String? {
@@ -58,19 +58,19 @@ class SongsCheck {
 
 // MARK: - YouTube Data API v3 response models
 
-private struct YouTubeSearchResponse: Decodable {
+private struct YouTubeSearchResponse: Decodable, Sendable {
     let items: [Item]
 
-    struct Item: Decodable {
+    struct Item: Decodable, Sendable {
         let id: VideoID
         let snippet: Snippet
     }
 
-    struct VideoID: Decodable {
+    struct VideoID: Decodable, Sendable {
         let videoId: String?
     }
 
-    struct Snippet: Decodable {
+    struct Snippet: Decodable, Sendable {
         let title: String
     }
 }

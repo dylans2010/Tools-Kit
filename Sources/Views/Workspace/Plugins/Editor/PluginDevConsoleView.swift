@@ -9,20 +9,20 @@ struct PluginDevConsoleView: View {
     @State private var cancellables = Set<AnyCancellable>()
     @State private var selectedFilter: LogFilter = .all
 
-    enum LogFilter: String, CaseIterable {
+    enum LogFilter: String, CaseIterable, Sendable {
         case all = "All"
         case events = "Events"
         case system = "System"
         case errors = "Errors"
     }
 
-    struct PluginLog: Identifiable {
+    struct PluginLog: Identifiable, Sendable {
         let id = UUID()
         let timestamp = Date()
         let type: LogType
         let message: String
 
-        enum LogType {
+        enum LogType: Sendable {
             case event, system, error
 
             var color: Color {

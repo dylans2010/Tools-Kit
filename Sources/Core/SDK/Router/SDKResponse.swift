@@ -1,7 +1,7 @@
 import Foundation
 
 /// Structured response object for the SDK internal API system.
-public struct SDKResponse: Identifiable {
+public struct SDKResponse: Identifiable, Sendable {
     public let id: UUID
     public let requestId: UUID
     public let status: Status
@@ -10,7 +10,7 @@ public struct SDKResponse: Identifiable {
     public let timestamp: Date
     public var latency: TimeInterval
 
-    public enum Status: String, Codable {
+    public enum Status: String, Codable, Sendable {
         case success, error, notFound, unauthorized, rateLimited
     }
 

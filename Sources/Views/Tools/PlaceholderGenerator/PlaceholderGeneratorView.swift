@@ -31,7 +31,7 @@ struct PlaceholderGeneratorView: View {
     }
 }
 
-struct PlaceholderGeneratorTool: Tool {
+struct PlaceholderGeneratorTool: Tool, Sendable {
     let name = "Placeholder Data"
     let icon = "text.badge.plus"
     let category = ToolCategory.utility

@@ -56,7 +56,7 @@ struct JWTDecoderView: View {
     }
 }
 
-struct JWTDecoderTool: Tool {
+struct JWTDecoderTool: Tool, Sendable {
     let name = "JWT Decoder"
     let icon = "key.fill"
     let category = ToolCategory.development
