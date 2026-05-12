@@ -2,7 +2,7 @@ import Foundation
 
 /// Orchestrates AI capabilities across the workspace.
 /// Coordinates between different models and services to provide intelligent features.
-final class AIOrchestrator {
+actor AIOrchestrator {
     static let shared = AIOrchestrator()
 
     private let embeddingService = EmbeddingService.shared

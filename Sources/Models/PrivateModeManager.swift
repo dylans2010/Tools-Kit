@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 
+@MainActor
 final class PrivateModeManager: ObservableObject {
     static let shared = PrivateModeManager()
 

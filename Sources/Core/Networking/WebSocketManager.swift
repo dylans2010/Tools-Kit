@@ -1,6 +1,7 @@
 import Foundation
 
 /// Manages real-time WebSocket connections for live updates and collaboration.
+@MainActor
 final class WebSocketManager: ObservableObject {
     static let shared = WebSocketManager()
 

@@ -1,33 +1,26 @@
 import Foundation
 
 /// Manages synchronization of data between local storage and remote services.
-final class SyncManager {
+actor SyncManager {
     static let shared = SyncManager()
 
     private let dataStore = UnifiedDataStore.shared
     private let apiClient = APIClient.shared
     private let webSocket = WebSocketManager.shared
 
-    private let queue = DispatchQueue(label: "io.toolskit.sync", qos: .utility)
-
     private init() {}
 
     /// Starts the synchronization process for all core modules.
-    func startSync() {
+    func startSync() async {
         print("[SyncManager] Starting background synchronization...")
-        setupWebSocketListeners()
+        await setupWebSocketListeners()
 
-        // Trigger initial pull of workspace state
-        queue.async {
-            Task {
-                await self.pullInitialState()
-            }
-        }
+        await pullInitialState()
     }
 
-    private func setupWebSocketListeners() {
-        webSocket.subscribe("workspace.updates") { payload in
-            self.handleRemoteUpdate(payload)
+    private func setupWebSocketListeners() async {
+        await webSocket.subscribe("workspace.updates") { payload in
+            Task { await self.handleRemoteUpdate(payload) }
         }
     }
 
@@ -38,17 +31,12 @@ final class SyncManager {
         print("[SyncManager] Initial state synchronization complete.")
     }
 
-    private func handleRemoteUpdate(_ payload: [String: Any]) {
+    private func handleRemoteUpdate(_ payload: [String: Any]) async {
         guard let key = payload["key"] as? String else { return }
         print("[SyncManager] Handling remote update for: \(key)")
-
-        queue.async {
-            Task {
-                // Logic to fetch updated data from API and save to DataStore
-                // let updated: SomeModel = try await self.apiClient.request("sync/\(key)")
-                // try self.dataStore.save(updated, key: key)
-            }
-        }
+        // Logic to fetch updated data from API and save to DataStore
+        // let updated: SomeModel = try await self.apiClient.request("sync/\(key)")
+        // try await MainActor.run { try self.dataStore.save(updated, key: key) }
     }
 
     /// Forces a full sync of a specific capability.

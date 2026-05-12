@@ -3,6 +3,7 @@ import Combine
 
 /// The central source of truth for all ToolsKit data.
 /// Handles persistent storage, in-memory caching, and change notifications.
+@MainActor
 final class UnifiedDataStore: ObservableObject {
     static let shared = UnifiedDataStore()
 

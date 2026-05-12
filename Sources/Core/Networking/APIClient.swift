@@ -1,7 +1,7 @@
 import Foundation
 
 /// Core API client for interacting with ToolsKit backend services.
-final class APIClient {
+actor APIClient {
     static let shared = APIClient()
 
     private let baseURL = URL(string: "https://api.toolskit.io/v1")!

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Handles generation and management of vector embeddings for semantic search.
-final class EmbeddingService {
+actor EmbeddingService {
     static let shared = EmbeddingService()
 
     private init() {}
