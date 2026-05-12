@@ -11549,8 +11549,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/tornikegomareli/Aurora.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.3.0;
+				kind = revision;
+				revision = f660efe80c98b2973ee7a70e96f3c5c843c855fd;
 			};
 		};
 		ZF0000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
