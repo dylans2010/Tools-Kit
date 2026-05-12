@@ -49,6 +49,14 @@ jobs:
             -destination 'generic/platform=iOS' \
             -resolvePackageDependencies
 
+      - name: Test (iOS Simulator)
+        run: |
+          xcodebuild test \
+            -project Tools-Kit.xcodeproj \
+            -scheme Tools-Kit \
+            -destination 'platform=iOS Simulator' \
+            -quiet
+
       - name: Archive (iOS ONLY)
         run: |
           mkdir -p build
@@ -64,14 +72,21 @@ jobs:
             ONLY_ACTIVE_ARCH=NO \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES \
             SKIP_INSTALL=NO
 
       - name: Package IPA
         run: |
           mkdir -p build/Payload
-          cp -R build/Tools-Kit.xcarchive/Products/Applications/*.app build/Payload/
-          cd build
-          zip -r Tools-Kit.ipa Payload
+          if [ -d build/Tools-Kit.xcarchive/Products/Applications/Tools-Kit.app ]; then
+            cp -R build/Tools-Kit.xcarchive/Products/Applications/Tools-Kit.app build/Payload/
+            cd build
+            zip -r Tools-Kit.ipa Payload
+          else
+            echo "Error: Tools-Kit.app not found in xcarchive"
+            exit 1
+          fi
 
       - name: Verify IPA
         run: |
