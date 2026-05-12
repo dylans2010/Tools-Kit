@@ -7,6 +7,85 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0DEDEABD5C14D8B23D1BFE84 /* AgenticModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8406130FA05AFEEA503F3A5F /* AgenticModels.swift */; };
+		CE9A492FE3BFBB571DC78F3A /* AgenticCoreDeviceCapabilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE19FC9D8D86A49DCA4C2A60 /* AgenticCoreDeviceCapabilityService.swift */; };
+		DBA61321637450B477440799 /* AgenticCoreSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E52686C1944B042309B8ECC /* AgenticCoreSessionManager.swift */; };
+		A2235E9A8C91DB4FD96C3970 /* AgenticCoreOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8494BC1A85A18542F8843C1B /* AgenticCoreOrchestrator.swift */; };
+		9EA71E8F7A34B0120C46C479 /* AgenticToolExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A26FF63BA5FD3CB2E04091D7 /* AgenticToolExecutor.swift */; };
+		DD0E5BBD03BD15E37034A9DB /* AgenticExecutionTraceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E398766332483BC8B1EDF2AC /* AgenticExecutionTraceStore.swift */; };
+		14FA552675BDB4D4CFA31DB0 /* WorkspaceAITools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D047A53E60B7BC99207DC1 /* WorkspaceAITools.swift */; };
+		6DA0A46C6D3AE5A6A2920D97 /* AgenticToolTaskCreate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F3AF7D5A26A565E9A2E037 /* AgenticToolTaskCreate.swift */; };
+		FB33229B3193E445150AACCA /* AgenticToolTaskUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB558BFCC5489E1EC374C60 /* AgenticToolTaskUpdate.swift */; };
+		B9826CB9958EF40F2792ABC0 /* AgenticToolTaskDelete.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BD150A7F89658B89B6DF8F /* AgenticToolTaskDelete.swift */; };
+		B2859B56472AE4AE626748F8 /* AgenticToolTaskList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B507B21D44EBC11692DDDE06 /* AgenticToolTaskList.swift */; };
+		CFBD4745EF2792041FDB6BCC /* AgenticToolTaskSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05709165A7544563A7F2B885 /* AgenticToolTaskSchedule.swift */; };
+		2ED51E4B6BA21B2DCB0B82AA /* AgenticToolTaskPrioritize.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63A1DDD09F72D38FCD1752B /* AgenticToolTaskPrioritize.swift */; };
+		B52D6D015605EFD6562E6B1E /* AgenticToolTaskAutoPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B698D72617EC360A9361881 /* AgenticToolTaskAutoPlan.swift */; };
+		2141C25C1D828449242A2714 /* AgenticToolTaskDependencyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0720CAAB5E0D357FBFBB851 /* AgenticToolTaskDependencyGraph.swift */; };
+		FB42B1591C6822A6D0C14B63 /* AgenticToolTaskCriticalPathAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A927E3F23BADAC36728709 /* AgenticToolTaskCriticalPathAnalyzer.swift */; };
+		84A56D9186644F7CAEA4B912 /* AgenticToolTaskResourceOptimizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201A8CAA7508CA322BEE1B56 /* AgenticToolTaskResourceOptimizer.swift */; };
+		58900451DF35CE7FE99EB7D0 /* AgenticToolNoteCreate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47377DB8AE903E130938D67 /* AgenticToolNoteCreate.swift */; };
+		42F0A62147571E1370B866F5 /* AgenticToolNoteUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBEB868B6D4A3A8233967254 /* AgenticToolNoteUpdate.swift */; };
+		8D4C27360C1FE69BF6F8026F /* AgenticToolNoteDelete.swift in Sources */ = {isa = PBXBuildFile; fileRef = E11CDC269A614A6291F3B947 /* AgenticToolNoteDelete.swift */; };
+		63D6576B485978CEA9F1E322 /* AgenticToolNoteSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE4CDB91844FD1A364C3E6D6 /* AgenticToolNoteSearch.swift */; };
+		54F7BF7540B237134E09D706 /* AgenticToolNoteSummarize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419AC4A615A299428F7927FF /* AgenticToolNoteSummarize.swift */; };
+		63D4186CE2DCF5CBC9382EA5 /* AgenticToolNoteExtractInsights.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B79441E1CC4649EB3310FD3 /* AgenticToolNoteExtractInsights.swift */; };
+		447AFC9E4BD013F69D2033EF /* AgenticToolNoteAutoTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F601020DE5ACADCF262D0CE /* AgenticToolNoteAutoTag.swift */; };
+		AB0A8149D6ED0171BAEBEC9B /* AgenticToolNoteGraphLinker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E658711B657859DD766D78AC /* AgenticToolNoteGraphLinker.swift */; };
+		2C7E88AD4EE3A9B78BED69DD /* AgenticToolCalendarEventCreate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4ED896D66D80A9B2B60507 /* AgenticToolCalendarEventCreate.swift */; };
+		AA0533383CE4A04667496387 /* AgenticToolCalendarEventUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E31F8F005F5A52F0AF3CBCD4 /* AgenticToolCalendarEventUpdate.swift */; };
+		6B3B6A70C9622ADB010091FE /* AgenticToolCalendarEventDelete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B6DABA4800F54D6942F708 /* AgenticToolCalendarEventDelete.swift */; };
+		280160228329D00D026189DB /* AgenticToolCalendarAvailabilityFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA17C9872E1E7768CB8AF57C /* AgenticToolCalendarAvailabilityFinder.swift */; };
+		DCE9045E41351A4D3E208118 /* AgenticToolCalendarConflictResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8853B8BF45EAE4EFDA5714ED /* AgenticToolCalendarConflictResolver.swift */; };
+		45469C8ECF5AE061F151A850 /* AgenticToolCalendarSmartSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D1644D2738C05CB82FD314 /* AgenticToolCalendarSmartSchedule.swift */; };
+		B637E1B5F799037E037DA3C9 /* AgenticToolMailSummarize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21FAD7FA6EB7B74F0A956E78 /* AgenticToolMailSummarize.swift */; };
+		57F52EEEBE9785E103CF502A /* AgenticToolMailDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5258805B4CEB459D401985 /* AgenticToolMailDraft.swift */; };
+		11A59293440941F0077DECDA /* AgenticToolMailSend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCA780CDD02AE73104EB257 /* AgenticToolMailSend.swift */; };
+		6EB98774877A51D2D92E5B63 /* AgenticToolMailSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E725919F9F37464B139766F9 /* AgenticToolMailSearch.swift */; };
+		79BA523433938E20D0D19097 /* AgenticToolMailExtractActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC93F22852F6259A512DA170 /* AgenticToolMailExtractActions.swift */; };
+		CE7B6277F5BDF28EA1331855 /* AgenticToolMailAutoReply.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA913B7C99B40EEA25723F88 /* AgenticToolMailAutoReply.swift */; };
+		EB8AAB1056F5E2D1DBC1E503 /* AgenticToolMailPriorityClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607BA313BF20B96770B21CE3 /* AgenticToolMailPriorityClassifier.swift */; };
+		F0EDF49ADC95BC5A0B45CEDE /* AgenticToolSlidesGenerate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A2758B216A37BFB795B46B /* AgenticToolSlidesGenerate.swift */; };
+		A139495DC836C4D3F0D2A130 /* AgenticToolSlidesEdit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DCDD14977074F2AD9DA6289 /* AgenticToolSlidesEdit.swift */; };
+		57D51B6FDADAC9DEC0D4A66B /* AgenticToolSlidesBuildRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38366C2321AAFC7CB3B668EF /* AgenticToolSlidesBuildRenderer.swift */; };
+		1BB5D4842DB81DFB9A8381C1 /* AgenticToolSlidesThemeSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80D86ADCB7259BC40E833C1 /* AgenticToolSlidesThemeSystem.swift */; };
+		BE83839DF8031A9DB721A23A /* AgenticToolSlidesExportPDF.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA45D35B67998E70A874E7F7 /* AgenticToolSlidesExportPDF.swift */; };
+		B868CBF423A80D192237354B /* AgenticToolSlidesInsertMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDBC10750E875281DD2350 /* AgenticToolSlidesInsertMedia.swift */; };
+		211B2F216045AD50676E471D /* AgenticToolSlidesLayoutOptimizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AC905F5B0DDBE85619D085 /* AgenticToolSlidesLayoutOptimizer.swift */; };
+		01D83F65943FDE793A79B2BB /* AgenticToolSheetCreate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C73D47B0C7AF9F5E59CD8CB /* AgenticToolSheetCreate.swift */; };
+		5C0B55F2692895D5C754E240 /* AgenticToolSheetUpdateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80D989DA88E8C980D9F0B4B /* AgenticToolSheetUpdateCell.swift */; };
+		93ED291EDD6C0885A1CFDD45 /* AgenticToolSheetFormulaEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035AD0566BE71CE41F9F7FCB /* AgenticToolSheetFormulaEngine.swift */; };
+		28C8A31D7FB616535E4DB48D /* AgenticToolSheetAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4765730766B429AE06CA750B /* AgenticToolSheetAnalyzer.swift */; };
+		77577AFDDFCBD2C382AC6F1F /* AgenticToolSheetVisualizationGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D887D3A47AA0D818A1B524 /* AgenticToolSheetVisualizationGenerator.swift */; };
+		21160E03307C5CA55CACECE9 /* AgenticToolSheetDependencyResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 905581985F43CEC39D6B7C76 /* AgenticToolSheetDependencyResolver.swift */; };
+		8989457A26648FCC2006B28D /* AgenticToolWorkspaceSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607E743312617F16108596AB /* AgenticToolWorkspaceSearch.swift */; };
+		765AB719C2FF1EDD044FD1D0 /* AgenticToolWorkspaceOpenItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E73375E4145E094070589A /* AgenticToolWorkspaceOpenItem.swift */; };
+		85E30FD9BDF7E47B5359603A /* AgenticToolWorkspaceLinkGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 583BCA4B9D7D09FB581E7A8A /* AgenticToolWorkspaceLinkGraph.swift */; };
+		12E78CCD93B534BD6A70FA96 /* AgenticToolWorkspaceTaggingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF6AF6B9D16566AD179BE4DB /* AgenticToolWorkspaceTaggingEngine.swift */; };
+		6DC5B08AE286A2E0E0811F63 /* AgenticToolWorkspaceIndexBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79092ACF52390CD3B14AAE47 /* AgenticToolWorkspaceIndexBuilder.swift */; };
+		5879AD4D69502CB151895940 /* AgenticToolWorkspaceSemanticIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 351CB50FB7034A07D64B8DC2 /* AgenticToolWorkspaceSemanticIndex.swift */; };
+		CEB62636BEB7FDB6753EE66E /* AgenticToolAITextSummarize.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB1D6A18FAF6BFE78D2AB598 /* AgenticToolAITextSummarize.swift */; };
+		868716482DEC549A303B7CB2 /* AgenticToolAITextRewrite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C39987E2BC7042AB757BC12 /* AgenticToolAITextRewrite.swift */; };
+		AF4F1E3948B5289550A80223 /* AgenticToolAITextTranslate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18350641095EAE42C48EEF65 /* AgenticToolAITextTranslate.swift */; };
+		5460E6D68FDF58ED2A3328EB /* AgenticToolAIIdeaGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C5CDE0C4DFF026C57E5009 /* AgenticToolAIIdeaGenerator.swift */; };
+		919EE10D05BF31016522CBFD /* AgenticToolAIClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32EF843B0D887A4CE1C05C85 /* AgenticToolAIClassifier.swift */; };
+		1EBFF4DD1FE07150D6995A42 /* AgenticToolAIContentExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A118879AD856EAC18F5CC03E /* AgenticToolAIContentExtractor.swift */; };
+		9AB0BA7923AB78DAF7F48B4F /* AgenticToolAIStructuredTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCC67ECD59F383E814F8388 /* AgenticToolAIStructuredTransformer.swift */; };
+		75929B4EA0DDBCB8852D71FC /* AgenticToolMediaImageSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 024AF9364CCA9DF73A0B3B40 /* AgenticToolMediaImageSearch.swift */; };
+		B9ECF00FC17BDD3967C65A66 /* AgenticToolMediaImageAttach.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CD3A910D3202B4F6D817D54 /* AgenticToolMediaImageAttach.swift */; };
+		439AE8E51A595F7F293C4774 /* AgenticToolMediaPromptGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08349F4711F74A967FB2FADA /* AgenticToolMediaPromptGenerator.swift */; };
+		EC9A2DC456EE88507EFB14F0 /* AgenticToolMediaAutoLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47D0069A0B7D5C763E53672 /* AgenticToolMediaAutoLayout.swift */; };
+		B2A2DFC39A1BE4CA7CAE4F32 /* AgenticToolMediaCompositionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1158CF4DCA35B0E5A28882C7 /* AgenticToolMediaCompositionEngine.swift */; };
+		18F68AA94CF6FC0D8399D892 /* AgenticToolCodeSwiftUIViewGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FA157C6F7316E293A5A42F1 /* AgenticToolCodeSwiftUIViewGenerator.swift */; };
+		478A010B8E76FA2D15D62BB0 /* AgenticToolCodeModelBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8CB5FB0372F8C431B1D285E /* AgenticToolCodeModelBuilder.swift */; };
+		338687252D37D3F50026932D /* AgenticToolCodeFeatureScaffolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B0F19FBF276EF60D38527B /* AgenticToolCodeFeatureScaffolder.swift */; };
+		63903062DD0D5DA2C3539523 /* AgenticToolCodeArchitectureGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FA2EA62EE89D8234D972CBB /* AgenticToolCodeArchitectureGenerator.swift */; };
+		F8416E8C46C4122D8F035914 /* AgenticToolCodeRefactorEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B588A2FEEBC9E13F6CAB60 /* AgenticToolCodeRefactorEngine.swift */; };
+		EC94513D538B3EE6641BF7B9 /* AgenticToolCodeModuleAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327F0699D8BAD03F0DEA6916 /* AgenticToolCodeModuleAssembler.swift */; };
+		0C6D7C5ECC86B7CEC9276937 /* AgenticUIHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 293BA72AB2E564740559EF52 /* AgenticUIHomeView.swift */; };
+		E5299DA44EB88D3C4EAA510F /* AgenticUIChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94274F548CC8CE37DFE6638 /* AgenticUIChatView.swift */; };
+		480D5A04CB0FBA5B2FC901E7 /* AgenticUIActionStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E99A500746042A23CF49C14 /* AgenticUIActionStreamView.swift */; };
+		D9DD6CB8738F4FFAC2281CCE /* AgenticUIDebugPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF99A60336A92E7B36E4DCFF /* AgenticUIDebugPanel.swift */; };
 		MS028A4E8FF9A0449D039277 /* JSONCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS018A4E8FF9A0449D039277 /* JSONCoder.swift */; };
 		MS026A2894802C56D5AB5FC3 /* SegmentSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */; };
 		MS028F0C9AC0045039A23CD0 /* MessageBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS018F0C9AC0045039A23CD0 /* MessageBubbleView.swift */; };
@@ -1414,6 +1493,85 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8406130FA05AFEEA503F3A5F /* AgenticModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticModels.swift; sourceTree = "<group>"; };
+		BE19FC9D8D86A49DCA4C2A60 /* AgenticCoreDeviceCapabilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticCoreDeviceCapabilityService.swift; sourceTree = "<group>"; };
+		8E52686C1944B042309B8ECC /* AgenticCoreSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticCoreSessionManager.swift; sourceTree = "<group>"; };
+		8494BC1A85A18542F8843C1B /* AgenticCoreOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticCoreOrchestrator.swift; sourceTree = "<group>"; };
+		A26FF63BA5FD3CB2E04091D7 /* AgenticToolExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolExecutor.swift; sourceTree = "<group>"; };
+		E398766332483BC8B1EDF2AC /* AgenticExecutionTraceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticExecutionTraceStore.swift; sourceTree = "<group>"; };
+		E8D047A53E60B7BC99207DC1 /* WorkspaceAITools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAITools.swift; sourceTree = "<group>"; };
+		C2F3AF7D5A26A565E9A2E037 /* AgenticToolTaskCreate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolTaskCreate.swift; sourceTree = "<group>"; };
+		5FB558BFCC5489E1EC374C60 /* AgenticToolTaskUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolTaskUpdate.swift; sourceTree = "<group>"; };
+		C3BD150A7F89658B89B6DF8F /* AgenticToolTaskDelete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolTaskDelete.swift; sourceTree = "<group>"; };
+		B507B21D44EBC11692DDDE06 /* AgenticToolTaskList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolTaskList.swift; sourceTree = "<group>"; };
+		05709165A7544563A7F2B885 /* AgenticToolTaskSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolTaskSchedule.swift; sourceTree = "<group>"; };
+		D63A1DDD09F72D38FCD1752B /* AgenticToolTaskPrioritize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolTaskPrioritize.swift; sourceTree = "<group>"; };
+		0B698D72617EC360A9361881 /* AgenticToolTaskAutoPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolTaskAutoPlan.swift; sourceTree = "<group>"; };
+		E0720CAAB5E0D357FBFBB851 /* AgenticToolTaskDependencyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolTaskDependencyGraph.swift; sourceTree = "<group>"; };
+		81A927E3F23BADAC36728709 /* AgenticToolTaskCriticalPathAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolTaskCriticalPathAnalyzer.swift; sourceTree = "<group>"; };
+		201A8CAA7508CA322BEE1B56 /* AgenticToolTaskResourceOptimizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolTaskResourceOptimizer.swift; sourceTree = "<group>"; };
+		F47377DB8AE903E130938D67 /* AgenticToolNoteCreate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolNoteCreate.swift; sourceTree = "<group>"; };
+		EBEB868B6D4A3A8233967254 /* AgenticToolNoteUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolNoteUpdate.swift; sourceTree = "<group>"; };
+		E11CDC269A614A6291F3B947 /* AgenticToolNoteDelete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolNoteDelete.swift; sourceTree = "<group>"; };
+		EE4CDB91844FD1A364C3E6D6 /* AgenticToolNoteSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolNoteSearch.swift; sourceTree = "<group>"; };
+		419AC4A615A299428F7927FF /* AgenticToolNoteSummarize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolNoteSummarize.swift; sourceTree = "<group>"; };
+		6B79441E1CC4649EB3310FD3 /* AgenticToolNoteExtractInsights.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolNoteExtractInsights.swift; sourceTree = "<group>"; };
+		8F601020DE5ACADCF262D0CE /* AgenticToolNoteAutoTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolNoteAutoTag.swift; sourceTree = "<group>"; };
+		E658711B657859DD766D78AC /* AgenticToolNoteGraphLinker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolNoteGraphLinker.swift; sourceTree = "<group>"; };
+		CC4ED896D66D80A9B2B60507 /* AgenticToolCalendarEventCreate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolCalendarEventCreate.swift; sourceTree = "<group>"; };
+		E31F8F005F5A52F0AF3CBCD4 /* AgenticToolCalendarEventUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolCalendarEventUpdate.swift; sourceTree = "<group>"; };
+		31B6DABA4800F54D6942F708 /* AgenticToolCalendarEventDelete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolCalendarEventDelete.swift; sourceTree = "<group>"; };
+		AA17C9872E1E7768CB8AF57C /* AgenticToolCalendarAvailabilityFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolCalendarAvailabilityFinder.swift; sourceTree = "<group>"; };
+		8853B8BF45EAE4EFDA5714ED /* AgenticToolCalendarConflictResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolCalendarConflictResolver.swift; sourceTree = "<group>"; };
+		A9D1644D2738C05CB82FD314 /* AgenticToolCalendarSmartSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolCalendarSmartSchedule.swift; sourceTree = "<group>"; };
+		21FAD7FA6EB7B74F0A956E78 /* AgenticToolMailSummarize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolMailSummarize.swift; sourceTree = "<group>"; };
+		8D5258805B4CEB459D401985 /* AgenticToolMailDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolMailDraft.swift; sourceTree = "<group>"; };
+		5BCA780CDD02AE73104EB257 /* AgenticToolMailSend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolMailSend.swift; sourceTree = "<group>"; };
+		E725919F9F37464B139766F9 /* AgenticToolMailSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolMailSearch.swift; sourceTree = "<group>"; };
+		FC93F22852F6259A512DA170 /* AgenticToolMailExtractActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolMailExtractActions.swift; sourceTree = "<group>"; };
+		AA913B7C99B40EEA25723F88 /* AgenticToolMailAutoReply.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolMailAutoReply.swift; sourceTree = "<group>"; };
+		607BA313BF20B96770B21CE3 /* AgenticToolMailPriorityClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolMailPriorityClassifier.swift; sourceTree = "<group>"; };
+		12A2758B216A37BFB795B46B /* AgenticToolSlidesGenerate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolSlidesGenerate.swift; sourceTree = "<group>"; };
+		5DCDD14977074F2AD9DA6289 /* AgenticToolSlidesEdit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolSlidesEdit.swift; sourceTree = "<group>"; };
+		38366C2321AAFC7CB3B668EF /* AgenticToolSlidesBuildRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolSlidesBuildRenderer.swift; sourceTree = "<group>"; };
+		C80D86ADCB7259BC40E833C1 /* AgenticToolSlidesThemeSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolSlidesThemeSystem.swift; sourceTree = "<group>"; };
+		FA45D35B67998E70A874E7F7 /* AgenticToolSlidesExportPDF.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolSlidesExportPDF.swift; sourceTree = "<group>"; };
+		4BBDBC10750E875281DD2350 /* AgenticToolSlidesInsertMedia.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolSlidesInsertMedia.swift; sourceTree = "<group>"; };
+		37AC905F5B0DDBE85619D085 /* AgenticToolSlidesLayoutOptimizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolSlidesLayoutOptimizer.swift; sourceTree = "<group>"; };
+		1C73D47B0C7AF9F5E59CD8CB /* AgenticToolSheetCreate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolSheetCreate.swift; sourceTree = "<group>"; };
+		F80D989DA88E8C980D9F0B4B /* AgenticToolSheetUpdateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolSheetUpdateCell.swift; sourceTree = "<group>"; };
+		035AD0566BE71CE41F9F7FCB /* AgenticToolSheetFormulaEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolSheetFormulaEngine.swift; sourceTree = "<group>"; };
+		4765730766B429AE06CA750B /* AgenticToolSheetAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolSheetAnalyzer.swift; sourceTree = "<group>"; };
+		77D887D3A47AA0D818A1B524 /* AgenticToolSheetVisualizationGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolSheetVisualizationGenerator.swift; sourceTree = "<group>"; };
+		905581985F43CEC39D6B7C76 /* AgenticToolSheetDependencyResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolSheetDependencyResolver.swift; sourceTree = "<group>"; };
+		607E743312617F16108596AB /* AgenticToolWorkspaceSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolWorkspaceSearch.swift; sourceTree = "<group>"; };
+		80E73375E4145E094070589A /* AgenticToolWorkspaceOpenItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolWorkspaceOpenItem.swift; sourceTree = "<group>"; };
+		583BCA4B9D7D09FB581E7A8A /* AgenticToolWorkspaceLinkGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolWorkspaceLinkGraph.swift; sourceTree = "<group>"; };
+		AF6AF6B9D16566AD179BE4DB /* AgenticToolWorkspaceTaggingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolWorkspaceTaggingEngine.swift; sourceTree = "<group>"; };
+		79092ACF52390CD3B14AAE47 /* AgenticToolWorkspaceIndexBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolWorkspaceIndexBuilder.swift; sourceTree = "<group>"; };
+		351CB50FB7034A07D64B8DC2 /* AgenticToolWorkspaceSemanticIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolWorkspaceSemanticIndex.swift; sourceTree = "<group>"; };
+		DB1D6A18FAF6BFE78D2AB598 /* AgenticToolAITextSummarize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolAITextSummarize.swift; sourceTree = "<group>"; };
+		4C39987E2BC7042AB757BC12 /* AgenticToolAITextRewrite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolAITextRewrite.swift; sourceTree = "<group>"; };
+		18350641095EAE42C48EEF65 /* AgenticToolAITextTranslate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolAITextTranslate.swift; sourceTree = "<group>"; };
+		16C5CDE0C4DFF026C57E5009 /* AgenticToolAIIdeaGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolAIIdeaGenerator.swift; sourceTree = "<group>"; };
+		32EF843B0D887A4CE1C05C85 /* AgenticToolAIClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolAIClassifier.swift; sourceTree = "<group>"; };
+		A118879AD856EAC18F5CC03E /* AgenticToolAIContentExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolAIContentExtractor.swift; sourceTree = "<group>"; };
+		AFCC67ECD59F383E814F8388 /* AgenticToolAIStructuredTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolAIStructuredTransformer.swift; sourceTree = "<group>"; };
+		024AF9364CCA9DF73A0B3B40 /* AgenticToolMediaImageSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolMediaImageSearch.swift; sourceTree = "<group>"; };
+		3CD3A910D3202B4F6D817D54 /* AgenticToolMediaImageAttach.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolMediaImageAttach.swift; sourceTree = "<group>"; };
+		08349F4711F74A967FB2FADA /* AgenticToolMediaPromptGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolMediaPromptGenerator.swift; sourceTree = "<group>"; };
+		B47D0069A0B7D5C763E53672 /* AgenticToolMediaAutoLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolMediaAutoLayout.swift; sourceTree = "<group>"; };
+		1158CF4DCA35B0E5A28882C7 /* AgenticToolMediaCompositionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolMediaCompositionEngine.swift; sourceTree = "<group>"; };
+		0FA157C6F7316E293A5A42F1 /* AgenticToolCodeSwiftUIViewGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolCodeSwiftUIViewGenerator.swift; sourceTree = "<group>"; };
+		D8CB5FB0372F8C431B1D285E /* AgenticToolCodeModelBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolCodeModelBuilder.swift; sourceTree = "<group>"; };
+		81B0F19FBF276EF60D38527B /* AgenticToolCodeFeatureScaffolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolCodeFeatureScaffolder.swift; sourceTree = "<group>"; };
+		8FA2EA62EE89D8234D972CBB /* AgenticToolCodeArchitectureGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolCodeArchitectureGenerator.swift; sourceTree = "<group>"; };
+		F9B588A2FEEBC9E13F6CAB60 /* AgenticToolCodeRefactorEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolCodeRefactorEngine.swift; sourceTree = "<group>"; };
+		327F0699D8BAD03F0DEA6916 /* AgenticToolCodeModuleAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticToolCodeModuleAssembler.swift; sourceTree = "<group>"; };
+		293BA72AB2E564740559EF52 /* AgenticUIHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIHomeView.swift; sourceTree = "<group>"; };
+		F94274F548CC8CE37DFE6638 /* AgenticUIChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIChatView.swift; sourceTree = "<group>"; };
+		0E99A500746042A23CF49C14 /* AgenticUIActionStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIActionStreamView.swift; sourceTree = "<group>"; };
+		FF99A60336A92E7B36E4DCFF /* AgenticUIDebugPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticUIDebugPanel.swift; sourceTree = "<group>"; };
 		MS018A4E8FF9A0449D039277 /* JSONCoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONCoder.swift; sourceTree = "<group>"; };
 		MS016A2894802C56D5AB5FC3 /* SegmentSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentSwitcher.swift; sourceTree = "<group>"; };
 		MS018F0C9AC0045039A23CD0 /* MessageBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubbleView.swift; sourceTree = "<group>"; };
@@ -8072,6 +8230,85 @@
 			isa = PBXGroup;
 			children = (
 				TKRF0000000000000000000002 /* AIOrchestrator.swift */,
+				8406130FA05AFEEA503F3A5F /* AgenticModels.swift */,
+				BE19FC9D8D86A49DCA4C2A60 /* AgenticCoreDeviceCapabilityService.swift */,
+				8E52686C1944B042309B8ECC /* AgenticCoreSessionManager.swift */,
+				8494BC1A85A18542F8843C1B /* AgenticCoreOrchestrator.swift */,
+				A26FF63BA5FD3CB2E04091D7 /* AgenticToolExecutor.swift */,
+				E398766332483BC8B1EDF2AC /* AgenticExecutionTraceStore.swift */,
+				E8D047A53E60B7BC99207DC1 /* WorkspaceAITools.swift */,
+				C2F3AF7D5A26A565E9A2E037 /* AgenticToolTaskCreate.swift */,
+				5FB558BFCC5489E1EC374C60 /* AgenticToolTaskUpdate.swift */,
+				C3BD150A7F89658B89B6DF8F /* AgenticToolTaskDelete.swift */,
+				B507B21D44EBC11692DDDE06 /* AgenticToolTaskList.swift */,
+				05709165A7544563A7F2B885 /* AgenticToolTaskSchedule.swift */,
+				D63A1DDD09F72D38FCD1752B /* AgenticToolTaskPrioritize.swift */,
+				0B698D72617EC360A9361881 /* AgenticToolTaskAutoPlan.swift */,
+				E0720CAAB5E0D357FBFBB851 /* AgenticToolTaskDependencyGraph.swift */,
+				81A927E3F23BADAC36728709 /* AgenticToolTaskCriticalPathAnalyzer.swift */,
+				201A8CAA7508CA322BEE1B56 /* AgenticToolTaskResourceOptimizer.swift */,
+				F47377DB8AE903E130938D67 /* AgenticToolNoteCreate.swift */,
+				EBEB868B6D4A3A8233967254 /* AgenticToolNoteUpdate.swift */,
+				E11CDC269A614A6291F3B947 /* AgenticToolNoteDelete.swift */,
+				EE4CDB91844FD1A364C3E6D6 /* AgenticToolNoteSearch.swift */,
+				419AC4A615A299428F7927FF /* AgenticToolNoteSummarize.swift */,
+				6B79441E1CC4649EB3310FD3 /* AgenticToolNoteExtractInsights.swift */,
+				8F601020DE5ACADCF262D0CE /* AgenticToolNoteAutoTag.swift */,
+				E658711B657859DD766D78AC /* AgenticToolNoteGraphLinker.swift */,
+				CC4ED896D66D80A9B2B60507 /* AgenticToolCalendarEventCreate.swift */,
+				E31F8F005F5A52F0AF3CBCD4 /* AgenticToolCalendarEventUpdate.swift */,
+				31B6DABA4800F54D6942F708 /* AgenticToolCalendarEventDelete.swift */,
+				AA17C9872E1E7768CB8AF57C /* AgenticToolCalendarAvailabilityFinder.swift */,
+				8853B8BF45EAE4EFDA5714ED /* AgenticToolCalendarConflictResolver.swift */,
+				A9D1644D2738C05CB82FD314 /* AgenticToolCalendarSmartSchedule.swift */,
+				21FAD7FA6EB7B74F0A956E78 /* AgenticToolMailSummarize.swift */,
+				8D5258805B4CEB459D401985 /* AgenticToolMailDraft.swift */,
+				5BCA780CDD02AE73104EB257 /* AgenticToolMailSend.swift */,
+				E725919F9F37464B139766F9 /* AgenticToolMailSearch.swift */,
+				FC93F22852F6259A512DA170 /* AgenticToolMailExtractActions.swift */,
+				AA913B7C99B40EEA25723F88 /* AgenticToolMailAutoReply.swift */,
+				607BA313BF20B96770B21CE3 /* AgenticToolMailPriorityClassifier.swift */,
+				12A2758B216A37BFB795B46B /* AgenticToolSlidesGenerate.swift */,
+				5DCDD14977074F2AD9DA6289 /* AgenticToolSlidesEdit.swift */,
+				38366C2321AAFC7CB3B668EF /* AgenticToolSlidesBuildRenderer.swift */,
+				C80D86ADCB7259BC40E833C1 /* AgenticToolSlidesThemeSystem.swift */,
+				FA45D35B67998E70A874E7F7 /* AgenticToolSlidesExportPDF.swift */,
+				4BBDBC10750E875281DD2350 /* AgenticToolSlidesInsertMedia.swift */,
+				37AC905F5B0DDBE85619D085 /* AgenticToolSlidesLayoutOptimizer.swift */,
+				1C73D47B0C7AF9F5E59CD8CB /* AgenticToolSheetCreate.swift */,
+				F80D989DA88E8C980D9F0B4B /* AgenticToolSheetUpdateCell.swift */,
+				035AD0566BE71CE41F9F7FCB /* AgenticToolSheetFormulaEngine.swift */,
+				4765730766B429AE06CA750B /* AgenticToolSheetAnalyzer.swift */,
+				77D887D3A47AA0D818A1B524 /* AgenticToolSheetVisualizationGenerator.swift */,
+				905581985F43CEC39D6B7C76 /* AgenticToolSheetDependencyResolver.swift */,
+				607E743312617F16108596AB /* AgenticToolWorkspaceSearch.swift */,
+				80E73375E4145E094070589A /* AgenticToolWorkspaceOpenItem.swift */,
+				583BCA4B9D7D09FB581E7A8A /* AgenticToolWorkspaceLinkGraph.swift */,
+				AF6AF6B9D16566AD179BE4DB /* AgenticToolWorkspaceTaggingEngine.swift */,
+				79092ACF52390CD3B14AAE47 /* AgenticToolWorkspaceIndexBuilder.swift */,
+				351CB50FB7034A07D64B8DC2 /* AgenticToolWorkspaceSemanticIndex.swift */,
+				DB1D6A18FAF6BFE78D2AB598 /* AgenticToolAITextSummarize.swift */,
+				4C39987E2BC7042AB757BC12 /* AgenticToolAITextRewrite.swift */,
+				18350641095EAE42C48EEF65 /* AgenticToolAITextTranslate.swift */,
+				16C5CDE0C4DFF026C57E5009 /* AgenticToolAIIdeaGenerator.swift */,
+				32EF843B0D887A4CE1C05C85 /* AgenticToolAIClassifier.swift */,
+				A118879AD856EAC18F5CC03E /* AgenticToolAIContentExtractor.swift */,
+				AFCC67ECD59F383E814F8388 /* AgenticToolAIStructuredTransformer.swift */,
+				024AF9364CCA9DF73A0B3B40 /* AgenticToolMediaImageSearch.swift */,
+				3CD3A910D3202B4F6D817D54 /* AgenticToolMediaImageAttach.swift */,
+				08349F4711F74A967FB2FADA /* AgenticToolMediaPromptGenerator.swift */,
+				B47D0069A0B7D5C763E53672 /* AgenticToolMediaAutoLayout.swift */,
+				1158CF4DCA35B0E5A28882C7 /* AgenticToolMediaCompositionEngine.swift */,
+				0FA157C6F7316E293A5A42F1 /* AgenticToolCodeSwiftUIViewGenerator.swift */,
+				D8CB5FB0372F8C431B1D285E /* AgenticToolCodeModelBuilder.swift */,
+				81B0F19FBF276EF60D38527B /* AgenticToolCodeFeatureScaffolder.swift */,
+				8FA2EA62EE89D8234D972CBB /* AgenticToolCodeArchitectureGenerator.swift */,
+				F9B588A2FEEBC9E13F6CAB60 /* AgenticToolCodeRefactorEngine.swift */,
+				327F0699D8BAD03F0DEA6916 /* AgenticToolCodeModuleAssembler.swift */,
+				293BA72AB2E564740559EF52 /* AgenticUIHomeView.swift */,
+				F94274F548CC8CE37DFE6638 /* AgenticUIChatView.swift */,
+				0E99A500746042A23CF49C14 /* AgenticUIActionStreamView.swift */,
+				FF99A60336A92E7B36E4DCFF /* AgenticUIDebugPanel.swift */,
 				TKRF0000000000000000000003 /* EmbeddingService.swift */,
 			);
 			path = AI;
@@ -9769,6 +10006,85 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0DEDEABD5C14D8B23D1BFE84 /* AgenticModels.swift in Sources */,
+				CE9A492FE3BFBB571DC78F3A /* AgenticCoreDeviceCapabilityService.swift in Sources */,
+				DBA61321637450B477440799 /* AgenticCoreSessionManager.swift in Sources */,
+				A2235E9A8C91DB4FD96C3970 /* AgenticCoreOrchestrator.swift in Sources */,
+				9EA71E8F7A34B0120C46C479 /* AgenticToolExecutor.swift in Sources */,
+				DD0E5BBD03BD15E37034A9DB /* AgenticExecutionTraceStore.swift in Sources */,
+				14FA552675BDB4D4CFA31DB0 /* WorkspaceAITools.swift in Sources */,
+				6DA0A46C6D3AE5A6A2920D97 /* AgenticToolTaskCreate.swift in Sources */,
+				FB33229B3193E445150AACCA /* AgenticToolTaskUpdate.swift in Sources */,
+				B9826CB9958EF40F2792ABC0 /* AgenticToolTaskDelete.swift in Sources */,
+				B2859B56472AE4AE626748F8 /* AgenticToolTaskList.swift in Sources */,
+				CFBD4745EF2792041FDB6BCC /* AgenticToolTaskSchedule.swift in Sources */,
+				2ED51E4B6BA21B2DCB0B82AA /* AgenticToolTaskPrioritize.swift in Sources */,
+				B52D6D015605EFD6562E6B1E /* AgenticToolTaskAutoPlan.swift in Sources */,
+				2141C25C1D828449242A2714 /* AgenticToolTaskDependencyGraph.swift in Sources */,
+				FB42B1591C6822A6D0C14B63 /* AgenticToolTaskCriticalPathAnalyzer.swift in Sources */,
+				84A56D9186644F7CAEA4B912 /* AgenticToolTaskResourceOptimizer.swift in Sources */,
+				58900451DF35CE7FE99EB7D0 /* AgenticToolNoteCreate.swift in Sources */,
+				42F0A62147571E1370B866F5 /* AgenticToolNoteUpdate.swift in Sources */,
+				8D4C27360C1FE69BF6F8026F /* AgenticToolNoteDelete.swift in Sources */,
+				63D6576B485978CEA9F1E322 /* AgenticToolNoteSearch.swift in Sources */,
+				54F7BF7540B237134E09D706 /* AgenticToolNoteSummarize.swift in Sources */,
+				63D4186CE2DCF5CBC9382EA5 /* AgenticToolNoteExtractInsights.swift in Sources */,
+				447AFC9E4BD013F69D2033EF /* AgenticToolNoteAutoTag.swift in Sources */,
+				AB0A8149D6ED0171BAEBEC9B /* AgenticToolNoteGraphLinker.swift in Sources */,
+				2C7E88AD4EE3A9B78BED69DD /* AgenticToolCalendarEventCreate.swift in Sources */,
+				AA0533383CE4A04667496387 /* AgenticToolCalendarEventUpdate.swift in Sources */,
+				6B3B6A70C9622ADB010091FE /* AgenticToolCalendarEventDelete.swift in Sources */,
+				280160228329D00D026189DB /* AgenticToolCalendarAvailabilityFinder.swift in Sources */,
+				DCE9045E41351A4D3E208118 /* AgenticToolCalendarConflictResolver.swift in Sources */,
+				45469C8ECF5AE061F151A850 /* AgenticToolCalendarSmartSchedule.swift in Sources */,
+				B637E1B5F799037E037DA3C9 /* AgenticToolMailSummarize.swift in Sources */,
+				57F52EEEBE9785E103CF502A /* AgenticToolMailDraft.swift in Sources */,
+				11A59293440941F0077DECDA /* AgenticToolMailSend.swift in Sources */,
+				6EB98774877A51D2D92E5B63 /* AgenticToolMailSearch.swift in Sources */,
+				79BA523433938E20D0D19097 /* AgenticToolMailExtractActions.swift in Sources */,
+				CE7B6277F5BDF28EA1331855 /* AgenticToolMailAutoReply.swift in Sources */,
+				EB8AAB1056F5E2D1DBC1E503 /* AgenticToolMailPriorityClassifier.swift in Sources */,
+				F0EDF49ADC95BC5A0B45CEDE /* AgenticToolSlidesGenerate.swift in Sources */,
+				A139495DC836C4D3F0D2A130 /* AgenticToolSlidesEdit.swift in Sources */,
+				57D51B6FDADAC9DEC0D4A66B /* AgenticToolSlidesBuildRenderer.swift in Sources */,
+				1BB5D4842DB81DFB9A8381C1 /* AgenticToolSlidesThemeSystem.swift in Sources */,
+				BE83839DF8031A9DB721A23A /* AgenticToolSlidesExportPDF.swift in Sources */,
+				B868CBF423A80D192237354B /* AgenticToolSlidesInsertMedia.swift in Sources */,
+				211B2F216045AD50676E471D /* AgenticToolSlidesLayoutOptimizer.swift in Sources */,
+				01D83F65943FDE793A79B2BB /* AgenticToolSheetCreate.swift in Sources */,
+				5C0B55F2692895D5C754E240 /* AgenticToolSheetUpdateCell.swift in Sources */,
+				93ED291EDD6C0885A1CFDD45 /* AgenticToolSheetFormulaEngine.swift in Sources */,
+				28C8A31D7FB616535E4DB48D /* AgenticToolSheetAnalyzer.swift in Sources */,
+				77577AFDDFCBD2C382AC6F1F /* AgenticToolSheetVisualizationGenerator.swift in Sources */,
+				21160E03307C5CA55CACECE9 /* AgenticToolSheetDependencyResolver.swift in Sources */,
+				8989457A26648FCC2006B28D /* AgenticToolWorkspaceSearch.swift in Sources */,
+				765AB719C2FF1EDD044FD1D0 /* AgenticToolWorkspaceOpenItem.swift in Sources */,
+				85E30FD9BDF7E47B5359603A /* AgenticToolWorkspaceLinkGraph.swift in Sources */,
+				12E78CCD93B534BD6A70FA96 /* AgenticToolWorkspaceTaggingEngine.swift in Sources */,
+				6DC5B08AE286A2E0E0811F63 /* AgenticToolWorkspaceIndexBuilder.swift in Sources */,
+				5879AD4D69502CB151895940 /* AgenticToolWorkspaceSemanticIndex.swift in Sources */,
+				CEB62636BEB7FDB6753EE66E /* AgenticToolAITextSummarize.swift in Sources */,
+				868716482DEC549A303B7CB2 /* AgenticToolAITextRewrite.swift in Sources */,
+				AF4F1E3948B5289550A80223 /* AgenticToolAITextTranslate.swift in Sources */,
+				5460E6D68FDF58ED2A3328EB /* AgenticToolAIIdeaGenerator.swift in Sources */,
+				919EE10D05BF31016522CBFD /* AgenticToolAIClassifier.swift in Sources */,
+				1EBFF4DD1FE07150D6995A42 /* AgenticToolAIContentExtractor.swift in Sources */,
+				9AB0BA7923AB78DAF7F48B4F /* AgenticToolAIStructuredTransformer.swift in Sources */,
+				75929B4EA0DDBCB8852D71FC /* AgenticToolMediaImageSearch.swift in Sources */,
+				B9ECF00FC17BDD3967C65A66 /* AgenticToolMediaImageAttach.swift in Sources */,
+				439AE8E51A595F7F293C4774 /* AgenticToolMediaPromptGenerator.swift in Sources */,
+				EC9A2DC456EE88507EFB14F0 /* AgenticToolMediaAutoLayout.swift in Sources */,
+				B2A2DFC39A1BE4CA7CAE4F32 /* AgenticToolMediaCompositionEngine.swift in Sources */,
+				18F68AA94CF6FC0D8399D892 /* AgenticToolCodeSwiftUIViewGenerator.swift in Sources */,
+				478A010B8E76FA2D15D62BB0 /* AgenticToolCodeModelBuilder.swift in Sources */,
+				338687252D37D3F50026932D /* AgenticToolCodeFeatureScaffolder.swift in Sources */,
+				63903062DD0D5DA2C3539523 /* AgenticToolCodeArchitectureGenerator.swift in Sources */,
+				F8416E8C46C4122D8F035914 /* AgenticToolCodeRefactorEngine.swift in Sources */,
+				EC94513D538B3EE6641BF7B9 /* AgenticToolCodeModuleAssembler.swift in Sources */,
+				0C6D7C5ECC86B7CEC9276937 /* AgenticUIHomeView.swift in Sources */,
+				E5299DA44EB88D3C4EAA510F /* AgenticUIChatView.swift in Sources */,
+				480D5A04CB0FBA5B2FC901E7 /* AgenticUIActionStreamView.swift in Sources */,
+				D9DD6CB8738F4FFAC2281CCE /* AgenticUIDebugPanel.swift in Sources */,
 				NB0100000000000000000001 /* SDKAnalyticsEngine.swift in Sources */,
 				NB0100000000000000000002 /* SDKWorkflowEngine.swift in Sources */,
 				NB0100000000000000000003 /* SDKTestHarness.swift in Sources */,
