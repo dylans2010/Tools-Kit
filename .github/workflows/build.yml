@@ -12,10 +12,15 @@ permissions:
 env:
   CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
   SECRET_ID: ${{ secrets.SECRET_ID }}
+  SCHEME: Tools-Kit
+  PROJECT: Tools-Kit.xcodeproj
+  CONFIGURATION: Release
+  DERIVED_DATA_PATH: ${{ github.workspace }}/build/DerivedData
+  SPM_CLONE_DIR: ${{ github.workspace }}/build/SourcePackages
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
       - name: Checkout
@@ -26,15 +31,18 @@ jobs:
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.2'
+          xcode-version: '16.3'
 
       - name: Verify Xcode
         run: |
           xcodebuild -version
           xcodebuild -showsdks
 
-      - name: Clean DerivedData
-        run: rm -rf ~/Library/Developer/Xcode/DerivedData
+      - name: Clean DerivedData and SwiftPM caches
+        run: |
+          rm -rf "$DERIVED_DATA_PATH" "$SPM_CLONE_DIR"
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+          rm -rf ~/Library/Caches/org.swift.swiftpm
 
       - name: Verify CI secrets
         run: |
@@ -44,21 +52,26 @@ jobs:
       - name: Resolve Swift Packages
         run: |
           xcodebuild \
-            -project Tools-Kit.xcodeproj \
-            -scheme Tools-Kit \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIGURATION" \
             -destination 'generic/platform=iOS' \
+            -derivedDataPath "$DERIVED_DATA_PATH" \
+            -clonedSourcePackagesDirPath "$SPM_CLONE_DIR" \
             -resolvePackageDependencies
 
-      - name: Archive (iOS ONLY)
+      - name: Archive (iOS only)
         run: |
           mkdir -p build
 
           xcodebuild \
-            -project Tools-Kit.xcodeproj \
-            -scheme Tools-Kit \
-            -configuration Release \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIGURATION" \
             -destination 'generic/platform=iOS' \
             -sdk iphoneos \
+            -derivedDataPath "$DERIVED_DATA_PATH" \
+            -clonedSourcePackagesDirPath "$SPM_CLONE_DIR" \
             -archivePath build/Tools-Kit.xcarchive \
             archive \
             ONLY_ACTIVE_ARCH=NO \
