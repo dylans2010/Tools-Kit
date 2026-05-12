@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 public final class SDKAuditLogger: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKAuditLogger()
+    public static let shared = SDKAuditLogger()
 
     public struct Event: Identifiable, Codable, Sendable {
         public enum EventType: String, Codable, CaseIterable, Sendable {

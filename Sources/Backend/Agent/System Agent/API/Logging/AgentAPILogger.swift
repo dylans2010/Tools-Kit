@@ -1,7 +1,7 @@
 import Foundation
 
 final class AgentAPILogger {
-    nonisolated(unsafe) static let shared = AgentAPILogger()
+    static let shared = AgentAPILogger()
     private var entries: [AgentLogEntry] = []
     private let queue = DispatchQueue(label: "com.tools-kit.agent.logging")
 

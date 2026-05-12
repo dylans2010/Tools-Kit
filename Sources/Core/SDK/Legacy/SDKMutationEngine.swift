@@ -3,7 +3,7 @@ import Foundation
 /// Performs workspace mutations (create/edit/delete).
 /// Enforces permission and scope validation before execution.
 public final class SDKMutationEngine {
-    nonisolated(unsafe) public static let shared = SDKMutationEngine()
+    public static let shared = SDKMutationEngine()
 
     private let gate = SDKPermissionGate.shared
     private let dispatcher = SDKActionDispatcher.shared

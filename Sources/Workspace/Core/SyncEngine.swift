@@ -4,7 +4,7 @@ import Combine
 /// Real-time and offline consistency engine for the Workspace.
 /// Orchestrates data synchronization across devices and offline state reconciliation.
 final class SyncEngine: ObservableObject {
-    nonisolated(unsafe) static let shared = SyncEngine()
+    static let shared = SyncEngine()
 
     @Published var isSyncing = false
     @Published var lastSyncedAt: Date?
@@ -51,7 +51,7 @@ final class SyncEngine: ObservableObject {
 // MARK: - Connector Runtime Engine
 
 final class ConnectorRuntime: ObservableObject {
-    nonisolated(unsafe) static let shared = ConnectorRuntime()
+    static let shared = ConnectorRuntime()
 
     @Published var activeRunningConnectors: Set<UUID> = []
 
@@ -76,7 +76,7 @@ final class ConnectorRuntime: ObservableObject {
 // MARK: - Connector Auth Manager
 
 final class ConnectorAuthManager {
-    nonisolated(unsafe) static let shared = ConnectorAuthManager()
+    static let shared = ConnectorAuthManager()
 
     private init() {}
 
@@ -130,7 +130,7 @@ final class ConnectorAuthManager {
 // MARK: - Connector Flow Engine
 
 final class ConnectorFlowEngine {
-    nonisolated(unsafe) static let shared = ConnectorFlowEngine()
+    static let shared = ConnectorFlowEngine()
 
     private init() {}
 
@@ -164,7 +164,7 @@ final class ConnectorFlowEngine {
 // MARK: - Plugin Advanced Toolkit Logic
 
 final class PluginAdvancedToolkitEngine {
-    nonisolated(unsafe) static let shared = PluginAdvancedToolkitEngine()
+    static let shared = PluginAdvancedToolkitEngine()
 
     private init() {}
 

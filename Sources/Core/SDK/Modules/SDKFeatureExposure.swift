@@ -50,7 +50,7 @@ public struct SDKFeatureParameter: Codable, Hashable, Sendable {
 
 @MainActor
 public final class SDKFeatureExposureManager: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKFeatureExposureManager()
+    public static let shared = SDKFeatureExposureManager()
 
     @Published public var exposedFeatures: [SDKExposedFeature] = []
     private var executionHandlers: [UUID: ([String: Any]) async throws -> Any] = [:]

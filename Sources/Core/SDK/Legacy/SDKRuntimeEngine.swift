@@ -4,7 +4,7 @@ import Combine
 /// The execution heart for SDK projects.
 /// Manages project lifecycle, runtime state, and execution modes.
 public final class SDKRuntimeEngine: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKRuntimeEngine()
+    public static let shared = SDKRuntimeEngine()
 
     @Published public var activeProjects: [SDKProjectLegacy] = []
     @Published public var isNoSandboxModeEnabled: Bool = false

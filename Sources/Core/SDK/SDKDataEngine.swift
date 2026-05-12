@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKDataEngine: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKDataEngine()
+    public static let shared = SDKDataEngine()
 
     private let cache = NSCache<NSString, CacheEntry>()
     private let cacheTTL: TimeInterval = 300

@@ -2,7 +2,7 @@ import Foundation
 import Security
 
 class MailKeychainManager {
-    nonisolated(unsafe) static let shared = MailKeychainManager()
+    static let shared = MailKeychainManager()
     private let service = "com.tools-kit.mail"
     private let oauthService = "com.tools-kit.mail.oauth"
 

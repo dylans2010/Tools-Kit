@@ -2,7 +2,7 @@ import Foundation
 
 /// Engine for detecting negotiation patterns, tracking concessions, and suggesting strategies.
 actor NegotiationIntelligenceEngine {
-    nonisolated(unsafe) static let shared = NegotiationIntelligenceEngine()
+    static let shared = NegotiationIntelligenceEngine()
     private let aiService = AIService.shared
 
     private init() {}
@@ -31,7 +31,7 @@ actor NegotiationIntelligenceEngine {
 
 /// Engine for automatic extraction and tracking of deadlines and commitments.
 actor DeadlineCommitmentEngine {
-    nonisolated(unsafe) static let shared = DeadlineCommitmentEngine()
+    static let shared = DeadlineCommitmentEngine()
     private let aiService = AIService.shared
 
     private init() {}
@@ -81,7 +81,7 @@ actor DeadlineCommitmentEngine {
 
 /// Engine for building dynamic profiles and tracking relationship health.
 actor RelationshipIntelligenceEngine {
-    nonisolated(unsafe) static let shared = RelationshipIntelligenceEngine()
+    static let shared = RelationshipIntelligenceEngine()
     private let aiService = AIService.shared
 
     private init() {}
@@ -132,7 +132,7 @@ actor RelationshipIntelligenceEngine {
 
 /// Engine for converting email threads into structured knowledge entries.
 actor KnowledgeExtractionEngine {
-    nonisolated(unsafe) static let shared = KnowledgeExtractionEngine()
+    static let shared = KnowledgeExtractionEngine()
     private let aiService = AIService.shared
 
     private init() {}
@@ -183,7 +183,7 @@ actor KnowledgeExtractionEngine {
 
 /// Engine for correlating context across multiple related threads.
 actor MultiThreadCorrelationEngine {
-    nonisolated(unsafe) static let shared = MultiThreadCorrelationEngine()
+    static let shared = MultiThreadCorrelationEngine()
     private let aiService = AIService.shared
 
     private init() {}
@@ -210,7 +210,7 @@ actor MultiThreadCorrelationEngine {
 
 /// Engine for identifying decisions made and building decision timelines.
 actor DecisionIntelligenceEngine {
-    nonisolated(unsafe) static let shared = DecisionIntelligenceEngine()
+    static let shared = DecisionIntelligenceEngine()
     private let aiService = AIService.shared
 
     private init() {}
@@ -260,7 +260,7 @@ actor DecisionIntelligenceEngine {
 
 /// Engine for parsing and executing natural language commands inside emails.
 actor EmailCommandEngine {
-    nonisolated(unsafe) static let shared = EmailCommandEngine()
+    static let shared = EmailCommandEngine()
     private let aiService = AIService.shared
 
     private init() {}
@@ -321,7 +321,7 @@ actor EmailCommandEngine {
 
 /// Engine for learning user patterns and refining AI outputs over time.
 actor BehavioralLearningEngine {
-    nonisolated(unsafe) static let shared = BehavioralLearningEngine()
+    static let shared = BehavioralLearningEngine()
     private var interactions: [String: Int] = [:]
 
     private init() {}

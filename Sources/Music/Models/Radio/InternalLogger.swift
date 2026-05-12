@@ -2,7 +2,7 @@ import Foundation
 
 /// Lightweight shared logger that integrates with LogViewerBackend levels for cross-module error reporting.
 final class InternalLogger {
-    nonisolated(unsafe) static let shared = InternalLogger()
+    static let shared = InternalLogger()
 
     private var entries: [InternalLogEntry] = []
     private let maxEntries = 500

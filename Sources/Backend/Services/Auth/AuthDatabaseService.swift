@@ -13,7 +13,7 @@ enum AuthDatabaseError: LocalizedError, Sendable {
 }
 
 final class AuthDatabaseService {
-    nonisolated(unsafe) static let shared = AuthDatabaseService()
+    static let shared = AuthDatabaseService()
 
     private let tables = TablesDB(AppwriteService.client)
     private let databaseId: String?

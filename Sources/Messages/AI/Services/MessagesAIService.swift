@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 
 final class MessagesAIService {
-    nonisolated(unsafe) static let shared = MessagesAIService()
+    static let shared = MessagesAIService()
 
     private let session: URLSession
     private let endpoint = URL(string: "https://openrouter.ai/api/v1/chat/completions")!

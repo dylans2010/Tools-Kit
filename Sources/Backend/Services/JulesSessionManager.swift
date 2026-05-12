@@ -3,7 +3,7 @@ import Combine
 
 /// Manages active Jules sessions and coordinates Agent Mode tasks.
 final class JulesSessionManager: ObservableObject {
-    nonisolated(unsafe) static let shared = JulesSessionManager()
+    static let shared = JulesSessionManager()
 
     @Published var activeSessions: [JulesProvider.Session] = []
     @Published var isRequesting = false

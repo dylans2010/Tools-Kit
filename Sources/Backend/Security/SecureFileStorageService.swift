@@ -2,7 +2,7 @@ import Foundation
 import CryptoKit
 
 class SecureFileStorageService {
-    nonisolated(unsafe) static let shared = SecureFileStorageService()
+    static let shared = SecureFileStorageService()
 
     private let fileManager = FileManager.default
     private let vaultDirectoryName = "SecurityVault"

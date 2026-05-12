@@ -2,7 +2,7 @@ import Foundation
 
 /// Resolves cross-system dependencies and ensures execution order correctness.
 public final class SDKDependencyResolver {
-    nonisolated(unsafe) public static let shared = SDKDependencyResolver()
+    public static let shared = SDKDependencyResolver()
 
     private init() {}
 

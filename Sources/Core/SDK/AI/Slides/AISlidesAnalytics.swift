@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class AISlidesAnalytics: ObservableObject {
-    nonisolated(unsafe) public static let shared = AISlidesAnalytics()
+    public static let shared = AISlidesAnalytics()
 
     @Published public private(set) var presentationStats: [UUID: PresentationStats] = [:]
     @Published public private(set) var generationMetrics: [GenerationMetric] = []

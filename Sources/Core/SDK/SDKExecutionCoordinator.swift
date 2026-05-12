@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 public final class SDKExecutionCoordinator {
-    nonisolated(unsafe) public static let shared = SDKExecutionCoordinator()
+    public static let shared = SDKExecutionCoordinator()
 
     private let workspaceState = SDKRuntimeWorkspaceState.shared
     private let dependencyPlanner = SDKDependencyExecutionPlanner()

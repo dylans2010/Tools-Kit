@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 final class AISlidesManager: ObservableObject {
-    nonisolated(unsafe) static let shared = AISlidesManager()
+    static let shared = AISlidesManager()
 
     @Published private(set) var isGenerating = false
     @Published private(set) var progressMessage = "Idle"

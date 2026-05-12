@@ -4,7 +4,7 @@ import SwiftUI
 
 /// Manages media editing projects, imports, and exports.
 final class EditingManager: ObservableObject {
-    nonisolated(unsafe) static let shared = EditingManager()
+    static let shared = EditingManager()
 
     @Published var projects: [EditingProject] = []
     private var undoStacks: [UUID: [EditingProject]] = [:]

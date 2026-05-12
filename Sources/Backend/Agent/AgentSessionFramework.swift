@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class AgentEventBus {
-    nonisolated(unsafe) static let shared = AgentEventBus()
+    static let shared = AgentEventBus()
 
     private let subject = PassthroughSubject<AgentExecutionEvent, Never>()
 
@@ -16,7 +16,7 @@ final class AgentEventBus {
 }
 
 final class AgentExecutionEngine {
-    nonisolated(unsafe) static let shared = AgentExecutionEngine()
+    static let shared = AgentExecutionEngine()
 
     func convert(session: AgentSession, activities: [AgentActivity], previousActivityIds: Set<String>) -> [AgentExecutionEvent] {
         var events: [AgentExecutionEvent] = []
@@ -237,7 +237,7 @@ final class AgentExecutionEngine {
 }
 
 final class AgentSessionStore: ObservableObject {
-    nonisolated(unsafe) static let shared = AgentSessionStore()
+    static let shared = AgentSessionStore()
 
     @Published private(set) var states: [String: AgentSessionState] = [:]
     @Published private(set) var orderedSessionIDs: [String] = []
@@ -331,7 +331,7 @@ final class AgentSessionFramework {
         var isExpired: Bool { Date() > expiresAt }
     }
 
-    nonisolated(unsafe) static let shared = AgentSessionFramework()
+    static let shared = AgentSessionFramework()
 
     private let client: AgentClient
     private let engine: AgentExecutionEngine

@@ -2,7 +2,7 @@ import Foundation
 
 /// A reusable API client for GitHub.
 final class GitHubAPIClient {
-    nonisolated(unsafe) static let shared = GitHubAPIClient()
+    static let shared = GitHubAPIClient()
 
     private let session: URLSession
     private let decoder: JSONDecoder

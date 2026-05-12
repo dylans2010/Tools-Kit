@@ -1,7 +1,7 @@
 import Foundation
 
 final class ModelConfigManager: ObservableObject {
-    nonisolated(unsafe) static let shared = ModelConfigManager()
+    static let shared = ModelConfigManager()
 
     private let defaults = UserDefaults.standard
     private enum Keys: Sendable {

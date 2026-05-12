@@ -3,7 +3,7 @@ import Combine
 
 /// Graph-based content structure: nodes are notes/tasks/files, edges are relationships.
 final class ContentGraphService: ObservableObject {
-    nonisolated(unsafe) static let shared = ContentGraphService()
+    static let shared = ContentGraphService()
 
     // MARK: - Models
 

@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class AISlidesTemplateManager: ObservableObject {
-    nonisolated(unsafe) public static let shared = AISlidesTemplateManager()
+    public static let shared = AISlidesTemplateManager()
 
     @Published public private(set) var templates: [SlideTemplate] = []
     @Published public private(set) var categories: [TemplateCategory] = TemplateCategory.allCases

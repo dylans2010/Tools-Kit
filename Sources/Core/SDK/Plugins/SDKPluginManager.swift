@@ -18,7 +18,7 @@ public enum PluginPermission: String, Codable, Sendable {
 
 @MainActor
 public final class SDKPluginManager: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKPluginManager()
+    public static let shared = SDKPluginManager()
 
     @Published public var plugins: [SDKPlugin] = []
 

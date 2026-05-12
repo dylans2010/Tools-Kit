@@ -2,7 +2,7 @@ import Foundation
 
 /// Handles loading of plugins from storage and initializing them into the runtime.
 final class PluginLoader {
-    nonisolated(unsafe) static let shared = PluginLoader()
+    static let shared = PluginLoader()
 
     private let pluginManager = PluginManager.shared
 

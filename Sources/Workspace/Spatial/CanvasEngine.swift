@@ -43,7 +43,7 @@ final class CanvasEngine: ObservableObject {
 }
 
 final class WhiteboardService {
-    nonisolated(unsafe) static let shared = WhiteboardService()
+    static let shared = WhiteboardService()
     private init() {}
 
     func createNewCanvas(name: String) -> SpatialCanvas {

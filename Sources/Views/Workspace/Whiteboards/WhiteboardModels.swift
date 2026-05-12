@@ -260,7 +260,7 @@ public struct CanvasState: Codable, Equatable, Sendable {
 
 @MainActor
 final class WhiteboardStore: ObservableObject {
-    nonisolated(unsafe) static let shared = WhiteboardStore()
+    static let shared = WhiteboardStore()
 
     @Published var boards: [WhiteboardBoard] = []
 

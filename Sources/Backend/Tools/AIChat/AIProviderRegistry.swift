@@ -3,7 +3,7 @@ import Foundation
 // MARK: - AIProviderRegistry
 
 final class AIProviderRegistry {
-    nonisolated(unsafe) static let shared = AIProviderRegistry()
+    static let shared = AIProviderRegistry()
 
     private(set) var providers: [any AIProvider]
 

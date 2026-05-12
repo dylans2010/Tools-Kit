@@ -8,7 +8,7 @@ protocol AgenticToolProtocol {
 
 @MainActor
 final class AgenticToolExecutor: ObservableObject {
-    nonisolated(unsafe) static let shared = AgenticToolExecutor()
+    static let shared = AgenticToolExecutor()
 
     private var toolImplementations: [String: AgenticToolProtocol] = [:]
     private let registry = WorkspaceAITools.shared

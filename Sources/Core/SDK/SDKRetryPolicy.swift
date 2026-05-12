@@ -95,7 +95,7 @@ public struct SDKRetryResult<T: Sendable>: Sendable {
 
 /// Executor that applies a retry policy to an async operation.
 public actor SDKRetryExecutor {
-    nonisolated(unsafe) public static let shared = SDKRetryExecutor()
+    public static let shared = SDKRetryExecutor()
 
     private var executionCount: Int = 0
 

@@ -1,7 +1,7 @@
 import Foundation
 
 class ToolManager: ObservableObject {
-    nonisolated(unsafe) static let shared = ToolManager()
+    static let shared = ToolManager()
 
     @Published var isExecuting = false
     @Published var lastResult: Any?

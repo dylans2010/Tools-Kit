@@ -3,7 +3,7 @@ import Combine
 
 /// Component system for Slides, managing reusable templates and design tokens.
 final class SlideComponentSystem: ObservableObject {
-    nonisolated(unsafe) static let shared = SlideComponentSystem()
+    static let shared = SlideComponentSystem()
 
     struct Component: Codable, Identifiable, Sendable {
         let id: UUID

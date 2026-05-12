@@ -10,7 +10,7 @@ public protocol SDKRouterProtocol {
 /// On-device API routing system for the SDK.
 /// Routes internal calls to the appropriate service handlers.
 public final class SDKRouter: SDKRouterProtocol {
-    nonisolated(unsafe) public static let shared = SDKRouter()
+    public static let shared = SDKRouter()
 
     private var registeredRoutes: [String: SDKRoute] = [:]
     private var handlers: [String: (SDKRequest) async throws -> SDKResponse] = [:]

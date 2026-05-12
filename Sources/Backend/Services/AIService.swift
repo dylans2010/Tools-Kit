@@ -8,7 +8,7 @@ enum AIError: Error, Sendable {
 }
 
 class AIService {
-    nonisolated(unsafe) static let shared = AIService()
+    static let shared = AIService()
 
     private let registry = AIProviderRegistry.shared
     private let settingsManager = AIChatSettingsManager.shared

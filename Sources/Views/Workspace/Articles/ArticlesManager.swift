@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class ArticlesManager: ObservableObject {
-    nonisolated(unsafe) static let shared = ArticlesManager()
+    static let shared = ArticlesManager()
 
     @Published var collections: [ArticleCollection] = []
     @Published var recentArticles: [Article] = []

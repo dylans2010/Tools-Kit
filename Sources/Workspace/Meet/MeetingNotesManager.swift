@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 final class MeetingNotesManager: ObservableObject {
-    nonisolated(unsafe) static let shared = MeetingNotesManager()
+    static let shared = MeetingNotesManager()
 
     @Published private(set) var notesBySession: [String: String] = [:]
 

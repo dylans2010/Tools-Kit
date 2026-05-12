@@ -5,7 +5,7 @@ protocol JulesPayloadValidating {
 }
 
 final class JulesRequestManager {
-    nonisolated(unsafe) static let shared = JulesRequestManager()
+    static let shared = JulesRequestManager()
 
     struct FieldValidationError: Error, Sendable {
         let field: String

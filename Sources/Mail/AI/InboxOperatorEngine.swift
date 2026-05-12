@@ -2,7 +2,7 @@ import Foundation
 
 /// Autonomous engine for inbox triage, cleanup, and batch execution with constraints.
 actor InboxOperatorEngine {
-    nonisolated(unsafe) static let shared = InboxOperatorEngine()
+    static let shared = InboxOperatorEngine()
     private let aiService = AIService.shared
     private let mailAIService = MailAIService.shared
 

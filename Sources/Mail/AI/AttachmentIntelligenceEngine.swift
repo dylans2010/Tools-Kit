@@ -3,7 +3,7 @@ import UIKit
 
 /// Engine for file-type classification, OCR, and structured data extraction from attachments.
 actor AttachmentIntelligenceEngine {
-    nonisolated(unsafe) static let shared = AttachmentIntelligenceEngine()
+    static let shared = AttachmentIntelligenceEngine()
     private let aiService = AIService.shared
 
     private init() {}

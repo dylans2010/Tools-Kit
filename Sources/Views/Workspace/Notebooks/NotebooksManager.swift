@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class NotebooksManager: ObservableObject {
-    nonisolated(unsafe) static let shared = NotebooksManager()
+    static let shared = NotebooksManager()
 
     @Published var notebooks: [Notebook] = []
     @Published var integrations: [IntegrationTool] = []

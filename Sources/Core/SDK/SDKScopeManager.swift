@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKScopeManager: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKScopeManager()
+    public static let shared = SDKScopeManager()
 
     @Published public var authorizedScopes: Set<String> = []
     @Published public var scopeAuditLog: [ScopeAuditEntry] = []

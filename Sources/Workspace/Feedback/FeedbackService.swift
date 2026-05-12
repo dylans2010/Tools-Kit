@@ -18,7 +18,7 @@ enum FeedbackServiceError: LocalizedError, Sendable {
 }
 
 final class FeedbackService {
-    nonisolated(unsafe) static let shared = FeedbackService()
+    static let shared = FeedbackService()
 
     private let databases = Databases(AppwriteService.client)
     private let account = AppwriteService.account

@@ -4,7 +4,7 @@ import SwiftUI
 /// Manages the AI Persona based on workspace data.
 @MainActor
 final class PersonaManager: ObservableObject {
-    nonisolated(unsafe) static let shared = PersonaManager()
+    static let shared = PersonaManager()
 
     @Published var interactions: [PersonaInteraction] = []
     @Published var chatHistory: [PersonaMessage] = []

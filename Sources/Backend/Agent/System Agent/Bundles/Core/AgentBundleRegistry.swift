@@ -1,7 +1,7 @@
 import Foundation
 
 final class AgentBundleRegistry {
-    nonisolated(unsafe) static let shared = AgentBundleRegistry()
+    static let shared = AgentBundleRegistry()
     private var bundles: [String: AgentBundle] = [:]
 
     private init() {}

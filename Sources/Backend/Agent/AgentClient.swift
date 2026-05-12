@@ -2,7 +2,7 @@ import Foundation
 
 /// Handles API communication with Jules.
 final class AgentClient {
-    nonisolated(unsafe) static let shared = AgentClient()
+    static let shared = AgentClient()
 
     private let requestManager: JulesRequestManager
     private let maxRetries = 3

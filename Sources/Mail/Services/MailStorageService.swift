@@ -1,7 +1,7 @@
 import Foundation
 
 class MailStorageService: ObservableObject {
-    nonisolated(unsafe) static let shared = MailStorageService()
+    static let shared = MailStorageService()
     private let fileManager = FileManager.default
     @Published var threads: [MailThread] = []
     private var activeFolderId: String?
@@ -81,7 +81,7 @@ class MailStorageService: ObservableObject {
 
 @MainActor
 final class MailStore: ObservableObject {
-    nonisolated(unsafe) static let shared = MailStore()
+    static let shared = MailStore()
 
     @Published private(set) var accounts: [MailAccount] = []
     @Published private(set) var activeAccount: MailAccount?

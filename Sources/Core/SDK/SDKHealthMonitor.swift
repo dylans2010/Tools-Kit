@@ -62,7 +62,7 @@ public struct SDKHealthReport: Sendable {
 /// Continuous health monitoring system for all SDK components.
 @MainActor
 public final class SDKHealthMonitor: SDKHealthMonitorProtocol, ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKHealthMonitor()
+    public static let shared = SDKHealthMonitor()
 
     @Published public private(set) var overallStatus: SDKHealthStatus = .unknown
     @Published public private(set) var componentStatuses: [SDKComponentHealth] = []

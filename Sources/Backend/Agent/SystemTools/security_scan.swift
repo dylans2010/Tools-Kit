@@ -15,7 +15,7 @@ final class SecurityScanTool: SystemTool {
         let caseSensitive = input["caseSensitive"] as? Bool ?? false
         let needle = caseSensitive ? query : query.lowercased()
         var matches: [String] = []
-        for case let fileURL as URL in enumerator {
+        while let fileURL = enumerator.nextObject() as? URL {
             guard fileURL.pathExtension == "swift" || fileURL.pathExtension == "md" || fileURL.pathExtension == "txt" else { continue }
             guard let content = try? String(contentsOf: fileURL, encoding: .utf8) else { continue }
             let lines = content.split(separator: "\n", omittingEmptySubsequences: false)

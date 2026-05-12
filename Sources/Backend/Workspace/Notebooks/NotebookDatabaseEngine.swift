@@ -2,7 +2,7 @@ import Foundation
 
 /// Enhanced database engine for Notebooks with relational views and computed properties.
 final class NotebookDatabaseEngine: ObservableObject {
-    nonisolated(unsafe) static let shared = NotebookDatabaseEngine()
+    static let shared = NotebookDatabaseEngine()
 
     struct DatabaseSchema: Codable, Sendable {
         var columns: [Column]

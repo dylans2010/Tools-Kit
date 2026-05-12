@@ -3,7 +3,7 @@ import Combine
 
 /// Single source of truth for Space-driven collaboration.
 final class SpaceCollabManager: ObservableObject {
-    nonisolated(unsafe) static let shared = SpaceCollabManager()
+    static let shared = SpaceCollabManager()
 
     @Published var spaces: [CollaborationSpace] = []
 

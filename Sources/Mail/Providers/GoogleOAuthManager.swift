@@ -4,7 +4,7 @@ import Foundation
 import SwiftUI
 
 final class GoogleOAuthManager: NSObject, ASWebAuthenticationPresentationContextProviding {
-    nonisolated(unsafe) static let shared = GoogleOAuthManager()
+    static let shared = GoogleOAuthManager()
 
     private var authSession: ASWebAuthenticationSession?
 

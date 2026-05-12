@@ -78,7 +78,7 @@ public struct ConnectorTemplate: Identifiable, Codable, Sendable {
 
 @MainActor
 public final class SDKConnectorRuntimeBinder: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKConnectorRuntimeBinder()
+    public static let shared = SDKConnectorRuntimeBinder()
 
     @Published public var bindings: [ConnectorBinding] = []
     @Published public var templates: [ConnectorTemplate] = []

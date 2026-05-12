@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 final class WorkspaceAITools: ObservableObject {
-    nonisolated(unsafe) static let shared = WorkspaceAITools()
+    static let shared = WorkspaceAITools()
 
     @Published private(set) var tools: [WorkspaceAIToolDefinition] = []
 

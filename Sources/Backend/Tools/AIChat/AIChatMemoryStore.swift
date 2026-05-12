@@ -14,7 +14,7 @@ struct ChatMemoryItem: Identifiable, Codable, Sendable {
 }
 
 final class AIChatMemoryStore: ObservableObject {
-    nonisolated(unsafe) static let shared = AIChatMemoryStore()
+    static let shared = AIChatMemoryStore()
 
     @Published private(set) var memories: [ChatMemoryItem] = []
     private let key = "ai_chat_memories"

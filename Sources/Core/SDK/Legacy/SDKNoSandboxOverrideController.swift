@@ -3,7 +3,7 @@ import Foundation
 /// Activates sdk.developer.noSandbox mode.
 /// Bypasses sandbox ONLY in testing/developer context.
 public final class SDKNoSandboxOverrideController {
-    nonisolated(unsafe) public static let shared = SDKNoSandboxOverrideController()
+    public static let shared = SDKNoSandboxOverrideController()
 
     private init() {}
 

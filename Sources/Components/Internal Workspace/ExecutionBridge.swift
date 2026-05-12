@@ -3,7 +3,7 @@ import os.log
 
 @MainActor
 final class ExecutionBridge {
-    nonisolated(unsafe) static let shared = ExecutionBridge()
+    static let shared = ExecutionBridge()
 
     private let calendarManager = CalendarManager.shared
     private let tasksManager = TasksManager.shared

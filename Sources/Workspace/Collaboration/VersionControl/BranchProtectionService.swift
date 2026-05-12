@@ -13,7 +13,7 @@ struct BranchProtectionRule: Codable, Identifiable, Sendable {
 
 /// Service for managing and enforcing branch protection rules.
 final class BranchProtectionService: ObservableObject {
-    nonisolated(unsafe) static let shared = BranchProtectionService()
+    static let shared = BranchProtectionService()
 
     @Published var rules: [UUID: [BranchProtectionRule]] = [:] // spaceID: rules
 

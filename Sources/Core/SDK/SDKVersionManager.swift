@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKVersionManager: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKVersionManager()
+    public static let shared = SDKVersionManager()
 
     @Published public private(set) var currentVersion: SemanticVersion = SemanticVersion(major: 2, minor: 0, patch: 0)
     @Published public private(set) var changelog: [VersionEntry] = []

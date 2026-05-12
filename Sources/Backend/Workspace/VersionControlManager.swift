@@ -4,7 +4,7 @@ import Combine
 /// A high-performance, Git-like version control engine for workspace modules.
 @MainActor
 final class VersionControlManager: ObservableObject {
-    nonisolated(unsafe) static let shared = VersionControlManager()
+    static let shared = VersionControlManager()
 
     struct Branch: Codable, Identifiable, Sendable {
         let id: UUID

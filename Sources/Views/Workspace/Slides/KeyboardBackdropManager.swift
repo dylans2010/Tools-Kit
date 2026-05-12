@@ -5,7 +5,7 @@ import Combine
 /// gradient-glow effects so the keyboard appears to float on top of a living backdrop.
 /// Modelled after KeyboardCustomizeManager (Portal) but scoped to AIGenerateSlides.
 final class KeyboardBackdropManager: ObservableObject {
-    nonisolated(unsafe) static let shared = KeyboardBackdropManager()
+    static let shared = KeyboardBackdropManager()
 
     @Published var isKeyboardVisible: Bool = false
     @Published var keyboardHeight: CGFloat = 0

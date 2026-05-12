@@ -29,7 +29,7 @@ enum AIFeatureCheckError: LocalizedError, Sendable {
 
 @MainActor
 final class AIFeatureCheck: ObservableObject {
-    nonisolated(unsafe) static let shared = AIFeatureCheck()
+    static let shared = AIFeatureCheck()
 
     @Published private(set) var requestsToday: Int = 0
 

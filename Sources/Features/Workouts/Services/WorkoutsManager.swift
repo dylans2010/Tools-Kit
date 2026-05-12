@@ -78,7 +78,7 @@ struct WorkoutsSnapshot: Codable, Sendable {
 }
 
 final class WorkoutsManager: ObservableObject {
-    nonisolated(unsafe) static let shared = WorkoutsManager()
+    static let shared = WorkoutsManager()
 
     @Published var profile: UserFitnessProfile?
     @Published var todayWorkout: WorkoutModel?

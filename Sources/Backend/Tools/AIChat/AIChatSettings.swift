@@ -61,7 +61,7 @@ struct SystemPromptPreset: Identifiable, Codable, Sendable {
 }
 
 class AIChatSettingsManager: ObservableObject {
-    nonisolated(unsafe) static let shared = AIChatSettingsManager()
+    static let shared = AIChatSettingsManager()
 
     @Published var settings: AIChatSettings {
         didSet { save() }

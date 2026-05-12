@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKTestHarness: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKTestHarness()
+    public static let shared = SDKTestHarness()
 
     @Published public private(set) var testSuites: [SDKTestSuite] = []
     @Published public private(set) var isRunning = false

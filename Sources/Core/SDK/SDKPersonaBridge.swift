@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKPersonaBridge: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKPersonaBridge()
+    public static let shared = SDKPersonaBridge()
 
     @Published public var queryHistory: [PersonaQueryRecord] = []
 

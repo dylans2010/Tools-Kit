@@ -1,7 +1,7 @@
 import Foundation
 
 public final class WorkspaceAPI {
-    nonisolated(unsafe) public static let shared = WorkspaceAPI()
+    public static let shared = WorkspaceAPI()
 
     private init() {}
 

@@ -23,7 +23,7 @@ public protocol PluginRuntimeProtocol {
 /// Manages app lifecycle with isolated execution and permission enforcement.
 @MainActor
 public final class PluginRuntimeEngine: PluginRuntimeProtocol, ObservableObject {
-    nonisolated(unsafe) public static let shared = PluginRuntimeEngine()
+    public static let shared = PluginRuntimeEngine()
 
     @Published public var loadedApps: [SDKAppDefinition] = []
     @Published public var runningApps: Set<UUID> = []

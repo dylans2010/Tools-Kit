@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 public final class SDKGraphInterface: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKGraphInterface()
+    public static let shared = SDKGraphInterface()
 
     @Published public var graph = SDKGraph(nodes: [], edges: [])
 

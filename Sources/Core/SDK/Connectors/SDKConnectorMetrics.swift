@@ -61,7 +61,7 @@ public struct SDKConnectorMetricsSummary: Identifiable, Sendable {
 /// Tracks performance metrics for all connectors.
 @MainActor
 public final class SDKConnectorMetricsTracker: SDKConnectorMetricsProtocol, ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKConnectorMetricsTracker()
+    public static let shared = SDKConnectorMetricsTracker()
 
     @Published public private(set) var allMetrics: [SDKConnectorMetricsSummary] = []
     @Published public private(set) var totalRequests: Int = 0

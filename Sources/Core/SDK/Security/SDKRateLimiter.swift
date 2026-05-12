@@ -1,7 +1,7 @@
 import Foundation
 
 public actor SDKRateLimiter {
-    nonisolated(unsafe) public static let shared = SDKRateLimiter()
+    public static let shared = SDKRateLimiter()
 
     public struct Rule: Sendable {
         public let requestsPerMinute: Int

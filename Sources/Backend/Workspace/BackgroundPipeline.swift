@@ -3,7 +3,7 @@ import os.log
 
 /// Orchestrates background tasks for AI processing, indexing, and rendering with priority support and retries.
 final class BackgroundPipeline {
-    nonisolated(unsafe) static let shared = BackgroundPipeline()
+    static let shared = BackgroundPipeline()
     private let queue = DispatchQueue(label: "com.workspace.pipeline", qos: .utility, attributes: .concurrent)
     private let logger = Logger(subsystem: "com.workspace", category: "Pipeline")
 

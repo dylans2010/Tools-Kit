@@ -277,7 +277,7 @@ public struct SDKRunConfiguration: Identifiable, Codable, Hashable, Sendable {
 
 @MainActor
 public final class SDKRuntimeWorkspaceState: ObservableObject {
-    nonisolated(unsafe) public static let shared = SDKRuntimeWorkspaceState()
+    public static let shared = SDKRuntimeWorkspaceState()
 
     @Published public var layout = SDKWorkspaceLayout()
     @Published public var selectedNode: SDKWorkspaceNode = .config

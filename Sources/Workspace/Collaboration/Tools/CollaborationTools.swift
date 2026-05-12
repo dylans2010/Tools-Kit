@@ -19,7 +19,7 @@ final class DecisionEngineTool: ObservableObject {
     @Published var decisions: [Decision] = []
     private let decisionsFile = "collaboration_decisions.json"
 
-    nonisolated(unsafe) static let shared = DecisionEngineTool()
+    static let shared = DecisionEngineTool()
 
     private init() {
         loadDecisions()
@@ -80,7 +80,7 @@ final class ProjectExecutionBoardTool: ObservableObject {
     @Published var tasks: [BoardTask] = []
     private let tasksFile = "collaboration_tasks.json"
 
-    nonisolated(unsafe) static let shared = ProjectExecutionBoardTool()
+    static let shared = ProjectExecutionBoardTool()
 
     private init() {
         loadTasks()

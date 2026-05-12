@@ -2,7 +2,7 @@ import Foundation
 
 /// Core workflow engine that manages multi-step, branching automation pipelines.
 actor WorkflowAutomationEngine {
-    nonisolated(unsafe) static let shared = WorkflowAutomationEngine()
+    static let shared = WorkflowAutomationEngine()
     private let aiService = AIService.shared
     private var activeWorkflows: [UUID: WorkflowState] = [:]
 

@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 final class SpreadsheetsManager: ObservableObject {
-    nonisolated(unsafe) static let shared = SpreadsheetsManager()
+    static let shared = SpreadsheetsManager()
 
     @Published var spreadsheets: [Spreadsheet] = []
     private let aiService = AIService.shared

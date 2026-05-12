@@ -1,7 +1,7 @@
 import Foundation
 
 class KeyboardAIService {
-    nonisolated(unsafe) static let shared = KeyboardAIService()
+    static let shared = KeyboardAIService()
     private let framework = KeyboardAIFramework()
 
     func fetchIntelligence(for text: String, mode: AccessMode) async -> AIResponse {

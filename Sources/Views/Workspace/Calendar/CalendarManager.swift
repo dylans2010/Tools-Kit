@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 final class CalendarManager: ObservableObject {
-    nonisolated(unsafe) static let shared = CalendarManager()
+    static let shared = CalendarManager()
 
     @Published var events: [CalendarEvent] = []
     private let aiService = AIService.shared

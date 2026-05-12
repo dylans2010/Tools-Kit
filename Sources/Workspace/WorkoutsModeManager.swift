@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class WorkoutsModeManager: ObservableObject {
-    nonisolated(unsafe) static let shared = WorkoutsModeManager()
+    static let shared = WorkoutsModeManager()
 
     private let key = "workoutsModeEnabled"
 

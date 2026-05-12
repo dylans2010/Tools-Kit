@@ -5,7 +5,7 @@ actor DailyService {
     static let apiRequestTimeoutInterval: TimeInterval = 20
     static let dailyTokenParameterName = "t"
     static let persistedAPIKeyStorageKey = "daily_api_key"
-    nonisolated(unsafe) static let shared = DailyService()
+    static let shared = DailyService()
 
     enum ServiceError: LocalizedError, Sendable {
         case invalidMeetingID

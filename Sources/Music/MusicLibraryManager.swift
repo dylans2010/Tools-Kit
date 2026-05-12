@@ -4,7 +4,7 @@ import ZIPFoundation
 import CryptoKit
 
 final class MusicLibraryManager: ObservableObject {
-    nonisolated(unsafe) static let shared = MusicLibraryManager()
+    static let shared = MusicLibraryManager()
 
     @Published var songs: [Song] = []
     @Published var playlists: [Playlist] = []

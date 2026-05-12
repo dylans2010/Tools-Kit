@@ -3,7 +3,7 @@ import Combine
 
 /// Animation runtime for Slides, handling physics-based motion and timeline sequencing.
 final class AnimationRuntime: ObservableObject {
-    nonisolated(unsafe) static let shared = AnimationRuntime()
+    static let shared = AnimationRuntime()
 
     @Published var currentTime: Double = 0
     @Published var isPlaying: Bool = false
