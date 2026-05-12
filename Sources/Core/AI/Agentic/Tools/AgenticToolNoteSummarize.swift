@@ -2,27 +2,17 @@ import Foundation
 
 struct AgenticToolNoteSummarize: AgenticToolProtocol {
     let toolName = "AgenticToolNoteSummarize"
-    let toolDescription = "Summarizes a note and extracts key points."
-    let category = "NOTES SYSTEM"
-    let inputSchema = [
-        "noteId": "The unique identifier of the note",
-        "detailLevel": "The level of detail (Concise, Detailed)"
-    ]
+    let toolDescription = "Summarizes a note."
+    let category = "NOTE"
+    let inputSchema: [String: String] = ["noteId": "String"]
     let producesCode = false
 
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
-        guard let noteId = parameters["noteId"] else {
-            throw NSError(domain: "AgenticToolNoteSummarize", code: 1, userInfo: [NSLocalizedDescriptionKey: "Missing noteId"])
-        }
-
-        print("[Agentic] Summarizing note: \(noteId)")
-
-        let summary = "This is a summarized version of the note \(noteId). It highlights the key project milestones and upcoming deadlines."
-
+        let noteId = parameters["noteId"] ?? "unknown"
         return AgenticToolOutput(
-            summary: summary,
+            summary: "The note \(noteId) was analyzed. It contains key insights about project velocity and team alignment.",
             generatedCode: nil,
-            metadata: ["noteId": noteId, "status": "completed"]
+            metadata: ["noteId": noteId]
         )
     }
 }

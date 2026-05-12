@@ -1,4 +1,5 @@
 import Foundation
+// import FoundationModels
 
 protocol AgenticToolProtocol {
     var toolName: String { get }

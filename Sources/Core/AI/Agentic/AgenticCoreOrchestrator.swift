@@ -6,61 +6,66 @@ final class AgenticCoreOrchestrator: ObservableObject {
 
     @Published var isProcessing = false
     @Published var lastMessage = ""
+    @Published var streamingTokens = ""
+    @Published var deviceCapability: AgenticDeviceCapability?
 
     private let sessionManager = AgenticCoreSessionManager.shared
     private let toolExecutor = AgenticToolExecutor.shared
     private let traceStore = AgenticExecutionTraceStore.shared
+    private let capabilityChecker = AgenticCoreDeviceCapabilityChecker.shared
+    private let integrityLayer = AgenticIntegrityValidationLayer.shared
 
-    private init() {}
+    private init() {
+        self.deviceCapability = capabilityChecker.checkCapability()
+    }
 
     func processRequest(_ prompt: String) async {
+        guard deviceCapability?.isSupported == true else {
+            lastMessage = "Agentic features are unavailable: \(deviceCapability?.reason ?? "Unknown error")"
+            return
+        }
+
         isProcessing = true
+        streamingTokens = ""
         var history: [AgenticModelResponse] = []
-        var isComplete = false
 
         do {
-            while !isComplete {
-                // 1. Model emits actions
-                let response = try await sessionManager.getOrchestrationResponse(prompt: prompt, history: history)
-                history.append(response)
-                lastMessage = response.message
+            // 1. Start streaming session
+            let stream = try await sessionManager.streamOrchestrationResponse(prompt: prompt, history: history)
 
-                if response.actions.isEmpty && response.isComplete {
-                    isComplete = true
+            for try await token in stream {
+                streamingTokens += token
+                // Optional: partial parsing for tool call detection during stream
+            }
+
+            // 2. Final parse and validation
+            let response = sessionManager.parseResponse(streamingTokens)
+            try integrityLayer.validateModelReasoning(response.message)
+
+            history.append(response)
+            lastMessage = response.message
+
+            // 3. Execute tools
+            for action in response.actions {
+                let trace = AgenticExecutionTrace(toolName: action.toolName, parameters: action.parameters)
+                traceStore.addTrace(trace)
+
+                traceStore.updateTrace(id: trace.id, status: .running)
+
+                do {
+                    let output = try await toolExecutor.execute(toolName: action.toolName, parameters: action.parameters)
+
+                    // Validate Integrity (Zero Tolerance for mocks)
+                    try integrityLayer.validateToolOutput(output, from: action.toolName)
+
+                    traceStore.updateTrace(id: trace.id, status: .completed, output: output)
+
+                } catch {
+                    traceStore.updateTrace(id: trace.id, status: .failed, error: error.localizedDescription)
                     break
                 }
-
-                // 2. Execute tools
-                for action in response.actions {
-                    let trace = AgenticExecutionTrace(toolName: action.toolName, parameters: action.parameters)
-                    traceStore.addTrace(trace)
-
-                    // UI: Preparing -> Running
-                    traceStore.updateTrace(id: trace.id, status: .running)
-
-                    do {
-                        let output = try await toolExecutor.execute(toolName: action.toolName, parameters: action.parameters)
-
-                        // UI: Running -> Completed
-                        traceStore.updateTrace(id: trace.id, status: .completed, output: output)
-
-                        // If code exists -> simulate writing .swift file
-                        if let code = output.generatedCode {
-                            print("[Agentic] Writing generated code for \(action.toolName)")
-                            // In real app: try code.write(to: ...)
-                        }
-
-                    } catch {
-                        traceStore.updateTrace(id: trace.id, status: .failed, error: error.localizedDescription)
-                        isComplete = true
-                        break
-                    }
-                }
-
-                if response.isComplete {
-                    isComplete = true
-                }
             }
+
         } catch {
             print("[Agentic] Orchestration error: \(error.localizedDescription)")
             lastMessage = "Error: \(error.localizedDescription)"

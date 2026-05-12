@@ -1,5 +1,7 @@
 import Foundation
+// import FoundationModels // Note: FoundationModels is part of a restricted environment, typically Apple's private/early access SDKs.
 
+// @Generable // Macro for structured output enforcement
 struct AgenticModelResponse {
     var message: String
     var actions: [AgenticModelAction]
@@ -11,6 +13,7 @@ struct AgenticModelAction {
     var parameters: [String: String]
 }
 
+// @Generable
 struct AgenticToolOutput {
     var summary: String
     var generatedCode: String?
