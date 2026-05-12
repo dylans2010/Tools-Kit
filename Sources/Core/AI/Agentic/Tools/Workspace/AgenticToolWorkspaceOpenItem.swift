@@ -39,10 +39,50 @@ struct AgenticToolWorkspaceOpenItem: AgenticToolProtocol {
                 foundItem = event.title
                 itemDetail = ["type": "event", "title": event.title, "description": event.description]
             }
+        case "deck", "slides":
+            if let deck = SlideDecksManager.shared.decks.first(where: { $0.id == targetId || $0.title.lowercased() == itemId.lowercased() }) {
+                foundItem = deck.title
+                itemDetail = ["type": "deck", "title": deck.title, "slideCount": "\(deck.slides.count)", "theme": deck.theme]
+            }
+        case "sheet", "spreadsheet":
+            if let sheet = SpreadsheetsManager.shared.spreadsheets.first(where: { $0.id == targetId || $0.name.lowercased() == itemId.lowercased() }) {
+                foundItem = sheet.name
+                itemDetail = ["type": "spreadsheet", "name": sheet.name, "rows": "\(sheet.rows)", "columns": "\(sheet.columns)"]
+            }
         default:
             if let task = TasksManager.shared.tasks.first(where: { $0.id == targetId || $0.title.lowercased() == itemId.lowercased() }) {
                 foundItem = task.title
-                itemDetail = ["type": "task", "title": task.title]
+                itemDetail = ["type": "task", "title": task.title, "priority": task.priority.rawValue]
+            }
+            if foundItem == nil {
+                for notebook in NotebooksManager.shared.notebooks {
+                    for folder in notebook.folders {
+                        if let page = folder.pages.first(where: { $0.id == targetId || $0.title.lowercased() == itemId.lowercased() }) {
+                            foundItem = page.title
+                            itemDetail = ["type": "note", "title": page.title, "notebook": notebook.name]
+                            break
+                        }
+                    }
+                    if foundItem != nil { break }
+                }
+            }
+            if foundItem == nil {
+                if let event = CalendarManager.shared.events.first(where: { $0.id == targetId || $0.title.lowercased() == itemId.lowercased() }) {
+                    foundItem = event.title
+                    itemDetail = ["type": "event", "title": event.title]
+                }
+            }
+            if foundItem == nil {
+                if let deck = SlideDecksManager.shared.decks.first(where: { $0.id == targetId || $0.title.lowercased() == itemId.lowercased() }) {
+                    foundItem = deck.title
+                    itemDetail = ["type": "deck", "title": deck.title]
+                }
+            }
+            if foundItem == nil {
+                if let sheet = SpreadsheetsManager.shared.spreadsheets.first(where: { $0.id == targetId || $0.name.lowercased() == itemId.lowercased() }) {
+                    foundItem = sheet.name
+                    itemDetail = ["type": "spreadsheet", "name": sheet.name]
+                }
             }
         }
 

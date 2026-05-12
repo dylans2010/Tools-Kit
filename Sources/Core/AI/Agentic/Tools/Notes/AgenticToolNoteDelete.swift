@@ -18,21 +18,24 @@ struct AgenticToolNoteDelete: AgenticToolProtocol {
 
         let manager = NotebooksManager.shared
         var deletedTitle = ""
+        var found = false
 
         for notebook in manager.notebooks {
             for folder in notebook.folders {
                 if let page = folder.pages.first(where: { $0.id == noteId }) {
                     deletedTitle = page.title
-                    var updatedNotebook = notebook
                     var updatedFolder = folder
                     updatedFolder.pages.removeAll { $0.id == noteId }
-                    if let fIdx = updatedNotebook.folders.firstIndex(where: { $0.id == folder.id }) {
-                        updatedNotebook.folders[fIdx] = updatedFolder
-                    }
-                    manager.updateNotebook(updatedNotebook)
+                    manager.updateFolder(updatedFolder, in: notebook)
+                    found = true
                     break
                 }
             }
+            if found { break }
+        }
+
+        guard found else {
+            throw AgenticToolExecutionError.executionFailed("note_delete", NSError(domain: "AgenticTools", code: 2, userInfo: [NSLocalizedDescriptionKey: "Note not found"]))
         }
 
         return AgenticToolOutput(

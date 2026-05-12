@@ -21,23 +21,15 @@ struct AgenticToolNoteUpdate: AgenticToolProtocol {
         var found = false
         var noteTitle = ""
 
-        for (nbIndex, notebook) in manager.notebooks.enumerated() {
-            for (fIndex, folder) in notebook.folders.enumerated() {
-                for (pIndex, page) in folder.pages.enumerated() {
-                    if page.id == noteId {
-                        var updatedNotebook = notebook
-                        var updatedFolder = folder
-                        var updatedPage = page
-                        updatedPage.content = newContent
-                        updatedFolder.pages[pIndex] = updatedPage
-                        updatedNotebook.folders[fIndex] = updatedFolder
-                        manager.updateNotebook(updatedNotebook)
-                        noteTitle = page.title
-                        found = true
-                        break
-                    }
+        for notebook in manager.notebooks {
+            for folder in notebook.folders {
+                if var page = folder.pages.first(where: { $0.id == noteId }) {
+                    noteTitle = page.title
+                    page.content = newContent
+                    manager.updatePage(page, in: folder.id, notebookID: notebook.id)
+                    found = true
+                    break
                 }
-                if found { break }
             }
             if found { break }
         }

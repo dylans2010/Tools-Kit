@@ -14,22 +14,32 @@ struct AgenticToolMailPriorityClassifier: AgenticToolProtocol {
         let scope = parameters["scope"] ?? "inbox"
 
         let accounts = AccountManager.shared.accounts
-        let accountInfo = accounts.map { "\($0.emailAddress) (\($0.providerType.rawValue))" }.joined(separator: ", ")
+        let threads = MailStore.shared.threads
+
+        var emailDescriptions: [String] = []
+        for thread in threads.prefix(20) {
+            if let lastMessage = thread.messages.last {
+                emailDescriptions.append("- Subject: \(lastMessage.subject) | From: \(lastMessage.from) | Date: \(lastMessage.date)")
+            }
+        }
 
         let session = LanguageModelSession(instructions: "You are an email priority classifier. Categorize emails into urgency levels: critical, high, medium, low.")
         let prompt = """
         Classify email priorities for scope: \(scope)
-        Accounts: \(accountInfo)
+        Accounts: \(accounts.map { $0.emailAddress }.joined(separator: ", "))
 
-        Analyze and classify emails by urgency. Provide classification criteria and rationale.
+        Recent emails:
+        \(emailDescriptions.joined(separator: "\n"))
+
+        Analyze and classify each email by urgency. Provide classification criteria and rationale.
         """
 
         let response = try await session.respond(to: prompt)
 
         return AgenticToolOutput(
-            summary: "Classified email priorities for '\(scope)' scope",
+            summary: "Classified \(emailDescriptions.count) email priorities for '\(scope)' scope",
             generatedCode: nil,
-            metadata: ["scope": scope, "accountCount": "\(accounts.count)"],
+            metadata: ["scope": scope, "accountCount": "\(accounts.count)", "emailCount": "\(emailDescriptions.count)"],
             dataPayload: ["classification": response.content]
         )
     }

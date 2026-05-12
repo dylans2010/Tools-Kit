@@ -10,6 +10,7 @@ struct AgenticToolCodeSwiftUIViewGenerator: AgenticToolProtocol {
         producesCode: true
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let viewDescription = parameters["viewDescription"] ?? ""
         let viewName = parameters["viewName"] ?? "GeneratedView"

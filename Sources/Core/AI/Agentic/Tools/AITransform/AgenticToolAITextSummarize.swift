@@ -9,6 +9,7 @@ struct AgenticToolAITextSummarize: AgenticToolProtocol {
         inputSchema: ["text": "String", "maxLength": "String"]
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let text = parameters["text"] ?? ""
         let maxLength = parameters["maxLength"] ?? "200"

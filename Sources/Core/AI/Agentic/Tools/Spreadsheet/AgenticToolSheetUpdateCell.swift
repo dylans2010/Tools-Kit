@@ -31,10 +31,13 @@ struct AgenticToolSheetUpdateCell: AgenticToolProtocol {
             sheet.cells.append([])
         }
         while sheet.cells[row].count <= column {
-            sheet.cells[row].append(CellValue(value: ""))
+            sheet.cells[row].append(SpreadsheetCell())
         }
 
-        sheet.cells[row][column] = CellValue(value: value)
+        sheet.cells[row][column].value = value
+        if value.hasPrefix("=") {
+            sheet.cells[row][column].formula = value
+        }
         manager.updateSpreadsheet(sheet)
 
         return AgenticToolOutput(

@@ -15,14 +15,26 @@ struct AgenticToolTaskCreate: AgenticToolProtocol {
         let priorityRaw = parameters["priority"] ?? "medium"
         let dueDateStr = parameters["dueDate"] ?? ""
 
-        let priority: TaskPriority
+        let priority: WorkspaceTask.TaskPriority
         switch priorityRaw.lowercased() {
         case "high": priority = .high
         case "low": priority = .low
+        case "critical": priority = .critical
         default: priority = .medium
         }
 
-        let task = TaskItem(title: title, description: description, priority: priority)
+        var dueDate: Date? = nil
+        if !dueDateStr.isEmpty {
+            let formatter = ISO8601DateFormatter()
+            dueDate = formatter.date(from: dueDateStr)
+        }
+
+        let task = WorkspaceTask(
+            title: title,
+            description: description,
+            dueDate: dueDate,
+            priority: priority
+        )
         TasksManager.shared.addTask(task)
 
         return AgenticToolOutput(

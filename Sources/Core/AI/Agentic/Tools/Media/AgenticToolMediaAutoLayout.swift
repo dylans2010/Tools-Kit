@@ -9,6 +9,7 @@ struct AgenticToolMediaAutoLayout: AgenticToolProtocol {
         inputSchema: ["targetId": "String", "mediaIds": "String"]
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let targetId = parameters["targetId"] ?? ""
         let mediaIdsStr = parameters["mediaIds"] ?? ""

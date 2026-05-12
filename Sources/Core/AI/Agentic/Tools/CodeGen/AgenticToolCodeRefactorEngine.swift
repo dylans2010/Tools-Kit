@@ -10,6 +10,7 @@ struct AgenticToolCodeRefactorEngine: AgenticToolProtocol {
         producesCode: true
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let sourceCode = parameters["sourceCode"] ?? ""
         let refactorType = parameters["refactorType"] ?? "clean"

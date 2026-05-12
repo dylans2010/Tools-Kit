@@ -28,10 +28,21 @@ struct AgenticToolCalendarEventUpdate: AgenticToolProtocol {
         switch field.lowercased() {
         case "title": event.title = value
         case "description": event.description = value
+        case "location": event.location = value
         case "starttime":
-            if let date = formatter.date(from: value) { event.startTime = date }
+            if let date = formatter.date(from: value) {
+                event.startTime = date
+                event.date = date
+            }
         case "endtime":
             if let date = formatter.date(from: value) { event.endTime = date }
+        case "priority":
+            switch value.lowercased() {
+            case "low": event.priority = .low
+            case "high": event.priority = .high
+            case "critical": event.priority = .critical
+            default: event.priority = .normal
+            }
         default: break
         }
 
