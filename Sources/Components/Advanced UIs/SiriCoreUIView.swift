@@ -4,7 +4,7 @@ import Aurora
 /// SiriCoreUIView provides a production-grade control surface for the Aurora animation engine.
 /// It enables real-time adjustments to animation intensity, speed, and preset moods.
 struct SiriCoreUIView: View {
-    enum ViewState: String, CaseIterable, Identifiable {
+    enum ViewState: String, CaseIterable, Identifiable, Hashable {
         case idle = "Idle"
         case active = "Active"
         case listening = "Listening"
@@ -54,7 +54,7 @@ struct SiriCoreUIView: View {
 
             // Control Surface
             List {
-                Section("State & Style") {
+                Section {
                     Picker("Current State", selection: $state) {
                         ForEach(ViewState.allCases, id: \.self) { state in
                             Text(state.rawValue).tag(state)
@@ -70,9 +70,11 @@ struct SiriCoreUIView: View {
                         Text("Cyberpunk").tag(AuroraGlow.Palette.cyberpunk)
                         Text("Monochrome").tag(AuroraGlow.Palette.monochrome)
                     }
+                } header: {
+                    Text("State & Style")
                 }
 
-                Section("Parameters") {
+                Section {
                     VStack(alignment: .leading) {
                         Text("Intensity: \(intensity, specifier: "%.2f")")
                         Slider(value: $intensity, in: 0...1)
@@ -84,6 +86,8 @@ struct SiriCoreUIView: View {
                     }
 
                     Toggle("Reactive Motion (Wash Effect)", isOn: $reactiveMotion)
+                } header: {
+                    Text("Parameters")
                 }
 
                 Section {
