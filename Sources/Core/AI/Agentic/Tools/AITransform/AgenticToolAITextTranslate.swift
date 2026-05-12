@@ -9,6 +9,7 @@ struct AgenticToolAITextTranslate: AgenticToolProtocol {
         inputSchema: ["text": "String", "targetLanguage": "String"]
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let text = parameters["text"] ?? ""
         let targetLanguage = parameters["targetLanguage"] ?? "Spanish"

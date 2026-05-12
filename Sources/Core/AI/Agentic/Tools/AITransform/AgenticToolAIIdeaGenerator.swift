@@ -9,6 +9,7 @@ struct AgenticToolAIIdeaGenerator: AgenticToolProtocol {
         inputSchema: ["topic": "String", "count": "String"]
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let topic = parameters["topic"] ?? ""
         let countStr = parameters["count"] ?? "5"

@@ -10,6 +10,7 @@ struct AgenticToolCodeModelBuilder: AgenticToolProtocol {
         producesCode: true
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let modelName = parameters["modelName"] ?? "GeneratedModel"
         let properties = parameters["properties"] ?? ""

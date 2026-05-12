@@ -9,6 +9,7 @@ struct AgenticToolMediaPromptGenerator: AgenticToolProtocol {
         inputSchema: ["description": "String", "style": "String"]
     )
 
+    @MainActor
     func execute(parameters: [String: String]) async throws -> AgenticToolOutput {
         let description = parameters["description"] ?? ""
         let style = parameters["style"] ?? "photorealistic"

@@ -15,21 +15,32 @@ struct AgenticToolNoteCreate: AgenticToolProtocol {
         let content = parameters["content"] ?? ""
 
         let manager = NotebooksManager.shared
-        let notebook = manager.notebooks.first { $0.name == notebookName }
 
-        let page = NotebookPage(title: title, content: content)
-
-        if var nb = notebook, let firstFolder = nb.folders.first {
-            var folder = firstFolder
-            folder.pages.append(page)
-            nb.folders[0] = folder
-            manager.updateNotebook(nb)
+        var notebook = manager.notebooks.first { $0.name.lowercased() == notebookName.lowercased() }
+        if notebook == nil {
+            notebook = manager.createNotebook(name: notebookName)
         }
+
+        guard let nb = notebook else {
+            throw AgenticToolExecutionError.executionFailed("note_create", NSError(domain: "AgenticTools", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create or find notebook"]))
+        }
+
+        var folderID: UUID
+        if let firstFolder = nb.folders.first {
+            folderID = firstFolder.id
+        } else {
+            guard let newFolder = manager.addFolder(to: nb.id, name: "General") else {
+                throw AgenticToolExecutionError.executionFailed("note_create", NSError(domain: "AgenticTools", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to create folder"]))
+            }
+            folderID = newFolder.id
+        }
+
+        manager.addPage(to: folderID, in: nb.id, title: title, content: content)
 
         return AgenticToolOutput(
             summary: "Created note '\(title)' in notebook '\(notebookName)'",
             generatedCode: nil,
-            metadata: ["pageId": page.id.uuidString, "notebook": notebookName],
+            metadata: ["notebookId": nb.id.uuidString, "notebook": notebookName],
             dataPayload: ["title": title, "contentLength": "\(content.count)"]
         )
     }

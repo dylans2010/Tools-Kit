@@ -15,8 +15,13 @@ struct AgenticToolSheetCreate: AgenticToolProtocol {
         let columns = columnsStr.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }
 
         let manager = SpreadsheetsManager.shared
-        let sheet = Spreadsheet(name: name, cells: [columns.map { CellValue(value: $0) }])
-        manager.addSpreadsheet(sheet)
+        var sheet = manager.createSpreadsheet(name: name)
+
+        for (colIdx, header) in columns.enumerated() where colIdx < (sheet.cells.first?.count ?? 0) {
+            sheet.cells[0][colIdx].value = header
+        }
+
+        manager.updateSpreadsheet(sheet)
 
         return AgenticToolOutput(
             summary: "Created spreadsheet '\(name)' with \(columns.count) columns",
