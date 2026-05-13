@@ -120,12 +120,16 @@ struct SlideEditorView: View {
             }
         ))
         .onChange(of: photoPickerItem) { _, newItem in
-            guard let newItem else { return }
-            Task {
-                if let data = try? await newItem.loadTransferable(type: Data.self) {
-                    await MainActor.run {
-                        setBackgroundImageData(data)
-                    }
+            handlePhotoPickerChange(newItem)
+        }
+    }
+
+    private func handlePhotoPickerChange(_ newItem: PhotosPickerItem?) {
+        guard let newItem else { return }
+        Task {
+            if let data = try? await newItem.loadTransferable(type: Data.self) {
+                await MainActor.run {
+                    setBackgroundImageData(data)
                 }
             }
         }
@@ -149,21 +153,26 @@ struct SlideEditorView: View {
                 }
                 toolIcon("trash.slash", label: "Clear BG") { clearSlideBackgroundImage() }
                 if selectedElement != nil {
-                    toolIcon("slider.horizontal.3", label: "Element Tools") { showingElementSheet = true }
-                    toolIcon("character.cursor.ibeam", label: "Bold") { toggleSelectedTextBold() }
-                    toolIcon("text.alignleft", label: "Align Left") { setTextAlignment("leading") }
-                    toolIcon("text.aligncenter", label: "Align Center") { setTextAlignment("center") }
-                    toolIcon("text.alignright", label: "Align Right") { setTextAlignment("trailing") }
-                    toolIcon("arrow.up.to.line", label: "Bring Front") { bringSelectedElementToFront() }
-                    toolIcon("arrow.down.to.line", label: "Send Back") { sendSelectedElementToBack() }
-                    toolIcon("plus.square.on.square", label: "Duplicate Element") { if let el = selectedElement { duplicateElement(el) } }
-                    toolIcon("trash", label: "Delete Element", tint: .red) { deleteSelectedElement() }
+                    elementSpecificTools
                 }
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
         }
         .background(.ultraThinMaterial)
+    }
+
+    @ViewBuilder
+    private var elementSpecificTools: some View {
+        toolIcon("slider.horizontal.3", label: "Element Tools") { showingElementSheet = true }
+        toolIcon("character.cursor.ibeam", label: "Bold") { toggleSelectedTextBold() }
+        toolIcon("text.alignleft", label: "Align Left") { setTextAlignment("leading") }
+        toolIcon("text.aligncenter", label: "Align Center") { setTextAlignment("center") }
+        toolIcon("text.alignright", label: "Align Right") { setTextAlignment("trailing") }
+        toolIcon("arrow.up.to.line", label: "Bring Front") { bringSelectedElementToFront() }
+        toolIcon("arrow.down.to.line", label: "Send Back") { sendSelectedElementToBack() }
+        toolIcon("plus.square.on.square", label: "Duplicate Element") { if let el = selectedElement { duplicateElement(el) } }
+        toolIcon("trash", label: "Delete Element", tint: .red) { deleteSelectedElement() }
     }
 
     private func toolIcon(_ icon: String, label: String, tint: Color = .blue, action: @escaping () -> Void) -> some View {
@@ -187,29 +196,19 @@ struct SlideEditorView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(Array(deck.slides.enumerated()), id: \.element.id) { idx, slide in
-                    Button {
-                        selectedSlideIndex = idx
-                        selectedElementID = nil
-                    } label: {
-                        VStack(spacing: 4) {
-                            SlideThumbnailView(slide: slide)
-                                .frame(width: 92, height: 56)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(selectedSlideIndex == idx ? Color.blue : Color.clear, lineWidth: 2)
-                                )
-                            Text("\(idx + 1)")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .contextMenu {
-                        Button { duplicateSlide(at: idx) } label: { Label("Duplicate", systemImage: "doc.on.doc") }
-                        Button { moveSlide(at: idx, by: -1) } label: { Label("Move Left", systemImage: "arrow.left") }
-                        Button { moveSlide(at: idx, by: 1) } label: { Label("Move Right", systemImage: "arrow.right") }
-                        Button(role: .destructive) { deleteSlide(at: idx) } label: { Label("Delete", systemImage: "trash") }
-                    }
+                    SlideStripItem(
+                        idx: idx,
+                        slide: slide,
+                        isSelected: selectedSlideIndex == idx,
+                        onSelect: {
+                            selectedSlideIndex = idx
+                            selectedElementID = nil
+                        },
+                        onDuplicate: { duplicateSlide(at: idx) },
+                        onMoveLeft: { moveSlide(at: idx, by: -1) },
+                        onMoveRight: { moveSlide(at: idx, by: 1) },
+                        onDelete: { deleteSlide(at: idx) }
+                    )
                 }
             }
             .padding(.horizontal, 12)
@@ -702,70 +701,19 @@ struct SlideEditorView: View {
         var slide = Slide.blank(title: "Slide \(deck.slides.count + 1)")
         switch layout {
         case "Title":
-            var titleEl = SlideElement(kind: .text)
-            titleEl.text = "Title"; titleEl.fontSize = 48
-            titleEl.x = 200; titleEl.y = 150; titleEl.width = 560; titleEl.height = 80
-            var subtitleEl = SlideElement(kind: .text)
-            subtitleEl.text = "Subtitle"; subtitleEl.fontSize = 28
-            subtitleEl.x = 200; subtitleEl.y = 260; subtitleEl.width = 560; subtitleEl.height = 50
-            subtitleEl.textColor = "CCCCCC"
-            slide.elements = [titleEl, subtitleEl]
+            addTitleLayout(to: &slide)
         case "Content":
-            var titleEl = SlideElement(kind: .text)
-            titleEl.text = "Title"; titleEl.fontSize = 36
-            titleEl.x = 50; titleEl.y = 60; titleEl.width = 860; titleEl.height = 60
-            var bodyEl = SlideElement(kind: .text)
-            bodyEl.text = "Content goes here"; bodyEl.fontSize = 22
-            bodyEl.x = 50; bodyEl.y = 150; bodyEl.width = 860; bodyEl.height = 200
-            bodyEl.textColor = "DDDDDD"; bodyEl.textAlignment = "leading"
-            slide.elements = [titleEl, bodyEl]
+            addContentLayout(to: &slide)
         case "Quote":
-            var quoteEl = SlideElement(kind: .text)
-            quoteEl.text = "\"Your quote here\""; quoteEl.fontSize = 32
-            quoteEl.x = 80; quoteEl.y = 160; quoteEl.width = 800; quoteEl.height = 100
-            quoteEl.textColor = "FFFFFF"; quoteEl.textAlignment = "center"
-            slide.elements = [quoteEl]
+            addQuoteLayout(to: &slide)
         case "Two-Column":
-            var left = SlideElement(kind: .text)
-            left.text = "Left column"; left.fontSize = 24
-            left.x = 250; left.y = 220; left.width = 360; left.height = 280
-            left.textAlignment = "leading"
-            var right = SlideElement(kind: .text)
-            right.text = "Right column"; right.fontSize = 24
-            right.x = 700; right.y = 220; right.width = 360; right.height = 280
-            right.textAlignment = "leading"
-            slide.elements = [left, right]
+            addTwoColumnLayout(to: &slide)
         case "Image + Text":
-            var image = SlideElement(kind: .image)
-            image.x = 260; image.y = 250; image.width = 420; image.height = 300
-            var text = SlideElement(kind: .text)
-            text.text = "Describe the visual"; text.fontSize = 26
-            text.x = 710; text.y = 250; text.width = 320; text.height = 260
-            text.textAlignment = "leading"
-            slide.elements = [image, text]
+            addImageTextLayout(to: &slide)
         case "Agenda":
-            var titleEl = SlideElement(kind: .text)
-            titleEl.text = "Agenda"; titleEl.fontSize = 42
-            titleEl.x = 200; titleEl.y = 90; titleEl.width = 560; titleEl.height = 70
-            var agenda = SlideElement(kind: .text)
-            agenda.text = "1. Intro\n2. Problem\n3. Solution\n4. Next Steps"
-            agenda.fontSize = 24
-            agenda.x = 260; agenda.y = 240; agenda.width = 620; agenda.height = 280
-            agenda.textAlignment = "leading"
-            slide.elements = [titleEl, agenda]
+            addAgendaLayout(to: &slide)
         case "Metrics":
-            var titleEl = SlideElement(kind: .text)
-            titleEl.text = "Key Metrics"; titleEl.fontSize = 40
-            titleEl.x = 220; titleEl.y = 90; titleEl.width = 560; titleEl.height = 70
-            var metric1 = SlideElement(kind: .shape)
-            metric1.shapeKind = .rectangle
-            metric1.fillColor = "1D4ED8"
-            metric1.x = 220; metric1.y = 240; metric1.width = 240; metric1.height = 140
-            var metric2 = SlideElement(kind: .shape)
-            metric2.shapeKind = .rectangle
-            metric2.fillColor = "047857"
-            metric2.x = 500; metric2.y = 240; metric2.width = 240; metric2.height = 140
-            slide.elements = [titleEl, metric1, metric2]
+            addMetricsLayout(to: &slide)
         default:
             break
         }
@@ -773,6 +721,85 @@ struct SlideEditorView: View {
         selectedSlideIndex = deck.slides.count - 1
         selectedElementID = nil
         saveDeck()
+    }
+
+    private func addTitleLayout(to slide: inout Slide) {
+        var titleEl = SlideElement(kind: .text)
+        titleEl.text = "Title"; titleEl.fontSize = 48
+        titleEl.x = 200; titleEl.y = 150; titleEl.width = 560; titleEl.height = 80
+        var subtitleEl = SlideElement(kind: .text)
+        subtitleEl.text = "Subtitle"; subtitleEl.fontSize = 28
+        subtitleEl.x = 200; subtitleEl.y = 260; subtitleEl.width = 560; subtitleEl.height = 50
+        subtitleEl.textColor = "CCCCCC"
+        slide.elements = [titleEl, subtitleEl]
+    }
+
+    private func addContentLayout(to slide: inout Slide) {
+        var titleEl = SlideElement(kind: .text)
+        titleEl.text = "Title"; titleEl.fontSize = 36
+        titleEl.x = 50; titleEl.y = 60; titleEl.width = 860; titleEl.height = 60
+        var bodyEl = SlideElement(kind: .text)
+        bodyEl.text = "Content goes here"; bodyEl.fontSize = 22
+        bodyEl.x = 50; bodyEl.y = 150; bodyEl.width = 860; bodyEl.height = 200
+        bodyEl.textColor = "DDDDDD"; bodyEl.textAlignment = "leading"
+        slide.elements = [titleEl, bodyEl]
+    }
+
+    private func addQuoteLayout(to slide: inout Slide) {
+        var quoteEl = SlideElement(kind: .text)
+        quoteEl.text = "\"Your quote here\""; quoteEl.fontSize = 32
+        quoteEl.x = 80; quoteEl.y = 160; quoteEl.width = 800; quoteEl.height = 100
+        quoteEl.textColor = "FFFFFF"; quoteEl.textAlignment = "center"
+        slide.elements = [quoteEl]
+    }
+
+    private func addTwoColumnLayout(to slide: inout Slide) {
+        var left = SlideElement(kind: .text)
+        left.text = "Left column"; left.fontSize = 24
+        left.x = 250; left.y = 220; left.width = 360; left.height = 280
+        left.textAlignment = "leading"
+        var right = SlideElement(kind: .text)
+        right.text = "Right column"; right.fontSize = 24
+        right.x = 700; right.y = 220; right.width = 360; right.height = 280
+        right.textAlignment = "leading"
+        slide.elements = [left, right]
+    }
+
+    private func addImageTextLayout(to slide: inout Slide) {
+        var image = SlideElement(kind: .image)
+        image.x = 260; image.y = 250; image.width = 420; image.height = 300
+        var text = SlideElement(kind: .text)
+        text.text = "Describe the visual"; text.fontSize = 26
+        text.x = 710; text.y = 250; text.width = 320; text.height = 260
+        text.textAlignment = "leading"
+        slide.elements = [image, text]
+    }
+
+    private func addAgendaLayout(to slide: inout Slide) {
+        var titleEl = SlideElement(kind: .text)
+        titleEl.text = "Agenda"; titleEl.fontSize = 42
+        titleEl.x = 200; titleEl.y = 90; titleEl.width = 560; titleEl.height = 70
+        var agenda = SlideElement(kind: .text)
+        agenda.text = "1. Intro\n2. Problem\n3. Solution\n4. Next Steps"
+        agenda.fontSize = 24
+        agenda.x = 260; agenda.y = 240; agenda.width = 620; agenda.height = 280
+        agenda.textAlignment = "leading"
+        slide.elements = [titleEl, agenda]
+    }
+
+    private func addMetricsLayout(to slide: inout Slide) {
+        var titleEl = SlideElement(kind: .text)
+        titleEl.text = "Key Metrics"; titleEl.fontSize = 40
+        titleEl.x = 220; titleEl.y = 90; titleEl.width = 560; titleEl.height = 70
+        var metric1 = SlideElement(kind: .shape)
+        metric1.shapeKind = .rectangle
+        metric1.fillColor = "1D4ED8"
+        metric1.x = 220; metric1.y = 240; metric1.width = 240; metric1.height = 140
+        var metric2 = SlideElement(kind: .shape)
+        metric2.shapeKind = .rectangle
+        metric2.fillColor = "047857"
+        metric2.x = 500; metric2.y = 240; metric2.width = 240; metric2.height = 140
+        slide.elements = [titleEl, metric1, metric2]
     }
 
     private func addElement(kind: SlideElement.ElementKind) {
@@ -957,6 +984,42 @@ struct SlideEditorView: View {
     }
 }
 
+// MARK: - Subviews
+
+private struct SlideStripItem: View {
+    let idx: Int
+    let slide: Slide
+    let isSelected: Bool
+    let onSelect: () -> Void
+    let onDuplicate: () -> Void
+    let onMoveLeft: () -> Void
+    let onMoveRight: () -> Void
+    let onDelete: () -> Void
+
+    var body: some View {
+        Button(action: onSelect) {
+            VStack(spacing: 4) {
+                SlideThumbnailView(slide: slide)
+                    .frame(width: 92, height: 56)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+                    )
+                Text("\(idx + 1)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .buttonStyle(.plain)
+        .contextMenu {
+            Button(action: onDuplicate) { Label("Duplicate", systemImage: "doc.on.doc") }
+            Button(action: onMoveLeft) { Label("Move Left", systemImage: "arrow.left") }
+            Button(action: onMoveRight) { Label("Move Right", systemImage: "arrow.right") }
+            Button(role: .destructive, action: onDelete) { Label("Delete", systemImage: "trash") }
+        }
+    }
+}
+
 private struct SlideCanvasElementView: View {
     let element: SlideElement
     let isSelected: Bool
@@ -999,46 +1062,7 @@ private struct SlideCanvasElementView: View {
                 .multilineTextAlignment(textAlignment)
                 .frame(width: element.width, height: element.height)
         case .image:
-            if let data = element.imageData, let img = UIImage(data: data) {
-                Image(uiImage: img)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: element.width, height: element.height)
-                    .clipped()
-            } else if let imageURL = element.imageURL {
-                AsyncImage(url: imageURL) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .scaledToFill()
-                    case .failure:
-                        ZStack {
-                            Color.gray.opacity(0.3)
-                            Image(systemName: "photo")
-                                .font(.largeTitle)
-                                .foregroundColor(.white.opacity(0.7))
-                        }
-                    case .empty:
-                        Color.gray.opacity(0.1)
-                            .overlay { ProgressView() }
-                    @unknown default:
-                        Color.gray.opacity(0.3)
-                    }
-                }
-                .frame(width: element.width, height: element.height)
-                .clipped()
-                .cornerRadius(8)
-            } else {
-                ZStack {
-                    Color.gray.opacity(0.3)
-                    Image(systemName: "photo")
-                        .font(.largeTitle)
-                        .foregroundColor(.white.opacity(0.7))
-                }
-                .frame(width: element.width, height: element.height)
-                .cornerRadius(8)
-            }
+            elementImageContent
         case .chart:
             ZStack {
                 RoundedRectangle(cornerRadius: 10)
@@ -1054,6 +1078,50 @@ private struct SlideCanvasElementView: View {
             .frame(width: element.width, height: element.height)
         case .shape:
             shapeView
+        }
+    }
+
+    @ViewBuilder
+    private var elementImageContent: some View {
+        if let data = element.imageData, let img = UIImage(data: data) {
+            Image(uiImage: img)
+                .resizable()
+                .scaledToFill()
+                .frame(width: element.width, height: element.height)
+                .clipped()
+        } else if let imageURL = element.imageURL {
+            AsyncImage(url: imageURL) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                case .failure:
+                    ZStack {
+                        Color.gray.opacity(0.3)
+                        Image(systemName: "photo")
+                            .font(.largeTitle)
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+                case .empty:
+                    Color.gray.opacity(0.1)
+                        .overlay { ProgressView() }
+                @unknown default:
+                    Color.gray.opacity(0.3)
+                }
+            }
+            .frame(width: element.width, height: element.height)
+            .clipped()
+            .cornerRadius(8)
+        } else {
+            ZStack {
+                Color.gray.opacity(0.3)
+                Image(systemName: "photo")
+                    .font(.largeTitle)
+                    .foregroundColor(.white.opacity(0.7))
+            }
+            .frame(width: element.width, height: element.height)
+            .cornerRadius(8)
         }
     }
 

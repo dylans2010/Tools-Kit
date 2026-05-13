@@ -24,16 +24,7 @@ struct AIChatToolView: View {
         .toolbar {
             if viewModel.isApiKeySaved {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Button("Settings") { showSettings = true }
-                        Button("History") { showHistorySheet = true }
-                        Button("Clear Chat", role: .destructive, action: viewModel.clearChat)
-                        Button("Change API Key") {
-                            viewModel.deleteKey()
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                    }
+                    chatMenu
                 }
             }
         }
@@ -41,17 +32,7 @@ struct AIChatToolView: View {
             AIChatSettingsView(settings: $viewModel.settingsManager.settings)
         }
         .sheet(isPresented: $showHistorySheet) {
-            NavigationStack {
-                List(viewModel.messages) { message in
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(message.role.capitalized).font(.caption).foregroundColor(.secondary)
-                        Text(message.content).lineLimit(4)
-                        Text(message.timestamp.formatted(date: .abbreviated, time: .shortened))
-                            .font(.caption2).foregroundColor(.secondary)
-                    }
-                }
-                .navigationTitle("Chat History")
-            }
+            ChatHistoryView(messages: viewModel.messages)
         }
         .sheet(isPresented: $showFileImporter) {
             FileImporterRepresentableView(allowedContentTypes: [.data, .image, .pdf, .text], allowsMultipleSelection: false) { urls in
@@ -68,6 +49,19 @@ struct AIChatToolView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text("The current model doesn't support image/file attachments. Switch to a vision-capable model (e.g. GPT-4o, Gemini, Claude) in Settings.")
+        }
+    }
+
+    private var chatMenu: some View {
+        Menu {
+            Button("Settings") { showSettings = true }
+            Button("History") { showHistorySheet = true }
+            Button("Clear Chat", role: .destructive, action: viewModel.clearChat)
+            Button("Change API Key") {
+                viewModel.deleteKey()
+            }
+        } label: {
+            Image(systemName: "ellipsis.circle")
         }
     }
 
@@ -118,38 +112,7 @@ struct AIChatToolView: View {
 
     private var chatView: some View {
         VStack(spacing: 0) {
-            ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack(spacing: 12) {
-                        ForEach(viewModel.messages) { message in
-                            ChatBubble(
-                                message: message,
-                                fontSize: viewModel.settingsManager.settings.fontSize,
-                                bubbleColorHex: viewModel.settingsManager.settings.bubbleColorHex,
-                                showTimestamp: viewModel.settingsManager.settings.showTimestamps
-                            )
-                        }
-                        if viewModel.isLoading {
-                            HStack {
-                                ProgressView()
-                                    .padding(12)
-                                    .background(Color(.secondarySystemBackground))
-                                    .cornerRadius(18)
-                                Spacer()
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
-                    .padding()
-                }
-                .onChange(of: viewModel.messages.count) { _, _ in
-                    if let lastId = viewModel.messages.last?.id {
-                        withAnimation {
-                            proxy.scrollTo(lastId, anchor: .bottom)
-                        }
-                    }
-                }
-            }
+            chatScrollView
 
             if let error = viewModel.error {
                 Text(error)
@@ -159,60 +122,108 @@ struct AIChatToolView: View {
                     .padding(.top, 4)
             }
 
-            if !viewModel.pendingAttachments.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(viewModel.pendingAttachments.indices, id: \.self) { index in
-                            AttachmentChip(attachment: viewModel.pendingAttachments[index]) {
-                                viewModel.removeAttachment(at: index)
-                            }
+            attachmentsBar
+
+            chatInputArea
+        }
+    }
+
+    private var chatScrollView: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(spacing: 12) {
+                    ForEach(viewModel.messages) { message in
+                        ChatBubble(
+                            message: message,
+                            fontSize: viewModel.settingsManager.settings.fontSize,
+                            bubbleColorHex: viewModel.settingsManager.settings.bubbleColorHex,
+                            showTimestamp: viewModel.settingsManager.settings.showTimestamps
+                        )
+                    }
+                    if viewModel.isLoading {
+                        loadingIndicator
+                    }
+                }
+                .padding()
+            }
+            .onChange(of: viewModel.messages.count) { _, _ in
+                if let lastId = viewModel.messages.last?.id {
+                    withAnimation {
+                        proxy.scrollTo(lastId, anchor: .bottom)
+                    }
+                }
+            }
+        }
+    }
+
+    private var loadingIndicator: some View {
+        HStack {
+            ProgressView()
+                .padding(12)
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(18)
+            Spacer()
+        }
+        .padding(.horizontal)
+    }
+
+    @ViewBuilder
+    private var attachmentsBar: some View {
+        if !viewModel.pendingAttachments.isEmpty {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(viewModel.pendingAttachments.indices, id: \.self) { index in
+                        AttachmentChip(attachment: viewModel.pendingAttachments[index]) {
+                            viewModel.removeAttachment(at: index)
                         }
                     }
-                    .padding(.horizontal)
                 }
-                .padding(.vertical, 6)
-                .background(Color(.systemBackground))
+                .padding(.horizontal)
             }
-
-            HStack(spacing: 8) {
-                PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
-                    Image(systemName: "photo")
-                        .font(.system(size: 22))
-                        .foregroundColor(.blue)
-                }
-
-                Button {
-                    if !viewModel.currentModelSupportsVision() {
-                        showVisionAlert = true
-                    } else {
-                        showFileImporter = true
-                    }
-                } label: {
-                    Image(systemName: "paperclip")
-                        .font(.system(size: 22))
-                        .foregroundColor(.blue)
-                }
-
-                TextField("Message", text: $viewModel.inputText, axis: .vertical)
-                    .textFieldStyle(.roundedBorder)
-                    .lineLimit(1...5)
-                    .skillPicker(text: $viewModel.inputText)
-
-                Button(action: viewModel.sendMessage) {
-                    if viewModel.isLoading {
-                        ProgressView()
-                    } else {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.system(size: 32))
-                            .foregroundColor(.blue)
-                    }
-                }
-                .disabled(viewModel.inputText.isEmpty || viewModel.isLoading)
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 10)
-            .background(.ultraThinMaterial)
+            .padding(.vertical, 6)
+            .background(Color(.systemBackground))
         }
+    }
+
+    private var chatInputArea: some View {
+        HStack(spacing: 8) {
+            PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                Image(systemName: "photo")
+                    .font(.system(size: 22))
+                    .foregroundColor(.blue)
+            }
+
+            Button {
+                if !viewModel.currentModelSupportsVision() {
+                    showVisionAlert = true
+                } else {
+                    showFileImporter = true
+                }
+            } label: {
+                Image(systemName: "paperclip")
+                    .font(.system(size: 22))
+                    .foregroundColor(.blue)
+            }
+
+            TextField("Message", text: $viewModel.inputText, axis: .vertical)
+                .textFieldStyle(.roundedBorder)
+                .lineLimit(1...5)
+                .skillPicker(text: $viewModel.inputText)
+
+            Button(action: viewModel.sendMessage) {
+                if viewModel.isLoading {
+                    ProgressView()
+                } else {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.system(size: 32))
+                        .foregroundColor(.blue)
+                }
+            }
+            .disabled(viewModel.inputText.isEmpty || viewModel.isLoading)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 10)
+        .background(.ultraThinMaterial)
     }
 
     private func handleImportedURLs(_ urls: [URL]) {
@@ -258,6 +269,26 @@ struct AIChatToolView: View {
         case "pdf": return "application/pdf"
         case "txt": return "text/plain"
         default: return "application/octet-stream"
+        }
+    }
+}
+
+// MARK: - Subviews
+
+struct ChatHistoryView: View {
+    let messages: [ChatMessage]
+
+    var body: some View {
+        NavigationStack {
+            List(messages) { message in
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(message.role.capitalized).font(.caption).foregroundColor(.secondary)
+                    Text(message.content).lineLimit(4)
+                    Text(message.timestamp.formatted(date: .abbreviated, time: .shortened))
+                        .font(.caption2).foregroundColor(.secondary)
+                }
+            }
+            .navigationTitle("Chat History")
         }
     }
 }

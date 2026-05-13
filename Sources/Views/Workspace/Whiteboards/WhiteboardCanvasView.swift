@@ -37,7 +37,16 @@ struct WhiteboardCanvasView: View {
         _board = State(initialValue: board)
         let loaded = WhiteboardStore.shared.loadCanvasState(for: board.id)
         _canvasState = State(initialValue: loaded ?? CanvasState())
-        _activeTool = State(initialValue: WhiteboardViewTools.shared.tool(id: "select")!)
+
+        let defaultTool = WhiteboardViewTools.shared.tool(id: "select") ?? WhiteboardViewTools.ToolEntry(
+            id: "select",
+            displayName: "Select",
+            iconName: "cursorarrow",
+            category: .selection,
+            interactionMode: .select,
+            configuration: .init()
+        )
+        _activeTool = State(initialValue: defaultTool)
     }
 
     var body: some View {
@@ -77,23 +86,7 @@ struct WhiteboardCanvasView: View {
             .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showElementToolbar) {
-            if let idx = selectedElementIndex {
-                ElementToolbar(
-                    element: $canvasState.elements[idx],
-                    onDelete: {
-                        deleteElement(id: canvasState.elements[idx].id)
-                        showElementToolbar = false
-                    },
-                    onDuplicate: {
-                        duplicateElement(id: canvasState.elements[idx].id)
-                        showElementToolbar = false
-                    },
-                    onBringToFront: { bringToFront(id: canvasState.elements[idx].id) },
-                    onSendToBack: { sendToBack(id: canvasState.elements[idx].id) }
-                )
-                .presentationDetents([.medium, .large])
-                .presentationDragIndicator(.visible)
-            }
+            elementToolbarSheet
         }
         .safeAreaInset(edge: .bottom) { toolPalette }
     }
@@ -101,6 +94,27 @@ struct WhiteboardCanvasView: View {
     private var selectedElementIndex: Int? {
         guard let id = selectedElementID else { return nil }
         return canvasState.elements.firstIndex(where: { $0.id == id })
+    }
+
+    @ViewBuilder
+    private var elementToolbarSheet: some View {
+        if let idx = selectedElementIndex {
+            ElementToolbar(
+                element: $canvasState.elements[idx],
+                onDelete: {
+                    deleteElement(id: canvasState.elements[idx].id)
+                    showElementToolbar = false
+                },
+                onDuplicate: {
+                    duplicateElement(id: canvasState.elements[idx].id)
+                    showElementToolbar = false
+                },
+                onBringToFront: { bringToFront(id: canvasState.elements[idx].id) },
+                onSendToBack: { sendToBack(id: canvasState.elements[idx].id) }
+            )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+        }
     }
 
     // MARK: - Tool Palette
@@ -231,45 +245,14 @@ struct WhiteboardCanvasView: View {
 
     private var drawingsLayer: some View {
         ForEach(canvasState.drawings) { drawing in
-            drawingPathView(for: drawing)
-        }
-    }
-
-    private func drawingPathView(for drawing: DrawingPath) -> some View {
-        Path { path in
-            guard let first = drawing.points.first else { return }
-            path.move(to: CGPoint(x: first.x, y: first.y))
-            for point in drawing.points.dropFirst() {
-                path.addLine(to: CGPoint(x: point.x, y: point.y))
-            }
-        }
-        .stroke(
-            Color(hex: drawing.colorHex),
-            style: drawingStrokeStyle(for: drawing)
-        )
-        .opacity(drawing.opacity)
-    }
-
-    private func drawingStrokeStyle(for drawing: DrawingPath) -> StrokeStyle {
-        let style = WhiteboardViewTools.DrawingStyle(rawValue: drawing.drawingStyleRaw) ?? .solid
-        switch style {
-        case .dashed:
-            return StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .round, lineJoin: .round, dash: [drawing.lineWidth * 3, drawing.lineWidth * 2])
-        case .dotted:
-            return StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .round, lineJoin: .round, dash: [1, drawing.lineWidth * 2])
-        case .calligraphy:
-            return StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .butt, lineJoin: .miter)
-        case .chiselTip:
-            return StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .butt, lineJoin: .bevel)
-        default:
-            return StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .round, lineJoin: .round)
+            DrawingPathView(drawing: drawing)
         }
     }
 
     @ViewBuilder
     private var activeDrawingLayer: some View {
         if let active = currentDrawingPath {
-            drawingPathView(for: active)
+            DrawingPathView(drawing: active)
         }
     }
 
@@ -681,6 +664,43 @@ struct WhiteboardCanvasView: View {
             showingAddElement = false
         } label: {
             Label("Idea Node", systemImage: "lightbulb")
+        }
+    }
+}
+
+// MARK: - Drawing Path View
+
+struct DrawingPathView: View {
+    let drawing: DrawingPath
+
+    var body: some View {
+        Path { path in
+            guard let first = drawing.points.first else { return }
+            path.move(to: CGPoint(x: first.x, y: first.y))
+            for point in drawing.points.dropFirst() {
+                path.addLine(to: CGPoint(x: point.x, y: point.y))
+            }
+        }
+        .stroke(
+            Color(hex: drawing.colorHex),
+            style: drawingStrokeStyle(for: drawing)
+        )
+        .opacity(drawing.opacity)
+    }
+
+    private func drawingStrokeStyle(for drawing: DrawingPath) -> StrokeStyle {
+        let style = WhiteboardViewTools.DrawingStyle(rawValue: drawing.drawingStyleRaw) ?? .solid
+        switch style {
+        case .dashed:
+            return StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .round, lineJoin: .round, dash: [drawing.lineWidth * 3, drawing.lineWidth * 2])
+        case .dotted:
+            return StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .round, lineJoin: .round, dash: [1, drawing.lineWidth * 2])
+        case .calligraphy:
+            return StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .butt, lineJoin: .miter)
+        case .chiselTip:
+            return StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .butt, lineJoin: .bevel)
+        default:
+            return StrokeStyle(lineWidth: drawing.lineWidth, lineCap: .round, lineJoin: .round)
         }
     }
 }
