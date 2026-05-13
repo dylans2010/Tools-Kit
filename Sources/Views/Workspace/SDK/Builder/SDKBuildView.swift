@@ -57,6 +57,7 @@ struct SDKBuildView: View {
                 architectureSection(project)
                 stabilitySection
                 explorationSection
+                advancedFeaturesSection
                 deploymentSection(project)
             } else {
                 emptyProjectSection
@@ -324,8 +325,24 @@ struct SDKBuildView: View {
             Button("System Explorer") { showingSystemExplorer = true }
             NavigationLink("Workspace Explorer", destination: SDKWorkspaceExplorerView())
             NavigationLink("API Browser", destination: SDKAPIBrowserView())
+            NavigationLink("Global Search", destination: SDKGlobalSearchView())
                 } header: {
             Text("Exploration")
+        }
+    }
+
+    private var advancedFeaturesSection: some View {
+        Section("Advanced SDK Features") {
+            NavigationLink("CI/CD Integration", destination: SDKCIIntegrationView())
+            NavigationLink("Code Obfuscation", destination: SDKObfuscationView())
+            NavigationLink("Remote Configuration", destination: SDKRemoteConfigView())
+            NavigationLink("Performance Profiler", destination: SDKProfilerView())
+            NavigationLink("Compliance Audit", destination: SDKComplianceAuditView())
+            NavigationLink("Bridge Generator", destination: SDKBridgeGeneratorView())
+            NavigationLink("Extension Points", destination: SDKExtensionPointView())
+            NavigationLink("Quotas & Billing", destination: SDKQuotaManagementView())
+            NavigationLink("White-labeling", destination: SDKWhiteLabelingView())
+            NavigationLink("Sandbox Environment", destination: SDKSandboxEnvironmentView())
         }
     }
 

@@ -49,6 +49,16 @@ export async function onEvent(event, ctx) {
     // Toolkit Tools
     @State private var toolkitTools: [PluginToolkitTool] = []
 
+    // Advanced Features
+    @State private var assets: [String] = []
+    @State private var storageQuota: Int = 10
+    @State private var locales: [String] = ["en-US"]
+    @State private var analyticsEnabled = true
+    @State private var backgroundTasksEnabled = false
+    @State private var sandboxLevel = "Strict"
+    @State private var executionPriority = "Normal"
+    @State private var themeAccentColor = "#007AFF"
+
     // Release Info
     @State private var releaseNotes = ""
 
@@ -74,6 +84,7 @@ export async function onEvent(event, ctx) {
         case rules = "Rules"
         case ui = "UI"
         case toolkit = "Toolkit"
+        case advanced = "Advanced"
         case testing = "Testing"
         case release = "Release"
     }
@@ -115,6 +126,18 @@ export async function onEvent(event, ctx) {
                 BuildUIInjectionSection(uiExtensions: $uiExtensions, toolkitTools: $toolkitTools)
             case .toolkit:
                 BuildToolkitSection(toolkitTools: $toolkitTools)
+            case .advanced:
+                BuildAdvancedFeaturesSection(
+                    assets: $assets,
+                    storageQuota: $storageQuota,
+                    locales: $locales,
+                    analyticsEnabled: $analyticsEnabled,
+                    backgroundTasksEnabled: $backgroundTasksEnabled,
+                    sandboxLevel: $sandboxLevel,
+                    executionPriority: $executionPriority,
+                    themeAccentColor: $themeAccentColor,
+                    plugin: currentPluginSnapshot
+                )
             case .testing:
                 BuildTestingSection(testEventPayload: $testEventPayload, simulatedBuildOutput: simulatedBuildOutput) { runLocalValidation() }
             case .release:
@@ -207,7 +230,10 @@ export async function onEvent(event, ctx) {
             releaseNotes: releaseNotes.isEmpty ? nil : releaseNotes, apiKey: apiKey, privacyNote: privacyNote,
             dataUsageExplanation: dataUsageExplanation, retentionPolicy: retentionPolicy,
             endpoints: endpoints, dataMappings: dataMappings, executionRules: executionRules,
-            uiExtensions: uiExtensions, toolkitTools: toolkitTools
+            uiExtensions: uiExtensions, toolkitTools: toolkitTools,
+            assets: assets, storageQuotaMB: storageQuota, locales: locales,
+            isAnalyticsEnabled: analyticsEnabled, isBackgroundTasksEnabled: backgroundTasksEnabled,
+            sandboxLevel: sandboxLevel, executionPriority: executionPriority, themeAccentColor: themeAccentColor
         )
         manager.savePlugin(newPlugin)
         dismiss()
@@ -235,7 +261,10 @@ export async function onEvent(event, ctx) {
             actions: Array(selectedActions), sourceCode: sourceCode, apiKey: apiKey, privacyNote: privacyNote,
             dataUsageExplanation: dataUsageExplanation, retentionPolicy: retentionPolicy,
             endpoints: endpoints, dataMappings: dataMappings, executionRules: executionRules,
-            uiExtensions: uiExtensions, toolkitTools: toolkitTools
+            uiExtensions: uiExtensions, toolkitTools: toolkitTools,
+            assets: assets, storageQuotaMB: storageQuota, locales: locales,
+            isAnalyticsEnabled: analyticsEnabled, isBackgroundTasksEnabled: backgroundTasksEnabled,
+            sandboxLevel: sandboxLevel, executionPriority: executionPriority, themeAccentColor: themeAccentColor
         )
     }
 }
@@ -752,6 +781,41 @@ struct EditEndpointView: View {
                 ToolbarItem(placement: .topBarLeading) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .topBarTrailing) { Button("Save") { onSave(endpoint); dismiss() }.bold() }
             }
+        }
+    }
+}
+
+private struct BuildAdvancedFeaturesSection: View {
+    @Binding var assets: [String]
+    @Binding var storageQuota: Int
+    @Binding var locales: [String]
+    @Binding var analyticsEnabled: Bool
+    @Binding var backgroundTasksEnabled: Bool
+    @Binding var sandboxLevel: String
+    @Binding var executionPriority: String
+    @Binding var themeAccentColor: String
+
+    let plugin: PluginDefinition
+
+    var body: some View {
+        Section("Plugin Management") {
+            NavigationLink("Asset Manager") { PluginAssetManagerView(assets: $assets) }
+            NavigationLink("Storage Configuration") { PluginStorageConfigView(quotaMB: $storageQuota) }
+            NavigationLink("Localization") { PluginLocalizationView(locales: $locales) }
+            NavigationLink("Analytics Configuration") { PluginAnalyticsConfigView(isEnabled: $analyticsEnabled) }
+        }
+
+        Section("Execution & Security") {
+            NavigationLink("Permission Escalation") { PluginPermissionEscalationView() }
+            NavigationLink("Background Tasks") { PluginBackgroundTaskView(isEnabled: $backgroundTasksEnabled) }
+            NavigationLink("Sandbox Configuration") { PluginSandboxConfigView(level: $sandboxLevel) }
+            NavigationLink("Performance Limits") { PluginPerformanceConfigView(priority: $executionPriority) }
+        }
+
+        Section("Resources") {
+            NavigationLink("Theme Customization") { PluginThemeConfigView(accentColor: $themeAccentColor) }
+            NavigationLink("Documentation Generator") { PluginDocGeneratorView(plugin: plugin) }
+            NavigationLink("Version Rollback") { PluginVersionRollbackView() }
         }
     }
 }

@@ -56,25 +56,63 @@ struct SecurityScopeApplicationView: View {
 
             Section {
                 let highRiskCapabilities = plugin.capabilities.filter { $0.riskLevel == .high }
+                let usedScopes = AuthorizationManager.shared.currentScopes()
+
                 if highRiskCapabilities.isEmpty {
                     Text("No high-risk scopes requested.").font(.caption).foregroundStyle(.secondary)
                 } else {
                     ForEach(highRiskCapabilities) { cap in
-                        HStack {
-                            Label(cap.displayName, systemImage: cap.icon).font(.subheadline)
-                            Spacer()
-                            Text("HIGH RISK")
-                                .font(.system(size: 8, weight: .black))
-                                .padding(.horizontal, 6).padding(.vertical, 2)
-                                .background(Color.red.opacity(0.1), in: Capsule())
-                                .foregroundStyle(.red)
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Label(cap.displayName, systemImage: cap.icon).font(.subheadline)
+                                Spacer()
+                                let isUsed = usedScopes.contains(where: { $0.contains(cap.rawValue) })
+
+                                Text(isUsed ? "ACTIVE" : "PENDING")
+                                    .font(.system(size: 8, weight: .black))
+                                    .padding(.horizontal, 6).padding(.vertical, 2)
+                                    .background((isUsed ? Color.green : Color.orange).opacity(0.1), in: Capsule())
+                                    .foregroundStyle(isUsed ? .green : .orange)
+
+                                Text("HIGH RISK")
+                                    .font(.system(size: 8, weight: .black))
+                                    .padding(.horizontal, 6).padding(.vertical, 2)
+                                    .background(Color.red.opacity(0.1), in: Capsule())
+                                    .foregroundStyle(.red)
+                            }
+
+                            if !usedScopes.contains(where: { $0.contains(cap.rawValue) }) {
+                                Text("Scope requested but not yet granted in current session.")
+                                    .font(.system(size: 10))
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
                 }
             } header: {
-                Label("Requested High-Risk Scopes", systemImage: "exclamationmark.shield.fill")
+                Label("Scope Status", systemImage: "exclamationmark.shield.fill")
             } footer: {
                 Text("Changes are applied to the plugin definition. High-risk plugins without an API Key or Privacy Note will be blocked during installation or execution.")
+            }
+
+            Section("Unavailable Scopes") {
+                let allScopes = PluginCapability.allCases.map { $0.rawValue }
+                let currentScopes = AuthorizationManager.shared.currentScopes()
+                let unavailable = allScopes.filter { scope in
+                    !currentScopes.contains { $0 == "*" || $0 == scope || (scope.contains(".") && $0 == scope.split(separator: ".").first! + ".*") }
+                }
+
+                if unavailable.isEmpty {
+                    Text("All system scopes are available.").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(unavailable, id: \.self) { scope in
+                        HStack {
+                            Text(scope).font(.caption.monospaced())
+                            Spacer()
+                            Image(systemName: "lock.slash.fill").foregroundStyle(.secondary).font(.caption2)
+                        }
+                    }
+                }
             }
         }
         .navigationTitle("Security Scopes")

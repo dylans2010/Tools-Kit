@@ -8,20 +8,57 @@ struct ScopeInspectorView: View {
 
     var body: some View {
         List {
-            Section("Active Scopes") {
+            Section("Active (Granted) Scopes") {
                 if authorizationManager.currentScopes().isEmpty {
                     Text("No active scopes")
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(authorizationManager.currentScopes(), id: \.self) { scope in
-                        Text(scope).font(.caption.monospaced())
+                        HStack {
+                            Text(scope).font(.caption.monospaced())
+                            Spacer()
+                            Image(systemName: "checkmark.shield.fill").foregroundStyle(.green).font(.caption2)
+                        }
                     }
                 }
             }
 
-            ForEach(authorizationManager.currentScopes(), id: \.self) { scope in
-                Section(scope) {
-                    resourceRows(for: scope)
+            Section("Requested (Pending) Scopes") {
+                let requested = getRequestedButUnusedScopes()
+                if requested.isEmpty {
+                    Text("No pending requests").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(requested, id: \.self) { scope in
+                        HStack {
+                            Text(scope).font(.caption.monospaced())
+                            Spacer()
+                            Image(systemName: "clock.fill").foregroundStyle(.orange).font(.caption2)
+                        }
+                    }
+                }
+            }
+
+            Section("Unavailable (System) Scopes") {
+                let unavailable = getUnavailableScopes()
+                if unavailable.isEmpty {
+                    Text("No unavailable scopes").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(unavailable, id: \.self) { scope in
+                        HStack {
+                            Text(scope).font(.caption.monospaced())
+                            Spacer()
+                            Image(systemName: "lock.slash.fill").foregroundStyle(.red).font(.caption2)
+                        }
+                    }
+                }
+            }
+
+            Section("Usage Mapping") {
+                ForEach(authorizationManager.currentScopes(), id: \.self) { scope in
+                    DisclosureGroup(scope) {
+                        resourceRows(for: scope)
+                    }
+                    .font(.caption.monospaced())
                 }
             }
         }
@@ -60,5 +97,25 @@ struct ScopeInspectorView: View {
                 .labelStyle(.iconOnly)
                 .foregroundStyle(allowed ? Color.green : Color.red)
         }
+    }
+
+    private func getRequestedButUnusedScopes() -> [String] {
+        let current = Set(authorizationManager.currentScopes())
+        var requested = Set<String>()
+
+        for plugin in pluginManager.plugins {
+            requested.formUnion(plugin.requiredScopes)
+        }
+        for connector in connectorManager.connectors {
+            requested.formUnion(connector.requiredScopes)
+        }
+
+        return requested.subtracting(current).sorted()
+    }
+
+    private func getUnavailableScopes() -> [String] {
+        let allPossible = Set(PluginCapability.allCases.map { $0.rawValue })
+        let current = Set(authorizationManager.currentScopes())
+        return allPossible.subtracting(current).sorted()
     }
 }

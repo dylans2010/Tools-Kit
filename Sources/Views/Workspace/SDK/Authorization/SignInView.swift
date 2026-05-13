@@ -1,4 +1,5 @@
 import SwiftUI
+import CryptoKit
 
 struct SignInView: View {
     @Environment(\.dismiss) private var dismiss
@@ -25,8 +26,11 @@ struct SignInView: View {
             Section {
                 Button("Authenticate") {
                     authorizationManager.beginAuthentication()
+                    let finalUserId = userId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "workspace-user" : userId
+                    let hashedUserId = SHA256.hash(data: Data(finalUserId.utf8)).map { String(format: "%02hhx", $0) }.joined()
+
                     _ = authorizationManager.authenticate(
-                        userId: userId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : userId,
+                        userId: hashedUserId,
                         scopes: parseScopes(scopesText),
                         sessionDuration: durationHours * 3600,
                         refreshToken: refreshToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : refreshToken

@@ -30,6 +30,27 @@ struct SDKHomeView: View {
                     }
                 }
 
+                Section("Authorization") {
+                    NavigationLink(destination: SignInView()) {
+                        Label("Sign In", systemImage: "person.badge.key")
+                    }
+                    NavigationLink(destination: SessionStatusView()) {
+                        Label("Session Status", systemImage: "timer")
+                    }
+                    NavigationLink(destination: AccessControlOverviewView()) {
+                        Label("Access Control", systemImage: "shield.lefthalf.filled")
+                    }
+                    NavigationLink(destination: ScopeInspectorView()) {
+                        Label("Scope Inspector", systemImage: "magnifyingglass.circle")
+                    }
+                    NavigationLink(destination: AuthRootView()) {
+                        Label("Auth Management", systemImage: "lock.shield")
+                    }
+                    NavigationLink(destination: SecurityScopeApplicationView(plugin: .constant(PluginDefinition(id: UUID(), name: "System", identifier: "com.toolskit.system", capabilities: [])))) {
+                        Label("Security Scope Application", systemImage: "lock.trianglebadge.exclamationmark")
+                    }
+                }
+
                 Section("Projects") {
                     if projects.isEmpty {
                         ContentUnavailableView(

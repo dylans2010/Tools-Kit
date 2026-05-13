@@ -36,6 +36,16 @@ struct PluginDefinition: Codable, Identifiable {
     var uiExtensions: [UIExtension] = []
     var toolkitTools: [PluginToolkitTool] = []
 
+    // Advanced State
+    var assets: [String] = []
+    var storageQuotaMB: Int = 10
+    var locales: [String] = ["en-US"]
+    var isAnalyticsEnabled: Bool = true
+    var isBackgroundTasksEnabled: Bool = false
+    var sandboxLevel: String = "Strict"
+    var executionPriority: String = "Normal"
+    var themeAccentColor: String = "#007AFF"
+
     var permissions: [PluginCapabilityPermission] {
         capabilities.map { PluginCapabilityPermission(capability: $0) }
     }

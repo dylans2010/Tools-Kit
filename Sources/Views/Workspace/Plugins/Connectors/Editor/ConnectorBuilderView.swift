@@ -295,6 +295,20 @@ struct ConnectorBuilderView: View {
                 }
             }
         }
+
+        Section("Advanced Connector Features") {
+            NavigationLink("GraphQL Configuration") { ConnectorGraphQLView() }
+            NavigationLink("Pagination Settings") { ConnectorPaginationView() }
+            NavigationLink("Caching Strategy") { ConnectorCachingView() }
+            NavigationLink("Data Pipeline") { ConnectorPipelineView() }
+            NavigationLink("Multi-region Config") { ConnectorRegionConfigView() }
+            NavigationLink("Certificate Management") { ConnectorCertificateView() }
+            NavigationLink("SLA Monitoring") { ConnectorSLAView() }
+            NavigationLink("Network Debugger") { ConnectorDebuggerView() }
+            NavigationLink("OpenAPI Import") { ConnectorOpenAPIImportView() }
+            NavigationLink("Binary Data Handling") { ConnectorBinaryDataView() }
+            NavigationLink("Advanced Rate Limiting") { ConnectorAdvancedRateLimitView() }
+        }
     }
 
     // MARK: - Flow Builder Sheet

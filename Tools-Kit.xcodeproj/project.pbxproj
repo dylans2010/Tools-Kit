@@ -1160,6 +1160,28 @@
 		TKBF000000000000000000000D /* SpatialWorkspaceHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF000000000000000000000D /* SpatialWorkspaceHomeView.swift */; };
 		TKBF000000000000000000000E /* PluginsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF000000000000000000000E /* PluginsMainView.swift */; };
 		TKBF000000000000000000000F /* PluginBuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF000000000000000000000F /* PluginBuildView.swift */; };
+		FA20000000000000000000001 /* PluginAnalyticsConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000001 /* PluginAnalyticsConfigView.swift */; };
+		FA20000000000000000000002 /* PluginAssetManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000002 /* PluginAssetManagerView.swift */; };
+		FA20000000000000000000003 /* PluginBackgroundTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000003 /* PluginBackgroundTaskView.swift */; };
+		FA20000000000000000000004 /* PluginDocGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000004 /* PluginDocGeneratorView.swift */; };
+		FA20000000000000000000005 /* PluginLocalizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000005 /* PluginLocalizationView.swift */; };
+		FA20000000000000000000006 /* PluginPerformanceConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000006 /* PluginPerformanceConfigView.swift */; };
+		FA20000000000000000000007 /* PluginPermissionEscalationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000007 /* PluginPermissionEscalationView.swift */; };
+		FA20000000000000000000008 /* PluginSandboxConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000008 /* PluginSandboxConfigView.swift */; };
+		FA20000000000000000000009 /* PluginStorageConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000009 /* PluginStorageConfigView.swift */; };
+		FA2000000000000000000000A /* PluginThemeConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1000000000000000000000A /* PluginThemeConfigView.swift */; };
+		FA2000000000000000000000B /* PluginVersionRollbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1000000000000000000000B /* PluginVersionRollbackView.swift */; };
+		FA10000000000000000000001 /* PluginAnalyticsConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginAnalyticsConfigView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000002 /* PluginAssetManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginAssetManagerView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000003 /* PluginBackgroundTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginBackgroundTaskView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000004 /* PluginDocGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginDocGeneratorView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000005 /* PluginLocalizationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginLocalizationView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000006 /* PluginPerformanceConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginPerformanceConfigView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000007 /* PluginPermissionEscalationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginPermissionEscalationView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000008 /* PluginSandboxConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginSandboxConfigView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000009 /* PluginStorageConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginStorageConfigView.swift; sourceTree = "<group>"; };
+		FA1000000000000000000000A /* PluginThemeConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginThemeConfigView.swift; sourceTree = "<group>"; };
+		FA1000000000000000000000B /* PluginVersionRollbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginVersionRollbackView.swift; sourceTree = "<group>"; };
 		TKBF0000000000000000000010 /* PluginsInstalledView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000010 /* PluginsInstalledView.swift */; };
 		TKBF0000000000000000000011 /* MarketplaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000011 /* MarketplaceView.swift */; };
 		TKBF0000000000000000000012 /* PluginDevConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TKRF0000000000000000000012 /* PluginDevConsoleView.swift */; };
@@ -1203,6 +1225,28 @@
 		PL020000000000000000000004 /* PluginSecurityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000004 /* PluginSecurityView.swift */; };
 		PL020000000000000000000101 /* ConnectorsMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000101 /* ConnectorsMainView.swift */; };
 		PL020000000000000000000102 /* ConnectorBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000102 /* ConnectorBuilderView.swift */; };
+		FB2000000000000000000000C /* ConnectorAdvancedRateLimitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1000000000000000000000C /* ConnectorAdvancedRateLimitView.swift */; };
+		FB2000000000000000000000D /* ConnectorBinaryDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1000000000000000000000D /* ConnectorBinaryDataView.swift */; };
+		FB2000000000000000000000E /* ConnectorCachingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1000000000000000000000E /* ConnectorCachingView.swift */; };
+		FB2000000000000000000000F /* ConnectorCertificateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1000000000000000000000F /* ConnectorCertificateView.swift */; };
+		FB20000000000000000000010 /* ConnectorDebuggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB10000000000000000000010 /* ConnectorDebuggerView.swift */; };
+		FB20000000000000000000011 /* ConnectorGraphQLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB10000000000000000000011 /* ConnectorGraphQLView.swift */; };
+		FB20000000000000000000012 /* ConnectorOpenAPIImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB10000000000000000000012 /* ConnectorOpenAPIImportView.swift */; };
+		FB20000000000000000000013 /* ConnectorPaginationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB10000000000000000000013 /* ConnectorPaginationView.swift */; };
+		FB20000000000000000000014 /* ConnectorPipelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB10000000000000000000014 /* ConnectorPipelineView.swift */; };
+		FB20000000000000000000015 /* ConnectorRegionConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB10000000000000000000015 /* ConnectorRegionConfigView.swift */; };
+		FB20000000000000000000016 /* ConnectorSLAView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB10000000000000000000016 /* ConnectorSLAView.swift */; };
+		FB1000000000000000000000C /* ConnectorAdvancedRateLimitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorAdvancedRateLimitView.swift; sourceTree = "<group>"; };
+		FB1000000000000000000000D /* ConnectorBinaryDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorBinaryDataView.swift; sourceTree = "<group>"; };
+		FB1000000000000000000000E /* ConnectorCachingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorCachingView.swift; sourceTree = "<group>"; };
+		FB1000000000000000000000F /* ConnectorCertificateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorCertificateView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000010 /* ConnectorDebuggerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorDebuggerView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000011 /* ConnectorGraphQLView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorGraphQLView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000012 /* ConnectorOpenAPIImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorOpenAPIImportView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000013 /* ConnectorPaginationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorPaginationView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000014 /* ConnectorPipelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorPipelineView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000015 /* ConnectorRegionConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorRegionConfigView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000016 /* ConnectorSLAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorSLAView.swift; sourceTree = "<group>"; };
 		ABCD1234567890ABCDEF0101 /* PresetConnectorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCD1234567890ABCDEF0100 /* PresetConnectorsView.swift */; };
 		PL020000000000000000000103 /* ConnectorDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000103 /* ConnectorDetailView.swift */; };
 		PL020000000000000000000104 /* ConnectorExecutionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000104 /* ConnectorExecutionView.swift */; };
@@ -1237,6 +1281,28 @@
 		DV0200000000000000000013 /* SDKSandboxController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000013 /* SDKSandboxController.swift */; };
 		DV0200000000000000000014 /* SDKNoSandboxOverrideController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000014 /* SDKNoSandboxOverrideController.swift */; };
 		PL020000000000000000000007 /* SDKBuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000007 /* SDKBuildView.swift */; };
+		FC20000000000000000000017 /* SDKBridgeGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC10000000000000000000017 /* SDKBridgeGeneratorView.swift */; };
+		FC20000000000000000000018 /* SDKCIIntegrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC10000000000000000000018 /* SDKCIIntegrationView.swift */; };
+		FC20000000000000000000019 /* SDKComplianceAuditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC10000000000000000000019 /* SDKComplianceAuditView.swift */; };
+		FC2000000000000000000001A /* SDKExtensionPointView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1000000000000000000001A /* SDKExtensionPointView.swift */; };
+		FC2000000000000000000001B /* SDKGlobalSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1000000000000000000001B /* SDKGlobalSearchView.swift */; };
+		FC2000000000000000000001C /* SDKObfuscationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1000000000000000000001C /* SDKObfuscationView.swift */; };
+		FC2000000000000000000001D /* SDKProfilerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1000000000000000000001D /* SDKProfilerView.swift */; };
+		FC2000000000000000000001E /* SDKQuotaManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1000000000000000000001E /* SDKQuotaManagementView.swift */; };
+		FC2000000000000000000001F /* SDKRemoteConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1000000000000000000001F /* SDKRemoteConfigView.swift */; };
+		FC20000000000000000000020 /* SDKSandboxEnvironmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC10000000000000000000020 /* SDKSandboxEnvironmentView.swift */; };
+		FC20000000000000000000021 /* SDKWhiteLabelingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC10000000000000000000021 /* SDKWhiteLabelingView.swift */; };
+		FC10000000000000000000017 /* SDKBridgeGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKBridgeGeneratorView.swift; sourceTree = "<group>"; };
+		FC10000000000000000000018 /* SDKCIIntegrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKCIIntegrationView.swift; sourceTree = "<group>"; };
+		FC10000000000000000000019 /* SDKComplianceAuditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKComplianceAuditView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001A /* SDKExtensionPointView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKExtensionPointView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001B /* SDKGlobalSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKGlobalSearchView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001C /* SDKObfuscationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKObfuscationView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001D /* SDKProfilerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKProfilerView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001E /* SDKQuotaManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKQuotaManagementView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001F /* SDKRemoteConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKRemoteConfigView.swift; sourceTree = "<group>"; };
+		FC10000000000000000000020 /* SDKSandboxEnvironmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKSandboxEnvironmentView.swift; sourceTree = "<group>"; };
+		FC10000000000000000000021 /* SDKWhiteLabelingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKWhiteLabelingView.swift; sourceTree = "<group>"; };
 		PL020000000000000000000008 /* SDKProjectDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000008 /* SDKProjectDashboardView.swift */; };
 		PL020000000000000000000009 /* SDKDeploymentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL010000000000000000000009 /* SDKDeploymentView.swift */; };
 		PL02000000000000000000000A /* SDKSystemExplorerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PL01000000000000000000000A /* SDKSystemExplorerView.swift */; };
@@ -2575,6 +2641,17 @@
 		SV01753ABE02878346C2A212 /* SecurityActivityLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityActivityLogView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000101 /* ConnectorsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/ConnectorsMainView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000102 /* ConnectorBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/ConnectorBuilderView.swift; sourceTree = "<group>"; };
+		FB1000000000000000000000C /* ConnectorAdvancedRateLimitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorAdvancedRateLimitView.swift; sourceTree = "<group>"; };
+		FB1000000000000000000000D /* ConnectorBinaryDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorBinaryDataView.swift; sourceTree = "<group>"; };
+		FB1000000000000000000000E /* ConnectorCachingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorCachingView.swift; sourceTree = "<group>"; };
+		FB1000000000000000000000F /* ConnectorCertificateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorCertificateView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000010 /* ConnectorDebuggerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorDebuggerView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000011 /* ConnectorGraphQLView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorGraphQLView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000012 /* ConnectorOpenAPIImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorOpenAPIImportView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000013 /* ConnectorPaginationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorPaginationView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000014 /* ConnectorPipelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorPipelineView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000015 /* ConnectorRegionConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorRegionConfigView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000016 /* ConnectorSLAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorSLAView.swift; sourceTree = "<group>"; };
 		ABCD1234567890ABCDEF0100 /* PresetConnectorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/PresetConnectorsView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000103 /* ConnectorDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Detail/ConnectorDetailView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000104 /* ConnectorExecutionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Execution/ConnectorExecutionView.swift; sourceTree = "<group>"; };
@@ -2602,6 +2679,17 @@
 		TKRF000000000000000000000D /* SpatialWorkspaceHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpatialWorkspaceHomeView.swift; sourceTree = "<group>"; };
 		TKRF000000000000000000000E /* PluginsMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/PluginsMainView.swift; sourceTree = "<group>"; };
 		TKRF000000000000000000000F /* PluginBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/PluginBuildView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000001 /* PluginAnalyticsConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginAnalyticsConfigView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000002 /* PluginAssetManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginAssetManagerView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000003 /* PluginBackgroundTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginBackgroundTaskView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000004 /* PluginDocGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginDocGeneratorView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000005 /* PluginLocalizationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginLocalizationView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000006 /* PluginPerformanceConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginPerformanceConfigView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000007 /* PluginPermissionEscalationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginPermissionEscalationView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000008 /* PluginSandboxConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginSandboxConfigView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000009 /* PluginStorageConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginStorageConfigView.swift; sourceTree = "<group>"; };
+		FA1000000000000000000000A /* PluginThemeConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginThemeConfigView.swift; sourceTree = "<group>"; };
+		FA1000000000000000000000B /* PluginVersionRollbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginVersionRollbackView.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000010 /* PluginsInstalledView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/PluginsInstalledView.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000011 /* MarketplaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/MarketplaceView.swift; sourceTree = "<group>"; };
 		TKRF0000000000000000000012 /* PluginDevConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Editor/PluginDevConsoleView.swift; sourceTree = "<group>"; };
@@ -2666,6 +2754,17 @@
 		DV0100000000000000000013 /* SDKSandboxController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKSandboxController.swift; sourceTree = "<group>"; };
 		DV0100000000000000000014 /* SDKNoSandboxOverrideController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKNoSandboxOverrideController.swift; sourceTree = "<group>"; };
 		PL010000000000000000000007 /* SDKBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder/SDKBuildView.swift; sourceTree = "<group>"; };
+		FC10000000000000000000017 /* SDKBridgeGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKBridgeGeneratorView.swift; sourceTree = "<group>"; };
+		FC10000000000000000000018 /* SDKCIIntegrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKCIIntegrationView.swift; sourceTree = "<group>"; };
+		FC10000000000000000000019 /* SDKComplianceAuditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKComplianceAuditView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001A /* SDKExtensionPointView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKExtensionPointView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001B /* SDKGlobalSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKGlobalSearchView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001C /* SDKObfuscationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKObfuscationView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001D /* SDKProfilerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKProfilerView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001E /* SDKQuotaManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKQuotaManagementView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001F /* SDKRemoteConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKRemoteConfigView.swift; sourceTree = "<group>"; };
+		FC10000000000000000000020 /* SDKSandboxEnvironmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKSandboxEnvironmentView.swift; sourceTree = "<group>"; };
+		FC10000000000000000000021 /* SDKWhiteLabelingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKWhiteLabelingView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000008 /* SDKProjectDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main/SDKProjectDashboardView.swift; sourceTree = "<group>"; };
 		PL010000000000000000000009 /* SDKDeploymentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deployment/SDKDeploymentView.swift; sourceTree = "<group>"; };
 		PL01000000000000000000000A /* SDKSystemExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics/SDKSystemExplorerView.swift; sourceTree = "<group>"; };
@@ -3550,6 +3649,29 @@
 				3D5A471B59E29485B1D61A66 /* SDKConnectorMetricsView.swift */,
 				PL010000000000000000000101 /* ConnectorsMainView.swift */,
 				PL010000000000000000000102 /* ConnectorBuilderView.swift */,
+		FB1000000000000000000000C /* ConnectorAdvancedRateLimitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorAdvancedRateLimitView.swift; sourceTree = "<group>"; };
+		FB1000000000000000000000D /* ConnectorBinaryDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorBinaryDataView.swift; sourceTree = "<group>"; };
+		FB1000000000000000000000E /* ConnectorCachingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorCachingView.swift; sourceTree = "<group>"; };
+		FB1000000000000000000000F /* ConnectorCertificateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorCertificateView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000010 /* ConnectorDebuggerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorDebuggerView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000011 /* ConnectorGraphQLView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorGraphQLView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000012 /* ConnectorOpenAPIImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorOpenAPIImportView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000013 /* ConnectorPaginationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorPaginationView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000014 /* ConnectorPipelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorPipelineView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000015 /* ConnectorRegionConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorRegionConfigView.swift; sourceTree = "<group>"; };
+		FB10000000000000000000016 /* ConnectorSLAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/ConnectorSLAView.swift; sourceTree = "<group>"; };
+				FB1000000000000000000000C /* ConnectorAdvancedRateLimitView.swift */,
+				FB1000000000000000000000D /* ConnectorBinaryDataView.swift */,
+				FB1000000000000000000000E /* ConnectorCachingView.swift */,
+				FB1000000000000000000000F /* ConnectorCertificateView.swift */,
+				FB10000000000000000000010 /* ConnectorDebuggerView.swift */,
+				FB10000000000000000000011 /* ConnectorGraphQLView.swift */,
+				FB10000000000000000000012 /* ConnectorOpenAPIImportView.swift */,
+				FB10000000000000000000013 /* ConnectorPaginationView.swift */,
+				FB10000000000000000000014 /* ConnectorPipelineView.swift */,
+				FB10000000000000000000015 /* ConnectorRegionConfigView.swift */,
+				FB10000000000000000000016 /* ConnectorSLAView.swift */,
+
 				ABCD1234567890ABCDEF0100 /* PresetConnectorsView.swift */,
 				PL010000000000000000000103 /* ConnectorDetailView.swift */,
 				PL010000000000000000000104 /* ConnectorExecutionView.swift */,
@@ -6726,6 +6848,29 @@
 				PL0100000000000000000003 /* PluginGlobalOverlay.swift */,
 				TKRF000000000000000000000E /* PluginsMainView.swift */,
 				TKRF000000000000000000000F /* PluginBuildView.swift */,
+		FA10000000000000000000001 /* PluginAnalyticsConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginAnalyticsConfigView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000002 /* PluginAssetManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginAssetManagerView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000003 /* PluginBackgroundTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginBackgroundTaskView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000004 /* PluginDocGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginDocGeneratorView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000005 /* PluginLocalizationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginLocalizationView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000006 /* PluginPerformanceConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginPerformanceConfigView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000007 /* PluginPermissionEscalationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginPermissionEscalationView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000008 /* PluginSandboxConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginSandboxConfigView.swift; sourceTree = "<group>"; };
+		FA10000000000000000000009 /* PluginStorageConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginStorageConfigView.swift; sourceTree = "<group>"; };
+		FA1000000000000000000000A /* PluginThemeConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginThemeConfigView.swift; sourceTree = "<group>"; };
+		FA1000000000000000000000B /* PluginVersionRollbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Management/PluginVersionRollbackView.swift; sourceTree = "<group>"; };
+				FA10000000000000000000001 /* PluginAnalyticsConfigView.swift */,
+				FA10000000000000000000002 /* PluginAssetManagerView.swift */,
+				FA10000000000000000000003 /* PluginBackgroundTaskView.swift */,
+				FA10000000000000000000004 /* PluginDocGeneratorView.swift */,
+				FA10000000000000000000005 /* PluginLocalizationView.swift */,
+				FA10000000000000000000006 /* PluginPerformanceConfigView.swift */,
+				FA10000000000000000000007 /* PluginPermissionEscalationView.swift */,
+				FA10000000000000000000008 /* PluginSandboxConfigView.swift */,
+				FA10000000000000000000009 /* PluginStorageConfigView.swift */,
+				FA1000000000000000000000A /* PluginThemeConfigView.swift */,
+				FA1000000000000000000000B /* PluginVersionRollbackView.swift */,
+
 				TKRF0000000000000000000010 /* PluginsInstalledView.swift */,
 				TKRF0000000000000000000011 /* MarketplaceView.swift */,
 				TKRF0000000000000000000012 /* PluginDevConsoleView.swift */,
@@ -7477,6 +7622,29 @@
 				94F7CA9EB7294F5194434142 /* SDKAppBuilderView.swift */,
 				D09A5B508388459689A2623D /* SDKAutomationView.swift */,
 				PL010000000000000000000007 /* SDKBuildView.swift */,
+		FC10000000000000000000017 /* SDKBridgeGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKBridgeGeneratorView.swift; sourceTree = "<group>"; };
+		FC10000000000000000000018 /* SDKCIIntegrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKCIIntegrationView.swift; sourceTree = "<group>"; };
+		FC10000000000000000000019 /* SDKComplianceAuditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKComplianceAuditView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001A /* SDKExtensionPointView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKExtensionPointView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001B /* SDKGlobalSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKGlobalSearchView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001C /* SDKObfuscationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKObfuscationView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001D /* SDKProfilerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKProfilerView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001E /* SDKQuotaManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKQuotaManagementView.swift; sourceTree = "<group>"; };
+		FC1000000000000000000001F /* SDKRemoteConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKRemoteConfigView.swift; sourceTree = "<group>"; };
+		FC10000000000000000000020 /* SDKSandboxEnvironmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKSandboxEnvironmentView.swift; sourceTree = "<group>"; };
+		FC10000000000000000000021 /* SDKWhiteLabelingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/SDKWhiteLabelingView.swift; sourceTree = "<group>"; };
+				FC10000000000000000000017 /* SDKBridgeGeneratorView.swift */,
+				FC10000000000000000000018 /* SDKCIIntegrationView.swift */,
+				FC10000000000000000000019 /* SDKComplianceAuditView.swift */,
+				FC1000000000000000000001A /* SDKExtensionPointView.swift */,
+				FC1000000000000000000001B /* SDKGlobalSearchView.swift */,
+				FC1000000000000000000001C /* SDKObfuscationView.swift */,
+				FC1000000000000000000001D /* SDKProfilerView.swift */,
+				FC1000000000000000000001E /* SDKQuotaManagementView.swift */,
+				FC1000000000000000000001F /* SDKRemoteConfigView.swift */,
+				FC10000000000000000000020 /* SDKSandboxEnvironmentView.swift */,
+				FC10000000000000000000021 /* SDKWhiteLabelingView.swift */,
+
 				PL010000000000000000000008 /* SDKProjectDashboardView.swift */,
 				PL010000000000000000000009 /* SDKDeploymentView.swift */,
 				PL01000000000000000000000A /* SDKSystemExplorerView.swift */,
@@ -10098,6 +10266,28 @@
 				PL020000000000000000000006 /* SecurityScopeApplicationView.swift in Sources */,
 				PL020000000000000000000101 /* ConnectorsMainView.swift in Sources */,
 				PL020000000000000000000102 /* ConnectorBuilderView.swift in Sources */,
+		FB2000000000000000000000C /* ConnectorAdvancedRateLimitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1000000000000000000000C /* ConnectorAdvancedRateLimitView.swift */; };
+		FB2000000000000000000000D /* ConnectorBinaryDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1000000000000000000000D /* ConnectorBinaryDataView.swift */; };
+		FB2000000000000000000000E /* ConnectorCachingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1000000000000000000000E /* ConnectorCachingView.swift */; };
+		FB2000000000000000000000F /* ConnectorCertificateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1000000000000000000000F /* ConnectorCertificateView.swift */; };
+		FB20000000000000000000010 /* ConnectorDebuggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB10000000000000000000010 /* ConnectorDebuggerView.swift */; };
+		FB20000000000000000000011 /* ConnectorGraphQLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB10000000000000000000011 /* ConnectorGraphQLView.swift */; };
+		FB20000000000000000000012 /* ConnectorOpenAPIImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB10000000000000000000012 /* ConnectorOpenAPIImportView.swift */; };
+		FB20000000000000000000013 /* ConnectorPaginationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB10000000000000000000013 /* ConnectorPaginationView.swift */; };
+		FB20000000000000000000014 /* ConnectorPipelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB10000000000000000000014 /* ConnectorPipelineView.swift */; };
+		FB20000000000000000000015 /* ConnectorRegionConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB10000000000000000000015 /* ConnectorRegionConfigView.swift */; };
+		FB20000000000000000000016 /* ConnectorSLAView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB10000000000000000000016 /* ConnectorSLAView.swift */; };
+				FB2000000000000000000000C /* ConnectorAdvancedRateLimitView.swift in Sources */,
+				FB2000000000000000000000D /* ConnectorBinaryDataView.swift in Sources */,
+				FB2000000000000000000000E /* ConnectorCachingView.swift in Sources */,
+				FB2000000000000000000000F /* ConnectorCertificateView.swift in Sources */,
+				FB20000000000000000000010 /* ConnectorDebuggerView.swift in Sources */,
+				FB20000000000000000000011 /* ConnectorGraphQLView.swift in Sources */,
+				FB20000000000000000000012 /* ConnectorOpenAPIImportView.swift in Sources */,
+				FB20000000000000000000013 /* ConnectorPaginationView.swift in Sources */,
+				FB20000000000000000000014 /* ConnectorPipelineView.swift in Sources */,
+				FB20000000000000000000015 /* ConnectorRegionConfigView.swift in Sources */,
+				FB20000000000000000000016 /* ConnectorSLAView.swift in Sources */,
 				ABCD1234567890ABCDEF0101 /* PresetConnectorsView.swift in Sources */,
 				PL020000000000000000000103 /* ConnectorDetailView.swift in Sources */,
 				PL020000000000000000000104 /* ConnectorExecutionView.swift in Sources */,
@@ -10126,6 +10316,28 @@
 				TKBF000000000000000000000D /* SpatialWorkspaceHomeView.swift in Sources */,
 				TKBF000000000000000000000E /* PluginsMainView.swift in Sources */,
 				TKBF000000000000000000000F /* PluginBuildView.swift in Sources */,
+		FA20000000000000000000001 /* PluginAnalyticsConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000001 /* PluginAnalyticsConfigView.swift */; };
+		FA20000000000000000000002 /* PluginAssetManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000002 /* PluginAssetManagerView.swift */; };
+		FA20000000000000000000003 /* PluginBackgroundTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000003 /* PluginBackgroundTaskView.swift */; };
+		FA20000000000000000000004 /* PluginDocGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000004 /* PluginDocGeneratorView.swift */; };
+		FA20000000000000000000005 /* PluginLocalizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000005 /* PluginLocalizationView.swift */; };
+		FA20000000000000000000006 /* PluginPerformanceConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000006 /* PluginPerformanceConfigView.swift */; };
+		FA20000000000000000000007 /* PluginPermissionEscalationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000007 /* PluginPermissionEscalationView.swift */; };
+		FA20000000000000000000008 /* PluginSandboxConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000008 /* PluginSandboxConfigView.swift */; };
+		FA20000000000000000000009 /* PluginStorageConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA10000000000000000000009 /* PluginStorageConfigView.swift */; };
+		FA2000000000000000000000A /* PluginThemeConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1000000000000000000000A /* PluginThemeConfigView.swift */; };
+		FA2000000000000000000000B /* PluginVersionRollbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1000000000000000000000B /* PluginVersionRollbackView.swift */; };
+				FA20000000000000000000001 /* PluginAnalyticsConfigView.swift in Sources */,
+				FA20000000000000000000002 /* PluginAssetManagerView.swift in Sources */,
+				FA20000000000000000000003 /* PluginBackgroundTaskView.swift in Sources */,
+				FA20000000000000000000004 /* PluginDocGeneratorView.swift in Sources */,
+				FA20000000000000000000005 /* PluginLocalizationView.swift in Sources */,
+				FA20000000000000000000006 /* PluginPerformanceConfigView.swift in Sources */,
+				FA20000000000000000000007 /* PluginPermissionEscalationView.swift in Sources */,
+				FA20000000000000000000008 /* PluginSandboxConfigView.swift in Sources */,
+				FA20000000000000000000009 /* PluginStorageConfigView.swift in Sources */,
+				FA2000000000000000000000A /* PluginThemeConfigView.swift in Sources */,
+				FA2000000000000000000000B /* PluginVersionRollbackView.swift in Sources */,
 				TKBF0000000000000000000010 /* PluginsInstalledView.swift in Sources */,
 				TKBF0000000000000000000011 /* MarketplaceView.swift in Sources */,
 				TKBF0000000000000000000012 /* PluginDevConsoleView.swift in Sources */,
@@ -11184,6 +11396,28 @@
 				DV0200000000000000000013 /* SDKSandboxController.swift in Sources */,
 				DV0200000000000000000014 /* SDKNoSandboxOverrideController.swift in Sources */,
 				PL020000000000000000000007 /* SDKBuildView.swift in Sources */,
+		FC20000000000000000000017 /* SDKBridgeGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC10000000000000000000017 /* SDKBridgeGeneratorView.swift */; };
+		FC20000000000000000000018 /* SDKCIIntegrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC10000000000000000000018 /* SDKCIIntegrationView.swift */; };
+		FC20000000000000000000019 /* SDKComplianceAuditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC10000000000000000000019 /* SDKComplianceAuditView.swift */; };
+		FC2000000000000000000001A /* SDKExtensionPointView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1000000000000000000001A /* SDKExtensionPointView.swift */; };
+		FC2000000000000000000001B /* SDKGlobalSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1000000000000000000001B /* SDKGlobalSearchView.swift */; };
+		FC2000000000000000000001C /* SDKObfuscationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1000000000000000000001C /* SDKObfuscationView.swift */; };
+		FC2000000000000000000001D /* SDKProfilerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1000000000000000000001D /* SDKProfilerView.swift */; };
+		FC2000000000000000000001E /* SDKQuotaManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1000000000000000000001E /* SDKQuotaManagementView.swift */; };
+		FC2000000000000000000001F /* SDKRemoteConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1000000000000000000001F /* SDKRemoteConfigView.swift */; };
+		FC20000000000000000000020 /* SDKSandboxEnvironmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC10000000000000000000020 /* SDKSandboxEnvironmentView.swift */; };
+		FC20000000000000000000021 /* SDKWhiteLabelingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC10000000000000000000021 /* SDKWhiteLabelingView.swift */; };
+				FC20000000000000000000017 /* SDKBridgeGeneratorView.swift in Sources */,
+				FC20000000000000000000018 /* SDKCIIntegrationView.swift in Sources */,
+				FC20000000000000000000019 /* SDKComplianceAuditView.swift in Sources */,
+				FC2000000000000000000001A /* SDKExtensionPointView.swift in Sources */,
+				FC2000000000000000000001B /* SDKGlobalSearchView.swift in Sources */,
+				FC2000000000000000000001C /* SDKObfuscationView.swift in Sources */,
+				FC2000000000000000000001D /* SDKProfilerView.swift in Sources */,
+				FC2000000000000000000001E /* SDKQuotaManagementView.swift in Sources */,
+				FC2000000000000000000001F /* SDKRemoteConfigView.swift in Sources */,
+				FC20000000000000000000020 /* SDKSandboxEnvironmentView.swift in Sources */,
+				FC20000000000000000000021 /* SDKWhiteLabelingView.swift in Sources */,
 				PL020000000000000000000008 /* SDKProjectDashboardView.swift in Sources */,
 				PL020000000000000000000009 /* SDKDeploymentView.swift in Sources */,
 				PL02000000000000000000000A /* SDKSystemExplorerView.swift in Sources */,
