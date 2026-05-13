@@ -62,7 +62,9 @@ struct SiriCoreUIView: View {
             case .forest: self = .forest
             case .cyberpunk: self = .cyberpunk
             case .monochrome: self = .monochrome
-            @unknown default: self = .appleIntelligence
+            // AuroraGlow.Palette is defined in an external module and may grow with new
+            // public cases. Fall back to the default palette for unsupported values.
+            default: self = .appleIntelligence
             }
         }
     }
