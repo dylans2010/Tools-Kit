@@ -855,6 +855,7 @@ private struct CanvasStickyNote: View {
     var body: some View {
         TextField("Note", text: $note.text, axis: .vertical)
             .textFieldStyle(.plain)
+            .skillPicker(text: $note.text)
             .padding(12)
             .frame(width: 220, height: 130, alignment: .topLeading)
             .background(

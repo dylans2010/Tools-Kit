@@ -1412,6 +1412,12 @@
 		NB0700000000000000000004 /* SDKVersionManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0700000000000000000004 /* SDKVersionManagerView.swift */; };
 		NB0700000000000000000005 /* SDKTestRunnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0700000000000000000005 /* SDKTestRunnerView.swift */; };
 		NB0700000000000000000006 /* SDKChangelogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = NF0700000000000000000006 /* SDKChangelogView.swift */; };
+		SK020001 /* Skill.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010001 /* Skill.swift */; };
+		SK020002 /* SkillsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010002 /* SkillsView.swift */; };
+		SK020003 /* SkillsDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010003 /* SkillsDetailView.swift */; };
+		SK020004 /* AddSkillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010004 /* AddSkillView.swift */; };
+		SK020005 /* DraftSkillsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010005 /* DraftSkillsView.swift */; };
+		SK020006 /* SkillPickerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010006 /* SkillPickerModifier.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2817,6 +2823,12 @@
 		NF0700000000000000000004 /* SDKVersionManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKVersionManagerView.swift; sourceTree = "<group>"; };
 		NF0700000000000000000005 /* SDKTestRunnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKTestRunnerView.swift; sourceTree = "<group>"; };
 		NF0700000000000000000006 /* SDKChangelogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKChangelogView.swift; sourceTree = "<group>"; };
+		SK010001 /* Skill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Models/Skill.swift"; sourceTree = "<group>"; };
+		SK010002 /* SkillsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Views/Tools/AIChat/Skills/SkillsView.swift"; sourceTree = "<group>"; };
+		SK010003 /* SkillsDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Views/Tools/AIChat/Skills/SkillsDetailView.swift"; sourceTree = "<group>"; };
+		SK010004 /* AddSkillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Views/Tools/AIChat/Skills/AddSkillView.swift"; sourceTree = "<group>"; };
+		SK010005 /* DraftSkillsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Views/Tools/AIChat/Skills/DraftSkillsView.swift"; sourceTree = "<group>"; };
+		SK010006 /* SkillPickerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/SkillPickerModifier.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -9788,6 +9800,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				SK020001 /* in Sources */,
+				SK020002 /* in Sources */,
+				SK020003 /* in Sources */,
+				SK020004 /* in Sources */,
+				SK020005 /* in Sources */,
+				SK020006 /* in Sources */,
 				NB0100000000000000000001 /* SDKAnalyticsEngine.swift in Sources */,
 				NB0100000000000000000002 /* SDKWorkflowEngine.swift in Sources */,
 				NB0100000000000000000003 /* SDKTestHarness.swift in Sources */,

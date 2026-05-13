@@ -99,6 +99,7 @@ struct AIWriteView: View {
                                 ZStack(alignment: .topLeading) {
                                     TextEditor(text: $prompt)
                                         .frame(height: 140)
+                                        .skillPicker(text: $prompt)
                                         .padding(12)
                                         .scrollContentBackground(.hidden)
                                         .background(.ultraThinMaterial)
