@@ -881,6 +881,24 @@
 		A00200000000000000000002 /* SiriCoreUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000001 /* SiriCoreUIView.swift */; };
 		A00200000000000000000003 /* GlowingUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000002 /* GlowingUIView.swift */; };
 		A00200000000000000000004 /* GlowingUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000002 /* GlowingUIView.swift */; };
+		A00200000000000000000101 /* DemoCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000101 /* DemoCatalog.swift */; };
+		A00200000000000000000102 /* DemoCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000101 /* DemoCatalog.swift */; };
+		A00200000000000000000103 /* DemoCatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000102 /* DemoCatalogView.swift */; };
+		A00200000000000000000104 /* DemoCatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000102 /* DemoCatalogView.swift */; };
+		A00200000000000000000105 /* HeroDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000103 /* HeroDemo.swift */; };
+		A00200000000000000000106 /* HeroDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000103 /* HeroDemo.swift */; };
+		A00200000000000000000107 /* LiveTuningDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000104 /* LiveTuningDemo.swift */; };
+		A00200000000000000000108 /* LiveTuningDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000104 /* LiveTuningDemo.swift */; };
+		A00200000000000000000109 /* CustomProfileDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000105 /* CustomProfileDemo.swift */; };
+		A00200000000000000000110 /* CustomProfileDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000105 /* CustomProfileDemo.swift */; };
+		A00200000000000000000111 /* WashTuningDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000106 /* WashTuningDemo.swift */; };
+		A00200000000000000000112 /* WashTuningDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000106 /* WashTuningDemo.swift */; };
+		A00200000000000000000113 /* PaletteGalleryDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000107 /* PaletteGalleryDemo.swift */; };
+		A00200000000000000000114 /* PaletteGalleryDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000107 /* PaletteGalleryDemo.swift */; };
+		A00200000000000000000115 /* MoodDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000108 /* MoodDemo.swift */; };
+		A00200000000000000000116 /* MoodDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000108 /* MoodDemo.swift */; };
+		A00200000000000000000117 /* LoadingDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000109 /* LoadingDemo.swift */; };
+		A00200000000000000000118 /* LoadingDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000109 /* LoadingDemo.swift */; };
 		C55C83D89974490D95A25381 /* revert_commit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E8647ED6564F6089115FC0 /* revert_commit.swift */; };
 		63C324C2B81B4F69B4BD036B /* profile_runtime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4AAD1E0AAC45D18918053D /* profile_runtime.swift */; };
 		4FB758CF14514C3C9789AA6D /* api_contract_scan.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9395E8F2234858B419C0B5 /* api_contract_scan.swift */; };
@@ -1778,6 +1796,15 @@
 		DV0100000000000000000015 /* SDKUIComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKUIComponents.swift; sourceTree = "<group>"; };
 		A00100000000000000000001 /* SiriCoreUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiriCoreUIView.swift; sourceTree = "<group>"; };
 		A00100000000000000000002 /* GlowingUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlowingUIView.swift; sourceTree = "<group>"; };
+		A00100000000000000000101 /* DemoCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoCatalog.swift; sourceTree = "<group>"; };
+		A00100000000000000000102 /* DemoCatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoCatalogView.swift; sourceTree = "<group>"; };
+		A00100000000000000000103 /* HeroDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroDemo.swift; sourceTree = "<group>"; };
+		A00100000000000000000104 /* LiveTuningDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveTuningDemo.swift; sourceTree = "<group>"; };
+		A00100000000000000000105 /* CustomProfileDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomProfileDemo.swift; sourceTree = "<group>"; };
+		A00100000000000000000106 /* WashTuningDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WashTuningDemo.swift; sourceTree = "<group>"; };
+		A00100000000000000000107 /* PaletteGalleryDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteGalleryDemo.swift; sourceTree = "<group>"; };
+		A00100000000000000000108 /* MoodDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodDemo.swift; sourceTree = "<group>"; };
+		A00100000000000000000109 /* LoadingDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingDemo.swift; sourceTree = "<group>"; };
 		CA1234567890ABCDEF123456 /* CameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreview.swift; sourceTree = "<group>"; };
 		8F5090DCA1AD4E1DA6D7A453 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		126F5D3967E54F42B0F95A85 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
@@ -6309,8 +6336,25 @@
 			children = (
 				A00100000000000000000001 /* SiriCoreUIView.swift */,
 				A00100000000000000000002 /* GlowingUIView.swift */,
+				A00300000000000000000002 /* Internal Demos */,
 			);
 			path = "Advanced UIs";
+			sourceTree = "<group>";
+		};
+		A00300000000000000000002 /* Internal Demos */ = {
+			isa = PBXGroup;
+			children = (
+				A00100000000000000000101 /* DemoCatalog.swift */,
+				A00100000000000000000102 /* DemoCatalogView.swift */,
+				A00100000000000000000103 /* HeroDemo.swift */,
+				A00100000000000000000104 /* LiveTuningDemo.swift */,
+				A00100000000000000000105 /* CustomProfileDemo.swift */,
+				A00100000000000000000106 /* WashTuningDemo.swift */,
+				A00100000000000000000107 /* PaletteGalleryDemo.swift */,
+				A00100000000000000000108 /* MoodDemo.swift */,
+				A00100000000000000000109 /* LoadingDemo.swift */,
+			);
+			path = "Internal Demos";
 			sourceTree = "<group>";
 		};
 		9D3BFD7FE51B493F849CDF84 /* Models */ = {
@@ -9818,6 +9862,15 @@
 				SK020006 /* in Sources */,
 				A00200000000000000000002 /* SiriCoreUIView.swift in Sources */,
 				A00200000000000000000004 /* GlowingUIView.swift in Sources */,
+				A00200000000000000000101 /* DemoCatalog.swift in Sources */,
+				A00200000000000000000103 /* DemoCatalogView.swift in Sources */,
+				A00200000000000000000105 /* HeroDemo.swift in Sources */,
+				A00200000000000000000107 /* LiveTuningDemo.swift in Sources */,
+				A00200000000000000000109 /* CustomProfileDemo.swift in Sources */,
+				A00200000000000000000111 /* WashTuningDemo.swift in Sources */,
+				A00200000000000000000113 /* PaletteGalleryDemo.swift in Sources */,
+				A00200000000000000000115 /* MoodDemo.swift in Sources */,
+				A00200000000000000000117 /* LoadingDemo.swift in Sources */,
 				NB0100000000000000000001 /* SDKAnalyticsEngine.swift in Sources */,
 				NB0100000000000000000002 /* SDKWorkflowEngine.swift in Sources */,
 				NB0100000000000000000003 /* SDKTestHarness.swift in Sources */,
@@ -11235,6 +11288,15 @@
 				C0B0B0B0B0B0B0B0B0B0B001 /* Color+Hex.swift in Sources */,
 				A00200000000000000000001 /* SiriCoreUIView.swift in Sources */,
 				A00200000000000000000003 /* GlowingUIView.swift in Sources */,
+				A00200000000000000000102 /* DemoCatalog.swift in Sources */,
+				A00200000000000000000104 /* DemoCatalogView.swift in Sources */,
+				A00200000000000000000106 /* HeroDemo.swift in Sources */,
+				A00200000000000000000108 /* LiveTuningDemo.swift in Sources */,
+				A00200000000000000000110 /* CustomProfileDemo.swift in Sources */,
+				A00200000000000000000112 /* WashTuningDemo.swift in Sources */,
+				A00200000000000000000114 /* PaletteGalleryDemo.swift in Sources */,
+				A00200000000000000000116 /* MoodDemo.swift in Sources */,
+				A00200000000000000000118 /* LoadingDemo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
