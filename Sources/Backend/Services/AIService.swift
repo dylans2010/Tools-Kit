@@ -12,8 +12,8 @@ class AIService {
 
     private let registry = AIProviderRegistry.shared
     private let settingsManager = AIChatSettingsManager.shared
-    private let featureCheck = AIFeatureCheck.shared
-    private let modelCatalog = AIModelCatalog.shared
+    @MainActor private let featureCheck = AIFeatureCheck.shared
+    @MainActor private let modelCatalog = AIModelCatalog.shared
 
     // MARK: - Current provider helpers
 
@@ -247,6 +247,7 @@ class AIService {
         return normalizeJSONObject(from: response)
     }
 
+    @MainActor
     func processWithOpenRouter(
         prompt: String,
         modelID: String,
