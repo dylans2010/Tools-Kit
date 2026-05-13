@@ -1,4 +1,5 @@
 import SwiftUI
+import Aurora
 
 struct DraftingEmailResult {
     let recipient: String
@@ -104,10 +105,9 @@ struct DraftingEmailsView: View {
                 .safeAreaInset(edge: .bottom) {
                     generateButton
                 }
-
-                if isGenerating {
-                    loadingOverlay
-                }
+            }
+            .glowWhileLoading(isGenerating) {
+                WashGlow(style: .dramatic)
             }
             .navigationTitle("Drafting Assistant")
             .navigationBarTitleDisplayMode(.inline)
@@ -209,22 +209,6 @@ struct DraftingEmailsView: View {
         .disabled(context.isEmpty || isGenerating)
         .padding()
         .background(.ultraThinMaterial)
-    }
-
-    private var loadingOverlay: some View {
-        ZStack {
-            Color.black.opacity(0.4).ignoresSafeArea()
-            VStack(spacing: 20) {
-                ProgressView()
-                    .scaleEffect(1.2)
-                    .tint(.white)
-                Text("Drafting Your Email...")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-            }
-            .padding(40)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24))
-        }
     }
 
     private func generate() async {

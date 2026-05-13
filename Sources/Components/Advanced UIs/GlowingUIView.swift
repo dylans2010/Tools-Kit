@@ -73,4 +73,25 @@ extension View {
             content: { self }
         )
     }
+
+    /// Shows a full-screen Aurora animation overlay while a loading condition is met.
+    /// - Parameters:
+    ///   - isLoading: A boolean indicating if the loading state is active.
+    ///   - glow: A closure returning an Aurora-based view (like `LiveTuningGlow`, `MoodGlow`, etc.) to show as an overlay.
+    public func glowWhileLoading<Glow: View>(
+        _ isLoading: Bool,
+        @ViewBuilder glow: () -> Glow
+    ) -> some View {
+        ZStack {
+            self
+
+            if isLoading {
+                glow()
+                    .ignoresSafeArea()
+                    .transition(.opacity)
+                    .zIndex(100)
+            }
+        }
+        .animation(.easeInOut(duration: 0.3), value: isLoading)
+    }
 }

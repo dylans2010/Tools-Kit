@@ -1,4 +1,5 @@
 import SwiftUI
+import Aurora
 
 struct PersonaHomeView: View {
     @ObservedObject private var manager = PersonaManager.shared
@@ -328,17 +329,24 @@ struct PersonaHomeView: View {
     }
 
     var body: some View {
-        PersonaHomeNavigationContent(
-            chatHistory: manager.chatHistory,
-            isThinking: manager.isThinking,
-            query: $query,
-            shuffledPrompts: shuffledPrompts,
-            followUpSuggestions: followUpSuggestions,
-            onPromptSelection: selectPromptAndSend(_:),
-            onSend: sendMessage,
-            onOpenDiscovery: openDiscovery,
-            onNeedScroll: scrollToBottom
-        )
+        ZStack {
+            AuroraGlow(.standard)
+                .palette(.appleIntelligence)
+                .speed(0.08)
+                .ignoresSafeArea()
+
+            PersonaHomeNavigationContent(
+                chatHistory: manager.chatHistory,
+                isThinking: manager.isThinking,
+                query: $query,
+                shuffledPrompts: shuffledPrompts,
+                followUpSuggestions: followUpSuggestions,
+                onPromptSelection: selectPromptAndSend(_:),
+                onSend: sendMessage,
+                onOpenDiscovery: openDiscovery,
+                onNeedScroll: scrollToBottom
+            )
+        }
         .navigationTitle("AI Persona")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -527,10 +535,53 @@ private struct PersonaComposerView: View {
     var body: some View {
         VStack(spacing: 0) {
             Divider()
+
+            PersonaQuickActionsView(onTapAction: onTapPrompt)
+                .padding(.vertical, 8)
+                .background(.ultraThinMaterial.opacity(0.5))
+
             if !followUpSuggestions.isEmpty {
                 PersonaFollowUpsView(suggestions: followUpSuggestions, onSelect: onTapPrompt)
             }
             PersonaInputPanelView(query: $query, isThinking: isThinking, shuffledPrompts: shuffledPrompts, onTapPrompt: onTapPrompt, onSend: onSend, onOpenDiscovery: onOpenDiscovery)
+        }
+    }
+}
+
+private struct PersonaQuickActionsView: View {
+    let onTapAction: (String) -> Void
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                QuickActionChip(icon: "bolt.fill", label: "Catch Up", action: { onTapAction("Catch up on my day") })
+                QuickActionChip(icon: "calendar", label: "Schedule", action: { onTapAction("What is my schedule for today?") })
+                QuickActionChip(icon: "exclamationmark.circle", label: "Priorities", action: { onTapAction("What are my top priorities?") })
+                QuickActionChip(icon: "envelope.fill", label: "Unread Mail", action: { onTapAction("Summarize my unread emails") })
+            }
+            .padding(.horizontal)
+        }
+    }
+}
+
+private struct QuickActionChip: View {
+    let icon: String
+    let label: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.caption)
+                Text(label)
+                    .font(.caption.bold())
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(.white.opacity(0.1), in: Capsule())
+            .overlay(Capsule().stroke(Color.white.opacity(0.15), lineWidth: 1))
+            .foregroundStyle(.white)
         }
     }
 }
@@ -540,9 +591,11 @@ private struct PersonaEmptyStateView: View {
     var body: some View {
         VStack(spacing: 20) {
             Image(systemName: "sparkles")
-                .font(.system(size: 50))
+                .font(.system(size: 60))
                 .foregroundStyle(LinearGradient(colors: [.blue, .purple, .mint], startPoint: .topLeading, endPoint: .bottomTrailing))
                 .padding(.top, 100)
+                .shadow(color: .purple.opacity(0.5), radius: 20)
+
             Text("Your Workspace Intelligence").font(.title2.bold())
             Text("Ask anything about your Mail, Tasks, Files, and Habits.")
                 .font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center).padding(.horizontal, 40)
@@ -562,9 +615,10 @@ private struct PersonaChatBubble: View {
 
             VStack(alignment: isUser ? .trailing : .leading, spacing: 4) {
                 PersonaMarkdownBubbleText(markdown: message.content, isUser: isUser)
-                    .padding(12)
+                    .padding(14)
                     .background(PersonaMessageBubbleBackground(isUser: isUser))
                     .foregroundStyle(isUser ? Color.white : Color.primary)
+                    .shadow(color: isUser ? .purple.opacity(0.3) : .black.opacity(0.05), radius: 5, y: 2)
                     .contextMenu {
                         Button {
                             UIPasteboard.general.string = message.content
@@ -576,7 +630,7 @@ private struct PersonaChatBubble: View {
                 Text(message.timestamp, style: .time)
                     .font(.system(size: 10))
                     .foregroundStyle(.secondary)
-                    .padding(.horizontal, 4)
+                    .padding(.horizontal, 8)
             }
 
             if !isUser { Spacer() }
@@ -595,11 +649,13 @@ private struct PersonaMessageBubbleBackground: View {
 
     var body: some View {
         if isUser {
-            RoundedRectangle(cornerRadius: 18)
-                .fill(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+            RoundedRectangle(cornerRadius: 20)
+                .fill(LinearGradient(colors: [Color.blue.opacity(0.8), Color.purple.opacity(0.8)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.2), lineWidth: 1))
         } else {
-            RoundedRectangle(cornerRadius: 18)
-                .fill(Color.secondary.opacity(0.15))
+            RoundedRectangle(cornerRadius: 20)
+                .fill(.ultraThinMaterial)
+                .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.1), lineWidth: 1))
         }
     }
 }
@@ -615,9 +671,10 @@ private struct PersonaFollowUpsView: View {
                     Button(suggestion) { onSelect(suggestion) }
                         .font(.caption.bold())
                         .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
+                        .padding(.vertical, 8)
                         .background(.ultraThinMaterial, in: Capsule())
-                        .overlay(Capsule().stroke(Color.primary.opacity(0.1), lineWidth: 0.5))
+                        .overlay(Capsule().stroke(Color.white.opacity(0.1), lineWidth: 1))
+                        .foregroundStyle(.primary)
                 }
             }
             .padding(.horizontal)
@@ -639,28 +696,35 @@ private struct PersonaInputPanelView: View {
             HStack(spacing: 8) {
                 ForEach(shuffledPrompts, id: \.self) { prompt in
                     Button(action: { onTapPrompt(prompt) }) {
-                        Text(prompt).font(.caption2).padding(.horizontal, 10).padding(.vertical, 6).background(Color.secondary.opacity(0.1)).cornerRadius(12).lineLimit(1)
+                        Text(prompt)
+                            .font(.system(size: 11, weight: .medium))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(.white.opacity(0.05), in: Capsule())
+                            .overlay(Capsule().stroke(Color.white.opacity(0.1), lineWidth: 1))
                     }
                 }
-                Button(action: onOpenDiscovery) { Image(systemName: "plus.circle.fill").font(.system(size: 20)).foregroundStyle(.blue) }
+                Button(action: onOpenDiscovery) { Image(systemName: "plus.circle.fill").font(.system(size: 22)).foregroundStyle(.blue) }
             }
             .padding(.horizontal)
 
             HStack(spacing: 12) {
                 TextField("Message Persona...", text: $query, axis: .vertical)
-                    .padding(10)
-                    .background(Color.secondary.opacity(0.1))
-                    .cornerRadius(20)
+                    .padding(12)
+                    .background(.white.opacity(0.08))
+                    .cornerRadius(22)
+                    .overlay(RoundedRectangle(cornerRadius: 22).stroke(Color.white.opacity(0.1), lineWidth: 1))
                     .lineLimit(1...5)
+
                 PersonaSendButton(
                     isDisabled: query.isEmpty || isThinking,
                     onSend: onSend
                 )
             }
             .padding(.horizontal)
-            .padding(.bottom, 10)
+            .padding(.bottom, 12)
         }
-        .padding(.top, 8)
+        .padding(.top, 10)
         .background(.ultraThinMaterial)
     }
 }
@@ -673,17 +737,18 @@ private struct PersonaSendButton: View {
         Button(action: onSend) {
             ZStack {
                 Image(systemName: "arrow.up.circle.fill")
-                    .font(.system(size: 32))
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 36))
+                    .foregroundStyle(.secondary.opacity(0.3))
                     .opacity(isDisabled ? 1 : 0)
 
                 Image(systemName: "arrow.up.circle.fill")
-                    .font(.system(size: 32))
+                    .font(.system(size: 36))
                     .foregroundStyle(
                         LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom)
                     )
                     .opacity(isDisabled ? 0 : 1)
             }
+            .shadow(color: isDisabled ? .clear : .purple.opacity(0.4), radius: 8)
         }
         .disabled(isDisabled)
     }
@@ -782,14 +847,15 @@ struct ThinkingIndicator: View {
                 HStack(spacing: 4) {
                     ForEach(0..<3) { index in
                         Circle()
-                            .fill(Color.accentColor)
-                            .frame(width: 7, height: 7)
+                            .fill(LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom))
+                            .frame(width: 8, height: 8)
                             .scaleEffect(animStep == index ? 1.2 : 0.8)
                             .opacity(animStep == index ? 1.0 : 0.4)
                     }
                 }
-                .padding(14)
-                .background(RoundedRectangle(cornerRadius: 18).fill(Color.secondary.opacity(0.15)))
+                .padding(16)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+                .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.1), lineWidth: 1))
             }
             Spacer()
         }
@@ -808,41 +874,53 @@ struct WelcomePersonaView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 30) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 80))
-                        .symbolEffect(.pulse.byLayer, options: .nonRepeating)
-                        .padding(.top, 40)
+            ZStack {
+                AuroraGlow(.dramatic)
+                    .palette(.appleIntelligence)
+                    .ignoresSafeArea()
 
-                    VStack(spacing: 8) {
-                        Text("Welcome to Persona")
-                            .font(.system(size: 34, weight: .bold))
-                        Text("Your Personal Workspace AI")
-                            .font(.title3)
-                            .foregroundStyle(.secondary)
+                ScrollView {
+                    VStack(spacing: 30) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 80))
+                            .symbolEffect(.pulse.byLayer, options: .nonRepeating)
+                            .foregroundStyle(LinearGradient(colors: [.blue, .purple, .mint], startPoint: .topLeading, endPoint: .bottomTrailing))
+                            .padding(.top, 40)
+                            .shadow(color: .purple.opacity(0.5), radius: 30)
+
+                        VStack(spacing: 8) {
+                            Text("Welcome to Persona")
+                                .font(.system(size: 34, weight: .bold))
+                            Text("Your Personal Workspace AI")
+                                .font(.title3)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        VStack(alignment: .leading, spacing: 25) {
+                            PersonaInfoRow(icon: "brain.head.profile", title: "Intelligent Analysis", detail: "Persona analyzes your Mail, Calendar, Tasks, and more to provide context-aware insights.")
+                            PersonaInfoRow(icon: "bubble.left.and.bubble.right", title: "Natural Chat", detail: "Talk to your data naturally. Ask questions, draft replies, or plan your week effortlessly.")
+                            PersonaInfoRow(icon: "lock.shield", title: "Secure & Private", detail: "All data processing happens within your workspace. We prioritize your privacy and data sovereignty.")
+                        }
+                        .padding(30)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 32))
+                        .overlay(RoundedRectangle(cornerRadius: 32).stroke(Color.white.opacity(0.1), lineWidth: 1))
+                        .padding(.horizontal, 20)
+
+                        Spacer(minLength: 40)
+
+                        Button {
+                            dismiss()
+                        } label: {
+                            Text("Get Started")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing), in: Capsule())
+                                .foregroundStyle(.white)
+                        }
+                        .padding(.horizontal, 30)
+                        .padding(.bottom, 20)
                     }
-
-                    VStack(alignment: .leading, spacing: 25) {
-                        PersonaInfoRow(icon: "brain.head.profile", title: "Intelligent Analysis", detail: "Persona analyzes your Mail, Calendar, Tasks, and more to provide context-aware insights.")
-                        PersonaInfoRow(icon: "bubble.left.and.bubble.right", title: "Natural Chat", detail: "Talk to your data naturally. Ask questions, draft replies, or plan your week effortlessly.")
-                        PersonaInfoRow(icon: "lock.shield", title: "Secure & Private", detail: "All data processing happens within your workspace. We prioritize your privacy and data sovereignty.")
-                    }
-                    .padding(.horizontal, 30)
-
-                    Spacer(minLength: 40)
-
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("Get Started")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
-                    .padding(.horizontal, 30)
-                    .padding(.bottom, 20)
                 }
             }
             .toolbar {
@@ -912,7 +990,7 @@ private struct PersonaInfoRow: View {
         HStack(alignment: .top, spacing: 18) {
             Image(systemName: icon)
                 .font(.title2)
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
                 .frame(width: 35)
 
             VStack(alignment: .leading, spacing: 4) {

@@ -19,7 +19,7 @@ struct DualKeyboardInputView: View {
     var onSubmit: () -> Void
 
     @ObservedObject var keyboard: KeyboardObserver
-    @FocusState private var isTextFieldFocused: Bool
+    @FocusState.Binding var isFocused: Bool
     @State private var animateIn = false
 
     // Binding to the currently-active text field
@@ -29,6 +29,32 @@ struct DualKeyboardInputView: View {
         case .notes: return $notesText
         case .documents: return $documentsText
         }
+    }
+
+    init(
+        promptText: Binding<String>,
+        notesText: Binding<String>,
+        documentsText: Binding<String>,
+        activeField: Binding<SlideInputField>,
+        tone: Binding<SlideTone>,
+        slideCount: Binding<Int>,
+        selectedStyleID: Binding<String>,
+        selectedThemeID: Binding<String>,
+        onSubmit: @escaping () -> Void,
+        keyboard: KeyboardObserver,
+        isFocused: FocusState<Bool>.Binding
+    ) {
+        self._promptText = promptText
+        self._notesText = notesText
+        self._documentsText = documentsText
+        self._activeField = activeField
+        self._tone = tone
+        self._slideCount = slideCount
+        self._selectedStyleID = selectedStyleID
+        self._selectedThemeID = selectedThemeID
+        self.onSubmit = onSubmit
+        self.keyboard = keyboard
+        self._isFocused = isFocused
     }
 
     var body: some View {
@@ -54,7 +80,7 @@ struct DualKeyboardInputView: View {
     /// Tapping the field-selector chips or the container refocuses here.
     private var focusTriggerField: some View {
         TextField("", text: activeTextBinding, axis: .vertical)
-            .focused($isTextFieldFocused)
+            .focused($isFocused)
             .lineLimit(1...4)
             .font(.subheadline)
             .frame(height: 0)
@@ -123,7 +149,7 @@ struct DualKeyboardInputView: View {
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .fill(Color(.systemBackground).opacity(0.6))
                     )
-                    .focused($isTextFieldFocused)
+                    .focused($isFocused)
 
                 Button(action: onSubmit) {
                     Image(systemName: "arrow.up.circle.fill")
@@ -165,7 +191,7 @@ struct DualKeyboardInputView: View {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                     activeField = field
                 }
-                isTextFieldFocused = true
+                isFocused = true
             } label: {
                 chipLabel(
                     icon: field.icon,

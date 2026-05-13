@@ -1,4 +1,5 @@
 import SwiftUI
+import Aurora
 
 struct InboxAIFeaturesView: View {
     @Environment(\.dismiss) private var dismiss
@@ -37,6 +38,9 @@ struct InboxAIFeaturesView: View {
                     }
                     .padding(20)
                 }
+            }
+            .glowWhileLoading(isAnalyzing) {
+                MoodGlow(mood: .thinking, style: .standard)
             }
             .navigationTitle("AI Intelligence")
             .navigationBarTitleDisplayMode(.inline)

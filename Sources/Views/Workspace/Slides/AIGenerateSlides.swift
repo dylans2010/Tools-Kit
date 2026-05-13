@@ -1,5 +1,6 @@
 import SwiftUI
 import PhotosUI
+import Aurora
 
 public struct AIGenerateSlides: View {
     private let fallbackThemeGradient: [Color] = [.blue, .purple]
@@ -31,6 +32,8 @@ public struct AIGenerateSlides: View {
     @State private var showErrorAlert = false
     @State private var imagesExpanded = false
 
+    @FocusState private var isFieldFocused: Bool
+
     private var themesEnabled: Bool { WorkspaceSDKAI().isThemeScopeEnabled }
 
     public init() {}
@@ -49,6 +52,9 @@ public struct AIGenerateSlides: View {
                             fieldSelectorRow
 
                             activeFieldPreview
+                                .onTapGesture {
+                                    isFieldFocused = true
+                                }
                         }
                     }
 
@@ -173,6 +179,15 @@ public struct AIGenerateSlides: View {
                 .padding()
             }
         }
+        .glowWhileLoading(manager.isGenerating) {
+            LiveTuningGlow(
+                style: .standard,
+                cornerRadius: 55,
+                borderWidth: 6,
+                glowSize: 28,
+                speed: 0.12
+            )
+        }
         .withKeyboardGlowBackdrop()
         .navigationTitle("AI Slides")
         .safeAreaInset(edge: .bottom) {
@@ -186,7 +201,8 @@ public struct AIGenerateSlides: View {
                 selectedStyleID: $selectedStyleID,
                 selectedThemeID: $selectedThemeID,
                 onSubmit: generate,
-                keyboard: keyboardObserver
+                keyboard: keyboardObserver,
+                isFocused: $isFieldFocused
             )
         }
         .alert("Generation Error", isPresented: $showErrorAlert) {
@@ -205,6 +221,7 @@ public struct AIGenerateSlides: View {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         activeField = field
                     }
+                    isFieldFocused = true
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: field.icon)
@@ -260,6 +277,7 @@ public struct AIGenerateSlides: View {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .fill(Color(.systemBackground).opacity(0.5))
             )
+            .contentShape(Rectangle())
     }
 
     // MARK: - Previews
