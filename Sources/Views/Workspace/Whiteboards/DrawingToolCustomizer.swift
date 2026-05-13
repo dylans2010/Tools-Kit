@@ -217,32 +217,36 @@ struct DrawingToolCustomizer: View {
             Text("Preview")
                 .font(.subheadline.weight(.medium))
 
-            Canvas { context, size in
-                var path = Path()
-                let midY = size.height / 2
-                path.move(to: CGPoint(x: 16, y: midY))
+            stylePreviewCanvas
+        }
+    }
 
-                let steps = 40
-                for i in 0...steps {
-                    let x = 16 + (size.width - 32) * Double(i) / Double(steps)
-                    let wave = sin(Double(i) * 0.3) * 8
-                    path.addLine(to: CGPoint(x: x, y: midY + wave))
-                }
+    private var stylePreviewCanvas: some View {
+        Canvas { context, size in
+            var path = Path()
+            let midY = size.height / 2
+            path.move(to: CGPoint(x: 16, y: midY))
 
-                let resolvedColor = Color(hex: colorHex)
-                context.opacity = opacity
-                context.stroke(
-                    path,
-                    with: .color(resolvedColor),
-                    style: strokeStyle(for: tool.configuration.drawingStyle)
-                )
+            let steps = 40
+            for i in 0...steps {
+                let x = 16 + (size.width - 32) * Double(i) / Double(steps)
+                let wave = sin(Double(i) * 0.3) * 8
+                path.addLine(to: CGPoint(x: x, y: midY + wave))
             }
-            .frame(height: 48)
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.black.opacity(0.2))
+
+            let resolvedColor = Color(hex: colorHex)
+            context.opacity = opacity
+            context.stroke(
+                path,
+                with: .color(resolvedColor),
+                style: strokeStyle(for: tool.configuration.drawingStyle)
             )
         }
+        .frame(height: 48)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.black.opacity(0.2))
+        )
     }
 
     private func strokeStyle(for style: WhiteboardViewTools.DrawingStyle) -> StrokeStyle {

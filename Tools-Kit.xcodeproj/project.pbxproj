@@ -1418,6 +1418,7 @@
 		SK020004 /* AddSkillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010004 /* AddSkillView.swift */; };
 		SK020005 /* DraftSkillsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010005 /* DraftSkillsView.swift */; };
 		SK020006 /* SkillPickerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010006 /* SkillPickerModifier.swift */; };
+		C0B0B0B0B0B0B0B0B0B0B002 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
 		C0B0B0B0B0B0B0B0B0B0B001 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
 /* End PBXBuildFile section */
 
@@ -9809,6 +9810,7 @@
 				SK020004 /* in Sources */,
 				SK020005 /* in Sources */,
 				SK020006 /* in Sources */,
+				C0B0B0B0B0B0B0B0B0B0B002 /* Color+Hex.swift in Sources */,
 				NB0100000000000000000001 /* SDKAnalyticsEngine.swift in Sources */,
 				NB0100000000000000000002 /* SDKWorkflowEngine.swift in Sources */,
 				NB0100000000000000000003 /* SDKTestHarness.swift in Sources */,

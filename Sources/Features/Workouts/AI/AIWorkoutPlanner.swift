@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 final class AIWorkoutPlanner {
     private let ai = AIService.shared
 

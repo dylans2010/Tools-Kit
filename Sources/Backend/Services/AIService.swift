@@ -7,14 +7,13 @@ enum AIError: Error {
     case unknownProvider(String)
 }
 
-@MainActor
 class AIService {
     static let shared = AIService()
 
     private let registry = AIProviderRegistry.shared
     private let settingsManager = AIChatSettingsManager.shared
-    @MainActor private let featureCheck = AIFeatureCheck.shared
-    @MainActor private let modelCatalog = AIModelCatalog.shared
+    private let featureCheck = AIFeatureCheck.shared
+    private let modelCatalog = AIModelCatalog.shared
 
     // MARK: - Current provider helpers
 

@@ -5,7 +5,7 @@ struct SlideThumbnailView: View {
     var showTitle: Bool = false
 
     private var bgColor: Color {
-        Color(hex: slide.backgroundColorHex), green: 0.23, blue: 0.37)
+        Color(hex: slide.backgroundColorHex)
     }
 
     var body: some View {

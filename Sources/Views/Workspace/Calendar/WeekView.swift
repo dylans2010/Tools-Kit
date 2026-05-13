@@ -66,6 +66,30 @@ struct WeekDayRow: View {
     private var dayEvents: [CalendarEvent] { manager.events(on: day) }
     private var isToday: Bool { calendar.isDateInToday(day) }
     private var isSelected: Bool { calendar.isDate(day, inSameDayAs: selectedDate) }
+    @ViewBuilder
+    private var dayEventsContent: some View {
+        if dayEvents.isEmpty {
+            Text("No events")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.leading, 8)
+        } else {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(dayEvents) { event in
+                        Button { selectedEvent = event } label: {
+                            Text(event.title)
+                                .font(.caption.bold())
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(Color(hex: event.priority.color).opacity(0.2), in: Capsule())
+                                .foregroundStyle(Color(hex: event.priority.color))
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -78,24 +102,7 @@ struct WeekDayRow: View {
                 .padding(8)
                 .background(isToday ? Color.blue.opacity(0.1) : Color.clear, in: RoundedRectangle(cornerRadius: 12))
 
-                if dayEvents.isEmpty {
-                    Text("No events").font(.caption).foregroundStyle(.secondary).padding(.leading, 8)
-                } else {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
-                            ForEach(dayEvents) { event in
-                                Button { selectedEvent = event } label: {
-                                    Text(event.title)
-                                        .font(.caption.bold())
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 8)
-                                        .background(Color(hex: event.priority.color).opacity(0.2), in: Capsule())
-                                        .foregroundStyle(Color(hex: event.priority.color))
-                                }
-                            }
-                        }
-                    }
-                }
+                dayEventsContent
                 Spacer()
             }
         }
