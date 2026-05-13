@@ -34,7 +34,7 @@ struct SiriCoreUIView: View {
     @State private var palette: AuroraGlow.Palette = .appleIntelligence
     @State private var reactiveMotion: Bool = true
 
-    private enum PaletteOption: String, CaseIterable, Identifiable, Sendable {
+    enum PaletteOption: String, CaseIterable, Identifiable, Sendable {
         case appleIntelligence = "Apple Intelligence"
         case sunset = "Sunset"
         case ocean = "Ocean"
@@ -71,105 +71,8 @@ struct SiriCoreUIView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                // Modernized Preview Area
-                ZStack {
-                    RoundedRectangle(cornerRadius: 32, style: .continuous)
-                        .fill(Color.black)
-                        .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
-
-                    contentPreview
-                        .glow(
-                            baseGlow
-                                .speed(speed)
-                                .glowSize(intensity * 40 + 10)
-                                .palette(palette)
-                                .washPeak(reactiveMotion ? 0.15 : 0.0)
-                        )
-                }
-                .frame(height: 320)
-                .padding(.horizontal)
-
-                VStack(spacing: 20) {
-                    // State Selection
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Current State", systemImage: "waveform")
-                            .font(.headline)
-                            .padding(.horizontal)
-
-                        Picker("Current State", selection: $state) {
-                            ForEach(ViewState.allCases) { state in
-                                Text(state.rawValue).tag(state)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        .padding(.horizontal)
-                    }
-
-                    // Palette Selection
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Palette", systemImage: "paintpalette")
-                            .font(.headline)
-                            .padding(.horizontal)
-
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
-                                ForEach(PaletteOption.allCases) { option in
-                                    PaletteChip(
-                                        option: option,
-                                        isSelected: PaletteOption(palette: palette) == option
-                                    ) {
-                                        palette = option.palette
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
-
-                    // Sliders
-                    VStack(spacing: 16) {
-                        ParameterSlider(
-                            label: "Intensity",
-                            value: $intensity,
-                            range: 0...1,
-                            icon: "sparkles"
-                        )
-
-                        ParameterSlider(
-                            label: "Speed",
-                            value: $speed,
-                            range: 0.01...0.5,
-                            icon: "bolt.fill"
-                        )
-
-                        Toggle(isOn: $reactiveMotion) {
-                            Label("Reactive Motion", systemImage: "move.3d")
-                                .font(.headline)
-                        }
-                        .padding()
-                        .background(Color(.secondarySystemGroupedBackground))
-                        .cornerRadius(16)
-                        .padding(.horizontal)
-                    }
-
-                    Button(role: .destructive) {
-                        withAnimation {
-                            intensity = 0.5
-                            speed = 0.12
-                            state = .idle
-                            palette = .appleIntelligence
-                            reactiveMotion = true
-                        }
-                    } label: {
-                        Label("Reset Defaults", systemImage: "arrow.counterclockwise")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color(.secondarySystemGroupedBackground))
-                            .cornerRadius(16)
-                    }
-                    .padding(.horizontal)
-                    .padding(.bottom, 30)
-                }
+                previewSection
+                controlsSection
             }
             .padding(.vertical)
         }
@@ -184,6 +87,120 @@ struct SiriCoreUIView: View {
         } else {
             return AuroraGlow(state.style)
         }
+    }
+
+    private var configuredGlow: AuroraGlow {
+        baseGlow
+            .speed(speed)
+            .glowSize(intensity * 40 + 10)
+            .palette(palette)
+            .washPeak(reactiveMotion ? 0.15 : 0.0)
+    }
+
+    private var previewSection: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 32, style: .continuous)
+                .fill(Color.black)
+                .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
+
+            contentPreview.glow(configuredGlow)
+        }
+        .frame(height: 320)
+        .padding(.horizontal)
+    }
+
+    private var controlsSection: some View {
+        VStack(spacing: 20) {
+            stateSelectorSection
+            paletteSelectionSection
+            slidersSection
+            resetDefaultsButton
+        }
+    }
+
+    private var stateSelectorSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Current State", systemImage: "waveform")
+                .font(.headline)
+                .padding(.horizontal)
+
+            Picker("Current State", selection: $state) {
+                ForEach(ViewState.allCases) { state in
+                    Text(state.rawValue).tag(state)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+        }
+    }
+
+    private var paletteSelectionSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Palette", systemImage: "paintpalette")
+                .font(.headline)
+                .padding(.horizontal)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(PaletteOption.allCases) { option in
+                        PaletteChip(
+                            option: option,
+                            isSelected: PaletteOption(palette: palette) == option
+                        ) {
+                            palette = option.palette
+                        }
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
+
+    private var slidersSection: some View {
+        VStack(spacing: 16) {
+            ParameterSlider(
+                label: "Intensity",
+                value: $intensity,
+                range: 0...1,
+                icon: "sparkles"
+            )
+
+            ParameterSlider(
+                label: "Speed",
+                value: $speed,
+                range: 0.01...0.5,
+                icon: "bolt.fill"
+            )
+
+            Toggle(isOn: $reactiveMotion) {
+                Label("Reactive Motion", systemImage: "move.3d")
+                    .font(.headline)
+            }
+            .padding()
+            .background(Color(.secondarySystemGroupedBackground))
+            .cornerRadius(16)
+            .padding(.horizontal)
+        }
+    }
+
+    private var resetDefaultsButton: some View {
+        Button(role: .destructive) {
+            withAnimation {
+                intensity = 0.5
+                speed = 0.12
+                state = .idle
+                palette = .appleIntelligence
+                reactiveMotion = true
+            }
+        } label: {
+            Label("Reset Defaults", systemImage: "arrow.counterclockwise")
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color(.secondarySystemGroupedBackground))
+                .cornerRadius(16)
+        }
+        .padding(.horizontal)
+        .padding(.bottom, 30)
     }
 
     private var contentPreview: some View {
