@@ -172,45 +172,90 @@ public final class ToolsKitSDK: ObservableObject {
     private let executionEngine = SDKExecutionEngine.shared
     private let connectorEngine = SDKConnectorEngine.shared
     private let toolRuntime = SDKToolRuntime.shared
+    private let securityManager = SDKSecurityManager.shared
+    private let privacyManager = SDKPrivacyManager.shared
+    private let policyEngine = SDKPolicyEngine.shared
+    private let auditLogger = SDKAuditLogger.shared
+    private let projectManager = SDKProjectManager.shared
+    private let authorizationManager = AuthorizationManager.shared
 
     private init() {
         initialize()
     }
 
     private func initialize() {
-        SDKLogStore.shared.log("ToolsKitSDK initializing", source: "ToolsKitSDK", level: .info)
+        Task {
+            await SDKLogStore.shared.log("ToolsKitSDK initializing", source: "ToolsKitSDK", level: .info)
+            await SDKLogStore.shared.log("ToolsKitSDK ready", source: "ToolsKitSDK", level: .info)
+        }
         isInitialized = true
-        SDKLogStore.shared.log("ToolsKitSDK ready", source: "ToolsKitSDK", level: .info)
     }
 
     // MARK: - 1. sdk.fetchData
 
     public func fetchData(scope: SDKScope) async throws -> [SDKDataItem] {
-        try scopeManager.validateAccess(scope: scope, operation: .read)
-        SDKLogStore.shared.log("fetchData scope=\(scope)", source: "ToolsKitSDK", level: .info)
-        return try await dataEngine.fetch(scope: scope)
+        let scopeName = scope == .all ? "sdk.fetchData.full" : "workspace.\(String(describing: scope))"
+        return try await runGovernedCall(
+            operationName: "sdk.fetchData",
+            scopeName: scopeName,
+            eventType: .dataAccess,
+            fetchUnits: 1
+        ) {
+            try self.scopeManager.validateAccess(scope: scope, operation: .read)
+            await SDKLogStore.shared.log("fetchData scope=\(scope)", source: "ToolsKitSDK", level: .info)
+            let raw = try await self.dataEngine.fetch(scope: scope)
+            return raw.map { item in
+                let redacted = self.privacyManager.redactRestrictedFields(item.payload, scope: scopeName)
+                return SDKDataItem(id: item.id, scope: item.scope, title: item.title, payload: redacted, timestamp: item.timestamp)
+            }
+        }
     }
 
     public func fetchData(query: SDKQuery) async throws -> [SDKDataItem] {
-        try scopeManager.validateAccess(scope: query.scope, operation: .read)
-        return try await dataEngine.fetch(query: query)
+        let scopeName = query.scope == .all ? "sdk.fetchData.full" : "workspace.\(String(describing: query.scope))"
+        return try await runGovernedCall(
+            operationName: "sdk.fetchData.query",
+            scopeName: scopeName,
+            eventType: .dataAccess,
+            fetchUnits: query.pagination?.pageSize ?? 1
+        ) {
+            try self.scopeManager.validateAccess(scope: query.scope, operation: .read)
+            let raw = try await self.dataEngine.fetch(query: query)
+            return raw.map { item in
+                let redacted = self.privacyManager.redactRestrictedFields(item.payload, scope: scopeName)
+                return SDKDataItem(id: item.id, scope: item.scope, title: item.title, payload: redacted, timestamp: item.timestamp)
+            }
+        }
     }
 
     // MARK: - 2. sdk.writeData
 
     public func writeData(scope: SDKScope, title: String, payload: [String: Any]) async throws -> SDKWriteResult {
-        try scopeManager.validateAccess(scope: scope, operation: .write)
-        let result = try await dataEngine.write(scope: scope, title: title, payload: payload)
-        eventBridge.emit(type: "data.written", payload: ["scope": "\(scope)", "title": title])
-        return result
+        try await runGovernedCall(
+            operationName: "sdk.writeData",
+            scopeName: "workspace.\(String(describing: scope))",
+            eventType: .dataAccess
+        ) {
+            try self.scopeManager.validateAccess(scope: scope, operation: .write)
+            let sanitized = self.privacyManager.redactRestrictedFields(payload, scope: "workspace.\(String(describing: scope))")
+            let result = try await self.dataEngine.write(scope: scope, title: title, payload: sanitized)
+            self.eventBridge.emit(type: "data.written", payload: ["scope": "\(scope)", "title": title])
+            return result
+        }
     }
 
     // MARK: - 3. sdk.deleteData
 
     public func deleteData(scope: SDKScope, id: UUID) async throws {
-        try scopeManager.validateAccess(scope: scope, operation: .delete)
-        try await dataEngine.delete(scope: scope, id: id)
-        eventBridge.emit(type: "data.deleted", payload: ["scope": "\(scope)", "id": id.uuidString])
+        try await runGovernedCall(
+            operationName: "sdk.deleteData",
+            scopeName: "workspace.\(String(describing: scope))",
+            eventType: .dataAccess
+        ) {
+            try self.scopeManager.validateAccess(scope: scope, operation: .delete)
+            try await self.dataEngine.delete(scope: scope, id: id)
+            self.eventBridge.emit(type: "data.deleted", payload: ["scope": "\(scope)", "id": id.uuidString])
+        }
     }
 
     // MARK: - 4. sdk.batchUpdate
@@ -231,7 +276,7 @@ public final class ToolsKitSDK: ObservableObject {
             }
         }
 
-        SDKLogStore.shared.log("batchUpdate: \(succeeded) succeeded, \(failed) failed", source: "ToolsKitSDK", level: .info)
+        await SDKLogStore.shared.log("batchUpdate: \(succeeded) succeeded, \(failed) failed", source: "ToolsKitSDK", level: .info)
         return SDKBatchResult(succeeded: succeeded, failed: failed, errors: errors)
     }
 
@@ -335,7 +380,9 @@ public final class ToolsKitSDK: ObservableObject {
 
     public func automationCreateWorkflow(rule: SDKAutomationRule) {
         SDKAutomationEngine.shared.add(rule)
-        SDKLogStore.shared.log("Workflow created: \(rule.name)", source: "ToolsKitSDK", level: .info)
+        Task {
+            await SDKLogStore.shared.log("Workflow created: \(rule.name)", source: "ToolsKitSDK", level: .info)
+        }
     }
 
     // MARK: - 19. sdk.automation.modify
@@ -350,27 +397,53 @@ public final class ToolsKitSDK: ObservableObject {
     // MARK: - 20. sdk.external.connect
 
     public func externalConnect(connector: any BaseConnector, credentials: [String: String]) async throws {
-        try await connectorEngine.connect(connector: connector, credentials: credentials)
+        try await runGovernedCall(
+            operationName: "sdk.external.connect",
+            scopeName: "external.api.unrestricted",
+            eventType: .externalAPICall
+        ) {
+            try await self.connectorEngine.connect(connector: connector, credentials: credentials)
+        }
     }
 
     // MARK: - 21. sdk.external.fetch
 
     public func externalFetch(url: String, headers: [String: String] = [:]) async throws -> Data {
-        return try await networkManager.fetch(url: url, headers: headers)
+        try await runGovernedCall(
+            operationName: "sdk.external.fetch",
+            scopeName: "external.api.unrestricted",
+            eventType: .externalAPICall
+        ) {
+            try await self.networkManager.fetch(url: url, headers: headers)
+        }
     }
 
     // MARK: - 22. sdk.external.webhook
 
     public func externalWebhook(url: String, payload: [String: Any], apiKey: String? = nil) async throws -> Data {
-        return try await networkManager.postWebhook(url: url, payload: payload, apiKey: apiKey)
+        try await runGovernedCall(
+            operationName: "sdk.external.webhook",
+            scopeName: "external.api.unrestricted",
+            apiKey: apiKey,
+            eventType: .externalAPICall
+        ) {
+            let sanitized = self.privacyManager.redactRestrictedFields(payload, scope: "external.api.unrestricted")
+            return try await self.networkManager.postWebhook(url: url, payload: sanitized, apiKey: apiKey)
+        }
     }
 
     // MARK: - 23. sdk.external.sync
 
     public func externalSync() async throws {
-        isSyncing = true
-        defer { isSyncing = false }
-        try await connectorEngine.syncAll()
+        try await runGovernedCall(
+            operationName: "sdk.external.sync",
+            scopeName: "external.api.unrestricted",
+            eventType: .externalAPICall
+        ) {
+            self.isSyncing = true
+            defer { self.isSyncing = false }
+            try await self.connectorEngine.syncAll()
+        }
     }
 
     // MARK: - 24. sdk.realtime.subscribe
@@ -387,7 +460,7 @@ public final class ToolsKitSDK: ObservableObject {
 
     // MARK: - 26. sdk.graph.query
 
-    public func graphQuery(entityType: String?, relation: String?) -> SDKGraph {
+    internal func graphQuery(entityType: String?, relation: String?) -> SDKGraph {
         return graphInterface.query(entityType: entityType, relation: relation)
     }
 
@@ -400,7 +473,7 @@ public final class ToolsKitSDK: ObservableObject {
 
     // MARK: - 28. sdk.time.getHistory
 
-    public func timeGetHistory(scope: SDKScope?, from: Date?, to: Date?) -> [WorkspaceSnapshot] {
+    internal func timeGetHistory(scope: SDKScope?, from: Date?, to: Date?) -> [WorkspaceSnapshot] {
         return timeTravelBridge.getHistory(scope: scope, from: from, to: to)
     }
 
@@ -479,9 +552,15 @@ public final class ToolsKitSDK: ObservableObject {
     // MARK: - Connector Sync
 
     public func syncConnectors() async throws {
-        isSyncing = true
-        defer { isSyncing = false }
-        try await connectorEngine.syncAll()
+        try await runGovernedCall(
+            operationName: "sdk.syncConnectors",
+            scopeName: "external.api.unrestricted",
+            eventType: .externalAPICall
+        ) {
+            self.isSyncing = true
+            defer { self.isSyncing = false }
+            try await self.connectorEngine.syncAll()
+        }
     }
 
     // MARK: - Developer NoSandbox Mode
@@ -498,26 +577,83 @@ public final class ToolsKitSDK: ObservableObject {
 
             public func enable() {
                 SDKRuntimeEngine.shared.isNoSandboxModeEnabled = true
-                SDKLogStore.shared.log("NoSandbox mode ENABLED - all scope restrictions bypassed", source: "SDK.Developer", level: .warning)
+                Task {
+                    await SDKLogStore.shared.log("NoSandbox mode ENABLED - all scope restrictions bypassed", source: "SDK.Developer", level: .warning)
+                }
             }
 
             public func disable() {
                 SDKRuntimeEngine.shared.isNoSandboxModeEnabled = false
-                SDKLogStore.shared.log("NoSandbox mode DISABLED", source: "SDK.Developer", level: .info)
+                Task {
+                    await SDKLogStore.shared.log("NoSandbox mode DISABLED", source: "SDK.Developer", level: .info)
+                }
             }
+        }
+    }
+}
+
+extension ToolsKitSDK {
+    private func runGovernedCall<T>(
+        operationName: String,
+        scopeName: String,
+        apiKey: String? = nil,
+        eventType: SDKAuditLogger.Event.EventType = .execution,
+        fetchUnits: Int = 0,
+        block: @escaping () async throws -> T
+    ) async throws -> T {
+        let project = projectManager.currentProject
+        let allowedScopes = Set(project?.enabledScopes ?? []).union(Set(project?.requiredScopes ?? []))
+        let request = SDKPolicyRequest(
+            operationName: operationName,
+            scope: scopeName,
+            projectID: project?.id,
+            actorID: "workspace-user",
+            apiKey: apiKey,
+            allowedScopes: allowedScopes.isEmpty ? ["*"] : allowedScopes,
+            justification: project?.description,
+            privacyNote: project?.description
+        )
+
+        guard authorizationManager.validateScope(scopeName) else {
+            throw SDKError.permissionDenied(scope: scopeName)
+        }
+
+        do {
+            let decision = try policyEngine.evaluate(request)
+            try securityManager.enforce(request: request, definition: decision.scopeDefinition)
+            _ = try await SDKRateLimiter.shared.enforce(
+                key: "\(request.actorID):\(project?.id.uuidString ?? "global"):\(scopeName)",
+                rule: decision.rateRule,
+                fetchUnits: fetchUnits,
+                executions: 1
+            )
+            auditLogger.log(
+                eventType: .scopeUsage,
+                projectID: project?.id,
+                scope: scopeName,
+                message: "Policy approved \(operationName)"
+            )
+            return try await executionEngine.executeGovernedOperation(
+                name: operationName,
+                scope: scopeName,
+                projectID: project?.id,
+                operation: block
+            )
+        } catch {
+            auditLogger.log(
+                eventType: eventType,
+                projectID: project?.id,
+                scope: scopeName,
+                message: "Governed call blocked: \(operationName)",
+                metadata: ["error": error.localizedDescription]
+            )
+            throw error
         }
     }
 }
 
 // MARK: - Workspace Data Models
 
-public struct Note: Identifiable {
-    public let id: UUID
-    public let title: String
-    public let content: String
-    public let createdAt: Date
-    public let updatedAt: Date
-}
 
 public struct SDKCacheInfo {
     public let scope: SDKScope

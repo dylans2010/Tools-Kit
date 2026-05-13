@@ -16,23 +16,27 @@ struct WorkflowDetailView: View {
 
     var body: some View {
         Form {
-            Section("Workflow") {
+            Section {
                 Text(workflow.name)
                 Text(workflow.path).font(.caption)
                 Text("Created: \(workflow.createdAt.formatted())")
                 Text("Updated: \(workflow.updatedAt.formatted())")
+            } header: {
+                Text("Workflow")
             }
 
-            Section("Context") {
+            Section {
                 Text("Repository: \(owner)/\(repo)")
                 TextField("Ref", text: $ref)
                 if let lastRun {
                     Text("Last Run Branch: \(lastRun.headBranch)")
                     Text("Last Commit: \(lastRun.headSHA)").font(.caption)
                 }
+            } header: {
+                Text("Context")
             }
 
-            Section("Execution") {
+            Section {
                 Button("Run Workflow") { showRunSheet = true }
                 NavigationLink("View Runs") {
                     WorkflowRunView(owner: owner, repo: repo, workflowID: workflow.id)
@@ -46,9 +50,11 @@ struct WorkflowDetailView: View {
                 Button("Open in GitHub") {
                     openURL(workflow.htmlURL)
                 }
+            } header: {
+                Text("Execution")
             }
 
-            Section("YAML") {
+            Section {
                 Toggle("Editable", isOn: $editable)
                 TextEditor(text: $yaml)
                     .font(.system(.caption, design: .monospaced))
@@ -64,10 +70,14 @@ struct WorkflowDetailView: View {
                         }
                     }
                 }
+            } header: {
+                Text("YAML")
             }
             if !statusMessage.isEmpty {
-                Section("Status") {
+                Section {
                     Text(statusMessage).font(.caption)
+                } header: {
+                    Text("Status")
                 }
             }
         }

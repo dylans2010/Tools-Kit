@@ -79,7 +79,7 @@ public final class SDKDataEngine: ObservableObject {
         }
 
         invalidateCache(scope: scope)
-        SDKLogStore.shared.log("writeData scope=\(scope) title=\(title)", source: "SDKDataEngine", level: .info)
+        SDKLogStore.shared.log("writeData scope=\(scope) title=\(title)", source: "SDKDataEngine", level: LogLevel.info)
         return SDKWriteResult(id: id, scope: scope, success: true)
     }
 
@@ -94,7 +94,7 @@ public final class SDKDataEngine: ObservableObject {
         }
 
         invalidateCache(scope: scope)
-        SDKLogStore.shared.log("deleteData scope=\(scope) id=\(id)", source: "SDKDataEngine", level: .info)
+        SDKLogStore.shared.log("deleteData scope=\(scope) id=\(id)", source: "SDKDataEngine", level: LogLevel.info)
     }
 
     // MARK: - Cache Management
@@ -176,7 +176,7 @@ public final class SDKDataEngine: ObservableObject {
         case .files:
             return WorkspaceAPI.shared.files.listFiles().map { file in
                 SDKDataItem(id: UUID(), scope: .files, title: file.name,
-                           payload: ["path": file.path],
+                           payload: ["path": file.url.path],
                            timestamp: Date())
             }
         case .emails:
@@ -207,10 +207,10 @@ public final class SDKDataEngine: ObservableObject {
             }
         case .repos:
             let files = WorkspaceAPI.shared.files.listFiles()
-            let repoFiles = files.filter { $0.name.hasSuffix(".git") || $0.path.contains(".git") || $0.name.hasSuffix(".swift") || $0.name.hasSuffix(".json") }
+            let repoFiles = files.filter { $0.name.hasSuffix(".git") || $0.url.path.contains(".git") || $0.name.hasSuffix(".swift") || $0.name.hasSuffix(".json") }
             return repoFiles.map { file in
                 SDKDataItem(id: UUID(), scope: .repos, title: file.name,
-                           payload: ["path": file.path],
+                           payload: ["path": file.url.path],
                            timestamp: Date())
             }
         case .media:
@@ -221,7 +221,7 @@ public final class SDKDataEngine: ObservableObject {
             }
             return mediaFiles.map { file in
                 SDKDataItem(id: UUID(), scope: .media, title: file.name,
-                           payload: ["path": file.path],
+                           payload: ["path": file.url.path],
                            timestamp: Date())
             }
         case .whiteboards:

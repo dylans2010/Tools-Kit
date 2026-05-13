@@ -25,10 +25,77 @@ class AIService {
         registry.provider(for: currentProviderID)
     }
 
+    // MARK: - Skills Manager
+
+    @MainActor
+    class SkillsManager: ObservableObject {
+        static let shared = SkillsManager()
+
+        @Published var skills: [Skill] = []
+        private let skillsDirectory: URL
+
+        init() {
+            let paths = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
+            skillsDirectory = paths[0].appendingPathComponent("Skills", isDirectory: true)
+            try? FileManager.default.createDirectory(at: skillsDirectory, withIntermediateDirectories: true)
+            loadSkills()
+        }
+
+        func loadSkills() {
+            guard let files = try? FileManager.default.contentsOfDirectory(at: skillsDirectory, includingPropertiesForKeys: nil) else { return }
+            skills = files.compactMap { url in
+                guard url.pathExtension == "json" else { return nil }
+                guard let data = try? Data(contentsOf: url) else { return nil }
+                return try? JSONDecoder().decode(Skill.self, from: data)
+            }.sorted(by: { $0.createdAt > $1.createdAt })
+        }
+
+        func addSkill(name: String, content: String) {
+            let skill = Skill(name: name, content: content)
+            saveSkill(skill)
+            loadSkills()
+        }
+
+        func updateSkill(_ skill: Skill) {
+            saveSkill(skill)
+            loadSkills()
+        }
+
+        func deleteSkill(_ skill: Skill) {
+            let url = skillsDirectory.appendingPathComponent("\(skill.id.uuidString).json")
+            try? FileManager.default.removeItem(at: url)
+            loadSkills()
+        }
+
+        func importSkill(from url: URL) throws {
+            let content = try String(contentsOf: url)
+            let name = url.deletingPathExtension().lastPathComponent
+            addSkill(name: name, content: content)
+        }
+
+        private func saveSkill(_ skill: Skill) {
+            let url = skillsDirectory.appendingPathComponent("\(skill.id.uuidString).json")
+            if let data = try? JSONEncoder().encode(skill) {
+                try? data.write(to: url)
+            }
+        }
+
+        func activeSkillsPrompt() -> String {
+            let active = skills.filter { $0.isActive }
+            guard !active.isEmpty else { return "" }
+
+            var prompt = "\n\nAvailable User Skills:\n"
+            for skill in active {
+                prompt += "--- Skill: \(skill.name) ---\n\(skill.content)\n\n"
+            }
+            return prompt
+        }
+    }
+
     // MARK: - Public API
 
     @MainActor
-    func processText(prompt: String, systemPrompt: String = "You are a helpful assistant.", model: String? = nil) async throws -> String {
+    func processText(prompt: String, systemPrompt: String = "", model: String? = nil) async throws -> String {
         guard let provider = currentProvider else {
             throw AIError.unknownProvider(currentProviderID)
         }
@@ -49,10 +116,24 @@ class AIService {
                 }
             }
         }
-        let systemPromptToUse = systemPrompt.isEmpty ? settingsManager.settings.systemPrompt : systemPrompt
+
+        // Combine System Prompt, App Default System Prompt, and Active Skills
+        let appSystemPrompt = settingsManager.settings.systemPrompt
+        let activeSkills = SkillsManager.shared.activeSkillsPrompt()
+
+        var finalSystemPrompt = "You are a helpful assistant."
+        if !appSystemPrompt.isEmpty {
+            finalSystemPrompt = appSystemPrompt
+        }
+        if !systemPrompt.isEmpty {
+            finalSystemPrompt += "\n\nTask-specific instructions: \(systemPrompt)"
+        }
+        if !activeSkills.isEmpty {
+            finalSystemPrompt += activeSkills
+        }
 
         let messages = [
-            ChatMessage(role: "system", content: systemPromptToUse),
+            ChatMessage(role: "system", content: finalSystemPrompt),
             ChatMessage(role: "user", content: prompt)
         ]
 
@@ -166,6 +247,7 @@ class AIService {
         return normalizeJSONObject(from: response)
     }
 
+    @MainActor
     func processWithOpenRouter(
         prompt: String,
         modelID: String,

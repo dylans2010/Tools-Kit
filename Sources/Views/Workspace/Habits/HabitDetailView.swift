@@ -7,7 +7,7 @@ struct HabitDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showingEdit = false
 
-    private var habitColor: Color { Color(hex: habit.colorHex) ?? .blue }
+    private var habitColor: Color { Color(hex: habit.colorHex) }
     private let dateFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "yyyy-MM-dd"
@@ -60,10 +60,10 @@ struct HabitDetailView: View {
                         .font(.title3.bold())
                     Label(habit.frequency.rawValue, systemImage: "repeat")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     Label("Target: \(habit.targetCount)x per day", systemImage: "target")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 Spacer()
             }
@@ -89,7 +89,7 @@ struct HabitDetailView: View {
                     .font(.system(.title2, design: .rounded).bold())
                 Text(title)
                     .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity)
@@ -134,7 +134,7 @@ struct HabitDetailView: View {
                     ForEach(days, id: \.self) { day in
                         Text(day)
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity)
                     }
                 }

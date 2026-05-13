@@ -17,7 +17,7 @@ struct FileSizeView: View {
                                 .keyboardType(.decimalPad)
                                 .font(.title3.bold())
                                 .foregroundColor(.blue)
-                                .onChange(of: backend.inputAmount) { _ in backend.convert() }
+                                .onChange(of: backend.inputAmount) { _, _ in backend.convert() }
 
                             Spacer()
 
@@ -27,7 +27,7 @@ struct FileSizeView: View {
                                 }
                             }
                             .pickerStyle(.menu)
-                            .onChange(of: backend.inputUnit) { _ in backend.convert() }
+                            .onChange(of: backend.inputUnit) { _, _ in backend.convert() }
                         }
                     }
                 } header: {

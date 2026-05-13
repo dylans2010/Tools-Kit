@@ -23,25 +23,29 @@ struct CellEditorView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.workspaceBackground.ignoresSafeArea()
+                Color(.systemBackground).ignoresSafeArea()
 
                 Form {
                     Section {
                         Toggle("Formula Mode", isOn: $isFormulaMode)
                     }
-                    .listRowBackground(Color.workspaceSurface)
+                    .listRowBackground(Color(.secondarySystemBackground))
 
                     if isFormulaMode {
-                        Section("Formula") {
+                        Section {
                             TextField("=SUM(A1:A10)", text: $formula)
                                 .font(.system(.body, design: .monospaced))
+                        } header: {
+                            Text("Formula")
                         }
-                        .listRowBackground(Color.workspaceSurface)
+                        .listRowBackground(Color(.secondarySystemBackground))
                     } else {
-                        Section("Value") {
+                        Section {
                             TextField("Cell value", text: $rawValue)
+                        } header: {
+                            Text("Value")
                         }
-                        .listRowBackground(Color.workspaceSurface)
+                        .listRowBackground(Color(.secondarySystemBackground))
                     }
                 }
                 .scrollContentBackground(.hidden)

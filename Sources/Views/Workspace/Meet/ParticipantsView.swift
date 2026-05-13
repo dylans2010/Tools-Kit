@@ -42,9 +42,9 @@ struct ParticipantsView: View {
 
             HStack(spacing: 16) {
                 Image(systemName: participant.isMuted ? "mic.slash.fill" : "mic.fill")
-                    .foregroundStyle(participant.isMuted ? .red : .green)
+                    .foregroundStyle(participant.isMuted ? Color.red : Color.green)
                 Image(systemName: participant.hasVideo ? "video.fill" : "video.slash.fill")
-                    .foregroundStyle(participant.hasVideo ? .green : .secondary)
+                    .foregroundStyle(participant.hasVideo ? Color.green : Color.secondary)
             }
             .font(.caption)
         }

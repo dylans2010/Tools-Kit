@@ -2,7 +2,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct FormsView: View {
-    @StateObject private var backend = FormsBackend()
+    @StateObject private var backend = FormsBackend.shared
     @State private var showingCreate = false
     @State private var showingTemplates = false
     @State private var showingImport = false
@@ -225,7 +225,7 @@ private struct FormCard: View {
     let onDelete: () -> Void
 
     private var accentColor: Color {
-        Color(hex: form.accentHexColor) ?? .blue
+        Color(hex: form.accentHexColor)
     }
 
     var body: some View {

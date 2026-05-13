@@ -6,7 +6,7 @@ struct GitHubQuickFixPanelView: View {
 
     var body: some View {
         List {
-            Section("Deterministic Fixes") {
+            Section {
                 QuickFixRow(title: "Remove Unused Imports", icon: "link.badge.plus", description: "Rule-based parsing to clean up Swift imports.") {
                     // Logic to parse and remove unused imports
                 }
@@ -18,9 +18,11 @@ struct GitHubQuickFixPanelView: View {
                 QuickFixRow(title: "Revert File State", icon: "arrow.uturn.backward", description: "Restore file to the last committed state.") {
                     // Logic to revert file
                 }
+            } header: {
+                Text("Deterministic Fixes")
             }
 
-            Section("Recovery Actions") {
+            Section {
                 QuickFixRow(title: "Restore Deleted Files", icon: "doc.badge.plus", description: "Recover tracked files that were recently deleted.") {
                     // Logic to restore files
                 }
@@ -28,9 +30,11 @@ struct GitHubQuickFixPanelView: View {
                 QuickFixRow(title: "Trigger Conflict Mode", icon: "exclamationmark.triangle.fill", color: .orange, description: "Manually enter conflict resolution for selected files.") {
                     // Logic to enter conflict mode
                 }
+            } header: {
+                Text("Recovery Actions")
             }
 
-            Section("System Status") {
+            Section {
                 HStack {
                     Text("Intelligence Scanning")
                     Spacer()
@@ -40,6 +44,8 @@ struct GitHubQuickFixPanelView: View {
                         Text("Idle").foregroundStyle(.secondary)
                     }
                 }
+            } header: {
+                Text("System Status")
             }
         }
         .navigationTitle("Quick Fix")
@@ -64,7 +70,7 @@ struct QuickFixRow: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .font(.subheadline.bold())
-                        .foregroundColor(.primary)
+                        .foregroundStyle(.primary)
                     Text(description)
                         .font(.caption2)
                         .foregroundStyle(.secondary)

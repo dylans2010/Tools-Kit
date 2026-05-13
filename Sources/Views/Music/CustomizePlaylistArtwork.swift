@@ -188,7 +188,7 @@ struct CustomizePlaylistArtwork: View {
                 }
             ))
         }
-        .onChange(of: photoPickerItem) { newItem in
+        .onChange(of: photoPickerItem) { _, newItem in
             guard let newItem else { return }
             Task {
                 if let data = try? await newItem.loadTransferable(type: Data.self),
@@ -474,7 +474,7 @@ struct CustomizePlaylistArtwork: View {
             }
         }
         .pickerStyle(.segmented)
-        .onChange(of: gradientType) { _ in generatedImage = nil; uploadedBackground = nil }
+        .onChange(of: gradientType) { _, _ in generatedImage = nil; uploadedBackground = nil }
     }
 
     private func colorStopsEditor(maxVisibleStops: Int? = nil) -> some View {
@@ -514,11 +514,13 @@ struct CustomizePlaylistArtwork: View {
     private var gradientControlsSheet: some View {
         NavigationStack {
             Form {
-                Section("Type") {
+                Section {
                     gradientTypePicker
+                } header: {
+                    Text("Type")
                 }
 
-                Section("Advanced") {
+                Section {
                     if gradientType != .radial {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
@@ -529,7 +531,7 @@ struct CustomizePlaylistArtwork: View {
                                     .monospacedDigit()
                             }
                             Slider(value: $gradientAngle, in: 0...360, step: 5)
-                                .onChange(of: gradientAngle) { _ in generatedImage = nil; uploadedBackground = nil }
+                                .onChange(of: gradientAngle) { _, _ in generatedImage = nil; uploadedBackground = nil }
                         }
                     } else {
                         VStack(alignment: .leading, spacing: 8) {
@@ -541,16 +543,20 @@ struct CustomizePlaylistArtwork: View {
                                     .monospacedDigit()
                             }
                             Slider(value: $radialGradientRadiusMultiplier, in: 0.2...1.2, step: 0.05)
-                                .onChange(of: radialGradientRadiusMultiplier) { _ in
+                                .onChange(of: radialGradientRadiusMultiplier) { _, _ in
                                     generatedImage = nil
                                     uploadedBackground = nil
                                 }
                         }
                     }
+                } header: {
+                    Text("Advanced")
                 }
 
-                Section("Colors") {
+                Section {
                     colorStopsEditor()
+                } header: {
+                    Text("Colors")
                 }
             }
             .navigationTitle("Gradient Controls")

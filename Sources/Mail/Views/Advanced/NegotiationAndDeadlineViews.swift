@@ -93,7 +93,7 @@ struct DeadlineTrackerDashboard: View {
                             Spacer()
                             Text(entry.timestamp, style: .date)
                                 .font(.caption2.bold())
-                                .foregroundStyle(entry.timestamp < Date() ? .red : .blue)
+                                .foregroundStyle(entry.timestamp < Date() ? Color.red : Color.blue)
                         }
                     }
                 }

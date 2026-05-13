@@ -13,7 +13,7 @@ struct ChatMessageBubbleView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(message.senderName)
                     .font(.caption.bold())
-                    .foregroundStyle(message.isSystem ? .orange : .secondary)
+                    .foregroundStyle(message.isSystem ? Color.orange : Color.secondary)
                 Text(message.text)
                     .font(.subheadline)
                 Text(message.sentAt, style: .time)

@@ -12,12 +12,14 @@ public final class SDKMutationEngine {
 
     public func performMutation(_ action: SDKAction, context: SDKExecutionContext) async throws {
         // Enforce permissions
-        try gate.enforce(action: action, context: context)
+        try await gate.enforce(action: action, context: context)
 
         // Convert to system action and dispatch
         let systemAction = try SDKSystemRouter.shared.route(action: action)
         try await dispatcher.dispatch(systemAction, context: context)
 
-        SDKConsoleView.LogBus.shared.log("Mutation executed: \(action)", type: .success)
+        Task { @MainActor in
+            await SDKLogStore.shared.log("Mutation executed: \(action)", source: "SDKMutationEngine", level: .info)
+        }
     }
 }

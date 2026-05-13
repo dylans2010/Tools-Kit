@@ -14,156 +14,142 @@ struct ArticlesHomeView: View {
     private let featuredTopics = ["Artificial Intelligence", "Space Exploration", "Technology", "Science"]
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 14) {
-                summaryCard
-                compactHeader
-                featuredSection
-                if !manager.recentArticles.isEmpty { recentSection }
-                if !manager.collections.isEmpty { collectionSection }
+        List {
+            Section("Overview") {
+                HStack(spacing: 12) {
+                    StatLabel(label: "Featured", value: "\(featuredArticles.count)")
+                    StatLabel(label: "Recent", value: "\(manager.recentArticles.count)")
+                    StatLabel(label: "Collections", value: "\(manager.collections.count)")
+                }
             }
-            .padding(16)
+
+            Section("Featured") {
+                if isLoadingFeatured {
+                    ProgressView("Loading Featured Articles…")
+                } else if featuredArticles.isEmpty {
+                    Text("No featured articles. Pull to refresh.")
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(featuredArticles.prefix(8)) { article in
+                        NavigationLink {
+                            ArticleDetailView(article: article)
+                        } label: {
+                            ArticleRowLabel(article: article)
+                        }
+                    }
+                }
+            }
+
+            if !manager.recentArticles.isEmpty {
+                Section("Continue Reading") {
+                    ForEach(manager.recentArticles.prefix(8)) { article in
+                        NavigationLink {
+                            ArticleDetailView(article: article)
+                        } label: {
+                            ArticleRowLabel(article: article)
+                        }
+                    }
+                }
+            }
+
+            if !manager.collections.isEmpty {
+                Section("Collections") {
+                    ForEach(manager.collections) { collection in
+                        NavigationLink {
+                            CollectionDetailView(collection: collection)
+                        } label: {
+                            Label {
+                                HStack {
+                                    Text(collection.name)
+                                    Spacer()
+                                    Text("\(collection.articles.count)")
+                                        .foregroundStyle(.secondary)
+                                }
+                            } icon: {
+                                Image(systemName: collection.icon)
+                            }
+                        }
+                    }
+                }
+            }
         }
         .navigationTitle("Articles")
+        .toolbar {
+            ToolbarItemGroup(placement: .primaryAction) {
+                NavigationLink(destination: ArticleSearchView()) {
+                    Image(systemName: "magnifyingglass")
+                }
+
+                Menu {
+                    Button { showingCollections = true } label: {
+                        Label("Collections", systemImage: "folder")
+                    }
+                    Button { showingAISheet = true } label: {
+                        Label("AI Assistant", systemImage: "sparkles")
+                    }
+                    Divider()
+                    Button { runAI(using: "Give me a concise executive brief from this article.") } label: {
+                        Label("Executive Brief", systemImage: "doc.text.magnifyingglass")
+                    }
+                    Button { runAI(using: "Explain both sides and key assumptions.") } label: {
+                        Label("Debate Lens", systemImage: "bubble.left.and.bubble.right")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+            }
+        }
         .sheet(isPresented: $showingCollections) { CollectionsView() }
         .sheet(isPresented: $showingAISheet) { aiAssistantSheet }
         .onAppear { if featuredArticles.isEmpty { loadFeaturedArticles() } }
         .refreshable { loadFeaturedArticles() }
     }
 
-    private var compactHeader: some View {
-        WorkspaceSurfaceCard {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 10) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Articles")
-                            .font(.title3.bold())
-                        Text("Read, summarize, and rewrite with quick AI help.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    NavigationLink(destination: ArticleSearchView()) {
-                        Image(systemName: "magnifyingglass")
-                            .font(.headline)
-                            .frame(width: 36, height: 36)
-                    }
-                    .buttonStyle(.bordered)
-
-                    Menu {
-                        Button { showingCollections = true } label: {
-                            Label("Collections", systemImage: "folder")
-                        }
-                        Button { showingAISheet = true } label: {
-                            Label("AI Assistant", systemImage: "sparkles")
-                        }
-                        Divider()
-                        Button { runAI(using: "Give me a concise executive brief from this article.") } label: {
-                            Label("Executive Brief", systemImage: "doc.text.magnifyingglass")
-                        }
-                        Button { runAI(using: "Explain both sides and key assumptions.") } label: {
-                            Label("Debate Lens", systemImage: "bubble.left.and.bubble.right")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                            .font(.headline)
-                            .frame(width: 36, height: 36)
-                    }
-                    .buttonStyle(.bordered)
-
-                    Button { showingAISheet = true } label: {
-                        Image(systemName: "sparkles")
-                            .font(.headline)
-                            .frame(width: 36, height: 36)
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        aiQuickAction("Brief", icon: "doc.text.magnifyingglass") {
-                            runAI(using: "Give me a concise executive brief from this article.")
-                        }
-                        aiQuickAction("Debate", icon: "bubble.left.and.bubble.right") {
-                            runAI(using: "Explain both sides and key assumptions.")
-                        }
-                        aiQuickAction("Study Notes", icon: "lightbulb.max.fill") {
-                            runAI(using: "Turn this into study notes and action steps.")
-                        }
-                        aiQuickAction("Rewrite", icon: "pencil.and.outline") {
-                            runAI(using: "Rewrite this article for a general audience.")
-                        }
-                        aiQuickAction("Collections", icon: "folder.fill") {
-                            showingCollections = true
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private var summaryCard: some View {
-        WorkspaceSurfaceCard {
-            HStack(spacing: 10) {
-                summaryStat("Featured", value: "\(featuredArticles.count)", icon: "star.fill", tint: .orange)
-                summaryStat("Recent", value: "\(manager.recentArticles.count)", icon: "clock.fill", tint: .blue)
-                summaryStat("Collections", value: "\(manager.collections.count)", icon: "folder.fill", tint: .indigo)
-            }
-        }
-    }
-
-    private func summaryStat(_ title: String, value: String, icon: String, tint: Color) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Label(title, systemImage: icon)
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(.secondary)
-            Text(value)
-                .font(.headline.bold())
-                .foregroundStyle(tint)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-    }
+    // MARK: - AI Sheet
 
     private var aiAssistantSheet: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("AI Article Tools")
-                        .font(.headline)
-                    Text("Use natural language—short requests like \"give me key takeaways\" or \"rewrite for beginners\" work.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-
+            Form {
+                Section {
                     TextField("Ask naturally or paste article text…", text: $aiPrompt, axis: .vertical)
-                        .textFieldStyle(.roundedBorder)
+                } header: {
+                    Text("AI Article Tools")
+                } footer: {
+                    Text("Use natural language—short requests like \"give me key takeaways\" or \"rewrite for beginners\" work.")
+                }
 
-                    quickActionGrid
+                Section("Quick Actions") {
+                    HStack(spacing: 8) {
+                        Button("Brief") { runAI(using: "Give me an executive brief from this article.") }
+                            .buttonStyle(.bordered)
+                        Button("Debate") { runAI(using: "Explain both sides and main assumptions.") }
+                            .buttonStyle(.bordered)
+                        Button("Study") { runAI(using: "Turn this into study notes and action steps.") }
+                            .buttonStyle(.bordered)
+                    }
+                }
 
+                Section {
                     Button("Analyze", action: runAI)
                         .buttonStyle(.borderedProminent)
                         .disabled(aiPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || aiLoading)
 
                     if aiLoading {
-                        WorkspaceSkeletonLine()
-                        WorkspaceSkeletonLine(widthRatio: 0.8)
+                        ProgressView("Analyzing…")
                     } else if let aiError {
-                        Text(aiError)
-                            .font(.caption)
+                        Label(aiError, systemImage: "exclamationmark.triangle")
                             .foregroundStyle(.red)
                     } else if let aiInsights {
                         Text(aiInsights.summary)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         ForEach(aiInsights.keyPoints, id: \.self) { point in
-                            Text("• \(point)")
+                            Label(point, systemImage: "circle.fill")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
                     }
                 }
-                .padding(16)
             }
             .navigationTitle("AI Assistant")
             .navigationBarTitleDisplayMode(.inline)
@@ -176,78 +162,7 @@ struct ArticlesHomeView: View {
         .presentationDetents([.medium, .large])
     }
 
-    private var quickActionGrid: some View {
-        HStack(spacing: 8) {
-            aiQuickAction("Executive Brief", icon: "doc.text.magnifyingglass") {
-                runAI(using: "Give me an executive brief from this article.")
-            }
-            aiQuickAction("Debate Lens", icon: "bubble.left.and.bubble.right") {
-                runAI(using: "Explain both sides and main assumptions.")
-            }
-            aiQuickAction("Study Notes", icon: "lightbulb.max.fill") {
-                runAI(using: "Turn this into study notes and action steps.")
-            }
-        }
-    }
-
-    private var featuredSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            WorkspaceSectionHeader(title: "Featured")
-            if isLoadingFeatured {
-                WorkspaceSurfaceCard { WorkspaceSkeletonLine() }
-                WorkspaceSurfaceCard { WorkspaceSkeletonLine(widthRatio: 0.7) }
-            } else if featuredArticles.isEmpty {
-                Text("No featured articles. Pull to refresh.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            } else {
-                ForEach(featuredArticles.prefix(8)) { article in
-                    NavigationLink {
-                        ArticleDetailView(article: article)
-                    } label: {
-                        FeaturedArticleRow(article: article)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-    }
-
-    private var recentSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            WorkspaceSectionHeader(title: "Continue Reading")
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(manager.recentArticles.prefix(8)) { article in
-                        NavigationLink {
-                            ArticleDetailView(article: article)
-                        } label: {
-                            RecentArticleCard(article: article)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
-        }
-    }
-
-    private var collectionSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            WorkspaceSectionHeader(title: "Collections")
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(manager.collections) { collection in
-                        NavigationLink {
-                            CollectionDetailView(collection: collection)
-                        } label: {
-                            CollectionChip(collection: collection)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
-        }
-    }
+    // MARK: - Logic
 
     private func loadFeaturedArticles() {
         isLoadingFeatured = true
@@ -286,82 +201,44 @@ struct ArticlesHomeView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiError = "We couldn’t process that yet. You can type naturally and keep it short; we’ll infer details."
+                    aiError = "We couldn't process that yet. You can type naturally and keep it short; we'll infer details."
                     aiLoading = false
                 }
             }
         }
     }
-
-    private func aiQuickAction(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: icon)
-                .font(.caption.weight(.semibold))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-        }
-        .buttonStyle(.bordered)
-        .accessibilityLabel(title)
-    }
 }
 
-private struct FeaturedArticleRow: View {
+// MARK: - Supporting Views
+
+private struct ArticleRowLabel: View {
     let article: Article
     var body: some View {
-        WorkspaceSurfaceCard {
-            HStack(alignment: .top, spacing: 10) {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.orange.opacity(0.15))
-                    .frame(width: 56, height: 56)
-                    .overlay(Image(systemName: "doc.text.fill").foregroundStyle(.orange))
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(article.title)
-                        .font(.headline)
-                        .lineLimit(2)
-                    Text(article.summary)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(3)
-                }
-                Spacer()
-            }
+        VStack(alignment: .leading, spacing: 4) {
+            Text(article.title)
+                .font(.headline)
+                .lineLimit(2)
+            Text(article.summary)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
         }
+        .padding(.vertical, 2)
     }
 }
 
-private struct RecentArticleCard: View {
-    let article: Article
-    var body: some View {
-        WorkspaceSurfaceCard {
-            VStack(alignment: .leading, spacing: 6) {
-                Text(article.title)
-                    .font(.subheadline.weight(.semibold))
-                    .lineLimit(2)
-                Text(article.summary)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(3)
-            }
-            .frame(width: 170, alignment: .leading)
-        }
-        .frame(width: 190)
-    }
-}
+private struct StatLabel: View {
+    let label: String
+    let value: String
 
-private struct CollectionChip: View {
-    let collection: ArticleCollection
     var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: collection.icon)
-            Text(collection.name)
-                .font(.subheadline.weight(.semibold))
-            Text("\(collection.articles.count)")
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.headline)
+            Text(label)
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(Capsule())
+        .frame(maxWidth: .infinity)
     }
 }

@@ -18,13 +18,13 @@ struct WorkspaceAutomationView: View {
                 HStack {
                     Label("Active", systemImage: "checkmark.circle.fill")
                     Spacer()
-                    Text("\(engine.automations.filter { $0.isEnabled }.count)").foregroundStyle(.green)
+                    Text("\(engine.automations.filter { $0.isEnabled }.count)").foregroundStyle(.primary)
                 }
             } header: {
                 Text("Overview")
             }
 
-            Section("Automations") {
+            Section {
                 if engine.automations.isEmpty {
                     Text("No automations yet. Tap + to create one.")
                         .foregroundStyle(.secondary)
@@ -37,9 +37,11 @@ struct WorkspaceAutomationView: View {
                         offsets.map { engine.automations[$0].id }.forEach { engine.deleteAutomation(id: $0) }
                     }
                 }
+            } header: {
+                Text("Automations")
             }
 
-            Section("Recent Execution Log") {
+            Section {
                 if engine.executionLog.isEmpty {
                     Text("No Executions Yet")
                         .foregroundStyle(.secondary)
@@ -49,6 +51,8 @@ struct WorkspaceAutomationView: View {
                         Text(entry).font(.caption2).foregroundStyle(.secondary)
                     }
                 }
+            } header: {
+                Text("Recent Execution Log")
             }
         }
         .navigationTitle("Automations")
@@ -114,19 +118,23 @@ struct CreateAutomationView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Name") {
+                Section {
                     TextField("Automation Name", text: $name)
+                } header: {
+                    Text("Name")
                 }
 
-                Section("Trigger") {
+                Section {
                     Picker("Event", selection: $trigger) {
                         ForEach(WorkspaceAutomationEngine.TriggerType.allCases, id: \.self) { t in
                             Text(t.rawValue).tag(t)
                         }
                     }
+                } header: {
+                    Text("Trigger")
                 }
 
-                Section("Condition (Optional)") {
+                Section {
                     Picker("Operator", selection: $conditionOp) {
                         ForEach(WorkspaceAutomationEngine.ConditionOperator.allCases, id: \.self) { op in
                             Text(op.rawValue).tag(op)
@@ -136,15 +144,19 @@ struct CreateAutomationView: View {
                         TextField("Field (e.g. taskTitle)", text: $conditionField)
                         TextField("Value", text: $conditionValue)
                     }
+                } header: {
+                    Text("Condition (Optional)")
                 }
 
-                Section("Action") {
+                Section {
                     Picker("Action", selection: $actionType) {
                         ForEach(WorkspaceAutomationEngine.ActionType.allCases, id: \.self) { a in
                             Text(a.rawValue).tag(a)
                         }
                     }
                     TextField("Parameter (Optional)", text: $actionParam)
+                } header: {
+                    Text("Action")
                 }
             }
             .navigationTitle("New Automation")
@@ -185,10 +197,12 @@ struct AutomationDetailView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Trigger") {
+                Section {
                     Label(automation.triggerType.rawValue, systemImage: "bolt.fill")
+                } header: {
+                    Text("Trigger")
                 }
-                Section("Conditions") {
+                Section {
                     if automation.conditions.isEmpty {
                         Text("No Conditions (Always Runs)").foregroundStyle(.secondary)
                     } else {
@@ -196,8 +210,10 @@ struct AutomationDetailView: View {
                             Text("\(c.field) \(c.conditionOperator.rawValue) \(c.value)")
                         }
                     }
+                } header: {
+                    Text("Conditions")
                 }
-                Section("Actions") {
+                Section {
                     if automation.actions.isEmpty {
                         Text("No Actions Defined").foregroundStyle(.secondary)
                     } else {
@@ -205,20 +221,24 @@ struct AutomationDetailView: View {
                             Label(a.actionType.rawValue, systemImage: "play.fill")
                         }
                     }
+                } header: {
+                    Text("Actions")
                 }
-                Section("Stats") {
+                Section {
                     LabeledContent("Executions", value: "\(automation.executionCount)")
                     if let last = automation.lastExecuted {
                         LabeledContent("Last Run", value: last.formatted(date: .abbreviated, time: .shortened))
                     }
                     LabeledContent("Created", value: automation.createdAt.formatted(date: .abbreviated, time: .omitted))
+                } header: {
+                    Text("Stats")
                 }
 
                 Section {
                     Button("Test Fire Now") {
                         engine.fire(trigger: automation.triggerType, context: ["taskTitle": "Test Task"])
                     }
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(.primary)
                 }
             }
             .navigationTitle(automation.name)
@@ -231,7 +251,7 @@ struct AutomationDetailView: View {
                         engine.toggleAutomation(id: automation.id)
                         dismiss()
                     }
-                    .foregroundStyle(automation.isEnabled ? .red : .green)
+                    .foregroundStyle(automation.isEnabled ? Color.red : Color.green)
                 }
             }
         }

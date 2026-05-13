@@ -9,10 +9,10 @@ struct AddDataCollabView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Available Workspace Data") {
+                Section {
                     if framework.indexedObjects.isEmpty {
                         Text("No compatible data found.")
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     } else {
                         ForEach(Array(framework.indexedObjects.keys), id: \.self) { id in
                             let type = framework.indexedObjects[id]!
@@ -27,6 +27,8 @@ struct AddDataCollabView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Available Workspace Data")
                 }
             }
             .searchable(text: $searchText)

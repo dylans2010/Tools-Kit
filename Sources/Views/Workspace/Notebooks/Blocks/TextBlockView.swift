@@ -10,6 +10,6 @@ struct TextBlockView: View {
             .frame(minHeight: 40)
             .fixedSize(horizontal: false, vertical: true)
             .scrollContentBackground(.hidden)
-            .onChange(of: block.content) { _ in onUpdate() }
+            .onChange(of: block.content) { _, _ in onUpdate() }
     }
 }

@@ -10,7 +10,7 @@ struct EventDetailView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.workspaceBackground.ignoresSafeArea()
+                Color(.systemBackground).ignoresSafeArea()
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
@@ -65,8 +65,8 @@ struct EventDetailView: View {
                     .font(.caption.bold())
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
-                    .background(Color(hex: event.priority.color)?.opacity(0.2) ?? .blue.opacity(0.2), in: Capsule())
-                    .foregroundStyle(Color(hex: event.priority.color) ?? .blue)
+                    .background(Color(hex: event.priority.color).opacity(0.2), in: Capsule())
+                    .foregroundStyle(Color(hex: event.priority.color))
 
                 Spacer()
 
@@ -76,28 +76,28 @@ struct EventDetailView: View {
             }
         }
         .padding()
-        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 20))
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 20))
     }
 
     private var detailsSection: some View {
         VStack(spacing: 1) {
             detailRow(icon: "clock", label: "Starts", value: event.startTime.formatted(date: .omitted, time: .shortened))
-            Divider().background(Color.workspaceSurface)
+            Divider().background(Color(.secondarySystemBackground))
             detailRow(icon: "clock.fill", label: "Ends", value: event.endTime.formatted(date: .omitted, time: .shortened))
 
             if !event.location.isEmpty {
-                Divider().background(Color.workspaceSurface)
+                Divider().background(Color(.secondarySystemBackground))
                 detailRow(icon: "mappin.and.ellipse", label: "Location", value: event.location)
             }
         }
-        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 16))
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
     }
 
     private var descriptionSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Label("Agenda & Notes", systemImage: "text.alignleft")
                 .font(.subheadline.bold())
-                .foregroundStyle(.blue)
+                .foregroundStyle(.primary)
 
             Text(event.description)
                 .font(.body)
@@ -110,7 +110,7 @@ struct EventDetailView: View {
 
     private func detailRow(icon: String, label: String, value: String) -> some View {
         HStack {
-            Image(systemName: icon).frame(width: 24).foregroundStyle(.blue)
+            Image(systemName: icon).frame(width: 24).foregroundStyle(.primary)
             Text(label).foregroundStyle(.secondary)
             Spacer()
             Text(value).bold()

@@ -6,7 +6,7 @@ struct GitHubWorkspaceSnapshotView: View {
 
     var body: some View {
         List {
-            Section("Repository Snapshots") {
+            Section {
                 if snapshots.isEmpty {
                     Text("No snapshots found in local storage.")
                         .font(.caption).foregroundStyle(.secondary)
@@ -33,6 +33,8 @@ struct GitHubWorkspaceSnapshotView: View {
                         .padding(.vertical, 4)
                     }
                 }
+            } header: {
+                Text("Repository Snapshots")
             }
 
             Section {

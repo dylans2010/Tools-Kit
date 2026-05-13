@@ -59,7 +59,7 @@ struct LyricsView: View {
                     Color.clear.frame(height: 120)
                 }
             }
-            .onChange(of: engine.currentIndex) { newIdx in
+            .onChange(of: engine.currentIndex) { _, newIdx in
                 guard newIdx >= 0 else { return }
                 withAnimation(.easeInOut(duration: 0.4)) {
                     proxy.scrollTo(newIdx, anchor: .center)
@@ -199,7 +199,7 @@ struct LyricsView: View {
     private var offsetEditorSheet: some View {
         NavigationStack {
             Form {
-                Section("Sync Adjustment") {
+                Section {
                     HStack {
                         Text("Offset (seconds)")
                         Spacer()
@@ -208,6 +208,8 @@ struct LyricsView: View {
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
                     }
+                } header: {
+                    Text("Sync Adjustment")
                 }
                 Section {
                     Text("Positive values delay lyrics; negative values advance them.")

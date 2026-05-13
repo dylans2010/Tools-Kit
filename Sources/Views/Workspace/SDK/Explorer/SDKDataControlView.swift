@@ -1,0 +1,106 @@
+
+
+import SwiftUI
+
+struct SDKDataControlView: View {
+    @State private var showingWarning = true
+    @State private var statusMessage = ""
+    @State private var isProcessing = false
+    @StateObject private var runtime = SDKRuntimeEngine.shared
+
+    var body: some View {
+        Form {
+            if showingWarning {
+                warningSection
+            }
+
+            Section {
+                Button("Reindex All Notes") { runMaintenanceTask("Reindexed all notes") { WorkspaceAPI.shared.notes.listNotes() } }
+                Button("Cleanup Completed Tasks") { cleanupTasks() }
+                Button("Rebuild Intelligence Graph") { runMaintenanceTask("Intelligence graph rebuilt") { WorkspaceAPI.shared.intelligence.getGraph() } }
+                Button("Invalidate SDK Cache") { SDKDataEngine.shared.invalidateCache(); statusMessage = "Cache cleared" }
+                Button("Create Workspace Snapshot") { WorkspaceAPI.shared.timeTravel.createSnapshot(message: "Manual snapshot"); statusMessage = "Snapshot created" }
+            } header: {
+                Text("System Maintenance")
+            } footer: {
+                Text("Direct manipulation of data structures can lead to permanent loss.")
+            }
+
+            if !statusMessage.isEmpty {
+                Section {
+                    Text(statusMessage)
+                        .font(.subheadline.bold())
+                        .foregroundStyle(isProcessing ? Color.secondary : Color.green)
+                } header: {
+                    Text("Status")
+                }
+            }
+
+            Section {
+                Toggle(isOn: $runtime.isNoSandboxModeEnabled) {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("No-Sandbox Mode")
+                            Text("Bypass execution restrictions")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "shield.slash")
+                            .foregroundStyle(runtime.isNoSandboxModeEnabled ? Color.red : Color.secondary)
+                    }
+                }
+                .tint(.red)
+            } header: {
+                Text("Security Control")
+            }
+
+            Section {
+                NavigationLink {
+                    EntityExplorerView()
+                } label: {
+                    Label("System Snapshots", systemImage: "clock.arrow.circlepath")
+                }
+            } header: {
+                Text("State Recovery")
+            }
+        }
+        .navigationTitle("Data Control")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var warningSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 12) {
+                Label("High Risk Access", systemImage: "exclamationmark.shield.fill")
+                    .font(.headline)
+                    .foregroundStyle(.red)
+                Text("This interface allows direct manipulation of workspace data. Incorrect operations may lead to data corruption.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Button("Acknowledge & Continue") { showingWarning = false }
+                    .buttonStyle(.bordered)
+                    .tint(.red)
+            }
+            .padding(.vertical, 8)
+        }
+    }
+
+    private func runMaintenanceTask(_ label: String, action: () -> Void) {
+        isProcessing = true
+        action()
+        statusMessage = label
+        isProcessing = false
+        SDKLogStore.shared.log(label, source: "SDKDataControlView", level: .info)
+    }
+
+    private func cleanupTasks() {
+        isProcessing = true
+        let tasks = WorkspaceAPI.shared.tasks.listTasks()
+        let completed = tasks.filter { $0.completed }
+        for task in completed { TasksManager.shared.deleteTask(task) }
+        statusMessage = "Cleaned up \(completed.count) tasks"
+        isProcessing = false
+        SDKLogStore.shared.log(statusMessage, source: "SDKDataControlView", level: .info)
+    }
+}

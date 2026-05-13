@@ -31,12 +31,20 @@ struct PageEditorView: View {
     @State private var canvasNotes: [CanvasNote] = []
     @State private var canvasZoom: CGFloat = 1.0
 
+    // Sheet states
     @State private var showingSearch = false
     @State private var showingCompare = false
     @State private var showingComments = false
     @State private var showingLogs = false
+    @State private var showingAttachments = false
+    @State private var showingPageInfo = false
+    @State private var showingCanvasSettings = false
+    @State private var showingAIResult = false
+    @State private var showingBlockPicker = false
+    @State private var showingVersionHistory = false
+    @State private var showingCitations = false
+    @State private var showingUnsplash = false
 
-    // 1.5 seconds in nanoseconds for autosave debounce.
     private let autosaveDelayNanoseconds: UInt64 = 1_500_000_000
     private let defaultNoteSpawn = CGPoint(x: 320, y: 320)
     private let bootstrapFirstNote = CGPoint(x: 220, y: 220)
@@ -71,15 +79,11 @@ struct PageEditorView: View {
             VStack(spacing: 0) {
                 topTitleBar
                     .padding(.horizontal)
-                    .padding(.top, 14)
+                    .padding(.top, 10)
 
                 modeSwitcher
                     .padding(.horizontal)
-                    .padding(.top, 8)
-
-                aiQuickActions
-                    .padding(.horizontal)
-                    .padding(.top, 8)
+                    .padding(.top, 6)
 
                 Group {
                     if editorMode == .notes {
@@ -88,79 +92,66 @@ struct PageEditorView: View {
                         infiniteCanvas
                     }
                 }
-                .padding(.top, 8)
-
-                attachmentsSection
-                    .padding(.horizontal)
-                    .padding(.bottom, editorMode == .notes ? 74 : 16)
-            }
-
-            if !aiResult.isEmpty {
-                aiOverlay
+                .padding(.top, 6)
             }
 
             if editorMode == .notes && !isPreview {
                 formattingToolbar
-                    .padding(.bottom, 18)
+                    .padding(.bottom, 8)
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Button {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        isPreview.toggle()
-                    }
-                } label: {
-                    Image(systemName: isPreview ? "pencil" : "eye")
-                }
-                .disabled(editorMode == .canvas)
-
-                PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
-                    Image(systemName: "photo")
-                }
-
-                Button {
-                    showingFilePicker = true
-                } label: {
-                    Image(systemName: "paperclip")
-                }
-
-                Button {
-                    showingAI = true
-                } label: {
-                    Image(systemName: "sparkles")
-                }
-
-                Menu {
-                    Button { showingSearch = true } label: {
-                        Label("Search Pages", systemImage: "magnifyingglass")
-                    }
-                    Button { showingCompare = true } label: {
-                        Label("Compare Pages", systemImage: "arrow.left.and.right")
-                    }
-                    Button { showingComments = true } label: {
-                        Label("Comments", systemImage: "bubble.left.and.right")
-                    }
-                    Button { showingLogs = true } label: {
-                        Label("Audit Logs", systemImage: "clock.arrow.circlepath")
-                    }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                }
-            }
-        }
+        .toolbar { toolbarContent }
         .sheet(isPresented: $showingSearch) {
             NotebookSearchPageView()
+                .presentationDetents([.large])
         }
         .sheet(isPresented: $showingCompare) {
             NotebookComparePagesView()
+                .presentationDetents([.large])
         }
         .sheet(isPresented: $showingComments) {
             NotebookAddCommentsView(pageID: page.id)
+                .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $showingLogs) {
             NotebookAuditLogsView(pageID: page.id)
+                .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showingAttachments) {
+            attachmentsSheet
+                .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showingPageInfo) {
+            pageInfoSheet
+                .presentationDetents([.medium])
+        }
+        .sheet(isPresented: $showingAIResult) {
+            aiResultSheet
+                .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showingBlockPicker) {
+            blockPickerSheet
+                .presentationDetents([.medium])
+        }
+        .sheet(isPresented: $showingVersionHistory) {
+            Text("Version history is currently unavailable in this build.")
+                .foregroundStyle(.secondary)
+                .padding()
+                .presentationDetents([.large])
+        }
+        .sheet(isPresented: $showingCitations) {
+            CitationFormatsView()
+                .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showingUnsplash) {
+            UnsplashImagesView { photo in
+                insertUnsplashImage(photo)
+            }
+        }
+        .sheet(isPresented: $showingCanvasSettings) {
+            canvasSettingsSheet
+                .presentationDetents([.medium])
         }
         .confirmationDialog("Notebook AI Tools", isPresented: $showingAI, titleVisibility: .visible) {
             Button("Summarize Page") { runAI("Summarize", "Summarize these notes with concise key takeaways and decisions:\n\n\(content)") }
@@ -173,8 +164,13 @@ struct PageEditorView: View {
             }
             Button("Cancel", role: .cancel) {}
         }
-        .onChange(of: selectedPhotoItem) { newItem in
+        .onChange(of: selectedPhotoItem) { _, newItem in
             Task { await importPhoto(newItem) }
+        }
+        .onChange(of: aiResult) { _, newValue in
+            if !newValue.isEmpty && newValue != "Loading…" {
+                showingAIResult = true
+            }
         }
         .fileImporter(isPresented: $showingFilePicker, allowedContentTypes: [.item], allowsMultipleSelection: true) { result in
             importFiles(result)
@@ -182,6 +178,84 @@ struct PageEditorView: View {
         .onAppear(perform: bootstrapCanvas)
         .onDisappear { save() }
     }
+
+    // MARK: - Toolbar
+
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .navigationBarTrailing) {
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                    isPreview.toggle()
+                }
+            } label: {
+                Image(systemName: isPreview ? "pencil" : "eye")
+            }
+            .disabled(editorMode == .canvas)
+
+            Menu {
+                Section("Insert") {
+                    PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                        Label("Photo", systemImage: "photo")
+                    }
+                    Button { showingUnsplash = true } label: {
+                        Label("Unsplash Image", systemImage: "photo.on.rectangle.angled")
+                    }
+                    Button { showingFilePicker = true } label: {
+                        Label("File", systemImage: "paperclip")
+                    }
+                    Button { showingBlockPicker = true } label: {
+                        Label("Block", systemImage: "plus.square")
+                    }
+                }
+
+                Section("Tools") {
+                    Button { showingAI = true } label: {
+                        Label("AI Assistant", systemImage: "sparkles")
+                    }
+                    Button { showingSearch = true } label: {
+                        Label("Search Pages", systemImage: "magnifyingglass")
+                    }
+                    Button { showingCompare = true } label: {
+                        Label("Compare Pages", systemImage: "arrow.left.and.right")
+                    }
+                    Button { showingCitations = true } label: {
+                        Label("Citations", systemImage: "quote.opening")
+                    }
+                }
+
+                Section("Review") {
+                    Button { showingComments = true } label: {
+                        Label("Comments", systemImage: "bubble.left.and.right")
+                    }
+                    Button { showingLogs = true } label: {
+                        Label("Audit Logs", systemImage: "clock.arrow.circlepath")
+                    }
+                    Button { showingVersionHistory = true } label: {
+                        Label("Version History", systemImage: "clock.badge.checkmark")
+                    }
+                }
+
+                Section("Page") {
+                    Button { showingAttachments = true } label: {
+                        Label("Attachments (\(attachments.count))", systemImage: "paperclip")
+                    }
+                    Button { showingPageInfo = true } label: {
+                        Label("Page Info", systemImage: "info.circle")
+                    }
+                    if editorMode == .canvas {
+                        Button { showingCanvasSettings = true } label: {
+                            Label("Canvas Settings", systemImage: "slider.horizontal.3")
+                        }
+                    }
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
+            }
+        }
+    }
+
+    // MARK: - Background
 
     private var backgroundGradient: LinearGradient {
         LinearGradient(
@@ -193,33 +267,38 @@ struct PageEditorView: View {
         )
     }
 
+    // MARK: - Top Title Bar
+
     private var topTitleBar: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
             TextField("Untitled Page", text: $title)
-                .font(.system(size: 30, weight: .bold, design: .rounded))
-                .onChange(of: title) { _ in scheduleAutosave() }
-            HStack(spacing: 8) {
+                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .onChange(of: title) { _, _ in scheduleAutosave() }
+
+            HStack(spacing: 6) {
                 Label("\(content.split { $0.isWhitespace }.count) words", systemImage: "textformat.abc")
-                Text("•")
-                Text("\(attachments.count) attachments")
-                Text("•")
-                Text("Edited \(page.updatedAt, style: .time)")
+                Text("·")
+                Text("\(attachments.count) files")
+                Text("·")
+                Text(page.updatedAt, style: .time)
             }
-            .font(.caption)
+            .font(.caption2)
             .foregroundStyle(.secondary)
         }
     }
 
+    // MARK: - Mode Switcher
+
     private var modeSwitcher: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 6) {
             ForEach(EditorMode.allCases, id: \.self) { mode in
                 Button {
                     withAnimation(.easeInOut(duration: 0.2)) { editorMode = mode }
                 } label: {
                     Label(mode.rawValue, systemImage: mode.icon)
-                        .font(.footnote.weight(.semibold))
+                        .font(.caption.weight(.semibold))
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
+                        .padding(.vertical, 7)
                         .background(
                             Capsule().fill(editorMode == mode ? Color.accentColor.opacity(0.18) : Color(.secondarySystemBackground))
                         )
@@ -229,9 +308,13 @@ struct PageEditorView: View {
         }
     }
 
+    // MARK: - Notes Editor
+
     private var notesEditor: some View {
         ScrollView {
-            VStack(spacing: 12) {
+            VStack(spacing: 10) {
+                aiQuickActions
+
                 if isPreview {
                     Text(renderPreview(content))
                         .padding(16)
@@ -263,41 +346,48 @@ struct PageEditorView: View {
                     }
 
                     Button {
-                        manager.addBlock(to: page.id, folderID: folderID, notebookID: notebookID, kind: .text)
+                        showingBlockPicker = true
                     } label: {
                         Label("Add Block", systemImage: "plus.circle")
                     }
                     .buttonStyle(.bordered)
-                    .padding(.top, 8)
+                    .padding(.top, 6)
                 }
             }
             .padding(.horizontal, 16)
+            .padding(.bottom, 80)
         }
     }
 
+    // MARK: - Infinite Canvas
+
     private var infiniteCanvas: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 10) {
+        VStack(spacing: 6) {
+            HStack(spacing: 8) {
                 Button {
                     canvasNotes.append(CanvasNote(text: "New Note", position: defaultNoteSpawn))
                     scheduleAutosave()
                 } label: {
-                    Label("Add Note", systemImage: "plus.square.on.square")
+                    Label("Add", systemImage: "plus.square.on.square")
+                        .font(.caption)
                 }
                 .buttonStyle(.bordered)
+                .controlSize(.small)
 
-                HStack(spacing: 8) {
-                    Text("Zoom")
-                        .font(.caption)
+                Spacer()
+
+                HStack(spacing: 4) {
+                    Image(systemName: "minus.magnifyingglass")
+                        .font(.caption2)
                         .foregroundStyle(.secondary)
                     Slider(value: $canvasZoom, in: 0.5...1.8)
-                        .frame(maxWidth: 160)
+                        .frame(maxWidth: 120)
+                    Image(systemName: "plus.magnifyingglass")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
                 }
-                Spacer()
-                Text("Infinite Canvas")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
             }
+            .padding(.horizontal)
 
             ScrollView([.horizontal, .vertical]) {
                 ZStack(alignment: .topLeading) {
@@ -314,7 +404,6 @@ struct PageEditorView: View {
                 .padding(20)
             }
         }
-        .padding(.horizontal)
     }
 
     private var canvasGrid: some View {
@@ -338,106 +427,7 @@ struct PageEditorView: View {
         }
     }
 
-    private var attachmentsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Label("Attachments", systemImage: "paperclip")
-                    .font(.subheadline.weight(.semibold))
-                Spacer()
-                if !attachments.isEmpty {
-                    Button("Clear") {
-                        attachments.removeAll()
-                        scheduleAutosave()
-                    }
-                    .font(.caption.weight(.semibold))
-                }
-            }
-
-            if attachments.isEmpty {
-                Text("No attachments yet. Add images or files from the toolbar.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(attachments, id: \.self) { item in
-                            HStack(spacing: 6) {
-                                Image(systemName: iconForAttachment(item))
-                                Text(item)
-                                    .lineLimit(1)
-                            }
-                            .font(.caption)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 7)
-                            .background(Color.accentColor.opacity(0.14), in: Capsule())
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private var aiOverlay: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Label("AI \(aiTask)", systemImage: "sparkles")
-                    .font(.headline)
-                Spacer()
-                Button { aiResult = "" } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.white.opacity(0.75))
-                }
-            }
-
-            if aiLoading {
-                HStack {
-                    Spacer()
-                    ProgressView().tint(.white)
-                    Spacer()
-                }
-            } else {
-                ScrollView {
-                    Group {
-                        if let parsed = try? AttributedString(markdown: aiResult) {
-                            Text(parsed)
-                        } else {
-                            Text(aiResult)
-                        }
-                    }
-                    .font(.callout)
-                    .lineSpacing(4)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .frame(maxHeight: 220)
-
-                HStack(spacing: 10) {
-                    Button {
-                        UIPasteboard.general.string = aiResult
-                    } label: {
-                        Label("Copy", systemImage: "doc.on.doc")
-                    }
-                    .buttonStyle(.bordered)
-
-                    Button {
-                        content += "\n\n" + aiResult
-                        editorMode = .notes
-                        scheduleAutosave()
-                    } label: {
-                        Label("Insert", systemImage: "plus.bubble")
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-            }
-        }
-        .padding()
-        .background(
-            LinearGradient(colors: [.indigo, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
-        )
-        .foregroundColor(.white)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .shadow(radius: 10)
-        .padding()
-    }
+    // MARK: - Formatting Toolbar
 
     private var formattingToolbar: some View {
         HStack(spacing: 14) {
@@ -450,14 +440,16 @@ struct PageEditorView: View {
             toolbarIcon("checklist") { insert("- [ ] ") }
         }
         .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .padding(.vertical, 10)
         .background(.ultraThinMaterial, in: Capsule())
         .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
     }
 
+    // MARK: - AI Quick Actions
+
     private var aiQuickActions: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+            HStack(spacing: 6) {
                 quickActionChip("Summarize", icon: "text.alignleft") {
                     runAI("Summarize", "Summarize these notes in concise markdown bullets:\n\n\(content)")
                 }
@@ -471,7 +463,240 @@ struct PageEditorView: View {
                     runAI("Study", "Turn this into study guide with key terms and quiz prompts:\n\n\(content)")
                 }
             }
-            .padding(.vertical, 4)
+            .padding(.vertical, 2)
+        }
+    }
+
+    // MARK: - Attachments Sheet
+
+    private var attachmentsSheet: some View {
+        NavigationStack {
+            List {
+                if attachments.isEmpty {
+                    ContentUnavailableView("No Attachments", systemImage: "paperclip", description: Text("Add images or files from the toolbar."))
+                } else {
+                    ForEach(attachments, id: \.self) { item in
+                        HStack(spacing: 10) {
+                            Image(systemName: iconForAttachment(item))
+                                .font(.title3)
+                                .foregroundStyle(.blue)
+                                .frame(width: 32)
+                            Text(item)
+                                .font(.subheadline)
+                                .lineLimit(1)
+                            Spacer()
+                        }
+                        .padding(.vertical, 2)
+                    }
+                    .onDelete { idxs in
+                        attachments.remove(atOffsets: idxs)
+                        scheduleAutosave()
+                    }
+                }
+            }
+            .navigationTitle("Attachments")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showingAttachments = false }.bold()
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    if !attachments.isEmpty {
+                        Button("Clear All", role: .destructive) {
+                            attachments.removeAll()
+                            scheduleAutosave()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Page Info Sheet
+
+    private var pageInfoSheet: some View {
+        NavigationStack {
+            List {
+                Section("Statistics") {
+                    infoRow("Words", value: "\(content.split { $0.isWhitespace }.count)")
+                    infoRow("Characters", value: "\(content.count)")
+                    infoRow("Lines", value: "\(content.components(separatedBy: .newlines).count)")
+                    infoRow("Paragraphs", value: "\(content.components(separatedBy: "\n\n").count)")
+                    infoRow("Blocks", value: "\(page.blocks.count)")
+                    infoRow("Attachments", value: "\(attachments.count)")
+                }
+
+                Section("Timestamps") {
+                    infoRow("Created", value: page.createdAt.formatted(date: .long, time: .shortened))
+                    infoRow("Modified", value: page.updatedAt.formatted(date: .long, time: .shortened))
+                }
+
+                Section("Reading Time") {
+                    let wordCount = content.split { $0.isWhitespace }.count
+                    let minutes = max(1, wordCount / 200)
+                    infoRow("Estimated", value: "\(minutes) min read")
+                }
+            }
+            .navigationTitle("Page Info")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showingPageInfo = false }.bold()
+                }
+            }
+        }
+    }
+
+    // MARK: - AI Result Sheet
+
+    private var aiResultSheet: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    if aiLoading {
+                        HStack {
+                            ProgressView()
+                            Text("Processing…")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 40)
+                    } else {
+                        Label("AI \(aiTask)", systemImage: "sparkles")
+                            .font(.headline)
+
+                        Group {
+                            if let parsed = try? AttributedString(markdown: aiResult) {
+                                Text(parsed)
+                            } else {
+                                Text(aiResult)
+                            }
+                        }
+                        .font(.body)
+                        .lineSpacing(4)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .padding()
+            }
+            .navigationTitle("AI Result")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showingAIResult = false }.bold()
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    Menu {
+                        Button {
+                            UIPasteboard.general.string = aiResult
+                        } label: {
+                            Label("Copy", systemImage: "doc.on.doc")
+                        }
+                        Button {
+                            content += "\n\n" + aiResult
+                            editorMode = .notes
+                            scheduleAutosave()
+                            showingAIResult = false
+                        } label: {
+                            Label("Insert into Page", systemImage: "plus.bubble")
+                        }
+                        Button {
+                            aiResult = ""
+                        } label: {
+                            Label("Dismiss Result", systemImage: "xmark")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Block Picker Sheet
+
+    private var blockPickerSheet: some View {
+        NavigationStack {
+            List {
+                Section("Content Blocks") {
+                    blockPickerRow("Text", icon: "doc.text", kind: .text)
+                    blockPickerRow("Code", icon: "chevron.left.forwardslash.chevron.right", kind: .code)
+                    blockPickerRow("Toggle", icon: "chevron.down.circle", kind: .toggle)
+                }
+                Section("Data Blocks") {
+                    blockPickerRow("Database", icon: "tablecells", kind: .database)
+                    blockPickerRow("Embed", icon: "link", kind: .embed)
+                    blockPickerRow("Widget", icon: "square.grid.2x2", kind: .widget)
+                }
+            }
+            .navigationTitle("Add Block")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Cancel") { showingBlockPicker = false }
+                }
+            }
+        }
+    }
+
+    private func blockPickerRow(_ title: String, icon: String, kind: NotebookBlock.BlockKind) -> some View {
+        Button {
+            manager.addBlock(to: page.id, folderID: folderID, notebookID: notebookID, kind: kind)
+            showingBlockPicker = false
+        } label: {
+            Label(title, systemImage: icon)
+        }
+    }
+
+    // MARK: - Canvas Settings Sheet
+
+    private var canvasSettingsSheet: some View {
+        NavigationStack {
+            Form {
+                Section("Zoom") {
+                    HStack {
+                        Text("Scale: \(String(format: "%.0f%%", canvasZoom * 100))")
+                            .font(.subheadline)
+                        Spacer()
+                        Button("Reset") { canvasZoom = 1.0 }
+                            .font(.caption)
+                    }
+                    Slider(value: $canvasZoom, in: 0.5...1.8)
+                }
+
+                Section("Notes") {
+                    HStack {
+                        Text("Count")
+                        Spacer()
+                        Text("\(canvasNotes.count)")
+                            .foregroundStyle(.secondary)
+                    }
+                    Button(role: .destructive) {
+                        canvasNotes.removeAll()
+                    } label: {
+                        Label("Clear All Notes", systemImage: "trash")
+                    }
+                }
+            }
+            .navigationTitle("Canvas Settings")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showingCanvasSettings = false }.bold()
+                }
+            }
+        }
+    }
+
+    // MARK: - Helpers
+
+    private func infoRow(_ label: String, value: String) -> some View {
+        HStack {
+            Text(label).foregroundStyle(.secondary)
+            Spacer()
+            Text(value).font(.subheadline.monospaced())
         }
     }
 
@@ -555,6 +780,13 @@ struct PageEditorView: View {
         ]
     }
 
+    private func insertUnsplashImage(_ photo: UnsplashPhoto) {
+        let imageURL = photo.urls.regular
+        let credit = "Photo by \(photo.user.name) on Unsplash"
+        content += "\n\n![\(photo.altDescription ?? "Unsplash image")](\(imageURL))\n*\(credit)*"
+        scheduleAutosave()
+    }
+
     private func importPhoto(_ item: PhotosPickerItem?) async {
         guard let item else { return }
         do {
@@ -623,6 +855,7 @@ private struct CanvasStickyNote: View {
     var body: some View {
         TextField("Note", text: $note.text, axis: .vertical)
             .textFieldStyle(.plain)
+            .skillPicker(text: $note.text)
             .padding(12)
             .frame(width: 220, height: 130, alignment: .topLeading)
             .background(
@@ -691,10 +924,10 @@ struct BlockRenderer: View {
 
     private func icon(for kind: NotebookBlock.BlockKind) -> String {
         switch kind {
-        case .text: return "text.alignleft"
+        case .text: return "doc.text"
         case .code: return "chevron.left.forwardslash.chevron.right"
         case .database: return "tablecells"
-        case .toggle: return "chevron.right.circle"
+        case .toggle: return "chevron.down.circle"
         case .embed: return "link"
         case .widget: return "square.grid.2x2"
         }

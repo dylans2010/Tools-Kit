@@ -15,7 +15,9 @@ public final class SDKRuntimeEngine: ObservableObject {
     private init() {}
 
     public func runProject(_ project: SDKProjectLegacy) {
-        SDKConsoleView.LogBus.shared.log("Starting project: \(project.name)", type: .info)
+        Task { @MainActor in
+            await SDKLogStore.shared.log("Starting project: \(project.name)", source: "SDKRuntimeEngine", level: .info)
+        }
 
         let executionContext = SDKExecutionContext(
             projectID: project.id,
@@ -26,9 +28,13 @@ public final class SDKRuntimeEngine: ObservableObject {
         Task {
             do {
                 try await performExecution(project: project, context: executionContext)
-                SDKConsoleView.LogBus.shared.log("Project \(project.name) executed successfully.", type: .success)
+                Task { @MainActor in
+                    await SDKLogStore.shared.log("Project \(project.name) executed successfully.", source: "SDKRuntimeEngine", level: .info)
+                }
             } catch {
-                SDKConsoleView.LogBus.shared.log("Project \(project.name) failed: \(error.localizedDescription)", type: .error)
+                Task { @MainActor in
+                    await SDKLogStore.shared.log("Project \(project.name) failed: \(error.localizedDescription)", source: "SDKRuntimeEngine", level: .error)
+                }
             }
         }
     }
@@ -36,7 +42,9 @@ public final class SDKRuntimeEngine: ObservableObject {
     private func performExecution(project: SDKProjectLegacy, context: SDKExecutionContext) async throws {
         // Use SDKExecutionKernel for coordinated execution
         if context.noSandbox {
-            SDKConsoleView.LogBus.shared.log("WARNING: Running in noSandbox mode. Restrictions bypassed.", type: .warning)
+            Task { @MainActor in
+                await SDKLogStore.shared.log("WARNING: Running in noSandbox mode. Restrictions bypassed.", source: "SDKRuntimeEngine", level: .warning)
+            }
             try await SDKNoSandboxOverrideController.shared.executeUnrestricted(project.sourceCode)
         } else {
             try await SDKSandboxController.shared.execute(project.sourceCode, context: context)
@@ -45,7 +53,9 @@ public final class SDKRuntimeEngine: ObservableObject {
 
     public func stopProject(id: UUID) {
         activeProjects.removeAll { $0.id == id }
-        SDKConsoleView.LogBus.shared.log("Stopped project: \(id)", type: .info)
+        Task { @MainActor in
+            await SDKLogStore.shared.log("Stopped project: \(id)", source: "SDKRuntimeEngine", level: .info)
+        }
     }
 }
 

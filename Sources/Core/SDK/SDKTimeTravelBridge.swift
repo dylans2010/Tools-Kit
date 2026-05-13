@@ -25,7 +25,7 @@ public final class SDKTimeTravelBridge: ObservableObject {
 
     // MARK: - Get History
 
-    public func getHistory(scope: SDKScope?, from: Date?, to: Date?) -> [WorkspaceSnapshot] {
+    internal func getHistory(scope: SDKScope?, from: Date?, to: Date?) -> [WorkspaceSnapshot] {
         var snapshots = WorkspaceAPI.shared.timeTravel.listSnapshots()
 
         if let from = from {
@@ -35,7 +35,7 @@ public final class SDKTimeTravelBridge: ObservableObject {
             snapshots = snapshots.filter { $0.timestamp <= to }
         }
 
-        SDKLogStore.shared.log("Retrieved \(snapshots.count) snapshots", source: "SDKTimeTravelBridge", level: .info)
+        SDKLogStore.shared.log("Retrieved \(snapshots.count) snapshots", source: "SDKTimeTravelBridge", level: LogLevel.info)
         return snapshots
     }
 
@@ -53,7 +53,7 @@ public final class SDKTimeTravelBridge: ObservableObject {
         )
         appendRecord(record)
 
-        SDKLogStore.shared.log("Snapshot restored: \(snapshotID)", source: "SDKTimeTravelBridge", level: .info)
+        SDKLogStore.shared.log("Snapshot restored: \(snapshotID)", source: "SDKTimeTravelBridge", level: LogLevel.info)
     }
 
     // MARK: - Create Snapshot
@@ -70,7 +70,7 @@ public final class SDKTimeTravelBridge: ObservableObject {
         )
         appendRecord(record)
 
-        SDKLogStore.shared.log("Snapshot created: \(message)", source: "SDKTimeTravelBridge", level: .info)
+        SDKLogStore.shared.log("Snapshot created: \(message)", source: "SDKTimeTravelBridge", level: LogLevel.info)
     }
 
     // MARK: - Diff
@@ -102,7 +102,7 @@ public final class SDKTimeTravelBridge: ObservableObject {
         )
         appendRecord(record)
 
-        SDKLogStore.shared.log("Diff computed: \(snapshotA) vs \(snapshotB)", source: "SDKTimeTravelBridge", level: .info)
+        SDKLogStore.shared.log("Diff computed: \(snapshotA) vs \(snapshotB)", source: "SDKTimeTravelBridge", level: LogLevel.info)
         return diffResult
     }
 

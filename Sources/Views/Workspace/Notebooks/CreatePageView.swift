@@ -10,8 +10,10 @@ struct CreatePageView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Page Title") {
+                Section {
                     TextField("Enter Page Title", text: $title)
+                } header: {
+                    Text("Page Title")
                 }
             }
             .navigationTitle("New Page")

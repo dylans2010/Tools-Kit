@@ -6,7 +6,7 @@ struct GitHubRefactorPlannerView: View {
 
     var body: some View {
         List {
-            Section("Refactor Roadmap") {
+            Section {
                 if isAnalyzing {
                     HStack {
                         ProgressView()
@@ -26,11 +26,13 @@ struct GitHubRefactorPlannerView: View {
                             Text(step.description).font(.caption).foregroundStyle(.secondary)
 
                             ProgressView(value: step.progress)
-                                .tint(.purple)
+                                .tint(.secondary)
                         }
                         .padding(.vertical, 4)
                     }
                 }
+            } header: {
+                Text("Refactor Roadmap")
             }
 
             Section {

@@ -6,19 +6,26 @@ struct IntegrationsHomeView: View {
 
     var body: some View {
         List {
-            Section("My Workflows") {
+            Section {
                 if dataStore.integrationWorkflows.isEmpty {
-                    Text("No workflows created yet.")
-                        .foregroundColor(.secondary)
+                    ContentUnavailableView(
+                        "No Workflows",
+                        systemImage: "square.grid.3x3.topleft.filled",
+                        description: Text("Create a workflow to connect your services.")
+                    )
                 } else {
                     ForEach(dataStore.integrationWorkflows) { workflow in
                         HStack {
-                            VStack(alignment: .leading) {
-                                Text(workflow.name)
-                                    .font(.subheadline.bold())
-                                Text(workflow.description)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                            Label {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(workflow.name)
+                                        .font(.subheadline.bold())
+                                    Text(workflow.description)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            } icon: {
+                                Image(systemName: "bolt.circle")
                             }
                             Spacer()
                             Toggle("", isOn: .constant(workflow.isEnabled))
@@ -27,64 +34,76 @@ struct IntegrationsHomeView: View {
                     }
                 }
 
-                Button("Create New Workflow") {
+                Button {
                     showingWorkflowBuilder = true
+                } label: {
+                    Label("Create New Workflow", systemImage: "plus.circle")
                 }
+            } header: {
+                Label("My Workflows", systemImage: "bolt.horizontal")
             }
 
-            Section("Execution History") {
-                HistoryRow(name: "Daily Sync", status: "Success", time: "2h ago")
-                HistoryRow(name: "Slack Notify", status: "Failed", time: "5h ago")
-                HistoryRow(name: "GitHub Issue Creator", status: "Success", time: "1d ago")
-            }
-
-            Section("Performance Analytics") {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("Total Executions").font(.caption).foregroundColor(.secondary)
-                        Text("1,248").font(.headline)
-                    }
-                    Spacer()
-                    VStack(alignment: .trailing) {
-                        Text("Success Rate").font(.caption).foregroundColor(.secondary)
-                        Text("99.2%").font(.headline).foregroundColor(.green)
+            Section {
+                ForEach(dataStore.executionHistory) { entry in
+                    HStack {
+                        Label {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(entry.name)
+                                    .font(.subheadline)
+                                Text(entry.time)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                        } icon: {
+                            Image(systemName: entry.status == "Success" ? "checkmark.circle" : "xmark.circle")
+                        }
+                        Spacer()
+                        Text(entry.status)
+                            .font(.caption2.bold())
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(
+                                entry.status == "Success"
+                                    ? Color(.systemGreen).opacity(0.1)
+                                    : Color(.systemRed).opacity(0.1),
+                                in: Capsule()
+                            )
                     }
                 }
-                .padding(.vertical, 4)
+            } header: {
+                Label("Execution History", systemImage: "clock.arrow.circlepath")
             }
 
-            Section("Connections") {
-                NavigationLink("Manage Connections") {
+            Section {
+                LabeledContent {
+                    Text("\(dataStore.totalExecutions)")
+                        .font(.headline)
+                } label: {
+                    Label("Total Executions", systemImage: "number")
+                }
+                LabeledContent {
+                    Text(String(format: "%.1f%%", dataStore.successRate))
+                        .font(.headline)
+                } label: {
+                    Label("Success Rate", systemImage: "chart.bar")
+                }
+            } header: {
+                Label("Performance Analytics", systemImage: "chart.xyaxis.line")
+            }
+
+            Section {
+                NavigationLink {
                     IntegrationConnectionsView()
+                } label: {
+                    Label("Manage Connections", systemImage: "link")
                 }
+            } header: {
+                Label("Connections", systemImage: "cable.connector")
             }
         }
         .navigationTitle("Integrations")
         .sheet(isPresented: $showingWorkflowBuilder) {
-WorkflowBuilderView()
-        }
-    }
-}
-
-struct HistoryRow: View {
-    let name: String
-    let status: String
-    let time: String
-
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(name).font(.subheadline)
-                Text(time).font(.caption2).foregroundColor(.secondary)
-            }
-            Spacer()
-            Text(status)
-                .font(.caption2.bold())
-                .padding(.horizontal, 8)
-                .padding(.vertical, 2)
-                .background(status == "Success" ? Color.green.opacity(0.1) : Color.red.opacity(0.1))
-                .foregroundColor(status == "Success" ? .green : .red)
-                .cornerRadius(4)
+            WorkflowBuilderView()
         }
     }
 }
@@ -92,10 +111,16 @@ struct HistoryRow: View {
 struct IntegrationConnectionsView: View {
     var body: some View {
         List {
-            Label("GitHub", systemImage: "terminal.fill")
-            Label("Slack", systemImage: "message.fill")
-            Label("Gmail", systemImage: "envelope.fill")
-            Label("Calendar", systemImage: "calendar")
+            Section {
+                Label("GitHub", systemImage: "terminal.fill")
+                Label("Slack", systemImage: "message.fill")
+                Label("Gmail", systemImage: "envelope.fill")
+                Label("Calendar", systemImage: "calendar")
+                Label("Jira", systemImage: "checklist")
+                Label("Notion", systemImage: "doc.text")
+            } header: {
+                Label("Available Services", systemImage: "square.grid.3x3")
+            }
         }
         .navigationTitle("Connections")
     }

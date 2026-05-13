@@ -55,7 +55,7 @@ struct ProjectDetailsView: View {
                 showFileImporter = false
             }
         }
-        .onChange(of: selectedPhotoItem) { item in
+        .onChange(of: selectedPhotoItem) { _, item in
             guard let item = item else { return }
             loadPhoto(from: item)
         }
@@ -100,7 +100,7 @@ struct ProjectDetailsView: View {
                 HStack {
                     ZStack {
                         RoundedRectangle(cornerRadius: 14)
-                            .fill(Color(hex: currentProject.colorHex) ?? .blue)
+                            .fill(Color(hex: currentProject.colorHex))
                             .frame(width: 56, height: 56)
                         Image(systemName: currentProject.iconName)
                             .font(.title2)

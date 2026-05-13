@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 /// A high-performance, Git-like version control engine for workspace modules.
+@MainActor
 final class VersionControlManager: ObservableObject {
     static let shared = VersionControlManager()
 
@@ -36,6 +37,33 @@ final class VersionControlManager: ObservableObject {
         } else {
             branches[branchName] = Branch(id: UUID(), name: branchName, headCommitID: commit.id)
         }
+    }
+
+    func getHistory(for branchName: String) -> [Commit] {
+        guard var nextCommitID = branches[branchName]?.headCommitID else { return [] }
+        var history: [Commit] = []
+
+        while let commit = commits[nextCommitID] {
+            history.append(commit)
+            guard let parentID = commit.parentID else { break }
+            nextCommitID = parentID
+        }
+
+        return history
+    }
+
+    @discardableResult
+    func restoreVersion(id: UUID, on branchName: String = "main") -> Data? {
+        guard let commit = commits[id] else { return nil }
+
+        if var branch = branches[branchName] {
+            branch.headCommitID = id
+            branches[branchName] = branch
+        } else {
+            branches[branchName] = Branch(id: UUID(), name: branchName, headCommitID: id)
+        }
+
+        return commit.dataSnapshot
     }
 
     func diff(commitA: UUID, commitB: UUID) -> String {

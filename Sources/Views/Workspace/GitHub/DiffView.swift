@@ -20,7 +20,7 @@ struct DiffView: View {
                 } else {
                     Text("No patch available (binary or too large).")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .padding()
                 }
             }
@@ -58,9 +58,9 @@ struct DiffView: View {
     @ViewBuilder
     private func lineView(for line: String) -> some View {
         let color: Color = {
-            if line.hasPrefix("+") { return Color.green.opacity(0.15) }
-            if line.hasPrefix("-") { return Color.red.opacity(0.15) }
-            if line.hasPrefix("@@") { return Color.blue.opacity(0.1) }
+            if line.hasPrefix("+") { return Color(.systemGreen).opacity(0.15) }
+            if line.hasPrefix("-") { return Color(.systemRed).opacity(0.15) }
+            if line.hasPrefix("@@") { return .primary.opacity(0.1) }
             return .clear
         }()
 

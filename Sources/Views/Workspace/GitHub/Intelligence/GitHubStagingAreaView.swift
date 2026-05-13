@@ -8,7 +8,7 @@ struct GitHubStagingAreaView: View {
     var body: some View {
         VStack(spacing: 0) {
             List {
-                Section("Staged Changes (\(gitEngine.stagedChanges.count))") {
+                Section {
                     if gitEngine.stagedChanges.isEmpty {
                         Text("No files staged for commit.").font(.caption).foregroundStyle(.secondary)
                     } else {
@@ -29,14 +29,18 @@ struct GitHubStagingAreaView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Staged Changes (\(gitEngine.stagedChanges.count))")
                 }
 
-                Section("Commit Details") {
+                Section {
                     TextField("Commit Message", text: $commitMessage)
                     Picker("Target Branch", selection: $selectedBranch) {
                         Text("main").tag("main")
                         Text("feature/mobile-git").tag("feature/mobile-git")
                     }
+                } header: {
+                    Text("Commit Details")
                 }
             }
 
@@ -48,10 +52,10 @@ struct GitHubStagingAreaView: View {
                 } label: {
                     Text("Commit & Push")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(gitEngine.stagedChanges.isEmpty || commitMessage.isEmpty ? Color.gray : Color.blue)
+                        .background(gitEngine.stagedChanges.isEmpty || commitMessage.isEmpty ? Color.gray : .primary)
                         .cornerRadius(12)
                 }
                 .disabled(gitEngine.stagedChanges.isEmpty || commitMessage.isEmpty)
@@ -75,7 +79,7 @@ struct ChangeTypeBadge: View {
     var body: some View {
         Text(type.rawValue.prefix(1))
             .font(.caption2.bold())
-            .foregroundColor(.white)
+            .foregroundStyle(.white)
             .frame(width: 20, height: 20)
             .background(badgeColor)
             .clipShape(Circle())

@@ -81,7 +81,7 @@ struct AutomationBuilderView: View {
                 EditButton()
             }
         }
-        .onChange(of: viewModel.isCompiling) { newValue in
+        .onChange(of: viewModel.isCompiling) { _, newValue in
             if !newValue && !viewModel.workflowName.isEmpty && !viewModel.steps.isEmpty {
                 // Successfully compiled
                 dismiss()
@@ -106,7 +106,7 @@ struct AutomationBuilderView: View {
 }
 
 struct StepRow: View {
-    @Binding var step: WorkflowStep
+    @Binding var step: MailWorkflowStep
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {

@@ -28,10 +28,10 @@ struct GitHubSyncStatusDashboardView: View {
                         } else {
                             Label("Full Sync Resolution", systemImage: "arrow.triangle.2.circlepath")
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(Color.blue)
+                                .background(.primary)
                                 .cornerRadius(12)
                         }
                     }
@@ -52,7 +52,7 @@ struct GitHubSyncStatusDashboardView: View {
         VStack(spacing: 8) {
             Image(systemName: isSyncing ? "arrow.triangle.2.circlepath" : "icloud.and.arrow.up.fill")
                 .font(.system(size: 60))
-                .foregroundStyle(.blue)
+                .foregroundStyle(.primary)
                 .symbolEffect(.bounce, value: isSyncing)
 
             Text(isSyncing ? "Syncing..." : "Repository Status")

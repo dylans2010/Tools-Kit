@@ -15,6 +15,7 @@ struct PluginDefinition: Codable, Identifiable {
     var installedAt: Date? = nil
     var lastExecutedAt: Date? = nil
     var errorCount: Int = 0
+    var executionCount: Int = 0
 
     var capabilities: [PluginCapability]
     var actions: [PluginAction]
@@ -35,8 +36,8 @@ struct PluginDefinition: Codable, Identifiable {
     var uiExtensions: [UIExtension] = []
     var toolkitTools: [PluginToolkitTool] = []
 
-    var permissions: [PluginPermission] {
-        capabilities.map { PluginPermission(capability: $0) }
+    var permissions: [PluginCapabilityPermission] {
+        capabilities.map { PluginCapabilityPermission(capability: $0) }
     }
 }
 
@@ -47,7 +48,7 @@ struct PluginChangeLogEntry: Codable, Identifiable {
     let notes: String
 }
 
-struct PluginPermission: Codable, Identifiable {
+struct PluginCapabilityPermission: Codable, Identifiable {
     var id: String { capability.technicalKey }
     let capability: PluginCapability
 
@@ -354,6 +355,10 @@ struct PluginEvent: Codable, Identifiable {
     let action: String
     let payload: [String: String]
     let timestamp: Date
+
+    var description: String {
+        "\(capability.rawValue): \(action)"
+    }
 }
 
 // MARK: - Advanced Models

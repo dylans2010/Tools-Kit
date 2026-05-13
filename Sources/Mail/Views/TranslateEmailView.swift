@@ -138,7 +138,7 @@ struct TranslateEmailView: View {
                                 .padding(.horizontal, 14)
                                 .padding(.vertical, 8)
                                 .background(targetLanguage == lang ? Color.blue : Color.white.opacity(0.1), in: Capsule())
-                                .foregroundStyle(targetLanguage == lang ? .white : .secondary)
+                                .foregroundStyle(targetLanguage == lang ? Color.white : Color.secondary)
                         }
                         .buttonStyle(.plain)
                     }
@@ -186,7 +186,7 @@ struct TranslateEmailView: View {
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 7)
                                 .background(selection.wrappedValue == option ? Color.blue : Color.white.opacity(0.1), in: Capsule())
-                                .foregroundStyle(selection.wrappedValue == option ? .white : .secondary)
+                                .foregroundStyle(selection.wrappedValue == option ? Color.white : Color.secondary)
                         }
                         .buttonStyle(.plain)
                     }
@@ -199,7 +199,7 @@ struct TranslateEmailView: View {
         VStack(alignment: .leading, spacing: 12) {
             Label(title, systemImage: icon)
                 .font(.caption.bold())
-                .foregroundStyle(isResult ? .blue : .secondary)
+                .foregroundStyle(isResult ? Color.blue : Color.secondary)
 
             content()
                 .padding(12)
@@ -212,7 +212,7 @@ struct TranslateEmailView: View {
 
     private var backgroundGradient: LinearGradient {
         LinearGradient(
-            colors: [Color(hex: "#05070F") ?? .black, Color(hex: "#101A31") ?? .black, Color(hex: "#1B1231") ?? .black],
+            colors: [Color(hex: "#05070F"), Color(hex: "#101A31"), Color(hex: "#1B1231")],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )

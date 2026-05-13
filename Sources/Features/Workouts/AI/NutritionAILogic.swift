@@ -21,6 +21,7 @@ struct NutritionSummaryInfo: Codable {
     let detectedFoods: [String]
 }
 
+@MainActor
 final class NutritionAILogic {
     enum InputMode: String {
         case image

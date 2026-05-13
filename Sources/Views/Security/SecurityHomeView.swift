@@ -22,12 +22,14 @@ struct SecurityHomeView: View {
                 Label("Security Hub", systemImage: "shield.lefthalf.filled")
                 Text("Manage your vault and security tools.").font(.caption).foregroundStyle(.secondary)
             }
-            Section("Quick Actions") {
+            Section {
                 Button { showingAddSheet = true } label: { Label("Add Item", systemImage: "plus.circle.fill") }
                 Button { showingPackageView = true } label: { Label("Backup & Restore", systemImage: "archivebox") }
                 Button(role: .destructive) { authService.logout() } label: { Label("Lock Vault", systemImage: "lock.fill") }
+            } header: {
+                Text("Quick Actions")
             }
-            Section("Vault Items") {
+            Section {
                 if vaultManager.items.isEmpty { Text("No items yet").foregroundStyle(.secondary) }
                 else {
                     ForEach(vaultManager.items.sorted(by: { $0.updatedAt > $1.updatedAt })) { item in
@@ -36,6 +38,8 @@ struct SecurityHomeView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Vault Items")
             }
         }
         .navigationTitle("Security")

@@ -217,7 +217,7 @@ struct ManageAccountsView: View {
             Spacer()
             HStack(spacing: 12) {
                 Image(systemName: isError ? "xmark.octagon.fill" : "checkmark.seal.fill")
-                    .foregroundStyle(isError ? .red : .green)
+                    .foregroundStyle(isError ? Color.red : Color.green)
                     .font(.headline)
 
                 Text(message)

@@ -6,7 +6,7 @@ struct SecurityThreatDetectionView: View {
 
     var body: some View {
         List {
-            Section("Detected Threats") {
+            Section {
                 if threats.isEmpty {
                     Label("No threats detected in logs", systemImage: "checkmark.shield.fill")
                         .foregroundStyle(.green)
@@ -32,6 +32,8 @@ struct SecurityThreatDetectionView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Detected Threats")
             }
 
             Section {
@@ -41,9 +43,11 @@ struct SecurityThreatDetectionView: View {
                 .frame(maxWidth: .infinity)
             }
 
-            Section("Protection Rules") {
+            Section {
                 Toggle("Brute Force Detection", isOn: .constant(true))
                 Toggle("Credential Stuffing Defense", isOn: .constant(true))
+            } header: {
+                Text("Protection Rules")
             }
         }
         .navigationTitle("Threat Detection")

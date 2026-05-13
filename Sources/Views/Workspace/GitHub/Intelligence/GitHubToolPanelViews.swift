@@ -12,13 +12,9 @@ struct RepoToolsPanelView: View {
 
     var body: some View {
         List {
-            Section("Health Analysis") {
+            Section {
                 Button {
-                    // Demo scan
-                    intelligence.scanContent(files: [
-                        (path: "Sources/App.swift", content: "import SwiftUI\n@main struct App: App { var body: some Scene { WindowGroup { ContentView() } } }"),
-                        (path: "Config.json", content: "{ \"token\": \"ghp_abc123456789\" }"),
-                    ])
+                    intelligence.scanRepository()
                 } label: {
                     Label("Analyze Repo Health", systemImage: "stethoscope")
                 }
@@ -29,38 +25,44 @@ struct RepoToolsPanelView: View {
                     NavigationLink(destination: CodeIntelligenceView()) {
                         HStack {
                             Label("View Issues", systemImage: "exclamationmark.triangle.fill")
-                                .foregroundStyle(.orange)
+                                .foregroundStyle(.secondary)
                             Spacer()
-                            Text("\(intelligence.securityIssues.count + intelligence.codeSmells.count)").font(.caption.bold()).foregroundStyle(.orange)
+                            Text("\(intelligence.securityIssues.count + intelligence.codeSmells.count)").font(.caption.bold()).foregroundStyle(.secondary)
                         }
                     }
                 }
+            } header: {
+                Text("Health Analysis")
             }
 
-            Section("Cleanup") {
+            Section {
                 Button {
                     gitEngine.clearStagingArea()
                 } label: {
                     Label("Clear Staging Area", systemImage: "trash")
                 }
-                .foregroundStyle(.orange)
+                .foregroundStyle(.secondary)
 
                 NavigationLink(destination: LocalGitEngineView()) {
                     Label("Manage Local Git", systemImage: "externaldrive.connected.to.line.below")
                 }
+            } header: {
+                Text("Cleanup")
             }
 
-            Section("Reports") {
+            Section {
                 Button {
                     reportText = generateRepoReport()
                     showingReport = true
                 } label: {
                     Label("Generate Repo Report", systemImage: "doc.text.fill")
                 }
-                .foregroundStyle(.blue)
+                .foregroundStyle(.primary)
+            } header: {
+                Text("Reports")
             }
 
-            Section("Quick Actions") {
+            Section {
                 NavigationLink(destination: WorkflowBuilderView()) {
                     Label("Workflow Builder", systemImage: "play.rectangle.on.rectangle")
                 }
@@ -70,6 +72,8 @@ struct RepoToolsPanelView: View {
                 NavigationLink(destination: SecurityToolsView(owner: owner, repo: repo)) {
                     Label("Security Scan", systemImage: "lock.shield")
                 }
+            } header: {
+                Text("Quick Actions")
             }
         }
         .navigationTitle("Repo Tools")
@@ -110,12 +114,14 @@ struct ReleaseManagerView: View {
 
     var body: some View {
         Form {
-            Section("Release Info") {
+            Section {
                 TextField("Tag (e.g. v1.0.0)", text: $tagName)
                 TextField("Release Name", text: $releaseName)
+            } header: {
+                Text("Release Info")
             }
 
-            Section("Release Notes") {
+            Section {
                 TextEditor(text: $releaseBody)
                     .font(.system(.body, design: .monospaced))
                     .frame(minHeight: 120)
@@ -123,27 +129,33 @@ struct ReleaseManagerView: View {
                     generatedNotes = generateNotes()
                     releaseBody = generatedNotes
                 }
-                .foregroundStyle(.blue)
+                .foregroundStyle(.primary)
+            } header: {
+                Text("Release Notes")
             }
 
-            Section("Options") {
+            Section {
                 Toggle("Draft Release", isOn: $isDraft)
                 Toggle("Pre-release", isOn: $isPrerelease)
+            } header: {
+                Text("Options")
             }
 
-            Section("Preview") {
+            Section {
                 if !tagName.isEmpty {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("\(releaseName.isEmpty ? tagName : releaseName)")
                             .font(.headline)
                         HStack {
                             if isDraft { Label("Draft", systemImage: "pencil").font(.caption) }
-                            if isPrerelease { Label("Pre-release", systemImage: "exclamationmark.circle").font(.caption).foregroundStyle(.orange) }
+                            if isPrerelease { Label("Pre-release", systemImage: "exclamationmark.circle").font(.caption).foregroundStyle(.secondary) }
                         }
                         Text(releaseBody.isEmpty ? "No description." : String(releaseBody.prefix(200)))
                             .font(.caption).foregroundStyle(.secondary)
                     }
                 }
+            } header: {
+                Text("Preview")
             }
 
             Section {
@@ -198,7 +210,7 @@ struct SecurityToolsView: View {
 
     var body: some View {
         List {
-            Section("Secret Detection") {
+            Section {
                 Button {
                     let stagingFiles = gitEngine.stagedChanges.map {
                         (path: $0.filePath, content: $0.modifiedContent)
@@ -214,7 +226,7 @@ struct SecurityToolsView: View {
                 } label: {
                     Label("Scan for Exposed Secrets", systemImage: "eye.slash.fill")
                 }
-                .foregroundStyle(.blue)
+                .foregroundStyle(.primary)
 
                 if intelligence.isScanning {
                     HStack { ProgressView(); Text("Scanning staged files…").font(.caption) }
@@ -239,19 +251,21 @@ struct SecurityToolsView: View {
                                 }
                                 .font(.caption.bold()).foregroundStyle(.red).buttonStyle(.bordered).controlSize(.mini)
                             } else {
-                                Text("Blocked").font(.caption2).foregroundStyle(.orange)
+                                Text("Blocked").font(.caption2).foregroundStyle(.secondary)
                             }
                         }
                     }
                 } else if !intelligence.isScanning {
                     HStack {
-                        Image(systemName: "checkmark.shield.fill").foregroundStyle(.green)
+                        Image(systemName: "checkmark.shield.fill").foregroundStyle(.secondary)
                         Text("No secrets detected.").font(.caption).foregroundStyle(.secondary)
                     }
                 }
+            } header: {
+                Text("Secret Detection")
             }
 
-            Section("Pre-commit Validation") {
+            Section {
                 let staged = gitEngine.stagedChanges
                 if staged.isEmpty {
                     Text("No staged changes to validate.").foregroundStyle(.secondary).font(.caption)
@@ -266,16 +280,20 @@ struct SecurityToolsView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Pre-commit Validation")
             }
 
             if !blockedFiles.isEmpty {
-                Section("Blocked Files (\(blockedFiles.count))") {
+                Section {
                     ForEach(Array(blockedFiles), id: \.self) { path in
                         Label(URL(fileURLWithPath: path).lastPathComponent, systemImage: "nosign")
                             .font(.caption).foregroundStyle(.red)
                     }
                     Button("Clear Block List") { blockedFiles = [] }
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(.secondary)
+                } header: {
+                    Text("Blocked Files (\(blockedFiles.count))")
                 }
             }
         }
@@ -316,7 +334,7 @@ struct BranchIntelligenceView: View {
                             Button("Preview Merge") {
                                 conflictPreviewText = simulateMerge(a: a, b: b)
                             }
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(.primary)
                         }
                         if !conflictPreviewText.isEmpty {
                             Text(conflictPreviewText)
@@ -337,7 +355,7 @@ struct BranchIntelligenceView: View {
                 let grouped = Dictionary(grouping: gitEngine.localCommits, by: { $0.branch })
                 ForEach(Array(grouped.keys.sorted()), id: \.self) { branch in
                     HStack {
-                        Image(systemName: "arrow.branch").foregroundStyle(.blue)
+                        Image(systemName: "arrow.branch").foregroundStyle(.primary)
                         Text(branch).font(.subheadline)
                         Spacer()
                         Text("\(grouped[branch]?.count ?? 0) commits").font(.caption2).foregroundStyle(.secondary)

@@ -7,21 +7,27 @@ struct InspectorPanelView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Block Metadata") {
+                Section {
                     LabeledContent("ID", value: block.id.uuidString).font(.caption)
                     LabeledContent("Kind", value: block.kind.rawValue.capitalized)
                     LabeledContent("Created", value: block.createdAt, format: .dateTime)
+                } header: {
+                    Text("Block Metadata")
                 }
 
-                Section("Configuration") {
+                Section {
                     ForEach(block.metadata.keys.sorted(), id: \.self) { key in
                         TextField(key, text: .constant(block.metadata[key] ?? ""))
                     }
+                } header: {
+                    Text("Configuration")
                 }
 
-                Section("Advanced") {
+                Section {
                     Button("View Execution Logs") {}
                     Button("Inspect AI Context") {}
+                } header: {
+                    Text("Advanced")
                 }
             }
             .navigationTitle("Block Inspector")
@@ -41,13 +47,17 @@ struct DebugPanelView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Version Control") {
+                Section {
                     LabeledContent("Active Branches", value: "\(vc.branches.count)")
                     LabeledContent("Total Commits", value: "\(vc.commits.count)")
+                } header: {
+                    Text("Version Control")
                 }
 
-                Section("AI Context") {
+                Section {
                     LabeledContent("Indexed Entities", value: "\(ai.semanticIndex.count)")
+                } header: {
+                    Text("AI Context")
                 }
             }
             .navigationTitle("Workspace Debug")

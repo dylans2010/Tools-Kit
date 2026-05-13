@@ -30,7 +30,10 @@ struct NotesView: View {
     }
 
     var body: some View {
-        ScrollView {
+        let notesToShow: [Note] = filteredNotes
+        let currentViewMode: ViewMode = viewMode
+
+        return ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 // Folder filter chips
                 if !folders.isEmpty {
@@ -53,20 +56,23 @@ struct NotesView: View {
                 }
 
                 // Empty state
-                if filteredNotes.isEmpty {
+                if notesToShow.isEmpty {
+                    let message: String = searchText.isEmpty
+                        ? "Tap the + button to create your first note."
+                        : "No notes match your search."
+                    let action: (() -> Void)? = searchText.isEmpty ? { createNote() } : nil
+
                     EmptyStateView(
                         icon: "note.text",
                         title: "No Notes Yet",
-                        message: searchText.isEmpty
-                            ? "Tap the + button to create your first note."
-                            : "No notes match your search.",
-                        action: searchText.isEmpty ? { createNote() } : nil,
+                        message: message,
+                        action: action,
                         actionLabel: "New Note"
                     )
                     .padding(.top, 20)
-                } else if viewMode == .grid {
+                } else if currentViewMode == .grid {
                     LazyVGrid(columns: twoColumns, spacing: 12) {
-                        ForEach(filteredNotes) { note in
+                        ForEach(notesToShow) { note in
                             NavigationLink(destination: NoteEditorView(note: note, backend: backend)) {
                                 NoteCardView(note: note, onPin: { togglePin(note) }, onDelete: { deleteNote(note) }, onDuplicate: { duplicateNote(note) })
                             }
@@ -77,7 +83,7 @@ struct NotesView: View {
                     .padding(.top, 12)
                 } else {
                     LazyVStack(spacing: 0) {
-                        ForEach(filteredNotes) { note in
+                        ForEach(notesToShow) { note in
                             NavigationLink(destination: NoteEditorView(note: note, backend: backend)) {
                                 NoteListRowView(note: note)
                             }

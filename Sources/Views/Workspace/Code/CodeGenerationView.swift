@@ -41,7 +41,7 @@ struct CodeGenerationView: View {
                         }
                         .padding(.vertical)
                     }
-                    .onChange(of: logs) { _ in
+                    .onChange(of: logs) { _, _ in
                         if let last = logs.last {
                             proxy.scrollTo(last, anchor: .bottom)
                         }

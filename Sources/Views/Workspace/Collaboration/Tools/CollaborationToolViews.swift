@@ -12,10 +12,10 @@ struct DecisionEngineView: View {
 
     var body: some View {
         List {
-            Section("Decisions") {
+            Section {
                 if filteredDecisions.isEmpty {
                     Text("No Decisions In This Space")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 } else {
                     ForEach(filteredDecisions) { decision in
                         NavigationLink(destination: DecisionDetailView(decision: decision)) {
@@ -23,9 +23,11 @@ struct DecisionEngineView: View {
                         }
                     }
                 }
+            } header: {
+                Text("Decisions")
             }
 
-            Section("New Decision") {
+            Section {
                 HStack {
                     TextField("Title", text: $newDecisionTitle)
                     Button("Create") {
@@ -34,6 +36,8 @@ struct DecisionEngineView: View {
                     }
                     .disabled(newDecisionTitle.isEmpty)
                 }
+            } header: {
+                Text("New Decision")
             }
         }
         .navigationTitle("Decision Engine")
@@ -131,7 +135,7 @@ struct BoardColumn: View {
                     if !task.dependencyIDs.isEmpty {
                         Text("Has Dependencies")
                             .font(.caption2)
-                            .foregroundColor(.orange)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 .padding()

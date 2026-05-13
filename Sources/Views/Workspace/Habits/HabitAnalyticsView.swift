@@ -79,7 +79,7 @@ struct HabitAnalyticsView: View {
 
                 Text("Based on last \(days) days")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
             .padding()
         }
@@ -96,7 +96,7 @@ struct HabitAnalyticsView: View {
                 ForEach(sorted.prefix(5)) { habit in
                     HStack {
                         Image(systemName: habit.icon)
-                            .foregroundColor(Color(hex: habit.colorHex) ?? .blue)
+                            .foregroundColor(Color(hex: habit.colorHex))
                             .frame(width: 24)
                         Text(habit.name)
                             .font(.subheadline)
@@ -110,7 +110,7 @@ struct HabitAnalyticsView: View {
                 if manager.habits.isEmpty {
                     Text("No habits tracked yet.")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
             }
             .padding()
@@ -182,16 +182,16 @@ struct HabitAnalyticsView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
                             Image(systemName: habit.icon)
-                                .foregroundColor(Color(hex: habit.colorHex) ?? .blue)
+                                .foregroundColor(Color(hex: habit.colorHex))
                             Text(habit.name)
                                 .font(.subheadline)
                             Spacer()
                             Text("\(Int(rate * 100))%")
                                 .font(.caption.bold())
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
                         ProgressView(value: rate)
-                            .tint(Color(hex: habit.colorHex) ?? .blue)
+                            .tint(Color(hex: habit.colorHex))
                     }
                 }
             }

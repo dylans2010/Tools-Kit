@@ -9,7 +9,7 @@ struct FileManagementCreateFileSectionView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("File Details") {
+                Section {
                     TextField("Name", text: $newFileName)
                         .autocorrectionDisabled()
                     Picker("Type", selection: $selectedType) {
@@ -17,6 +17,8 @@ struct FileManagementCreateFileSectionView: View {
                             Text(".\(type.rawValue)").tag(type)
                         }
                     }
+                } header: {
+                    Text("File Details")
                 }
             }
             .navigationTitle("New File")

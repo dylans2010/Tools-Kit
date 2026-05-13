@@ -15,15 +15,20 @@ public final class SDKConnectorManager: ObservableObject {
 
     public func register(_ connector: any BaseConnector) {
         guard !connectors.contains(where: { $0.id == connector.id }) else { return }
+        guard AuthorizationManager.shared.canUseScopes(connector.requiredScopes) || connector.requiredScopes.isEmpty else {
+            connector.disconnect()
+            SDKLogStore.shared.log("Connector blocked by authorization: \(connector.name)", source: "SDKConnectorManager", level: LogLevel.warning)
+            return
+        }
         connectors.append(connector)
         saveConnectors()
-        SDKLogStore.shared.log("Connector registered: \(connector.name)", source: "SDKConnectorManager", level: .info)
+        SDKLogStore.shared.log("Connector registered: \(connector.name)", source: "SDKConnectorManager", level: LogLevel.info)
     }
 
     public func remove(id: UUID) {
         if let connector = connectors.first(where: { $0.id == id }) {
             connector.disconnect()
-            SDKLogStore.shared.log("Connector removed: \(connector.name)", source: "SDKConnectorManager", level: .info)
+            SDKLogStore.shared.log("Connector removed: \(connector.name)", source: "SDKConnectorManager", level: LogLevel.info)
         }
         connectors.removeAll { $0.id == id }
         saveConnectors()
@@ -32,10 +37,14 @@ public final class SDKConnectorManager: ObservableObject {
     public func syncAll() async throws {
         guard !connectors.isEmpty else { return }
 
-        SDKLogStore.shared.log("Starting sync for \(connectors.count) connectors", source: "SDKConnectorManager", level: .info)
+        SDKLogStore.shared.log("Starting sync for \(connectors.count) connectors", source: "SDKConnectorManager", level: LogLevel.info)
 
         try await withThrowingTaskGroup(of: Void.self) { group in
             for connector in connectors where connector.status == .connected {
+                guard AuthorizationManager.shared.canUseScopes(connector.requiredScopes) || connector.requiredScopes.isEmpty else {
+                    connector.disconnect()
+                    continue
+                }
                 group.addTask {
                     try await connector.sync()
                 }
@@ -43,7 +52,7 @@ public final class SDKConnectorManager: ObservableObject {
             try await group.waitForAll()
         }
 
-        SDKLogStore.shared.log("All connector syncs completed", source: "SDKConnectorManager", level: .info)
+        SDKLogStore.shared.log("All connector syncs completed", source: "SDKConnectorManager", level: LogLevel.info)
     }
 
     public func status(for id: UUID) -> ConnectorStatus {
@@ -80,6 +89,8 @@ public final class SDKConnectorManager: ObservableObject {
             case .webhook: connector = WebhookConnector()
             case .calendar: connector = CalendarConnector()
             case .localFileSystem: connector = LocalFileConnector()
+            case .rest: connector = RESTConnector()
+            case .mqtt: connector = MQTTConnector()
             }
             if let connector = connector {
                 connectors.append(connector)

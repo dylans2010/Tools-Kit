@@ -15,17 +15,21 @@ struct CreatePRView: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
-                Section("PR Details") {
+                Section {
                     TextField("Title", text: $title)
                     TextField("Base Branch (e.g. main)", text: $base)
                     TextField("Head Branch (e.g. feature-branch)", text: $head)
+                } header: {
+                    Text("PR Details")
                 }
 
-                Section("Description") {
+                Section {
                     TextEditor(text: $bodyText)
                         .frame(minHeight: 150)
+                } header: {
+                    Text("Description")
                 }
             }
             .navigationTitle("New Pull Request")

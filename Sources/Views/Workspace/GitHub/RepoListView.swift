@@ -33,7 +33,7 @@ struct RepoListView: View {
                             } label: {
                                 Label("Star", systemImage: "star.fill")
                             }
-                            .tint(.yellow)
+                            .tint(.secondary)
                         }
                     }
                 }
@@ -53,7 +53,7 @@ struct RepoListView: View {
         .task {
             await fetchRepositories()
         }
-        .onChange(of: searchText) { _ in
+        .onChange(of: searchText) { _, _ in
             filterRepositories()
         }
     }
@@ -109,9 +109,8 @@ private struct RepoRow: View {
             HStack(spacing: 14) {
                 Image(systemName: repository.private ? "lock.fill" : "book.closed.fill")
                     .font(.title3)
-                    .foregroundStyle(repository.private ? .orange : .blue)
                     .frame(width: 40, height: 40)
-                    .background((repository.private ? Color.orange : Color.blue).opacity(0.12))
+                    .background(Color(.secondarySystemBackground))
                     .clipShape(Circle())
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -128,7 +127,6 @@ private struct RepoRow: View {
                 VStack(alignment: .trailing, spacing: 4) {
                     HStack(spacing: 4) {
                         Image(systemName: "star.fill")
-                            .foregroundStyle(.yellow)
                         Text("\(repository.stargazersCount)")
                     }
                     .font(.caption2.bold())
@@ -136,7 +134,7 @@ private struct RepoRow: View {
                         .font(.system(size: 10, weight: .semibold))
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(Color.gray.opacity(0.12))
+                        .background(.secondary.opacity(0.12))
                         .clipShape(Capsule())
                 }
             }

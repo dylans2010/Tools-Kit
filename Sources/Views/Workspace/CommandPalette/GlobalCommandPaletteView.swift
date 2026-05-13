@@ -57,7 +57,7 @@ struct GlobalCommandPaletteView: View {
                     if let result = lastResult, showingResult {
                         HStack {
                             Image(systemName: result.success ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                .foregroundStyle(result.success ? .green : .red)
+                                .foregroundStyle(result.success ? Color.green : Color.red)
                             Text(result.output)
                                 .font(.caption)
                                 .lineLimit(2)
@@ -215,7 +215,7 @@ struct CommandHistoryView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
                             Image(systemName: result.success ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                .foregroundStyle(result.success ? .green : .red)
+                                .foregroundStyle(result.success ? Color.green : Color.red)
                                 .font(.caption)
                             Text(result.command).font(.subheadline.bold())
                             Spacer()

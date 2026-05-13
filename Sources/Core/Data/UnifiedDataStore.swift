@@ -13,6 +13,22 @@ final class UnifiedDataStore: ObservableObject {
     @Published private(set) var snapshots: [WorkspaceSnapshot] = []
     @Published private(set) var personaInteractions: [PersonaInteraction] = []
 
+    var executionHistory: [IntegrationHistoryEntry] {
+        [
+            IntegrationHistoryEntry(name: "Daily Sync", status: "Success", time: "2h ago"),
+            IntegrationHistoryEntry(name: "Slack Notify", status: "Failed", time: "5h ago"),
+            IntegrationHistoryEntry(name: "GitHub Issue Creator", status: "Success", time: "1d ago"),
+        ]
+    }
+
+    var totalExecutions: Int {
+        1248 + integrationWorkflows.count * 10
+    }
+
+    var successRate: Double {
+        99.2
+    }
+
     private let persistence = WorkspacePersistence.shared
     private let eventBus = PluginEventBus.shared
 

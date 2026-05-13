@@ -24,7 +24,7 @@ struct ProjectCreateView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Project Details") {
+                Section {
                     TextField("Project Name", text: $name)
                     TextEditor(text: $description)
                         .frame(minHeight: 80)
@@ -37,9 +37,11 @@ struct ProjectCreateView: View {
                                     .allowsHitTesting(false)
                             }
                         }
+                } header: {
+                    Text("Project Details")
                 }
 
-                Section("Icon") {
+                Section {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8), spacing: 12) {
                         ForEach(icons, id: \.self) { icon in
                             Button {
@@ -48,23 +50,25 @@ struct ProjectCreateView: View {
                                 Image(systemName: icon)
                                     .font(.system(size: 20))
                                     .frame(width: 36, height: 36)
-                                    .background(selectedIcon == icon ? Color(hex: selectedColorHex) ?? .blue : Color(.secondarySystemGroupedBackground))
+                                    .background(selectedIcon == icon ? Color(hex: selectedColorHex) : Color(.secondarySystemBackground))
                                     .foregroundColor(selectedIcon == icon ? .white : .primary)
                                     .cornerRadius(8)
                             }
                         }
                     }
                     .padding(.vertical, 4)
+                } header: {
+                    Text("Icon")
                 }
 
-                Section("Color") {
+                Section {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 10), spacing: 10) {
                         ForEach(colors, id: \.0) { hex, _ in
                             Button {
                                 selectedColorHex = hex
                             } label: {
                                 Circle()
-                                    .fill(Color(hex: hex) ?? .blue)
+                                    .fill(Color(hex: hex))
                                     .frame(width: 28, height: 28)
                                     .overlay(
                                         Circle()
@@ -75,6 +79,8 @@ struct ProjectCreateView: View {
                         }
                     }
                     .padding(.vertical, 4)
+                } header: {
+                    Text("Color")
                 }
             }
             .navigationTitle("New Project")

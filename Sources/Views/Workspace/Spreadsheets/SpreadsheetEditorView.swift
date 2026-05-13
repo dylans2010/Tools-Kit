@@ -24,7 +24,7 @@ struct SpreadsheetEditorView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.workspaceBackground.ignoresSafeArea()
+                Color(.systemBackground).ignoresSafeArea()
 
                 VStack(spacing: 0) {
                     FormulaBarView(selectedCell: selectedCell, sheet: sheet) { newFormula in
@@ -85,7 +85,7 @@ struct SpreadsheetEditorView: View {
             .font(.caption.bold())
             .frame(height: rowHeight)
             .frame(maxWidth: .infinity)
-            .background(Color.workspaceSurface)
+            .background(Color(.secondarySystemBackground))
             .overlay(Rectangle().stroke(Color.white.opacity(0.1), lineWidth: 0.5))
     }
 
@@ -141,7 +141,8 @@ struct SpreadsheetEditorView: View {
         aiLoading = true
         Task {
             do {
-                let result = try await manager.analyzeSpreadsheet(prompt: "Analyze this sheet", dataPreview: "Data sample")
+                let dataPreview = buildDataPreview()
+                let result = try await manager.analyzeSpreadsheet(prompt: "Analyze this spreadsheet data and provide insights", dataPreview: dataPreview)
                 await MainActor.run {
                     aiResult = result
                     aiLoading = false
@@ -150,6 +151,25 @@ struct SpreadsheetEditorView: View {
                 aiLoading = false
             }
         }
+    }
+
+    private func buildDataPreview() -> String {
+        var lines: [String] = []
+        let maxRows = min(sheet.rows, 50)
+        let maxCols = min(sheet.columns, 20)
+        var header: [String] = []
+        for col in 0..<maxCols { header.append(columnLabel(col)) }
+        lines.append(header.joined(separator: "\t"))
+        for row in 0..<maxRows {
+            var rowValues: [String] = []
+            for col in 0..<maxCols {
+                let cell = sheet.cells[row][col]
+                rowValues.append(manager.compute(cell: cell, allCells: sheet.cells))
+            }
+            lines.append(rowValues.joined(separator: "\t"))
+        }
+        if sheet.rows > maxRows { lines.append("... (\(sheet.rows - maxRows) more rows)") }
+        return lines.joined(separator: "\n")
     }
 
     private func columnLabel(_ col: Int) -> String {

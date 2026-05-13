@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AdvancedCollaborationView: View {
     @StateObject private var webSocket = WebSocketManager.shared
-    @State private var participants: [String] = ["You", "Jules"]
+    @State private var participants: [String] = ["You"]
 
     var body: some View {
         VStack {
@@ -20,13 +20,13 @@ struct AdvancedCollaborationView: View {
                     .font(.caption.bold())
                     .frame(width: 32, height: 32)
                     .background(Color.blue)
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
                     .clipShape(Circle())
                     .overlay(Circle().stroke(Color.white, lineWidth: 2))
             }
             Text("\(participants.count) Active Now")
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
             Spacer()
         }
         .padding()
@@ -36,14 +36,14 @@ struct AdvancedCollaborationView: View {
         VStack(spacing: 20) {
             Image(systemName: "person.2.wave.2.fill")
                 .font(.system(size: 60))
-                .foregroundColor(.blue)
+                .foregroundStyle(.primary)
 
             Text("Real time presence and co-editing enabled.")
                 .font(.headline)
 
             Text("Changes made by any participant will propagate instantly across the workspace.")
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 

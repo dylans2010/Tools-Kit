@@ -6,7 +6,7 @@ struct WorkspaceCommandCenterView: View {
 
     var body: some View {
         List {
-            Section("System Status") {
+            Section {
                 HStack {
                     Label("Total Spaces", systemImage: "folder")
                     Spacer()
@@ -16,24 +16,30 @@ struct WorkspaceCommandCenterView: View {
                 Button("Run Global Audit") {
                     auditLogs = controlCenter.performGlobalAudit()
                 }
+            } header: {
+                Text("System Status")
             }
 
-            Section("Audit Logs") {
+            Section {
                 if auditLogs.isEmpty {
                     Text("No Issues Found")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 } else {
                     ForEach(auditLogs, id: \.self) { log in
                         Label(log, systemImage: "exclamationmark.triangle")
                             .font(.caption)
                     }
                 }
+            } header: {
+                Text("Audit Logs")
             }
 
-            Section("Bulk Operations") {
+            Section {
                 Button("Bulk Permission Edit") {
                     // Navigate to bulk edit UI
                 }
+            } header: {
+                Text("Bulk Operations")
             }
         }
         .navigationTitle("Command Center")
@@ -53,7 +59,7 @@ struct DependencyInspectorView: View {
 
             Text("Object ID: \(objectID.uuidString)")
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
 
             Divider()
 

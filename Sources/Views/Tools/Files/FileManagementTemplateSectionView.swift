@@ -8,7 +8,7 @@ struct FileManagementTemplateSectionView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Template") {
+                Section {
                     Picker("Template", selection: $selectedTemplate) {
                         ForEach(FileTemplate.allCases) { template in
                             Label(template.rawValue, systemImage: templateIcon(template))
@@ -16,15 +16,19 @@ struct FileManagementTemplateSectionView: View {
                         }
                     }
                     .pickerStyle(.inline)
+                } header: {
+                    Text("Template")
                 }
 
-                Section("Preview") {
+                Section {
                     ScrollView {
                         Text(selectedTemplate.contents)
                             .font(.system(.caption, design: .monospaced))
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .frame(maxHeight: 120)
+                } header: {
+                    Text("Preview")
                 }
             }
             .navigationTitle("From Template")

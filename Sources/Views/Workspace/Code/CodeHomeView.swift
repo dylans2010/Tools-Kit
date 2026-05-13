@@ -7,16 +7,18 @@ struct CodeHomeView: View {
     var body: some View {
         NavigationView {
             List {
-                Section("Target Repository") {
+                Section {
                     HStack {
                         Image(systemName: "link")
                         Text("https://github.com/dylans2010/SwiftCode")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
+                } header: {
+                    Text("Target Repository")
                 }
 
-                Section("Status") {
+                Section {
                     if analyzer.isAnalyzing {
                         HStack {
                             ProgressView()
@@ -35,6 +37,8 @@ struct CodeHomeView: View {
                         Text("No analysis performed yet.")
                             .foregroundColor(.secondary)
                     }
+                } header: {
+                    Text("Status")
                 }
 
                 Section {

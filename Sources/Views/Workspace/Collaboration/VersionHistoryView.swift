@@ -29,12 +29,12 @@ struct SpaceVersionHistoryView: View {
                 VStack(spacing: 20) {
                     Image(systemName: "clock.arrow.circlepath")
                         .font(.largeTitle)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     Text("No Version History Yet")
                         .font(.headline)
                     Text("Every change you make will appear here as a commit.")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                 }
@@ -47,10 +47,10 @@ struct SpaceVersionHistoryView: View {
                                 .font(.headline)
                             Text("\(commit.author) • \(commit.timestamp, style: .date) At \(commit.timestamp, style: .time)")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                             Text(commit.id.uuidString.prefix(8))
                                 .font(.system(.caption, design: .monospaced))
-                                .foregroundColor(.blue)
+                                .foregroundStyle(.primary)
                         }
                         .swipeActions {
                             if let spaceID {
@@ -86,17 +86,17 @@ struct BranchManagementUI: View {
                                 .font(.headline)
                             Text("Head: \(branch.headCommitID.uuidString.prefix(8))")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
                         Spacer()
                         if branch.id == space.currentBranchID {
                             Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
+                                .foregroundStyle(.primary)
                         }
                         if branch.isProtected {
                             Image(systemName: "lock.fill")
                                 .font(.caption)
-                                .foregroundColor(.orange)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }

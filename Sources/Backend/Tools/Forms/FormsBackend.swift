@@ -2,6 +2,7 @@ import Foundation
 
 @MainActor
 final class FormsBackend: ObservableObject {
+    static let shared = FormsBackend()
     @Published var forms: [FormDocument] = []
     @Published var importedForm: FormDocument?
     @Published var reviewedAnswers: FilledOutFormDocument?

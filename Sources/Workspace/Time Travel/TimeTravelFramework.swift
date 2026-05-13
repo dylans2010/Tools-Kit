@@ -44,6 +44,24 @@ final class TimeTravelManager: ObservableObject {
     func refresh() {
         self.snapshots = UnifiedDataStore.shared.snapshots
     }
+
+    func restore(_ snapshot: WorkspaceSnapshot) {
+        if let index = snapshots.firstIndex(where: { $0.id == snapshot.id }) {
+            snapshots = Array(snapshots.prefix(through: index))
+        }
+        refresh()
+    }
+
+    func takeSnapshot(message: String) {
+        let snapshot = WorkspaceSnapshot(
+            id: UUID(),
+            name: message,
+            branch: "main",
+            timestamp: Date()
+        )
+        try? UnifiedDataStore.shared.saveSnapshot(snapshot)
+        refresh()
+    }
 }
 
 final class SnapshotEngine {

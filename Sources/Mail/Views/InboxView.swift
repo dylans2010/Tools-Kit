@@ -272,7 +272,7 @@ struct InboxView: View {
 
                 Text(relativeTimestamp(message.date))
                     .font(.caption2)
-                    .foregroundStyle(Color(hex: "#8888AA") ?? .gray)
+                    .foregroundStyle(Color(hex: "#8888AA"))
             }
 
             HStack {
@@ -466,11 +466,11 @@ struct InboxView: View {
 
     private func providerColor(_ provider: MailAccount.ProviderType) -> Color {
         switch provider {
-        case .gmail: return Color(hex: "#EA4335") ?? .red
-        case .outlook: return Color(hex: "#0078D4") ?? .blue
-        case .yahoo: return Color(hex: "#6C3BD1") ?? .purple
-        case .proton: return Color(hex: "#2E8B57") ?? .green
-        case .imap: return Color(hex: "#9090AE") ?? .gray
+        case .gmail: return Color(hex: "#EA4335")
+        case .outlook: return Color(hex: "#0078D4")
+        case .yahoo: return Color(hex: "#6C3BD1")
+        case .proton: return Color(hex: "#2E8B57")
+        case .imap: return Color(hex: "#9090AE")
         case .icloud: return .blue
         }
     }
@@ -571,7 +571,7 @@ private struct SkeletonMailRow: View {
             }
         }
         .padding(12)
-        .background(Color(hex: "#161622") ?? Color.black, in: RoundedRectangle(cornerRadius: 12))
+        .background(Color(hex: "#161622"), in: RoundedRectangle(cornerRadius: 12))
         .overlay {
             GeometryReader { geo in
                 Rectangle()

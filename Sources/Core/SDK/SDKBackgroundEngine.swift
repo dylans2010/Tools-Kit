@@ -2,7 +2,7 @@ import Foundation
 import Combine
 import BackgroundTasks
 
-public struct SDKHealthReport {
+public struct SDKBackgroundHealthReport {
     public var connectorReachability: Bool
     public var pluginSandboxStatus: Bool
     public var coreDataHealth: Bool
@@ -14,7 +14,7 @@ public struct SDKHealthReport {
 public final class SDKBackgroundEngine: ObservableObject {
     public static let shared = SDKBackgroundEngine()
 
-    @Published public var systemHealth = SDKHealthReport(connectorReachability: true, pluginSandboxStatus: true, coreDataHealth: true, lastCheck: Date(), details: [:])
+    @Published public var systemHealth = SDKBackgroundHealthReport(connectorReachability: true, pluginSandboxStatus: true, coreDataHealth: true, lastCheck: Date(), details: [:])
 
     private let syncQueue = DispatchQueue(label: "com.toolskit.sdk.sync", attributes: .concurrent)
     private var healthTimer: AnyCancellable?
@@ -54,7 +54,7 @@ public final class SDKBackgroundEngine: ObservableObject {
                 details["connector.\(connector.name)"] = reachable
             }
 
-            systemHealth = SDKHealthReport(
+            systemHealth = SDKBackgroundHealthReport(
                 connectorReachability: connectorsHealthy,
                 pluginSandboxStatus: pluginsHealthy,
                 coreDataHealth: storageHealthy,
@@ -62,7 +62,7 @@ public final class SDKBackgroundEngine: ObservableObject {
                 details: details
             )
 
-            SDKLogStore.shared.log("Health check: connectors=\(connectorsHealthy) plugins=\(pluginsHealthy) storage=\(storageHealthy)", source: "SDKBackgroundEngine", level: .info)
+            SDKLogStore.shared.log("Health check: connectors=\(connectorsHealthy) plugins=\(pluginsHealthy) storage=\(storageHealthy)", source: "SDKBackgroundEngine", level: LogLevel.info)
         }
     }
 
@@ -100,9 +100,9 @@ public final class SDKBackgroundEngine: ObservableObject {
 
         do {
             try BGTaskScheduler.shared.submit(request)
-            SDKLogStore.shared.log("Background sync scheduled", source: "SDKBackgroundEngine", level: .info)
+            SDKLogStore.shared.log("Background sync scheduled", source: "SDKBackgroundEngine", level: LogLevel.info)
         } catch {
-            SDKLogStore.shared.log("Could not schedule background sync: \(error.localizedDescription)", source: "SDKBackgroundEngine", level: .error)
+            SDKLogStore.shared.log("Could not schedule background sync: \(error.localizedDescription)", source: "SDKBackgroundEngine", level: LogLevel.error)
         }
     }
 
@@ -110,7 +110,7 @@ public final class SDKBackgroundEngine: ObservableObject {
         scheduleSync()
 
         task.expirationHandler = { [weak self] in
-            SDKLogStore.shared.log("Background sync expired", source: "SDKBackgroundEngine", level: .warning)
+            SDKLogStore.shared.log("Background sync expired", source: "SDKBackgroundEngine", level: LogLevel.warning)
             self?.retryQueue.removeAll()
         }
 
@@ -118,10 +118,10 @@ public final class SDKBackgroundEngine: ObservableObject {
             do {
                 try await SDKConnectorManager.shared.syncAll()
                 task.setTaskCompleted(success: true)
-                SDKLogStore.shared.log("Background sync completed", source: "SDKBackgroundEngine", level: .info)
+                SDKLogStore.shared.log("Background sync completed", source: "SDKBackgroundEngine", level: LogLevel.info)
             } catch {
                 task.setTaskCompleted(success: false)
-                SDKLogStore.shared.log("Background sync failed: \(error.localizedDescription)", source: "SDKBackgroundEngine", level: .error)
+                SDKLogStore.shared.log("Background sync failed: \(error.localizedDescription)", source: "SDKBackgroundEngine", level: LogLevel.error)
             }
         }
     }
@@ -140,7 +140,7 @@ public final class SDKBackgroundEngine: ObservableObject {
         Task {
             do {
                 try await item.operation()
-                SDKLogStore.shared.log("Retry operation succeeded", source: "SDKBackgroundEngine", level: .info)
+                SDKLogStore.shared.log("Retry operation succeeded", source: "SDKBackgroundEngine", level: LogLevel.info)
             } catch {
                 if item.retryCount < item.maxRetries {
                     let delay = pow(2.0, Double(item.retryCount + 1))
@@ -148,7 +148,7 @@ public final class SDKBackgroundEngine: ObservableObject {
                     retryQueue.append((operation: item.operation, retryCount: item.retryCount + 1, maxRetries: item.maxRetries))
                     processRetryQueue()
                 } else {
-                    SDKLogStore.shared.log("Operation failed after \(item.maxRetries) retries: \(error.localizedDescription)", source: "SDKBackgroundEngine", level: .error)
+                    SDKLogStore.shared.log("Operation failed after \(item.maxRetries) retries: \(error.localizedDescription)", source: "SDKBackgroundEngine", level: LogLevel.error)
                 }
             }
         }

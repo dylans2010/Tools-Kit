@@ -81,14 +81,14 @@ struct IntelligenceToolCard: View {
             VStack(alignment: .leading, spacing: 12) {
                 Image(systemName: icon)
                     .font(.title3)
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
                     .frame(width: 40, height: 40)
                     .background(color.gradient)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
 
                 Text(title)
                     .font(.subheadline.bold())
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)

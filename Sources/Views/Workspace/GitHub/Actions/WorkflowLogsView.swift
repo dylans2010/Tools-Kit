@@ -21,7 +21,7 @@ struct WorkflowLogsView: View {
             } else if let errorMessage {
                 Text(errorMessage).foregroundStyle(.red)
             } else {
-                Section("Failure Detection") {
+                Section {
                     if failureReasons.isEmpty {
                         Text("No obvious failures detected.")
                     } else {
@@ -29,9 +29,11 @@ struct WorkflowLogsView: View {
                             Text(reason).font(.caption)
                         }
                     }
+                } header: {
+                    Text("Failure Detection")
                 }
 
-                Section("Artifacts") {
+                Section {
                     if artifacts.isEmpty {
                         Text("No artifacts found.")
                     } else {
@@ -42,15 +44,19 @@ struct WorkflowLogsView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Artifacts")
                 }
 
-                Section("Logs") {
+                Section {
                     ScrollView {
                         Text(logs)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .font(.system(.footnote, design: .monospaced))
                     }
                     .frame(minHeight: 260)
+                } header: {
+                    Text("Logs")
                 }
             }
         }

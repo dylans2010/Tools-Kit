@@ -6,15 +6,19 @@ struct CitationFormatsView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Academic Formats") {
+                Section {
                     CitationRow(name: "APA (7th ed.)", format: "Author, A. A. (Year). Title of work. Publisher.")
                     CitationRow(name: "MLA (9th ed.)", format: "Author. Title of Work. Publisher, Year.")
                     CitationRow(name: "Chicago (17th ed.)", format: "Author. Title of Work. City: Publisher, Year.")
+                } header: {
+                    Text("Academic Formats")
                 }
 
-                Section("Professional Formats") {
+                Section {
                     CitationRow(name: "IEEE", format: "[1] A. Author, Title of Work. City: Publisher, Year.")
                     CitationRow(name: "Harvard", format: "Author, A. (Year) Title of work. City: Publisher.")
+                } header: {
+                    Text("Professional Formats")
                 }
             }
             .navigationTitle("Citations")

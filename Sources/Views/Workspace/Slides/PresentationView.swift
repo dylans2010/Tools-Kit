@@ -37,7 +37,7 @@ private struct FullSlideView: View {
     let slide: Slide
 
     private var bgColor: Color {
-        Color(hex: slide.backgroundColorHex) ?? Color(red: 0.12, green: 0.23, blue: 0.37)
+        Color(hex: slide.backgroundColorHex)
     }
 
     var body: some View {
@@ -63,10 +63,10 @@ private struct FullSlideView: View {
         let h = el.height * scaleY
 
         switch el.kind {
-        case .text:
+        case .text, .bullets:
             Text(el.text)
                 .font(.system(size: el.fontSize * scaleX))
-                .foregroundColor(Color(hex: el.textColor) ?? .white)
+                .foregroundColor(Color(hex: el.textColor))
                 .multilineTextAlignment(textAlignmentFor(el.textAlignment))
                 .frame(width: w, height: h)
 
@@ -84,6 +84,20 @@ private struct FullSlideView: View {
                     .frame(width: w, height: h)
             }
 
+        case .chart:
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.white.opacity(0.16))
+                VStack(spacing: 6) {
+                    Image(systemName: "chart.bar.fill")
+                        .foregroundStyle(.white)
+                    Text(el.chartData?.title ?? "Chart")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white)
+                }
+            }
+            .frame(width: w, height: h)
+
         case .shape:
             shapeView(el, width: w, height: h)
         }
@@ -91,7 +105,7 @@ private struct FullSlideView: View {
 
     @ViewBuilder
     private func shapeView(_ el: SlideElement, width: CGFloat, height: CGFloat) -> some View {
-        let fill = Color(hex: el.fillColor) ?? .blue
+        let fill = Color(hex: el.fillColor)
         switch el.shapeKind {
         case .rectangle:
             RoundedRectangle(cornerRadius: el.cornerRadius)

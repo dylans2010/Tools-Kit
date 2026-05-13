@@ -24,11 +24,11 @@ struct GitHubChangeReviewerView: View {
                             } label: {
                                 HStack {
                                     Image(systemName: approvedFiles.contains(change.id) ? "checkmark.circle.fill" : "circle")
-                                        .foregroundStyle(approvedFiles.contains(change.id) ? .green : .secondary)
+                                        .foregroundStyle(approvedFiles.contains(change.id) ? .primary : .secondary)
                                     VStack(alignment: .leading) {
                                         Text(URL(fileURLWithPath: change.filePath).lastPathComponent).font(.subheadline.bold())
                                         if isRisky(change) {
-                                            Label("Risky Operation", systemImage: "exclamationmark.triangle.fill").font(.caption2).foregroundStyle(.orange)
+                                            Label("Risky Operation", systemImage: "exclamationmark.triangle.fill").font(.caption2).foregroundStyle(.secondary)
                                         }
                                     }
                                 }
@@ -44,10 +44,10 @@ struct GitHubChangeReviewerView: View {
                 } label: {
                     Text("Finalize Review")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(approvedFiles.count == gitEngine.stagedChanges.count && !gitEngine.stagedChanges.isEmpty ? Color.blue : Color.gray)
+                        .background(approvedFiles.count == gitEngine.stagedChanges.count && !gitEngine.stagedChanges.isEmpty ? .primary : Color(.systemGray))
                         .cornerRadius(12)
                 }
                 .disabled(approvedFiles.count != gitEngine.stagedChanges.count || gitEngine.stagedChanges.isEmpty)
@@ -79,10 +79,10 @@ struct ReviewFileDetailView: View {
                 } label: {
                     Label(isApproved ? "Approved" : "Approve Changes", systemImage: isApproved ? "checkmark.circle.fill" : "circle")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(isApproved ? Color.green : Color.blue)
+                        .background(isApproved ? Color.accentColor : .primary)
                         .cornerRadius(12)
                 }
                 .padding(.horizontal)

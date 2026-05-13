@@ -28,7 +28,7 @@ struct LocalGitEngineView: View {
                 Button(action: { showingStageFile = true }) {
                     Label("Stage a Change", systemImage: "plus.circle")
                 }
-                .foregroundStyle(.blue)
+                .foregroundStyle(.primary)
             } header: {
                 HStack {
                     Text("Staging Area")
@@ -39,25 +39,27 @@ struct LocalGitEngineView: View {
 
             // Commit builder
             if !gitEngine.stagedChanges.isEmpty {
-                Section("Build Commit") {
+                Section {
                     TextField("Commit message…", text: $newMessage)
                     TextField("Branch", text: $newBranch)
                     Button("Auto-Generate Message") {
                         newMessage = gitEngine.autoGenerateMessage(for: gitEngine.stagedChanges)
                     }
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(.primary)
                     Button("Build & Stage Commit") {
                         guard !newMessage.isEmpty else { return }
                         let _ = gitEngine.buildCommit(message: newMessage, branch: newBranch)
                         newMessage = ""
                     }
                     .disabled(newMessage.isEmpty)
-                    .foregroundStyle(.green)
+                    .foregroundStyle(.secondary)
+                } header: {
+                    Text("Build Commit")
                 }
             }
 
             // Local commit history
-            Section("Local Commits (\(gitEngine.localCommits.count))") {
+            Section {
                 if gitEngine.localCommits.isEmpty {
                     Text("No local commits yet.").foregroundStyle(.secondary).font(.caption)
                 } else {
@@ -65,21 +67,25 @@ struct LocalGitEngineView: View {
                         LocalCommitRow(commit: commit)
                     }
                 }
+            } header: {
+                Text("Local Commits (\(gitEngine.localCommits.count))")
             }
 
             // Push queue
             if !gitEngine.commitQueue.isEmpty {
-                Section("Push Queue (\(gitEngine.commitQueue.count))") {
+                Section {
                     ForEach(gitEngine.commitQueue, id: \.self) { id in
                         if let commit = gitEngine.localCommits.first(where: { $0.id == id }) {
                             HStack {
                                 Text(commit.message).font(.caption)
                                 Spacer()
                                 Button("Dequeue") { gitEngine.dequeueCommit(id: id) }
-                                    .font(.caption).foregroundStyle(.orange)
+                                    .font(.caption).foregroundStyle(.secondary)
                             }
                         }
                     }
+                } header: {
+                    Text("Push Queue (\(gitEngine.commitQueue.count))")
                 }
             }
         }
@@ -139,19 +145,19 @@ struct LocalCommitRow: View {
                 Spacer()
                 Text(commit.category.rawValue).font(.caption2)
                     .padding(.horizontal, 6).padding(.vertical, 2)
-                    .background(Color.blue.opacity(0.12))
+                    .background(.primary.opacity(0.12))
                     .clipShape(Capsule())
             }
             HStack {
                 Text("Branch: \(commit.branch)").font(.caption2).foregroundStyle(.secondary)
                 Text("·").foregroundStyle(.secondary).font(.caption2)
-                Text("Risk: \(String(format: "%.1f", commit.riskScore))").font(.caption2).foregroundStyle(commit.riskScore > 5 ? .red : .secondary)
+                Text("Risk: \(String(format: "%.1f", commit.riskScore))").font(.caption2).foregroundStyle(commit.riskScore > 5 ? .primary : .secondary)
                 Text("·").foregroundStyle(.secondary).font(.caption2)
                 Text(commit.createdAt.formatted(date: .abbreviated, time: .shortened)).font(.caption2).foregroundStyle(.secondary)
             }
             if commit.status == .staged {
                 Button("Add to Push Queue") { engine.enqueueCommit(id: commit.id) }
-                    .font(.caption.bold()).foregroundStyle(.blue)
+                    .font(.caption.bold()).foregroundStyle(.primary)
             }
         }
         .padding(.vertical, 2)
@@ -176,26 +182,34 @@ struct StageFileView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("File Path") {
+                Section {
                     TextField("e.g. Sources/Models/User.swift", text: $filePath)
+                } header: {
+                    Text("File Path")
                 }
-                Section("Change Type") {
+                Section {
                     Picker("Type", selection: $changeType) {
                         ForEach(GitEngineService.ChangeType.allCases, id: \.self) { t in
                             Text(t.rawValue).tag(t)
                         }
                     }
                     .pickerStyle(.segmented)
+                } header: {
+                    Text("Change Type")
                 }
-                Section("Original Content (optional)") {
+                Section {
                     TextEditor(text: $originalContent)
                         .font(.system(.caption, design: .monospaced))
                         .frame(minHeight: 80)
+                } header: {
+                    Text("Original Content (optional)")
                 }
-                Section("Modified Content") {
+                Section {
                     TextEditor(text: $modifiedContent)
                         .font(.system(.caption, design: .monospaced))
                         .frame(minHeight: 80)
+                } header: {
+                    Text("Modified Content")
                 }
             }
             .navigationTitle("Stage Change")

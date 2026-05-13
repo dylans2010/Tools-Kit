@@ -23,7 +23,7 @@ struct CreateTaskView: View {
                     ZStack(alignment: .topLeading) {
                         if description.isEmpty {
                             Text("Notes (Optional)")
-                                .foregroundColor(Color(.placeholderText))
+                                .foregroundStyle(.placeholder)
                                 .padding(.top, 8)
                                 .padding(.leading, 4)
                         }
@@ -54,7 +54,7 @@ struct CreateTaskView: View {
                     Picker("Category", selection: $categoryID) {
                         Text("None").tag(Optional<UUID>.none)
                         ForEach(manager.categories) { cat in
-                            Label(cat.name, systemImage: "folder.fill")
+                            Label(cat.name, systemImage: "folder")
                                 .tag(Optional(cat.id))
                         }
                     }
@@ -72,7 +72,7 @@ struct CreateTaskView: View {
             .navigationTitle(isEditing ? "Edit Task" : "New Task")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
             }

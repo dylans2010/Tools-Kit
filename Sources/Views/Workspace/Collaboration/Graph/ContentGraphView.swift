@@ -94,7 +94,7 @@ struct NodeRow: View {
                 }
                 Spacer()
                 VStack(alignment: .trailing) {
-                    Text("\(edgeCount)").font(.caption).bold().foregroundStyle(.blue)
+                    Text("\(edgeCount)").font(.caption).bold().foregroundStyle(.primary)
                     Text("Links").font(.caption2).foregroundStyle(.secondary)
                 }
             }
@@ -141,16 +141,18 @@ struct NodeDetailView: View {
         NavigationStack {
             List {
                 if let node = node {
-                    Section("Node Info") {
+                    Section {
                         LabeledContent("Type", value: node.nodeType.rawValue)
                         LabeledContent("Created", value: node.createdAt.formatted(date: .abbreviated, time: .omitted))
                         if !node.tags.isEmpty {
                             LabeledContent("Tags", value: node.tags.joined(separator: ", "))
                         }
+                    } header: {
+                        Text("Node Info")
                     }
                 }
 
-                Section("Connections (\(neighbors.count))") {
+                Section {
                     if neighbors.isEmpty {
                         Text("No Connections Yet").foregroundStyle(.secondary).font(.caption)
                     } else {
@@ -158,7 +160,7 @@ struct NodeDetailView: View {
                             HStack {
                                 Image(systemName: "circle.fill")
                                     .font(.caption2)
-                                    .foregroundStyle(.blue)
+                                    .foregroundStyle(.primary)
                                 VStack(alignment: .leading) {
                                     Text(neighbor.label).font(.subheadline)
                                     if let edge = edges.first(where: { ($0.sourceID == nodeID && $0.targetID == neighbor.id) || ($0.targetID == nodeID && $0.sourceID == neighbor.id) }) {
@@ -169,14 +171,18 @@ struct NodeDetailView: View {
                         }
                     }
                     Button("Link To Node…") { showingLinkPicker = true }
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(.primary)
+                } header: {
+                    Text("Connections (\(neighbors.count))")
                 }
 
                 if let node = node, !node.metadata.isEmpty {
-                    Section("Metadata") {
+                    Section {
                         ForEach(Array(node.metadata.keys.sorted()), id: \.self) { key in
                             LabeledContent(key, value: node.metadata[key] ?? "")
                         }
+                    } header: {
+                        Text("Metadata")
                     }
                 }
             }
@@ -215,16 +221,18 @@ struct LinkNodePickerView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Edge Type") {
+                Section {
                     Picker("Type", selection: $linkType) {
                         ForEach(ContentGraphService.EdgeType.allCases, id: \.self) { t in
                             Text(t.rawValue).tag(t)
                         }
                     }
                     .pickerStyle(.wheel)
+                } header: {
+                    Text("Edge Type")
                 }
 
-                Section("Select Target Node") {
+                Section {
                     ForEach(candidates) { node in
                         Button {
                             graph.linkNodes(source: sourceNodeID, target: node.id, type: linkType)
@@ -238,6 +246,8 @@ struct LinkNodePickerView: View {
                         }
                         .buttonStyle(.plain)
                     }
+                } header: {
+                    Text("Select Target Node")
                 }
             }
             .navigationTitle("Link Node")
@@ -262,16 +272,20 @@ struct AddNodeView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Node") {
+                Section {
                     TextField("Label", text: $label)
                     Picker("Type", selection: $nodeType) {
                         ForEach(ContentGraphService.NodeType.allCases, id: \.self) { t in
                             Text(t.rawValue).tag(t)
                         }
                     }
+                } header: {
+                    Text("Node")
                 }
-                Section("Tags") {
+                Section {
                     TextField("e.g. design, sprint-2", text: $tagText)
+                } header: {
+                    Text("Tags")
                 }
             }
             .navigationTitle("Add Node")

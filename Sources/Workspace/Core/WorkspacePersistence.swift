@@ -106,7 +106,7 @@ struct FlowStep: Codable, Identifiable {
     var type: StepType
     var config: [String: String]
 
-    enum StepType: String, Codable {
+    enum StepType: String, Codable, CaseIterable {
         case trigger, condition, action, delay
     }
 }
@@ -181,6 +181,16 @@ final class ConnectorManager: ObservableObject {
     func addLog(_ log: ConnectorLog) {
         logs.insert(log, at: 0)
         if logs.count > 1000 { logs.removeLast() }
+        save()
+    }
+
+    func clearLogs(for connectorID: UUID) {
+        logs.removeAll { $0.connectorID == connectorID }
+        save()
+    }
+
+    func clearAllLogs() {
+        logs.removeAll()
         save()
     }
 }

@@ -72,13 +72,15 @@ struct IntegrationsView: View {
     }
 
     private var filtersSection: some View {
-        Section("Filters") {
+        Section {
             Toggle("Enabled Only", isOn: $showEnabledOnly)
             Picker("Category", selection: $selectedCategory) {
                 ForEach(categories, id: \.self) { category in
                     Text(category).tag(category)
                 }
             }
+        } header: {
+            Text("Filters")
         }
     }
 
@@ -93,10 +95,12 @@ struct IntegrationsView: View {
                 )
             }
         } else {
-            Section("Tools") {
+            Section {
                 ForEach(filteredTools) { tool in
                     toolRow(tool)
                 }
+            } header: {
+                Text("Tools")
             }
         }
     }

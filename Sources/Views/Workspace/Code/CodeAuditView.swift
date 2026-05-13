@@ -5,7 +5,7 @@ struct CodeAuditView: View {
 
     var body: some View {
         List {
-            Section("Detected Modules") {
+            Section {
                 ForEach(analyzer.modules) { module in
                     VStack(alignment: .leading) {
                         Text(module.name)
@@ -15,19 +15,21 @@ struct CodeAuditView: View {
                             .foregroundColor(.secondary)
 
                         HStack {
-                            StatPill(label: module.type.rawValue.capitalized, value: "", color: color(for: module.type))
+                            SDKStatPill(label: module.type.rawValue.capitalized, value: "", color: color(for: module.type))
                             if !module.dependencies.isEmpty {
-                                StatPill(label: "\(module.dependencies.count) Deps", value: "", color: .gray)
+                                SDKStatPill(label: "\(module.dependencies.count) Deps", value: "", color: .gray)
                             }
                         }
                         .padding(.top, 4)
                     }
                     .padding(.vertical, 4)
                 }
+            } header: {
+                Text("Detected Modules")
             }
 
             if let structure = analyzer.auditResult {
-                Section("File Tree") {
+                Section {
                     ForEach(structure.files.prefix(50), id: \.path) { file in
                         HStack {
                             Image(systemName: file.type == "dir" ? "folder" : "doc")
@@ -48,6 +50,8 @@ struct CodeAuditView: View {
                             .foregroundColor(.secondary)
                             .italic()
                     }
+                } header: {
+                    Text("File Tree")
                 }
             }
         }

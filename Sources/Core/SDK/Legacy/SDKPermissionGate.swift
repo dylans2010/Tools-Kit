@@ -5,20 +5,21 @@ public final class SDKPermissionGate {
 
     private init() {}
 
+    @MainActor
     public func enforce(action: SDKAction, context: SDKExecutionContext) throws {
         if context.noSandbox {
-            SDKLogStore.shared.log("PermissionGate: Bypassing scope check for noSandbox mode", source: "SDKPermissionGate", level: .warning)
+            SDKLogStore.shared.log("PermissionGate: Bypassing scope check for noSandbox mode", source: "SDKPermissionGate", level: LogLevel.warning)
             return
         }
 
         let requiredScope = getRequiredScope(for: action)
 
         guard SDKScopeManager.shared.isAuthorized(scope: mapActionToSDKScope(action), operation: .execute) else {
-            SDKLogStore.shared.log("PermissionGate: Denied scope \(requiredScope) for action \(action)", source: "SDKPermissionGate", level: .error)
+            SDKLogStore.shared.log("PermissionGate: Denied scope \(requiredScope) for action \(action)", source: "SDKPermissionGate", level: LogLevel.error)
             throw SDKError.permissionDenied(scope: requiredScope)
         }
 
-        SDKLogStore.shared.log("PermissionGate: Granted scope \(requiredScope)", source: "SDKPermissionGate", level: .debug)
+        SDKLogStore.shared.log("PermissionGate: Granted scope \(requiredScope)", source: "SDKPermissionGate", level: LogLevel.debug)
     }
 
     private func getRequiredScope(for action: SDKAction) -> String {

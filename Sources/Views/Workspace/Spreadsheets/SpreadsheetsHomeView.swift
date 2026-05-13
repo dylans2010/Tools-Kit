@@ -7,32 +7,55 @@ struct SpreadsheetsHomeView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                Color.workspaceBackground.ignoresSafeArea()
+            Group {
+                if manager.spreadsheets.isEmpty {
+                    ContentUnavailableView {
+                        Label("No Sheets Yet", systemImage: "tablecells")
+                    } description: {
+                        Text("Create a spreadsheet to get started with data analysis.")
+                    } actions: {
+                        Button("Create Spreadsheet") { showingCreate = true }
+                            .buttonStyle(.borderedProminent)
+                    }
+                } else {
+                    List {
+                        Section {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Computational Intelligence")
+                                    .font(.title3.bold())
+                                Text("Data analysis, forecasting, and formula automation at your fingertips.")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.vertical, 4)
+                        }
 
-                ScrollView {
-                    VStack(spacing: 20) {
-                        heroHeader
-
-                        if manager.spreadsheets.isEmpty {
-                            emptyState
-                        } else {
-                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 160))], spacing: 16) {
-                                ForEach(manager.spreadsheets) { sheet in
-                                    NavigationLink(destination: SpreadsheetEditorView(spreadsheet: sheet, manager: manager)) {
-                                        SpreadsheetThumbnail(sheet: sheet)
+                        Section("Your Sheets") {
+                            ForEach(manager.spreadsheets) { sheet in
+                                NavigationLink(destination: SpreadsheetEditorView(spreadsheet: sheet, manager: manager)) {
+                                    Label {
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(sheet.name)
+                                                .font(.body.weight(.semibold))
+                                            Text("\(sheet.rows) x \(sheet.columns)")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    } icon: {
+                                        Image(systemName: "tablecells")
                                     }
                                 }
                             }
-                            .padding()
                         }
                     }
                 }
             }
             .navigationTitle("Spreadsheets")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button { showingCreate = true } label: { Image(systemName: "plus.circle.fill").font(.title3) }
+                ToolbarItem(placement: .primaryAction) {
+                    Button { showingCreate = true } label: {
+                        Image(systemName: "plus")
+                    }
                 }
             }
             .sheet(isPresented: $showingCreate) {
@@ -41,61 +64,30 @@ struct SpreadsheetsHomeView: View {
         }
     }
 
-    private var heroHeader: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Computational Intelligence")
-                .font(.title2.bold())
-            Text("Data analysis, forecasting, and formula automation at your fingertips.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 20))
-        .padding()
-    }
-
-    private var emptyState: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "tablecells").font(.system(size: 44)).foregroundStyle(.secondary)
-            Text("No Sheets Yet").font(.headline)
-            Button("Create Spreadsheet") { showingCreate = true }.buttonStyle(.borderedProminent)
-        }
-        .padding(.top, 100)
-    }
-
     private var createSheet: some View {
         NavigationStack {
             Form {
-                TextField("Name", text: $newName)
+                Section {
+                    TextField("Name", text: $newName)
+                } header: {
+                    Text("Sheet Name")
+                }
             }
             .navigationTitle("New Sheet")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { showingCreate = false }
+                }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Create") {
-                        manager.createSpreadsheet(name: newName)
+                        let n = newName.trimmingCharacters(in: .whitespacesAndNewlines)
+                        manager.createSpreadsheet(name: n.isEmpty ? "Untitled" : n)
                         showingCreate = false
                     }
+                    .bold()
                 }
             }
         }
-    }
-}
-
-struct SpreadsheetThumbnail: View {
-    let sheet: Spreadsheet
-    var body: some View {
-        VStack(alignment: .leading) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12).fill(Color.green.opacity(0.1))
-                Image(systemName: "tablecells.fill").font(.title).foregroundStyle(.green)
-            }
-            .frame(height: 100)
-
-            Text(sheet.name).font(.caption.bold()).lineLimit(1).foregroundStyle(.white)
-            Text("\(sheet.rows)x\(sheet.columns)").font(.system(size: 10)).foregroundStyle(.secondary)
-        }
-        .padding(8)
-        .background(Color.workspaceSurface, in: RoundedRectangle(cornerRadius: 16))
     }
 }

@@ -13,11 +13,11 @@ struct FormDetailView: View {
     @State private var importError: String?
 
     private var accentColor: Color {
-        Color(hex: form.accentHexColor) ?? .blue
+        Color(hex: form.accentHexColor)
     }
 
     private var backgroundColor: Color {
-        Color(hex: form.backgroundHexColor) ?? Color(.secondarySystemGroupedBackground)
+        Color(hex: form.backgroundHexColor)
     }
 
     private var canReviewAnswers: Bool {

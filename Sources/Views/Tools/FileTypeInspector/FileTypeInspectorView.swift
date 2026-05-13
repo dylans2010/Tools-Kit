@@ -10,16 +10,20 @@ struct FileTypeInspectorView: View {
         VStack {
             if let file = selectedFile, let type = utType {
                 List {
-                    Section("File Identification") {
+                    Section {
                         LabeledContent("Filename", value: file.lastPathComponent)
                         LabeledContent("Extension", value: file.pathExtension)
                         LabeledContent("MIME Type", value: type.preferredMIMEType ?? "Unknown")
+                    } header: {
+                        Text("File Identification")
                     }
 
-                    Section("Type Metadata") {
+                    Section {
                         LabeledContent("UTI", value: type.identifier)
                         LabeledContent("Description", value: type.localizedDescription ?? "Unknown")
                         LabeledContent("Category", value: String(describing: type.supertypes))
+                    } header: {
+                        Text("Type Metadata")
                     }
                 }
             } else {

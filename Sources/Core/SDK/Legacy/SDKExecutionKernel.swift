@@ -23,7 +23,7 @@ public final class SDKExecutionKernel {
             try dependencyResolver.validate(action: action)
 
             // 2. Check permissions
-            try gate.enforce(action: action, context: context)
+            try await gate.enforce(action: action, context: context)
 
             // 3. Route to target system
             let systemAction = try router.route(action: action)

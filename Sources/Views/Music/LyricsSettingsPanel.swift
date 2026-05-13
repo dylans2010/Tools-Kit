@@ -11,11 +11,13 @@ struct LyricsSettingsPanel: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Visibility") {
+                Section {
                     Toggle("Show Lyrics", isOn: $showLyrics)
+                } header: {
+                    Text("Visibility")
                 }
 
-                Section("Sync Offset") {
+                Section {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Text("Offset")
@@ -31,9 +33,11 @@ struct LyricsSettingsPanel: View {
                             .foregroundColor(.secondary)
                     }
                     .padding(.vertical, 4)
+                } header: {
+                    Text("Sync Offset")
                 }
 
-                Section("Source") {
+                Section {
                     ForEach(LyricsSourceType.allCases, id: \.self) { source in
                         Button {
                             switchSource(to: source)
@@ -49,6 +53,8 @@ struct LyricsSettingsPanel: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Source")
                 }
             }
             .navigationTitle("Lyrics Settings")

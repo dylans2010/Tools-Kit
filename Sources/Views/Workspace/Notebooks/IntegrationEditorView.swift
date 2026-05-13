@@ -59,15 +59,17 @@ struct IntegrationEditorView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Tool Identity") {
+                Section {
                     TextField("Name (e.g. Meeting Action Extractor)", text: $name)
                     TextField("Category (e.g. Product, Study, Meetings)", text: $category)
                     TextField("Tags (comma-separated)", text: $tagsCSV)
                     TextField("Description", text: $description, axis: .vertical)
                         .lineLimit(2...5)
+                } header: {
+                    Text("Tool Identity")
                 }
 
-                Section("Execution Mode") {
+                Section {
                     Picker("Trigger", selection: $triggerMode) {
                         ForEach(IntegrationTool.TriggerMode.allCases) { mode in
                             Text(mode.rawValue).tag(mode)
@@ -83,9 +85,11 @@ struct IntegrationEditorView: View {
                             Text(style.rawValue).tag(style)
                         }
                     }
+                } header: {
+                    Text("Execution Mode")
                 }
 
-                Section("AI Configuration") {
+                Section {
                     TextField("AI Model", text: $aiModel)
                         .autocapitalization(.none)
                         .keyboardType(.asciiCapable)
@@ -98,6 +102,8 @@ struct IntegrationEditorView: View {
 
                     Stepper("Max Tokens: \(maxResponseTokens)", value: $maxResponseTokens, in: 64...8192, step: 64)
                     Stepper("Timeout: \(timeoutSeconds)s", value: $timeoutSeconds, in: 10...300, step: 5)
+                } header: {
+                    Text("AI Configuration")
                 }
 
                 Section {
@@ -148,11 +154,13 @@ struct IntegrationEditorView: View {
                         .font(.caption)
                 }
 
-                Section("Runtime Options") {
+                Section {
                     Toggle("Include Attachments Context", isOn: $includeAttachmentsContext)
                     Toggle("Allow Web Results (if provider supports it)", isOn: $allowWebResults)
                     Toggle("Run in Background Mode", isOn: $runInBackground)
                     Toggle("Enabled", isOn: $isEnabled)
+                } header: {
+                    Text("Runtime Options")
                 }
             }
             .navigationTitle(tool == nil ? "New Integration" : "Edit Integration")

@@ -10,20 +10,24 @@ struct CreatePlaylistView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Playlist Name") {
+                Section {
                     TextField("My Playlist", text: $name)
+                } header: {
+                    Text("Playlist Name")
                 }
 
-                Section("Artwork") {
+                Section {
                     Button {
                         openArtworkCustomizer()
                     } label: {
                         Label("Customize Playlist Artwork", systemImage: "paintbrush.pointed")
                     }
+                } header: {
+                    Text("Artwork")
                 }
 
                 if !library.songs.isEmpty {
-                    Section("Add Songs") {
+                    Section {
                         ForEach(library.songs) { song in
                             HStack {
                                 VStack(alignment: .leading, spacing: 2) {
@@ -42,6 +46,8 @@ struct CreatePlaylistView: View {
                                 else { selectedSongs.insert(song.id) }
                             }
                         }
+                    } header: {
+                        Text("Add Songs")
                     }
                 }
             }

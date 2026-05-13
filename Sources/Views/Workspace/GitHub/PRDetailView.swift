@@ -21,13 +21,13 @@ struct PRDetailView: View {
 
                     HStack {
                         Capsule()
-                            .fill(pullRequest.state == "open" ? Color.green : Color.purple)
-                            .overlay(Text(pullRequest.state.capitalized).font(.caption.bold()).foregroundColor(.white))
+                            .fill(pullRequest.state == "open" ? Color.accentColor : .secondary)
+                            .overlay(Text(pullRequest.state.capitalized).font(.caption.bold()).foregroundStyle(.white))
                             .frame(width: 60, height: 24)
 
                         Text("\(pullRequest.user.login) wants to merge \(pullRequest.head.ref) into \(pullRequest.base.ref)")
                             .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 .padding()
@@ -66,8 +66,8 @@ struct PRDetailView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
+                        .background(Color.accentColor)
+                        .foregroundStyle(.white)
                         .cornerRadius(12)
                         .disabled(isMerging)
 
@@ -79,8 +79,8 @@ struct PRDetailView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.red)
-                        .foregroundColor(.white)
+                        .background(Color(.systemRed))
+                        .foregroundStyle(.white)
                         .cornerRadius(12)
                         .disabled(isMerging)
                     }
@@ -151,7 +151,7 @@ struct StatBox: View {
     var body: some View {
         VStack {
             Text(value).font(.headline).foregroundColor(color)
-            Text(label).font(.caption).foregroundColor(.secondary)
+            Text(label).font(.caption).foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)

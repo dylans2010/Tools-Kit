@@ -46,10 +46,21 @@ struct EditingLayer: Codable, Identifiable {
     var textContent: String?
     var shapeData: Data?
 
+    // Non-destructive adjustments per layer
+    var adjustments: LayerAdjustments = LayerAdjustments()
+
     // Filters applied to this layer
     var filters: [MediaFilter] = []
 
     var metadata: [String: String] = [:]
+}
+
+/// Non-destructive adjustments stored as modifiers on a layer.
+struct LayerAdjustments: Codable, Equatable {
+    var brightness: Double = 0.0
+    var contrast: Double = 1.0
+    var saturation: Double = 1.0
+    var temperature: Double = 0.0
 }
 
 /// Represents a track in the editing timeline.

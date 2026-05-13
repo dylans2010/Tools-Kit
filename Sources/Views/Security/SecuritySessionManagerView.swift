@@ -7,13 +7,15 @@ struct SecuritySessionManagerView: View {
 
     var body: some View {
         List {
-            Section("Current Session") {
+            Section {
                 if let current = activeSessions.first(where: { $0.isCurrent }) {
                     SessionRow(session: current)
                 }
+            } header: {
+                Text("Current Session")
             }
 
-            Section("Other Active Sessions") {
+            Section {
                 ForEach(activeSessions.filter { !$0.isCurrent }) { session in
                     SessionRow(session: session)
                         .swipeActions {
@@ -24,6 +26,8 @@ struct SecuritySessionManagerView: View {
                             }
                         }
                 }
+            } header: {
+                Text("Other Active Sessions")
             }
 
             Section {
@@ -68,7 +72,7 @@ struct SessionRow: View {
         HStack {
             Image(systemName: session.isCurrent ? "iphone.badge.play" : "iphone")
                 .font(.title2)
-                .foregroundStyle(session.isCurrent ? .blue : .secondary)
+                .foregroundStyle(session.isCurrent ? Color.blue : Color.secondary)
                 .frame(width: 40)
 
             VStack(alignment: .leading, spacing: 2) {

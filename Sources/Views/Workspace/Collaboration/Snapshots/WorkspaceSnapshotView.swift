@@ -15,11 +15,11 @@ struct WorkspaceSnapshotView: View {
                 Button(action: { showingSave = true }) {
                     Label("Save Current Snapshot", systemImage: "camera.fill")
                 }
-                .foregroundStyle(.blue)
+                .foregroundStyle(.primary)
             }
 
             if service.snapshots.count >= 2 {
-                Section("Compare Snapshots") {
+                Section {
                     HStack {
                         SnapshotPicker(label: "Before", selection: $compareA, snapshots: service.snapshots)
                         Image(systemName: "arrow.right")
@@ -30,10 +30,12 @@ struct WorkspaceSnapshotView: View {
                         showingDiff = true
                     }
                     .disabled(compareA == nil || compareB == nil)
+                } header: {
+                    Text("Compare Snapshots")
                 }
             }
 
-            Section("Saved Snapshots (\(service.snapshots.count))") {
+            Section {
                 if service.snapshots.isEmpty {
                     Text("No Snapshots Saved Yet").foregroundStyle(.secondary).font(.caption)
                 } else {
@@ -44,6 +46,8 @@ struct WorkspaceSnapshotView: View {
                         offsets.map { service.snapshots[$0].id }.forEach { service.deleteSnapshot(id: $0) }
                     }
                 }
+            } header: {
+                Text("Saved Snapshots (\(service.snapshots.count))")
             }
         }
         .navigationTitle("Snapshots")
@@ -78,7 +82,7 @@ struct SnapshotRow: View {
             }
             Button("Restore") { showingRestore = true }
                 .font(.caption.bold())
-                .foregroundStyle(.orange)
+                .foregroundStyle(.secondary)
         }
         .padding(.vertical, 4)
         .confirmationDialog("Restore '\(snapshot.label)'?", isPresented: $showingRestore, titleVisibility: .visible) {
@@ -102,10 +106,12 @@ struct SaveSnapshotView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Snapshot") {
+                Section {
                     TextField("Label", text: $label)
                     TextField("Notes (Optional)", text: $notes, axis: .vertical)
                         .lineLimit(3...)
+                } header: {
+                    Text("Snapshot")
                 }
             }
             .navigationTitle("Save Snapshot")
@@ -148,14 +154,14 @@ struct SnapshotDiffView: View {
                         Image(systemName: "arrow.right").foregroundStyle(.secondary)
                         Spacer()
                         VStack(alignment: .trailing) {
-                            Text("After").font(.caption.bold()).foregroundStyle(.green)
+                            Text("After").font(.caption.bold()).foregroundStyle(.primary)
                             Text(snapshotB.label).font(.subheadline)
                             Text(snapshotB.createdAt.formatted(date: .abbreviated, time: .shortened)).font(.caption2).foregroundStyle(.secondary)
                         }
                     }
                 }
 
-                Section("Changes (\(diffs.count))") {
+                Section {
                     if diffs.isEmpty {
                         Text("No Differences Found.").foregroundStyle(.secondary).font(.caption)
                     } else {
@@ -166,16 +172,18 @@ struct SnapshotDiffView: View {
                                     Text(diff.before)
                                         .font(.subheadline)
                                         .strikethrough(diff.before != diff.after, color: .red)
-                                        .foregroundStyle(diff.before != diff.after ? .red : .primary)
+                                        .foregroundStyle(diff.before != diff.after ? Color.red : Color.primary)
                                     if diff.before != diff.after {
                                         Image(systemName: "arrow.right").font(.caption).foregroundStyle(.secondary)
-                                        Text(diff.after).font(.subheadline).foregroundStyle(.green)
+                                        Text(diff.after).font(.subheadline).foregroundStyle(.primary)
                                     }
                                 }
                             }
                             .padding(.vertical, 2)
                         }
                     }
+                } header: {
+                    Text("Changes (\(diffs.count))")
                 }
             }
             .navigationTitle("Snapshot Diff")

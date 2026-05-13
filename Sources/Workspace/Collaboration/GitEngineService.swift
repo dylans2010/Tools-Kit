@@ -317,6 +317,38 @@ final class RepoIntelligenceService: ObservableObject {
         codeSmells = foundSmells
         isScanning = false
     }
+
+    func scanRepository() {
+        isScanning = true
+        let fm = FileManager.default
+        let searchPaths = [
+            fm.urls(for: .documentDirectory, in: .userDomainMask).first,
+            fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+        ].compactMap { $0 }
+
+        var collectedFiles: [(path: String, content: String)] = []
+
+        for baseURL in searchPaths {
+            guard let enumerator = fm.enumerator(at: baseURL, includingPropertiesForKeys: [.fileSizeKey], options: [.skipsHiddenFiles]) else { continue }
+            while let url = enumerator.nextObject() as? URL {
+                guard url.pathExtension == "swift" || url.pathExtension == "json" || url.pathExtension == "plist" || url.pathExtension == "yaml" || url.pathExtension == "yml" else { continue }
+                let size = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+                guard size < 500_000 else { continue }
+                if let content = try? String(contentsOf: url, encoding: .utf8) {
+                    collectedFiles.append((path: url.path, content: content))
+                }
+            }
+        }
+
+        if collectedFiles.isEmpty {
+            securityIssues = []
+            codeSmells = []
+            isScanning = false
+            return
+        }
+
+        scanContent(files: collectedFiles)
+    }
 }
 
 /// Builds and manages visual GitHub workflow definitions locally.

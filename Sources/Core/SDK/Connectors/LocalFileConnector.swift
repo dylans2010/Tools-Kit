@@ -6,6 +6,7 @@ public final class LocalFileConnector: BaseConnector {
     public let id = UUID()
     public let name = "Local Files"
     public let type: ConnectorType = .localFileSystem
+    public let requiredScopes: [String] = ["workspace.files.read"]
     @Published public var status: ConnectorStatus = .connected
 
     public var authFields: [AuthField] { [] }
@@ -17,15 +18,15 @@ public final class LocalFileConnector: BaseConnector {
 
     public func authenticate(credentials: [String: String]) async throws {
         status = .connected
-        log("Local file system connected", level: .info)
+        log("Local file system connected", level: LogLevel.info)
     }
 
     public func sync() async throws {
-        log("Scanning sandbox documents...", level: .info)
+        log("Scanning sandbox documents...", level: LogLevel.info)
 
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
         guard let documentsURL = documentsURL else {
-            log("Documents directory not accessible", level: .error)
+            log("Documents directory not accessible", level: LogLevel.error)
             throw SDKError.executionFailed(reason: "Documents directory not accessible")
         }
 
@@ -45,7 +46,7 @@ public final class LocalFileConnector: BaseConnector {
 
         scannedFileCount = fileCount
         let sizeString = ByteCountFormatter.string(fromByteCount: totalSize, countStyle: .file)
-        log("Scanned \(fileCount) files (\(sizeString))", level: .info)
+        log("Scanned \(fileCount) files (\(sizeString))", level: LogLevel.info)
     }
 
     public func testConnection() async throws -> Bool {
@@ -55,7 +56,7 @@ public final class LocalFileConnector: BaseConnector {
 
     public func disconnect() {
         status = .disconnected
-        log("Local files disconnected", level: .info)
+        log("Local files disconnected", level: LogLevel.info)
     }
 
     private func log(_ message: String, level: LogLevel) {

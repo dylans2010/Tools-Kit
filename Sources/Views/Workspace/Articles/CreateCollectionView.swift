@@ -32,8 +32,8 @@ struct CreateCollectionView: View {
                             Image(systemName: icon)
                                 .font(.title3)
                                 .frame(width: 44, height: 44)
-                                .background(selectedIcon == icon ? Color.blue.opacity(0.2) : Color(.systemGray6))
-                                .cornerRadius(8)
+                                .background(selectedIcon == icon ? Color.accentColor.opacity(0.2) : Color(.secondarySystemBackground))
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
                                 .onTapGesture { selectedIcon = icon }
                         }
                     }
@@ -44,7 +44,7 @@ struct CreateCollectionView: View {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 12) {
                         ForEach(colors, id: \.self) { hex in
                             Circle()
-                                .fill(Color(hex: hex) ?? .blue)
+                                .fill(Color(hex: hex))
                                 .frame(width: 36, height: 36)
                                 .overlay(
                                     Circle().stroke(Color.primary, lineWidth: selectedColor == hex ? 2.5 : 0)
@@ -58,10 +58,10 @@ struct CreateCollectionView: View {
             .navigationTitle("New Collection")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .confirmationAction) {
                     Button("Create") {
                         let n = name.trimmingCharacters(in: .whitespacesAndNewlines)
                         manager.createCollection(name: n.isEmpty ? "Untitled" : n, icon: selectedIcon, colorHex: selectedColor)

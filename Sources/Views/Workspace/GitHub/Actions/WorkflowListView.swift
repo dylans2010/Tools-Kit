@@ -18,20 +18,22 @@ struct WorkflowListView: View {
 
     var body: some View {
         List {
-            Section("Dashboard") {
+            Section {
                 LabeledContent("Total Workflows", value: "\(manager.summaries.count)")
                 LabeledContent("Active", value: "\(manager.summaries.filter { $0.workflow.state == "active" }.count)")
                 LabeledContent("Pinned", value: "\(manager.summaries.filter(\.isFavorite).count)")
                 LabeledContent("Templates Available", value: "\(manager.templates.count)")
+            } header: {
+                Text("Dashboard")
             }
 
-            Section("Workflows") {
+            Section {
                 ForEach(filtered) { summary in
                     NavigationLink(destination: WorkflowDetailView(owner: owner, repo: repo, workflow: summary.workflow, lastRun: summary.lastRun)) {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
                                 Text(summary.workflow.name).font(.headline)
-                                if summary.isFavorite { Image(systemName: "pin.fill").foregroundStyle(.orange) }
+                                if summary.isFavorite { Image(systemName: "pin.fill").foregroundStyle(.secondary) }
                             }
                             Text(summary.workflow.path).font(.caption).foregroundStyle(.secondary)
                             Text("State: \(summary.workflow.state) • Trigger: \(summary.triggerDescription)").font(.caption2)
@@ -47,9 +49,11 @@ struct WorkflowListView: View {
                         } label: {
                             Label(summary.isFavorite ? "Unpin" : "Pin", systemImage: summary.isFavorite ? "pin.slash" : "pin")
                         }
-                        .tint(.orange)
+                        .tint(.secondary)
                     }
                 }
+            } header: {
+                Text("Workflows")
             }
         }
         .overlay {

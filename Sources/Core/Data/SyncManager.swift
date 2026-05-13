@@ -32,14 +32,10 @@ final class SyncManager {
     }
 
     private func pullInitialState() async {
-        do {
-            // Real production logic: fetch remote workflows and sync to local store
-            // let remoteWorkflows: [WorkspaceWorkflow] = try await apiClient.request("workflows")
-            // try dataStore.saveWorkflows(remoteWorkflows)
-            print("[SyncManager] Initial state synchronization complete.")
-        } catch {
-            print("[SyncManager] Failed to pull initial state: \(error.localizedDescription)")
-        }
+        // Real production logic: fetch remote workflows and sync to local store
+        // let remoteWorkflows: [WorkspaceWorkflow] = try await apiClient.request("workflows")
+        // try dataStore.saveWorkflows(remoteWorkflows)
+        print("[SyncManager] Initial state synchronization complete.")
     }
 
     private func handleRemoteUpdate(_ payload: [String: Any]) {
@@ -48,13 +44,9 @@ final class SyncManager {
 
         queue.async {
             Task {
-                do {
-                    // Logic to fetch updated data from API and save to DataStore
-                    // let updated: SomeModel = try await self.apiClient.request("sync/\(key)")
-                    // try self.dataStore.save(updated, key: key)
-                } catch {
-                    print("[SyncManager] Failed to sync remote update for \(key)")
-                }
+                // Logic to fetch updated data from API and save to DataStore
+                // let updated: SomeModel = try await self.apiClient.request("sync/\(key)")
+                // try self.dataStore.save(updated, key: key)
             }
         }
     }

@@ -75,9 +75,9 @@ struct ProjectsMainView: View {
     private var projectList: some View {
         VStack(spacing: 0) {
             HStack {
-                StatPill(label: "Active", value: "\(manager.activeProjects.count)", color: .green)
-                StatPill(label: "Completed", value: "\(manager.completedProjects.count)", color: .blue)
-                StatPill(label: "Total", value: "\(manager.projects.count)", color: .secondary)
+                SDKStatPill(label: "Active", value: "\(manager.activeProjects.count)", color: .green)
+                SDKStatPill(label: "Completed", value: "\(manager.completedProjects.count)", color: .blue)
+                SDKStatPill(label: "Total", value: "\(manager.projects.count)", color: .secondary)
             }
             .padding(.horizontal)
             .padding(.top, 8)
@@ -130,7 +130,7 @@ struct ProjectRowView: View {
             HStack(spacing: 14) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(hex: project.colorHex) ?? .blue)
+                        .fill(Color(hex: project.colorHex))
                         .frame(width: 44, height: 44)
                     Image(systemName: project.iconName)
                         .foregroundColor(.white)
@@ -167,7 +167,7 @@ struct ProjectRowView: View {
                     }
 
                     ProgressView(value: progress)
-                        .tint(Color(hex: project.colorHex) ?? .blue)
+                        .tint(Color(hex: project.colorHex))
                         .scaleEffect(x: 1, y: 0.5)
                 }
             }

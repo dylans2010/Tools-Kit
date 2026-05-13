@@ -7,7 +7,7 @@ struct BranchSettingsView: View {
 
     var body: some View {
         List {
-            Section("Protection Rules") {
+            Section {
                 if let rules = protectionService.rules[spaceID], !rules.isEmpty {
                     ForEach(rules) { rule in
                         VStack(alignment: .leading) {
@@ -16,14 +16,16 @@ struct BranchSettingsView: View {
                             if rule.requireApprovals {
                                 Text("Requires \(rule.requiredApprovalCount) Approvals")
                                     .font(.caption)
-                                    .foregroundColor(.orange)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     }
                 } else {
                     Text("No Protection Rules Defined")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
+            } header: {
+                Text("Protection Rules")
             }
 
             Button("Add Protection Rule") {
