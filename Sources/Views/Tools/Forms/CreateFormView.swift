@@ -95,7 +95,7 @@ struct CreateFormView: View {
                                     .autocapitalization(.allCharacters)
                                 ColorPicker("Accent Color", selection: Binding(
                                     get: { accentColor },
-                                    set: { accentHex = $0.toHex() }
+                                    set: { accentHex = $0.toHex() ?? "" }
                                 ), supportsOpacity: false)
                                     .font(.caption)
                             }
@@ -108,7 +108,7 @@ struct CreateFormView: View {
                                     .autocapitalization(.allCharacters)
                                 ColorPicker("Background Color", selection: Binding(
                                     get: { backgroundColor },
-                                    set: { backgroundHex = $0.toHex() }
+                                    set: { backgroundHex = $0.toHex() ?? "" }
                                 ), supportsOpacity: false)
                                     .font(.caption)
                             }

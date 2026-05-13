@@ -44,7 +44,9 @@ struct WhiteboardCanvasView: View {
             iconName: "cursorarrow",
             category: .selection,
             interactionMode: .select,
-            configuration: .init()
+            targetElementTypes: CanvasElement.ElementKind.allCases,
+            configuration: .init(),
+            gestureBinding: .tap
         )
         _activeTool = State(initialValue: defaultTool)
     }
