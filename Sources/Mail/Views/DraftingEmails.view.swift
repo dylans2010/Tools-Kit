@@ -1,4 +1,5 @@
 import SwiftUI
+import Aurora
 
 struct DraftingEmailResult {
     let recipient: String

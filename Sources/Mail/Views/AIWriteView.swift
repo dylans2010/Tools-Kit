@@ -1,4 +1,5 @@
 import SwiftUI
+import Aurora
 
 struct AIWriteView: View {
     @Environment(\.dismiss) private var dismiss

@@ -1,4 +1,5 @@
 import SwiftUI
+import Aurora
 
 struct InboxAIFeaturesView: View {
     @Environment(\.dismiss) private var dismiss

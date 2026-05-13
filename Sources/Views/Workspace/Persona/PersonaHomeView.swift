@@ -1,4 +1,5 @@
 import SwiftUI
+import Aurora
 
 struct PersonaHomeView: View {
     @ObservedObject private var manager = PersonaManager.shared

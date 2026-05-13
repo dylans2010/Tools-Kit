@@ -891,6 +891,14 @@
 		A00200000000000000000108 /* LiveTuningDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000104 /* LiveTuningDemo.swift */; };
 		A00200000000000000000109 /* CustomProfileDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000105 /* CustomProfileDemo.swift */; };
 		A00200000000000000000110 /* CustomProfileDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000105 /* CustomProfileDemo.swift */; };
+		A00200000000000000000201 /* LiveTuningGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000201 /* LiveTuningGlow.swift */; };
+		A00200000000000000000202 /* LiveTuningGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000201 /* LiveTuningGlow.swift */; };
+		A00200000000000000000203 /* WashGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000202 /* WashGlow.swift */; };
+		A00200000000000000000204 /* WashGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000202 /* WashGlow.swift */; };
+		A00200000000000000000205 /* CustomGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000203 /* CustomGlow.swift */; };
+		A00200000000000000000206 /* CustomGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000203 /* CustomGlow.swift */; };
+		A00200000000000000000207 /* MoodGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000204 /* MoodGlow.swift */; };
+		A00200000000000000000208 /* MoodGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000204 /* MoodGlow.swift */; };
 		A00200000000000000000111 /* WashTuningDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000106 /* WashTuningDemo.swift */; };
 		A00200000000000000000112 /* WashTuningDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000106 /* WashTuningDemo.swift */; };
 		A00200000000000000000113 /* PaletteGalleryDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000107 /* PaletteGalleryDemo.swift */; };
@@ -1801,6 +1809,10 @@
 		A00100000000000000000103 /* HeroDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroDemo.swift; sourceTree = "<group>"; };
 		A00100000000000000000104 /* LiveTuningDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveTuningDemo.swift; sourceTree = "<group>"; };
 		A00100000000000000000105 /* CustomProfileDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomProfileDemo.swift; sourceTree = "<group>"; };
+		A00100000000000000000201 /* LiveTuningGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveTuningGlow.swift; sourceTree = "<group>"; };
+		A00100000000000000000202 /* WashGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WashGlow.swift; sourceTree = "<group>"; };
+		A00100000000000000000203 /* CustomGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomGlow.swift; sourceTree = "<group>"; };
+		A00100000000000000000204 /* MoodGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodGlow.swift; sourceTree = "<group>"; };
 		A00100000000000000000106 /* WashTuningDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WashTuningDemo.swift; sourceTree = "<group>"; };
 		A00100000000000000000107 /* PaletteGalleryDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteGalleryDemo.swift; sourceTree = "<group>"; };
 		A00100000000000000000108 /* MoodDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodDemo.swift; sourceTree = "<group>"; };
@@ -6336,9 +6348,21 @@
 			children = (
 				A00100000000000000000001 /* SiriCoreUIView.swift */,
 				A00100000000000000000002 /* GlowingUIView.swift */,
+				A00300000000000000000003 /* Structs */,
 				A00300000000000000000002 /* Internal Demos */,
 			);
 			path = "Advanced UIs";
+			sourceTree = "<group>";
+		};
+		A00300000000000000000003 /* Structs */ = {
+			isa = PBXGroup;
+			children = (
+				A00100000000000000000201 /* LiveTuningGlow.swift */,
+				A00100000000000000000202 /* WashGlow.swift */,
+				A00100000000000000000203 /* CustomGlow.swift */,
+				A00100000000000000000204 /* MoodGlow.swift */,
+			);
+			path = Structs;
 			sourceTree = "<group>";
 		};
 		A00300000000000000000002 /* Internal Demos */ = {
@@ -9867,6 +9891,10 @@
 				A00200000000000000000105 /* HeroDemo.swift in Sources */,
 				A00200000000000000000107 /* LiveTuningDemo.swift in Sources */,
 				A00200000000000000000109 /* CustomProfileDemo.swift in Sources */,
+				A00200000000000000000201 /* LiveTuningGlow.swift in Sources */,
+				A00200000000000000000203 /* WashGlow.swift in Sources */,
+				A00200000000000000000205 /* CustomGlow.swift in Sources */,
+				A00200000000000000000207 /* MoodGlow.swift in Sources */,
 				A00200000000000000000111 /* WashTuningDemo.swift in Sources */,
 				A00200000000000000000113 /* PaletteGalleryDemo.swift in Sources */,
 				A00200000000000000000115 /* MoodDemo.swift in Sources */,
@@ -11293,6 +11321,10 @@
 				A00200000000000000000106 /* HeroDemo.swift in Sources */,
 				A00200000000000000000108 /* LiveTuningDemo.swift in Sources */,
 				A00200000000000000000110 /* CustomProfileDemo.swift in Sources */,
+				A00200000000000000000202 /* LiveTuningGlow.swift in Sources */,
+				A00200000000000000000204 /* WashGlow.swift in Sources */,
+				A00200000000000000000206 /* CustomGlow.swift in Sources */,
+				A00200000000000000000208 /* MoodGlow.swift in Sources */,
 				A00200000000000000000112 /* WashTuningDemo.swift in Sources */,
 				A00200000000000000000114 /* PaletteGalleryDemo.swift in Sources */,
 				A00200000000000000000116 /* MoodDemo.swift in Sources */,
