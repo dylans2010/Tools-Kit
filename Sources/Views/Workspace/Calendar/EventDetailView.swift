@@ -65,8 +65,8 @@ struct EventDetailView: View {
                     .font(.caption.bold())
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
-                    .background(Color(hex: event.priority.color)?.opacity(0.2) ?? .blue.opacity(0.2), in: Capsule())
-                    .foregroundStyle(Color(hex: event.priority.color) ?? Color.blue)
+                    .background(Color(hex: event.priority.color).opacity(0.2), in: Capsule())
+                    .foregroundStyle(Color(hex: event.priority.color))
 
                 Spacer()
 

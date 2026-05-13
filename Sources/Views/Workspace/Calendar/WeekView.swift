@@ -89,8 +89,8 @@ struct WeekDayRow: View {
                                         .font(.caption.bold())
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
-                                        .background(Color(hex: event.priority.color)?.opacity(0.2) ?? Color.blue.opacity(0.2), in: Capsule())
-                                        .foregroundStyle(Color(hex: event.priority.color) ?? Color.blue)
+                                        .background(Color(hex: event.priority.color).opacity(0.2), in: Capsule())
+                                        .foregroundStyle(Color(hex: event.priority.color))
                                 }
                             }
                         }

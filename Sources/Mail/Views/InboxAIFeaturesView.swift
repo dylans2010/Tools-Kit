@@ -84,7 +84,7 @@ struct InboxAIFeaturesView: View {
     private var backgroundGradient: LinearGradient {
         LinearGradient(
             colors: [
-                Color(hex: "#090E1F") ?? .black,
+                Color(hex: "#090E1F"),
                 Color.workspaceBackground ?? .black
             ],
             startPoint: .topLeading,

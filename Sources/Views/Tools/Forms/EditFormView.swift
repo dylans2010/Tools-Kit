@@ -24,7 +24,7 @@ struct EditFormView: View {
     ]
 
     private var accentColor: Color {
-        Color(hex: form.accentHexColor) ?? .blue
+        Color(hex: form.accentHexColor)
     }
 
     var body: some View {

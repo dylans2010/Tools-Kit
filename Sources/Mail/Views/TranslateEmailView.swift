@@ -212,7 +212,7 @@ struct TranslateEmailView: View {
 
     private var backgroundGradient: LinearGradient {
         LinearGradient(
-            colors: [Color(hex: "#05070F") ?? .black, Color(hex: "#101A31") ?? .black, Color(hex: "#1B1231") ?? .black],
+            colors: [Color(hex: "#05070F"), Color(hex: "#101A31"), Color(hex: "#1B1231")],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )

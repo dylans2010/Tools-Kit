@@ -73,7 +73,7 @@ struct TaskCategoryView: View {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8), spacing: 12) {
                         ForEach(presetColors, id: \.self) { hex in
                             Circle()
-                                .fill(Color(hex: hex) ?? .accentColor)
+                                .fill(Color(hex: hex))
                                 .frame(width: 32, height: 32)
                                 .overlay(
                                     Circle()

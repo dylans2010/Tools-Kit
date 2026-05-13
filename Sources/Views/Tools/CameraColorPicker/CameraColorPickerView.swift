@@ -37,7 +37,7 @@ struct CameraColorPickerView: View {
                             HStack(spacing: 12) {
                                 ForEach(backend.history, id: \.self) { hex in
                                     Circle()
-                                        .fill(Color(hex: hex) ?? .clear)
+                                        .fill(Color(hex: hex))
                                         .frame(width: 44, height: 44)
                                         .overlay(Circle().stroke(Color.secondary.opacity(0.2), lineWidth: 1))
                                 }
