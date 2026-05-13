@@ -69,60 +69,76 @@ struct SiriCoreUIView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                previewSection
-                controlsSection
+        ZStack {
+            // Full-screen Aurora Glow background
+            AuroraGlow(state.style)
+                .mood(state.mood ?? .listening) // Use mood if available, default to listening for demo
+                .palette(palette)
+                .speed(speed)
+                .glowSize(intensity * 40 + 10)
+                .washPeak(reactiveMotion ? 0.15 : 0.0)
+                .ignoresSafeArea()
+
+            // Foreground UI Content
+            ScrollView {
+                VStack(spacing: 32) {
+                    contentPreview
+                        .frame(height: 300)
+                        .padding(.top, 40)
+
+                    controlsSection
+                        .background(
+                            RoundedRectangle(cornerRadius: 24)
+                                .fill(.ultraThinMaterial)
+                                .shadow(color: .black.opacity(0.1), radius: 10)
+                        )
+                        .padding(.horizontal)
+                }
+                .padding(.bottom, 40)
             }
-            .padding(.vertical)
         }
-        .background(Color(.systemGroupedBackground))
         .navigationTitle("Siri Core UI")
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    private var baseGlow: AuroraGlow {
-        if let mood = state.mood {
-            return AuroraGlow(state.style).mood(mood)
-        } else {
-            return AuroraGlow(state.style)
+    private var contentPreview: some View {
+        VStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .fill(.ultraThinMaterial)
+                    .frame(width: 120, height: 120)
+                    .overlay(
+                        Circle()
+                            .stroke(.white.opacity(0.2), lineWidth: 1)
+                    )
+
+                Image(systemName: state == .listening ? "mic.fill" : "sparkles")
+                    .font(.system(size: 48))
+                    .foregroundStyle(.white)
+                    .symbolEffect(.bounce, value: state)
+            }
+
+            Text(state.rawValue)
+                .font(.title2.bold())
+                .foregroundColor(.white)
+                .shadow(radius: 5)
         }
-    }
-
-    private var configuredGlow: AuroraGlow {
-        baseGlow
-            .speed(speed)
-            .glowSize(intensity * 40 + 10)
-            .palette(palette)
-            .washPeak(reactiveMotion ? 0.15 : 0.0)
-    }
-
-    private var previewSection: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 32, style: .continuous)
-                .fill(Color.black)
-                .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
-
-            contentPreview.glow(configuredGlow)
-        }
-        .frame(height: 320)
-        .padding(.horizontal)
     }
 
     private var controlsSection: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 24) {
             stateSelectorSection
             paletteSelectionSection
             slidersSection
             resetDefaultsButton
         }
+        .padding()
     }
 
     private var stateSelectorSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Label("Current State", systemImage: "waveform")
                 .font(.headline)
-                .padding(.horizontal)
 
             Picker("Current State", selection: $state) {
                 ForEach(ViewState.allCases) { state in
@@ -130,7 +146,6 @@ struct SiriCoreUIView: View {
                 }
             }
             .pickerStyle(.segmented)
-            .padding(.horizontal)
         }
     }
 
@@ -138,7 +153,6 @@ struct SiriCoreUIView: View {
         VStack(alignment: .leading, spacing: 12) {
             Label("Palette", systemImage: "paintpalette")
                 .font(.headline)
-                .padding(.horizontal)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
@@ -151,7 +165,6 @@ struct SiriCoreUIView: View {
                         }
                     }
                 }
-                .padding(.horizontal)
             }
         }
     }
@@ -177,9 +190,8 @@ struct SiriCoreUIView: View {
                     .font(.headline)
             }
             .padding()
-            .background(Color(.secondarySystemGroupedBackground))
+            .background(Color(.secondarySystemGroupedBackground).opacity(0.5))
             .cornerRadius(16)
-            .padding(.horizontal)
         }
     }
 
@@ -194,31 +206,11 @@ struct SiriCoreUIView: View {
             }
         } label: {
             Label("Reset Defaults", systemImage: "arrow.counterclockwise")
+                .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color(.secondarySystemGroupedBackground))
+                .background(Color(.secondarySystemGroupedBackground).opacity(0.8))
                 .cornerRadius(16)
-        }
-        .padding(.horizontal)
-        .padding(.bottom, 30)
-    }
-
-    private var contentPreview: some View {
-        VStack(spacing: 16) {
-            ZStack {
-                Circle()
-                    .fill(.ultraThinMaterial)
-                    .frame(width: 100, height: 100)
-
-                Image(systemName: state == .listening ? "mic.fill" : "sparkles")
-                    .font(.system(size: 44))
-                    .foregroundStyle(.white)
-                    .symbolEffect(.bounce, value: state)
-            }
-
-            Text(state.rawValue)
-                .font(.title3.bold())
-                .foregroundColor(.white)
         }
     }
 }
@@ -234,7 +226,7 @@ struct PaletteChip: View {
                 .font(.subheadline.weight(.medium))
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(isSelected ? Color.blue : Color(.secondarySystemGroupedBackground))
+                .background(isSelected ? Color.blue : Color(.secondarySystemGroupedBackground).opacity(0.5))
                 .foregroundColor(isSelected ? .white : .primary)
                 .clipShape(Capsule())
                 .overlay(
@@ -266,9 +258,8 @@ struct ParameterSlider: View {
                 .tint(.blue)
         }
         .padding()
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(Color(.secondarySystemGroupedBackground).opacity(0.5))
         .cornerRadius(16)
-        .padding(.horizontal)
     }
 }
 

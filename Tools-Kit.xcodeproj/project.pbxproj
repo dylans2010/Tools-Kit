@@ -879,6 +879,8 @@
 		DV0200000000000000000015 /* SDKUIComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000015 /* SDKUIComponents.swift */; };
 		A00200000000000000000001 /* SiriCoreUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000001 /* SiriCoreUIView.swift */; };
 		A00200000000000000000002 /* SiriCoreUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000001 /* SiriCoreUIView.swift */; };
+		A00200000000000000000003 /* GlowingUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000002 /* GlowingUIView.swift */; };
+		A00200000000000000000004 /* GlowingUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000002 /* GlowingUIView.swift */; };
 		C55C83D89974490D95A25381 /* revert_commit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E8647ED6564F6089115FC0 /* revert_commit.swift */; };
 		63C324C2B81B4F69B4BD036B /* profile_runtime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4AAD1E0AAC45D18918053D /* profile_runtime.swift */; };
 		4FB758CF14514C3C9789AA6D /* api_contract_scan.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9395E8F2234858B419C0B5 /* api_contract_scan.swift */; };
@@ -1775,6 +1777,7 @@
 		8089CEDC467040D2B38719FF /* SectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
 		DV0100000000000000000015 /* SDKUIComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKUIComponents.swift; sourceTree = "<group>"; };
 		A00100000000000000000001 /* SiriCoreUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiriCoreUIView.swift; sourceTree = "<group>"; };
+		A00100000000000000000002 /* GlowingUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlowingUIView.swift; sourceTree = "<group>"; };
 		CA1234567890ABCDEF123456 /* CameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreview.swift; sourceTree = "<group>"; };
 		8F5090DCA1AD4E1DA6D7A453 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		126F5D3967E54F42B0F95A85 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
@@ -6305,6 +6308,7 @@
 			isa = PBXGroup;
 			children = (
 				A00100000000000000000001 /* SiriCoreUIView.swift */,
+				A00100000000000000000002 /* GlowingUIView.swift */,
 			);
 			path = "Advanced UIs";
 			sourceTree = "<group>";
@@ -9813,6 +9817,7 @@
 				SK020005 /* in Sources */,
 				SK020006 /* in Sources */,
 				A00200000000000000000002 /* SiriCoreUIView.swift in Sources */,
+				A00200000000000000000004 /* GlowingUIView.swift in Sources */,
 				NB0100000000000000000001 /* SDKAnalyticsEngine.swift in Sources */,
 				NB0100000000000000000002 /* SDKWorkflowEngine.swift in Sources */,
 				NB0100000000000000000003 /* SDKTestHarness.swift in Sources */,
@@ -11229,6 +11234,7 @@
 				MS028A4E8FF9A0449D039277 /* JSONCoder.swift in Sources */,
 				C0B0B0B0B0B0B0B0B0B0B001 /* Color+Hex.swift in Sources */,
 				A00200000000000000000001 /* SiriCoreUIView.swift in Sources */,
+				A00200000000000000000003 /* GlowingUIView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
