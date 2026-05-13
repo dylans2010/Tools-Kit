@@ -118,6 +118,9 @@ struct DraftingEmailsView: View {
                 }
             }
         }
+        .glowWhileLoading(isGenerating) {
+            CustomGlow(anchorAmp: 0.5, anchorSpd: 2.5, flameAmp: 3.0, decayRate: 1.2)
+        }
     }
 
     private var headerSection: some View {

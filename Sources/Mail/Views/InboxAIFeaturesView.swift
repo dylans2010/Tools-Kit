@@ -61,6 +61,9 @@ struct InboxAIFeaturesView: View {
             .sheet(isPresented: $showingEmailsUsed) {
                 emailsUsedSheet
             }
+            .glowWhileLoading(isAnalyzing) {
+                MoodGlow(mood: .listening, style: .standard)
+            }
             .navigationDestination(item: $selectedEmail) { message in
                 if let account {
                     InboxMessageDetailView(account: account, message: message)

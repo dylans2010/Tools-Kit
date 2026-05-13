@@ -7,6 +7,7 @@ public struct AIGenerateSlides: View {
     @StateObject private var whiteboardStore = WhiteboardStore.shared
     @StateObject private var keyboardObserver = KeyboardObserver()
     @StateObject private var backdropManager = KeyboardBackdropManager.shared
+    @FocusState private var isInputFocused: Bool
 
     // All text input state is owned here but edited exclusively via the keyboard extension.
     @State private var rawText = ""
@@ -49,6 +50,9 @@ public struct AIGenerateSlides: View {
                             fieldSelectorRow
 
                             activeFieldPreview
+                                .onTapGesture {
+                                    isInputFocused = true
+                                }
                         }
                     }
 
@@ -153,15 +157,6 @@ public struct AIGenerateSlides: View {
                     .disabled(manager.isGenerating)
                     .shadow(color: .purple.opacity(0.5), radius: 8, x: 0, y: 4)
 
-                    if manager.isGenerating {
-                        VStack(alignment: .leading, spacing: 6) {
-                            ProgressView(value: manager.progressValue)
-                                .tint(.cyan)
-                            Text(manager.progressMessage)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
 
                     // Slide Preview (Scheme)
                     if let scheme = manager.latestScheme {
@@ -172,6 +167,9 @@ public struct AIGenerateSlides: View {
                 }
                 .padding()
             }
+        }
+        .glowWhileLoading(manager.isGenerating) {
+            LiveTuningGlow()
         }
         .withKeyboardGlowBackdrop()
         .navigationTitle("AI Slides")
@@ -186,7 +184,8 @@ public struct AIGenerateSlides: View {
                 selectedStyleID: $selectedStyleID,
                 selectedThemeID: $selectedThemeID,
                 onSubmit: generate,
-                keyboard: keyboardObserver
+                keyboard: keyboardObserver,
+                isTextFieldFocused: $isInputFocused
             )
         }
         .alert("Generation Error", isPresented: $showErrorAlert) {

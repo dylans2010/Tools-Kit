@@ -143,6 +143,9 @@ struct AIWriteView: View {
                 }
             }
         }
+        .glowWhileLoading(isGenerating) {
+            WashGlow(style: .dramatic, pulseWidth: 0.8, peak: 0.15)
+        }
     }
 
     private var headerSection: some View {

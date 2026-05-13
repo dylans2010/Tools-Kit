@@ -328,17 +328,26 @@ struct PersonaHomeView: View {
     }
 
     var body: some View {
-        PersonaHomeNavigationContent(
-            chatHistory: manager.chatHistory,
-            isThinking: manager.isThinking,
-            query: $query,
-            shuffledPrompts: shuffledPrompts,
-            followUpSuggestions: followUpSuggestions,
-            onPromptSelection: selectPromptAndSend(_:),
-            onSend: sendMessage,
-            onOpenDiscovery: openDiscovery,
-            onNeedScroll: scrollToBottom
-        )
+        ZStack {
+            AuroraGlow(.standard)
+                .palette(.appleIntelligence)
+                .speed(0.08)
+                .opacity(0.4)
+                .ignoresSafeArea()
+
+            PersonaHomeNavigationContent(
+                chatHistory: manager.chatHistory,
+                isThinking: manager.isThinking,
+                query: $query,
+                shuffledPrompts: shuffledPrompts,
+                followUpSuggestions: followUpSuggestions,
+                onPromptSelection: selectPromptAndSend(_:),
+                onSend: sendMessage,
+                onOpenDiscovery: openDiscovery,
+                onNeedScroll: scrollToBottom,
+                onClearHistory: { manager.clearHistory() }
+            )
+        }
         .navigationTitle("AI Persona")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -424,9 +433,13 @@ private struct PersonaHomeNavigationContent: View {
     let onSend: () -> Void
     let onOpenDiscovery: () -> Void
     let onNeedScroll: (ScrollViewProxy) -> Void
+    let onClearHistory: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
+            PersonaQuickActionsView(onPromptSelection: onPromptSelection, onClearHistory: onClearHistory)
+                .padding(.top, 8)
+
             PersonaChatTimelineView(
                 chatHistory: chatHistory,
                 isThinking: isThinking,
@@ -442,6 +455,57 @@ private struct PersonaHomeNavigationContent: View {
                 onTapPrompt: onPromptSelection,
                 onSend: onSend,
                 onOpenDiscovery: onOpenDiscovery
+            )
+        }
+    }
+}
+
+private struct PersonaQuickActionsView: View {
+    let onPromptSelection: (String) -> Void
+    let onClearHistory: () -> Void
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                QuickActionButton(title: "Catch Up", icon: "bolt.fill", color: .yellow) {
+                    onPromptSelection("Summarize my recent emails and tasks")
+                }
+                QuickActionButton(title: "My Schedule", icon: "calendar", color: .blue) {
+                    onPromptSelection("What does my day look like?")
+                }
+                QuickActionButton(title: "Priorities", icon: "exclamationmark.triangle.fill", color: .orange) {
+                    onPromptSelection("What are my top priorities today?")
+                }
+                QuickActionButton(title: "Clear", icon: "trash", color: .red, action: onClearHistory)
+            }
+            .padding(.horizontal)
+        }
+    }
+}
+
+private struct QuickActionButton: View {
+    let title: String
+    let icon: String
+    let color: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .bold))
+                Text(title)
+                    .font(.system(size: 13, weight: .semibold))
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(color.opacity(0.15))
+            .background(.ultraThinMaterial)
+            .cornerRadius(12)
+            .foregroundStyle(color)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(color.opacity(0.3), lineWidth: 1)
             )
         }
     }
@@ -562,9 +626,10 @@ private struct PersonaChatBubble: View {
 
             VStack(alignment: isUser ? .trailing : .leading, spacing: 4) {
                 PersonaMarkdownBubbleText(markdown: message.content, isUser: isUser)
-                    .padding(12)
+                    .padding(14)
                     .background(PersonaMessageBubbleBackground(isUser: isUser))
                     .foregroundStyle(isUser ? Color.white : Color.primary)
+                    .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
                     .contextMenu {
                         Button {
                             UIPasteboard.general.string = message.content
@@ -779,17 +844,26 @@ struct ThinkingIndicator: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 4) {
+                HStack(spacing: 6) {
                     ForEach(0..<3) { index in
                         Circle()
-                            .fill(Color.accentColor)
-                            .frame(width: 7, height: 7)
-                            .scaleEffect(animStep == index ? 1.2 : 0.8)
-                            .opacity(animStep == index ? 1.0 : 0.4)
+                            .fill(
+                                LinearGradient(colors: [.blue, .purple, .cyan], startPoint: .topLeading, endPoint: .bottomTrailing)
+                            )
+                            .frame(width: 8, height: 8)
+                            .scaleEffect(animStep == index ? 1.3 : 0.7)
+                            .opacity(animStep == index ? 1.0 : 0.3)
                     }
                 }
-                .padding(14)
-                .background(RoundedRectangle(cornerRadius: 18).fill(Color.secondary.opacity(0.15)))
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(.ultraThinMaterial)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                        )
+                )
             }
             Spacer()
         }

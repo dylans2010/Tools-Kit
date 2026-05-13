@@ -19,7 +19,7 @@ struct DualKeyboardInputView: View {
     var onSubmit: () -> Void
 
     @ObservedObject var keyboard: KeyboardObserver
-    @FocusState private var isTextFieldFocused: Bool
+    @FocusState.Binding var isTextFieldFocused: Bool
     @State private var animateIn = false
 
     // Binding to the currently-active text field
