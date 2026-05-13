@@ -175,7 +175,7 @@ struct InboxView: View {
                     }
                     .padding(.vertical, 4)
                 }
-                .listRowBackground(Color(hex: "#161622"))
+                .listRowBackground(Color(hex: "#161622") ?? Color.black)
             }
 
             if visibleThreads.isEmpty {
