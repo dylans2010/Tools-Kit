@@ -1442,6 +1442,11 @@
 		C0B0B0B0B0B0B0B0B0B0B002 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
 		C0B0B0B0B0B0B0B0B0B0B001 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
 		C0B0B0B0B0B0B0B0B0B0B003 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
+		A00200000000000000000201 /* CustomGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000201 /* CustomGlow.swift */; };
+		A00200000000000000000202 /* HeroGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000202 /* HeroGlow.swift */; };
+		A00200000000000000000203 /* LiveTuningGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000203 /* LiveTuningGlow.swift */; };
+		A00200000000000000000204 /* MoodGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000204 /* MoodGlow.swift */; };
+		A00200000000000000000205 /* WashGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000205 /* WashGlow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2864,6 +2869,11 @@
 		SK010005 /* DraftSkillsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Views/Tools/AIChat/Skills/DraftSkillsView.swift"; sourceTree = "<group>"; };
 		SK010006 /* SkillPickerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/SkillPickerModifier.swift"; sourceTree = "<group>"; };
 		C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
+		A00100000000000000000201 /* CustomGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/CustomGlow.swift"; sourceTree = "<group>"; };
+		A00100000000000000000202 /* HeroGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/HeroGlow.swift"; sourceTree = "<group>"; };
+		A00100000000000000000203 /* LiveTuningGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/LiveTuningGlow.swift"; sourceTree = "<group>"; };
+		A00100000000000000000204 /* MoodGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/MoodGlow.swift"; sourceTree = "<group>"; };
+		A00100000000000000000205 /* WashGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/Structs/WashGlow.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -6335,6 +6345,7 @@
 			isa = PBXGroup;
 			children = (
 				A00100000000000000000001 /* SiriCoreUIView.swift */,
+				A00300000000000000000200 /* Structs */,
 				A00100000000000000000002 /* GlowingUIView.swift */,
 				A00300000000000000000002 /* Internal Demos */,
 			);
@@ -6356,6 +6367,18 @@
 			);
 			path = "Internal Demos";
 			sourceTree = "<group>";
+		A00300000000000000000200 /* Structs */ = {
+			isa = PBXGroup;
+			children = (
+				A00100000000000000000201 /* CustomGlow.swift */,
+				A00100000000000000000202 /* HeroGlow.swift */,
+				A00100000000000000000203 /* LiveTuningGlow.swift */,
+				A00100000000000000000204 /* MoodGlow.swift */,
+				A00100000000000000000205 /* WashGlow.swift */,
+			);
+			path = Structs;
+			sourceTree = "<group>";
+		};
 		};
 		9D3BFD7FE51B493F849CDF84 /* Models */ = {
 			isa = PBXGroup;
@@ -9868,6 +9891,11 @@
 				A00200000000000000000107 /* LiveTuningDemo.swift in Sources */,
 				A00200000000000000000109 /* CustomProfileDemo.swift in Sources */,
 				A00200000000000000000111 /* WashTuningDemo.swift in Sources */,
+				A00200000000000000000201 /* CustomGlow.swift in Sources */,
+				A00200000000000000000202 /* HeroGlow.swift in Sources */,
+				A00200000000000000000203 /* LiveTuningGlow.swift in Sources */,
+				A00200000000000000000204 /* MoodGlow.swift in Sources */,
+				A00200000000000000000205 /* WashGlow.swift in Sources */,
 				A00200000000000000000113 /* PaletteGalleryDemo.swift in Sources */,
 				A00200000000000000000115 /* MoodDemo.swift in Sources */,
 				A00200000000000000000117 /* LoadingDemo.swift in Sources */,

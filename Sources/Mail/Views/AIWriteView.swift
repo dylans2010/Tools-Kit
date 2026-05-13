@@ -1,4 +1,5 @@
 import SwiftUI
+import Aurora
 
 struct AIWriteView: View {
     @Environment(\.dismiss) private var dismiss
@@ -129,10 +130,9 @@ struct AIWriteView: View {
                 .safeAreaInset(edge: .bottom) {
                     generateButton
                 }
-
-                if isGenerating {
-                    loadingOverlay
-                }
+            }
+            .glowWhileLoading(isGenerating) {
+                HeroGlow(style: .standard)
             }
             .navigationTitle("AI Intelligence")
             .navigationBarTitleDisplayMode(.inline)
@@ -264,23 +264,6 @@ struct AIWriteView: View {
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.1), lineWidth: 1))
-    }
-
-    private var loadingOverlay: some View {
-        ZStack {
-            Color.black.opacity(0.4).ignoresSafeArea()
-
-            VStack(spacing: 16) {
-                ProgressView()
-                    .scaleEffect(1.5)
-                    .tint(.white)
-                Text("AI is processing...")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-            }
-            .padding(30)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
-        }
     }
 
     private var placeholderText: String {
