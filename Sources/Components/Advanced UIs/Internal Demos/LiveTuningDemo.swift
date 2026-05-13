@@ -44,7 +44,7 @@ struct LiveTuningDemo: View {
         )
       }
     }
-    .navigationTitle("Live tuning")
+    .navigationTitle("Live Tuning")
     .navigationBarTitleDisplayMode(.inline)
     .toolbarBackground(.black, for: .navigationBar)
     .animation(.easeInOut(duration: 0.25), value: isVisible)
@@ -158,7 +158,7 @@ private struct BurstButton: View {
 
   var body: some View {
     Button(action: action) {
-      Label("Trigger burst", systemImage: "sparkles")
+      Label("Trigger Burst", systemImage: "sparkles")
         .font(.system(size: 15, weight: .semibold))
         .frame(maxWidth: .infinity)
         .frame(height: 46)
@@ -186,7 +186,7 @@ private struct VisibilityButton: View {
   var body: some View {
     Button(action: action) {
       Label(
-        isVisible ? "Hide glow" : "Show glow",
+        isVisible ? "Hide Glow" : "Show Glow",
         systemImage: isVisible ? "eye.slash.fill" : "eye.fill"
       )
       .font(.system(size: 14, weight: .semibold))

@@ -41,8 +41,6 @@ struct DraftSkillsView: View {
             Section {
                 Button("Add Skill") {
                     skillsManager.addSkill(name: name, content: content)
-                    // We need to dismiss twice to get back to SkillsView
-                    // but since this is usually in a sheet's NavigationStack:
                     dismiss()
                 }
                 .disabled(name.isEmpty || content.isEmpty)
@@ -58,8 +56,8 @@ struct DraftSkillsView: View {
         isGenerating = true
         Task {
             do {
-                let prompt = "Generate a comprehensive 'skill.md' file content based on this description: \(aiPrompt). The content should be clear instructions for an AI assistant."
-                let generated = try await AIService.shared.processText(prompt: prompt, systemPrompt: "You are an expert at writing system prompts and AI skills in markdown.")
+                let prompt = "Generate a comprehensive 'skill.md' file content based on this description: \(aiPrompt). The content should be clear instructions for an AI assistant but YOU MUST RETURN THE COMPLETE MARKDOWN FILE CONTENT AS THE OUTPUT, NOTHING ELSE."
+                let generated = try await AIService.shared.processText(prompt: prompt, systemPrompt: "You are an expert at writing system prompts and AI skills in markdown. You will generate a complete markdown file with all necessary sections but DO NOT say anything else, you can only return the markdown file conten as the output, NOTHING ELSE.")
                 await MainActor.run {
                     content = generated
                     if name.isEmpty {
@@ -70,7 +68,6 @@ struct DraftSkillsView: View {
             } catch {
                 await MainActor.run {
                     isGenerating = false
-                    // Handle error (could add an alert)
                 }
             }
         }

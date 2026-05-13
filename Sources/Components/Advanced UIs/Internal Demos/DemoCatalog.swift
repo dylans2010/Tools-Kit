@@ -14,7 +14,7 @@ enum Demo: String, CaseIterable, Identifiable {
   var title: String {
     switch self {
     case .hero: return "Hero"
-    case .liveTuning: return "Live tuning"
+    case .liveTuning: return "Live Tuning"
     case .customProfile: return "Custom Profile"
     case .washTuning: return "Wash tuning"
     case .palettes: return "Palettes"
@@ -25,11 +25,11 @@ enum Demo: String, CaseIterable, Identifiable {
 
   var subtitle: String {
     switch self {
-    case .hero: return "Full-screen dramatic glow"
+    case .hero: return "Full screen dramatic glow"
     case .liveTuning: return "Tweak every knob live"
     case .customProfile: return "Build a Profile by hand"
     case .washTuning: return "Dial the intro wash pulse"
-    case .palettes: return "Six built-in colour sets"
+    case .palettes: return "Six built-in color sets"
     case .moods: return "Semantic state presets"
     case .loading: return "Async loading wrapper"
     }

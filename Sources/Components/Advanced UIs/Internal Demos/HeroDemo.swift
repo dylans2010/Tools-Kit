@@ -11,10 +11,10 @@ struct HeroDemo: View {
         .burster(burster)
         .ignoresSafeArea()
       VStack(spacing: 14) {
-        Text("Aurora")
+        Text("Hero Demo")
           .font(.system(size: 72, weight: .light, design: .serif))
           .foregroundStyle(.white)
-        Text("the Apple-Intelligence glow,\nin SwiftUI")
+        Text("Demo of Apple Intelligence UI, in SwiftUI & Metal")
           .font(.system(.body, design: .rounded))
           .foregroundStyle(.white.opacity(0.55))
           .multilineTextAlignment(.center)

@@ -174,8 +174,6 @@ struct AIChatSettingsView: View {
         }
     }
 
-    // MARK: - Sub-contents extracted for clarity
-
     private var providerSectionContent: some View {
         VStack(alignment: .leading, spacing: 16) {
             ScrollView(.horizontal, showsIndicators: false) {
@@ -241,7 +239,7 @@ struct AIChatSettingsView: View {
                 VStack(alignment: .leading) {
                     Text(featureCheck.usageMessage())
                         .font(.subheadline.bold())
-                    Text(settings.aiModelSource == .ownKey ? "Unlimited personal usage" : "10 free daily tasks")
+                    Text(settings.aiModelSource == .ownKey ? "Unlimited Personal Usage" : "10 Free Daily Tasks")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -271,7 +269,7 @@ struct AIChatSettingsView: View {
             } else {
                 HStack {
                     ProgressView().padding(.trailing, 8)
-                    Text("Fetching models...")
+                    Text("Fetching Models...")
                         .foregroundColor(.secondary)
                 }
             }
@@ -315,8 +313,8 @@ struct AIChatSettingsView: View {
         Group {
             Toggle("Custom Personality", isOn: $settings.useCustomPersonality)
             if settings.useCustomPersonality {
-                TextField("Name (e.g. Jules)", text: $settings.personalityName)
-                TagEditorView(tags: $settings.personalityTraits, placeholder: "Add trait...")
+                TextField("Name", text: $settings.personalityName)
+                TagEditorView(tags: $settings.personalityTraits, placeholder: "Add Trait (e.g. Creative, Analytical)")
             }
         }
     }
@@ -431,7 +429,7 @@ struct AIChatSettingsView: View {
 
     private var developerToolsSectionContent: some View {
         Group {
-            NavigationLink("Siri Core UI") { SiriCoreUIView() }
+            NavigationLink("SiriGlowCore UI Playground") { SiriCoreUIView() }
             NavigationLink("Model Config") { modelConfigSheet }
             if debugModeEnabled {
                 NavigationLink("Agent Config") { AgentConfigView() }

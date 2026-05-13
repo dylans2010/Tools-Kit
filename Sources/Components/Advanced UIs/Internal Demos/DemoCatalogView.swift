@@ -12,7 +12,7 @@ struct DemoCatalogView: View {
     .listStyle(.plain)
     .scrollContentBackground(.hidden)
     .background(Color.black)
-    .navigationTitle("Aurora Demos")
+    .navigationTitle("Demos")
     .toolbarBackground(.black, for: .navigationBar)
     .preferredColorScheme(.dark)
   }

@@ -1,8 +1,6 @@
 import SwiftUI
 import Aurora
 
-/// SiriCoreUIView provides a production-grade control surface for the Aurora animation engine.
-/// It enables real-time adjustments to animation intensity, speed, and preset moods.
 @MainActor
 struct SiriCoreUIView: View {
     enum ViewState: String, CaseIterable, Identifiable, Hashable, Sendable {
@@ -105,7 +103,7 @@ struct SiriCoreUIView: View {
 
     private var demosButton: some View {
         NavigationLink(destination: DemoCatalogView()) {
-            Label("Explore Demos", systemImage: "square.grid.2x2.fill")
+            Label("See Demos", systemImage: "square.grid.2x2.fill")
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding()

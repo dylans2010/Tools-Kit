@@ -67,7 +67,7 @@ struct SkillPickerModifier: ViewModifier {
                 }
 
                 if filteredSkills.isEmpty {
-                    Text("No Skills found")
+                    Text("No Skills Found")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else {

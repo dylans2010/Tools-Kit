@@ -1,8 +1,7 @@
 import SwiftUI
 import Aurora
 
-/// GlowingUIView is a reusable wrapper that applies a high-performance,
-/// Metal-backed Aurora ambient glow to its content.
+
 public struct GlowingUIView<Content: View>: View {
     private let content: Content
     private let style: AuroraGlow.Style

@@ -41,12 +41,12 @@ private struct ResponseCard: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       Label(
-        isLoading ? "thinking…" : (text == nil ? "tap below" : "response"),
+        isLoading ? "Thinking…" : (text == nil ? "Tap Below" : "Response"),
         systemImage: isLoading ? "sparkles" : "checkmark.circle.fill"
       )
       .font(.system(.caption, design: .monospaced))
       .foregroundStyle(.white.opacity(0.5))
-      Text(text ?? "Aurora's `.glowWhileLoading(_:)` modifier wraps any view and shows the glow only while the loading flag is true.")
+      Text(text ?? "`.glowWhileLoading(_:)` modifier wraps any view and shows the glow only while the loading flag is true.")
         .font(.system(.body, design: .rounded))
         .foregroundStyle(.white.opacity(0.85))
         .frame(maxWidth: .infinity, alignment: .leading)
