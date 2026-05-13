@@ -888,7 +888,7 @@ struct ColorPickerRow: View {
             ColorPicker("", selection: Binding(
                 get: { color },
                 set: { newColor in
-                    hexColor = newColor.toHex()
+                    hexColor = newColor.toHex() ?? "000000"
                 }
             ), supportsOpacity: false)
             .labelsHidden()
