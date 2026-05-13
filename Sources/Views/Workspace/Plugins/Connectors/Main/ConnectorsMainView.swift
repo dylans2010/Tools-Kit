@@ -122,7 +122,7 @@ struct ConnectorsMainView: View {
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Connectors")
-        .searchable(text: $searchText, prompt: "Search connectors...")
+        .searchable(text: $searchText, prompt: "Search Connectors")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button { showingBuilder = true } label: {

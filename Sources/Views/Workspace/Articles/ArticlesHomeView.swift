@@ -25,7 +25,7 @@ struct ArticlesHomeView: View {
 
             Section("Featured") {
                 if isLoadingFeatured {
-                    ProgressView("Loading featured articles…")
+                    ProgressView("Loading Featured Articles…")
                 } else if featuredArticles.isEmpty {
                     Text("No featured articles. Pull to refresh.")
                         .foregroundStyle(.secondary)

@@ -21,7 +21,7 @@ struct AISummarySheet: View {
 
         let formattedDate = date.formatted(date: .abbreviated, time: .shortened)
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        let normalizedTitle = trimmedTitle.isEmpty ? "Untitled event" : trimmedTitle
+        let normalizedTitle = trimmedTitle.isEmpty ? "Untitled Event" : trimmedTitle
         let normalizedLocation = location.trimmingCharacters(in: .whitespacesAndNewlines)
 
         var seeded = "Agenda for \(normalizedTitle) on \(formattedDate)."

@@ -20,7 +20,7 @@ struct ArticleDetailView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(displayArticle.title)
                         .font(.title2.bold())
-                    Text(displayArticle.summary.isEmpty ? "Full article view" : displayArticle.summary)
+                    Text(displayArticle.summary.isEmpty ? "Full Article View" : displayArticle.summary)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .lineLimit(3)
@@ -39,7 +39,7 @@ struct ArticleDetailView: View {
 
             if isLoading {
                 Section {
-                    ProgressView("Loading article…")
+                    ProgressView("Loading Article…")
                 }
             } else if let err = errorMessage {
                 Section {

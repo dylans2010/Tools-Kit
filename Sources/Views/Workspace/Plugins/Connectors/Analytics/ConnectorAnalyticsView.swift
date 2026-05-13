@@ -30,7 +30,7 @@ struct ConnectorAnalyticsView: View {
                             Text(stat.name)
                                 .font(.headline)
                             Spacer()
-                            Text("\(stat.totalCalls) calls")
+                            Text("\(stat.totalCalls) Calls")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -79,7 +79,6 @@ struct ConnectorAnalyticsView: View {
     }
 
     private func loadStats() {
-        // Stats are populated from real connector usage data; start empty.
     }
 }
 
