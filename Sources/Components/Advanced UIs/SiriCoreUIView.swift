@@ -33,6 +33,40 @@ struct SiriCoreUIView: View {
     @State private var palette: AuroraGlow.Palette = .appleIntelligence
     @State private var reactiveMotion: Bool = true
 
+    private enum PaletteOption: String, CaseIterable, Identifiable {
+        case appleIntelligence = "Apple Intelligence"
+        case sunset = "Sunset"
+        case ocean = "Ocean"
+        case forest = "Forest"
+        case cyberpunk = "Cyberpunk"
+        case monochrome = "Monochrome"
+
+        var id: String { rawValue }
+
+        var palette: AuroraGlow.Palette {
+            switch self {
+            case .appleIntelligence: return .appleIntelligence
+            case .sunset: return .sunset
+            case .ocean: return .ocean
+            case .forest: return .forest
+            case .cyberpunk: return .cyberpunk
+            case .monochrome: return .monochrome
+            }
+        }
+
+        init(palette: AuroraGlow.Palette) {
+            switch palette {
+            case .appleIntelligence: self = .appleIntelligence
+            case .sunset: self = .sunset
+            case .ocean: self = .ocean
+            case .forest: self = .forest
+            case .cyberpunk: self = .cyberpunk
+            case .monochrome: self = .monochrome
+            @unknown default: self = .appleIntelligence
+            }
+        }
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Preview Area
@@ -56,19 +90,22 @@ struct SiriCoreUIView: View {
             List {
                 Section {
                     Picker("Current State", selection: $state) {
-                        ForEach(ViewState.allCases, id: \.self) { state in
+                        ForEach(ViewState.allCases) { state in
                             Text(state.rawValue).tag(state)
                         }
                     }
                     .pickerStyle(.segmented)
 
-                    Picker("Palette", selection: $palette) {
-                        Text("Apple Intelligence").tag(AuroraGlow.Palette.appleIntelligence)
-                        Text("Sunset").tag(AuroraGlow.Palette.sunset)
-                        Text("Ocean").tag(AuroraGlow.Palette.ocean)
-                        Text("Forest").tag(AuroraGlow.Palette.forest)
-                        Text("Cyberpunk").tag(AuroraGlow.Palette.cyberpunk)
-                        Text("Monochrome").tag(AuroraGlow.Palette.monochrome)
+                    Picker(
+                        "Palette",
+                        selection: Binding<PaletteOption>(
+                            get: { PaletteOption(palette: palette) },
+                            set: { palette = $0.palette }
+                        )
+                    ) {
+                        ForEach(PaletteOption.allCases) { option in
+                            Text(option.rawValue).tag(option)
+                        }
                     }
                 } header: {
                     Text("State & Style")
