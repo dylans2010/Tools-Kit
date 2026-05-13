@@ -1421,6 +1421,7 @@
 		SK020006 /* SkillPickerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010006 /* SkillPickerModifier.swift */; };
 		C0B0B0B0B0B0B0B0B0B0B002 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
 		C0B0B0B0B0B0B0B0B0B0B001 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
+		C0B0B0B0B0B0B0B0B0B0B003 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -11156,6 +11157,7 @@
 				144A90454B5592597A231A7F /* SDKMetricsDashboardView.swift in Sources */,
 				D2493764F3B55CB73F0BCC14 /* SDKPluginRegistryView.swift in Sources */,
 				A635DCE822B6300B2142EE01 /* SDKConnectorHealthView.swift in Sources */,
+				C0B0B0B0B0B0B0B0B0B0B003 /* Color+Hex.swift in Sources */,
 				04494BFF858161E110044905 /* SDKConnectorMetricsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -11187,6 +11189,7 @@
 				KB0200000000000000000021 /* TextAnalyzer.swift in Sources */,
 				KB0200000000000000000022 /* JSONCoder.swift in Sources */,
 				KB0200000000000000000023 /* Debouncer.swift in Sources */,
+				C0B0B0B0B0B0B0B0B0B0B002 /* Color+Hex.swift in Sources */,
 				KB02OPENRT00000000000001 /* OpenRouterService.swift in Sources */,
 				KB02AIPROTO0000000000001 /* AIProviderProtocol.swift in Sources */,
 				KB02AICHAT00000000000001 /* AIChatSettings.swift in Sources */,
