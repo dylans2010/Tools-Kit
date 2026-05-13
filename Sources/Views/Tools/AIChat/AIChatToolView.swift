@@ -196,6 +196,7 @@ struct AIChatToolView: View {
                 TextField("Message", text: $viewModel.inputText, axis: .vertical)
                     .textFieldStyle(.roundedBorder)
                     .lineLimit(1...5)
+                    .skillPicker(text: $viewModel.inputText)
 
                 Button(action: viewModel.sendMessage) {
                     if viewModel.isLoading {

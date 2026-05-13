@@ -11,6 +11,8 @@ struct AIChatSettingsView: View {
     @StateObject private var musicMode = MusicModeManager.shared
     @StateObject private var workoutsMode = WorkoutsModeManager.shared
     @StateObject private var workspaceMode = WorkspaceModeManager.shared
+    @StateObject private var skillsManager = AIService.SkillsManager.shared
+
     @State private var isUploadingToCloud = false
     @State private var cloudStatusMessage: String?
     @State private var isSigningOut = false
@@ -36,29 +38,123 @@ struct AIChatSettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                providerSection
-                aiUsageSection
-                apiKeySection
-                unsplashAPIKeySection
-                modelSection
-                systemPromptSection
-                personalitySection
-                expertiseSection
-                styleSection
-                contextSection
-                advancedSection
-                chatInterfaceSection
-                storageSection
-                memorySection
-                agentSettingsSection
-                appModeSection
-                keyboardExtensionSection
-                toolVisibilitySection
-                supportSection
-                developerToolsSection
-                internalSection
-                cloudDataSection
-                accountSection
+                Group {
+                    Section {
+                        providerSectionContent
+                    } header: {
+                        Label("AI Provider", systemImage: "cpu")
+                    }
+
+                    Section {
+                        aiUsageSectionContent
+                    } header: {
+                        Label("AI Usage", systemImage: "bolt.fill")
+                    }
+
+                    Section {
+                        modelSectionContent
+                    } header: {
+                        Label("Model Configuration", systemImage: "cube.fill")
+                    }
+
+                    Section {
+                        NavigationLink(destination: SkillsView()) {
+                            Label {
+                                HStack {
+                                    Text("AI Skills")
+                                    Spacer()
+                                    Text("\(skillsManager.skills.count)")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
+                            } icon: {
+                                Image(systemName: "bolt.square.fill")
+                                    .foregroundColor(.orange)
+                            }
+                        }
+                    } header: {
+                        Label("Capabilities", systemImage: "star.fill")
+                    }
+                }
+
+                Group {
+                    Section {
+                        systemPromptSectionContent
+                    } header: {
+                        Label("System Prompt", systemImage: "terminal.fill")
+                    }
+
+                    Section {
+                        personalitySectionContent
+                        expertiseSectionContent
+                        styleSectionContent
+                    } header: {
+                        Label("AI Personality & Tone", systemImage: "person.fill")
+                    }
+
+                    Section {
+                        contextSectionContent
+                    } header: {
+                        Label("Knowledge & Context", systemImage: "book.fill")
+                    }
+                }
+
+                Group {
+                    Section {
+                        memorySectionContent
+                    } header: {
+                        Label("Memory", systemImage: "brain.head.profile")
+                    }
+
+                    Section {
+                        advancedSectionContent
+                    } header: {
+                        Label("Advanced Parameters", systemImage: "slider.horizontal.3")
+                    }
+                }
+
+                Group {
+                    Section {
+                        chatInterfaceSectionContent
+                    } header: {
+                        Label("Interface", systemImage: "paintbrush.fill")
+                    }
+
+                    Section {
+                        storageSectionContent
+                    } header: {
+                        Label("Data Management", systemImage: "tray.full.fill")
+                    }
+                }
+
+                Group {
+                    Section {
+                        agentSettingsSectionContent
+                    } header: {
+                        Label("Autonomous Agent", systemImage: "robot.fill")
+                    }
+
+                    Section {
+                        appModeSectionContent
+                    } header: {
+                        Label("App Experience", systemImage: "square.grid.2x2.fill")
+                    }
+                }
+
+                Group {
+                    Section {
+                        cloudDataSectionContent
+                        accountSectionContent
+                    } header: {
+                        Label("Account & Sync", systemImage: "person.crop.circle.fill")
+                    }
+
+                    Section {
+                        developerToolsSectionContent
+                    } header: {
+                        Label("Developer Settings", systemImage: "hammer.fill")
+                    }
+                }
             }
             .task {
                 await loadProviderModels(force: false)
@@ -67,158 +163,21 @@ struct AIChatSettingsView: View {
             .onChange(of: settings.selectedProviderID) { _, _ in
                 Task { await loadProviderModels(force: false) }
             }
-            .navigationTitle("App Settings")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("AI Settings")
+            .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") { dismiss() }
-                }
-            }
-            .sheet(isPresented: $showFileImporter) {
-                FileImporterView(allowedContentTypes: [.data, .content, .item], allowsMultipleSelection: true) { urls in
-                    self.importedFileNames = urls.map { $0.lastPathComponent }
-                }
-            }
-            .sheet(isPresented: $showFreeOpenRouterSheet) {
-                NavigationStack {
-                    List(freeOpenRouterModels) { model in
-                        Button {
-                            settings.modelID = model.id
-                            showFreeOpenRouterSheet = false
-                        } label: {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(model.name)
-                                    .font(.subheadline.weight(.semibold))
-                                Text(model.id)
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                    }
-                    .navigationTitle("Free OpenRouter Models")
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button("Done") { showFreeOpenRouterSheet = false }
-                        }
-                    }
+                        .fontWeight(.bold)
                 }
             }
         }
     }
 
-    private var internalSection: some View {
-        Section {
-            Button {
-                showModelConfigSheet = true
-            } label: {
-                Label("Model Configuration", systemImage: "cpu")
-            }
-            .sheet(isPresented: $showModelConfigSheet) {
-                modelConfigSheet
-            }
+    // MARK: - Sub-contents extracted for clarity
 
-            Button {
-                showFileImporter = true
-            } label: {
-                Label("Test File Importer", systemImage: "doc.badge.plus")
-            }
-
-            if !importedFileNames.isEmpty {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Imported Files:")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    ForEach(importedFileNames, id: \.self) { name in
-                        Text(name)
-                            .font(.subheadline)
-                    }
-                }
-                .padding(.vertical, 4)
-            }
-        } header: {
-            Text("Internal (Debug)")
-        }
-    }
-
-    private var modelConfigSheet: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    TextField("Reasoning Model or Endpoint", text: $modelConfig.reasoningModel)
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
-                    TextField("Vision Model or Endpoint", text: $modelConfig.visionModel)
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
-                    TextField("Language Model or Endpoint", text: $modelConfig.languageModel)
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
-                } header: {
-                    Text("AI Models")
-                } footer: {
-                    Text("Configure model IDs and/or full API endpoints used for slide generation and other AI pipelines. Leave empty to use defaults.")
-                }
-
-                Section {
-                    if modelConfig.hasReasoningModel {
-                        Label("Reasoning: \(modelConfig.reasoningModel)", systemImage: "brain")
-                            .font(.caption)
-                    }
-                    if modelConfig.hasVisionModel {
-                        Label("Vision: \(modelConfig.visionModel)", systemImage: "eye")
-                            .font(.caption)
-                    }
-                    if modelConfig.hasLanguageModel {
-                        Label("Language: \(modelConfig.languageModel)", systemImage: "text.bubble")
-                            .font(.caption)
-                    }
-                    if !modelConfig.hasReasoningModel && !modelConfig.hasVisionModel && !modelConfig.hasLanguageModel {
-                        Text("All models using defaults.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                } header: {
-                    Text("Active Configuration")
-                }
-            }
-            .navigationTitle("Model Configuration")
-            .navigationBarTitleDisplayMode(.inline)
-            .presentationDetents([.medium])
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { showModelConfigSheet = false }
-                }
-            }
-        }
-    }
-
-    private var agentSettingsSection: some View {
-        Section {
-            Toggle("Use System Tools", isOn: $settings.useSystemTools)
-            Toggle("Agent", isOn: $agentEnabled)
-                .help("Choose which agent handles your sessions")
-            if agentEnabled {
-                Picker("Agent Type", selection: $selectedAgentType) {
-                    Text("System").tag(AgentType.system.rawValue)
-                    Text("Jules").tag(AgentType.jules.rawValue)
-                }
-                .pickerStyle(.segmented)
-            }
-            let jules = JulesProvider.apiProviderInfo
-            APIKeyRowView(
-                providerID: jules.id,
-                providerName: jules.name,
-                placeholder: jules.apiKeyPlaceholder
-            )
-        } header: {
-            Text("Agent (Beta)")
-        }
-    }
-
-    // MARK: - Provider Section
-
-    private var providerSection: some View {
-        Section {
+    private var providerSectionContent: some View {
+        VStack(alignment: .leading, spacing: 16) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(registry.providers, id: \.id) { provider in
@@ -233,194 +192,94 @@ struct AIChatSettingsView: View {
                 }
                 .padding(.vertical, 4)
             }
-            .scrollClipDisabled()
 
             if let provider = selectedProvider {
-                HStack(spacing: 10) {
-                    Image(systemName: provider.icon)
-                        .font(.headline)
-                        .foregroundStyle(.blue)
-                        .frame(width: 34, height: 34)
-                        .background(.blue.opacity(0.12), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("\(provider.name) Selected")
-                            .font(.subheadline.weight(.semibold))
-                        Text("Keys are stored per provider and preserved when switching.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(spacing: 12) {
+                        Image(systemName: provider.icon)
+                            .font(.title3)
+                            .foregroundColor(.blue)
+                            .frame(width: 40, height: 40)
+                            .background(Color.blue.opacity(0.1), in: Circle())
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(provider.name)
+                                .font(.headline)
+                            if let url = provider.apiKeyURL {
+                                Link("Get API Key", destination: url)
+                                    .font(.caption)
+                                    .foregroundColor(.blue)
+                            }
+                        }
                     }
-                    Spacer()
+
+                    APIKeyRowView(
+                        providerID: provider.id,
+                        providerName: provider.name,
+                        placeholder: provider.apiKeyPlaceholder
+                    )
                 }
-                .padding(10)
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-            }
-        } header: {
-            Text("AI Provider")
-        } footer: {
-            if let provider = selectedProvider, let url = provider.apiKeyURL {
-                Link("Get an API key from \(provider.name)", destination: url)
-                    .font(.footnote)
+                .padding()
+                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
             }
         }
     }
 
-    // MARK: - API Key Section
-
-    private var apiKeySection: some View {
-        Section {
-            if let provider = selectedProvider {
-                APIKeyRowView(
-                    providerID: provider.id,
-                    providerName: provider.name,
-                    placeholder: provider.apiKeyPlaceholder
-                )
+    private var aiUsageSectionContent: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Picker("Model Source", selection: $settings.aiModelSource) {
+                ForEach(AIModelSource.allCases, id: \.self) { source in
+                    Text(source.rawValue).tag(source)
+                }
             }
-        } header: {
-            Text("API Key")
+            .pickerStyle(.segmented)
+
+            HStack {
+                Image(systemName: settings.aiModelSource == .ownKey ? "checkmark.shield.fill" : "bolt.badge.clock.fill")
+                    .foregroundColor(settings.aiModelSource == .ownKey ? .green : .blue)
+
+                VStack(alignment: .leading) {
+                    Text(featureCheck.usageMessage())
+                        .font(.subheadline.bold())
+                    Text(settings.aiModelSource == .ownKey ? "Unlimited personal usage" : "10 free daily tasks")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background((settings.aiModelSource == .ownKey ? Color.green : Color.blue).opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
         }
     }
 
-    private var unsplashAPIKeySection: some View {
-        Section {
-            SecureField("Access Key", text: $unsplashAccessKey)
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
-                .onChange(of: unsplashAccessKey) { _, newValue in
-                    APIKeyManager.shared.unsplashAccessKey = newValue.isEmpty ? nil : newValue
-                }
-            SecureField("Secret Key", text: $unsplashSecretKey)
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
-                .onChange(of: unsplashSecretKey) { _, newValue in
-                    APIKeyManager.shared.unsplashSecretKey = newValue.isEmpty ? nil : newValue
-                }
-            TextField("Application ID", text: $unsplashAppID)
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
-                .onChange(of: unsplashAppID) { _, newValue in
-                    APIKeyManager.shared.unsplashApplicationID = newValue.isEmpty ? nil : newValue
-                }
-            if !unsplashAccessKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                Label("Access Key configured", systemImage: "checkmark.circle.fill")
-                    .font(.caption)
-                    .foregroundColor(.green)
-            } else {
-                Label("Access Key required", systemImage: "exclamationmark.triangle.fill")
-                    .font(.caption)
-                    .foregroundColor(.orange)
-            }
-        } header: {
-            Text("Unsplash API Keys")
-        } footer: {
-            Text("Required for Unsplash image search in whiteboards, notebooks, and slides. Get a free key at unsplash.com/developers.")
-        }
-    }
-
-    private var aiUsageSection: some View {
-        Section {
-            VStack(alignment: .leading, spacing: 12) {
-                Picker("Model Source", selection: $settings.aiModelSource) {
-                    ForEach(AIModelSource.allCases, id: \.self) { source in
-                        Text(source.rawValue).tag(source)
-                    }
-                }
-                .pickerStyle(.segmented)
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Label(featureCheck.usageMessage(), systemImage: settings.aiModelSource == .ownKey ? "checkmark.shield" : "bolt.badge.clock")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(settings.aiModelSource == .ownKey ? .green : .blue)
-
-                    HStack(spacing: 8) {
-                        Text(settings.aiModelSource == .ownKey ? "Unlimited Requests" : "Daily Limit Reached")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Spacer()
-                    }
-                }
-                .padding(12)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill((settings.aiModelSource == .ownKey ? Color.green : Color.blue).opacity(0.12))
-                )
-            }
-            .padding(.vertical, 4)
-        } header: {
-            Text("AI Usage")
-        } footer: {
-            Text("App Model uses the cloud for any AI tasks which you will be limited to 10 tasks a day. Your own API key will be fully controlled by you.")
-        }
-    }
-
-    // MARK: - Model Section
-
-    private var modelSection: some View {
-        Section {
+    private var modelSectionContent: some View {
+        Group {
             let availableModels = modelCatalog.models(for: settings.selectedProviderID)
             if !availableModels.isEmpty {
-                Picker("Model", selection: $settings.modelID) {
+                Picker("Active Model", selection: $settings.modelID) {
                     ForEach(availableModels) { model in
                         HStack {
                             Text(model.name)
                             if model.supportsVision {
-                                Image(systemName: "eye.fill")
-                                    .foregroundColor(.blue)
-                                    .font(.caption)
+                                Image(systemName: "eye.fill").foregroundColor(.blue).font(.caption)
                             }
                         }
                         .tag(model.id)
                     }
                 }
                 .pickerStyle(.navigationLink)
-
-                if let model = availableModels.first(where: { $0.id == settings.modelID }) {
-                    HStack {
-                        if model.supportsVision {
-                            Label("Vision Supported", systemImage: "eye.fill")
-                                .font(.caption)
-                                .foregroundColor(.blue)
-                        }
-                        if let ctx = model.contextLength {
-                            Spacer()
-                            Text("\(ctx / 1000)K Context")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-
-                    if settings.selectedProviderID == "openrouter", model.name.localizedCaseInsensitiveContains("free") || model.id.localizedCaseInsensitiveContains("free") {
-                        Button {
-                            showFreeOpenRouterSheet = true
-                        } label: {
-                            Label("Browse Free OpenRouter Models", systemImage: "list.bullet.rectangle")
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                    }
-                }
-            } else if modelCatalog.loadingProviders.contains(settings.selectedProviderID) {
+            } else {
                 HStack {
-                    ProgressView()
-                    Text("Loading Models…")
+                    ProgressView().padding(.trailing, 8)
+                    Text("Fetching models...")
                         .foregroundColor(.secondary)
                 }
-            } else {
-                TextField("Model ID", text: $settings.modelID)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-                Button("Fetch Models") {
-                    Task { await loadProviderModels(force: true) }
-                }
             }
-        } header: {
-            Text("Model")
         }
     }
 
-    // MARK: - System Prompt Section
-
-    private var systemPromptSection: some View {
-        Section {
+    private var systemPromptSectionContent: some View {
+        VStack(alignment: .leading, spacing: 12) {
             Toggle("Use Preset", isOn: Binding(
                 get: { settings.selectedPresetID != nil },
                 set: { usePreset in
@@ -432,342 +291,165 @@ struct AIChatSettingsView: View {
             ))
 
             if settings.selectedPresetID != nil {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 140))], spacing: 12) {
-                    ForEach(SystemPromptPreset.builtIn) { preset in
-                        PresetCard(preset: preset, isSelected: settings.selectedPresetID == preset.id)
-                            .onTapGesture {
-                                settings.selectedPresetID = preset.id
-                                settings.systemPrompt = preset.prompt
-                            }
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(SystemPromptPreset.builtIn) { preset in
+                            PresetCard(preset: preset, isSelected: settings.selectedPresetID == preset.id)
+                                .onTapGesture {
+                                    settings.selectedPresetID = preset.id
+                                    settings.systemPrompt = preset.prompt
+                                }
+                        }
                     }
+                    .padding(.vertical, 4)
                 }
-                .padding(.vertical, 4)
             } else {
                 TextEditor(text: $settings.systemPrompt)
-                    .frame(minHeight: 80)
+                    .frame(minHeight: 100)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.2)))
             }
-        } header: {
-            Text("System Prompt")
         }
     }
 
-    // MARK: - Personality Section
-
-    private var personalitySection: some View {
-        Section {
-            Toggle("Use Custom Personality", isOn: $settings.useCustomPersonality)
+    private var personalitySectionContent: some View {
+        Group {
+            Toggle("Custom Personality", isOn: $settings.useCustomPersonality)
             if settings.useCustomPersonality {
-                TextField("Personality Name", text: $settings.personalityName)
+                TextField("Name (e.g. Jules)", text: $settings.personalityName)
                 TagEditorView(tags: $settings.personalityTraits, placeholder: "Add trait...")
             }
-        } header: {
-            Text("AI Personality")
         }
     }
 
-    // MARK: - Expertise Section
+    private var expertiseSectionContent: some View {
+        TagEditorView(tags: $settings.expertiseAreas, placeholder: "Add Expertise (e.g. Swift, Python)")
+    }
 
-    private var expertiseSection: some View {
-        Section {
-            TagEditorView(tags: $settings.expertiseAreas, placeholder: "Add Expertise")
-        } header: {
-            Text("Expertise Areas")
+    private var styleSectionContent: some View {
+        Group {
+            Picker("Tone", selection: $settings.responseTone) {
+                ForEach(ResponseTone.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+            }
+            Picker("Length", selection: $settings.preferredResponseLength) {
+                ForEach(ResponseLength.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+            }
         }
     }
 
-    // MARK: - Style Section
+    private var contextSectionContent: some View {
+        TextEditor(text: $settings.knowledgeContext)
+            .frame(minHeight: 80)
+    }
 
-    private var styleSection: some View {
-        Section {
-            Picker("Response Tone", selection: $settings.responseTone) {
-                ForEach(ResponseTone.allCases, id: \.self) { tone in
-                    Text(tone.rawValue).tag(tone)
+    private var memorySectionContent: some View {
+        Group {
+            Toggle("Enable Long-term Memory", isOn: $settings.memoryEnabled)
+            if settings.memoryEnabled {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Sensitivity: \(settings.memorySensitivity, specifier: "%.2f")")
+                    Slider(value: $settings.memorySensitivity, in: 0.2...1.0)
+                }
+                NavigationLink("Manage Memories") {
+                    MemoryManagerView(memoryStore: memoryStore)
                 }
             }
-            Picker("Response Length", selection: $settings.preferredResponseLength) {
-                ForEach(ResponseLength.allCases, id: \.self) { length in
-                    Text(length.rawValue).tag(length)
-                }
-            }
-        } header: {
-            Text("Personality & Style")
         }
     }
 
-    // MARK: - Context Section
-
-    private var contextSection: some View {
-        Section {
-            TextEditor(text: $settings.knowledgeContext)
-                .frame(minHeight: 80)
-        } header: {
-            Text("Knowledge & Context")
-        }
-    }
-
-    // MARK: - Advanced Section
-
-    private var advancedSection: some View {
-        Section {
-            VStack(alignment: .leading, spacing: 4) {
+    private var advancedSectionContent: some View {
+        Group {
+            VStack(alignment: .leading) {
                 Text("Temperature: \(settings.temperature, specifier: "%.1f")")
                 Slider(value: $settings.temperature, in: 0...2, step: 0.1)
             }
             Stepper("Max Tokens: \(settings.maxTokens)", value: $settings.maxTokens, in: 256...8192, step: 256)
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Top P: \(settings.topP, specifier: "%.2f")")
-                Slider(value: $settings.topP, in: 0...1, step: 0.05)
-            }
-        } header: {
-            Text("Advanced")
         }
     }
 
-    // MARK: - Chat Interface Section
-
-    private var chatInterfaceSection: some View {
-        Section {
+    private var chatInterfaceSectionContent: some View {
+        Group {
             ColorPickerRow(label: "Bubble Color", hexColor: $settings.bubbleColorHex)
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading) {
                 Text("Font Size: \(Int(settings.fontSize))pt")
                 Slider(value: $settings.fontSize, in: 12...22, step: 1)
             }
             Toggle("Show Timestamps", isOn: $settings.showTimestamps)
-        } header: {
-            Text("Chat Interface")
         }
     }
 
-    // MARK: - Storage Section
-
-    private var storageSection: some View {
-        Section {
-            Toggle("Save Chat History", isOn: $settings.saveChatHistory)
-            Toggle("Detailed Error Logging", isOn: $settings.logErrorsToConsole)
-            Toggle("Enable Streaming (Experimental)", isOn: $settings.streamResponseText)
-        } header: {
-            Text("Storage & Reliability")
+    private var storageSectionContent: some View {
+        Group {
+            Toggle("Save History", isOn: $settings.saveChatHistory)
+            Toggle("Stream Responses", isOn: $settings.streamResponseText)
         }
     }
 
-    // MARK: - Memory Section
-
-    private var memorySection: some View {
-        Section {
-            Toggle("Enable Memory", isOn: $settings.memoryEnabled)
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Sensitivity: \(settings.memorySensitivity, specifier: "%.2f")")
-                Slider(value: $settings.memorySensitivity, in: 0.2...1.0, step: 0.05)
+    private var agentSettingsSectionContent: some View {
+        Group {
+            Toggle("Agent Active", isOn: $agentEnabled)
+            if agentEnabled {
+                Picker("Agent Personality", selection: $selectedAgentType) {
+                    Text("System").tag(AgentType.system.rawValue)
+                    Text("Jules").tag(AgentType.jules.rawValue)
+                }
+                .pickerStyle(.segmented)
             }
-            NavigationLink("Manage Saved Memory") {
-                MemoryManagerView(memoryStore: memoryStore)
-            }
-        } header: {
-            Text("Memory (CoreML Powered)")
         }
     }
 
-    // MARK: - App Mode Section
-
-    private var keyboardExtensionSection: some View {
-        Section {
-            VStack(alignment: .leading, spacing: 8) {
-                Label("Keyboard (Beta)", systemImage: "keyboard")
-                    .font(.headline)
-
-                Text("Enable the ToolsKit keyboard to get AI writing assistance in any app.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-
-                Button {
-                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                        UIApplication.shared.open(url)
-                    }
-                } label: {
-                    Text("Open System Settings")
-                        .font(.subheadline.bold())
-                }
-                .buttonStyle(.borderedProminent)
-                .padding(.top, 4)
-            }
-            .padding(.vertical, 4)
-
-            NavigationLink {
-                VStack(spacing: 20) {
-                    Image(systemName: "keyboard")
-                        .font(.system(size: 60))
-                        .foregroundColor(.blue)
-
-                    Text("How to Enable")
-                        .font(.title2.bold())
-
-                    VStack(alignment: .leading, spacing: 12) {
-                        StepView(number: 1, text: "Open iOS Settings")
-                        StepView(number: 2, text: "Go to General > Keyboard > Keyboards")
-                        StepView(number: 3, text: "Tap 'Add New Keyboard...'")
-                        StepView(number: 4, text: "Select 'ToolsKit'")
-                        StepView(number: 5, text: "Tap 'ToolsKit' and enable 'Allow Full Access'")
-                    }
-                    .padding()
-
-                    Spacer()
-                }
-                .padding()
-                .navigationTitle("Keyboard Setup")
-            } label: {
-                Label("Setup Instructions", systemImage: "info.circle")
-            }
-        } header: {
-            Text("Keyboard")
-        } footer: {
-            Text("Full access is required for AI features like rewriting and smart suggestions.")
-        }
-    }
-
-    private var appModeSection: some View {
-        Section {
-            Picker("Mode", selection: selectedAppMode) {
-                ForEach(AppMode.allCases) { mode in
-                    Label(mode.title, systemImage: mode.icon)
-                        .tag(mode)
-                }
-            }
-            .pickerStyle(.navigationLink)
-            .disabled(musicMode.isLocked)
-
-            HStack(spacing: 12) {
-                Image(systemName: currentMode.icon)
-                    .foregroundColor(currentMode.tint)
-                    .frame(width: 24)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(currentMode.title)
-                        .font(.subheadline.weight(.semibold))
-                    Text(currentMode.description)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-            .padding(.vertical, 4)
-
-            if musicMode.isLocked {
-                Text("Music mode is locked because the app bundle identifier contains 'music'.")
+    private var appModeSectionContent: some View {
+        NavigationLink(destination: AppModePickerView(selectedAppMode: selectedAppMode)) {
+            HStack {
+                Label(currentMode.title, systemImage: currentMode.icon)
+                Spacer()
+                Text("Change Mode")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
-        } header: {
-            Text("Turn ToolsKit Into")
-        } footer: {
-            Text("Choose the launch experience for ToolsKit. Only one mode can be active at a time.")
-                .font(.caption)
         }
     }
 
-    // MARK: - Tool Visibility Section
-
-    private var toolVisibilitySection: some View {
-        Section {
-            NavigationLink {
-                ToolVisibilitySettingsView()
-            } label: {
-                HStack(spacing: 14) {
-                    Image(systemName: "square.grid.2x2")
-                        .font(.title3)
-                        .foregroundColor(.blue)
-                        .frame(width: 32)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Tool Visibility")
-                            .font(.body)
-                        Text("Show or hide tools on the Dashboard")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
+    private var cloudDataSectionContent: some View {
+        Button {
+            uploadDataToCloud()
+        } label: {
+            HStack {
+                if isUploadingToCloud { ProgressView().padding(.trailing, 8) }
+                Text(isUploadingToCloud ? "Syncing..." : "Sync to Cloud")
             }
-        } header: {
-            Text("Dashboard")
+        }
+        .disabled(isUploadingToCloud)
+    }
+
+    private var accountSectionContent: some View {
+        Button(role: .destructive) {
+            signOutCurrentUser()
+        } label: {
+            Text("Sign Out")
         }
     }
 
-
-    private var developerToolsSection: some View {
-        Section {
-            NavigationLink("Siri Core UI") {
-                SiriCoreUIView()
-            }
-            NavigationLink("Developer Tools") {
-                MeetDeveloperToolsView(manager: .shared)
-            }
-            NavigationLink("Feedback Admin") {
-                FeedbackAdminView(allowDeveloperToolsAccess: true)
-            }
+    private var developerToolsSectionContent: some View {
+        Group {
+            NavigationLink("Siri Core UI") { SiriCoreUIView() }
+            NavigationLink("Model Config") { modelConfigSheet }
             if debugModeEnabled {
-                NavigationLink {
-                    AgentConfigView()
-                } label: {
-                    Label("Agent Config (Debug)", systemImage: "ant.fill")
-                }
+                NavigationLink("Agent Config") { AgentConfigView() }
             }
-        } header: {
-            Text("Developer")
         }
     }
 
-    private var supportSection: some View {
-        Section {
-            NavigationLink("Send Feedback") {
-                FeedbackView()
+    // MARK: - Private Methods
+
+    private var modelConfigSheet: some View {
+        Form {
+            Section("Endpoints") {
+                TextField("Reasoning", text: $modelConfig.reasoningModel)
+                TextField("Vision", text: $modelConfig.visionModel)
+                TextField("Language", text: $modelConfig.languageModel)
             }
-        } header: {
-            Text("Support")
         }
-    }
-
-    private var cloudDataSection: some View {
-        Section {
-            Button {
-                uploadDataToCloud()
-            } label: {
-                HStack {
-                    if isUploadingToCloud {
-                        ProgressView()
-                    }
-                    Text(isUploadingToCloud ? "Uploading..." : "Upload Data To Cloud")
-                }
-            }
-            .disabled(isUploadingToCloud)
-
-            if let cloudStatusMessage {
-                Text(cloudStatusMessage)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-        } header: {
-            Text("Cloud Sync")
-        }
-    }
-
-    private var accountSection: some View {
-        Section {
-            Button(role: .destructive) {
-                signOutCurrentUser()
-            } label: {
-                HStack {
-                    if isSigningOut {
-                        ProgressView()
-                    }
-                    Text(isSigningOut ? "Signing Out..." : "Sign Out")
-                }
-            }
-            .disabled(isSigningOut)
-
-            if let signOutStatusMessage {
-                Text(signOutStatusMessage)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-        } header: {
-            Text("Account")
-        }
+        .navigationTitle("Model Config")
     }
 
     private func loadProviderModels(force: Bool) async {
@@ -783,63 +465,72 @@ struct AIChatSettingsView: View {
 
     private func uploadDataToCloud() {
         isUploadingToCloud = true
-        cloudStatusMessage = nil
         Task {
             do {
                 try await UserDataManager.shared.uploadCurrentUserData()
-                await MainActor.run {
-                    cloudStatusMessage = "Data uploaded to cloud."
-                    isUploadingToCloud = false
-                }
+                await MainActor.run { isUploadingToCloud = false }
             } catch {
-                await MainActor.run {
-                    cloudStatusMessage = "Upload failed: \(error.localizedDescription)"
-                    isUploadingToCloud = false
-                }
+                await MainActor.run { isUploadingToCloud = false }
             }
         }
     }
 
     private func signOutCurrentUser() {
-        isSigningOut = true
-        signOutStatusMessage = nil
         Task {
-            do {
-                try await AccountAuthService.shared.signOut()
-                await MainActor.run {
-                    signOutStatusMessage = "Signed Out"
-                    isSigningOut = false
-                    onSignOut?()
-                    dismiss()
-                }
-            } catch {
-                await MainActor.run {
-                    signOutStatusMessage = "Sign out failed: \(error.localizedDescription)"
-                    isSigningOut = false
-                }
+            try? await AccountAuthService.shared.signOut()
+            await MainActor.run {
+                onSignOut?()
+                dismiss()
             }
         }
     }
 }
 
+struct AppModePickerView: View {
+    @Binding var selectedAppMode: AIChatSettingsView.AppMode
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        List(AIChatSettingsView.AppMode.allCases) { mode in
+            Button {
+                selectedAppMode = mode
+                dismiss()
+            } label: {
+                HStack(spacing: 16) {
+                    Image(systemName: mode.icon)
+                        .font(.title2)
+                        .foregroundColor(mode.tint)
+                        .frame(width: 40, height: 40)
+                        .background(mode.tint.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(mode.title)
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        Text(mode.description)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        }
+        .navigationTitle("App Mode")
+    }
+}
+
 private extension AIChatSettingsView {
     enum AppMode: String, CaseIterable, Identifiable {
-        case dashboard
-        case music
-        case workouts
-        case workspace
-
+        case dashboard, music, workouts, workspace
         var id: String { rawValue }
-
         var title: String {
             switch self {
-            case .dashboard: return "Default Dashboard"
+            case .dashboard: return "Dashboard"
             case .music: return "Music"
             case .workouts: return "Workouts"
             case .workspace: return "Workspace"
             }
         }
-
         var icon: String {
             switch self {
             case .dashboard: return "square.grid.2x2"
@@ -848,7 +539,6 @@ private extension AIChatSettingsView {
             case .workspace: return "rectangle.3.group"
             }
         }
-
         var tint: Color {
             switch self {
             case .dashboard: return .blue
@@ -857,21 +547,14 @@ private extension AIChatSettingsView {
             case .workspace: return .indigo
             }
         }
-
         var description: String {
             switch self {
-            case .dashboard: return "Launch into the standard dashboard with all tools."
-            case .music: return "Replace the dashboard with the Music player experience."
-            case .workouts: return "Launch into AI-powered fitness tracking and plans."
-            case .workspace: return "Launch into Notes, Forms, and Slides workspace."
+            case .dashboard: return "Standard tools & dashboard"
+            case .music: return "Music player experience"
+            case .workouts: return "AI fitness tracking"
+            case .workspace: return "Production workspace"
             }
         }
-    }
-
-    var freeOpenRouterModels: [AIModel] {
-        modelCatalog.models(for: "openrouter")
-            .filter { $0.name.localizedCaseInsensitiveContains("free") || $0.id.localizedCaseInsensitiveContains("free") }
-            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
     var currentMode: AppMode {
@@ -885,37 +568,15 @@ private extension AIChatSettingsView {
         Binding(
             get: { currentMode },
             set: { newMode in
-                if musicMode.isLocked {
-                    musicMode.isMusicModeEnabled = true
-                    workoutsMode.isWorkoutsModeEnabled = false
-                    workspaceMode.isWorkspaceModeEnabled = false
-                    return
-                }
-
-                switch newMode {
-                case .dashboard:
-                    musicMode.isMusicModeEnabled = false
-                    workoutsMode.isWorkoutsModeEnabled = false
-                    workspaceMode.isWorkspaceModeEnabled = false
-                case .music:
-                    musicMode.isMusicModeEnabled = true
-                    workoutsMode.isWorkoutsModeEnabled = false
-                    workspaceMode.isWorkspaceModeEnabled = false
-                case .workouts:
-                    musicMode.isMusicModeEnabled = false
-                    workoutsMode.isWorkoutsModeEnabled = true
-                    workspaceMode.isWorkspaceModeEnabled = false
-                case .workspace:
-                    musicMode.isMusicModeEnabled = false
-                    workoutsMode.isWorkoutsModeEnabled = false
-                    workspaceMode.isWorkspaceModeEnabled = true
-                }
+                musicMode.isMusicModeEnabled = (newMode == .music)
+                workoutsMode.isWorkoutsModeEnabled = (newMode == .workouts)
+                workspaceMode.isWorkspaceModeEnabled = (newMode == .workspace)
             }
         )
     }
 }
 
-// MARK: - Provider Chip
+// MARK: - Supporting Views
 
 struct ProviderChip: View {
     let provider: any AIProvider
@@ -947,8 +608,6 @@ struct ProviderChip: View {
         }
     }
 }
-
-// MARK: - API Key Row
 
 struct APIKeyRowView: View {
     let providerID: String
@@ -1091,8 +750,6 @@ struct APIKeyRowView: View {
     }
 }
 
-// MARK: - Supporting Views (unchanged)
-
 struct MemoryManagerView: View {
     @ObservedObject var memoryStore: AIChatMemoryStore
 
@@ -1216,26 +873,6 @@ struct TagFlowLayout<Content: View>: View {
     }
 }
 
-struct StepView: View {
-    let number: Int
-    let text: String
-
-    var body: some View {
-        HStack(spacing: 12) {
-            Text("\(number)")
-                .font(.caption.bold())
-                .foregroundColor(.white)
-                .frame(width: 24, height: 24)
-                .background(Circle().fill(Color.blue))
-
-            Text(text)
-                .font(.subheadline)
-
-            Spacer()
-        }
-    }
-}
-
 struct ColorPickerRow: View {
     let label: String
     @Binding var hexColor: String
@@ -1258,30 +895,5 @@ struct ColorPickerRow: View {
             ), supportsOpacity: false)
             .labelsHidden()
         }
-    }
-}
-
-extension Color {
-    init?(hex: String) {
-        let cleaned = hex.trimmingCharacters(in: .alphanumerics.inverted)
-        var int: UInt64 = 0
-        guard Scanner(string: cleaned).scanHexInt64(&int) else { return nil }
-        let r, g, b: Double
-        switch cleaned.count {
-        case 6:
-            r = Double((int >> 16) & 0xFF) / 255
-            g = Double((int >> 8) & 0xFF) / 255
-            b = Double(int & 0xFF) / 255
-        default:
-            return nil
-        }
-        self.init(red: r, green: g, blue: b)
-    }
-
-    func toHex() -> String? {
-        let uic = UIColor(self)
-        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-        guard uic.getRed(&r, green: &g, blue: &b, alpha: &a) else { return nil }
-        return String(format: "%02X%02X%02X", Int(r * 255), Int(g * 255), Int(b * 255))
     }
 }

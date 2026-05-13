@@ -340,6 +340,7 @@ struct SlideEditorView: View {
                         Section {
                             TextField("Text", text: bindingText(element: element), axis: .vertical)
                                 .textFieldStyle(.roundedBorder)
+                                .skillPicker(text: bindingText(element: element))
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Font Size: \(Int(element.fontSize))")
                                     .font(.caption)
@@ -391,6 +392,7 @@ struct SlideEditorView: View {
 
                     TextField("e.g. Make this slide simpler for executives", text: $aiPrompt, axis: .vertical)
                         .textFieldStyle(.roundedBorder)
+                        .skillPicker(text: $aiPrompt)
 
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
                         aiQuick("Outline", icon: "list.bullet.rectangle", prompt: "Generate a concise slide outline with 3-5 bullets.")

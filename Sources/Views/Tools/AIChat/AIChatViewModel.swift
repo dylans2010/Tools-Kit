@@ -161,7 +161,12 @@ final class AIChatViewModel: ObservableObject, @unchecked Sendable {
             if !memory.isEmpty { parts.append(memory) }
         }
 
-        return parts.isEmpty ? nil : parts.joined(separator: " ")
+        let skillsPrompt = AIService.SkillsManager.shared.activeSkillsPrompt()
+        if !skillsPrompt.isEmpty {
+            parts.append(skillsPrompt)
+        }
+
+        return parts.isEmpty ? nil : parts.joined(separator: "\n\n")
     }
 
     func sendMessage() {
