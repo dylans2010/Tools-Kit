@@ -249,7 +249,7 @@ struct SlideEditorView: View {
                 .resizable()
                 .scaledToFill()
         } else {
-            (Color(hex: slide.backgroundColorHex), green: 0.23, blue: 0.37))
+            Color(hex: slide.backgroundColorHex)
         }
     }
 

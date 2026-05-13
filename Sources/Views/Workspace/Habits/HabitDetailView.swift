@@ -7,7 +7,7 @@ struct HabitDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showingEdit = false
 
-    private var habitColor: Color { Color(hex: habit.colorHex)
+    private var habitColor: Color { Color(hex: habit.colorHex) }
     private let dateFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "yyyy-MM-dd"

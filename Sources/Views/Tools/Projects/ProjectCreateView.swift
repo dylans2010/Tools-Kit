@@ -50,7 +50,7 @@ struct ProjectCreateView: View {
                                 Image(systemName: icon)
                                     .font(.system(size: 20))
                                     .frame(width: 36, height: 36)
-                                    .background(selectedIcon == icon ? Color(hex: selectedColorHex)))
+                                    .background(selectedIcon == icon ? Color(hex: selectedColorHex) : Color(.secondarySystemBackground))
                                     .foregroundColor(selectedIcon == icon ? .white : .primary)
                                     .cornerRadius(8)
                             }

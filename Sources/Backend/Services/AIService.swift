@@ -7,7 +7,6 @@ enum AIError: Error {
     case unknownProvider(String)
 }
 
-@MainActor
 class AIService {
     static let shared = AIService()
 
@@ -248,6 +247,7 @@ class AIService {
         return normalizeJSONObject(from: response)
     }
 
+    @MainActor
     func processWithOpenRouter(
         prompt: String,
         modelID: String,

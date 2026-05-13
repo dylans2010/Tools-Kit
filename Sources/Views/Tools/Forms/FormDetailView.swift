@@ -17,7 +17,7 @@ struct FormDetailView: View {
     }
 
     private var backgroundColor: Color {
-        Color(hex: form.backgroundHexColor))
+        Color(hex: form.backgroundHexColor)
     }
 
     private var canReviewAnswers: Bool {

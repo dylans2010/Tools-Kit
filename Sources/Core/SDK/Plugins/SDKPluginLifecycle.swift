@@ -1,11 +1,11 @@
 import Foundation
 import Combine
 
-public enum SDKPluginPhase: String, Codable, CaseIterable {
+public enum SDKPluginPhase: String, Codable, CaseIterable, Sendable {
     case unloaded, loading, active, paused, updating, migrating, errored, disabled
 }
 
-public struct SDKPluginCapability: Identifiable, Codable, Hashable {
+public struct SDKPluginCapability: Identifiable, Codable, Hashable, Sendable {
     public let id: UUID
     public var name: String
     public var description: String

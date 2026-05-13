@@ -1,6 +1,7 @@
 import Foundation
 
-class RealTimeTranslationBackend: ObservableObject, @unchecked Sendable {
+@MainActor
+class RealTimeTranslationBackend: ObservableObject {
     @Published var inputText = ""
     @Published var translatedText = ""
     @Published var sourceLanguage = "en"
@@ -9,7 +10,7 @@ class RealTimeTranslationBackend: ObservableObject, @unchecked Sendable {
 
     let languages = ["en": "English", "fr": "French", "es": "Spanish", "de": "German", "it": "Italian", "pt": "Portuguese", "ru": "Russian", "zh": "Chinese", "ja": "Japanese", "ko": "Korean"]
 
-    private let aiService = AIService()
+    private let aiService = AIService.shared
     private var translationTask: Task<Void, Never>?
 
     func translate() {
@@ -31,17 +32,13 @@ class RealTimeTranslationBackend: ObservableObject, @unchecked Sendable {
                 let result = try await aiService.processText(prompt: prompt, systemPrompt: "You are a professional translator.")
 
                 if !Task.isCancelled {
-                    DispatchQueue.main.async {
-                        self.translatedText = result
-                        self.isTranslating = false
-                    }
+                    self.translatedText = result
+                    self.isTranslating = false
                 }
             } catch {
                 if !Task.isCancelled {
-                    DispatchQueue.main.async {
-                        self.translatedText = "Error: \(error.localizedDescription)"
-                        self.isTranslating = false
-                    }
+                    self.translatedText = "Error: \(error.localizedDescription)"
+                    self.isTranslating = false
                 }
             }
         }
