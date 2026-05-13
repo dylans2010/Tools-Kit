@@ -81,7 +81,7 @@ struct AutomationBuilderView: View {
                 EditButton()
             }
         }
-        .onChange(of: viewModel.isCompiling) { newValue in
+        .onChange(of: viewModel.isCompiling) { _, newValue in
             if !newValue && !viewModel.workflowName.isEmpty && !viewModel.steps.isEmpty {
                 // Successfully compiled
                 dismiss()

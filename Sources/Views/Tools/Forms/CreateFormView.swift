@@ -35,7 +35,7 @@ struct CreateFormView: View {
     }
 
     private var backgroundColor: Color {
-        Color(hex: backgroundHex))
+        Color(hex: backgroundHex)
     }
 
     private var attachStatusText: String {
