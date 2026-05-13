@@ -878,7 +878,7 @@ struct ColorPickerRow: View {
     @Binding var hexColor: String
 
     var color: Color {
-        Color(hex: hexColor) ?? .blue
+        Color(hex: hexColor)
     }
 
     var body: some View {
@@ -888,9 +888,7 @@ struct ColorPickerRow: View {
             ColorPicker("", selection: Binding(
                 get: { color },
                 set: { newColor in
-                    if let hex = newColor.toHex() {
-                        hexColor = hex
-                    }
+                    hexColor = newColor.toHex()
                 }
             ), supportsOpacity: false)
             .labelsHidden()
