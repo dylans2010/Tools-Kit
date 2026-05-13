@@ -46,7 +46,7 @@ public struct GlowingUIView<Content: View>: View {
             .palette(palette)
             .speed(speed)
             .glowSize(glowSize)
-            .washPeak(intensity * 0.15)
+            .washPeak(Float(intensity * 0.15))
 
         if ignoresSafeArea {
             glow.ignoresSafeArea()
