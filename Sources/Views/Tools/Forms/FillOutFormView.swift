@@ -14,7 +14,7 @@ struct FillOutFormView: View {
     private let requiredValidationMessage = "Please answer all required questions before submitting."
 
     private var accentColor: Color {
-        Color(hex: form.accentHexColor) ?? .blue
+        Color(hex: form.accentHexColor)
     }
 
     private var unansweredRequired: [FormQuestion] {

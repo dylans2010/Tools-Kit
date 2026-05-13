@@ -5,7 +5,7 @@ struct SlideThumbnailView: View {
     var showTitle: Bool = false
 
     private var bgColor: Color {
-        Color(hex: slide.backgroundColorHex) ?? Color(red: 0.12, green: 0.23, blue: 0.37)
+        Color(hex: slide.backgroundColorHex), green: 0.23, blue: 0.37)
     }
 
     var body: some View {
@@ -36,7 +36,7 @@ struct SlideThumbnailView: View {
         case .text, .bullets:
             Text(el.text)
                 .font(.system(size: el.fontSize * 0.3))
-                .foregroundColor(Color(hex: el.textColor) ?? .white)
+                .foregroundColor(Color(hex: el.textColor))
                 .frame(width: el.width * 0.3, height: el.height * 0.3)
         case .image:
             if let data = el.imageData, let img = UIImage(data: data) {
@@ -66,7 +66,7 @@ struct SlideThumbnailView: View {
 
     @ViewBuilder
     private func shapePreview(_ el: SlideElement) -> some View {
-        let fill = Color(hex: el.fillColor) ?? .blue
+        let fill = Color(hex: el.fillColor)
         let w = el.width * 0.3
         let h = el.height * 0.3
         switch el.shapeKind {

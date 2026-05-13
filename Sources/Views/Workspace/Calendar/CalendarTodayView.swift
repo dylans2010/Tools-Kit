@@ -107,7 +107,7 @@ struct EventTimelineRow: View {
     let event: CalendarEvent
 
     private var eventColor: Color {
-        Color(hex: event.priority.color) ?? .blue
+        Color(hex: event.priority.color)
     }
 
     var body: some View {

@@ -294,7 +294,7 @@ struct ElementToolbar: View {
                     .font(.subheadline.weight(.medium))
                 Spacer()
                 RoundedRectangle(cornerRadius: 4)
-                    .fill(Color(hex: element.colorHex) ?? .gray)
+                    .fill(Color(hex: element.colorHex))
                     .frame(width: 22, height: 22)
                     .overlay(
                         RoundedRectangle(cornerRadius: 4)
@@ -308,7 +308,7 @@ struct ElementToolbar: View {
                         withAnimation(.easeInOut(duration: 0.1)) { element.colorHex = hex }
                     } label: {
                         Circle()
-                            .fill(Color(hex: hex) ?? .gray)
+                            .fill(Color(hex: hex))
                             .frame(width: 24, height: 24)
                             .overlay(
                                 Circle()
@@ -329,7 +329,7 @@ struct ElementToolbar: View {
                     .font(.subheadline.weight(.medium))
                 Spacer()
                 RoundedRectangle(cornerRadius: 4)
-                    .fill(Color(hex: element.strokeColorHex) ?? .gray)
+                    .fill(Color(hex: element.strokeColorHex))
                     .frame(width: 22, height: 22)
                     .overlay(
                         RoundedRectangle(cornerRadius: 4)
@@ -343,7 +343,7 @@ struct ElementToolbar: View {
                         withAnimation(.easeInOut(duration: 0.1)) { element.strokeColorHex = hex }
                     } label: {
                         Circle()
-                            .fill(Color(hex: hex) ?? .gray)
+                            .fill(Color(hex: hex))
                             .frame(width: 24, height: 24)
                             .overlay(
                                 Circle()

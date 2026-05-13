@@ -6,7 +6,7 @@ struct SlideContentView: View {
 
     var body: some View {
         ZStack {
-            (Color(hex: slide.backgroundColorHex) ?? .black)
+            (Color(hex: slide.backgroundColorHex))
 
             if let bgData = slide.backgroundImageData, let img = UIImage(data: bgData) {
                 Image(uiImage: img)
@@ -32,7 +32,7 @@ struct ElementRenderer: View {
             case .text:
                 Text(element.text)
                     .font(.system(size: element.fontSize, weight: fontWeight))
-                    .foregroundColor(Color(hex: element.textColor) ?? .white)
+                    .foregroundColor(Color(hex: element.textColor))
                     .multilineTextAlignment(textAlignment)
 
             case .bullets:
@@ -40,12 +40,12 @@ struct ElementRenderer: View {
                     ForEach(Array(element.bullets.enumerated()), id: \.offset) { _, bullet in
                         HStack(alignment: .top, spacing: 6) {
                             Circle()
-                                .fill(Color(hex: element.textColor) ?? .white)
+                                .fill(Color(hex: element.textColor))
                                 .frame(width: 5, height: 5)
                                 .padding(.top, 6)
                             Text(bullet)
                                 .font(.system(size: element.fontSize * 0.8))
-                                .foregroundColor(Color(hex: element.textColor) ?? .white)
+                                .foregroundColor(Color(hex: element.textColor))
                         }
                     }
                 }
@@ -123,19 +123,19 @@ struct ElementRenderer: View {
 
     @ViewBuilder
     private var shapeView: some View {
-        let fill = Color(hex: element.fillColor) ?? .blue
+        let fill = Color(hex: element.fillColor)
         switch element.shapeKind {
         case .rectangle:
             RoundedRectangle(cornerRadius: element.cornerRadius)
                 .fill(fill)
                 .overlay(
                     RoundedRectangle(cornerRadius: element.cornerRadius)
-                        .stroke(Color(hex: element.strokeColor) ?? .clear, lineWidth: element.strokeWidth)
+                        .stroke(Color(hex: element.strokeColor), lineWidth: element.strokeWidth)
                 )
         case .circle:
             Circle()
                 .fill(fill)
-                .overlay(Circle().stroke(Color(hex: element.strokeColor) ?? .clear, lineWidth: element.strokeWidth))
+                .overlay(Circle().stroke(Color(hex: element.strokeColor), lineWidth: element.strokeWidth))
         case .triangle:
             TriangleShape()
                 .fill(fill)

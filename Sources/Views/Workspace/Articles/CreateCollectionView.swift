@@ -44,7 +44,7 @@ struct CreateCollectionView: View {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 12) {
                         ForEach(colors, id: \.self) { hex in
                             Circle()
-                                .fill(Color(hex: hex) ?? .accentColor)
+                                .fill(Color(hex: hex))
                                 .frame(width: 36, height: 36)
                                 .overlay(
                                     Circle().stroke(Color.primary, lineWidth: selectedColor == hex ? 2.5 : 0)

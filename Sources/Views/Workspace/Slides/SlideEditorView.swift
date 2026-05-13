@@ -249,7 +249,7 @@ struct SlideEditorView: View {
                 .resizable()
                 .scaledToFill()
         } else {
-            (Color(hex: slide.backgroundColorHex) ?? Color(red: 0.12, green: 0.23, blue: 0.37))
+            (Color(hex: slide.backgroundColorHex), green: 0.23, blue: 0.37))
         }
     }
 
@@ -490,7 +490,7 @@ struct SlideEditorView: View {
                     } label: {
                         HStack {
                             RoundedRectangle(cornerRadius: 6)
-                                .fill(Color(hex: hex) ?? .blue)
+                                .fill(Color(hex: hex))
                                 .frame(width: 30, height: 30)
                             Text(name)
                         }
@@ -516,7 +516,7 @@ struct SlideEditorView: View {
                     } label: {
                         HStack {
                             RoundedRectangle(cornerRadius: 8)
-                                .fill(Color(hex: bg) ?? .blue)
+                                .fill(Color(hex: bg))
                                 .frame(width: 48, height: 32)
                             Text(name)
                         }
@@ -995,7 +995,7 @@ private struct SlideCanvasElementView: View {
         case .text, .bullets:
             Text(element.text)
                 .font(.system(size: element.fontSize, weight: element.fontWeight == "bold" ? .bold : .regular))
-                .foregroundColor(Color(hex: element.textColor) ?? .white)
+                .foregroundColor(Color(hex: element.textColor))
                 .multilineTextAlignment(textAlignment)
                 .frame(width: element.width, height: element.height)
         case .image:
@@ -1067,7 +1067,7 @@ private struct SlideCanvasElementView: View {
 
     @ViewBuilder
     private var shapeView: some View {
-        let fill = Color(hex: element.fillColor) ?? .blue
+        let fill = Color(hex: element.fillColor)
         switch element.shapeKind {
         case .rectangle:
             RoundedRectangle(cornerRadius: element.cornerRadius)

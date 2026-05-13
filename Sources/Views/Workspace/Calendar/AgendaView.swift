@@ -100,7 +100,7 @@ struct EventAgendaRow: View {
             Spacer()
 
             Circle()
-                .fill(Color(hex: event.priority.color) ?? .blue)
+                .fill(Color(hex: event.priority.color))
                 .frame(width: 8, height: 8)
         }
         .padding()

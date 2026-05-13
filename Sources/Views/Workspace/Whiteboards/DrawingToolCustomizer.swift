@@ -68,7 +68,7 @@ struct DrawingToolCustomizer: View {
                 .frame(width: 36, height: 36)
                 .background(
                     Circle()
-                        .fill(Color(hex: colorHex) ?? .accentColor)
+                        .fill(Color(hex: colorHex))
                         .opacity(opacity)
                 )
 
@@ -91,7 +91,7 @@ struct DrawingToolCustomizer: View {
                     .font(.subheadline.weight(.medium))
                 Spacer()
                 RoundedRectangle(cornerRadius: 4)
-                    .fill(Color(hex: colorHex) ?? .white)
+                    .fill(Color(hex: colorHex))
                     .frame(width: 24, height: 24)
                     .overlay(
                         RoundedRectangle(cornerRadius: 4)
@@ -107,7 +107,7 @@ struct DrawingToolCustomizer: View {
                         }
                     } label: {
                         Circle()
-                            .fill(Color(hex: hex) ?? .gray)
+                            .fill(Color(hex: hex))
                             .frame(width: 26, height: 26)
                             .overlay(
                                 Circle()
@@ -134,7 +134,7 @@ struct DrawingToolCustomizer: View {
 
             HStack(spacing: 12) {
                 Circle()
-                    .fill(Color(hex: colorHex) ?? .white)
+                    .fill(Color(hex: colorHex))
                     .frame(width: max(4, lineWidth * 0.8), height: max(4, lineWidth * 0.8))
                     .frame(width: 30, height: 30)
 
@@ -143,7 +143,7 @@ struct DrawingToolCustomizer: View {
                     in: tool.configuration.minStrokeWidth...tool.configuration.maxStrokeWidth,
                     step: 0.5
                 )
-                .tint(Color(hex: colorHex) ?? .accentColor)
+                .tint(Color(hex: colorHex))
             }
 
             HStack(spacing: 8) {
@@ -184,11 +184,11 @@ struct DrawingToolCustomizer: View {
                     .foregroundStyle(.secondary)
 
                 Slider(value: $opacity, in: 0.05...1.0, step: 0.05)
-                    .tint(Color(hex: colorHex) ?? .accentColor)
+                    .tint(Color(hex: colorHex))
 
                 Image(systemName: "circle.fill")
                     .font(.system(size: 14))
-                    .foregroundStyle(Color(hex: colorHex) ?? .white)
+                    .foregroundStyle(Color(hex: colorHex))
             }
 
             HStack(spacing: 8) {
@@ -229,7 +229,7 @@ struct DrawingToolCustomizer: View {
                     path.addLine(to: CGPoint(x: x, y: midY + wave))
                 }
 
-                let resolvedColor = Color(hex: colorHex) ?? .white
+                let resolvedColor = Color(hex: colorHex)
                 context.opacity = opacity
                 context.stroke(
                     path,

@@ -1418,6 +1418,7 @@
 		SK020004 /* AddSkillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010004 /* AddSkillView.swift */; };
 		SK020005 /* DraftSkillsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010005 /* DraftSkillsView.swift */; };
 		SK020006 /* SkillPickerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK010006 /* SkillPickerModifier.swift */; };
+		C0B0B0B0B0B0B0B0B0B0B001 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -2829,6 +2830,7 @@
 		SK010004 /* AddSkillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Views/Tools/AIChat/Skills/AddSkillView.swift"; sourceTree = "<group>"; };
 		SK010005 /* DraftSkillsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Views/Tools/AIChat/Skills/DraftSkillsView.swift"; sourceTree = "<group>"; };
 		SK010006 /* SkillPickerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Components/Advanced UIs/SkillPickerModifier.swift"; sourceTree = "<group>"; };
+		C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -4159,6 +4161,7 @@
 				WS010000000000000000000B /* ToolHeaderView.swift */,
 				WS010000000000000000000C /* CardView.swift */,
 				WS010000000000000000000D /* EmptyStateView.swift */,
+				C0A0A0A0A0A0A0A0A0A0A001 /* Color+Hex.swift */,
 				US010000000000000000000A /* UnsplashImagesView.swift */,
 			);
 			path = Components;
@@ -11218,6 +11221,7 @@
 				MS028F0C9AC0045039A23CD0 /* MessageBubbleView.swift in Sources */,
 				MS026A2894802C56D5AB5FC3 /* SegmentSwitcher.swift in Sources */,
 				MS028A4E8FF9A0449D039277 /* JSONCoder.swift in Sources */,
+				C0B0B0B0B0B0B0B0B0B0B001 /* Color+Hex.swift in Sources */,
 				A00200000000000000000001 /* SiriCoreUIView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

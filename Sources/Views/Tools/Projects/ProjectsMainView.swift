@@ -130,7 +130,7 @@ struct ProjectRowView: View {
             HStack(spacing: 14) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(hex: project.colorHex) ?? .blue)
+                        .fill(Color(hex: project.colorHex))
                         .frame(width: 44, height: 44)
                     Image(systemName: project.iconName)
                         .foregroundColor(.white)
@@ -167,7 +167,7 @@ struct ProjectRowView: View {
                     }
 
                     ProgressView(value: progress)
-                        .tint(Color(hex: project.colorHex) ?? .blue)
+                        .tint(Color(hex: project.colorHex))
                         .scaleEffect(x: 1, y: 0.5)
                 }
             }

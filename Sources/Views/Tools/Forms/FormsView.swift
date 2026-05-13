@@ -225,7 +225,7 @@ private struct FormCard: View {
     let onDelete: () -> Void
 
     private var accentColor: Color {
-        Color(hex: form.accentHexColor) ?? .blue
+        Color(hex: form.accentHexColor)
     }
 
     var body: some View {

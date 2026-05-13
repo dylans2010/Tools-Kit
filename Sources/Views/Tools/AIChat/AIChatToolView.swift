@@ -271,7 +271,7 @@ struct ChatBubble: View {
     var isUser: Bool { message.role == "user" }
 
     var bubbleColor: Color {
-        isUser ? (Color(hex: bubbleColorHex) ?? .blue) : Color(.secondarySystemBackground)
+        isUser ? (Color(hex: bubbleColorHex)) : Color(.secondarySystemBackground)
     }
 
     var body: some View {

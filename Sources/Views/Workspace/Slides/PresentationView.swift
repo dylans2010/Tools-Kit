@@ -37,7 +37,7 @@ private struct FullSlideView: View {
     let slide: Slide
 
     private var bgColor: Color {
-        Color(hex: slide.backgroundColorHex) ?? Color(red: 0.12, green: 0.23, blue: 0.37)
+        Color(hex: slide.backgroundColorHex), green: 0.23, blue: 0.37)
     }
 
     var body: some View {
@@ -66,7 +66,7 @@ private struct FullSlideView: View {
         case .text, .bullets:
             Text(el.text)
                 .font(.system(size: el.fontSize * scaleX))
-                .foregroundColor(Color(hex: el.textColor) ?? .white)
+                .foregroundColor(Color(hex: el.textColor))
                 .multilineTextAlignment(textAlignmentFor(el.textAlignment))
                 .frame(width: w, height: h)
 
@@ -105,7 +105,7 @@ private struct FullSlideView: View {
 
     @ViewBuilder
     private func shapeView(_ el: SlideElement, width: CGFloat, height: CGFloat) -> some View {
-        let fill = Color(hex: el.fillColor) ?? .blue
+        let fill = Color(hex: el.fillColor)
         switch el.shapeKind {
         case .rectangle:
             RoundedRectangle(cornerRadius: el.cornerRadius)

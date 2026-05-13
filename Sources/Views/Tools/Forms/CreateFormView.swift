@@ -31,11 +31,11 @@ struct CreateFormView: View {
     ]
 
     private var accentColor: Color {
-        Color(hex: accentHex) ?? .blue
+        Color(hex: accentHex)
     }
 
     private var backgroundColor: Color {
-        Color(hex: backgroundHex) ?? Color(.secondarySystemGroupedBackground)
+        Color(hex: backgroundHex))
     }
 
     private var attachStatusText: String {

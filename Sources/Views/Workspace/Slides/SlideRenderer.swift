@@ -240,7 +240,7 @@ struct SlideRenderer: View {
     }
 
     private var accentColor: Color {
-        Color(hex: theme.gradient.last ?? "#3B82F6") ?? .blue
+        Color(hex: theme.gradient.last ?? "#3B82F6")
     }
 }
 

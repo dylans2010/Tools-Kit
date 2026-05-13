@@ -46,7 +46,7 @@ struct ProjectSettingsView: View {
                                 Image(systemName: icon)
                                     .font(.system(size: 18))
                                     .frame(width: 32, height: 32)
-                                    .background(project.iconName == icon ? (Color(hex: project.colorHex) ?? .blue) : Color(.secondarySystemGroupedBackground))
+                                    .background(project.iconName == icon ? (Color(hex: project.colorHex)) : Color(.secondarySystemGroupedBackground))
                                     .foregroundColor(project.iconName == icon ? .white : .primary)
                                     .cornerRadius(8)
                             }
@@ -63,7 +63,7 @@ struct ProjectSettingsView: View {
                                 project.colorHex = hex
                             } label: {
                                 Circle()
-                                    .fill(Color(hex: hex) ?? .blue)
+                                    .fill(Color(hex: hex))
                                     .frame(width: 26, height: 26)
                                     .overlay(
                                         Circle().stroke(Color.primary, lineWidth: project.colorHex == hex ? 2 : 0).padding(2)

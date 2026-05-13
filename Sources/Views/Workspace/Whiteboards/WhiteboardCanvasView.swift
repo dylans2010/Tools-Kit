@@ -166,7 +166,7 @@ struct WhiteboardCanvasView: View {
     private var drawingQuickBar: some View {
         HStack(spacing: 12) {
             Circle()
-                .fill(Color(hex: drawingColor) ?? .white)
+                .fill(Color(hex: drawingColor))
                 .opacity(drawingOpacity)
                 .frame(width: 20, height: 20)
                 .overlay(Circle().stroke(.white.opacity(0.3), lineWidth: 1))
@@ -177,7 +177,7 @@ struct WhiteboardCanvasView: View {
 
             Slider(value: $drawingLineWidth, in: activeTool.configuration.minStrokeWidth...activeTool.configuration.maxStrokeWidth, step: 0.5)
                 .frame(maxWidth: 140)
-                .tint(Color(hex: drawingColor) ?? .accentColor)
+                .tint(Color(hex: drawingColor))
 
             Button {
                 showDrawingCustomizer = true
@@ -244,7 +244,7 @@ struct WhiteboardCanvasView: View {
             }
         }
         .stroke(
-            Color(hex: drawing.colorHex) ?? .white,
+            Color(hex: drawing.colorHex),
             style: drawingStrokeStyle(for: drawing)
         )
         .opacity(drawing.opacity)
@@ -733,26 +733,26 @@ struct CanvasElementView: View {
         }
         .padding(8)
         .frame(width: element.width, height: element.height)
-        .background(Color(hex: element.colorHex) ?? .yellow)
+        .background(Color(hex: element.colorHex))
         .cornerRadius(4)
         .shadow(color: .black.opacity(0.15), radius: 2, x: 1, y: 2)
     }
 
     private var rectangleElement: some View {
         RoundedRectangle(cornerRadius: 8)
-            .fill(Color(hex: element.colorHex)?.opacity(0.3) ?? Color.blue.opacity(0.3))
+            .fill(Color(hex: element.colorHex).opacity(0.3))
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color(hex: element.strokeColorHex) ?? .white, lineWidth: element.strokeWidth)
+                    .stroke(Color(hex: element.strokeColorHex), lineWidth: element.strokeWidth)
             )
     }
 
     private var circleElement: some View {
         Circle()
-            .fill(Color(hex: element.colorHex)?.opacity(0.3) ?? Color.purple.opacity(0.3))
+            .fill(Color(hex: element.colorHex).opacity(0.3))
             .overlay(
                 Circle()
-                    .stroke(Color(hex: element.strokeColorHex) ?? .white, lineWidth: element.strokeWidth)
+                    .stroke(Color(hex: element.strokeColorHex), lineWidth: element.strokeWidth)
             )
     }
 
@@ -766,17 +766,17 @@ struct CanvasElementView: View {
                 path.move(to: CGPoint(x: geo.size.width - 12, y: geo.size.height / 2))
                 path.addLine(to: CGPoint(x: geo.size.width - 20, y: geo.size.height / 2 + 8))
             }
-            .stroke(Color(hex: element.colorHex) ?? .white, lineWidth: 2)
+            .stroke(Color(hex: element.colorHex), lineWidth: 2)
         }
     }
 
     private var connectorElement: some View {
         Rectangle()
-            .fill(Color(hex: element.colorHex)?.opacity(0.2) ?? Color.gray.opacity(0.2))
+            .fill(Color(hex: element.colorHex).opacity(0.2))
             .overlay(
                 Rectangle()
                     .stroke(style: StrokeStyle(lineWidth: 1, dash: [4]))
-                    .foregroundStyle(Color(hex: element.strokeColorHex) ?? .gray)
+                    .foregroundStyle(Color(hex: element.strokeColorHex))
             )
     }
 
@@ -816,7 +816,7 @@ struct CanvasElementView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(width: element.width, height: element.height)
-        .background(Color(hex: element.colorHex)?.opacity(0.15) ?? Color.gray.opacity(0.15))
+        .background(Color(hex: element.colorHex).opacity(0.15))
         .overlay(
             RoundedRectangle(cornerRadius: 8)
                 .stroke(style: StrokeStyle(lineWidth: 1, dash: [6]))
