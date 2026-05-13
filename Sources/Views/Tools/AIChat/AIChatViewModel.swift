@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 final class AIChatViewModel: ObservableObject, @unchecked Sendable {
     @Published var messages: [ChatMessage] = []
     @Published var inputText: String = ""
