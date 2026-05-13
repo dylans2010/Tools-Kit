@@ -878,6 +878,7 @@
 		BB318558F9F14ECDB06CD673 /* lint_code.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D1C8968C5A4094B3796BEC /* lint_code.swift */; };
 		DV0200000000000000000015 /* SDKUIComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = DV0100000000000000000015 /* SDKUIComponents.swift */; };
 		A00200000000000000000001 /* SiriCoreUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000001 /* SiriCoreUIView.swift */; };
+		A00200000000000000000002 /* SiriCoreUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000001 /* SiriCoreUIView.swift */; };
 		C55C83D89974490D95A25381 /* revert_commit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E8647ED6564F6089115FC0 /* revert_commit.swift */; };
 		63C324C2B81B4F69B4BD036B /* profile_runtime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4AAD1E0AAC45D18918053D /* profile_runtime.swift */; };
 		4FB758CF14514C3C9789AA6D /* api_contract_scan.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9395E8F2234858B419C0B5 /* api_contract_scan.swift */; };
@@ -9810,7 +9811,7 @@
 				SK020004 /* in Sources */,
 				SK020005 /* in Sources */,
 				SK020006 /* in Sources */,
-				C0B0B0B0B0B0B0B0B0B0B002 /* Color+Hex.swift in Sources */,
+				A00200000000000000000002 /* SiriCoreUIView.swift in Sources */,
 				NB0100000000000000000001 /* SDKAnalyticsEngine.swift in Sources */,
 				NB0100000000000000000002 /* SDKWorkflowEngine.swift in Sources */,
 				NB0100000000000000000003 /* SDKTestHarness.swift in Sources */,

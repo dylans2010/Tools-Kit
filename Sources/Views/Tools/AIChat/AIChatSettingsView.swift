@@ -519,7 +519,7 @@ struct AppModePickerView: View {
     }
 }
 
-private extension AIChatSettingsView {
+extension AIChatSettingsView {
     enum AppMode: String, CaseIterable, Identifiable {
         case dashboard, music, workouts, workspace
         var id: String { rawValue }
