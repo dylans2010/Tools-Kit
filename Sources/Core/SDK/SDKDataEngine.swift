@@ -260,7 +260,17 @@ public final class SDKDataEngine: ObservableObject {
                 }
             }
             return allItems.sorted { $0.timestamp > $1.timestamp }
-        case .custom:
+        case .custom,
+             .workspaceRead,
+             .workspaceWrite,
+             .sdkProjectCreate,
+             .sdkManageLibraries,
+             .sdkManageFrameworks,
+             .sdkManagePackages,
+             .frameworkExecute,
+             .libraryInvoke,
+             .agentExecute,
+             .agentTakeover:
             return []
         }
     }

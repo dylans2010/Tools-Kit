@@ -515,20 +515,46 @@ struct PersonaAgentFrameworkView: View {
     }
 
     private var planSection: some View {
-        Section("Current Plan") {
-            if agent.currentPlan.isEmpty {
-                Text("No active plan").foregroundStyle(.secondary)
-            } else {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Current Plan")
+                .font(.headline)
+                .padding(.horizontal)
+
+            if !agent.currentPlan.isEmpty {
                 ForEach(agent.currentPlan) { step in
-                    HStack {
-                        Text(step.title)
+                    HStack(spacing: 12) {
+                        Image(systemName: stepIcon(step.status))
+                            .foregroundColor(stepColor(step.status))
+                            .frame(width: 20)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(step.description)
+                                .font(.subheadline)
+                            Text(step.intent.rawValue.capitalized)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
                         Spacer()
                         Text(step.status.rawValue)
+                            .font(.caption2)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(stepColor(step.status).opacity(0.15))
+                            .cornerRadius(4)
                     }
+                    .padding(.horizontal)
                     .padding(.vertical, 4)
                 }
+            } else {
+                Text("No active plan")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
             }
         }
+        .padding(.vertical, 8)
+        .background(Color(.secondarySystemGroupedBackground))
+        .cornerRadius(12)
+        .padding(.horizontal)
     }
 
     private var auditSection: some View {
@@ -633,7 +659,7 @@ struct PersonaAgentFrameworkView: View {
         Binding(get: { toolParams[key] ?? "" }, set: { toolParams[key] = $0 })
     }
 
-    private func stepIcon(_ status: AgentPlanStep.StepStatus) -> String {
+    private func stepIcon(_ status: PersonaAgentPlanStep.StepStatus) -> String {
         switch status {
         case .pending: return "circle"
         case .executing: return "arrow.triangle.2.circlepath"
@@ -643,7 +669,7 @@ struct PersonaAgentFrameworkView: View {
         }
     }
 
-    private func stepColor(_ status: AgentPlanStep.StepStatus) -> Color {
+    private func stepColor(_ status: PersonaAgentPlanStep.StepStatus) -> Color {
         switch status {
         case .pending: return .secondary
         case .executing: return .blue

@@ -102,6 +102,16 @@ public final class SDKScopeManager: ObservableObject {
         case .persona: scopeName = "workspace.persona"
         case .all: scopeName = "workspace"
         case .custom: scopeName = "workspace.custom"
+        case .workspaceRead: scopeName = "workspace.read"
+        case .workspaceWrite: scopeName = "workspace.write"
+        case .sdkProjectCreate: scopeName = "sdk.project.create"
+        case .sdkManageLibraries: scopeName = "sdk.manage.libraries"
+        case .sdkManageFrameworks: scopeName = "sdk.manage.frameworks"
+        case .sdkManagePackages: scopeName = "sdk.manage.packages"
+        case .frameworkExecute: scopeName = "framework.execute"
+        case .libraryInvoke: scopeName = "library.invoke"
+        case .agentExecute: scopeName = "agent.execute"
+        case .agentTakeover: scopeName = "agent.takeover"
         }
         return "\(scopeName).\(operation.rawValue)"
     }
