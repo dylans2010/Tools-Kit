@@ -162,9 +162,37 @@ struct AgentPlan: Codable {
 }
 
 struct AgentPlanStep: Codable {
+    enum StepStatus: String, Codable {
+        case pending
+        case executing
+        case completed
+        case failed
+        case rolledBack
+    }
+
     let id: String
     let title: String
     let index: Int?
+    var status: StepStatus = .pending
+
+    init(id: String, title: String, index: Int?, status: StepStatus = .pending) {
+        self.id = id
+        self.title = title
+        self.index = index
+        self.status = status
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, title, index, status
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        title = try container.decode(String.self, forKey: .title)
+        index = try container.decodeIfPresent(Int.self, forKey: .index)
+        status = try container.decodeIfPresent(StepStatus.self, forKey: .status) ?? .pending
+    }
 }
 
 struct AgentProgressUpdated: Codable {

@@ -181,8 +181,8 @@ struct SDKDiagnosticsView: View {
 
     private func scopeTitle(_ scope: SDKScope) -> String {
         switch scope {
-        case .custom(let query):
-            return query.isEmpty ? "Custom" : query.capitalized
+        case .custom:
+            return "Custom"
         default:
             return String(describing: scope).capitalized
         }
