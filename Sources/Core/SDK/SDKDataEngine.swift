@@ -260,8 +260,8 @@ public final class SDKDataEngine: ObservableObject {
                 }
             }
             return allItems.sorted { $0.timestamp > $1.timestamp }
-        case .custom(let query):
-            return try await searchWorkspace(query: query)
+        case .custom:
+            return []
         }
     }
 

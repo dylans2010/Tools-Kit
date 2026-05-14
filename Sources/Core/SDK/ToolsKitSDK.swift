@@ -37,6 +37,7 @@ public enum SDKScope: String, Hashable, CaseIterable, Codable, Identifiable {
     case automations = "automations"
     case intelligence = "intelligence"
     case persona = "persona"
+    case custom = "custom"
 
     case workspaceRead = "workspace.read"
     case workspaceWrite = "workspace.write"
@@ -71,7 +72,7 @@ public enum SDKScope: String, Hashable, CaseIterable, Codable, Identifiable {
         [
             .all, .tasks, .notes, .calendar, .files, .emails, .whiteboards,
             .plugins, .slides, .media, .meet, .repos, .automations,
-            .intelligence, .persona, .workspaceRead, .workspaceWrite,
+            .intelligence, .persona, .custom, .workspaceRead, .workspaceWrite,
             .sdkProjectCreate, .sdkManageLibraries, .sdkManageFrameworks,
             .sdkManagePackages, .frameworkExecute, .libraryInvoke,
             .agentExecute, .agentTakeover
