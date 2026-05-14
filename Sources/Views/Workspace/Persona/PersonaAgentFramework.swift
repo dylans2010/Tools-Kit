@@ -49,7 +49,7 @@ enum AgentIntent: String, Codable {
     case install, resolve, execute, inspect, takeover, rollback
 }
 
-struct AgentPlanStep: Identifiable {
+struct PersonaAgentPlanStep: Identifiable {
     let id = UUID()
     let intent: AgentIntent
     let description: String
@@ -86,7 +86,7 @@ final class PersonaAgentFramework: ObservableObject {
     static let shared = PersonaAgentFramework()
 
     @Published private(set) var executionState: AgentExecutionState = .idle
-    @Published private(set) var currentPlan: [AgentPlanStep] = []
+    @Published private(set) var currentPlan: [PersonaAgentPlanStep] = []
     @Published private(set) var invocationLog: [AgentToolInvocation] = []
     @Published private(set) var auditLog: [AgentAuditEntry] = []
     @Published var takeoverActive: Bool = false
@@ -120,9 +120,9 @@ final class PersonaAgentFramework: ObservableObject {
 
     // MARK: - Multi-Step Planning
 
-    func buildPlan(for intent: AgentIntent, target: String) -> [AgentPlanStep] {
+    func buildPlan(for intent: AgentIntent, target: String) -> [PersonaAgentPlanStep] {
         executionState = .planning
-        var steps: [AgentPlanStep] = []
+        var steps: [PersonaAgentPlanStep] = []
 
         // Project Awareness: Inject project context if available
         if let project = SDKProjectManager.shared.currentProject {
@@ -130,24 +130,24 @@ final class PersonaAgentFramework: ObservableObject {
         }
 
         if currentProfile == .precise {
-            steps.append(AgentPlanStep(intent: .inspect, description: "Deep analysis for \(target)", requiredScopes: [.workspaceRead]))
+            steps.append(PersonaAgentPlanStep(intent: .inspect, description: "Deep analysis for \(target)", requiredScopes: [.workspaceRead]))
         }
 
         switch intent {
         case .install:
-            steps.append(AgentPlanStep(intent: .resolve, description: "Resolve dependencies for \(target)", requiredScopes: [.sdkManagePackages]))
-            steps.append(AgentPlanStep(intent: .install, description: "Install \(target)", requiredScopes: [.sdkManagePackages, .sdkManageLibraries]))
+            steps.append(PersonaAgentPlanStep(intent: .resolve, description: "Resolve dependencies for \(target)", requiredScopes: [.sdkManagePackages]))
+            steps.append(PersonaAgentPlanStep(intent: .install, description: "Install \(target)", requiredScopes: [.sdkManagePackages, .sdkManageLibraries]))
         case .resolve:
-            steps.append(AgentPlanStep(intent: .resolve, description: "Analyze dependency graph for \(target)", requiredScopes: [.sdkManagePackages]))
+            steps.append(PersonaAgentPlanStep(intent: .resolve, description: "Analyze dependency graph for \(target)", requiredScopes: [.sdkManagePackages]))
         case .execute:
-            steps.append(AgentPlanStep(intent: .resolve, description: "Verify dependencies for \(target)", requiredScopes: [.sdkManagePackages]))
-            steps.append(AgentPlanStep(intent: .execute, description: "Execute \(target) in sandbox", requiredScopes: [.frameworkExecute]))
+            steps.append(PersonaAgentPlanStep(intent: .resolve, description: "Verify dependencies for \(target)", requiredScopes: [.sdkManagePackages]))
+            steps.append(PersonaAgentPlanStep(intent: .execute, description: "Execute \(target) in sandbox", requiredScopes: [.frameworkExecute]))
         case .inspect:
-            steps.append(AgentPlanStep(intent: .inspect, description: "Inspect \(target)", requiredScopes: [.workspaceRead]))
+            steps.append(PersonaAgentPlanStep(intent: .inspect, description: "Inspect \(target)", requiredScopes: [.workspaceRead]))
         case .takeover:
-            steps.append(AgentPlanStep(intent: .takeover, description: "Request workspace takeover", requiredScopes: [.agentTakeover, .agentExecute]))
+            steps.append(PersonaAgentPlanStep(intent: .takeover, description: "Request workspace takeover", requiredScopes: [.agentTakeover, .agentExecute]))
         case .rollback:
-            steps.append(AgentPlanStep(intent: .rollback, description: "Rollback changes for \(target)", requiredScopes: [.workspaceWrite]))
+            steps.append(PersonaAgentPlanStep(intent: .rollback, description: "Rollback changes for \(target)", requiredScopes: [.workspaceWrite]))
         }
 
         currentPlan = steps

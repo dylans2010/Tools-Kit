@@ -21,78 +21,76 @@ public struct SDKDataItem: Identifiable, Codable {
     }
 }
 
-public enum SDKScope: Hashable, CaseIterable, Codable {
-    case all, tasks, notes, calendar, files, emails, whiteboards, plugins
-    case slides, media, meet, repos, automations, intelligence, persona
-    case custom(query: String)
+public enum SDKScope: String, Hashable, CaseIterable, Codable, Identifiable {
+    case all = "all"
+    case tasks = "tasks"
+    case notes = "notes"
+    case calendar = "calendar"
+    case files = "files"
+    case emails = "emails"
+    case whiteboards = "whiteboards"
+    case plugins = "plugins"
+    case slides = "slides"
+    case media = "media"
+    case meet = "meet"
+    case repos = "repos"
+    case automations = "automations"
+    case intelligence = "intelligence"
+    case persona = "persona"
+
+    case workspaceRead = "workspace.read"
+    case workspaceWrite = "workspace.write"
+    case sdkProjectCreate = "sdk.project.create"
+    case sdkManageLibraries = "sdk.manage.libraries"
+    case sdkManageFrameworks = "sdk.manage.frameworks"
+    case sdkManagePackages = "sdk.manage.packages"
+    case frameworkExecute = "framework.execute"
+    case libraryInvoke = "library.invoke"
+    case agentExecute = "agent.execute"
+    case agentTakeover = "agent.takeover"
+
+    public var id: String { rawValue }
+
+    public var displayName: String {
+        switch self {
+        case .workspaceRead: return "Workspace Read"
+        case .workspaceWrite: return "Workspace Write"
+        case .sdkProjectCreate: return "Create SDK Projects"
+        case .sdkManageLibraries: return "Manage Libraries"
+        case .sdkManageFrameworks: return "Manage Frameworks"
+        case .sdkManagePackages: return "Manage Packages"
+        case .frameworkExecute: return "Execute Frameworks"
+        case .libraryInvoke: return "Invoke Libraries"
+        case .agentExecute: return "Agent Execution"
+        case .agentTakeover: return "Agent Workspace Takeover"
+        default: return rawValue.replacingOccurrences(of: ".", with: " ").capitalized
+        }
+    }
 
     public static var allCases: [SDKScope] {
-        return [.all, .tasks, .notes, .calendar, .files, .emails, .whiteboards,
-                .plugins, .slides, .media, .meet, .repos, .automations,
-                .intelligence, .persona]
+        [
+            .all, .tasks, .notes, .calendar, .files, .emails, .whiteboards,
+            .plugins, .slides, .media, .meet, .repos, .automations,
+            .intelligence, .persona, .workspaceRead, .workspaceWrite,
+            .sdkProjectCreate, .sdkManageLibraries, .sdkManageFrameworks,
+            .sdkManagePackages, .frameworkExecute, .libraryInvoke,
+            .agentExecute, .agentTakeover
+        ]
     }
 
-    private enum CodingKeys: String, CodingKey {
-        case type, query
+    static func encode(_ scopes: Set<SDKScope>) -> String {
+        let sorted = scopes.map(\.rawValue).sorted()
+        guard let data = try? JSONEncoder().encode(sorted) else { return "" }
+        return data.base64EncodedString()
     }
 
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let type = try container.decode(String.self, forKey: .type)
-        switch type {
-        case "all": self = .all
-        case "tasks": self = .tasks
-        case "notes": self = .notes
-        case "calendar": self = .calendar
-        case "files": self = .files
-        case "emails": self = .emails
-        case "whiteboards": self = .whiteboards
-        case "plugins": self = .plugins
-        case "slides": self = .slides
-        case "media": self = .media
-        case "meet": self = .meet
-        case "repos": self = .repos
-        case "automations": self = .automations
-        case "intelligence": self = .intelligence
-        case "persona": self = .persona
-        case "custom":
-            let query = try container.decode(String.self, forKey: .query)
-            self = .custom(query: query)
-        default:
-            self = .all
-        }
+    static func decode(_ encoded: String) -> Set<SDKScope> {
+        guard let data = Data(base64Encoded: encoded),
+              let raw = try? JSONDecoder().decode([String].self, from: data) else { return [] }
+        return Set(raw.compactMap { SDKScope(rawValue: $0) })
     }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        switch self {
-        case .all: try container.encode("all", forKey: .type)
-        case .tasks: try container.encode("tasks", forKey: .type)
-        case .notes: try container.encode("notes", forKey: .type)
-        case .calendar: try container.encode("calendar", forKey: .type)
-        case .files: try container.encode("files", forKey: .type)
-        case .emails: try container.encode("emails", forKey: .type)
-        case .whiteboards: try container.encode("whiteboards", forKey: .type)
-        case .plugins: try container.encode("plugins", forKey: .type)
-        case .slides: try container.encode("slides", forKey: .type)
-        case .media: try container.encode("media", forKey: .type)
-        case .meet: try container.encode("meet", forKey: .type)
-        case .repos: try container.encode("repos", forKey: .type)
-        case .automations: try container.encode("automations", forKey: .type)
-        case .intelligence: try container.encode("intelligence", forKey: .type)
-        case .persona: try container.encode("persona", forKey: .type)
-        case .custom(let query):
-            try container.encode("custom", forKey: .type)
-            try container.encode(query, forKey: .query)
-        }
-    }
-
-    var cacheKey: String {
-        switch self {
-        case .custom(let query): return "custom_\(query)"
-        default: return String(describing: self)
-        }
-    }
+    var cacheKey: String { rawValue }
 }
 
 // MARK: - SDK Query Types
