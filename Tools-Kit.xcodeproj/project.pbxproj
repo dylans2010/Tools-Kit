@@ -1355,6 +1355,10 @@
 		EXP200000000000000000004 /* SDKPluginLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000004 /* SDKPluginLifecycle.swift */; };
 		EXP200000000000000000005 /* SDKConnectorRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000005 /* SDKConnectorRuntime.swift */; };
 		EXP200000000000000000006 /* SDKDownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000006 /* SDKDownloadView.swift */; };
+		PAF200000000000000000001 /* LibraryManageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PAF100000000000000000001 /* LibraryManageView.swift */; };
+		PAF200000000000000000002 /* FrameworkManageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PAF100000000000000000002 /* FrameworkManageView.swift */; };
+		PAF200000000000000000003 /* PackageDependenciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PAF100000000000000000003 /* PackageDependenciesView.swift */; };
+		PAF200000000000000000004 /* PersonaAgentFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = PAF100000000000000000004 /* PersonaAgentFramework.swift */; };
 		EXP200000000000000000007 /* CustomAppSDKView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000007 /* CustomAppSDKView.swift */; };
 		EXP200000000000000000008 /* SDKHelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000008 /* SDKHelpView.swift */; };
 		EXP200000000000000000009 /* SDKSupportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EXP100000000000000000009 /* SDKSupportView.swift */; };
@@ -2786,6 +2790,10 @@
 		EXP100000000000000000004 /* SDKPluginLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Core/SDK/Plugins/SDKPluginLifecycle.swift; sourceTree = SOURCE_ROOT; };
 		EXP100000000000000000005 /* SDKConnectorRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Core/SDK/Connectors/SDKConnectorRuntime.swift; sourceTree = SOURCE_ROOT; };
 		EXP100000000000000000006 /* SDKDownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Builder/SDKDownloadView.swift; sourceTree = SOURCE_ROOT; };
+		PAF100000000000000000001 /* LibraryManageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Builder/LibraryManageView.swift; sourceTree = SOURCE_ROOT; };
+		PAF100000000000000000002 /* FrameworkManageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Builder/FrameworkManageView.swift; sourceTree = SOURCE_ROOT; };
+		PAF100000000000000000003 /* PackageDependenciesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Builder/PackageDependenciesView.swift; sourceTree = SOURCE_ROOT; };
+		PAF100000000000000000004 /* PersonaAgentFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaAgentFramework.swift; sourceTree = "<group>"; };
 		EXP100000000000000000007 /* CustomAppSDKView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Builder/CustomAppSDKView.swift; sourceTree = SOURCE_ROOT; };
 		EXP100000000000000000008 /* SDKHelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Docs/SDKHelpView.swift; sourceTree = SOURCE_ROOT; };
 		EXP100000000000000000009 /* SDKSupportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/Views/Workspace/SDK/Docs/SDKSupportView.swift; sourceTree = SOURCE_ROOT; };
@@ -3489,6 +3497,7 @@
 			isa = PBXGroup;
 			children = (
 				ML0180133150940C4A3C83DA /* PersonaHomeView.swift */,
+				PAF100000000000000000004 /* PersonaAgentFramework.swift */,
 			);
 			path = Persona;
 			sourceTree = "<group>";
@@ -7528,6 +7537,9 @@
 				SDK1A00000000000000000013 /* SDKDependencyManagerView.swift */,
 				EXP100000000000000000006 /* SDKDownloadView.swift */,
 				EXP100000000000000000007 /* CustomAppSDKView.swift */,
+				PAF100000000000000000001 /* LibraryManageView.swift */,
+				PAF100000000000000000002 /* FrameworkManageView.swift */,
+				PAF100000000000000000003 /* PackageDependenciesView.swift */,
 				EXP100000000000000000008 /* SDKHelpView.swift */,
 				EXP100000000000000000009 /* SDKSupportView.swift */,
 				SDKD1000000000000000001 /* SDKAIContextProvider.swift */,
@@ -11226,6 +11238,10 @@
 				AU2000000000000000000013 /* SessionStatusView.swift in Sources */,
 				AU2000000000000000000014 /* ScopeInspectorView.swift in Sources */,
 				AU2000000000000000000015 /* AccessControlOverviewView.swift in Sources */,
+				PAF200000000000000000001 /* LibraryManageView.swift in Sources */,
+				PAF200000000000000000002 /* FrameworkManageView.swift in Sources */,
+				PAF200000000000000000003 /* PackageDependenciesView.swift in Sources */,
+				PAF200000000000000000004 /* PersonaAgentFramework.swift in Sources */,
 				77D13E1865752DB3F0DD532A /* SDKErrorDomains.swift in Sources */,
 				D2397D2B4DC20A3F697A98FC /* SDKCancellationManager.swift in Sources */,
 				CF1092C1534A2C178C06FC24 /* SDKRetryPolicy.swift in Sources */,
