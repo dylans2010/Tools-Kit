@@ -2,6 +2,8 @@ import SwiftUI
 
 struct WorkspaceHomeView: View {
     @StateObject private var mailStore = MailStore.shared
+    @StateObject private var authorizationManager = AuthorizationManager.shared
+    @State private var showingSignIn = false
 
     private var hasMailAccounts: Bool {
         !mailStore.accounts.isEmpty
@@ -71,15 +73,39 @@ struct WorkspaceHomeView: View {
                 }
 
                 Section("System") {
-                    NavigationLink { SDKHomeView() } label: {
-                        Label("SDK", systemImage: "hammer")
+                    Group {
+                        if authorizationManager.authState == .authenticated {
+                            NavigationLink { SDKHomeView() } label: {
+                                Label("SDK", systemImage: "hammer")
+                            }
+                            NavigationLink { PluginsMainView() } label: {
+                                Label("Plugins", systemImage: "puzzlepiece.extension")
+                            }
+                            NavigationLink { ConnectorsMainView() } label: {
+                                Label("Connectors", systemImage: "cable.connector")
+                            }
+                        } else {
+                            Button {
+                                showingSignIn = true
+                            } label: {
+                                Label("SDK (Sign In Required)", systemImage: "hammer")
+                                    .foregroundStyle(.secondary)
+                            }
+                            Button {
+                                showingSignIn = true
+                            } label: {
+                                Label("Plugins (Sign In Required)", systemImage: "puzzlepiece.extension")
+                                    .foregroundStyle(.secondary)
+                            }
+                            Button {
+                                showingSignIn = true
+                            } label: {
+                                Label("Connectors (Sign In Required)", systemImage: "cable.connector")
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
                     }
-                    NavigationLink { PluginsMainView() } label: {
-                        Label("Plugins", systemImage: "puzzlepiece.extension")
-                    }
-                    NavigationLink { ConnectorsMainView() } label: {
-                        Label("Connectors", systemImage: "cable.connector")
-                    }
+
                     NavigationLink { SecurityHomeView() } label: {
                         Label("Security", systemImage: "lock.shield")
                     }
@@ -106,6 +132,16 @@ struct WorkspaceHomeView: View {
                                     }
             }
             .navigationTitle("Workspace")
+            .sheet(isPresented: $showingSignIn) {
+                NavigationStack {
+                    SignInView()
+                }
+            }
+            .onAppear {
+                if authorizationManager.authState != .authenticated {
+                    showingSignIn = true
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink {

@@ -3,20 +3,35 @@ import CryptoKit
 
 // MARK: - Package Descriptor
 
+enum PackageDependencyLayer: String, CaseIterable, Codable, Identifiable {
+    case core, optional, dev
+    var id: String { rawValue }
+
+    var weight: Int {
+        switch self {
+        case .core: return 100
+        case .optional: return 50
+        case .dev: return 10
+        }
+    }
+}
+
 struct PackageDescriptor: Identifiable, Codable {
     let id: UUID
     let name: String
     let version: String
+    let layer: PackageDependencyLayer
     let exports: [String]
     let dependencyIds: [UUID]
     let integrityHash: String
 
     init(
         id: UUID = UUID(), name: String, version: String,
+        layer: PackageDependencyLayer = .core,
         exports: [String] = [], dependencyIds: [UUID] = [],
         integrityHash: String = ""
     ) {
-        self.id = id; self.name = name; self.version = version
+        self.id = id; self.name = name; self.version = version; self.layer = layer
         self.exports = exports; self.dependencyIds = dependencyIds
         self.integrityHash = integrityHash
     }
@@ -24,10 +39,17 @@ struct PackageDescriptor: Identifiable, Codable {
 
 // MARK: - Package Registry
 
+enum RegistryType: String, CaseIterable, Codable, Identifiable {
+    case local, remote, project
+    var id: String { rawValue }
+}
+
 @MainActor
 final class PackageRegistry: ObservableObject {
     static let shared = PackageRegistry()
     @Published var packages: [PackageDescriptor] = []
+    @Published var activeRegistry: RegistryType = .local
+    @Published var remoteRegistryURL: String = "https://registry.toolskit.dev"
 
     private init() {}
 
@@ -49,10 +71,59 @@ final class PackageRegistry: ObservableObject {
     }
 }
 
+// MARK: - Dependency Health System
+
+struct PackageHealth {
+    let score: Int
+    let issues: [String]
+    let recommendations: [String]
+}
+
+struct DependencyHealthEngine {
+    static func analyze(package: PackageDescriptor, graph: DependencyGraph) -> PackageHealth {
+        var score = 100
+        var issues: [String] = []
+        var recs: [String] = []
+
+        // 1. Freshness check
+        if package.version.hasPrefix("0.") {
+            score -= 20
+            issues.append("Unstable major version (0.x)")
+            recs.append("Migrate to stable v1.0.0+")
+        }
+
+        // 2. Depth check
+        let depth = calculateDepth(id: package.id, graph: graph)
+        if depth > 5 {
+            score -= 10
+            issues.append("Deep dependency chain (\(depth))")
+            recs.append("Flatten dependency tree if possible")
+        }
+
+        // 3. Risk check (deprecated pattern)
+        if package.name.lowercased().contains("legacy") || package.name.lowercased().contains("old") {
+            score -= 30
+            issues.append("Legacy naming pattern detected")
+            recs.append("Replace with modern alternative")
+        }
+
+        return PackageHealth(score: max(0, score), issues: issues, recommendations: recs)
+    }
+
+    private static func calculateDepth(id: UUID, graph: DependencyGraph) -> Int {
+        var maxDepth = 0
+        for depId in graph.adjacency[id] ?? [] {
+            maxDepth = max(maxDepth, 1 + calculateDepth(id: depId, graph: graph))
+        }
+        return maxDepth
+    }
+}
+
 // MARK: - DAG-Based Dependency Graph Engine
 
 struct DependencyGraph {
     let packages: [PackageDescriptor]
+    static var resolutionCache: [String: [PackageDescriptor]] = [:]
 
     var adjacency: [UUID: [UUID]] {
         var map: [UUID: [UUID]] = [:]
@@ -135,15 +206,25 @@ struct PackageIntegrityEngine {
 // MARK: - Semver Resolution Engine
 
 struct SemverResolver {
+    enum RangeOperator: String {
+        case caret = "^"
+        case tilde = "~"
+        case exact = ""
+        case wildcard = "*"
+    }
+
     struct Version: Comparable {
         let major: Int
         let minor: Int
         let patch: Int
 
         init?(string: String) {
-            let parts = string.split(separator: ".").compactMap { Int($0) }
-            guard parts.count >= 3 else { return nil }
-            major = parts[0]; minor = parts[1]; patch = parts[2]
+            let clean = string.trimmingCharacters(in: CharacterSet.decimalDigits.inverted.subtracting(CharacterSet(charactersIn: ".")))
+            let parts = clean.split(separator: ".").compactMap { Int($0) }
+            guard !parts.isEmpty else { return nil }
+            major = parts[0]
+            minor = parts.count > 1 ? parts[1] : 0
+            patch = parts.count > 2 ? parts[2] : 0
         }
 
         var string: String { "\(major).\(minor).\(patch)" }
@@ -162,9 +243,27 @@ struct SemverResolver {
         return v1 >= v2 ? existing : incoming
     }
 
-    static func isCompatible(installed: String, required: String) -> Bool {
-        guard let v1 = Version(string: installed), let v2 = Version(string: required) else { return false }
-        return v1.major == v2.major && v1 >= v2
+    static func isCompatible(installed: String, requiredRange: String) -> Bool {
+        if requiredRange == "*" { return true }
+
+        let op: RangeOperator
+        if requiredRange.hasPrefix("^") { op = .caret }
+        else if requiredRange.hasPrefix("~") { op = .tilde }
+        else { op = .exact }
+
+        guard let vInstalled = Version(string: installed),
+              let vRequired = Version(string: requiredRange) else { return false }
+
+        switch op {
+        case .caret:
+            return vInstalled.major == vRequired.major && vInstalled >= vRequired
+        case .tilde:
+            return vInstalled.major == vRequired.major && vInstalled.minor == vRequired.minor && vInstalled >= vRequired
+        case .exact:
+            return vInstalled == vRequired
+        case .wildcard:
+            return true
+        }
     }
 }
 
@@ -179,12 +278,12 @@ final class PackageDependencyManager: ObservableObject {
 
     private init() {}
 
-    func installPackage(name: String, version: String, exports: [String], dependencyIds: [UUID]) -> Bool {
+    func installPackage(name: String, version: String, layer: PackageDependencyLayer = .core, exports: [String], dependencyIds: [UUID]) -> Bool {
         guard tokenEngine.requireScope(.sdkManagePackages) else { return false }
         guard !name.isEmpty, !version.isEmpty else { return false }
 
         let hash = PackageIntegrityEngine.computeHash(name: name, version: version, exports: exports)
-        let pkg = PackageDescriptor(name: name, version: version, exports: exports, dependencyIds: dependencyIds, integrityHash: hash)
+        let pkg = PackageDescriptor(name: name, version: version, layer: layer, exports: exports, dependencyIds: dependencyIds, integrityHash: hash)
         registry.install(pkg)
         return true
     }
@@ -233,7 +332,13 @@ final class PackageDependencyManager: ObservableObject {
     }
 
     func resolvedOrder() -> [PackageDescriptor] {
-        registry.buildDependencyGraph().topologicalSort()
+        let currentHash = PackageIntegrityEngine.computeHash(name: "registry", version: "state", exports: registry.packages.map(\.name))
+        if let cached = DependencyGraph.resolutionCache[currentHash] {
+            return cached
+        }
+        let resolved = registry.buildDependencyGraph().topologicalSort()
+        DependencyGraph.resolutionCache[currentHash] = resolved
+        return resolved
     }
 }
 
@@ -248,6 +353,7 @@ struct PackageDependenciesView: View {
     @State private var selectedPackage: PackageDescriptor?
     @State private var searchText = ""
     @State private var cycleWarning: [String]?
+    @State private var showingVisualGraph = false
 
     private var filteredPackages: [PackageDescriptor] {
         if searchText.isEmpty { return registry.packages }
@@ -261,6 +367,8 @@ struct PackageDependenciesView: View {
         NavigationStack {
             List {
                 authSection
+                registrySelectionSection
+                overallHealthSection
                 cycleSection
                 bulkActionsSection
                 packageListSection
@@ -285,6 +393,46 @@ struct PackageDependenciesView: View {
                 NavigationStack { PackageDetailSheet(package: pkg, manager: manager) }
             }
             .onAppear { cycleWarning = manager.checkCycles() }
+        }
+    }
+
+    private var registrySelectionSection: some View {
+        Section("Registry Source") {
+            Picker("Registry", selection: $registry.activeRegistry) {
+                ForEach(RegistryType.allCases) { type in
+                    Text(type.rawValue.capitalized).tag(type)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            if registry.activeRegistry == .remote {
+                TextField("Remote URL", text: $registry.remoteRegistryURL)
+                    .font(.caption)
+                    .foregroundStyle(.blue)
+            }
+        }
+    }
+
+    private var overallHealthSection: some View {
+        Section("Overall Health") {
+            let order = manager.resolvedOrder()
+            let graph = registry.buildDependencyGraph()
+            let scores = order.map { DependencyHealthEngine.analyze(package: $0, graph: graph).score }
+            let avgScore = scores.isEmpty ? 100 : scores.reduce(0, +) / scores.count
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("Health Score").font(.headline)
+                    Spacer()
+                    Text("\(avgScore)%")
+                        .font(.title2.bold())
+                        .foregroundStyle(avgScore > 80 ? .green : (avgScore > 50 ? .orange : .red))
+                }
+
+                ProgressView(value: Double(avgScore), total: 100)
+                    .tint(avgScore > 80 ? .green : (avgScore > 50 ? .orange : .red))
+            }
+            .padding(.vertical, 4)
         }
     }
 
@@ -325,7 +473,13 @@ struct PackageDependenciesView: View {
     }
 
     private var bulkActionsSection: some View {
-        Section("Bulk Actions") {
+        Section("Actions") {
+            Button {
+                showingVisualGraph = true
+            } label: {
+                Label("View Dependency Graph", systemImage: "circle.grid.cross")
+            }
+
             Button {
                 for pkg in registry.packages {
                     _ = manager.updatePackage(id: pkg.id, version: pkg.version) // Simulate update
@@ -363,6 +517,7 @@ struct PackageDependenciesView: View {
                             }
                             HStack {
                                 Text("Deps: \(pkg.dependencyIds.count)").font(.caption2).foregroundStyle(.tertiary)
+                                Text("Layer: \(pkg.layer.rawValue)").font(.system(size: 8, weight: .bold)).foregroundStyle(.secondary)
                                 Spacer()
                                 Image(systemName: manager.verifyIntegrity(id: pkg.id) ? "checkmark.seal.fill" : "xmark.seal")
                                     .font(.caption2)
@@ -442,6 +597,7 @@ struct PackageInstallSheet: View {
 
     @State private var name = ""
     @State private var version = "1.0.0"
+    @State private var layer: PackageDependencyLayer = .core
     @State private var exportsText = ""
 
     var body: some View {
@@ -449,12 +605,17 @@ struct PackageInstallSheet: View {
             Section("Package Info") {
                 TextField("Name", text: $name)
                 TextField("Version (semver)", text: $version)
+                Picker("Layer", selection: $layer) {
+                    ForEach(PackageDependencyLayer.allCases) { l in
+                        Text(l.rawValue.capitalized).tag(l)
+                    }
+                }
                 TextField("Exports (comma-separated)", text: $exportsText)
             }
             Section {
                 Button("Install Package") {
                     let exports = exportsText.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
-                    if manager.installPackage(name: name, version: version, exports: exports, dependencyIds: []) { dismiss() }
+                    if manager.installPackage(name: name, version: version, layer: layer, exports: exports, dependencyIds: []) { dismiss() }
                 }.buttonStyle(.borderedProminent).disabled(name.isEmpty || version.isEmpty)
             }
         }
@@ -464,18 +625,118 @@ struct PackageInstallSheet: View {
     }
 }
 
+// MARK: - Graph Visualization UI
+
+struct DependencyGraphVisualizerView: View {
+    @Environment(\.dismiss) private var dismiss
+    let packages: [PackageDescriptor]
+    @State private var expandedNodes: Set<UUID> = []
+
+    var body: some View {
+        ScrollView([.horizontal, .vertical]) {
+            VStack(alignment: .leading, spacing: 20) {
+                ForEach(packages.filter { pkg in !packages.contains(where: { $0.dependencyIds.contains(pkg.id) }) }) { rootPkg in
+                    nodeView(for: rootPkg, depth: 0)
+                }
+            }
+            .padding()
+        }
+        .navigationTitle("Dependency Graph")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Done") { dismiss() }
+            }
+        }
+    }
+
+    private func healthDetailSection(for package: PackageDescriptor) -> some View {
+        let health = DependencyHealthEngine.analyze(package: package, graph: registry.buildDependencyGraph())
+        return Group {
+            Section("Health Analysis") {
+                LabeledContent("Score", value: "\(health.score)%")
+
+                if !health.issues.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Issues").font(.caption.bold()).foregroundStyle(.red)
+                        ForEach(health.issues, id: \.self) { issue in
+                            Text("• \(issue)").font(.caption2)
+                        }
+                    }
+                }
+
+                if !health.recommendations.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Recommendations").font(.caption.bold()).foregroundStyle(.blue)
+                        ForEach(health.recommendations, id: \.self) { rec in
+                            Text("• \(rec)").font(.caption2)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func nodeView(for pkg: PackageDescriptor, depth: Int) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Rectangle()
+                    .fill(Color.secondary.opacity(0.3))
+                    .frame(width: CGFloat(depth) * 20, height: 1)
+
+                HStack {
+                    Image(systemName: pkg.dependencyIds.isEmpty ? "shippingbox" : (expandedNodes.contains(pkg.id) ? "chevron.down.circle.fill" : "chevron.right.circle.fill"))
+                        .foregroundStyle(pkg.layer == .core ? .blue : .secondary)
+
+                    VStack(alignment: .leading) {
+                        Text(pkg.name).font(.subheadline.bold())
+                        Text("v\(pkg.version)").font(.system(size: 8, design: .monospaced)).foregroundStyle(.secondary)
+                    }
+                }
+                .padding(8)
+                .background(Color.accentColor.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
+                .onTapGesture {
+                    if !pkg.dependencyIds.isEmpty {
+                        if expandedNodes.contains(pkg.id) { expandedNodes.remove(pkg.id) }
+                        else { expandedNodes.insert(pkg.id) }
+                    }
+                }
+            }
+
+            if expandedNodes.contains(pkg.id) {
+                ForEach(pkg.dependencyIds, id: \.self) { depId in
+                    if let depPkg = packages.first(where: { $0.id == depId }) {
+                        nodeView(for: depPkg, depth: depth + 1)
+                    } else {
+                        HStack {
+                            Rectangle()
+                                .fill(Color.secondary.opacity(0.3))
+                                .frame(width: CGFloat(depth + 1) * 20, height: 1)
+                            Text("Missing: \(depId.uuidString.prefix(8))")
+                                .font(.system(size: 8, design: .monospaced))
+                                .foregroundStyle(.red)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 // MARK: - Package Detail Sheet
 
 struct PackageDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
     let package: PackageDescriptor
     let manager: PackageDependencyManager
+    @StateObject private var registry = PackageRegistry.shared
 
     var body: some View {
         List {
             Section("Details") {
                 LabeledContent("Name", value: package.name)
                 LabeledContent("Version", value: package.version)
+                LabeledContent("Layer", value: package.layer.rawValue.capitalized)
                 LabeledContent("ID", value: String(package.id.uuidString.prefix(8)) + "...")
             }
             Section("Exports") {
@@ -496,6 +757,8 @@ struct PackageDetailSheet: View {
                     }
                 }
             }
+            healthDetailSection(for: package)
+
             Section("Integrity") {
                 LabeledContent("Hash", value: String(package.integrityHash.prefix(16)) + "...")
                 LabeledContent("Verified") {

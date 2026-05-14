@@ -18,7 +18,7 @@ struct TokenHeader: Codable {
 }
 
 struct TokenPayload: Codable {
-    let uid: String
+    let devId: String
     let iat: TimeInterval
     let exp: TimeInterval
     let scp: String
@@ -80,7 +80,7 @@ final class DeterministicTokenEngine: ObservableObject {
     // MARK: - Token Generation (device-bound, deterministic)
 
     func generateToken(
-        uid: String,
+        developerId: String,
         scopes: Set<SDKScope>,
         sessionDuration: TimeInterval = 3600,
         deviceFingerprint: String
@@ -92,7 +92,7 @@ final class DeterministicTokenEngine: ObservableObject {
 
         let header = TokenHeader(tokenType: "deterministic", algorithm: "HMAC-SHA256", keyId: keyId)
         let payload = TokenPayload(
-            uid: uid,
+            devId: developerId,
             iat: now.timeIntervalSince1970,
             exp: now.addingTimeInterval(max(1, sessionDuration)).timeIntervalSince1970,
             scp: SDKScope.encode(scopes),
@@ -109,7 +109,7 @@ final class DeterministicTokenEngine: ObservableObject {
         currentToken = token
         rotatingKeyIndex += 1
 
-        logEvent("Token Generated", detail: "uid=\(uid) scopes=\(scopes.count) expires=\(Int(sessionDuration))s")
+        logEvent("Token Generated", detail: "devId=\(developerId) scopes=\(scopes.count) expires=\(Int(sessionDuration))s")
         return token
     }
 
@@ -119,7 +119,7 @@ final class DeterministicTokenEngine: ObservableObject {
         // 1. Structural validation
         guard !token.signature.isEmpty else { return fail("Missing signature") }
         // 2. Schema validation
-        guard !token.payload.uid.isEmpty, !token.payload.sid.isEmpty,
+        guard !token.payload.devId.isEmpty, !token.payload.sid.isEmpty,
               !token.payload.nonce.isEmpty, !token.payload.dfp.isEmpty else {
             return fail("Schema validation failed")
         }
@@ -220,40 +220,31 @@ struct AuthRootView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 16) {
-                statusHeader
-                switch authorizationManager.authState {
-                case .unauthenticated:
-                    stateView(title: "Unauthenticated", message: "Sign in to activate SDK authorization.")
-                case .authenticating:
-                    Text("Authenticating...")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                case .authenticated:
-                    VStack(spacing: 16) {
-                        if let session = authorizationManager.authSession {
-                            SessionStatusView(session: session) {
-                                showingScopeInspector = true
-                            }
-                        }
-                        securityAuditSection
-                        NavigationLink("Access Control Overview", destination: AccessControlOverviewView())
+            ScrollView {
+                VStack(spacing: 20) {
+                    statusHeader
+
+                    switch authorizationManager.authState {
+                    case .unauthenticated, .revoked, .sessionExpired:
+                        unauthenticatedView
+                    case .authenticating:
+                        authenticatingView
+                    case .authenticated:
+                        authenticatedView
                     }
-                case .sessionExpired:
-                    stateView(title: "Session Expired", message: "Your SDK authorization session expired.")
-                case .revoked:
-                    stateView(title: "Access Revoked", message: "Authorization was revoked.")
                 }
+                .padding()
             }
-            .padding()
-            .navigationTitle("Authorization")
+            .navigationTitle("SDK Authorization")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button(authorizationManager.authState == .authenticated ? "Sign Out" : "Sign In") {
-                        if authorizationManager.authState == .authenticated {
+                    if authorizationManager.authState == .authenticated {
+                        Button("Sign Out", role: .destructive) {
                             authorizationManager.signOut()
-                        } else {
+                        }
+                    } else {
+                        Button("Sign In") {
                             showingSignInSheet = true
                         }
                     }
@@ -326,16 +317,76 @@ struct AuthRootView: View {
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
     }
 
-    private func stateView(title: String, message: String) -> some View {
+    private var authenticatedView: some View {
         VStack(spacing: 16) {
-            Text(title)
+            if let session = authorizationManager.authSession {
+                SessionStatusView(session: session) {
+                    showingScopeInspector = true
+                }
+                .frame(minHeight: 400)
+            }
+
+            securityAuditSection
+
+            NavigationLink(destination: AccessControlOverviewView()) {
+                Label("Access Control Overview", systemImage: "checklist.checked")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+            }
+        }
+    }
+
+    private var authenticatingView: some View {
+        VStack(spacing: 20) {
+            ProgressView()
+                .scaleEffect(1.5)
+            Text("Verifying Developer Identity...")
                 .font(.headline)
-            Text(message)
+            Text("Generating deterministic tokens and validating hardware fingerprint.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
-            Button("Sign In") { showingSignInSheet = true }
-                .buttonStyle(.borderedProminent)
-            NavigationLink("Access Control Overview", destination: AccessControlOverviewView())
+                .multilineTextAlignment(.center)
+        }
+        .padding(.top, 100)
+    }
+
+    private var unauthenticatedView: some View {
+        VStack(spacing: 24) {
+            VStack(spacing: 12) {
+                Image(systemName: "lock.shield.fill")
+                    .font(.system(size: 60))
+                    .foregroundStyle(.orange)
+
+                Text(authorizationManager.authState == .revoked ? "Access Revoked" : (authorizationManager.authState == .sessionExpired ? "Session Expired" : "Authentication Required"))
+                    .font(.title2.bold())
+
+                Text("To access the Workspace SDK and management systems, you must create or sign in with a valid Developer ID.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 20)
+            }
+            .padding(.top, 40)
+
+            Button {
+                showingSignInSheet = true
+            } label: {
+                HStack {
+                    Image(systemName: "person.badge.key.fill")
+                    Text("Sign In with Developer ID")
+                }
+                .frame(maxWidth: .infinity)
+                .font(.headline)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .padding(.horizontal, 20)
+
+            NavigationLink(destination: AccessControlOverviewView()) {
+                Text("View Public Access Policies")
+                    .font(.caption)
+            }
         }
     }
 }

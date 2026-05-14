@@ -606,7 +606,7 @@ extension ToolsKitSDK {
             operationName: operationName,
             scope: scopeName,
             projectID: project?.id,
-            actorID: "workspace-user",
+            actorID: authorizationManager.authSession?.developerId ?? "unauthenticated",
             apiKey: apiKey,
             allowedScopes: allowedScopes.isEmpty ? ["*"] : allowedScopes,
             justification: project?.description,
