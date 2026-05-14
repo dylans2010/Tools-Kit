@@ -7,17 +7,15 @@ struct AuthRootView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
+            VStack(spacing: 16) {
+                statusHeader
                 switch authorizationManager.authState {
                 case .unauthenticated:
                     stateView(title: "Unauthenticated", message: "Sign in to activate SDK authorization.")
                 case .authenticating:
-                    VStack(spacing: 12) {
-                        ProgressView()
-                        Text("Authenticating...")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                    Text("Authenticating...")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 case .authenticated:
                     VStack(spacing: 16) {
                         if let session = authorizationManager.authSession {
@@ -48,6 +46,7 @@ struct AuthRootView: View {
                 }
             }
         }
+        .aiAnimationLoading(authorizationManager.authState == .authenticating)
         .sheet(isPresented: $showingSignInSheet) {
             NavigationStack { SignInView() }
         }
@@ -64,6 +63,24 @@ struct AuthRootView: View {
         .onAppear {
             showingSignInSheet = authorizationManager.authState == .unauthenticated || authorizationManager.authState == .sessionExpired || authorizationManager.authState == .revoked
         }
+    }
+
+    private var statusHeader: some View {
+        HStack(spacing: 12) {
+            Image(systemName: authorizationManager.authState == .authenticated ? "checkmark.shield.fill" : "shield.lefthalf.filled")
+                .font(.title3)
+                .foregroundStyle(authorizationManager.authState == .authenticated ? .green : .orange)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("SDK Authorization Center")
+                    .font(.headline)
+                Text("Live state, scope controls, and session lifecycle management.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+        }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
     }
 
     private func stateView(title: String, message: String) -> some View {
