@@ -3,11 +3,13 @@ import Aurora
 
 struct PersonaHomeView: View {
     @ObservedObject private var manager = PersonaManager.shared
+    @StateObject private var agent = PersonaAgentFramework.shared
     @State private var query = ""
     @AppStorage("persona.welcome_shown") private var hasShownWelcome = false
     @State private var activeModal: PersonaHomeModal?
     @State private var chatThreads: [PersonaChatThread] = []
     @State private var activeThreadID: UUID?
+    @State private var agentModeEnabled = false
 
     // Expanded Preset Prompts (500+)
     private let allPrompts = [
@@ -311,6 +313,7 @@ struct PersonaHomeView: View {
         case welcome
         case tuning
         case discovery
+        case history
 
         var id: String { rawValue }
     }
@@ -334,6 +337,7 @@ struct PersonaHomeView: View {
             PersonaHomeNavigationContent(
                 chatHistory: manager.chatHistory,
                 isThinking: manager.isThinking,
+                agentMode: agentModeEnabled,
                 query: $query,
                 followUpSuggestions: followUpSuggestions,
                 onPromptSelection: selectPromptAndSend(_:),
@@ -348,6 +352,7 @@ struct PersonaHomeView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             PersonaHomeToolbar(
+                agentMode: $agentModeEnabled,
                 onShowWelcome: { activeModal = .welcome },
                 onShowTuning: { activeModal = .tuning }
             )
@@ -358,7 +363,8 @@ struct PersonaHomeView: View {
                 modal: modal,
                 manager: manager,
                 allPrompts: allPrompts,
-                onPromptSelection: selectPromptAndSend(_:)
+                onPromptSelection: selectPromptAndSend(_:),
+                onThreadSelection: continueChat(_:)
             )
         }
     }
@@ -376,7 +382,7 @@ struct PersonaHomeView: View {
 
     private func openChats() {
         hydrateThreadsIfNeeded()
-        activeModal = nil
+        activeModal = .history
     }
 
     private func hydrateThreadsIfNeeded() {
@@ -384,6 +390,7 @@ struct PersonaHomeView: View {
             let seed = PersonaChatThread(title: "Current Chat", messages: manager.chatHistory, updatedAt: Date())
             chatThreads = [seed]
             activeThreadID = seed.id
+            manager.chatThreads = chatThreads
         }
     }
 
@@ -401,6 +408,7 @@ struct PersonaHomeView: View {
         let thread = PersonaChatThread(title: "New Chat", messages: [], updatedAt: Date())
         chatThreads.insert(thread, at: 0)
         activeThreadID = thread.id
+        manager.chatThreads = chatThreads
         manager.chatHistory = []
         manager.saveChatHistory()
     }
@@ -454,6 +462,7 @@ struct PersonaHomeView: View {
 private struct PersonaHomeNavigationContent: View {
     let chatHistory: [PersonaMessage]
     let isThinking: Bool
+    let agentMode: Bool
     @Binding var query: String
     let followUpSuggestions: [String]
     let onPromptSelection: (String) -> Void
@@ -464,6 +473,10 @@ private struct PersonaHomeNavigationContent: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            if agentMode {
+                PersonaAgentStatusOverlay()
+            }
+
             PersonaChatTimelineView(
                 chatHistory: chatHistory,
                 isThinking: isThinking,
@@ -484,14 +497,106 @@ private struct PersonaHomeNavigationContent: View {
     }
 }
 
+private struct PersonaAgentStatusOverlay: View {
+    @StateObject private var agent = PersonaAgentFramework.shared
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(statusColor)
+                            .frame(width: 8, height: 8)
+                        Text("AGENT MODE ACTIVE")
+                            .font(.system(size: 10, weight: .black))
+                    }
+                    Text(agent.executionState.rawValue.uppercased())
+                        .font(.system(size: 8))
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                if agent.takeoverActive {
+                    Label("TAKEOVER", systemImage: "bolt.fill")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(.orange)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(.orange.opacity(0.1))
+
+            if !agent.currentPlan.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(agent.currentPlan) { step in
+                            HStack(spacing: 4) {
+                                Image(systemName: stepIcon(step.status))
+                                    .font(.system(size: 10))
+                                Text(step.description)
+                                    .font(.system(size: 10))
+                            }
+                            .foregroundStyle(stepColor(step.status))
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 4)
+                }
+                .background(.black.opacity(0.05))
+            }
+            Divider()
+        }
+    }
+
+    private var statusColor: Color {
+        switch agent.executionState {
+        case .idle: return .gray
+        case .planning, .executing: return .blue
+        case .awaitingApproval: return .orange
+        case .takenOver: return .red
+        case .completed: return .green
+        case .failed, .rolledBack: return .red
+        }
+    }
+
+    private func stepIcon(_ status: PersonaAgentPlanStep.StepStatus) -> String {
+        switch status {
+        case .pending: return "circle"
+        case .executing: return "arrow.triangle.2.circlepath"
+        case .completed: return "checkmark.circle.fill"
+        case .failed: return "xmark.circle.fill"
+        case .rolledBack: return "arrow.uturn.backward.circle"
+        }
+    }
+
+    private func stepColor(_ status: PersonaAgentPlanStep.StepStatus) -> Color {
+        switch status {
+        case .pending: return .secondary
+        case .executing: return .blue
+        case .completed: return .green
+        case .failed: return .red
+        case .rolledBack: return .orange
+        }
+    }
+}
+
 private struct PersonaHomeToolbar: ToolbarContent {
+    @Binding var agentMode: Bool
     let onShowWelcome: () -> Void
     let onShowTuning: () -> Void
 
     var body: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            Button(action: onShowTuning) {
-                Image(systemName: "slider.horizontal.3")
+            HStack {
+                Toggle(isOn: $agentMode) {
+                    Label("Agent", systemImage: "bolt.shield")
+                }
+                .toggleStyle(.button)
+                .tint(.orange)
+
+                Button(action: onShowTuning) {
+                    Image(systemName: "slider.horizontal.3")
+                }
             }
         }
 
@@ -508,6 +613,7 @@ private struct PersonaHomeModalContent: View {
     @ObservedObject var manager: PersonaManager
     let allPrompts: [String]
     let onPromptSelection: (String) -> Void
+    let onThreadSelection: (PersonaChatThread) -> Void
 
     var body: some View {
         Group {
@@ -520,6 +626,19 @@ private struct PersonaHomeModalContent: View {
             case .discovery:
                 PromptDiscoveryView(allPrompts: allPrompts, onSelect: onPromptSelection)
                     .presentationDetents([.medium])
+            case .history:
+                PersonaChatHistorySheet(
+                    threads: $manager.chatThreads,
+                    activeThreadID: .constant(nil),
+                    onCreateNew: {
+                        startNewChat()
+                        activeModal = nil
+                    },
+                    onContinue: { thread in
+                        onThreadSelection(thread)
+                        activeModal = nil
+                    }
+                )
             }
         }
     }

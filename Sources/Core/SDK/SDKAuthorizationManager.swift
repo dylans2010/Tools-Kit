@@ -11,7 +11,7 @@ public enum AuthState: String, Codable, CaseIterable {
 
 public struct AuthSession: Codable, Hashable {
     public let sessionId: String
-    public let userId: String?
+    public let developerId: String?
     public let issuedAt: Date
     public let expiresAt: Date
     public let refreshToken: String?
@@ -19,14 +19,14 @@ public struct AuthSession: Codable, Hashable {
 
     public init(
         sessionId: String,
-        userId: String?,
+        developerId: String?,
         issuedAt: Date,
         expiresAt: Date,
         refreshToken: String? = nil,
         scopes: [String]
     ) {
         self.sessionId = sessionId
-        self.userId = userId
+        self.developerId = developerId
         self.issuedAt = issuedAt
         self.expiresAt = expiresAt
         self.refreshToken = refreshToken
@@ -63,7 +63,7 @@ public final class AuthorizationManager: ObservableObject {
 
     @discardableResult
     public func authenticate(
-        userId: String? = nil,
+        developerId: String? = nil,
         scopes: [String],
         sessionDuration: TimeInterval = 60 * 60,
         refreshToken: String? = nil
@@ -73,7 +73,7 @@ public final class AuthorizationManager: ObservableObject {
         let now = Date()
         let session = AuthSession(
             sessionId: UUID().uuidString,
-            userId: userId,
+            developerId: developerId,
             issuedAt: now,
             expiresAt: now.addingTimeInterval(max(1, sessionDuration)),
             refreshToken: refreshToken,
@@ -121,7 +121,7 @@ public final class AuthorizationManager: ObservableObject {
         guard var session = authSession else { return }
         session = AuthSession(
             sessionId: session.sessionId,
-            userId: session.userId,
+            developerId: session.developerId,
             issuedAt: session.issuedAt,
             expiresAt: session.expiresAt,
             refreshToken: session.refreshToken,

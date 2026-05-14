@@ -8,6 +8,7 @@ final class PersonaManager: ObservableObject {
 
     @Published var interactions: [PersonaInteraction] = []
     @Published var chatHistory: [PersonaMessage] = []
+    @Published var chatThreads: [PersonaChatThread] = []
     @Published var config: PersonaConfig = PersonaConfig(name: "Expert Assistant", instructions: "You are an expert AI Persona.", baseModel: "gpt-4", workspaceScope: ["All"])
     @Published var isThinking: Bool = false
 
@@ -45,6 +46,17 @@ final class PersonaManager: ObservableObject {
         - If they ask about emails, refer to 'mail_accounts'.
         - Be concise but thorough. Use professional yet approachable tone.
         - Respond using rich Markdown formatting (headers, lists, bold text, etc.).
+
+        WORKSPACE STRUCTURE AWARENESS:
+        - The workspace contains: Notes, Tasks, Files, Calendar, Spreadsheets, Mail, Slides, Whiteboards.
+        - Collaboration is handled via Spaces and Plugins.
+        - System systems include SDK, Connectors, and Security.
+
+        AGENTIC CAPABILITIES (AGENT MODE):
+        - You can execute real actions using your tool library.
+        - Tools available: createNote, sendEmail, createSlides, updateTask, installLibrary, attachFramework, managePackages.
+        - When Agent Mode is ON, you should transition from chatting to executing multi-step plans.
+        - Always validate security scopes before performing destructive actions.
 
         WORKSPACE CONTEXT (JSON):
         \(workspaceContext)

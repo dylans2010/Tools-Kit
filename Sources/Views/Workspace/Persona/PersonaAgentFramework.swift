@@ -9,17 +9,25 @@ enum AgentToolName: String, CaseIterable, Identifiable {
     case invokeLibrary
     case attachFramework
     case executeFramework
+    case createNote
+    case sendEmail
+    case createSlides
+    case updateTask
+    case managePackages
 
     var id: String { rawValue }
 
     var requiredScope: SDKScope {
         switch self {
-        case .installPackage: return .sdkManagePackages
-        case .resolveDependencies: return .sdkManagePackages
+        case .installPackage, .resolveDependencies, .managePackages: return .sdkManagePackages
         case .installLibrary: return .sdkManageLibraries
         case .invokeLibrary: return .libraryInvoke
         case .attachFramework: return .sdkManageFrameworks
         case .executeFramework: return .frameworkExecute
+        case .createNote: return .notes
+        case .sendEmail: return .emails
+        case .createSlides: return .slides
+        case .updateTask: return .tasks
         }
     }
 
@@ -31,6 +39,11 @@ enum AgentToolName: String, CaseIterable, Identifiable {
         case .invokeLibrary: return "Invoke Library"
         case .attachFramework: return "Attach Framework"
         case .executeFramework: return "Execute Framework"
+        case .createNote: return "Create Note"
+        case .sendEmail: return "Send Email"
+        case .createSlides: return "Create Slides"
+        case .updateTask: return "Update Task"
+        case .managePackages: return "Manage Packages"
         }
     }
 }
@@ -53,11 +66,21 @@ struct PersonaAgentPlanStep: Identifiable {
     let id = UUID()
     let intent: AgentIntent
     let description: String
+    let tool: AgentToolName?
+    let parameters: [String: String]?
     let requiredScopes: Set<SDKScope>
     var status: StepStatus = .pending
 
     enum StepStatus: String {
         case pending, executing, completed, failed, rolledBack
+    }
+
+    init(intent: AgentIntent, description: String, tool: AgentToolName? = nil, parameters: [String: String]? = nil, requiredScopes: Set<SDKScope>) {
+        self.intent = intent
+        self.description = description
+        self.tool = tool
+        self.parameters = parameters
+        self.requiredScopes = requiredScopes
     }
 }
 
@@ -124,6 +147,13 @@ final class PersonaAgentFramework: ObservableObject {
         executionState = .planning
         var steps: [PersonaAgentPlanStep] = []
 
+        // Pre-validation before planning
+        if target.isEmpty {
+            audit("Planning Failed", detail: "Empty target", outcome: "aborted")
+            executionState = .failed
+            return []
+        }
+
         // Project Awareness: Inject project context if available
         if let project = SDKProjectManager.shared.currentProject {
             audit("Project Context", detail: "Planning for project: \(project.name) (v\(project.version))", outcome: "aware")
@@ -135,13 +165,13 @@ final class PersonaAgentFramework: ObservableObject {
 
         switch intent {
         case .install:
-            steps.append(PersonaAgentPlanStep(intent: .resolve, description: "Resolve dependencies for \(target)", requiredScopes: [.sdkManagePackages]))
-            steps.append(PersonaAgentPlanStep(intent: .install, description: "Install \(target)", requiredScopes: [.sdkManagePackages, .sdkManageLibraries]))
+            steps.append(PersonaAgentPlanStep(intent: .resolve, description: "Resolve dependencies for \(target)", tool: .resolveDependencies, requiredScopes: [.sdkManagePackages]))
+            steps.append(PersonaAgentPlanStep(intent: .install, description: "Install \(target)", tool: .installPackage, parameters: ["name": target, "version": "1.0.0"], requiredScopes: [.sdkManagePackages, .sdkManageLibraries]))
         case .resolve:
-            steps.append(PersonaAgentPlanStep(intent: .resolve, description: "Analyze dependency graph for \(target)", requiredScopes: [.sdkManagePackages]))
+            steps.append(PersonaAgentPlanStep(intent: .resolve, description: "Analyze dependency graph for \(target)", tool: .resolveDependencies, requiredScopes: [.sdkManagePackages]))
         case .execute:
-            steps.append(PersonaAgentPlanStep(intent: .resolve, description: "Verify dependencies for \(target)", requiredScopes: [.sdkManagePackages]))
-            steps.append(PersonaAgentPlanStep(intent: .execute, description: "Execute \(target) in sandbox", requiredScopes: [.frameworkExecute]))
+            steps.append(PersonaAgentPlanStep(intent: .resolve, description: "Verify dependencies for \(target)", tool: .resolveDependencies, requiredScopes: [.sdkManagePackages]))
+            steps.append(PersonaAgentPlanStep(intent: .execute, description: "Execute \(target) in sandbox", tool: .executeFramework, parameters: ["name": target], requiredScopes: [.frameworkExecute]))
         case .inspect:
             steps.append(PersonaAgentPlanStep(intent: .inspect, description: "Inspect \(target)", requiredScopes: [.workspaceRead]))
         case .takeover:
@@ -182,6 +212,11 @@ final class PersonaAgentFramework: ObservableObject {
         case .invokeLibrary: result = executeInvokeLibrary(parameters)
         case .attachFramework: result = executeAttachFramework(parameters)
         case .executeFramework: result = executeExecuteFramework(parameters)
+        case .createNote: result = executeCreateNote(parameters)
+        case .sendEmail: result = executeSendEmail(parameters)
+        case .createSlides: result = executeCreateSlides(parameters)
+        case .updateTask: result = executeUpdateTask(parameters)
+        case .managePackages: result = executeManagePackages(parameters)
         }
         logInvocation(tool: tool, parameters: parameters, result: result)
         return result
@@ -207,7 +242,7 @@ final class PersonaAgentFramework: ObservableObject {
         if let token = tokenEngine.currentToken {
             let allScopes = SDKScope.decode(token.payload.scp).union(grantedScopes)
             _ = tokenEngine.generateToken(
-                uid: token.payload.uid,
+                developerId: token.payload.devId,
                 scopes: allScopes,
                 sessionDuration: token.payload.exp - Date().timeIntervalSince1970,
                 deviceFingerprint: token.payload.dfp
@@ -248,15 +283,24 @@ final class PersonaAgentFramework: ObservableObject {
 
                 try? await Task.sleep(nanoseconds: 50_000_000 * UInt64(attempts))
 
-                // Simulate transient failure for testing retry logic
-                if attempts == 1 && currentPlan[index].intent == .execute {
-                    audit("Transient Failure", detail: "Retrying step...", outcome: "attempt_1_failed")
-                    continue
+                if let tool = currentPlan[index].tool {
+                    let result = executeTool(tool, parameters: currentPlan[index].parameters ?? [:])
+                    switch result {
+                    case .success:
+                        success = true
+                    case .failure(let error):
+                        audit("Tool Execution Failed", detail: error, outcome: "retry")
+                    case .dryRun:
+                        success = true
+                    }
+                } else {
+                    success = true
                 }
 
-                currentPlan[index].status = .completed
-                success = true
-                audit("Plan Step Completed", detail: currentPlan[index].description, outcome: "success (attempt \(attempts))")
+                if success {
+                    currentPlan[index].status = .completed
+                    audit("Plan Step Completed", detail: currentPlan[index].description, outcome: "success (attempt \(attempts))")
+                }
             }
 
             if !success {
@@ -309,7 +353,7 @@ final class PersonaAgentFramework: ObservableObject {
             return .failure("Missing required parameters: name, version")
         }
         let hash = PackageIntegrityEngine.computeHash(name: name, version: version, exports: [])
-        let pkg = PackageDescriptor(name: name, version: version, exports: params["exports"]?.components(separatedBy: ",") ?? [], integrityHash: hash)
+        let pkg = PackageDescriptor(name: name, version: version, layer: .core, exports: params["exports"]?.components(separatedBy: ",") ?? [], dependencyIds: [], integrityHash: hash)
         PackageRegistry.shared.install(pkg)
         audit("Package Installed", detail: "\(name)@\(version)", outcome: "success")
         return .success("Installed \(name)@\(version)")
@@ -328,7 +372,7 @@ final class PersonaAgentFramework: ObservableObject {
         guard let name = params["name"], let version = params["version"] else {
             return .failure("Missing required parameters: name, version")
         }
-        let lib = LibraryDescriptor(name: name, version: version, capabilities: params["capabilities"]?.components(separatedBy: ",") ?? [], requiredScopes: [.sdkManageLibraries])
+        let lib = LibraryDescriptor(name: name, version: version, channel: .stable, capabilities: params["capabilities"]?.components(separatedBy: ",") ?? [], requiredScopes: [.sdkManageLibraries])
         LibraryRegistry.shared.install(lib)
         audit("Library Installed", detail: "\(name)@\(version)", outcome: "success")
         return .success("Installed library \(name)@\(version)")
@@ -348,7 +392,9 @@ final class PersonaAgentFramework: ObservableObject {
         guard let name = params["name"] else {
             return .failure("Missing framework name")
         }
-        let fw = FrameworkDescriptor(name: name, entryPoints: params["entryPoints"]?.components(separatedBy: ",") ?? ["main"], languageType: params["language"] ?? "swift")
+        let langStr = params["language"] ?? "swift"
+        let lang = FrameworkLanguage(rawValue: langStr) ?? .swift
+        let fw = FrameworkDescriptor(name: name, entryPoints: params["entryPoints"]?.components(separatedBy: ",") ?? ["main"], language: lang)
         FrameworkRegistry.shared.install(fw)
         audit("Framework Attached", detail: name, outcome: "success")
         return .success("Attached framework \(name)")
@@ -366,6 +412,65 @@ final class PersonaAgentFramework: ObservableObject {
             return .failure("Unresolved dependencies: \(missing.joined(separator: ", "))")
         }
         return FrameworkSandboxRunner.execute(framework: fw, params: params)
+    }
+
+    private func executeCreateNote(_ params: [String: String]) -> UIAgentToolResult {
+        guard let title = params["title"], let content = params["content"] else {
+            return .failure("Missing title or content")
+        }
+        Task {
+            _ = try? await ToolsKitSDK.shared.writeData(scope: .notes, title: title, payload: ["content": content])
+        }
+        audit("Note Created", detail: title, outcome: "success")
+        return .success("Created note: \(title)")
+    }
+
+    private func executeSendEmail(_ params: [String: String]) -> UIAgentToolResult {
+        guard let to = params["to"], let subject = params["subject"], let body = params["body"] else {
+            return .failure("Missing email parameters")
+        }
+        Task {
+            _ = try? await ToolsKitSDK.shared.writeData(scope: .emails, title: subject, payload: ["to": to, "body": body])
+        }
+        audit("Email Sent", detail: "To: \(to)", outcome: "success")
+        return .success("Sent email to \(to)")
+    }
+
+    private func executeCreateSlides(_ params: [String: String]) -> UIAgentToolResult {
+        guard let topic = params["topic"], let countStr = params["slideCount"], let count = Int(countStr) else {
+            return .failure("Missing topic or slide count")
+        }
+        Task {
+            _ = try? await ToolsKitSDK.shared.writeData(scope: .slides, title: topic, payload: ["slideCount": count])
+        }
+        audit("Slides Created", detail: "\(topic) (\(count) slides)", outcome: "success")
+        return .success("Created \(count) slides on \(topic)")
+    }
+
+    private func executeUpdateTask(_ params: [String: String]) -> UIAgentToolResult {
+        guard let id = params["id"], let status = params["status"] else {
+            return .failure("Missing task ID or status")
+        }
+        Task {
+            _ = try? await ToolsKitSDK.shared.writeData(scope: .tasks, title: "Update Task", payload: ["id": id, "status": status])
+        }
+        audit("Task Updated", detail: "ID: \(id) Status: \(status)", outcome: "success")
+        return .success("Updated task \(id) to \(status)")
+    }
+
+    private func executeManagePackages(_ params: [String: String]) -> UIAgentToolResult {
+        guard let action = params["action"], let package = params["package"] else {
+            return .failure("Missing action or package name")
+        }
+        if action == "install" {
+            _ = PackageDependencyManager.shared.installPackage(name: package, version: params["version"] ?? "1.0.0", exports: [], dependencyIds: [])
+        } else if action == "uninstall" {
+            if let pkg = PackageRegistry.shared.packages.first(where: { $0.name == package }) {
+                _ = PackageDependencyManager.shared.uninstallPackage(id: pkg.id)
+            }
+        }
+        audit("Package Managed", detail: "\(action) \(package)", outcome: "success")
+        return .success("\(action.capitalized)ed package \(package)")
     }
 
     private func logInvocation(tool: AgentToolName, parameters: [String: String], result: UIAgentToolResult) {

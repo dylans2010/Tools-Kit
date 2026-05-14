@@ -6,6 +6,7 @@ struct LibraryDescriptor: Identifiable, Codable {
     let id: UUID
     let name: String
     let version: String
+    let channel: VersionChannel
     let capabilities: [String]
     let requiredScopes: [SDKScope]
     let inputSchema: [String: String]
@@ -15,12 +16,13 @@ struct LibraryDescriptor: Identifiable, Codable {
 
     init(
         id: UUID = UUID(), name: String, version: String,
+        channel: VersionChannel = .stable,
         capabilities: [String] = [], requiredScopes: [SDKScope] = [],
         inputSchema: [String: String] = [:], outputSchema: [String: String] = [:],
         constraints: [String] = [],
         resourceLimits: [String: Double] = ["max_memory": 128.0, "max_cpu": 0.5]
     ) {
-        self.id = id; self.name = name; self.version = version
+        self.id = id; self.name = name; self.version = version; self.channel = channel
         self.capabilities = capabilities; self.requiredScopes = requiredScopes
         self.inputSchema = inputSchema; self.outputSchema = outputSchema
         self.constraints = constraints
@@ -29,6 +31,25 @@ struct LibraryDescriptor: Identifiable, Codable {
 }
 
 // MARK: - Library Capability
+
+enum LibraryCategory: String, CaseIterable, Codable, Identifiable {
+    case ai = "AI"
+    case storage = "Storage"
+    case communication = "Communication"
+    case data = "Data"
+    case security = "Security"
+
+    var id: String { rawValue }
+    var icon: String {
+        switch self {
+        case .ai: return "sparkles"
+        case .storage: return "externaldrive.fill"
+        case .communication: return "message.fill"
+        case .data: return "tablecells.fill"
+        case .security: return "shield.fill"
+        }
+    }
+}
 
 enum LibraryCapability: String, CaseIterable, Codable, Identifiable {
     case textProcessing = "text.processing"
@@ -41,6 +62,16 @@ enum LibraryCapability: String, CaseIterable, Codable, Identifiable {
     case audioProcessing = "audio.processing"
 
     var id: String { rawValue }
+
+    var category: LibraryCategory {
+        switch self {
+        case .textProcessing, .mlInference, .audioProcessing: return .ai
+        case .imageAnalysis, .dataTransform: return .data
+        case .networkRelay: return .communication
+        case .cryptoOps: return .security
+        case .storageIO: return .storage
+        }
+    }
 
     var displayName: String {
         switch self {
@@ -80,10 +111,40 @@ struct LibraryExecutionBridge {
     }
 }
 
+// MARK: - Capability Composition Engine
+
+struct CompositeWorkflow: Identifiable, Codable {
+    let id: UUID
+    var name: String
+    var steps: [WorkflowStep]
+
+    struct WorkflowStep: Identifiable, Codable {
+        let id: UUID
+        var libraryId: UUID
+        var capability: String
+        var inputMapping: [String: String] // maps workflow input/prev step output to library input
+    }
+}
+
+// MARK: - Invocation Templates
+
+struct InvocationTemplate: Identifiable, Codable {
+    let id: UUID
+    var name: String
+    var libraryId: UUID
+    var capability: String
+    var predefinedInput: [String: String]
+}
+
 // MARK: - Invocation State
 
 enum LibraryInvocationState: String {
     case idle, scopeCheck, capabilityMatch, inputValidation, executing, outputValidation, completed, failed
+}
+
+enum VersionChannel: String, CaseIterable, Codable, Identifiable {
+    case stable, beta, experimental
+    var id: String { rawValue }
 }
 
 struct LibraryInvocationRecord: Identifiable {
@@ -111,8 +172,20 @@ struct CapabilityConflict: Identifiable {
 final class LibraryRegistry: ObservableObject {
     static let shared = LibraryRegistry()
     @Published var libraries: [LibraryDescriptor] = []
+    @Published var marketplaceLibraries: [LibraryDescriptor] = []
 
-    private init() {}
+    private init() {
+        seedMarketplace()
+    }
+
+    private func seedMarketplace() {
+        marketplaceLibraries = [
+            LibraryDescriptor(name: "NeuralProcessor", version: "2.1.0", channel: .stable, capabilities: [LibraryCapability.mlInference.rawValue, LibraryCapability.textProcessing.rawValue], requiredScopes: [.persona]),
+            LibraryDescriptor(name: "CloudVault", version: "1.0.5", channel: .stable, capabilities: [LibraryCapability.storageIO.rawValue, LibraryCapability.cryptoOps.rawValue], requiredScopes: [.files]),
+            LibraryDescriptor(name: "StreamBridge", version: "0.9.8", channel: .beta, capabilities: [LibraryCapability.networkRelay.rawValue, LibraryCapability.audioProcessing.rawValue], requiredScopes: [.meet]),
+            LibraryDescriptor(name: "DataAnalyzer", version: "3.2.1", channel: .experimental, capabilities: [LibraryCapability.dataTransform.rawValue, LibraryCapability.imageAnalysis.rawValue], requiredScopes: [.workspaceRead])
+        ]
+    }
 
     func install(_ lib: LibraryDescriptor) {
         libraries.removeAll { $0.name == lib.name }
@@ -135,9 +208,13 @@ final class LibraryManager: ObservableObject {
     static let shared = LibraryManager()
 
     @Published var invocationRecords: [LibraryInvocationRecord] = []
+    @Published var usageMetrics: [UUID: UsageMetrics] = [:]
     @Published var pendingApprovals: [LibraryScopeApproval] = []
+    @Published var compositeWorkflows: [CompositeWorkflow] = []
+    @Published var invocationTemplates: [InvocationTemplate] = []
     @Published private(set) var invocationState: LibraryInvocationState = .idle
     @Published var dryRunEnabled: Bool = false
+    @Published var rateLimits: [UUID: Int] = [:] // libraryId: max per minute
 
     private let tokenEngine = DeterministicTokenEngine.shared
     private let registry = LibraryRegistry.shared
@@ -151,15 +228,40 @@ final class LibraryManager: ObservableObject {
         var approved: Bool = false
     }
 
-    private init() {}
+    struct UsageMetrics: Codable {
+        var totalInvocations: Int = 0
+        var successCount: Int = 0
+        var failureCount: Int = 0
+        var lastDurationMs: Int = 0
+        var totalDurationMs: Int = 0
+
+        var failureRate: Double {
+            totalInvocations == 0 ? 0 : Double(failureCount) / Double(totalInvocations)
+        }
+
+        var avgDurationMs: Int {
+            totalInvocations == 0 ? 0 : totalDurationMs / totalInvocations
+        }
+    }
+
+    private init() {
+        seedTemplates()
+    }
+
+    private func seedTemplates() {
+        invocationTemplates = [
+            InvocationTemplate(id: UUID(), name: "Analyze Sentiment", libraryId: UUID(), capability: LibraryCapability.textProcessing.rawValue, predefinedInput: ["mode": "sentiment", "text": "Enter text here"]),
+            InvocationTemplate(id: UUID(), name: "Secure Export", libraryId: UUID(), capability: LibraryCapability.cryptoOps.rawValue, predefinedInput: ["format": "aes-256", "target": "workspace"])
+        ]
+    }
 
     // MARK: - Install / Uninstall
 
-    func installLibrary(name: String, version: String, capabilities: [String], scopes: [SDKScope]) -> Bool {
+    func installLibrary(name: String, version: String, channel: VersionChannel = .stable, capabilities: [String], scopes: [SDKScope]) -> Bool {
         guard tokenEngine.requireScope(.sdkManageLibraries) else { return false }
         guard !name.isEmpty, !version.isEmpty else { return false }
 
-        let lib = LibraryDescriptor(name: name, version: version, capabilities: capabilities, requiredScopes: scopes)
+        let lib = LibraryDescriptor(name: name, version: version, channel: channel, capabilities: capabilities, requiredScopes: scopes)
         registry.install(lib)
         pendingApprovals.append(LibraryScopeApproval(libraryId: lib.id, libraryName: name, requestedScopes: scopes, timestamp: Date()))
         return true
@@ -174,7 +276,15 @@ final class LibraryManager: ObservableObject {
     // MARK: - Execution Pipeline: Request → Scope Check → Capability Match → Input Validation → Execution Bridge → Output Validation
 
     func invokeLibrary(id: UUID, capability: String, input: [String: String]) -> UIAgentToolResult {
-        let startTime = Date()
+        // Rate limiting check
+        let now = Date()
+        let minuteAgo = now.addingTimeInterval(-60)
+        let recentCalls = invocationRecords.filter { $0.libraryId == id && $0.timestamp > minuteAgo }.count
+        if let limit = rateLimits[id], recentCalls >= limit {
+            return .failure("Rate limit exceeded (\(limit) calls/min)")
+        }
+
+        let startTime = now
 
         invocationState = .scopeCheck
         guard tokenEngine.requireScope(.libraryInvoke) else {
@@ -216,11 +326,26 @@ final class LibraryManager: ObservableObject {
                 return recordAndReturn(id: id, name: lib.name, capability: capability, input: input, result: .failure("Output validation failed"), state: .failed, start: startTime)
             }
             invocationState = .completed
+            updateMetrics(for: id, duration: Int(Date().timeIntervalSince(startTime) * 1000), success: true)
             return recordAndReturn(id: id, name: lib.name, capability: capability, input: input, result: bridgeResult, state: .completed, start: startTime)
         case .failure, .dryRun:
             invocationState = .failed
+            updateMetrics(for: id, duration: Int(Date().timeIntervalSince(startTime) * 1000), success: false)
             return recordAndReturn(id: id, name: lib.name, capability: capability, input: input, result: bridgeResult, state: .failed, start: startTime)
         }
+    }
+
+    private func updateMetrics(for libraryId: UUID, duration: Int, success: Bool) {
+        var metrics = usageMetrics[libraryId] ?? UsageMetrics()
+        metrics.totalInvocations += 1
+        if success {
+            metrics.successCount += 1
+        } else {
+            metrics.failureCount += 1
+        }
+        metrics.lastDurationMs = duration
+        metrics.totalDurationMs += duration
+        usageMetrics[libraryId] = metrics
     }
 
     // MARK: - Capability Conflict Resolution
@@ -281,7 +406,8 @@ struct LibraryManageView: View {
     @State private var showInstallSheet = false
     @State private var selectedLibrary: LibraryDescriptor?
     @State private var searchText = ""
-    @State private var selectedCategory: LibraryCapability?
+    @State private var selectedCategory: LibraryCategory?
+    @State private var showingMarketplace = false
 
     private var filteredLibraries: [LibraryDescriptor] {
         var filtered = registry.libraries
@@ -292,7 +418,11 @@ struct LibraryManageView: View {
             }
         }
         if let category = selectedCategory {
-            filtered = filtered.filter { $0.capabilities.contains(category.rawValue) }
+            filtered = filtered.filter { lib in
+                lib.capabilities.contains { cap in
+                    LibraryCapability(rawValue: cap)?.category == category
+                }
+            }
         }
         return filtered
     }
@@ -301,10 +431,14 @@ struct LibraryManageView: View {
         NavigationStack {
             List {
                 authStatusSection
+                marketplaceShortcutSection
+                templatesSection
                 resourceMonitorSection
+                usageIntelligenceSection
                 categoryFilterSection
                 libraryListSection
                 pipelineStateSection
+                workflowsSection
                 conflictsSection
                 approvalsSection
                 invocationHistorySection
@@ -324,6 +458,11 @@ struct LibraryManageView: View {
             }
             .sheet(item: $selectedLibrary) { lib in
                 NavigationStack { LibraryDetailSheet(library: lib, manager: manager) }
+            }
+            .sheet(isPresented: $showingMarketplace) {
+                NavigationStack {
+                    CapabilityMarketplaceView(manager: manager, registry: registry)
+                }
             }
         }
     }
@@ -355,19 +494,102 @@ struct LibraryManageView: View {
         }
     }
 
+    private var marketplaceShortcutSection: some View {
+        Section {
+            Button {
+                showingMarketplace = true
+            } label: {
+                HStack {
+                    Image(systemName: "cart.fill")
+                        .font(.title2)
+                        .foregroundStyle(.purple)
+                    VStack(alignment: .leading) {
+                        Text("Capability Marketplace")
+                            .font(.headline)
+                        Text("Discover and install high-level workspace capabilities.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    private var templatesSection: some View {
+        Section("Invocation Templates") {
+            if manager.invocationTemplates.isEmpty {
+                Text("No templates defined").foregroundStyle(.secondary).font(.caption)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(manager.invocationTemplates) { template in
+                            Button {
+                                // Template execution logic
+                            } label: {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(template.name).font(.caption.bold())
+                                    Text(template.capability).font(.system(size: 8)).foregroundStyle(.secondary)
+                                }
+                                .padding(8)
+                                .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var workflowsSection: some View {
+        Section("Composite Workflows") {
+            if manager.compositeWorkflows.isEmpty {
+                Text("No workflows created").foregroundStyle(.secondary).font(.caption)
+            } else {
+                ForEach(manager.compositeWorkflows) { workflow in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(workflow.name).font(.subheadline.bold())
+                            Text("\(workflow.steps.count) steps").font(.caption2).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Button("Run") {
+                            // Run workflow logic
+                        }.buttonStyle(.bordered).controlSize(.small)
+                    }
+                }
+            }
+
+            Button {
+                let newWorkflow = CompositeWorkflow(id: UUID(), name: "New Workflow", steps: [])
+                manager.compositeWorkflows.append(newWorkflow)
+            } label: {
+                Label("Create Workflow", systemImage: "plus.circle")
+                    .font(.caption)
+            }
+        }
+    }
+
     private var categoryFilterSection: some View {
         Section("Categories") {
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack {
-                    ForEach(LibraryCapability.allCases) { cap in
-                        Toggle(cap.displayName, isOn: Binding(
-                            get: { selectedCategory == cap },
-                            set: { selectedCategory = $0 ? cap : nil }
-                        ))
+                HStack(spacing: 8) {
+                    ForEach(LibraryCategory.allCases) { cat in
+                        Toggle(isOn: Binding(
+                            get: { selectedCategory == cat },
+                            set: { selectedCategory = $0 ? cat : nil }
+                        )) {
+                            Label(cat.rawValue, systemImage: cat.icon)
+                        }
                         .toggleStyle(.button)
                         .controlSize(.small)
+                        .tint(.purple)
                     }
                 }
+                .padding(.vertical, 4)
             }
         }
     }
@@ -406,6 +628,41 @@ struct LibraryManageView: View {
                     }
                 }
             }
+        }
+    }
+
+    private var usageIntelligenceSection: some View {
+        Section("Usage Intelligence") {
+            let totalCalls = manager.invocationRecords.count
+            let totalSuccess = manager.usageMetrics.values.map(\.successCount).reduce(0, +)
+            let totalFailures = manager.usageMetrics.values.map(\.failureCount).reduce(0, +)
+
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 20) {
+                    metricItem(label: "Total", value: "\(totalCalls)", icon: "function")
+                    metricItem(label: "Success", value: "\(totalSuccess)", icon: "checkmark.circle", color: .green)
+                    metricItem(label: "Failure", value: "\(totalFailures)", icon: "xmark.circle", color: .red)
+                }
+
+                if totalCalls > 0 {
+                    let rate = Double(totalFailures) / Double(totalCalls) * 100
+                    Text("System-wide Failure Rate: \(String(format: "%.1f", rate))%")
+                        .font(.caption2)
+                        .foregroundStyle(rate > 10 ? .red : .secondary)
+                }
+            }
+            .padding(.vertical, 4)
+        }
+    }
+
+    private func metricItem(label: String, value: String, icon: String, color: Color = .primary) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Label(label, systemImage: icon)
+                .font(.system(size: 8, weight: .bold))
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.headline)
+                .foregroundStyle(color)
         }
     }
 
@@ -482,6 +739,7 @@ struct LibraryInstallSheet: View {
 
     @State private var name = ""
     @State private var version = "1.0.0"
+    @State private var channel: VersionChannel = .stable
     @State private var selectedCaps: Set<LibraryCapability> = []
     @State private var selectedScopes: Set<SDKScope> = [.sdkManageLibraries]
 
@@ -490,6 +748,11 @@ struct LibraryInstallSheet: View {
             Section("Library Info") {
                 TextField("Name", text: $name)
                 TextField("Version (semver)", text: $version)
+                Picker("Channel", selection: $channel) {
+                    ForEach(VersionChannel.allCases) { c in
+                        Text(c.rawValue.capitalized).tag(c)
+                    }
+                }
             }
             Section("Capabilities") {
                 ForEach(LibraryCapability.allCases) { cap in
@@ -505,13 +768,91 @@ struct LibraryInstallSheet: View {
             }
             Section {
                 Button("Install Library") {
-                    if manager.installLibrary(name: name, version: version, capabilities: selectedCaps.map(\.rawValue), scopes: Array(selectedScopes)) { dismiss() }
+                    if manager.installLibrary(name: name, version: version, channel: channel, capabilities: selectedCaps.map(\.rawValue), scopes: Array(selectedScopes)) { dismiss() }
                 }.buttonStyle(.borderedProminent).disabled(name.isEmpty || version.isEmpty)
             }
         }
         .navigationTitle("Install Library")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+    }
+}
+
+// MARK: - Library Marketplace View
+
+struct CapabilityMarketplaceView: View {
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject var manager: LibraryManager
+    @ObservedObject var registry: LibraryRegistry
+    @State private var searchText = ""
+
+    private var availableLibraries: [LibraryDescriptor] {
+        let installedNames = Set(registry.libraries.map(\.name))
+        var list = registry.marketplaceLibraries.filter { !installedNames.contains($0.name) }
+        if !searchText.isEmpty {
+            list = list.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        }
+        return list
+    }
+
+    var body: some View {
+        List {
+            Section {
+                Text("Browse and install managed libraries to expand your SDK's capabilities.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            ForEach(availableLibraries) { lib in
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(lib.name)
+                                .font(.headline)
+                            Text("v\(lib.version)")
+                                .font(.caption2.monospaced())
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Button("Install") {
+                            _ = manager.installLibrary(
+                                name: lib.name,
+                                version: lib.version,
+                                channel: lib.channel,
+                                capabilities: lib.capabilities,
+                                scopes: lib.requiredScopes
+                            )
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                    }
+
+                    Text(lib.capabilities.joined(separator: " • "))
+                        .font(.caption2)
+                        .foregroundStyle(.purple)
+
+                    HStack {
+                        ForEach(lib.requiredScopes.prefix(3)) { scope in
+                            Text(scope.rawValue)
+                                .font(.system(size: 8, weight: .bold, design: .monospaced))
+                                .padding(.horizontal, 4)
+                                .padding(.vertical, 2)
+                                .background(Color.accentColor.opacity(0.1))
+                                .cornerRadius(4)
+                        }
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        }
+        .navigationTitle("Marketplace")
+        .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, prompt: "Search marketplace")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Close") { dismiss() }
+            }
+        }
     }
 }
 

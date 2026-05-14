@@ -11,7 +11,7 @@ struct SessionStatusView: View {
             Section("Session") {
                 LabeledContent("State", value: authorizationManager.authState.rawValue)
                 LabeledContent("Session ID", value: session.sessionId)
-                LabeledContent("User ID", value: session.userId ?? "n/a")
+                LabeledContent("Developer ID", value: session.developerId ?? "n/a")
                 LabeledContent("Issued", value: session.issuedAt.formatted(date: .abbreviated, time: .standard))
                 LabeledContent("Expires", value: session.expiresAt.formatted(date: .abbreviated, time: .standard))
                 LabeledContent("Valid", value: session.isExpired ? "No" : "Yes")
