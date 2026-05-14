@@ -8,6 +8,7 @@ public struct AIGenerateSlides: View {
     @StateObject private var whiteboardStore = WhiteboardStore.shared
     @StateObject private var keyboardObserver = KeyboardObserver()
     @State private var showingKeyboardSheet = false
+    @State private var selectedSuggestion: SlideSuggestion?
 
     // All text input state is owned here but edited exclusively via the keyboard extension.
     @State private var rawText = ""
@@ -79,19 +80,22 @@ public struct AIGenerateSlides: View {
         .aiAnimationLoading(manager.isGenerating)
         .navigationTitle("AI Slides")
         .safeAreaInset(edge: .bottom) {
-            DualKeyboardInputView(
-                promptText: $rawText,
-                notesText: $notes,
-                documentsText: $documents,
-                activeField: $activeField,
-                tone: $tone,
-                slideCount: $slideCount,
-                selectedStyleID: $selectedStyleID,
-                selectedThemeID: $selectedThemeID,
-                onSubmit: generate,
-                keyboard: keyboardObserver,
-                isFocused: $isFieldFocused
-            )
+            VStack(spacing: 8) {
+                suggestionsStrip
+                DualKeyboardInputView(
+                    promptText: $rawText,
+                    notesText: $notes,
+                    documentsText: $documents,
+                    activeField: $activeField,
+                    tone: $tone,
+                    slideCount: $slideCount,
+                    selectedStyleID: $selectedStyleID,
+                    selectedThemeID: $selectedThemeID,
+                    onSubmit: generate,
+                    keyboard: keyboardObserver,
+                    isFocused: $isFieldFocused
+                )
+            }
         }
         .alert("Generation Error", isPresented: $showErrorAlert) {
             Button("OK", role: .cancel) {}
@@ -109,6 +113,7 @@ public struct AIGenerateSlides: View {
                     .washSweepDuration(1.2)
                     .washPulseWidth(1.0)
                     .washPeak(0.6)
+                    .opacity(keyboardObserver.isVisible ? 1 : 0)
                     .ignoresSafeArea()
 
                 LinearGradient(
@@ -447,6 +452,29 @@ public struct AIGenerateSlides: View {
             }
         }
     }
+
+    private var suggestionsStrip: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                ForEach(slideSuggestions) { suggestion in
+                    Button {
+                        selectedThemeID = suggestion.themeID
+                        selectedStyleID = suggestion.styleID
+                        rawText = suggestion.prompt
+                        notes = suggestion.notes.joined(separator: "\n")
+                        generate()
+                    } label: {
+                        Text(suggestion.title)
+                            .font(.caption.weight(.semibold))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(.ultraThinMaterial, in: Capsule())
+                            .overlay(Capsule().stroke(.white.opacity(0.2), lineWidth: 1))
+                    }
+                }
+            }.padding(.horizontal, 12)
+        }
+    }
 }
 
 // MARK: - Input Field Enum
@@ -485,4 +513,25 @@ private extension Array {
     func ifEmpty(_ fallback: [Element]) -> [Element] {
         isEmpty ? fallback : self
     }
+}
+
+private struct SlideSuggestion: Identifiable {
+    let id = UUID()
+    let title: String
+    let themeID: String
+    let styleID: String
+    let prompt: String
+    let notes: [String]
+}
+
+private let slideSuggestions: [SlideSuggestion] = (1...25).map { i in
+    SlideSuggestion(
+        title: "Suggestion \(i)",
+        themeID: AIGenSlideCatalog.defaultThemeID,
+        styleID: AIGenSlideCatalog.defaultStyleID,
+        prompt: """
+        {"theme":"\(AIGenSlideCatalog.defaultThemeID)","style":"\(AIGenSlideCatalog.defaultStyleID)","prompt":"Create a polished presentation concept #\(i) with an executive storyline, visuals, and actionable insights."}
+        """,
+        notes: ["Audience: leadership", "Goal: decision-ready", "Include data storytelling"]
+    )
 }

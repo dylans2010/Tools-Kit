@@ -7,6 +7,8 @@ struct PersonaHomeView: View {
     @AppStorage("persona.welcome_shown") private var hasShownWelcome = false
     @State private var activeModal: PersonaHomeModal?
     @State private var shuffledPrompts: [String] = []
+    @State private var chatThreads: [PersonaChatThread] = []
+    @State private var activeThreadID: UUID?
 
     // Expanded Preset Prompts (500+)
     private let allPrompts = [
@@ -374,6 +376,38 @@ struct PersonaHomeView: View {
         activeModal = .discovery
     }
 
+    private func hydrateThreadsIfNeeded() {
+        if chatThreads.isEmpty {
+            let seed = PersonaChatThread(title: "Current Chat", messages: manager.chatHistory, updatedAt: Date())
+            chatThreads = [seed]
+            activeThreadID = seed.id
+        }
+    }
+
+    private func upsertActiveThread() {
+        guard let activeThreadID else { return }
+        guard let idx = chatThreads.firstIndex(where: { $0.id == activeThreadID }) else { return }
+        let preview = manager.chatHistory.first?.content ?? "New Chat"
+        let name = chatThreads[idx].title == "New Chat" && !preview.isEmpty ? String(preview.prefix(42)) : chatThreads[idx].title
+        chatThreads[idx].messages = manager.chatHistory
+        chatThreads[idx].title = name
+        chatThreads[idx].updatedAt = Date()
+    }
+
+    private func startNewChat() {
+        let thread = PersonaChatThread(title: "New Chat", messages: [], updatedAt: Date())
+        chatThreads.insert(thread, at: 0)
+        activeThreadID = thread.id
+        manager.chatHistory = []
+        manager.saveChatHistory()
+    }
+
+    private func continueChat(_ thread: PersonaChatThread) {
+        activeThreadID = thread.id
+        manager.chatHistory = thread.messages
+        manager.saveChatHistory()
+    }
+
     private func selectPromptAndSend(_ prompt: String) {
         query = prompt
         sendMessage()
@@ -678,52 +712,31 @@ private struct PersonaFollowUpsView: View {
 private struct PersonaInputPanelView: View {
     @Binding var query: String
     let isThinking: Bool
-    let shuffledPrompts: [String]
-    let onTapPrompt: (String) -> Void
     let onSend: () -> Void
     let onOpenDiscovery: () -> Void
+    let onOpenChats: () -> Void
 
     var body: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 12) {
-                Button(action: onOpenDiscovery) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 20))
-                        .foregroundStyle(LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom))
-                }
-
-                TextField("Message Persona...", text: $query, axis: .vertical)
-                    .padding(12)
-                    .background(.white.opacity(0.08))
-                    .cornerRadius(22)
-                    .overlay(RoundedRectangle(cornerRadius: 22).stroke(Color.white.opacity(0.1), lineWidth: 1))
-                    .lineLimit(1...5)
-
-                PersonaSendButton(
-                    isDisabled: query.isEmpty || isThinking,
-                    onSend: onSend
-                )
+        HStack(spacing: 12) {
+            Button(action: onOpenDiscovery) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 20))
+                    .foregroundStyle(LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom))
             }
-            .padding(.horizontal)
-            .padding(.bottom, 12)
-
-            HStack(spacing: 8) {
-                ForEach(shuffledPrompts, id: \.self) { prompt in
-                    Button(action: { onTapPrompt(prompt) }) {
-                        Text(prompt)
-                            .font(.system(size: 10, weight: .medium))
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(.white.opacity(0.05), in: Capsule())
-                            .overlay(Capsule().stroke(Color.white.opacity(0.1), lineWidth: 1))
-                            .lineLimit(1)
-                    }
-                }
+            Button(action: onOpenChats) {
+                Image(systemName: "clock.arrow.circlepath")
+                    .font(.system(size: 18, weight: .semibold))
             }
-            .padding(.horizontal)
-            .padding(.bottom, 8)
+            TextField("Message Persona...", text: $query, axis: .vertical)
+                .padding(12)
+                .background(.white.opacity(0.08))
+                .cornerRadius(22)
+                .overlay(RoundedRectangle(cornerRadius: 22).stroke(Color.white.opacity(0.1), lineWidth: 1))
+                .lineLimit(1...5)
+            PersonaSendButton(isDisabled: query.isEmpty || isThinking, onSend: onSend)
         }
-        .padding(.top, 10)
+        .padding(.horizontal)
+        .padding(.vertical, 12)
         .background(.ultraThinMaterial)
     }
 }
@@ -759,12 +772,7 @@ private struct PersonaMarkdownBubbleText: View {
 
     var body: some View {
         // Robust markdown parsing using AttributedString
-        if let parsed = try? AttributedString(markdown: markdown, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)) {
-            Text(parsed)
-        } else {
-            // Fallback that cleans up obvious markdown markers if parsing fails
-            Text(cleanMarkdown(markdown))
-        }
+        Text(MarkdownSyntaxStripper.plainText(from: markdown))
     }
 
     private func cleanMarkdown(_ text: String) -> String {
@@ -997,5 +1005,40 @@ private struct PersonaInfoRow: View {
                 Text(detail).font(.subheadline).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             }
         }
+    }
+}
+
+
+private struct PersonaChatThread: Identifiable, Equatable {
+    let id: UUID = UUID()
+    var title: String
+    var messages: [PersonaMessage]
+    var updatedAt: Date
+}
+
+private struct PersonaChatHistorySheet: View {
+    @Binding var threads: [PersonaChatThread]
+    @Binding var activeThreadID: UUID?
+    let onCreateNew: () -> Void
+    let onContinue: (PersonaChatThread) -> Void
+
+    var body: some View { NavigationStack { List { Button("New Chat", action: onCreateNew)
+            ForEach($threads) { $thread in
+                VStack(alignment: .leading) {
+                    TextField("Chat name", text: $thread.title)
+                    Button("Continue") { onContinue(thread) }
+                }
+            }.onDelete { threads.remove(atOffsets: $0) }
+        }.navigationTitle("Chats") } }
+}
+
+private struct MarkdownSyntaxStripper {
+    static func plainText(from markdown: String) -> String {
+        var text = markdown
+        let patterns = ["```[\\s\\S]*?```", "`([^`]*)`", "!\\[[^\\]]*\\]\\([^\\)]*\\)", "\\[[^\\]]*\\]\\([^\\)]*\\)", "(^|\\n)#{1,6}\\s*", "[*_~>#-]", "\\d+\\.\\s"]
+        for pattern in patterns {
+            text = text.replacingOccurrences(of: pattern, with: " ", options: .regularExpression)
+        }
+        return text.replacingOccurrences(of: "\\n{3,}", with: "\\n\\n", options: .regularExpression).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

@@ -4,6 +4,7 @@ import UIKit
 
 public struct AIAnimationCoreModifier: ViewModifier {
     let isLoading: Bool
+    @State private var alternateDirection = false
 
     public func body(content: Content) -> some View {
         ZStack {
@@ -14,12 +15,17 @@ public struct AIAnimationCoreModifier: ViewModifier {
                     .washSweepDuration(1.00)
                     .washPulseWidth(1.00)
                     .washPeak(0.80)
-                    .direction(.bottomToTop)
+                    .direction(alternateDirection ? .topToBottom : .bottomToTop)
                     .introStyle(.borderFill)
                     .introDuration(0.15)
                     .ignoresSafeArea()
                     .transition(.opacity)
                     .zIndex(100)
+                    .onAppear {
+                        withAnimation(.linear(duration: 1.0).repeatForever(autoreverses: true)) {
+                            alternateDirection.toggle()
+                        }
+                    }
             }
         }
         .animation(.easeInOut(duration: 0.3), value: isLoading)
