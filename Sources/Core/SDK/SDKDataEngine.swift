@@ -9,6 +9,7 @@ public final class SDKDataEngine: ObservableObject {
     private let cacheTTL: TimeInterval = 300
     private var cacheTimestamps: [String: Date] = [:]
     private let batchQueue = DispatchQueue(label: "com.toolskit.sdk.data.batch", attributes: .concurrent)
+    private var mockResponses: [NSString: [SDKDataItem]] = [:]
 
     private init() {
         cache.countLimit = 100
@@ -27,6 +28,10 @@ public final class SDKDataEngine: ObservableObject {
     // MARK: - Fetch
 
     public func fetch(scope: SDKScope) async throws -> [SDKDataItem] {
+        if let mocked = mockResponses[scope.cacheKey as NSString] {
+            return mocked
+        }
+
         if let cached = getCachedItems(for: scope) {
             return cached
         }
@@ -113,6 +118,10 @@ public final class SDKDataEngine: ObservableObject {
             )
         }
         return SDKCacheInfo(scope: scope, itemCount: 0, lastRefreshed: nil, isValid: false, ttlRemaining: 0)
+    }
+
+    public func setMockResponse(scope: SDKScope, response: [SDKDataItem]) {
+        mockResponses[scope.cacheKey as NSString] = response
     }
 
     public func invalidateCache(scope: SDKScope? = nil) {

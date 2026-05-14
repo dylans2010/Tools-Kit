@@ -81,7 +81,16 @@ struct SecurityScopeApplicationView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Save") { dismiss() }.bold()
+                Button("Save") {
+                    let highRiskCapabilities = plugin.capabilities.filter { $0.riskLevel == .high || $0.riskLevel == .critical }
+                    if !highRiskCapabilities.isEmpty {
+                        if plugin.apiKey == nil || (plugin.privacyNote?.isEmpty ?? true) {
+                            // In a real app, show alert. Here we enforce logic.
+                            return
+                        }
+                    }
+                    dismiss()
+                }.bold()
             }
         }
     }

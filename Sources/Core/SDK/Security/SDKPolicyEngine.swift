@@ -67,6 +67,13 @@ public final class SDKPolicyEngine: ObservableObject {
         scopeDefinitions[definition.name] = definition
     }
 
+    public func updateGlobalPolicy(rules: [SDKSecurityScopeDefinition]) {
+        for rule in rules {
+            registerScope(rule)
+        }
+        SDKLogStore.shared.log("Global policy updated dynamically", source: "SDKPolicyEngine", level: .info)
+    }
+
     public func availableScopes() -> [SDKSecurityScopeDefinition] {
         scopeDefinitions.values.sorted { $0.name < $1.name }
     }

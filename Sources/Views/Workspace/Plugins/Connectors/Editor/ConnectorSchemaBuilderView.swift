@@ -75,7 +75,19 @@ struct ConnectorSchemaBuilderView: View {
         jsonSchema = res
     }
     private func resetToDefault() { jsonSchema = "{}"; mappings = [MappingEntry(source: "", target: "")] }
-    private func validateSchema() { /* Logic preserved from original */ validationErrors = jsonSchema.isEmpty ? ["Schema is empty."] : [] }
+    private func validateSchema() {
+        // Feature 10: Schema Evolution Tracker
+        var errors: [String] = []
+        if jsonSchema.isEmpty { errors.append("Schema is empty.") }
+
+        let oldSchema = connector.schema.jsonSchema
+        if !oldSchema.isEmpty && oldSchema != jsonSchema {
+            if jsonSchema.count < oldSchema.count {
+                errors.append("WARNING: Possible breaking change detected (schema reduction).")
+            }
+        }
+        validationErrors = errors
+    }
     private func saveSchema() { var dict: [String: String] = [:]; mappings.forEach { if !$0.source.isEmpty { dict[$0.source] = $0.target } }; connector.schema = ConnectorSchema(mappings: dict, jsonSchema: jsonSchema); manager.updateConnector(connector) }
 }
 

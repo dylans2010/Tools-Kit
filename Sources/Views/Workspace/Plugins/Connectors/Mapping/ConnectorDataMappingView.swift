@@ -6,6 +6,7 @@ struct ConnectorDataMappingView: View {
     @State private var sourceField = ""
     @State private var targetField = ""
     @State private var transformType: TransformType = .direct
+    @State private var transformerScript = "function transform(value) {\n  return value;\n}"
 
     var body: some View {
         List {
@@ -85,6 +86,12 @@ struct ConnectorDataMappingView: View {
                                 Text(type.rawValue.capitalized).tag(type)
                             }
                         }
+
+                        if transformType == .script {
+                            TextEditor(text: $transformerScript)
+                                .font(.system(.caption, design: .monospaced))
+                                .frame(height: 100)
+                        }
                     }
                 }
                 .navigationTitle("New Mapping")
@@ -113,7 +120,7 @@ private struct ConnectorFieldMapping: Identifiable {
 }
 
 private enum TransformType: String, CaseIterable {
-    case direct, uppercase, lowercase, trim, dateFormat, jsonParse, numberFormat
+    case direct, uppercase, lowercase, trim, dateFormat, jsonParse, numberFormat, script
 
     var icon: String {
         switch self {
@@ -124,6 +131,7 @@ private enum TransformType: String, CaseIterable {
         case .dateFormat: return "calendar"
         case .jsonParse: return "curlybraces"
         case .numberFormat: return "number"
+        case .script: return "scroll.fill"
         }
     }
 
@@ -136,6 +144,7 @@ private enum TransformType: String, CaseIterable {
         case .dateFormat: return "Parse and format dates"
         case .jsonParse: return "Parse JSON strings"
         case .numberFormat: return "Format numeric values"
+        case .script: return "Custom JS transformer script"
         }
     }
 }

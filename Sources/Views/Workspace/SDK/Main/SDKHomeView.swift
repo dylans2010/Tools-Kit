@@ -30,6 +30,18 @@ struct SDKHomeView: View {
                     }
                 }
 
+                Section("Authorization & Security") {
+                    NavigationLink(destination: SignInView()) {
+                        Label("Identity & Sign In", systemImage: "person.badge.key")
+                    }
+                    NavigationLink(destination: ScopeInspectorView()) {
+                        Label("Scope Inspector", systemImage: "scope")
+                    }
+                    NavigationLink(destination: SDKSecurityMonitorView()) {
+                        Label("Security Monitor", systemImage: "shield.badge.check")
+                    }
+                }
+
                 Section("Projects") {
                     if projects.isEmpty {
                         ContentUnavailableView(

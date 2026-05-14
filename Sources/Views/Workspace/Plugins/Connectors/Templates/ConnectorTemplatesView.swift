@@ -74,7 +74,13 @@ struct ConnectorTemplatesView: View {
     }
 
     private func loadTemplates() {
-        // Templates are loaded from a registry or user-created; start empty.
+        // Feature 6: Template Marketplace logic
+        templates = [
+            ConnectorTemplateItem(name: "REST API Starter", description: "Standard template for generic REST APIs.", icon: "network", category: .api, complexity: .simple),
+            ConnectorTemplateItem(name: "Cloud Storage Link", description: "Sync workspace files with S3 or GCP.", icon: "cloud.fill", category: .storage, complexity: .medium),
+            ConnectorTemplateItem(name: "Webhook Listener", description: "Inbound event handler for external triggers.", icon: "bell.badge", category: .events, complexity: .medium),
+            ConnectorTemplateItem(name: "PostgreSQL Bridge", description: "Direct data mapping for SQL databases.", icon: "externaldrive.fill", category: .data, complexity: .advanced)
+        ]
     }
 }
 

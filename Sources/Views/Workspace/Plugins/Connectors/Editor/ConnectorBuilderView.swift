@@ -51,6 +51,7 @@ struct ConnectorBuilderView: View {
     @State private var newWebhookEvent = ""
 
     // Rate Limiting
+    @State private var retryPolicy: RetryPolicy = RetryPolicy()
     @State private var rateLimitEnabled = false
     @State private var rateLimitRequests = 60
     @State private var rateLimitWindow = 60
@@ -113,6 +114,20 @@ struct ConnectorBuilderView: View {
             BuildIdentitySection(name: $name, identifier: $identifier, version: $version, description: $description, isLocked: isIdentifierLocked)
 
             Section("Network Root") {
+                Picker("Deployment Target", selection: Binding(
+                    get: { (manager.connectors.first { $0.id == connectorID }?.deploymentTarget) ?? .multiCloud },
+                    set: { newTarget in
+                        if let id = connectorID, var c = manager.connectors.first(where: { $0.id == id }) {
+                            c.deploymentTarget = newTarget
+                            manager.updateConnector(c)
+                        }
+                    }
+                )) {
+                    ForEach(ConnectorDefinition.DeploymentTarget.allCases, id: \.self) { target in
+                        Text(target.rawValue).tag(target)
+                    }
+                }
+
                 TextField("https://api.example.com/v1", text: $baseURL)
                     .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
                 Text("All endpoint paths will be relative to this base URL.").font(.caption2).foregroundStyle(.secondary)
@@ -153,6 +168,12 @@ struct ConnectorBuilderView: View {
                 if retryEnabled {
                     Stepper("Max Retries: \(maxRetries)", value: $maxRetries, in: 1...10)
                         .font(.caption)
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Backoff Strategy: Exponential").font(.caption2).foregroundStyle(.secondary)
+                        Slider(value: $retryBackoffSeconds, in: 1...10, step: 0.5)
+                        Text("Base Delay: \(String(format: "%.1f", retryBackoffSeconds))s").font(.caption2)
+                    }
                 }
             }
 

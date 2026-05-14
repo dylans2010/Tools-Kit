@@ -42,6 +42,20 @@ struct ConnectorExecutionView: View {
                 if !connector.flow.steps.isEmpty {
                     ExecutionFlowPreview(steps: connector.flow.steps)
                 }
+
+                if let lastLog = recentLogs.first(where: { $0.type == .info || $0.type == .performance }) {
+                    Section {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Raw Payload Inspector", systemImage: "curlybraces")
+                                .font(.caption.bold()).foregroundStyle(.secondary)
+
+                            Text(lastLog.details ?? "No payload details available in log.")
+                                .font(.system(size: 10, design: .monospaced))
+                                .padding(8)
+                                .background(Color.black.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
+                        }
+                    }
+                }
             }
             .padding()
         }

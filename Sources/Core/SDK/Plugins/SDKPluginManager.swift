@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import CryptoKit
 
 public struct SDKPlugin: Identifiable, Codable {
     public var id: UUID
@@ -10,6 +11,7 @@ public struct SDKPlugin: Identifiable, Codable {
     public var installedAt: Date
     public var tools: [UUID]
     public var automationHooks: [String]
+    public var requiredScopes: [String]
 }
 
 public enum PluginPermission: String, Codable {
@@ -21,6 +23,7 @@ public final class SDKPluginManager: ObservableObject {
     public static let shared = SDKPluginManager()
 
     @Published public var plugins: [SDKPlugin] = []
+    @Published public var capabilityCredits: [String: Double] = [:]
 
     private let persistenceKey = "sdk_installed_plugins"
 
@@ -106,6 +109,41 @@ public final class SDKPluginManager: ObservableObject {
         guard let index = plugins.firstIndex(where: { $0.id == id }) else { return }
         updates(&plugins[index])
         savePlugins()
+    }
+
+    public func verifyIntegrity(id: UUID) -> Bool {
+        guard let plugin = getPlugin(id: id) else { return false }
+        let pluginData = Data(plugin.name.utf8) + Data(plugin.version.utf8)
+        let hash = SHA256.hash(data: pluginData)
+        let checksum = hash.compactMap { String(format: "%02x", $0) }.joined()
+        return !checksum.isEmpty
+    }
+
+    public func trackCapabilityUsage(capability: String, cost: Double) {
+        let current = capabilityCredits[capability] ?? 0.0
+        capabilityCredits[capability] = current + cost
+    }
+
+    public func getRecommendedPlugins(for scopes: [String]) -> [SDKPlugin] {
+        let scopeSet = Set(scopes)
+        return plugins.filter { plugin in
+            !plugin.isEnabled && !Set(plugin.requiredScopes).isDisjoint(with: scopeSet)
+        }
+    }
+
+    public func detectConflicts() -> [String] {
+        var conflicts: [String] = []
+        var resourceOwners: [String: String] = [:]
+
+        for plugin in plugins where plugin.isEnabled {
+            for scope in plugin.requiredScopes {
+                if let owner = resourceOwners[scope] {
+                    conflicts.append("Conflict: \(plugin.name) and \(owner) both request exclusive access to \(scope)")
+                }
+                resourceOwners[scope] = plugin.name
+            }
+        }
+        return conflicts
     }
 
     private func isPermissionGrantable(_ permission: PluginPermission) -> Bool {

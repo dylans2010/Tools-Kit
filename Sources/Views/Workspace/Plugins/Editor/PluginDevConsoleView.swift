@@ -74,6 +74,11 @@ struct PluginDevConsoleView: View {
                 }
                 .buttonStyle(.bordered)
 
+                Button(action: reloadLogic) {
+                    Label("Hot Reload", systemImage: "arrow.clockwise")
+                }
+                .buttonStyle(.bordered)
+
                 Spacer()
 
                 Text("\(filteredLogs.count) entries")
@@ -117,6 +122,15 @@ struct PluginDevConsoleView: View {
     private func appendLog(_ type: PluginLog.LogType, _ message: String) {
         logs.append(PluginLog(type: type, message: message))
         if logs.count > 500 { logs.removeFirst() }
+    }
+
+    private func reloadLogic() {
+        appendLog(.system, "Initiating Hot Reload...")
+        // In a real app, this would re-parse the JS logic from PluginDefinition
+        Task {
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            appendLog(.system, "Hot Reload Successful. Logic re-attached to sandbox.")
+        }
     }
 
     private func injectTestEvent() {

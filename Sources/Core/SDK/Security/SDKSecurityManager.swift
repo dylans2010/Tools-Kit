@@ -27,6 +27,14 @@ public final class SDKSecurityManager: ObservableObject {
     private var deniedScopes: Set<String> = []
     private var projectAPIKeys: [UUID: Set<String>] = [:]
 
+    // Resource Quota System
+    private var quotaUsage: [String: Int] = [:]
+    private var quotaLimits: [String: Int] = [
+        "external.api.unrestricted": 100,
+        "sdk.fetchData.full": 500,
+        "workspace.modify.bulk": 50
+    ]
+
     private init() {}
 
     public func setPermissions(for appId: UUID, permissions: Set<String>) {
@@ -73,6 +81,24 @@ public final class SDKSecurityManager: ObservableObject {
 
     public func enforce(request: SDKPolicyRequest, definition: SDKSecurityScopeDefinition) throws {
         if SDKRuntimeEngine.shared.isNoSandboxModeEnabled { return }
+
+        // 0. Resource Quota Enforcement
+        let quotaKey = "\(request.actorID):\(request.scope)"
+        let currentUsage = quotaUsage[quotaKey] ?? 0
+        if let limit = quotaLimits[request.scope], currentUsage >= limit {
+            recordSensitiveOperation(request: request, reason: "Resource quota exceeded (\(limit))")
+            throw SDKError.executionFailed(reason: "Resource quota exceeded for scope: \(request.scope)")
+        }
+        quotaUsage[quotaKey] = currentUsage + 1
+
+        // 1. Validate Project Ownership
+        if let projectID = request.projectID,
+           let project = SDKProjectManager.shared.projects.first(where: { $0.id == projectID }) {
+            if let owner = project.ownerIdentifier, owner != request.actorID {
+                recordSensitiveOperation(request: request, reason: "Cross-tenant access blocked")
+                throw SDKError.permissionDenied(scope: "project.ownership")
+            }
+        }
 
         if deniedScopes.contains(request.scope) {
             recordSensitiveOperation(request: request, reason: "Denied scope")

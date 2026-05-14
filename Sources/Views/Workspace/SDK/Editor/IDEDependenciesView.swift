@@ -5,6 +5,7 @@ struct IDEDependenciesView: View {
     private let conflictResolver = SDKDependencyConflictResolver()
     @State private var selectedNodeID: UUID?
     @State private var resolutionState: ResolutionState = .idle
+    @State private var vulnerabilities: [String: [String]] = [:]
 
     enum ResolutionState: String {
         case idle = "Idle"
@@ -23,6 +24,12 @@ struct IDEDependenciesView: View {
                 } label: {
                     Label("Resolve Graph", systemImage: "arrow.triangle.2.circlepath")
                 }
+
+                Button {
+                    scanForVulnerabilities()
+                } label: {
+                    Label("Scan for Vulnerabilities", systemImage: "shield.lefthalf.filled")
+                }
             }
 
             Section("Dependency Operations") {
@@ -37,6 +44,19 @@ struct IDEDependenciesView: View {
                     Label("Remove Selected", systemImage: "trash")
                 }
                 .disabled(selectedNodeID == nil)
+            }
+
+            if !vulnerabilities.isEmpty {
+                Section("Security Vulnerabilities") {
+                    ForEach(Array(vulnerabilities.keys.sorted()), id: \.self) { nodeName in
+                        VStack(alignment: .leading) {
+                            Text(nodeName).font(.subheadline.bold()).foregroundStyle(.red)
+                            ForEach(vulnerabilities[nodeName] ?? [], id: \.self) { vuln in
+                                Text("• \(vuln)").font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
             }
 
             let conflicts = conflictResolver.conflicts(in: state.dependencies)
@@ -135,6 +155,18 @@ struct IDEDependenciesView: View {
         }
         self.selectedNodeID = nil
         state.recalculateDiagnostics()
+    }
+
+    private func scanForVulnerabilities() {
+        var found: [String: [String]] = [:]
+
+        for node in state.dependencies {
+            let vulns = VulnerabilityDatabase.shared.checkVulnerabilities(for: node.name)
+            if !vulns.isEmpty {
+                found[node.name] = vulns.map { "\($0.id): \($0.name) (\($0.severity))" }
+            }
+        }
+        vulnerabilities = found
     }
 
     private func runResolution() {

@@ -59,9 +59,17 @@ struct ConnectorDefinition: Codable, Identifiable {
     var metadata: ConnectorMetadata = ConnectorMetadata()
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
+    var deploymentTarget: DeploymentTarget = .multiCloud
 
     enum ConnectorStatus: String, Codable {
         case active, inactive, error, connecting
+    }
+
+    enum DeploymentTarget: String, Codable, CaseIterable {
+        case multiCloud = "Multi-Cloud"
+        case aws = "AWS"
+        case azure = "Azure"
+        case gcp = "GCP"
     }
 }
 

@@ -35,6 +35,9 @@ struct PluginDefinition: Codable, Identifiable {
     var executionRules: [ExecutionRule] = []
     var uiExtensions: [UIExtension] = []
     var toolkitTools: [PluginToolkitTool] = []
+    var isolationLevel: IsolationLevel = .standard
+    var eventFilters: [String] = []
+    var sourceChecksum: String?
 
     var permissions: [PluginCapabilityPermission] {
         capabilities.map { PluginCapabilityPermission(capability: $0) }
@@ -428,11 +431,21 @@ enum UIComponentType: String, Codable, CaseIterable {
     case button, panel, modal, textInput, statusIndicator
 }
 
+enum IsolationLevel: String, Codable, CaseIterable {
+    case standard, restricted, isolated, unrestricted
+}
+
 struct PluginToolkitTool: Codable, Identifiable {
     var id: UUID = UUID()
     var name: String
     var category: PluginToolCategory
     var config: [String: String]
+}
+
+struct SecurePluginVault: Codable, Identifiable {
+    var id: UUID = UUID()
+    var pluginID: UUID
+    var encryptedData: String
 }
 
 enum PluginToolCategory: String, Codable, CaseIterable {

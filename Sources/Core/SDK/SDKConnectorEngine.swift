@@ -8,6 +8,14 @@ public final class SDKConnectorEngine: ObservableObject {
     @Published public var connectorHealth: [UUID: ConnectorHealthInfo] = [:]
     @Published public var syncInProgress = false
 
+    private var circuitBreakers: [UUID: CircuitState] = [:]
+    private var perConnectorRateLimits: [UUID: Int] = [:]
+    private var connectorUsageCount: [UUID: Int] = [:]
+
+    private enum CircuitState {
+        case closed, open(until: Date), halfOpen
+    }
+
     private var backgroundSyncTimers: [UUID: AnyCancellable] = [:]
     private let maxSyncRetries = 3
     private let policyEngine = SDKPolicyEngine.shared
@@ -103,6 +111,10 @@ public final class SDKConnectorEngine: ObservableObject {
         backgroundSyncTimers.removeValue(forKey: connectorID)
     }
 
+    public func setConnectorRateLimit(connectorID: UUID, limit: Int) {
+        perConnectorRateLimits[connectorID] = limit
+    }
+
     // MARK: - Health
 
     public func checkHealth() async -> [ConnectorHealthInfo] {
@@ -136,9 +148,28 @@ public final class SDKConnectorEngine: ObservableObject {
     // MARK: - Private
 
     private func syncWithRetry(connector: any BaseConnector) async throws {
+        // Feature 9: Per-connector Rate Limits
+        if let limit = perConnectorRateLimits[connector.id] {
+            let current = connectorUsageCount[connector.id] ?? 0
+            if current >= limit {
+                throw SDKError.executionFailed(reason: "Per-connector rate limit exceeded for \(connector.name)")
+            }
+            connectorUsageCount[connector.id] = current + 1
+        }
+
         guard AuthorizationManager.shared.canUseScopes(connector.requiredScopes) || connector.requiredScopes.isEmpty else {
             connector.disconnect()
             throw SDKError.permissionDenied(scope: connector.requiredScopes.joined(separator: ","))
+        }
+
+        // Feature 2: Health Circuit Breaker
+        if case .open(let until) = circuitBreakers[connector.id] {
+            if Date() < until {
+                SDKLogStore.shared.log("Circuit open for connector \(connector.name), skipping sync", source: "ConnectorEngine", level: .warning)
+                throw SDKError.executionFailed(reason: "Circuit breaker open for \(connector.name)")
+            } else {
+                circuitBreakers[connector.id] = .halfOpen
+            }
         }
 
         var lastError: Error?
@@ -149,6 +180,8 @@ public final class SDKConnectorEngine: ObservableObject {
                 try await connector.sync()
                 await updateHealth(for: connector)
                 auditLogger.log(eventType: .externalAPICall, projectID: SDKProjectManager.shared.currentProject?.id, scope: "external.api.unrestricted", message: "Connector sync succeeded: \(connector.name)")
+
+                circuitBreakers[connector.id] = .closed
                 return
             } catch {
                 lastError = error
@@ -162,6 +195,8 @@ public final class SDKConnectorEngine: ObservableObject {
 
         SDKLogStore.shared.log("\(connector.name) sync failed after \(maxSyncRetries) attempts", source: "SDKConnectorEngine", level: LogLevel.error)
         auditLogger.log(eventType: .externalAPICall, projectID: SDKProjectManager.shared.currentProject?.id, scope: "external.api.unrestricted", message: "Connector sync failed: \(connector.name)", metadata: ["error": lastError?.localizedDescription ?? "Unknown"])
+
+        circuitBreakers[connector.id] = .open(until: Date().addingTimeInterval(60))
         throw lastError ?? SDKError.executionFailed(reason: "Sync failed")
     }
 
@@ -194,7 +229,7 @@ public final class SDKConnectorEngine: ObservableObject {
             operationName: "connector.\(operation)",
             scope: "external.api.unrestricted",
             projectID: SDKProjectManager.shared.currentProject?.id,
-            actorID: "connector-engine",
+            actorID: AuthorizationManager.shared.authSession?.userId ?? "connector-engine",
             apiKey: nil,
             allowedScopes: ["external.api.unrestricted", "*"],
             justification: "Connector operation \(operation)",

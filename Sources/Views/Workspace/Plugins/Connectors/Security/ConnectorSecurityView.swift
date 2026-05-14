@@ -43,6 +43,11 @@ struct ConnectorSecurityView: View {
             Section("Token Policy") {
                 Stepper("\(tokenExpiryHours) Hours", value: $tokenExpiryHours, in: 1...720).font(.subheadline)
                 Toggle("Auto-Refresh", isOn: $autoRefreshTokens)
+
+                Button("Rotate Secrets Now") {
+                    rotateSecrets()
+                }
+                .font(.caption)
             }
 
             CORSConfigSection(enabled: $enableCORS, origins: $allowedOrigins, newOrigin: $newOrigin)
@@ -70,6 +75,18 @@ struct ConnectorSecurityView: View {
         .navigationTitle("Security").navigationBarTitleDisplayMode(.inline)
         .alert("Policy Applied", isPresented: $showingSaveAlert) { Button("OK") {} }
         .alert("Reset Settings?", isPresented: $showingResetAlert) { Button("Cancel", role: .cancel) {}; Button("Reset", role: .destructive) { resetToDefaults() } }
+    }
+
+    private func rotateSecrets() {
+        // Feature 4: Secret Rotation
+        guard var conn = connector else { return }
+        if conn.authConfig.type == .apiKey {
+            let newKey = "tk_" + UUID().uuidString.replacingOccurrences(of: "-", with: "").lowercased()
+            conn.authConfig.credentials["apiKey"] = newKey
+            manager.updateConnector(conn)
+            connector = conn
+            SDKLogStore.shared.log("Rotating secrets for \(conn.name)", source: "SecurityView", level: .info)
+        }
     }
 
     private func resetToDefaults() { rateLimit = 60; enforceTLS = true; allowPublicAccess = false; enableIPWhitelist = false; whitelistedIPs = []; tokenExpiryHours = 24; autoRefreshTokens = true; enableCORS = true; allowedOrigins = ["*"]; enableWebhookSignatures = true; webhookSecret = ""; requestedScopes = ["api.read", "api.write"] }

@@ -16,6 +16,7 @@ public struct AuthSession: Codable, Hashable {
     public let expiresAt: Date
     public let refreshToken: String?
     public let scopes: [String]
+    public var isMFAVerified: Bool = false
 
     public init(
         sessionId: String,
@@ -23,7 +24,8 @@ public struct AuthSession: Codable, Hashable {
         issuedAt: Date,
         expiresAt: Date,
         refreshToken: String? = nil,
-        scopes: [String]
+        scopes: [String],
+        isMFAVerified: Bool = false
     ) {
         self.sessionId = sessionId
         self.userId = userId
@@ -57,7 +59,8 @@ public final class AuthorizationManager: ObservableObject {
         userId: String? = nil,
         scopes: [String],
         sessionDuration: TimeInterval = 60 * 60,
-        refreshToken: String? = nil
+        refreshToken: String? = nil,
+        isMFAVerified: Bool = false
     ) -> AuthSession {
         authState = .authenticating
 
@@ -68,7 +71,8 @@ public final class AuthorizationManager: ObservableObject {
             issuedAt: now,
             expiresAt: now.addingTimeInterval(max(1, sessionDuration)),
             refreshToken: refreshToken,
-            scopes: normalizeScopes(scopes)
+            scopes: normalizeScopes(scopes),
+            isMFAVerified: isMFAVerified
         )
 
         authSession = session
@@ -127,6 +131,14 @@ public final class AuthorizationManager: ObservableObject {
 
     public func validateScope(_ scope: String) -> Bool {
         guard ensureActiveSession() else { return false }
+
+        let definition = SDKPolicyEngine.shared.scopeDefinitions[scope]
+        if let risk = definition?.riskLevel, (risk == .high || risk == .critical) {
+            if authSession?.isMFAVerified == false {
+                return false
+            }
+        }
+
         let granted = activeScopes()
         return hasScope(scope, in: granted)
     }
@@ -213,16 +225,18 @@ public final class AuthorizationManager: ObservableObject {
     }
 
     private func persistSession(_ session: AuthSession) {
-        guard let data = try? JSONEncoder().encode(session) else { return }
-        UserDefaults.standard.set(data, forKey: sessionKey)
+        guard let data = try? JSONEncoder().encode(session),
+              let jsonString = String(data: data, encoding: .utf8) else { return }
+        try? SDKStorageManager.shared.setSecureValue(key: sessionKey, value: jsonString)
     }
 
     private func clearPersistedSession() {
-        UserDefaults.standard.removeObject(forKey: sessionKey)
+        SDKStorageManager.shared.deleteSecureValue(key: sessionKey)
     }
 
     private func loadPersistedSession() {
-        guard let data = UserDefaults.standard.data(forKey: sessionKey),
+        guard let jsonString = SDKStorageManager.shared.getSecureValue(key: sessionKey),
+              let data = jsonString.data(using: .utf8),
               let session = try? JSONDecoder().decode(AuthSession.self, from: data) else {
             authSession = nil
             authState = .unauthenticated

@@ -174,6 +174,7 @@ public struct SDKAppDefinition: SDKModel {
     public var isEnabled: Bool
     public var isSandboxed: Bool
     public var madeForWorkspace: Bool
+    public var requiredScopes: [String] = []
     public let createdAt: Date
     public var updatedAt: Date
 

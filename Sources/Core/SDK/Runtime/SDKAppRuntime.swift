@@ -170,6 +170,24 @@ public final class PluginRuntimeEngine: PluginRuntimeProtocol, ObservableObject 
         return runningApps.contains(id)
     }
 
+    public func sendSecureMessage(from: UUID, to: UUID, message: String) async throws {
+        guard isRunning(from) && isRunning(to) else {
+            throw SDKError.executionFailed(reason: "Apps must be running for secure bridge communication")
+        }
+
+        // Feature 10: Real messaging via EventBus
+        let event = PluginEvent(
+            id: UUID(),
+            capability: .intelligence, // Shared bridge capability
+            action: "secure.bridge.message",
+            payload: ["sender": from.uuidString, "message": message, "target": to.uuidString],
+            timestamp: Date()
+        )
+        PluginEventBus.shared.emit(event)
+
+        await SDKLogStore.shared.log("Secure bridge message from \(from) to \(to)", source: "PluginRuntime", level: .info)
+    }
+
     // MARK: - Persistence
 
     private func saveApps() {

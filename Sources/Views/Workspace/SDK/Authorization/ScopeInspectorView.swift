@@ -6,8 +6,33 @@ struct ScopeInspectorView: View {
     @StateObject private var pluginManager = SDKPluginManager.shared
     @StateObject private var connectorManager = SDKConnectorManager.shared
 
+    @State private var violations: [SDKSecurityManager.SensitiveOperation] = []
+
     var body: some View {
         List {
+            Section("Security Health") {
+                LabeledContent("Status", value: violations.isEmpty ? "Secured" : "Threats Detected")
+                    .foregroundStyle(violations.isEmpty ? .green : .red)
+                LabeledContent("Active Sessions", value: "\(authorizationManager.authSession != nil ? 1 : 0)")
+            }
+
+            Section("Recent Violations") {
+                if violations.isEmpty {
+                    Text("No security violations detected").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(violations) { violation in
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text(violation.scope).font(.caption.monospaced().bold())
+                                Spacer()
+                                Text(violation.timestamp, style: .time).font(.caption2).foregroundStyle(.secondary)
+                            }
+                            Text(violation.reason).font(.caption2).foregroundStyle(.red)
+                        }
+                    }
+                }
+            }
+
             Section("Active Scopes") {
                 if authorizationManager.currentScopes().isEmpty {
                     Text("No active scopes")
@@ -28,6 +53,9 @@ struct ScopeInspectorView: View {
         .listStyle(.insetGrouped)
         .navigationTitle("Scope Inspector")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            violations = SDKSecurityManager.shared.sensitiveOperations
+        }
     }
 
     @ViewBuilder

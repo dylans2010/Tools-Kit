@@ -125,6 +125,15 @@ struct SDKControlCenterView: View {
 
     private var developerSection: some View {
         Section {
+            Button(role: .destructive) {
+                AuthorizationManager.shared.revokeSession()
+                runtime.activeProjects.forEach { runtime.stopProject(id: $0.id) }
+            } label: {
+                Label("Global SDK Kill Switch", systemImage: "bolt.fill")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+
             Toggle(isOn: $runtime.isNoSandboxModeEnabled) {
                 Label {
                     VStack(alignment: .leading, spacing: 2) {

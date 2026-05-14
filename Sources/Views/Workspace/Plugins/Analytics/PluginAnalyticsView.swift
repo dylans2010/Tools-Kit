@@ -14,10 +14,48 @@ struct PluginAnalyticsView: View {
         List {
             overviewSection
             timeRangeSection
+            interactionGraphSection
             pluginUsageSection
             executionTrendsSection
         }
         .navigationTitle("Plugin Analytics")
+    }
+
+    private var interactionGraphSection: some View {
+        Section("Interaction Graph") {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Inter-Plugin Communication Nodes").font(.caption).foregroundStyle(.secondary)
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12).fill(Color.primary.opacity(0.05)).frame(height: 150)
+
+                    let plugins = manager.installedPlugins.prefix(6)
+                    let center = CGPoint(x: 150, y: 75)
+
+                    ForEach(Array(plugins.enumerated()), id: \.element.id) { index, plugin in
+                        let angle = 2.0 * .pi * Double(index) / Double(max(1, plugins.count))
+                        let x = 60.0 * cos(angle)
+                        let y = 50.0 * sin(angle)
+
+                        Circle()
+                            .fill(plugin.isEnabled ? .green : .gray)
+                            .frame(width: 24, height: 24)
+                            .overlay(Text(String(plugin.name.prefix(1))).font(.system(size: 10, weight: .bold)).foregroundStyle(.white))
+                            .offset(x: x, y: y)
+
+                        // Dynamic lines to "main" (first) plugin if it exists
+                        if index > 0 && plugins[0].isEnabled && plugin.isEnabled {
+                            Path { path in
+                                path.move(to: CGPoint(x: center.x + x, y: center.y + y))
+                                path.addLine(to: center)
+                            }
+                            .stroke(Color.blue.opacity(0.2), lineWidth: 1)
+                        }
+                    }
+                }
+                .frame(height: 150)
+                .frame(maxWidth: .infinity)
+            }
+        }
     }
 
     private var overviewSection: some View {

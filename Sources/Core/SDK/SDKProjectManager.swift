@@ -23,11 +23,12 @@ public struct SDKProject: Identifiable, Codable {
     public var healthStatus: HealthStatus
     public var sourceCode: String
     public var requiredScopes: [String]
+    public var ownerIdentifier: String?
 
     private enum CodingKeys: String, CodingKey {
         case id, name, description, createdAt, updatedAt, lastBuiltAt, version, status
         case enabledScopes, enabledPluginIDs, enabledToolIDs, enabledConnectorIDs
-        case automationRules, healthStatus, sourceCode, requiredScopes
+        case automationRules, healthStatus, sourceCode, requiredScopes, ownerIdentifier
     }
 
     public init(
@@ -46,7 +47,8 @@ public struct SDKProject: Identifiable, Codable {
         automationRules: [SDKAutomationRule] = [],
         healthStatus: HealthStatus = .healthy,
         sourceCode: String = "",
-        requiredScopes: [String] = []
+        requiredScopes: [String] = [],
+        ownerIdentifier: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -64,6 +66,7 @@ public struct SDKProject: Identifiable, Codable {
         self.healthStatus = healthStatus
         self.sourceCode = sourceCode
         self.requiredScopes = requiredScopes
+        self.ownerIdentifier = ownerIdentifier
     }
 
     public init(from decoder: Decoder) throws {
@@ -84,6 +87,7 @@ public struct SDKProject: Identifiable, Codable {
         healthStatus = try c.decodeIfPresent(HealthStatus.self, forKey: .healthStatus) ?? .healthy
         sourceCode = try c.decodeIfPresent(String.self, forKey: .sourceCode) ?? ""
         requiredScopes = try c.decodeIfPresent([String].self, forKey: .requiredScopes) ?? []
+        ownerIdentifier = try c.decodeIfPresent(String.self, forKey: .ownerIdentifier)
     }
 }
 
@@ -111,7 +115,13 @@ public final class SDKProjectManager: ObservableObject {
 
     @discardableResult
     public func createProject(name: String, description: String = "", status: SDKProject.ProjectStatus = .draft) -> SDKProject {
-        let project = SDKProject(name: name, description: description, status: status)
+        let ownerId = AuthorizationManager.shared.authSession?.userId
+        let project = SDKProject(
+            name: name,
+            description: description,
+            status: status,
+            ownerIdentifier: ownerId
+        )
         projects.insert(project, at: 0)
         currentProject = project
         try? save()
@@ -196,6 +206,20 @@ public final class SDKProjectManager: ObservableObject {
         }
         currentProject = project
         updateProject(project)
+    }
+
+    @Published public var snapshots: [UUID: SDKProject] = [:]
+
+    public func createSnapshot(for id: UUID) {
+        guard let project = projects.first(where: { $0.id == id }) else { return }
+        snapshots[UUID()] = project
+        SDKLogStore.shared.log("Project snapshot created", source: "SDKProjectManager", level: .info)
+    }
+
+    public func rollback(projectID: UUID, snapshotID: UUID) {
+        guard let snapshot = snapshots[snapshotID] else { return }
+        updateProject(snapshot)
+        SDKLogStore.shared.log("Project rolled back to snapshot", source: "SDKProjectManager", level: .warning)
     }
 
     public func updateHealth() {

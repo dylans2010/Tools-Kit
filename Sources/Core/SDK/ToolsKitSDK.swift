@@ -290,6 +290,10 @@ public final class ToolsKitSDK: ObservableObject {
         dataEngine.invalidateCache(scope: scope)
     }
 
+    public func setMockResponse(scope: SDKScope, response: [SDKDataItem]) {
+        dataEngine.setMockResponse(scope: scope, response: response)
+    }
+
     // MARK: - 6. sdk.localStorage
 
     public func localStorage(key: String) -> Any? {
@@ -607,7 +611,7 @@ extension ToolsKitSDK {
             operationName: operationName,
             scope: scopeName,
             projectID: project?.id,
-            actorID: "workspace-user",
+            actorID: authorizationManager.authSession?.userId ?? "anonymous",
             apiKey: apiKey,
             allowedScopes: allowedScopes.isEmpty ? ["*"] : allowedScopes,
             justification: project?.description,

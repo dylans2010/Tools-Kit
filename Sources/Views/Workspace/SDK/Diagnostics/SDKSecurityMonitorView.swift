@@ -4,8 +4,10 @@ import SwiftUI
 
 struct SDKSecurityMonitorView: View {
     @StateObject private var scopeManager = SDKScopeManager.shared
+    @StateObject private var securityManager = SDKSecurityManager.shared
     @StateObject private var runtime = SDKRuntimeEngine.shared
     @State private var selectedFilter: SecurityFilter = .all
+    @State private var sensitiveOps: [SDKSecurityManager.SensitiveOperation] = []
 
     enum SecurityFilter: String, CaseIterable {
         case all = "All", granted = "Granted", blocked = "Blocked"
@@ -71,10 +73,41 @@ struct SDKSecurityMonitorView: View {
             } header: {
                 Label("Authorized Scopes", systemImage: "lock.open.fill")
             }
+
+            Section {
+                if sensitiveOps.isEmpty {
+                    Text("No sensitive operations detected").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(sensitiveOps) { op in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(op.scope).font(.caption.monospaced().bold())
+                                Spacer()
+                                Text(op.timestamp, style: .time).font(.caption2).foregroundStyle(.secondary)
+                            }
+                            Text(op.reason).font(.caption2).foregroundStyle(.red)
+                        }
+                    }
+                }
+            } header: {
+                Label("Critical Alerts (Live)", systemImage: "bolt.shield.fill")
+            }
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Security Monitor")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            sensitiveOps = securityManager.sensitiveOperations
+        }
+        .task {
+            // Stream-like updates (poll for this implementation)
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                await MainActor.run {
+                    sensitiveOps = securityManager.sensitiveOperations
+                }
+            }
+        }
     }
 }
 

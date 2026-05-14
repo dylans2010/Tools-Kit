@@ -8,13 +8,28 @@ struct SDKDiagnosticsView: View {
     @StateObject private var telemetry = SDKTelemetryEngine.shared
     private let successRateHealthyThreshold: Double = 90
 
+    @State private var complianceIssues: [String] = []
+
     var body: some View {
         let snapshot = makeSnapshot()
 
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 16) {
+                if !complianceIssues.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Compliance Issues", systemImage: "shield.exclamationmark.fill")
+                            .font(.headline).foregroundStyle(.red)
+                        ForEach(complianceIssues, id: \.self) { issue in
+                            Text("• \(issue)").font(.caption).foregroundStyle(.red)
+                        }
+                    }
+                    .padding(12)
+                    .background(Color.red.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+                }
+
                 DiagnosticsHeaderView(lastAuditText: snapshot.lastAuditText) {
                     bgEngine.startHealthCheckLoop()
+                    runComplianceCheck()
                 }
 
                 DiagnosticsStatusPanel(
@@ -177,6 +192,21 @@ struct SDKDiagnosticsView: View {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .short
         return formatter.localizedString(for: date, relativeTo: Date())
+    }
+
+    private func runComplianceCheck() {
+        var issues: [String] = []
+        if let project = projectManager.currentProject {
+            if project.ownerIdentifier == nil { issues.append("Project owner not set (Identity Risk)") }
+            if project.enabledScopes.contains("external.api.unrestricted") && project.description.isEmpty {
+                issues.append("Unrestricted API access requires a justification in project description.")
+            }
+            if project.enabledScopes.count > 10 { issues.append("High scope count: Consider following principle of least privilege.") }
+        }
+        if !SDKBackgroundEngine.shared.systemHealth.pluginSandboxStatus {
+            issues.append("Plugin sandbox is not in a healthy state.")
+        }
+        complianceIssues = issues
     }
 
     private func scopeTitle(_ scope: SDKScope) -> String {

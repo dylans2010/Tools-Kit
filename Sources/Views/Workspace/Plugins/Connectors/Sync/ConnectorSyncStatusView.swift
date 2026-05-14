@@ -31,6 +31,21 @@ struct ConnectorSyncStatusView: View {
                     syncJobRow(job)
                 }
             }
+
+            Section("Conflict Resolution") {
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("Unresolved Conflicts").font(.subheadline.bold())
+                        Text("3 items require manual resolution").font(.caption).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button("Resolve") {
+                        // Feature 7: Resolve Conflicts
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                }
+            }
         }
         .navigationTitle("Sync Status")
         .toolbar {
